@@ -4,16 +4,11 @@
 
 source code control/build system:
 
- * make new module 'cosmo'
- * use maven
+ * extract non-cosmo classes from core into their own cvs module
+   (commons?)
  * precompile jsps for distribution
  * update jackrabbit snapshot (allows us to remove dependency on
    commons-beanutils 2.1)
-
-core:
-
- * migrate from hibernate to jcr for roles and users
- * security subsystem tests
 
 webui:
 
@@ -22,22 +17,16 @@ webui:
    and mails it to the user
  * "forgot password?" function that generates new password and mails
    it to the user
- * email confirmation of account signup
- * admin ability to confirm an unconfirmed account
  * account mgmt screen - change email, password
- * batch remove on user list
- * page,sort,search user list
- * icons on user list for root users
  * see if we can't get Struts to work with "/user/bcm/update" rather
    than "/user/update.do" with "username=bcm" in content body
- * use Sitemesh to provide layout decoration rather than Tiles?
- * bring tests up to date
+ * unit tests
+ * integration tests
 
 webdav:
 
  * tickets
  * iCalendar directory indexes for iCal
- * HTML directory indexes for web browsers
  * PROPPATCH
  * look into litmus failures
  * write tests for all components
@@ -45,16 +34,34 @@ webdav:
 security:
 
  * ticket-based auth
- * digest authen for webdav
- * user mgmt api
- * user mgmt command line tool
-
-install/configure:
-
- * rename start up script to cosmoctl
- * Windows startup script
- * validation of install procedure by other people
+ * tests
 
 dist:
 
  * Windows startup script
+
+LATER RELEASES
+==============
+
+core:
+
+ * migrate from hibernate to jcr for roles and users
+
+webui:
+
+ * use Sitemesh to provide layout decoration rather than Tiles?
+ * batch remove on user list
+ * page,sort,search user list
+ * email confirmation of account signup
+ * admin ability to confirm an unconfirmed account
+ * icons on user list for root users
+
+webdav:
+
+ * HTML directory indexes for web browsers
+
+security:
+
+ * digest authen for webdav
+ * user mgmt api
+ * user mgmt command line tool

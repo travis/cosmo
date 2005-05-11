@@ -1,5 +1,5 @@
 
-                            Cosmo Sharing Server 0.1
+                            Cosmo Sharing Server 0.2
 
 
 WHAT IS COSMO?
@@ -45,7 +45,7 @@ RELEASE-NOTES.txt.
 Legal information is found in LICENSE.txt.
 
 Cosmo's project page is at
-<http://wiki.osafoundation.org/Cosmo/CosmoHome>.
+<http://wiki.osafoundation.org/Journal/CosmoTempHome>.
 
 Issues are tracked at <http://bugzilla.osafoundation.org/>.
 

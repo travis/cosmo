@@ -1,5 +1,5 @@
 
-                            Cosmo Sharing Server 0.1
+                            Cosmo Sharing Server 0.2
                             Installation Instructions
 
 
@@ -32,11 +32,11 @@ following steps:
 
     * Download a binary distribution from:
 
-        http://wiki.osafoundation.org/bin/view/Cosmo/GettingCosmo
+        http://wiki.osafoundation.org/bin/view/Journal/CosmoTempHome
 
     * Unpack the binary distribution into a convenient location so
       that the distribution resides in its own directory
-      (conventionally named cosmo-0.1).  For the purposes of
+      (conventionally named cosmo-0.2).  For the purposes of
       the remainder of this document, the symbolic name
       "$COSMO_HOME" is used to refer to the full pathname of the
       release directory.
@@ -152,7 +152,7 @@ TROUBLESHOOTING
  *** First read the Release Notes! ***
 
     You can find the release notes for Cosmo at
-    $COSMO_HOME/RELEASE_NOTES.txt. Please read them and become
+    $COSMO_HOME/docs/RELEASE_NOTES.txt. Please read them and become
     familiar with all of the known issues before asking for help. If
     your question is not answered there, check README.txt for mailing
     list and bug tracker information.

@@ -1,5 +1,5 @@
 
-                            Cosmo Sharing Server 0.1
+                            Cosmo Sharing Server 0.2
                            Frequently Asked Questions
 
 
@@ -9,41 +9,45 @@ BUILDING
 Q: Wow, the build seems to be downloading a lot of jars. Is that
    normal?
 
-    A: Yes. Cosmo has a lot of external dependencies, which is why we
-       use the Ant Tasks for Maven to manage them. The jars only need
+    A: Yes. Cosmo has a lot of external dependencies. The jars only need
        to be downloaded the first time you build though, and
        afterwards only when we update our dependencies.
 
 Q: Where did all those downloaded jars go?
 
-    A: In your Maven2 repository at ~/.m2/repository.
+    A: In your Maven repository at ~/.maven/repository.
 
-Q: Why is the building downloading JUnit if I already installed it?
+Q: Didn't I download all those jars once before?
 
-    A: One of the jars we depend on has its own dependency on JUnit,
-       so Maven sucks it down into your local repository (see previous
-       question). Our build doesn't look there for JUnit though; it
-       expects you to have installed JUnit in your $ANT_HOME/lib
-       directory. This has the additional benefit of allowing you to
-       use JUnit for projects other than Cosmo.
+    A: Yes, but in 0.2 we have switched from Ant (with the Maven 2.0
+       download management tools for Ant) to Maven 1.0. The repository
+       formats are different, and so we have to set up a new one the
+       first time we build Cosmo.
 
-Q: When running 'ant build', why do I get the error
-   "java.lang.NoClassDefFoundError: org/apache/tools/ant/types/FileList$FileName"?
+Q: The build fails because Maven can't download one of my jars. What's
+   going on?
 
-    A: You are using an older version of Ant and need to upgrade to
-       1.6.2 or later.
+    A: A few of our dependencies are not distributed by ibiblio
+      (jta.jar is not indepently distributable, and the
+      jcr/jackrabbit/jcr-server jars are built from source). OSAF
+      hosts a Maven repository containing all of the dependencies. You
+      should make sure your project.properties file contains this:
+
+        maven.repo.remote=http://downloads.osafoundation.org/maven/
+
+      and that it is not overridden in your build.properties file.
 
 
 TESTING
 =======
 
-Q: Why do I have to run a separate ant command to set up the test
+Q: Why do I have to run a separate Maven command to set up the test
    database? Can't that be done automatically?
 
     A: No, because we're using HSQLDB in embedded mode, which means
        that the database is owned by a single process. To run our
-       tests, Ant forks off a separate process for JUnit. If we used
-       a single Ant command to set up the test db and run the tests,
+       tests, Maven forks off a separate process for JUnit. If we used
+       a single Maven command to set up the test db and run the tests,
        then the forked JUnit JVM would not be able to access the
        database.
 
@@ -55,7 +59,7 @@ Q: Why are you using an RDBMS anyway?
 
     A: Because it was the easiest way to get up and running. We will
        migrate user and role info to JCR very soon (likely in
-       0.2). This will simplify every stage of the process.
+       0.3). This will simplify every stage of the process.
 
 
 $Id$

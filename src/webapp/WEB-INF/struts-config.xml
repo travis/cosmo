@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE struts-config PUBLIC
+          "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN"
+          "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+
+<struts-config>
+
+  <form-beans>
+    <form-bean name="createUserForm" type="org.osaf.cosmo.ui.UserForm"/>
+    <form-bean name="updateUserForm" type="org.osaf.cosmo.ui.UserForm"/>
+  </form-beans>
+
+  <global-exceptions>
+    <exception type="java.lang.Throwable" key="ignore"
+               handler="org.osaf.struts.OSAFExceptionHandler"/>
+  </global-exceptions>
+
+  <global-forwards type="org.apache.struts.action.ActionForward">
+    <forward name="error" path="/error.do" redirect="false"/>
+  </global-forwards>
+
+  <action-mappings>
+    <action path="/error"
+            type="org.osaf.cosmo.ui.CosmoErrorAction">
+      <forward name="error.general" path="error.general"
+               redirect="false"/>
+      <forward name="error.connect" path="error.connect"
+               redirect="false"/>
+      <forward name="error.notfound" path="error.notfound"
+               redirect="false"/>
+    </action>
+
+    <!-- session/welcome actions -->
+
+    <action path="/login"
+            forward="login"/>
+
+    <action path="/welcome"
+            forward="welcome"/>
+
+    <action path="/logout"
+            type="org.osaf.struts.OSAFLogoutAction">
+      <forward name="ok" path="/" redirect="true"/>
+    </action>
+
+    <!-- user actions -->
+
+    <action path="/user"
+            type="org.osaf.cosmo.ui.UserAction"
+            name="updateUserForm"
+            scope="request"
+            validate="false"
+            parameter="view">
+      <forward name="ok" path="user.view"/>
+    </action>
+
+    <action path="/user/update"
+            type="org.osaf.cosmo.ui.UserAction"
+            name="updateUserForm"
+            scope="request"
+            validate="true"
+            input="/user.do"
+            parameter="update">
+      <forward name="cancel" path="/users" redirect="true"/>
+      <forward name="failure" path="/user.do"/>
+      <forward name="success" path="/users" redirect="true"/>
+    </action>
+
+    <action path="/user/remove"
+            type="org.osaf.cosmo.ui.UserAction"
+            parameter="remove">
+      <forward name="success" path="/users" redirect="true"/>
+    </action>
+
+    <action path="/users"
+            type="org.osaf.cosmo.ui.UserAction"
+            name="createUserForm"
+            scope="request"
+            validate="false"
+            parameter="list">
+      <forward name="ok" path="user.list"/>
+    </action>
+
+    <action path="/user/create"
+            type="org.osaf.cosmo.ui.UserAction"
+            name="createUserForm"
+            scope="request"
+            validate="true"
+            input="/users.do"
+            parameter="create">
+      <forward name="failure" path="/users.do"/>
+      <forward name="success" path="/users" redirect="true"/>
+    </action>
+  </action-mappings>
+
+  <controller nocache="true"
+              processorClass="org.springframework.web.struts.DelegatingTilesRequestProcessor"/>
+
+  <message-resources parameter="MessageResources" null="false"/>    
+
+  <plug-in className="org.apache.struts.tiles.TilesPlugin">
+    <set-property property="definitions-config"
+                  value="/WEB-INF/tiles-config.xml"/>
+    <set-property property="definitions-parser-validate"
+                  value="true"/>
+  </plug-in>
+
+  <plug-in className="org.apache.struts.validator.ValidatorPlugIn">
+    <set-property property="pathnames"
+                  value="/WEB-INF/validator-rules.xml
+                         ,/WEB-INF/validation.xml"/>
+    <set-property property="stopOnFirstError" value="false"/>
+  </plug-in>
+
+  <plug-in
+     className="org.springframework.web.struts.ContextLoaderPlugIn"/>
+</struts-config>

@@ -1,0 +1,61 @@
+
+                            Cosmo Sharing Server 0.1
+                           Frequently Asked Questions
+
+
+BUILDING
+========
+
+Q: Wow, the build seems to be downloading a lot of jars. Is that
+   normal?
+
+    A: Yes. Cosmo has a lot of external dependencies, which is why we
+       use the Ant Tasks for Maven to manage them. The jars only need
+       to be downloaded the first time you build though, and
+       afterwards only when we update our dependencies.
+
+Q: Where did all those downloaded jars go?
+
+    A: In your Maven2 repository at ~/.m2/repository.
+
+Q: Why is the building downloading JUnit if I already installed it?
+
+    A: One of the jars we depend on has its own dependency on JUnit,
+       so Maven sucks it down into your local repository (see previous
+       question). Our build doesn't look there for JUnit though; it
+       expects you to have installed JUnit in your $ANT_HOME/lib
+       directory. This has the additional benefit of allowing you to
+       use JUnit for projects other than Cosmo.
+
+Q: When running 'ant build', why do I get the error
+   "java.lang.NoClassDefFoundError: org/apache/tools/ant/types/FileList$FileName"?
+
+    A: You are using an older version of Ant and need to upgrade to
+       1.6.2 or later.
+
+
+TESTING
+=======
+
+Q: Why do I have to run a separate ant command to set up the test
+   database? Can't that be done automatically?
+
+    A: No, because we're using HSQLDB in embedded mode, which means
+       that the database is owned by a single process. To run our
+       tests, Ant forks off a separate process for JUnit. If we used
+       a single Ant command to set up the test db and run the tests,
+       then the forked JUnit JVM would not be able to access the
+       database.
+
+
+DEPLOYMENT
+==========
+
+Q: Why are you using an RDBMS anyway?
+
+    A: Because it was the easiest way to get up and running. We will
+       migrate user and role info to JCR very soon (likely in
+       0.2). This will simplify every stage of the process.
+
+
+$Id$

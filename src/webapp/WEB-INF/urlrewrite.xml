@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 2.0//EN"
+          "http://tuckey.org/res/dtds/urlrewrite2.dtd">
+
+<urlrewrite>
+  <!-- error rules -->
+  <rule>
+    <from>^/error$</from>
+    <to>/error.do</to>
+  </rule>
+
+  <!-- session/welcome rules -->
+  <rule>
+    <from>^/login$</from>
+    <to>/login.do</to>
+  </rule>
+  <rule>
+    <from>^/loginfailed$</from>
+    <to>/login.do?login_failed=1</to>
+  </rule>
+  <rule>
+    <from>^/welcome$</from>
+    <to>/welcome.do</to>
+  </rule>
+  <rule>
+    <from>^/logout$</from>
+    <to>/logout.do</to>
+  </rule>
+
+  <!-- user rules -->
+  <rule>
+    <from>^/users$</from>
+    <to>/users.do</to>
+  </rule>
+  <rule>
+    <from>^/user/([a-z]+)$</from>
+    <to>/user.do?username=$1</to>
+  </rule>
+
+  <!-- homedir rules -->
+  <rule>
+    <from>^/home$</from>
+    <to>/home/</to>
+  </rule>
+</urlrewrite>

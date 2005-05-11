@@ -1,0 +1,177 @@
+
+                            Cosmo Sharing Server 0.1
+                            Installation Instructions
+
+
+TOMCAT BUNDLE
+=============
+
+In order to install and run Cosmo bundled with Tomcat, perform the
+following steps:
+
+
+(1) Download and install a Java Runtime Environment
+
+    * Download a JRE release (version 1.4 or later) from:
+
+        http://java.sun.com/j2se/
+
+    * Install the JRE according to the instructions included with the
+      release.
+
+    * Set an environment variable JAVA_HOME to the pathname of the
+      directory into which you installed the JDK release.
+
+
+(2) Download and install the Cosmo binary distribution
+
+    NOTE: As an alternative to downloading a binary distribution, you
+    can create your own from the source repository, as described in
+    BUILD.txt.  If you do this, the release directory will be created
+    inside the "dist" directory of the source distribution.
+
+    * Download a binary distribution from:
+
+        http://wiki.osafoundation.org/bin/view/Cosmo/GettingCosmo
+
+    * Unpack the binary distribution into a convenient location so
+      that the distribution resides in its own directory
+      (conventionally named cosmo-0.1).  For the purposes of
+      the remainder of this document, the symbolic name
+      "$COSMO_HOME" is used to refer to the full pathname of the
+      release directory.
+
+
+(3) Configure SSL (OPTIONAL)
+
+    * Create a certificate keystore by executing the following
+      command as the user which will run Cosmo, specifying
+      a password value of "cosmo" for both the keystore password
+      and the key (certificate) password:
+
+        Unix:
+
+        $JAVA_HOME/bin/keytool -genkey -alias osafcosmo -keyalg RSA
+
+        Windows:
+
+        -- not yet supported --
+
+    * Uncomment the SSL Connector entry in
+      $COSMO_HOME/tomcat/conf/server.xml:
+
+        <Connector port="8443" enableLookups="false" secure="true"
+                   scheme="https" clientAuth="want"
+                   keystorePass="osafcosmo"/>
+
+    For more information on creating a keystore, importing an
+    existing certificates into a keystore, and configuring the SSL
+    connector in Tomcat, see:
+
+        http://jakarta.apache.org/tomcat/tomcat-5.0-doc/ssl-howto.html
+
+
+(4) Start Cosmo
+
+    Cosmo can be started by executing the following command:
+
+        Unix:
+
+        $COSMO_HOME/bin/cosmoctl start
+
+        Windows:
+
+        -- not yet supported --
+
+    Cosmo's data store contains:
+
+        data/db                       the embedded HSQLDB database for
+                                      users and roles
+        data/repository               the Jackrabbit content repository
+
+    Cosmo writes the following log files:
+
+        logs/cosmo.log                log output from Cosmo webapp and most
+                                      Tomcat components
+        logs/access.YYYY-MM-DD.log    HTTP access log (configured in
+                                      tomcat/conf/Cataalina/localhost/cosmo.xml)
+        tomcat/logs/catalina.out      Tomcat startup notices and other info
+                                      it sends to STDOUT
+
+    cosmo.log is rotated when the file reaches 1000KB in size. One
+    old log will be maintained (with the ".1" suffix). This
+    configuration can be modified by editing *both*
+    $COSMO_HOME/tomcat/common/classes/log4j.xml and
+    $COSMO_HOME/tomcat/webapps/cosmo/WEB-INF/classes/log4j.xml. The
+    appender configurations for these files should match exactly; the
+    results of not doing so are undetermined. See
+    <http://logging.apache.org/log4j/docs/> for more information on
+    Log4j configuration.
+
+    The access log is rotated at midnight each night. Old logs are not
+    cleaned up. This configuration can be modified by editing
+    $COSMO_HOME/tomcat/conf/Catalina/localhost/cosmo.xml. See
+    <http://jakarta.apache.org/tomcat/tomcat-5.0-doc/config/valve.html>
+    for more information on Tomcat Access Log Valve configuration.
+
+    catalina.out is not rotated. It simply captures STDOUT output for
+    the Tomcat java process. It will very rarely contain anything
+    other than Tomcat startup notices.
+
+
+(5) Use Cosmo
+
+    After startup, the server's welcome page is viewable at
+    (username 'root', password 'cosmo'):
+
+        http://localhost:8080/
+        https://localhost:8443/                (if you enabled SSL)
+
+    You should immediately change the root user's password in the
+    "Users" section of the admin console.
+
+    You can use a WebDAV client to view the user home directory
+    workspace (same credentials as above):
+
+        http://localhost:8080/home/
+        https://localhost:8443/home/           (if you enabled SSL)
+
+
+STANDALONE WEBAPP
+=================
+
+Future releases of Cosmo will provide a standalone webapp distribution
+that you can deploy into an existing application server. Advanced
+users should be able to do this today by examining the customized
+config files in the Tomcat bundle distribution.
+
+
+TROUBLESHOOTING
+===============
+
+ *** First read the Release Notes! ***
+
+    You can find the release notes for Cosmo at
+    $COSMO_HOME/RELEASE_NOTES.txt. Please read them and become
+    familiar with all of the known issues before asking for help. If
+    your question is not answered there, check README.txt for mailing
+    list and bug tracker information.
+
+
+Common Gotchas:
+
+    * If another process is listening on port 8080, you will need to
+      change the port on which Tomcat's connector listens. Edit the
+      Connector entry in $COSMO_HOME/tomcat/conf/server.xml and change
+      the port attribute to specify a port that isn't in use (and that
+      the user running the Cosmo server has the privilege to use):
+
+        <Connector port="8080" enableLookups="false"/>
+
+      If you are running another instance of Tomcat, you may also need
+      to change this instance's shutdown port:
+
+        <Server port="8005" shutdown="SHUTDOWN">
+
+
+$Id$

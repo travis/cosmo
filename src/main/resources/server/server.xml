@@ -1,0 +1,14 @@
+<Server port="8005" shutdown="SHUTDOWN">
+  <Service name="Catalina">
+    <Connector port="8080" enableLookups="false"/>
+<!--
+    <Connector port="8443" enableLookups="false" secure="true"
+               scheme="https" clientAuth="want"
+               keystorePass="osafcosmo"/>
+-->
+    <Engine name="Catalina" defaultHost="localhost">
+      <Host name="localhost" appBase="webapps" autoDeploy="false"
+            deployOnStartup="false" debug="0"/>
+    </Engine>
+  </Service>
+</Server>

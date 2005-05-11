@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd"> 
+
+<beans>
+
+  <!-- Environment entries -->
+
+  <bean id="cosmoVersion" class="java.lang.String">
+    <constructor-arg type="java.lang.String">
+      <value>0.1</value>
+    </constructor-arg>
+  </bean>
+
+  <bean id="cosmoServerAdmin" class="java.lang.String">
+    <constructor-arg type="java.lang.String">
+      <value>root@localhost</value>
+    </constructor-arg>
+  </bean>
+
+  <!-- JDBC data source -->
+
+  <bean id="dataSource"
+        class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName">
+      <value>@DRIVER@</value>
+    </property>
+    <property name="url">
+      <value>@DB_URL@</value>
+    </property>
+    <property name="username">
+      <value>@DB_USERNAME@</value>
+    </property>
+    <property name="password">
+      <value>@DB_PASSWORD@</value>
+    </property>
+  </bean>
+
+  <!-- JCR repository -->
+
+  <bean id="jcrRepository"
+        class="org.osaf.jcr.jackrabbit.JackrabbitRepositoryFactoryBean">
+    <property name="configFilePath">
+      <value>@CONFIGFILEPATH@</value>
+    </property>
+    <property name="repositoryHomeDirPath">
+      <value>@REPOSITORYHOMEDIRPATH@</value>
+    </property>
+    <property name="singleton">
+      <value>false</value>
+    </property>
+  </bean>
+
+  <bean id="authenticationProvider"
+        class="org.osaf.cosmo.TestAuthenticationProvider"/>
+
+</beans>

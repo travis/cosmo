@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+    Application context containing webapp security beans
+-->
+
+<beans>
+
+  <!-- filter chain that kicks off request-time processing -->
+
+<!--
+        /**=channelProcessingFilter,httpSessionContextIntegrationFilter,basicProcessingFilter,securityEnforcementFilter
+-->
+
+  <bean id="uiFilterChainProxy"
+        class="net.sf.acegisecurity.util.FilterChainProxy">
+    <property name="filterInvocationDefinitionSource">
+      <value>
+        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+        PATTERN_TYPE_APACHE_ANT
+        /**=httpSessionContextIntegrationFilter,formBasedProcessingFilter,uiSecurityEnforcementFilter
+      </value>
+    </property>
+  </bean>
+
+  <bean id="davFilterChainProxy"
+        class="net.sf.acegisecurity.util.FilterChainProxy">
+    <property name="filterInvocationDefinitionSource">
+      <value>
+        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+        PATTERN_TYPE_APACHE_ANT
+        /**=httpSessionContextIntegrationFilter,basicProcessingFilter,davSecurityEnforcementFilter
+      </value>
+    </property>
+  </bean>
+
+  <!-- filter that forces all access to come over a secure channel -->
+
+  <bean id="secureChannelProcessor"
+        class="net.sf.acegisecurity.securechannel.SecureChannelProcessor"/>
+   
+  <bean id="channelDecisionManager"
+        class="net.sf.acegisecurity.securechannel.ChannelDecisionManagerImpl">
+    <property name="channelProcessors">
+      <list>
+        <ref local="secureChannelProcessor"/>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="channelProcessingFilter"
+        class="net.sf.acegisecurity.securechannel.ChannelProcessingFilter">
+    <property name="channelDecisionManager">
+      <ref local="channelDecisionManager"/>
+    </property>
+    <property name="filterInvocationDefinitionSource">
+      <value>
+	CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+        PATTERN_TYPE_APACHE_ANT
+	/**=REQUIRES_SECURE_CHANNEL
+      </value>
+    </property>
+  </bean>
+
+  <!-- filter that integrates SecureContext into HTTP Session -->
+
+  <bean id="httpSessionContextIntegrationFilter"
+        class="net.sf.acegisecurity.context.HttpSessionContextIntegrationFilter">
+    <property name="context">
+      <value>net.sf.acegisecurity.context.security.SecureContextImpl</value>
+    </property>
+  </bean>
+
+  <!-- interceptor that performs role-based authorization -->
+
+   <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter"/>
+
+   <bean id="httpRequestAccessDecisionManager"
+         class="net.sf.acegisecurity.vote.AffirmativeBased">
+      <property name="allowIfAllAbstainDecisions">
+        <value>false</value>
+      </property>
+      <property name="decisionVoters">
+        <list>
+          <ref bean="roleVoter"/>
+        </list>
+      </property>
+   </bean>
+
+   <bean id="uiFilterInvocationInterceptor"
+         class="net.sf.acegisecurity.intercept.web.FilterSecurityInterceptor">
+     <property name="authenticationManager">
+       <ref bean="authenticationManager"/>
+     </property>
+     <property name="accessDecisionManager">
+       <ref local="httpRequestAccessDecisionManager"/>
+     </property>
+     <property name="objectDefinitionSource">
+       <value>
+	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+	 PATTERN_TYPE_APACHE_ANT
+         /index.jsp=ROLE_ROOT,ROLE_USER
+         /welcome=ROLE_ROOT,ROLE_USER
+         /logout=ROLE_ROOT,ROLE_USER
+         /users=ROLE_ROOT
+         /user/**=ROLE_ROOT
+       </value>
+     </property>
+   </bean>
+
+   <bean id="davFilterInvocationInterceptor"
+         class="net.sf.acegisecurity.intercept.web.FilterSecurityInterceptor">
+     <property name="authenticationManager">
+       <ref bean="authenticationManager"/>
+     </property>
+     <property name="accessDecisionManager">
+       <ref local="httpRequestAccessDecisionManager"/>
+     </property>
+     <property name="objectDefinitionSource">
+       <value>
+	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+	 PATTERN_TYPE_APACHE_ANT
+         /home/jcr:system=ROLE_ROOT
+         /home/jcr:system/**=ROLE_ROOT
+         /home/**=ROLE_USER,ROLE_ROOT
+       </value>
+     </property>
+   </bean>
+
+   <!-- filter that performs form-based authentication -->
+
+  <bean id="formBasedAuthenticationEntryPoint"
+        class="net.sf.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+    <property name="loginFormUrl">
+      <value>/login</value>
+    </property>
+    <property name="forceHttps">
+      <value>false</value>
+    </property>
+    <!--
+    <property name="forceHttps">
+      <value>true</value>
+    </property>
+    -->
+  </bean>
+
+  <bean id="formBasedProcessingFilter"
+        class="net.sf.acegisecurity.ui.webapp.AuthenticationProcessingFilter">
+    <property name="authenticationManager">
+      <ref bean="authenticationManager"/>
+    </property>
+      <property name="authenticationFailureUrl">
+        <value>/loginfailed</value>
+      </property>
+      <property name="defaultTargetUrl">
+        <value>/</value>
+      </property>
+  </bean>
+
+   <!-- filter that performs BASIC authentication -->
+
+  <bean id="basicAuthenticationEntryPoint"
+        class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
+    <property name="realmName">
+      <value>Cosmo Sharing server</value>
+    </property>
+  </bean>
+
+  <bean id="basicProcessingFilter"
+        class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilter">
+    <property name="authenticationManager">
+      <ref bean="authenticationManager"/>
+    </property>
+    <property name="authenticationEntryPoint">
+      <ref local="basicAuthenticationEntryPoint"/></property>
+  </bean>
+
+  <!-- filter that enforces security constraints on web requests -->
+
+  <bean id="uiSecurityEnforcementFilter"
+        class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
+    <property name="filterSecurityInterceptor">
+      <ref local="uiFilterInvocationInterceptor"/>
+    </property>
+    <property name="authenticationEntryPoint">
+      <ref local="formBasedAuthenticationEntryPoint"/>
+    </property>
+  </bean>
+
+  <bean id="davSecurityEnforcementFilter"
+        class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
+    <property name="filterSecurityInterceptor">
+      <ref local="davFilterInvocationInterceptor"/>
+    </property>
+    <property name="authenticationEntryPoint">
+      <ref local="basicAuthenticationEntryPoint"/>
+    </property>
+  </bean>
+
+</beans>

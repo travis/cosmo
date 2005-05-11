@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+    Application context containing WebDAV server beans
+-->
+
+<beans>
+
+  <bean id="jcrRepository"
+        class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName">
+      <value>jcr/repositoryFactory</value>
+    </property>
+    <property name="resourceRef">
+      <value>true</value>
+    </property>
+  </bean>
+
+  <bean id="sessionProvider"
+        class="org.osaf.cosmo.dav.impl.CosmoDavSessionProviderImpl">
+    <property name="repository">
+      <ref local="jcrRepository"/>
+    </property>
+    <property name="securityManager">
+      <ref bean="securityManager"/>
+    </property>
+    <property name="workspaceName">
+      <value>homedir</value>
+    </property>
+  </bean>
+
+  <bean id="lockManager"
+        class="org.apache.jackrabbit.server.simple.dav.lock.SimpleLockManager"/>
+
+  <bean id="resourceFactory"
+        class="org.osaf.cosmo.dav.impl.CosmoDavResourceFactoryImpl">
+    <property name="lockManager">
+      <ref local="lockManager"/>
+    </property>
+  </bean>
+
+</beans>

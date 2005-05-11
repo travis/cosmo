@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+  <appender name="FILE" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="logs/cosmo.log"/>
+    <param name="MaxFileSize" value="1000KB"/>
+    <param name="MaxBackupIndex" value="1"/>
+    <param name="BufferedIO" value="false"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern"
+             value="%d{ISO8601} %-5p [%c{1}] %m%n"/>
+    </layout>
+  </appender>
+
+  <logger name="net.sf">
+    <level value="WARN"/>
+  </logger>
+
+  <logger name="net.sf.acegisecurity">
+    <level value="WARN"/>
+  </logger>
+
+  <logger name="org.apache">
+    <level value="WARN"/>
+  </logger>
+
+  <logger name="org.apache.jackrabbit">
+    <level value="WARN"/>
+  </logger>
+
+  <logger name="org.apache.catalina.startup.Catalina">
+    <level value="INFO"/>
+  </logger>
+
+  <logger name="org.springframework">
+    <level value="WARN"/>
+  </logger>
+
+  <logger name="org.osaf">
+    <level value="DEBUG"/>
+  </logger>
+
+  <logger name="org.tuckey">
+    <level value="WARN"/>
+  </logger>
+
+  <root>
+    <level value="WARN"/>
+    <appender-ref ref="FILE"/>
+  </root>
+
+</log4j:configuration>

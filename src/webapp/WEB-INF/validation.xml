@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE form-validation PUBLIC
+          "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.0//EN"
+          "http://jakarta.apache.org/commons/dtds/validator_1_0.dtd">
+
+<form-validation>
+   <global>
+      <constant>
+        <constant-name>username</constant-name>
+        <constant-value>^[\w\s.\-\']+$</constant-value>
+      </constant>
+   </global>
+   <formset>
+     <form name="createUserForm">
+       <field property="username"
+              depends="required,mask,minlength,maxlength">
+         <msg name="required" key="Form.FieldRequired"/>
+         <msg name="mask" key="User.Form.UsernameInvalid"/>
+         <msg name="minlength" key="Form.Length"/>
+         <msg name="maxlength" key="Form.Length"/>
+         <arg0 name="minlength" key="${var:minlength}" resource="false"/>
+         <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
+         <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
+         <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
+         <var>
+           <var-name>mask</var-name>
+           <var-value>${username}</var-value>
+         </var>
+         <var>
+           <var-name>minlength</var-name>
+           <var-value>3</var-value>
+         </var>
+         <var>
+           <var-name>maxlength</var-name>
+           <var-value>32</var-value>
+         </var>
+       </field>
+       <field property="email"
+              depends="required,maxlength">
+         <msg name="required" key="Form.FieldRequired"/>
+         <msg name="maxlength" key="Form.Length"/>
+         <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
+         <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
+         <var>
+           <var-name>minlength</var-name>
+           <var-value>1</var-value>
+         </var>
+         <var>
+           <var-name>maxlength</var-name>
+           <var-value>32</var-value>
+         </var>
+       </field>
+       <field property="password"
+              depends="required,minlength,maxlength">
+         <msg name="required" key="Form.FieldRequired"/>
+         <msg name="minlength" key="Form.Length"/>
+         <msg name="maxlength" key="Form.Length"/>
+         <arg0 name="minlength" key="${var:minlength}" resource="false"/>
+         <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
+         <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
+         <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
+         <var>
+           <var-name>minlength</var-name>
+           <var-value>5</var-value>
+         </var>
+         <var>
+           <var-name>maxlength</var-name>
+           <var-value>16</var-value>
+         </var>
+       </field>
+       <field property="confirm"
+              depends="required,validwhen">
+         <msg name="required" key="Form.FieldRequired"/>
+         <msg name="validwhen" key="User.Form.PasswordMismatch"/>
+         <var>
+           <var-name>test</var-name>
+           <var-value>(*this* == password)</var-value>
+         </var>
+       </field>
+       <field property="role"
+              depends="required">
+         <msg name="required" key="Form.AtLeastOneRequired"/>
+       </field>
+     </form>
+     <form name="updateUserForm">
+       <field property="email"
+              depends="required,maxlength">
+         <msg name="required" key="Form.FieldRequired"/>
+         <msg name="maxlength" key="Form.Length"/>
+         <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
+         <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
+         <var>
+           <var-name>minlength</var-name>
+           <var-value>1</var-value>
+         </var>
+         <var>
+           <var-name>maxlength</var-name>
+           <var-value>32</var-value>
+         </var>
+       </field>
+       <field property="password"
+              depends="minlength,maxlength">
+         <msg name="minlength" key="Form.Length"/>
+         <msg name="maxlength" key="Form.Length"/>
+         <arg0 name="minlength" key="${var:minlength}" resource="false"/>
+         <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
+         <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
+         <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
+         <var>
+           <var-name>minlength</var-name>
+           <var-value>5</var-value>
+         </var>
+         <var>
+           <var-name>maxlength</var-name>
+           <var-value>16</var-value>
+         </var>
+       </field>
+       <field property="confirm"
+              depends="validwhen">
+         <msg name="validwhen" key="User.Form.PasswordMismatch"/>
+         <var>
+           <var-name>test</var-name>
+           <var-value>((password == null) or (*this* == password))</var-value>
+         </var>
+       </field>
+       <field property="role"
+              depends="required">
+         <msg name="required" key="Form.AtLeastOneRequired"/>
+       </field>
+     </form>
+   </formset>
+</form-validation>

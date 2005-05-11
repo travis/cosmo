@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+          "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN"
+          "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd">
+
+<tiles-definitions>
+
+  <!-- standard layout defs -->
+
+  <definition name="layout.standard" page="/WEB-INF/jsp/layout.jsp">
+    <put name="body"         value="Replace!"/>
+    <put name="prefix"       value=""/>
+    <put name="nav"          value="/WEB-INF/jsp/nav.jsp"/>
+  </definition>
+
+  <!-- error defs -->
+
+  <definition name="error.general" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/error/general.jsp"/>
+    <put name="prefix"       value="Error.General."/>
+    <put name="nav"          value=""/>
+  </definition>
+
+  <definition name="error.connect" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/error/connect.jsp"/>
+    <put name="prefix"       value="Error.Connect."/>
+    <put name="nav"          value=""/>
+  </definition>
+
+  <definition name="error.notfound" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/error/notfound.jsp"/>
+    <put name="prefix"       value="Error.NotFound."/>
+    <put name="nav"          value=""/>
+  </definition>
+
+  <!-- session/welcome defs -->
+
+  <definition name="login" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/login.jsp"/>
+    <put name="prefix"       value="Login."/>
+    <put name="showNav"      value="false"/>
+  </definition>
+
+  <definition name="welcome" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/welcome.jsp"/>
+    <put name="prefix"       value="Welcome."/>
+  </definition>
+
+  <!-- user defs -->
+
+  <definition name="user.view" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/user/view.jsp"/>
+    <put name="prefix"       value="User.View."/>
+  </definition>
+
+  <definition name="user.form" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/user/form.jsp"/>
+    <put name="prefix"       value="User.Form."/>
+  </definition>
+
+  <definition name="user.list" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/user/list.jsp"/>
+    <put name="prefix"       value="User.List."/>
+  </definition>
+
+</tiles-definitions>

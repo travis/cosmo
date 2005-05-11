@@ -1,0 +1,14 @@
+
+                            Cosmo Sharing Server 0.1
+                                  Release Notes
+
+
+============================
+KNOWN ISSUES IN THIS RELEASE
+============================
+
+
+ * Bug #2584: OS X WebFS does not interoperate with Cosmo. 
+
+
+$Id$

@@ -1,4 +1,4 @@
-package org.osaf.jcr.jackrabbit;
+package org.osaf.spring.jcr.jackrabbit;
 
 import javax.jcr.Repository;
 

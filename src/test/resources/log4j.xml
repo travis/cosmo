@@ -25,7 +25,7 @@
     <level value="DEBUG"/>
   </logger>
 
-  <logger name="org.osaf.jcr">
+  <logger name="org.osaf.spring.jcr.jackrabbit">
     <level value="WARN"/>
   </logger>
 

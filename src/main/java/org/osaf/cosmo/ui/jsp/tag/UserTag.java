@@ -1,10 +1,10 @@
 package org.osaf.cosmo.ui.jsp.tag;
 
 import org.osaf.commons.jsp.tag.SimpleVarSetterTag;
+import org.osaf.commons.spring.web.util.WebApplicationContextAwareTagUtils;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
-import org.osaf.spring.web.util.WebApplicationContextAwareTagUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspException;

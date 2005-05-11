@@ -8,7 +8,7 @@
   <!-- JCR Resources -->
 
   <bean id="homedirTemplate"
-        class="org.osaf.spring.jcr.JCRTemplate">
+        class="org.osaf.commons.spring.jcr.JCRTemplate">
     <property name="authenticationProvider">
       <ref bean="authenticationProvider"/>
     </property>

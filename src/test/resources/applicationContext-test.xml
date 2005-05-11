@@ -40,7 +40,7 @@
   <!-- JCR repository -->
 
   <bean id="jcrRepository"
-        class="org.osaf.spring.jcr.jackrabbit.JackrabbitRepositoryFactoryBean">
+        class="org.osaf.commons.spring.jcr.jackrabbit.JackrabbitRepositoryFactoryBean">
     <property name="configFilePath">
       <value>@CONFIGFILEPATH@</value>
     </property>

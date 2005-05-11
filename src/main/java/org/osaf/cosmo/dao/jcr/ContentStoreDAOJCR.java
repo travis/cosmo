@@ -1,8 +1,8 @@
 package org.osaf.cosmo.dao.jcr;
 
+import org.osaf.commons.spring.jcr.JCRCallback;
+import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
 import org.osaf.cosmo.dao.ShareDAO;
-import org.osaf.spring.jcr.JCRCallback;
-import org.osaf.spring.jcr.support.JCRDaoSupport;
 
 import javax.jcr.Item;
 import javax.jcr.Node;

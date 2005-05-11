@@ -1,7 +1,7 @@
 package org.osaf.cosmo.spring.jcr;
 
+import org.osaf.commons.spring.jcr.JCRAuthenticationProvider;
 import org.osaf.cosmo.security.CosmoSecurityManager;
-import org.osaf.spring.jcr.JCRAuthenticationProvider;
 
 import javax.jcr.Credentials;
 import javax.security.auth.Subject;

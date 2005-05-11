@@ -269,8 +269,17 @@
     </dependency>
     <dependency>
       <!-- from internal repository -->
-      <groupId>osaf</groupId>
-      <artifactId>osaf-spring</artifactId>
+      <groupId>osaf-commons</groupId>
+      <artifactId>osaf-commons-spring</artifactId>
+      <version>0.1</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <!-- from internal repository -->
+      <groupId>osaf-commons</groupId>
+      <artifactId>osaf-commons-jsp</artifactId>
       <version>0.1</version>
       <properties>
         <war.bundle>true</war.bundle>

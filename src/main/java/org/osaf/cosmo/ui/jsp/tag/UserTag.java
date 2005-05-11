@@ -1,9 +1,9 @@
 package org.osaf.cosmo.ui.jsp.tag;
 
+import org.osaf.commons.jsp.tag.SimpleVarSetterTag;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
-import org.osaf.jsp.tag.SimpleVarSetterTag;
 import org.osaf.spring.web.util.WebApplicationContextAwareTagUtils;
 
 import javax.servlet.ServletContext;
@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
  * the current Cosmo security context as the value of a scripting
  * variable.
  *
- * @see org.osaf.jsp.tag.SimpleVarSetterTag
+ * @see org.osaf.commons.jsp.tag.SimpleVarSetterTag
  */
 public class UserTag extends SimpleVarSetterTag {
     private static final Log log = LogFactory.getLog(UserTag.class);

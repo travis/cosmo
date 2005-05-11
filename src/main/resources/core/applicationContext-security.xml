@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+    Application context containing common security beans
+-->
+
+<beans>
+
+  <!-- Authentication -->
+
+  <bean id="securityManager"
+        class="org.osaf.cosmo.security.impl.CosmoSecurityManagerImpl">
+    <property name="userDAO">
+      <ref bean="userDAO"/>
+    </property>
+  </bean>
+
+  <bean id="authenticationDao"
+        class="org.osaf.cosmo.acegisecurity.UserAuthenticationDao">
+    <property name="securityManager">
+      <ref local="securityManager"/>
+    </property>
+  </bean>
+
+  <bean id="passwordEncoder"
+        class="net.sf.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
+
+  <bean id="daoAuthenticationProvider"
+        class="net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider">
+    <property name="authenticationDao">
+      <ref local="authenticationDao"/>
+    </property>
+    <property name="passwordEncoder">
+      <ref local="passwordEncoder"/>
+    </property>
+  </bean>
+
+  <bean id="authenticationManager"
+        class="net.sf.acegisecurity.providers.ProviderManager">
+    <property name="providers">
+      <list>
+        <ref local="daoAuthenticationProvider"/>
+      </list>
+    </property>
+  </bean>
+
+</beans>

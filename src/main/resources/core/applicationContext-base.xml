@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd"> 
+
+<beans>
+
+  <!-- Environment Entries -->
+
+  <bean id="cosmoVersion"
+        class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName">
+      <value>cosmo/version</value>
+    </property>
+    <property name="resourceRef">
+      <value>true</value>
+    </property>
+  </bean>
+
+  <bean id="cosmoServerAdmin"
+        class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName">
+      <value>cosmo/serverAdmin</value>
+    </property>
+    <property name="resourceRef">
+      <value>true</value>
+    </property>
+  </bean>
+
+</beans>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+          "-//Hibernate/Hibernate Configuration DTD 2.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-configuration-2.0.dtd"> 
+
+<hibernate-configuration>
+  <session-factory>
+    <property name="show_sql">false</property>
+    <property name="use_outer_join">false</property>
+    <mapping resource="Role.hbm.xml"/>
+    <mapping resource="User.hbm.xml"/>
+    <class-cache class="org.osaf.cosmo.model.Role"
+                 usage="read-write"/>
+    <collection-cache collection="org.osaf.cosmo.model.Role.users"
+                      usage="read-write"/>
+    <class-cache class="org.osaf.cosmo.model.User"
+                 usage="read-write"/>
+    <collection-cache collection="org.osaf.cosmo.model.User.roles"
+                      usage="read-write"/>
+  </session-factory>
+</hibernate-configuration>

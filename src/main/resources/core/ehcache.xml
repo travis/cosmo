@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ehcache>
+  <diskStore path="java.io.tmpdir"/>
+  <defaultCache
+         eternal="false" maxElementsInMemory="100000"
+         overflowToDisk="true" timeToIdleSeconds="300"
+         timeToLiveSeconds="300" diskPersistent="false"
+         diskExpiryThreadIntervalSeconds="120"/>
+  <cache name="org.osaf.cosmo.model.Role"
+         eternal="false" maxElementsInMemory="100000"
+         overflowToDisk="true" timeToIdleSeconds="300"
+         timeToLiveSeconds="300" diskPersistent="false"
+         diskExpiryThreadIntervalSeconds="120"/>
+  <cache name="org.osaf.cosmo.model.Role.users"
+         eternal="false" maxElementsInMemory="100000"
+         overflowToDisk="true" timeToIdleSeconds="300"
+         timeToLiveSeconds="300" diskPersistent="false"
+         diskExpiryThreadIntervalSeconds="120"/>
+  <cache name="org.osaf.cosmo.model.User"
+         eternal="false" maxElementsInMemory="100000"
+         overflowToDisk="true" timeToIdleSeconds="300"
+         timeToLiveSeconds="300" diskPersistent="false"
+         diskExpiryThreadIntervalSeconds="120"/>
+  <cache name="org.osaf.cosmo.model.User.roles"
+         eternal="false" maxElementsInMemory="100000"
+         overflowToDisk="true" timeToIdleSeconds="300"
+         timeToLiveSeconds="300" diskPersistent="false"
+         diskExpiryThreadIntervalSeconds="120"/>
+</ehcache>

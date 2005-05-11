@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.or g/dtd/spring-beans.dtd"> 
+
+<beans>
+
+  <!-- Hibernate resources -->
+
+  <bean id="sessionFactory"
+        class="org.springframework.orm.hibernate.LocalSessionFactoryBean">
+    <property name="configLocation">
+      <value>classpath:hibernate.cfg.xml</value>
+    </property>
+    <property name="hibernateProperties">
+      <value>classpath:hibernate.properties</value>
+    </property>
+    <property name="dataSource">
+      <ref bean="dataSource"/>
+    </property>
+  </bean>
+
+  <bean id="transactionManager"
+        class="org.springframework.orm.hibernate.HibernateTransactionManager">
+    <property name="sessionFactory">
+      <ref local="sessionFactory"/>
+    </property>
+  </bean>
+
+</beans>

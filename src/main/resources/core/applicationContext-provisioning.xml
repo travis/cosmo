@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.or g/dtd/spring-beans.dtd"> 
+
+<beans>
+
+  <!-- DAOs -->
+
+  <bean id="roleDAO"
+        class="org.osaf.cosmo.dao.hibernate.RoleDAOHibernate">
+    <property name="sessionFactory">
+      <ref bean="sessionFactory"/>
+    </property>
+  </bean>
+
+  <bean id="userDAO"
+        class="org.osaf.cosmo.dao.hibernate.UserDAOHibernate">
+    <property name="sessionFactory">
+      <ref bean="sessionFactory"/>
+    </property>
+  </bean>
+
+  <bean id="shareDAO"
+        class="org.osaf.cosmo.dao.jcr.ContentStoreDAOJCR">
+    <property name="template">
+      <ref bean="homedirTemplate"/>
+    </property>
+  </bean>
+
+  <!-- Managers -->
+
+  <bean id="provisioningManagerTarget"
+        class="org.osaf.cosmo.manager.impl.ProvisioningManagerImpl">
+    <property name="roleDAO">
+      <ref bean="roleDAO"/>
+    </property>
+    <property name="shareDAO">
+      <ref bean="shareDAO"/>
+    </property>
+    <property name="userDAO">
+      <ref bean="userDAO"/>
+    </property>
+    <property name="digest">
+      <value>MD5</value>
+    </property>
+  </bean>
+
+  <bean id="provisioningManager"
+        class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <property name="transactionManager">
+      <ref bean="transactionManager"/>
+    </property>
+    <property name="target">
+      <ref local="provisioningManagerTarget"/>
+    </property>
+    <property name="transactionAttributes">
+      <props>
+        <prop key="save*">PROPAGATION_REQUIRED</prop>
+        <prop key="update*">PROPAGATION_REQUIRED</prop>
+        <prop key="remove*">PROPAGATION_REQUIRED</prop>
+        <prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+      </props>
+    </property>
+  </bean>
+
+</beans>

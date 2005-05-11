@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+          "-//Hibernate/Hibernate Mapping DTD 2.0//EN" 
+          "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+
+<hibernate-mapping>
+  <class name="org.osaf.cosmo.model.User"
+         table="user"
+         dynamic-update="false"
+         dynamic-insert="false"
+         select-before-update="false"
+         optimistic-lock="version">
+    <id name="id"
+        type="java.lang.Long"
+        unsaved-value="null">
+      <column name="id" 
+              not-null="true"
+              sql-type="long"/>
+      <generator class="native"/>
+    </id>
+    <property name="username"
+              type="java.lang.String"
+              update="true"
+              insert="true"
+              access="property"
+              column="username"
+              length="32"
+              not-null="true"/>
+    <property name="password"
+              type="java.lang.String"
+              update="true"
+              insert="true"
+              access="property"
+              column="password"
+              length="32"
+              not-null="true"/>
+    <property name="email"
+              type="java.lang.String"
+              update="true"
+              insert="true"
+              access="property"
+              column="email"
+              length="32"
+              not-null="true"/>
+    <property name="dateCreated"
+              type="java.util.Date"
+              update="false"
+              insert="true"
+              access="property"
+              column="dateCreated"
+              not-null="true"/>
+    <property name="dateModified"
+              type="java.util.Date"
+              update="true"
+              insert="true"
+              access="property"
+              column="dateModified"
+              not-null="true"/>
+    <set name="roles"
+         table="userrole"
+         lazy="true"
+         inverse="false"
+         cascade="none"
+         sort="unsorted">
+      <key column="userid"/>
+      <many-to-many class="org.osaf.cosmo.model.Role"
+                    column="roleid"
+                    outer-join="auto"/>
+    </set>
+  </class>
+</hibernate-mapping>

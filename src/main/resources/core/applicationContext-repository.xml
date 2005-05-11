@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.or g/dtd/spring-beans.dtd"> 
+
+<beans>
+
+  <!-- JCR Repository -->
+
+  <bean id="jcrRepository"
+        class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName">
+      <value>jcr/repositoryFactory</value>
+    </property>
+    <property name="resourceRef">
+      <value>true</value>
+    </property>
+  </bean>
+
+  <bean id="authenticationProvider"
+        class="org.osaf.cosmo.spring.jcr.CosmoJCRAuthenticationProvider">
+    <property name="securityManager">
+      <ref bean="securityManager"/>
+    </property>
+  </bean>
+
+</beans>

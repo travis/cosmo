@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd"> 
+
+<beans>
+
+  <!-- provisioning actions -->
+
+  <bean name="userAction" abstract="true" singleton="false"
+        class="org.osaf.cosmo.ui.UserAction" >
+    <property name="provisioningManager">
+      <ref bean="provisioningManager"/>
+    </property>
+  </bean>
+
+  <bean name="/users"       parent="userAction"/>
+  <bean name="/user"        parent="userAction"/>
+  <bean name="/user/create" parent="userAction"/>
+  <bean name="/user/update" parent="userAction"/>
+  <bean name="/user/remove" parent="userAction"/>
+
+</beans>

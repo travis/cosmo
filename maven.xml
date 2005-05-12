@@ -97,6 +97,9 @@
         <include name="*.txt"/>
       </fileset>
     </copy>
+    <copy todir="${cosmo.dist.version}/docs/license">
+      <fileset dir="${basedir}/src/docs/license"/>
+    </copy>
     <copy todir="${cosmo.dist.version}/tomcat/conf"
           file="${basedir}/src/main/resources/server/server.xml"/>
     <copy todir="${cosmo.dist.version}/tomcat/conf/Catalina/localhost"

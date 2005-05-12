@@ -1,7 +1,7 @@
 package org.osaf.cosmo.ui;
 
-import org.osaf.struts.OSAFErrorAction;
-import org.osaf.struts.OSAFStrutsConstants;
+import org.osaf.commons.struts.OSAFErrorAction;
+import org.osaf.commons.struts.OSAFStrutsConstants;
 
 import java.net.ConnectException;
 

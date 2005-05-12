@@ -1,11 +1,11 @@
 package org.osaf.cosmo.ui;
 
+import org.osaf.commons.struts.OSAFMappingDispatchAction;
+import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
-import org.osaf.struts.OSAFMappingDispatchAction;
-import org.osaf.struts.OSAFStrutsConstants;
 
 import java.util.Collections;
 import java.util.HashMap;

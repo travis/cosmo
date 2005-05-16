@@ -17,9 +17,13 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<authz:authorize ifAnyGranted="ROLE_USER,ROLE_ROOT">
-  <tiles:insert definition="home.user" flush="false"/>
-</authz:authorize>
-<authz:authorize ifNotGranted="ROLE_USER,ROLE_ROOT">
-  <tiles:insert definition="home.guest" flush="false"/>
-</authz:authorize>
+<p>
+  <fmt:message key="Home.WelcomeMsg">
+    <fmt:param value="${pageContext.request.serverName}"/>
+  </fmt:message>
+</p>
+
+<p>
+  <html:link page="/account/new">Create an account</html:link>
+  or <html:link page="/login">log in</html:link>.
+</p>

@@ -26,7 +26,6 @@
   <definition name="layout.standard" page="/WEB-INF/jsp/layout.jsp">
     <put name="body"         value="Replace!"/>
     <put name="prefix"       value=""/>
-    <put name="nav"          value="/WEB-INF/jsp/nav.jsp"/>
   </definition>
 
   <!-- error defs -->
@@ -34,22 +33,22 @@
   <definition name="error.general" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/error/general.jsp"/>
     <put name="prefix"       value="Error.General."/>
-    <put name="nav"          value=""/>
+    <put name="showNav"      value="false"/>
   </definition>
 
   <definition name="error.connect" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/error/connect.jsp"/>
     <put name="prefix"       value="Error.Connect."/>
-    <put name="nav"          value=""/>
+    <put name="showNav"      value="false"/>
   </definition>
 
   <definition name="error.notfound" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/error/notfound.jsp"/>
     <put name="prefix"       value="Error.NotFound."/>
-    <put name="nav"          value=""/>
+    <put name="showNav"      value="false"/>
   </definition>
 
-  <!-- session/welcome defs -->
+  <!-- login/signup defs -->
 
   <definition name="login" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/login.jsp"/>
@@ -57,9 +56,17 @@
     <put name="showNav"      value="false"/>
   </definition>
 
-  <definition name="welcome" extends="layout.standard">
-    <put name="body"         value="/WEB-INF/jsp/welcome.jsp"/>
-    <put name="prefix"       value="Welcome."/>
+  <!-- home defs -->
+
+  <definition name="home.user" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/home/user.jsp"/>
+    <put name="prefix"       value="Home."/>
+  </definition>
+
+  <definition name="home.guest" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/home/guest.jsp"/>
+    <put name="prefix"       value="Home."/>
+    <put name="showNav"      value="false"/>
   </definition>
 
   <!-- user defs -->

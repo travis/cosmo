@@ -46,18 +46,20 @@
                redirect="false"/>
     </action>
 
-    <!-- session/welcome actions -->
+    <!-- login/signup actions -->
 
     <action path="/login"
             forward="login"/>
 
-    <action path="/welcome"
-            forward="welcome"/>
-
     <action path="/logout"
-            type="org.osaf.struts.OSAFLogoutAction">
+            type="org.osaf.commons.struts.OSAFLogoutAction">
       <forward name="ok" path="/" redirect="true"/>
     </action>
+
+    <!-- home actions -->
+
+    <action path="/home"
+            forward="home.user"/>
 
     <!-- user actions -->
 

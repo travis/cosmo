@@ -117,8 +117,7 @@
        <value>
 	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
 	 PATTERN_TYPE_APACHE_ANT
-         /index.jsp=ROLE_ROOT,ROLE_USER
-         /welcome=ROLE_ROOT,ROLE_USER
+         /home=ROLE_ROOT,ROLE_USER
          /logout=ROLE_ROOT,ROLE_USER
          /users=ROLE_ROOT
          /user/**=ROLE_ROOT

@@ -25,7 +25,7 @@
     <to>/error.do</to>
   </rule>
 
-  <!-- session/welcome rules -->
+  <!-- login/signup rules -->
   <rule>
     <from>^/login$</from>
     <to>/login.do</to>
@@ -35,12 +35,15 @@
     <to>/login.do?login_failed=1</to>
   </rule>
   <rule>
-    <from>^/welcome$</from>
-    <to>/welcome.do</to>
-  </rule>
-  <rule>
     <from>^/logout$</from>
     <to>/logout.do</to>
+  </rule>
+
+  <!-- home rules -->
+
+  <rule>
+    <from>^/home$</from>
+    <to>/home.do</to>
   </rule>
 
   <!-- user rules -->

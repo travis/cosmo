@@ -351,7 +351,16 @@
       </properties>
     </dependency>
     <dependency>
-      <!-- not currently on ibiblio local repository -->
+      <!-- not currently on ibiblio -->
+      <groupId>taglibs</groupId>
+      <artifactId>unstandard</artifactId>
+      <version>20050518</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <!-- not currently on ibiblio -->
       <groupId>urlrewrite</groupId>
       <artifactId>urlrewrite</artifactId>
       <version>2.0.1</version>

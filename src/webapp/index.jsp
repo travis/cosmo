@@ -18,8 +18,8 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
 <authz:authorize ifAnyGranted="ROLE_USER,ROLE_ROOT">
-  <tiles:insert definition="home.user" flush="false"/>
+  <tiles:insert definition="welcome.user" flush="false"/>
 </authz:authorize>
-<authz:authorize ifNotGranted="ROLE_USER,ROLE_ROOT">
-  <tiles:insert definition="home.guest" flush="false"/>
+<authz:authorize ifAnyGranted="ROLE_ANONYMOUS">
+  <tiles:insert definition="welcome.anonymous" flush="false"/>
 </authz:authorize>

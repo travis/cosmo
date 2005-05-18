@@ -18,7 +18,7 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
 <p>
-  <fmt:message key="Home.WelcomeMsg">
+  <fmt:message key="Welcome.WelcomeMsg">
     <fmt:param value="${pageContext.request.serverName}"/>
   </fmt:message>
 </p>

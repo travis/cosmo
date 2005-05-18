@@ -22,18 +22,18 @@
 <cosmo:baseurl var="baseurl"/>
 
 <p>
-  <fmt:message key="Home.WelcomeMsg">
+  <fmt:message key="Welcome.WelcomeMsg">
     <fmt:param value="${pageContext.request.serverName}"/>
   </fmt:message>
 </p>
 <authz:authorize ifAllGranted="ROLE_USER">
   <p>
-    <fmt:message key="Home.User.HomeDirectory"/>
+    <fmt:message key="Welcome.User.HomeDirectory"/>
     <html:link page="${homedir}">
       <b>${baseurl}${homedir}</b>
     </html:link>
   </p>
   <p>
-    <fmt:message key="Home.User.YourHomeDirectory"/>
+    <fmt:message key="Welcome.User.YourHomeDirectory"/>
   </p>
 </authz:authorize>

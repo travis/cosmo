@@ -45,7 +45,7 @@
       <tr>
         <td align="left" valign="top">
           <div class="lg">
-              <c:choose><c:when test="${fn:endsWith(body, '/home/user.jsp') || fn:endsWith(body, '/home/guest.jsp')}"><b><fmt:message key="Layout.Title"/></b></c:when><c:otherwise><html:link page="/"><b><fmt:message key="Layout.Title"/></b></html:link></c:otherwise></c:choose>
+              <c:choose><c:when test="${fn:endsWith(body, '/welcome/user.jsp') || fn:endsWith(body, '/welcome/guest.jsp')}"><b><fmt:message key="Layout.Title"/></b></c:when><c:otherwise><html:link page="/"><b><fmt:message key="Layout.Title"/></b></html:link></c:otherwise></c:choose>
           </div>
         </td>
         <c:if test="${showNav}">
@@ -57,11 +57,11 @@
               </fmt:message>
               |
               <authz:authorize ifAllGranted="ROLE_ROOT">
-                <html:link page="/home/"><fmt:message key="Layout.Nav.Main.Shares"/></html:link>
+                <html:link page="/home/"><fmt:message key="Layout.Nav.Main.HomeDirectories"/></html:link>
               |
               </authz:authorize>
               <authz:authorize ifAllGranted="ROLE_USER">
-                <html:link page="/home/${user.username}/"><fmt:message key="Layout.Nav.Main.Home"/></html:link>
+                <html:link page="/home/${user.username}/"><fmt:message key="Layout.Nav.Main.HomeDirectory"/></html:link>
               |
               </authz:authorize>
               <html:link page="/logout">

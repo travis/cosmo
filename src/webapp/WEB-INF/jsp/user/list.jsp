@@ -80,6 +80,8 @@
   <b><fmt:message key="User.List.NewUser"/></b>
 </p>
 
+<cosmo:errmsg/>
+
 <html:form action="/user/create">
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>

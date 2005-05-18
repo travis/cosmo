@@ -26,18 +26,11 @@
 
   <!-- Authentication -->
 
-  <bean id="securityManager"
-        class="org.osaf.cosmo.security.impl.CosmoSecurityManagerImpl">
-    <property name="userDAO">
-      <ref bean="userDAO"/>
-    </property>
-  </bean>
-
   <bean id="authenticationDao"
         class="org.osaf.cosmo.acegisecurity.UserAuthenticationDao">
-    <property name="securityManager">
-      <ref local="securityManager"/>
-    </property>
+     <property name="userDAO">
+       <ref bean="userDAO"/>
+     </property>
   </bean>
 
   <bean id="passwordEncoder"
@@ -53,13 +46,63 @@
     </property>
   </bean>
 
+  <bean id="anonymousAuthenticationProvider"
+        class="net.sf.acegisecurity.providers.anonymous.AnonymousAuthenticationProvider">
+    <property name="key">
+      <value>badgerbadgerbadger</value>
+    </property>
+  </bean>
+
+  <bean id="runAsAuthenticationProvider"
+        class="net.sf.acegisecurity.runas.RunAsImplAuthenticationProvider">
+    <property name="key">
+      <value>weasleyweasley</value>
+    </property>
+  </bean>
+
   <bean id="authenticationManager"
         class="net.sf.acegisecurity.providers.ProviderManager">
     <property name="providers">
       <list>
         <ref local="daoAuthenticationProvider"/>
+        <ref local="anonymousAuthenticationProvider"/>
+        <ref local="runAsAuthenticationProvider"/>
       </list>
     </property>
   </bean>
+
+  <!-- Role-based authorization -->
+
+   <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter"/>
+
+   <bean id="accessDecisionManager"
+         class="net.sf.acegisecurity.vote.AffirmativeBased">
+      <property name="allowIfAllAbstainDecisions">
+        <value>false</value>
+      </property>
+      <property name="decisionVoters">
+        <list>
+          <ref bean="roleVoter"/>
+        </list>
+      </property>
+   </bean>
+
+   <!-- Run-as authorization -->
+
+   <bean id="runAsManager"
+         class="net.sf.acegisecurity.runas.RunAsManagerImpl">
+     <property name="key">
+       <value>weasleyweasley</value>
+     </property>
+   </bean>
+
+   <!-- Cosmo security subsystem -->
+
+   <bean id="securityManager"
+         class="org.osaf.cosmo.security.impl.CosmoSecurityManagerImpl">
+     <property name="authenticationManager">
+       <ref local="authenticationManager"/>
+     </property>
+   </bean>
 
 </beans>

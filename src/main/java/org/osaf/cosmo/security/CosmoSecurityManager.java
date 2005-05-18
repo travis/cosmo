@@ -40,22 +40,28 @@ public interface CosmoSecurityManager {
     public static final String ROLE_USER = "user";
 
     /**
-     * Provide a <code>CosmoSecurityContext</code> initialized from
-     * within the Cosmo security environment (e.g. Acegi Security).
+     * Provide a <code>CosmoSecurityContext</code> representing a
+     * Cosmo user previously authenticated by the Cosmo security
+     * system.
      */
     public CosmoSecurityContext getSecurityContext()
         throws CosmoSecurityException;
 
     /**
-     * Provide a <code>CosmoSecurityContext</code> initialized from a
-     * JAAS environment.
+     * Provide a <code>CosmoSecurityContext</code> representing a
+     * previously authenticated Cosmo user previously authenticated by
+     * JAAS.
      */
     public CosmoSecurityContext getSecurityContext(Subject subject)
         throws CosmoSecurityException;
 
     /**
-     * Returns the <code>CosmoUserDetails</code> for the identified
-     * Cosmo user.
+     * Create and register a <code>CosmoSecurityContext</code> for the
+     * given Cosmo credentials. This method is used when Cosmo
+     * components need to programatically log in a user rather than
+     * relying on a security context already being in place.
      */
-    public CosmoUserDetails loadUser(String username);
+    public CosmoSecurityContext establishSecurityContext(String username,
+                                                         String password)
+        throws CosmoSecurityException;
 }

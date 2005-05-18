@@ -50,22 +50,28 @@
 
   <!-- login/signup defs -->
 
+  <definition name="account.new" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/account/new.jsp"/>
+    <put name="prefix"       value="Account.New."/>
+    <put name="showNav"      value="false"/>
+  </definition>
+
   <definition name="login" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/login.jsp"/>
     <put name="prefix"       value="Login."/>
     <put name="showNav"      value="false"/>
   </definition>
 
-  <!-- home defs -->
+  <!-- welcome defs -->
 
-  <definition name="home.user" extends="layout.standard">
-    <put name="body"         value="/WEB-INF/jsp/home/user.jsp"/>
-    <put name="prefix"       value="Home."/>
+  <definition name="welcome.user" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/welcome/user.jsp"/>
+    <put name="prefix"       value="Welcome."/>
   </definition>
 
-  <definition name="home.guest" extends="layout.standard">
-    <put name="body"         value="/WEB-INF/jsp/home/guest.jsp"/>
-    <put name="prefix"       value="Home."/>
+  <definition name="welcome.anonymous" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/welcome/anonymous.jsp"/>
+    <put name="prefix"       value="Welcome."/>
     <put name="showNav"      value="false"/>
   </definition>
 
@@ -74,11 +80,6 @@
   <definition name="user.view" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/user/view.jsp"/>
     <put name="prefix"       value="User.View."/>
-  </definition>
-
-  <definition name="user.form" extends="layout.standard">
-    <put name="body"         value="/WEB-INF/jsp/user/form.jsp"/>
-    <put name="prefix"       value="User.Form."/>
   </definition>
 
   <definition name="user.list" extends="layout.standard">

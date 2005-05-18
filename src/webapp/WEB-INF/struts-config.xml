@@ -22,13 +22,14 @@
 <struts-config>
 
   <form-beans>
+    <form-bean name="signupAccountForm" type="org.osaf.cosmo.ui.UserForm"/>
     <form-bean name="createUserForm" type="org.osaf.cosmo.ui.UserForm"/>
     <form-bean name="updateUserForm" type="org.osaf.cosmo.ui.UserForm"/>
   </form-beans>
 
   <global-exceptions>
     <exception type="java.lang.Throwable" key="ignore"
-               handler="org.osaf.struts.OSAFExceptionHandler"/>
+               handler="org.osaf.commons.struts.OSAFExceptionHandler"/>
   </global-exceptions>
 
   <global-forwards type="org.apache.struts.action.ActionForward">
@@ -48,6 +49,20 @@
 
     <!-- login/signup actions -->
 
+    <action path="/account/new"
+            forward="account.new"/>
+
+    <action path="/account/signup"
+            type="org.osaf.cosmo.ui.UserAction"
+            name="signupAccountForm"
+            scope="request"
+            validate="true"
+            input="/account/new.do"
+            parameter="signup">
+      <forward name="failure" path="/account/new.do"/>
+      <forward name="success" path="/login" redirect="true"/>
+    </action>
+
     <action path="/login"
             forward="login"/>
 
@@ -56,12 +71,12 @@
       <forward name="ok" path="/" redirect="true"/>
     </action>
 
-    <!-- home actions -->
+    <!-- welcome actions -->
 
-    <action path="/home"
-            forward="home.user"/>
+    <action path="/welcome"
+            forward="welcome.user"/>
 
-    <!-- user actions -->
+    <!-- user admin actions -->
 
     <action path="/user"
             type="org.osaf.cosmo.ui.UserAction"

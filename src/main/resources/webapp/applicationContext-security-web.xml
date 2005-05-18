@@ -24,6 +24,43 @@
 
 <beans>
 
+  <!-- interceptor which specifies access control rules for the
+       URL space, invoked by security enforcement filter -->
+
+   <bean id="filterInvocationInterceptor"
+         class="net.sf.acegisecurity.intercept.web.FilterSecurityInterceptor">
+     <property name="authenticationManager">
+       <ref bean="authenticationManager"/>
+     </property>
+     <property name="accessDecisionManager">
+       <ref bean="accessDecisionManager"/>
+     </property>
+     <property name="runAsManager">
+       <ref bean="runAsManager"/>
+       </property>
+     <property name="objectDefinitionSource">
+       <value>
+	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+	 PATTERN_TYPE_APACHE_ANT
+         /account/new=ROLE_ANONYMOUS
+         /account/signup.do=ROLE_ANONYMOUS,RUN_AS_ROOT
+         /login=ROLE_ANONYMOUS
+         /loginfailed=ROLE_ANONYMOUS
+         /*.css=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /*.js=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /*.ico=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /*.gif=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /index.jsp=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /home=ROLE_ROOT,ROLE_USER
+         /home/jcr:system=ROLE_ROOT
+         /home/jcr:system/**=ROLE_ROOT
+         /home/**=ROLE_ROOT,ROLE_USER
+         /logout=ROLE_ROOT,ROLE_USER
+         /**=ROLE_ROOT
+       </value>
+     </property>
+   </bean>
+
   <!-- filter chain that kicks off request-time processing -->
 
 <!--
@@ -36,7 +73,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=httpSessionContextIntegrationFilter,formBasedProcessingFilter,uiSecurityEnforcementFilter
+        /**=httpSessionContextIntegrationFilter,formBasedProcessingFilter,anonymousProcessingFilter,uiSecurityEnforcementFilter
       </value>
     </property>
   </bean>
@@ -89,61 +126,6 @@
     </property>
   </bean>
 
-  <!-- interceptor that performs role-based authorization -->
-
-   <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter"/>
-
-   <bean id="httpRequestAccessDecisionManager"
-         class="net.sf.acegisecurity.vote.AffirmativeBased">
-      <property name="allowIfAllAbstainDecisions">
-        <value>false</value>
-      </property>
-      <property name="decisionVoters">
-        <list>
-          <ref bean="roleVoter"/>
-        </list>
-      </property>
-   </bean>
-
-   <bean id="uiFilterInvocationInterceptor"
-         class="net.sf.acegisecurity.intercept.web.FilterSecurityInterceptor">
-     <property name="authenticationManager">
-       <ref bean="authenticationManager"/>
-     </property>
-     <property name="accessDecisionManager">
-       <ref local="httpRequestAccessDecisionManager"/>
-     </property>
-     <property name="objectDefinitionSource">
-       <value>
-	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-	 PATTERN_TYPE_APACHE_ANT
-         /home=ROLE_ROOT,ROLE_USER
-         /logout=ROLE_ROOT,ROLE_USER
-         /users=ROLE_ROOT
-         /user/**=ROLE_ROOT
-       </value>
-     </property>
-   </bean>
-
-   <bean id="davFilterInvocationInterceptor"
-         class="net.sf.acegisecurity.intercept.web.FilterSecurityInterceptor">
-     <property name="authenticationManager">
-       <ref bean="authenticationManager"/>
-     </property>
-     <property name="accessDecisionManager">
-       <ref local="httpRequestAccessDecisionManager"/>
-     </property>
-     <property name="objectDefinitionSource">
-       <value>
-	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-	 PATTERN_TYPE_APACHE_ANT
-         /home/jcr:system=ROLE_ROOT
-         /home/jcr:system/**=ROLE_ROOT
-         /home/**=ROLE_USER,ROLE_ROOT
-       </value>
-     </property>
-   </bean>
-
    <!-- filter that performs form-based authentication -->
 
   <bean id="formBasedAuthenticationEntryPoint"
@@ -192,12 +174,24 @@
       <ref local="basicAuthenticationEntryPoint"/></property>
   </bean>
 
+  <!-- filter that performs anonymous authentication -->
+
+  <bean id="anonymousProcessingFilter"
+        class="net.sf.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+    <property name="key">
+      <value>badgerbadgerbadger</value>
+    </property>
+    <property name="userAttribute">
+      <value>anonymous,ROLE_ANONYMOUS</value>
+    </property>
+  </bean>
+
   <!-- filter that enforces security constraints on web requests -->
 
   <bean id="uiSecurityEnforcementFilter"
         class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
     <property name="filterSecurityInterceptor">
-      <ref local="uiFilterInvocationInterceptor"/>
+      <ref local="filterInvocationInterceptor"/>
     </property>
     <property name="authenticationEntryPoint">
       <ref local="formBasedAuthenticationEntryPoint"/>
@@ -207,7 +201,7 @@
   <bean id="davSecurityEnforcementFilter"
         class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
     <property name="filterSecurityInterceptor">
-      <ref local="davFilterInvocationInterceptor"/>
+      <ref local="filterInvocationInterceptor"/>
     </property>
     <property name="authenticationEntryPoint">
       <ref local="basicAuthenticationEntryPoint"/>

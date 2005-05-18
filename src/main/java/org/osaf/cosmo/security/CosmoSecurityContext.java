@@ -27,8 +27,15 @@ import javax.security.auth.Subject;
 public interface CosmoSecurityContext {
 
     /**
+     * Determines whether or not the context represents a Cosmo user
+     * account or an anonymous user.
+     */
+    public boolean isAnonymous();
+
+    /**
      * Returns an instance of {@link User} describing the user
-     * represented by the security context.
+     * represented by the security context, or <code>null</code> if
+     * the context represents an anonymous user.
      */
     public User getUser();
 

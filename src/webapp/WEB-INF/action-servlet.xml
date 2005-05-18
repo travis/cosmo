@@ -27,12 +27,20 @@
     <property name="provisioningManager">
       <ref bean="provisioningManager"/>
     </property>
+    <property name="securityManager">
+      <ref bean="securityManager"/>
+    </property>
   </bean>
 
-  <bean name="/users"       parent="userAction"/>
-  <bean name="/user"        parent="userAction"/>
-  <bean name="/user/create" parent="userAction"/>
-  <bean name="/user/update" parent="userAction"/>
-  <bean name="/user/remove" parent="userAction"/>
+  <bean name="/users"          parent="userAction"/>
+  <bean name="/user"           parent="userAction"/>
+  <bean name="/user/create"    parent="userAction"/>
+  <bean name="/user/update"    parent="userAction"/>
+  <bean name="/user/remove"    parent="userAction"/>
+
+  <!-- account management actions -->
+
+  <bean name="/account/new"    parent="userAction"/>
+  <bean name="/account/signup" parent="userAction"/>
 
 </beans>

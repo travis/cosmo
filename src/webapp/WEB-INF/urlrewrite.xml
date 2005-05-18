@@ -27,6 +27,10 @@
 
   <!-- login/signup rules -->
   <rule>
+    <from>^/account/new$</from>
+    <to>/account/new.do</to>
+  </rule>
+  <rule>
     <from>^/login$</from>
     <to>/login.do</to>
   </rule>
@@ -42,8 +46,8 @@
   <!-- home rules -->
 
   <rule>
-    <from>^/home$</from>
-    <to>/home.do</to>
+    <from>^/welcome$</from>
+    <to>/welcome.do</to>
   </rule>
 
   <!-- user rules -->
@@ -52,7 +56,11 @@
     <to>/users.do</to>
   </rule>
   <rule>
-    <from>^/user/([a-z]+)$</from>
+    <from>^/user/(.+\.do)$</from>
+    <to>/user/$1</to>
+  </rule>
+  <rule>
+    <from>^/user/([\w\s.\-\']+)$</from>
     <to>/user.do?username=$1</to>
   </rule>
 

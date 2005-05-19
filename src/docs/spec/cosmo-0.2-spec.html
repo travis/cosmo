@@ -23,17 +23,18 @@ Home</a> &gt; <a
 <table width="100%">
   <tbody>
     <tr>
-      <td width="33%">Authors: <a href="mailto:bcm@osafoundation.org">Brian
+      <td width="33%">Authors:
+      <a href="mailto:bcm@osafoundation.org">Brian
 Moseley</a></td>
       <td width="33%">Last
-edited: May 16, 2005 </td>
+edited: May 19, 2005 </td>
       <td width="33%">Creation
 date: May 3, 2005</td>
     </tr>
     <tr>
-      <td colspan="3">Reviewers: <a
- href="mailto:quidama@osafoundation.org">Quidam A</a>, <a
- href="mailto:quidamb@osafoundation.org">Quidam B</a></td>
+      <td colspan="3">Reviewers:
+        <a href="mailto:lisa@osafoundation.org">Lisa Dusseault</a>
+      </td>
     </tr>
   </tbody>
 </table>
@@ -45,27 +46,30 @@ date: May 3, 2005</td>
 <p>Cosmo 0.2 has four primary
 goals:</p>
 <ol>
-  <li>Support for Chandler 0.6
-sharing features</li>
-  <li>An interface for end users
-to sign up for and manage their own accounts</li>
-  <li>Basic standards-based
-interoperability with calendar clients other than Chandler</li>
+  <li>Support for Chandler 0.6 sharing features</li>
+  <li>An interface for end users to sign up for and manage their own accounts</li>
+  <li>Basic standards-based interoperability with calendar clients other than Chandler</li>
   <li>Windows platform support</li>
+  <li>Special support for Apple iCal so that their calendar sharing format (which is
+    iCalendar, but not CalDAV) can be translated from (and possibly to) the format
+    used by CalDAV/Chandler.</li>
 </ol>
 <dl>
   <dt>Brian Moseley</dt>
   <dd>Spec owner, development lead<span style="font-weight: bold;"> </span></dd>
 </dl>
-<h3><span style="font-weight: bold;">Background</span></h3>
-<p>The initial version of Cosmo
+  
+<h3>Background</h3>
+
+  <p>The initial version of Cosmo
 focused on securely providing basic sharing support for multiple users
 in a single repository. Sharing in Cosmo 0.1 is performed solely by
-WebDAV; there are no calendar-specific features. A user can synchronize
+WebDAV; there are no calendar-specific features. A user can 
 synchronize a collection across multiple instances of Chandler by
 storing opaque data files in the user's Cosmo home directory. However,
 Cosmo 0.1 does not provide a mechanism for allowing a second user to
-view or edit the collection.</p>
+  view or edit the collection.</p>
+  
 <p>In Cosmo 0.1, an administrator
 has to log into the "admin console" web user interface to provision an
 account for an end user and then email or otherwise communicate the
@@ -74,17 +78,18 @@ Chandler's sharing and synchronization features, especially considering
 that OSAF (and perhaps other organizations) will in the future host a
 public Cosmo server for users who are not part of a workgroup with a
 dedicated Cosmo installation and administrator.</p>
+  
 <p>One of the primary goals for
 the eventual Cosmo 1.0 is interoperability with standards-based
 calendar clients via CalDAV. A staged approach toward CalDAV
 implementation allows the realization of primary interoperability use
 cases in early Cosmo and Chandler versions. Furthermore, Cosmo should
-make some allowance for widely-used clients that have not yet embraced
-CalDAV, such as Apple's iCal, which uses the "first generation"
+make special allowance for Apple's iCal, which uses the "first generation"
 technique
 of publishing and subscribing to monolithic iCalendar resources
 (events, timezones, and calendar bundled into a single WebDAV resource)
 rather than the single-iCalendar-object-per-resource approach of CalDAV.</p>
+  
 <h3>Use Cases</h3>
 <ul>
   <li>A Chandler user attempts to
@@ -113,45 +118,86 @@ it with iCal.</li>
 to a calendar published by a friend
 who uses iCal.</li>
 </ul>
-<h2>Definitions</h2>
-<h3>Requirements</h3>
-<h4>Tickets</h4>
-<p>Cosmo must accept a ticket
+
+  <h2>Requirements</h2>
+
+  <h3>Tickets (Access control)</h3>
+
+  <p>Cosmo must accept a ticket
 specified in the URL of a WebDAV resource
 in preference to other authentication schemes and access control
 procedures (e.g. Basic authentication, ACL-based authorization) as
-per&nbsp;<span style="font-style: italic;">Ticket-Based Access
-Control
-Extension
-to WebDAV</span> (see link at
-bottom).</p>
-<h4><span style="font-weight: bold;">Calendar content
-negotiation</span></h4>
-<p> Cosmo must be able to provide
-varying views of a calendar collection or resource based on the
-requesting client. iCal expects to GET, PUT and DELETE monolithic
-iCalendar resources containing the calendar and all constituent events
-and timezones. It does not understand the notion of a calendar
-collection. A CalDAV client expects to use MKCALENDAR to create a
-calendar collection, PROPFIND to list the calendar resources within the
-collection (ignoring any non-calendar resources), and GET, PUT and
-DELETE to manage each individual resource. Cosmo must support all of
-these access methods for any given calendar. It must be able to convert
-a monolithic iCalendar request resource into a calendar collection
-containing individual calendar resources, and it must be able to
-generate a monolithic iCalendar view of a calendar collection.
-</p>
-<h4>iCalendar awareness<br />
-</h4>
-<p>Cosmo must be able to store iCalendar calendar and event objects in
+per <em>Ticket-Based Access Control Extension
+to WebDAV</em> (see link at bottom).  In addition, must be able to accept
+  ticket-creation requests, though only for unlimited-life and unlimited-use
+  tickets.  Cosmo 0.2 should reject requests for tickets with limited life or 
+  limited use.</p>
+  
+  
+  <p>Cosmo 0.2 will not support any
+mechanisms for controlling access to
+a user's home directory by another user other than tickets. A future
+version will allow
+a user to assign permissions on his home directory to other users
+(probably only on the same server) via WebDAV ACL and a web user
+interface.</p>
+
+  
+
+  <h3>iCalendar (RFC2445) and CalDAV Interoperability</h3>
+
+  <p>Cosmo must be able to store iCalendar calendar and event objects in
 its repository in such a way as to facilitate CalDAV queries, even
 though those queries are not supported by this version of Cosmo.
 Addressing this requirement eliminates a significant risk early in
 Cosmo's development (that of not knowing how much effort it will take
 to make the repository aware of calendar content) and reduces the
-amount of data migration necessary when upgrading to future versions.</p>
-<h4><span style="font-weight: bold;">Chandler share data</span></h4>
-<p>Cosmo must allow Chandler to
+  amount of data migration necessary when upgrading to future versions.</p>
+  
+  <p>Cosmo 0.2 must validate new or updated event resources for correct
+  syntax and semantics on each PUT request.  GET and DELETE will be handled
+  normally for event resources.</p>
+  
+  <p>Cosmo will support CalDAV's MKCALENDAR request.  Cosmo will advertise
+    support for CalDAV even though not all of CalDAV will be interoperable
+  in 0.2.</p>
+  
+  <p>Cosmo 0.2 will support PROPFIND on calendar collections, listing 
+    individual event resources, but not the special CalDAV REPORTs.
+  
+  <h3>Apple's iCal Interoperability</h3>
+  
+  <p>Basic client/server interoperability with Apple's iCal client 
+    will be supported for Cosmo 0.2.  Apple's iCal works with calendar
+    data at a granularity of one file per calendar and expects to be able to 
+    GET, PUT and DELETE whole-calendar iCalendar resources (iCal does not
+    understand CalDAV collections or single-event resources). Cosmo will translate
+  to and from this format for both read and write operations as follows.</p>
+  
+
+  <ul>
+    <li>iCal expects to be able to use a single resource with a URL ending in .ics
+      and a certain MIME type (text/calendar).  Cosmo will handle these URLs, 
+      managing a dynamic resource that will appear alongside a CalDAV calendar
+      collection URL, in the same parent collection.
+    </li>
+    <li>A GET request to the URL used by iCAL will be handled by the Cosmo 
+    server bundling the calendar data into a single .ics file for the response.</li>
+    <li>A DELETE request will remove the calendar collection as well as the 
+    monolithic calendar resource.</li>
+    <li>A PUT request will be interpreted and individual event resources in
+      the calendar collection will be
+      added, overwritten or deleted as appropriate (not overwritten wholesale).
+    More on this in protocol interactions section.</li>
+    </ul>
+    
+  
+  <!-- Do we say something about Cosmo's "native" format? -->
+    
+
+  <h3>Chandler share data</h3>
+
+  <p>Cosmo must allow Chandler to
 store arbitrary data files within a calendar collection. When sharing
 an ItemCollection, Chandler will create a calendar collection in the
 user's home directory to contain iCalendar resources and beneath that a
@@ -162,30 +208,39 @@ itself does not have to follow any particular naming policy; because
 CalDAV specifies that calendar collections may not contain other
 calendar collections, Cosmo can ignore any subcollections of a calendar
 collection when generating an iCalendar view of a calendar collection.</p>
-<h3>Assumptions</h3>
-<ul>
-  <li>Cosmo will defer support for
-the CalDAV server timezone
-collection, ticket timeouts and ticket usage limits to a later version.</li>
-  <li>Tickets do not necessarily
-represent unique individuals; a ticket
-can be given to and used by multiple persons.</li>
-  <li>Tickets will never be used
-to access the web user interface.</li>
-</ul>
-<h3>High-level Decisions</h3>
-<p>Cosmo 0.2 will not support any
-mechanisms for controlling access to
-a user's home directory by another user other than tickets. A future
-version will allow
-a user to assign permissions on his home directory to other users
-(probably only on the same server) via WebDAV ACL and a web user
-interface.</p>
-<p>Chandler 0.6 will provide a
+
+  <h3>Assumptions</h3>
+
+  <ul>
+  <li>The CalDAV server timezone collection functionality is being removed
+  from CalDAV in draft version 06 therefore Cosmo will not support it.</li>
+
+    <li>Tickets do not necessarily represent unique individuals; a ticket
+    can be given to and used by multiple persons.</li>
+    
+  <li>Tickets will not be used in the timeframe of Cosmo 0.2 to access 
+  the web user interface.</li>
+    
+    <li>We are making certain assumptions about Apple's iCal client functionality
+      that will need to be confirmed through interoperability testing or other
+      testing. If our assumptions turn out to be incorrect we'll update the design decisions
+    described here.</li>
+
+    <li>Chandler 0.6 schedule currently includes work for Chandler to support 
+      the iCalendar format for event resources and to use it to create resources.
+      This work is required in order to interoperate with Apple iCal and with
+    Cosmo's support for iCal.  Morgen confirmed that this is on his 0.6 schedule.</li>
+    
+  </ul>
+
+  <h3>High-level Decisions</h3>
+  
+  <p>Chandler 0.6 will provide a
 link to a Cosmo account signup page
 whenever a user is prompted to enter WebDAV account information. A
 future version will support a Cosmo API for automated account creation.</p>
-<h3>Terminology</h3>
+
+  <h3>Terminology</h3>
 <dl>
   <dt>Calendar collection</dt>
   <dd>A WebDAV collection that
@@ -208,13 +263,13 @@ Chandler users; the fundamental unit of sharing for Chandler</dd>
   <dt>Monolithic iCalendar resource</dt>
   <dd>An HTTP resource containing
 an iCalendar representation of a
-calendar and its constituent events and timezones<span
- style="font-style: italic;"> </span></dd>
+calendar and its constituent events and timezones</dd>
   <dt>WebDAV collection</dt>
   <dd>A resource on a WebDAV
 server that can contain other resources;
 roughly equivalent to a directory or folder in a file system</dd>
 </dl>
+  
 <h2>User Interface / Interaction</h2>
 <h3>Account Signup</h3>
 <p>This page has a form with these
@@ -224,21 +279,31 @@ fields:</p>
 unique, 3-32 chars long, legal chars
 are letters, numbers, underscores, spaces, periods, hyphens,
 apostrophes)</li>
-  <li>email address (required,
+  <li>email address (required, must be unique,
 1-32 chars long)</li>
   <li>password (required, 5-16
 chars long)</li>
   <li>password confirmation
-(required, must match password)</li>
+  (required, must match password)</li>
+  <li>Full name (required, 1-100 chars long)</li>
 </ul>
-<p><span class="issue">Should we also capture the user's first
-and last
-name? Any other fields? What are the rules for those fields (required,
-min/max length, legal syntax, etc)? How would capturing this
-information affect external authentication?</span></p>
+  
+<p>The user registration form captures full name so that later on we can
+use this information in places like access logs, interfaces to browse peoples' 
+calendars, etc.  If we don't capture full name now then there will be accounts
+created on test and trial servers which don't have this information.  Asking
+for full name is appropriate for the dogfood usage expected in 0.2 timeframe 
+although later in hosting situations we might find some resistance from users 
+who don't want to reveal full names.</p>
+  
+  <p>The email address is required to be unique so that we can look up accounts
+    even when login IDs are forgotten.  It is easier to change our minds later 
+    and relax this requirement than it is to go the other way.</p>
+  
 <p>When the form is submitted, the
 server validates the input.</p>
-<ul>
+
+  <ul>
   <li>If validation fails, the
 form is redisplayed including a message
 for each error</li>
@@ -246,41 +311,52 @@ for each error</li>
 the account, sends a confirmation
 email to the specified address, logs in the user and displays the
 Welcome Page.</li>
-</ul>
-<h3>Account Management</h3>
-<p>This page has a form with the
+  </ul>
+  
+
+  <h3>Account Management</h3>
+
+  <p>This page has a form with the
 same fields as on the Account Signup
 page. The validation rules are slightly different in that the password
 and confirmation are not required if the password is not being changed
 (but both are required if the password is being changed).</p>
-<p>When the form is submitted, the
+
+  <p>When the form is submitted, the
 server validates the input.</p>
-<ul>
+
+  <ul>
   <li>If validation fails, the
 form is redisplayed including a message
 for each error.</li>
   <li>Otherwise the server updates
 the account and redisplays the
 Account Management Page.</li>
-</ul>
-<h3>Forgotten Username</h3>
-<p>This page has a form containing
-a single email address field.</p>
-<p>When the form is submitted, the
+
+  </ul>
+
+  <h3>Forgotten Username or password</h3>
+
+  <p>This <em>popup</em> has a form containing
+  a single email address field.</p>
+  
+  <p>When the form is submitted, the
 server validates the given address.</p>
-<ul>
+
+  <ul>
   <li>If an account does not exist
 with the address, the form is
 redisplayed including an error message.</li>
   <li>Otherwise, the server sends
 an email to the address containing
 the username of the associated account and redisplays the Login Page.</li>
-</ul>
-<p><span class="issue">What happens if multiple accounts use
-the given
-email address?</span></p>
-<h3>Forgotten Password</h3>
-<p>This page has a form containing
+
+  </ul>
+
+
+  <h3>Forgotten Password</h3>
+
+  <p>This <em>popup</em> has a form containing
 a single username field.</p>
 <p>When the form is submitted, the
 server validates the given username.</p>
@@ -292,25 +368,79 @@ redisplayed including an error message.</li>
 an email containing the password of the associated account to the
 account's address and redisplays the Login Page.</li>
 </ul>
+  
 <h2>Protocol Interactions</h2>
-<h3><span style="font-weight: bold;">Tickets</span></h3>
-<p>Cosmo will implement the
-MKTICKET
-and DELTICKET methods defined in&nbsp;<span style="font-style: italic;">Ticket-Based
-Access Control Extension
-to WebDAV</span> (see link at
-bottom). Ticket discovery is not
-required,
+
+  <h3>Tickets</h3>
+
+  <p>Cosmo will implement the MKTICKET
+and DELTICKET methods defined in <em>Ticket-Based Access Control Extension
+to WebDAV</em> (see link at bottom). Ticket discovery is not required,
 since Chandler will remember any generated tickets. Chandler-generated
 tickets will never have timeouts or use limits.</p>
-<h3><span style="font-weight: bold;">CalDAV</span></h3>
-<p>Cosmo will implement
+
+    <p> If MKTICKET is used to attempt to create a ticket with timeouts or
+    use limits, Cosmo should reject that request (501 Not Supported)</p>
+    
+      
+
+    <h3>CalDAV</h3>
+
+  <p>Cosmo will implement
 individually-addressable calendar objects and the MKCALENDAR method as
-per&nbsp;<span style="font-style: italic;">Calendaring Extensions to
-WebDAV (CalDAV)</span> (see
-link at bottom).</p>
-<h2>Special Considerations</h2>
-<h3>QA / Test</h3>
+per <em>Calendaring Extensions to WebDAV (CalDAV)</em> (see
+  link at bottom).</p>
+  
+    <h3>iCal's usage</h3>
+      
+    <p>Although iCal uses normal HTTP and WebDAV requests (PUT, GET in 
+      particular), its data model is inconsistent with that of CalDAV and
+      that used by Chandler.  Thus, Cosmo will require special handling of
+    certain requests from iCal.</p>
+    
+    <p>Handling iCal GET requests is expected to be rather straightforward.
+      Cosmo will take all the event resources in the calendar collection
+      (the one with the same base name as the URL used by iCal) and wrap those
+      events up into one iCalendar file with START:VCALENDAR and END:VCALENDAR
+      around it.  For 0.2, where performance isn't likely to be a problem,
+      Cosmo can concatenate event data either in memory or while streaming 
+    over the wire.  </p>
+    
+    <p>Handling iCal PUT requests requires a little more care.</p>
+    
+    <ul>
+      <li>Parse the entire iCalendar file and reject the PUT request
+      if it can't be parsed.</li>
+      <li>Compare the list of events from iCal to the list of events in
+        the calendar collection.  If the calendar collection doesn't yet
+        exist, create it and all the event resources inside it.  If it
+        does already exist, figure out which events are new in the iCal
+      data and which resources are absent in the iCal data (deleted).</li>
+      <li>For each event that is new in the iCal data, create a new
+        event resource in the calendar collection, preserving all the data 
+        provided.</li>
+      <li>For each event that is absent in the iCal data, delete the 
+      event resource in the calendar collection.</li>
+      <li>For events that appear in both the iCal data and the existing 
+        calendar collection, determine if the event data is identical or
+        has been changed.  See note.</li>
+      <li>For events that have not been changed, leave the event resource
+        untouched so that the ETag doesn't change and Chandler synchronization
+      works better.</li>
+      <li>For events that have changed, update the event resource.</li>
+    </ul>
+    
+    <p>Note: One concern with this plan is what to do if Apple iCal alters
+      event data routinely.  For example, Chandler wishes to preserve timezone
+      information for each event but it's conceivable that iCal might translate
+      all events to UTC and lose that information.  If we run into any of these
+    kinds of issues we may or may not be able to deal with it easily.</p>
+    
+    
+
+  <h2>Special Considerations</h2>
+
+  <h3>QA / Test</h3>
 <p>Cosmo will provide a full suite
 of unit and integration tests for
 every subsystem so that QA can focus on functional and security
@@ -350,17 +480,17 @@ to unauthorized or untrusted clients.</p>
 <p>Furthermore, Chandler 0.5 does
 not support WebDAV over SSL, so
 tickets are exposed as soon as they are generated by the server and
-sent to the client.</p>
-<p class="issue">It is
-unknown if Chandler 0.6 will support WebDAV
-over SSL. If so, Cosmo 0.2 will likely require SSL for all connections
-(HTTP, WebDAV, CalDAV).</p>
+sent to the client.  Chandler 0.6, however, will support WebDAV over
+SSL.</p>
+
 <p>Cosmo 0.2 will only support
-Basic and ticket authentication. A
+Basic authentication and ticket access control. A
 future version will add Digest support in preference to Basic.</p>
-<h3>Internationalization /
-Localization</h3>
-<p>JSTL and Java message resource
+
+
+    <h3>Internationalization / Localization</h3>
+
+    <p>JSTL and Java message resource
 bundles will be used to provide an
 internationalized web user interface. The web interface will be
 designed to be as locale-independent as possible (avoiding intermixing
@@ -384,35 +514,6 @@ appropriate. Community discussions on this topic are welcomed.</p>
 <p>Cosmo's build system will be
 migrated from Ant to Maven, and the source code will be moved from CVS
 to Subversion.</p>
-<h2>Cuts</h2>
-<ul>
-  <li> scalability improvements to admin console
-  </li>
-  <li> formal graphic and interaction design
-  </li>
-  <li> migrate from Tiles to <span class="twikiNewLink"
- style="background: rgb(255, 255, 206) none repeat scroll 0% 50%; -moz-background-clip: initial; -moz-background-origin: initial; -moz-background-inline-policy: initial;"><font
- color="#0000ff">SiteMesh</font></span> for page layout
-  </li>
-  <li> extended CalDAV interop (OPTIONS, timezone collection, misc.
-spec compliance sections 3-6)
-  </li>
-  <li> web browser interop (GET HTML view of calendar collection)
-  </li>
-  <li> digest authen for WebDAV/CalDAV
-  </li>
-  <li> external auth API
-  </li>
-  <li> reference external auth plugin
-  </li>
-  <li> auth mgmt service
-  </li>
-  <li> auth mgmt command line tool
-  </li>
-  <li> advanced Windows support (run as service)
-  </li>
-  <li> migrate from RDBMS to JCR for auth info</li>
-</ul>
 </div>
 <div id="codicille">
 <h2>Useful Links</h2>
@@ -454,10 +555,13 @@ already exist in 0.1), added iCalendar awareness requirement, removed
 Code Design section (will address separately later)</td>
     </tr>
     <tr>
-      <td><a href="mailto:bcm@osafoundation.org">m</a></td>
-      <td>May 16, 2005</td>
-      <td>added cuts</td>
+      <td><a href="mailt:lisa@osafoundation.org">Lisa D</a></td>
+      <td>May 19, 2005</td>
+      <td>Added more detail about supporting Apple iCal.  Cleaned up
+        issues, making strawman decisions about things like email 
+      uniqueness.</td>
     </tr>
+    
   </tbody>
 </table>
 </div>

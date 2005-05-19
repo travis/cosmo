@@ -1,5 +1,5 @@
 
-                            Cosmo Sharing Server 0.1
+                            Cosmo Sharing Server 0.2
                                    To Do List
 
 
@@ -21,66 +21,30 @@
 0.2 RELEASE
 ===========
 
-source code control/build system:
+See
+<http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
+for current development plan. Additional tasks:
 
- * extract non-cosmo classes from core into their own cvs module
-   (commons?)
  * precompile jsps for distribution
- * update jackrabbit snapshot (allows us to remove dependency on
-   commons-beanutils 2.1)
-
-webui:
-
- * account signup screen
- * "forgot username?" function that finds username by email address
-   and mails it to the user
- * "forgot password?" function that generates new password and mails
-   it to the user
- * account mgmt screen - change email, password
+ * find a way to tweak Acegi Security's run-as authz so that it
+   doesn't refresh the SecureContext at the end of the account signup
+   request, overwriting our automatic login and forcing the user to
+   explicitly log in
  * see if we can't get Struts to work with "/user/bcm/update" rather
    than "/user/update.do" with "username=bcm" in content body
- * unit tests
- * integration tests
-
-webdav:
-
- * tickets
- * iCalendar directory indexes for iCal
- * PROPPATCH
  * look into litmus failures
- * write tests for all components
 
-security:
-
- * ticket-based auth
- * tests
-
-dist:
-
- * Windows startup script
 
 LATER RELEASES
 ==============
 
-core:
+See "Cuts" section of the 0.2 Spec at
+<http://cvs.osafoundation.org/viewcvs.cgi/*checkout*/cosmo/src/docs/spec/cosmo-0.2-spec.html?rev=HEAD&content-type=text/html>. Additonal tasks:
 
- * migrate from hibernate to jcr for roles and users
-
-webui:
-
- * use Sitemesh to provide layout decoration rather than Tiles?
- * batch remove on user list
- * page,sort,search user list
- * email confirmation of account signup
- * admin ability to confirm an unconfirmed account
+ * account activation
+    o system generates email at signup containing activation url; user
+      must click the url to confirm his address and activation his
+      account before he can use the account
+    o admin can auto-confirm users
  * icons on user list for root users
-
-webdav:
-
- * HTML directory indexes for web browsers
-
-security:
-
- * digest authen for webdav
- * user mgmt api
- * user mgmt command line tool
+ * move user creation form to its own page (admin ui)

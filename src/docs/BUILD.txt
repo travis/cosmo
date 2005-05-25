@@ -57,12 +57,10 @@ following steps:
 SOURCE CODE
 ===========
 
-Find instructions for accessing the OSAF CVS repository here (search
-for "CVS Access"):
+Find instructions for accessing the Subversion repository at the Cosmo
+home page (search for "Source Code Access"):
 
     http://wiki.osafoundation.org/bin/view/Journal/CosmoTempHome
-
-The Cosmo module is "cosmo" (this is a change from Cosmo 0.1).
 
 
 BUILD
@@ -84,13 +82,19 @@ The most commonly-used goals are:
 
 All generated files are placed into the target/ subdirectory.
 
+The build depends on several libraries from the OSAF commons
+project being installed into your local Maven repository. See the OSAF
+Server Commons home page for more information:
+
+    http://wiki.osafoundation.org/bin/view/Journal/ServerCommonsTempHome
+
 
 TEST
 ====
 
 There aren't too many tests yet, but those that exist can be run with
 'maven test'. Before doing so, however, you will need to initialize the
-test database with 'maven test-dbsetup'. Do these as separate maven calls,
+test database with 'maven test:dbsetup'. Do these as separate maven calls,
 however, because otherwise the forked JUnit JVM will not have access
 to the hsqldb embedded within the original Maven process.
 
@@ -115,7 +119,7 @@ for more details on running Cosmo.
 RELEASE
 =======
 
-'maven dist-release' creates a packaged distribution of the Tomcat
+'maven dist:release' creates a packaged distribution of the Tomcat
 bundle at dist/cosmo-x.x.tar.gz. A separate unbundled WAR file will
 come in a future version.
 

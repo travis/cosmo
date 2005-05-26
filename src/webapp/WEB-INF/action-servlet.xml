@@ -20,7 +20,7 @@
 
 <beans>
 
-  <!-- provisioning actions -->
+  <!-- user admin actions -->
 
   <bean name="userAction" abstract="true" singleton="false"
         class="org.osaf.cosmo.ui.UserAction" >
@@ -38,9 +38,21 @@
   <bean name="/user/update"    parent="userAction"/>
   <bean name="/user/remove"    parent="userAction"/>
 
-  <!-- account management actions -->
+  <!-- account self-management actions -->
 
-  <bean name="/account/new"    parent="userAction"/>
-  <bean name="/account/signup" parent="userAction"/>
+  <bean name="accountAction" abstract="true" singleton="false"
+        class="org.osaf.cosmo.ui.AccountAction" >
+    <property name="provisioningManager">
+      <ref bean="provisioningManager"/>
+    </property>
+    <property name="securityManager">
+      <ref bean="securityManager"/>
+    </property>
+  </bean>
+
+  <bean name="/account"        parent="accountAction"/>
+  <bean name="/account/new"    parent="accountAction"/>
+  <bean name="/account/signup" parent="accountAction"/>
+  <bean name="/account/update" parent="accountAction"/>
 
 </beans>

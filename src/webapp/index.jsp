@@ -20,8 +20,8 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
 <authz:authorize ifAnyGranted="ROLE_USER,ROLE_ROOT">
-  <tiles:insert definition="welcome.user" flush="false"/>
+  <jsp:forward page="/account.do"/>
 </authz:authorize>
 <authz:authorize ifAnyGranted="ROLE_ANONYMOUS">
-  <tiles:insert definition="welcome.anonymous" flush="false"/>
+  <jsp:forward page="/welcome.do"/>
 </authz:authorize>

@@ -19,7 +19,6 @@ import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import java.util.Collections;
@@ -47,8 +46,6 @@ public class UserAction extends CosmoMappingDispatchAction {
     private static final String MSG_CONFIRM_CREATE = "User.Form.Created";
     private static final String MSG_CONFIRM_UPDATE = "User.Form.Updated";
     private static final String MSG_CONFIRM_REMOVE = "User.Form.Removed";
-    private static final String MSG_CONFIRM_SELFUPDATE =
-        "Account.Form.SelfUpdated";
     private static final Log log = LogFactory.getLog(UserAction.class);
 
     /**
@@ -145,43 +142,6 @@ public class UserAction extends CosmoMappingDispatchAction {
             saveErrorMessage(request, MSG_ERROR_EXISTS, PARAM_USERNAME);
             return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
         }
-
-        return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
-    }
-
-    /**
-     * Signs up the specified user.
-     */
-    public ActionForward signup(ActionMapping mapping,
-                                ActionForm form,
-                                HttpServletRequest request,
-                                HttpServletResponse response)
-        throws Exception {
-        UserForm userForm = (UserForm) form;
-        User formUser = new User();
-        populateUser(formUser, userForm);
-
-        // assign the user role to the new account
-        Role userRole = mgr.getRoleByName(CosmoSecurityManager.ROLE_USER);
-        formUser.addRole(userRole);
-
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("signing up user " + formUser.getUsername());
-            }
-            User user = mgr.saveUser(formUser);
-
-            request.setAttribute(ATTR_USER, user);
-        } catch (DataIntegrityViolationException e) {
-            saveErrorMessage(request, MSG_ERROR_EXISTS, PARAM_USERNAME);
-            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
-        }
-
-        // log in the user automatically
-        CosmoSecurityContext securityContext =
-            getSecurityManager().
-            establishSecurityContext(userForm.getUsername(),
-                                     userForm.getPassword());
 
         return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
     }

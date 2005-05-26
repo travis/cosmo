@@ -48,13 +48,7 @@
     <put name="showNav"      value="false"/>
   </definition>
 
-  <!-- login/signup defs -->
-
-  <definition name="account.new" extends="layout.standard">
-    <put name="body"         value="/WEB-INF/jsp/account/new.jsp"/>
-    <put name="prefix"       value="Account.New."/>
-    <put name="showNav"      value="false"/>
-  </definition>
+  <!-- login defs -->
 
   <definition name="login" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/login.jsp"/>
@@ -62,14 +56,22 @@
     <put name="showNav"      value="false"/>
   </definition>
 
-  <!-- welcome defs -->
+  <!-- account defs -->
 
-  <definition name="welcome.user" extends="layout.standard">
-    <put name="body"         value="/WEB-INF/jsp/welcome/user.jsp"/>
-    <put name="prefix"       value="Welcome."/>
+  <definition name="account.new" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/account/new.jsp"/>
+    <put name="prefix"       value="Account.New."/>
+    <put name="showNav"      value="false"/>
   </definition>
 
-  <definition name="welcome.anonymous" extends="layout.standard">
+  <definition name="account.view" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/account/view.jsp"/>
+    <put name="prefix"       value="Account.View."/>
+  </definition>
+
+  <!-- welcome defs -->
+
+  <definition name="welcome" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/welcome/anonymous.jsp"/>
     <put name="prefix"       value="Welcome."/>
     <put name="showNav"      value="false"/>

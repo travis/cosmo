@@ -23,6 +23,7 @@
 
   <form-beans>
     <form-bean name="signupAccountForm" type="org.osaf.cosmo.ui.UserForm"/>
+    <form-bean name="updateAccountForm" type="org.osaf.cosmo.ui.UserForm"/>
     <form-bean name="createUserForm" type="org.osaf.cosmo.ui.UserForm"/>
     <form-bean name="updateUserForm" type="org.osaf.cosmo.ui.UserForm"/>
   </form-beans>
@@ -47,7 +48,20 @@
                redirect="false"/>
     </action>
 
-    <!-- login/signup actions -->
+    <!-- login actions -->
+
+    <action path="/welcome"
+            forward="welcome"/>
+
+    <action path="/login"
+            forward="login"/>
+
+    <action path="/logout"
+            type="org.osaf.commons.struts.OSAFLogoutAction">
+      <forward name="ok" path="/" redirect="true"/>
+    </action>
+
+    <!-- account actions -->
 
     <action path="/account/new"
             forward="account.new"/>
@@ -63,18 +77,25 @@
       <forward name="success" path="/login" redirect="true"/>
     </action>
 
-    <action path="/login"
-            forward="login"/>
-
-    <action path="/logout"
-            type="org.osaf.commons.struts.OSAFLogoutAction">
-      <forward name="ok" path="/" redirect="true"/>
+    <action path="/account"
+            type="org.osaf.cosmo.ui.UserAction"
+            name="updateAccountForm"
+            scope="request"
+            validate="false"
+            parameter="view">
+      <forward name="ok" path="account.view"/>
     </action>
 
-    <!-- welcome actions -->
-
-    <action path="/welcome"
-            forward="welcome.user"/>
+    <action path="/account/update"
+            type="org.osaf.cosmo.ui.UserAction"
+            name="updateAccountForm"
+            scope="request"
+            validate="true"
+            input="/account.do"
+            parameter="update">
+      <forward name="failure" path="/account.do"/>
+      <forward name="success" path="/" redirect="true"/>
+    </action>
 
     <!-- user admin actions -->
 

@@ -25,10 +25,11 @@
     <to>/error.do</to>
   </rule>
 
-  <!-- login/signup rules -->
+  <!-- login rules -->
+
   <rule>
-    <from>^/account/new$</from>
-    <to>/account/new.do</to>
+    <from>^/welcome$</from>
+    <to>/welcome.do</to>
   </rule>
   <rule>
     <from>^/login$</from>
@@ -43,11 +44,14 @@
     <to>/logout.do</to>
   </rule>
 
-  <!-- home rules -->
-
+  <!-- account rules -->
   <rule>
-    <from>^/welcome$</from>
-    <to>/welcome.do</to>
+    <from>^/account/new$</from>
+    <to>/account/new.do</to>
+  </rule>
+  <rule>
+    <from>^/account$</from>
+    <to>/account.do</to>
   </rule>
 
   <!-- user rules -->

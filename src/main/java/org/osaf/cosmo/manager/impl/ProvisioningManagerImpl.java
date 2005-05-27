@@ -126,10 +126,20 @@ public class ProvisioningManagerImpl implements ProvisioningManager {
     /**
      */
     public User updateUser(User user) {
+        // XXX: make this configurable (2 * password-maxlength)
         if (user.getPassword().length() < 32) {
             user.setPassword(digestPassword(user.getPassword()));
         }
+
         userDao.updateUser(user);
+
+        // if the username was changed, rename the home directory. do
+        // this after the database update, because we can roll back
+        // the database if the homedir rename fails, but not vice
+        // versa.
+        if (user.isUsernameChanged()) {
+            shareDao.renameHomedir(user.getOldUsername(), user.getUsername());
+        }
 
         return userDao.getUser(user.getUsername());
     }

@@ -71,6 +71,25 @@ public class ContentStoreDAOJCR extends JCRDaoSupport implements ShareDAO {
 
     /**
      */
+    public void renameHomedir(final String oldUsername,
+                              final String newUsername) {
+        if (log.isDebugEnabled()) {
+            log.debug("renaming homedir from " + oldUsername + " to " +
+                      newUsername);
+        }
+        getTemplate().execute(new JCRCallback() {
+                public Object doInJCR(Session session)
+                    throws RepositoryException {
+                    session.move("/" + oldUsername,
+                                 "/" + newUsername);
+                    session.save();
+                    return null;
+                }
+            });
+    }
+
+    /**
+     */
     public void deleteHomedir(final String username) {
         if (log.isDebugEnabled()) {
             log.debug("deleting homedir for " + username);

@@ -29,6 +29,7 @@ public class User extends BaseModelObject {
 
     private Long id;
     private String username;
+    private String oldUsername;
     private String password;
     private String email;
     private Date dateCreated;
@@ -62,7 +63,20 @@ public class User extends BaseModelObject {
     /**
      */
     public void setUsername(String username) {
+        oldUsername = this.username;
         this.username = username;
+    }
+
+    /**
+     */
+    public String getOldUsername() {
+        return oldUsername;
+    }
+
+    /**
+     */
+    public boolean isUsernameChanged() {
+        return oldUsername != null && ! oldUsername.equals(username);
     }
 
     /**

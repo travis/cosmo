@@ -101,6 +101,7 @@
   <p class="hd">
     <b><fmt:message key="Account.View.AccountDetails.Header"/></b>
   </p>
+  <cosmo:errmsg/>
   <html:form action="/account/update">
     <table cellpadding="3" cellspacing="1" border="0">
       <tr>

@@ -46,7 +46,7 @@
          /account/new=ROLE_ANONYMOUS
          /account/signup.do=ROLE_ANONYMOUS,RUN_AS_ROOT
          /account=ROLE_ROOT,ROLE_USER
-         /account/update.do=ROLE_ROOT,ROLE_USER
+         /account/update.do=ROLE_ROOT,ROLE_USER,RUN_AS_ROOT
          /login=ROLE_ANONYMOUS
          /loginfailed=ROLE_ANONYMOUS
          /*.css=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS

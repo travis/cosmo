@@ -67,7 +67,7 @@
             forward="account.new"/>
 
     <action path="/account/signup"
-            type="org.osaf.cosmo.ui.UserAction"
+            type="org.osaf.cosmo.ui.AccountAction"
             name="signupAccountForm"
             scope="request"
             validate="true"
@@ -78,7 +78,7 @@
     </action>
 
     <action path="/account"
-            type="org.osaf.cosmo.ui.UserAction"
+            type="org.osaf.cosmo.ui.AccountAction"
             name="updateAccountForm"
             scope="request"
             validate="false"
@@ -87,14 +87,14 @@
     </action>
 
     <action path="/account/update"
-            type="org.osaf.cosmo.ui.UserAction"
+            type="org.osaf.cosmo.ui.AccountAction"
             name="updateAccountForm"
             scope="request"
             validate="true"
             input="/account.do"
             parameter="update">
       <forward name="failure" path="/account.do"/>
-      <forward name="success" path="/" redirect="true"/>
+      <forward name="success" path="/account" redirect="true"/>
     </action>
 
     <!-- user admin actions -->

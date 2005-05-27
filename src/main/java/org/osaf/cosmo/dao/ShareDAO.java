@@ -34,5 +34,9 @@ public interface ShareDAO extends DAO {
 
     /**
      */
+    public void renameHomedir(String oldUsername, String newUsername);
+
+    /**
+     */
     public void deleteHomedir(String username);
 }

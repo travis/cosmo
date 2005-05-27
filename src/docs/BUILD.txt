@@ -94,9 +94,7 @@ TEST
 
 There aren't too many tests yet, but those that exist can be run with
 'maven test'. Before doing so, however, you will need to initialize the
-test database with 'maven test:dbsetup'. Do these as separate maven calls,
-however, because otherwise the forked JUnit JVM will not have access
-to the hsqldb embedded within the original Maven process.
+test database with 'maven test:dbsetup'.
 
 If you want to build or package cosmo without running the tests (often
 useful when making small incremental changes to the user interface),

@@ -53,20 +53,6 @@ Q: The build fails because Maven can't download one of my jars. What's
       and that it is not overridden in your build.properties file.
 
 
-TESTING
-=======
-
-Q: Why do I have to run a separate Maven command to set up the test
-   database? Can't that be done automatically?
-
-    A: No, because we're using HSQLDB in embedded mode, which means
-       that the database is owned by a single process. To run our
-       tests, Maven forks off a separate process for JUnit. If we used
-       a single Maven command to set up the test db and run the tests,
-       then the forked JUnit JVM would not be able to access the
-       database.
-
-
 DEPLOYMENT
 ==========
 

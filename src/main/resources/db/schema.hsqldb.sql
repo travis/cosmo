@@ -52,3 +52,6 @@ INSERT INTO user VALUES (1, 'root', '32a8bd4d676f4fef0920c7da8db2bad7', 'root@lo
 --
 ALTER TABLE userrole ADD FOREIGN KEY (roleid) REFERENCES role (id);
 ALTER TABLE userrole ADD FOREIGN KEY (userid) REFERENCES user (id);
+
+COMMIT;
+SHUTDOWN

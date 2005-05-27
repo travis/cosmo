@@ -22,6 +22,8 @@
 <struts-config>
 
   <form-beans>
+    <form-bean name="forgotForm"
+               type="org.apache.struts.validator.LazyValidatorForm"/>
     <form-bean name="signupAccountForm" type="org.osaf.cosmo.ui.UserForm"/>
     <form-bean name="updateAccountForm" type="org.osaf.cosmo.ui.UserForm"/>
     <form-bean name="createUserForm" type="org.osaf.cosmo.ui.UserForm"/>
@@ -55,6 +57,16 @@
 
     <action path="/login"
             forward="login"/>
+
+    <action path="/forgot"
+            forward="forgot"/>
+
+    <action path="/remind"
+            name="forgotForm"
+            scope="request"
+            type="org.osaf.cosmo.ui.CredentialsReminderAction">
+      <forward name="ok" path="forgot"/>
+    </action>
 
     <action path="/logout"
             type="org.osaf.commons.struts.OSAFLogoutAction">

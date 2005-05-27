@@ -42,3 +42,10 @@ function setFoot() {
         footerSpacer.setAttribute('height', myHeight);
     }
 }
+
+function popup (url, name, features) {
+    popupWindow = window.open(url, name, features);
+    if (window.focus) {
+        popupWindow.focus();
+    }
+}

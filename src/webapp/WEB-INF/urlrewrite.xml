@@ -40,6 +40,14 @@
     <to>/login.do?login_failed=1</to>
   </rule>
   <rule>
+    <from>^/forgot$</from>
+    <to>/forgot.do</to>
+  </rule>
+  <rule>
+    <from>^/remind$</from>
+    <to>/remind.do</to>
+  </rule>
+  <rule>
     <from>^/logout$</from>
     <to>/logout.do</to>
   </rule>

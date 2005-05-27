@@ -63,4 +63,8 @@
       </td>
     </tr>
   </table>
+  <p class="md">
+    <c:url var="forgotUrl" value="/forgot"/>
+    <html:link page="/forgot" onclick="popup('${forgotUrl}', 'forgot', 'resizable=yes,width=480,height=200,left=40,screenx=40,top=20,screeny=20,scrollbars'); return false"><fmt:message key="Login.Forgot"/></html:link>
+  </p>
 </form>

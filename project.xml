@@ -329,7 +329,7 @@
     <dependency>
       <groupId>struts</groupId>
       <artifactId>struts</artifactId>
-      <version>1.2.4</version>
+      <version>1.2.7</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -337,7 +337,7 @@
     <dependency>
       <groupId>struts</groupId>
       <artifactId>struts-el</artifactId>
-      <version>1.2.4</version>
+      <version>1.2.7</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

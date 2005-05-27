@@ -21,9 +21,14 @@
 
 <tiles-definitions>
 
-  <!-- standard layout defs -->
+  <!-- layout defs -->
 
-  <definition name="layout.standard" page="/WEB-INF/jsp/layout.jsp">
+  <definition name="layout.standard" page="/WEB-INF/jsp/layout/standard.jsp">
+    <put name="body"         value="Replace!"/>
+    <put name="prefix"       value=""/>
+  </definition>
+
+  <definition name="layout.dialog" page="/WEB-INF/jsp/layout/dialog.jsp">
     <put name="body"         value="Replace!"/>
     <put name="prefix"       value=""/>
   </definition>
@@ -53,6 +58,12 @@
   <definition name="login" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/login.jsp"/>
     <put name="prefix"       value="Login."/>
+    <put name="showNav"      value="false"/>
+  </definition>
+
+  <definition name="forgot" extends="layout.dialog">
+    <put name="body"         value="/WEB-INF/jsp/forgot.jsp"/>
+    <put name="prefix"       value="Forgot."/>
     <put name="showNav"      value="false"/>
   </definition>
 

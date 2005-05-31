@@ -41,7 +41,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 /**
  * Action for managing users.
  */
-public class UserAction extends CosmoMappingDispatchAction {
+public class UserAction extends CosmoAction {
     private static final String MSG_ERROR_EXISTS = "User.Form.Exists";
     private static final String MSG_CONFIRM_CREATE = "User.Form.Created";
     private static final String MSG_CONFIRM_UPDATE = "User.Form.Updated";

@@ -39,7 +39,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 /**
  * Action for account self-management
  */
-public class AccountAction extends CosmoMappingDispatchAction {
+public class AccountAction extends CosmoAction {
     private static final String MSG_ERROR_EXISTS = "Account.Form.Exists";
     private static final String MSG_CONFIRM_UPDATE = "Account.Form.Updated";
     private static final Log log = LogFactory.getLog(AccountAction.class);

@@ -15,16 +15,20 @@ import org.apache.struts.validator.BeanValidatorForm;
 import org.osaf.commons.struts.OSAFStrutsConstants;
 
 /**
- * An {@link org.apache.struts.action.Action} that generates email
- * reminders for forgotten usernames and passwords.
+ * A {@link CosmoAction} that generates email reminders for forgotten
+ * usernames and passwords.
  */
-public class CredentialsReminderAction extends Action {
+public class CredentialsReminderAction extends CosmoAction {
     private static final Log log =
         LogFactory.getLog(CredentialsReminderAction.class);
 
     private static final String FORM_EMAIL = "email";
     private static final String FORM_BUTTON_USERNAME = "username";
     private static final String FORM_BUTTON_PASSWORD = "password";
+    private static final String MSG_CONFIRM_USERNAME =
+        "Forgot.Confirm.Username";
+    private static final String MSG_CONFIRM_PASSWORD =
+        "Forgot.Confirm.Password";
 
     /**
      * Looks up the user for the entered email address and:
@@ -49,13 +53,20 @@ public class CredentialsReminderAction extends Action {
 
         log.debug("email address: " + email);
 
-        if (forgotForm.get(FORM_BUTTON_USERNAME) != null) {
-            log.debug("reminding username");
+        if (wasUsernameButtonClicked(forgotForm)) {
+            saveConfirmationMessage(request, MSG_CONFIRM_USERNAME);
         }
-        if (forgotForm.get(FORM_BUTTON_PASSWORD) != null) {
-            log.debug("resetting password");
+        if (wasPasswordButtonClicked(forgotForm)) {
+            saveConfirmationMessage(request, MSG_CONFIRM_PASSWORD);
         }
 
         return mapping.findForward(OSAFStrutsConstants.FWD_OK);
+    }
+
+    public boolean wasUsernameButtonClicked(BeanValidatorForm form) {
+        return form.get(FORM_BUTTON_USERNAME) != null;
+    }
+    public boolean wasPasswordButtonClicked(BeanValidatorForm form) {
+        return form.get(FORM_BUTTON_PASSWORD) != null;
     }
 }

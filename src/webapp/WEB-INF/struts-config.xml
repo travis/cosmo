@@ -64,12 +64,14 @@
     <action path="/remind"
             name="forgotForm"
             scope="request"
+            validate="true"
+            input="/forgot.do"
             type="org.osaf.cosmo.ui.CredentialsReminderAction">
       <forward name="ok" path="forgot"/>
     </action>
 
     <action path="/logout"
-            type="org.osaf.commons.struts.OSAFLogoutAction">
+            type="org.osaf.cosmo.ui.LogoutAction">
       <forward name="ok" path="/" redirect="true"/>
     </action>
 

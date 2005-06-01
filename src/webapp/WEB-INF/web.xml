@@ -138,6 +138,6 @@
   </resource-env-ref>
   <resource-env-ref>
     <resource-env-ref-name>mail/cosmo</resource-env-ref-name>
-    <resource-env-ref-type>javax.sql.DataSource</resource-env-ref-type>
+    <resource-env-ref-type>javax.mail.Session</resource-env-ref-type>
   </resource-env-ref>
 </web-app>

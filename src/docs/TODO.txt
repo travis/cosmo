@@ -25,11 +25,16 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
- * precompile jsps for distribution
+ * i18n mail messages
+ * final copy and format for mail messages
+ * find a better way to specify configuration items than using j2ee
+   environment entries
+ * user error message for "email not unique"
  * find a way to tweak Acegi Security's run-as authz so that it
    doesn't refresh the SecureContext at the end of the account signup
    request, overwriting our automatic login and forcing the user to
    explicitly log in
+ * precompile jsps for distribution
  * see if we can't get Struts to work with "/user/bcm/update" rather
    than "/user/update.do" with "username=bcm" in content body
  * look into litmus failures

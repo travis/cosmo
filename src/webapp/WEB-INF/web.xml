@@ -34,6 +34,7 @@
       classpath:applicationContext-webapp.xml
       classpath:applicationContext-security-web.xml
       classpath:applicationContext-adapter-dav.xml
+      classpath:applicationContext-mail.xml
     </param-value>
   </context-param>
   <context-param>
@@ -133,6 +134,10 @@
   </resource-env-ref>
   <resource-env-ref>
     <resource-env-ref-name>jdbc/cosmo</resource-env-ref-name>
+    <resource-env-ref-type>javax.sql.DataSource</resource-env-ref-type>
+  </resource-env-ref>
+  <resource-env-ref>
+    <resource-env-ref-name>mail/cosmo</resource-env-ref-name>
     <resource-env-ref-type>javax.sql.DataSource</resource-env-ref-type>
   </resource-env-ref>
 </web-app>

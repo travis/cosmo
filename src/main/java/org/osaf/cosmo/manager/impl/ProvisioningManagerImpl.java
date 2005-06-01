@@ -107,7 +107,13 @@ public class ProvisioningManagerImpl implements ProvisioningManager {
     /**
      */
     public User getUserByUsername(String username) {
-        return userDao.getUser(username);
+        return userDao.getUserByUsername(username);
+    }
+
+    /**
+     */
+    public User getUserByEmail(String email) {
+        return userDao.getUserByEmail(email);
     }
 
     /**
@@ -120,7 +126,7 @@ public class ProvisioningManagerImpl implements ProvisioningManager {
             shareDao.createHomedir(user.getUsername());
         }
 
-        return userDao.getUser(user.getUsername());
+        return userDao.getUserByUsername(user.getUsername());
     }
 
     /**
@@ -141,7 +147,7 @@ public class ProvisioningManagerImpl implements ProvisioningManager {
             shareDao.renameHomedir(user.getOldUsername(), user.getUsername());
         }
 
-        return userDao.getUser(user.getUsername());
+        return userDao.getUserByUsername(user.getUsername());
     }
 
     /**

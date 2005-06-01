@@ -87,7 +87,13 @@ public class UserDAOJCR extends JCRDaoSupport implements UserDAO {
 
     /**
      */
-    public User getUser(String username) {
+    public User getUserByUsername(String username) {
+        return null;
+    }
+
+    /**
+     */
+    public User getUserByEmail(String email) {
         return null;
     }
 

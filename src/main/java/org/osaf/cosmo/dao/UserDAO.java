@@ -36,7 +36,11 @@ public interface UserDAO extends DAO {
 
     /**
      */
-    public User getUser(String username);
+    public User getUserByUsername(String username);
+
+    /**
+     */
+    public User getUserByEmail(String email);
 
     /**
      */

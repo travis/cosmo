@@ -1,6 +1,6 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"    %>
 <%@ attribute name="exception" required="true"
-              type="java.lang.Exception"       %>
+              type="java.lang.Throwable"       %>
 
 <c:if test="${not empty exception}">
   <div class="pre">

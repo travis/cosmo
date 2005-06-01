@@ -33,13 +33,18 @@
             value="${cosmo.test.userdb.username}"/>
     <filter token="DB_PASSWORD"
             value="${cosmo.test.userdb.password}"/>
+    <filter token="MAIL_TRANSPORT_PROTOCOL"
+            value="${cosmo.test.mail.transport.protocol}"/>
+    <filter token="MAIL_SMTP_HOST"
+            value="${cosmo.test.mail.smtp.host}"/>
+    <filter token="MAIL_SMTP_STARTTLS_ENABLE"
+            value="${cosmo.test.mail.smtp.starttls.enable}"/>
+    <filter token="MAIL_SMTPS_HOST"
+            value="${cosmo.test.mail.smtps.host}"/>
   </preGoal>
 
   <preGoal name="test:test">
-    <available property="test.db.exists" type="dir"
-               file="${maven.build.dir}/test-db"/>
-    <fail unless="test.db.exists"
-          message="You need to run 'maven test:dbsetup' first!"/>
+    <attainGoal name="test:dbsetup"/>
   </preGoal>
 
   <goal name="test:dbsetup">
@@ -112,6 +117,14 @@
         <filter token="DB_PASSWORD" value="${cosmo.dist.userdb.password}"/>
         <filter token="DB_DRIVER" value="${cosmo.dist.userdb.driver}"/>
         <filter token="DB_URL" value="${cosmo.dist.userdb.url}"/>
+        <filter token="MAIL_TRANSPORT_PROTOCOL"
+                value="${cosmo.dist.mail.transport.protocol}"/>
+        <filter token="MAIL_SMTP_HOST"
+                value="${cosmo.dist.mail.smtp.host}"/>
+        <filter token="MAIL_SMTP_STARTTLS_ENABLE"
+                value="${cosmo.dist.mail.smtp.starttls.enable}"/>
+        <filter token="MAIL_SMTPS_HOST"
+                value="${cosmo.dist.mail.smtps.host}"/>
       </filterset>
     </copy>
     <copy todir="${cosmo.dist.version}/etc"
@@ -131,14 +144,15 @@
         <include name="log4j-*.jar"/>
       </fileset>
     </copy>
-    <!-- need to make tomcat aware of the jcr classes for webapp
-         reloads -->
+    <!-- tomcat uses a different classloader to find these when
+         setting up jndi resources -->
     <copy todir="${cosmo.dist.version}/tomcat/common/lib">
       <fileset dir="${maven.build.dir}/${pom.artifactId}/WEB-INF/lib">
         <include name="jcr-*.jar"/>
+        <include name="mailapi-*.jar"/>
+        <include name="activation-*.jar"/>
       </fileset>
     </copy>
-    <!-- needed for database access -->
     <copy todir="${cosmo.dist.version}/tomcat/common/lib"
           file="${cosmo.dist.userdb.jar}"/>
   </goal>

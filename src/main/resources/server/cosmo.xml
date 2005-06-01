@@ -76,6 +76,26 @@
       <value>@DB_URL@</value>
     </parameter>
   </ResourceParams>
+  <Resource name="mail/cosmo"
+            type="javax.mail.Session"/>
+  <ResourceParams name="mail/cosmo">
+    <parameter>
+      <name>mail.transport.protocol</name>
+      <value>@MAIL_TRANSPORT_PROTOCOL@</value>
+    </parameter>
+    <parameter>
+      <name>mail.smtp.host</name>
+      <value>@MAIL_SMTP_HOST@</value>
+    </parameter>
+    <parameter>
+      <name>mail.smtps.host</name>
+      <value>@MAIL_SMTPS_HOST@</value>
+    </parameter>
+    <parameter>
+      <name>mail.smtp.starttls.enable</name>
+      <value>@MAIL_SMTP_STARTTLS_ENABLE@</value>
+    </parameter>
+  </ResourceParams>
   <Realm className="org.apache.catalina.realm.DataSourceRealm"
          dataSourceName="jdbc/cosmo"
          roleNameCol="rolename"

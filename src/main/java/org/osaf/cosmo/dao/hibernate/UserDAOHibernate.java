@@ -46,6 +46,8 @@ public class UserDAOHibernate extends HibernateDaoSupport
         "from User order by username";
     private static final String HQL_GET_USER_BY_USERNAME =
         "from User where username=?";
+    private static final String HQL_GET_USER_BY_EMAIL =
+        "from User where email=?";
     private static final String HQL_DELETE_USER =
         "from User where id=?";
 
@@ -72,23 +74,33 @@ public class UserDAOHibernate extends HibernateDaoSupport
             });
     }
 
-    /**
-     */
-    public User getUser(final String username) {
+    private User queryForUser(final String query,
+                              final String param) {
         return (User) getHibernateTemplate().execute(new HibernateCallback() {
                 public Object doInHibernate(Session session)
                     throws HibernateException, SQLException {
-                    List users = session.find(HQL_GET_USER_BY_USERNAME,
-                                              username, Hibernate.STRING);
+                    List users = session.find(query, param, Hibernate.STRING);
                     if (users.isEmpty()) {
                         throw new ObjectRetrievalFailureException(User.class,
-                                                                  username);
+                                                                  param);
                     }
                     User user = (User) users.get(0);
                     Hibernate.initialize(user.getRoles());
                     return user;
                 }
             });
+    }
+
+    /**
+     */
+    public User getUserByUsername(String username) {
+        return queryForUser(HQL_GET_USER_BY_USERNAME, username);
+    }
+
+    /**
+     */
+    public User getUserByEmail(String email) {
+        return queryForUser(HQL_GET_USER_BY_EMAIL, email);
     }
 
     /**

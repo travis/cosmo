@@ -55,4 +55,19 @@
   <bean name="/account/signup" parent="accountAction"/>
   <bean name="/account/update" parent="accountAction"/>
 
+  <!-- credentials reminder actions -->
+
+  <bean name="/remind" singleton="false"
+        class="org.osaf.cosmo.ui.CredentialsReminderAction" >
+    <property name="provisioningManager">
+      <ref bean="provisioningManager"/>
+    </property>
+    <property name="mailSender">
+      <ref bean="mailSender"/>
+    </property>
+    <property name="securityManager">
+      <ref bean="securityManager"/>
+    </property>
+  </bean>
+
 </beans>

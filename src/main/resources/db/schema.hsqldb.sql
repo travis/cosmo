@@ -41,7 +41,8 @@ CREATE TABLE user (
   email VARCHAR(32) NOT NULL,
   dateCreated DATETIME NOT NULL,
   dateModified DATETIME NOT NULL,
-  CONSTRAINT username UNIQUE (username)
+  CONSTRAINT username UNIQUE (username),
+  CONSTRAINT email UNIQUE (email)
 );
 
 INSERT INTO user VALUES (1, 'root', '32a8bd4d676f4fef0920c7da8db2bad7', 'root@localhost', NOW(), NOW());

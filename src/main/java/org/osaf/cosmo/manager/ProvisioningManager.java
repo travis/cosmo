@@ -53,6 +53,10 @@ public interface ProvisioningManager extends Manager {
 
     /**
      */
+    public User getUserByEmail(String email);
+
+    /**
+     */
     public User saveUser(User user);
 
     /**

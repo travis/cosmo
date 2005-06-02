@@ -25,7 +25,6 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
- * i18n mail messages
  * final copy and format for mail messages
  * find a better way to specify configuration items than using j2ee
    environment entries

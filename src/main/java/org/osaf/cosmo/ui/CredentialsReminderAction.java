@@ -1,5 +1,6 @@
 package org.osaf.cosmo.ui;
 
+import java.util.Locale;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.util.MessageResources;
 import org.apache.struts.validator.BeanValidatorForm;
 
 import org.osaf.commons.struts.OSAFStrutsConstants;
@@ -37,6 +39,14 @@ public class CredentialsReminderAction extends CosmoAction {
         "Forgot.Confirm.Username";
     private static final String MSG_CONFIRM_PASSWORD =
         "Forgot.Confirm.Password";
+    private static final String MSG_USERNAME_REMINDER_SUBJECT =
+        "Email.UsernameReminder.Subject";
+    private static final String MSG_USERNAME_REMINDER_TEXT =
+        "Email.UsernameReminder.Text";
+    private static final String MSG_PASSWORD_RESET_SUBJECT =
+        "Email.PasswordReset.Subject";
+    private static final String MSG_PASSWORD_RESET_TEXT =
+        "Email.PasswordReset.Text";
 
     private JavaMailSender mailSender;
     private ProvisioningManager mgr;
@@ -76,14 +86,14 @@ public class CredentialsReminderAction extends CosmoAction {
         User user = mgr.getUserByEmail(email);
 
         if (wasUsernameButtonClicked(forgotForm)) {
-            sendUsernameReminderMessage(user);
+            sendUsernameReminderMessage(request, user);
             saveConfirmationMessage(request, MSG_CONFIRM_USERNAME);
         }
         if (wasPasswordButtonClicked(forgotForm)) {
             String newPassword = generatePassword();
             user.setPassword(newPassword);
             mgr.updateUser(user);
-            sendPasswordResetMessage(user, newPassword);
+            sendPasswordResetMessage(request, user, newPassword);
             saveConfirmationMessage(request, MSG_CONFIRM_PASSWORD);
         }
 
@@ -103,39 +113,57 @@ public class CredentialsReminderAction extends CosmoAction {
         return "deadbeef";
     }
 
-    private void sendUsernameReminderMessage(final User user) {
+    private void sendUsernameReminderMessage(final HttpServletRequest request,
+                                             final User user) {
         mailSender.send(new MimeMessagePreparator() {
                 public void prepare(MimeMessage mimeMessage)
                     throws MessagingException {
-                    // XXX enclose both text and html versions?
+                    MessageResources resources = getResources(request);
+                    Locale locale = getLocale(request);
+
+                    String subject =
+                        resources.getMessage(locale,
+                                             MSG_USERNAME_REMINDER_SUBJECT);
+                    String text =
+                        resources.getMessage(locale,
+                                             MSG_USERNAME_REMINDER_TEXT,
+                                             user.getUsername());
+
                     MimeMessageHelper message =
                         new MimeMessageHelper(mimeMessage);
                     // XXX serverAdmin config property
                     message.setFrom("root@localhost");
                     message.setTo(user.getEmail());
-                    // XXX i18n these
-                    message.setSubject("Cosmo username reminder");
-                    message.setText("Your username is:\t" + user.getUsername() +
-                                    "\n");
+                    message.setSubject(subject);
+                    message.setText(text);
                 }
             });
     }
 
-    private void sendPasswordResetMessage(final User user,
+    private void sendPasswordResetMessage(final HttpServletRequest request,
+                                          final User user,
                                           final String newPassword) {
         mailSender.send(new MimeMessagePreparator() {
                 public void prepare(MimeMessage mimeMessage)
                     throws MessagingException {
-                    // XXX enclose both text and html versions?
+                    MessageResources resources = getResources(request);
+                    Locale locale = getLocale(request);
+
+                    String subject =
+                        resources.getMessage(locale,
+                                             MSG_PASSWORD_RESET_SUBJECT);
+                    String text =
+                        resources.getMessage(locale,
+                                             MSG_PASSWORD_RESET_TEXT,
+                                             newPassword);
+
                     MimeMessageHelper message =
                         new MimeMessageHelper(mimeMessage);
                     // XXX serverAdmin config property
                     message.setFrom("root@localhost");
                     message.setTo(user.getEmail());
-                    // XXX i18n these
-                    message.setSubject("Cosmo password");
-                    message.setText("Your new password is:\t" + newPassword +
-                                    "\n");
+                    message.setSubject(subject);
+                    message.setText(text);
                 }
             });
     }

@@ -22,6 +22,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,10 +41,18 @@ import org.springframework.dao.DataIntegrityViolationException;
  * Action for account self-management
  */
 public class AccountAction extends CosmoAction {
-    private static final String MSG_ERROR_EXISTS = "Account.Form.Exists";
+    private static final String MSG_ERROR_EMAIL_EXISTS =
+        "Account.Form.EmailExists";
+    private static final String MSG_ERROR_USERNAME_EXISTS =
+        "Account.Form.UsernameExists";
     private static final String MSG_CONFIRM_UPDATE = "Account.Form.Updated";
     private static final Log log = LogFactory.getLog(AccountAction.class);
 
+    /**
+     * The request parameter that contains the email address
+     * identifying a user.
+     */
+    public static final String PARAM_EMAIL = "email";
     /**
      * The request parameter that contains the username identifying a
      * user.
@@ -105,7 +114,7 @@ public class AccountAction extends CosmoAction {
 
             request.setAttribute(ATTR_USER, user);
         } catch (DataIntegrityViolationException e) {
-            saveErrorMessage(request, MSG_ERROR_EXISTS, PARAM_USERNAME);
+            handleIntegrityViolation(request, e);
             return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
         }
 
@@ -117,7 +126,7 @@ public class AccountAction extends CosmoAction {
 
         return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
     }
-
+    
     /**
      * Updates the specified user.
      */
@@ -139,7 +148,7 @@ public class AccountAction extends CosmoAction {
             request.setAttribute(ATTR_USER, user);
             saveConfirmationMessage(request, MSG_CONFIRM_UPDATE);
         } catch (DataIntegrityViolationException e) {
-            saveErrorMessage(request, MSG_ERROR_EXISTS, PARAM_USERNAME);
+            handleIntegrityViolation(request, e);
             return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
         }
 
@@ -162,5 +171,26 @@ public class AccountAction extends CosmoAction {
         form.setUsername(user.getUsername());
         form.setEmail(user.getEmail());
         // never set password into the form
+    }
+
+    // would be great if this exception told us which constraint was
+    // violated.. we have to work it out for ourself, breaking
+    // encapsulation
+    private void handleIntegrityViolation(HttpServletRequest request,
+                                          DataIntegrityViolationException e) {
+        if (e.getCause() instanceof SQLException) {
+            if (e.getCause().getMessage().toLowerCase().
+                startsWith("unique constraint violation: email")) {
+                saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS,
+                                 PARAM_EMAIL);
+                return;
+            } else if (e.getCause().getMessage().toLowerCase().
+                       startsWith("unique constraint violation: username")) {
+                saveErrorMessage(request, MSG_ERROR_USERNAME_EXISTS,
+                                 PARAM_USERNAME);
+                return;
+            }
+        }
+        throw e;
     }
 }

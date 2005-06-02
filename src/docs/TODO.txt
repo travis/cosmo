@@ -28,7 +28,6 @@ for current development plan. Additional tasks:
  * final copy and format for mail messages
  * find a better way to specify configuration items than using j2ee
    environment entries
- * user error message for "email not unique"
  * find a way to tweak Acegi Security's run-as authz so that it
    doesn't refresh the SecureContext at the end of the account signup
    request, overwriting our automatic login and forcing the user to

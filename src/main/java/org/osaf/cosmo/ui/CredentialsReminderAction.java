@@ -17,6 +17,7 @@ import org.apache.struts.util.MessageResources;
 import org.apache.struts.validator.BeanValidatorForm;
 
 import org.osaf.commons.struts.OSAFStrutsConstants;
+import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.User;
 
@@ -121,6 +122,8 @@ public class CredentialsReminderAction extends CosmoAction {
                     MessageResources resources = getResources(request);
                     Locale locale = getLocale(request);
 
+                    String from = (String) getServlet().getServletContext().
+                        getAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN);
                     String subject =
                         resources.getMessage(locale,
                                              MSG_USERNAME_REMINDER_SUBJECT);
@@ -131,8 +134,7 @@ public class CredentialsReminderAction extends CosmoAction {
 
                     MimeMessageHelper message =
                         new MimeMessageHelper(mimeMessage);
-                    // XXX serverAdmin config property
-                    message.setFrom("root@localhost");
+                    message.setFrom(from);
                     message.setTo(user.getEmail());
                     message.setSubject(subject);
                     message.setText(text);
@@ -149,6 +151,8 @@ public class CredentialsReminderAction extends CosmoAction {
                     MessageResources resources = getResources(request);
                     Locale locale = getLocale(request);
 
+                    String from = (String) getServlet().getServletContext().
+                        getAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN);
                     String subject =
                         resources.getMessage(locale,
                                              MSG_PASSWORD_RESET_SUBJECT);
@@ -159,8 +163,7 @@ public class CredentialsReminderAction extends CosmoAction {
 
                     MimeMessageHelper message =
                         new MimeMessageHelper(mimeMessage);
-                    // XXX serverAdmin config property
-                    message.setFrom("root@localhost");
+                    message.setFrom(from);
                     message.setTo(user.getEmail());
                     message.setSubject(subject);
                     message.setText(text);

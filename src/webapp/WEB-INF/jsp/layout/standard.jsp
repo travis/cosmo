@@ -28,6 +28,13 @@
   <cosmo-core:user var="user"/>
 </c:if>
 
+<u:bind var="SC_ATTR_SERVER_ADMIN"
+        type="org.osaf.cosmo.CosmoConstants"
+        field="SC_ATTR_SERVER_ADMIN"/>
+<u:bind var="SC_ATTR_VERSION"
+        type="org.osaf.cosmo.CosmoConstants"
+        field="SC_ATTR_VERSION"/>
+
 <html:html xhtml="true">
   <head>
     <title>
@@ -105,9 +112,9 @@
               border="0" styleId="footerSpacer"/>
     <hr noshade="noshade"/>
     <div class="footer">
-      <a href="mailto:${applicationScope.cosmoServerAdmin}">
+      <a href="mailto:${applicationScope[SC_ATTR_SERVER_ADMIN]}">
         <fmt:message key="Layout.Footer">
-          <fmt:param value="${applicationScope.cosmoVersion}"/>
+          <fmt:param value="${applicationScope[SC_ATTR_VERSION]}"/>
         </fmt:message>
       </a>
       <jsp:useBean id="now" class="java.util.Date"/>

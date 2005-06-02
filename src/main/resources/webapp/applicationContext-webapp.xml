@@ -19,7 +19,7 @@
 -->
 
 <!--
-    Application context containing WebDAV server beans
+    Application context making beans available to the web application
 -->
 
 <beans>
@@ -28,10 +28,10 @@
      class="org.springframework.web.context.support.ServletContextAttributeExporter">
     <property name="attributes">
       <map>
-        <entry key="cosmoVersion">
+        <entry key="cosmo.version">
           <ref bean="cosmoVersion"/>
         </entry>
-        <entry key="cosmoServerAdmin">
+        <entry key="cosmo.serverAdmin">
           <ref bean="cosmoServerAdmin"/>
         </entry>
       </map>

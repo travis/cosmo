@@ -61,7 +61,7 @@ following steps:
 
     * Create a certificate keystore by executing the following
       command as the user which will run Cosmo, specifying
-      a password value of "cosmo" for both the keystore password
+      a password value of "osafcosmo" for both the keystore password
       and the key (certificate) password:
 
         Unix:

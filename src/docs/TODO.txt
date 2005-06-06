@@ -25,9 +25,6 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
- * final copy and format for mail messages
- * find a better way to specify configuration items than using j2ee
-   environment entries
  * find a way to tweak Acegi Security's run-as authz so that it
    doesn't refresh the SecureContext at the end of the account signup
    request, overwriting our automatic login and forcing the user to
@@ -35,13 +32,16 @@ for current development plan. Additional tasks:
  * precompile jsps for distribution
  * see if we can't get Struts to work with "/user/bcm/update" rather
    than "/user/update.do" with "username=bcm" in content body
+ * final copy and format for mail messages
+ * find a better way to specify configuration items than using j2ee
+   environment entries
  * look into litmus failures
 
 
 LATER RELEASES
 ==============
 
-See "Cuts" section of the 0.2 Spec at
+See "Deferred Features" section of the 0.2 Spec at
 <http://cvs.osafoundation.org/viewcvs.cgi/*checkout*/cosmo/src/docs/spec/cosmo-0.2-spec.html?rev=HEAD&content-type=text/html>. Additonal tasks:
 
  * account activation

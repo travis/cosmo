@@ -106,16 +106,6 @@
     <table cellpadding="3" cellspacing="1" border="0">
       <tr>
         <td class="md" align="right">
-          <b><fmt:message key="Account.Form.Username"/></b>
-        </td>
-        <td class="md" align="left">
-          <html:text property="username" size="32" maxlength="32"
-                     styleClass="md"/>
-          <cosmo:errmsg property="username"/>
-        </td>
-      </tr>
-      <tr>
-        <td class="md" align="right">
           <b><fmt:message key="Account.Form.Email"/></b>
         </td>
         <td class="md" align="left">

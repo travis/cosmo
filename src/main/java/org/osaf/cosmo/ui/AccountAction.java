@@ -154,7 +154,10 @@ public class AccountAction extends CosmoAction {
     }
 
     private void populateUser(User user, UserForm form) {
-        user.setUsername(form.getUsername());
+        // user does not get to change his username once it's set
+        if (user.getId() == null) {
+            user.setUsername(form.getUsername());
+        }
         user.setEmail(form.getEmail());
         // password is required for signup but not for update. on
         // update, don't blank out the saved password if the user is

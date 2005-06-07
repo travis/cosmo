@@ -43,7 +43,7 @@
             value="${cosmo.test.mail.smtps.host}"/>
   </preGoal>
 
-  <preGoal name="test:test">
+  <preGoal name="test:test-resources">
     <attainGoal name="test:dbsetup"/>
   </preGoal>
 

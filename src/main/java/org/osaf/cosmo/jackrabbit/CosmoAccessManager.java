@@ -48,10 +48,13 @@ import org.apache.jackrabbit.core.security.AMContext;
  * parameter in the repository configuration.
  */
 public class CosmoAccessManager implements AccessManager {
+    private static final String DEFAULT_SECURITY_MANAGER_CLASS =
+            "org.osaf.cosmo.security.impl.CosmoSecurityManagerImpl";
     private static final Log log = LogFactory.getLog(CosmoAccessManager.class);
 
     private HierarchyManager hierarchyManager;
     private String homedirWorkspaceName;
+    private String securityManagerClass;
     private boolean initialized;
     private boolean root;
     private CosmoSecurityContext securityContext;
@@ -62,6 +65,7 @@ public class CosmoAccessManager implements AccessManager {
     public CosmoAccessManager() {
         initialized = false;
         root = false;
+        securityManagerClass = DEFAULT_SECURITY_MANAGER_CLASS;
     }
 
     /* ----- AccessManager methods ----- */
@@ -82,6 +86,10 @@ public class CosmoAccessManager implements AccessManager {
 
         if (homedirWorkspaceName == null) {
             throw new IllegalStateException("homedirWorkspaceName not defined");
+        }
+
+        if (securityManagerClass == null) {
+            throw new IllegalStateException("securityManagerClass not defined");
         }
 
         if (! canAccess(context.getWorkspaceName())) {
@@ -310,8 +318,10 @@ public class CosmoAccessManager implements AccessManager {
 
     /**
      */
-    protected CosmoSecurityManager createSecurityManager() {
-        return new CosmoSecurityManagerImpl();
+    protected CosmoSecurityManager createSecurityManager()
+        throws Exception {
+        return (CosmoSecurityManager)
+            Class.forName(securityManagerClass).newInstance();
     }
 
     /**
@@ -330,6 +340,18 @@ public class CosmoAccessManager implements AccessManager {
      */
     public void setHomedirWorkspaceName(String homedirWorkspaceName) {
         this.homedirWorkspaceName = homedirWorkspaceName;
+    }
+
+    /**
+     */
+    public String getSecurityManagerClass() {
+        return securityManagerClass;
+    }
+
+    /**
+     */
+    public void setSecurityManagerClass(String securityManagerClass) {
+        this.securityManagerClass = securityManagerClass;
     }
 
     /**

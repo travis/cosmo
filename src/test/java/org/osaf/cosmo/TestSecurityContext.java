@@ -13,22 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.security.impl;
+package org.osaf.cosmo;
 
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
-import org.osaf.cosmo.security.CosmoUserDetails;
 
 import java.util.Iterator;
+import java.security.Principal;
 import javax.security.auth.Subject;
-
-import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.GrantedAuthority;
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import net.sf.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
-import net.sf.acegisecurity.runas.RunAsUserToken;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -36,45 +30,42 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * The default implementation of {@link CosmoSecurityContext}. Wraps
- * an instance of Acegi Security's
- * {@link net.sf.acegisecurity.Authentication}.
+ * A test implementation of {@link CosmoSecurityContext} that provides
+ * dummy instances for use with unit tests.
  */
-public class CosmoSecurityContextImpl implements CosmoSecurityContext {
+public class TestSecurityContext implements CosmoSecurityContext {
     private static final Log log =
-        LogFactory.getLog(CosmoSecurityContextImpl.class);
+        LogFactory.getLog(TestSecurityContext.class);
 
     private boolean anonymous;
-    private Authentication authentication;
+    private Principal principal;
     private boolean rootRole;
     private Subject subject;
     private User user;
 
     /**
      */
-    public CosmoSecurityContextImpl(Authentication authentication) {
+    public TestSecurityContext(Principal principal) {
         this.anonymous = false;
-        this.authentication = authentication;
+        this.principal = principal;
         this.rootRole = false;
 
         this.subject = new Subject();
-        this.subject.getPrincipals().add(authentication);
-        this.subject.getPrivateCredentials().
-            add(authentication.getCredentials());
+        this.subject.getPrincipals().add(principal);
 
-        processAuthentication();
+        processPrincipal();
     }
 
     /**
      */
-    public CosmoSecurityContextImpl(Authentication authentication,
-                                    Subject subject) {
+    public TestSecurityContext(Principal principal,
+                               Subject subject) {
         this.anonymous = false;
-        this.authentication = authentication;
+        this.principal = principal;
         this.rootRole = false;
         this.subject = subject;
 
-        processAuthentication();
+        processPrincipal();
     }
 
     /* ----- CosmoSecurityContext methods ----- */
@@ -133,22 +124,17 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
 
     /**
      */
-    protected Authentication getAuthentication() {
-        return authentication;
+    protected Principal getPrincipal() {
+        return principal;
     }
 
-    private void processAuthentication() {
-        //anonymous principals do not have CosmoUserDetails and by
-        //definition are not running as other principals
-        if (authentication instanceof AnonymousAuthenticationToken) {
+    private void processPrincipal() {
+        if (principal instanceof TestAnonymousPrincipal) {
             anonymous = true;
-            return;
         }
-
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof CosmoUserDetails) {
-            user = ((CosmoUserDetails) principal).getUser();
-
+        else if (principal instanceof TestUserPrincipal) {
+            user = ((TestUserPrincipal) principal).getUser();
+            
             // determine if the user is in the root role
             for (Iterator i=user.getRoles().iterator(); i.hasNext();) {
                 Role role = (Role) i.next();
@@ -158,6 +144,6 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
                 }
             }
         }
-
+        
     }
 }

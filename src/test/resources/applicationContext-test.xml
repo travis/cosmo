@@ -34,6 +34,12 @@
     </constructor-arg>
   </bean>
 
+   <!-- Cosmo security -->
+
+   <bean id="securityManager"
+         class="org.osaf.cosmo.TestSecurityManager">
+   </bean>
+
   <!-- JDBC data source -->
 
   <bean id="dataSource"
@@ -68,6 +74,10 @@
   </bean>
 
   <bean id="authenticationProvider"
-        class="org.osaf.cosmo.TestAuthenticationProvider"/>
+        class="org.osaf.cosmo.spring.jcr.CosmoJCRAuthenticationProvider">
+    <property name="securityManager">
+      <ref bean="securityManager"/>
+    </property>
+  </bean>
 
 </beans>

@@ -15,12 +15,16 @@
  */
 package org.osaf.cosmo;
 
+import java.security.Principal;
+
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.security.CosmoSecurityManager;
 
 /**
  */
 public class TestHelper {
+    static int apseq = 0;
     static int rseq = 0;
     static int useq = 0;
 
@@ -40,14 +44,60 @@ public class TestHelper {
 
     /**
      */
-    public static User makeDummyUser() {
-        String serial = new Integer(++useq).toString();
+    public static User makeDummyUser(String username,
+                                     String password) {
+        if (username == null) {
+            throw new IllegalArgumentException("username required");
+        }
+        if (password == null) {
+            throw new IllegalArgumentException("password required");
+        }
 
         User user = new User();
-        user.setUsername("dummy" + serial);
-        user.setEmail(user.getUsername() + "@osafoundation.org");
-        user.setPassword(user.getUsername());
+        user.setUsername(username);
+        user.setFirstName(username);
+        user.setLastName(username);
+        user.setEmail(username + "@localhost");
+        user.setPassword(password);
 
         return user;
+    }
+
+    /**
+     */
+    public static User makeDummyUser() {
+        String serial = new Integer(++useq).toString();
+        String username = "dummy" + serial;
+        return makeDummyUser(username, username);
+    }
+
+    /**
+     */
+    public static Principal makeDummyUserPrincipal() {
+        return new TestUserPrincipal(makeDummyUser());
+    }
+
+    /**
+     */
+    public static Principal makeDummyUserPrincipal(String name,
+                                                   String password) {
+        return new TestUserPrincipal(makeDummyUser(name, password));
+    }
+
+    /**
+     */
+    public static Principal makeDummyAnonymousPrincipal() {
+        String serial = new Integer(++apseq).toString();
+        return new TestAnonymousPrincipal("dummy" + serial);
+    }
+
+    /**
+     */
+    public static Principal makeDummyRootPrincipal() {
+        User user = makeDummyUser();
+        Role role = new Role();
+        role.setName(CosmoSecurityManager.ROLE_ROOT);
+        user.addRole(role);
+        return new TestUserPrincipal(user);
     }
 }

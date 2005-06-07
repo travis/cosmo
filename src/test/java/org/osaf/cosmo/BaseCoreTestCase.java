@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo;
 
+import java.security.Principal;
+
 import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
@@ -30,7 +32,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class BaseCoreTestCase extends TestCase {
     private static final Log log = LogFactory.getLog(BaseCoreTestCase.class);
-    private ApplicationContext appCtx = null;
+    private ApplicationContext appCtx;
+    private TestSecurityManager securityManager;
 
     /**
      */
@@ -43,6 +46,24 @@ public class BaseCoreTestCase extends TestCase {
             "/applicationContext-provisioning.xml"
         };
         appCtx = new ClassPathXmlApplicationContext(paths);
+        securityManager = new TestSecurityManager();
+    }
+
+    /**
+     */
+    protected void setUp() throws Exception {
+        super.setUp();
+        // by default set up a root security context. subclasses can
+        // override.
+        Principal principal = TestHelper.makeDummyRootPrincipal();
+        securityManager.setUpTestSecurityContext(principal);
+    }
+
+    /**
+     */
+    protected void tearDown() throws Exception {
+        securityManager.tearDownTestSecurityContext();
+        super.tearDown();
     }
 
     /**

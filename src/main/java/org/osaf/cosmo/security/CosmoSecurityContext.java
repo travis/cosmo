@@ -27,6 +27,12 @@ import javax.security.auth.Subject;
 public interface CosmoSecurityContext {
 
     /**
+     * Returns a name describing the principal for this security
+     * context (either the name of the Cosmo user or "anonymous").
+     */
+    public String getName();
+
+    /**
      * Determines whether or not the context represents a Cosmo user
      * account or an anonymous user.
      */

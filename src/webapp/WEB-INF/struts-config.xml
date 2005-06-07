@@ -88,7 +88,7 @@
             input="/account/new.do"
             parameter="signup">
       <forward name="failure" path="/account/new.do"/>
-      <forward name="success" path="/login" redirect="true"/>
+      <forward name="success" path="/account" redirect="true"/>
     </action>
 
     <action path="/account"

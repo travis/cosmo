@@ -44,8 +44,6 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
     private static final Log log =
         LogFactory.getLog(CosmoSecurityContextImpl.class);
 
-    public static final String AUTHORITY_RUN_AS_ROOT = "ROLE_RUN_AS_ROOT";
-
     private boolean anonymous;
     private Authentication authentication;
     private boolean rootRole;
@@ -150,18 +148,5 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
             }
         }
 
-        // even if the user is anonymous, or if he's not a root user,
-        // the application may specify that he runs as root
-        // (e.g. anonymous user signing up for an account)
-        if (authentication instanceof RunAsUserToken) {
-            GrantedAuthority[] authorities =  authentication.getAuthorities();
-            for (int i=0; i<authorities.length; i++) {
-                String authority = authorities[i].getAuthority();
-                if (authority.equals(AUTHORITY_RUN_AS_ROOT)) {
-                    rootRole=true;
-                    break;
-                }
-            }
-        }
     }
 }

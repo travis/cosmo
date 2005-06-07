@@ -143,15 +143,16 @@ public class CosmoAccessManager implements AccessManager {
             return;
         }
 
-        // Jackrabbit seems to require read privilege on the root node
-        // when deleting a resource in a home directory, so allow
-        // anybody to read it but nothing else
         if (path.denotesRoot()) {
-            if ((permissions & READ) == READ) {
-                return;
+            // Jackrabbit requires read permission on the root node
+            // in order to read a homedir node. Similarly, it
+            // requires write permission on the root node in order
+            // to write a homedir node. Grant those permissions to
+            // any authenticated user.
+            if (isAnonymous()) {
+                throw new AccessDeniedException("anonymous access not allowed for root node");
             }
-            log.error("write access not supported for root node");
-            throw new AccessDeniedException();
+            return;
         }
 
         // Jackrabbit does not use an AccessManager to enforce
@@ -163,8 +164,7 @@ public class CosmoAccessManager implements AccessManager {
         if (isVersionStorageItem(path)) {
             if ((permissions & WRITE) == WRITE ||
                 (permissions & REMOVE) == REMOVE) {
-                log.error("write access not supported for version storage");
-                throw new AccessDeniedException();
+                throw new AccessDeniedException("write access not supported for version storage item " + id);
             }
             return;
         }
@@ -204,15 +204,17 @@ public class CosmoAccessManager implements AccessManager {
             return true;
         }
 
-        // Jackrabbit seems to require read privilege on the root node
-        // when deleting a resource in a home directory, so allow
-        // anybody to read it but nothing else
         if (path.denotesRoot()) {
-            if ((permissions & READ) == READ) {
-                return true;
+            // Jackrabbit requires read permission on the root node
+            // in order to read a homedir node. Similarly, it
+            // requires write permission on the root node in order
+            // to write a homedir node. Grant those permissions to
+            // any authenticated user.
+            if (isAnonymous()) {
+                log.error("anonymous access not allowed for root node");
+                return false;
             }
-            log.error("write access not supported for root node");
-            return false;
+            return true;
         }
 
         // Jackrabbit does not use an AccessManager to enforce
@@ -224,10 +226,9 @@ public class CosmoAccessManager implements AccessManager {
         if (isVersionStorageItem(path)) {
             if ((permissions & WRITE) == WRITE ||
                 (permissions & REMOVE) == REMOVE) {
-                log.error("write access not supported for version storage");
+                log.error("write access not supported for version storage item at path " + id2path(id));
                 return false;
             }
-
             return true;
         }
 
@@ -255,6 +256,14 @@ public class CosmoAccessManager implements AccessManager {
     /* ----- our methods ----- */
 
     /**
+     * Determines whether or not the <code>subject</code> represents an
+     * anonymous user.
+     */
+    public boolean isAnonymous() {
+        return securityContext.isAnonymous();
+    }
+
+    /**
      * Determines whether or not the <code>subject</code> represents a
      * user with root privileges.
      */
@@ -274,6 +283,10 @@ public class CosmoAccessManager implements AccessManager {
      */
     public boolean isOwner(Path path)
         throws RepositoryException {
+        if (isRoot() || isAnonymous()) {
+            return false;
+        }
+
         // if the item is a version history node, then find the
         // versionable node it represents and use that path instead
         // it will be of type nt:versionHistory with a 

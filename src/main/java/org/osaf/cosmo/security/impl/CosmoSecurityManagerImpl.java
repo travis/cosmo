@@ -84,13 +84,14 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
     }
 
     /**
-     * Create and register a <code>CosmoSecurityContext</code> for the
-     * given Cosmo credentials. This method is used when Cosmo
-     * components need to programatically log in a user rather than
-     * relying on a security context already being in place.
+     * Authenticate the given Cosmo credentials and register a
+     * <code>CosmoSecurityContext</code> for them. This method is used
+     * when Cosmo components need to programatically log in a user
+     * rather than relying on a security context already being in
+     * place.
      */
-    public CosmoSecurityContext establishSecurityContext(String username,
-                                                         String password)
+    public CosmoSecurityContext initiateSecurityContext(String username,
+                                                        String password)
         throws CosmoSecurityException {
         try {
             UsernamePasswordAuthenticationToken credentials =
@@ -104,6 +105,20 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
             throw new CosmoSecurityException("can't establish security context",
                                              e);
         }
+    }
+
+    /**
+     * Overwrite the existing <code>CosmoSecurityContext</code>. This 
+     * method is used when Cosmo components need to replace the
+     * existing security context with a different one (useful when
+     * executing multiple operations which require different security
+     * contexts).
+     */
+    public void refreshSecurityContext(CosmoSecurityContext securityContext) {
+        SecureContext sc = SecureContextUtils.getSecureContext();
+        CosmoSecurityContextImpl impl =
+            (CosmoSecurityContextImpl) securityContext;
+        sc.setAuthentication(impl.getAuthentication());
     }
 
     /* ----- our methods ----- */

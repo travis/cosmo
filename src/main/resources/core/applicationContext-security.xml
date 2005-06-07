@@ -53,20 +53,12 @@
     </property>
   </bean>
 
-  <bean id="runAsAuthenticationProvider"
-        class="net.sf.acegisecurity.runas.RunAsImplAuthenticationProvider">
-    <property name="key">
-      <value>weasleyweasley</value>
-    </property>
-  </bean>
-
   <bean id="authenticationManager"
         class="net.sf.acegisecurity.providers.ProviderManager">
     <property name="providers">
       <list>
         <ref local="daoAuthenticationProvider"/>
         <ref local="anonymousAuthenticationProvider"/>
-        <ref local="runAsAuthenticationProvider"/>
       </list>
     </property>
   </bean>
@@ -85,15 +77,6 @@
           <ref bean="roleVoter"/>
         </list>
       </property>
-   </bean>
-
-   <!-- Run-as authorization -->
-
-   <bean id="runAsManager"
-         class="net.sf.acegisecurity.runas.RunAsManagerImpl">
-     <property name="key">
-       <value>weasleyweasley</value>
-     </property>
    </bean>
 
    <!-- Cosmo security subsystem -->

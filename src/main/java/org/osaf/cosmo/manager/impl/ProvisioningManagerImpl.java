@@ -21,6 +21,7 @@ import org.osaf.cosmo.dao.UserDAO;
 import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import java.security.MessageDigest;
@@ -31,18 +32,28 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.beans.factory.InitializingBean;
+
 /**
  * Basic implementation of ProvisioningManager.
  *
  * @author Brian Moseley
  */
-public class ProvisioningManagerImpl implements ProvisioningManager {
+public class ProvisioningManagerImpl
+    implements InitializingBean, ProvisioningManager {
     private static final Log log =
         LogFactory.getLog(ProvisioningManagerImpl.class);
     private RoleDAO roleDao;
     private ShareDAO shareDao;
     private UserDAO userDao;
     private MessageDigest digest;
+    private CosmoSecurityManager securityManager;
+
+    /**
+     */
+    public void setSecurityManager(CosmoSecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
     /**
      */
@@ -73,6 +84,8 @@ public class ProvisioningManagerImpl implements ProvisioningManager {
             }
         }
     }
+
+    // ProvisioningManager methods
 
     /**
      */
@@ -119,11 +132,23 @@ public class ProvisioningManagerImpl implements ProvisioningManager {
     /**
      */
     public User saveUser(User user) {
-        user.setPassword(digestPassword(user.getPassword()));
+        String undigestedPassword = user.getPassword();
+        user.setPassword(digestPassword(undigestedPassword));
         userDao.saveUser(user);
 
         if (! user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
-            shareDao.createHomedir(user.getUsername());
+            // we need to access jackrabbit as the new user, so switch
+            // the security context to the new user. switch back to
+            // the old context when finished.
+            CosmoSecurityContext oldSecurityContext =
+                securityManager.getSecurityContext();
+            securityManager.initiateSecurityContext(user.getUsername(),
+                                                    undigestedPassword);
+            try {
+                shareDao.createHomedir(user.getUsername());
+            } finally {
+                securityManager.refreshSecurityContext(oldSecurityContext);
+            }
         }
 
         return userDao.getUserByUsername(user.getUsername());
@@ -159,6 +184,28 @@ public class ProvisioningManagerImpl implements ProvisioningManager {
         }
         userDao.removeUser(user);
     }
+
+    // InitializingBean methods
+
+    /**
+     * Sanity check the object's properties.
+     */
+    public void afterPropertiesSet() throws Exception {
+        if (securityManager == null) {
+            throw new IllegalArgumentException("securityManager is required");
+        }
+        if (roleDao == null) {
+            throw new IllegalArgumentException("roleDAO is required");
+        }
+        if (shareDao == null) {
+            throw new IllegalArgumentException("shareDAO is required");
+        }
+        if (userDao == null) {
+            throw new IllegalArgumentException("userDAO is required");
+        }
+    }
+
+    // private methods
 
     private String digestPassword(String password) {
         if (digest == null) {

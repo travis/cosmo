@@ -35,18 +35,15 @@
      <property name="accessDecisionManager">
        <ref bean="accessDecisionManager"/>
      </property>
-     <property name="runAsManager">
-       <ref bean="runAsManager"/>
-       </property>
      <property name="objectDefinitionSource">
        <value>
 	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
 	 PATTERN_TYPE_APACHE_ANT
          /welcome=ROLE_ANONYMOUS
          /account/new=ROLE_ANONYMOUS
-         /account/signup.do=ROLE_ANONYMOUS,RUN_AS_ROOT
+         /account/signup.do=ROLE_ANONYMOUS
          /account=ROLE_ROOT,ROLE_USER
-         /account/update.do=ROLE_ROOT,ROLE_USER,RUN_AS_ROOT
+         /account/update.do=ROLE_ROOT,ROLE_USER
          /forgot=ROLE_ANONYMOUS
          /remind.do=ROLE_ANONYMOUS
          /login=ROLE_ANONYMOUS
@@ -176,7 +173,8 @@
       <ref bean="authenticationManager"/>
     </property>
     <property name="authenticationEntryPoint">
-      <ref local="basicAuthenticationEntryPoint"/></property>
+      <ref local="basicAuthenticationEntryPoint"/>
+    </property>
   </bean>
 
   <!-- filter that performs anonymous authentication -->

@@ -111,18 +111,16 @@ public class AccountAction extends CosmoAction {
                 log.debug("signing up user " + formUser.getUsername());
             }
             User user = mgr.saveUser(formUser);
-
             request.setAttribute(ATTR_USER, user);
+
+            // set the new security context
+            getSecurityManager().
+                initiateSecurityContext(userForm.getUsername(),
+                                        userForm.getPassword());
         } catch (DataIntegrityViolationException e) {
             handleIntegrityViolation(request, e);
             return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
         }
-
-        // log in the user automatically
-        CosmoSecurityContext securityContext =
-            getSecurityManager().
-            establishSecurityContext(userForm.getUsername(),
-                                     userForm.getPassword());
 
         return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
     }

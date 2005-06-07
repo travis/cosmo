@@ -44,6 +44,26 @@
     </tr>
     <tr>
       <td class="md" align="right">
+        <b><fmt:message key="Account.Form.FirstName"/></b>
+      </td>
+      <td class="md" align="left">
+        <html:text property="firstName" size="32" maxlength="32"
+                   styleClass="md"/>
+        <cosmo:errmsg property="firstName"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="md" align="right">
+        <b><fmt:message key="Account.Form.LastName"/></b>
+      </td>
+      <td class="md" align="left">
+        <html:text property="lastName" size="32" maxlength="32"
+                   styleClass="md"/>
+        <cosmo:errmsg property="lastName"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="md" align="right">
         <b><fmt:message key="Account.Form.Email"/></b>
       </td>
       <td class="md" align="left">

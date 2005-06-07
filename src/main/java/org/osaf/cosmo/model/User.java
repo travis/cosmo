@@ -31,6 +31,8 @@ public class User extends BaseModelObject {
     private String username;
     private String oldUsername;
     private String password;
+    private String firstName;
+    private String lastName;
     private String email;
     private Date dateCreated;
     private Date dateModified;
@@ -89,6 +91,30 @@ public class User extends BaseModelObject {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     */
+    public String getFirstName() {
+        return firstName;
+    }
+
+    /**
+     */
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    /**
+     */
+    public String getLastName() {
+        return lastName;
+    }
+
+    /**
+     */
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     /**
@@ -161,6 +187,8 @@ public class User extends BaseModelObject {
         return new EqualsBuilder().
             append(username, it.username).
             append(password, it.password).
+            append(firstName, it.firstName).
+            append(lastName, it.lastName).
             append(email, it.email).
             isEquals();
     }
@@ -171,6 +199,8 @@ public class User extends BaseModelObject {
         return new HashCodeBuilder(3, 5).
             append(username).
             append(password).
+            append(firstName).
+            append(lastName).
             append(email).
             toHashCode();
     }
@@ -181,7 +211,9 @@ public class User extends BaseModelObject {
         return new ToStringBuilder(this).
             append("id", id).
             append("username", username).
-            append("password", password).
+            append("password", "xxxxxx").
+            append("firstName", firstName).
+            append("lastName", lastName).
             append("email", email).
             append("dateCreated", dateCreated).
             append("dateModified", dateModified).

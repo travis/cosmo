@@ -19,12 +19,18 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<u:bind var="USER_ROOT" field="USER_ROOT"
+        type="org.osaf.cosmo.security.CosmoSecurityManager"/>
+
 <cosmo:cnfmsg/>
 
 <c:choose>
   <c:when test="${not empty Users}">
     <table cellpadding="3" cellspacing="1" border="0" width="100%">
       <tr>
+        <td class="md" valign="bottom">
+          <b><fmt:message key="User.List.TH.FullName"/></b>
+        </td>
         <td class="md" valign="bottom">
           <b><fmt:message key="User.List.TH.User"/></b>
         </td>
@@ -43,7 +49,11 @@
       </tr>
       <c:forEach var="user" items="${Users}">
         <cosmo:homedir var="homedir" user="${user}"/>
+        <cosmo:fullName var="fullName" user="${user}"/>
         <tr>
+          <td class="md" nowrap="nowrap">
+            ${fullName}
+          </td>
           <td class="md" nowrap="nowrap">
             <html:link page="/user/${user.username}">
               ${user.username}
@@ -51,7 +61,7 @@
           </td>
           <td class="md" nowrap="nowrap">
             <c:choose>
-              <c:when test="${user.username ne 'root'}">
+              <c:when test="${user.username ne USER_ROOT}">
                 <html:link target="homedir" page="${homedir}">
                   ${homedir}
                 </html:link>
@@ -94,6 +104,26 @@
         <html:text property="username" size="32" maxlength="32"
                    styleClass="md"/>
         <cosmo:errmsg property="username"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="md" align="right">
+        <b><fmt:message key="User.Form.FirstName"/></b>
+      </td>
+      <td class="md" align="left">
+        <html:text property="firstName" size="32" maxlength="32"
+                   styleClass="md"/>
+        <cosmo:errmsg property="firstName"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="md" align="right">
+        <b><fmt:message key="User.Form.LastName"/></b>
+      </td>
+      <td class="md" align="left">
+        <html:text property="lastName" size="32" maxlength="32"
+                   styleClass="md"/>
+        <cosmo:errmsg property="lastName"/>
       </td>
     </tr>
     <tr>

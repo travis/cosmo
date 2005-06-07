@@ -27,6 +27,8 @@ public class UserForm extends ValidatorForm {
 
     private String id;
     private String username;
+    private String firstName;
+    private String lastName;
     private String email;
     private String password;
     private String confirm;
@@ -66,6 +68,30 @@ public class UserForm extends ValidatorForm {
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    /**
+     */
+    public String getFirstName() {
+        return firstName;
+    }
+
+    /**
+     */
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    /**
+     */
+    public String getLastName() {
+        return lastName;
+    }
+
+    /**
+     */
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     /**
@@ -128,6 +154,8 @@ public class UserForm extends ValidatorForm {
      */
     private void initialize() {
         username = null;
+        firstName = null;
+        lastName = null;
         email = null;
         password = null;
         confirm = null;

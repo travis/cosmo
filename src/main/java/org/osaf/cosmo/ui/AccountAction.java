@@ -158,6 +158,8 @@ public class AccountAction extends CosmoAction {
         if (user.getId() == null) {
             user.setUsername(form.getUsername());
         }
+        user.setFirstName(form.getFirstName());
+        user.setLastName(form.getLastName());
         user.setEmail(form.getEmail());
         // password is required for signup but not for update. on
         // update, don't blank out the saved password if the user is
@@ -170,6 +172,8 @@ public class AccountAction extends CosmoAction {
     private void populateForm(UserForm form, User user) {
         form.setId(user.getId());
         form.setUsername(user.getUsername());
+        form.setFirstName(user.getFirstName());
+        form.setLastName(user.getLastName());
         form.setEmail(user.getEmail());
         // never set password into the form
     }

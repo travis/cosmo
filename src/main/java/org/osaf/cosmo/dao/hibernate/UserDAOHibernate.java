@@ -43,7 +43,7 @@ public class UserDAOHibernate extends HibernateDaoSupport
     private final Log log = LogFactory.getLog(UserDAOHibernate.class);
 
     private static final String HQL_GET_USERS =
-        "from User order by username";
+        "from User as user";
     private static final String HQL_GET_USER_BY_USERNAME =
         "from User where username=?";
     private static final String HQL_GET_USER_BY_EMAIL =

@@ -22,6 +22,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -231,7 +232,15 @@ public class UserAction extends CosmoAction {
             log.debug("listing users");
         }
         List users = mgr.getUsers();
-        Collections.sort(users);
+        Collections.sort(users, new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    User u1 = (User) o1;
+                    User u2 = (User) o2;
+                    String name1 = u1.getLastName() + " " + u1.getFirstName();
+                    String name2 = u2.getLastName() + " " + u2.getFirstName();
+                    return name1.compareTo(name2);
+                }
+            });
 
         return users;
     }
@@ -247,6 +256,8 @@ public class UserAction extends CosmoAction {
 
     private void populateUser(User user, UserForm form) {
         user.setUsername(form.getUsername());
+        user.setFirstName(form.getFirstName());
+        user.setLastName(form.getLastName());
         user.setEmail(form.getEmail());
         if (form.getPassword() != null && ! form.getPassword().equals("")) {
             user.setPassword(form.getPassword());
@@ -269,6 +280,8 @@ public class UserAction extends CosmoAction {
     private void populateUpdateForm(UserForm form, User user) {
         form.setId(user.getId());
         form.setUsername(user.getUsername());
+        form.setFirstName(user.getFirstName());
+        form.setLastName(user.getLastName());
         form.setEmail(user.getEmail());
         // never set password in the form
         Role[] roles = (Role[]) user.getRoles().toArray(new Role[0]);

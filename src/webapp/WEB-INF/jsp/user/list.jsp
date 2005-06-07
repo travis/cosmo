@@ -32,7 +32,7 @@
           <b><fmt:message key="User.List.TH.FullName"/></b>
         </td>
         <td class="md" valign="bottom">
-          <b><fmt:message key="User.List.TH.User"/></b>
+          <b><fmt:message key="User.List.TH.Username"/></b>
         </td>
         <td class="md" valign="bottom">
           <b><fmt:message key="User.List.TH.Homedir"/></b>

@@ -246,10 +246,7 @@ public class UserAction extends CosmoAction {
     }
 
     private void populateUser(User user, UserForm form) {
-        if (user.getId() == null) {
-            // this is a creation action, where username is modifiable
-            user.setUsername(form.getUsername());
-        }
+        user.setUsername(form.getUsername());
         user.setEmail(form.getEmail());
         if (form.getPassword() != null && ! form.getPassword().equals("")) {
             user.setPassword(form.getPassword());
@@ -271,6 +268,7 @@ public class UserAction extends CosmoAction {
 
     private void populateUpdateForm(UserForm form, User user) {
         form.setId(user.getId());
+        form.setUsername(user.getUsername());
         form.setEmail(user.getEmail());
         // never set password in the form
         Role[] roles = (Role[]) user.getRoles().toArray(new Role[0]);

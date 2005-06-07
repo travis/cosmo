@@ -43,6 +43,16 @@
     </tr>
     <tr>
       <td class="md" align="right">
+        <b><fmt:message key="User.Form.Username"/></b>
+      </td>
+      <td class="md" align="left">
+        <html:text property="username" size="32" maxlength="32"
+                   styleClass="md"/>
+        <cosmo:errmsg property="username"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="md" align="right">
         <b><fmt:message key="User.Form.Email"/></b>
       </td>
       <td class="md" align="left">

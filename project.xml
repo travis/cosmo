@@ -186,9 +186,6 @@
       <groupId>jackrabbit</groupId>
       <artifactId>jackrabbit</artifactId>
       <version>0.16.4.1-dev</version>
-<!--
-      <version>0.16.2-dev</version>
--->
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

@@ -142,7 +142,4 @@ your favorite mirror and/or choose a different version of Tomcat (but
 beware the latter - see the compatibility notes in README.txt):
 
     ext.tomcat.package=jakarta-tomcat-5.0.28
-    ext.tomcat.url=http://www.ibiblio.org/pub/mirrors/apache/jakarta/tomcat-5/v5.0.28/bin/${ext.tomcat.package}.tar.gz
-
-
-$Id$
+    ext.tomcat.url=http://downloads.osafoundation.org/cosmo/${ext.tomcat.package}.tar.gz

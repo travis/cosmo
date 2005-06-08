@@ -23,7 +23,5 @@ KNOWN ISSUES IN THIS RELEASE
 ============================
 
 
- * Bug #2584: OS X WebFS does not interoperate with Cosmo. 
-
-
-$Id$
+ * Bug #2584: problems viewing and uploading files with OS X WebFS
+ * Bug #3068: apostrophe character not accepted in resource name

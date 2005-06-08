@@ -61,6 +61,3 @@ Q: Why are you using an RDBMS anyway?
     A: Because it was the easiest way to get up and running. We will
        migrate user and role info to JCR very soon (likely in
        0.3). This will simplify every stage of the process.
-
-
-$Id$

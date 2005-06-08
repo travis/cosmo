@@ -187,6 +187,3 @@ Common Gotchas:
       to change this instance's shutdown port:
 
         <Server port="8005" shutdown="SHUTDOWN">
-
-
-$Id$

@@ -66,6 +66,3 @@ Issues are tracked at <http://bugzilla.osafoundation.org/>.
 
 Feel free to ask questions and report problems to
 cosmo@osafoundation.org.
-
-
-$Id$

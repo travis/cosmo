@@ -53,11 +53,14 @@ public class CosmoDavSessionProviderImpl implements DavSessionProvider {
      * Acquires a DavSession. Upon success, the WebdavRequest will
      * reference that session.
      *
+     * A session will not be available if an exception is thrown.
+     *
      * @param request
-     * @throws DavException if a problem occurred while obtaining the
-     * session
+     * @return <code>true</code> if the session was attached to the request;
+     *         <code>false</code> otherwise.
+     * @throws DavException if a problem occurred while obtaining the session
      */
-    public void acquireSession(WebdavRequest request) throws DavException {
+    public boolean attachSession(WebdavRequest request) throws DavException {
         // XXX cache dav session in web session?
         try {
             CosmoSecurityContext securityContext =
@@ -80,6 +83,7 @@ public class CosmoDavSessionProviderImpl implements DavSessionProvider {
                 Subject.doAs(securityContext.getSubject(), action);
             DavSession ds = new DavSessionImpl(rs);
             request.setDavSession(ds);
+            return true;
         } catch (Exception e) {
             log.error("error logging into repository", e);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,

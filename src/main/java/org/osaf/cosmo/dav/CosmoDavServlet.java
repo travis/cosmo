@@ -15,11 +15,18 @@
  */
 package org.osaf.cosmo.dav;
 
-import javax.servlet.ServletException;
+import java.io.IOException;
 
-import org.apache.jackrabbit.server.simple.WebdavServlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.jackrabbit.j2ee.SimpleWebdavServlet;
+import org.apache.jackrabbit.webdav.DavException;
+import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavSessionProvider;
+import org.apache.jackrabbit.webdav.WebdavRequest;
+import org.apache.jackrabbit.webdav.WebdavResponse;
 
 import org.apache.log4j.Logger;
 
@@ -32,7 +39,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * {@link org.apache.jackrabbit.server.simple.WebdavServlet} which
  * integrates the Spring Framework for configuring support objects.
  */
-public class CosmoDavServlet extends WebdavServlet {
+public class CosmoDavServlet extends SimpleWebdavServlet {
     private static final Logger log =
         Logger.getLogger(CosmoDavServlet.class);
 
@@ -58,6 +65,7 @@ public class CosmoDavServlet extends WebdavServlet {
      */
     public void init() throws ServletException {
         super.init();
+
         wac = WebApplicationContextUtils.
             getRequiredWebApplicationContext(getServletContext());
 
@@ -70,6 +78,67 @@ public class CosmoDavServlet extends WebdavServlet {
             getBean(BEAN_DAV_RESOURCE_FACTORY,
                     DavResourceFactory.class);
         setResourceFactory(resourceFactory);
+    }
+
+
+    /**
+     * Dispatch dav methods that jcr-server does not know about.
+     *
+     * @throws ServletException
+     * @throws IOException
+     * @throws DavException
+     */
+    protected boolean execute(WebdavRequest request,
+                              WebdavResponse response,
+                              int method,
+                              DavResource resource)
+            throws ServletException, IOException, DavException {
+        if (method > 0) {
+            return super.execute(request, response, method, resource);
+        }
+
+        method = CosmoDavMethods.getMethodCode(request.getMethod());
+        switch (method) {
+        case CosmoDavMethods.DAV_MKTICKET:
+            doMkTicket(request, response, resource);
+            break;
+        case CosmoDavMethods.DAV_DELTICKET:
+            doDelTicket(request, response, resource);
+            break;
+        default:
+            // any other method
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Executes the MKTICKET method
+     *
+     * @throws IOException
+     * @throws DavException
+     */
+    protected void doMkTicket(WebdavRequest request,
+                              WebdavResponse response,
+                              DavResource resource)
+        throws IOException, DavException {
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setIntHeader("Content-Length", 0);
+    }
+
+    /**
+     * Executes the DELTICKET method
+     *
+     * @throws IOException
+     * @throws DavException
+     */
+    protected void doDelTicket(WebdavRequest request,
+                               WebdavResponse response,
+                               DavResource resource)
+        throws IOException, DavException {
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setIntHeader("Content-Length", 0);
     }
 
     /**

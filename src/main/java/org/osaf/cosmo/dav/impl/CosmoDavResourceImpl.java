@@ -24,7 +24,7 @@ import javax.jcr.RepositoryException;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
-import org.apache.jackrabbit.server.simple.dav.DavResourceImpl;
+import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
 
 /**
  * A subclass of

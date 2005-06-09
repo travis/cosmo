@@ -18,7 +18,7 @@
   <name>Cosmo</name>
   <groupId>cosmo</groupId>
   <artifactId>cosmo</artifactId>
-  <currentVersion>0.2-1</currentVersion>
+  <currentVersion>0.2-2</currentVersion>
   <organization>
     <name>OSAF</name>
     <url>http://osafoundation.org/</url>
@@ -98,7 +98,7 @@
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
-      <version>2.1</version>
+      <version>3.1</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -181,41 +181,49 @@
       <version>1.7.3.3</version>
     </dependency>
     <dependency>
-      <!-- pre-release not on ibiblio.. snapshots built manually and
-           located in internal repository -->
       <groupId>jackrabbit</groupId>
       <artifactId>jackrabbit</artifactId>
-      <version>0.16.4.1-dev</version>
+      <version>0.16.4.1-dev-SNAPSHOT</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
     <dependency>
-      <!-- pre-release not on ibiblio.. snapshots built manually and
-           located in internal repository -->
       <groupId>jsr170</groupId>
       <artifactId>jcr</artifactId>
-      <version>0.16.4.1</version>
+      <version>1.0</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
     <dependency>
-      <!-- pre-release not on ibiblio.. snapshots built manually and
-           located in internal repository -->
+      <groupId>jcr-server</groupId>
+      <artifactId>commons-jcr</artifactId>
+      <version>0.16.4.1-SNAPSHOT</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
       <groupId>jcr-server</groupId>
       <artifactId>jcr-server</artifactId>
-      <version>0.16.4.1</version>
+      <version>0.16.4.1-SNAPSHOT</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
     <dependency>
-      <!-- pre-release not on ibiblio.. snapshots built manually and
-           located in internal repository -->
+      <groupId>jcr-server</groupId>
+      <artifactId>jackrabbit-server</artifactId>
+      <version>0.16.4.1-SNAPSHOT</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
       <groupId>jcr-server</groupId>
       <artifactId>jcr-webdav</artifactId>
-      <version>0.16.4.1</version>
+      <version>0.16.4.1-SNAPSHOT</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

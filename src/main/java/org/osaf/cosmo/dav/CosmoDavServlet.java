@@ -18,17 +18,21 @@ package org.osaf.cosmo.dav;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jackrabbit.j2ee.SimpleWebdavServlet;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavSessionProvider;
+import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.WebdavRequest;
 import org.apache.jackrabbit.webdav.WebdavResponse;
 
 import org.apache.log4j.Logger;
+
+import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
+import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
@@ -53,7 +57,14 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
      */
     public static final String BEAN_DAV_SESSION_PROVIDER =
         "sessionProvider";
+    /**
+     * The name of the Spring bean identifying the Cosmo security
+     * manager
+     */
+    public static final String BEAN_SECURITY_MANAGER =
+        "securityManager";
 
+    private CosmoSecurityManager securityManager;
     private WebApplicationContext wac;
 
     /**
@@ -78,6 +89,9 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             getBean(BEAN_DAV_RESOURCE_FACTORY,
                     DavResourceFactory.class);
         setResourceFactory(resourceFactory);
+
+        securityManager = (CosmoSecurityManager)
+            getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
     }
 
 
@@ -123,8 +137,36 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                               WebdavResponse response,
                               DavResource resource)
         throws IOException, DavException {
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setIntHeader("Content-Length", 0);
+        if (!resource.exists()) {
+            response.sendError(DavServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        CosmoDavRequest cdr = new CosmoDavRequestImpl(request);
+        Ticket ticket = null;
+        try {
+            ticket = cdr.getTicket();
+            if (ticket == null) {
+                throw new IllegalArgumentException("ticket request missing ticket info");
+            }
+        } catch (IllegalArgumentException e) {
+            response.sendError(DavServletResponse.SC_BAD_REQUEST,
+                               e.getMessage());
+            return;
+        }
+
+        // XXX: make the ticket on the resource
+        ticket.setId("deadbeef");
+        String owner =
+            securityManager.getSecurityContext().getUser().getUsername();
+        ticket.setOwner(owner);
+
+        log.debug("ticket info: " + ticket);
+
+        // XXX: CosmoDavResponse.sendMkTicketResponse
+        response.setHeader("Ticket", ticket.getId());
+
+        //response.setStatus(DavServletResponse.SC_OK);
     }
 
     /**
@@ -137,7 +179,12 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                                WebdavResponse response,
                                DavResource resource)
         throws IOException, DavException {
-        response.setStatus(HttpServletResponse.SC_OK);
+        if (!resource.exists()) {
+            response.sendError(DavServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        response.setStatus(DavServletResponse.SC_OK);
         response.setIntHeader("Content-Length", 0);
     }
 

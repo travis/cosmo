@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<D:ticketinfo xmlns:D="DAV:" > 
+  <D:privilege><D:read/></D:privilege> 
+  <D:timeout>Second-3600</D:timeout> 
+  <D:visits>1</D:visits> 
+</D:ticketinfo>
+

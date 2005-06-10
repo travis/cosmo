@@ -50,6 +50,9 @@
   <bean id="lockManager"
         class="org.apache.jackrabbit.server.simple.dav.lock.SimpleLockManager"/>
 
+  <bean id="ticketIdGenerator"
+        class="org.apache.commons.id.random.SessionIdGenerator"/>
+
   <bean id="resourceFactory"
         class="org.osaf.cosmo.dav.impl.CosmoDavResourceFactoryImpl">
     <property name="lockManager">
@@ -57,6 +60,9 @@
     </property>
     <property name="securityManager">
       <ref bean="securityManager"/>
+    </property>
+    <property name="ticketIdGenerator">
+      <ref local="ticketIdGenerator"/>
     </property>
   </bean>
 

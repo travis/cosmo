@@ -20,7 +20,7 @@ import java.util.HashMap;
 
 import javax.jcr.RepositoryException;
 
-import org.apache.commons.id.random.SessionIdGenerator;
+import org.apache.commons.id.StringIdentifierGenerator;
 
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
@@ -41,8 +41,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     implements CosmoDavResource {
 
     private HashMap tickets = new HashMap();
-    private static final SessionIdGenerator ticketIdGenerator =
-        new SessionIdGenerator();
+    private StringIdentifierGenerator ticketIdGenerator;
 
     /**
      * Create a new {@link DavResource}.
@@ -85,5 +84,13 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     public Ticket getTicket(String id) {
         // XXX pull out of repository
         return (Ticket) tickets.get(id);
+    }
+
+    // our methods
+
+    /**
+     */
+    public void setTicketIdGenerator(StringIdentifierGenerator generator) {
+        ticketIdGenerator = generator;
     }
 }

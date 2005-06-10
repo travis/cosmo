@@ -30,7 +30,9 @@ import org.apache.jackrabbit.webdav.WebdavResponse;
 
 import org.apache.log4j.Logger;
 
+import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
+import org.osaf.cosmo.dav.impl.CosmoDavResponseImpl;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
@@ -142,31 +144,22 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
-        CosmoDavRequest cdr = new CosmoDavRequestImpl(request);
+        CosmoDavRequest cosmoRequest = new CosmoDavRequestImpl(request);
+        CosmoDavResponse cosmoResponse = new CosmoDavResponseImpl(response);
+        CosmoDavResource cosmoResource = (CosmoDavResource) resource;
+
         Ticket ticket = null;
         try {
-            ticket = cdr.getTicket();
-            if (ticket == null) {
-                throw new IllegalArgumentException("ticket request missing ticket info");
-            }
+            ticket = cosmoRequest.getTicket();
         } catch (IllegalArgumentException e) {
             response.sendError(DavServletResponse.SC_BAD_REQUEST,
                                e.getMessage());
             return;
         }
 
-        // XXX: make the ticket on the resource
-        ticket.setId("deadbeef");
-        String owner =
-            securityManager.getSecurityContext().getUser().getUsername();
-        ticket.setOwner(owner);
+        cosmoResource.saveTicket(ticket);
 
-        log.debug("ticket info: " + ticket);
-
-        // XXX: CosmoDavResponse.sendMkTicketResponse
-        response.setHeader("Ticket", ticket.getId());
-
-        //response.setStatus(DavServletResponse.SC_OK);
+        cosmoResponse.sendMkTicketResponse(cosmoResource, ticket.getId());
     }
 
     /**

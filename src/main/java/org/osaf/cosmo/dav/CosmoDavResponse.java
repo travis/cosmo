@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dav.ticket;
+package org.osaf.cosmo.dav;
 
-import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.dav.ticket.TicketDavResponse;
 
 /**
- * Provides request functionality related to "Ticket-Based Access
- * Control Extension to WebDAV".
- *
- * @see http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt
+ * An empty interface collecting the functionality defined by various
+ * WebDAV extensions implemented by Cosmo.
  */
-public interface TicketDavRequest {
-
-    /**
-     * Return a {@link Ticket} representing the information about a
-     * ticket contained in the request.
-     *
-     * @throws IllegalArgumentException if there is no ticket
-     * information in the request or if the ticket information exists
-     * but is invalid
-     */
-    public Ticket getTicket();
+public interface CosmoDavResponse extends TicketDavResponse {
 }

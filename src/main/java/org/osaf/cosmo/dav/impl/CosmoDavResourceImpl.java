@@ -16,15 +16,17 @@
 package org.osaf.cosmo.dav.impl;
 
 import java. io.IOException;
-import java. io.InputStream;
+import java.util.HashMap;
 
-import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
-import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
+
+import org.osaf.cosmo.dav.CosmoDavResource;
+import org.osaf.cosmo.dav.CosmoDavResourceFactory;
+import org.osaf.cosmo.model.Ticket;
 
 /**
  * A subclass of
@@ -33,7 +35,10 @@ import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
  *
  * For now, this class is a placeholder.
  */
-public class CosmoDavResourceImpl extends DavResourceImpl {
+public class CosmoDavResourceImpl extends DavResourceImpl 
+    implements CosmoDavResource {
+
+    private HashMap tickets = new HashMap();
 
     /**
      * Create a new {@link DavResource}.
@@ -43,9 +48,39 @@ public class CosmoDavResourceImpl extends DavResourceImpl {
      * @param session
      */
     public CosmoDavResourceImpl(DavResourceLocator locator,
-                                DavResourceFactory factory,
+                                CosmoDavResourceFactory factory,
                                 DavSession session)
         throws RepositoryException {
         super(locator, factory, session);
+    }
+
+    // CosmoDavResource methods
+
+    /**
+     * Associates a ticket with this resource and saves it into
+     * persistent storage.
+     */
+    public void saveTicket(Ticket ticket) {
+        // XXX: generate unique id
+        ticket.setId("deadbeef");
+
+        // assign owner
+        CosmoDavResourceFactory cosmoFactory =
+            (CosmoDavResourceFactory) getFactory();
+        String owner = cosmoFactory.getSecurityManager().getSecurityContext().
+            getUser().getUsername();
+        ticket.setOwner(owner);
+
+        // XXX save into repository
+        tickets.put(ticket.getId(), ticket);
+    }
+
+    /**
+     * Returns the ticket with the given id associated with this
+     * resource.
+     */
+    public Ticket getTicket(String id) {
+        // XXX pull out of repository
+        return (Ticket) tickets.get(id);
     }
 }

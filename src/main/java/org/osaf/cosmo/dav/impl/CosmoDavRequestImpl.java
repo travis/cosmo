@@ -49,7 +49,8 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
      * Return a {@link Ticket} representing the information about a
      * ticket contained in the request.
      *
-     * @throws IllegalArgumentException if ticket information exists
+     * @throws IllegalArgumentException if there is no ticket
+     * information in the request or if the ticket information exists
      * but is invalid
      */
     public Ticket getTicket() {
@@ -64,7 +65,7 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
     private Ticket parseTicketRequest() {
         Document requestDocument = wdr.getRequestDocument();
         if (requestDocument == null) {
-            return null;
+            throw new IllegalArgumentException("ticket request missing body");
         }
 
         Element root = requestDocument.getRootElement();

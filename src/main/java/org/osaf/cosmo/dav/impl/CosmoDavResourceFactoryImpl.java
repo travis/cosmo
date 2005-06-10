@@ -19,7 +19,6 @@ import javax.jcr.RepositoryException;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
-import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.apache.jackrabbit.webdav.DavServletResponse;
@@ -27,14 +26,21 @@ import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.lock.LockManager;
 import org.apache.jackrabbit.webdav.spi.JcrDavException;
 
+import org.osaf.cosmo.dav.CosmoDavResource;
+import org.osaf.cosmo.dav.CosmoDavResourceFactory;
+import org.osaf.cosmo.security.CosmoSecurityManager;
+
 /**
  * An implementation of 
  * {@link org.apache.jackrabbit.webdav.DavResourceFactory} that
- * provides instances of {@link CosmoDavResourceImpl}.
+ * provides instances of {@link CosmoDavResource}.
  */
-public class CosmoDavResourceFactoryImpl implements DavResourceFactory {
+public class CosmoDavResourceFactoryImpl implements CosmoDavResourceFactory {
 
+    private CosmoSecurityManager securityManager;
     private LockManager lockManager;
+
+    // DavResourceFactory methods
 
     /**
      */
@@ -51,14 +57,16 @@ public class CosmoDavResourceFactoryImpl implements DavResourceFactory {
                                       DavSession session)
         throws DavException {
         try {
-            DavResource resource = new CosmoDavResourceImpl(locator, this,
-                                                            session);
+            CosmoDavResourceImpl resource =
+                new CosmoDavResourceImpl(locator, this, session);
             resource.addLockManager(lockManager);
             return resource;
         } catch (RepositoryException e) {
             throw new JcrDavException(e);
         }
     }
+
+    // CosmoDavResourceFactory methods
 
     /**
      */
@@ -68,7 +76,21 @@ public class CosmoDavResourceFactoryImpl implements DavResourceFactory {
 
     /**
      */
+    public CosmoSecurityManager getSecurityManager() {
+        return securityManager;
+    }
+
+    // our methods
+
+    /**
+     */
     public void setLockManager(LockManager lockManager) {
         this.lockManager = lockManager;
+    }
+
+    /**
+     */
+    public void setSecurityManager(CosmoSecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
 }

@@ -25,6 +25,15 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
+ * CosmoDavRequestImpl, CosmoDavResponseImpl: convert ticketinfo
+   timeout xml to/from a number of seconds for storage
+ * CosmoDavResourceImpl: generate unique ticket id
+ * CosmoDavResourceImpl: save ticket into repository
+ * CosmoDavResourceImpl: pull ticket out of repository
+ * CosmoDavResponseImpl: use resource's locator to generate owner href
+   for response xml
+ * ticket method tests
+
  * precompile jsps for distribution
  * see if we can't get Struts to work with "/user/bcm/update" rather
    than "/user/update.do" with "username=bcm" in content body

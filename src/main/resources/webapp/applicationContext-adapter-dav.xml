@@ -55,6 +55,9 @@
     <property name="lockManager">
       <ref local="lockManager"/>
     </property>
+    <property name="securityManager">
+      <ref bean="securityManager"/>
+    </property>
   </bean>
 
 </beans>

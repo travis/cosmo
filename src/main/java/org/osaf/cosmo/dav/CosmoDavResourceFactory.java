@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dav.ticket;
+package org.osaf.cosmo.dav;
 
-import org.osaf.cosmo.model.Ticket;
+import org.apache.jackrabbit.webdav.DavResourceFactory;
+import org.apache.jackrabbit.webdav.lock.LockManager;
+
+import org.osaf.cosmo.security.CosmoSecurityManager;
 
 /**
- * Provides request functionality related to "Ticket-Based Access
- * Control Extension to WebDAV".
- *
- * @see http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt
+ * An interface for Cosmo-specific
+ * {@link org.apache.jackrabbit.webdav.DavResource} factories.
  */
-public interface TicketDavRequest {
+public interface CosmoDavResourceFactory extends DavResourceFactory {
 
     /**
-     * Return a {@link Ticket} representing the information about a
-     * ticket contained in the request.
-     *
-     * @throws IllegalArgumentException if there is no ticket
-     * information in the request or if the ticket information exists
-     * but is invalid
      */
-    public Ticket getTicket();
+    public LockManager getLockManager();
+
+    /**
+     */
+    public CosmoSecurityManager getSecurityManager();
 }

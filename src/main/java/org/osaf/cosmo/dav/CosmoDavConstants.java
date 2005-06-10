@@ -31,9 +31,11 @@ public interface CosmoDavConstants extends DavConstants {
 
     // ticket elements
 
+    public static final String ELEMENT_TICKETDISCOVERY = "ticketdiscovery";
     public static final String ELEMENT_TICKETINFO = "ticketinfo";
     public static final String ELEMENT_ID = "id";
     public static final String ELEMENT_OWNER = "owner";
+    public static final String ELEMENT_HREF = "href";
     public static final String ELEMENT_TIMEOUT = "timeout";
     public static final String ELEMENT_VISITS = "visits";
     public static final String ELEMENT_PRIVILEGE = "privilege";

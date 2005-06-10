@@ -15,23 +15,24 @@
  */
 package org.osaf.cosmo.dav.ticket;
 
-import org.osaf.cosmo.model.Ticket;
+import java.io.IOException;
+
+import org.osaf.cosmo.dav.CosmoDavResource;
 
 /**
- * Provides request functionality related to "Ticket-Based Access
+ * Provides response functionality related to "Ticket-Based Access
  * Control Extension to WebDAV".
  *
  * @see http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt
  */
-public interface TicketDavRequest {
+public interface TicketDavResponse {
 
     /**
-     * Return a {@link Ticket} representing the information about a
-     * ticket contained in the request.
-     *
-     * @throws IllegalArgumentException if there is no ticket
-     * information in the request or if the ticket information exists
-     * but is invalid
+     * Send the response body for a {@link Ticket} creation event. The
+     * given id specifies which ticket was created, as a resource may
+     * have multiple tickets associated with it.
      */
-    public Ticket getTicket();
+    public void sendMkTicketResponse(CosmoDavResource resource,
+                                     String ticketId)
+        throws IOException;
 }

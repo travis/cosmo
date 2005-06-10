@@ -20,6 +20,8 @@ import java.util.HashMap;
 
 import javax.jcr.RepositoryException;
 
+import org.apache.commons.id.random.SessionIdGenerator;
+
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
@@ -39,6 +41,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     implements CosmoDavResource {
 
     private HashMap tickets = new HashMap();
+    private static final SessionIdGenerator ticketIdGenerator =
+        new SessionIdGenerator();
 
     /**
      * Create a new {@link DavResource}.
@@ -61,8 +65,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      * persistent storage.
      */
     public void saveTicket(Ticket ticket) {
-        // XXX: generate unique id
-        ticket.setId("deadbeef");
+        ticket.setId(ticketIdGenerator.nextStringIdentifier());
 
         // assign owner
         CosmoDavResourceFactory cosmoFactory =

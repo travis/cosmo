@@ -18,8 +18,14 @@ package org.osaf.cosmo.dav;
 import org.osaf.cosmo.dav.ticket.TicketDavRequest;
 
 /**
- * An empty interface collecting the functionality defined by various
+ * An interface collecting the functionality defined by various
  * WebDAV extensions implemented by Cosmo.
  */
 public interface CosmoDavRequest extends TicketDavRequest {
+
+    /**
+     * Return the base URL for this request (including scheme, server
+     * name, and port if not the scheme's default port).
+     */
+    public String getBaseUrl();
 }

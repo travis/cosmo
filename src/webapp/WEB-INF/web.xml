@@ -97,6 +97,10 @@
       <param-value>/home</param-value>
     </init-param>
     <init-param>
+      <param-name>principal-resource-path-prefix</param-name>
+      <param-value>/principal</param-value>
+    </init-param>
+    <init-param>
       <param-name>chain-catalog</param-name>
       <param-value>/WEB-INF/chain-catalog.xml</param-value>
     </init-param>

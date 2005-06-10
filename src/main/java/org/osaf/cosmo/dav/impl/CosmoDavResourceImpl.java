@@ -22,6 +22,7 @@ import javax.jcr.RepositoryException;
 
 import org.apache.commons.id.StringIdentifierGenerator;
 
+import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
@@ -34,21 +35,16 @@ import org.osaf.cosmo.model.Ticket;
  * A subclass of
  * {@link org.apache.jackrabbit.server.simple.dav.DavResourceImpl}
  * that provides Cosmo-specific WebDAV behaviors.
- *
- * For now, this class is a placeholder.
  */
 public class CosmoDavResourceImpl extends DavResourceImpl 
     implements CosmoDavResource {
 
     private HashMap tickets = new HashMap();
     private StringIdentifierGenerator ticketIdGenerator;
+    private String baseUrl;
+    private DavLocatorFactory principalLocatorFactory;
 
     /**
-     * Create a new {@link DavResource}.
-     *
-     * @param locator
-     * @param factory
-     * @param session
      */
     public CosmoDavResourceImpl(DavResourceLocator locator,
                                 CosmoDavResourceFactory factory,
@@ -86,11 +82,37 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         return (Ticket) tickets.get(id);
     }
 
+    /**
+     * Returns a resource locator for the named principal.
+     */
+    public DavResourceLocator getPrincipalLocator(String principal) {
+        return principalLocatorFactory.
+            createResourceLocator(baseUrl, "/" + principal);
+    }
+
     // our methods
 
     /**
+     * Set the generator for ticket identifiers.
      */
     public void setTicketIdGenerator(StringIdentifierGenerator generator) {
         ticketIdGenerator = generator;
+    }
+
+    /**
+     * Set the base URL for the server on which this resource lives
+     * (could be statically configured or dynamically calculated
+     * per-request).
+     */
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    /**
+     * Set the locator factory that generates URLs for principal
+     * resources (often used to address the owner of a dav resource).
+     */
+    public void setPrincipalLocatorFactory(DavLocatorFactory factory) {
+        principalLocatorFactory = factory;
     }
 }

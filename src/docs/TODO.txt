@@ -25,12 +25,12 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
+ * incorporate alternate namespace for ticketinfo
+ * ignore visit limitation (treat as always infinite)
  * CosmoDavRequestImpl, CosmoDavResponseImpl: convert ticketinfo
    timeout xml to/from a number of seconds for storage
  * CosmoDavResourceImpl: save ticket into repository
  * CosmoDavResourceImpl: pull ticket out of repository
- * CosmoDavResponseImpl: use resource's locator to generate owner href
-   for response xml
  * ticket method tests
 
  * precompile jsps for distribution

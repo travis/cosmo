@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.dav;
 
+import org.apache.jackrabbit.webdav.DavResource;
+import org.apache.jackrabbit.webdav.DavResourceLocator;
+
 import org.osaf.cosmo.dav.ticket.TicketDavRequest;
 import org.osaf.cosmo.model.Ticket;
 
@@ -22,7 +25,7 @@ import org.osaf.cosmo.model.Ticket;
  * An interface providing resource functionality required by WebDAV
  * extensions implemented by Cosmo.
  */
-public interface CosmoDavResource {
+public interface CosmoDavResource extends DavResource {
 
     /**
      * Associates a ticket with this resource and saves it into
@@ -35,4 +38,9 @@ public interface CosmoDavResource {
      * resource.
      */
     public Ticket getTicket(String id);
+
+    /**
+     * Returns a resource locator for the named principal.
+     */
+    public DavResourceLocator getPrincipalLocator(String principal);
 }

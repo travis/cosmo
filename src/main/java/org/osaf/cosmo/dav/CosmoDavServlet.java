@@ -21,17 +21,20 @@ import javax.servlet.ServletException;
 
 import org.apache.jackrabbit.j2ee.SimpleWebdavServlet;
 import org.apache.jackrabbit.webdav.DavException;
+import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavSessionProvider;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.WebdavRequest;
 import org.apache.jackrabbit.webdav.WebdavResponse;
+import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 
 import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
+import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResponseImpl;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -49,6 +52,12 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     private static final Logger log =
         Logger.getLogger(CosmoDavServlet.class);
 
+    /**
+     * The name of the servlet init parameter identifying the resource
+     * path prefix for principal resources.
+     */
+    public static final String INIT_PARAM_PRINCIPAL_RESOURCE_PATH_PREFIX =
+        "principal-resource-path-prefix";
     /** The name of the Spring bean identifying the servlet's
      * {@link org.apache.jackrabbit.webdav.DavResourceFactory}
      */
@@ -66,6 +75,8 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     public static final String BEAN_SECURITY_MANAGER =
         "securityManager";
 
+    private DavLocatorFactory principalLocatorFactory;
+    private String principalResourcePathPrefix;
     private CosmoSecurityManager securityManager;
     private WebApplicationContext wac;
 
@@ -78,6 +89,16 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
      */
     public void init() throws ServletException {
         super.init();
+
+        principalResourcePathPrefix =
+            getInitParameter(INIT_PARAM_PRINCIPAL_RESOURCE_PATH_PREFIX);
+        if (principalResourcePathPrefix == null) {
+            principalResourcePathPrefix = "";
+        } else if (principalResourcePathPrefix.endsWith("/")) {
+            principalResourcePathPrefix =
+                principalResourcePathPrefix.
+                substring(0, principalResourcePathPrefix.length() - 1);
+        }
 
         wac = WebApplicationContextUtils.
             getRequiredWebApplicationContext(getServletContext());
@@ -113,13 +134,19 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return super.execute(request, response, method, resource);
         }
 
+        CosmoDavRequestImpl cosmoRequest = new CosmoDavRequestImpl(request);
+        CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
+        CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
+        cosmoResource.setBaseUrl(cosmoRequest.getBaseUrl());
+        cosmoResource.setPrincipalLocatorFactory(getPrincipalLocatorFactory());
+
         method = CosmoDavMethods.getMethodCode(request.getMethod());
         switch (method) {
         case CosmoDavMethods.DAV_MKTICKET:
-            doMkTicket(request, response, resource);
+            doMkTicket(cosmoRequest, cosmoResponse, cosmoResource);
             break;
         case CosmoDavMethods.DAV_DELTICKET:
-            doDelTicket(request, response, resource);
+            doDelTicket(cosmoRequest, cosmoResponse, cosmoResource);
             break;
         default:
             // any other method
@@ -135,31 +162,27 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
      * @throws IOException
      * @throws DavException
      */
-    protected void doMkTicket(WebdavRequest request,
-                              WebdavResponse response,
-                              DavResource resource)
+    protected void doMkTicket(CosmoDavRequest request,
+                              CosmoDavResponse response,
+                              CosmoDavResource resource)
         throws IOException, DavException {
         if (!resource.exists()) {
             response.sendError(DavServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        CosmoDavRequest cosmoRequest = new CosmoDavRequestImpl(request);
-        CosmoDavResponse cosmoResponse = new CosmoDavResponseImpl(response);
-        CosmoDavResource cosmoResource = (CosmoDavResource) resource;
-
         Ticket ticket = null;
         try {
-            ticket = cosmoRequest.getTicket();
+            ticket = request.getTicket();
         } catch (IllegalArgumentException e) {
             response.sendError(DavServletResponse.SC_BAD_REQUEST,
                                e.getMessage());
             return;
         }
 
-        cosmoResource.saveTicket(ticket);
+        resource.saveTicket(ticket);
 
-        cosmoResponse.sendMkTicketResponse(cosmoResource, ticket.getId());
+        response.sendMkTicketResponse(resource, ticket.getId());
     }
 
     /**
@@ -168,9 +191,9 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
      * @throws IOException
      * @throws DavException
      */
-    protected void doDelTicket(WebdavRequest request,
-                               WebdavResponse response,
-                               DavResource resource)
+    protected void doDelTicket(CosmoDavRequest request,
+                               CosmoDavResponse response,
+                               CosmoDavResource resource)
         throws IOException, DavException {
         if (!resource.exists()) {
             response.sendError(DavServletResponse.SC_NOT_FOUND);
@@ -179,6 +202,36 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
         response.setStatus(DavServletResponse.SC_OK);
         response.setIntHeader("Content-Length", 0);
+    }
+
+    // our methods
+
+    /**
+     */
+    public String getPrincipalPathPrefix() {
+        return principalResourcePathPrefix;
+    }
+
+    /**
+     * Returns the <code>DavLocatorFactory</code> used to construct
+     * principal URLs. If no locator factory has been set or created a
+     * new instance of
+     * {@link org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl}
+     * is returned.
+     */
+    public DavLocatorFactory getPrincipalLocatorFactory() {
+        if (principalLocatorFactory == null) {
+            principalLocatorFactory =
+                new LocatorFactoryImpl(principalResourcePathPrefix);
+        }
+        return principalLocatorFactory;
+    }
+
+    /**
+     * Sets the principal <code>DavLocatorFactory</code>.
+     */
+    public void setPrincipalLocatorFactory(DavLocatorFactory factory) {
+        principalLocatorFactory = factory;
     }
 
     /**

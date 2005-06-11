@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<ticketinfo>
-  <privilege><read/></privilege> 
-  <timeout>Second-3600</timeout> 
-  <visits>1</visits> 
-</ticketinfo>
-
+<D:prop xmlns:D="DAV:">
+  <ticketinfo>
+    <D:privilege><D:read/></D:privilege> 
+    <timeout>Second-3600</timeout> 
+  </ticketinfo>
+</D:prop>

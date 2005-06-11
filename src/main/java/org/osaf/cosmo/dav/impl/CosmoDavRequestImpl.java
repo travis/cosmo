@@ -118,40 +118,35 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
 
         Element root = requestDocument.getRootElement();
 
-        if (! root.getName().equals(ELEMENT_TICKETINFO)) {
-            throw new IllegalArgumentException("ticket request missing ticketinfo");
+        if (! root.getName().equals(ELEMENT_PROP)) {
+            throw new IllegalArgumentException("ticket request missing prop");
         }
         if (root.getNamespace() == null ||
             ! root.getNamespace().equals(NAMESPACE)) {
             throw new IllegalArgumentException("ticket request contains ticketinfo with missing or incorrect namespace");
         }
-        if (root.getChild(ELEMENT_ID, NAMESPACE) != null) {
+        Element ticketinfo = root.getChild(ELEMENT_TICKETINFO,
+                                           NAMESPACE_TICKET);
+        if (ticketinfo == null) {
+            throw new IllegalArgumentException("ticket request missing ticketinfo");
+        }
+        if (ticketinfo.getChild(ELEMENT_ID, NAMESPACE_TICKET) != null) {
             throw new IllegalArgumentException("ticket request must not include id");
         }
-        if (root.getChild(ELEMENT_OWNER, NAMESPACE) != null) {
+        if (ticketinfo.getChild(ELEMENT_OWNER, NAMESPACE_TICKET) != null) {
             throw new IllegalArgumentException("ticket request must not include owner");
         }
 
         // XXX: convert to a number of seconds
-        String timeout = root.getChildTextNormalize(ELEMENT_TIMEOUT, NAMESPACE);
+        String timeout = ticketinfo.getChildTextNormalize(ELEMENT_TIMEOUT,
+                                                          NAMESPACE_TICKET);
         if (timeout == null) {
             throw new IllegalArgumentException("ticket request timeout missing or invalid");
         }
 
-        Integer visits = null;
-        try {
-            String tmp = root.getChildTextNormalize(ELEMENT_VISITS, NAMESPACE);
-            if (tmp == null) {
-                throw new IllegalArgumentException("ticket request visits missing or invalid");
-            }
-            visits = tmp.equals(VALUE_INFINITY) ?
-                visits = new Integer(Integer.MAX_VALUE) :
-                Integer.valueOf(tmp);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("ticket request contains invalid visits: " + e.getMessage());
-        }
+        // visit limits are not supported
 
-        Element privilege = root.getChild(ELEMENT_PRIVILEGE, NAMESPACE);
+        Element privilege = ticketinfo.getChild(ELEMENT_PRIVILEGE, NAMESPACE);
         if (privilege == null) {
             throw new IllegalArgumentException("ticket request missing privileges");
         }
@@ -162,7 +157,6 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
 
         Ticket ticket = new Ticket();
         ticket.setTimeout(timeout);
-        ticket.setVisits(visits);
         if (privilege.getChild(ELEMENT_READ, NAMESPACE) != null) {
             ticket.setRead(Boolean.TRUE);
         }

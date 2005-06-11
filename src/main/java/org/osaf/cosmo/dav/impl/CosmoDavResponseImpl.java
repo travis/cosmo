@@ -71,11 +71,15 @@ public class CosmoDavResponseImpl
 
         webdavResponse.setHeader(HEADER_TICKET, ticketId);
 
-        Element ticketDiscovery =
-            new Element(ELEMENT_TICKETDISCOVERY, NAMESPACE);
-        ticketDiscovery.addContent(ticketToXml(ticket, resource));
+        Element prop = new Element(ELEMENT_PROP, NAMESPACE);
+        prop.addNamespaceDeclaration(NAMESPACE_TICKET);
 
-        webdavResponse.sendXmlResponse(new Document(ticketDiscovery),
+        Element ticketDiscovery =
+            new Element(ELEMENT_TICKETDISCOVERY, NAMESPACE_TICKET);
+        ticketDiscovery.addContent(ticketToXml(ticket, resource));
+        prop.addContent(ticketDiscovery);
+
+        webdavResponse.sendXmlResponse(new Document(prop),
                                        WebdavResponse.SC_OK);
     }
 
@@ -83,9 +87,9 @@ public class CosmoDavResponseImpl
 
     private Element ticketToXml(Ticket ticket,
                                 CosmoDavResource resource) {
-        Element ticketInfo = new Element(ELEMENT_TICKETINFO, NAMESPACE);
+        Element ticketInfo = new Element(ELEMENT_TICKETINFO, NAMESPACE_TICKET);
 
-        Element id = new Element(ELEMENT_ID, NAMESPACE);
+        Element id = new Element(ELEMENT_ID, NAMESPACE_TICKET);
         id.addContent(ticket.getId());
         ticketInfo.addContent(id);
 
@@ -97,15 +101,15 @@ public class CosmoDavResponseImpl
         owner.addContent(href);
         ticketInfo.addContent(owner);
 
-        Element timeout = new Element(ELEMENT_TIMEOUT, NAMESPACE);
+        Element timeout = new Element(ELEMENT_TIMEOUT, NAMESPACE_TICKET);
         // XXX: convert from seconds
         timeout.addContent(ticket.getTimeout());
         ticketInfo.addContent(timeout);
 
-        Element visits = new Element(ELEMENT_VISITS, NAMESPACE);
-        visits.addContent(ticket.getVisits().intValue() == Integer.MAX_VALUE ?
-                          VALUE_INFINITY :
-                          ticket.getVisits().toString());
+        // visit limits are not supported; the element remains to
+        // comply with the current draft of the spec
+        Element visits = new Element(ELEMENT_VISITS, NAMESPACE_TICKET);
+        visits.addContent(VALUE_INFINITY);
         ticketInfo.addContent(visits);
 
         Element privilege = new Element(ELEMENT_PRIVILEGE, NAMESPACE);

@@ -17,6 +17,8 @@ package org.osaf.cosmo.dav;
 
 import org.apache.jackrabbit.webdav.DavConstants;
 
+import org.jdom.Namespace;
+
 /**
  * Extends {@link org.apache.jackrabbit.webdav.DavConstants} to
  * provide additional constants for request and response headers, XML
@@ -29,8 +31,15 @@ public interface CosmoDavConstants extends DavConstants {
 
     public static final String HEADER_TICKET = "Ticket";
 
+    // ticket namespace
+
+    // defined by Xythos
+    public static final Namespace NAMESPACE_TICKET =
+        Namespace.getNamespace("ticket", "http://www.xythos.com/namespaces/StorageServer");
+
     // ticket elements
 
+    public static final String ELEMENT_PROP = "prop";
     public static final String ELEMENT_TICKETDISCOVERY = "ticketdiscovery";
     public static final String ELEMENT_TICKETINFO = "ticketinfo";
     public static final String ELEMENT_ID = "id";

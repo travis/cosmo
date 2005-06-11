@@ -40,7 +40,6 @@ public class Ticket {
     private String id;
     private String owner;
     private String timeout;
-    private Integer visits;
     private Boolean read;
     private Boolean write;
     private Date dateCreated;
@@ -49,7 +48,6 @@ public class Ticket {
     /**
      */
     public Ticket() {
-        visits = new Integer(0);
         read = Boolean.FALSE;
         write = Boolean.FALSE;
     }
@@ -88,19 +86,6 @@ public class Ticket {
      */
     public void setTimeout(String timeout) {
         this.timeout = timeout;
-    }
-
-    /**
-     * <code>Integer.MAX_INT</code> signifies no visit limit.
-     */
-    public Integer getVisits() {
-        return visits;
-    }
-
-    /**
-     */
-    public void setVisits(Integer visits) {
-        this.visits = visits;
     }
 
     /**
@@ -161,7 +146,6 @@ public class Ticket {
         return new EqualsBuilder().
             append(owner, it.owner).
             append(timeout, it.timeout).
-            append(visits, it.visits).
             append(read, it.read).
             append(write, it.write).
             isEquals();
@@ -173,7 +157,6 @@ public class Ticket {
         return new HashCodeBuilder(3, 5).
             append(owner).
             append(timeout).
-            append(visits).
             append(read).
             append(write).
             toHashCode();
@@ -186,7 +169,6 @@ public class Ticket {
             append("id", id).
             append("owner", owner).
             append("timeout", timeout).
-            append("visits", visits).
             append("read", read).
             append("write", write).
             append("dateCreated", dateCreated).

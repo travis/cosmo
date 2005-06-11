@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<D:ticketinfo xmlns:D="IDONG:" >
-  <D:privilege><D:read/></D:privilege> 
-  <D:timeout>Second-3600</D:timeout> 
-  <D:visits>1</D:visits> 
-</D:ticketinfo>
-
+<D:prop xmlns:D="DAV:"
+        xmlns:ticket="oops">
+  <ticket:ticketinfo>
+    <D:privilege><D:read/></D:privilege> 
+    <ticket:timeout>Second-3600</ticket:timeout> 
+  </ticket:ticketinfo>
+</D:prop>

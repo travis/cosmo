@@ -141,7 +141,7 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
         String timeout = ticketinfo.getChildTextNormalize(ELEMENT_TIMEOUT,
                                                           NAMESPACE_TICKET);
         if (timeout == null) {
-            throw new IllegalArgumentException("ticket request timeout missing or invalid");
+            timeout = VALUE_INFINITY;
         }
 
         // visit limits are not supported

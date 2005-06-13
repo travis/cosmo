@@ -95,13 +95,13 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
 
     /**
      * Return a {@link Ticket} representing the information about a
-     * ticket contained in the request.
+     * ticket to be created by a <code>MKTICKET</code> request.
      *
      * @throws IllegalArgumentException if there is no ticket
      * information in the request or if the ticket information exists
      * but is invalid
      */
-    public Ticket getTicket() {
+    public Ticket getTicketInfo() {
         if (ticket == null) {
             ticket = parseTicketRequest();
         }

@@ -28,9 +28,11 @@ import org.osaf.cosmo.dav.CosmoDavResource;
 public interface TicketDavResponse {
 
     /**
-     * Send the response body for a {@link Ticket} creation event. The
-     * given id specifies which ticket was created, as a resource may
-     * have multiple tickets associated with it.
+     * Send the <code>ticketdiscovery</code> response to a
+     * <code>MKTICKET</code> request.
+     *
+     * @param resource the resource on which the ticket was created
+     * @param ticketId the id of the newly created ticket
      */
     public void sendMkTicketResponse(CosmoDavResource resource,
                                      String ticketId)

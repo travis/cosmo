@@ -173,7 +173,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
         Ticket ticket = null;
         try {
-            ticket = request.getTicket();
+            ticket = request.getTicketInfo();
         } catch (IllegalArgumentException e) {
             response.sendError(DavServletResponse.SC_BAD_REQUEST,
                                e.getMessage());

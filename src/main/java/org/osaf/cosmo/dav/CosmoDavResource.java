@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.dav;
 
+import java.util.Set;
+
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 
@@ -34,10 +36,20 @@ public interface CosmoDavResource extends DavResource {
     public void saveTicket(Ticket ticket);
 
     /**
-     * Returns the ticket with the given id associated with this
-     * resource.
+     * Returns all tickets owned by the named user on this resource,
+     * or an empty <code>Set</code> if the user does not own any
+     * tickets.
+     *
+     * @param username
      */
-    public Ticket getTicket(String id);
+    public Set getTickets(String username);
+
+    /**
+     * Returns all tickets owned by the currently logged in user on
+     * this resource, or an empty <code>Set</code> if the user does
+     * not own any tickets.
+     */
+    public Set getLoggedInUserTickets();
 
     /**
      * Returns a resource locator for the named principal.

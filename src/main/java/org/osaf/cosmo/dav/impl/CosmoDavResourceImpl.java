@@ -17,6 +17,8 @@ package org.osaf.cosmo.dav.impl;
 
 import java. io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.jcr.RepositoryException;
 
@@ -30,6 +32,7 @@ import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.User;
 
 /**
  * A subclass of
@@ -61,25 +64,36 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public void saveTicket(Ticket ticket) {
         ticket.setId(ticketIdGenerator.nextStringIdentifier());
-
-        // assign owner
-        CosmoDavResourceFactory cosmoFactory =
-            (CosmoDavResourceFactory) getFactory();
-        String owner = cosmoFactory.getSecurityManager().getSecurityContext().
-            getUser().getUsername();
-        ticket.setOwner(owner);
+        ticket.setOwner(getLoggedInUser().getUsername());
 
         // XXX save into repository
-        tickets.put(ticket.getId(), ticket);
+        getTickets(ticket.getOwner()).add(ticket);
     }
 
     /**
-     * Returns the ticket with the given id associated with this
-     * resource.
+     * Returns all tickets owned by the named user on this resource,
+     * or an empty <code>Set</code> if the user does not own any
+     * tickets.
+     *
+     * @param username
      */
-    public Ticket getTicket(String id) {
-        // XXX pull out of repository
-        return (Ticket) tickets.get(id);
+    public Set getTickets(String username) {
+        // XXX pull from repository
+        Set userTickets = (Set) tickets.get(username);
+        if (userTickets == null) {
+            userTickets = new HashSet();
+            tickets.put(username, userTickets);
+        }
+        return userTickets;
+    }
+
+    /**
+     * Returns all tickets owned by the currently logged in user on
+     * this resource, or an empty <code>Set</code> if the user does
+     * not own any tickets.
+     */
+    public Set getLoggedInUserTickets() {
+        return getTickets(getLoggedInUser().getUsername());
     }
 
     /**
@@ -114,5 +128,14 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public void setPrincipalLocatorFactory(DavLocatorFactory factory) {
         principalLocatorFactory = factory;
+    }
+
+    // private methods
+
+    private User getLoggedInUser() {
+        CosmoDavResourceFactory cosmoFactory =
+            (CosmoDavResourceFactory) getFactory();
+        return cosmoFactory.getSecurityManager().getSecurityContext().
+            getUser();
     }
 }

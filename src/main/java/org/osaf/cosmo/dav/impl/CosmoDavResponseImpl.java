@@ -21,6 +21,7 @@ import javax.servlet.ServletOutputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.jackrabbit.webdav.DavException;
@@ -60,15 +61,15 @@ public class CosmoDavResponseImpl
     // TicketDavResponse methods
 
     /**
-     * Send the response body for a {@link Ticket} creation event. The
-     * given id specifies which ticket was created, as a resource may
-     * have multiple tickets associated with it.
+     * Send the <code>ticketdiscovery</code> response to a
+     * <code>MKTICKET</code> request.
+     *
+     * @param resource the resource on which the ticket was created
+     * @param ticketId the id of the newly created ticket
      */
     public void sendMkTicketResponse(CosmoDavResource resource,
                                      String ticketId)
         throws IOException {
-        Ticket ticket = resource.getTicket(ticketId);
-
         webdavResponse.setHeader(HEADER_TICKET, ticketId);
 
         Element prop = new Element(ELEMENT_PROP, NAMESPACE);
@@ -76,8 +77,13 @@ public class CosmoDavResponseImpl
 
         Element ticketDiscovery =
             new Element(ELEMENT_TICKETDISCOVERY, NAMESPACE_TICKET);
-        ticketDiscovery.addContent(ticketToXml(ticket, resource));
         prop.addContent(ticketDiscovery);
+
+        for (Iterator i=resource.getLoggedInUserTickets().iterator();
+             i.hasNext();) {
+            Ticket ticket = (Ticket) i.next();
+            ticketDiscovery.addContent(ticketToXml(ticket, resource));
+        }
 
         webdavResponse.sendXmlResponse(new Document(prop),
                                        WebdavResponse.SC_OK);

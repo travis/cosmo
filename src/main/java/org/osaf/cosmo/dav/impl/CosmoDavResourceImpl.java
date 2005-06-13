@@ -42,10 +42,11 @@ import org.osaf.cosmo.model.User;
 public class CosmoDavResourceImpl extends DavResourceImpl 
     implements CosmoDavResource {
 
-    private HashMap tickets = new HashMap();
     private StringIdentifierGenerator ticketIdGenerator;
     private String baseUrl;
     private DavLocatorFactory principalLocatorFactory;
+    private HashMap ticketsByUser;
+    private HashMap allTickets;
 
     /**
      */
@@ -54,6 +55,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                                 DavSession session)
         throws RepositoryException {
         super(locator, factory, session);
+        ticketsByUser = new HashMap();
+        allTickets = new HashMap();
     }
 
     // CosmoDavResource methods
@@ -68,6 +71,25 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
         // XXX save into repository
         getTickets(ticket.getOwner()).add(ticket);
+        allTickets.put(ticket.getId(), ticket);
+    }
+
+    /**
+     * Removes the association between the ticket and this resource
+     * and deletes the ticket from persistent storage.
+     */
+    public void removeTicket(Ticket ticket) {
+        // XXX remove from repository
+        getTickets(ticket.getOwner()).remove(ticket);
+    }
+
+    /**
+     * Returns the ticket with the given id on this resource. Does not
+     * execute any security checks.
+     */
+    public Ticket getTicket(String id) {
+        // XXX pull from repository
+        return (Ticket) allTickets.get(id);
     }
 
     /**
@@ -79,10 +101,10 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public Set getTickets(String username) {
         // XXX pull from repository
-        Set userTickets = (Set) tickets.get(username);
+        Set userTickets = (Set) ticketsByUser.get(username);
         if (userTickets == null) {
             userTickets = new HashSet();
-            tickets.put(username, userTickets);
+            ticketsByUser.put(username, userTickets);
         }
         return userTickets;
     }

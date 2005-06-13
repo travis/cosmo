@@ -31,6 +31,10 @@ public interface CosmoDavConstants extends DavConstants {
 
     public static final String HEADER_TICKET = "Ticket";
 
+    // ticket URL parameters
+
+    public static final String PARAM_TICKET = "ticket";
+
     // ticket namespace
 
     // defined by Xythos

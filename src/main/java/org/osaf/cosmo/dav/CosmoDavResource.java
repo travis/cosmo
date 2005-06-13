@@ -36,6 +36,17 @@ public interface CosmoDavResource extends DavResource {
     public void saveTicket(Ticket ticket);
 
     /**
+     * Removes the association between the ticket and this resource
+     * and deletes the ticket from persistent storage.
+     */
+    public void removeTicket(Ticket ticket);
+
+    /**
+     * Returns the ticket with the given id on this resource.
+     */
+    public Ticket getTicket(String id);
+
+    /**
      * Returns all tickets owned by the named user on this resource,
      * or an empty <code>Set</code> if the user does not own any
      * tickets.

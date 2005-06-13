@@ -37,6 +37,7 @@ import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResponseImpl;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import org.springframework.beans.BeansException;
@@ -180,6 +181,10 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("saving ticket for resource " +
+                      resource.getResourcePath());
+        }
         resource.saveTicket(ticket);
 
         response.sendMkTicketResponse(resource, ticket.getId());
@@ -200,8 +205,25 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
-        response.setStatus(DavServletResponse.SC_OK);
-        response.setIntHeader("Content-Length", 0);
+        String ticketId = request.getTicketId();
+        Ticket ticket = resource.getTicket(ticketId);
+        if (ticket == null) {
+            response.sendError(DavServletResponse.SC_PRECONDITION_FAILED,
+                               "The ticket specified does not exist.");
+            return;
+        }
+        if (! ticket.getOwner().equals(getLoggedInUser().getUsername())) {
+            response.sendError(DavServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("removing ticket " + ticket.getId() + " for resource " +
+                      resource.getResourcePath());
+        }
+        resource.removeTicket(ticket);
+
+        response.sendDelTicketResponse(resource, ticket.getId());
     }
 
     // our methods
@@ -256,5 +278,11 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
      */
     public WebApplicationContext getWebApplicationContext() {
         return wac;
+    }
+
+    // private methods
+
+    private User getLoggedInUser() {
+        return securityManager.getSecurityContext().getUser();
     }
 }

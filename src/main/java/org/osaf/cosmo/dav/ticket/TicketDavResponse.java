@@ -37,4 +37,14 @@ public interface TicketDavResponse {
     public void sendMkTicketResponse(CosmoDavResource resource,
                                      String ticketId)
         throws IOException;
+
+    /**
+     * Send the response to a <code>DELTICKET</code> request.
+     *
+     * @param resource the resource on which the ticket was deleted
+     * @param ticketId the id of the deleted ticket
+     */
+    public void sendDelTicketResponse(CosmoDavResource resource,
+                                      String ticketId)
+        throws IOException;
 }

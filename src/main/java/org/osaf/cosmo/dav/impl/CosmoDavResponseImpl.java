@@ -85,8 +85,19 @@ public class CosmoDavResponseImpl
             ticketDiscovery.addContent(ticketToXml(ticket, resource));
         }
 
-        webdavResponse.sendXmlResponse(new Document(prop),
-                                       WebdavResponse.SC_OK);
+        sendXmlResponse(new Document(prop), SC_OK);
+    }
+
+    /**
+     * Send the response to a <code>DELTICKET</code> request.
+     *
+     * @param resource the resource on which the ticket was deleted
+     * @param ticketId the id of the deleted ticket
+     */
+    public void sendDelTicketResponse(CosmoDavResource resource,
+                                      String ticketId)
+        throws IOException {
+        setStatus(SC_NO_CONTENT);
     }
 
     // private methods

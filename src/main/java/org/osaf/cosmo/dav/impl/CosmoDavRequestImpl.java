@@ -108,6 +108,19 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
         return ticket;
     }
 
+    /**
+     * Return the ticket id included in this request, if any. If
+     * different ticket ids are included in the headers and URL, the
+     * one from the URL is used.
+     */
+    public String getTicketId() {
+        String ticketId = getParameter(PARAM_TICKET);
+        if (ticketId == null) {
+            ticketId = getHeader(HEADER_TICKET);
+        }
+        return ticketId;
+    }
+
     // private methods
 
     private Ticket parseTicketRequest() {

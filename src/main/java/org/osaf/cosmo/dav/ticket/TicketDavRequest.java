@@ -34,4 +34,11 @@ public interface TicketDavRequest {
      * but is invalid
      */
     public Ticket getTicketInfo();
+
+    /**
+     * Return the ticket id included in this request, if any. If
+     * different ticket ids are included in the headers and URL, the
+     * one from the URL is used.
+     */
+    public String getTicketId();
 }

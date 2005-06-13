@@ -23,8 +23,7 @@ Home</a> &gt; <a
 <table width="100%">
   <tbody>
     <tr>
-      <td width="33%">Authors:
-      <a href="mailto:bcm@osafoundation.org">Brian
+      <td width="33%">Authors: <a href="mailto:bcm@osafoundation.org">Brian
 Moseley</a></td>
       <td width="33%">Last
 edited: June 13, 2005 </td>
@@ -32,8 +31,8 @@ edited: June 13, 2005 </td>
 date: May 3, 2005</td>
     </tr>
     <tr>
-      <td colspan="3">Reviewers:
-      <a href="mailto:lisa@osafoundation.org">Lisa
+      <td colspan="3">Reviewers: <a
+ href="mailto:lisa@osafoundation.org">Lisa
 Dusseault</a> </td>
     </tr>
   </tbody>
@@ -342,7 +341,8 @@ Access Control Extension
 to WebDAV</em> (see link at bottom). The response to a MKTICKET request
 will include only the tickets owned by the user sending the request
 (including the one just created). Cosmo will fully support ticket
-timeouts.</p>
+timeouts. Cosmo will not support PROPFIND requests for the
+ticketdiscovery property.</p>
 <h4>Deviations from Spec</h4>
 <p>The Xythos ticket implementation differs from the specification in
 numerous ways. In order to promote interoperability, Cosmo will align
@@ -353,7 +353,7 @@ a new version of the spec in the near future.</p>
 future versions of the spec). Cosmo will always return the value&nbsp;<span
  style="font-style: italic;">infinity</span> for the <code>visits</code>
 element.<span style="font-family: monospace;"><span
- style="font-style: italic;" /></span><span style="font-style: italic;"><code /></span></li>
+ style="font-style: italic;" /><span style="font-style: italic;"><code /></span></span></li>
   <li>The custom XML namespace&nbsp;<span style="font-style: italic;">http://www.xythos.com/namespaces/StorageServer</span>
 is used for the <code>ticketdiscovery</code>, <code>ticketinfo</code>,
     <code>id</code> and <code>timeout</code> elements.</li>
@@ -515,7 +515,7 @@ for auth info</li>
 <h2>Useful Links</h2>
 <ul>
   <li><a
- href="http://www.sharemation.com/%7EEmilele/public/dav/draft-ito-dav-ticket-00.txt">Ticket
+ href="http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt">Ticket
 spec</a></li>
   <li><a href="http://ietf.webdav.org/caldav/draft-dusseault-caldav.txt">CalDAV
 spec</a></li>

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>OSAF - Spec Title</title>
+  <title>OSAF - Cosmo 0.2 Specification</title>
   <link href="Spec.css" type="text/css" rel="stylesheet" />
   <meta http-equiv="Content-type"
  content="text/html; charset=iso-8859-1" />
@@ -27,7 +27,7 @@ Home</a> &gt; <a
       <a href="mailto:bcm@osafoundation.org">Brian
 Moseley</a></td>
       <td width="33%">Last
-edited: May 19, 2005 </td>
+edited: June 13, 2005 </td>
       <td width="33%">Creation
 date: May 3, 2005</td>
     </tr>
@@ -127,9 +127,7 @@ procedures (e.g. Basic authentication, ACL-based authorization) as
 per <em>Ticket-Based Access
 Control Extension
 to WebDAV</em> (see link at bottom).
-In addition, must be able to accept ticket-creation requests, though
-only for unlimited-life and unlimited-use tickets. Cosmo 0.2 should
-reject requests for tickets with limited life or limited use.</p>
+In addition, must be able to accept ticket-creation requests.</p>
 <p>Cosmo 0.2 will not support any
 mechanisms for controlling access to
 a user's home directory by another user other than tickets. A future
@@ -341,13 +339,30 @@ account's address and redisplays the Login Page.</li>
 MKTICKET
 and DELTICKET methods defined in <em>Ticket-Based
 Access Control Extension
-to WebDAV</em> (see link at bottom).
-Ticket discovery is not required,
-since Chandler will remember any generated tickets. Chandler-generated
-tickets will never have timeouts or use limits.</p>
-<p> If MKTICKET is used to attempt
-to create a ticket with timeouts or use limits, Cosmo should reject
-that request (501 Not Supported)</p>
+to WebDAV</em> (see link at bottom). The response to a MKTICKET request
+will include only the tickets owned by the user sending the request
+(including the one just created). Cosmo will fully support ticket
+timeouts.</p>
+<h4>Deviations from Spec</h4>
+<p>The Xythos ticket implementation differs from the specification in
+numerous ways. In order to promote interoperability, Cosmo will align
+with the Xythos implementation as much as possible, looking forward to
+a new version of the spec in the near future.</p>
+<ul>
+  <li>Visit limits are not supported (and will likely be removed from
+future versions of the spec). Cosmo will always return the value&nbsp;<span
+ style="font-style: italic;">infinity</span> for the <code>visits</code>
+element.<span style="font-family: monospace;"><span
+ style="font-style: italic;" /></span><span style="font-style: italic;"><code /></span></li>
+  <li>The custom XML namespace&nbsp;<span style="font-style: italic;">http://www.xythos.com/namespaces/StorageServer</span>
+is used for the <code>ticketdiscovery</code>, <code>ticketinfo</code>,
+    <code>id</code> and <code>timeout</code> elements.</li>
+  <li>Valid values for the <code>timeout</code> element are&nbsp;<span
+ style="font-style: italic;">infinity</span> for tickets that never
+time out and strings of the form&nbsp;<span style="font-style: italic;">Seconds-xxxx</span>
+where&nbsp;<span style="font-style: italic;">xxxx</span> is the
+lifetime of the ticket in seconds.</li>
+</ul>
 <h3>CalDAV</h3>
 <p>Cosmo will implement
 individually-addressable calendar objects and the MKCALENDAR method as
@@ -472,26 +487,35 @@ migrated from Ant to Maven, and the source code will be moved from CVS
 to Subversion.</p>
 <h2>Deferred Features</h2>
 <ul>
-  <li>scalability improvements to admin console</li>
-  <li>formal graphic and interaction design</li>
-  <li>migrate from Tiles to SiteMesh</li>
-  <li>extended CalDAV interop (OPTIONS, misc spec compliance sections
+  <li>scalability improvements to
+admin console</li>
+  <li>formal graphic and
+interaction design</li>
+  <li>migrate from Tiles to
+SiteMesh</li>
+  <li>extended CalDAV interop
+(OPTIONS, misc spec compliance sections
 3-6)</li>
-  <li>web browser interop (GET HTML view of calendar collection)</li>
-  <li>digest authen for WebDAV/CalDAV</li>
+  <li>web browser interop (GET
+HTML view of calendar collection)</li>
+  <li>digest authen for
+WebDAV/CalDAV</li>
   <li>external auth API</li>
-  <li>reference external auth plugin</li>
+  <li>reference external auth
+plugin</li>
   <li>auth mgmt service</li>
   <li>auth mgmt command line tool</li>
-  <li>advanced Windows support (run as service)</li>
-  <li>migrate from RDBMS to JCR for auth info</li>
+  <li>advanced Windows support
+(run as service)</li>
+  <li>migrate from RDBMS to JCR
+for auth info</li>
 </ul>
 </div>
 <div id="codicille">
 <h2>Useful Links</h2>
 <ul>
   <li><a
- href="http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt">Ticket
+ href="http://www.sharemation.com/%7EEmilele/public/dav/draft-ito-dav-ticket-00.txt">Ticket
 spec</a></li>
   <li><a href="http://ietf.webdav.org/caldav/draft-dusseault-caldav.txt">CalDAV
 spec</a></li>
@@ -500,6 +524,8 @@ spec</a></li>
   <li><a
  href="http://cvs.osafoundation.org/viewcvs.cgi/*checkout*/docs/specs/rel0_6/Sharing-0.6.html?rev=HEAD">Chandler
 0.6 Sharing spec</a></li>
+  <li><a href="http://sharemation.com/">Sharemation</a> (hosted WebDAV
+service implementing the ticket spec)</li>
 </ul>
 <h2>History</h2>
 <table width="100%">
@@ -537,6 +563,12 @@ Code Design section (will address separately later)</td>
       <td>Added more detail about
 supporting Apple iCal. Cleaned up issues, making strawman decisions
 about things like email uniqueness.</td>
+    </tr>
+    <tr>
+      <td><a href="mailto:bcm@osafoundation.org">bcm</a></td>
+      <td>June 13, 2005</td>
+      <td>Updated ticket protocol section, noting spec deviations and
+adding back support for ticket timeouts</td>
     </tr>
   </tbody>
 </table>

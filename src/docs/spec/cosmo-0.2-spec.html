@@ -353,7 +353,7 @@ a new version of the spec in the near future.</p>
 future versions of the spec). Cosmo will always return the value&nbsp;<span
  style="font-style: italic;">infinity</span> for the <code>visits</code>
 element.<span style="font-family: monospace;"><span
- style="font-style: italic;" /><span style="font-style: italic;"><code /></span></span></li>
+ style="font-style: italic;"><span style="font-style: italic;"><code /></span></span></span></li>
   <li>The custom XML namespace&nbsp;<span style="font-style: italic;">http://www.xythos.com/namespaces/StorageServer</span>
 is used for the <code>ticketdiscovery</code>, <code>ticketinfo</code>,
     <code>id</code> and <code>timeout</code> elements.</li>
@@ -362,6 +362,13 @@ is used for the <code>ticketdiscovery</code>, <code>ticketinfo</code>,
 time out and strings of the form&nbsp;<span style="font-style: italic;">Seconds-xxxx</span>
 where&nbsp;<span style="font-style: italic;">xxxx</span> is the
 lifetime of the ticket in seconds.</li>
+  <li>If different tickets are included in the request headers and URL,
+the ticket in the URL is used.</li>
+  <li>If a DELTICKET request is received for a resource or ticket on
+which the requesting principal does not have access privileges, Cosmo
+returns a 403 (Forbidden) response. Example: user A owns resource X and
+creates ticket 123 on it. user B does not have privileges on resource X
+but attempts to delete the ticket.</li>
 </ul>
 <h3>CalDAV</h3>
 <p>Cosmo will implement

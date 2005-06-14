@@ -27,8 +27,6 @@ for current development plan. Additional tasks:
 
  * CosmoDavRequestImpl, CosmoDavResponseImpl: convert ticketinfo
    timeout xml to/from a number of seconds for storage
- * CosmoDavResourceImpl: save ticket into repository
- * CosmoDavResourceImpl: pull ticket out of repository
  * ticket method tests
 
  * precompile jsps for distribution

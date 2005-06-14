@@ -17,6 +17,7 @@ package org.osaf.cosmo.dav;
 
 import java.util.Set;
 
+import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 
@@ -33,18 +34,18 @@ public interface CosmoDavResource extends DavResource {
      * Associates a ticket with this resource and saves it into
      * persistent storage.
      */
-    public void saveTicket(Ticket ticket);
+    public void saveTicket(Ticket ticket) throws DavException;
 
     /**
      * Removes the association between the ticket and this resource
      * and deletes the ticket from persistent storage.
      */
-    public void removeTicket(Ticket ticket);
+    public void removeTicket(Ticket ticket) throws DavException;
 
     /**
      * Returns the ticket with the given id on this resource.
      */
-    public Ticket getTicket(String id);
+    public Ticket getTicket(String id) throws DavException;
 
     /**
      * Returns all tickets owned by the named user on this resource,
@@ -53,14 +54,14 @@ public interface CosmoDavResource extends DavResource {
      *
      * @param username
      */
-    public Set getTickets(String username);
+    public Set getTickets(String username) throws DavException;
 
     /**
      * Returns all tickets owned by the currently logged in user on
      * this resource, or an empty <code>Set</code> if the user does
      * not own any tickets.
      */
-    public Set getLoggedInUserTickets();
+    public Set getLoggedInUserTickets() throws DavException;
 
     /**
      * Returns a resource locator for the named principal.

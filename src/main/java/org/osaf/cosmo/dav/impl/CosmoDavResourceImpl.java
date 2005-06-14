@@ -16,21 +16,31 @@
 package org.osaf.cosmo.dav.impl;
 
 import java. io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.jcr.Item;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 
 import org.apache.commons.id.StringIdentifierGenerator;
 
+import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
 
+import org.apache.log4j.Logger;
+
+import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
+import org.osaf.cosmo.dav.CosmoDavResponse;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
@@ -40,13 +50,12 @@ import org.osaf.cosmo.model.User;
  * that provides Cosmo-specific WebDAV behaviors.
  */
 public class CosmoDavResourceImpl extends DavResourceImpl 
-    implements CosmoDavResource {
+    implements CosmoDavResource, CosmoJcrConstants {
+    private static final Logger log = Logger.getLogger(CosmoDavResource.class);
 
     private StringIdentifierGenerator ticketIdGenerator;
     private String baseUrl;
     private DavLocatorFactory principalLocatorFactory;
-    private HashMap ticketsByUser;
-    private HashMap allTickets;
 
     /**
      */
@@ -55,8 +64,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                                 DavSession session)
         throws RepositoryException {
         super(locator, factory, session);
-        ticketsByUser = new HashMap();
-        allTickets = new HashMap();
     }
 
     // CosmoDavResource methods
@@ -65,31 +72,62 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      * Associates a ticket with this resource and saves it into
      * persistent storage.
      */
-    public void saveTicket(Ticket ticket) {
+    public void saveTicket(Ticket ticket)
+        throws DavException {
         ticket.setId(ticketIdGenerator.nextStringIdentifier());
         ticket.setOwner(getLoggedInUser().getUsername());
 
-        // XXX save into repository
-        getTickets(ticket.getOwner()).add(ticket);
-        allTickets.put(ticket.getId(), ticket);
+        try {
+            Node resourceNode = getNode();
+            Node ticketNode = resourceNode.addNode(ticket.getId(), NT_TICKET);
+            ticketNode.setProperty(NP_OWNER, ticket.getOwner());
+            ticketNode.setProperty(NP_TIMEOUT, ticket.getTimeout());
+            ticketNode.setProperty(NP_READ, ticket.isRead().booleanValue());
+            ticketNode.setProperty(NP_WRITE, ticket.isWrite().booleanValue());
+            ticketNode.setProperty(NP_CREATED,
+                             dateToCalendar(ticket.getDateCreated()));
+            ticketNode.setProperty(NP_LAST_MODIFIED,
+                             dateToCalendar(ticket.getDateModified()));
+            resourceNode.save();
+        } catch (RepositoryException e) {
+            log.error("cannot save ticket", e);
+            throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
+                                   e.getMessage());
+        }
     }
 
     /**
      * Removes the association between the ticket and this resource
      * and deletes the ticket from persistent storage.
      */
-    public void removeTicket(Ticket ticket) {
-        // XXX remove from repository
-        getTickets(ticket.getOwner()).remove(ticket);
+    public void removeTicket(Ticket ticket)
+        throws DavException {
+        try {
+            Node resourceNode = getNode();
+            Node ticketNode = resourceNode.getNode(ticket.getId());
+            ticketNode.remove();
+            resourceNode.save();
+        } catch (RepositoryException e) {
+            log.error("cannot remove ticket", e);
+            throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
+                                   e.getMessage());
+        }
     }
 
     /**
      * Returns the ticket with the given id on this resource. Does not
      * execute any security checks.
      */
-    public Ticket getTicket(String id) {
-        // XXX pull from repository
-        return (Ticket) allTickets.get(id);
+    public Ticket getTicket(String id)
+        throws DavException {
+        try {
+            Node ticketNode = getNode().getNode(id);
+            return ticketNode != null ? nodeToTicket(ticketNode) : null;
+        } catch (RepositoryException e) {
+            log.error("cannot remove ticket", e);
+            throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
+                                   e.getMessage());
+        }
     }
 
     /**
@@ -99,14 +137,27 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      *
      * @param username
      */
-    public Set getTickets(String username) {
-        // XXX pull from repository
-        Set userTickets = (Set) ticketsByUser.get(username);
-        if (userTickets == null) {
-            userTickets = new HashSet();
-            ticketsByUser.put(username, userTickets);
+    public Set getTickets(String username)
+        throws DavException {
+        try {
+            Set tickets = new HashSet();
+            for (NodeIterator i=getNode().getNodes(); i.hasNext();) {
+                Node childNode = i.nextNode();
+                // chlid node must be a ticket node and be owned by
+                // this user
+                if (! (childNode.isNodeType(NT_TICKET) &&
+                       childNode.getProperty(NP_OWNER).getString().
+                       equals(username))) {
+                    continue;
+                }
+                tickets.add(nodeToTicket(childNode));
+            }
+            return tickets;
+        } catch (RepositoryException e) {
+            log.error("cannot get tickets owned by " + username, e);
+            throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
+                                   e.getMessage());
         }
-        return userTickets;
     }
 
     /**
@@ -114,7 +165,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      * this resource, or an empty <code>Set</code> if the user does
      * not own any tickets.
      */
-    public Set getLoggedInUserTickets() {
+    public Set getLoggedInUserTickets()
+        throws DavException {
         return getTickets(getLoggedInUser().getUsername());
     }
 
@@ -127,6 +179,15 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     // our methods
+
+    /**
+     */
+    protected User getLoggedInUser() {
+        CosmoDavResourceFactory cosmoFactory =
+            (CosmoDavResourceFactory) getFactory();
+        return cosmoFactory.getSecurityManager().getSecurityContext().
+            getUser();
+    }
 
     /**
      * Set the generator for ticket identifiers.
@@ -154,10 +215,23 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
     // private methods
 
-    private User getLoggedInUser() {
-        CosmoDavResourceFactory cosmoFactory =
-            (CosmoDavResourceFactory) getFactory();
-        return cosmoFactory.getSecurityManager().getSecurityContext().
-            getUser();
+    private Calendar dateToCalendar(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        return c;
+    }
+
+    private Ticket nodeToTicket(Node node)
+        throws RepositoryException {
+        Ticket ticket = new Ticket();
+        ticket.setId(node.getName());
+        ticket.setOwner(node.getProperty(NP_OWNER).getString());
+        ticket.setTimeout(node.getProperty(NP_TIMEOUT).getString());
+        ticket.setRead(new Boolean(node.getProperty(NP_READ).getBoolean()));
+        ticket.setWrite(new Boolean(node.getProperty(NP_WRITE).getBoolean()));
+        ticket.setDateCreated(node.getProperty(NP_CREATED).getDate().getTime());
+        ticket.setDateModified(node.getProperty(NP_LAST_MODIFIED).getDate().
+                               getTime());
+        return ticket;
     }
 }

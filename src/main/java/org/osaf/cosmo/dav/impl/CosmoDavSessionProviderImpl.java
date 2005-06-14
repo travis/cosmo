@@ -25,12 +25,12 @@ import javax.jcr.Session;
 import javax.jcr.RepositoryException;
 import javax.security.auth.Subject;
 
-import org.apache.jackrabbit.server.simple.dav.DavSessionImpl;
 import org.apache.jackrabbit.webdav.DavSessionProvider;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.WebdavRequest;
+import org.apache.jackrabbit.webdav.simple.DavSessionImpl;
 
 import org.apache.log4j.Logger;
 

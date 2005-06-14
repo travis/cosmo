@@ -48,7 +48,7 @@
   </bean>
 
   <bean id="lockManager"
-        class="org.apache.jackrabbit.server.simple.dav.lock.SimpleLockManager"/>
+        class="org.apache.jackrabbit.webdav.lock.SimpleLockManager"/>
 
   <bean id="ticketIdGenerator"
         class="org.apache.commons.id.random.SessionIdGenerator"/>

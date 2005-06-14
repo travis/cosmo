@@ -186,12 +186,12 @@
     <tar destfile="${cosmo.dist.version}.tar.gz"
          compression="gzip" longfile="gnu">
       <tarfileset dir="${cosmo.dist.version}" mode="755"
-                  prefix="cosmo-${cosmo.version}">
+                  prefix="cosmo-${pom.currentVersion}">
         <include name="bin/cosmoctl"/>
         <include name="tomcat/bin/*.sh"/>
       </tarfileset>
       <tarfileset dir="${cosmo.dist.version}"
-                  prefix="cosmo-${cosmo.version}">
+                  prefix="cosmo-${pom.currentVersion}">
         <exclude name="bin/cosmoctl"/>
         <exclude name="tomcat/bin/*.sh"/>
       </tarfileset>

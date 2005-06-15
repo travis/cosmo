@@ -17,6 +17,8 @@ package org.osaf.cosmo.dav.ticket;
 
 import java.io.IOException;
 
+import org.apache.jackrabbit.webdav.DavException;
+
 import org.osaf.cosmo.dav.CosmoDavResource;
 
 /**
@@ -36,7 +38,7 @@ public interface TicketDavResponse {
      */
     public void sendMkTicketResponse(CosmoDavResource resource,
                                      String ticketId)
-        throws IOException;
+        throws DavException, IOException;
 
     /**
      * Send the response to a <code>DELTICKET</code> request.
@@ -46,5 +48,5 @@ public interface TicketDavResponse {
      */
     public void sendDelTicketResponse(CosmoDavResource resource,
                                       String ticketId)
-        throws IOException;
+        throws DavException, IOException;
 }

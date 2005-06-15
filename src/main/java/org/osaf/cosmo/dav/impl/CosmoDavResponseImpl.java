@@ -69,7 +69,7 @@ public class CosmoDavResponseImpl
      */
     public void sendMkTicketResponse(CosmoDavResource resource,
                                      String ticketId)
-        throws IOException {
+        throws DavException, IOException {
         webdavResponse.setHeader(HEADER_TICKET, ticketId);
 
         Element prop = new Element(ELEMENT_PROP, NAMESPACE);
@@ -96,7 +96,7 @@ public class CosmoDavResponseImpl
      */
     public void sendDelTicketResponse(CosmoDavResource resource,
                                       String ticketId)
-        throws IOException {
+        throws DavException, IOException {
         setStatus(SC_NO_CONTENT);
     }
 

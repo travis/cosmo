@@ -53,25 +53,15 @@ PropertyDef
   Protected false
   Multiple false
 PropertyDef
-  Name dav:read
-  RequiredType BOOLEAN
-  ValueConstraints []
+  Name dav:privileges
+  RequiredType STRING
+  ValueConstraints ["read", "write"]
   DefaultValues null
   AutoCreate false
   Mandatory true
   OnParentVersion COPY
   Protected false
-  Multiple false
-PropertyDef
-  Name dav:write
-  RequiredType BOOLEAN
-  ValueConstraints []
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
+  Multiple true
 PropertyDef
   Name jcr:created
   RequiredType DATE

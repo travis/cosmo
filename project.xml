@@ -114,7 +114,7 @@
     <dependency>
       <groupId>commons-digester</groupId>
       <artifactId>commons-digester</artifactId>
-      <version>1.6</version>
+      <version>1.7</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

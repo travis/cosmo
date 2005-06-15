@@ -26,14 +26,12 @@ public interface CosmoJcrConstants extends JcrConstants {
 
     // node types
 
-    public static final String NT_TICKET = "cosmo:ticket";
+    public static final String NT_TICKET = "dav:ticket";
 
     // node properties
 
-    public static final String NP_OWNER = "cosmo:owner";
-    public static final String NP_TIMEOUT = "cosmo:timeout";
-    public static final String NP_READ = "cosmo:read";
-    public static final String NP_WRITE = "cosmo:write";
-    public static final String NP_CREATED = "cosmo:created";
-    public static final String NP_LAST_MODIFIED = "cosmo:lastModified";
+    public static final String NP_OWNER = "dav:owner";
+    public static final String NP_TIMEOUT = "dav:timeout";
+    public static final String NP_READ = "dav:read";
+    public static final String NP_WRITE = "dav:write";
 }

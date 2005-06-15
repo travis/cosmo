@@ -42,8 +42,7 @@ public class Ticket {
     private String timeout;
     private Boolean read;
     private Boolean write;
-    private Date dateCreated;
-    private Date dateModified;
+    private Date created;
 
     /**
      */
@@ -114,26 +113,14 @@ public class Ticket {
 
     /**
      */
-    public Date getDateCreated() {
-        return dateCreated;
+    public Date getCreated() {
+        return created;
     }
 
     /**
      */
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
-    /**
-     */
-    public Date getDateModified() {
-        return dateModified;
-    }
-
-    /**
-     */
-    public void setDateModified(Date dateModified) {
-        this.dateModified = dateModified;
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     /**
@@ -171,8 +158,7 @@ public class Ticket {
             append("timeout", timeout).
             append("read", read).
             append("write", write).
-            append("dateCreated", dateCreated).
-            append("dateModified", dateModified).
+            append("created", created).
             toString();
     }
 }

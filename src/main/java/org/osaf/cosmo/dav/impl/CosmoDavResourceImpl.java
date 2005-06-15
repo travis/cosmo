@@ -16,8 +16,6 @@
 package org.osaf.cosmo.dav.impl;
 
 import java. io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -84,10 +82,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             ticketNode.setProperty(NP_TIMEOUT, ticket.getTimeout());
             ticketNode.setProperty(NP_READ, ticket.isRead().booleanValue());
             ticketNode.setProperty(NP_WRITE, ticket.isWrite().booleanValue());
-            ticketNode.setProperty(NP_CREATED,
-                             dateToCalendar(ticket.getDateCreated()));
-            ticketNode.setProperty(NP_LAST_MODIFIED,
-                             dateToCalendar(ticket.getDateModified()));
             resourceNode.save();
         } catch (RepositoryException e) {
             log.error("cannot save ticket", e);
@@ -215,12 +209,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
     // private methods
 
-    private Calendar dateToCalendar(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        return c;
-    }
-
     private Ticket nodeToTicket(Node node)
         throws RepositoryException {
         Ticket ticket = new Ticket();
@@ -229,9 +217,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         ticket.setTimeout(node.getProperty(NP_TIMEOUT).getString());
         ticket.setRead(new Boolean(node.getProperty(NP_READ).getBoolean()));
         ticket.setWrite(new Boolean(node.getProperty(NP_WRITE).getBoolean()));
-        ticket.setDateCreated(node.getProperty(NP_CREATED).getDate().getTime());
-        ticket.setDateModified(node.getProperty(NP_LAST_MODIFIED).getDate().
-                               getTime());
+        ticket.setCreated(node.getProperty(JCR_CREATED).getDate().getTime());
         return ticket;
     }
 }

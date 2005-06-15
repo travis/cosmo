@@ -171,10 +171,10 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
         Ticket ticket = new Ticket();
         ticket.setTimeout(timeout);
         if (privilege.getChild(ELEMENT_READ, NAMESPACE) != null) {
-            ticket.setRead(Boolean.TRUE);
+            ticket.getPrivileges().add(PRIVILEGE_READ);
         }
         if (privilege.getChild(ELEMENT_WRITE, NAMESPACE) != null) {
-            ticket.setWrite(Boolean.TRUE);
+            ticket.getPrivileges().add(PRIVILEGE_WRITE);
         }
 
         return ticket;

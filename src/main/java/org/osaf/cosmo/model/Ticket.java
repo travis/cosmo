@@ -16,6 +16,8 @@
 package org.osaf.cosmo.model;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -31,24 +33,19 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * Similarly, the class does not know how to convert itself to or from
  * XML.
- *
- * Open Issue: how do we support privileges other than read and write
- * (defined by WebDAV extensions or applications)?
  */
 public class Ticket {
 
     private String id;
     private String owner;
     private String timeout;
-    private Boolean read;
-    private Boolean write;
+    private Set privileges;
     private Date created;
 
     /**
      */
     public Ticket() {
-        read = Boolean.FALSE;
-        write = Boolean.FALSE;
+        privileges = new HashSet();
     }
 
     /**
@@ -89,26 +86,14 @@ public class Ticket {
 
     /**
      */
-    public Boolean isRead() {
-        return read;
+    public Set getPrivileges() {
+        return privileges;
     }
 
     /**
      */
-    public void setRead(Boolean read) {
-        this.read = read;
-    }
-
-    /**
-     */
-    public Boolean isWrite() {
-        return write;
-    }
-
-    /**
-     */
-    public void setWrite(Boolean write) {
-        this.write = write;
+    public void setPrivileges(Set privileges) {
+        this.privileges = privileges;
     }
 
     /**
@@ -133,8 +118,7 @@ public class Ticket {
         return new EqualsBuilder().
             append(owner, it.owner).
             append(timeout, it.timeout).
-            append(read, it.read).
-            append(write, it.write).
+            append(privileges, it.privileges).
             isEquals();
     }
 
@@ -144,8 +128,7 @@ public class Ticket {
         return new HashCodeBuilder(3, 5).
             append(owner).
             append(timeout).
-            append(read).
-            append(write).
+            append(privileges).
             toHashCode();
     }
 
@@ -156,8 +139,7 @@ public class Ticket {
             append("id", id).
             append("owner", owner).
             append("timeout", timeout).
-            append("read", read).
-            append("write", write).
+            append("privileges", privileges).
             append("created", created).
             toString();
     }

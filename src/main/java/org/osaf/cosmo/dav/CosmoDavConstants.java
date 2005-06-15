@@ -58,4 +58,9 @@ public interface CosmoDavConstants extends DavConstants {
     // ticket values
 
     public static final String VALUE_INFINITY = "infinity";
+
+    // ticket privileges
+
+    public static final String PRIVILEGE_READ = "read";
+    public static final String PRIVILEGE_WRITE = "write";
 }

@@ -32,6 +32,5 @@ public interface CosmoJcrConstants extends JcrConstants {
 
     public static final String NP_OWNER = "dav:owner";
     public static final String NP_TIMEOUT = "dav:timeout";
-    public static final String NP_READ = "dav:read";
-    public static final String NP_WRITE = "dav:write";
+    public static final String NP_PRIVILEGES = "dav:privileges";
 }

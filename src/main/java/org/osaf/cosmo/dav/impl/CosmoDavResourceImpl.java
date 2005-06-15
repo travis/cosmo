@@ -24,6 +24,7 @@ import javax.jcr.Item;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
+import javax.jcr.Value;
 
 import org.apache.commons.id.StringIdentifierGenerator;
 
@@ -80,8 +81,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             Node ticketNode = resourceNode.addNode(ticket.getId(), NT_TICKET);
             ticketNode.setProperty(NP_OWNER, ticket.getOwner());
             ticketNode.setProperty(NP_TIMEOUT, ticket.getTimeout());
-            ticketNode.setProperty(NP_READ, ticket.isRead().booleanValue());
-            ticketNode.setProperty(NP_WRITE, ticket.isWrite().booleanValue());
+            ticketNode.setProperty(NP_PRIVILEGES,
+                                   (String[]) ticket.getPrivileges().
+                                   toArray(new String[0]));
             resourceNode.save();
         } catch (RepositoryException e) {
             log.error("cannot save ticket", e);
@@ -215,8 +217,11 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         ticket.setId(node.getName());
         ticket.setOwner(node.getProperty(NP_OWNER).getString());
         ticket.setTimeout(node.getProperty(NP_TIMEOUT).getString());
-        ticket.setRead(new Boolean(node.getProperty(NP_READ).getBoolean()));
-        ticket.setWrite(new Boolean(node.getProperty(NP_WRITE).getBoolean()));
+        ticket.setPrivileges(new HashSet());
+        Value[] privileges = node.getProperty(NP_PRIVILEGES).getValues();
+        for (int i=0; i<privileges.length; i++) {
+            ticket.getPrivileges().add(privileges[i].getString());
+        }
         ticket.setCreated(node.getProperty(JCR_CREATED).getDate().getTime());
         return ticket;
     }

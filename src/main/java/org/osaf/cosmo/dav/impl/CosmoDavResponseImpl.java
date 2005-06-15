@@ -130,11 +130,11 @@ public class CosmoDavResponseImpl
         ticketInfo.addContent(visits);
 
         Element privilege = new Element(ELEMENT_PRIVILEGE, NAMESPACE);
-        if (ticket.isRead().booleanValue()) {
+        if (ticket.getPrivileges().contains(PRIVILEGE_READ)) {
             Element read = new Element(ELEMENT_READ, NAMESPACE);
             privilege.addContent(read);
         }
-        if (ticket.isWrite().booleanValue()) {
+        if (ticket.getPrivileges().contains(PRIVILEGE_WRITE)) {
             Element write = new Element(ELEMENT_WRITE, NAMESPACE);
             privilege.addContent(write);
         }

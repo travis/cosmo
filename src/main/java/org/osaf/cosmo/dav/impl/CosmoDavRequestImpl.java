@@ -165,7 +165,7 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
         }
         if (privilege.getChild(ELEMENT_READ, NAMESPACE) == null &&
             privilege.getChild(ELEMENT_WRITE, NAMESPACE) == null) {
-            throw new IllegalArgumentException("ticket request contains empty privileges");
+            throw new IllegalArgumentException("ticket request contains empty or invalid privileges");
         }
 
         Ticket ticket = new Ticket();

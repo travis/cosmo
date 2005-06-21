@@ -217,7 +217,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         ticket.setId(node.getName());
         ticket.setOwner(node.getProperty(NP_OWNER).getString());
         ticket.setTimeout(node.getProperty(NP_TIMEOUT).getString());
-        ticket.setPrivileges(new HashSet());
         Value[] privileges = node.getProperty(NP_PRIVILEGES).getValues();
         for (int i=0; i<privileges.length; i++) {
             ticket.getPrivileges().add(privileges[i].getString());

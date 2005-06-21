@@ -107,7 +107,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         DavSessionProvider sessionProvider = (DavSessionProvider)
             getBean(BEAN_DAV_SESSION_PROVIDER,
                     DavSessionProvider.class);
-        setSessionProvider(sessionProvider);
+        setDavSessionProvider(sessionProvider);
 
         DavResourceFactory resourceFactory = (DavResourceFactory)
             getBean(BEAN_DAV_RESOURCE_FACTORY,

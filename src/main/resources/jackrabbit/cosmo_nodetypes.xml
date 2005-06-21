@@ -31,7 +31,7 @@
     </propertyDefinition>
     <propertyDefinition autoCreated="false" mandatory="true"
                         multiple="false" name="ticket:created"
-                        onParentVersion="INITIALIZE" protected="true"
+                        onParentVersion="COPY" protected="true"
                         requiredType="Date"/>
   </nodeType>
 </nodeTypes>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<nodeTypes xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+           xmlns:ticket="http://osafoundation.org/jcr/dav/ticket/1.0">
+  <nodeType hasOrderableChildNodes="false" isMixin="false"
+            name="ticket:ticket" primaryItemName="">
+    <supertypes>
+      <supertype>nt:base</supertype>
+    </supertypes>
+    <propertyDefinition autoCreated="false" mandatory="true"
+                        multiple="false" name="ticket:owner"
+                        onParentVersion="COPY" protected="false"
+                        requiredType="String"/>
+    <propertyDefinition autoCreated="false" mandatory="true"
+                        multiple="false" name="ticket:timeout"
+                        onParentVersion="COPY" protected="false"
+                        requiredType="String">
+      <valueConstraints>
+        <valueConstraint>infinity</valueConstraint>
+        <valueConstraint>Seconds-\d{1,4}</valueConstraint>
+    </valueConstraints>
+    </propertyDefinition>
+    <propertyDefinition autoCreated="false" mandatory="true"
+                        multiple="true" name="ticket:privileges"
+                        onParentVersion="COPY" protected="false"
+                        requiredType="String">
+      <valueConstraints>
+        <valueConstraint>read</valueConstraint>
+        <valueConstraint>write</valueConstraint>
+      </valueConstraints>
+    </propertyDefinition>
+    <propertyDefinition autoCreated="false" mandatory="true"
+                        multiple="false" name="ticket:created"
+                        onParentVersion="INITIALIZE" protected="true"
+                        requiredType="Date"/>
+  </nodeType>
+</nodeTypes>

@@ -19,11 +19,17 @@
    limitations under the License.
 
 
+Namespaces
+==========
+
+ticket: http://osafoundation.org/jcr/dav/ticket/1.0
+
+
 Tickets
 =======
 
 NodeTypeName
-  dav:ticket
+  ticket:ticket
 SuperTypes
   nt:base
 IsMixin
@@ -33,7 +39,7 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 PropertyDef
-  Name dav:owner
+  Name ticket:owner
   RequiredType STRING
   ValueConstraints []
   DefaultValues null
@@ -43,7 +49,7 @@ PropertyDef
   Protected false
   Multiple false
 PropertyDef
-  Name dav:timeout
+  Name ticket:timeout
   RequiredType STRING
   ValueConstraints ["infinity", "Seconds-\d{1,4}"]
   DefaultValues null
@@ -53,7 +59,7 @@ PropertyDef
   Protected false
   Multiple false
 PropertyDef
-  Name dav:privileges
+  Name ticket:privileges
   RequiredType STRING
   ValueConstraints ["read", "write"]
   DefaultValues null
@@ -63,12 +69,12 @@ PropertyDef
   Protected false
   Multiple true
 PropertyDef
-  Name jcr:created
+  Name ticket:created
   RequiredType DATE
   ValueConstraints []
   DefaultValues null
-  AutoCreate true
+  AutoCreate false
   Mandatory true
-  OnParentVersion INITIALIZE
+  OnParentVersion COPY
   Protected true
   Multiple false

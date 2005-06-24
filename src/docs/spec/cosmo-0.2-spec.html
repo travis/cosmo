@@ -26,7 +26,7 @@ Home</a> &gt; <a
       <td width="33%">Authors: <a href="mailto:bcm@osafoundation.org">Brian
 Moseley</a></td>
       <td width="33%">Last
-edited: June 13, 2005 </td>
+edited: June 24, 2005 </td>
       <td width="33%">Creation
 date: May 3, 2005</td>
     </tr>
@@ -177,7 +177,6 @@ interpreted and individual event resources in the calendar collection
 will be added, overwritten or deleted as appropriate (not overwritten
 wholesale). More on this in protocol interactions section.</li>
 </ul>
-<!-- Do we say something about Cosmo's "native" format? -->
 <h3>Chandler share data</h3>
 <p>Cosmo must allow Chandler to
 store arbitrary data files within a calendar collection. When sharing
@@ -375,7 +374,8 @@ but attempts to delete the ticket.</li>
 individually-addressable calendar objects and the MKCALENDAR method as
 per <em>Calendaring Extensions to
 WebDAV (CalDAV)</em> (see link at
-bottom).</p>
+bottom). It will also support WebDAV Class 1 except for PROPPATCH, SSL,
+and strong ETags, but not WebDAV ACL or the REPORTs defined by CalDAV.</p>
 <h3>iCal's usage</h3>
 <p>Although iCal uses normal HTTP
 and WebDAV requests (PUT, GET in particular), its data model is
@@ -576,6 +576,12 @@ about things like email uniqueness.</td>
       <td>June 13, 2005</td>
       <td>Updated ticket protocol section, noting spec deviations and
 adding back support for ticket timeouts</td>
+    </tr>
+    <tr>
+      <td><a href="mailto:bcm@osafoundation.org">bcm</a></td>
+      <td>June 24, 2005</td>
+      <td>Updated CalDAV protocol section to note which parts of WebDAV
+and CalDAV will be supported</td>
     </tr>
   </tbody>
 </table>

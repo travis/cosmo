@@ -335,6 +335,12 @@
     <dependency>
       <!-- from internal repository -->
       <groupId>osaf-commons</groupId>
+      <artifactId>osaf-commons-jackrabbit</artifactId>
+      <version>0.1</version>
+    </dependency>
+    <dependency>
+      <!-- from internal repository -->
+      <groupId>osaf-commons</groupId>
       <artifactId>osaf-commons-jsp</artifactId>
       <version>0.1</version>
       <properties>
@@ -412,7 +418,7 @@
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
+      <artifactId>xmlParserAPIs</artifactId>
       <version>2.0.2</version>
     </dependency>
   </dependencies>

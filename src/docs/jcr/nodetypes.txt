@@ -51,7 +51,7 @@ PropertyDef
 PropertyDef
   Name ticket:timeout
   RequiredType STRING
-  ValueConstraints ["infinity", "Seconds-\d{1,4}"]
+  ValueConstraints ["infinity", "Second-\d+"]
   DefaultValues null
   AutoCreate false
   Mandatory true
@@ -76,5 +76,5 @@ PropertyDef
   AutoCreate false
   Mandatory true
   OnParentVersion COPY
-  Protected true
+  Protected false
   Multiple false

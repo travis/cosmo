@@ -168,6 +168,9 @@
         <path refid="maven.dependency.classpath"/>
       </classpath>
     </sql>
+    <echo>Initializing Jackrabbit repository</echo>
+    <delete dir="${jackrabbit.repository.homedirPath}"/> 
+    <attainGoal name="jackrabbit:import"/>
     <move todir="${cosmo.dist.version}/data">
       <fileset dir="${basedir}/data"/>
     </move>

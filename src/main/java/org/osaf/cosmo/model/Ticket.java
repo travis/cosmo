@@ -116,6 +116,7 @@ public class Ticket {
         }
         Ticket it = (Ticket) o;
         return new EqualsBuilder().
+            append(id, it.id).
             append(owner, it.owner).
             append(timeout, it.timeout).
             append(privileges, it.privileges).
@@ -126,6 +127,7 @@ public class Ticket {
      */
     public int hashCode() {
         return new HashCodeBuilder(3, 5).
+            append(id).
             append(owner).
             append(timeout).
             append(privileges).

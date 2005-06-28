@@ -16,6 +16,7 @@
 package org.osaf.cosmo.dav.impl;
 
 import java. io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -84,6 +85,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             ticketNode.setProperty(NP_PRIVILEGES,
                                    (String[]) ticket.getPrivileges().
                                    toArray(new String[0]));
+            ticketNode.setProperty(NP_CREATED, Calendar.getInstance());
             resourceNode.save();
         } catch (RepositoryException e) {
             log.error("cannot save ticket", e);
@@ -139,7 +141,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             Set tickets = new HashSet();
             for (NodeIterator i=getNode().getNodes(); i.hasNext();) {
                 Node childNode = i.nextNode();
-                // chlid node must be a ticket node and be owned by
+                // child node must be a ticket node and be owned by
                 // this user
                 if (! (childNode.isNodeType(NT_TICKET) &&
                        childNode.getProperty(NP_OWNER).getString().
@@ -221,7 +223,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         for (int i=0; i<privileges.length; i++) {
             ticket.getPrivileges().add(privileges[i].getString());
         }
-        ticket.setCreated(node.getProperty(JCR_CREATED).getDate().getTime());
+        ticket.setCreated(node.getProperty(NP_CREATED).getDate().getTime());
         return ticket;
     }
 }

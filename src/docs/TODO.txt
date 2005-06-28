@@ -25,6 +25,13 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
+ * rework plugin scripting to take args rather than rely on hardcoded
+   properties, allowing us to init the test repository as well as the
+   prod repo -OR-
+ * find a server- or webapp-startup-time equivalent for repo init that
+   can use existing security mechanisms rather than relying on
+   repository_init.xml which has to be kept in sync with the test and
+   production repository.xml files
  * ticket method tests
 
  * precompile jsps for distribution

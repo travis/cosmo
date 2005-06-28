@@ -53,6 +53,15 @@ following steps:
 
     * Add $MAVEN_HOME/bin to your PATH.
 
+(3) Download the most recent version of the Xthe Xalan XSLT processor
+    and install it into the Maven endorsed library directory
+
+    * Download a Xalan binary release from
+
+        http://www.apache.org/dyn/closer.cgi/xml/xalan-j
+
+    * Copy xalan-x.x.x.jar into $MAVEN_HOME/lib/endorsed
+
 
 SOURCE CODE
 ===========
@@ -78,7 +87,7 @@ The most commonly-used goals are:
   clean                remove all compiled source code and helper files
   test                 run all tests
   dist                 package the distribution
-  dist-clean           remove the distribution package and helper files
+  dist:clean           remove the distribution package and helper files
 
 All generated files are placed into the target/ subdirectory.
 

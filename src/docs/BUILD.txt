@@ -64,7 +64,7 @@ following steps:
 
 (4) Install the OSAF Jackrabbit plugin for Maven
 
-    * maven plugin:download -Dmaven.repo.remote=http://downloads.osafoundation.org/maven/ -DartifactId=maven-osaf-jackrabbit-plugin -DgroupId=osaf-commons -Dversion=0.1
+    * maven plugin:download -Dmaven.repo.remote=http://builds.osafoundation.org/maven/ -DartifactId=maven-osaf-jackrabbit-plugin -DgroupId=osaf-commons -Dversion=0.1
 
 
 SOURCE CODE

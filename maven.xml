@@ -14,7 +14,8 @@
    limitations under the License.
 -->
 
-<project xmlns:j="jelly:core" xmlns:ant="jelly:ant">
+<project xmlns:j="jelly:core" xmlns:ant="jelly:ant"
+         xmlns:jackrabbit="jackrabbit">
   <goal name="build">
     <attainGoal name="war:webapp"/>
   </goal>
@@ -157,7 +158,7 @@
           file="${cosmo.dist.userdb.jar}"/>
   </goal>
 
-  <goal name="dist:data">
+  <goal name="dist:db">
     <echo>Setting up db ${cosmo.dist.userdb.url}</echo>
     <sql driver="${cosmo.dist.userdb.driver}"
          url="${cosmo.dist.userdb.url}"
@@ -168,12 +169,24 @@
         <path refid="maven.dependency.classpath"/>
       </classpath>
     </sql>
-    <echo>Initializing Jackrabbit repository</echo>
-    <delete dir="${jackrabbit.repository.homedirPath}"/> 
-    <attainGoal name="jackrabbit:import"/>
     <move todir="${cosmo.dist.version}/data">
       <fileset dir="${basedir}/data"/>
     </move>
+  </goal>
+
+  <goal name="dist:repository">
+    <echo>Initializing Jackrabbit repository</echo>
+    <delete dir="${cosmo.dist.version}/data/repository"/> 
+    <jackrabbit:import
+      configFilePath="${basedir}/src/main/resources/jackrabbit/repository_init.xml"
+      repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+      username="anonymous" password=""
+      descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
+  </goal>
+
+  <goal name="dist:data">
+    <attainGoal name="dist:db"/>
+    <attainGoal name="dist:repository"/>
   </goal>
 
   <goal name="dist">

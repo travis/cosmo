@@ -60,7 +60,7 @@ RELEASE-NOTES.txt.
 Legal information is found in LICENSE.txt.
 
 Cosmo's project page is at
-<http://wiki.osafoundation.org/bin/view/Journal/CosmoTempHome>.
+<http://wiki.osafoundation.org/bin/view/Projects/CosmoHome>.
 
 Issues are tracked at <http://bugzilla.osafoundation.org/>.
 

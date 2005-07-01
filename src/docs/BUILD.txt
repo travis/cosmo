@@ -73,7 +73,7 @@ SOURCE CODE
 Find instructions for accessing the Subversion repository at the Cosmo
 home page (search for "Source Code Access"):
 
-    http://wiki.osafoundation.org/bin/view/Journal/CosmoTempHome
+    http://wiki.osafoundation.org/bin/view/Projects/CosmoHome
 
 
 BUILD

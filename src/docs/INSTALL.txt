@@ -47,7 +47,7 @@ following steps:
 
     * Download a binary distribution from:
 
-        http://wiki.osafoundation.org/bin/view/Journal/CosmoTempHome
+        http://wiki.osafoundation.org/bin/view/Projects/CosmoHome
 
     * Unpack the binary distribution into a convenient location so
       that the distribution resides in its own directory

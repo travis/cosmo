@@ -15,17 +15,14 @@
  */
 package org.osaf.cosmo.dav;
 
-import org.apache.jackrabbit.webdav.DavConstants;
-
 import org.jdom.Namespace;
 
 /**
- * Extends {@link org.apache.jackrabbit.webdav.DavConstants} to
- * provide additional constants for request and response headers, XML
- * elements and property names defined by the WebDAV extensions
- * implemented by Cosmo.
+ * Provides constants for request and response headers, XML elements
+ * and property names defined by the WebDAV extensions implemented by
+ * Cosmo.
  */
-public interface CosmoDavConstants extends DavConstants {
+public class CosmoDavConstants {
 
     // ticket headers
 

@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Locale;
 
+import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.MultiStatus;
@@ -45,8 +46,7 @@ import org.osaf.cosmo.model.Ticket;
  * The standard implementation of {@link CosmoDavResponse}. Wraps a
  * {@link org.apache.jackrabbit.webdav.WebdavResponse}.
  */
-public class CosmoDavResponseImpl
-    implements CosmoDavResponse, CosmoDavConstants {
+public class CosmoDavResponseImpl implements CosmoDavResponse {
     private static final Logger log =
         Logger.getLogger(CosmoDavResponseImpl.class);
 
@@ -70,13 +70,15 @@ public class CosmoDavResponseImpl
     public void sendMkTicketResponse(CosmoDavResource resource,
                                      String ticketId)
         throws DavException, IOException {
-        webdavResponse.setHeader(HEADER_TICKET, ticketId);
+        webdavResponse.setHeader(CosmoDavConstants.HEADER_TICKET, ticketId);
 
-        Element prop = new Element(ELEMENT_PROP, NAMESPACE);
-        prop.addNamespaceDeclaration(NAMESPACE_TICKET);
+        Element prop = new Element(CosmoDavConstants.ELEMENT_PROP,
+                                   CosmoDavConstants.NAMESPACE_TICKET);
+        prop.addNamespaceDeclaration(CosmoDavConstants.NAMESPACE_TICKET);
 
         Element ticketDiscovery =
-            new Element(ELEMENT_TICKETDISCOVERY, NAMESPACE_TICKET);
+            new Element(CosmoDavConstants.ELEMENT_TICKETDISCOVERY,
+                        CosmoDavConstants.NAMESPACE_TICKET);
         prop.addContent(ticketDiscovery);
 
         for (Iterator i=resource.getLoggedInUserTickets().iterator();
@@ -104,38 +106,48 @@ public class CosmoDavResponseImpl
 
     private Element ticketToXml(Ticket ticket,
                                 CosmoDavResource resource) {
-        Element ticketInfo = new Element(ELEMENT_TICKETINFO, NAMESPACE_TICKET);
+        Element ticketInfo = new Element(CosmoDavConstants.ELEMENT_TICKETINFO,
+                                         CosmoDavConstants.NAMESPACE_TICKET);
 
-        Element id = new Element(ELEMENT_ID, NAMESPACE_TICKET);
+        Element id = new Element(CosmoDavConstants.ELEMENT_ID,
+                                 CosmoDavConstants.NAMESPACE_TICKET);
         id.addContent(ticket.getId());
         ticketInfo.addContent(id);
 
-        Element owner = new Element(ELEMENT_OWNER, NAMESPACE);
-        Element href = new Element(ELEMENT_HREF, NAMESPACE);
+        Element owner = new Element(CosmoDavConstants.ELEMENT_OWNER,
+                                    CosmoDavConstants.NAMESPACE_TICKET);
+        Element href = new Element(CosmoDavConstants.ELEMENT_HREF,
+                                   CosmoDavConstants.NAMESPACE_TICKET);
         DavResourceLocator locator =
             resource.getPrincipalLocator(ticket.getOwner());
         href.addContent(locator.getHref(false));
         owner.addContent(href);
         ticketInfo.addContent(owner);
 
-        Element timeout = new Element(ELEMENT_TIMEOUT, NAMESPACE_TICKET);
+        Element timeout = new Element(CosmoDavConstants.ELEMENT_TIMEOUT,
+                                      CosmoDavConstants.NAMESPACE_TICKET);
         // XXX: convert from seconds
         timeout.addContent(ticket.getTimeout());
         ticketInfo.addContent(timeout);
 
         // visit limits are not supported; the element remains to
         // comply with the current draft of the spec
-        Element visits = new Element(ELEMENT_VISITS, NAMESPACE_TICKET);
-        visits.addContent(VALUE_INFINITY);
+        Element visits = new Element(CosmoDavConstants.ELEMENT_VISITS,
+                                     CosmoDavConstants.NAMESPACE_TICKET);
+        visits.addContent(CosmoDavConstants.VALUE_INFINITY);
         ticketInfo.addContent(visits);
 
-        Element privilege = new Element(ELEMENT_PRIVILEGE, NAMESPACE);
-        if (ticket.getPrivileges().contains(PRIVILEGE_READ)) {
-            Element read = new Element(ELEMENT_READ, NAMESPACE);
+        Element privilege = new Element(CosmoDavConstants.ELEMENT_PRIVILEGE,
+                                        CosmoDavConstants.NAMESPACE_TICKET);
+        if (ticket.getPrivileges().contains(CosmoDavConstants.PRIVILEGE_READ)) {
+            Element read = new Element(CosmoDavConstants.ELEMENT_READ,
+                                       CosmoDavConstants.NAMESPACE_TICKET);
             privilege.addContent(read);
         }
-        if (ticket.getPrivileges().contains(PRIVILEGE_WRITE)) {
-            Element write = new Element(ELEMENT_WRITE, NAMESPACE);
+        if (ticket.getPrivileges().
+            contains(CosmoDavConstants.PRIVILEGE_WRITE)) {
+            Element write = new Element(CosmoDavConstants.ELEMENT_WRITE,
+                                        CosmoDavConstants.NAMESPACE_TICKET);
             privilege.addContent(write);
         }
         ticketInfo.addContent(privilege);

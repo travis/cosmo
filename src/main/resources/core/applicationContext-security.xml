@@ -53,12 +53,20 @@
     </property>
   </bean>
 
+  <bean id="ticketAuthenticationProvider"
+        class="org.osaf.cosmo.acegisecurity.ticket.TicketAuthenticationProvider">
+    <property name="ticketDao">
+      <ref bean="ticketDao"/>
+    </property>
+  </bean>
+
   <bean id="authenticationManager"
         class="net.sf.acegisecurity.providers.ProviderManager">
     <property name="providers">
       <list>
         <ref local="daoAuthenticationProvider"/>
         <ref local="anonymousAuthenticationProvider"/>
+        <ref local="ticketAuthenticationProvider"/>
       </list>
     </property>
   </bean>

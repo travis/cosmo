@@ -16,16 +16,11 @@
 package org.osaf.cosmo.dav.impl;
 
 import java. io.IOException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 
-import javax.jcr.Item;
 import javax.jcr.Node;
-import javax.jcr.NodeIterator;
+import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
-import javax.jcr.Value;
 
 import org.apache.commons.id.StringIdentifierGenerator;
 
@@ -38,6 +33,7 @@ import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
 import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
+import org.osaf.cosmo.jcr.JCRUtils;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
@@ -50,7 +46,7 @@ import org.osaf.cosmo.model.User;
  * that provides Cosmo-specific WebDAV behaviors.
  */
 public class CosmoDavResourceImpl extends DavResourceImpl 
-    implements CosmoDavResource, CosmoJcrConstants {
+    implements CosmoDavResource {
     private static final Logger log = Logger.getLogger(CosmoDavResource.class);
 
     private StringIdentifierGenerator ticketIdGenerator;
@@ -79,13 +75,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
         try {
             Node resourceNode = getNode();
-            Node ticketNode = resourceNode.addNode(ticket.getId(), NT_TICKET);
-            ticketNode.setProperty(NP_OWNER, ticket.getOwner());
-            ticketNode.setProperty(NP_TIMEOUT, ticket.getTimeout());
-            ticketNode.setProperty(NP_PRIVILEGES,
-                                   (String[]) ticket.getPrivileges().
-                                   toArray(new String[0]));
-            ticketNode.setProperty(NP_CREATED, Calendar.getInstance());
+            JCRUtils.ticketToNode(resourceNode, ticket);
             resourceNode.save();
         } catch (RepositoryException e) {
             log.error("cannot save ticket", e);
@@ -102,8 +92,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         throws DavException {
         try {
             Node resourceNode = getNode();
-            Node ticketNode = resourceNode.getNode(ticket.getId());
-            ticketNode.remove();
+            resourceNode.getNode(ticket.getId()).remove();
             resourceNode.save();
         } catch (RepositoryException e) {
             log.error("cannot remove ticket", e);
@@ -119,10 +108,12 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     public Ticket getTicket(String id)
         throws DavException {
         try {
-            Node ticketNode = getNode().getNode(id);
-            return ticketNode != null ? nodeToTicket(ticketNode) : null;
+            return JCRUtils.nodeToTicket(getNode().getNode(id));
+        } catch (PathNotFoundException e) {
+            // no ticket
+            return null;
         } catch (RepositoryException e) {
-            log.error("cannot remove ticket", e);
+            log.error("cannot remove ticket " + id, e);
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }
@@ -138,19 +129,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     public Set getTickets(String username)
         throws DavException {
         try {
-            Set tickets = new HashSet();
-            for (NodeIterator i=getNode().getNodes(); i.hasNext();) {
-                Node childNode = i.nextNode();
-                // child node must be a ticket node and be owned by
-                // this user
-                if (! (childNode.isNodeType(NT_TICKET) &&
-                       childNode.getProperty(NP_OWNER).getString().
-                       equals(username))) {
-                    continue;
-                }
-                tickets.add(nodeToTicket(childNode));
-            }
-            return tickets;
+            return JCRUtils.findTickets(getNode(), username);
         } catch (RepositoryException e) {
             log.error("cannot get tickets owned by " + username, e);
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
@@ -209,21 +188,5 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public void setPrincipalLocatorFactory(DavLocatorFactory factory) {
         principalLocatorFactory = factory;
-    }
-
-    // private methods
-
-    private Ticket nodeToTicket(Node node)
-        throws RepositoryException {
-        Ticket ticket = new Ticket();
-        ticket.setId(node.getName());
-        ticket.setOwner(node.getProperty(NP_OWNER).getString());
-        ticket.setTimeout(node.getProperty(NP_TIMEOUT).getString());
-        Value[] privileges = node.getProperty(NP_PRIVILEGES).getValues();
-        for (int i=0; i<privileges.length; i++) {
-            ticket.getPrivileges().add(privileges[i].getString());
-        }
-        ticket.setCreated(node.getProperty(NP_CREATED).getDate().getTime());
-        return ticket;
     }
 }

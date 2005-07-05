@@ -15,23 +15,25 @@
  */
 package org.osaf.cosmo.jcr;
 
-import org.apache.jackrabbit.JcrConstants;
-
 /**
- * Extends {@link org.apache.jackrabbit.JcrConstants} to
- * provide additional constants for JCR items, node types
- * etc. implemented by Cosmo.
+ * Provides constants for JCR items, node types,  etc. implemented by
+ * Cosmo.
  */
-public interface CosmoJcrConstants extends JcrConstants {
+public class CosmoJcrConstants {
 
     // node types
 
+    /** <code>ticket:ticket</code> */
     public static final String NT_TICKET = "ticket:ticket";
 
     // node properties
 
+    /** <code>ticket:owner</code> */
     public static final String NP_OWNER = "ticket:owner";
+    /** <code>ticket:timeout</code> */
     public static final String NP_TIMEOUT = "ticket:timeout";
+    /** <code>ticket:privileges</code> */
     public static final String NP_PRIVILEGES = "ticket:privileges";
+    /** <code>ticket:created</code> */
     public static final String NP_CREATED = "ticket:created";
 }

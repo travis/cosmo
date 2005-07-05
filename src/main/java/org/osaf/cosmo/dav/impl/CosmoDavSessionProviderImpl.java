@@ -74,11 +74,6 @@ public class CosmoDavSessionProviderImpl implements DavSessionProvider {
                         }
                     }
                 };
-            if (log.isDebugEnabled()) {
-                log.debug("Logging into repository workspace " +
-                          workspaceName + " as " +
-                          securityContext.getUser().getUsername());
-            }
             Session rs = (Session)
                 Subject.doAs(securityContext.getSubject(), action);
             DavSession ds = new DavSessionImpl(rs);

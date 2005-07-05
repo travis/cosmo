@@ -29,6 +29,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
 
+import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
@@ -59,7 +60,7 @@ import org.osaf.cosmo.model.Ticket;
  * The standard implementation of {@link CosmoDavRequest}. Wraps a
  * {@link org.apache.jackrabbit.webdav.WebdavRequest}.
  */
-public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
+public class CosmoDavRequestImpl implements CosmoDavRequest {
     private static final Logger log =
         Logger.getLogger(CosmoDavRequestImpl.class);
 
@@ -114,9 +115,9 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
      * one from the URL is used.
      */
     public String getTicketId() {
-        String ticketId = getParameter(PARAM_TICKET);
+        String ticketId = getParameter(CosmoDavConstants.PARAM_TICKET);
         if (ticketId == null) {
-            ticketId = getHeader(HEADER_TICKET);
+            ticketId = getHeader(CosmoDavConstants.HEADER_TICKET);
         }
         return ticketId;
     }
@@ -131,50 +132,58 @@ public class CosmoDavRequestImpl implements CosmoDavRequest, CosmoDavConstants {
 
         Element root = requestDocument.getRootElement();
 
-        if (! root.getName().equals(ELEMENT_PROP)) {
+        if (! root.getName().equals(CosmoDavConstants.ELEMENT_PROP)) {
             throw new IllegalArgumentException("ticket request missing prop");
         }
         if (root.getNamespace() == null ||
-            ! root.getNamespace().equals(NAMESPACE)) {
+            ! root.getNamespace().equals(DavConstants.NAMESPACE)) {
             throw new IllegalArgumentException("ticket request contains ticketinfo with missing or incorrect namespace");
         }
-        Element ticketinfo = root.getChild(ELEMENT_TICKETINFO,
-                                           NAMESPACE_TICKET);
+        Element ticketinfo = root.getChild(CosmoDavConstants.ELEMENT_TICKETINFO,
+                                           CosmoDavConstants.NAMESPACE_TICKET);
         if (ticketinfo == null) {
             throw new IllegalArgumentException("ticket request missing ticketinfo");
         }
-        if (ticketinfo.getChild(ELEMENT_ID, NAMESPACE_TICKET) != null) {
+        if (ticketinfo.getChild(CosmoDavConstants.ELEMENT_ID,
+                                CosmoDavConstants.NAMESPACE_TICKET) != null) {
             throw new IllegalArgumentException("ticket request must not include id");
         }
-        if (ticketinfo.getChild(ELEMENT_OWNER, NAMESPACE_TICKET) != null) {
+        if (ticketinfo.getChild(CosmoDavConstants.ELEMENT_OWNER,
+                                CosmoDavConstants.NAMESPACE_TICKET) != null) {
             throw new IllegalArgumentException("ticket request must not include owner");
         }
 
-        // XXX: convert to a number of seconds
-        String timeout = ticketinfo.getChildTextNormalize(ELEMENT_TIMEOUT,
-                                                          NAMESPACE_TICKET);
+        String timeout = ticketinfo.
+            getChildTextNormalize(CosmoDavConstants.ELEMENT_TIMEOUT,
+                                  CosmoDavConstants.NAMESPACE_TICKET);
         if (timeout == null) {
-            timeout = VALUE_INFINITY;
+            timeout = CosmoDavConstants.VALUE_INFINITY;
         }
 
         // visit limits are not supported
 
-        Element privilege = ticketinfo.getChild(ELEMENT_PRIVILEGE, NAMESPACE);
+        Element privilege =
+            ticketinfo.getChild(CosmoDavConstants.ELEMENT_PRIVILEGE,
+                                DavConstants.NAMESPACE);
         if (privilege == null) {
             throw new IllegalArgumentException("ticket request missing privileges");
         }
-        if (privilege.getChild(ELEMENT_READ, NAMESPACE) == null &&
-            privilege.getChild(ELEMENT_WRITE, NAMESPACE) == null) {
+        if (privilege.getChild(CosmoDavConstants.ELEMENT_READ,
+                               DavConstants.NAMESPACE) == null &&
+            privilege.getChild(CosmoDavConstants.ELEMENT_WRITE,
+                               DavConstants.NAMESPACE) == null) {
             throw new IllegalArgumentException("ticket request contains empty or invalid privileges");
         }
 
         Ticket ticket = new Ticket();
         ticket.setTimeout(timeout);
-        if (privilege.getChild(ELEMENT_READ, NAMESPACE) != null) {
-            ticket.getPrivileges().add(PRIVILEGE_READ);
+        if (privilege.getChild(CosmoDavConstants.ELEMENT_READ,
+                               DavConstants.NAMESPACE) != null) {
+            ticket.getPrivileges().add(CosmoDavConstants.PRIVILEGE_READ);
         }
-        if (privilege.getChild(ELEMENT_WRITE, NAMESPACE) != null) {
-            ticket.getPrivileges().add(PRIVILEGE_WRITE);
+        if (privilege.getChild(CosmoDavConstants.ELEMENT_WRITE,
+                               DavConstants.NAMESPACE) != null) {
+            ticket.getPrivileges().add(CosmoDavConstants.PRIVILEGE_WRITE);
         }
 
         return ticket;

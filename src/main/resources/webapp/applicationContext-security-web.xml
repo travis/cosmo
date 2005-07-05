@@ -56,7 +56,7 @@
          /home=ROLE_ROOT,ROLE_USER
          /home/jcr:system=ROLE_ROOT
          /home/jcr:system/**=ROLE_ROOT
-         /home/**=ROLE_ROOT,ROLE_USER
+         /home/**=ROLE_ROOT,ROLE_USER,ROLE_TICKET
          /logout=ROLE_ROOT,ROLE_USER
          /**=ROLE_ROOT
        </value>
@@ -86,7 +86,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=httpSessionContextIntegrationFilter,basicProcessingFilter,davSecurityEnforcementFilter
+        /**=httpSessionContextIntegrationFilter,ticketProcessingFilter,basicProcessingFilter,davSecurityEnforcementFilter
       </value>
     </property>
   </bean>
@@ -186,6 +186,15 @@
     </property>
     <property name="userAttribute">
       <value>anonymous,ROLE_ANONYMOUS</value>
+    </property>
+  </bean>
+
+  <!-- filter that performs ticket authentication -->
+
+  <bean id="ticketProcessingFilter"
+        class="org.osaf.cosmo.acegisecurity.ticket.TicketProcessingFilter">
+    <property name="resourcePathPrefix">
+      <value>/home</value>
     </property>
   </bean>
 

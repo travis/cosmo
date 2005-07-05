@@ -160,18 +160,15 @@
             access manager:
             class: FQN of class implementing the AccessManager interface
         -->
+        <AccessManager class="org.apache.jackrabbit.core.security.SimpleAccessManager"/>
 <!--
-        <AccessManager class="org.apache.jackrabbit.core.security.SimpleAccessManager">
-          <param name="config" value="${rep.home}/access.xml"/>
-        </AccessManager>
-
           <LoginModule class="org.apache.jackrabbit.core.security.SimpleLoginModule">
             <param name="anonymousId" value="anonymous"/>
           </LoginModule>
--->
         <AccessManager class="org.osaf.cosmo.jackrabbit.CosmoAccessManager">
             <param name="homedirWorkspaceName" value="homedir"/>
         </AccessManager>
+-->
     </Security>
 
     <!--

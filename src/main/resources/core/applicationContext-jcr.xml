@@ -35,4 +35,11 @@
     </property>
   </bean>
 
+  <bean id="ticketDao"
+        class="org.osaf.cosmo.dao.jcr.JCRTicketDao">
+    <property name="template">
+      <ref local="homedirTemplate"/>
+    </property>
+  </bean>
+
 </beans>

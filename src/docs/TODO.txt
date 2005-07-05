@@ -25,6 +25,22 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
+ * implement ticket inheritance so that chandler can request a ticket
+   for an entire calendar collection (including subcollections)
+ * figure out how to make Acegi Security not cache the token if it
+   doesn't authenticate or if access is denied. this causes all kinds
+   of problems with our different authen schemes in each different
+   client.
+ * figure out how to lock down the repository to require a single
+   login for the entire web layer
+ * test web layer security to make sure that the new approach to
+   repository security doesn't introduce any holes
+ * figure out why cadaver tacks on a / to the query string when we
+   try to open a url with a ticket in the query string
+ * consider re-implementing CosmoDavResourceImpl's ticket persistence
+   methods using TicketDao; this means we'd have to look up the node
+   again (DavResourceImpl has already done so), but we can assume that
+   the repository is caching the node internally anyway
  * ticket method tests
 
  * precompile jsps for distribution

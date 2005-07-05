@@ -206,6 +206,11 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         }
 
         String ticketId = request.getTicketId();
+        if (ticketId == null) {
+            response.sendError(DavServletResponse.SC_BAD_REQUEST,
+                               "No ticket was specified.");
+            return;
+        }
         Ticket ticket = resource.getTicket(ticketId);
         if (ticket == null) {
             response.sendError(DavServletResponse.SC_PRECONDITION_FAILED,

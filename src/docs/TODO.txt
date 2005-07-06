@@ -25,16 +25,10 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
- * figure out how to make Acegi Security not cache the token if it
-   doesn't authenticate or if access is denied. this causes all kinds
-   of problems with our different authen schemes in each different
-   client.
- * figure out how to lock down the repository to require a single
-   login for the entire web layer
  * use web layer security to restrict access for users to their home
    directories (root can see everything of course)
- * figure out why cadaver tacks on a / to the query string when we
-   try to open a url with a ticket in the query string
+ * figure out how to lock down the repository to require a single
+   login for the entire web layer
  * consider re-implementing CosmoDavResourceImpl's ticket persistence
    methods using TicketDao; this means we'd have to look up the node
    again (DavResourceImpl has already done so), but we can assume that
@@ -52,6 +46,13 @@ for current development plan. Additional tasks:
    repo init that can use existing security mechanisms rather than
    relying on repository_init.xml which has to be kept in sync with
    the test and production repository.xml files
+ * figure out how to make Acegi Security not cache the token if it
+   doesn't authenticate or if access is denied. caching the token
+   causes problems for clients that send the session cookie to the
+   server (cadaver, browsers, etc.) - low priority since chandler does
+   not deal with the session cookie
+ * figure out why cadaver tacks on a / to the query string when we
+   try to open a url with a ticket in the query string
 
 
 LATER RELEASES

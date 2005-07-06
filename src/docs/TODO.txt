@@ -29,7 +29,6 @@ for current development plan. Additional tasks:
    doesn't authenticate or if access is denied. this causes all kinds
    of problems with our different authen schemes in each different
    client.
- * make PROPFIND ignore ticket nodes
  * figure out how to lock down the repository to require a single
    login for the entire web layer
  * use web layer security to restrict access for users to their home

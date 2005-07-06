@@ -16,15 +16,19 @@
 package org.osaf.cosmo.dav.impl;
 
 import java. io.IOException;
+import java.util.ArrayList;
 import java.util.Set;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 
 import org.apache.commons.id.StringIdentifierGenerator;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
+import org.apache.jackrabbit.webdav.DavResourceIterator;
+import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
@@ -76,6 +80,32 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             // XXX
         }
         return super.isCollection();
+    }
+
+    /**
+     */
+    public DavResourceIterator getMembers() {
+        // wholly copied from DavResourceImpl in order to filter out
+        // ticket nodes
+        ArrayList list = new ArrayList();
+        if (exists() && isCollection()) {
+            try {
+                NodeIterator it = getNode().getNodes();
+                while(it.hasNext()) {
+                    Node childNode = it.nextNode();
+                    if (childNode.getPrimaryNodeType().getName().
+                        equals(CosmoJcrConstants.NT_TICKET)) {
+                        continue;
+                    }
+                    list.add(buildResourceFromItem(childNode));
+                }
+            } catch (RepositoryException e) {
+                // should not occure
+            } catch (DavException e) {
+                // should not occure
+            }
+        }
+        return new DavResourceIteratorImpl(list);
     }
 
     // CosmoDavResource methods

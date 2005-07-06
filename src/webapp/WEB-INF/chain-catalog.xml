@@ -119,9 +119,11 @@
             @return true
         -->
         <command
-            id="export-dirlisting"
-            className="org.apache.jackrabbit.server.io.DirListingExportCommand"
-            nonCollectionNodeTypes="nt:resource, nt:file"
+           id="export-dirlisting"
+           className="org.apache.jackrabbit.server.io.DirListingExportCommand"
+           nonCollectionNodeTypes="nt:resource, nt:file"
+           collectionNodeTypes="nt:folder"
+           ignoredNodeTypes="rep:system,ticket:ticket"
         />
     </chain>
 

@@ -32,10 +32,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.core.HierarchyManager;
 import org.apache.jackrabbit.core.ItemId;
-import org.apache.jackrabbit.core.MalformedPathException;
-import org.apache.jackrabbit.core.Path;
 import org.apache.jackrabbit.core.security.AccessManager;
 import org.apache.jackrabbit.core.security.AMContext;
+import org.apache.jackrabbit.name.MalformedPathException;
+import org.apache.jackrabbit.name.Path;
 
 /**
  * An implementation of Jackrabbit's

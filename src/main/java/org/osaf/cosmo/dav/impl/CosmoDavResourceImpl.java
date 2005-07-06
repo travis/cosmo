@@ -48,6 +48,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     implements CosmoDavResource {
     private static final Logger log = Logger.getLogger(CosmoDavResource.class);
 
+    private boolean isCollection;
     private StringIdentifierGenerator ticketIdGenerator;
     private String baseUrl;
     private DavLocatorFactory principalLocatorFactory;
@@ -59,6 +60,22 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                                 DavSession session)
         throws RepositoryException {
         super(locator, factory, session);
+    }
+
+    // DavResource methods
+
+    /**
+     */
+    public boolean isCollection() {
+        try {
+            // required because super.isCollection is private
+            if (getNode().isNodeType(CosmoJcrConstants.NT_TICKET)) {
+                return false;
+            }
+        } catch (RepositoryException e) {
+            // XXX
+        }
+        return super.isCollection();
     }
 
     // CosmoDavResource methods

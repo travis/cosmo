@@ -29,10 +29,11 @@ for current development plan. Additional tasks:
    doesn't authenticate or if access is denied. this causes all kinds
    of problems with our different authen schemes in each different
    client.
+ * make PROPFIND ignore ticket nodes
  * figure out how to lock down the repository to require a single
    login for the entire web layer
- * test web layer security to make sure that the new approach to
-   repository security doesn't introduce any holes
+ * use web layer security to restrict access for users to their home
+   directories (root can see everything of course)
  * figure out why cadaver tacks on a / to the query string when we
    try to open a url with a ticket in the query string
  * consider re-implementing CosmoDavResourceImpl's ticket persistence

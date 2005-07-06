@@ -80,6 +80,11 @@ public class TicketProcessingFilter implements Filter {
                     id = httpRequest.getHeader(HEADER_TICKET);
                 }
                 if (id != null && ! id.equals("")) {
+                    // fix up the path to remove the resource path
+                    // prefix (often the servlet path but not always),
+                    // to remove trailing slashes (used by webdav
+                    // to indicate collections), and to use "/" for
+                    // the root item
                     String path = httpRequest.getRequestURI();
                     if (resourcePathPrefix != null &&
                         path.startsWith(resourcePathPrefix)) {
@@ -87,6 +92,15 @@ public class TicketProcessingFilter implements Filter {
                     }
                     if (path == null || path.equals("")) {
                         path = "/";
+                    }
+                    else if (path.endsWith("/")) {
+                        path = path.substring(0, path.length()-1);
+                    }
+                    // cadaver for some reason appends a "/" to the
+                    // ticket query param when doing "open
+                    // http://localhost:8080/home/bcm/?ticket=deadbeef"
+                    if (id.endsWith("/")) {
+                        id = id.substring(0, id.length()-1);
                     }
                     Authentication token = createAuthentication(path, id);
                     sc.setAuthentication(token);

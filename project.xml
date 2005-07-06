@@ -190,8 +190,24 @@
     </dependency>
     <dependency>
       <groupId>jackrabbit</groupId>
-      <artifactId>jackrabbit</artifactId>
-      <version>0.16.4.1-dev-SNAPSHOT</version>
+      <artifactId>jackrabbit-api</artifactId>
+      <version>1.0-dev</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>jackrabbit</groupId>
+      <artifactId>jackrabbit-commons</artifactId>
+      <version>1.0-dev</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>jackrabbit</groupId>
+      <artifactId>jackrabbit-core</artifactId>
+      <version>1.0-dev</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -206,16 +222,8 @@
     </dependency>
     <dependency>
       <groupId>jcr-server</groupId>
-      <artifactId>commons-jcr</artifactId>
-      <version>0.16.4.1-SNAPSHOT</version>
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>jcr-server</groupId>
       <artifactId>jcr-server</artifactId>
-      <version>0.16.4.1-SNAPSHOT</version>
+      <version>0.16.4.1</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -223,7 +231,7 @@
     <dependency>
       <groupId>jcr-server</groupId>
       <artifactId>jackrabbit-server</artifactId>
-      <version>0.16.4.1-SNAPSHOT</version>
+      <version>0.16.4.1</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -231,7 +239,7 @@
     <dependency>
       <groupId>jcr-server</groupId>
       <artifactId>jcr-webdav</artifactId>
-      <version>0.16.4.1-SNAPSHOT</version>
+      <version>0.16.4.1</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

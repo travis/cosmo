@@ -18,6 +18,7 @@ package org.osaf.cosmo.dao.jcr;
 import org.osaf.commons.spring.jcr.JCRCallback;
 import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
 import org.osaf.cosmo.dao.ShareDAO;
+import org.osaf.cosmo.jcr.CosmoJcrConstants;
 
 import javax.jcr.Item;
 import javax.jcr.Node;
@@ -35,8 +36,6 @@ import org.apache.commons.logging.LogFactory;
 public class ContentStoreDAOJCR extends JCRDaoSupport implements ShareDAO {
     private static final Log log = LogFactory.getLog(ContentStoreDAOJCR.class);
 
-    private static final String NODE_TYPE_COLLECTION = "nt:folder";
-
     /**
      */
     public void createHomedir(final String username) {
@@ -47,7 +46,9 @@ public class ContentStoreDAOJCR extends JCRDaoSupport implements ShareDAO {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
                     Node rootNode = session.getRootNode();
-                    rootNode.addNode(username, NODE_TYPE_COLLECTION);
+                    Node homedirNode =
+                        rootNode.addNode(username, CosmoJcrConstants.NT_FOLDER);
+                    homedirNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
                     rootNode.save();
                     return null;
                 }

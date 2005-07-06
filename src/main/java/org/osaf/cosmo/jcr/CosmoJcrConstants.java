@@ -28,6 +28,10 @@ public class CosmoJcrConstants {
 
     // node types
 
+    /** <code>nt:folder</code> */
+    public static final String NT_FOLDER = "nt:folder";
+    /** <code>mix:ticketable</code> */
+    public static final String NT_TICKETABLE = "mix:ticketable";
     /** <code>ticket:ticket</code> */
     public static final String NT_TICKET = "ticket:ticket";
 

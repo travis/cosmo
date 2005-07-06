@@ -33,6 +33,7 @@ for current development plan. Additional tasks:
    methods using TicketDao; this means we'd have to look up the node
    again (DavResourceImpl has already done so), but we can assume that
    the repository is caching the node internally anyway
+ * initialize test repository to make repo tests work again
  * ticket method tests
 
  * precompile jsps for distribution

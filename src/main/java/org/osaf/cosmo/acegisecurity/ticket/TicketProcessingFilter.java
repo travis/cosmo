@@ -93,7 +93,7 @@ public class TicketProcessingFilter implements Filter {
                     if (path == null || path.equals("")) {
                         path = "/";
                     }
-                    else if (path.endsWith("/")) {
+                    if (! path.equals("/") && path.endsWith("/")) {
                         path = path.substring(0, path.length()-1);
                     }
                     // cadaver for some reason appends a "/" to the

@@ -28,7 +28,9 @@ public interface TicketDao {
 
     /**
      * Returns the identified ticket for the item at the given path,
-     * or <code>null</code> if the ticket does not exist.
+     * or <code>null</code> if the ticket does not exist. Tickets are
+     * inherited, so if the specified item does not have the ticket
+     * but an ancestor does, it will still be returned.
      *
      * @param path the path of the ticketed item unique to the repository
      * @param id the id of the ticket unique to the parent item

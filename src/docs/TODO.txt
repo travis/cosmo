@@ -25,8 +25,6 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
- * implement ticket inheritance so that chandler can request a ticket
-   for an entire calendar collection (including subcollections)
  * figure out how to make Acegi Security not cache the token if it
    doesn't authenticate or if access is denied. this causes all kinds
    of problems with our different authen schemes in each different

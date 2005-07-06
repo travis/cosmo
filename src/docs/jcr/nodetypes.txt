@@ -22,11 +22,32 @@
 Namespaces
 ==========
 
+dav: http://osafoundation.org/jcr/dav/1.0
 ticket: http://osafoundation.org/jcr/dav/ticket/1.0
 
 
 Tickets
 =======
+
+NodeTypeName
+  mix:ticketable
+SuperTypes
+  []
+IsMixin
+  true
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+ChildNodeDef
+  Name dav:ticket
+  RequiredPrimaryTypes [ticket:ticket]
+  DefaultPrimaryType ticket:ticket
+  AutoCreate false
+  Mandatory false
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs true
 
 NodeTypeName
   ticket:ticket
@@ -37,7 +58,16 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  null
+  id
+PropertyDef
+  Name ticket:id
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
 PropertyDef
   Name ticket:owner
   RequiredType STRING

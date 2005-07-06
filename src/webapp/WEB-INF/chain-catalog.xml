@@ -33,6 +33,13 @@
             className="org.apache.jackrabbit.server.io.AddNodeCommand"
             nodeType="nt:folder"
         />
+
+        <!-- make the node ticketable -->
+        <command
+            id="make-ticketable"
+            className="org.apache.jackrabbit.server.io.AddMixinCommand"
+            nodeType="mix:ticketable"
+        />
     </chain>
 
     <!--
@@ -90,6 +97,12 @@
             nodeType="mix:versionable"
         />
 
+        <!-- make the node ticketable -->
+        <command
+            id="make-ticketable"
+            className="org.apache.jackrabbit.server.io.AddMixinCommand"
+            nodeType="mix:ticketable"
+        />
     </chain>
 
     <!--

@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <nodeTypes xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+           xmlns:mix="http://www.jcp.org/jcr/mix/1.0"
+           xmlns:dav="http://osafoundation.org/jcr/dav/1.0"
            xmlns:ticket="http://osafoundation.org/jcr/dav/ticket/1.0">
   <nodeType hasOrderableChildNodes="false" isMixin="false"
             name="ticket:ticket" primaryItemName="">
     <supertypes>
       <supertype>nt:base</supertype>
     </supertypes>
+    <propertyDefinition autoCreated="false" mandatory="true"
+                        multiple="false" name="ticket:id"
+                        onParentVersion="COPY" protected="false"
+                        requiredType="String"/>
     <propertyDefinition autoCreated="false" mandatory="true"
                         multiple="false" name="ticket:owner"
                         onParentVersion="COPY" protected="false"
@@ -33,5 +39,17 @@
                         multiple="false" name="ticket:created"
                         onParentVersion="COPY" protected="false"
                         requiredType="Date"/>
+  </nodeType>
+  <nodeType hasOrderableChildNodes="false" isMixin="true"
+            name="mix:ticketable" primaryItemName="">
+    <supertypes/>
+    <childNodeDefinition name="dav:ticket" autoCreated="false"
+                         mandatory="false" onParentVersion="VERSION"
+                         protected="false" sameNameSiblings="true"
+                         defaultPrimaryType="ticket:ticket">
+      <requiredPrimaryTypes>
+        <requiredPrimaryType>ticket:ticket</requiredPrimaryType>
+      </requiredPrimaryTypes>
+    </childNodeDefinition>
   </nodeType>
 </nodeTypes>

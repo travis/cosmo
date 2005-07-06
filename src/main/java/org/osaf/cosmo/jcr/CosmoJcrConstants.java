@@ -21,6 +21,11 @@ package org.osaf.cosmo.jcr;
  */
 public class CosmoJcrConstants {
 
+    // node names
+
+    /** <code>dav:ticket</code> */
+    public static final String NN_TICKET = "dav:ticket";
+
     // node types
 
     /** <code>ticket:ticket</code> */
@@ -28,6 +33,8 @@ public class CosmoJcrConstants {
 
     // node properties
 
+    /** <code>ticket:id</code> */
+    public static final String NP_ID = "ticket:id";
     /** <code>ticket:owner</code> */
     public static final String NP_OWNER = "ticket:owner";
     /** <code>ticket:timeout</code> */

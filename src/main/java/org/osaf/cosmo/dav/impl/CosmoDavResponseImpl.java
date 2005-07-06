@@ -73,7 +73,7 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
         webdavResponse.setHeader(CosmoDavConstants.HEADER_TICKET, ticketId);
 
         Element prop = new Element(CosmoDavConstants.ELEMENT_PROP,
-                                   CosmoDavConstants.NAMESPACE_TICKET);
+                                   DavConstants.NAMESPACE);
         prop.addNamespaceDeclaration(CosmoDavConstants.NAMESPACE_TICKET);
 
         Element ticketDiscovery =
@@ -115,9 +115,9 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
         ticketInfo.addContent(id);
 
         Element owner = new Element(CosmoDavConstants.ELEMENT_OWNER,
-                                    CosmoDavConstants.NAMESPACE_TICKET);
+                                    DavConstants.NAMESPACE);
         Element href = new Element(CosmoDavConstants.ELEMENT_HREF,
-                                   CosmoDavConstants.NAMESPACE_TICKET);
+                                   DavConstants.NAMESPACE);
         DavResourceLocator locator =
             resource.getPrincipalLocator(ticket.getOwner());
         href.addContent(locator.getHref(false));
@@ -126,7 +126,6 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
 
         Element timeout = new Element(CosmoDavConstants.ELEMENT_TIMEOUT,
                                       CosmoDavConstants.NAMESPACE_TICKET);
-        // XXX: convert from seconds
         timeout.addContent(ticket.getTimeout());
         ticketInfo.addContent(timeout);
 
@@ -138,16 +137,16 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
         ticketInfo.addContent(visits);
 
         Element privilege = new Element(CosmoDavConstants.ELEMENT_PRIVILEGE,
-                                        CosmoDavConstants.NAMESPACE_TICKET);
+                                        DavConstants.NAMESPACE);
         if (ticket.getPrivileges().contains(CosmoDavConstants.PRIVILEGE_READ)) {
             Element read = new Element(CosmoDavConstants.ELEMENT_READ,
-                                       CosmoDavConstants.NAMESPACE_TICKET);
+                                       DavConstants.NAMESPACE);
             privilege.addContent(read);
         }
         if (ticket.getPrivileges().
             contains(CosmoDavConstants.PRIVILEGE_WRITE)) {
             Element write = new Element(CosmoDavConstants.ELEMENT_WRITE,
-                                        CosmoDavConstants.NAMESPACE_TICKET);
+                                        DavConstants.NAMESPACE);
             privilege.addContent(write);
         }
         ticketInfo.addContent(privilege);

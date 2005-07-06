@@ -19,7 +19,6 @@ import java. io.IOException;
 import java.util.Set;
 
 import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 
 import org.apache.commons.id.StringIdentifierGenerator;
@@ -92,10 +91,14 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         throws DavException {
         try {
             Node resourceNode = getNode();
-            resourceNode.getNode(ticket.getId()).remove();
+            Node ticketNode = JCRUtils.findNode(resourceNode, ticket);
+            if (ticketNode == null) {
+                return;
+            }
+            ticketNode.remove();
             resourceNode.save();
         } catch (RepositoryException e) {
-            log.error("cannot remove ticket", e);
+            log.error("cannot remove ticket " + ticket.getId(), e);
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }
@@ -108,12 +111,13 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     public Ticket getTicket(String id)
         throws DavException {
         try {
-            return JCRUtils.nodeToTicket(getNode().getNode(id));
-        } catch (PathNotFoundException e) {
-            // no ticket
-            return null;
+            Node ticketNode = JCRUtils.findNode(getNode(), id);
+            if (ticketNode == null) {
+                return null;
+            }
+            return JCRUtils.nodeToTicket(ticketNode);
         } catch (RepositoryException e) {
-            log.error("cannot remove ticket " + id, e);
+            log.error("cannot get ticket " + id, e);
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }

@@ -45,10 +45,10 @@ public class JCRUtils {
      */
     public static Node ticketToNode(Node parentNode, Ticket ticket)
         throws RepositoryException {
-        Node ticketNode = parentNode.addNode(ticket.getId(),
+        Node ticketNode = parentNode.addNode(CosmoJcrConstants.NN_TICKET,
                                              CosmoJcrConstants.NT_TICKET);
-        ticketNode.setProperty(CosmoJcrConstants.NP_OWNER,
-                               ticket.getOwner());
+        ticketNode.setProperty(CosmoJcrConstants.NP_ID, ticket.getId());
+        ticketNode.setProperty(CosmoJcrConstants.NP_OWNER, ticket.getOwner());
         ticketNode.setProperty(CosmoJcrConstants.NP_TIMEOUT,
                                ticket.getTimeout());
         ticketNode.setProperty(CosmoJcrConstants.NP_PRIVILEGES,
@@ -65,7 +65,7 @@ public class JCRUtils {
     public static Ticket nodeToTicket(Node node)
         throws RepositoryException {
         Ticket ticket = new Ticket();
-        ticket.setId(node.getName());
+        ticket.setId(getStringValue(node, CosmoJcrConstants.NP_ID));
         ticket.setOwner(getStringValue(node, CosmoJcrConstants.NP_OWNER));
         ticket.setTimeout(getStringValue(node, CosmoJcrConstants.NP_TIMEOUT));
         Value[] privileges = getValues(node, CosmoJcrConstants.NP_PRIVILEGES);
@@ -77,19 +77,43 @@ public class JCRUtils {
     }
 
     /**
+     * Returns the child ticket node for the given node with the given
+     * id.
+     */
+    public static Node findNode(Node parentNode, String id)
+        throws RepositoryException {
+        for (NodeIterator i=parentNode.getNodes(CosmoJcrConstants.NN_TICKET);
+             i.hasNext();) {
+            Node childNode = i.nextNode();
+            if (getStringValue(childNode, CosmoJcrConstants.NP_ID).equals(id)) {
+                return childNode;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the child ticket node for the given node matching the
+     * given ticket.
+     */
+    public static Node findNode(Node parentNode, Ticket ticket)
+        throws RepositoryException {
+        return findNode(parentNode, ticket.getId());
+    }
+
+    /**
      * Returns a <code>Set</code> of tickets representing the child
      * ticket nodes of the given node owned by the given owner.
      */
     public static Set findTickets(Node node, String owner)
         throws RepositoryException {
         Set tickets = new HashSet();
-        for (NodeIterator i=node.getNodes(); i.hasNext();) {
+        for (NodeIterator i=node.getNodes(CosmoJcrConstants.NN_TICKET);
+             i.hasNext();) {
             Node childNode = i.nextNode();
-            // child node must be a ticket node and be owned by
-            // the named owner
-            if (! (childNode.isNodeType(CosmoJcrConstants.NT_TICKET) &&
-                   childNode.getProperty(CosmoJcrConstants.NP_OWNER).
-                   getString().equals(owner))) {
+            // child node must be owned by the named owner
+            if (! getStringValue(childNode, CosmoJcrConstants.NP_OWNER).
+                equals(owner)) {
                 continue;
             }
             tickets.add(nodeToTicket(childNode));

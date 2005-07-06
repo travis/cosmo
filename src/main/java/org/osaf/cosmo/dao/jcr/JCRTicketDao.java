@@ -16,8 +16,8 @@
 package org.osaf.cosmo.dao.jcr;
 
 import javax.jcr.Item;
+import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
@@ -46,7 +46,9 @@ public class JCRTicketDao extends JCRDaoSupport
 
     /**
      * Returns the identified ticket for the item at the given path,
-     * or <code>null</code> if the ticket does not exist.
+     * or <code>null</code> if the ticket does not exist. Tickets are
+     * inherited, so if the specified item does not have the ticket
+     * but an ancestor does, it will still be returned.
      *
      * @param path the absolute JCR path of the ticketed item
      * @param id the id of the ticket unique to the parent item
@@ -56,20 +58,23 @@ public class JCRTicketDao extends JCRDaoSupport
      * @throws InvalidDataAccessResourceException if the parent item
      * is not a node
      */
-    public Ticket getTicket(final String path, final String id) {
+    public Ticket getTicket(final String path,
+                            final String id) {
         return (Ticket) getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
-                    Item parentItem = session.getItem(path);
-                    if (! parentItem.isNode()) {
+                    Item item = session.getItem(path);
+                    if (! item.isNode()) {
                         throw new InvalidDataAccessResourceUsageException("item at path " + path + " is not a node and therefore cannot have a ticket");
                     }
-                    Node parentNode = (Node) parentItem;
-                    try {
-                        return JCRUtils.nodeToTicket(parentNode.getNode(id));
-                    } catch (PathNotFoundException e) {
-                        return null;
+                    Node node = (Node) item;
+                    Node ticketNode = JCRUtils.findNode(node, id);
+                    if (ticketNode == null) {
+                        return node.getDepth() > 0 ?
+                            getTicket(node.getParent().getPath(), id) :
+                            null;
                     }
+                    return JCRUtils.nodeToTicket(ticketNode);
                 }
             });
     }

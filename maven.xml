@@ -189,7 +189,7 @@
     <delete dir="${cosmo.dist.version}/data/repository"/> 
     <echo>Initializing Jackrabbit repository</echo>
     <jackrabbit:import
-      configFilePath="${basedir}/src/main/resources/jackrabbit/repository.xml"
+      configFilePath="${basedir}/src/main/resources/server/repository.xml"
       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
       username="anonymous" password=""
       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>

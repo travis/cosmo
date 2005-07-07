@@ -24,7 +24,7 @@
     <filter token="VERSION" value="${pom.currentVersion}"/>
     <filter token="SERVER_ADMIN" value="${cosmo.serverAdmin}"/>
     <filter token="CONFIGFILEPATH"
-            value="${basedir}/src/test/resources/repository.xml"/>
+            value="${basedir}/src/main/resources/server/repository.xml"/>
     <filter token="REPOSITORYHOMEDIRPATH"
             value="${maven.build.dir}/test-repository"/>
     <filter token="DIALECT" value="${cosmo.test.userdb.dialect}"/>
@@ -46,6 +46,7 @@
 
   <preGoal name="test:test-resources">
     <attainGoal name="test:dbsetup"/>
+    <attainGoal name="test:reposetup"/>
   </preGoal>
 
   <goal name="test:dbsetup">
@@ -61,6 +62,16 @@
     </sql>
   </goal>
 
+  <goal name="test:reposetup">
+    <delete dir="${maven.build.dir}/test-repository"/> 
+    <echo>Setting up test repository</echo>
+    <jackrabbit:import
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${maven.build.dir}/test-repository"
+       username="anonymous" password=""
+       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
+  </goal>
+    
   <goal name="dist:tomcat">
     <attainGoal name="java:prepare-filesystem"/>
     <get src="${ext.tomcat.url}"
@@ -175,10 +186,10 @@
   </goal>
 
   <goal name="dist:repository">
-    <echo>Initializing Jackrabbit repository</echo>
     <delete dir="${cosmo.dist.version}/data/repository"/> 
+    <echo>Initializing Jackrabbit repository</echo>
     <jackrabbit:import
-      configFilePath="${basedir}/src/main/resources/jackrabbit/repository_init.xml"
+      configFilePath="${basedir}/src/main/resources/jackrabbit/repository.xml"
       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
       username="anonymous" password=""
       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>

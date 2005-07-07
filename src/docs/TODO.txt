@@ -25,7 +25,6 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
- * initialize test repository to make repo tests work again
  * respect ticket privileges (disallow access to MKCOL etc when the
    ticket only has read privilege)
  * figure out how to lock down the repository to require a single

@@ -73,27 +73,29 @@
 
   <!-- Role-based authorization -->
 
-   <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter"/>
+  <bean id="homedirVoter" class="org.osaf.cosmo.acegisecurity.HomedirVoter"/>
+  <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter"/>
 
-   <bean id="accessDecisionManager"
-         class="net.sf.acegisecurity.vote.AffirmativeBased">
-      <property name="allowIfAllAbstainDecisions">
-        <value>false</value>
-      </property>
-      <property name="decisionVoters">
-        <list>
-          <ref bean="roleVoter"/>
-        </list>
-      </property>
-   </bean>
+  <bean id="accessDecisionManager"
+        class="net.sf.acegisecurity.vote.AffirmativeBased">
+    <property name="allowIfAllAbstainDecisions">
+      <value>false</value>
+    </property>
+    <property name="decisionVoters">
+      <list>
+        <ref bean="homedirVoter"/>
+        <ref bean="roleVoter"/>
+      </list>
+    </property>
+  </bean>
 
-   <!-- Cosmo security subsystem -->
+  <!-- Cosmo security subsystem -->
 
-   <bean id="securityManager"
-         class="org.osaf.cosmo.security.impl.CosmoSecurityManagerImpl">
-     <property name="authenticationManager">
-       <ref local="authenticationManager"/>
-     </property>
-   </bean>
+  <bean id="securityManager"
+        class="org.osaf.cosmo.security.impl.CosmoSecurityManagerImpl">
+    <property name="authenticationManager">
+      <ref local="authenticationManager"/>
+    </property>
+  </bean>
 
 </beans>

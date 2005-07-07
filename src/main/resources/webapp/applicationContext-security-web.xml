@@ -53,10 +53,10 @@
          /*.ico=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /*.gif=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /index.jsp=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
-         /home=ROLE_ROOT,ROLE_USER
+         /home=ROLE_ROOT
          /home/jcr:system=ROLE_ROOT
          /home/jcr:system/**=ROLE_ROOT
-         /home/**=ROLE_ROOT,ROLE_USER,ROLE_TICKET
+         /home/**=ROLE_ROOT,ROLE_TICKET
          /logout=ROLE_ROOT,ROLE_USER
          /**=ROLE_ROOT
        </value>

@@ -21,7 +21,6 @@ import org.osaf.cosmo.dao.UserDAO;
 import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import java.security.MessageDigest;
@@ -47,13 +46,6 @@ public class ProvisioningManagerImpl
     private ShareDAO shareDao;
     private UserDAO userDao;
     private MessageDigest digest;
-    private CosmoSecurityManager securityManager;
-
-    /**
-     */
-    public void setSecurityManager(CosmoSecurityManager securityManager) {
-        this.securityManager = securityManager;
-    }
 
     /**
      */
@@ -137,18 +129,7 @@ public class ProvisioningManagerImpl
         userDao.saveUser(user);
 
         if (! user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
-            // we need to access jackrabbit as the new user, so switch
-            // the security context to the new user. switch back to
-            // the old context when finished.
-            CosmoSecurityContext oldSecurityContext =
-                securityManager.getSecurityContext();
-            securityManager.initiateSecurityContext(user.getUsername(),
-                                                    undigestedPassword);
-            try {
-                shareDao.createHomedir(user.getUsername());
-            } finally {
-                securityManager.refreshSecurityContext(oldSecurityContext);
-            }
+            shareDao.createHomedir(user.getUsername());
         }
 
         return userDao.getUserByUsername(user.getUsername());
@@ -191,9 +172,6 @@ public class ProvisioningManagerImpl
      * Sanity check the object's properties.
      */
     public void afterPropertiesSet() throws Exception {
-        if (securityManager == null) {
-            throw new IllegalArgumentException("securityManager is required");
-        }
         if (roleDao == null) {
             throw new IllegalArgumentException("roleDAO is required");
         }

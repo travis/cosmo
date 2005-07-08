@@ -25,7 +25,6 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
- * remove obsolete potions of security API
  * consider re-implementing CosmoDavResourceImpl's ticket persistence
    methods using TicketDao; this means we'd have to look up the node
    again (DavResourceImpl has already done so), but we can assume that

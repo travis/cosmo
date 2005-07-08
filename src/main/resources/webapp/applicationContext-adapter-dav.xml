@@ -24,26 +24,10 @@
 
 <beans>
 
-  <bean id="jcrRepository"
-        class="org.springframework.jndi.JndiObjectFactoryBean">
-    <property name="jndiName">
-      <value>jcr/repositoryFactory</value>
-    </property>
-    <property name="resourceRef">
-      <value>true</value>
-    </property>
-  </bean>
-
   <bean id="sessionProvider"
         class="org.osaf.cosmo.dav.impl.CosmoDavSessionProviderImpl">
-    <property name="repository">
-      <ref local="jcrRepository"/>
-    </property>
-    <property name="securityManager">
-      <ref bean="securityManager"/>
-    </property>
-    <property name="workspaceName">
-      <value>homedir</value>
+    <property name="sessionFactory">
+      <ref local="homedirSessionFactory"/>
     </property>
   </bean>
 

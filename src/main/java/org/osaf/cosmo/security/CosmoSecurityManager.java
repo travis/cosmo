@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.security;
 
-import javax.security.auth.Subject;
-
 /**
  * An interface that represents a server-wide security controller for
  * Cosmo. It provides a simple mechanism for external environments
@@ -48,14 +46,6 @@ public interface CosmoSecurityManager {
         throws CosmoSecurityException;
 
     /**
-     * Provide a <code>CosmoSecurityContext</code> representing a
-     * previously authenticated Cosmo user previously authenticated by
-     * JAAS.
-     */
-    public CosmoSecurityContext getSecurityContext(Subject subject)
-        throws CosmoSecurityException;
-
-    /**
      * Authenticate the given Cosmo credentials and register a
      * <code>CosmoSecurityContext</code> for them. This method is used
      * when Cosmo components need to programatically log in a user
@@ -65,13 +55,4 @@ public interface CosmoSecurityManager {
     public CosmoSecurityContext initiateSecurityContext(String username,
                                                         String password)
         throws CosmoSecurityException;
-
-    /**
-     * Overwrite the existing <code>CosmoSecurityContext</code>. This 
-     * method is used when Cosmo components need to replace the
-     * existing security context with a different one (useful when
-     * executing multiple operations which require different security
-     * contexts).
-     */
-    public void refreshSecurityContext(CosmoSecurityContext securityContext);
 }

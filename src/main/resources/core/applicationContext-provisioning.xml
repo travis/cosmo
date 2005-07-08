@@ -47,9 +47,6 @@
 
   <bean id="provisioningManagerTarget"
         class="org.osaf.cosmo.manager.impl.ProvisioningManagerImpl">
-    <property name="securityManager">
-      <ref bean="securityManager"/>
-    </property>
     <property name="roleDAO">
       <ref bean="roleDAO"/>
     </property>

@@ -217,7 +217,13 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                                "The ticket specified does not exist.");
             return;
         }
-        if (! ticket.getOwner().equals(getLoggedInUser().getUsername())) {
+
+        // must either be a root user or the user that created the
+        // ticket
+        String loggedInUsername =
+            securityManager.getSecurityContext().getUser().getUsername();
+        if (! (ticket.getOwner().equals(loggedInUsername) ||
+               securityManager.getSecurityContext().inRootRole())) {
             response.sendError(DavServletResponse.SC_FORBIDDEN);
             return;
         }

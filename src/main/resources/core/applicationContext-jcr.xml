@@ -22,16 +22,33 @@
 
   <!-- JCR Resources -->
 
-  <bean id="homedirTemplate"
-        class="org.osaf.commons.spring.jcr.JCRTemplate">
+  <bean id="jcrAuthenticationProvider"
+        class="org.osaf.cosmo.spring.jcr.UsernamePasswordAuthenticationProvider">
+    <property name="username">
+      <ref bean="repositoryUsername"/>
+    </property>
+    <property name="password">
+      <ref bean="repositoryPassword"/>
+    </property>
+  </bean>
+
+  <bean id="homedirSessionFactory"
+        class="org.osaf.commons.spring.jcr.JCRSessionFactory">
     <property name="authenticationProvider">
-      <ref bean="authenticationProvider"/>
+      <ref bean="jcrAuthenticationProvider"/>
     </property>
     <property name="repository">
       <ref bean="jcrRepository"/>
     </property>
     <property name="workspaceName">
       <value>homedir</value>
+    </property>
+  </bean>
+
+  <bean id="homedirTemplate"
+        class="org.osaf.commons.spring.jcr.JCRTemplate">
+    <property name="sessionFactory">
+      <ref local="homedirSessionFactory"/>
     </property>
   </bean>
 

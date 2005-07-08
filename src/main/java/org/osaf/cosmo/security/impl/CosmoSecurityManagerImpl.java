@@ -19,15 +19,9 @@ import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
-import java.security.Principal;
-import java.util.Iterator;
-
-import javax.security.auth.Subject;
-
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationException;
 import net.sf.acegisecurity.AuthenticationManager;
-import net.sf.acegisecurity.context.ContextHolder;
 import net.sf.acegisecurity.context.security.SecureContext;
 import net.sf.acegisecurity.context.security.SecureContextUtils;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
@@ -66,24 +60,6 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
     }
 
     /**
-     * Provide a <code>CosmoSecurityContext</code> representing a
-     * previously authenticated Cosmo user previously authenticated by
-     * JAAS.
-     */
-    public CosmoSecurityContext getSecurityContext(Subject subject)
-        throws CosmoSecurityException {
-        for (Iterator i=subject.getPrincipals().iterator(); i.hasNext();) {
-            Principal principal = (Principal) i.next();
-            if (principal instanceof Authentication) {
-                return createSecurityContext((Authentication) principal,
-                                             subject);
-            }
-        }
-        throw new CosmoSecurityException("no Authentication principal " +
-                                         "found for subject");
-    }
-
-    /**
      * Authenticate the given Cosmo credentials and register a
      * <code>CosmoSecurityContext</code> for them. This method is used
      * when Cosmo components need to programatically log in a user
@@ -107,20 +83,6 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
         }
     }
 
-    /**
-     * Overwrite the existing <code>CosmoSecurityContext</code>. This 
-     * method is used when Cosmo components need to replace the
-     * existing security context with a different one (useful when
-     * executing multiple operations which require different security
-     * contexts).
-     */
-    public void refreshSecurityContext(CosmoSecurityContext securityContext) {
-        SecureContext sc = SecureContextUtils.getSecureContext();
-        CosmoSecurityContextImpl impl =
-            (CosmoSecurityContextImpl) securityContext;
-        sc.setAuthentication(impl.getAuthentication());
-    }
-
     /* ----- our methods ----- */
 
     /**
@@ -128,13 +90,6 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
     protected CosmoSecurityContext
         createSecurityContext(Authentication authen) {
         return new CosmoSecurityContextImpl(authen);
-    }
-
-    /**
-     */
-    protected CosmoSecurityContext
-        createSecurityContext(Authentication authen, Subject subject) {
-        return new CosmoSecurityContextImpl(authen, subject);
     }
 
     /**

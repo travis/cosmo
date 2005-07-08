@@ -15,20 +15,20 @@
  */
 package org.osaf.cosmo.security.impl;
 
+import org.osaf.cosmo.acegisecurity.ticket.TicketAuthenticationToken;
 import org.osaf.cosmo.model.Role;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.CosmoUserDetails;
 
 import java.util.Iterator;
-import javax.security.auth.Subject;
 
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import net.sf.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
-import net.sf.acegisecurity.runas.RunAsUserToken;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -47,7 +47,7 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
     private boolean anonymous;
     private Authentication authentication;
     private boolean rootRole;
-    private Subject subject;
+    private Ticket ticket;
     private User user;
 
     /**
@@ -57,23 +57,6 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
         this.authentication = authentication;
         this.rootRole = false;
 
-        this.subject = new Subject();
-        this.subject.getPrincipals().add(authentication);
-        this.subject.getPrivateCredentials().
-            add(authentication.getCredentials());
-
-        processAuthentication();
-    }
-
-    /**
-     */
-    public CosmoSecurityContextImpl(Authentication authentication,
-                                    Subject subject) {
-        this.anonymous = false;
-        this.authentication = authentication;
-        this.rootRole = false;
-        this.subject = subject;
-
         processAuthentication();
     }
 
@@ -81,18 +64,22 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
 
     /**
      * Returns a name describing the principal for this security
-     * context (either the name of the Cosmo user or "anonymous").
+     * context (the name of the Cosmo user, the id of the ticket, or
+     * the string "anonymous".
      */
     public String getName() {
         if (isAnonymous()) {
             return "anonymous";
         }
+        if (ticket != null) {
+            return ticket.getId();
+        }
         return user.getUsername();
     }
 
     /**
-     * Determines whether or not the context represents a Cosmo user
-     * account or an anonymous user.
+     * Determines whether or not the context represents an anonymous
+     * Cosmo user.
      */
     public boolean isAnonymous() {
         return anonymous;
@@ -100,18 +87,20 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
 
     /**
      * Returns an instance of {@link User} describing the user
-     * represented by the security context.
+     * represented by the security context, or <code>null</code> if
+     * the context does not represent a user.
      */
     public User getUser() {
         return user;
     }
 
     /**
-     * Returns an instance of {@link javax.security.auth.Subject}
-     * describing the user represented by the security context.
+     * Returns an instance of {@link Ticket} describing the ticket
+     * represented by the security context, or <code>null</code> if
+     * the context does not represent a ticket.
      */
-    public Subject getSubject() {
-        return subject;
+    public Ticket getTicket() {
+        return ticket;
     }
 
     /**
@@ -145,9 +134,14 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
             return;
         }
 
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof CosmoUserDetails) {
-            user = ((CosmoUserDetails) principal).getUser();
+        if (authentication instanceof TicketAuthenticationToken) {
+            ticket = (Ticket)
+                ((TicketAuthenticationToken) authentication).getPrincipal();
+            return;
+        }
+
+        if (authentication instanceof UsernamePasswordAuthenticationToken) {
+            user = ((CosmoUserDetails) authentication.getPrincipal()).getUser();
 
             // determine if the user is in the root role
             for (Iterator i=user.getRoles().iterator(); i.hasNext();) {

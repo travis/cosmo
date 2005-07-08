@@ -21,9 +21,6 @@ import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import java.security.Principal;
-import java.util.Iterator;
-
-import javax.security.auth.Subject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,28 +53,6 @@ public class TestSecurityManager implements CosmoSecurityManager {
             log.debug("getting security context for " + context.getName());
         }
         return context;
-    }
-
-    /**
-     * Provide a <code>CosmoSecurityContext</code> representing a
-     * previously authenticated Cosmo user previously authenticated by
-     * JAAS.
-     */
-    public CosmoSecurityContext getSecurityContext(Subject subject)
-        throws CosmoSecurityException {
-        CosmoSecurityContext context = (CosmoSecurityContext) contexts.get();
-        if (context == null) {
-            throw new CosmoSecurityException("security context not set up");
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("getting security context by subject for " +
-                      context.getName());
-        }
-        if (subject.equals(context.getSubject())) {
-            return context;
-        }
-        throw new CosmoSecurityException("subject does not match security " +
-                                         "context");
     }
 
     /**
@@ -145,12 +120,5 @@ public class TestSecurityManager implements CosmoSecurityManager {
      */
     protected CosmoSecurityContext createSecurityContext(Principal principal) {
         return new TestSecurityContext(principal);
-    }
-
-    /**
-     */
-    protected CosmoSecurityContext
-        createSecurityContext(Principal principal, Subject subject) {
-        return new TestSecurityContext(principal, subject);
     }
 }

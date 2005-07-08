@@ -15,9 +15,8 @@
  */
 package org.osaf.cosmo.security;
 
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
-
-import javax.security.auth.Subject;
 
 /**
  * An interface that represents a user-specific context for Cosmo
@@ -28,28 +27,30 @@ public interface CosmoSecurityContext {
 
     /**
      * Returns a name describing the principal for this security
-     * context (either the name of the Cosmo user or "anonymous").
+     * context (the name of the Cosmo user, the id of the ticket, or
+     * some other precise identification.
      */
     public String getName();
 
     /**
-     * Determines whether or not the context represents a Cosmo user
-     * account or an anonymous user.
+     * Determines whether or not the context represents an anonymous
+     * Cosmo user.
      */
     public boolean isAnonymous();
 
     /**
      * Returns an instance of {@link User} describing the user
      * represented by the security context, or <code>null</code> if
-     * the context represents an anonymous user.
+     * the context does not represent a user.
      */
     public User getUser();
 
     /**
-     * Returns an instance of {@link javax.security.auth.Subject}
-     * describing the user represented by the security context.
+     * Returns an instance of {@link Ticket} describing the ticket
+     * represented by the security context, or <code>null</code> if
+     * the context does not represent a ticket.
      */
-    public Subject getSubject();
+    public Ticket getTicket();
 
     /**
      * Determines whether or not the security context represents a

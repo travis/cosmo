@@ -15,15 +15,8 @@
  */
 package org.osaf.cosmo.dav.impl;
 
-import org.osaf.cosmo.security.CosmoSecurityContext;
-import org.osaf.cosmo.security.CosmoSecurityManager;
-
-import java.security.PrivilegedAction;
-import javax.jcr.Credentials;
-import javax.jcr.Repository;
 import javax.jcr.Session;
 import javax.jcr.RepositoryException;
-import javax.security.auth.Subject;
 
 import org.apache.jackrabbit.webdav.DavSessionProvider;
 import org.apache.jackrabbit.webdav.DavException;
@@ -34,20 +27,35 @@ import org.apache.jackrabbit.webdav.simple.DavSessionImpl;
 
 import org.apache.log4j.Logger;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.osaf.commons.spring.jcr.JCRSessionFactory;
+
 /**
  * Implementation of the jcr-server {@link DavSessionProvider}
- * interface that uses wired-in instances of
- * {@link Repository} and {@link CosmoSecurityManager} to
- * log into the repository and provide a
+ * interface that uses a {@link JCRSessionFactory} to log into the
+ * repository and provide a
  * {@link org.apache.jackrabbit.webdav.DavSession} to the request.
  */
-public class CosmoDavSessionProviderImpl implements DavSessionProvider {
+public class CosmoDavSessionProviderImpl
+    implements DavSessionProvider, InitializingBean {
     private static final Logger log =
         Logger.getLogger(CosmoDavSessionProviderImpl.class);
 
-    private Repository repository;
-    private CosmoSecurityManager securityManager;
-    private String workspaceName;
+    private JCRSessionFactory sessionFactory;
+
+    /**
+     */
+    public CosmoDavSessionProviderImpl() {
+    }
+
+    /**
+     */
+    public CosmoDavSessionProviderImpl(JCRSessionFactory sessionFactory) {
+        setSessionFactory(sessionFactory);
+        afterPropertiesSet();
+    }
+
+    // DavSessionProvider methods
 
     /**
      * Acquires a DavSession. Upon success, the WebdavRequest will
@@ -63,21 +71,9 @@ public class CosmoDavSessionProviderImpl implements DavSessionProvider {
     public boolean attachSession(WebdavRequest request) throws DavException {
         // XXX cache dav session in web session?
         try {
-            CosmoSecurityContext securityContext =
-                securityManager.getSecurityContext();
-            PrivilegedAction action = new PrivilegedAction() {
-                    public Object run() {
-                        try {
-                            return repository.login(workspaceName);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                };
-            Session rs = (Session)
-                Subject.doAs(securityContext.getSubject(), action);
-            DavSession ds = new DavSessionImpl(rs);
-            request.setDavSession(ds);
+            Session session = sessionFactory.getSession();
+            DavSession davSession = new DavSessionImpl(session);
+            request.setDavSession(davSession);
             return true;
         } catch (Exception e) {
             log.error("error logging into repository", e);
@@ -95,39 +91,28 @@ public class CosmoDavSessionProviderImpl implements DavSessionProvider {
         request.setDavSession(null);
     }
 
+    // InitializingBean methods
+
+    /**
+     * Sanity check the object's properties.
+     */
+    public void afterPropertiesSet() {
+        if (sessionFactory == null) {
+            throw new IllegalArgumentException("sessionFactory is required");
+        }
+    }
+
+    // our methods
+
     /**
      */
-    public Repository getRepository() {
-        return repository;
+    public JCRSessionFactory getSessionFactory() {
+        return sessionFactory;
     }
 
     /**
      */
-    public void setRepository(Repository repository) {
-        this.repository = repository;
-    }
-
-    /**
-     */
-    public CosmoSecurityManager getSecurityManager() {
-        return securityManager;
-    }
-
-    /**
-     */
-    public void setSecurityManager(CosmoSecurityManager securityManager) {
-        this.securityManager = securityManager;
-    }
-
-    /**
-     */
-    public String getWorkspaceName() {
-        return workspaceName;
-    }
-
-    /**
-     */
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
+    public void setSessionFactory(JCRSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 }

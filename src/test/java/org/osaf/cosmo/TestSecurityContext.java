@@ -16,13 +16,13 @@
 package org.osaf.cosmo;
 
 import org.osaf.cosmo.model.Role;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import java.util.Iterator;
 import java.security.Principal;
-import javax.security.auth.Subject;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -40,7 +40,7 @@ public class TestSecurityContext implements CosmoSecurityContext {
     private boolean anonymous;
     private Principal principal;
     private boolean rootRole;
-    private Subject subject;
+    private Ticket ticket;
     private User user;
 
     /**
@@ -50,21 +50,6 @@ public class TestSecurityContext implements CosmoSecurityContext {
         this.principal = principal;
         this.rootRole = false;
 
-        this.subject = new Subject();
-        this.subject.getPrincipals().add(principal);
-
-        processPrincipal();
-    }
-
-    /**
-     */
-    public TestSecurityContext(Principal principal,
-                               Subject subject) {
-        this.anonymous = false;
-        this.principal = principal;
-        this.rootRole = false;
-        this.subject = subject;
-
         processPrincipal();
     }
 
@@ -72,18 +57,22 @@ public class TestSecurityContext implements CosmoSecurityContext {
 
     /**
      * Returns a name describing the principal for this security
-     * context (either the name of the Cosmo user or "anonymous").
+     * context (the name of the Cosmo user, the id of the ticket, or
+     * some other precise identification.
      */
     public String getName() {
         if (isAnonymous()) {
             return "anonymous";
         }
+        if (ticket != null) {
+            return ticket.getId();
+        }
         return user.getUsername();
     }
 
     /**
-     * Determines whether or not the context represents a Cosmo user
-     * account or an anonymous user.
+     * Determines whether or not the context represents an anonymous
+     * Cosmo user.
      */
     public boolean isAnonymous() {
         return anonymous;
@@ -91,18 +80,20 @@ public class TestSecurityContext implements CosmoSecurityContext {
 
     /**
      * Returns an instance of {@link User} describing the user
-     * represented by the security context.
+     * represented by the security context, or <code>null</code> if
+     * the context does not represent a user.
      */
     public User getUser() {
         return user;
     }
 
     /**
-     * Returns an instance of {@link javax.security.auth.Subject}
-     * describing the user represented by the security context.
+     * Returns an instance of {@link Ticket} describing the ticket
+     * represented by the security context, or <code>null</code> if
+     * the context does not represent a ticket.
      */
-    public Subject getSubject() {
-        return subject;
+    public Ticket getTicket() {
+        return ticket;
     }
 
     /**

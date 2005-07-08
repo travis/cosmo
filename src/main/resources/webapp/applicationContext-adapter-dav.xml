@@ -27,7 +27,7 @@
   <bean id="sessionProvider"
         class="org.osaf.cosmo.dav.impl.CosmoDavSessionProviderImpl">
     <property name="sessionFactory">
-      <ref local="homedirSessionFactory"/>
+      <ref bean="homedirSessionFactory"/>
     </property>
   </bean>
 

@@ -18,26 +18,27 @@ package org.osaf.cosmo.acegisecurity.ticket;
 import java.io.Serializable;
 
 import net.sf.acegisecurity.GrantedAuthority;
-import net.sf.acegisecurity.GrantedAuthorityImpl;
 import net.sf.acegisecurity.providers.AbstractAuthenticationToken;
 
+import org.osaf.cosmo.model.Ticket;
+
 /**
- * Represents a ticket-based {@link net.sf.acegisecurity.Authentication}.
+ * Represents a ticket-based
+ * {@link net.sf.acegisecurity.Authentication}.
  *
- * Ticket tokens are always assigned a single
- * {@link net.sf.acegisecurity.GrantedAuthority} named
- * <code>ROLE_TICKET</code>.
+ * Before being authenticated, the token contains the ticket id and
+ * the path of the ticketed resource. After authentication, the
+ * token's principal is the {@link Ticket} itself.
  */
 public class TicketAuthenticationToken extends AbstractAuthenticationToken
     implements Serializable {
 
-    private static final GrantedAuthority[] AUTHORITIES = {
-        new GrantedAuthorityImpl("ROLE_TICKET")
-    };
+    private static final GrantedAuthority[] AUTHORITIES = {};
 
     private boolean authenticated;
     private String path;
     private String id;
+    private Ticket ticket;
 
     /**
      * @param path the absolute path to the ticketed resource
@@ -83,13 +84,19 @@ public class TicketAuthenticationToken extends AbstractAuthenticationToken
     }
 
     /**
-     * Returns the path and id separated by a colon.
+     * Returns the ticket.
      */
     public Object getPrincipal() {
-        return path + ":" + id;
+        return ticket;
     }
 
     // our methods
+
+    /**
+     */
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
+    }
 
     /**
      */
@@ -109,12 +116,10 @@ public class TicketAuthenticationToken extends AbstractAuthenticationToken
         if (! super.equals(obj)) {
             return false;
         }
-
         if (! (obj instanceof TicketAuthenticationToken)) {
             return false;
         }
-
         TicketAuthenticationToken test = (TicketAuthenticationToken) obj;
-        return id.equals(test.getPrincipal());
+        return ticket.equals(test.getPrincipal());
     }
 }

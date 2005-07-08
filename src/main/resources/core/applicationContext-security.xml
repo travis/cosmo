@@ -71,8 +71,10 @@
     </property>
   </bean>
 
-  <!-- Role-based authorization -->
+  <!-- Authorization -->
 
+  <bean id="ticketVoter"
+        class="org.osaf.cosmo.acegisecurity.ticket.TicketVoter"/>
   <bean id="homedirVoter" class="org.osaf.cosmo.acegisecurity.HomedirVoter"/>
   <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter"/>
 
@@ -83,6 +85,7 @@
     </property>
     <property name="decisionVoters">
       <list>
+        <ref bean="ticketVoter"/>
         <ref bean="homedirVoter"/>
         <ref bean="roleVoter"/>
       </list>

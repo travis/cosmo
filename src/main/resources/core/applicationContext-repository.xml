@@ -33,9 +33,12 @@
   </bean>
 
   <bean id="authenticationProvider"
-        class="org.osaf.cosmo.spring.jcr.CosmoJCRAuthenticationProvider">
-    <property name="securityManager">
-      <ref bean="securityManager"/>
+        class="org.osaf.cosmo.spring.jcr.UsernamePasswordAuthenticationProvider">
+    <property name="username">
+      <ref bean="repositoryUsername"/>
+    </property>
+    <property name="password">
+      <ref bean="repositoryPassword"/>
     </property>
   </bean>
 

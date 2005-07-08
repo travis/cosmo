@@ -20,14 +20,18 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.jcr.Item;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.jcr.Value;
 import javax.jcr.ValueFormatException;
 
 import org.osaf.cosmo.model.Ticket;
+
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * Utilities for working with JCR in Cosmo.
@@ -80,7 +84,7 @@ public class JCRUtils {
      * Returns the child ticket node for the given node with the given
      * id.
      */
-    public static Node findNode(Node parentNode, String id)
+    public static Node findChildTicketNode(Node parentNode, String id)
         throws RepositoryException {
         for (NodeIterator i=parentNode.getNodes(CosmoJcrConstants.NN_TICKET);
              i.hasNext();) {
@@ -96,9 +100,9 @@ public class JCRUtils {
      * Returns the child ticket node for the given node matching the
      * given ticket.
      */
-    public static Node findNode(Node parentNode, Ticket ticket)
+    public static Node findChildTicketNode(Node parentNode, Ticket ticket)
         throws RepositoryException {
-        return findNode(parentNode, ticket.getId());
+        return findChildTicketNode(parentNode, ticket.getId());
     }
 
     /**
@@ -119,6 +123,46 @@ public class JCRUtils {
             tickets.add(nodeToTicket(childNode));
         }
         return tickets;
+    }
+
+    /**
+     * Finds the deepest existing node on the given path.
+     */
+    public static Node findDeepestExistingNode(Session session, String path)
+        throws RepositoryException {
+        // try for the deepest node first
+        try {
+            Item item = session.getItem(path);
+            if (! item.isNode()) {
+                throw new InvalidDataAccessResourceUsageException("item at path " + path + " is not a node");
+            }
+            return (Node) item;
+        } catch (PathNotFoundException e) {
+            // will need to step down through the path one by one
+        }
+
+        Node node = session.getRootNode();
+        if (path.equals("/")) {
+            return node;
+        }
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+
+        String[] names = path.split("/");
+        Node parentNode = null;
+        for (int i=0; i<names.length; i++) {
+            try {
+                parentNode = node;
+                node = parentNode.getNode(names[i]);
+            } catch (PathNotFoundException e) {
+                // previous one was the last existing
+                node = parentNode;
+                break;
+            }
+        }
+
+        return node;
     }
 
     /**

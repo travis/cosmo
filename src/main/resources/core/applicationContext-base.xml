@@ -42,4 +42,24 @@
     </property>
   </bean>
 
+  <bean id="repositoryUsername"
+        class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName">
+      <value>cosmo/repository/username</value>
+    </property>
+    <property name="resourceRef">
+      <value>true</value>
+    </property>
+  </bean>
+
+  <bean id="repositoryPassword"
+        class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName">
+      <value>cosmo/repository/password</value>
+    </property>
+    <property name="resourceRef">
+      <value>true</value>
+    </property>
+  </bean>
+
 </beans>

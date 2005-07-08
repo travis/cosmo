@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.dao.jcr;
 
-import javax.jcr.Item;
-import javax.jcr.ItemNotFoundException;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -29,8 +27,6 @@ import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
 import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.jcr.JCRUtils;
 import org.osaf.cosmo.model.Ticket;
-
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * Implementation of TicketDao that operates against a JCR Repository.
@@ -45,33 +41,27 @@ public class JCRTicketDao extends JCRDaoSupport
     private static final Log log = LogFactory.getLog(JCRTicketDao.class);
 
     /**
-     * Returns the identified ticket for the item at the given path,
-     * or <code>null</code> if the ticket does not exist. Tickets are
-     * inherited, so if the specified item does not have the ticket
-     * but an ancestor does, it will still be returned.
+     * Returns the identified ticket for the node at the given path
+     * (or the nearest existing ancestor), or <code>null</code> if the
+     * ticket does not exist. Tickets are inherited, so if the
+     * specified node does not have the ticket but an ancestor does,
+     * it will still be returned.
      *
-     * @param path the absolute JCR path of the ticketed item
-     * @param id the id of the ticket unique to the parent item
-     *
-     * @throws DataRetrievalFailureException if either the item or the
-     * ticket are not found
-     * @throws InvalidDataAccessResourceException if the parent item
-     * is not a node
+     * @param path the absolute JCR path of the ticketed node
+     * @param id the id of the ticket unique to the parent node
      */
     public Ticket getTicket(final String path,
                             final String id) {
         return (Ticket) getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
-                    Item item = session.getItem(path);
-                    if (! item.isNode()) {
-                        throw new InvalidDataAccessResourceUsageException("item at path " + path + " is not a node and therefore cannot have a ticket");
-                    }
-                    Node node = (Node) item;
-                    Node ticketNode = JCRUtils.findNode(node, id);
+                    Node parentNode =
+                        JCRUtils.findDeepestExistingNode(session, path);
+                    Node ticketNode =
+                        JCRUtils.findChildTicketNode(parentNode, id);
                     if (ticketNode == null) {
-                        return node.getDepth() > 0 ?
-                            getTicket(node.getParent().getPath(), id) :
+                        return parentNode.getDepth() > 0 ?
+                            getTicket(parentNode.getParent().getPath(), id) :
                             null;
                     }
                     return JCRUtils.nodeToTicket(ticketNode);

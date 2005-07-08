@@ -138,7 +138,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         throws DavException {
         try {
             Node resourceNode = getNode();
-            Node ticketNode = JCRUtils.findNode(resourceNode, ticket);
+            Node ticketNode =
+                JCRUtils.findChildTicketNode(resourceNode, ticket);
             if (ticketNode == null) {
                 return;
             }
@@ -158,7 +159,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     public Ticket getTicket(String id)
         throws DavException {
         try {
-            Node ticketNode = JCRUtils.findNode(getNode(), id);
+            Node ticketNode = JCRUtils.findChildTicketNode(getNode(), id);
             if (ticketNode == null) {
                 return null;
             }

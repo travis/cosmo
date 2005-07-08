@@ -24,13 +24,27 @@
 
   <bean id="cosmoVersion" class="java.lang.String">
     <constructor-arg type="java.lang.String">
-      <value>0.1</value>
+      <value>@VERSION@</value>
     </constructor-arg>
   </bean>
 
   <bean id="cosmoServerAdmin" class="java.lang.String">
     <constructor-arg type="java.lang.String">
-      <value>root@localhost</value>
+      <value>@SERVER_ADMIN@</value>
+    </constructor-arg>
+  </bean>
+
+  <!-- repository -->
+
+  <bean id="repositoryUsername" class="java.lang.String">
+    <constructor-arg type="java.lang.String">
+      <value>@REPOSITORY_USERNAME@</value>
+    </constructor-arg>
+  </bean>
+
+  <bean id="repositoryPassword" class="java.lang.String">
+    <constructor-arg type="java.lang.String">
+      <value>@REPOSITORY_PASSWORD@</value>
     </constructor-arg>
   </bean>
 
@@ -74,9 +88,12 @@
   </bean>
 
   <bean id="authenticationProvider"
-        class="org.osaf.cosmo.spring.jcr.CosmoJCRAuthenticationProvider">
-    <property name="securityManager">
-      <ref bean="securityManager"/>
+        class="org.osaf.cosmo.spring.jcr.UsernamePasswordAuthenticationProvider">
+    <property name="username">
+      <ref bean="repositoryUsername"/>
+    </property>
+    <property name="password">
+      <ref bean="repositoryPassword"/>
     </property>
   </bean>
 

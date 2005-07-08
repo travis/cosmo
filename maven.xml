@@ -23,6 +23,10 @@
   <preGoal name="test:test-resources">
     <filter token="VERSION" value="${pom.currentVersion}"/>
     <filter token="SERVER_ADMIN" value="${cosmo.serverAdmin}"/>
+    <filter token="REPOSITORY_USERNAME"
+            value="${cosmo.test.repository.username}"/>
+    <filter token="REPOSITORY_PASSWORD"
+            value="${cosmo.test.repository.password}"/>
     <filter token="CONFIGFILEPATH"
             value="${basedir}/src/main/resources/server/repository.xml"/>
     <filter token="REPOSITORYHOMEDIRPATH"
@@ -68,7 +72,8 @@
     <jackrabbit:import
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
-       username="anonymous" password=""
+       username="${cosmo.test.repository.username}"
+       password="${cosmo.test.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
   </goal>
     
@@ -125,6 +130,10 @@
         <filter token="RELOADABLE" value="${cosmo.webapp.reloadable}"/>
         <filter token="VERSION" value="${pom.currentVersion}"/>
         <filter token="SERVER_ADMIN" value="${cosmo.serverAdmin}"/>
+        <filter token="REPOSITORY_USERNAME"
+                value="${cosmo.dist.repository.username}"/>
+        <filter token="REPOSITORY_PASSWORD"
+                value="${cosmo.dist.repository.password}"/>
         <filter token="DB_USERNAME" value="${cosmo.dist.userdb.username}"/>
         <filter token="DB_PASSWORD" value="${cosmo.dist.userdb.password}"/>
         <filter token="DB_DRIVER" value="${cosmo.dist.userdb.driver}"/>
@@ -191,7 +200,8 @@
     <jackrabbit:import
       configFilePath="${basedir}/src/main/resources/server/repository.xml"
       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
-      username="anonymous" password=""
+      username="${cosmo.dist.repository.username}"
+       password="${cosmo.dist.repository.password}"
       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
   </goal>
 

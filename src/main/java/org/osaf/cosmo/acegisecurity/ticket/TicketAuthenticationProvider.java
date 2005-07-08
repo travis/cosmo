@@ -65,7 +65,12 @@ public class TicketAuthenticationProvider
                                                   " not found for resource " +
                                                   "at " + token.getPath());
             }
+
             checkTimeout(ticket);
+
+            token.setTicket(ticket);
+            token.setAuthenticated(true);
+            return token;
         } catch (DataRetrievalFailureException e) {
             throw new TicketedItemNotFoundException("Resource at " +
                                                     token.getPath() +
@@ -73,9 +78,6 @@ public class TicketAuthenticationProvider
         } catch (DataAccessException e) {
             throw new AuthenticationServiceException(e.getMessage(), e);
         }
-
-        token.setAuthenticated(true);
-        return token;
     }
 
     /**

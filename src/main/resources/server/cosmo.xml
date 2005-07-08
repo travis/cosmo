@@ -22,6 +22,12 @@
                type="java.lang.String" override="false"/>
   <Environment name="cosmo/serverAdmin" value="@SERVER_ADMIN@"
                type="java.lang.String" override="false"/>
+  <Environment name="cosmo/repository/username"
+               value="@REPOSITORY_USERNAME@"
+               type="java.lang.String" override="false"/>
+  <Environment name="cosmo/repository/password"
+               value="@REPOSITORY_PASSWORD@"
+               type="java.lang.String" override="false"/>
   <Resource name="jcr/repositoryFactory"
             type="org.apache.jackrabbit.core.jndi.BindableRepository"/>
   <ResourceParams name="jcr/repositoryFactory">

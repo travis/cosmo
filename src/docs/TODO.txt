@@ -25,14 +25,13 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
- * respect ticket privileges (disallow access to MKCOL etc when the
-   ticket only has read privilege)
- * figure out how to lock down the repository to require a single
-   login for the entire web layer
+ * remove obsolete potions of security API
  * consider re-implementing CosmoDavResourceImpl's ticket persistence
    methods using TicketDao; this means we'd have to look up the node
    again (DavResourceImpl has already done so), but we can assume that
    the repository is caching the node internally anyway
+ * consider splitting security config into completely separate ones
+   for ui and dav
  * ticket method tests
 
  * precompile jsps for distribution

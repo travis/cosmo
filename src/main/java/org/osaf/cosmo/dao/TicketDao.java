@@ -39,4 +39,16 @@ public interface TicketDao {
      * ticket are not found
      */
     public Ticket getTicket(String path, String id);
+
+    /**
+     * Removes the assocation between the ticket and the item at the
+     * given path and deletes the ticket from persistent storage.
+     *
+     * @param path the path of the ticketed item unique to the
+     * repository
+     * @param ticket the <code>Ticket</code> to remove
+     *
+     * @throws DataRetrievalFailureException if the item is not found
+     */
+    public void removeTicket(String path, Ticket ticket);
 }

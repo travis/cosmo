@@ -66,7 +66,15 @@ public class TicketAuthenticationProvider
                                                   "at " + token.getPath());
             }
 
-            checkTimeout(ticket);
+            try {
+                checkTimeout(ticket);
+            } catch (TicketTimeoutException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("removing timed out ticket " + token.getId());
+                }
+                ticketDao.removeTicket(token.getPath(), ticket);
+                throw e;
+            }
 
             token.setTicket(ticket);
             token.setAuthenticated(true);
@@ -107,6 +115,7 @@ public class TicketAuthenticationProvider
         Calendar expiry = Calendar.getInstance();
         expiry.setTime(ticket.getCreated());
         expiry.add(Calendar.SECOND, timeout.intValue());
+
         if (Calendar.getInstance().after(expiry)) {
             throw new TicketTimeoutException("ticket timed out at " +
                                              expiry.getTime());

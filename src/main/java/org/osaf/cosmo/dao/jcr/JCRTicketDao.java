@@ -68,4 +68,38 @@ public class JCRTicketDao extends JCRDaoSupport
                 }
             });
     }
+
+    /**
+     * Removes the given ticket from the node at the given path.
+     *
+     * @param path the absolute JCR path of the ticketed node
+     * @param ticket the <code>Ticket</code> to remove
+     */
+    public void removeTicket(final String path,
+                             final Ticket ticket) {
+        getTemplate().execute(new JCRCallback() {
+                public Object doInJCR(Session session)
+                    throws RepositoryException {
+                    Node parentNode =
+                        JCRUtils.findDeepestExistingNode(session, path);
+                    Node ticketNode =
+                        JCRUtils.findChildTicketNode(parentNode, ticket);
+                    if (ticketNode == null) {
+                        if (parentNode.getDepth() == 0) {
+                            // this is the root node; the ticket
+                            // simply doesn't exist in the original
+                            // path
+                            return null;
+                        }
+                        // the ticket might be on an ancestor, so step
+                        // up the tree and look for it on the parent
+                        removeTicket(parentNode.getParent().getPath(), ticket);
+                        return null;
+                    }
+                    ticketNode.remove();
+                    parentNode.save();
+                    return null;
+                }
+            });
+    }
 }

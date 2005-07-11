@@ -25,8 +25,6 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
- * when a ticket is timed out, remove it from the repository and treat
-   the request as if the ticket did not exist
  * consider re-implementing CosmoDavResourceImpl's ticket persistence
    methods using TicketDao; this means we'd have to look up the node
    again (DavResourceImpl has already done so), but we can assume that

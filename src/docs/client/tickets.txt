@@ -1,0 +1,171 @@
+
+
+Client Development - Tickets
+
+
+Overview
+========
+
+"Ticket-Based Access Control Extension to WebDAV" [1] defines
+extensions to WebDAV for transmitting a token or "ticket" in the
+request to assign access privileges to a user otherwise unknown to the
+WebDAV server.
+
+Cosmo's ticket support allows Chandler to provide a universal sharing
+feature. A Chandler user with a Cosmo account can share a calendar to
+the server and generate read-only and/or read-write tickets for the
+calendar. The user can then communicate the calendar's URL and a
+ticket to another person, who can then subscribe to the calendar even
+if he does not have an account on the Cosmo server. Cosmo tickets are
+not specific to Chandler; other clients can take advantage of Cosmo
+tickets to implement similar functionality.
+
+
+Ticket Scope and Privileges
+===========================
+
+Tickets are inherited from ancestor resources. If a ticket is created
+on a resource, that ticket's id may be presented for that resource or
+any of its descendents to gain access as per the ticket's privileges.
+
+  Ex: the ticket 123 created on /home/bcm/MyCalendar/ is also honored
+      for /home/bcm/MyCalendar/deadbeef.ics and for
+      /home/bcm/MyCalendar/.chandler/sharing.ics. It is not honored
+      for /home/bcm/ or /home/bcm/arbitrary_file.txt.
+
+The ticket specification defines two possible ticket privileges,
+"read" and "write". The read privilege corresponds to the OPTIONS,
+GET, HEAD and PROPFIND methods, and the write privilege allows the
+POST, PUT, DELETE, PROPPATCH, MKCOL, COPY, MOVE, LOCK, UNLOCK,
+MKTICKET and DELTICKET methods.
+
+
+Request Methods
+===============
+
+Cosmo implements the MKTICKET and DELTICKET methods defined in the
+ticket spec. Cosmo does not (yet) support PROPFIND requests for the
+ticketdiscovery property on a ticketed resource, but the MKTICKET
+response does include all the tickets owned by the user sending the
+request, including the one just generated.
+
+Clients may as usual use an OPTIONS request to discover whether or not
+MKTICKET and DELTICKET are supported methods for a particular Cosmo
+URI.
+
+Due to interoperability concerns and the age of the specification, the
+XML content for a MKTICKET request looks slightly different than
+what's in the specification (see "Deviations from Spec" below for
+details).
+
+The Cosmo version of the example from section 2.3 of the spec is:
+
+  >>Request
+  MKTICKET /home/bcm/MyCalendar HTTP/1.1
+  Host: cosmo.osafoundation.org
+  Content-length: xxx
+  Content-Type: text/xml; charset="utf-8"
+  Authorization: Basic dGVzdHVzZXI6dGVzdHVzZXI=
+
+  <?xml version="1.0" encoding="utf-8" ?> 
+  <D:prop xmlns:D="DAV:"
+          xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">
+    <ticket:ticketinfo>
+      <D:privilege><D:read/></D:privilege> 
+      <ticket:timeout>Second-3600</ticket:timeout> 
+    </ticket:ticketinfo>
+  </D:prop>
+
+  >>Response
+  HTTP/1.0 200 OK
+  Ticket: 266dxwmag0
+  Content-Type: text/xml;charset=UTF-8
+  Content-Length: xxx
+
+  <?xml version="1.0" encoding="UTF-8"?>
+  <D:prop xmlns:D="DAV:"
+          xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">
+    <ticket:ticketdiscovery>
+      <ticket:ticketinfo>
+        <ticket:id>266dxwmag0</ticket:id>
+        <D:owner>
+          <D:href>http://localhost:8080/principal/bcm</D:href>
+        </D:owner>
+        <ticket:timeout>Second-3600</ticket:timeout>
+        <ticket:visits>infinity</ticket:visits>
+        <D:privilege>
+          <D:read />
+        </D:privilege>
+      </ticket:ticketinfo>
+    </ticket:ticketdiscovery>
+  </D:prop>
+
+
+Deviations from Spec
+====================
+
+The Xythos ticket implementation differs from the specification in
+numerous ways. In order to promote interoperability, Cosmo aligns with
+Xythos as much as possible. There were also a few holes in the
+spec. The complete list of spec differences is as follows:
+
+  (1) Visit limits are not supported. Regardless of what is requested,
+      Cosmo always returns a value of infinity. Xythos behaves the
+      same way, and visit limits will likely be removed from future
+      versions of the spec.
+
+  (2) The custom XML namespace
+      "http://www.xythos.com/namespaces/StorageServer" is used for XML
+      elements defined by the spec (ticketdiscovery, ticketinfo, id
+      and timeout).
+
+  (3) The MKTICKET request content is wrapped in a DAV:prop element.
+
+  (4) If different ticket ids are included in the request headers and
+      URL, the id in the URL is used (the one from the Ticket header
+      is ignored, even if the ticket identified by the URL is not
+      found by the server).
+
+  (5) If a DELTICKET request is received for a resource on which the
+      requesting user does not have appropriate access privileges,
+      Cosmo returns a 403 (Forbidden) response. Example: User A owns
+      resource X and creates ticket 123 on it. User B does not have
+      privileges on resource X but attempts to delete the ticket.
+
+  (6) Similarly, only the owner of a ticket (the user who created
+      it via MKTICKET) or a user with root privileges can delete it
+      with DELTICKET.
+
+
+Unimplemented
+=============
+
+The following items from the ticket spec are not yet implemented:
+
+  (1) Support the ticketdiscovery property on PROPFIND requests
+      (section 1.5)
+
+  (2) Support the OPTIONS and PROPFIND methods for principal URLs
+      (those indicated by the DAV:owner property of a
+      ticket:ticketinfo XML element) (section 5.1)
+
+
+References
+==========
+
+  (1) http://www.sharemation.com/~milele/public/dav/draft-ito-dav-ticket-00.txt
+
+
+Copyright 2005 Open Source Applications Foundation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

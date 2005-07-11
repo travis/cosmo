@@ -25,7 +25,6 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
- * OPTIONS responses should advertise MKTICKET and DELTICKET
  * when a ticket is timed out, remove it from the repository and treat
    the request as if the ticket did not exist
  * consider re-implementing CosmoDavResourceImpl's ticket persistence

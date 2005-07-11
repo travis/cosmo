@@ -31,6 +31,13 @@ import org.osaf.cosmo.model.Ticket;
 public interface CosmoDavResource extends DavResource {
 
     /**
+     * String constant representing the extended method set
+     * implemented by Cosmo (WebDAV class 1 and 2 plus tickets)
+     */
+    public static final String METHODS = DavResource.METHODS +
+        ", MKTICKET, DELTICKET";
+
+    /**
      * Associates a ticket with this resource and saves it into
      * persistent storage.
      */

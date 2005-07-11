@@ -84,6 +84,12 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
     /**
      */
+    public String getSupportedMethods() {
+        return CosmoDavResource.METHODS;
+    }
+
+    /**
+     */
     public DavResourceIterator getMembers() {
         // wholly copied from DavResourceImpl in order to filter out
         // ticket nodes

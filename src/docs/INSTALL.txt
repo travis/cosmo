@@ -167,7 +167,7 @@ TROUBLESHOOTING
  *** First read the Release Notes! ***
 
     You can find the release notes for Cosmo at
-    $COSMO_HOME/docs/RELEASE_NOTES.txt. Please read them and become
+    $COSMO_HOME/RELEASE-NOTES.txt. Please read them and become
     familiar with all of the known issues before asking for help. If
     your question is not answered there, check README.txt for mailing
     list and bug tracker information.

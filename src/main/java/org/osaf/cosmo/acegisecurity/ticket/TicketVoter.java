@@ -65,6 +65,7 @@ public class TicketVoter implements AccessDecisionVoter {
 
         writeMethods.add(CosmoDavMethods.METHOD_MKTICKET);
         writeMethods.add(CosmoDavMethods.METHOD_DELTICKET);
+        writeMethods.add(CosmoDavMethods.METHOD_MKCALENDAR);
     }
 
     /**

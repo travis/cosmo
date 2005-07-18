@@ -143,6 +143,9 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
         method = CosmoDavMethods.getMethodCode(request.getMethod());
         switch (method) {
+        case CosmoDavMethods.DAV_MKCALENDAR:
+            doMkCalendar(cosmoRequest, cosmoResponse, cosmoResource);
+            break;
         case CosmoDavMethods.DAV_MKTICKET:
             doMkTicket(cosmoRequest, cosmoResponse, cosmoResource);
             break;
@@ -155,6 +158,56 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         }
 
         return true;
+    }
+
+    /**
+     * Executes the MKTICKET method
+     *
+     * @throws IOException
+     * @throws DavException
+     */
+    protected void doMkCalendar(CosmoDavRequest request,
+                                CosmoDavResponse response,
+                                CosmoDavResource resource)
+        throws IOException, DavException {
+        WebdavRequest webdavRequest = request.getWebdavRequest();
+
+        // resource must be null
+        if (resource.exists()) {
+            response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+            return;
+        }
+
+        // one or more intermediate collections must be created
+        CosmoDavResource parentResource =
+            (CosmoDavResource) resource.getCollection();
+        if (parentResource == null ||
+            ! parentResource.exists()) {
+            response.sendError(DavServletResponse.SC_CONFLICT);
+        }
+
+        // parent resource must be a regular collection - calendar
+        // collections are not allowed within other calendar
+        // collections
+        if (! parentResource.isCollection() ||
+            parentResource.isCalendarCollection()) {
+            response.sendError(DavServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        // we do not allow request bodies
+        if (webdavRequest.getContentLength() > 0 ||
+            webdavRequest.getHeader("Transfer-Encoding") != null) {
+            response.sendError(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+            return;
+        }
+
+        // also could return INSUFFICIENT_STORAGE if we do not have
+        // enough space for the collection, but how do we determine
+        // that?
+
+        parentResource.addMember(resource);
+        response.setStatus(DavServletResponse.SC_CREATED);
     }
 
     /**

@@ -45,6 +45,12 @@ public class CosmoDavMethods extends DavMethods {
     public static final String METHOD_DELTICKET = "DELTICKET";
 
     /**
+     * The MKCALENDAR method and public constant
+     */
+    public static final int DAV_MKCALENDAR = DAV_DELTICKET + 1;
+    public static final String METHOD_MKCALENDAR = "MKCALENDAR";
+
+    /**
      * Return the type code for a dav method. Valid type codes are
      * positive. Unknown methods are represented by <code>0</code>.
      */
@@ -63,5 +69,6 @@ public class CosmoDavMethods extends DavMethods {
     static {
         addMethodCode(METHOD_MKTICKET, DAV_MKTICKET);
         addMethodCode(METHOD_DELTICKET, DAV_DELTICKET);
+        addMethodCode(METHOD_MKCALENDAR, DAV_MKCALENDAR);
     }
 }

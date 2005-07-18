@@ -92,6 +92,12 @@ public class CosmoDavRequestImpl implements CosmoDavRequest {
         return buf.toString();
     }
 
+    /**
+     */
+    public WebdavRequest getWebdavRequest() {
+        return webdavRequest;
+    }
+
     // TicketDavRequest methods
 
     /**

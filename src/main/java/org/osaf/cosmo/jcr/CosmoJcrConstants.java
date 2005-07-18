@@ -34,6 +34,9 @@ public class CosmoJcrConstants {
     public static final String NT_TICKETABLE = "mix:ticketable";
     /** <code>ticket:ticket</code> */
     public static final String NT_TICKET = "ticket:ticket";
+    /** <code>caldav:calendarCollection</code> */
+    public static final String NT_CALENDAR_COLLECTION =
+        "caldav:calendarCollection";
 
     // node properties
 

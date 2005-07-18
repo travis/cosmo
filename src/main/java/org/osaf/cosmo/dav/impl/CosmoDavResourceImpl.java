@@ -76,6 +76,10 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             if (getNode().isNodeType(CosmoJcrConstants.NT_TICKET)) {
                 return false;
             }
+            if (getNode().
+                isNodeType(CosmoJcrConstants.NT_CALENDAR_COLLECTION)) {
+                return true;
+            }
         } catch (RepositoryException e) {
             // XXX
         }
@@ -85,7 +89,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     /**
      */
     public String getSupportedMethods() {
-        return CosmoDavResource.METHODS;
+        return isCalendarCollection() ?
+            CALENDAR_COLLECTION_METHODS :
+            UNIVERSALLY_SUPPORTED_METHODS;
     }
 
     /**
@@ -115,6 +121,19 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     // CosmoDavResource methods
+
+    /**
+     * Returns true if this resource represents a calendar
+     * collection.
+     */
+    public boolean isCalendarCollection() {
+        try {
+            return getNode().
+                isNodeType(CosmoJcrConstants.NT_CALENDAR_COLLECTION);
+        } catch (RepositoryException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Associates a ticket with this resource and saves it into

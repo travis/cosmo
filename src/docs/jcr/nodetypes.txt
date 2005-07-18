@@ -24,7 +24,8 @@ Namespaces
 
 dav: http://osafoundation.org/jcr/dav/1.0
 ticket: http://osafoundation.org/jcr/dav/ticket/1.0
-
+icalendar: http://osafoundation.org/jcr/icalendar/1.0
+caldav: http://osafoundation.org/jcr/caldav/1.0
 
 Tickets
 =======
@@ -108,3 +109,236 @@ PropertyDef
   OnParentVersion COPY
   Protected false
   Multiple false
+
+
+iCalendar
+=========
+
+NodeTypeName
+  icalendar:component
+SuperTypes
+  nt:base
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+ChildNodeDef
+  Name *
+  RequiredPrimaryTypes [icalendar:property]
+  DefaultPrimaryType null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs true
+
+NodeTypeName
+  icalendar:property
+SuperTypes
+  nt:base
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+ChildNodeDef
+  Name *
+  RequiredPrimaryTypes [icalendar:parameter]
+  DefaultPrimaryType null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs true
+
+NodeTypeName
+  icalendar:prodid
+SuperTypes
+  icalendar:property
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  icalendar:value
+PropertyDef
+  Name icalendar:value
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+
+NodeTypeName
+  icalendar:version
+SuperTypes
+  icalendar:property
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+PropertyDef
+  Name icalendar:minVersion
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:maxVersion
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+
+NodeTypeName
+  icalendar:calscale
+SuperTypes
+  icalendar:property
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  icalendar:value
+PropertyDef
+  Name icalendar:value
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+
+NodeTypeName
+  icalendar:method
+SuperTypes
+  icalendar:property
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  icalendar:value
+PropertyDef
+  Name icalendar:value
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+
+NodeTypeName
+  icalendar:parameter
+SuperTypes
+  nt:base
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+
+NodeTypeName
+  icalendar:calendar
+SuperTypes
+  nt:base
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+ChildNodeDef
+  Name icalendar:prodid
+  RequiredPrimaryTypes [icalendar:prodid]
+  DefaultPrimaryType icalendar:prodid
+  AutoCreate false
+  Mandatory true
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs false
+ChildNodeDef
+  Name icalendar:version
+  RequiredPrimaryTypes [icalendar:version]
+  DefaultPrimaryType icalendar:version
+  AutoCreate false
+  Mandatory true
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs false
+ChildNodeDef
+  Name icalendar:calscale
+  RequiredPrimaryTypes [icalendar:calscale]
+  DefaultPrimaryType icalendar:calscale
+  AutoCreate false
+  Mandatory false
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs false
+ChildNodeDef
+  Name icalendar:method
+  RequiredPrimaryTypes [icalendar:method]
+  DefaultPrimaryType icalendar:method
+  AutoCreate false
+  Mandatory false
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs false
+ChildNodeDef
+  Name *
+  RequiredPrimaryTypes [icalendar:property]
+  DefaultPrimaryType null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs true
+ChildNodeDef
+  Name *
+  RequiredPrimaryTypes [icalendar:component]
+  DefaultPrimaryType null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs true
+
+
+CalDAV
+======
+
+NodeTypeName
+  caldav:calendarCollection
+SuperTypes
+  nt:folder
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+ChildNodeDef
+  Name caldav:calendar
+  RequiredPrimaryTypes [icalendar:calendar]
+  DefaultPrimaryType icalendar:calendar
+  AutoCreate false
+  Mandatory true
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs false

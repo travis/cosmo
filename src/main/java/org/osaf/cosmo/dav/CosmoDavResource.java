@@ -37,18 +37,11 @@ public interface CosmoDavResource extends DavResource {
     public boolean isCalendarCollection();
 
     /**
+     * String constant representing the WebDAV 1 and 2 method set as
+     * well as the Cosmo extended method set (excluding MKCALENDAR,
+     * which is only supported for certain resources).
      */
-    public String TICKET_METHODS = "MKTICKET, DELTICKET";
-
-    /**
-     */
-    public String CALENDAR_COLLECTION_METHODS =
-        DavResource.METHODS + ", " + TICKET_METHODS;
-
-    /**
-     */
-    public String UNIVERSALLY_SUPPORTED_METHODS =
-        CALENDAR_COLLECTION_METHODS + ", MKCALENDAR";
+    public String METHODS = DavResource.METHODS + ", MKTICKET, DELTICKET";
 
     /**
      * Associates a ticket with this resource and saves it into

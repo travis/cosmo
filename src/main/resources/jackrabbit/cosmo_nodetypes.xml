@@ -172,7 +172,7 @@
       </requiredPrimaryTypes>
     </childNodeDefinition>
     <childNodeDefinition name="icalendar:calscale" autoCreated="false"
-                         mandatory="true" onParentVersion="VERSION"
+                         mandatory="false" onParentVersion="VERSION"
                          protected="false" sameNameSiblings="false"
                          defaultPrimaryType="icalendar:calscale">
       <requiredPrimaryTypes>
@@ -180,7 +180,7 @@
       </requiredPrimaryTypes>
     </childNodeDefinition>
     <childNodeDefinition name="icalendar:method" autoCreated="false"
-                         mandatory="true" onParentVersion="VERSION"
+                         mandatory="false" onParentVersion="VERSION"
                          protected="false" sameNameSiblings="false"
                          defaultPrimaryType="icalendar:method">
       <requiredPrimaryTypes>

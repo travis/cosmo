@@ -114,6 +114,41 @@ PropertyDef
 iCalendar
 =========
 
+iCalendar calendars, components, properties and parameters are
+represented as JCR nodes.
+
+Property and parameter values are represented as JCR properties and
+converted to JCR property types (date, long, double, etc.) where
+possible, defaulted to String otherwise.
+
+Complex values are broken down into multiple JCR properties (eg
+icalendar:version has two properties, icalendar:minVersion and
+icalendar:maxVersion).
+
+Inheritance Hierarchy:
+
+  nt:base
+  |
+  |--icalendar:calendar
+  |
+  |--icalendar:component
+  |  |
+  |  |--icalendar:event
+  |  |
+  |  |...
+  |
+  |--icalendar:property
+  |  |
+  |  |--icalendar:prodid
+  |  |
+  |  |...
+  |
+  |--icalendar:parameter
+     |
+     |--icalendar:partstat
+     |
+     |...
+
 NodeTypeName
   icalendar:component
 SuperTypes

@@ -26,6 +26,18 @@ public class CosmoJcrConstants {
     /** <code>dav:ticket</code> */
     public static final String NN_TICKET = "dav:ticket";
 
+    /** <code>icalendar:calendar</code> */
+    public static final String NN_ICAL_CALENDAR =
+        "icalendar:calendar";
+    /** <code>icalendar:prodid</code> */
+    public static final String NN_ICAL_PRODID = "icalendar:prodid";
+    /** <code>icalendar:version</code> */
+    public static final String NN_ICAL_VERSION = "icalendar:version";
+    /** <code>icalendar:calscale</code> */
+    public static final String NN_ICAL_CALSCALE = "icalendar:calscale";
+    /** <code>icalendar:method</code> */
+    public static final String NN_ICAL_METHOD = "icalendar:method";
+
     // node types
 
     /** <code>nt:folder</code> */
@@ -37,6 +49,17 @@ public class CosmoJcrConstants {
     /** <code>caldav:calendarCollection</code> */
     public static final String NT_CALENDAR_COLLECTION =
         "caldav:calendarCollection";
+    /** <code>icalendar:calendar</code> */
+    public static final String NT_ICAL_CALENDAR =
+        "icalendar:calendar";
+    /** <code>icalendar:prodid</code> */
+    public static final String NT_ICAL_PRODID = "icalendar:prodid";
+    /** <code>icalendar:version</code> */
+    public static final String NT_ICAL_VERSION = "icalendar:version";
+    /** <code>icalendar:calscale</code> */
+    public static final String NT_ICAL_CALSCALE = "icalendar:calscale";
+    /** <code>icalendar:method</code> */
+    public static final String NT_ICAL_METHOD = "icalendar:method";
 
     // node properties
 
@@ -50,4 +73,9 @@ public class CosmoJcrConstants {
     public static final String NP_PRIVILEGES = "ticket:privileges";
     /** <code>ticket:created</code> */
     public static final String NP_CREATED = "ticket:created";
+
+    /** <code>icalendar:value</code> */
+    public static final String NP_ICAL_VALUE = "icalendar:value";
+    /** <code>icalendar:maxVersion</code> */
+    public static final String NP_ICAL_MAX_VERSION = "icalendar:maxVersion";
 }

@@ -20,10 +20,24 @@ package org.osaf.cosmo;
  */
 public class CosmoConstants {
     /**
+     * A string identifier for Cosmo used to distinguish it from other
+     * software producs.
+     */
+    public static final String PRODUCT_ID =
+        "-//Open Source Applications Foundation//NONSGML Cosmo Sharing Server//EN";
+
+    /**
+     * The version of iCalendar supported by Cosmo: 2.0, as
+     * specified by RFC 2445
+     */
+    public static final String ICALENDAR_VERSION = "2.0";
+
+    /**
      * The servlet context attribute which contains the Cosmo version
      * number.
      */
     public static final String SC_ATTR_VERSION = "cosmo.version";
+
     /**
      * The servlet context attribute which contains the Cosmo server
      * administrator's email address.

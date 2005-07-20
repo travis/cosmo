@@ -120,7 +120,7 @@
                         multiple="false" name="icalendar:minVersion"
                         onParentVersion="COPY" protected="false"
                         requiredType="String"/>
-    <propertyDefinition autoCreated="false" mandatory="false"
+    <propertyDefinition autoCreated="false" mandatory="true"
                         multiple="false" name="icalendar:maxVersion"
                         onParentVersion="COPY" protected="false"
                         requiredType="String"/>
@@ -212,7 +212,7 @@
     <supertypes>
       <supertype>nt:folder</supertype>
     </supertypes>
-    <childNodeDefinition name="caldav:calendar" autoCreated="false"
+    <childNodeDefinition name="icalendar:calendar" autoCreated="true"
                          mandatory="true" onParentVersion="VERSION"
                          protected="false" sameNameSiblings="false"
                          defaultPrimaryType="icalendar:calendar">

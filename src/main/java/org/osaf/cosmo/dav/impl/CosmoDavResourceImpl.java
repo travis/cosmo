@@ -19,22 +19,26 @@ import java. io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 
+import javax.jcr.ItemExistsException;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 
 import org.apache.commons.id.StringIdentifierGenerator;
 
+import org.apache.jackrabbit.server.io.ImportContext;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
+import org.apache.jackrabbit.webdav.jcr.JcrDavException;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
 
 import org.apache.log4j.Logger;
 
+import org.osaf.cosmo.jackrabbit.io.ImportCalendarCollectionChain;
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.jcr.JCRUtils;
 import org.osaf.cosmo.dav.CosmoDavResource;
@@ -73,15 +77,18 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     public boolean isCollection() {
         try {
             // required because super.isCollection is private
-            if (getNode().isNodeType(CosmoJcrConstants.NT_TICKET)) {
+            Node node = getNode();
+            if (node == null) {
                 return false;
             }
-            if (getNode().
-                isNodeType(CosmoJcrConstants.NT_CALENDAR_COLLECTION)) {
+            if (node.isNodeType(CosmoJcrConstants.NT_CALENDAR_COLLECTION)) {
                 return true;
             }
+            if (node.isNodeType(CosmoJcrConstants.NT_TICKET)) {
+                return false;
+            }
         } catch (RepositoryException e) {
-            // XXX
+            throw new RuntimeException(e);
         }
         return super.isCollection();
     }
@@ -95,32 +102,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             return CosmoDavResource.METHODS + ", MKCALENDAR";
         }
         return CosmoDavResource.METHODS;
-    }
-
-    /**
-     */
-    public DavResourceIterator getMembers() {
-        // wholly copied from DavResourceImpl in order to filter out
-        // ticket nodes
-        ArrayList list = new ArrayList();
-        if (exists() && isCollection()) {
-            try {
-                NodeIterator it = getNode().getNodes();
-                while(it.hasNext()) {
-                    Node childNode = it.nextNode();
-                    if (childNode.getPrimaryNodeType().getName().
-                        equals(CosmoJcrConstants.NT_TICKET)) {
-                        continue;
-                    }
-                    list.add(buildResourceFromItem(childNode));
-                }
-            } catch (RepositoryException e) {
-                // should not occure
-            } catch (DavException e) {
-                // should not occure
-            }
-        }
-        return new DavResourceIteratorImpl(list);
     }
 
     // CosmoDavResource methods
@@ -140,11 +121,32 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
     /**
      * Adds the given resoure as an internal member to this resource.
-     *
-     * @param resource {@link CosmoDavResource} to be added
      */
     public void addCalendarCollection(CosmoDavResource resource)
         throws DavException {
+        if (!exists()) {
+            throw new DavException(CosmoDavResponse.SC_CONFLICT);
+        }
+	if (isLocked(this)) {
+            throw new DavException(CosmoDavResponse.SC_LOCKED);
+        }
+        try {
+            Node node = getNode();
+            ImportContext ctx = new ImportContext(node);
+            ctx.setSystemId(resource.getDisplayName());
+            ImportCalendarCollectionChain.getChain().execute(ctx);
+            node.save();
+        } catch (ItemExistsException e) {
+            log.error("Error while executing import chain", e);
+            throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
+        } catch (RepositoryException e) {
+            log.error("Error while executing import chain", e);
+            throw new JcrDavException(e);
+        } catch (Exception e) {
+            log.error("Error while executing import chain", e);
+            throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
+                                   e.getMessage());
+        }
     }
 
     /**
@@ -245,6 +247,21 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     // our methods
+
+    /**
+     * Return true if the given item should not be included in the
+     * members list.
+     *
+     * @see DavResource#getMembers()
+     */
+    protected boolean isPrivateItem(Node node) {
+        try {
+            return node.isNodeType(CosmoJcrConstants.NT_ICAL_CALENDAR) ||
+                node.isNodeType(CosmoJcrConstants.NT_TICKET);
+        } catch (RepositoryException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      */

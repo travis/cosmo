@@ -174,6 +174,10 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
         // resource must be null
         if (resource.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("cannot make calendar at " +
+                          resource.getResourcePath() + ": resource exists");
+            }
             response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
             return;
         }
@@ -183,7 +187,13 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             (CosmoDavResource) resource.getCollection();
         if (parentResource == null ||
             ! parentResource.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("cannot make calendar at " +
+                          resource.getResourcePath() +
+                          ": one or more intermediate collections must be created");
+            }
             response.sendError(DavServletResponse.SC_CONFLICT);
+            return;
         }
 
         // parent resource must be a regular collection - calendar
@@ -191,6 +201,11 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         // collections
         if (! parentResource.isCollection() ||
             parentResource.isCalendarCollection()) {
+            if (log.isDebugEnabled()) {
+                log.debug("cannot make calendar at " +
+                          resource.getResourcePath() +
+                          ": parent resource must be a regular collection");
+            }
             response.sendError(DavServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -198,6 +213,11 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         // we do not allow request bodies
         if (webdavRequest.getContentLength() > 0 ||
             webdavRequest.getHeader("Transfer-Encoding") != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("cannot make calendar at " +
+                          resource.getResourcePath() +
+                          ": request body not allowed");
+            }
             response.sendError(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
             return;
         }
@@ -205,8 +225,11 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         // also could return INSUFFICIENT_STORAGE if we do not have
         // enough space for the collection, but how do we determine
         // that?
-
-        parentResource.addMember(resource);
+        
+        if (log.isDebugEnabled()) {
+            log.debug("making calendar at " + resource.getResourcePath());
+        }
+        parentResource.addCalendarCollection(resource);
         response.setStatus(DavServletResponse.SC_CREATED);
     }
 

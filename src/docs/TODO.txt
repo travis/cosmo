@@ -25,6 +25,17 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
+CalDAV:
+ * PROPFIND on a calendar collection should include calendar
+   collection resource type
+
+WebDAV:
+ * add dav:collection and dav:resource node types that allow custom
+   properties
+ * extend PROPFIND implementation to add custom properties
+ * implement PROPPATCH
+
+Tickets:
  * consider re-implementing CosmoDavResourceImpl's ticket persistence
    methods using TicketDao; this means we'd have to look up the node
    again (DavResourceImpl has already done so), but we can assume that
@@ -33,6 +44,7 @@ for current development plan. Additional tasks:
    for ui and dav
  * ticket method tests
 
+General:
  * precompile jsps for distribution
  * see if we can't get Struts to work with "/user/bcm/update" rather
    than "/user/update.do" with "username=bcm" in content body

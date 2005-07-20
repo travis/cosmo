@@ -66,6 +66,7 @@ public class AddCalendarCollectionCommand extends AddNodeCommand {
         // METHOD: only used for iTIP scheduling, not necessary for
         // provisioning
 
+        context.setNode(newNode);
         return false;
     }
 }

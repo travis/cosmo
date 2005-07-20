@@ -19,7 +19,9 @@ import org.apache.commons.chain.impl.ChainBase;
 import org.apache.commons.chain.impl.CatalogFactoryBase;
 import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Catalog;
-import org.apache.jackrabbit.JcrConstants;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This Class implements a default chain for importing calendar
@@ -28,8 +30,9 @@ import org.apache.jackrabbit.JcrConstants;
  * <li>{@link AddCalendarCollectionCommand}
  * </ul>
  */
-public class ImportCalendarCollectionChain extends ChainBase
-    implements JcrConstants {
+public class ImportCalendarCollectionChain extends ChainBase {
+    private static final Log log =
+        LogFactory.getLog(ImportCalendarCollectionChain.class);
 
     /**
      * The default name of this chain:

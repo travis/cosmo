@@ -160,6 +160,11 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
         try {
             Node resourceNode = getNode();
+            if (! resourceNode.isNodeType(CosmoJcrConstants.NT_TICKETABLE)) {
+                log.error("cannot save ticket for resource " +
+                          getResourcePath() + ": resource is not ticketable");
+                throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
+            }
             JCRUtils.ticketToNode(resourceNode, ticket);
             resourceNode.save();
         } catch (RepositoryException e) {

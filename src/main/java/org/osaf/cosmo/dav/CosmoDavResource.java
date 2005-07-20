@@ -31,17 +31,25 @@ import org.osaf.cosmo.model.Ticket;
 public interface CosmoDavResource extends DavResource {
 
     /**
+     * String constant representing the WebDAV 1 and 2 method set as
+     * well as the Cosmo extended method set (excluding MKCALENDAR,
+     * which is only supported for certain resources).
+     */
+    public String METHODS = DavResource.METHODS + ", MKTICKET, DELTICKET";
+
+    /**
      * Returns true if this resource represents a calendar
      * collection.
      */
     public boolean isCalendarCollection();
 
     /**
-     * String constant representing the WebDAV 1 and 2 method set as
-     * well as the Cosmo extended method set (excluding MKCALENDAR,
-     * which is only supported for certain resources).
+     * Adds the given resoure as an internal member to this resource.
+     *
+     * @param resource {@link CosmoDavResource} to be added
      */
-    public String METHODS = DavResource.METHODS + ", MKTICKET, DELTICKET";
+    public void addCalendarCollection(CosmoDavResource resource)
+        throws DavException;
 
     /**
      * Associates a ticket with this resource and saves it into

@@ -139,6 +139,15 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     /**
+     * Adds the given resoure as an internal member to this resource.
+     *
+     * @param resource {@link CosmoDavResource} to be added
+     */
+    public void addCalendarCollection(CosmoDavResource resource)
+        throws DavException {
+    }
+
+    /**
      * Associates a ticket with this resource and saves it into
      * persistent storage.
      */

@@ -9,12 +9,6 @@ References
 http://www.faqs.org/rfcs/rfc2518.html
 
 
-Namespaces
-==========
-
-dav: http://osafoundation.org/jcr/dav/1.0
-
-
 Node Type Definitions
 =====================
 

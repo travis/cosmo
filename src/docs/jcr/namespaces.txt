@@ -1,36 +1,15 @@
 
 
-Custom JCR Node Types - CalDAV
+Custom JCR Namespaces
 
 
-References
+Namespaces
 ==========
 
-http://ietf.webdav.org/caldav/draft-dusseault-caldav.txt
-
-
-Node Type Definitions
-=====================
-
-NodeTypeName
-  caldav:calendarCollection
-SuperTypes
-  dav:collection
-IsMixin
-  false
-HasOrderableChildNodes
-  false
-PrimaryItemName
-  null
-ChildNodeDef
-  Name icalendar:calendar
-  RequiredPrimaryTypes [icalendar:calendar]
-  DefaultPrimaryType icalendar:calendar
-  AutoCreate true
-  Mandatory true
-  OnParentVersion VERSION
-  Protected false
-  SameNamedSibs false
+dav: http://osafoundation.org/jcr/dav/1.0
+icalendar: http://osafoundation.org/jcr/icalendar/1.0
+caldav: http://osafoundation.org/jcr/caldav/1.0
+ticket: http://osafoundation.org/jcr/dav/ticket/1.0
 
 
 Copyright 2005 Open Source Applications Foundation

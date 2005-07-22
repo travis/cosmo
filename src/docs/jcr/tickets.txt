@@ -9,13 +9,6 @@ References
 http://www.sharemation.com/~milele/public/dav/draft-ito-dav-ticket-00.txt
 
 
-Namespaces
-==========
-
-dav: http://osafoundation.org/jcr/dav/1.0
-ticket: http://osafoundation.org/jcr/dav/ticket/1.0
-
-
 Node Type Definitions
 =====================
 

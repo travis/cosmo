@@ -9,12 +9,6 @@ References
 http://www.faqs.org/rfcs/rfc2445.html
 
 
-Namespaces
-==========
-
-icalendar: http://osafoundation.org/jcr/icalendar/1.0
-
-
 Node Type Definitions
 =========
 

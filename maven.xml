@@ -20,6 +20,21 @@
     <attainGoal name="war:webapp"/>
   </goal>
 
+  <goal name="build:nodetypes">
+    <jackrabbit:generate
+       catalog="${basedir}/src/docs/jcr/webdav.txt"
+       descriptor="${maven.build.dir}/webdav_nodetypes.xml"/>
+    <jackrabbit:generate
+       catalog="${basedir}/src/docs/jcr/tickets.txt"
+       descriptor="${maven.build.dir}/tickets_nodetypes.xml"/>
+    <jackrabbit:generate
+       catalog="${basedir}/src/docs/jcr/icalendar.txt"
+       descriptor="${maven.build.dir}/icalendar_nodetypes.xml"/>
+    <jackrabbit:generate
+       catalog="${basedir}/src/docs/jcr/caldav.txt"
+       descriptor="${maven.build.dir}/caldav_nodetypes.xml"/>
+  </goal>
+
   <preGoal name="test:test-resources">
     <filter token="VERSION" value="${pom.currentVersion}"/>
     <filter token="SERVER_ADMIN" value="${cosmo.serverAdmin}"/>
@@ -74,7 +89,7 @@
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
+       descriptor="${maven.build.dir}/webdav_nodetypes.xml"/>
   </goal>
     
   <goal name="dist:tomcat">
@@ -202,7 +217,7 @@
       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
       username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
-      descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
+      descriptor="${maven.build.dir}/webdav_nodetypes.xml"/>
   </goal>
 
   <goal name="dist:data">

@@ -41,7 +41,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  id
+  ticket:id
 PropertyDef
   Name ticket:id
   RequiredType STRING

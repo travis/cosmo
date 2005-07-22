@@ -13,26 +13,6 @@ Node Type Definitions
 =====================
 
 NodeTypeName
-  mix:ticketable
-SuperTypes
-  []
-IsMixin
-  true
-HasOrderableChildNodes
-  false
-PrimaryItemName
-  null
-ChildNodeDef
-  Name dav:ticket
-  RequiredPrimaryTypes [ticket:ticket]
-  DefaultPrimaryType ticket:ticket
-  AutoCreate false
-  Mandatory false
-  OnParentVersion VERSION
-  Protected false
-  SameNamedSibs true
-
-NodeTypeName
   ticket:ticket
 SuperTypes
   nt:base
@@ -91,6 +71,26 @@ PropertyDef
   OnParentVersion COPY
   Protected false
   Multiple false
+
+NodeTypeName
+  mix:ticketable
+SuperTypes
+  []
+IsMixin
+  true
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+ChildNodeDef
+  Name dav:ticket
+  RequiredPrimaryTypes [ticket:ticket]
+  DefaultPrimaryType ticket:ticket
+  AutoCreate false
+  Mandatory false
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs true
 
 
 Copyright 2005 Open Source Applications Foundation

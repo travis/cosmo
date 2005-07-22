@@ -82,6 +82,7 @@
   </goal>
 
   <goal name="test:reposetup">
+    <attainGoal name="build:nodetypes"/>
     <delete dir="${maven.build.dir}/test-repository"/> 
     <echo>Setting up test repository</echo>
     <jackrabbit:import
@@ -90,6 +91,24 @@
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        descriptor="${maven.build.dir}/webdav_nodetypes.xml"/>
+    <jackrabbit:import
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${maven.build.dir}/test-repository"
+       username="${cosmo.test.repository.username}"
+       password="${cosmo.test.repository.password}"
+       descriptor="${maven.build.dir}/tickets_nodetypes.xml"/>
+    <jackrabbit:import
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${maven.build.dir}/test-repository"
+       username="${cosmo.test.repository.username}"
+       password="${cosmo.test.repository.password}"
+       descriptor="${maven.build.dir}/icalendar_nodetypes.xml"/>
+    <jackrabbit:import
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${maven.build.dir}/test-repository"
+       username="${cosmo.test.repository.username}"
+       password="${cosmo.test.repository.password}"
+       descriptor="${maven.build.dir}/caldav_nodetypes.xml"/>
   </goal>
     
   <goal name="dist:tomcat">

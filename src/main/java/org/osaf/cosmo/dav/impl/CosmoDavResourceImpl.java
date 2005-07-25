@@ -95,6 +95,12 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
     /**
      */
+    public String getComplianceClass() {
+        return CosmoDavResource.COMPLIANCE_CLASS;
+    }
+
+    /**
+     */
     public String getSupportedMethods() {
         // can only make a calendar collection inside a regular
         // collection (NEVER inside another calendar collection).

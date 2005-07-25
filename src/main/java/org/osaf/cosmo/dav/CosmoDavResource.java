@@ -31,6 +31,13 @@ import org.osaf.cosmo.model.Ticket;
 public interface CosmoDavResource extends DavResource {
 
     /**
+     * String constant representing the WebDAV 1 and 2 compliance
+     * classes as well as the Cosmo extended classes.
+     */
+    public String COMPLIANCE_CLASS =
+        DavResource.COMPLIANCE_CLASS + ", calendar-access";
+
+    /**
      * String constant representing the WebDAV 1 and 2 method set as
      * well as the Cosmo extended method set (excluding MKCALENDAR,
      * which is only supported for certain resources).

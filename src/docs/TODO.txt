@@ -26,8 +26,6 @@ See
 for current development plan. Additional tasks:
 
 CalDAV:
- * capability advertisement: include "calendar-access" field in DAV
-   response header for OPTIONS request on all resources (3.1)
  * calendar home: include 'CALDAV:calendar-home' element in
    DAV:resourcetype property for homedirs (4.2)
  * calendar collection: include "CALDAV:calendar" element in

@@ -26,16 +26,37 @@ See
 for current development plan. Additional tasks:
 
 CalDAV:
- * PROPFIND on a calendar collection should include calendar
-   collection resource type
+ * capability advertisement: include "calendar-access" field in DAV
+   response header for OPTIONS request on all resources (3.1)
+ * calendar home: include 'CALDAV:calendar-home' element in
+   DAV:resourcetype property for homedirs (4.2)
+ * calendar collection: include "CALDAV:calendar" element in
+   DAV:resourcetype property for calendar collections (4.3)
+ * calendar description: include CALDAV:calendar-description property
+   for homedirs and calendar collections (4.4.1)
+ * calendar component restrictions: include
+   CALDAV:calendar-component-restriction-set protected property for
+   calendar collections specifying VEVENT only (4.4.2)
+ * calendar restrictions: include CALDAV:calendar-restrictions
+   protected property for calendar collections specifying
+   calendar-data with content-type "text/calendar" and version "2.0"
+   (4.4.3)
+ * MKCALENDAR: ensure that the response includes "Cache-control:
+   no-cache" header (4.6.1)
+ * PUT: ensure that "If-None-Match: *" and "If-Match: <etag>" request
+   headers are honored, and return ETag response header (4.6.2)
+ * PUT: honor preconditions - uid already, exists, invalid calendar
+   resource (4.6.2)
 
 WebDAV:
  * add dav:collection and dav:resource node types that allow custom
    properties
  * extend PROPFIND implementation to add custom properties
  * implement PROPPATCH
+ * support PROPPATCH for DAV:displayname
 
 Tickets:
+ * make principal url be the homedir url
  * consider re-implementing CosmoDavResourceImpl's ticket persistence
    methods using TicketDao; this means we'd have to look up the node
    again (DavResourceImpl has already done so), but we can assume that

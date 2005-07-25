@@ -92,7 +92,7 @@ public interface CosmoDavResource extends DavResource {
     public Set getLoggedInUserTickets() throws DavException;
 
     /**
-     * Returns a resource locator for the named principal.
+     * Returns a resource locator for the named principal's homedir.
      */
-    public DavResourceLocator getPrincipalLocator(String principal);
+    public DavResourceLocator getHomedirLocator(String principal);
 }

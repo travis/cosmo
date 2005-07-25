@@ -50,7 +50,6 @@ CalDAV:
    resource (4.6.2)
 
 Tickets:
- * make principal url be the homedir url
  * consider re-implementing CosmoDavResourceImpl's ticket persistence
    methods using TicketDao; this means we'd have to look up the node
    again (DavResourceImpl has already done so), but we can assume that

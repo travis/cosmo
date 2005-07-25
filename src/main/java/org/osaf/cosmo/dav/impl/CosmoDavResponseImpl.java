@@ -119,8 +119,8 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
         Element href = new Element(CosmoDavConstants.ELEMENT_HREF,
                                    DavConstants.NAMESPACE);
         DavResourceLocator locator =
-            resource.getPrincipalLocator(ticket.getOwner());
-        href.addContent(locator.getHref(false));
+            resource.getHomedirLocator(ticket.getOwner());
+        href.addContent(locator.getHref(true));
         owner.addContent(href);
         ticketInfo.addContent(owner);
 

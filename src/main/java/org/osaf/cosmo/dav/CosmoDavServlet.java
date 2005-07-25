@@ -53,12 +53,6 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     private static final Logger log =
         Logger.getLogger(CosmoDavServlet.class);
 
-    /**
-     * The name of the servlet init parameter identifying the resource
-     * path prefix for principal resources.
-     */
-    public static final String INIT_PARAM_PRINCIPAL_RESOURCE_PATH_PREFIX =
-        "principal-resource-path-prefix";
     /** The name of the Spring bean identifying the servlet's
      * {@link org.apache.jackrabbit.webdav.DavResourceFactory}
      */
@@ -76,8 +70,6 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     public static final String BEAN_SECURITY_MANAGER =
         "securityManager";
 
-    private DavLocatorFactory principalLocatorFactory;
-    private String principalResourcePathPrefix;
     private CosmoSecurityManager securityManager;
     private WebApplicationContext wac;
 
@@ -90,16 +82,6 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
      */
     public void init() throws ServletException {
         super.init();
-
-        principalResourcePathPrefix =
-            getInitParameter(INIT_PARAM_PRINCIPAL_RESOURCE_PATH_PREFIX);
-        if (principalResourcePathPrefix == null) {
-            principalResourcePathPrefix = "";
-        } else if (principalResourcePathPrefix.endsWith("/")) {
-            principalResourcePathPrefix =
-                principalResourcePathPrefix.
-                substring(0, principalResourcePathPrefix.length() - 1);
-        }
 
         wac = WebApplicationContextUtils.
             getRequiredWebApplicationContext(getServletContext());
@@ -139,7 +121,6 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
         CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
         cosmoResource.setBaseUrl(cosmoRequest.getBaseUrl());
-        cosmoResource.setPrincipalLocatorFactory(getPrincipalLocatorFactory());
 
         method = CosmoDavMethods.getMethodCode(request.getMethod());
         switch (method) {
@@ -314,34 +295,6 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     }
 
     // our methods
-
-    /**
-     */
-    public String getPrincipalPathPrefix() {
-        return principalResourcePathPrefix;
-    }
-
-    /**
-     * Returns the <code>DavLocatorFactory</code> used to construct
-     * principal URLs. If no locator factory has been set or created a
-     * new instance of
-     * {@link org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl}
-     * is returned.
-     */
-    public DavLocatorFactory getPrincipalLocatorFactory() {
-        if (principalLocatorFactory == null) {
-            principalLocatorFactory =
-                new LocatorFactoryImpl(principalResourcePathPrefix);
-        }
-        return principalLocatorFactory;
-    }
-
-    /**
-     * Sets the principal <code>DavLocatorFactory</code>.
-     */
-    public void setPrincipalLocatorFactory(DavLocatorFactory factory) {
-        principalLocatorFactory = factory;
-    }
 
     /**
      * Looks up the bean with given name and class in the web

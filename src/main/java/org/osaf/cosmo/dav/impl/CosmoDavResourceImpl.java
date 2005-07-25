@@ -59,7 +59,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     private boolean isCollection;
     private StringIdentifierGenerator ticketIdGenerator;
     private String baseUrl;
-    private DavLocatorFactory principalLocatorFactory;
 
     /**
      */
@@ -250,10 +249,10 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     /**
-     * Returns a resource locator for the named principal.
+     * Returns a resource locator for the named principal's homedir.
      */
-    public DavResourceLocator getPrincipalLocator(String principal) {
-        return principalLocatorFactory.
+    public DavResourceLocator getHomedirLocator(String principal) {
+        return getLocator().getFactory().
             createResourceLocator(baseUrl, "/" + principal);
     }
 
@@ -297,13 +296,5 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
-    }
-
-    /**
-     * Set the locator factory that generates URLs for principal
-     * resources (often used to address the owner of a dav resource).
-     */
-    public void setPrincipalLocatorFactory(DavLocatorFactory factory) {
-        principalLocatorFactory = factory;
     }
 }

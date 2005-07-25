@@ -25,6 +25,11 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
+WebDAV:
+ * extend PROPFIND implementation to add custom properties
+ * implement PROPPATCH
+ * support PROPPATCH for DAV:displayname
+
 CalDAV:
  * calendar home: include 'CALDAV:calendar-home' element in
    DAV:resourcetype property for homedirs (4.2)
@@ -39,19 +44,10 @@ CalDAV:
    protected property for calendar collections specifying
    calendar-data with content-type "text/calendar" and version "2.0"
    (4.4.3)
- * MKCALENDAR: ensure that the response includes "Cache-control:
-   no-cache" header (4.6.1)
  * PUT: ensure that "If-None-Match: *" and "If-Match: <etag>" request
    headers are honored, and return ETag response header (4.6.2)
  * PUT: honor preconditions - uid already, exists, invalid calendar
    resource (4.6.2)
-
-WebDAV:
- * add dav:collection and dav:resource node types that allow custom
-   properties
- * extend PROPFIND implementation to add custom properties
- * implement PROPPATCH
- * support PROPPATCH for DAV:displayname
 
 Tickets:
  * make principal url be the homedir url

@@ -20,6 +20,8 @@
     <attainGoal name="war:webapp"/>
   </goal>
 
+  <!-- not used in the standard build, but only for manually
+  regenerating node type -->
   <goal name="build:nodetypes">
     <jackrabbit:generate
        catalog="${basedir}/src/docs/jcr/webdav.txt"
@@ -82,7 +84,6 @@
   </goal>
 
   <goal name="test:reposetup">
-    <attainGoal name="build:nodetypes"/>
     <delete dir="${maven.build.dir}/test-repository"/> 
     <echo>Setting up test repository</echo>
     <jackrabbit:import
@@ -90,25 +91,25 @@
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       descriptor="${maven.build.dir}/webdav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/resources/jackrabbit/webdav_nodetypes.xml"/>
     <jackrabbit:import
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       descriptor="${maven.build.dir}/tickets_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/resources/jackrabbit/tickets_nodetypes.xml"/>
     <jackrabbit:import
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       descriptor="${maven.build.dir}/icalendar_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/resources/jackrabbit/icalendar_nodetypes.xml"/>
     <jackrabbit:import
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       descriptor="${maven.build.dir}/caldav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/resources/jackrabbit/caldav_nodetypes.xml"/>
   </goal>
     
   <goal name="dist:tomcat">
@@ -232,11 +233,29 @@
     <delete dir="${cosmo.dist.version}/data/repository"/> 
     <echo>Initializing Jackrabbit repository</echo>
     <jackrabbit:import
-      configFilePath="${basedir}/src/main/resources/server/repository.xml"
-      repositoryHomedirPath="${cosmo.dist.version}/data/repository"
-      username="${cosmo.dist.repository.username}"
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
-      descriptor="${maven.build.dir}/webdav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/resources/jackrabbit/webdav_nodetypes.xml"/>
+    <jackrabbit:import
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       username="${cosmo.dist.repository.username}"
+       password="${cosmo.dist.repository.password}"
+       descriptor="${basedir}/src/main/resources/jackrabbit/tickets_nodetypes.xml"/>
+    <jackrabbit:import
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       username="${cosmo.dist.repository.username}"
+       password="${cosmo.dist.repository.password}"
+       descriptor="${basedir}/src/main/resources/jackrabbit/icalendar_nodetypes.xml"/>
+    <jackrabbit:import
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       username="${cosmo.dist.repository.username}"
+       password="${cosmo.dist.repository.password}"
+       descriptor="${basedir}/src/main/resources/jackrabbit/caldav_nodetypes.xml"/>
   </goal>
 
   <goal name="dist:data">

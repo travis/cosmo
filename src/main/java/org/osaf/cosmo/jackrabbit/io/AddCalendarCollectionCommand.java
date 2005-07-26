@@ -33,7 +33,7 @@ public class AddCalendarCollectionCommand extends AddNodeCommand {
     /**
      */
     public AddCalendarCollectionCommand() {
-        super(CosmoJcrConstants.NT_CALENDAR_COLLECTION);
+        super(CosmoJcrConstants.NT_CALDAV_COLLECTION);
     }
 
     /**

@@ -24,21 +24,25 @@ import org.jdom.Namespace;
  */
 public class CosmoDavConstants {
 
-    // ticket headers
+    // request headers
 
     public static final String HEADER_TICKET = "Ticket";
 
-    // ticket URL parameters
+    // request parameters
 
     public static final String PARAM_TICKET = "ticket";
 
-    // ticket namespace
+    // request content types
+
+    public static final String CT_ICALENDAR = "text/calendar";
+
+    // XML namespaces
 
     // defined by Xythos
     public static final Namespace NAMESPACE_TICKET =
         Namespace.getNamespace("ticket", "http://www.xythos.com/namespaces/StorageServer");
 
-    // ticket elements
+    // XML elements
 
     public static final String ELEMENT_PROP = "prop";
     public static final String ELEMENT_TICKETDISCOVERY = "ticketdiscovery";
@@ -52,11 +56,11 @@ public class CosmoDavConstants {
     public static final String ELEMENT_READ = "read";
     public static final String ELEMENT_WRITE = "write";
 
-    // ticket values
+    // XML values
 
     public static final String VALUE_INFINITY = "infinity";
 
-    // ticket privileges
+    // ACL privileges
 
     public static final String PRIVILEGE_READ = "read";
     public static final String PRIVILEGE_WRITE = "write";

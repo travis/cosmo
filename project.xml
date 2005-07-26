@@ -189,6 +189,11 @@
       <version>1.7.3.3</version>
     </dependency>
     <dependency>
+      <groupId>ical4j</groupId>
+      <artifactId>ical4j</artifactId>
+      <version>0.9.13</version>
+    </dependency>
+    <dependency>
       <groupId>jackrabbit</groupId>
       <artifactId>jackrabbit-api</artifactId>
       <version>1.0-dev</version>

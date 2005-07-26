@@ -47,7 +47,8 @@ public class ContentStoreDAOJCR extends JCRDaoSupport implements ShareDAO {
                     throws RepositoryException {
                     Node rootNode = session.getRootNode();
                     Node homedirNode =
-                        rootNode.addNode(username, CosmoJcrConstants.NT_FOLDER);
+                        rootNode.addNode(username,
+                                         CosmoJcrConstants.NT_DAV_COLLECTION);
                     homedirNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
                     rootNode.save();
                     return null;

@@ -29,9 +29,14 @@ import javax.jcr.Session;
 import javax.jcr.Value;
 import javax.jcr.ValueFormatException;
 
+import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.model.Ticket;
 
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
+
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
 
 /**
  * Utilities for working with JCR in Cosmo.
@@ -163,6 +168,105 @@ public class JCRUtils {
         }
 
         return node;
+    }
+
+    /**
+     */
+    public static Node getEventComponentNode(VEvent event,
+                                             Node resourceNode)
+        throws RepositoryException {
+        // if there is no revent node, there is no match
+        if (! resourceNode.hasNode(CosmoJcrConstants.NN_ICAL_REVENT)) {
+            return null;
+        }
+
+        // if the revent node's uid does not match the given
+        // event's uid, there is no match
+        String uid = ICalendarUtils.getUid(event).getValue();
+        Node reventNode =
+            resourceNode.getNode(CosmoJcrConstants.NN_ICAL_REVENT);
+        String reventUid = getUidPropertyValue(reventNode);
+        if (! uid.equals(reventUid)) {
+            return null;
+        }
+
+        // if the given event has an rrule, return the revent node
+        if (ICalendarUtils.getRRule(event) != null) {
+            return reventNode;
+        }
+
+        // the given event has no rrule, so it must be an exevent
+        Date recurrenceId = ICalendarUtils.getRecurrenceId(event).getTime();
+        NodeIterator i =
+            resourceNode.getNodes(CosmoJcrConstants.NN_ICAL_EXEVENT);
+        while (i.hasNext()) {
+            Node exeventNode = i.nextNode();
+
+            // if the exception node's recurrence id does not match
+            // the given event's recurrence id, there is no match
+            Date exRecurrenceId = getRecurrenceIdPropertyValue(exeventNode);
+            if (recurrenceId.getTime() == exRecurrenceId.getTime()) {
+                return exeventNode;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     */
+    public static void setEventNode(VEvent event,
+                                    Node resourceNode)
+        throws RepositoryException {
+        Node eventNode = getEventComponentNode(event, resourceNode);
+        if (eventNode == null) {
+            eventNode =
+                resourceNode.addNode(CosmoJcrConstants.NN_ICAL_COMPONENT,
+                                     CosmoJcrConstants.NT_ICAL_EVENT);
+        }
+
+        setClassPropertyNode(event, eventNode);
+    }
+
+    /**
+     */
+    public static void setTimeZoneNode(VTimeZone timezone,
+                                       Node resourceNode)
+        throws RepositoryException {
+    }
+
+    /**
+     */
+    public static void setClassPropertyNode(Component component,
+                                            Node componentNode)
+        throws RepositoryException {
+        Node propertyNode =
+            componentNode.getNode(CosmoJcrConstants.NN_ICAL_CLASS);
+        if (propertyNode == null) {
+            propertyNode =
+                componentNode.addNode(CosmoJcrConstants.NN_ICAL_CLASS);
+        }
+        String propertyValue = ICalendarUtils.getClazz(component).getValue();
+        propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_VALUE,
+                                 propertyValue);
+    }
+
+    /**
+     */
+    public static Date getRecurrenceIdPropertyValue(Node componentNode)
+        throws RepositoryException {
+        Node propertyNode =
+            componentNode.getNode(CosmoJcrConstants.NN_ICAL_UID);
+        return getDateValue(propertyNode, CosmoJcrConstants.NP_ICAL_TEXT);
+    }
+
+    /**
+     */
+    public static String getUidPropertyValue(Node componentNode)
+        throws RepositoryException {
+        Node propertyNode =
+            componentNode.getNode(CosmoJcrConstants.NN_ICAL_UID);
+        return getStringValue(propertyNode, CosmoJcrConstants.NP_ICAL_TEXT);
     }
 
     /**

@@ -21,7 +21,7 @@
   <chain name="import-collection">
     <command id="add-collection"
              className="org.apache.jackrabbit.server.io.AddNodeCommand"
-             nodeType="nt:folder"/>
+             nodeType="dav:collection"/>
     <command id="make-ticketable"
              className="org.apache.jackrabbit.server.io.AddMixinCommand"
              nodeType="mix:ticketable"/>
@@ -60,9 +60,9 @@
   <chain name="export-collection">
     <command id="export-dirlisting"
              className="org.apache.jackrabbit.server.io.DirListingExportCommand"
-             nonCollectionNodeTypes="nt:resource, nt:file"
-             collectionNodeTypes="nt:folder"
-             ignoredNodeTypes="rep:system,ticket:ticket,icalendar:calendar"/>
+             nonCollectionNodeTypes="nt:resource, nt:file, dav:resource, caldav:resource"
+             collectionNodeTypes="nt:folder, dav:collection, caldav:collection"
+             ignoredNodeTypes="rep:system, ticket:ticket, icalendar:calendar"/>
   </chain>
 
   <!-- export webdav resource -->

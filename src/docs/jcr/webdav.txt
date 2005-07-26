@@ -42,7 +42,7 @@ PropertyDef
   Multiple true
 
 NodeTypeName
-  dav:file
+  dav:resource
 SuperTypes
   nt:file
 IsMixin

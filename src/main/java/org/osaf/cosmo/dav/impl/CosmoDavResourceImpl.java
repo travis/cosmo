@@ -80,7 +80,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             if (node == null) {
                 return false;
             }
-            if (node.isNodeType(CosmoJcrConstants.NT_CALENDAR_COLLECTION)) {
+            if (node.isNodeType(CosmoJcrConstants.NT_DAV_COLLECTION)) {
                 return true;
             }
             if (node.isNodeType(CosmoJcrConstants.NT_TICKET)) {
@@ -118,7 +118,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     public boolean isCalendarCollection() {
         try {
             return getNode().
-                isNodeType(CosmoJcrConstants.NT_CALENDAR_COLLECTION);
+                isNodeType(CosmoJcrConstants.NT_CALDAV_COLLECTION);
         } catch (RepositoryException e) {
             throw new RuntimeException(e);
         }

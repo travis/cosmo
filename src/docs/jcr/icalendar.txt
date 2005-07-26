@@ -1613,26 +1613,6 @@ PropertyDef
 #
 
 NodeTypeName
-  icalendar:component
-SuperTypes
-  nt:base
-IsMixin
-  false
-HasOrderableChildNodes
-  false
-PrimaryItemName
-  null
-ChildNodeDef
-  Name *
-  RequiredPrimaryTypes [icalendar:xproperty]
-  DefaultPrimaryType icalendar:xproperty
-  AutoCreate false
-  Mandatory false
-  OnParentVersion VERSION
-  Protected false
-  SameNamedSibs true
-
-NodeTypeName
   icalendar:calendar
 SuperTypes
   nt:base
@@ -1680,13 +1660,24 @@ ChildNodeDef
   SameNamedSibs false
 ChildNodeDef
   Name *
-  RequiredPrimaryTypes [icalendar:component]
-  DefaultPrimaryType null
+  RequiredPrimaryTypes [icalendar:xproperty]
+  DefaultPrimaryType icalendar:xproperty
   AutoCreate false
   Mandatory false
   OnParentVersion VERSION
   Protected false
   SameNamedSibs true
+
+NodeTypeName
+  icalendar:component
+SuperTypes
+  nt:base
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
 ChildNodeDef
   Name *
   RequiredPrimaryTypes [icalendar:xproperty]

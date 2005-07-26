@@ -38,36 +38,40 @@
   </goal>
 
   <preGoal name="test:test-resources">
-    <filter token="VERSION" value="${pom.currentVersion}"/>
-    <filter token="SERVER_ADMIN" value="${cosmo.serverAdmin}"/>
-    <filter token="REPOSITORY_USERNAME"
-            value="${cosmo.test.repository.username}"/>
-    <filter token="REPOSITORY_PASSWORD"
-            value="${cosmo.test.repository.password}"/>
-    <filter token="CONFIGFILEPATH"
-            value="${basedir}/src/main/resources/server/repository.xml"/>
-    <filter token="REPOSITORYHOMEDIRPATH"
-            value="${maven.build.dir}/test-repository"/>
-    <filter token="DIALECT" value="${cosmo.test.userdb.dialect}"/>
-    <filter token="DRIVER" value="${cosmo.test.userdb.driver}"/>
-    <filter token="DB_URL" value="${cosmo.test.userdb.url}"/>
-    <filter token="DB_USERNAME"
-            value="${cosmo.test.userdb.username}"/>
-    <filter token="DB_PASSWORD"
-            value="${cosmo.test.userdb.password}"/>
-    <filter token="MAIL_TRANSPORT_PROTOCOL"
-            value="${cosmo.test.mail.transport.protocol}"/>
-    <filter token="MAIL_SMTP_HOST"
-            value="${cosmo.test.mail.smtp.host}"/>
-    <filter token="MAIL_SMTP_STARTTLS_ENABLE"
-            value="${cosmo.test.mail.smtp.starttls.enable}"/>
-    <filter token="MAIL_SMTPS_HOST"
-            value="${cosmo.test.mail.smtps.host}"/>
+    <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
+      <filter token="VERSION" value="${pom.currentVersion}"/>
+      <filter token="SERVER_ADMIN" value="${cosmo.serverAdmin}"/>
+      <filter token="REPOSITORY_USERNAME"
+              value="${cosmo.test.repository.username}"/>
+      <filter token="REPOSITORY_PASSWORD"
+              value="${cosmo.test.repository.password}"/>
+      <filter token="CONFIGFILEPATH"
+              value="${basedir}/src/main/resources/server/repository.xml"/>
+      <filter token="REPOSITORYHOMEDIRPATH"
+              value="${maven.build.dir}/test-repository"/>
+      <filter token="DIALECT" value="${cosmo.test.userdb.dialect}"/>
+      <filter token="DRIVER" value="${cosmo.test.userdb.driver}"/>
+      <filter token="DB_URL" value="${cosmo.test.userdb.url}"/>
+      <filter token="DB_USERNAME"
+              value="${cosmo.test.userdb.username}"/>
+      <filter token="DB_PASSWORD"
+              value="${cosmo.test.userdb.password}"/>
+      <filter token="MAIL_TRANSPORT_PROTOCOL"
+              value="${cosmo.test.mail.transport.protocol}"/>
+      <filter token="MAIL_SMTP_HOST"
+              value="${cosmo.test.mail.smtp.host}"/>
+      <filter token="MAIL_SMTP_STARTTLS_ENABLE"
+              value="${cosmo.test.mail.smtp.starttls.enable}"/>
+      <filter token="MAIL_SMTPS_HOST"
+              value="${cosmo.test.mail.smtps.host}"/>
+    </j:if>
   </preGoal>
 
   <preGoal name="test:test-resources">
-    <attainGoal name="test:dbsetup"/>
-    <attainGoal name="test:reposetup"/>
+    <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
+      <attainGoal name="test:dbsetup"/>
+      <attainGoal name="test:reposetup"/>
+    </j:if>
   </preGoal>
 
   <goal name="test:dbsetup">

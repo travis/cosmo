@@ -50,7 +50,7 @@ ChildNodeDef
   Mandatory true
   OnParentVersion VERSION
   Protected false
-  SameNamedSibs true
+  SameNamedSibs false
 ChildNodeDef
   Name icalendar:exevent
   RequiredPrimaryTypes [icalendar:event]

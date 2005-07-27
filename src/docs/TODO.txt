@@ -44,6 +44,8 @@ CalDAV:
    protected property for calendar collections specifying
    calendar-data with content-type "text/calendar" and version "2.0"
    (4.4.3)
+ * PUT: store x-properties and x-parameters
+ * PUT: store event alarms
  * PUT: ensure that "If-None-Match: *" and "If-Match: <etag>" request
    headers are honored, and return ETag response header (4.6.2)
  * PUT: honor preconditions - uid already, exists, invalid calendar

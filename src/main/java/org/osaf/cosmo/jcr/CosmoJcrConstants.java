@@ -23,82 +23,125 @@ public class CosmoJcrConstants {
 
     // node names
 
-    /** <code>dav:ticket</code> */
     public static final String NN_TICKET = "dav:ticket";
 
-    /** <code>icalendar:calendar</code> */
     public static final String NN_ICAL_CALENDAR = "icalendar:calendar";
-    /** <code>icalendar:calendar</code> */
     public static final String NN_ICAL_COMPONENT = "icalendar:component";
-    /** <code>icalendar:revent</code> */
     public static final String NN_ICAL_REVENT = "icalendar:revent";
-    /** <code>icalendar:exevent</code> */
     public static final String NN_ICAL_EXEVENT = "icalendar:exevent";
-    /** <code>icalendar:prodid</code> */
     public static final String NN_ICAL_PRODID = "icalendar:prodid";
-    /** <code>icalendar:version</code> */
     public static final String NN_ICAL_VERSION = "icalendar:version";
-    /** <code>icalendar:calscale</code> */
     public static final String NN_ICAL_CALSCALE = "icalendar:calscale";
-    /** <code>icalendar:method</code> */
     public static final String NN_ICAL_METHOD = "icalendar:method";
-    /** <code>icalendar:class</code> */
+    public static final String NN_ICAL_ATTACH = "icalendar:attach";
+    public static final String NN_ICAL_ATTENDEE = "icalendar:attendee";
+    public static final String NN_ICAL_CATEGORIES = "icalendar:categories";
     public static final String NN_ICAL_CLASS = "icalendar:class";
-    /** <code>icalendar:uid</code> */
+    public static final String NN_ICAL_COMMENT = "icalendar:comment";
+    public static final String NN_ICAL_CONTACT = "icalendar:contact";
+    public static final String NN_ICAL_CREATED = "icalendar:created";
+    public static final String NN_ICAL_DESCRIPTION = "icalendar:description";
+    public static final String NN_ICAL_DTEND = "icalendar:dtend";
+    public static final String NN_ICAL_DTSTAMP = "icalendar:dtstamp";
+    public static final String NN_ICAL_DTSTART = "icalendar:dtstart";
+    public static final String NN_ICAL_DURATION = "icalendar:duration";
+    public static final String NN_ICAL_EXDATE = "icalendar:exdate";
+    public static final String NN_ICAL_EXRULE = "icalendar:exrule";
+    public static final String NN_ICAL_GEO = "icalendar:geo";
+    public static final String NN_ICAL_LASTMODIFIED = "icalendar:lastmodified";
+    public static final String NN_ICAL_LOCATION = "icalendar:location";
+    public static final String NN_ICAL_ORGANIZER = "icalendar:organizer";
+    public static final String NN_ICAL_PERIOD = "icalendar:period";
+    public static final String NN_ICAL_PRIORITY = "icalendar:priority";
+    public static final String NN_ICAL_RANGE = "icalendar:range";
+    public static final String NN_ICAL_RDATE = "icalendar:rdate";
+    public static final String NN_ICAL_RECUR = "icalendar:recur";
+    public static final String NN_ICAL_RECURRENCEID = "icalendar:recurrenceid";
+    public static final String NN_ICAL_RELATEDTO = "icalendar:relatedto";
+    public static final String NN_ICAL_REQUESTSTATUS =
+        "icalendar:requeststatus";
+    public static final String NN_ICAL_RESOURCES = "icalendar:resources";
+    public static final String NN_ICAL_RRULE = "icalendar:rrule";
+    public static final String NN_ICAL_SEQ = "icalendar:seq";
+    public static final String NN_ICAL_STATUS = "icalendar:status";
+    public static final String NN_ICAL_SUMMARY = "icalendar:summary";
+    public static final String NN_ICAL_TRANSP = "icalendar:transp";
     public static final String NN_ICAL_UID = "icalendar:uid";
+    public static final String NN_ICAL_URL = "icalendar:url";
 
     // node types
 
-    /** <code>nt:folder</code> */
     public static final String NT_FOLDER = "nt:folder";
 
-    /** <code>dav:collection</code> **/
     public static final String NT_DAV_COLLECTION = "dav:collection";
-    /** <code>dav:resource</code> **/
     public static final String NT_DAV_RESOURCE = "dav:resource";
 
-    /** <code>mix:ticketable</code> */
     public static final String NT_TICKETABLE = "mix:ticketable";
-    /** <code>ticket:ticket</code> */
     public static final String NT_TICKET = "ticket:ticket";
 
-    /** <code>caldav:collection</code> */
     public static final String NT_CALDAV_COLLECTION = "caldav:collection";
-    /** <code>caldav:resource</code> */
     public static final String NT_CALDAV_RESOURCE = "caldav:resource";
 
-    /** <code>icalendar:calendar</code> */
     public static final String NT_ICAL_CALENDAR = "icalendar:calendar";
-    /** <code>icalendar:event</code> */
     public static final String NT_ICAL_EVENT = "icalendar:event";
-    /** <code>icalendar:timezone</code> */
     public static final String NT_ICAL_TIMEZONE = "icalendar:timezone";
-    /** <code>icalendar:prodid</code> */
     public static final String NT_ICAL_PRODID = "icalendar:prodid";
-    /** <code>icalendar:version</code> */
     public static final String NT_ICAL_VERSION = "icalendar:version";
-    /** <code>icalendar:calscale</code> */
     public static final String NT_ICAL_CALSCALE = "icalendar:calscale";
-    /** <code>icalendar:method</code> */
     public static final String NT_ICAL_METHOD = "icalendar:method";
 
     // node properties
 
-    /** <code>ticket:id</code> */
     public static final String NP_ID = "ticket:id";
-    /** <code>ticket:owner</code> */
     public static final String NP_OWNER = "ticket:owner";
-    /** <code>ticket:timeout</code> */
     public static final String NP_TIMEOUT = "ticket:timeout";
-    /** <code>ticket:privileges</code> */
     public static final String NP_PRIVILEGES = "ticket:privileges";
-    /** <code>ticket:created</code> */
     public static final String NP_CREATED = "ticket:created";
 
-    /** <code>icalendar:value</code> */
-    public static final String NP_ICAL_VALUE = "icalendar:value";
-    /** <code>icalendar:text</code> */
+    public static final String NP_ICAL_ALTREP = "icalendar:altrep";
+    public static final String NP_ICAL_BINARY = "icalendar:binary";
+    public static final String NP_ICAL_BYDAY = "icalendar:byday";
+    public static final String NP_ICAL_BYHOUR = "icalendar:byhour";
+    public static final String NP_ICAL_BYMINUTE = "icalendar:byminute";
+    public static final String NP_ICAL_BYMONTH = "icalendar:bymonth";
+    public static final String NP_ICAL_BYMONTHDAY = "icalendar:bymonthday";
+    public static final String NP_ICAL_BYSECOND = "icalendar:bysecond";
+    public static final String NP_ICAL_BYSETPOS = "icalendar:bysetpos";
+    public static final String NP_ICAL_BYWEEKNO = "icalendar:byweekno";
+    public static final String NP_ICAL_BYYEARDAY = "icalendar:byyearday";
+    public static final String NP_ICAL_CALADDRESS = "icalendar:caladdress";
+    public static final String NP_ICAL_CATEGORY = "icalendar:category";
+    public static final String NP_ICAL_CN = "icalendar:cn";
+    public static final String NP_ICAL_COUNT = "icalendar:count";
+    public static final String NP_ICAL_CUTYPE = "icalendar:cutype";
+    public static final String NP_ICAL_DELFROM = "icalendar:delfrom";
+    public static final String NP_ICAL_DELTO = "icalendar:delto";
+    public static final String NP_ICAL_DIR = "icalendar:dir";
+    public static final String NP_ICAL_DATETIME = "icalendar:datetime";
+    public static final String NP_ICAL_DESCRIPTION = "icalendar:description";
+    public static final String NP_ICAL_END = "icalendar:end";
+    public static final String NP_ICAL_EXDATA = "icalendar:exdata";
+    public static final String NP_ICAL_FMTTYPE = "icalendar:fmttype";
+    public static final String NP_ICAL_FREQ = "icalendar:freq";
+    public static final String NP_ICAL_INTERVAL = "icalendar:interval";
+    public static final String NP_ICAL_LANGUAGE = "icalendar:language";
+    public static final String NP_ICAL_LATITUDE = "icalendar:latitude";
+    public static final String NP_ICAL_LONGITUDE = "icalendar:longitude";
+    public static final String NP_ICAL_MAXVERSION = "icalendar:maxversion";
+    public static final String NP_ICAL_MEMBER = "icalendar:member";
+    public static final String NP_ICAL_PARTSTAT = "icalendar:partstat";
+    public static final String NP_ICAL_RELTYPE = "icalendar:reltype";
+    public static final String NP_ICAL_REQUESTSTATUS =
+        "icalendar:requeststatus";
+    public static final String NP_ICAL_ROLE = "icalendar:role";
+    public static final String NP_ICAL_RSVP = "icalendar:rsvp";
+    public static final String NP_ICAL_SENTBY = "icalendar:sentby";
+    public static final String NP_ICAL_START = "icalendar:start";
+    public static final String NP_ICAL_STATCODE = "icalendar:statcode";
     public static final String NP_ICAL_TEXT = "icalendar:text";
-    /** <code>icalendar:maxVersion</code> */
-    public static final String NP_ICAL_MAX_VERSION = "icalendar:maxVersion";
+    public static final String NP_ICAL_UNTIL = "icalendar:until";
+    public static final String NP_ICAL_URI = "icalendar:uri";
+    public static final String NP_ICAL_UTC = "icalendar:utc";
+    public static final String NP_ICAL_VALUE = "icalendar:value";
+    public static final String NP_ICAL_WKST = "icalendar:wkst";
 }

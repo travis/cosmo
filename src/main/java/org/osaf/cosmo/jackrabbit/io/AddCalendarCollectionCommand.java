@@ -57,7 +57,7 @@ public class AddCalendarCollectionCommand extends AddNodeCommand {
         
         Node versionNode =
             calendarNode.addNode(CosmoJcrConstants.NN_ICAL_VERSION);
-        versionNode.setProperty(CosmoJcrConstants.NP_ICAL_MAX_VERSION,
+        versionNode.setProperty(CosmoJcrConstants.NP_ICAL_MAXVERSION,
                                 CosmoConstants.ICALENDAR_VERSION);
 
         // CALSCALE: we only support Gregorian, so as per RFC 2445

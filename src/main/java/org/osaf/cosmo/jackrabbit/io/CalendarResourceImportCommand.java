@@ -102,8 +102,7 @@ public class CalendarResourceImportCommand extends AbstractCommand {
                 continue;
             }
             if (component instanceof VTimeZone) {
-                importTimeZone(context, (VTimeZone) component);
-                continue;
+                // XXX
             }
             // probably should return a BAD REQUEST error here
             throw new IllegalStateException("calendar resource contains unhandleable resource of type " + component.getClass());
@@ -154,12 +153,5 @@ public class CalendarResourceImportCommand extends AbstractCommand {
     protected void importEvent(ImportContext context, VEvent event)
         throws Exception {
         JCRUtils.setEventNode(event, context.getNode());
-    }
-
-    /**
-     */
-    protected void importTimeZone(ImportContext context, VTimeZone timezone)
-        throws Exception {
-        JCRUtils.setTimeZoneNode(timezone, context.getNode());
     }
 }

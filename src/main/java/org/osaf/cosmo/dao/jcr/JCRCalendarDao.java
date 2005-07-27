@@ -39,28 +39,29 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
     private static final Log log = LogFactory.getLog(JCRCalendarDao.class);
 
     /**
-     * Creates a calendar collection within which calendars may be
-     * created.
+     * Creates a calendar in the repository.
      *
      * @param path the repository path of the parent node of the new
      * collection
      * @param name the name of the new collection
      */
-    public void createCalendarCollection(final String path,
-                                         final String name) {
+    public void createCalendar(final String path,
+                               final String name) {
         getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
                     // find parent node
                     Node parent = JCRUtils.findNode(session, path);
 
-                    // add calendar collection node
+                    // add calendar node
                     if (log.isDebugEnabled()) {
-                        log.debug("adding calendar collection node " + name +
-                                  " below " + parent.getPath());
+                        log.debug("adding calendar node " + name + " below " +
+                                  parent.getPath());
                     }
+                    // XXX: should just be NT_CALENDAR or something
                     Node cc = parent.
                         addNode(name, CosmoJcrConstants.NT_CALDAV_COLLECTION);
+                    cc.addMixin(CosmoJcrConstants.NT_TICKETABLE);
 
                     // add subnodes representing calendar properties
                     // to the autocreated calendar node
@@ -100,24 +101,24 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
     }
 
     /**
-     * Returns true if a calendar collection exists at the given path,
+     * Returns true if a calendar exists at the given path,
      * false otherwise
      *
      * @param path the repository path to test for existence
      */
-    public boolean existsCalendarCollection(final String path) {
+    public boolean existsCalendar(final String path) {
         return ((Boolean) getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
                     try {
                         if (log.isDebugEnabled()) {
-                            log.debug("checking existence of " +
-                                      "calendar collection at " + path);
+                            log.debug("checking existence of calendar at " +
+                                      path);
                         }
                         Node cc = JCRUtils.findNode(session, path);
                         if (! cc.isNodeType(CosmoJcrConstants.
                                             NT_CALDAV_COLLECTION)) {
-                            throw new InvalidDataAccessResourceUsageException("node at path " + path + " is not a calendar collection");
+                            throw new InvalidDataAccessResourceUsageException("node at path " + path + " is not a calendar");
                         }
                         return Boolean.TRUE;
                     } catch (PathNotFoundException e) {
@@ -128,18 +129,17 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
     }
 
     /**
-     * Removes the calendar collection at the given path and its
-     * entire subtree.
+     * Removes the calendar at the given path.
      *
-     * @param path the repository path of the calendar collection to
+     * @param path the repository path of the calendar to
      * remove
      */
-    public void deleteCalendarCollection(final String path) {
+    public void deleteCalendar(final String path) {
         getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
                     if (log.isDebugEnabled()) {
-                        log.debug("deleting calendar collection at " + path);
+                        log.debug("deleting calendar at " + path);
                     }
                     JCRUtils.findNode(session, path).remove();
                     session.save();

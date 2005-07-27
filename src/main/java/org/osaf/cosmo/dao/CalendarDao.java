@@ -17,38 +17,32 @@ package org.osaf.cosmo.dao;
 
 /**
  * Dao interface for calendar related activities.
- *
- * A calendar collection is a container for calendars. A calendar
- * collection may contain any number of calendars but may not contain
- * other calendar collections.
  */
 public interface CalendarDao extends DAO {
 
     /**
-     * Creates a calendar collection within which calendars may be
-     * created.
+     * Creates a calendar underneath the item at the given path.
      *
-     * @param path the repository path of the parent node of the new
+     * @param path the repository path of the parent of the new
      * collection
      * @param name the name of the new collection
      */
-    public void createCalendarCollection(String path, String name);
+    public void createCalendar(String path, String name);
 
     /**
-     * Returns true if a calendar collection exists at the given path,
+     * Returns true if a calendar exists at the given path,
      * false otherwise
      *
      * @param path the repository path to test for existence
      */
-    public boolean existsCalendarCollection(String path);
+    public boolean existsCalendar(String path);
 
     /**
-     * Removes the calendar collection at the given path and its
+     * Removes the calendar at the given path and its
      * entire subtree.
      *
-     * @param path the repository path of the calendar collection to
-     * remove
+     * @param path the repository path of the calendar to be deleted
      */
-    public void deleteCalendarCollection(String path);
+    public void deleteCalendar(String path);
 
 }

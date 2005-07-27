@@ -50,19 +50,19 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         dao = null;
     }
 
-    public void testCDCalendarCollection() throws Exception {
+    public void testCDCalendar() throws Exception {
         User user = TestHelper.makeDummyUser();
 
         if (log.isDebugEnabled()) {
-            log.debug("creating calendar collection /" + user.getUsername());
+            log.debug("creating calendar at /" + user.getUsername());
         }
-        dao.createCalendarCollection("/", user.getUsername());
-        assertTrue(dao.existsCalendarCollection("/" + user.getUsername()));
+        dao.createCalendar("/", user.getUsername());
+        assertTrue(dao.existsCalendar("/" + user.getUsername()));
 
         if (log.isDebugEnabled()) {
-            log.debug("deleting calendar collection /" + user.getUsername());
+            log.debug("deleting calendar at /" + user.getUsername());
         }
-        dao.deleteCalendarCollection("/" + user.getUsername());
-        assertTrue(! dao.existsCalendarCollection("/" + user.getUsername()));
+        dao.deleteCalendar("/" + user.getUsername());
+        assertTrue(! dao.existsCalendar("/" + user.getUsername()));
     }
 }

@@ -26,11 +26,9 @@ import javax.jcr.RepositoryException;
 
 import org.apache.commons.id.StringIdentifierGenerator;
 
-import org.apache.jackrabbit.server.io.ImportContext;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
-import org.apache.jackrabbit.webdav.DavResourceIterator;
-import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
+import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.jcr.JcrDavException;
@@ -38,14 +36,19 @@ import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
 
 import org.apache.log4j.Logger;
 
-import org.osaf.cosmo.jackrabbit.io.ImportCalendarCollectionChain;
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.jcr.JCRUtils;
+import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * A subclass of
@@ -53,12 +56,14 @@ import org.osaf.cosmo.model.User;
  * that provides Cosmo-specific WebDAV behaviors.
  */
 public class CosmoDavResourceImpl extends DavResourceImpl 
-    implements CosmoDavResource {
+    implements CosmoDavResource , ApplicationContextAware {
     private static final Logger log = Logger.getLogger(CosmoDavResource.class);
+    private static final String BEAN_CALENDAR_DAO = "calendarDao";
 
     private boolean isCollection;
     private StringIdentifierGenerator ticketIdGenerator;
     private String baseUrl;
+    private ApplicationContext applicationContext;
 
     /**
      */
@@ -109,6 +114,15 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         return CosmoDavResource.METHODS;
     }
 
+    /**
+     */
+    public DavResource getCollection() {
+        CosmoDavResourceImpl c = (CosmoDavResourceImpl) super.getCollection();
+        c.setBaseUrl(baseUrl);
+        c.setApplicationContext(applicationContext);
+        return c;
+    }
+
     // CosmoDavResource methods
 
     /**
@@ -125,9 +139,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     /**
-     * Adds the given resoure as an internal member to this resource.
+     * Adds the given resource as an internal member to this resource.
      */
-    public void addCalendarCollection(CosmoDavResource resource)
+    public void addCalendarCollection(CosmoDavResource child)
         throws DavException {
         if (!exists()) {
             throw new DavException(CosmoDavResponse.SC_CONFLICT);
@@ -136,19 +150,20 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             throw new DavException(CosmoDavResponse.SC_LOCKED);
         }
         try {
-            Node node = getNode();
-            ImportContext ctx = new ImportContext(node);
-            ctx.setSystemId(resource.getDisplayName());
-            ImportCalendarCollectionChain.getChain().execute(ctx);
-            node.save();
-        } catch (ItemExistsException e) {
-            log.error("Error while executing import chain", e);
+            Node parent = getNode();
+            CalendarDao dao = (CalendarDao) applicationContext.
+                getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
+            dao.createCalendar(parent.getPath(), child.getDisplayName());
+        } catch (DataIntegrityViolationException e) {
+            log.error("resource " + child.getResourcePath() +
+                      " already exists", e);
             throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
-        } catch (RepositoryException e) {
-            log.error("Error while executing import chain", e);
-            throw new JcrDavException(e);
         } catch (Exception e) {
-            log.error("Error while executing import chain", e);
+            log.error("can't add calendar collection", e);
+            if (e instanceof DataAccessException &&
+                e.getCause() instanceof RepositoryException) {
+                throw new JcrDavException((RepositoryException) e.getCause());
+            }
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }
@@ -256,6 +271,14 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             createResourceLocator(baseUrl, "/" + principal);
     }
 
+    // ApplicationContextAware methods
+
+    /**
+     */
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
     // our methods
 
     /**
@@ -296,5 +319,11 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
+    }
+
+    /**
+     */
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
     }
 }

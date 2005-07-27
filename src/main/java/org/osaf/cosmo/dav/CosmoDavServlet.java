@@ -121,6 +121,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
         CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
         cosmoResource.setBaseUrl(cosmoRequest.getBaseUrl());
+        cosmoResource.setApplicationContext(wac);
 
         method = CosmoDavMethods.getMethodCode(request.getMethod());
         switch (method) {
@@ -208,7 +209,8 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         // that?
         
         if (log.isDebugEnabled()) {
-            log.debug("making calendar at " + resource.getResourcePath());
+            log.debug("adding calendar collection at " +
+                      resource.getResourcePath());
         }
         parentResource.addCalendarCollection(resource);
         response.setStatus(DavServletResponse.SC_CREATED);

@@ -27,15 +27,6 @@
              nodeType="mix:ticketable"/>
   </chain>
 
-  <!-- import caldav calendar collection -->
-  <chain name="import-calendar-collection">
-    <command id="add-calendar-collection"
-             className="org.osaf.cosmo.jackrabbit.io.AddCalendarCollectionCommand"/>
-    <command id="make-ticketable"
-             className="org.apache.jackrabbit.server.io.AddMixinCommand"
-             nodeType="mix:ticketable"/>
-  </chain>
-
   <!-- import webdav resource -->
   <chain name="import-resource">
     <command id="set-contenttype"

@@ -43,6 +43,13 @@
     </property>
   </bean>
 
+  <bean id="calendarDao"
+        class="org.osaf.cosmo.dao.jcr.JCRCalendarDao">
+    <property name="template">
+      <ref bean="homedirTemplate"/>
+    </property>
+  </bean>
+
   <!-- Managers -->
 
   <bean id="provisioningManagerTarget"

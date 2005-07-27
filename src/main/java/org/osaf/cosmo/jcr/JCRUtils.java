@@ -32,11 +32,6 @@ import javax.jcr.Session;
 import javax.jcr.Value;
 import javax.jcr.ValueFormatException;
 
-import org.osaf.cosmo.icalendar.ICalendarUtils;
-import org.osaf.cosmo.model.Ticket;
-
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
-
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Property;
@@ -44,6 +39,11 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.model.parameter.*;
+
+import org.osaf.cosmo.icalendar.ICalendarUtils;
+import org.osaf.cosmo.model.Ticket;
+
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * Utilities for working with JCR in Cosmo.
@@ -138,21 +138,31 @@ public class JCRUtils {
     }
 
     /**
-     * Finds the deepest existing node on the given path.
+     * Return the node at the given path.
+     */
+    public static Node findNode(Session session, String path)
+        throws RepositoryException {
+        Item item = session.getItem(path);
+        if (! item.isNode()) {
+            throw new InvalidDataAccessResourceUsageException("item at path " + path + " is not a node");
+        }
+        return (Node) item;
+    }
+
+    /**
+     * Find the deepest existing node on the given path.
      */
     public static Node findDeepestExistingNode(Session session, String path)
         throws RepositoryException {
         // try for the deepest node first
         try {
-            Item item = session.getItem(path);
-            if (! item.isNode()) {
-                throw new InvalidDataAccessResourceUsageException("item at path " + path + " is not a node");
-            }
-            return (Node) item;
+            return findNode(session, path);
         } catch (PathNotFoundException e) {
-            // will need to step down through the path one by one
+            // not there, so we'll look for an ancestor
         }
 
+        // walk the path to find the deepest existing node from the
+        // top down
         Node node = session.getRootNode();
         if (path.equals("/")) {
             return node;

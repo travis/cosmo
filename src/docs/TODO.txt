@@ -52,10 +52,6 @@ CalDAV:
    resource (4.6.2)
 
 Tickets:
- * consider re-implementing CosmoDavResourceImpl's ticket persistence
-   methods using TicketDao; this means we'd have to look up the node
-   again (DavResourceImpl has already done so), but we can assume that
-   the repository is caching the node internally anyway
  * consider splitting security config into completely separate ones
    for ui and dav
  * ticket method tests

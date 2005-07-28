@@ -17,8 +17,6 @@ package org.osaf.cosmo.dav.impl;
 
 import javax.jcr.RepositoryException;
 
-import org.apache.commons.id.StringIdentifierGenerator;
-
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
@@ -41,7 +39,6 @@ public class CosmoDavResourceFactoryImpl implements CosmoDavResourceFactory {
 
     private CosmoSecurityManager securityManager;
     private LockManager lockManager;
-    private StringIdentifierGenerator ticketIdGenerator;
 
     // DavResourceFactory methods
 
@@ -63,7 +60,6 @@ public class CosmoDavResourceFactoryImpl implements CosmoDavResourceFactory {
             CosmoDavResourceImpl resource =
                 new CosmoDavResourceImpl(locator, this, session);
             resource.addLockManager(lockManager);
-            resource.setTicketIdGenerator(ticketIdGenerator);
             return resource;
         } catch (RepositoryException e) {
             throw new JcrDavException(e);
@@ -96,11 +92,5 @@ public class CosmoDavResourceFactoryImpl implements CosmoDavResourceFactory {
      */
     public void setSecurityManager(CosmoSecurityManager securityManager) {
         this.securityManager = securityManager;
-    }
-
-    /**
-     */
-    public void setTicketIdGenerator(StringIdentifierGenerator generator) {
-        ticketIdGenerator = generator;
     }
 }

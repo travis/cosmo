@@ -19,9 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import javax.jcr.Item;
 import javax.jcr.Node;
@@ -30,7 +28,6 @@ import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Value;
-import javax.jcr.ValueFormatException;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Period;
@@ -41,7 +38,6 @@ import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.model.parameter.*;
 
 import org.osaf.cosmo.icalendar.ICalendarUtils;
-import org.osaf.cosmo.model.Ticket;
 
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
@@ -49,93 +45,6 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
  * Utilities for working with JCR in Cosmo.
  */
 public class JCRUtils {
-
-    /**
-     * Adds a child node to the given node with properties set from
-     * the given ticket.
-     *
-     * @param parentNode the node to which the ticket node will be
-     * added
-     * @param ticket the ticket from which the node's properties will
-     * be set
-     */
-    public static Node ticketToNode(Node parentNode, Ticket ticket)
-        throws RepositoryException {
-        Node ticketNode = parentNode.addNode(CosmoJcrConstants.NN_TICKET,
-                                             CosmoJcrConstants.NT_TICKET);
-        ticketNode.setProperty(CosmoJcrConstants.NP_ID, ticket.getId());
-        ticketNode.setProperty(CosmoJcrConstants.NP_OWNER, ticket.getOwner());
-        ticketNode.setProperty(CosmoJcrConstants.NP_TIMEOUT,
-                               ticket.getTimeout());
-        ticketNode.setProperty(CosmoJcrConstants.NP_PRIVILEGES,
-                               (String[]) ticket.getPrivileges().
-                               toArray(new String[0]));
-        ticketNode.setProperty(CosmoJcrConstants.NP_CREATED,
-                               Calendar.getInstance());
-        return ticketNode;
-    }
-
-    /**
-     * Creates and populates a ticket representing the given node.
-     */
-    public static Ticket nodeToTicket(Node node)
-        throws RepositoryException {
-        Ticket ticket = new Ticket();
-        ticket.setId(getStringValue(node, CosmoJcrConstants.NP_ID));
-        ticket.setOwner(getStringValue(node, CosmoJcrConstants.NP_OWNER));
-        ticket.setTimeout(getStringValue(node, CosmoJcrConstants.NP_TIMEOUT));
-        Value[] privileges = getValues(node, CosmoJcrConstants.NP_PRIVILEGES);
-        for (int i=0; i<privileges.length; i++) {
-            ticket.getPrivileges().add(privileges[i].getString());
-        }
-        ticket.setCreated(getDateValue(node, CosmoJcrConstants.NP_CREATED));
-        return ticket;
-    }
-
-    /**
-     * Returns the child ticket node for the given node with the given
-     * id.
-     */
-    public static Node findChildTicketNode(Node parentNode, String id)
-        throws RepositoryException {
-        for (NodeIterator i=parentNode.getNodes(CosmoJcrConstants.NN_TICKET);
-             i.hasNext();) {
-            Node childNode = i.nextNode();
-            if (getStringValue(childNode, CosmoJcrConstants.NP_ID).equals(id)) {
-                return childNode;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the child ticket node for the given node matching the
-     * given ticket.
-     */
-    public static Node findChildTicketNode(Node parentNode, Ticket ticket)
-        throws RepositoryException {
-        return findChildTicketNode(parentNode, ticket.getId());
-    }
-
-    /**
-     * Returns a <code>Set</code> of tickets representing the child
-     * ticket nodes of the given node owned by the given owner.
-     */
-    public static Set findTickets(Node node, String owner)
-        throws RepositoryException {
-        Set tickets = new HashSet();
-        for (NodeIterator i=node.getNodes(CosmoJcrConstants.NN_TICKET);
-             i.hasNext();) {
-            Node childNode = i.nextNode();
-            // child node must be owned by the named owner
-            if (! getStringValue(childNode, CosmoJcrConstants.NP_OWNER).
-                equals(owner)) {
-                continue;
-            }
-            tickets.add(nodeToTicket(childNode));
-        }
-        return tickets;
-    }
 
     /**
      * Return the node at the given path.
@@ -884,7 +793,9 @@ public class JCRUtils {
     public static void setDateValue(Node node, String property, Date value)
         throws RepositoryException {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(value);
+        if (value != null) {
+            calendar.setTime(value);
+        }
         node.setProperty(property, calendar);
     }
 

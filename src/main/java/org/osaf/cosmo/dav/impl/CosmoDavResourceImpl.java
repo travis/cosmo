@@ -24,8 +24,6 @@ import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 
-import org.apache.commons.id.StringIdentifierGenerator;
-
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -39,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.jcr.JCRUtils;
 import org.osaf.cosmo.dao.CalendarDao;
+import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
@@ -59,9 +58,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     implements CosmoDavResource , ApplicationContextAware {
     private static final Logger log = Logger.getLogger(CosmoDavResource.class);
     private static final String BEAN_CALENDAR_DAO = "calendarDao";
+    private static final String BEAN_TICKET_DAO = "ticketDao";
 
     private boolean isCollection;
-    private StringIdentifierGenerator ticketIdGenerator;
     private String baseUrl;
     private ApplicationContext applicationContext;
 
@@ -159,7 +158,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                       " already exists", e);
             throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
         } catch (Exception e) {
-            log.error("can't add calendar collection", e);
+            log.error("cannot add calendar collection", e);
             if (e instanceof DataAccessException &&
                 e.getCause() instanceof RepositoryException) {
                 throw new JcrDavException((RepositoryException) e.getCause());
@@ -175,20 +174,29 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public void saveTicket(Ticket ticket)
         throws DavException {
-        ticket.setId(ticketIdGenerator.nextStringIdentifier());
-        ticket.setOwner(getLoggedInUser().getUsername());
+        if (!exists()) {
+            throw new DavException(CosmoDavResponse.SC_CONFLICT);
+        }
+	if (isLocked(this)) {
+            throw new DavException(CosmoDavResponse.SC_LOCKED);
+        }
 
         try {
-            Node resourceNode = getNode();
-            if (! resourceNode.isNodeType(CosmoJcrConstants.NT_TICKETABLE)) {
+            Node resource = getNode();
+            if (! resource.isNodeType(CosmoJcrConstants.NT_TICKETABLE)) {
                 log.error("cannot save ticket for resource " +
                           getResourcePath() + ": resource is not ticketable");
                 throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
             }
-            JCRUtils.ticketToNode(resourceNode, ticket);
-            resourceNode.save();
-        } catch (RepositoryException e) {
-            log.error("cannot save ticket", e);
+
+            ticket.setOwner(getLoggedInUser().getUsername());
+
+            TicketDao dao = (TicketDao) applicationContext.
+                getBean(BEAN_TICKET_DAO, TicketDao.class);
+            dao.createTicket(resource.getPath(), ticket);
+        } catch (Exception e) {
+            log.error("cannot save ticket for resource " + getResourcePath(),
+                      e);
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }
@@ -200,17 +208,20 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public void removeTicket(Ticket ticket)
         throws DavException {
+        if (!exists()) {
+            throw new DavException(CosmoDavResponse.SC_CONFLICT);
+        }
+	if (isLocked(this)) {
+            throw new DavException(CosmoDavResponse.SC_LOCKED);
+        }
+
         try {
-            Node resourceNode = getNode();
-            Node ticketNode =
-                JCRUtils.findChildTicketNode(resourceNode, ticket);
-            if (ticketNode == null) {
-                return;
-            }
-            ticketNode.remove();
-            resourceNode.save();
-        } catch (RepositoryException e) {
-            log.error("cannot remove ticket " + ticket.getId(), e);
+            TicketDao dao = (TicketDao) applicationContext.
+                getBean(BEAN_TICKET_DAO, TicketDao.class);
+            dao.removeTicket(getNode().getPath(), ticket);
+        } catch (Exception e) {
+            log.error("cannot remove ticket " + ticket.getId() +
+                      " for resource " + getResourcePath(), e);
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }
@@ -222,14 +233,17 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public Ticket getTicket(String id)
         throws DavException {
+        if (!exists()) {
+            throw new DavException(CosmoDavResponse.SC_CONFLICT);
+        }
+
         try {
-            Node ticketNode = JCRUtils.findChildTicketNode(getNode(), id);
-            if (ticketNode == null) {
-                return null;
-            }
-            return JCRUtils.nodeToTicket(ticketNode);
-        } catch (RepositoryException e) {
-            log.error("cannot get ticket " + id, e);
+            TicketDao dao = (TicketDao) applicationContext.
+                getBean(BEAN_TICKET_DAO, TicketDao.class);
+            return dao.getTicket(getNode().getPath(), id);
+        } catch (Exception e) {
+            log.error("cannot get ticket " + id + " for resource " +
+                      getResourcePath(), e);
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }
@@ -244,10 +258,17 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public Set getTickets(String username)
         throws DavException {
+        if (!exists()) {
+            throw new DavException(CosmoDavResponse.SC_CONFLICT);
+        }
+
         try {
-            return JCRUtils.findTickets(getNode(), username);
-        } catch (RepositoryException e) {
-            log.error("cannot get tickets owned by " + username, e);
+            TicketDao dao = (TicketDao) applicationContext.
+                getBean(BEAN_TICKET_DAO, TicketDao.class);
+            return dao.getTickets(getNode().getPath(), username);
+        } catch (Exception e) {
+            log.error("cannot get tickets owned by " + username +
+                      " for resource " + getResourcePath(), e);
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }
@@ -303,13 +324,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             (CosmoDavResourceFactory) getFactory();
         return cosmoFactory.getSecurityManager().getSecurityContext().
             getUser();
-    }
-
-    /**
-     * Set the generator for ticket identifiers.
-     */
-    public void setTicketIdGenerator(StringIdentifierGenerator generator) {
-        ticketIdGenerator = generator;
     }
 
     /**

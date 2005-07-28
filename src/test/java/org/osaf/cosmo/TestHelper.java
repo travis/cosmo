@@ -16,8 +16,11 @@
 package org.osaf.cosmo;
 
 import java.security.Principal;
+import java.util.HashSet;
 
+import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.model.Role;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
@@ -40,6 +43,16 @@ public class TestHelper {
         role.setName("dummy" + serial);
 
         return role;
+    }
+
+    /**
+     */
+    public static Ticket makeDummyTicket() {
+        Ticket ticket = new Ticket();
+        ticket.setTimeout(CosmoDavConstants.VALUE_INFINITY);
+        ticket.setPrivileges(new HashSet());
+        ticket.getPrivileges().add(CosmoDavConstants.PRIVILEGE_READ);
+        return ticket;
     }
 
     /**

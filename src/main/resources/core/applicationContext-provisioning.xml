@@ -43,6 +43,19 @@
     </property>
   </bean>
 
+  <bean id="ticketIdGenerator"
+        class="org.apache.commons.id.random.SessionIdGenerator"/>
+
+  <bean id="ticketDao"
+        class="org.osaf.cosmo.dao.jcr.JCRTicketDao">
+    <property name="template">
+      <ref bean="homedirTemplate"/>
+    </property>
+    <property name="idGenerator">
+      <ref local="ticketIdGenerator"/>
+    </property>
+  </bean>
+
   <bean id="calendarDao"
         class="org.osaf.cosmo.dao.jcr.JCRCalendarDao">
     <property name="template">

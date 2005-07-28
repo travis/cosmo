@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.dao.jcr;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
@@ -31,6 +34,8 @@ import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.jcr.JCRUtils;
 
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
+
+import net.fortuna.ical4j.model.component.VEvent;
 
 /**
  * Default implementation of {@link CalendarDao}.
@@ -55,10 +60,9 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
                     // add calendar node
                     if (log.isDebugEnabled()) {
-                        log.debug("adding calendar node " + name + " below " +
+                        log.debug("creating calendar node " + name + " below " +
                                   parent.getPath());
                     }
-                    // XXX: should just be NT_CALENDAR or something
                     Node cc = parent.
                         addNode(name, CosmoJcrConstants.NT_CALDAV_COLLECTION);
                     cc.addMixin(CosmoJcrConstants.NT_TICKETABLE);
@@ -143,6 +147,88 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
                     }
                     JCRUtils.findNode(session, path).remove();
                     session.save();
+                    return null;
+                }
+            });
+    }
+
+
+    /**
+     * Creates an event resource underneath the item at the given
+     * path.
+     *
+     * @param path the repository path of the parent of the new
+     * event resource
+     * @param name the name of the new event resource
+     * @param event the <code>VEvent</code> representing the new event
+     */
+    public void createEventResource(String path,
+                                    String name,
+                                    VEvent event) {
+        createEventResource(path, name, event, null);
+    }
+
+    /**
+     * Creates an event resource underneath the item at the given
+     * path containing a master event defining a recurrence rule and a
+     * set of events that are exceptions to the recurrence.
+     *
+     * @param path the repository path of the parent of the new
+     * event resource
+     * @param name the name of the new event resource
+     * @param masterEvent the <code>VEvent</code> representing
+     * the master event
+     * @param exceptionEvents the <code>Set</code> of
+     * <code>VEvent</code>s representing the exception events
+     */
+    public void createEventResource(final String path,
+                                    final String name,
+                                    final VEvent masterEvent,
+                                    final Set exceptionEvents) {
+        getTemplate().execute(new JCRCallback() {
+                public Object doInJCR(Session session)
+                    throws RepositoryException {
+                    // find parent node
+                    Node parent = JCRUtils.findNode(session, path);
+
+                    // add resource node
+                    if (log.isDebugEnabled()) {
+                        log.debug("creating calendar resource node " + name +
+                                  " below " + parent.getPath());
+                    }
+                    Node resource = parent.
+                        addNode(name, CosmoJcrConstants.NT_CALDAV_RESOURCE);
+                    JCRUtils.setDateValue(resource,
+                                          CosmoJcrConstants.NP_JCR_LASTMODIFIED,
+                                          null);
+
+                    // XXX: refactor JCRUtils.setEventNode immediately
+                    // XXX: check for uids already in use
+                    // XXX: incorporate alarms
+                    // XXX: what about timezones? does ical4j handle
+                    // them transparently?
+
+                    // add master event node
+                    if (log.isDebugEnabled()) {
+                        log.debug("creating master event node below " +
+                                  resource.getPath());
+                    }
+                    JCRUtils.setEventNode(masterEvent, resource);
+
+                    // add exception event nodes
+                    if (exceptionEvents != null) {
+                        for (Iterator i=exceptionEvents.iterator();
+                             i.hasNext();) {
+                            VEvent exceptionEvent = (VEvent) i.next();
+                            if (log.isDebugEnabled()) {
+                                log.debug("creating exception event node" +
+                                          " below " + resource.getPath());
+                            }
+                            JCRUtils.setEventNode(exceptionEvent, resource);
+                        }
+                    }
+
+                    parent.save();
                     return null;
                 }
             });

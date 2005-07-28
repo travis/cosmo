@@ -15,6 +15,10 @@
  */
 package org.osaf.cosmo.dao;
 
+import java.util.Set;
+
+import net.fortuna.ical4j.model.component.VEvent;
+
 /**
  * Dao interface for calendar related activities.
  */
@@ -45,4 +49,32 @@ public interface CalendarDao extends DAO {
      */
     public void deleteCalendar(String path);
 
+    /**
+     * Creates an event resource underneath the item at the given
+     * path.
+     *
+     * @param path the repository path of the parent of the new
+     * event resource
+     * @param name the name of the new event resource
+     * @param event the <code>VEvent</code> representing the new event
+     */
+    public void createEventResource(String path, String name,
+                                    VEvent event);
+
+    /**
+     * Creates an event resource underneath the item at the given
+     * path containing a master event defining a recurrence rule and a
+     * set of events that are exceptions to the recurrence.
+     *
+     * @param path the repository path of the parent of the new
+     * event resource
+     * @param name the name of the new event resource
+     * @param masterEvent the <code>VEvent</code> representing
+     * the master event
+     * @param exceptionEvents the <code>Set</code> of
+     * <code>VEvent</code>s representing the exception events
+     */
+    public void createEventResource(String path, String name,
+                                    VEvent masterEvent,
+                                    Set exceptionEvents);
 }

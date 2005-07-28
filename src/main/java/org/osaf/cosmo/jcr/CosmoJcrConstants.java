@@ -92,6 +92,8 @@ public class CosmoJcrConstants {
 
     // node properties
 
+    public static final String NP_JCR_LASTMODIFIED = "jcr:lastModified";
+
     public static final String NP_ID = "ticket:id";
     public static final String NP_OWNER = "ticket:owner";
     public static final String NP_TIMEOUT = "ticket:timeout";

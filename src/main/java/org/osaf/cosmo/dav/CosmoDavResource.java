@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dav;
 
+import java.io.InputStream;
 import java.util.Set;
 
 import org.apache.jackrabbit.webdav.DavException;
@@ -56,6 +57,20 @@ public interface CosmoDavResource extends DavResource {
      * @param resource {@link CosmoDavResource} to be added
      */
     public void addCalendarCollection(CosmoDavResource resource)
+        throws DavException;
+
+    /**
+     * Returns true if this resource represents a (non-collection)
+     * calendar resource.
+     */
+    public boolean isCalendarResource();
+
+    /**
+     * Adds the given calendar resource as an internal member to this
+     * resource.
+     */
+    public void addCalendarResource(CosmoDavResource resource,
+                                    InputStream in)
         throws DavException;
 
     /**

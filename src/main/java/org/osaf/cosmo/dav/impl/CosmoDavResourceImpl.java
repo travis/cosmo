@@ -15,8 +15,11 @@
  */
 package org.osaf.cosmo.dav.impl;
 
-import java. io.IOException;
+import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.jcr.ItemExistsException;
@@ -24,6 +27,7 @@ import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 
+import org.apache.jackrabbit.server.io.MimeResolver;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -38,9 +42,11 @@ import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.jcr.JCRUtils;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.TicketDao;
+import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
+import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
@@ -48,6 +54,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.component.VEvent;
 
 /**
  * A subclass of
@@ -63,6 +74,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     private boolean isCollection;
     private String baseUrl;
     private ApplicationContext applicationContext;
+    private MimeResolver mimeResolver;
 
     /**
      */
@@ -71,6 +83,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                                 DavSession session)
         throws RepositoryException {
         super(locator, factory, session);
+        mimeResolver = new MimeResolver();
     }
 
     // DavResource methods
@@ -122,6 +135,21 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         return c;
     }
 
+    /**
+     */
+    public void addMember(DavResource member,
+                          InputStream in)
+        throws DavException {
+        CosmoDavResource cdr = (CosmoDavResource) member;
+        if (cdr.isCalendarResource()) {
+            addCalendarResource(cdr, in);
+        }
+        else {
+            super.addMember(member, in);
+        }
+        return;
+    }
+
     // CosmoDavResource methods
 
     /**
@@ -169,6 +197,92 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     /**
+     * Returns true if this resource represents a (non-collection)
+     * calendar resource.
+     */
+    public boolean isCalendarResource() {
+        // XXX figure out a way to examine the request's Content-Type
+        // header
+        return (! isCalendarCollection() &&
+                mimeResolver.getMimeType(getDisplayName()).
+                equals(CosmoDavConstants.CT_ICALENDAR));
+    }
+
+    /**
+     * Adds the given calendar resource as an internal member to this
+     * resource.
+     */
+    public void addCalendarResource(CosmoDavResource resource,
+                                    InputStream in)
+        throws DavException {
+        if (!exists()) {
+            throw new DavException(CosmoDavResponse.SC_CONFLICT);
+        }
+	if (isLocked(this)) {
+            throw new DavException(CosmoDavResponse.SC_LOCKED);
+        }
+        try {
+            Node parent = getNode();
+            if (! isCalendarCollection()) {
+                throw new DavException(CosmoDavResponse.SC_FORBIDDEN,
+                                       "Parent collection is not a calendar collection");
+            }
+
+            // parse the calendar resource
+            CalendarBuilder builder = new CalendarBuilder();
+            Calendar calendar = builder.build(in);
+
+            // extract the events (one master event, possibly one or
+            // more exception events as well)
+            VEvent masterEvent = null;
+            HashSet exceptionEvents = new HashSet();
+            for (Iterator i=calendar.getComponents().iterator(); i.hasNext();) {
+                Component component = (Component) i.next();
+                if (component instanceof VEvent) {
+                    VEvent event = (VEvent) component;
+                    if (ICalendarUtils.getRRule(event) != null) {
+                        masterEvent = event;
+                    }
+                    else {
+                        exceptionEvents.add(event);
+                    }
+                }
+                else {
+                    // at the moment we only support events
+                    if (log.isDebugEnabled()) {
+                        log.debug("found unhandleable calendar component: " +
+                                  component);
+                    }
+                }
+            }
+            if (masterEvent == null) {
+                throw new DavException(CosmoDavResponse.SC_CONFLICT,
+                                       "No events found in calendar resource");
+            }
+
+            CalendarDao dao = (CalendarDao) applicationContext.
+                getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
+            // XXX: if the resource already exists, then it needs to
+            // be updated instead - or will the dao api use one method
+            // for both?
+            dao.createEventResource(parent.getPath(), resource.getDisplayName(),
+                                    masterEvent, exceptionEvents);
+        } catch (DataIntegrityViolationException e) {
+            log.error("resource " + resource.getResourcePath() +
+                      " already exists", e);
+            throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
+        } catch (Exception e) {
+            log.error("cannot add calendar resource", e);
+            if (e instanceof DataAccessException &&
+                e.getCause() instanceof RepositoryException) {
+                throw new JcrDavException((RepositoryException) e.getCause());
+            }
+            throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
+                                   e.getMessage());
+        }
+    }
+
+    /**
      * Associates a ticket with this resource and saves it into
      * persistent storage.
      */
@@ -184,9 +298,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         try {
             Node resource = getNode();
             if (! resource.isNodeType(CosmoJcrConstants.NT_TICKETABLE)) {
-                log.error("cannot save ticket for resource " +
-                          getResourcePath() + ": resource is not ticketable");
-                throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
+                throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED,
+                                       "Resource is not ticketable");
             }
 
             ticket.setOwner(getLoggedInUser().getUsername());

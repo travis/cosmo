@@ -265,8 +265,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             // XXX: if the resource already exists, then it needs to
             // be updated instead - or will the dao api use one method
             // for both?
-            dao.createEventResource(parent.getPath(), resource.getDisplayName(),
-                                    masterEvent, exceptionEvents);
+            dao.createEvent(parent.getPath(), resource.getDisplayName(),
+                            masterEvent, exceptionEvents);
         } catch (DataIntegrityViolationException e) {
             log.error("resource " + resource.getResourcePath() +
                       " already exists", e);

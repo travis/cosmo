@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.dao;
 
+import net.fortuna.ical4j.model.component.VEvent;
+
 import org.osaf.cosmo.BaseCoreTestCase;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.dao.CalendarDao;
@@ -52,17 +54,36 @@ public class CalendarDaoTest extends BaseCoreTestCase {
 
     public void testCDCalendar() throws Exception {
         User user = TestHelper.makeDummyUser();
+        String path = "/";
 
         if (log.isDebugEnabled()) {
-            log.debug("creating calendar at /" + user.getUsername());
+            log.debug("creating calendar at " + path + user.getUsername());
         }
-        dao.createCalendar("/", user.getUsername());
-        assertTrue(dao.existsCalendar("/" + user.getUsername()));
+        dao.createCalendar(path, user.getUsername());
+        assertTrue(dao.existsCalendar(path + user.getUsername()));
 
         if (log.isDebugEnabled()) {
-            log.debug("deleting calendar at /" + user.getUsername());
+            log.debug("deleting calendar at " + path + user.getUsername());
         }
-        dao.deleteCalendar("/" + user.getUsername());
-        assertTrue(! dao.existsCalendar("/" + user.getUsername()));
+        dao.deleteCalendar(path + user.getUsername());
+        assertTrue(! dao.existsCalendar(path + user.getUsername()));
+    }
+
+    public void testCDEvent() throws Exception {
+        User user = TestHelper.makeDummyUser();
+        String path = "/";
+
+        // create an event
+        String summary = "event1";
+        String name = summary + ".ics";
+        VEvent event1 = TestHelper.makeDummyEvent(summary);
+        if (log.isDebugEnabled()) {
+            log.debug("creating event at " + path);
+        }
+        dao.createEvent(path, name, event1);
+
+        // XXX: get the event
+
+        // XXX: delete the event
     }
 }

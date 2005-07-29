@@ -58,8 +58,7 @@ public interface CalendarDao extends DAO {
      * @param name the name of the new event resource
      * @param event the <code>VEvent</code> representing the new event
      */
-    public void createEventResource(String path, String name,
-                                    VEvent event);
+    public void createEvent(String path, String name, VEvent event);
 
     /**
      * Creates an event resource underneath the item at the given
@@ -74,7 +73,6 @@ public interface CalendarDao extends DAO {
      * @param exceptionEvents the <code>Set</code> of
      * <code>VEvent</code>s representing the exception events
      */
-    public void createEventResource(String path, String name,
-                                    VEvent masterEvent,
-                                    Set exceptionEvents);
+    public void createEvent(String path, String name, VEvent masterEvent,
+                            Set exceptionEvents);
 }

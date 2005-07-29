@@ -522,7 +522,7 @@ PropertyDef
   RequiredType STRING
   DefaultValues null
   AutoCreate false
-  Mandatory true
+  Mandatory false
   OnParentVersion COPY
   Protected false
   Multiple false

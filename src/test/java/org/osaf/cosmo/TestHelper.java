@@ -18,6 +18,12 @@ package org.osaf.cosmo;
 import java.security.Principal;
 import java.util.HashSet;
 
+import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.parameter.TzId;
+import net.fortuna.ical4j.model.parameter.Value;
+
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.Ticket;
@@ -32,6 +38,27 @@ public class TestHelper {
     static int useq = 0;
 
     private TestHelper() {
+    }
+
+    public static VEvent makeDummyEvent(String summary) {
+        // tomorrow
+        java.util.Calendar start = java.util.Calendar.getInstance();
+        start.add(java.util.Calendar.DAY_OF_MONTH, 1);
+        start.set(java.util.Calendar.HOUR_OF_DAY, 9);
+        start.set(java.util.Calendar.MINUTE, 30);
+
+        int duration = 1000 * 60 * 60;
+ 
+        VEvent event = new VEvent(start.getTime(), duration, summary);
+ 
+        // add timezone information..
+        VTimeZone tz = VTimeZone.getDefault();
+        TzId tzParam =
+            new TzId(tz.getProperties().getProperty(Property.TZID).getValue());
+        event.getProperties().getProperty(Property.DTSTART).
+            getParameters().add(tzParam);
+
+        return event;
     }
 
     /**

@@ -81,6 +81,8 @@ public class CosmoJcrConstants {
 
     public static final String NT_CALDAV_COLLECTION = "caldav:collection";
     public static final String NT_CALDAV_RESOURCE = "caldav:resource";
+    public static final String NT_CALDAV_EVENT_RESOURCE =
+        "caldav:eventresource";
 
     public static final String NT_ICAL_CALENDAR = "icalendar:calendar";
     public static final String NT_ICAL_EVENT = "icalendar:event";

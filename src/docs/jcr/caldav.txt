@@ -42,10 +42,21 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   null
+
+NodeTypeName
+  caldav:eventresource
+SuperTypes
+  caldav:resource
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  icalendar:revent
 ChildNodeDef
   Name icalendar:revent
   RequiredPrimaryTypes [icalendar:event]
-  DefaultPrimaryType null
+  DefaultPrimaryType icalendar:event
   AutoCreate false
   Mandatory true
   OnParentVersion VERSION
@@ -54,18 +65,18 @@ ChildNodeDef
 ChildNodeDef
   Name icalendar:exevent
   RequiredPrimaryTypes [icalendar:event]
-  DefaultPrimaryType null
+  DefaultPrimaryType icalendar:event
   AutoCreate false
-  Mandatory true
+  Mandatory false
   OnParentVersion VERSION
   Protected false
   SameNamedSibs true
 ChildNodeDef
   Name icalendar:timezone
   RequiredPrimaryTypes [icalendar:timezone]
-  DefaultPrimaryType null
+  DefaultPrimaryType icalendar:timezone
   AutoCreate false
-  Mandatory true
+  Mandatory false
   OnParentVersion VERSION
   Protected false
   SameNamedSibs true

@@ -175,10 +175,10 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
      * @param name the name of the new event resource
      * @param event the <code>VEvent</code> representing the new event
      */
-    public void createEventResource(String path,
-                                    String name,
-                                    VEvent event) {
-        createEventResource(path, name, event, null);
+    public void createEvent(String path,
+                            String name,
+                            VEvent event) {
+        createEvent(path, name, event, null);
     }
 
     /**
@@ -194,10 +194,10 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
      * @param exceptionEvents the <code>Set</code> of
      * <code>VEvent</code>s representing the exception events
      */
-    public void createEventResource(final String path,
-                                    final String name,
-                                    final VEvent masterEvent,
-                                    final Set exceptionEvents) {
+    public void createEvent(final String path,
+                            final String name,
+                            final VEvent masterEvent,
+                            final Set exceptionEvents) {
         getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
@@ -210,7 +210,9 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
                                   " below " + parentNode.getPath());
                     }
                     Node resourceNode = parentNode.
-                        addNode(name, CosmoJcrConstants.NT_CALDAV_RESOURCE);
+                        addNode(name,
+                                CosmoJcrConstants.NT_CALDAV_EVENT_RESOURCE);
+                    resourceNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
                     JCRUtils.setDateValue(resourceNode,
                                           CosmoJcrConstants.NP_JCR_LASTMODIFIED,
                                           null);
@@ -261,9 +263,9 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
         Node propertyNode =
             getICalendarPropertyNode(CosmoJcrConstants.NN_ICAL_CLASS,
                                      componentNode);
-        String propertyValue = ICalendarUtils.getClazz(component).getValue();
+        Clazz clazz = ICalendarUtils.getClazz(component);
         propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_VALUE,
-                                 propertyValue);
+                                 clazz != null ? clazz.getValue() : null);
     }
 
     /**
@@ -761,11 +763,11 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
     protected Node getICalendarPropertyNode(String propertyNodeName,
                                             Node componentNode)
         throws RepositoryException {
-        Node propertyNode = componentNode.getNode(propertyNodeName);
-        if (propertyNode == null) {
-            propertyNode = componentNode.addNode(propertyNodeName);
+        try {
+            return componentNode.getNode(propertyNodeName);
+        } catch (PathNotFoundException e) {
+            return componentNode.addNode(propertyNodeName);
         }
-        return propertyNode;
     }
 
     // low level mutators for nodes representing generic icalendar

@@ -123,6 +123,7 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_DIR = "icalendar:dir";
     public static final String NP_ICAL_DATETIME = "icalendar:datetime";
     public static final String NP_ICAL_DESCRIPTION = "icalendar:description";
+    public static final String NP_ICAL_DURATION = "icalendar:duration";
     public static final String NP_ICAL_END = "icalendar:end";
     public static final String NP_ICAL_EXDATA = "icalendar:exdata";
     public static final String NP_ICAL_FMTTYPE = "icalendar:fmttype";
@@ -130,19 +131,23 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_INTERVAL = "icalendar:interval";
     public static final String NP_ICAL_LANGUAGE = "icalendar:language";
     public static final String NP_ICAL_LATITUDE = "icalendar:latitude";
+    public static final String NP_ICAL_LEVEL = "icalendar:level";
     public static final String NP_ICAL_LONGITUDE = "icalendar:longitude";
     public static final String NP_ICAL_MAXVERSION = "icalendar:maxversion";
     public static final String NP_ICAL_MEMBER = "icalendar:member";
     public static final String NP_ICAL_PARTSTAT = "icalendar:partstat";
+    public static final String NP_ICAL_RANGE = "icalendar:range";
     public static final String NP_ICAL_RELTYPE = "icalendar:reltype";
     public static final String NP_ICAL_REQUESTSTATUS =
         "icalendar:requeststatus";
     public static final String NP_ICAL_ROLE = "icalendar:role";
     public static final String NP_ICAL_RSVP = "icalendar:rsvp";
     public static final String NP_ICAL_SENTBY = "icalendar:sentby";
+    public static final String NP_ICAL_SEQUENCENO = "icalendar:sequenceno";
     public static final String NP_ICAL_START = "icalendar:start";
     public static final String NP_ICAL_STATCODE = "icalendar:statcode";
     public static final String NP_ICAL_TEXT = "icalendar:text";
+    public static final String NP_ICAL_TZID = "icalendar:tzid";
     public static final String NP_ICAL_UNTIL = "icalendar:until";
     public static final String NP_ICAL_URI = "icalendar:uri";
     public static final String NP_ICAL_UTC = "icalendar:utc";

@@ -55,7 +55,7 @@ Inheritance Hierarchy:
   |  |
   |  |...
   |
-  |--icalendar:value
+  |--icalendar:valuetype
      |
      |--icalendar:period
      |
@@ -66,7 +66,7 @@ Inheritance Hierarchy:
 #
 
 NodeTypeName
-  icalendar:value
+  icalendar:valuetype
 SuperTypes
   nt:base
 IsMixin
@@ -79,7 +79,7 @@ PrimaryItemName
 NodeTypeName
   icalendar:period
 SuperTypes
-  icalendar:value
+  icalendar:valuetype
 IsMixin
   false
 HasOrderableChildNodes
@@ -108,7 +108,7 @@ PropertyDef
 NodeTypeName
   icalendar:recur
 SuperTypes
-  icalendar:value
+  icalendar:valuetype
 IsMixin
   false
 HasOrderableChildNodes
@@ -266,7 +266,16 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  null
+  icalendar:value
+PropertyDef
+  Name icalendar:value
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
 PropertyDef
   Name *
   RequiredType UNDEFINED
@@ -286,16 +295,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:text
-PropertyDef
-  Name icalendar:text
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
+  icalendar:value
 PropertyDef
   Name icalendar:altrep
   RequiredType STRING
@@ -343,6 +343,16 @@ PropertyDef
   OnParentVersion COPY
   Protected false
   Multiple false
+PropertyDef
+  Name icalendar:tzid
+  RequiredType STRUBG
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+
 #
 # 4.7 calendar properties
 #
@@ -357,15 +367,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
-PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 NodeTypeName
   icalendar:method
@@ -377,15 +378,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
-PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 NodeTypeName
   icalendar:prodid
@@ -397,15 +389,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
-PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 NodeTypeName
   icalendar:version
@@ -517,15 +500,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
-PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory false
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 NodeTypeName
   icalendar:comment
@@ -536,7 +510,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:text
+  icalendar:value
 
 NodeTypeName
   icalendar:description
@@ -547,7 +521,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:text
+  icalendar:value
 
 NodeTypeName
   icalendar:geo
@@ -558,7 +532,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  null
+  icalendar:value
 PropertyDef
   Name icalendar:latitude
   RequiredType DOUBLE
@@ -587,7 +561,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:text
+  icalendar:value
 
 NodeTypeName
   icalendar:percentcomplete
@@ -599,15 +573,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
-PropertyDef
-  Name icalendar:value
-  RequiredType LONG
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 NodeTypeName
   icalendar:priority
@@ -618,9 +583,9 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:level
 PropertyDef
-  Name icalendar:value
+  Name icalendar:level
   RequiredType LONG
   DefaultValues null
   AutoCreate false
@@ -638,7 +603,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:text
+  icalendar:value
 
 NodeTypeName
   icalendar:status
@@ -650,15 +615,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
-PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 NodeTypeName
   icalendar:summary
@@ -669,7 +625,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:text
+  icalendar:value
 
 #
 # 4.8.2 date and time component properties
@@ -737,10 +693,10 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:duration
 PropertyDef
-  Name icalendar:value
-  RequiredType DOUBLE
+  Name icalendar:duration
+  RequiredType LONG
   DefaultValues null
   AutoCreate false
   Mandatory true
@@ -787,16 +743,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
-PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  ValueConstraints ["OPAQUE", "TRANSPARENT"]
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 #
 # 4.8.3 time zone component properties
@@ -812,15 +758,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
-PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 NodeTypeName
   icalendar:tzname
@@ -831,16 +768,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:text
-PropertyDef
-  Name icalendar:text
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
+  icalendar:value
 PropertyDef
   Name icalendar:language
   RequiredType STRING
@@ -1043,7 +971,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:text
+  icalendar:value
 
 NodeTypeName
   icalendar:organizer
@@ -1133,15 +1061,6 @@ HasOrderableChildNodes
 PrimaryItemName
   icalendar:value
 PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory false
-  OnParentVersion COPY
-  Protected false
-  Multiple false
-PropertyDef
   Name icalendar:reltype
   RequiredType STRING
   DefaultValues null
@@ -1181,15 +1100,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
-PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory false
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 #
 # 4.8.5 recurrence component properties
@@ -1214,6 +1124,15 @@ PropertyDef
   OnParentVersion COPY
   Protected false
   Multiple true
+PropertyDef
+  Name icalendar:tzid
+  RequiredType STRUBG
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
 
 NodeTypeName
   icalendar:exrule
@@ -1244,7 +1163,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  null
+  icalendar:value
 ChildNodeDef
   Name icalendar:period
   RequiredPrimaryTypes [icalendar:period]
@@ -1263,6 +1182,15 @@ PropertyDef
   OnParentVersion COPY
   Protected false
   Multiple true
+PropertyDef
+  Name icalendar:tzid
+  RequiredType STRUBG
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
 
 NodeTypeName
   icalendar:rrule
@@ -1298,15 +1226,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
-PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory false
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 NodeTypeName
   icalendar:repeat
@@ -1317,9 +1236,9 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:count
 PropertyDef
-  Name icalendar:value
+  Name icalendar:count
   RequiredType LONG
   DefaultValues 0
   AutoCreate true
@@ -1337,17 +1256,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  null
-PropertyDef
-  Name icalendar:value
-  RequiredType STRING
-  VaueConstraints ["DURATION", "DATE-TIME"]
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
+  icalendar:value
 PropertyDef
   Name icalendar:related
   RequiredType STRING
@@ -1450,9 +1359,9 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:sequenceno
 PropertyDef
-  Name icalendar:value
+  Name icalendar:sequenceno
   RequiredType LONG
   DefaultValues null
   AutoCreate false
@@ -1474,16 +1383,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:text
-PropertyDef
-  Name icalendar:text
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
+  icalendar:value
 PropertyDef
   Name icalendar:language
   RequiredType STRING
@@ -1503,7 +1403,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:text
+  icalendar:statcode
 PropertyDef
   Name icalendar:statcode
   RequiredType STRING

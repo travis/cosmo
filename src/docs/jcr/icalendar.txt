@@ -345,7 +345,7 @@ PropertyDef
   Multiple false
 PropertyDef
   Name icalendar:tzid
-  RequiredType STRUBG
+  RequiredType STRING
   DefaultValues null
   AutoCreate false
   Mandatory false
@@ -1126,7 +1126,7 @@ PropertyDef
   Multiple true
 PropertyDef
   Name icalendar:tzid
-  RequiredType STRUBG
+  RequiredType STRING
   DefaultValues null
   AutoCreate false
   Mandatory false
@@ -1184,7 +1184,7 @@ PropertyDef
   Multiple true
 PropertyDef
   Name icalendar:tzid
-  RequiredType STRUBG
+  RequiredType STRING
   DefaultValues null
   AutoCreate false
   Mandatory false

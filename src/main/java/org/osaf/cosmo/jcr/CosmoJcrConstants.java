@@ -91,6 +91,7 @@ public class CosmoJcrConstants {
     public static final String NT_ICAL_VERSION = "icalendar:version";
     public static final String NT_ICAL_CALSCALE = "icalendar:calscale";
     public static final String NT_ICAL_METHOD = "icalendar:method";
+    public static final String NT_ICAL_XPROPERTY = "icalendar:xproperty";
 
     // node properties
 

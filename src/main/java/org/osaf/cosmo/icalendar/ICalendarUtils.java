@@ -15,6 +15,10 @@
  */
 package org.osaf.cosmo.icalendar;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java. util.Set;
+
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
@@ -234,6 +238,26 @@ public class ICalendarUtils {
         return (Url) component.getProperties().getProperty(Property.URL);
     }
 
+    /**
+     */
+    public static Property getXProperty(Component component,
+                                        String name) {
+        return component.getProperties().getProperty(name);
+    }
+
+    /**
+     */
+    public static Set getXPropertyNames(Component component) {
+        Set propNames = new HashSet();
+        for (Iterator i=component.getProperties().iterator(); i.hasNext();) {
+            Property prop = (Property) i.next();
+            if (prop.getName().startsWith("X-")) {
+                propNames.add(prop.getName());
+            }
+        }
+        return propNames;
+    }
+
     // convenience accessors for specific icalendar parameters
 
     /**
@@ -331,5 +355,13 @@ public class ICalendarUtils {
     public static SentBy getSentBy(Property property) {
         return (SentBy)
             property.getParameters().getParameter(Parameter.SENT_BY);
+    }
+
+    /**
+     */
+    public static net.fortuna.ical4j.model.parameter.TzId
+        getTzId(Property property) {
+        return (net.fortuna.ical4j.model.parameter.TzId)
+            property.getParameters().getParameter(Parameter.TZID);
     }
 }

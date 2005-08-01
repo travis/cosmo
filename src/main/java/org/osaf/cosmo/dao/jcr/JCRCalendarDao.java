@@ -292,6 +292,7 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
         setResourcesPropertyNode(event, eventNode);
         setRDatePropertyNode(event, eventNode);
         setRRulePropertyNode(event, eventNode);
+        setXPropertyNodes(event, eventNode);
     }
 
     /**
@@ -845,6 +846,49 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
     /**
      */
+    protected void setXPropertyNode(String name,
+                                    Component component,
+                                    Node componentNode)
+        throws RepositoryException {
+        Property xprop = ICalendarUtils.getXProperty(component, name);
+        if (xprop != null) {
+            Node propertyNode = getICalendarPropertyNode(name, componentNode);
+            setICalendarPropertyValueNode(xprop, propertyNode);
+            setLanguageParameterNode(xprop, propertyNode);
+        }
+    }
+                                    
+    /**
+     */
+    protected void setXPropertyNodes(Component component,
+                                     Node componentNode)
+        throws RepositoryException {
+        // build a list of names of the x-properties included in the
+        // version of the component being set
+        Set xPropNames = ICalendarUtils.getXPropertyNames(component);
+
+        // remove any xprop nodes from the stored version of the
+        // component that aren't reflected in the new xprop list
+        NodeIterator propertyNodes = componentNode.getNodes();
+        while (propertyNodes.hasNext()) {
+            Node propertyNode = propertyNodes.nextNode();
+            if (propertyNode.isNodeType(CosmoJcrConstants.NT_ICAL_XPROPERTY)) {
+                if (! xPropNames.contains(propertyNode.getName())) {
+                    propertyNode.remove();
+                }
+            }
+        }
+
+        // add xprop nodes for each of the xprops contained in the new
+        // version of the component
+        for (Iterator i=xPropNames.iterator(); i.hasNext();) {
+            String name = (String) i.next();
+            setXPropertyNode(name, component, componentNode);
+        }
+    }
+
+    /**
+     */
     protected void setAltRepParameterNode(Property property,
                                           Node propertyNode)
         throws RepositoryException {
@@ -1039,7 +1083,8 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
     protected void setTzIdParameterNode(Property property,
                                         Node propertyNode)
         throws RepositoryException {
-        SentBy tzId = ICalendarUtils.getSentBy(property);
+        net.fortuna.ical4j.model.parameter.TzId tzId =
+            ICalendarUtils.getTzId(property);
         if (tzId != null) {
             propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_TZID,
                                      tzId.getValue());

@@ -1377,7 +1377,7 @@ PropertyDef
 NodeTypeName
   icalendar:xproperty
 SuperTypes
-  nt:base
+  icalendar:property
 IsMixin
   false
 HasOrderableChildNodes

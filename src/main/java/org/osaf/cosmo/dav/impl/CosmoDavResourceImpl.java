@@ -17,14 +17,9 @@ package org.osaf.cosmo.dav.impl;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
-import javax.jcr.ItemExistsException;
 import javax.jcr.Node;
-import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 
 import org.apache.jackrabbit.server.io.MimeResolver;
@@ -38,6 +33,7 @@ import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
 
 import org.apache.log4j.Logger;
 
+import org.osaf.cosmo.UnsupportedFeatureException;
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.jcr.JCRUtils;
 import org.osaf.cosmo.dao.CalendarDao;
@@ -232,41 +228,16 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             CalendarBuilder builder = new CalendarBuilder();
             Calendar calendar = builder.build(in);
 
-            // extract the events (one master event, possibly one or
-            // more exception events as well)
-            VEvent masterEvent = null;
-            HashSet exceptionEvents = new HashSet();
-            for (Iterator i=calendar.getComponents().iterator(); i.hasNext();) {
-                Component component = (Component) i.next();
-                if (component instanceof VEvent) {
-                    VEvent event = (VEvent) component;
-                    if (ICalendarUtils.getRRule(event) != null) {
-                        masterEvent = event;
-                    }
-                    else {
-                        exceptionEvents.add(event);
-                    }
-                }
-                else {
-                    // at the moment we only support events
-                    if (log.isDebugEnabled()) {
-                        log.debug("found unhandleable calendar component: " +
-                                  component);
-                    }
-                }
-            }
-            if (masterEvent == null) {
-                throw new DavException(CosmoDavResponse.SC_CONFLICT,
-                                       "No events found in calendar resource");
-            }
-
+            // store the resource in the repository
             CalendarDao dao = (CalendarDao) applicationContext.
                 getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
-            // XXX: if the resource already exists, then it needs to
-            // be updated instead - or will the dao api use one method
-            // for both?
-            dao.createEvent(parent.getPath(), resource.getDisplayName(),
-                            masterEvent, exceptionEvents);
+            // XXX: different dao method for existing resource?
+            dao.createCalendarResource(parent.getPath(),
+                                       resource.getDisplayName(),
+                                       calendar);
+        } catch (UnsupportedFeatureException e) {
+            log.error("calendar resource not supported", e);
+            throw new DavException(CosmoDavResponse.SC_CONFLICT);
         } catch (DataIntegrityViolationException e) {
             log.error("resource " + resource.getResourcePath() +
                       " already exists", e);

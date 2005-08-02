@@ -17,7 +17,7 @@ package org.osaf.cosmo.dao;
 
 import java.util.Set;
 
-import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.Calendar;
 
 /**
  * Dao interface for calendar related activities.
@@ -50,29 +50,29 @@ public interface CalendarDao extends DAO {
     public void deleteCalendar(String path);
 
     /**
-     * Creates an event resource underneath the item at the given
-     * path.
+     * Creates a calendar resource in the repository. A calendar
+     * resource contains one or more calendar components.
+     *
+     * The only supported "top level" calendar component is
+     * event. Events are typically associated with timezones and
+     * alarms. Recurring events are represented as multiple calendar
+     * components: one "master" event that defines the recurrence
+     * rule, and zero or more "exception" events. All of these
+     * components share a uid.
+     *
+     * Journal, todo and freebusy components are not supported. These
+     * components will be ignored.
      *
      * @param path the repository path of the parent of the new
      * event resource
      * @param name the name of the new event resource
-     * @param event the <code>VEvent</code> representing the new event
-     */
-    public void createEvent(String path, String name, VEvent event);
-
-    /**
-     * Creates an event resource underneath the item at the given
-     * path containing a master event defining a recurrence rule and a
-     * set of events that are exceptions to the recurrence.
+     * @param event the <code>Calendar</code> containing events,
+     * timezones and alarms
      *
-     * @param path the repository path of the parent of the new
-     * event resource
-     * @param name the name of the new event resource
-     * @param masterEvent the <code>VEvent</code> representing
-     * the master event
-     * @param exceptionEvents the <code>Set</code> of
-     * <code>VEvent</code>s representing the exception events
+     * @throws {@link UnsupportedFeatureException} if the
+     * <code>Calendar</code> does not contain an event.
      */
-    public void createEvent(String path, String name, VEvent masterEvent,
-                            Set exceptionEvents);
+    public void createCalendarResource(String path,
+                                       String name,
+                                       Calendar calendar);
 }

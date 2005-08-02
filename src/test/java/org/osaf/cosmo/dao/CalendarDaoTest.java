@@ -15,10 +15,14 @@
  */
 package org.osaf.cosmo.dao;
 
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Summary;
 
 import org.osaf.cosmo.BaseCoreTestCase;
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.UnsupportedFeatureException;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.model.User;
 
@@ -53,37 +57,61 @@ public class CalendarDaoTest extends BaseCoreTestCase {
     }
 
     public void testCDCalendar() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+
         User user = TestHelper.makeDummyUser();
         String path = "/";
 
-        if (log.isDebugEnabled()) {
-            log.debug("creating calendar at " + path + user.getUsername());
-        }
         dao.createCalendar(path, user.getUsername());
         assertTrue(dao.existsCalendar(path + user.getUsername()));
 
-        if (log.isDebugEnabled()) {
-            log.debug("deleting calendar at " + path + user.getUsername());
-        }
         dao.deleteCalendar(path + user.getUsername());
         assertTrue(! dao.existsCalendar(path + user.getUsername()));
     }
 
-    public void testCDEvent() throws Exception {
-        User user = TestHelper.makeDummyUser();
+    public void testCRDResource() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+
         String path = "/";
 
+        // create a calendar
+        Calendar calendar1 = TestHelper.makeDummyCalendar();
+
         // create an event
-        String summary = "event1";
-        String name = summary + ".ics";
-        VEvent event1 = TestHelper.makeDummyEvent(summary);
-        if (log.isDebugEnabled()) {
-            log.debug("creating event at " + path);
-        }
-        dao.createEvent(path, name, event1);
+        VEvent event1 = TestHelper.makeDummyEvent();
+        Summary summary = 
+            (Summary) event1.getProperties().getProperty(Property.SUMMARY);
+        String name = summary.getValue() + ".ics";
+        calendar1.getComponents().add(event1);
+
+        // create the resource in the repository
+        dao.createCalendarResource(path, name, calendar1);
 
         // XXX: get the event
 
         // XXX: delete the event
+    }
+
+    public void testEmptyResource() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+
+        String path = "/";
+
+        // create a calendar
+        Calendar calendar1 = TestHelper.makeDummyCalendar();
+
+        // try to create the empty resource in the repository
+        try {
+            dao.createCalendarResource(path, "blah", calendar1);
+            fail("should not have been able to create empty calendar resource");
+        } catch (UnsupportedFeatureException e) {
+            // expected
+        }
     }
 }

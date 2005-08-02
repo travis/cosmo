@@ -18,6 +18,7 @@ package org.osaf.cosmo.dao.jcr;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -28,12 +29,8 @@ import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.Parameter;
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.*;
+import net.fortuna.ical4j.model.component.*;
 import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.model.parameter.*;
 
@@ -43,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.commons.spring.jcr.JCRCallback;
 import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
 import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.UnsupportedFeatureException;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
@@ -169,45 +167,56 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
             });
     }
 
-
     /**
-     * Creates an event resource underneath the item at the given
-     * path.
+     * Creates a calendar resource in the repository. A calendar
+     * resource contains one or more calendar components.
+     *
+     * The only supported "top level" calendar component is
+     * event. Events are typically associated with timezones and
+     * alarms. Recurring events are represented as multiple calendar
+     * components: one "master" event that defines the recurrence
+     * rule, and zero or more "exception" events. All of these
+     * components share a uid.
+     *
+     * Journal, todo and freebusy components are not supported. These
+     * components will be ignored.
      *
      * @param path the repository path of the parent of the new
      * event resource
      * @param name the name of the new event resource
-     * @param event the <code>VEvent</code> representing the new event
-     */
-    public void createEvent(String path,
-                            String name,
-                            VEvent event) {
-        createEvent(path, name, event, null);
-    }
-
-    /**
-     * Creates an event resource underneath the item at the given
-     * path containing a master event defining a recurrence rule and a
-     * set of events that are exceptions to the recurrence.
+     * @param event the <code>Calendar</code> containing events,
+     * timezones and alarms
      *
-     * @param path the repository path of the parent of the new
-     * event resource
-     * @param name the name of the new event resource
-     * @param masterEvent the <code>VEvent</code> representing
-     * the master event
-     * @param exceptionEvents the <code>Set</code> of
-     * <code>VEvent</code>s representing the exception events
+     * @throws {@link UnsupportedFeatureException} if the
+     * <code>Calendar</code> does not contain an event.
      */
-    public void createEvent(final String path,
-                            final String name,
-                            final VEvent masterEvent,
-                            final Set exceptionEvents) {
+    public void createCalendarResource(final String path,
+                                       final String name,
+                                       Calendar calendar) {
+        // find all supported components within the calendar
+        // XXX: timezones
+        final HashSet events = new HashSet();
+        for (Iterator i=calendar.getComponents().iterator(); i.hasNext();) {
+            Component component = (Component) i.next();
+            if (component instanceof VEvent) {
+                events.add(component);
+            }
+            else {
+                if (log.isDebugEnabled()) {
+                    log.debug("ignoring unsupported component " + component);
+                }
+            }
+        }
+        if (events.isEmpty()) {
+            throw new UnsupportedFeatureException("No events found");
+        }
+
         getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
                     // find parent node
                     Node parentNode = JCRUtils.findNode(session, path);
-
+                    
                     // add resource node
                     if (log.isDebugEnabled()) {
                         log.debug("creating calendar resource node " + name +
@@ -221,34 +230,7 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
                                           CosmoJcrConstants.NP_JCR_LASTMODIFIED,
                                           null);
 
-                    // XXX: check for uids already in use
-                    // XXX: alarms
-                    // XXX: timezones
-                    // XXX: is this the correct way to handle recurrence?
-
-                    // add master event node
-                    if (log.isDebugEnabled()) {
-                        log.debug("creating revent node below " +
-                                  resourceNode.getPath());
-                    }
-                    Node reventNode = resourceNode.
-                        addNode(CosmoJcrConstants.NN_ICAL_REVENT);
-                    setEventNodes(masterEvent, reventNode);
-
-                    // add exception event nodes
-                    if (exceptionEvents != null) {
-                        for (Iterator i=exceptionEvents.iterator();
-                             i.hasNext();) {
-                            VEvent exevent = (VEvent) i.next();
-                            if (log.isDebugEnabled()) {
-                                log.debug("creating exception event node" +
-                                          " below " + resourceNode.getPath());
-                            }
-                            Node exeventNode = resourceNode.
-                                addNode(CosmoJcrConstants.NN_ICAL_EXEVENT);
-                            setEventNodes(exevent, exeventNode);
-                        }
-                    }
+                    setEventNodes(resourceNode, events);
 
                     parentNode.save();
                     return null;
@@ -260,8 +242,62 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
     /**
      */
-    protected void setEventNodes(VEvent event,
-                                 Node eventNode)
+    protected void setEventNodes(Node resourceNode,
+                                 Set events)
+        throws RepositoryException {
+        // find master and exception events. ical4j ideally should
+        // have api for this.
+        VEvent masterEvent = null;
+        HashSet exceptionEvents = new HashSet();
+        if (events.size() == 1) {
+            masterEvent = (VEvent) events.iterator().next();
+        }
+        else {
+            for (Iterator i=events.iterator(); i.hasNext();) {
+                VEvent event = (VEvent) i.next();
+                if (ICalendarUtils.getRRule(event) != null) {
+                    masterEvent = event;
+                }
+                else {
+                    exceptionEvents.add(event);
+                }
+            }
+            if (masterEvent == null) {
+                throw new UnsupportedFeatureException("Master event missing");
+            }
+        }
+
+        // XXX: check for uids already in use
+        // XXX: is this the correct way to handle recurrence?
+        // XXX: allow for existing nodes
+        // XXX: alarms
+
+        // add master event node
+        if (log.isDebugEnabled()) {
+            log.debug("creating revent node below " +
+                      resourceNode.getPath());
+        }
+        Node reventNode = resourceNode.
+            addNode(CosmoJcrConstants.NN_ICAL_REVENT);
+        setEventPropertyNodes(masterEvent, reventNode);
+
+        // add exception event nodes
+        for (Iterator i=exceptionEvents.iterator(); i.hasNext();) {
+            VEvent exevent = (VEvent) i.next();
+            if (log.isDebugEnabled()) {
+                log.debug("creating exevent node" +
+                          " below " + resourceNode.getPath());
+            }
+            Node exeventNode = resourceNode.
+                addNode(CosmoJcrConstants.NN_ICAL_EXEVENT);
+            setEventPropertyNodes(exevent, exeventNode);
+        }
+    }
+
+    /**
+     */
+    protected void setEventPropertyNodes(VEvent event,
+                                         Node eventNode)
         throws RepositoryException {
         setClassPropertyNode(event, eventNode);
         setCreatedPropertyNode(event, eventNode);

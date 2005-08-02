@@ -18,14 +18,12 @@ package org.osaf.cosmo;
 import java.security.Principal;
 import java.util.HashSet;
 
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.component.VTimeZone;
-import net.fortuna.ical4j.model.parameter.TzId;
-import net.fortuna.ical4j.model.parameter.Value;
-import net.fortuna.ical4j.model.parameter.XParameter;
-import net.fortuna.ical4j.model.property.XProperty;
+import net.fortuna.ical4j.model.*;
+import net.fortuna.ical4j.model.component.*;
+import net.fortuna.ical4j.model.parameter.*;
+import net.fortuna.ical4j.model.property.*;
 
+import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.Ticket;
@@ -37,12 +35,26 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
 public class TestHelper {
     static int apseq = 0;
     static int rseq = 0;
+    static int tseq = 0;
     static int useq = 0;
 
     private TestHelper() {
     }
 
-    public static VEvent makeDummyEvent(String summary) {
+    public static Calendar makeDummyCalendar() {
+        Calendar cal =new Calendar();
+
+        cal.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+        cal.getProperties().add(new Version(CosmoConstants.ICALENDAR_VERSION,
+                                            CosmoConstants.ICALENDAR_VERSION));
+
+        return cal;
+    }
+
+    public static VEvent makeDummyEvent() {
+        String serial = new Integer(++rseq).toString();
+        String summary = "dummy" + serial;
+
         // tomorrow
         java.util.Calendar start = java.util.Calendar.getInstance();
         start.add(java.util.Calendar.DAY_OF_MONTH, 1);
@@ -55,8 +67,10 @@ public class TestHelper {
  
         // add timezone information..
         VTimeZone tz = VTimeZone.getDefault();
-        TzId tzParam =
-            new TzId(tz.getProperties().getProperty(Property.TZID).getValue());
+        String tzValue =
+            tz.getProperties().getProperty(Property.TZID).getValue();
+        net.fortuna.ical4j.model.parameter.TzId tzParam =
+            new net.fortuna.ical4j.model.parameter.TzId(tzValue);
         event.getProperties().getProperty(Property.DTSTART).
             getParameters().add(tzParam);
 

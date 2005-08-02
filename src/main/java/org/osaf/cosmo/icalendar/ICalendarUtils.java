@@ -364,4 +364,24 @@ public class ICalendarUtils {
         return (net.fortuna.ical4j.model.parameter.TzId)
             property.getParameters().getParameter(Parameter.TZID);
     }
+
+    /**
+     */
+    public static Parameter getXParameter(Property property,
+                                          String name) {
+        return property.getParameters().getParameter(name);
+    }
+
+    /**
+     */
+    public static Set getXParameterNames(Property property) {
+        Set propNames = new HashSet();
+        for (Iterator i=property.getParameters().iterator(); i.hasNext();) {
+            Parameter prop = (Parameter) i.next();
+            if (prop.getName().startsWith("X-")) {
+                propNames.add(prop.getName());
+            }
+        }
+        return propNames;
+    }
 }

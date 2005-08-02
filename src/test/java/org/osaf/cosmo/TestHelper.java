@@ -23,6 +23,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.parameter.XParameter;
 import net.fortuna.ical4j.model.property.XProperty;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
@@ -59,8 +60,11 @@ public class TestHelper {
         event.getProperties().getProperty(Property.DTSTART).
             getParameters().add(tzParam);
 
-        // add random x-property
-        event.getProperties().add(new XProperty("X-Cosmo-Test", "abc123"));
+        // add an x-property with an x-param
+        XParameter xparam = new XParameter("X-Cosmo-Test-Param", "deadbeef");
+        XProperty xprop = new XProperty("X-Cosmo-Test-Prop", "abc123");
+        xprop.getParameters().add(xparam);
+        event.getProperties().add(xprop);
 
         return event;
     }

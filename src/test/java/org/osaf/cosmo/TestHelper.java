@@ -34,8 +34,8 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
  */
 public class TestHelper {
     static int apseq = 0;
+    static int eseq = 0;
     static int rseq = 0;
-    static int tseq = 0;
     static int useq = 0;
 
     private TestHelper() {
@@ -52,7 +52,7 @@ public class TestHelper {
     }
 
     public static VEvent makeDummyEvent() {
-        String serial = new Integer(++rseq).toString();
+        String serial = new Integer(++eseq).toString();
         String summary = "dummy" + serial;
 
         // tomorrow

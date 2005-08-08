@@ -30,6 +30,7 @@ import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.jcr.JcrDavException;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
+import org.apache.jackrabbit.webdav.simple.ResourceFilter;
 
 import org.apache.log4j.Logger;
 
@@ -76,9 +77,10 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public CosmoDavResourceImpl(DavResourceLocator locator,
                                 CosmoDavResourceFactory factory,
-                                DavSession session)
-        throws RepositoryException {
-        super(locator, factory, session);
+                                DavSession session,
+                                ResourceFilter filter)
+        throws RepositoryException, DavException {
+        super(locator, factory, session, filter);
         mimeResolver = new MimeResolver();
     }
 
@@ -385,21 +387,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     // our methods
-
-    /**
-     * Return true if the given item should not be included in the
-     * members list.
-     *
-     * @see DavResource#getMembers()
-     */
-    protected boolean isPrivateItem(Node node) {
-        try {
-            return node.isNodeType(CosmoJcrConstants.NT_ICAL_CALENDAR) ||
-                node.isNodeType(CosmoJcrConstants.NT_TICKET);
-        } catch (RepositoryException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      */

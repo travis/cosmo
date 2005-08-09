@@ -100,10 +100,6 @@
       <param-name>chain-catalog</param-name>
       <param-value>/WEB-INF/chain-catalog.xml</param-value>
     </init-param>
-    <init-param>
-      <param-name>resource-filter</param-name>
-      <param-value>/WEB-INF/dav-filter.xml</param-value>
-    </init-param>
   </servlet>
   <servlet>
     <servlet-name>action</servlet-name>

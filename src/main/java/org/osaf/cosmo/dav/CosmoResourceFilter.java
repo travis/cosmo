@@ -15,27 +15,21 @@
  */
 package org.osaf.cosmo.dav;
 
-import org.apache.jackrabbit.webdav.DavResourceFactory;
-import org.apache.jackrabbit.webdav.lock.LockManager;
-import org.apache.jackrabbit.webdav.simple.ResourceFilter;
-
-import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.apache.jackrabbit.webdav.simple.DefaultResourceFilter;
 
 /**
- * An interface for Cosmo-specific
- * {@link org.apache.jackrabbit.webdav.DavResource} factories.
+ * A {@link org.apache.jackrabbit.webdav.simple.DefaultResourceFilter}
+ * that statically defines Cosmo resources to filter out of PROPFIND
+ * and directory listing responses.
  */
-public interface CosmoDavResourceFactory extends DavResourceFactory {
-
+public class CosmoResourceFilter extends DefaultResourceFilter {
+    protected static final String[] FILTERED_PREFIXES =
+    { "rep", "jcr", "icalendar", "ticket" };
+    
     /**
      */
-    public LockManager getLockManager();
-
-    /**
-     */
-    public ResourceFilter getResourceFilter();
-
-    /**
-     */
-    public CosmoSecurityManager getSecurityManager();
+    public CosmoResourceFilter() {
+        super();
+        setFilteredPrefixes(FILTERED_PREFIXES);
+    }
 }

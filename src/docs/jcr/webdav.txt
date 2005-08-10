@@ -23,11 +23,11 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 PropertyDef
-  Name *
-  RequiredType UNDEFINED
+  Name dav:displayname
+  RequiredType STRING
   DefaultValues null
   AutoCreate false
-  Mandatory false
+  Mandatory true
   OnParentVersion COPY
   Protected false
   Multiple false
@@ -39,7 +39,7 @@ PropertyDef
   Mandatory false
   OnParentVersion COPY
   Protected false
-  Multiple true
+  Multiple false
 
 NodeTypeName
   dav:resource
@@ -52,11 +52,11 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 PropertyDef
-  Name *
-  RequiredType UNDEFINED
+  Name dav:displayname
+  RequiredType STRING
   DefaultValues null
   AutoCreate false
-  Mandatory false
+  Mandatory true
   OnParentVersion COPY
   Protected false
   Multiple false
@@ -68,7 +68,7 @@ PropertyDef
   Mandatory false
   OnParentVersion COPY
   Protected false
-  Multiple true
+  Multiple false
 
 
 Copyright 2005 Open Source Applications Foundation

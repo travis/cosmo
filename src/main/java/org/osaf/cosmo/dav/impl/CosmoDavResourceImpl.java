@@ -156,8 +156,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public boolean isCalendarCollection() {
         try {
-            return getNode().
-                isNodeType(CosmoJcrConstants.NT_CALDAV_COLLECTION);
+            return exists() &&
+                getNode().isNodeType(CosmoJcrConstants.NT_CALDAV_COLLECTION);
         } catch (RepositoryException e) {
             throw new RuntimeException(e);
         }

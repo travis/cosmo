@@ -199,7 +199,7 @@
     <dependency>
       <groupId>jackrabbit</groupId>
       <artifactId>jackrabbit-api</artifactId>
-      <version>1.0-dev</version>
+      <version>1.0-SNAPSHOT</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -207,7 +207,7 @@
     <dependency>
       <groupId>jackrabbit</groupId>
       <artifactId>jackrabbit-commons</artifactId>
-      <version>1.0-dev</version>
+      <version>1.0-SNAPSHOT</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -215,7 +215,7 @@
     <dependency>
       <groupId>jackrabbit</groupId>
       <artifactId>jackrabbit-core</artifactId>
-      <version>1.0-dev</version>
+      <version>1.0-SNAPSHOT</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

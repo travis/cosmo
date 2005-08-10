@@ -79,6 +79,7 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
                     Node cc = parent.
                         addNode(name, CosmoJcrConstants.NT_CALDAV_COLLECTION);
                     cc.addMixin(CosmoJcrConstants.NT_TICKETABLE);
+                    cc.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
 
                     // add subnodes representing calendar properties
                     // to the autocreated calendar node
@@ -231,6 +232,27 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
                                           null);
 
                     setEventNodes(resourceNode, events);
+
+                    // set the display name to be the event summary if
+                    // one exists or the resource name otherwise
+                    Node reventNode = resourceNode.
+                        getNode(CosmoJcrConstants.NN_ICAL_REVENT);
+                    if (reventNode.hasNode(CosmoJcrConstants.NN_ICAL_SUMMARY)) {
+                        String summary =
+                            reventNode.
+                            getProperty(CosmoJcrConstants.NN_ICAL_SUMMARY +
+                                        "/" +
+                                        CosmoJcrConstants.NP_ICAL_VALUE).
+                            getString();
+                        resourceNode.
+                            setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
+                                        summary);
+                    }
+                    else {
+                        resourceNode.
+                            setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
+                                        name);
+                    }
 
                     parentNode.save();
                     return null;

@@ -22,6 +22,8 @@
     <command id="add-collection"
              className="org.apache.jackrabbit.server.io.AddNodeCommand"
              nodeType="dav:collection"/>
+    <command id="set-displayname"
+             className="org.osaf.cosmo.jackrabbit.io.SetDisplayNameCommand"/>
     <command id="make-ticketable"
              className="org.apache.jackrabbit.server.io.AddMixinCommand"
              nodeType="mix:ticketable"/>
@@ -31,17 +33,10 @@
   <chain name="import-resource">
     <command id="set-contenttype"
              className="org.apache.jackrabbit.server.io.SetContentTypeCommand"/>
-    <command id="import-zip"
-             className="org.apache.jackrabbit.server.io.ZIPImportCommand"/>
-<!--
-    <command id="import-xml"
-             className="org.apache.jackrabbit.server.io.XMLImportCommand"/>
--->
     <command id="import-file"
-             className="org.apache.jackrabbit.server.io.FileImportCommand"/>
-    <command id="make-versionable"
-             className="org.apache.jackrabbit.server.io.AddMixinCommand"
-             nodeType="mix:versionable"/>
+             className="org.osaf.cosmo.jackrabbit.io.DavResourceImportCommand"/>
+    <command id="set-displayname"
+             className="org.osaf.cosmo.jackrabbit.io.SetDisplayNameCommand"/>
     <command id="make-ticketable"
              className="org.apache.jackrabbit.server.io.AddMixinCommand"
              nodeType="mix:ticketable"/>
@@ -60,10 +55,5 @@
   <chain name="export-resource">
     <command id="export-file"
              className="org.apache.jackrabbit.server.io.FileExportCommand"/>
-<!--
-    <command id="export-docxml"
-             className="org.apache.jackrabbit.server.io.XMLExportCommand"
-             mode="docview"/>
--->
   </chain>
 </catalog>

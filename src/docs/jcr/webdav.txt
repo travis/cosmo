@@ -44,7 +44,7 @@ PropertyDef
 NodeTypeName
   dav:resource
 SuperTypes
-  nt:hierarchyNode
+  nt:file
 IsMixin
   false
 HasOrderableChildNodes

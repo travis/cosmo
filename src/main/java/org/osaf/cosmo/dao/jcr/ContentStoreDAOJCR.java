@@ -46,10 +46,15 @@ public class ContentStoreDAOJCR extends JCRDaoSupport implements ShareDAO {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
                     Node rootNode = session.getRootNode();
+                    // XXX: calendar home type
                     Node homedirNode =
                         rootNode.addNode(username,
                                          CosmoJcrConstants.NT_DAV_COLLECTION);
                     homedirNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
+                    homedirNode.
+                        setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
+                                    username);
+                    // XXX: set calendar home properties
                     rootNode.save();
                     return null;
                 }

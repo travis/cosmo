@@ -80,6 +80,8 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
                         addNode(name, CosmoJcrConstants.NT_CALDAV_COLLECTION);
                     cc.addMixin(CosmoJcrConstants.NT_TICKETABLE);
                     cc.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
+                    cc.setProperty(CosmoJcrConstants.
+                                   NP_CALDAV_CALENDARDESCRIPTION, name);
 
                     // add subnodes representing calendar properties
                     // to the autocreated calendar node

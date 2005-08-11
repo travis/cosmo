@@ -33,8 +33,6 @@ WebDAV:
    property dav:displayname
 
 CalDAV:
- * calendar description: include CALDAV:calendar-description property
-   for homedirs and calendar collections (4.4.1)
  * calendar component restrictions: include
    CALDAV:calendar-component-restriction-set protected property for
    calendar collections specifying VEVENT only (4.4.2)

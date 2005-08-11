@@ -51,10 +51,11 @@ public class ContentStoreDAOJCR extends JCRDaoSupport implements ShareDAO {
                                          CosmoJcrConstants.NT_DAV_COLLECTION);
                     homedirNode.addMixin(CosmoJcrConstants.NT_CALDAV_HOME);
                     homedirNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
-                    homedirNode.
-                        setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
-                                    username);
-                    // XXX: set calendar home properties
+                    homedirNode.setProperty(CosmoJcrConstants.
+                                            NP_DAV_DISPLAYNAME, username);
+                    homedirNode.setProperty(CosmoJcrConstants.
+                                            NP_CALDAV_CALENDARDESCRIPTION,
+                                            username);
                     rootNode.save();
                     return null;
                 }

@@ -99,6 +99,8 @@ public class CosmoJcrConstants {
     public static final String NP_JCR_LASTMODIFIED = "jcr:lastModified";
 
     public static final String NP_DAV_DISPLAYNAME = "dav:displayname";
+    public static final String NP_CALDAV_CALENDARDESCRIPTION =
+        "caldav:calendardescription";
 
     public static final String NP_ID = "ticket:id";
     public static final String NP_OWNER = "ticket:owner";

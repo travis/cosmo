@@ -41,6 +41,8 @@ public class CosmoDavConstants {
     // defined by Xythos
     public static final Namespace NAMESPACE_TICKET =
         Namespace.getNamespace("ticket", "http://www.xythos.com/namespaces/StorageServer");
+    public static final Namespace NAMESPACE_CALDAV =
+        Namespace.getNamespace("C", "urn:ietf:params:xml:ns:caldav");
 
     // XML elements
 
@@ -55,6 +57,9 @@ public class CosmoDavConstants {
     public static final String ELEMENT_PRIVILEGE = "privilege";
     public static final String ELEMENT_READ = "read";
     public static final String ELEMENT_WRITE = "write";
+
+    public static final String ELEMENT_CALDAV_CALENDAR_HOME = "calendar-home";
+    public static final String ELEMENT_CALDAV_CALENDAR = "calendar";
 
     // XML values
 

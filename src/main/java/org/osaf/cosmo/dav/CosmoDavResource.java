@@ -47,6 +47,12 @@ public interface CosmoDavResource extends DavResource {
 
     /**
      * Returns true if this resource represents a calendar
+     * home collection.
+     */
+    public boolean isCalendarHomeCollection();
+
+    /**
+     * Returns true if this resource represents a calendar
      * collection.
      */
     public boolean isCalendarCollection();

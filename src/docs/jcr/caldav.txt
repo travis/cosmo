@@ -12,6 +12,23 @@ http://ietf.webdav.org/caldav/draft-dusseault-caldav.txt
 Node Type Definitions
 =====================
 
+Note 1: caldav:home is defined as a mixin, since a particular
+dav:collection could presumably play the role of both a caldav home
+collection and, say, a principal collection.
+
+# XXX: change caldav:collection to mixin
+
+NodeTypeName
+  caldav:home
+SuperTypes
+  []
+IsMixin
+  true
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+
 NodeTypeName
   caldav:collection
 SuperTypes
@@ -35,13 +52,31 @@ ChildNodeDef
 NodeTypeName
   caldav:resource
 SuperTypes
-  dav:resource
+  nt:hierarchyNode
 IsMixin
   false
 HasOrderableChildNodes
   false
 PrimaryItemName
   null
+PropertyDef
+  Name dav:displayname
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name *
+  RequiredType UNDEFINED
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
 
 NodeTypeName
   caldav:eventresource

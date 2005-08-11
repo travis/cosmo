@@ -79,6 +79,7 @@ public class CosmoJcrConstants {
     public static final String NT_TICKETABLE = "mix:ticketable";
     public static final String NT_TICKET = "ticket:ticket";
 
+    public static final String NT_CALDAV_HOME = "caldav:home";
     public static final String NT_CALDAV_COLLECTION = "caldav:collection";
     public static final String NT_CALDAV_RESOURCE = "caldav:resource";
     public static final String NT_CALDAV_EVENT_RESOURCE =

@@ -29,6 +29,9 @@ import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.jcr.JcrDavException;
+import org.apache.jackrabbit.webdav.property.DavPropertyName;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
+import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
 import org.apache.jackrabbit.webdav.simple.ResourceFilter;
 
@@ -43,6 +46,7 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
+import org.osaf.cosmo.dav.property.CosmoResourceType;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -54,8 +58,6 @@ import org.springframework.context.ApplicationContextAware;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.component.VEvent;
 
 /**
  * A subclass of
@@ -63,7 +65,7 @@ import net.fortuna.ical4j.model.component.VEvent;
  * that provides Cosmo-specific WebDAV behaviors.
  */
 public class CosmoDavResourceImpl extends DavResourceImpl 
-    implements CosmoDavResource , ApplicationContextAware {
+    implements CosmoDavResource, ApplicationContextAware {
     private static final Logger log = Logger.getLogger(CosmoDavResource.class);
     private static final String BEAN_CALENDAR_DAO = "calendarDao";
     private static final String BEAN_TICKET_DAO = "ticketDao";
@@ -72,6 +74,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     private String baseUrl;
     private ApplicationContext applicationContext;
     private MimeResolver mimeResolver;
+    private boolean initializing;
 
     /**
      */
@@ -82,6 +85,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         throws RepositoryException, DavException {
         super(locator, factory, session, filter);
         mimeResolver = new MimeResolver();
+        initializing = false;
     }
 
     // DavResource methods
@@ -89,22 +93,19 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     /**
      */
     public boolean isCollection() {
+        // DavResourceImpl assumes that a resource is a collection
+        // until proven otherwise, so we use the same strategy,
+        // checking all the node types we know represent
+        // addressable, non-collection resources.
         try {
-            // required because super.isCollection is private
-            Node node = getNode();
-            if (node == null) {
+            if (exists() &&
+                getNode().isNodeType(CosmoJcrConstants.NT_TICKET)) {
                 return false;
             }
-            if (node.isNodeType(CosmoJcrConstants.NT_DAV_COLLECTION)) {
-                return true;
-            }
-            if (node.isNodeType(CosmoJcrConstants.NT_TICKET)) {
-                return false;
-            }
+            return super.isCollection();
         } catch (RepositoryException e) {
             throw new RuntimeException(e);
         }
-        return super.isCollection();
     }
 
     /**
@@ -117,8 +118,10 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public String getSupportedMethods() {
         // can only make a calendar collection inside a regular
-        // collection (NEVER inside another calendar collection).
-        if (exists () && isCollection() && ! isCalendarCollection()) {
+        // collection (NEVER inside another calendar collection or
+        // inside a calendar home collection).
+        if (exists () && isCollection() && ! isCalendarCollection() &&
+            ! isCalendarHomeCollection()) {
             return CosmoDavResource.METHODS + ", MKCALENDAR";
         }
         return CosmoDavResource.METHODS;
@@ -149,6 +152,19 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     // CosmoDavResource methods
+
+    /**
+     * Returns true if this resource represents a calendar home
+     * collection.
+     */
+    public boolean isCalendarHomeCollection() {
+        try {
+            return exists() &&
+                getNode().isNodeType(CosmoJcrConstants.NT_CALDAV_HOME);
+        } catch (RepositoryException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Returns true if this resource represents a calendar
@@ -376,6 +392,39 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     public DavResourceLocator getHomedirLocator(String principal) {
         return getLocator().getFactory().
             createResourceLocator(baseUrl, "/" + principal);
+    }
+
+    // DavResourceImpl methods
+
+    /**
+     * Fills the set of properties
+     */
+    protected void initProperties() {
+        if (! initializing) {
+            initializing = true;
+            super.initProperties();
+            DavPropertySet properties = getProperties();
+
+            // override the default resource type property with our own
+            // that sets the appropriate resource types for calendar home
+            // collections (caldav section 4.2) and calendar collections
+            // (caldav section 4.3)
+            if (isCalendarCollection() ||
+                isCalendarHomeCollection()) {
+                int[] resourceTypes = new int[2];
+                resourceTypes[0] = CosmoResourceType.COLLECTION;
+                resourceTypes[1] = isCalendarCollection() ?
+                    CosmoResourceType.CALENDAR_COLLECTION :
+                    CosmoResourceType.CALENDAR_HOME;
+
+                properties.add(new CosmoResourceType(resourceTypes));
+                // Windows XP support
+                properties.add(new DefaultDavProperty(DavPropertyName.
+                                                      ISCOLLECTION,
+                                                      "1"));
+            }
+            initializing = false;
+        }
     }
 
     // ApplicationContextAware methods

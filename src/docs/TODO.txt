@@ -29,7 +29,6 @@ WebDAV:
  * extend PROPPATCH implementation to store arbitrary dead properties
    (upcoming jackrabbit feature will register new namespaces as they
    are encountered)
- * filter jcr: properties out of PROPFIND
  * support PROPPATCH for DAV:displayname by converting it to the jcr
    property dav:displayname
 

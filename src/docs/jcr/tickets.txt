@@ -83,7 +83,7 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 ChildNodeDef
-  Name dav:ticket
+  Name ticket:ticket
   RequiredPrimaryTypes [ticket:ticket]
   DefaultPrimaryType ticket:ticket
   AutoCreate false

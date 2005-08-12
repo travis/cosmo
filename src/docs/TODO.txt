@@ -26,11 +26,6 @@ See
 for current development plan. Additional tasks:
 
 WebDAV:
- * extend PROPPATCH implementation to store arbitrary dead properties
-   (upcoming jackrabbit feature will register new namespaces as they
-   are encountered)
- * support PROPPATCH for DAV:displayname by converting it to the jcr
-   property dav:displayname
 
 CalDAV:
  * calendar component restrictions: include

@@ -49,6 +49,7 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
+import org.osaf.cosmo.dav.property.CalendarComponentRestrictionSet;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.CosmoResourceType;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
@@ -427,36 +428,14 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                 properties.add(new DefaultDavProperty(DavPropertyName.
                                                       ISCOLLECTION,
                                                       "1"));
+            }
 
-                // calendar-description property (caldav section
-                // 4.4.1) - if it is not set on the node, return empty
-                // string
-                Property jcrprop = null;
-                try {
-                    jcrprop = getNode().
-                        getProperty(CosmoJcrConstants.
-                                    NP_CALDAV_CALENDARDESCRIPTION);
-                } catch (RepositoryException e) {
-                    log.error("Cannot retrieve " +
-                              CosmoJcrConstants.NP_CALDAV_CALENDARDESCRIPTION +
-                              " JCR property", e);
-                } finally {
-                    String value = "";
-                    try {
-                        value = jcrprop != null ? jcrprop.getString() : "";
-                    } catch (RepositoryException e) {
-                        // should never happen
-                        log.error("Cannot retrieve value for JCR property " +
-                                  CosmoJcrConstants.
-                                  NP_CALDAV_CALENDARDESCRIPTION, e);
-                    } finally {
-                        DavProperty davprop = 
-                            new DefaultDavProperty(CosmoDavPropertyName.
-                                                   CALENDARDESCRIPTION,
-                                                   value);
-                        properties.add(davprop);
-                    }
-                }
+            if (isCalendarCollection()) {
+                // calendar-component-restriction-set property (caldav
+                // section 4.4.2);
+                DavProperty davprop =
+                    new CalendarComponentRestrictionSet(ICALENDAR_COMPONENTS);
+                properties.add(davprop);
             }
 
             initializing = false;

@@ -22,6 +22,7 @@ import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 
+import org.osaf.cosmo.dav.property.CalendarComponentRestrictionSet;
 import org.osaf.cosmo.dav.ticket.TicketDavRequest;
 import org.osaf.cosmo.model.Ticket;
 
@@ -44,6 +45,14 @@ public interface CosmoDavResource extends DavResource {
      * which is only supported for certain resources).
      */
     public String METHODS = DavResource.METHODS + ", MKTICKET, DELTICKET";
+
+    /**
+     * An array of int constants representing the iCalendar
+     * components supported in a calendar collection.
+     */
+    public int[] ICALENDAR_COMPONENTS = {
+        CalendarComponentRestrictionSet.VEVENT
+    };
 
     /**
      * Returns true if this resource represents a calendar

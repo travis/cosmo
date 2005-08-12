@@ -60,6 +60,11 @@ public class CosmoDavConstants {
 
     public static final String ELEMENT_CALDAV_CALENDAR_HOME = "calendar-home";
     public static final String ELEMENT_CALDAV_CALENDAR = "calendar";
+    public static final String ELEMENT_CALDAV_COMP = "comp";
+
+    // XML attributes
+
+    public static final String ATTR_CALDAV_NAME = "name";
 
     // XML values
 
@@ -73,4 +78,6 @@ public class CosmoDavConstants {
     // caldav properties
     public static final String PROPERTY_CALDAV_CALENDAR_DESCRIPTION =
         "calendar-description";
+    public static final String PROPERTY_CALDAV_CALENDAR_COMPONENT_RESTRICTION_SET =
+        "calendar-component-restriction-set";
 }

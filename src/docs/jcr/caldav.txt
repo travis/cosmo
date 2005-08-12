@@ -29,7 +29,7 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 PropertyDef
-  Name caldav:calendardescription
+  Name caldav:calendar-description
   RequiredType STRING
   DefaultValues null
   AutoCreate false
@@ -58,7 +58,7 @@ ChildNodeDef
   Protected false
   SameNamedSibs false
 PropertyDef
-  Name caldav:calendardescription
+  Name caldav:calendar-description
   RequiredType STRING
   DefaultValues null
   AutoCreate false

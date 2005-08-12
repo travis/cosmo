@@ -28,10 +28,6 @@ for current development plan. Additional tasks:
 WebDAV:
 
 CalDAV:
- * calendar restrictions: include CALDAV:calendar-restrictions
-   protected property for calendar collections specifying
-   calendar-data with content-type "text/calendar" and version "2.0"
-   (4.4.3)
  * PUT: store event alarms and timezones
  * PUT: ensure that "If-None-Match: *" and "If-Match: <etag>" request
    headers are honored, and return ETag response header (4.6.2)

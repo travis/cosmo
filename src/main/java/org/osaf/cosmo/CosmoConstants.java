@@ -33,6 +33,12 @@ public class CosmoConstants {
     public static final String ICALENDAR_VERSION = "2.0";
 
     /**
+     * The content type for iCalendar resources: text/calendar, as
+     * specified by RFC 2445
+     */
+    public static final String ICALENDAR_CONTENT_TYPE = "text/calendar";
+
+    /**
      * The servlet context attribute which contains the Cosmo version
      * number.
      */

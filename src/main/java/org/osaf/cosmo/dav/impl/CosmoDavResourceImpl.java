@@ -50,6 +50,7 @@ import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
 import org.osaf.cosmo.dav.property.CalendarComponentRestrictionSet;
+import org.osaf.cosmo.dav.property.CalendarRestrictions;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.CosmoResourceType;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
@@ -432,10 +433,20 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
             if (isCalendarCollection()) {
                 // calendar-component-restriction-set property (caldav
-                // section 4.4.2);
+                // section 4.4.2)
+                // the entire Cosmo server allows only the components
+                // specified by this constant, and this behavior can
+                // not be modified by clients
                 DavProperty davprop =
                     new CalendarComponentRestrictionSet(ICALENDAR_COMPONENTS);
                 properties.add(davprop);
+
+                // calendar-restrictions property (caldav section
+                // 4.4.3)
+                // the entire Cosmo server allows non-calendar data
+                // within calendar collections, and this behavior can
+                // not be modified by clients
+                properties.add(new CalendarRestrictions());
             }
 
             initializing = false;

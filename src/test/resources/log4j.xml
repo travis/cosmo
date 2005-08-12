@@ -38,14 +38,6 @@
   </logger>
 
   <logger name="org.osaf">
-    <level value="DEBUG"/>
-  </logger>
-
-  <logger name="org.osaf.commons.spring.jcr.jackrabbit">
-    <level value="WARN"/>
-  </logger>
-
-  <logger name="org.osaf.cosmo.TestSecurityManager">
     <level value="WARN"/>
   </logger>
 

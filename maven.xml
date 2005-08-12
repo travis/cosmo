@@ -218,6 +218,7 @@
   </goal>
 
   <goal name="dist:db">
+    <delete dir="${cosmo.dist.version}/data/db"/> 
     <echo>Setting up db ${cosmo.dist.userdb.url}</echo>
     <sql driver="${cosmo.dist.userdb.driver}"
          url="${cosmo.dist.userdb.url}"

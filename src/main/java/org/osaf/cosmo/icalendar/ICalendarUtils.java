@@ -22,6 +22,7 @@ import java. util.Set;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.model.parameter.*;
 
@@ -64,6 +65,12 @@ public class ICalendarUtils {
     public static Comment getComment(Component component) {
         return (Comment)
             component.getProperties().getProperty(Property.COMMENT);
+    }
+
+    /**
+     */
+    public static PropertyList getComments(Component component) {
+        return component.getProperties().getProperties(Property.COMMENT);
     }
 
     /**
@@ -168,6 +175,12 @@ public class ICalendarUtils {
 
     /**
      */
+    public static PropertyList getRDates(Component component) {
+        return component.getProperties().getProperties(Property.RDATE);
+    }
+
+    /**
+     */
     public static RecurrenceId getRecurrenceId(Component component) {
         return (RecurrenceId)
             component.getProperties().getProperty(Property.RECURRENCE_ID);
@@ -202,6 +215,12 @@ public class ICalendarUtils {
 
     /**
      */
+    public static PropertyList getRRules(Component component) {
+        return component.getProperties().getProperties(Property.RRULE);
+    }
+
+    /**
+     */
     public static Sequence getSequence(Component component) {
         return (Sequence)
             component.getProperties().getProperty(Property.SEQUENCE);
@@ -224,6 +243,46 @@ public class ICalendarUtils {
      */
     public static Transp getTransp(Component component) {
         return (Transp) component.getProperties().getProperty(Property.TRANSP);
+    }
+
+    /**
+     */
+    public static PropertyList getTzNames(Component component) {
+        return component.getProperties().getProperties(Property.TZNAME);
+    }
+
+    /**
+     */
+    public static TzName getTzName(Component component) {
+        return (TzName) component.getProperties().getProperty(Property.TZNAME);
+    }
+
+    /**
+     */
+    public static TzOffsetFrom getTzOffsetFrom(Component component) {
+        return (TzOffsetFrom) component.getProperties().
+            getProperty(Property.TZOFFSETFROM);
+    }
+
+    /**
+     */
+    public static TzOffsetTo getTzOffsetTo(Component component) {
+        return (TzOffsetTo) component.getProperties().
+            getProperty(Property.TZOFFSETTO);
+    }
+
+    /**
+     */
+    public static net.fortuna.ical4j.model.property.TzId
+        getTzId(Component component) {
+        return (net.fortuna.ical4j.model.property.TzId)
+            component.getProperties().getProperty(Property.TZID);
+    }
+
+    /**
+     */
+    public static TzUrl getTzUrl(Component component) {
+        return (TzUrl) component.getProperties().getProperty(Property.TZURL);
     }
 
     /**

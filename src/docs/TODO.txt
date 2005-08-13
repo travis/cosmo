@@ -28,7 +28,7 @@ for current development plan. Additional tasks:
 WebDAV:
 
 CalDAV:
- * PUT: store event alarms and timezones
+ * PUT: store event alarms
  * PUT: ensure that "If-None-Match: *" and "If-Match: <etag>" request
    headers are honored, and return ETag response header (4.6.2)
  * PUT: make sure uid isn't already used when creating the resource

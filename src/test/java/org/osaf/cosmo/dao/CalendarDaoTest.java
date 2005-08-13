@@ -18,6 +18,7 @@ package org.osaf.cosmo.dao;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.Summary;
 
 import org.osaf.cosmo.BaseCoreTestCase;
@@ -88,8 +89,11 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         String name = summary.getValue() + ".ics";
         calendar1.getComponents().add(event1);
 
+        // add its timezone
+        calendar1.getComponents().add(VTimeZone.getDefault());
+
         // create the resource in the repository
-        dao.createCalendarResource(path, name, calendar1);
+        dao.setCalendarResource(path, name, calendar1);
 
         // XXX: get the event
 
@@ -106,9 +110,10 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         // create a calendar
         Calendar calendar1 = TestHelper.makeDummyCalendar();
 
+
         // try to create the empty resource in the repository
         try {
-            dao.createCalendarResource(path, "blah", calendar1);
+            dao.setCalendarResource(path, "blah", calendar1);
             fail("should not have been able to create empty calendar resource");
         } catch (UnsupportedFeatureException e) {
             // expected

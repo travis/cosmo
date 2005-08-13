@@ -41,6 +41,12 @@
     <level value="WARN"/>
   </logger>
 
+<!--
+  <logger name="org.osaf.cosmo.dao">
+    <level value="DEBUG"/>
+  </logger>
+-->
+
   <root>
     <level value="WARN"/>
     <appender-ref ref="CONSOLE"/>

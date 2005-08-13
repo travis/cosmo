@@ -29,6 +29,9 @@ public class CosmoJcrConstants {
     public static final String NN_ICAL_COMPONENT = "icalendar:component";
     public static final String NN_ICAL_REVENT = "icalendar:revent";
     public static final String NN_ICAL_EXEVENT = "icalendar:exevent";
+    public static final String NN_ICAL_TIMEZONE = "icalendar:timezone";
+    public static final String NN_ICAL_STANDARD = "icalendar:standard";
+    public static final String NN_ICAL_DAYLIGHT = "icalendar:daylight";
     public static final String NN_ICAL_PRODID = "icalendar:prodid";
     public static final String NN_ICAL_VERSION = "icalendar:version";
     public static final String NN_ICAL_CALSCALE = "icalendar:calscale";
@@ -66,6 +69,11 @@ public class CosmoJcrConstants {
     public static final String NN_ICAL_STATUS = "icalendar:status";
     public static final String NN_ICAL_SUMMARY = "icalendar:summary";
     public static final String NN_ICAL_TRANSP = "icalendar:transp";
+    public static final String NN_ICAL_TZID = "icalendar:tzid";
+    public static final String NN_ICAL_TZNAME = "icalendar:tzname";
+    public static final String NN_ICAL_TZOFFSETFROM = "icalendar:tzoffsetfrom";
+    public static final String NN_ICAL_TZOFFSETTO = "icalendar:tzoffsetto";
+    public static final String NN_ICAL_TZURL = "icalendar:tzurl";
     public static final String NN_ICAL_UID = "icalendar:uid";
     public static final String NN_ICAL_URL = "icalendar:url";
 
@@ -141,6 +149,7 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_LONGITUDE = "icalendar:longitude";
     public static final String NP_ICAL_MAXVERSION = "icalendar:maxversion";
     public static final String NP_ICAL_MEMBER = "icalendar:member";
+    public static final String NP_ICAL_OFFSET = "icalendar:offset";
     public static final String NP_ICAL_PARTSTAT = "icalendar:partstat";
     public static final String NP_ICAL_RANGE = "icalendar:range";
     public static final String NP_ICAL_RELTYPE = "icalendar:reltype";

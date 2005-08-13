@@ -791,7 +791,7 @@ PrimaryItemName
   icalendar:offset
 PropertyDef
   Name icalendar:offset
-  RequiredType DOUBLE
+  RequiredType LONG
   DefaultValues null
   AutoCreate false
   Mandatory true
@@ -811,7 +811,7 @@ PrimaryItemName
   icalendar:offset
 PropertyDef
   Name icalendar:offset
-  RequiredType DOUBLE
+  RequiredType LONG
   DefaultValues null
   AutoCreate false
   Mandatory true
@@ -2569,7 +2569,7 @@ ChildNodeDef
   Protected false
   SameNamedSibs false
 ChildNodeDef
-  Name icalendar:standardc
+  Name icalendar:standard
   RequiredPrimaryTypes [icalendar:tzprop]
   DefaultPrimaryType icalendar:tzprop
   AutoCreate false
@@ -2578,7 +2578,7 @@ ChildNodeDef
   Protected false
   SameNamedSibs true
 ChildNodeDef
-  Name icalendar:daylightc
+  Name icalendar:daylight
   RequiredPrimaryTypes [icalendar:tzprop]
   DefaultPrimaryType icalendar:tzprop
   AutoCreate false

@@ -64,6 +64,7 @@ public class TestHelper {
         int duration = 1000 * 60 * 60;
  
         VEvent event = new VEvent(start.getTime(), duration, summary);
+        event.getProperties().add(new Uid(serial));
  
         // add timezone information..
         VTimeZone tz = VTimeZone.getDefault();

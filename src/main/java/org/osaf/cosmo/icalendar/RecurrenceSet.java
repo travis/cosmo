@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.icalendar;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,16 +59,16 @@ public class RecurrenceSet {
 
     /**
      */
-    public void addComponents(Set components) {
+    public void add(Collection components) {
         for (Iterator i=components.iterator(); i.hasNext();) {
             Component component = (Component) i.next();
-            addComponent(component);
+            add(component);
         }
     }
 
     /**
      */
-    public void addComponent(Component component) {
+    public void add(Component component) {
         components.put(getComponentKey(component), component);
 
         RDate rdate = ICalendarUtils.getRDate(component);
@@ -94,8 +95,14 @@ public class RecurrenceSet {
 
     /**
      */
-    public Component getComponent(Date date) {
+    public Component get(Date date) {
         return (Component) components.get(getComponentKey(date));
+    }
+
+    /**
+     */
+    public boolean contains(Date date) {
+        return components.containsKey(getComponentKey(date));
     }
 
     /**
@@ -123,12 +130,12 @@ public class RecurrenceSet {
     /**
      */
     public boolean isEmpty() {
-        return master == null && exceptions.isEmpty();
+        return components.isEmpty();
     }
 
     /**
      */
-    protected Long getComponentKey(Component component) {
+    public static Long getComponentKey(Component component) {
         RecurrenceId recurid = ICalendarUtils.getRecurrenceId(component);
         log.debug("recurid: " + recurid);
         if (recurid == null) {
@@ -139,7 +146,7 @@ public class RecurrenceSet {
 
     /**
      */
-    protected Long getComponentKey(Date date) {
+    public static Long getComponentKey(Date date) {
         return new Long(date.getTime());
     }
 }

@@ -43,6 +43,7 @@ import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.UnsupportedFeatureException;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
+import org.osaf.cosmo.icalendar.RecurrenceSet;
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.jcr.JCRUtils;
 
@@ -171,8 +172,9 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
     }
 
     /**
-     * Creates a calendar resource in the repository. A calendar
-     * resource contains one or more calendar components.
+     * Creates a calendar resource in the repository, or updates the
+     * resource if it already exists. A calendar resource contains one
+     * or more calendar components.
      *
      * The only supported "top level" calendar component is
      * event. Events are typically associated with timezones and
@@ -192,70 +194,40 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
      *
      * @throws {@link UnsupportedFeatureException} if the
      * <code>Calendar</code> does not contain an event.
+     * @throws {@link RecurrenceFeatureException} if a recurring event
+     * is improperly specified (no master event, etc)
      */
-    public void createCalendarResource(final String path,
-                                       final String name,
-                                       Calendar calendar) {
+    public void setCalendarResource(final String path,
+                                    final String name,
+                                    Calendar calendar) {
         // find all supported components within the calendar
-        // XXX: timezones
-        final HashSet events = new HashSet();
+        final RecurrenceSet events = new RecurrenceSet();
         for (Iterator i=calendar.getComponents().iterator(); i.hasNext();) {
             Component component = (Component) i.next();
             if (component instanceof VEvent) {
-                events.add(component);
+                events.addComponent(component);
             }
             else {
+                // XXX: timezones
                 if (log.isDebugEnabled()) {
-                    log.debug("ignoring unsupported component " + component);
+                    log.debug("ignoring unsupported component " +
+                              component.getName());
                 }
             }
         }
+
         if (events.isEmpty()) {
-            throw new UnsupportedFeatureException("No events found");
+            throw new UnsupportedFeatureException("No supported components" +
+                                                  " found");
         }
 
         getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
-                    // find parent node
                     Node parentNode = JCRUtils.findNode(session, path);
-                    
-                    // add resource node
-                    if (log.isDebugEnabled()) {
-                        log.debug("creating calendar resource node " + name +
-                                  " below " + parentNode.getPath());
-                    }
-                    Node resourceNode = parentNode.
-                        addNode(name,
-                                CosmoJcrConstants.NT_CALDAV_EVENT_RESOURCE);
-                    resourceNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
-                    JCRUtils.setDateValue(resourceNode,
-                                          CosmoJcrConstants.NP_JCR_LASTMODIFIED,
-                                          null);
-
-                    setEventNodes(resourceNode, events);
-
-                    // set the display name to be the event summary if
-                    // one exists or the resource name otherwise
-                    Node reventNode = resourceNode.
-                        getNode(CosmoJcrConstants.NN_ICAL_REVENT);
-                    if (reventNode.hasNode(CosmoJcrConstants.NN_ICAL_SUMMARY)) {
-                        String summary =
-                            reventNode.
-                            getProperty(CosmoJcrConstants.NN_ICAL_SUMMARY +
-                                        "/" +
-                                        CosmoJcrConstants.NP_ICAL_VALUE).
-                            getString();
-                        resourceNode.
-                            setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
-                                        summary);
-                    }
-                    else {
-                        resourceNode.
-                            setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
-                                        name);
-                    }
-
+                    Node resourceNode = setEventResourceNode(name, parentNode);
+                    // XXX: check to see if this uid is in use
+                    setEventNodes(events, resourceNode);
                     parentNode.save();
                     return null;
                 }
@@ -266,56 +238,91 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
     /**
      */
-    protected void setEventNodes(Node resourceNode,
-                                 Set events)
+    protected Node setEventResourceNode(String name,
+                                        Node parentNode)
         throws RepositoryException {
-        // find master and exception events. ical4j ideally should
-        // have api for this.
-        VEvent masterEvent = null;
-        HashSet exceptionEvents = new HashSet();
-        if (events.size() == 1) {
-            masterEvent = (VEvent) events.iterator().next();
-        }
-        else {
-            for (Iterator i=events.iterator(); i.hasNext();) {
-                VEvent event = (VEvent) i.next();
-                if (ICalendarUtils.getRRule(event) != null) {
-                    masterEvent = event;
-                }
-                else {
-                    exceptionEvents.add(event);
-                }
-            }
-            if (masterEvent == null) {
-                throw new UnsupportedFeatureException("Master event missing");
-            }
-        }
-
-        // XXX: check for uids already in use
-        // XXX: is this the correct way to handle recurrence?
-        // XXX: allow for existing nodes
-        // XXX: alarms
-
-        // add master event node
-        if (log.isDebugEnabled()) {
-            log.debug("creating revent node below " +
-                      resourceNode.getPath());
-        }
-        Node reventNode = resourceNode.
-            addNode(CosmoJcrConstants.NN_ICAL_REVENT);
-        setEventPropertyNodes(masterEvent, reventNode);
-
-        // add exception event nodes
-        for (Iterator i=exceptionEvents.iterator(); i.hasNext();) {
-            VEvent exevent = (VEvent) i.next();
+        Node resourceNode = null;
+        try {
+            resourceNode = parentNode.getNode(name);
+        } catch (PathNotFoundException e) {
             if (log.isDebugEnabled()) {
-                log.debug("creating exevent node" +
-                          " below " + resourceNode.getPath());
+                log.debug("creating calendar resource node " +
+                          name + " below " + parentNode.getPath());
             }
-            Node exeventNode = resourceNode.
-                addNode(CosmoJcrConstants.NN_ICAL_EXEVENT);
-            setEventPropertyNodes(exevent, exeventNode);
+            resourceNode =
+                parentNode.addNode(name,
+                                   CosmoJcrConstants.NT_CALDAV_EVENT_RESOURCE);
+            resourceNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
+            resourceNode.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
+                                     name);
+            JCRUtils.setDateValue(resourceNode,
+                                  CosmoJcrConstants.NP_JCR_LASTMODIFIED,
+                                  null);
         }
+        return resourceNode;
+    }
+
+    /**
+     */
+    protected void setEventNodes(RecurrenceSet events,
+                                 Node resourceNode)
+        throws RepositoryException {
+        setMasterEventNode((VEvent) events.getMaster(), resourceNode);
+
+        // brute force implementation: remove all exception event
+        // nodes and then set new ones for the ones listed in the
+        // recurrence set.
+        // XXX: enhance by removing only the ones that aren't listed
+        // in the recurrence set, which requires us to be able to
+        // uniquely identify each exevent node and each exception
+        // event in the recurrence set
+        for (NodeIterator i=resourceNode.
+                 getNodes(CosmoJcrConstants.NN_ICAL_EXEVENT); i.hasNext();) {
+            i.nextNode().remove();
+        }
+        for (Iterator i=events.getExceptions().iterator();
+             i.hasNext();) {
+            VEvent exceptionEvent = (VEvent) i.next();
+            setExceptionEventNode(exceptionEvent, resourceNode);
+        }
+    }
+
+    /**
+     */
+    protected void setMasterEventNode(VEvent event,
+                                      Node resourceNode)
+        throws RepositoryException {
+        Node eventNode = null;
+        try {
+            eventNode = resourceNode.getNode(CosmoJcrConstants.NN_ICAL_REVENT);
+        } catch (PathNotFoundException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("creating revent node below " +
+                          resourceNode.getPath());
+            }
+            eventNode =
+                resourceNode.addNode(CosmoJcrConstants.NN_ICAL_REVENT);
+        }
+        setEventPropertyNodes(event, eventNode);
+        // XXX: alarms
+    }
+
+    /**
+     */
+    protected void setExceptionEventNode(VEvent event,
+                                         Node resourceNode)
+        throws RepositoryException {
+        // for the moment we do not have to worry about finding an
+        // existing version of the node since we removed all existing
+        // ones before setting any new ones
+        if (log.isDebugEnabled()) {
+            log.debug("creating exevent node" +
+                      " below " + resourceNode.getPath());
+        }
+        Node eventNode =
+            resourceNode.addNode(CosmoJcrConstants.NN_ICAL_EXEVENT);
+        setEventPropertyNodes(event, eventNode);
+        // XXX: alarms
     }
 
     /**

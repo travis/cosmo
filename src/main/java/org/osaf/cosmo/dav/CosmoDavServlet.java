@@ -113,15 +113,15 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                               int method,
                               DavResource resource)
             throws ServletException, IOException, DavException {
-        if (method > 0) {
-            return super.execute(request, response, method, resource);
-        }
-
         CosmoDavRequestImpl cosmoRequest = new CosmoDavRequestImpl(request);
         CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
         CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
         cosmoResource.setBaseUrl(cosmoRequest.getBaseUrl());
         cosmoResource.setApplicationContext(wac);
+
+        if (method > 0) {
+            return super.execute(request, response, method, cosmoResource);
+        }
 
         method = CosmoDavMethods.getMethodCode(request.getMethod());
         switch (method) {

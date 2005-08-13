@@ -31,8 +31,10 @@ CalDAV:
  * PUT: store event alarms and timezones
  * PUT: ensure that "If-None-Match: *" and "If-Match: <etag>" request
    headers are honored, and return ETag response header (4.6.2)
- * PUT: honor preconditions - uid already, exists, invalid calendar
-   resource (4.6.2)
+ * PUT: make sure uid isn't already used when creating the resource
+   (4.6.2)
+ * PUT: only remove existing exception event nodes rather than all of
+   them
 
 Tickets:
  * consider splitting security config into completely separate ones
@@ -47,17 +49,11 @@ General:
  * find a better way to specify configuration items than using j2ee
    environment entries
  * look into litmus failures
- * potentially find a server- or webapp-startup-time equivalent for
-   repo init that can use existing security mechanisms rather than
-   relying on repository_init.xml which has to be kept in sync with
-   the test and production repository.xml files
  * figure out how to make Acegi Security not cache the token if it
    doesn't authenticate or if access is denied. caching the token
    causes problems for clients that send the session cookie to the
    server (cadaver, browsers, etc.) - low priority since chandler does
    not deal with the session cookie
- * figure out why cadaver tacks on a / to the query string when we
-   try to open a url with a ticket in the query string
 
 LATER RELEASES
 ==============
@@ -66,7 +62,7 @@ See "Deferred Features" section of the 0.2 Spec at
 <http://cvs.osafoundation.org/viewcvs.cgi/*checkout*/cosmo/src/docs/spec/cosmo-0.2-spec.html?rev=HEAD&content-type=text/html>. Additonal tasks:
 
  * support the ticketdiscovery property on PROPFIND requests
- * support OPTIONS and PROPFTIND requests for principal URLs
+ * support OPTIONS and PROPFIND requests for principal URLs
  * account activation
     o system generates email at signup containing activation url; user
       must click the url to confirm his address and activation his

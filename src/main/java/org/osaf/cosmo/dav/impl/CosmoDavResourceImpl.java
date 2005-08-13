@@ -24,6 +24,10 @@ import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
+
 import org.apache.jackrabbit.server.io.MimeResolver;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
@@ -54,6 +58,7 @@ import org.osaf.cosmo.dav.property.CalendarRestrictions;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.CosmoResourceType;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
+import org.osaf.cosmo.icalendar.RecurrenceException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
@@ -61,9 +66,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.model.Calendar;
 
 /**
  * A subclass of
@@ -105,7 +107,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         // addressable, non-collection resources.
         try {
             if (exists() &&
-                getNode().isNodeType(CosmoJcrConstants.NT_TICKET)) {
+                (getNode().isNodeType(CosmoJcrConstants.NT_TICKET) ||
+                 getNode().isNodeType(CosmoJcrConstants.NT_DAV_RESOURCE) ||
+                 getNode().isNodeType(CosmoJcrConstants.NT_CALDAV_RESOURCE))) {
                 return false;
             }
             return super.isCollection();
@@ -147,7 +151,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     public void addMember(DavResource member,
                           InputStream in)
         throws DavException {
-        CosmoDavResource cdr = (CosmoDavResource) member;
+        CosmoDavResourceImpl cdr = (CosmoDavResourceImpl) member;
         if (cdr.isCalendarResource()) {
             addCalendarResource(cdr, in);
         }
@@ -256,16 +260,26 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             CalendarDao dao = (CalendarDao) applicationContext.
                 getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
             // XXX: different dao method for existing resource?
-            dao.createCalendarResource(parent.getPath(),
-                                       resource.getDisplayName(),
-                                       calendar);
+            dao.setCalendarResource(parent.getPath(),
+                                    resource.getDisplayName(),
+                                    calendar);
+        } catch (ParserException e) {
+            // indicates an incorrectly-formatted resource
+            throw new DavException(CosmoDavResponse.SC_FORBIDDEN,
+                                   "Error parsing calendar resource: " +
+                                   e.getMessage());
         } catch (UnsupportedFeatureException e) {
-            log.error("calendar resource not supported", e);
-            throw new DavException(CosmoDavResponse.SC_CONFLICT);
-        } catch (DataIntegrityViolationException e) {
-            log.error("resource " + resource.getResourcePath() +
-                      " already exists", e);
-            throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
+            // indicates that no supported component types were found
+            // in the resource
+            throw new DavException(CosmoDavResponse.SC_CONFLICT,
+                                   e.getMessage());
+        } catch (RecurrenceException e) {
+            // indicates an incorrectly-constructed recurring event
+            // resource
+            throw new DavException(CosmoDavResponse.SC_FORBIDDEN,
+                                   e.getMessage());
+        } catch (DavException e) {
+            throw e;
         } catch (Exception e) {
             log.error("cannot add calendar resource", e);
             if (e instanceof DataAccessException &&

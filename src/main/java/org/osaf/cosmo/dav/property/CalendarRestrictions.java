@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.dav.property;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
 
 import org.jdom.Element;

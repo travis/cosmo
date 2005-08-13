@@ -50,8 +50,9 @@ public interface CalendarDao extends DAO {
     public void deleteCalendar(String path);
 
     /**
-     * Creates a calendar resource in the repository. A calendar
-     * resource contains one or more calendar components.
+     * Creates a calendar resource in the repository, or updates the
+     * resource if it already exists. A calendar resource contains one
+     * or more calendar components.
      *
      * The only supported "top level" calendar component is
      * event. Events are typically associated with timezones and
@@ -72,7 +73,7 @@ public interface CalendarDao extends DAO {
      * @throws {@link UnsupportedFeatureException} if the
      * <code>Calendar</code> does not contain an event.
      */
-    public void createCalendarResource(String path,
-                                       String name,
-                                       Calendar calendar);
+    public void setCalendarResource(String path,
+                                    String name,
+                                    Calendar calendar);
 }

@@ -15,6 +15,7 @@
 -->
 
 <project xmlns:j="jelly:core" xmlns:ant="jelly:ant"
+         xmlns:define="jelly:define"
          xmlns:jackrabbit="jackrabbit">
   <goal name="build">
     <attainGoal name="war:webapp"/>
@@ -301,5 +302,79 @@
   <goal name="dist:clean-data">
     <delete file="${cosmo.dist.version}/data"/>
   </goal>
+
+  <define:taglib uri="jackrabbit">
+    <define:tag name="import">
+      <j:catch var="exception">
+        <j:new var="importer"
+               className="org.osaf.commons.jackrabbit.NodeTypeImporter"/>
+        <j:invoke on="${importer}" method="setConfigFilePath">
+          <j:arg value="${configFilePath}"/>
+        </j:invoke>
+        <j:invoke on="${importer}" method="setRepositoryHomedirPath">
+          <j:arg value="${repositoryHomedirPath}"/>
+        </j:invoke>
+        <j:invoke on="${importer}" method="setSubject">
+          <j:arg value="${username}"/>
+          <j:arg value="${password}"/>
+        </j:invoke>
+        <j:invoke on="${importer}" method="importDescriptor">
+          <j:arg value="${descriptor}"/>
+        </j:invoke>
+      </j:catch>
+      <j:if test="${exception != null}">
+        <j:invoke on="${exception}" method="printStackTrace"/>
+        <j:choose>
+          <j:when test="${exception.cause != null}">
+            <j:choose>
+              <j:when test="${exception.cause.cause != null}">
+                <ant:fail>${exception.cause.cause.message}</ant:fail>
+              </j:when>
+              <j:otherwise>
+                <ant:fail>${exception.cause.message}</ant:fail>
+              </j:otherwise>
+            </j:choose>
+          </j:when>
+          <j:otherwise>
+            <ant:fail>${exception.message}</ant:fail>
+          </j:otherwise>
+        </j:choose>
+      </j:if>
+    </define:tag>
+
+    <define:tag name="generate">
+      <ant:uptodate property="descriptoruptodate"
+                    srcfile="${catalog}" targetfile="${descriptor}"/>
+      <j:if test="${not descriptoruptodate}">
+        <j:catch var="exception">
+          <ant:echo>generating node type descriptor ${descriptor} from catalog ${catalog}</ant:echo>
+          <j:new var="generator"
+                 className="org.osaf.commons.jackrabbit.NodeTypeDescriptorGenerator"/>
+          <j:invoke on="${generator}" method="generateDescriptor">
+            <j:arg value="${catalog}"/>
+            <j:arg value="${descriptor}"/>
+          </j:invoke>
+        </j:catch>
+        <j:if test="${exception != null}">
+          <j:invoke on="${exception}" method="printStackTrace"/>
+          <j:choose>
+            <j:when test="${exception.cause != null}">
+              <j:choose>
+                <j:when test="${exception.cause.cause != null}">
+                  <ant:fail>${exception.cause.cause.message}</ant:fail>
+                </j:when>
+                <j:otherwise>
+                  <ant:fail>${exception.cause.message}</ant:fail>
+                </j:otherwise>
+              </j:choose>
+            </j:when>
+            <j:otherwise>
+              <ant:fail>${exception.message}</ant:fail>
+            </j:otherwise>
+          </j:choose>
+        </j:if>
+      </j:if>
+    </define:tag>
+  </define:taglib>
 
 </project>

@@ -32,10 +32,12 @@ public class CosmoJcrConstants {
     public static final String NN_ICAL_TIMEZONE = "icalendar:timezone";
     public static final String NN_ICAL_STANDARD = "icalendar:standard";
     public static final String NN_ICAL_DAYLIGHT = "icalendar:daylight";
+    public static final String NN_ICAL_ALARM = "icalendar:alarm";
     public static final String NN_ICAL_PRODID = "icalendar:prodid";
     public static final String NN_ICAL_VERSION = "icalendar:version";
     public static final String NN_ICAL_CALSCALE = "icalendar:calscale";
     public static final String NN_ICAL_METHOD = "icalendar:method";
+    public static final String NN_ICAL_ACTION = "icalendar:action";
     public static final String NN_ICAL_ATTACH = "icalendar:attach";
     public static final String NN_ICAL_ATTENDEE = "icalendar:attendee";
     public static final String NN_ICAL_CATEGORIES = "icalendar:categories";
@@ -61,6 +63,7 @@ public class CosmoJcrConstants {
     public static final String NN_ICAL_RECUR = "icalendar:recur";
     public static final String NN_ICAL_RECURRENCEID = "icalendar:recurrenceid";
     public static final String NN_ICAL_RELATEDTO = "icalendar:relatedto";
+    public static final String NN_ICAL_REPEAT = "icalendar:repeat";
     public static final String NN_ICAL_REQUESTSTATUS =
         "icalendar:requeststatus";
     public static final String NN_ICAL_RESOURCES = "icalendar:resources";
@@ -69,6 +72,7 @@ public class CosmoJcrConstants {
     public static final String NN_ICAL_STATUS = "icalendar:status";
     public static final String NN_ICAL_SUMMARY = "icalendar:summary";
     public static final String NN_ICAL_TRANSP = "icalendar:transp";
+    public static final String NN_ICAL_TRIGGER = "icalendar:trigger";
     public static final String NN_ICAL_TZID = "icalendar:tzid";
     public static final String NN_ICAL_TZNAME = "icalendar:tzname";
     public static final String NN_ICAL_TZOFFSETFROM = "icalendar:tzoffsetfrom";
@@ -155,6 +159,7 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_OFFSET = "icalendar:offset";
     public static final String NP_ICAL_PARTSTAT = "icalendar:partstat";
     public static final String NP_ICAL_RANGE = "icalendar:range";
+    public static final String NP_ICAL_RELATED = "icalendar:related";
     public static final String NP_ICAL_RELTYPE = "icalendar:reltype";
     public static final String NP_ICAL_REQUESTSTATUS =
         "icalendar:requeststatus";

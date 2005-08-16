@@ -35,6 +35,13 @@ public class ICalendarUtils {
 
     /**
      */
+    public static Action getAction(Component component) {
+        return (Action)
+            component.getProperties().getProperty(Property.ACTION);
+    }
+
+    /**
+     */
     public static Attach getAttach(Component component) {
         return (Attach)
             component.getProperties().getProperty(Property.ATTACH);
@@ -45,6 +52,12 @@ public class ICalendarUtils {
     public static Attendee getAttendee(Component component) {
         return (Attendee)
             component.getProperties().getProperty(Property.ATTENDEE);
+    }
+
+    /**
+     */
+    public static PropertyList getAttendees(Component component) {
+        return component.getProperties().getProperties(Property.ATTENDEE);
     }
 
     /**
@@ -195,6 +208,13 @@ public class ICalendarUtils {
 
     /**
      */
+    public static Repeat getRepeat(Component component) {
+        return (Repeat)
+            component.getProperties().getProperty(Property.REPEAT);
+    }
+
+    /**
+     */
     public static RequestStatus getRequestStatus(Component component) {
         return (RequestStatus)
             component.getProperties().getProperty(Property.REQUEST_STATUS);
@@ -243,6 +263,12 @@ public class ICalendarUtils {
      */
     public static Transp getTransp(Component component) {
         return (Transp) component.getProperties().getProperty(Property.TRANSP);
+    }
+
+    /**
+     */
+    public static Trigger getTrigger(Component component) {
+        return (Trigger) component.getProperties().getProperty(Property.TRIGGER);
     }
 
     /**
@@ -388,6 +414,13 @@ public class ICalendarUtils {
      */
     public static Range getRange(Property property) {
         return (Range) property.getParameters().getParameter(Parameter.RANGE);
+    }
+
+    /**
+     */
+    public static Related getRelated(Property property) {
+        return (Related) property.getParameters().
+            getParameter(Parameter.RELATED);
     }
 
     /**

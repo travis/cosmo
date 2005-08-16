@@ -260,9 +260,6 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
             resourceNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
             resourceNode.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
                                      name);
-            JCRUtils.setDateValue(resourceNode,
-                                  CosmoJcrConstants.NP_JCR_LASTMODIFIED,
-                                  null);
         }
         return resourceNode;
     }
@@ -294,32 +291,6 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
     /**
      */
-    protected void setTimeZoneNodes(Map timezones,
-                                    Node resourceNode)
-        throws RepositoryException {
-        // find all timezone nodes and remove the ones that don't have
-        // corresponding timezones in the map
-        for (NodeIterator i=resourceNode.
-                 getNodes(CosmoJcrConstants.NN_ICAL_TIMEZONE); i.hasNext();) {
-            Node tzNode = i.nextNode();
-            Node tzidNode =
-                getICalendarPropertyNode(CosmoJcrConstants.NN_ICAL_TZID,
-                                         tzNode);
-            String tzid = getValueProperty(tzidNode).getString();
-            if (! timezones.containsKey(tzid)) {
-                tzNode.remove();
-            }
-        }
-
-        // set timezone nodes for each timezone in the map
-        for (Iterator i=timezones.values().iterator(); i.hasNext();) {
-            VTimeZone timezone = (VTimeZone) i.next();
-            setTimeZoneNode(timezone, resourceNode);
-        }
-    }
-
-    /**
-     */
     protected void setMasterEventNode(VEvent event,
                                       Node resourceNode)
         throws RepositoryException {
@@ -331,7 +302,7 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
                 resourceNode.addNode(CosmoJcrConstants.NN_ICAL_REVENT);
         }
         setEventPropertyNodes(event, eventNode);
-        // XXX: alarms
+        setAlarmNodes(event.getAlarms(), eventNode);
     }
 
     /**
@@ -345,23 +316,46 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
         Node eventNode =
             resourceNode.addNode(CosmoJcrConstants.NN_ICAL_EXEVENT);
         setEventPropertyNodes(event, eventNode);
-        // XXX: alarms
+        setAlarmNodes(event.getAlarms(), eventNode);
     }
 
     /**
      */
-    protected void setTimeZoneNode(VTimeZone timezone,
-                                   Node resourceNode)
+    protected void setAlarmNodes(ComponentList alarms,
+                                 Node componentNode)
         throws RepositoryException {
-        Node componentNode = null;
-        try {
-            componentNode =
-                resourceNode.getNode(CosmoJcrConstants.NN_ICAL_TIMEZONE);
-        } catch (PathNotFoundException e) {
-            componentNode =
-                resourceNode.addNode(CosmoJcrConstants.NN_ICAL_TIMEZONE);
+        // since there is no way to uniquely identify an
+        // already-stored alarm, remove all pre-existing alarm nodes
+        // from the component node, which means we don't have to worry
+        // about finding one that matches the given alarm
+        for (NodeIterator i=componentNode.
+                 getNodes(CosmoJcrConstants.NN_ICAL_ALARM); i.hasNext();) {
+            i.nextNode().remove();
         }
-        setTimeZonePropertyNodes(timezone, componentNode);
+        for (Iterator i=alarms.iterator(); i.hasNext();) {
+            VAlarm alarm = (VAlarm) i.next();
+            setAlarmNode(alarm, componentNode);
+        }
+    }
+
+    /**
+     */
+    protected void setAlarmNode(VAlarm alarm,
+                                Node componentNode)
+        throws RepositoryException {
+        Node alarmNode = componentNode.addNode(CosmoJcrConstants.NN_ICAL_ALARM);
+        setActionPropertyNode(alarm, alarmNode);
+        setTriggerPropertyNode(alarm, alarmNode);
+        setDurationPropertyNode(alarm, alarmNode);
+        setRepeatPropertyNode(alarm, alarmNode);
+        setAttachPropertyNode(alarm, alarmNode);
+        setDescriptionPropertyNode(alarm, alarmNode);
+        setSummaryPropertyNode(alarm, alarmNode);
+        for (Iterator i=ICalendarUtils.getAttendees(alarm).iterator();
+             i.hasNext();) {
+            setAttendeePropertyNode((Attendee) i.next(), componentNode);
+        }
+        setXPropertyNodes(alarm, alarmNode);
     }
 
     /**
@@ -405,9 +399,54 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
     /**
      */
-    protected void setTimeZonePropertyNodes(VTimeZone timezone,
-                                            Node timezoneNode)
+    protected void setTimeZoneNodes(Map timezones,
+                                    Node resourceNode)
         throws RepositoryException {
+        // make a copy of the timezone map so that we can remove items
+        // from it
+        Map myTimezones = new HashMap(timezones);
+
+        // find all timezone nodes, updating those that have a
+        // corresponding timezone in the map (and clearing them out of
+        // our local copy of the map) and removing those that don't.
+        for (NodeIterator i=resourceNode.
+                 getNodes(CosmoJcrConstants.NN_ICAL_TIMEZONE); i.hasNext();) {
+            Node tzNode = i.nextNode();
+            Node tzidNode =
+                getICalendarPropertyNode(CosmoJcrConstants.NN_ICAL_TZID,
+                                         tzNode);
+            String tzid = getValueProperty(tzidNode).getString();
+            VTimeZone timezone = (VTimeZone) myTimezones.get(tzid);
+            if (timezone != null) {
+                setTimeZoneNode(timezone, tzNode);
+                myTimezones.remove(timezone);
+            }
+            else {
+                tzNode.remove();
+            }
+        }
+
+        // our local copy of the timezone map now only contains
+        // entries for those timezones that have not already been
+        // saved. set timezone nodes for each.
+        for (Iterator i=myTimezones.values().iterator(); i.hasNext();) {
+            VTimeZone timezone = (VTimeZone) i.next();
+            setTimeZoneNode(timezone, resourceNode);
+        }
+    }
+
+    /**
+     */
+    protected void setTimeZoneNode(VTimeZone timezone,
+                                   Node inputNode)
+        throws RepositoryException {
+        // the input node can be either a timezone node itself (in
+        // case of an update) or the parent resource node on which a
+        // new timezone node should be created
+        Node timezoneNode =
+            inputNode.isNodeType(CosmoJcrConstants.NT_ICAL_TIMEZONE) ?
+            inputNode :
+            inputNode.addNode(CosmoJcrConstants.NN_ICAL_TIMEZONE);
         setTzIdPropertyNode(timezone, timezoneNode);
         setLastModifiedPropertyNode(timezone, timezoneNode);
         setTzUrlPropertyNode(timezone, timezoneNode);
@@ -861,11 +900,15 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
                                          componentNode);
             setValueProperty(attach, propertyNode);
             setXParameterProperties(attach, propertyNode);
-            propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_URI,
-                                     attach.getUri().toString());
-            propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_BINARY,
-                                     new ByteArrayInputStream(attach.
-                                                              getBinary()));
+            if (attach.getUri() != null) {
+                propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_URI,
+                                         attach.getUri().toString());
+            }
+            if (attach.getBinary() != null) {
+                propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_BINARY,
+                                         new ByteArrayInputStream(attach.
+                                                                  getBinary()));
+            }
             setFmtTypeParameterProperty(attach, propertyNode);
         }
     }
@@ -877,25 +920,33 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
         throws RepositoryException {
         Attendee attendee = ICalendarUtils.getAttendee(component);
         if (attendee != null) {
-            Node propertyNode =
-                getICalendarPropertyNode(CosmoJcrConstants.NN_ICAL_ATTENDEE,
-                                         componentNode);
-            setValueProperty(attendee, propertyNode);
-            setXParameterProperties(attendee, propertyNode);
-            propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_CALADDRESS,
-                                     attendee.getCalAddress().toString());
-            setCuTypeParameterProperty(attendee, propertyNode);
-            setMemberParameterProperty(attendee, propertyNode);
-            setRoleParameterProperty(attendee, propertyNode);
-            setPartStatParameterProperty(attendee, propertyNode);
-            setRsvpParameterProperty(attendee, propertyNode);
-            setDelToParameterProperty(attendee, propertyNode);
-            setDelFromParameterProperty(attendee, propertyNode);
-            setSentByParameterProperty(attendee, propertyNode);
-            setCnParameterProperty(attendee, propertyNode);
-            setDirParameterProperty(attendee, propertyNode);
-            setLanguageParameterProperty(attendee, propertyNode);
+            setAttendeePropertyNode(attendee, componentNode);
         }
+    }
+
+    /**
+     */
+    protected void setAttendeePropertyNode(Attendee attendee,
+                                           Node componentNode)
+        throws RepositoryException {
+        Node propertyNode =
+            getICalendarPropertyNode(CosmoJcrConstants.NN_ICAL_ATTENDEE,
+                                     componentNode);
+        setValueProperty(attendee, propertyNode);
+        setXParameterProperties(attendee, propertyNode);
+        propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_CALADDRESS,
+                                 attendee.getCalAddress().toString());
+        setCuTypeParameterProperty(attendee, propertyNode);
+        setMemberParameterProperty(attendee, propertyNode);
+        setRoleParameterProperty(attendee, propertyNode);
+        setPartStatParameterProperty(attendee, propertyNode);
+        setRsvpParameterProperty(attendee, propertyNode);
+        setDelToParameterProperty(attendee, propertyNode);
+        setDelFromParameterProperty(attendee, propertyNode);
+        setSentByParameterProperty(attendee, propertyNode);
+        setCnParameterProperty(attendee, propertyNode);
+        setDirParameterProperty(attendee, propertyNode);
+        setLanguageParameterProperty(attendee, propertyNode);
     }
 
     /**
@@ -1155,6 +1206,59 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
     /**
      */
+    protected void setActionPropertyNode(Component component,
+                                         Node componentNode)
+        throws RepositoryException {
+        Property action = ICalendarUtils.getAction(component);
+        if (action != null) {
+            Node propertyNode =
+                getICalendarPropertyNode(CosmoJcrConstants.NN_ICAL_ACTION,
+                                         componentNode);
+            setValueProperty(action, propertyNode);
+            setXParameterProperties(action, propertyNode);
+        }
+    }
+
+    /**
+     */
+    protected void setRepeatPropertyNode(Component component,
+                                         Node componentNode)
+        throws RepositoryException {
+        Repeat repeat = ICalendarUtils.getRepeat(component);
+        if (repeat != null) {
+            Node propertyNode =
+                getICalendarPropertyNode(CosmoJcrConstants.NN_ICAL_REPEAT,
+                                         componentNode);
+            setValueProperty(repeat, propertyNode);
+            setXParameterProperties(repeat, propertyNode);
+            propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_COUNT,
+                                     repeat.getCount());
+        }
+    }
+
+    /**
+     */
+    protected void setTriggerPropertyNode(Component component,
+                                         Node componentNode)
+        throws RepositoryException {
+        Trigger trigger = ICalendarUtils.getTrigger(component);
+        if (trigger != null) {
+            Node propertyNode =
+                getICalendarPropertyNode(CosmoJcrConstants.NN_ICAL_TRIGGER,
+                                         componentNode);
+            setValueProperty(trigger, propertyNode);
+            setXParameterProperties(trigger, propertyNode);
+            propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_DURATION,
+                                     trigger.getDuration());
+            setRelatedParameterProperty(trigger, propertyNode);
+            JCRUtils.setDateValue(propertyNode,
+                                  CosmoJcrConstants.NP_ICAL_DATETIME,
+                                  trigger.getDateTime());
+        }
+    }
+
+    /**
+     */
     protected void setXPropertyNode(String name,
                                     Component component,
                                     Node componentNode)
@@ -1336,6 +1440,18 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
         if (range != null) {
             propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_RANGE,
                                      range.getValue());
+        }
+    }
+
+    /**
+     */
+    protected void setRelatedParameterProperty(Property property,
+                                               Node propertyNode)
+        throws RepositoryException {
+        Related related = ICalendarUtils.getRelated(property);
+        if (related != null) {
+            propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_RELATED,
+                                     related.getValue());
         }
     }
 

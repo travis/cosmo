@@ -110,7 +110,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         // create a calendar
         Calendar calendar1 = TestHelper.makeDummyCalendar();
 
-
         // try to create the empty resource in the repository
         try {
             dao.setCalendarResource(path, "blah", calendar1);

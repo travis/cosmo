@@ -27,18 +27,6 @@ public class CosmoConstants {
         "-//Open Source Applications Foundation//NONSGML Cosmo Sharing Server//EN";
 
     /**
-     * The version of iCalendar supported by Cosmo: 2.0, as
-     * specified by RFC 2445
-     */
-    public static final String ICALENDAR_VERSION = "2.0";
-
-    /**
-     * The content type for iCalendar resources: text/calendar, as
-     * specified by RFC 2445
-     */
-    public static final String ICALENDAR_CONTENT_TYPE = "text/calendar";
-
-    /**
      * The servlet context attribute which contains the Cosmo version
      * number.
      */

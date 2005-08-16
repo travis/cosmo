@@ -21,6 +21,17 @@ package org.osaf.cosmo.icalendar;
  */
 public class CosmoICalendarConstants {
 
+    /**
+     */
+    public static final String VERSION = "2.0";
+    /**
+     */
+    public static final String CONTENT_TYPE = "text/calendar";
+
+    /**
+     */
     public static final String COMP_STANDARD = "STANDARD";
+    /**
+     */
     public static final String COMP_DAYLIGHT = "DAYLIGHT";
 }

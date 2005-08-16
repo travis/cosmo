@@ -104,9 +104,9 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
                     Node version = calendar.
                         addNode(CosmoJcrConstants.NN_ICAL_VERSION);
                     version.setProperty(CosmoJcrConstants.NP_ICAL_VALUE,
-                                        CosmoConstants.ICALENDAR_VERSION);
+                                        CosmoICalendarConstants.VERSION);
                     version.setProperty(CosmoJcrConstants.NP_ICAL_MAXVERSION,
-                                        CosmoConstants.ICALENDAR_VERSION);
+                                        CosmoICalendarConstants.VERSION);
 
                     // CALSCALE: we only support Gregorian, so as per
                     // RFC 2445 section 4.7.1, we don't need to set it

@@ -226,6 +226,15 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      * calendar resource.
      */
     public boolean isCalendarResource() {
+        if (exists()) {
+            try {
+                return getNode().
+                    isNodeType(CosmoJcrConstants.NT_CALDAV_RESOURCE);
+            }
+            catch (RepositoryException e) {
+                throw new RuntimeException(e);
+            }
+        }
         // XXX figure out a way to examine the request's Content-Type
         // header
         return (! isCalendarCollection() &&
@@ -484,6 +493,12 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             initializing = false;
         }
     }
+
+    /**
+     */
+    //    protected NodeResource createNodeResource() {
+    //        return new CosmoNodeResource(this, getNode());
+    //    }
 
     // ApplicationContextAware methods
 

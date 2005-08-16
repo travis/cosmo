@@ -22,9 +22,9 @@ import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
 
 import org.jdom.Element;
 
-import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
+import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
 
 /**
  * Represents the CalDAV calendar-restrictions property.
@@ -73,9 +73,9 @@ public class CalendarRestrictions extends AbstractDavProperty {
             new Element(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
                         CosmoDavConstants.NAMESPACE_CALDAV);
         element.setAttribute(CosmoDavConstants.ATTR_CALDAV_CONTENT_TYPE,
-                             CosmoConstants.ICALENDAR_CONTENT_TYPE);
+                             CosmoICalendarConstants.CONTENT_TYPE);
         element.setAttribute(CosmoDavConstants.ATTR_CALDAV_VERSION,
-                             CosmoConstants.ICALENDAR_VERSION);
+                             CosmoICalendarConstants.VERSION);
         elements.add(element);
         return elements;
     }

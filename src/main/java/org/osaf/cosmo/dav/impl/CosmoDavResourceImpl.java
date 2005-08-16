@@ -54,6 +54,7 @@ import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
 import org.osaf.cosmo.dav.property.CalendarComponentRestrictionSet;
+import org.osaf.cosmo.dav.property.CalendarDescription;
 import org.osaf.cosmo.dav.property.CalendarRestrictions;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.CosmoResourceType;
@@ -437,12 +438,29 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                 resourceTypes[1] = isCalendarCollection() ?
                     CosmoResourceType.CALENDAR_COLLECTION :
                     CosmoResourceType.CALENDAR_HOME;
-
                 properties.add(new CosmoResourceType(resourceTypes));
                 // Windows XP support
                 properties.add(new DefaultDavProperty(DavPropertyName.
                                                       ISCOLLECTION,
                                                       "1"));
+
+                // calendar-description property (caldav section
+                // 4.4.1) has a language attribute
+                try {
+                    if (getNode().hasProperty(CosmoJcrConstants.
+                                              NP_CALDAV_CALENDARDESCRIPTION)) {
+                        String text = getNode().
+                            getProperty(CosmoJcrConstants.
+                                        NP_CALDAV_CALENDARDESCRIPTION).
+                            getString();
+                        String lang = getNode().
+                            getProperty(CosmoJcrConstants.NP_XML_LANG).
+                            getString();
+                        properties.add(new CalendarDescription(text, lang));
+                    }
+                } catch (RepositoryException e) {
+                    log.warn("Unable to retrieve calendar description", e);
+                }
             }
 
             if (isCalendarCollection()) {

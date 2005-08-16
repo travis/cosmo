@@ -15,10 +15,7 @@
  */
 package org.osaf.cosmo.dao.jcr;
 
-import org.osaf.commons.spring.jcr.JCRCallback;
-import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
-import org.osaf.cosmo.dao.ShareDAO;
-import org.osaf.cosmo.jcr.CosmoJcrConstants;
+import java.util.Locale;
 
 import javax.jcr.Item;
 import javax.jcr.Node;
@@ -27,6 +24,11 @@ import javax.jcr.Session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.commons.spring.jcr.JCRCallback;
+import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
+import org.osaf.cosmo.dao.ShareDAO;
+import org.osaf.cosmo.jcr.CosmoJcrConstants;
 
 /**
  * JCR implementation of ShareDAO.
@@ -56,6 +58,8 @@ public class ContentStoreDAOJCR extends JCRDaoSupport implements ShareDAO {
                     homedirNode.setProperty(CosmoJcrConstants.
                                             NP_CALDAV_CALENDARDESCRIPTION,
                                             username);
+                    homedirNode.setProperty(CosmoJcrConstants.NP_XML_LANG,
+                                            Locale.getDefault().toString());
                     rootNode.save();
                     return null;
                 }

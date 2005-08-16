@@ -67,6 +67,8 @@ public class CosmoDavConstants {
 
     // XML attributes
 
+    public static final String ATTR_XML_LANG = "lang";
+
     public static final String ATTR_CALDAV_NAME = "name";
     public static final String ATTR_CALDAV_CONTENT_TYPE = "content-type";
     public static final String ATTR_CALDAV_VERSION = "version";

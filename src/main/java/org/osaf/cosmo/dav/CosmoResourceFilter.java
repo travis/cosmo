@@ -24,7 +24,7 @@ import org.apache.jackrabbit.webdav.simple.DefaultResourceFilter;
  */
 public class CosmoResourceFilter extends DefaultResourceFilter {
     protected static final String[] FILTERED_PREFIXES =
-    { "rep", "jcr", "icalendar", "ticket" };
+    { "rep", "jcr", "icalendar", "ticket", "xml" };
     
     /**
      */

@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -86,6 +87,8 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
                     cc.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
                     cc.setProperty(CosmoJcrConstants.
                                    NP_CALDAV_CALENDARDESCRIPTION, name);
+                    cc.setProperty(CosmoJcrConstants.NP_XML_LANG,
+                                   Locale.getDefault().toString());
 
                     // add subnodes representing calendar properties
                     // to the autocreated calendar node

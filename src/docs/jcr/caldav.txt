@@ -33,6 +33,15 @@ PropertyDef
   RequiredType STRING
   DefaultValues null
   AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name xml:lang
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
   Mandatory true
   OnParentVersion COPY
   Protected false
@@ -59,6 +68,15 @@ ChildNodeDef
   SameNamedSibs false
 PropertyDef
   Name caldav:calendar-description
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name xml:lang
   RequiredType STRING
   DefaultValues null
   AutoCreate false

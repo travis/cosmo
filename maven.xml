@@ -24,18 +24,23 @@
   <!-- not used in the standard build, but only for manually
   regenerating node type -->
   <goal name="build:nodetypes">
+    <delete>
+      <fileset dir="${basedir}/src/main/resources/jackrabbit">
+        <include name="*_nodetypes.xml"/>
+      </fileset>
+    </delete>
     <jackrabbit:generate
        catalog="${basedir}/src/docs/jcr/webdav.txt"
-       descriptor="${maven.build.dir}/webdav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/resources/jackrabbit/webdav_nodetypes.xml"/>
     <jackrabbit:generate
        catalog="${basedir}/src/docs/jcr/tickets.txt"
-       descriptor="${maven.build.dir}/tickets_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/resources/jackrabbit/tickets_nodetypes.xml"/>
     <jackrabbit:generate
        catalog="${basedir}/src/docs/jcr/icalendar.txt"
-       descriptor="${maven.build.dir}/icalendar_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/resources/jackrabbit/icalendar_nodetypes.xml"/>
     <jackrabbit:generate
        catalog="${basedir}/src/docs/jcr/caldav.txt"
-       descriptor="${maven.build.dir}/caldav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/resources/jackrabbit/caldav_nodetypes.xml"/>
   </goal>
 
   <preGoal name="test:test-resources">

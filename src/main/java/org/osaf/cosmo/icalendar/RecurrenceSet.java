@@ -75,21 +75,21 @@ public class RecurrenceSet {
         RRule rrule = ICalendarUtils.getRRule(component);
         ExDate exdate = ICalendarUtils.getExDate(component);
         ExRule exrule = ICalendarUtils.getExRule(component);
+        RecurrenceId recurid = ICalendarUtils.getRecurrenceId(component);
+        log.debug("recurid: " + recurid);
         log.debug("rdate: " + rdate);
         log.debug("rrule: " + rrule);
         log.debug("exdate: " + exdate);
         log.debug("exrule: " + exrule);
 
-        if ((rdate == null && rrule == null &&
-             exdate == null && exrule == null) || // no relevant props
-            (rdate != null || rrule != null)) {   // has a recurrence prop
+        if (recurid != null) {
+            log.debug("got exception");
+            exceptions.add(component);
+        }
+        else {
             log.debug("got master");
             master = component;
             uid = ICalendarUtils.getUid(master).getValue();
-        }
-        else {                                    // has an exception prop
-            log.debug("got exception");
-            exceptions.add(component);
         }
     }
 
@@ -137,7 +137,6 @@ public class RecurrenceSet {
      */
     public static Long getComponentKey(Component component) {
         RecurrenceId recurid = ICalendarUtils.getRecurrenceId(component);
-        log.debug("recurid: " + recurid);
         if (recurid == null) {
             return KEY_NO_RECUR;
         }

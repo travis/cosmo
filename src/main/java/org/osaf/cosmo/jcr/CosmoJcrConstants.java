@@ -85,6 +85,8 @@ public class CosmoJcrConstants {
 
     public static final String NT_FOLDER = "nt:folder";
 
+    public static final String NT_JCR_CONTENT = "jcr:content";
+
     public static final String NT_DAV_COLLECTION = "dav:collection";
     public static final String NT_DAV_RESOURCE = "dav:resource";
 
@@ -108,6 +110,7 @@ public class CosmoJcrConstants {
 
     // node properties
 
+    public static final String NP_JCR_DATA = "jcr:data";
     public static final String NP_JCR_CREATED = "jcr:created";
     public static final String NP_JCR_LASTMODIFIED = "jcr:lastModified";
 
@@ -127,6 +130,7 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_ALTREP = "icalendar:altrep";
     public static final String NP_ICAL_BINARY = "icalendar:binary";
     public static final String NP_ICAL_BYDAY = "icalendar:byday";
+    public static final String NP_ICAL_BYDAYOFFSET = "icalendar:bydayoffset";
     public static final String NP_ICAL_BYHOUR = "icalendar:byhour";
     public static final String NP_ICAL_BYMINUTE = "icalendar:byminute";
     public static final String NP_ICAL_BYMONTH = "icalendar:bymonth";

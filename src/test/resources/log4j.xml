@@ -47,6 +47,10 @@
   </logger>
 -->
 
+  <logger name="org.osaf.cosmo.dao.CalendarDaoTest">
+    <level value="DEBUG"/>
+  </logger>
+
   <root>
     <level value="WARN"/>
     <appender-ref ref="CONSOLE"/>

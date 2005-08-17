@@ -34,7 +34,6 @@ CalDAV:
    (4.6.2)
  * PUT: only remove existing exception event nodes rather than all of
    them
- * GET
 
 Tickets:
  * consider splitting security config into completely separate ones
@@ -43,6 +42,7 @@ Tickets:
 
 General:
  * precompile jsps for distribution
+ * remove commons-spring and replace with jcr-spring
  * see if we can't get Struts to work with "/user/bcm/update" rather
    than "/user/update.do" with "username=bcm" in content body
  * final copy and format for mail messages

@@ -25,12 +25,16 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Value;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * Utilities for working with JCR in Cosmo.
  */
 public class JCRUtils {
+    private static final Log log = LogFactory.getLog(JCRUtils.class);
 
     /**
      * Return the node at the given path.

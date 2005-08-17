@@ -88,42 +88,24 @@ PropertyDef
 NodeTypeName
   caldav:resource
 SuperTypes
-  nt:hierarchyNode
+  []
 IsMixin
-  false
+  true
 HasOrderableChildNodes
   false
 PrimaryItemName
   null
-PropertyDef
-  Name dav:displayname
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
-PropertyDef
-  Name *
-  RequiredType UNDEFINED
-  DefaultValues null
-  AutoCreate false
-  Mandatory false
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 NodeTypeName
   caldav:eventresource
 SuperTypes
   caldav:resource
 IsMixin
-  false
+  true
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:revent
+  null
 ChildNodeDef
   Name icalendar:revent
   RequiredPrimaryTypes [icalendar:event]

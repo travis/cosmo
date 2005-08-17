@@ -81,14 +81,6 @@ public interface CosmoDavResource extends DavResource {
     public boolean isCalendarResource();
 
     /**
-     * Adds the given calendar resource as an internal member to this
-     * resource.
-     */
-    public void addCalendarResource(CosmoDavResource resource,
-                                    InputStream in)
-        throws DavException;
-
-    /**
      * Associates a ticket with this resource and saves it into
      * persistent storage.
      */

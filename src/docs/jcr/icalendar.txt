@@ -185,7 +185,16 @@ PropertyDef
 PropertyDef
   Name icalendar:byday
   RequiredType STRING
-  ValueConstraints ["[+-]\d{1,2}(SU|MO|TU|WE|TH|FR|SA)"]
+  ValueConstraints ["(SU|MO|TU|WE|TH|FR|SA)"]
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple true
+PropertyDef
+  Name icalendar:bydayoffset
+  RequiredType LONG
   DefaultValues null
   AutoCreate false
   Mandatory false
@@ -1123,7 +1132,7 @@ PropertyDef
   Mandatory true
   OnParentVersion COPY
   Protected false
-  Multiple true
+  Multiple false
 PropertyDef
   Name icalendar:tzid
   RequiredType STRING
@@ -1181,7 +1190,7 @@ PropertyDef
   Mandatory false
   OnParentVersion COPY
   Protected false
-  Multiple true
+  Multiple false
 PropertyDef
   Name icalendar:tzid
   RequiredType STRING

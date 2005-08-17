@@ -17,6 +17,8 @@ package org.osaf.cosmo.dao;
 
 import java.util.Set;
 
+import javax.jcr.Node;
+
 import net.fortuna.ical4j.model.Calendar;
 
 /**
@@ -50,39 +52,28 @@ public interface CalendarDao extends DAO {
     public void deleteCalendar(String path);
 
     /**
-     * Creates a calendar resource in the repository, or updates the
-     * resource if it already exists. A calendar resource contains one
-     * or more calendar components.
-     *
-     * The only supported "top level" calendar component is
-     * event. Events are typically associated with timezones and
-     * alarms. Recurring events are represented as multiple calendar
-     * components: one "master" event that defines the recurrence
-     * rule, and zero or more "exception" events. All of these
-     * components share a uid.
+     * Attaches a calendar object to a node in the repository, or
+     * updates an existing one.
+
+     * A calendar object contains one or more calendar components. The
+     * only supported "top level" calendar component is event. Events
+     * are typically associated with timezones and alarms. Recurring
+     * events are represented as multiple calendar components: one
+     * "master" event that defines the recurrence rule, and zero or
+     * more "exception" events. All of these components share a uid.
      *
      * Journal, todo and freebusy components are not supported. These
      * components will be ignored.
      *
-     * @param path the repository path of the parent of the new
-     * calendar resource
-     * @param name the name of the new calendar resource
+     * @param node the <code>Node</code> to which the calendar object
+     * will be attached
      * @param event the <code>Calendar</code> containing events,
      * timezones and alarms
      *
      * @throws {@link UnsupportedFeatureException} if the
      * <code>Calendar</code> does not contain an event.
+     * @throws {@link RecurrenceFeatureException} if a recurring event
+     * is improperly specified (no master event, etc)
      */
-    public void setCalendarResource(String path,
-                                    String name,
-                                    Calendar calendar);
-
-    /**
-     * Gets the calendar object (containing one or more calendar
-     * components) associated with the calendar resource at the named
-     * path.
-     *
-     * @param path the repository path of the calendar resource
-     */
-    public Calendar getCalendarResource(String path);
+    public void storeCalendarObject(Node node, Calendar calendar);
 }

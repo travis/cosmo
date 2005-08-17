@@ -33,8 +33,12 @@
   <chain name="import-resource">
     <command id="set-contenttype"
              className="org.apache.jackrabbit.server.io.SetContentTypeCommand"/>
+    <!-- would not be necessary if FileImportCommand's nodeType param
+             did anything -->
     <command id="import-file"
              className="org.osaf.cosmo.jackrabbit.io.DavResourceImportCommand"/>
+    <command id="store-calendar-object"
+             className="org.osaf.cosmo.jackrabbit.io.StoreCalendarObjectCommand"/>
     <command id="set-displayname"
              className="org.osaf.cosmo.jackrabbit.io.SetDisplayNameCommand"/>
     <command id="make-ticketable"

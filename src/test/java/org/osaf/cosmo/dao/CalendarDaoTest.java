@@ -15,16 +15,21 @@
  */
 package org.osaf.cosmo.dao;
 
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
-import net.fortuna.ical4j.model.property.Summary;
 
+import org.osaf.commons.spring.jcr.JCRSessionFactory;
 import org.osaf.cosmo.BaseCoreTestCase;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.UnsupportedFeatureException;
 import org.osaf.cosmo.dao.CalendarDao;
+import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.model.User;
 
 import org.apache.commons.logging.Log;
@@ -39,7 +44,10 @@ public class CalendarDaoTest extends BaseCoreTestCase {
     private static final Log log = LogFactory.getLog(CalendarDaoTest.class);
 
     private static final String DAO_BEAN = "calendarDao";
-    private CalendarDao dao = null;
+    private static final String SESSIONFACTORY_BEAN = "homedirSessionFactory";
+
+    private CalendarDao dao;
+    private JCRSessionFactory sessionFactory;
 
     /**
      */
@@ -50,6 +58,8 @@ public class CalendarDaoTest extends BaseCoreTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         dao = (CalendarDao) getAppContext().getBean(DAO_BEAN);
+        sessionFactory = (JCRSessionFactory)
+            getAppContext().getBean(SESSIONFACTORY_BEAN);
     }
 
     protected void tearDown() throws Exception {
@@ -72,50 +82,44 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         assertTrue(! dao.existsCalendar(path + user.getUsername()));
     }
 
-    public void testCRDResource() throws Exception {
+    public void testStoreCalendarObject() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("BEGIN");
         }
 
-        String path = "/";
-
-        // create a calendar
+        // create a calendar object containing an event
+        // and a timezone
         Calendar calendar1 = TestHelper.makeDummyCalendar();
-
-        // create an event
         VEvent event1 = TestHelper.makeDummyEvent();
-        Summary summary = 
-            (Summary) event1.getProperties().getProperty(Property.SUMMARY);
-        String name = summary.getValue() + ".ics";
         calendar1.getComponents().add(event1);
-
-        // add its timezone
         calendar1.getComponents().add(VTimeZone.getDefault());
 
-        // create the resource in the repository
-        dao.setCalendarResource(path, name, calendar1);
-
-        // get the resource out of the repository
-        Calendar calendar2 = dao.getCalendarResource(path + name);
-        log.debug("calendar2:\n" + calendar2);
-
-        // XXX: delete the event
+        // store the calendar object in the repository
+        Session session = sessionFactory.getSession();
+        String name =
+            ICalendarUtils.getSummary(event1).getValue() + ".ics";
+        Node resource = session.getRootNode().addNode(name);
+        dao.storeCalendarObject(resource, calendar1);
+        session.save();
+        session.logout();
     }
 
-    public void testEmptyResource() throws Exception {
+    public void testStoreEmptyCalendarObject() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("BEGIN");
         }
 
-        String path = "/";
-
-        // create a calendar
+        // create an empty calendar object
         Calendar calendar1 = TestHelper.makeDummyCalendar();
 
-        // try to create the empty resource in the repository
         try {
-            dao.setCalendarResource(path, "blah", calendar1);
-            fail("should not have been able to create empty calendar resource");
+            // try to store the calendar object in the repository
+            Session session = sessionFactory.getSession();
+            Node resource = session.getRootNode().addNode("empty");
+            dao.storeCalendarObject(resource, calendar1);
+            session.save();
+            session.logout();
+            fail("should not have been able to create empty calendar object");
         } catch (UnsupportedFeatureException e) {
             // expected
         }

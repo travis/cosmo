@@ -25,6 +25,7 @@ import net.fortuna.ical4j.model.property.*;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
+import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -45,8 +46,8 @@ public class TestHelper {
         Calendar cal =new Calendar();
 
         cal.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
-        cal.getProperties().add(new Version(CosmoConstants.ICALENDAR_VERSION,
-                                            CosmoConstants.ICALENDAR_VERSION));
+        cal.getProperties().add(new Version(CosmoICalendarConstants.VERSION,
+                                            CosmoICalendarConstants.VERSION));
 
         return cal;
     }

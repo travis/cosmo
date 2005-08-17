@@ -65,8 +65,8 @@ public interface CalendarDao extends DAO {
      * components will be ignored.
      *
      * @param path the repository path of the parent of the new
-     * event resource
-     * @param name the name of the new event resource
+     * calendar resource
+     * @param name the name of the new calendar resource
      * @param event the <code>Calendar</code> containing events,
      * timezones and alarms
      *
@@ -76,4 +76,13 @@ public interface CalendarDao extends DAO {
     public void setCalendarResource(String path,
                                     String name,
                                     Calendar calendar);
+
+    /**
+     * Gets the calendar object (containing one or more calendar
+     * components) associated with the calendar resource at the named
+     * path.
+     *
+     * @param path the repository path of the calendar resource
+     */
+    public Calendar getCalendarResource(String path);
 }

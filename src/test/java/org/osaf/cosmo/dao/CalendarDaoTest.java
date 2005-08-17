@@ -95,7 +95,9 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         // create the resource in the repository
         dao.setCalendarResource(path, name, calendar1);
 
-        // XXX: get the event
+        // get the resource out of the repository
+        Calendar calendar2 = dao.getCalendarResource(path + name);
+        log.debug("calendar2:\n" + calendar2);
 
         // XXX: delete the event
     }

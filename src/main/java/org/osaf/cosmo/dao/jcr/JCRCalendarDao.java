@@ -239,6 +239,37 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
             });
     }
 
+    /**
+     * Gets the calendar object (containing one or more calendar
+     * components) associated with the calendar resource at the named
+     * path.
+     *
+     * @param path the repository path of the calendar resource
+     */
+    public Calendar getCalendarResource(final String path) {
+        return (Calendar) getTemplate().execute(new JCRCallback() {
+                public Object doInJCR(Session session)
+                    throws RepositoryException {
+                    Node resourceNode = JCRUtils.findNode(session, path);
+                    Calendar calendar = new Calendar();
+
+                    // components
+                    for (Iterator i=getEvents(resourceNode).iterator();
+                         i.hasNext();) {
+                        calendar.getComponents().add((VEvent) i.next());
+                    }
+                    for (Iterator i=getTimeZones(resourceNode).iterator();
+                         i.hasNext();) {
+                        calendar.getComponents().add((VTimeZone) i.next());
+                    }
+
+                    // XXX: properties
+
+                    return calendar;
+                }
+            });
+    }
+
     // our methods
 
     /**
@@ -260,8 +291,30 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
             resourceNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
             resourceNode.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
                                      name);
+        } finally {
+            JCRUtils.setDateValue(resourceNode,
+                                  CosmoJcrConstants.NP_JCR_LASTMODIFIED, null);
         }
         return resourceNode;
+    }
+
+    /**
+     */
+    protected Set getEvents(Node resourceNode)
+        throws RepositoryException {
+        Set events = new HashSet();
+
+        Node masterEventNode =
+            resourceNode.getNode(CosmoJcrConstants.NN_ICAL_REVENT);
+        events.add(getEvent(masterEventNode));
+
+        for (NodeIterator i =
+                 resourceNode.getNodes(CosmoJcrConstants.NN_ICAL_EXEVENT);
+             i.hasNext();) {
+            events.add(getEvent((Node) i.next()));
+        }
+
+        return events;
     }
 
     /**
@@ -289,6 +342,21 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
         }
     }
 
+    /**
+     */
+    protected VEvent getEvent(Node eventNode)
+        throws RepositoryException {
+        VEvent event = new VEvent();
+        for (Iterator i=getEventProperties(eventNode).iterator();
+             i.hasNext();) {
+            event.getProperties().add((Property) i.next());
+        }
+        for (Iterator i=getAlarms(eventNode).iterator(); i.hasNext();) {
+            event.getAlarms().add((VAlarm) i.next());
+        }
+        return event;
+    }
+    
     /**
      */
     protected void setMasterEventNode(VEvent event,
@@ -321,6 +389,20 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
     /**
      */
+    protected Set getAlarms(Node componentNode)
+        throws RepositoryException {
+        Set alarms = new HashSet();
+
+        for (NodeIterator i=componentNode.
+                 getNodes(CosmoJcrConstants.NN_ICAL_ALARM); i.hasNext();) {
+            alarms.add(getAlarm((Node) i.next()));
+        }
+
+        return alarms;
+    }
+
+    /**
+     */
     protected void setAlarmNodes(ComponentList alarms,
                                  Node componentNode)
         throws RepositoryException {
@@ -334,16 +416,28 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
         }
         for (Iterator i=alarms.iterator(); i.hasNext();) {
             VAlarm alarm = (VAlarm) i.next();
-            setAlarmNode(alarm, componentNode);
+            Node alarmNode =
+                componentNode.addNode(CosmoJcrConstants.NN_ICAL_ALARM);
+            setAlarmNode(alarm, alarmNode);
         }
     }
 
     /**
      */
-    protected void setAlarmNode(VAlarm alarm,
-                                Node componentNode)
+    protected VAlarm getAlarm(Node alarmNode)
         throws RepositoryException {
-        Node alarmNode = componentNode.addNode(CosmoJcrConstants.NN_ICAL_ALARM);
+        VAlarm alarm = new VAlarm();
+
+        // XXX: properties
+
+        return alarm;
+    }
+
+    /**
+     */
+    protected void setAlarmNode(VAlarm alarm,
+                                Node alarmNode)
+        throws RepositoryException {
         setActionPropertyNode(alarm, alarmNode);
         setTriggerPropertyNode(alarm, alarmNode);
         setDurationPropertyNode(alarm, alarmNode);
@@ -353,9 +447,20 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
         setSummaryPropertyNode(alarm, alarmNode);
         for (Iterator i=ICalendarUtils.getAttendees(alarm).iterator();
              i.hasNext();) {
-            setAttendeePropertyNode((Attendee) i.next(), componentNode);
+            setAttendeePropertyNode((Attendee) i.next(), alarmNode);
         }
         setXPropertyNodes(alarm, alarmNode);
+    }
+
+    /**
+     */
+    protected Set getEventProperties(Node eventNode)
+        throws RepositoryException {
+        Set properties = new HashSet();
+
+        // XXX: properties
+
+        return properties;
     }
 
     /**
@@ -399,6 +504,21 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
     /**
      */
+    protected Set getTimeZones(Node resourceNode)
+        throws RepositoryException {
+        Set timeZones = new HashSet();
+
+        for (NodeIterator i =
+                 resourceNode.getNodes(CosmoJcrConstants.NN_ICAL_TIMEZONE);
+             i.hasNext();) {
+            timeZones.add(getTimeZone((Node) i.next()));
+        }
+
+        return timeZones;
+    }
+
+    /**
+     */
     protected void setTimeZoneNodes(Map timezones,
                                     Node resourceNode)
         throws RepositoryException {
@@ -437,6 +557,32 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
     /**
      */
+    protected VTimeZone getTimeZone(Node timeZoneNode)
+        throws RepositoryException {
+        ComponentList types = new ComponentList();
+        for (NodeIterator i =
+                 timeZoneNode.getNodes(CosmoJcrConstants.NN_ICAL_STANDARD);
+             i.hasNext();) {
+            types.add(getTimeZoneComponent(CosmoICalendarConstants.
+                                           COMP_STANDARD,
+                                           (Node) i.next()));
+        }
+        for (NodeIterator i =
+                 timeZoneNode.getNodes(CosmoJcrConstants.NN_ICAL_DAYLIGHT);
+             i.hasNext();) {
+            types.add(getTimeZoneComponent(CosmoICalendarConstants.
+                                           COMP_DAYLIGHT,
+                                           (Node) i.next()));
+        }
+
+        PropertyList properties = new PropertyList();
+        // XXX: propertie
+
+        return new VTimeZone(properties, types);
+    }
+    
+    /**
+     */
     protected void setTimeZoneNode(VTimeZone timezone,
                                    Node inputNode)
         throws RepositoryException {
@@ -458,6 +604,29 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
 
     /**
      */
+    protected Component getTimeZoneComponent(String type,
+                                             Node timezoneNode)
+        throws RepositoryException {
+        Component comp = null;
+
+        // XXX: properties
+
+        if (type.equals(CosmoICalendarConstants.COMP_STANDARD)) {
+            comp = new Standard();
+        }
+        else if (type.equals(CosmoICalendarConstants.COMP_DAYLIGHT)) {
+            comp = new Daylight();
+        }
+        else {
+            throw new IllegalArgumentException("unknown timezone component " +
+                                               type);
+        }
+
+        return comp;
+    }
+
+    /**
+     */
     protected void setTimeZoneComponentNode(Component component,
                                             Node timezoneNode)
         throws RepositoryException {
@@ -470,9 +639,8 @@ public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
             name = CosmoJcrConstants.NN_ICAL_DAYLIGHT;
         }
         else {
-            log.warn("skipped umknown timezone component " +
-                     component.getName());
-            return;
+            throw new IllegalArgumentException("unknown timezone component " +
+                                               component.getName());
         }
 
         Node componentNode = null;

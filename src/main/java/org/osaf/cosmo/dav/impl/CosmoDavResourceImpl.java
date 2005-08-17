@@ -15,16 +15,21 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.jcr.Item;
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 
@@ -40,6 +45,8 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
+import org.apache.jackrabbit.webdav.simple.DefaultNodeResource;
+import org.apache.jackrabbit.webdav.simple.NodeResource;
 import org.apache.jackrabbit.webdav.simple.ResourceFilter;
 
 import org.apache.log4j.Logger;
@@ -58,6 +65,7 @@ import org.osaf.cosmo.dav.property.CalendarDescription;
 import org.osaf.cosmo.dav.property.CalendarRestrictions;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.CosmoResourceType;
+import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.icalendar.RecurrenceException;
 import org.osaf.cosmo.model.Ticket;
@@ -269,7 +277,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             // store the resource in the repository
             CalendarDao dao = (CalendarDao) applicationContext.
                 getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
-            // XXX: different dao method for existing resource?
             dao.setCalendarResource(parent.getPath(),
                                     resource.getDisplayName(),
                                     calendar);
@@ -496,9 +503,29 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
     /**
      */
-    //    protected NodeResource createNodeResource() {
-    //        return new CosmoNodeResource(this, getNode());
-    //    }
+    protected DavResource buildResourceFromItem(Item item)
+        throws DavException, RepositoryException {
+        CosmoDavResourceImpl resource = (CosmoDavResourceImpl)
+            super.buildResourceFromItem(item);
+        resource.setBaseUrl(baseUrl);
+        resource.setApplicationContext(applicationContext);
+        return resource;
+    }
+
+    /**
+     */
+    protected NodeResource createNodeResource()
+        throws RepositoryException {
+        if ( isCalendarResource()) {
+            try {
+                return createCalendarNodeResource();
+            } catch (Exception e) {
+                log.error("cannot load node resource", e);
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+        return super.createNodeResource();
+    }
 
     // ApplicationContextAware methods
 
@@ -532,5 +559,47 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public ApplicationContext getApplicationContext() {
         return applicationContext;
+    }
+
+    /**
+     */
+    protected NodeResource createCalendarNodeResource()
+        throws Exception {
+        Node node = getNode();
+        DefaultNodeResource nr = new DefaultNodeResource();
+
+        // load from backing node into NodeResource
+        CalendarDao dao = (CalendarDao) applicationContext.
+            getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
+        Calendar calendar = dao.getCalendarResource(node.getPath());
+
+        // use a tempfile to provide an input stream for the
+        // formatted content
+        File tmpfile = File.createTempFile("__calav", ".ics");
+        tmpfile.deleteOnExit();
+        FileOutputStream out = new FileOutputStream(tmpfile);
+        // XXX: want validation on?
+        CalendarOutputter outputter = new CalendarOutputter(false);
+        outputter.output(calendar, out);
+        out.close();
+
+        // populate the NodeResource
+        // XXX: should be calculating as much of this as possible when
+        // setting the calendar resource. maybe even store the
+        // original icalendar text as a property so we can also store
+        // the length and not have to calculate it.
+        nr.setContentLength(tmpfile.length());
+        nr.setCreationTime(node.getProperty(CosmoJcrConstants.NP_JCR_CREATED).
+                           getLong());
+        nr.setModificationTime(node.getProperty(CosmoJcrConstants.
+                                                NP_JCR_LASTMODIFIED).
+                               getLong());
+        nr.setETag("\"" + nr.getContentLength() + "-" +
+                   nr.getModificationTime() + "\"");
+        nr.setContentType(CosmoICalendarConstants.CONTENT_TYPE +
+                          "; charset=\"utf8\"");
+        nr.setStream(new FileInputStream(tmpfile));
+
+        return nr;
     }
 }

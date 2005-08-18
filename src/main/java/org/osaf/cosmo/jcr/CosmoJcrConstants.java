@@ -120,6 +120,7 @@ public class CosmoJcrConstants {
 
     public static final String NP_CALDAV_CALENDARDESCRIPTION =
         "caldav:calendar-description";
+    public static final String NP_CALDAV_UID = "caldav:uid";
 
     public static final String NP_ID = "ticket:id";
     public static final String NP_OWNER = "ticket:owner";

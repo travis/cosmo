@@ -34,6 +34,9 @@ import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.ValueFactory;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
 
 import net.fortuna.ical4j.model.*;
 import net.fortuna.ical4j.model.component.*;
@@ -48,6 +51,7 @@ import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.UnsupportedFeatureException;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
+import org.osaf.cosmo.icalendar.DuplicateUidException;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.icalendar.RecurrenceSet;
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
@@ -141,16 +145,28 @@ public class JCRCalendarDao implements CalendarDao {
         }
 
         try {
+            // check to see if this uid is in use by any other
+            // calendar resource in this calendar collection or
+            // below.
+            // XXX: this query hangs forever:
+            // /bcm/cal//element(*, caldav:resource)[@caldav:uid = '59BC120D-E909-4A56-A70D-8E97914E51A3']
+            // verifyUniqueUid(node, events.getUid());
+
             // add the mixin type that allows event storage
             if (! node.isNodeType(CosmoJcrConstants.NT_CALDAV_EVENT_RESOURCE)) {
                 node.addMixin(CosmoJcrConstants.NT_CALDAV_EVENT_RESOURCE);
             }
 
-            // XXX: check to see if this uid is in use
+            // it's possible that the client will have changed the uid
+            // of an existing calendar resource, so always (re-)set it
+            node.setProperty(CosmoJcrConstants.NP_CALDAV_UID, events.getUid());
 
             // add calendar components
             setEventNodes(events, node);
             setTimeZoneNodes(timezones, node);
+        } catch (DuplicateUidException e) {
+            // no need to warn about this
+            throw e;
         } catch (RepositoryException e) {
             log.error("JCR error storing calendar", e);
             throw JCRExceptionTranslator.translate(e);
@@ -161,6 +177,33 @@ public class JCRCalendarDao implements CalendarDao {
     }
 
     // our methods
+
+    /**
+     */
+    protected void verifyUniqueUid(Node node, String uid)
+        throws RepositoryException {
+        StringBuffer stmt = new StringBuffer();
+        if (! node.getParent().getPath().equals("/")) {
+            stmt.append(node.getParent().getPath());
+        }
+        stmt.append("//element(*, ").
+            append(CosmoJcrConstants.NT_CALDAV_RESOURCE).
+            append(")");
+        stmt.append("[@").
+            append(CosmoJcrConstants.NP_CALDAV_UID).
+            append(" = '").
+            append(uid).
+            append("']");
+        log.debug("uid query: " + stmt.toString());
+
+        QueryManager qm =
+            node.getSession().getWorkspace().getQueryManager();
+        QueryResult qr =
+            qm.createQuery(stmt.toString(), Query.XPATH).execute();
+        if (qr.getNodes().hasNext()) {
+            throw new DuplicateUidException("Duplicate uid: " + uid);
+        }
+    }
 
     /**
      */

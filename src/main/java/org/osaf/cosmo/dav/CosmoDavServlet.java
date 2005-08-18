@@ -186,7 +186,18 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             }
         }
 
-        super.doPut(request, response, resource);
+        try {
+            super.doPut(request, response, resource);
+        } catch (DavException e) {
+            // caldav (section 4.5): uid must be unique within a
+            // calendar collection
+            if (e.getMessage().startsWith("Duplicate uid")) {
+                response.sendError(DavServletResponse.SC_CONFLICT,
+                                   "Duplicate uid");
+                return;
+            }
+            throw e;
+        }
 
         // caldav (section 4.6.2): return ETag header
         if (cosmoResource.isCalendarResource() &&

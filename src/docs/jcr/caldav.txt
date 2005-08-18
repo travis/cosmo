@@ -95,6 +95,15 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   null
+PropertyDef
+  Name caldav:uid
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
 
 NodeTypeName
   caldav:eventresource

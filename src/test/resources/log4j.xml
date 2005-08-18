@@ -41,13 +41,7 @@
     <level value="WARN"/>
   </logger>
 
-<!--
   <logger name="org.osaf.cosmo.dao">
-    <level value="DEBUG"/>
-  </logger>
--->
-
-  <logger name="org.osaf.cosmo.dao.CalendarDaoTest">
     <level value="DEBUG"/>
   </logger>
 

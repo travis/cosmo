@@ -50,9 +50,9 @@ PropertyDef
 NodeTypeName
   caldav:collection
 SuperTypes
-  dav:collection
+  []
 IsMixin
-  false
+  true
 HasOrderableChildNodes
   false
 PrimaryItemName
@@ -61,8 +61,8 @@ ChildNodeDef
   Name icalendar:calendar
   RequiredPrimaryTypes [icalendar:calendar]
   DefaultPrimaryType icalendar:calendar
-  AutoCreate true
-  Mandatory true
+  AutoCreate false
+  Mandatory false
   OnParentVersion VERSION
   Protected false
   SameNamedSibs false

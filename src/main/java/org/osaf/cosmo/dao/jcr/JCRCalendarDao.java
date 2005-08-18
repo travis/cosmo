@@ -73,37 +73,14 @@ public class JCRCalendarDao implements CalendarDao {
         try {
             // add calendar node
             Node cc =
-                node.addNode(name, CosmoJcrConstants.NT_CALDAV_COLLECTION);
+                node.addNode(name, CosmoJcrConstants.NT_DAV_COLLECTION);
             cc.addMixin(CosmoJcrConstants.NT_TICKETABLE);
+            cc.addMixin(CosmoJcrConstants.NT_CALDAV_COLLECTION);
             cc.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
             cc.setProperty(CosmoJcrConstants.
                            NP_CALDAV_CALENDARDESCRIPTION, name);
             cc.setProperty(CosmoJcrConstants.NP_XML_LANG,
                            Locale.getDefault().toString());
-
-            // add subnodes representing calendar properties
-            // to the autocreated calendar node
-
-            Node calendar = cc.
-                getNode(CosmoJcrConstants.NN_ICAL_CALENDAR);
-
-            Node prodid = calendar.
-                addNode(CosmoJcrConstants.NN_ICAL_PRODID);
-            prodid.setProperty(CosmoJcrConstants.NP_ICAL_VALUE,
-                               CosmoConstants.PRODUCT_ID);
-        
-            Node version = calendar.
-                addNode(CosmoJcrConstants.NN_ICAL_VERSION);
-            version.setProperty(CosmoJcrConstants.NP_ICAL_VALUE,
-                                CosmoICalendarConstants.VERSION);
-            version.setProperty(CosmoJcrConstants.NP_ICAL_MAXVERSION,
-                                CosmoICalendarConstants.VERSION);
-
-            // CALSCALE: we only support Gregorian, so as per
-            // RFC 2445 section 4.7.1, we don't need to set it
-
-            // METHOD: only used for iTIP scheduling, not
-            // necessary for provisioning
         } catch (RepositoryException e) {
             log.error("JCR error creating calendar collection", e);
             throw JCRExceptionTranslator.translate(e);

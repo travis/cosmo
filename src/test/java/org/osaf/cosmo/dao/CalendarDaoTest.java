@@ -67,19 +67,18 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         dao = null;
     }
 
-    public void testCDCalendar() throws Exception {
+    public void testCreateCalendarCollection() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("BEGIN");
         }
 
-        User user = TestHelper.makeDummyUser();
-        String path = "/";
+        // create the calendar collection in the repository
+        Session session = sessionFactory.getSession();
+        Node root = session.getRootNode();
+        dao.createCalendarCollection(root, "calendarcollection");
+        session.save();
+        session.logout();
 
-        dao.createCalendar(path, user.getUsername());
-        assertTrue(dao.existsCalendar(path + user.getUsername()));
-
-        dao.deleteCalendar(path + user.getUsername());
-        assertTrue(! dao.existsCalendar(path + user.getUsername()));
     }
 
     public void testStoreCalendarObject() throws Exception {

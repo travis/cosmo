@@ -27,29 +27,13 @@ import net.fortuna.ical4j.model.Calendar;
 public interface CalendarDao extends DAO {
 
     /**
-     * Creates a calendar underneath the item at the given path.
+     * Creates a calendar collection in the repository.
      *
-     * @param path the repository path of the parent of the new
-     * collection
+     * @param node the <code>Node</code> to which the calendar
+     * collection will be attached.
      * @param name the name of the new collection
      */
-    public void createCalendar(String path, String name);
-
-    /**
-     * Returns true if a calendar exists at the given path,
-     * false otherwise
-     *
-     * @param path the repository path to test for existence
-     */
-    public boolean existsCalendar(String path);
-
-    /**
-     * Removes the calendar at the given path and its
-     * entire subtree.
-     *
-     * @param path the repository path of the calendar to be deleted
-     */
-    public void deleteCalendar(String path);
+    public void createCalendarCollection(Node node, String name);
 
     /**
      * Attaches a calendar object to a node in the repository, or

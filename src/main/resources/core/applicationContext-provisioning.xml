@@ -57,11 +57,7 @@
   </bean>
 
   <bean id="calendarDao"
-        class="org.osaf.cosmo.dao.jcr.JCRCalendarDao">
-    <property name="template">
-      <ref bean="homedirTemplate"/>
-    </property>
-  </bean>
+        class="org.osaf.cosmo.dao.jcr.JCRCalendarDao"/>
 
   <!-- Managers -->
 

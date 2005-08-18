@@ -203,7 +203,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             Node parent = getNode();
             CalendarDao dao = (CalendarDao) applicationContext.
                 getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
-            dao.createCalendar(parent.getPath(), child.getDisplayName());
+            dao.createCalendarCollection(parent, child.getDisplayName());
+            parent.save();
         } catch (DataIntegrityViolationException e) {
             log.error("resource " + child.getResourcePath() +
                       " already exists", e);

@@ -43,8 +43,6 @@ import net.fortuna.ical4j.model.parameter.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.commons.spring.jcr.JCRCallback;
-import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
 import org.osaf.commons.spring.jcr.support.JCRExceptionTranslator;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.UnsupportedFeatureException;
@@ -55,122 +53,61 @@ import org.osaf.cosmo.icalendar.RecurrenceSet;
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.jcr.JCRUtils;
 
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
-
 /**
  * Default implementation of {@link CalendarDao}.
  */
-public class JCRCalendarDao extends JCRDaoSupport implements CalendarDao {
+public class JCRCalendarDao implements CalendarDao {
     private static final Log log = LogFactory.getLog(JCRCalendarDao.class);
 
     // CalendarDao methods
 
     /**
-     * Creates a calendar in the repository.
+     * Creates a calendar collection in the repository.
      *
-     * @param path the repository path of the parent node of the new
-     * collection
+     * @param node the <code>Node</code> to which the calendar
+     * collection will be attached.
      * @param name the name of the new collection
      */
-    public void createCalendar(final String path,
-                               final String name) {
-        getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
-                    throws RepositoryException {
-                    // find parent node
-                    Node parent = JCRUtils.findNode(session, path);
+    public void createCalendarCollection(Node node,
+                                         String name) {
+        try {
+            // add calendar node
+            Node cc =
+                node.addNode(name, CosmoJcrConstants.NT_CALDAV_COLLECTION);
+            cc.addMixin(CosmoJcrConstants.NT_TICKETABLE);
+            cc.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
+            cc.setProperty(CosmoJcrConstants.
+                           NP_CALDAV_CALENDARDESCRIPTION, name);
+            cc.setProperty(CosmoJcrConstants.NP_XML_LANG,
+                           Locale.getDefault().toString());
 
-                    // add calendar node
-                    if (log.isDebugEnabled()) {
-                        log.debug("creating calendar collection node " +
-                                  parent.getPath() + "/" + name);
-                    }
-                    Node cc = parent.
-                        addNode(name, CosmoJcrConstants.NT_CALDAV_COLLECTION);
-                    cc.addMixin(CosmoJcrConstants.NT_TICKETABLE);
-                    cc.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
-                    cc.setProperty(CosmoJcrConstants.
-                                   NP_CALDAV_CALENDARDESCRIPTION, name);
-                    cc.setProperty(CosmoJcrConstants.NP_XML_LANG,
-                                   Locale.getDefault().toString());
+            // add subnodes representing calendar properties
+            // to the autocreated calendar node
 
-                    // add subnodes representing calendar properties
-                    // to the autocreated calendar node
+            Node calendar = cc.
+                getNode(CosmoJcrConstants.NN_ICAL_CALENDAR);
 
-                    Node calendar = cc.
-                        getNode(CosmoJcrConstants.NN_ICAL_CALENDAR);
-
-                    Node prodid = calendar.
-                        addNode(CosmoJcrConstants.NN_ICAL_PRODID);
-                    prodid.setProperty(CosmoJcrConstants.NP_ICAL_VALUE,
-                                       CosmoConstants.PRODUCT_ID);
+            Node prodid = calendar.
+                addNode(CosmoJcrConstants.NN_ICAL_PRODID);
+            prodid.setProperty(CosmoJcrConstants.NP_ICAL_VALUE,
+                               CosmoConstants.PRODUCT_ID);
         
-                    Node version = calendar.
-                        addNode(CosmoJcrConstants.NN_ICAL_VERSION);
-                    version.setProperty(CosmoJcrConstants.NP_ICAL_VALUE,
-                                        CosmoICalendarConstants.VERSION);
-                    version.setProperty(CosmoJcrConstants.NP_ICAL_MAXVERSION,
-                                        CosmoICalendarConstants.VERSION);
+            Node version = calendar.
+                addNode(CosmoJcrConstants.NN_ICAL_VERSION);
+            version.setProperty(CosmoJcrConstants.NP_ICAL_VALUE,
+                                CosmoICalendarConstants.VERSION);
+            version.setProperty(CosmoJcrConstants.NP_ICAL_MAXVERSION,
+                                CosmoICalendarConstants.VERSION);
 
-                    // CALSCALE: we only support Gregorian, so as per
-                    // RFC 2445 section 4.7.1, we don't need to set it
+            // CALSCALE: we only support Gregorian, so as per
+            // RFC 2445 section 4.7.1, we don't need to set it
 
-                    // METHOD: only used for iTIP scheduling, not
-                    // necessary for provisioning
-
-                    parent.save();
-
-                    return cc;
-                }
-            });
-    }
-
-    /**
-     * Returns true if a calendar exists at the given path,
-     * false otherwise
-     *
-     * @param path the repository path to test for existence
-     */
-    public boolean existsCalendar(final String path) {
-        return ((Boolean) getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
-                    throws RepositoryException {
-                    try {
-                        if (log.isDebugEnabled()) {
-                            log.debug("checking existence of calendar at " +
-                                      path);
-                        }
-                        Node cc = JCRUtils.findNode(session, path);
-                        if (! cc.isNodeType(CosmoJcrConstants.
-                                            NT_CALDAV_COLLECTION)) {
-                            throw new InvalidDataAccessResourceUsageException("node at path " + path + " is not a calendar");
-                        }
-                        return Boolean.TRUE;
-                    } catch (PathNotFoundException e) {
-                        return Boolean.FALSE;
-                    }
-                }
-            })).booleanValue();
-    }
-
-    /**
-     * Removes the calendar at the given path.
-     *
-     * @param path the repository path of the calendar to
-     * remove
-     */
-    public void deleteCalendar(final String path) {
-        getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
-                    throws RepositoryException {
-                    if (log.isDebugEnabled()) {
-                        log.debug("deleting calendar at " + path);
-                    }
-                    JCRUtils.findNode(session, path).remove();
-                    session.save();
-                    return null;
-                }
-            });
+            // METHOD: only used for iTIP scheduling, not
+            // necessary for provisioning
+        } catch (RepositoryException e) {
+            log.error("JCR error creating calendar collection", e);
+            throw JCRExceptionTranslator.translate(e);
+        }
     }
 
     /**

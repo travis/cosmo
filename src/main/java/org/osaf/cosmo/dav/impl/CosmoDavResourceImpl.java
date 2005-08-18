@@ -157,7 +157,19 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             throw new DavException(CosmoDavResponse.SC_FORBIDDEN,
                                    "Parent collection is not a calendar collection");
         }
+
         super.addMember(member, in);
+
+        if (cdr.isCalendarResource()) {
+            try {
+                // force the newly-created member's properties to be
+                // initialized so we can use them in the dav response
+                cdr.init(getNode().getSession().
+                         getItem(cdr.getLocator().getResourcePath()));
+            } catch (RepositoryException e) {
+                log.warn("could not initialize properties for new resource", e);
+            }
+        }
     }
 
     // CosmoDavResource methods
@@ -239,6 +251,14 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         return (! isCalendarCollection() &&
                 mimeResolver.getMimeType(getDisplayName()).
                 equals(CosmoDavConstants.CT_ICALENDAR));
+    }
+
+    /**
+     * Returns the entity tag for this resource.
+     */
+    public String getETag() {
+        initProperties();
+        return getNodeResource() == null ? "" : getNodeResource().getETag();
     }
 
     /**

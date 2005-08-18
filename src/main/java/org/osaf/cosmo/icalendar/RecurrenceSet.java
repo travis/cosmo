@@ -71,23 +71,11 @@ public class RecurrenceSet {
     public void add(Component component) {
         components.put(getComponentKey(component), component);
 
-        RDate rdate = ICalendarUtils.getRDate(component);
-        RRule rrule = ICalendarUtils.getRRule(component);
-        ExDate exdate = ICalendarUtils.getExDate(component);
-        ExRule exrule = ICalendarUtils.getExRule(component);
         RecurrenceId recurid = ICalendarUtils.getRecurrenceId(component);
-        log.debug("recurid: " + recurid);
-        log.debug("rdate: " + rdate);
-        log.debug("rrule: " + rrule);
-        log.debug("exdate: " + exdate);
-        log.debug("exrule: " + exrule);
-
         if (recurid != null) {
-            log.debug("got exception");
             exceptions.add(component);
         }
         else {
-            log.debug("got master");
             master = component;
             uid = ICalendarUtils.getUid(master).getValue();
         }

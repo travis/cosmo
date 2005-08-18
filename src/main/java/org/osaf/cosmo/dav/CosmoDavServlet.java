@@ -28,6 +28,8 @@ import org.apache.jackrabbit.webdav.DavSessionProvider;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.WebdavRequest;
 import org.apache.jackrabbit.webdav.WebdavResponse;
+import org.apache.jackrabbit.webdav.property.DavProperty;
+import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 
 import org.apache.log4j.Logger;
@@ -120,7 +122,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         cosmoResource.setApplicationContext(wac);
 
         if (method > 0) {
-            return super.execute(request, response, method, cosmoResource);
+            return super.execute(request, response, method, resource);
         }
 
         method = CosmoDavMethods.getMethodCode(request.getMethod());
@@ -140,6 +142,57 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         }
 
         return true;
+    }
+
+    /**
+     */
+    protected void doPut(WebdavRequest request,
+                         WebdavResponse response,
+                         DavResource resource)
+        throws IOException, DavException {
+        CosmoDavRequestImpl cosmoRequest = new CosmoDavRequestImpl(request);
+        CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
+        CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
+
+        // caldav (section 4.6.2): honor "If-None-Match"
+        String ifNoneMatch = request.getHeader("If-None-Match");
+        if (ifNoneMatch != null) {
+            // fail if it's "*" and the resource exists at all
+            if ((ifNoneMatch.equals("*") && resource.exists()) ||
+                // fail if the resource exists and both etags are
+                // strong and they match
+                (resource.exists() &&
+                 ! ifNoneMatch.startsWith("W/") &&
+                 ! cosmoResource.getETag().startsWith("W/") &&
+                 cosmoResource.getETag().equals(ifNoneMatch))) {
+                response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
+                return;
+            }
+        }
+
+        // caldav (section 4.6.2): honor "If-Match" header
+        String ifMatch = request.getHeader("If-Match");
+        if (ifMatch != null) {
+            // fail if it's "*" and the resource does not exist
+            if ((ifMatch.equals("*") && ! resource.exists()) ||
+                // fail if the resource does not exist, one or both of
+                // the etags are weak, or if the etags don't match
+                (! resource.exists() ||
+                 ifMatch.startsWith("W/") ||
+                 cosmoResource.getETag().startsWith("W/") ||
+                 ! cosmoResource.getETag().equals(ifMatch))) {
+                response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
+                return;
+            }
+        }
+
+        super.doPut(request, response, resource);
+
+        // caldav (section 4.6.2): return ETag header
+        if (cosmoResource.isCalendarResource() &&
+            ! cosmoResource.getETag().equals("")) {
+            response.setHeader("ETag", cosmoResource.getETag());
+        }
     }
 
     /**

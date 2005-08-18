@@ -81,6 +81,11 @@ public interface CosmoDavResource extends DavResource {
     public boolean isCalendarResource();
 
     /**
+     * Returns the entity tag for this resource.
+     */
+    public String getETag();
+
+    /**
      * Associates a ticket with this resource and saves it into
      * persistent storage.
      */

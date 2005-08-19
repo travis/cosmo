@@ -47,7 +47,6 @@ public class CosmoDavConstants {
     // XML elements
 
     public static final String ELEMENT_PROP = "prop";
-    public static final String ELEMENT_TICKETDISCOVERY = "ticketdiscovery";
     public static final String ELEMENT_TICKETINFO = "ticketinfo";
     public static final String ELEMENT_ID = "id";
     public static final String ELEMENT_OWNER = "owner";
@@ -89,4 +88,8 @@ public class CosmoDavConstants {
         "calendar-component-restriction-set";
     public static final String PROPERTY_CALDAV_CALENDAR_RESTRICTIONS =
         "calendar-restrictions";
+
+    // ticket properties
+    public static final String PROPERTY_TICKET_TICKETDISCOVERY =
+        "ticketdiscovery";
 }

@@ -30,6 +30,7 @@ import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.WebdavResponse;
 import org.apache.jackrabbit.webdav.lock.ActiveLock;
+import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.observation.EventDiscovery;
 import org.apache.jackrabbit.webdav.observation.Subscription;
 import org.apache.log4j.Logger;
@@ -40,6 +41,7 @@ import org.jdom.Element;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResponse;
+import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.model.Ticket;
 
 /**
@@ -76,16 +78,9 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
                                    DavConstants.NAMESPACE);
         prop.addNamespaceDeclaration(CosmoDavConstants.NAMESPACE_TICKET);
 
-        Element ticketDiscovery =
-            new Element(CosmoDavConstants.ELEMENT_TICKETDISCOVERY,
-                        CosmoDavConstants.NAMESPACE_TICKET);
-        prop.addContent(ticketDiscovery);
-
-        for (Iterator i=resource.getLoggedInUserTickets().iterator();
-             i.hasNext();) {
-            Ticket ticket = (Ticket) i.next();
-            ticketDiscovery.addContent(ticketToXml(ticket, resource));
-        }
+        DavProperty ticketdiscovery =
+            resource.getProperties().get(CosmoDavPropertyName.TICKETDISCOVERY);
+        prop.addContent(ticketdiscovery.toXml());
 
         sendXmlResponse(new Document(prop), SC_OK);
     }
@@ -100,58 +95,6 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
                                       String ticketId)
         throws DavException, IOException {
         setStatus(SC_NO_CONTENT);
-    }
-
-    // private methods
-
-    private Element ticketToXml(Ticket ticket,
-                                CosmoDavResource resource) {
-        Element ticketInfo = new Element(CosmoDavConstants.ELEMENT_TICKETINFO,
-                                         CosmoDavConstants.NAMESPACE_TICKET);
-
-        Element id = new Element(CosmoDavConstants.ELEMENT_ID,
-                                 CosmoDavConstants.NAMESPACE_TICKET);
-        id.addContent(ticket.getId());
-        ticketInfo.addContent(id);
-
-        Element owner = new Element(CosmoDavConstants.ELEMENT_OWNER,
-                                    DavConstants.NAMESPACE);
-        Element href = new Element(CosmoDavConstants.ELEMENT_HREF,
-                                   DavConstants.NAMESPACE);
-        DavResourceLocator locator =
-            resource.getHomedirLocator(ticket.getOwner());
-        href.addContent(locator.getHref(true));
-        owner.addContent(href);
-        ticketInfo.addContent(owner);
-
-        Element timeout = new Element(CosmoDavConstants.ELEMENT_TIMEOUT,
-                                      CosmoDavConstants.NAMESPACE_TICKET);
-        timeout.addContent(ticket.getTimeout());
-        ticketInfo.addContent(timeout);
-
-        // visit limits are not supported; the element remains to
-        // comply with the current draft of the spec
-        Element visits = new Element(CosmoDavConstants.ELEMENT_VISITS,
-                                     CosmoDavConstants.NAMESPACE_TICKET);
-        visits.addContent(CosmoDavConstants.VALUE_INFINITY);
-        ticketInfo.addContent(visits);
-
-        Element privilege = new Element(CosmoDavConstants.ELEMENT_PRIVILEGE,
-                                        DavConstants.NAMESPACE);
-        if (ticket.getPrivileges().contains(CosmoDavConstants.PRIVILEGE_READ)) {
-            Element read = new Element(CosmoDavConstants.ELEMENT_READ,
-                                       DavConstants.NAMESPACE);
-            privilege.addContent(read);
-        }
-        if (ticket.getPrivileges().
-            contains(CosmoDavConstants.PRIVILEGE_WRITE)) {
-            Element write = new Element(CosmoDavConstants.ELEMENT_WRITE,
-                                        DavConstants.NAMESPACE);
-            privilege.addContent(write);
-        }
-        ticketInfo.addContent(privilege);
-
-        return ticketInfo;
     }
 
     // WebdavResponse methods

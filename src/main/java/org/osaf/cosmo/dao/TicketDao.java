@@ -38,15 +38,13 @@ public interface TicketDao {
     public void createTicket(String path, Ticket ticket);
 
     /**
-     * Returns all tickets owned by the named user for the node at the
-     * given path, or an empty <code>Set</code> if the user does not
-     * own any tickets.
+     * Returns all tickets for the node at the given path, or an empty
+     * <code>Set</code> if the resource does not have any tickets.
      *
      * String path the absolute JCR path of the ticketed node
-     * @param username the username of the user whose tickets are to
      * be returned
      */
-    public Set getTickets(String path, String username);
+    public Set getTickets(String path);
 
     /**
      * Returns the identified ticket for the item at the given path,

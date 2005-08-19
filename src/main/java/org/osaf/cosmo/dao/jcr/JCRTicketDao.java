@@ -94,16 +94,12 @@ public class JCRTicketDao extends JCRDaoSupport
     }
 
     /**
-     * Returns all tickets owned by the named user for the node at the
-     * given path, or an empty <code>Set</code> if the user does not
-     * own any tickets.
+     * Returns all tickets for the node at the given path, or an empty
+     * <code>Set</code> if the resource does not have any tickets.
      *
      * String path the absolute JCR path of the ticketed node
-     * @param username the username of the user whose tickets are to
-     * be returned
      */
-    public Set getTickets(final String path,
-                          final String username) {
+    public Set getTickets(final String path) {
         return (Set) getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
@@ -114,12 +110,6 @@ public class JCRTicketDao extends JCRDaoSupport
                         resource.getNodes(CosmoJcrConstants.NN_TICKET);
                     while (i.hasNext()) {
                         Node child = i.nextNode();
-                        // child node must be owned by the named owner
-                        String owner = JCRUtils.
-                            getStringValue(child, CosmoJcrConstants.NP_OWNER);
-                        if (! username.equals(owner)) {
-                            continue;
-                        }
                         tickets.add(nodeToTicket(child));
                     }
 

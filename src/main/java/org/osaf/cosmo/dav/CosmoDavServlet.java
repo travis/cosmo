@@ -327,6 +327,9 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             response.sendError(DavServletResponse.SC_NOT_FOUND);
             return;
         }
+        if (!resource.isTicketable()) {
+            throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
+        }
 
         String ticketId = request.getTicketId();
         if (ticketId == null) {

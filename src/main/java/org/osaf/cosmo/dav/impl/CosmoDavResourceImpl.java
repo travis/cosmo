@@ -17,6 +17,10 @@ package org.osaf.cosmo.dav.impl;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jcr.Item;
@@ -57,6 +61,7 @@ import org.osaf.cosmo.dav.property.CalendarDescription;
 import org.osaf.cosmo.dav.property.CalendarRestrictions;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.CosmoResourceType;
+import org.osaf.cosmo.dav.property.TicketDiscovery;
 import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.jackrabbit.io.ApplicationContextAwareImportContext;
@@ -84,6 +89,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     private ApplicationContext applicationContext;
     private MimeResolver mimeResolver;
     private boolean initializing;
+    private Map tickets;
+    private Map ownedTickets;
 
     /**
      */
@@ -173,6 +180,17 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     // CosmoDavResource methods
+
+    /**
+     */
+    public boolean isTicketable() {
+        try {
+            return exists() &&
+                getNode().isNodeType(CosmoJcrConstants.NT_TICKETABLE);
+        } catch (RepositoryException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Returns true if this resource represents a calendar home
@@ -273,13 +291,12 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 	if (isLocked(this)) {
             throw new DavException(CosmoDavResponse.SC_LOCKED);
         }
+        if (!isTicketable()) {
+            throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
+        }
 
         try {
             Node resource = getNode();
-            if (! resource.isNodeType(CosmoJcrConstants.NT_TICKETABLE)) {
-                throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED,
-                                       "Resource is not ticketable");
-            }
 
             ticket.setOwner(getLoggedInUser().getUsername());
 
@@ -292,6 +309,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }
+
+        // refresh the ticketdiscovery property
+        getProperties().add(new TicketDiscovery(this));
     }
 
     /**
@@ -306,6 +326,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 	if (isLocked(this)) {
             throw new DavException(CosmoDavResponse.SC_LOCKED);
         }
+        if (!isTicketable()) {
+            throw new DavException(CosmoDavResponse.SC_METHOD_NOT_ALLOWED);
+        }
 
         try {
             TicketDao dao = (TicketDao) applicationContext.
@@ -317,28 +340,18 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }
+
+        // refresh the ticketdiscovery property
+        getProperties().add(new TicketDiscovery(this));
     }
 
     /**
      * Returns the ticket with the given id on this resource. Does not
      * execute any security checks.
      */
-    public Ticket getTicket(String id)
-        throws DavException {
-        if (!exists()) {
-            throw new DavException(CosmoDavResponse.SC_CONFLICT);
-        }
-
-        try {
-            TicketDao dao = (TicketDao) applicationContext.
-                getBean(BEAN_TICKET_DAO, TicketDao.class);
-            return dao.getTicket(getNode().getPath(), id);
-        } catch (Exception e) {
-            log.error("cannot get ticket " + id + " for resource " +
-                      getResourcePath(), e);
-            throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
-                                   e.getMessage());
-        }
+    public Ticket getTicket(String id) {
+        initTickets();
+        return (Ticket) tickets.get(id);
     }
 
     /**
@@ -348,22 +361,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      *
      * @param username
      */
-    public Set getTickets(String username)
-        throws DavException {
-        if (!exists()) {
-            throw new DavException(CosmoDavResponse.SC_CONFLICT);
-        }
-
-        try {
-            TicketDao dao = (TicketDao) applicationContext.
-                getBean(BEAN_TICKET_DAO, TicketDao.class);
-            return dao.getTickets(getNode().getPath(), username);
-        } catch (Exception e) {
-            log.error("cannot get tickets owned by " + username +
-                      " for resource " + getResourcePath(), e);
-            throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
-                                   e.getMessage());
-        }
+    public Set getTickets(String username) {
+        initTickets();
+        return (Set) ownedTickets.get(username);
     }
 
     /**
@@ -371,8 +371,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      * this resource, or an empty <code>Set</code> if the user does
      * not own any tickets.
      */
-    public Set getLoggedInUserTickets()
-        throws DavException {
+    public Set getLoggedInUserTickets() {
         return getTickets(getLoggedInUser().getUsername());
     }
 
@@ -387,7 +386,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     // DavResourceImpl methods
 
     /**
-     * Fills the set of properties
      */
     protected void initProperties() {
         if (! initializing) {
@@ -450,7 +448,39 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                 properties.add(new CalendarRestrictions());
             }
 
+            if (isTicketable()) {
+                initTickets();
+                properties.add(new TicketDiscovery(this));
+            }
+
             initializing = false;
+        }
+    }
+
+    /**
+     */
+    protected void initTickets() {
+        if (isTicketable() && tickets == null && exists()) {
+            tickets = new HashMap();
+            ownedTickets = new HashMap();
+
+            try {
+                TicketDao dao = (TicketDao)
+                    applicationContext.getBean(BEAN_TICKET_DAO, TicketDao.class);
+                for (Iterator i=dao.getTickets(getNode().getPath()).iterator();
+                     i.hasNext();) {
+                    Ticket ticket = (Ticket) i.next();
+                    tickets.put(ticket.getId(), ticket);
+                    Set ownedBy = (Set) ownedTickets.get(ticket.getOwner());
+                    if (ownedBy == null) {
+                        ownedBy = new HashSet();
+                        ownedTickets.put(ticket.getOwner(), ownedBy);
+                    }
+                    ownedBy.add(ticket);
+                }
+            } catch (RepositoryException e) {
+                log.warn("error getting tickets for node", e);
+            }
         }
     }
 

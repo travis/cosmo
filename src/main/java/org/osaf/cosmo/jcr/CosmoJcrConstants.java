@@ -22,8 +22,7 @@ package org.osaf.cosmo.jcr;
 public class CosmoJcrConstants {
 
     // node names
-
-    public static final String NN_TICKET = "dav:ticket";
+    public static final String NN_TICKET = "ticket:ticket";
 
     public static final String NN_ICAL_CALENDAR = "icalendar:calendar";
     public static final String NN_ICAL_COMPONENT = "icalendar:component";

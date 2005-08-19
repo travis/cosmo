@@ -47,4 +47,11 @@ public class CosmoDavPropertyName {
         DavPropertyName.create(CosmoDavConstants.
                                PROPERTY_CALDAV_CALENDAR_RESTRICTIONS,
                                CosmoDavConstants.NAMESPACE_CALDAV);
+
+    /**
+     */
+    public static final DavPropertyName TICKETDISCOVERY =
+        DavPropertyName.create(CosmoDavConstants.
+                               PROPERTY_TICKET_TICKETDISCOVERY,
+                               CosmoDavConstants.NAMESPACE_TICKET);
 }

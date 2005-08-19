@@ -55,6 +55,12 @@ public interface CosmoDavResource extends DavResource {
     };
 
     /**
+     * Returns true if this resource represents a ticketable dav
+     * resource.
+     */
+    public boolean isTicketable();
+
+    /**
      * Returns true if this resource represents a calendar
      * home collection.
      */
@@ -100,7 +106,7 @@ public interface CosmoDavResource extends DavResource {
     /**
      * Returns the ticket with the given id on this resource.
      */
-    public Ticket getTicket(String id) throws DavException;
+    public Ticket getTicket(String id);
 
     /**
      * Returns all tickets owned by the named user on this resource,
@@ -109,14 +115,14 @@ public interface CosmoDavResource extends DavResource {
      *
      * @param username
      */
-    public Set getTickets(String username) throws DavException;
+    public Set getTickets(String username);
 
     /**
      * Returns all tickets owned by the currently logged in user on
      * this resource, or an empty <code>Set</code> if the user does
      * not own any tickets.
      */
-    public Set getLoggedInUserTickets() throws DavException;
+    public Set getLoggedInUserTickets();
 
     /**
      * Returns a resource locator for the named principal's homedir.

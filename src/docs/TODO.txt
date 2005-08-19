@@ -52,9 +52,8 @@ LATER RELEASES
 ==============
 
 See "Deferred Features" section of the 0.2 Spec at
-<http://cvs.osafoundation.org/viewcvs.cgi/*checkout*/cosmo/src/docs/spec/cosmo-0.2-spec.html?rev=HEAD&content-type=text/html>. Additonal tasks:
+<http://svn.osafoundation.org/server/cosmo/trunk/src/docs/spec/cosmo-0.2-spec.html>
 
- * support the ticketdiscovery property on PROPFIND requests
  * support OPTIONS and PROPFIND requests for principal URLs
  * account activation
     o system generates email at signup containing activation url; user

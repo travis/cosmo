@@ -75,13 +75,12 @@ public class TicketDaoTest extends BaseCoreTestCase {
         }
         dao.createTicket(path, ticket2);
 
-        // get all of this user's tickets and make sure both of the
+        // get all of the node's tickets and make sure both of the
         // ones we created are there
         if (log.isDebugEnabled()) {
-            log.debug("getting tickets owned by " + user.getUsername() +
-                      " on " + path);
+            log.debug("getting tickets on " + path);
         }
-        Set tickets = dao.getTickets(path, user.getUsername());
+        Set tickets = dao.getTickets(path);
         assertTrue(tickets.contains(ticket));
         assertTrue(tickets.contains(ticket2));
         assertEquals(tickets.size(), 2);
@@ -100,9 +99,9 @@ public class TicketDaoTest extends BaseCoreTestCase {
         }
         dao.removeTicket(path, ticket);
 
-        // get all of the user's tickets again and make sure the
-        // removed one is gone
-        tickets = dao.getTickets(path, user.getUsername());
+        // get all of the tickets again and make sure the removed one
+        // is gone
+        tickets = dao.getTickets(path);
         assertTrue(! tickets.contains(ticket));
         assertTrue(tickets.contains(ticket2));
         assertEquals(tickets.size(), 1);

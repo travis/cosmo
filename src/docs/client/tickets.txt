@@ -37,17 +37,15 @@ The ticket specification defines two possible ticket privileges,
 "read" and "write". The read privilege corresponds to the OPTIONS,
 GET, HEAD and PROPFIND methods, and the write privilege allows the
 POST, PUT, DELETE, PROPPATCH, MKCOL, COPY, MOVE, LOCK, UNLOCK,
-MKTICKET and DELTICKET methods.
+MKCALENDAR, MKTICKET and DELTICKET methods.
 
 
 Request Methods
 ===============
 
 Cosmo implements the MKTICKET and DELTICKET methods defined in the
-ticket spec. Cosmo does not (yet) support PROPFIND requests for the
-ticketdiscovery property on a ticketed resource, but the MKTICKET
-response does include all the tickets owned by the user sending the
-request, including the one just generated.
+ticket spec and makes the ticketdiscovery property available via
+PROPFIND (this property is protected).
 
 Clients may as usual use an OPTIONS request to discover whether or not
 MKTICKET and DELTICKET are supported methods for a particular Cosmo
@@ -142,10 +140,7 @@ Unimplemented
 
 The following items from the ticket spec are not yet implemented:
 
-  (1) Support the ticketdiscovery property on PROPFIND requests
-      (section 1.5)
-
-  (2) Support the OPTIONS and PROPFIND methods for principal URLs
+  (1) Support the OPTIONS and PROPFIND methods for principal URLs
       (those indicated by the DAV:owner property of a
       ticket:ticketinfo XML element) (section 5.1)
 

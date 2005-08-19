@@ -130,9 +130,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         if (log.isDebugEnabled()) {
             log.debug("BEGIN");
         }
-        if (true) {
-            return;
-        }
         Session session = sessionFactory.getSession();
 
         // create a calendar object containing an event

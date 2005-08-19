@@ -153,7 +153,7 @@ public class JCRCalendarDao implements CalendarDao {
             // it's possible (tho pathological) that the client will
             // change the resource's uid on an update, so always
             // verify and set it
-            //            verifyUniqueUid(node, events.getUid());
+            verifyUniqueUid(node, events.getUid());
             node.setProperty(CosmoJcrConstants.NP_CALDAV_UID, events.getUid());
 
             // add calendar components

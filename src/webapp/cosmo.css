@@ -14,51 +14,110 @@
  * limitations under the License.
  */
 
+body, p, td, div {
+font-size: 12px; 
+background-color: #ffffff;
+font-family: verdana, arial, sans-serif;
+color:#333333;
+}
+
+form {
+margin:0px;
+padding:0px;
+}
+
+hr {
+height:1px;
+border:0px;
+background:#cccccc;
+}
+
 a:visited {
-  color: #c96;
+color: #333399;
 }
 
 a:link {
-  color: #963;
+color: #333399;
 }
 
 a:hover {
-  color: #630;
-}
-
-.bodystyle {
-  background-color: #fff;
+color: #9999cc;
 }
 
 .lg {
 font-size: 16px; 
-color: #000; 
-font-family: Georgia, Times Old Roman, Times, serif;
+color:#333333;
+font-family: verdana, arial, sans-serif;
 }
 
 .hd {
 font-size: 14px; 
-color: #000; 
-font-family: Georgia, Times Old Roman, Times, serif;
+color:#333333;
+font-family: verdana, arial, sans-serif;
+font-weight:bold;
 }
 
 .md {
 font-size: 12px; 
-color: #000; 
-font-family: Georgia, Times Old Roman, Times, serif;
+color:#333333;
+font-family: verdana, arial, sans-serif;
+}
+
+.mdData {
+font-size: 12px; 
+color:#333333;
+font-family: verdana, arial, sans-serif;
+}
+
+.mdLabel {
+font-size: 12px; 
+color:#666666;
+font-family: verdana, arial, sans-serif;
+font-weight:bold;
 }
 
 .sm {
-font-size: 10px; 
-color: #000; 
-font-family: Georgia, Times Old Roman, Times, serif;
+font-size: 11px; 
+color:#333333;
+font-family: verdana, arial, sans-serif;
 }
+
+.smData {
+font-size: 11px; 
+color:#333333;
+font-family: verdana, arial, sans-serif;
+}
+
+.smLabel {
+font-size: 11px; 
+color:#666666;
+font-family: verdana, arial, sans-serif;
+font-weight:bold;
+}
+
+.smTableColHead {
+font-size: 11px; 
+color:#666666;
+font-family: verdana, arial, sans-serif;
+font-weight:bold;
+text-align:center;
+background:#eeeeee;
+border:1px solid #cccccc;
+}
+
+.smTableData {
+font-size: 11px; 
+color:#666666;
+font-family: verdana, arial, sans-serif;
+border:1px solid #cccccc;
+}
+
 
 .footer {
 font-size:
 10px; font-style: italic;
-color: #000; 
-font-family: Georgia, Times Old Roman, Times, serif;
+color:#333333;
+font-family: verdana, arial, sans-serif;
 }
 
 .inlinecodeblock {
@@ -81,6 +140,25 @@ font-family: monospace;
 white-space: pre;
 }
 
-.error { color: #f00 }
+.error { color: #aa3333 }
 
-.confirm { color: #0f0 }
+.confirm { color: #33aa33 }
+
+.disabled { color:#aaaaaa; }
+
+.textInput {
+font-family: verdana, arial, sans-serif;
+color:#000000;
+border:1px solid #aaaaaa;
+padding:2px;
+}
+
+.buttonInput {
+font-family: verdana, arial, sans-serif;
+cursor:pointer;
+padding:1px;
+}
+
+.widgetBorder {
+border:1px solid #cccccc;
+}

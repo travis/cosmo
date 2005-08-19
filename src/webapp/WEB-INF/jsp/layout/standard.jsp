@@ -35,6 +35,7 @@
         type="org.osaf.cosmo.CosmoConstants"
         field="SC_ATTR_VERSION"/>
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html:html xhtml="true">
   <head>
     <title>
@@ -60,11 +61,7 @@
         <c:if test="${showNav}">
           <td align="right" valign="top">
             <!-- main navbar -->
-            <div class="md">
-              <fmt:message key="Layout.Nav.Main.LoggedInAs">
-                <fmt:param value="${user.username}"/>
-              </fmt:message>
-              |
+            <div class="mdData">
               <authz:authorize ifAllGranted="ROLE_ROOT">
                 <html:link page="/home/"><fmt:message key="Layout.Nav.Main.HomeDirectories"/></html:link>
               |
@@ -80,6 +77,11 @@
               <a href="mailto:${applicationScope.cosmoServerAdmin}">
                 <fmt:message key="Layout.Nav.Main.Help"/>
               </a>
+            </div>
+            <div class="mdData" style="margin-top:8px;">
+              <fmt:message key="Layout.Nav.Main.LoggedInAs">
+                <fmt:param value="${user.username}"/>
+              </fmt:message>
             </div>
             <!-- end main navbar -->
           </td>

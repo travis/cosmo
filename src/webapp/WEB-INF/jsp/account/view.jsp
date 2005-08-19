@@ -31,143 +31,141 @@
   <cosmo:baseurl var="baseurl"/>
 
   <p class="hd">
-    <b><fmt:message key="Account.View.ClientSetup.Header"/></b>
+    <fmt:message key="Account.View.ClientSetup.Header"/>
   </p>
   <p>
     <fmt:message key="Account.View.ClientSetup.Info"/>
   </p>
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>
-      <td class="md" align="right">
-        <b><fmt:message key="Account.View.ClientSetup.Server"/></b>
+      <td class="mdLabel" style="text-align:right;">
+        <fmt:message key="Account.View.ClientSetup.Server"/>
       </td>
-      <td class="md" align="left">
+      <td class="mdData">
         ${pageContext.request.serverName}
       </td>
     </tr>
     <tr>
-      <td class="md" align="right">
-        <b><fmt:message key="Account.View.ClientSetup.Path"/></b>
+      <td class="mdLabel" style="text-align:right;">
+        <fmt:message key="Account.View.ClientSetup.Path"/>
       </td>
-      <td class="md" align="left">
+      <td class="mdData">
         ${homedir}
       </td>
     </tr>
     <tr>
-      <td class="md" align="right">
-        <b><fmt:message key="Account.View.ClientSetup.Username"/></b>
+      <td class="mdLabel" style="text-align:right;">
+        <fmt:message key="Account.View.ClientSetup.Username"/>
       </td>
-      <td class="md" align="left">
+      <td class="mdData">
         ${user.username}
       </td>
     </tr>
     <tr>
-      <td class="md" align="right">
-        <b><fmt:message key="Account.View.ClientSetup.Password"/></b>
+      <td class="mdLabel" style="text-align:right;">
+        <fmt:message key="Account.View.ClientSetup.Password"/>
       </td>
-      <td class="md" align="left">
+      <td class="mdData">
         <i><fmt:message key="Account.View.ClientSetup.PasswordHidden"/></i>
       </td>
     </tr>
     <tr>
-      <td class="md" align="right">
-        <b><fmt:message key="Account.View.ClientSetup.Port"/></b>
+      <td class="mdLabel" style="text-align:right;">
+        <fmt:message key="Account.View.ClientSetup.Port"/>
       </td>
-      <td class="md" align="left">
+      <td class="mdData">
         ${pageContext.request.serverPort}
       </td>
       </td>
     </tr>
     <tr>
-      <td class="md" align="right">
-        <b><fmt:message key="Account.View.ClientSetup.Secure"/></b>
+      <td class="mdLabel" style="text-align:right;">
+        <fmt:message key="Account.View.ClientSetup.Secure"/>
       </td>
-      <td class="md" align="left">
+      <td class="mdData">
         <c:choose><c:when test="${pageContext.request.secure}"><fmt:message key="Yes"/></c:when><c:otherwise><fmt:message key="No"/></c:otherwise></c:choose>
       </td>
     </tr>
   </table>
-
   <p class="hd">
-    <b><fmt:message key="Account.View.HomeDirectory.Header"/></b>
+    <fmt:message key="Account.View.HomeDirectory.Header"/>
   </p>
   <p>
     <fmt:message key="Account.View.HomeDirectory.YourHomeDirectoryIs"/>
     <html:link page="${homedir}">
-      <b>${baseurl}${homedir}</b>
+      ${baseurl}${homedir}
     </html:link>.
   </p>
-
   <p class="hd">
-    <b><fmt:message key="Account.View.AccountDetails.Header"/></b>
+    <fmt:message key="Account.View.AccountDetails.Header"/>
   </p>
   <cosmo:errmsg/>
   <html:form action="/account/update">
     <table cellpadding="3" cellspacing="1" border="0">
       <tr>
-        <td class="md" align="right">
-          <b><fmt:message key="Account.Form.FirstName"/></b>
+        <td class="mdLabel" style="text-align:right;">
+          <fmt:message key="Account.Form.FirstName"/>
         </td>
-        <td class="md" align="left">
+        <td class="mdData">
           <html:text property="firstName" size="32" maxlength="32"
-                     styleClass="md"/>
+                     styleClass="textInput"/>
           <cosmo:errmsg property="firstName"/>
         </td>
       </tr>
       <tr>
-        <td class="md" align="right">
-          <b><fmt:message key="Account.Form.LastName"/></b>
+        <td class="mdLabel" style="text-align:right;">
+          <fmt:message key="Account.Form.LastName"/>
         </td>
-        <td class="md" align="left">
+        <td class="mdData">
           <html:text property="lastName" size="32" maxlength="32"
-                     styleClass="md"/>
+                     styleClass="textInput"/>
           <cosmo:errmsg property="lastName"/>
         </td>
       </tr>
       <tr>
-        <td class="md" align="right">
-          <b><fmt:message key="Account.Form.Email"/></b>
+        <td class="mdLabel" style="text-align:right;">
+          <fmt:message key="Account.Form.Email"/>
         </td>
-        <td class="md" align="left">
+        <td class="mdData">
           <html:text property="email" size="32" maxlength="32"
-                     styleClass="md"/>
+                     styleClass="textInput"/>
           <cosmo:errmsg property="email"/>
         </td>
       </tr>
       <tr>
-        <td class="md" align="right">
+        <td class="mdLabel" style="text-align:right;">
           &nbsp;
         </td>
-        <td class="md" align="left">
+        <td class="mdData">
           <span class="sm"><fmt:message key="Account.Form.PasswordBlurb"/></span>
         </td>
       </tr>
       <tr>
-        <td class="md" align="right">
-          <b><fmt:message key="Account.Form.Password"/></b>
+        <td class="mdLabel" style="text-align:right;">
+          <fmt:message key="Account.Form.Password"/>
         </td>
-        <td class="md" align="left">
+        <td class="mdData">
           <html:password property="password" size="16" maxlength="16"
-                         styleClass="md"/>
+                         styleClass="textInput"/>
           <cosmo:errmsg property="password"/>
         </td>
       </tr>
       <tr>
-        <td class="md" align="right">
-          <b><fmt:message key="Account.Form.Confirm"/></b>
+        <td class="mdLabel" style="text-align:right;">
+          <fmt:message key="Account.Form.Confirm"/>
         </td>
-        <td class="md" align="left">
+        <td class="mdData">
           <html:password property="confirm" size="16" maxlength="16"
-                         styleClass="md"/>
+                         styleClass="textInput"/>
           <cosmo:errmsg property="confirm"/>
         </td>
       </tr>
       <tr>
-        <td class="md" align="right">
+        <td class="mdLabel" style="text-align:right;">
           &nbsp;
         </td>
-        <td class="md" align="left">
-          <html:submit property="create" styleClass="md">
+        <td class="mdData">
+          <html:submit property="create" styleClass="buttonInput">
             <fmt:message key="Account.Form.Button.Update"/>
           </html:submit>
         </td>

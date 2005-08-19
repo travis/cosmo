@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-body, p, td, div {
+body {
 font-size: 12px; 
-background-color: #ffffff;
+background: #ffffff;
 font-family: verdana, arial, sans-serif;
-color:#333333;
+color:#222222;
+padding:8px;
+}
+
+p, td, div {
+font-size: 12px; 
+background: transparent;
+font-family: verdana, arial, sans-serif;
+color:#222222;
+vertical-align:top;
 }
 
 form {
@@ -74,6 +83,7 @@ font-size: 12px;
 color:#666666;
 font-family: verdana, arial, sans-serif;
 font-weight:bold;
+white-space:nowrap;
 }
 
 .sm {
@@ -103,11 +113,11 @@ font-weight:bold;
 text-align:center;
 background:#eeeeee;
 border:1px solid #cccccc;
+white-space:nowrap;
 }
 
 .smTableData {
-font-size: 11px; 
-color:#666666;
+font-size: 11px;
 font-family: verdana, arial, sans-serif;
 border:1px solid #cccccc;
 }
@@ -161,4 +171,8 @@ padding:1px;
 
 .widgetBorder {
 border:1px solid #cccccc;
+}
+
+.widgetContent {
+background:#efefef;
 }

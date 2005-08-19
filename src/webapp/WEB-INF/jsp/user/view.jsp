@@ -21,90 +21,87 @@
 
 <u:bind var="USER_ROOT" field="USER_ROOT" type="org.osaf.cosmo.security.CosmoSecurityManager"/>
 
-<p class="hd">
-  <b>${User.username}</b>
-</p>
+<div class="widgetBorder" style="width:460px; margin-top:24px;">
+<div class="widgetContent" style="padding:8px;">
+
+<div class="hd" style="margin-bottom:4px;"><fmt:message key="User.View.EditUser"/>: ${User.username}</div>
 
 <html:form action="/user/update">
-
-  <div style="width:400px;">
-  <div style="padding:12px;">
   
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        <b><fmt:message key="User.View.DateCreated" /></b>
+        <fmt:message key="User.View.DateCreated"/>
       </td>
       <td class="mdData">
-        <fmt:formatDate value="${User.dateCreated}" type="both" />
+        <fmt:formatDate value="${User.dateCreated}" type="both"/>
       </td>
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        <b><fmt:message key="User.View.DateLastModified" /></b>
+        <fmt:message key="User.View.DateLastModified"/>
       </td>
       <td class="mdData">
-        <fmt:formatDate value="${User.dateModified}" type="both" />
+        <fmt:formatDate value="${User.dateModified}" type="both"/>
       </td>
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        <b><fmt:message key="User.Form.Username" /></b>
+        <fmt:message key="User.Form.Username"/>
       </td>
-      <td class="mdData">
-        <html:text property="username" size="32" maxlength="32" styleClass="textInput" />
-        <cosmo:errmsg property="username" />
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <b><fmt:message key="User.Form.FirstName" /></b>
-      </td>
-      <td class="mdData">
-        <html:text property="firstName" size="32" maxlength="32" styleClass="textInput" />
-        <cosmo:errmsg property="firstName" />
+      <td>
+      	<div class="smData"><cosmo:errmsg property="username"/></div>
+        <div><html:text property="username" size="32" maxlength="32" styleClass="textInput"/></div>
       </td>
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        <b><fmt:message key="User.Form.LastName" /></b>
+        <fmt:message key="User.Form.FirstName"/>
       </td>
-      <td class="mdData">
-        <html:text property="lastName" size="32" maxlength="32" styleClass="textInput" />
-        <cosmo:errmsg property="lastName" />
+      <td>
+        <div class="smData"><cosmo:errmsg property="firstName"/></div>
+        <div><html:text property="firstName" size="32" maxlength="32" styleClass="textInput"/></div>
       </td>
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        <b><fmt:message key="User.Form.Email" /></b>
+        <fmt:message key="User.Form.LastName"/>
       </td>
-      <td class="mdData">
-        <html:text property="email" size="32" maxlength="32" styleClass="textInput" />
-        <cosmo:errmsg property="email" />
+      <td>
+        <div class="smData"><cosmo:errmsg property="lastName"/></div>
+        <div><html:text property="lastName" size="32" maxlength="32" styleClass="textInput"/></div>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        <fmt:message key="User.Form.Email"/>
+      </td>
+      <td>
+        <div class="smData"><cosmo:errmsg property="email"/></div>
+        <div><html:text property="email" size="32" maxlength="32" styleClass="textInput"/></div>
       </td>
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right; vertical-align:top;">
-        <b><fmt:message key="User.Form.Roles" /></b>
+        <fmt:message key="User.Form.Roles"/>
       </td>
-      <td class="mdData">
-      
-      <c:choose>
+      <td>  
+      <div class="smData"><cosmo:errmsg property="role"/></div>
+      <%-- This is a bit hackish, but it achieves the desired results: a single checkbox for admin access --%>
+      <div><c:choose>
         <c:when test="${User.username eq USER_ROOT}">
-          <div><input type="checkbox" name="roleDummy" value="" checked="checked" disabled="disabled" /> Make this user an administrator</div>
-          <input type="hidden" name="role" value="1" />
+          <div><input type="checkbox" name="roleDummy" value="" checked="checked" disabled="disabled"/> Make this user an administrator</div>
+          <input type="hidden" name="role" value="1"/>
         </c:when>
         <c:otherwise>
           <c:forEach var="role" items="${Roles}">
             <c:if test="${role.id == 1}">
-            <div><html:multibox property="role" value="${role.id}" /> Make this user an administrator</div>
+            <div><html:multibox property="role" value="${role.id}"/> Make this user an administrator</div>
             </c:if>
           </c:forEach>
-          <input type="hidden" name="role" value="2" />
+          <input type="hidden" name="role" value="2"/>
         </c:otherwise>
-      </c:choose>
-        
-        <cosmo:errmsg property="role" />
+      </c:choose></div>   
       </td>
     </tr>
     <tr>
@@ -112,25 +109,25 @@
         &nbsp;
       </td>
       <td class="mdData">
-        <span class="sm"><fmt:message key="User.Form.PasswordBlurb" /></span>
+        <span class="sm"><fmt:message key="User.Form.PasswordBlurb"/></span>
       </td>
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        <b><fmt:message key="User.Form.Password" /></b>
+        <fmt:message key="User.Form.Password"/>
       </td>
-      <td class="mdData">
-        <html:password property="password" size="16" maxlength="16" styleClass="textInput" />
-        <cosmo:errmsg property="password" />
+      <td>
+        <div class="smData"><cosmo:errmsg property="password"/></div>
+        <div><html:password property="password" size="16" maxlength="16" styleClass="textInput"/></div>
       </td>
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        <b><fmt:message key="User.Form.Confirm" /></b>
+        <fmt:message key="User.Form.Confirm"/>
       </td>
-      <td class="mdData">
-        <html:password property="confirm" size="16" maxlength="16" styleClass="textInput" />
-        <cosmo:errmsg property="confirm" />
+      <td>
+        <div class="smData"><cosmo:errmsg property="confirm"/></div>
+        <div><html:password property="confirm" size="16" maxlength="16" styleClass="textInput"/></div>
       </td>
     </tr>
   </table>
@@ -138,19 +135,19 @@
   <div style="margin-top:12px;">
      <div style="float:left;">
          <html:cancel styleClass="buttonInput">
-          <fmt:message key="User.Form.Button.Cancel" />
+          <fmt:message key="User.Form.Button.Cancel"/>
         </html:cancel>
       </div>
       <div style="float:right;">
         <html:submit property="create" styleClass="buttonInput">
-          <fmt:message key="User.Form.Button.Update" />
+          <fmt:message key="User.Form.Button.Update"/>
         </html:submit>
       </div>
-      <br style="clear:both;" />
+      <br style="clear:both;"/>
     </div>
-    
-  </div>
-  </div>
   
-  <html:hidden property="id" />
+  <html:hidden property="id"/>
 </html:form>
+
+</div>
+</div>

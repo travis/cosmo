@@ -19,6 +19,8 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<div style="width:500px;">
+
 <p>
   <fmt:message key="Welcome.WelcomeMsg">
     <fmt:param value="${pageContext.request.serverName}"/>
@@ -36,7 +38,10 @@
   <p>
     <fmt:message key="Account.View.ClientSetup.Info"/>
   </p>
-  <table cellpadding="3" cellspacing="1" border="0">
+  
+  <div class="widgetBorder" style="width:460px;">
+  
+  <table cellpadding="3" cellspacing="0" border="0">
     <tr>
       <td class="mdLabel" style="text-align:right;">
         <fmt:message key="Account.View.ClientSetup.Server"/>
@@ -87,89 +92,94 @@
       </td>
     </tr>
   </table>
+  
+  </div>
+  
   <p class="hd">
     <fmt:message key="Account.View.HomeDirectory.Header"/>
   </p>
-  <p>
+  <p style="line-height:18px;">
     <fmt:message key="Account.View.HomeDirectory.YourHomeDirectoryIs"/>
     <html:link page="${homedir}">
       ${baseurl}${homedir}
     </html:link>.
   </p>
-  <p class="hd">
-    <fmt:message key="Account.View.AccountDetails.Header"/>
-  </p>
+  
+<div class="widgetBorder" style="width:460px; margin-top:24px;">
+<div class="widgetContent" style="padding:8px;">  
+  
+  <div class="hd" style="margin-bottom:4px;"><fmt:message key="Account.View.AccountDetails.Header"/></div>
+  
   <cosmo:errmsg/>
+  
   <html:form action="/account/update">
     <table cellpadding="3" cellspacing="1" border="0">
       <tr>
         <td class="mdLabel" style="text-align:right;">
           <fmt:message key="Account.Form.FirstName"/>
         </td>
-        <td class="mdData">
-          <html:text property="firstName" size="32" maxlength="32"
-                     styleClass="textInput"/>
-          <cosmo:errmsg property="firstName"/>
+        <td>
+          <div class="smData"><cosmo:errmsg property="firstName"/></div>
+          <div><html:text property="firstName" size="32" maxlength="32" styleClass="textInput"/></div>
         </td>
       </tr>
       <tr>
         <td class="mdLabel" style="text-align:right;">
           <fmt:message key="Account.Form.LastName"/>
         </td>
-        <td class="mdData">
-          <html:text property="lastName" size="32" maxlength="32"
-                     styleClass="textInput"/>
-          <cosmo:errmsg property="lastName"/>
+        <td>
+          <div class="smData"><cosmo:errmsg property="lastName"/></div>
+          <div><html:text property="lastName" size="32" maxlength="32" styleClass="textInput"/></div>
         </td>
       </tr>
       <tr>
         <td class="mdLabel" style="text-align:right;">
           <fmt:message key="Account.Form.Email"/>
         </td>
-        <td class="mdData">
-          <html:text property="email" size="32" maxlength="32"
-                     styleClass="textInput"/>
-          <cosmo:errmsg property="email"/>
+        <td>
+          <div class="smData"><cosmo:errmsg property="email"/></div>
+          <div><html:text property="email" size="32" maxlength="32" styleClass="textInput"/></div>
         </td>
       </tr>
       <tr>
         <td class="mdLabel" style="text-align:right;">
           &nbsp;
         </td>
-        <td class="mdData">
-          <span class="sm"><fmt:message key="Account.Form.PasswordBlurb"/></span>
+        <td>
+          <span class="smData"><fmt:message key="Account.Form.PasswordBlurb"/></span>
         </td>
       </tr>
       <tr>
         <td class="mdLabel" style="text-align:right;">
           <fmt:message key="Account.Form.Password"/>
         </td>
-        <td class="mdData">
-          <html:password property="password" size="16" maxlength="16"
-                         styleClass="textInput"/>
-          <cosmo:errmsg property="password"/>
+        <td>
+          <div class="smData"><cosmo:errmsg property="password"/></div>
+          <div><html:password property="password" size="16" maxlength="16" styleClass="textInput"/></div>
         </td>
       </tr>
       <tr>
         <td class="mdLabel" style="text-align:right;">
           <fmt:message key="Account.Form.Confirm"/>
         </td>
-        <td class="mdData">
-          <html:password property="confirm" size="16" maxlength="16"
-                         styleClass="textInput"/>
-          <cosmo:errmsg property="confirm"/>
-        </td>
-      </tr>
-      <tr>
-        <td class="mdLabel" style="text-align:right;">
-          &nbsp;
-        </td>
-        <td class="mdData">
-          <html:submit property="create" styleClass="buttonInput">
-            <fmt:message key="Account.Form.Button.Update"/>
-          </html:submit>
+        <td>
+          <div class="smData"><cosmo:errmsg property="confirm"/></div>
+          <div><html:password property="confirm" size="16" maxlength="16" styleClass="textInput"/></div>
         </td>
       </tr>
     </table>
+    
+<div style="margin-top:12px; text-align:right;">    
+<html:submit property="create" styleClass="buttonInput">
+<fmt:message key="Account.Form.Button.Update"/>
+</html:submit>
+</div>
+    
   </html:form>
+  
+</div> 
+</div>  
+  
 </authz:authorize>
+
+</div>

@@ -38,10 +38,14 @@
 </div>
 </div>
 
-<div class="widgetBorder" style="margin-top:8px; width:280px;">
-<div style="padding:12px;">
+
+<div class="widgetBorder" style="margin-top:4px; width:280px;">
+<div class="widgetContent" style="padding:16px;">
 
   <table border="0" cellpadding="0" cellspacing="0">
+  <tr>
+  <td colspan="2"><div class="hd" style="margin-bottom:8px; text-align:left;">${okButton}</div></td>
+  </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
         <fmt:message key="Login.Username"/>&nbsp;&nbsp;
@@ -76,6 +80,12 @@
   
 </div>
 </div>
+
+<div class="mdData" style="margin-top:18px;">
+If you do not have an account, <br /><html:link page="/account/new">click here to create one</html:link>.
+</div>
+
+
 </div>
 
 </form>

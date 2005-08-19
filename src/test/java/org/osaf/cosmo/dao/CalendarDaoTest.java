@@ -126,36 +126,39 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         }
     }
 
-//     public void testStoreCalendarObjectWithDuplicateUid() throws Exception {
-//         if (log.isDebugEnabled()) {
-//             log.debug("BEGIN");
-//         }
-//         Session session = sessionFactory.getSession();
+    public void testStoreCalendarObjectWithDuplicateUid() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+        if (true) {
+            return;
+        }
+        Session session = sessionFactory.getSession();
 
-//         // create a calendar object containing an event
-//         // and a timezone
-//         Calendar calendar1 = TestHelper.makeDummyCalendar();
-//         VEvent event1 = TestHelper.makeDummyEvent();
-//         calendar1.getComponents().add(event1);
-//         calendar1.getComponents().add(VTimeZone.getDefault());
+        // create a calendar object containing an event
+        // and a timezone
+        Calendar calendar1 = TestHelper.makeDummyCalendar();
+        VEvent event1 = TestHelper.makeDummyEvent();
+        calendar1.getComponents().add(event1);
+        calendar1.getComponents().add(VTimeZone.getDefault());
 
-//         // store the calendar object in the repository
-//         String name =
-//             ICalendarUtils.getSummary(event1).getValue() + ".ics";
-//         Node resource = session.getRootNode().addNode(name);
-//         dao.storeCalendarObject(resource, calendar1);
-//         session.save();
+        // store the calendar object in the repository
+        String name =
+            ICalendarUtils.getSummary(event1).getValue() + ".ics";
+        Node resource = session.getRootNode().addNode(name);
+        dao.storeCalendarObject(resource, calendar1);
+        session.save();
 
-//         // now store it again
-//         try {
-//             name = ICalendarUtils.getSummary(event1).getValue() + "-dup.ics";
-//             resource = session.getRootNode().addNode(name);
-//             dao.storeCalendarObject(resource, calendar1);
-//             fail("should not have been able to store calendar object with duplicate uid");
-//         } catch (DuplicateUidException e) {
-//             // expected
-//         } finally {
-//             session.logout();
-//         }
-//     }
+        // now store it again
+        try {
+            name = ICalendarUtils.getSummary(event1).getValue() + "-dup.ics";
+            resource = session.getRootNode().addNode(name);
+            dao.storeCalendarObject(resource, calendar1);
+            fail("should not have been able to store calendar object with duplicate uid");
+        } catch (DuplicateUidException e) {
+            // expected
+        } finally {
+            session.logout();
+        }
+    }
 }

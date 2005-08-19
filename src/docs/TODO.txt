@@ -28,13 +28,10 @@ for current development plan. Additional tasks:
 WebDAV:
 
 CalDAV:
- * PUT: only remove existing exception event nodes rather than all of
-   them
 
 Tickets:
  * consider splitting security config into completely separate ones
    for ui and dav
- * ticket method tests
 
 General:
  * precompile jsps for distribution

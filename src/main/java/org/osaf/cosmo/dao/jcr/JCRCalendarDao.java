@@ -192,9 +192,6 @@ public class JCRCalendarDao implements CalendarDao {
             append(" = '").
             append(uid).
             append("']");
-        if (log.isDebugEnabled()) {
-            log.debug("uid query: " + stmt.toString());
-        }
 
         QueryManager qm =
             node.getSession().getWorkspace().getQueryManager();
@@ -216,54 +213,52 @@ public class JCRCalendarDao implements CalendarDao {
     protected void setEventNodes(RecurrenceSet events,
                                  Node resourceNode)
         throws RepositoryException {
-        setMasterEventNode((VEvent) events.getMaster(), resourceNode);
+        // add or update the master event
+        VEvent masterEvent = (VEvent) events.getMaster();
+        Node masterNode =
+            resourceNode.hasNode(CosmoJcrConstants.NN_ICAL_REVENT) ?
+            resourceNode.getNode(CosmoJcrConstants.NN_ICAL_REVENT) :
+            resourceNode.addNode(CosmoJcrConstants.NN_ICAL_REVENT);
+        setEventPropertyNodes(masterEvent, masterNode);
+        setAlarmNodes(masterEvent.getAlarms(), masterNode);
 
-        // brute force implementation: remove all exception event
-        // nodes and then set new ones for the ones listed in the
-        // recurrence set.
-        // XXX: enhance by removing only the ones that aren't listed
-        // in the recurrence set, which requires us to be able to
-        // uniquely identify each exevent node and each exception
-        // event in the recurrence set
+        // remove any exevent nodes for which a corresponding
+        // exception event does not exist in the recurrence set.
+        // save an index of the remaining exevent nodes so we can
+        // update them later.
+        Map updateIdx = new HashMap();
         for (NodeIterator i=resourceNode.
                  getNodes(CosmoJcrConstants.NN_ICAL_EXEVENT); i.hasNext();) {
-            i.nextNode().remove();
+            Node exeventNode = i.nextNode();
+            Node recuridNode = exeventNode.
+                getNode(CosmoJcrConstants.NN_ICAL_RECURRENCEID);
+            Date recurid = recuridNode.
+                getProperty(CosmoJcrConstants.NP_ICAL_DATETIME).getDate().
+                getTime();
+            Component event = events.get(recurid);
+            if (event == null) {
+                exeventNode.remove();
+            }
+            else {
+                updateIdx.put(recurid, exeventNode);
+            }
         }
+
+        // add/update exevent nodes for each exception event in the
+        // recurrence set
         for (Iterator i=events.getExceptions().iterator();
              i.hasNext();) {
             VEvent exceptionEvent = (VEvent) i.next();
-            setExceptionEventNode(exceptionEvent, resourceNode);
+            Date recurid =
+                ICalendarUtils.getRecurrenceId(exceptionEvent).getTime();
+            Node eventNode = (Node) updateIdx.get(recurid);
+            if (eventNode == null) {
+                eventNode =
+                    resourceNode.addNode(CosmoJcrConstants.NN_ICAL_EXEVENT);
+            }
+            setEventPropertyNodes(exceptionEvent, eventNode);
+            setAlarmNodes(exceptionEvent.getAlarms(), eventNode);
         }
-    }
-
-    /**
-     */
-    protected void setMasterEventNode(VEvent event,
-                                      Node resourceNode)
-        throws RepositoryException {
-        Node eventNode = null;
-        try {
-            eventNode = resourceNode.getNode(CosmoJcrConstants.NN_ICAL_REVENT);
-        } catch (PathNotFoundException e) {
-            eventNode =
-                resourceNode.addNode(CosmoJcrConstants.NN_ICAL_REVENT);
-        }
-        setEventPropertyNodes(event, eventNode);
-        setAlarmNodes(event.getAlarms(), eventNode);
-    }
-
-    /**
-     */
-    protected void setExceptionEventNode(VEvent event,
-                                         Node resourceNode)
-        throws RepositoryException {
-        // for the moment we do not have to worry about finding an
-        // existing version of the node since we removed all existing
-        // ones before setting any new ones
-        Node eventNode =
-            resourceNode.addNode(CosmoJcrConstants.NN_ICAL_EXEVENT);
-        setEventPropertyNodes(event, eventNode);
-        setAlarmNodes(event.getAlarms(), eventNode);
     }
 
     /**

@@ -55,13 +55,19 @@
         <cosmo:fullName var="fullName" user="${user}"/>
         <tr>
           <td class="smTableData" style="text-align:center; white-space:nowrap;">
-            <html:link page="/user/${user.username}">[edit]</html:link>
+            <html:link page="/user/${user.username}">
+              <fmt:message key="User.List.EditControl"/>
+            </html:link>
             <c:choose>
               <c:when test="${user.username ne USER_ROOT}">
-                <html:link page="/user/remove.do?id=${user.id}">[remove]</html:link>
+                <html:link page="/user/remove.do?id=${user.id}">
+                  <fmt:message key="User.List.RemoveControl"/>
+                </html:link>
               </c:when>
               <c:otherwise>
-                <span class="disabled">[remove]</span>
+                <span class="disabled">
+                  <fmt:message key="User.List.RemoveControl"/>
+                </span>
               </c:otherwise>
             </c:choose> 
           </td>
@@ -79,7 +85,9 @@
                 </html:link>
               </c:when>
               <c:otherwise>
-              <span class="disabled">(N/A)</span>
+              <span class="disabled">
+                <fmt:message key="User.List.NotApplicable"/>
+              </span>
               </c:otherwise>
             </c:choose>
           </td>
@@ -173,8 +181,14 @@
         <fmt:message key="User.Form.Roles"/>
       </td>
       <td>
-        <div class="smData"><cosmo:errmsg property="role"/></div>
-        <div><html:checkbox property="role" value="1"> Make this user an administrator</html:checkbox></div>
+        <div class="smData">
+          <cosmo:errmsg property="role"/>
+        </div>
+        <div>
+          <html:checkbox property="role" value="1">
+            <fmt:message key="User.Form.MakeAdministrator"/>
+          </html:checkbox>
+        </div>
         <input type="hidden" name="role" value="2" />
       </td>
     </tr>

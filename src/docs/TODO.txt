@@ -17,9 +17,11 @@ Tickets:
  * consider splitting security config into completely separate ones
    for ui and dav
 
-General:
+UI:
  * precompile jsps for distribution
- * remove commons-spring and replace with jcr-spring
+ * remove obsolete welcome page
+
+General:
  * see if we can't get Struts to work with "/user/bcm/update" rather
    than "/user/update.do" with "username=bcm" in content body
  * final copy and format for mail messages

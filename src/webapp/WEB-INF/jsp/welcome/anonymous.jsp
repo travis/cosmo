@@ -20,10 +20,20 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
 <p>
-  <div style="margin-bottom:4px;"><fmt:message key="Welcome.WelcomeMsg">
-    <fmt:param value="${pageContext.request.serverName}"/>
-  </fmt:message></div>
-  <div><html:link page="/login">Click here to log in.</html:link></div>
+  <div style="margin-bottom:4px;">
+    <fmt:message key="Welcome.WelcomeMsg">
+      <fmt:param value="${pageContext.request.serverName}"/>
+    </fmt:message>
+  </div>
+  <div>
+    <html:link page="/login">
+      <fmt:message key="Welcome.LoginControl"/>
+    </html:link>
+  </div>
 </p>
 
-<p>If you do not have an account, <html:link page="/account/new">click here to create one</html:link>.</p>
+<p>
+  <html:link page="/account/new">
+    <fmt:message key="Welcome.SignupControl"/>
+  </html:link>
+</p>

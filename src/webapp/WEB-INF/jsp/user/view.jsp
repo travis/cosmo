@@ -24,7 +24,11 @@
 <div class="widgetBorder" style="width:460px; margin-top:24px;">
 <div class="widgetContent" style="padding:8px;">
 
-<div class="hd" style="margin-bottom:4px;"><fmt:message key="User.View.EditUser"/>: ${User.username}</div>
+<div class="hd" style="margin-bottom:4px;">
+  <fmt:message key="User.View.Title">
+    <fmt:param value="${User.username}"/>
+  </fmt:message>
+</div>
 
 <html:form action="/user/update">
   
@@ -86,22 +90,32 @@
         <fmt:message key="User.Form.Roles"/>
       </td>
       <td>  
-      <div class="smData"><cosmo:errmsg property="role"/></div>
-      <%-- This is a bit hackish, but it achieves the desired results: a single checkbox for admin access --%>
-      <div><c:choose>
-        <c:when test="${User.username eq USER_ROOT}">
-          <div><input type="checkbox" name="roleDummy" value="" checked="checked" disabled="disabled"/> Make this user an administrator</div>
-          <input type="hidden" name="role" value="1"/>
-        </c:when>
-        <c:otherwise>
-          <c:forEach var="role" items="${Roles}">
-            <c:if test="${role.id == 1}">
-            <div><html:multibox property="role" value="${role.id}"/> Make this user an administrator</div>
-            </c:if>
-          </c:forEach>
-          <input type="hidden" name="role" value="2"/>
-        </c:otherwise>
-      </c:choose></div>   
+        <div class="smData">
+          <cosmo:errmsg property="role"/>
+        </div>
+        <div>
+          <c:choose>
+            <c:when test="${User.username eq USER_ROOT}">
+              <div>
+                <input type="checkbox" name="roleDummy" value=""
+                       checked="checked" disabled="disabled"/>
+                <fmt:message key="User.Form.MakeAdministrator"/>
+              </div>
+              <input type="hidden" name="role" value="1"/>
+            </c:when>
+            <c:otherwise>
+              <c:forEach var="role" items="${Roles}">
+                <c:if test="${role.id == 1}">
+                  <div>
+                    <html:multibox property="role" value="${role.id}"/>
+                    <fmt:message key="User.Form.MakeAdministrator"/>
+                  </div>
+                </c:if>
+              </c:forEach>
+              <input type="hidden" name="role" value="2"/>
+            </c:otherwise>
+          </c:choose>
+        </div>   
       </td>
     </tr>
     <tr>

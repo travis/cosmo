@@ -22,7 +22,7 @@
 <div style="width:500px;">
 
 <p>
-  <fmt:message key="Welcome.WelcomeMsg">
+  <fmt:message key="Account.View.Welcome">
     <fmt:param value="${pageContext.request.serverName}"/>
   </fmt:message>
 </p>

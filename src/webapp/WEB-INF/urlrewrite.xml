@@ -28,10 +28,6 @@
   <!-- login rules -->
 
   <rule>
-    <from>^/welcome$</from>
-    <to>/welcome.do</to>
-  </rule>
-  <rule>
     <from>^/login$</from>
     <to>/login.do</to>
   </rule>

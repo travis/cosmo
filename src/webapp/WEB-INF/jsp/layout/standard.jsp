@@ -55,7 +55,9 @@
       <tr>
         <td align="left" valign="top">
           <div class="lg">
-              <c:choose><c:when test="${fn:endsWith(body, '/welcome/user.jsp') || fn:endsWith(body, '/welcome/guest.jsp')}"><b><fmt:message key="Layout.Title"/></b></c:when><c:otherwise><html:link page="/"><b><fmt:message key="Layout.Title"/></b></html:link></c:otherwise></c:choose>
+            <html:link page="/">
+              <b><fmt:message key="Layout.Title"/></b>
+            </html:link>
           </div>
         </td>
         <c:if test="${showNav}">

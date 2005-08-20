@@ -18,8 +18,7 @@ Tickets:
    for ui and dav
 
 UI:
- * precompile jsps for distribution
- * remove obsolete welcome page
+ * fix "make this user an administrator" hack
 
 General:
  * see if we can't get Struts to work with "/user/bcm/update" rather
@@ -47,8 +46,8 @@ See "Deferred Features" section of the 0.2 Spec at
       must click the url to confirm his address and activation his
       account before he can use the account
     o admin can auto-confirm users
- * icons on user list for root users
  * move user creation form to its own page (admin ui)
+ * home directory browser
 
 
  Copyright 2005 Open Source Applications Foundation

@@ -80,14 +80,6 @@
     <put name="prefix"       value="Account.View."/>
   </definition>
 
-  <!-- welcome defs -->
-
-  <definition name="welcome" extends="layout.standard">
-    <put name="body"         value="/WEB-INF/jsp/welcome/anonymous.jsp"/>
-    <put name="prefix"       value="Welcome."/>
-    <put name="showNav"      value="false"/>
-  </definition>
-
   <!-- user defs -->
 
   <definition name="user.view" extends="layout.standard">

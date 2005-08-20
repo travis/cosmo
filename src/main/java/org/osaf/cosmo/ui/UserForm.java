@@ -32,7 +32,7 @@ public class UserForm extends ValidatorForm {
     private String email;
     private String password;
     private String confirm;
-    private String[] role;
+    private boolean admin;
 
     /**
      */
@@ -132,14 +132,14 @@ public class UserForm extends ValidatorForm {
 
     /**
      */
-    public String[] getRole() {
-        return role;
+    public boolean isAdmin() {
+        return admin;
     }
 
     /**
      */
-    public void setRole(String[] role) {
-        this.role = role;
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
     /**
@@ -159,6 +159,6 @@ public class UserForm extends ValidatorForm {
         email = null;
         password = null;
         confirm = null;
-        role = new String[0];
+        admin = false;
     }
 }

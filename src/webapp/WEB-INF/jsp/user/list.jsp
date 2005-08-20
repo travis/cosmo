@@ -182,12 +182,11 @@
       </td>
       <td>
         <div class="smData">
-          <cosmo:errmsg property="role"/>
+          <cosmo:errmsg property="admin"/>
         </div>
         <div>
-          <html:checkbox property="role" value="1">
-            <fmt:message key="User.Form.MakeAdministrator"/>
-          </html:checkbox>
+          <html:checkbox property="admin" value="true"/>
+          <fmt:message key="User.Form.MakeAdministrator"/>
         </div>
         <input type="hidden" name="role" value="2" />
       </td>

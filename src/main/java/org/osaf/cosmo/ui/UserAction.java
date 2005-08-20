@@ -69,11 +69,6 @@ public class UserAction extends CosmoAction {
      * Users: <code>Users</code>
      */
     public static final String ATTR_USERS = "Users";
-    /**
-     * The request attribute in which this action places a sorted
-     * List of the Roles to which a user can be assigned.
-     */
-    public static final String ATTR_ROLES = "Roles";
 
     private ProvisioningManager mgr;
 
@@ -112,7 +107,6 @@ public class UserAction extends CosmoAction {
         }
 
         request.setAttribute(ATTR_USER, user);
-        request.setAttribute(ATTR_ROLES, getSortedRoles());
 
         addTitleParam(request, user.getUsername());
 
@@ -212,17 +206,7 @@ public class UserAction extends CosmoAction {
         throws Exception {
         UserForm userForm = (UserForm) form;
 
-        // if the form has not yet been submitted, default the role
-        // selection
-        if (request.getParameter(OSAFStrutsConstants.PARAM_BUTTON_CREATE) ==
-            null) {
-            Role userRole = mgr.getRoleByName(CosmoSecurityManager.ROLE_USER);
-            String[] roleIds = { userRole.getId().toString() };
-            userForm.setRole(roleIds);
-        }
-
         request.setAttribute(ATTR_USERS, getSortedUsers());
-        request.setAttribute(ATTR_ROLES, getSortedRoles());
 
         return mapping.findForward(OSAFStrutsConstants.FWD_OK);
     }
@@ -245,15 +229,6 @@ public class UserAction extends CosmoAction {
         return users;
     }
 
-    private List getSortedRoles() {
-        if (log.isDebugEnabled()) {
-            log.debug("listing roles");
-        }
-        List roles = mgr.getRoles();
-        Collections.sort(roles);
-        return roles;
-    }
-
     private void populateUser(User user, UserForm form) {
         user.setUsername(form.getUsername());
         user.setFirstName(form.getFirstName());
@@ -262,18 +237,16 @@ public class UserAction extends CosmoAction {
         if (form.getPassword() != null && ! form.getPassword().equals("")) {
             user.setPassword(form.getPassword());
         }
-        String[] roleIds = form.getRole();
-        HashMap idx = new HashMap();
-        for (int i=0; i<roleIds.length; i++) {
-            Role role = mgr.getRole(roleIds[i]);
-            idx.put(roleIds[i], role);
-            user.addRole(role);
+
+        Role userRole = mgr.getRoleByName(CosmoSecurityManager.ROLE_USER);
+        user.addRole(userRole);
+
+        Role rootRole = mgr.getRoleByName(CosmoSecurityManager.ROLE_ROOT);
+        if (form.isAdmin()) {
+            user.addRole(rootRole);
         }
-        for (Iterator i=user.getRoles().iterator(); i.hasNext();) {
-            Role role = (Role) i.next();
-            if (idx.get(role.getId().toString()) == null) {
-                i.remove();
-            }
+        else {
+            user.removeRole(rootRole);
         }
     }
 
@@ -284,15 +257,6 @@ public class UserAction extends CosmoAction {
         form.setLastName(user.getLastName());
         form.setEmail(user.getEmail());
         // never set password in the form
-        Role[] roles = (Role[]) user.getRoles().toArray(new Role[0]);
-        form.setRole(mapRolesToRoleIds(roles));
-    }
-
-    private String[] mapRolesToRoleIds(Role[] roles) {
-        String[] roleIds = new String[roles.length];
-        for (int i=0; i<roles.length; i++) {
-            roleIds[i] = roles[i].getId().toString();
-        }
-        return roleIds;
+        form.setAdmin(user.inRole(CosmoSecurityManager.ROLE_ROOT));
     }
 }

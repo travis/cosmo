@@ -18,7 +18,6 @@ Tickets:
    for ui and dav
 
 UI:
- * fix "make this user an administrator" hack
 
 General:
  * see if we can't get Struts to work with "/user/bcm/update" rather

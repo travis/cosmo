@@ -361,10 +361,6 @@
            <var-value>(*this* == password)</var-value>
          </var>
        </field>
-       <field property="role"
-              depends="required">
-         <msg name="required" key="Form.AtLeastOneRequired"/>
-       </field>
      </form>
      <form name="updateUserForm">
        <field property="username"
@@ -475,10 +471,6 @@
            <var-name>test</var-name>
            <var-value>((password == null) or (*this* == password))</var-value>
          </var>
-       </field>
-       <field property="role"
-              depends="required">
-         <msg name="required" key="Form.AtLeastOneRequired"/>
        </field>
      </form>
    </formset>

@@ -17,6 +17,7 @@ package org.osaf.cosmo.model;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -151,6 +152,18 @@ public class User extends BaseModelObject {
      */
     public void setDateModified(Date dateModified) {
         this.dateModified = dateModified;
+    }
+
+    /**
+     */
+    public boolean inRole(String name) {
+        for (Iterator i=roles.iterator(); i.hasNext();) {
+            Role role = (Role) i.next();
+            if (role.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

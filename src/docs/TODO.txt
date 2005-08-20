@@ -12,25 +12,16 @@ for current development plan. Additional tasks:
 WebDAV:
 
 CalDAV:
+ * export command for calendar collections that returns an icalendar
+   object (or, with special header or paramter, html)
 
 Tickets:
  * consider splitting security config into completely separate ones
    for ui and dav
 
 UI:
-
-General:
- * see if we can't get Struts to work with "/user/bcm/update" rather
-   than "/user/update.do" with "username=bcm" in content body
  * final copy and format for mail messages
- * find a better way to specify configuration items than using j2ee
-   environment entries
- * look into litmus failures
- * figure out how to make Acegi Security not cache the token if it
-   doesn't authenticate or if access is denied. caching the token
-   causes problems for clients that send the session cookie to the
-   server (cadaver, browsers, etc.) - low priority since chandler does
-   not deal with the session cookie
+ * customizable login page welcome content
 
 
 LATER RELEASES
@@ -45,8 +36,17 @@ See "Deferred Features" section of the 0.2 Spec at
       must click the url to confirm his address and activation his
       account before he can use the account
     o admin can auto-confirm users
- * move user creation form to its own page (admin ui)
+ * move new user form to its own page
  * home directory browser
+ * jsp precompilation
+ * see if we can't get Struts to work with "/user/bcm/update" rather
+   than "/user/update.do" with "username=bcm" in content body
+ * look into litmus failures
+ * figure out how to make Acegi Security not cache the token if it
+   doesn't authenticate or if access is denied. caching the token
+   causes problems for clients that send the session cookie to the
+   server (cadaver, browsers, etc.) - low priority since chandler does
+   not deal with the session cookie
 
 
  Copyright 2005 Open Source Applications Foundation

@@ -76,7 +76,7 @@
                 <fmt:message key="Layout.Nav.Main.LogOut"/>
               </html:link>
               |
-              <a href="mailto:${applicationScope.cosmoServerAdmin}">
+              <a href="mailto:${applicationScope[SC_ATTR_SERVER_ADMIN]}">
                 <fmt:message key="Layout.Nav.Main.Help"/>
               </a>
             </div>

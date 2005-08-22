@@ -363,7 +363,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public Set getTickets(String username) {
         initTickets();
-        return (Set) ownedTickets.get(username);
+        Set t = (Set) ownedTickets.get(username);
+        return t != null ? t : new HashSet();
     }
 
     /**

@@ -48,6 +48,8 @@
 
   <!-- export webdav collection -->
   <chain name="export-collection">
+    <command id="export-calendar-collection"
+             className="org.osaf.cosmo.jackrabbit.io.ExportCalendarCollectionCommand"/>
     <command id="export-dirlisting"
              className="org.apache.jackrabbit.server.io.DirListingExportCommand"
              nonCollectionNodeTypes="nt:resource, nt:file, dav:resource, caldav:resource"

@@ -16,8 +16,6 @@ Note 1: caldav:home is defined as a mixin, since a particular
 dav:collection could presumably play the role of both a caldav home
 collection and, say, a principal collection.
 
-# XXX: change caldav:collection to mixin
-
 NodeTypeName
   caldav:home
 SuperTypes

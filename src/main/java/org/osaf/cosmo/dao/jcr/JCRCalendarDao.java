@@ -171,7 +171,48 @@ public class JCRCalendarDao implements CalendarDao {
         }
     }
 
+    /**
+     */
+    public Calendar getCalendarObject(Node node) {
+        try {
+            if (node.isNodeType(CosmoJcrConstants.NT_DAV_COLLECTION)) {
+                getCollectionCalendarObject(node);
+            }
+            // XXX: single object
+            throw new UnsupportedOperationException("not a collection");
+        } catch (RepositoryException e) {
+            log.error("JCR error getting calendar", e);
+            throw JCRExceptionTranslator.translate(e);
+        }
+    }
+
     // our methods
+
+    /**
+     */
+    protected Calendar getCollectionCalendarObject(Node node)
+        throws RepositoryException {
+        Calendar calendar = new Calendar();
+        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+        calendar.getProperties().add(Version.VERSION_2_0);
+        calendar.getProperties().add(CalScale.GREGORIAN);
+
+        // add x-properties here if we ever need them
+
+        // walk through child nodes and build a list of calendar
+        // resources
+
+        for (NodeIterator i=node.getNodes(); i.hasNext();) {
+            Node childNode = i.nextNode();
+            if (! childNode.isNodeType(CosmoJcrConstants.NT_CALDAV_RESOURCE)) {
+                continue;
+            }
+
+            // XXX: convert node to components and add to calendar
+        }
+
+        return calendar;
+    }
 
     /**
      */

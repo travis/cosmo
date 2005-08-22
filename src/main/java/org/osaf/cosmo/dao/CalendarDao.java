@@ -60,4 +60,8 @@ public interface CalendarDao extends DAO {
      * is improperly specified (no master event, etc)
      */
     public void storeCalendarObject(Node node, Calendar calendar);
+
+    /**
+     */
+    public Calendar getCalendarObject(Node node);
 }

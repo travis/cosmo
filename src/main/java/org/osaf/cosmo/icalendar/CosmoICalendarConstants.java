@@ -24,9 +24,14 @@ public class CosmoICalendarConstants {
     /**
      */
     public static final String VERSION = "2.0";
+
     /**
      */
     public static final String CONTENT_TYPE = "text/calendar";
+
+    /**
+     */
+    public static final String FILE_EXTENSION = "ics";
 
     /**
      */

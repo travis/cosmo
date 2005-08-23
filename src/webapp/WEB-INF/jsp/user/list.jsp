@@ -188,7 +188,6 @@
           <html:checkbox property="admin" value="true"/>
           <fmt:message key="User.Form.MakeAdministrator"/>
         </div>
-        <input type="hidden" name="role" value="2" />
       </td>
     </tr>
   </table>

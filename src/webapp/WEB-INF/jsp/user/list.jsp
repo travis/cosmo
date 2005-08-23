@@ -38,6 +38,9 @@
           <fmt:message key="User.List.TH.Username"/>
         </td>
         <td class="smTableColHead">
+          <fmt:message key="User.List.TH.IsAdmin"/>
+        </td>
+        <td class="smTableColHead">
           <fmt:message key="User.List.TH.Homedir"/>
         </td>
         <td class="smTableColHead">
@@ -76,8 +79,10 @@
           </td>
           <td class="smTableData" style="text-align:center;">
             ${user.username}
+          </td>
+          <td class="smTableData" style="text-align:center;">
             <c:if test="${cosmoui:isAdmin(user)}">
-              (admin)
+              Yes
             </c:if>
           </td>
           <td class="smTableData">
@@ -98,10 +103,10 @@
             <html:link href="mailto:${user.email}">${user.email}</html:link>
           </td>
           <td class="smTableData" style="text-align:center; white-space:nowrap;">
-            <fmt:formatDate value="${user.dateCreated}" type="both"/>
+            <fmt:formatDate value="${user.dateCreated}" type="both" pattern="MM-dd-yyyy"/>
           </td>
           <td class="smTableData" style="text-align:center; white-space:nowrap;">
-            <fmt:formatDate value="${user.dateModified}" type="both"/>
+            <fmt:formatDate value="${user.dateModified}" type="both" pattern="MM-dd-yyyy"/>
           </td>
         </tr>
       </c:forEach>
@@ -180,14 +185,9 @@
       </td>
     </tr>
     <tr>
-      <td class="mdLabel" style="text-align:right; vertical-align:top;">
-        <fmt:message key="User.Form.Roles"/>
-      </td>
+      <td class="mdLabel" style="text-align:right; vertical-align:top;">&nbsp;</td>
       <td>
-        <div class="smData">
-          <cosmo:errmsg property="admin"/>
-        </div>
-        <div>
+        <div style="margin-top:8px;">
           <html:checkbox property="admin" value="true"/>
           <fmt:message key="User.Form.MakeAdministrator"/>
         </div>
@@ -195,11 +195,11 @@
     </tr>
   </table>
  
-<div style="margin-top:12px; text-align:right;">
-<html:submit property="create" styleClass="md">
-<fmt:message key="User.Form.Button.Create"/>
-</html:submit>
-</div> 
+  <div style="margin-top:12px; text-align:right;">
+    <html:submit property="create" styleClass="md">
+      <fmt:message key="User.Form.Button.Create"/>
+    </html:submit>
+  </div> 
  
 </html:form> 
  

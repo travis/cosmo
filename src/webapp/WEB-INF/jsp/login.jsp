@@ -81,10 +81,8 @@
 </div>
 </div>
 
-<div class="mdData" style="margin-top:18px;">
-If you do not have an account, <br /><html:link page="/account/new">click here to create one</html:link>.
-</div>
-
+<div class="mdData" style="margin-top:18px;"><fmt:message key="Login.NoAccount"/></div>
+<div><html:link page="/account/new"><fmt:message key="Login.CreateAccount"/></html:link></div>
 
 </div>
 

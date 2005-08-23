@@ -86,22 +86,6 @@
       </td>
     </tr>
     <tr>
-      <td class="mdLabel" style="text-align:right; vertical-align:top;">
-        <fmt:message key="User.Form.Roles"/>
-      </td>
-      <td>  
-        <c:if test="${User.username ne USER_ROOT}">
-          <div class="smData">
-            <cosmo:errmsg property="admin"/>
-          </div>
-          <div>
-            <html:checkbox property="admin" value="true"/>
-            <fmt:message key="User.Form.MakeAdministrator"/>
-          </div>
-        </c:if>
-      </td>
-    </tr>
-    <tr>
       <td class="mdLabel" style="text-align:right;">
         &nbsp;
       </td>
@@ -127,6 +111,23 @@
         <div><html:password property="confirm" size="16" maxlength="16" styleClass="textInput"/></div>
       </td>
     </tr>
+    <tr>
+     <td class="mdLabel" style="text-align:right; vertical-align:top;">&nbsp;</td>
+      <td>  
+        <div style="margin-top:8px;">
+        <c:choose>
+          <c:when test="${User.username eq USER_ROOT}">
+            <input type="checkbox" name="dummy" checked="checked" disabled="disabled"/>
+          </c:when>
+          <c:otherwise>
+            <html:checkbox property="admin" value="true"/>
+          </c:otherwise>
+        </c:choose>
+        <fmt:message key="User.Form.MakeAdministrator"/>
+        </div>
+      </td>
+    </tr>
+   
   </table>
   
   <div style="margin-top:12px;">

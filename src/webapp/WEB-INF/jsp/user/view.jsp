@@ -19,8 +19,6 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<u:bind var="USER_ROOT" field="USER_ROOT" type="org.osaf.cosmo.security.CosmoSecurityManager"/>
-
 <div class="widgetBorder" style="width:460px; margin-top:24px;">
 <div class="widgetContent" style="padding:8px;">
 
@@ -115,15 +113,9 @@
      <td class="mdLabel" style="text-align:right; vertical-align:top;">&nbsp;</td>
       <td>  
         <div style="margin-top:8px;">
-        <c:choose>
-          <c:when test="${User.username eq USER_ROOT}">
-            <input type="checkbox" name="dummy" checked="checked" disabled="disabled"/>
-          </c:when>
-          <c:otherwise>
-            <html:checkbox property="admin" value="true"/>
-          </c:otherwise>
-        </c:choose>
-        <fmt:message key="User.Form.MakeAdministrator"/>
+          <html:checkbox property="admin" value="true"
+                         disabled="${cosmoui:isRoot(User)}"/>
+          <fmt:message key="User.Form.MakeAdministrator"/>
         </div>
       </td>
     </tr>

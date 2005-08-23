@@ -19,8 +19,6 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<u:bind var="USER_ROOT" field="USER_ROOT" type="org.osaf.cosmo.security.CosmoSecurityManager"/>
-
 <cosmo:cnfmsg/>
 
 <c:choose>
@@ -62,7 +60,7 @@
               <fmt:message key="User.List.EditControl"/>
             </html:link>
             <c:choose>
-              <c:when test="${user.username ne USER_ROOT}">
+              <c:when test="${not cosmoui:isRoot(user)}">
                 <html:link page="/user/remove.do?id=${user.id}">
                   <fmt:message key="User.List.RemoveControl"/>
                 </html:link>
@@ -87,7 +85,7 @@
           </td>
           <td class="smTableData">
             <c:choose>
-              <c:when test="${user.username ne USER_ROOT}">
+              <c:when test="${not cosmoui:isRoot(user)}">
                 <html:link target="homedir" page="${homedir}">
                   ${homedir}
                 </html:link>

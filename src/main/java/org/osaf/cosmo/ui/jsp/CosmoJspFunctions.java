@@ -28,11 +28,20 @@ public class CosmoJspFunctions {
     private static final Log log = LogFactory.getLog(CosmoJspFunctions.class);
 
     /**
-     * Indicates whether or not the given <code>User</code> is an
-     * application administrator (eg in the
-     * {@link CosmoSecurityManager.ROLE_ROOT} role)
+     * Indicates whether or not the given <code>User</code> is a
+     * server administrator (eg in the
+     * {@link CosmoSecurityManager.ROLE_ROOT} role).
      */
     public static boolean isAdmin(User user) {
         return user.isInRole(CosmoSecurityManager.ROLE_ROOT);
+    }
+
+    /**
+     * Indicates whether or not the given <code>User</code> is the
+     * server's root user (eg username is
+     * {@link CosmoSecurityManager.USER_ROOT}).
+     */
+    public static boolean isRoot(User user) {
+        return user.getUsername().equals(CosmoSecurityManager.USER_ROOT);
     }
 }

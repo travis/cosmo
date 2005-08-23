@@ -30,6 +30,10 @@ color:#222222;
 vertical-align:top;
 }
 
+img {
+border:0px;
+}
+
 form {
 margin:0px;
 padding:0px;
@@ -42,11 +46,11 @@ background:#cccccc;
 }
 
 a:visited {
-color: #333399;
+color: #5555bb;
 }
 
 a:link {
-color: #333399;
+color: #5555bb;
 }
 
 a:hover {

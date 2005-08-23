@@ -9,15 +9,9 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
-WebDAV:
-
 CalDAV:
  * export command for calendar collections that returns an icalendar
-   object (or, with special header or paramter, html)
-
-Tickets:
- * consider splitting security config into completely separate ones
-   for ui and dav
+   object
 
 UI:
  * final copy and format for mail messages
@@ -38,6 +32,8 @@ See "Deferred Features" section of the 0.2 Spec at
     o admin can auto-confirm users
  * move new user form to its own page
  * home directory browser
+ * honor HTTP Accept header in case the client prefers text/html over
+   text/calendar for calendar collections
  * jsp precompilation
  * see if we can't get Struts to work with "/user/bcm/update" rather
    than "/user/update.do" with "username=bcm" in content body

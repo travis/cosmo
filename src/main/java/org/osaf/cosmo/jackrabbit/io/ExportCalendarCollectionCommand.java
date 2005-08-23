@@ -76,7 +76,6 @@ public class ExportCalendarCollectionCommand extends AbstractCommand {
             context.getApplicationContext().
             getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
         Calendar calendar = dao.getCalendarObject(resourceNode);
-        log.debug("got calendar: " + calendar);
 
         // fill in the context
 
@@ -98,8 +97,6 @@ public class ExportCalendarCollectionCommand extends AbstractCommand {
         context.setContentType(CosmoICalendarConstants.CONTENT_TYPE +
                                "; charset=\"utf8\"");
         context.setETag("");
-
-        log.debug("done!");
 
         return true;
     }

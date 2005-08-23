@@ -82,7 +82,7 @@ public class CalendarDaoTest extends BaseCoreTestCase {
 
     }
 
-    public void testStoreCalendarObject() throws Exception {
+    public void testStoreAndGetCalendarObject() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("BEGIN");
         }
@@ -101,6 +101,11 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         Node resource = session.getRootNode().addNode(name);
         dao.storeCalendarObject(resource, calendar1);
         session.save();
+
+        // get the calendar object from the repository
+        Calendar calendar2 = dao.getCalendarObject(resource);
+        log.debug("calendar2:\n" + calendar2);
+        assertTrue(calendar2.getComponents().size() == 2);
 
         session.logout();
     }

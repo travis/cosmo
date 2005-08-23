@@ -257,6 +257,6 @@ public class UserAction extends CosmoAction {
         form.setLastName(user.getLastName());
         form.setEmail(user.getEmail());
         // never set password in the form
-        form.setAdmin(user.inRole(CosmoSecurityManager.ROLE_ROOT));
+        form.setAdmin(user.isInRole(CosmoSecurityManager.ROLE_ROOT));
     }
 }

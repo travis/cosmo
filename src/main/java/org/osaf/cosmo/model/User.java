@@ -156,7 +156,7 @@ public class User extends BaseModelObject {
 
     /**
      */
-    public boolean inRole(String name) {
+    public boolean isInRole(String name) {
         for (Iterator i=roles.iterator(); i.hasNext();) {
             Role role = (Role) i.next();
             if (role.getName().equals(name)) {

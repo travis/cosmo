@@ -29,7 +29,6 @@ import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
 
-import org.apache.jackrabbit.server.io.ExportContext;
 import org.apache.jackrabbit.server.io.ImportContext;
 import org.apache.jackrabbit.server.io.MimeResolver;
 import org.apache.jackrabbit.webdav.DavException;
@@ -57,6 +56,7 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
+import org.osaf.cosmo.dav.CosmoNodeResource;
 import org.osaf.cosmo.dav.property.CalendarComponentRestrictionSet;
 import org.osaf.cosmo.dav.property.CalendarDescription;
 import org.osaf.cosmo.dav.property.CalendarRestrictions;
@@ -65,7 +65,6 @@ import org.osaf.cosmo.dav.property.CosmoResourceType;
 import org.osaf.cosmo.dav.property.TicketDiscovery;
 import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
-import org.osaf.cosmo.jackrabbit.io.ApplicationContextAwareExportContext;
 import org.osaf.cosmo.jackrabbit.io.ApplicationContextAwareImportContext;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -500,11 +499,11 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
     /**
      */
-    protected ExportContext createExportContext() {
-        ApplicationContextAwareExportContext ctx =
-            new ApplicationContextAwareExportContext(getNode());
-        ctx.setApplicationContext(getApplicationContext());
-        return ctx;
+    protected NodeResource createNodeResource()
+        throws RepositoryException {
+        CosmoNodeResource cnr = new CosmoNodeResource(getApplicationContext());
+        cnr.init(this, getNode());
+        return cnr;
     }
 
     /**

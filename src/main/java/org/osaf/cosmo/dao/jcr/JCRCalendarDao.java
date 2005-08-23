@@ -176,7 +176,7 @@ public class JCRCalendarDao implements CalendarDao {
     public Calendar getCalendarObject(Node node) {
         try {
             if (node.isNodeType(CosmoJcrConstants.NT_DAV_COLLECTION)) {
-                getCollectionCalendarObject(node);
+                return getCollectionCalendarObject(node);
             }
             // XXX: single object
             throw new UnsupportedOperationException("not a collection");

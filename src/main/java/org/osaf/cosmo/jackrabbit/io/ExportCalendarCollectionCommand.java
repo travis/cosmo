@@ -65,12 +65,9 @@ public class ExportCalendarCollectionCommand extends AbstractCommand {
      */
     public boolean execute(ApplicationContextAwareExportContext context)
         throws Exception {
-        log.debug("in execute");
         Node resourceNode = context.getNode();
-        log.debug("node: " + resourceNode.getName());
         if (resourceNode == null ||
             ! resourceNode.isNodeType(CosmoJcrConstants.NT_CALDAV_COLLECTION)) {
-            log.debug("not caldav collection");
             return false;
         }
 

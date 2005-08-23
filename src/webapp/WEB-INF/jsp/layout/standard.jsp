@@ -56,7 +56,7 @@
         <td align="left" valign="top">
           <div class="lg">
             <html:link page="/">
-              <b><fmt:message key="Layout.Title"/></b>
+              <img src="/cosmo_logo.gif" alt="Cosmo Sharing Server"/>
             </html:link>
           </div>
         </td>

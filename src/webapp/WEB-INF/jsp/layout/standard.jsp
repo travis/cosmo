@@ -25,7 +25,7 @@
 
 <c:if test="${empty showNav}">
   <c:set var="showNav" value="true"/>
-  <cosmo-core:user var="user"/>
+  <cosmoui:user var="user"/>
 </c:if>
 
 <u:bind var="SC_ATTR_SERVER_ADMIN"

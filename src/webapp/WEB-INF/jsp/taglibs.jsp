@@ -25,5 +25,4 @@
 <%@ taglib uri="http://struts.apache.org/tags-logic-el"   prefix="logic"  %>
 <%@ taglib uri="http://struts.apache.org/tags-tiles-el"   prefix="tiles"  %>
 <%@ taglib uri="http://acegisecurity.sf.net/authz"        prefix="authz"  %>
-<%@ taglib uri="http://osafoundation.org/cosmo/jsp/core"
-    prefix="cosmo-core"  %>
+<%@ taglib uri="http://osafoundation.org/cosmo/jsp/core"  prefix="cosmoui"%>

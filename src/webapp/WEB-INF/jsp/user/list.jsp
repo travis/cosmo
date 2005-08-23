@@ -76,6 +76,9 @@
           </td>
           <td class="smTableData" style="text-align:center;">
             ${user.username}
+            <c:if test="${cosmoui:isAdmin(user)}">
+              (admin)
+            </c:if>
           </td>
           <td class="smTableData">
             <c:choose>

@@ -28,7 +28,7 @@
 </p>
 
 <authz:authorize ifAllGranted="ROLE_USER">
-  <cosmo-core:user var="user"/>
+  <cosmoui:user var="user"/>
   <cosmo:homedir var="homedir" user="${user}"/>
   <cosmo:baseurl var="baseurl"/>
 

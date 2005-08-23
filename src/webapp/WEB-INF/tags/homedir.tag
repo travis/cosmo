@@ -7,7 +7,7 @@
               scope="AT_END"                             %>
 
 <c:if test="${empty user}">
-  <cosmo-core:user var="user"/>
+  <cosmoui:user var="user"/>
 </c:if>
 
 <c:set var="result" value="/home/${user.username}/"/>

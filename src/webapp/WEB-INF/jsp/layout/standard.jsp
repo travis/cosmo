@@ -69,7 +69,7 @@
               |
               </authz:authorize>
               <authz:authorize ifAllGranted="ROLE_USER">
-                <html:link page="/home/${user.username}/"><fmt:message key="Layout.Nav.Main.HomeDirectory"/></html:link>
+                <html:link page="/dirlisting.jsp?rtype=home&username=${user.username}"><fmt:message key="Layout.Nav.Main.HomeDirectory"/></html:link>
               |
               </authz:authorize>
               <html:link page="/logout">

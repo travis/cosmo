@@ -54,6 +54,7 @@
          /*.gif=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /index.jsp=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /logout=ROLE_ROOT,ROLE_USER
+         /dirlisting.jsp*=ROLE_ROOT,ROLE_USER
          /**=ROLE_ROOT
        </value>
      </property>

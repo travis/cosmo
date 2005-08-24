@@ -19,6 +19,8 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<u:bind var="USER_ROOT" field="USER_ROOT" type="org.osaf.cosmo.security.CosmoSecurityManager"/>
+
 <div class="widgetBorder" style="width:460px; margin-top:24px;">
 <div class="widgetContent" style="padding:8px;">
 
@@ -53,7 +55,17 @@
       </td>
       <td>
       	<div class="smData"><cosmo:errmsg property="username"/></div>
-        <div><html:text property="username" size="32" maxlength="32" styleClass="textInput"/></div>
+      	<div>
+          <c:choose>
+            <c:when test="${User.username eq USER_ROOT}">
+              <input type="text" name="usernameDummy" size="32" maxlength="32" value="${User.username}" class="textInput" disabled="true"/>
+              <html:hidden property="username"/>
+            </c:when>
+            <c:otherwise>
+              <html:text property="username" size="32" maxlength="32" styleClass="textInput"/>
+            </c:otherwise>
+          </c:choose>
+      	</div>
       </td>
     </tr>
     <tr>
@@ -62,7 +74,17 @@
       </td>
       <td>
         <div class="smData"><cosmo:errmsg property="firstName"/></div>
-        <div><html:text property="firstName" size="32" maxlength="32" styleClass="textInput"/></div>
+        <div>
+          <c:choose>
+            <c:when test="${User.username eq USER_ROOT}">
+              <input type="text" name="firstNameDummy" size="32" maxlength="32" value="${User.firstName}" class="textInput" disabled="true"/>
+              <html:hidden property="firstName"/>
+            </c:when>
+            <c:otherwise>
+              <html:text property="firstName" size="32" maxlength="32" styleClass="textInput"/>
+            </c:otherwise>
+          </c:choose>
+      	</div>
       </td>
     </tr>
     <tr>
@@ -71,7 +93,17 @@
       </td>
       <td>
         <div class="smData"><cosmo:errmsg property="lastName"/></div>
-        <div><html:text property="lastName" size="32" maxlength="32" styleClass="textInput"/></div>
+        <div>
+          <c:choose>
+            <c:when test="${User.username eq USER_ROOT}">
+              <input type="text" name="lastNameDummy" size="32" maxlength="32" value="${User.lastName}" class="textInput" disabled="true"/>
+              <html:hidden property="lastName"/>
+            </c:when>
+            <c:otherwise>
+              <html:text property="lastName" size="32" maxlength="32" styleClass="textInput"/>
+            </c:otherwise>
+          </c:choose>
+      	</div>
       </td>
     </tr>
     <tr>
@@ -113,9 +145,16 @@
      <td class="mdLabel" style="text-align:right; vertical-align:top;">&nbsp;</td>
       <td>  
         <div style="margin-top:8px;">
-          <html:checkbox property="admin" value="true"
-                         disabled="${cosmoui:isRoot(User)}"/>
-          <fmt:message key="User.Form.MakeAdministrator"/>
+        <c:choose>
+          <c:when test="${User.username eq USER_ROOT}">
+            <input type="checkbox" name="adminDummy" checked="checked" disabled="disabled"/>
+            <html:hidden property="admin" value="true"/>
+          </c:when>
+          <c:otherwise>
+            <html:checkbox property="admin" value="true"/>
+          </c:otherwise>
+        </c:choose>
+        <fmt:message key="User.Form.MakeAdministrator"/>
         </div>
       </td>
     </tr>

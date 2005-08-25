@@ -17,6 +17,8 @@ package org.osaf.cosmo.ui;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import org.apache.struts.validator.ValidatorForm;
 import org.apache.struts.action.ActionMapping;
 
@@ -148,6 +150,19 @@ public class UserForm extends ValidatorForm {
                       HttpServletRequest request) {
         super.reset(mapping, request);
         initialize();
+    }
+
+    /**
+     */
+    public String toString() {
+        return new ToStringBuilder(this).
+            append("id", id).
+            append("username", username).
+            append("firstName", firstName).
+            append("lastName", lastName).
+            append("email", email).
+            append("admin", admin).
+            toString();
     }
 
     /**

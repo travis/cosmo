@@ -18,6 +18,8 @@ package org.osaf.cosmo.dao;
 import org.osaf.cosmo.BaseCoreTestCase;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.dao.UserDAO;
+import org.osaf.cosmo.model.DuplicateEmailException;
+import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 
 import java.util.List;
@@ -76,10 +78,12 @@ public class UserDAOTest extends BaseCoreTestCase {
         assertEquals(user3.hashCode(), user.hashCode());
         assertNotNull(user3.getEmail());
 
+        // change password
         user3.setPassword("changed password");
         dao.updateUser(user3);
         assertTrue(user3.hashCode() != user.hashCode());
 
+        //make sure the password was changed
         User user4 = dao.getUser(user2.getId());
         assertEquals(user4.getPassword(), user3.getPassword());
         assertTrue(! user4.getPassword().equals(user.getPassword()));
@@ -89,6 +93,96 @@ public class UserDAOTest extends BaseCoreTestCase {
             dao.getUser(user.getId());
             fail("user not removed");
         } catch (DataRetrievalFailureException e) {
+            // expected
+        }
+    }
+
+    public void testCreateDuplicateUsername() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+
+        // put in a user
+        User user1 = TestHelper.makeDummyUser();
+        dao.saveUser(user1);
+
+        // try to create a new user with the same username
+        User user2 = TestHelper.makeDummyUser();
+        user2.setUsername(user1.getUsername());
+
+        try {
+            dao.saveUser(user2);
+            fail("duplicate username accepted");
+        } catch (DuplicateUsernameException e) {
+            // expected
+        }
+    }
+
+    public void testCreateDuplicateEmail() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+
+        // put in a user
+        User user1 = TestHelper.makeDummyUser();
+        dao.saveUser(user1);
+
+        // try to create a new user with the same email
+        User user2 = TestHelper.makeDummyUser();
+        user2.setEmail(user1.getEmail());
+
+        try {
+            dao.saveUser(user2);
+            fail("duplicate email accepted");
+        } catch (DuplicateEmailException e) {
+            // expected
+        }
+    }
+
+    public void testUpdateDuplicateUsername() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+
+        // put in a user
+        User user1 = TestHelper.makeDummyUser();
+        dao.saveUser(user1);
+
+        // put in another user
+        User user2 = TestHelper.makeDummyUser();
+        dao.saveUser(user2);
+
+        // try to update user2 with user1's username
+        user2.setUsername(user1.getUsername());
+
+        try {
+            dao.updateUser(user2);
+            fail("duplicate username accepted");
+        } catch (DuplicateUsernameException e) {
+            // expected
+        }
+    }
+
+    public void testUpdateDuplicateEmail() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+
+        // put in a user
+        User user1 = TestHelper.makeDummyUser();
+        dao.saveUser(user1);
+
+        // put in another user
+        User user2 = TestHelper.makeDummyUser();
+        dao.saveUser(user2);
+
+        // try to update user2 with user1's email
+        user2.setEmail(user1.getEmail());
+
+        try {
+            dao.updateUser(user2);
+            fail("duplicate email accepted");
+        } catch (DuplicateEmailException e) {
             // expected
         }
     }

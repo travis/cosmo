@@ -17,12 +17,13 @@ package org.osaf.cosmo.ui;
 
 import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.manager.ProvisioningManager;
+import org.osaf.cosmo.model.DuplicateEmailException;
+import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,8 +35,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-
-import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * Action for account self-management
@@ -117,8 +116,12 @@ public class AccountAction extends CosmoAction {
             getSecurityManager().
                 initiateSecurityContext(userForm.getUsername(),
                                         userForm.getPassword());
-        } catch (DataIntegrityViolationException e) {
-            handleIntegrityViolation(request, e);
+        } catch (DuplicateEmailException e) {
+            saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
+            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+        } catch (DuplicateUsernameException e) {
+            saveErrorMessage(request, MSG_ERROR_USERNAME_EXISTS,
+                             PARAM_USERNAME);
             return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
         }
 
@@ -145,8 +148,12 @@ public class AccountAction extends CosmoAction {
 
             request.setAttribute(ATTR_USER, user);
             saveConfirmationMessage(request, MSG_CONFIRM_UPDATE);
-        } catch (DataIntegrityViolationException e) {
-            handleIntegrityViolation(request, e);
+        } catch (DuplicateEmailException e) {
+            saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
+            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+        } catch (DuplicateUsernameException e) {
+            saveErrorMessage(request, MSG_ERROR_USERNAME_EXISTS,
+                             PARAM_USERNAME);
             return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
         }
 
@@ -176,26 +183,5 @@ public class AccountAction extends CosmoAction {
         form.setLastName(user.getLastName());
         form.setEmail(user.getEmail());
         // never set password into the form
-    }
-
-    // would be great if this exception told us which constraint was
-    // violated.. we have to work it out for ourself, breaking
-    // encapsulation
-    private void handleIntegrityViolation(HttpServletRequest request,
-                                          DataIntegrityViolationException e) {
-        if (e.getCause() instanceof SQLException) {
-            if (e.getCause().getMessage().toLowerCase().
-                startsWith("unique constraint violation: email")) {
-                saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS,
-                                 PARAM_EMAIL);
-                return;
-            } else if (e.getCause().getMessage().toLowerCase().
-                       startsWith("unique constraint violation: username")) {
-                saveErrorMessage(request, MSG_ERROR_USERNAME_EXISTS,
-                                 PARAM_USERNAME);
-                return;
-            }
-        }
-        throw e;
     }
 }

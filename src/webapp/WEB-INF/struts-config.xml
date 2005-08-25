@@ -28,6 +28,7 @@
     <form-bean name="updateAccountForm" type="org.osaf.cosmo.ui.UserForm"/>
     <form-bean name="createUserForm" type="org.osaf.cosmo.ui.UserForm"/>
     <form-bean name="updateUserForm" type="org.osaf.cosmo.ui.UserForm"/>
+    <form-bean name="updateRootForm" type="org.osaf.cosmo.ui.UserForm"/>
   </form-beans>
 
   <global-exceptions>
@@ -126,6 +127,29 @@
             validate="true"
             input="/user.do"
             parameter="update">
+      <forward name="cancel" path="/users" redirect="true"/>
+      <forward name="failure" path="/user.do"/>
+      <forward name="success" path="/users" redirect="true"/>
+    </action>
+
+    <!-- root user requires totally different form validation -->
+
+    <action path="/user/root"
+            type="org.osaf.cosmo.ui.UserAction"
+            name="updateRootForm"
+            scope="request"
+            validate="false"
+            parameter="view">
+      <forward name="ok" path="user.view"/>
+    </action>
+
+    <action path="/user/root/update"
+            type="org.osaf.cosmo.ui.UserAction"
+            name="updateRootForm"
+            scope="request"
+            validate="true"
+            input="/user/root.do"
+            parameter="updateRoot">
       <forward name="cancel" path="/users" redirect="true"/>
       <forward name="failure" path="/user.do"/>
       <forward name="success" path="/users" redirect="true"/>

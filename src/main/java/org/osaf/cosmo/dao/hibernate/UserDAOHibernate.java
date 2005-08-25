@@ -16,6 +16,8 @@
 package org.osaf.cosmo.dao.hibernate;
 
 import org.osaf.cosmo.dao.UserDAO;
+import org.osaf.cosmo.model.DuplicateEmailException;
+import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 
 import java.sql.SQLException;
@@ -29,6 +31,7 @@ import net.sf.hibernate.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.orm.hibernate.HibernateCallback;
 import org.springframework.orm.hibernate.support.HibernateDaoSupport;
@@ -106,16 +109,54 @@ public class UserDAOHibernate extends HibernateDaoSupport
     /**
      */
     public void saveUser(User user) {
-        user.setDateModified(new Date());
-        user.setDateCreated(user.getDateModified());
-        getHibernateTemplate().save(user);
+        try {
+            user.setDateModified(new Date());
+            user.setDateCreated(user.getDateModified());
+            getHibernateTemplate().save(user);
+        } catch (DataIntegrityViolationException e) {
+            handleIntegrityViolation(e);
+        }
     }
 
     /**
      */
-    public void updateUser(User user) {
-        user.setDateModified(new Date());
-        getHibernateTemplate().update(user);
+    public void updateUser(final User user) {
+        // because we cannot reliably get a data integrity violation
+        // exception (hsqldb does a batch operation on update, which
+        // throws a batch exception containing absolutely no info), we
+        // have to check for duplicate username and email address
+        // manually
+        getHibernateTemplate().execute(new HibernateCallback() {
+                public Object doInHibernate(Session session)
+                    throws HibernateException, SQLException {
+                    List test1 = session.find(HQL_GET_USER_BY_EMAIL,
+                                              user.getEmail(),
+                                              Hibernate.STRING);
+                    if (! test1.isEmpty()) {
+                        User user1 = (User) test1.get(0);
+                        session.evict(user1);
+                        if (! user1.getId().equals(user.getId())) {
+                            throw new DuplicateEmailException();
+                        }
+                    }
+
+                    List test2 = session.find(HQL_GET_USER_BY_USERNAME,
+                                              user.getUsername(),
+                                              Hibernate.STRING);
+                    if (! test2.isEmpty()) {
+                        User user2 = (User) test2.get(0);
+                        session.evict(user2);
+                        if (! user2.getId().equals(user.getId())) {
+                            throw new DuplicateUsernameException();
+                        }
+                    }
+
+                    user.setDateModified(new Date());
+                    session.update(user);
+
+                    return null;
+                }
+            });
     }
 
     /**
@@ -128,5 +169,20 @@ public class UserDAOHibernate extends HibernateDaoSupport
      */
     public void removeUser(User user) {
         removeUser(user.getId());
+    }
+
+    /**
+     */
+    protected void handleIntegrityViolation(DataIntegrityViolationException e) {
+        if (e.getCause() instanceof SQLException) {
+            if (e.getCause().getMessage().toLowerCase().
+                startsWith("unique constraint violation: email")) {
+                throw new DuplicateEmailException();
+            } else if (e.getCause().getMessage().toLowerCase().
+                       startsWith("unique constraint violation: username")) {
+                throw new DuplicateUsernameException();
+            }
+        }
+        throw e;
     }
 }

@@ -68,6 +68,10 @@
     <to>/user/$1</to>
   </rule>
   <rule>
+    <from>^/user/root$</from>
+    <to>/user/root.do?username=root</to>
+  </rule>
+  <rule>
     <from>^/user/([\w\s.\-\']+)$</from>
     <to>/user.do?username=$1</to>
   </rule>

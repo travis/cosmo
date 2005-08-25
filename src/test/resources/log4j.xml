@@ -29,8 +29,12 @@
     <level value="WARN"/>
   </logger>
 
-  <logger name="net.sf.hibernate">
+  <logger name="net.sf">
     <level value="WARN"/>
+  </logger>
+
+  <logger name="net.sf.hibernate.util.JDBCExceptionReporter">
+    <level value="OFF"/>
   </logger>
 
   <logger name="org.springframework">
@@ -41,11 +45,9 @@
     <level value="WARN"/>
   </logger>
 
-<!--
   <logger name="org.osaf.cosmo.dao">
     <level value="DEBUG"/>
   </logger>
--->
 
   <root>
     <level value="WARN"/>

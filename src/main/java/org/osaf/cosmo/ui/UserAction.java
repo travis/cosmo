@@ -17,6 +17,8 @@ package org.osaf.cosmo.ui;
 
 import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.manager.ProvisioningManager;
+import org.osaf.cosmo.model.DuplicateEmailException;
+import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -37,13 +39,16 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import org.springframework.dao.DataIntegrityViolationException;
-
 /**
  * Action for managing users.
  */
 public class UserAction extends CosmoAction {
-    private static final String MSG_ERROR_EXISTS = "User.Form.Exists";
+    private static final String MSG_ATTRIBUTE_NOT_EDITABLE =
+        "User.Form.AttributeNotEditable";
+    private static final String MSG_ERROR_EMAIL_EXISTS =
+        "User.Form.EmailExists";
+    private static final String MSG_ERROR_USERNAME_EXISTS =
+        "User.Form.UsernameExists";
     private static final String MSG_CONFIRM_CREATE = "User.Form.Created";
     private static final String MSG_CONFIRM_UPDATE = "User.Form.Updated";
     private static final String MSG_CONFIRM_REMOVE = "User.Form.Removed";
@@ -59,6 +64,10 @@ public class UserAction extends CosmoAction {
      * user.
      */
     public static final String PARAM_ID = "id";
+    /**
+     * The request parameter that contains the email address of a user
+     */
+    public static final String PARAM_EMAIL = "email";
     /**
      * The request attribute in which this action places an
      * identified User: <code>User</code>
@@ -95,6 +104,16 @@ public class UserAction extends CosmoAction {
         if (user == null) {
             if (userForm.getId() != null && ! userForm.getId().equals("")) {
                 user = mgr.getUser(userForm.getId());
+                // the below condition happens when somebody tried to
+                // update the root user but fails to put in an email
+                // address. the form needs to be populated (but
+                // without the email address for sake of consistency
+                // with regular update page).
+                if (user.getUsername().equals(CosmoSecurityManager.USER_ROOT) &&
+                    userForm.getUsername() == null) {
+                    populateUpdateForm(userForm, user);
+                    userForm.setEmail(null);
+                }
             }
             else {
                 String username = request.getParameter(PARAM_USERNAME);
@@ -133,8 +152,12 @@ public class UserAction extends CosmoAction {
 
             request.setAttribute(ATTR_USER, user);
             saveConfirmationMessage(request, MSG_CONFIRM_CREATE);
-        } catch (DataIntegrityViolationException e) {
-            saveErrorMessage(request, MSG_ERROR_EXISTS, PARAM_USERNAME);
+        } catch (DuplicateEmailException e) {
+            saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
+            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+        } catch (DuplicateUsernameException e) {
+            saveErrorMessage(request, MSG_ERROR_USERNAME_EXISTS,
+                             PARAM_USERNAME);
             return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
         }
 
@@ -156,9 +179,10 @@ public class UserAction extends CosmoAction {
             return mapping.findForward(OSAFStrutsConstants.FWD_CANCEL);
         }
 
+        User formUser =  mgr.getUser(userForm.getId());
+        populateUser(formUser, userForm);
+
         try {
-            User formUser =  mgr.getUser(userForm.getId());
-            populateUser(formUser, userForm);
             if (log.isDebugEnabled()) {
                 log.debug("updating user " + formUser.getUsername());
             }
@@ -166,8 +190,54 @@ public class UserAction extends CosmoAction {
 
             request.setAttribute(ATTR_USER, user);
             saveConfirmationMessage(request, MSG_CONFIRM_UPDATE);
-        } catch (DataIntegrityViolationException e) {
-            saveErrorMessage(request, MSG_ERROR_EXISTS, PARAM_USERNAME);
+        } catch (DuplicateEmailException e) {
+            saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
+            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+        } catch (DuplicateUsernameException e) {
+            saveErrorMessage(request, MSG_ERROR_USERNAME_EXISTS,
+                             PARAM_USERNAME);
+            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+        }
+
+        return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
+    }
+
+    /**
+     * Updates the root user.
+     */
+    public ActionForward updateRoot(ActionMapping mapping,
+                                    ActionForm form,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response)
+        throws Exception {
+        UserForm userForm = (UserForm) form;
+
+        if (isCancelled(request)) {
+            userForm.reset(mapping, request);
+            return mapping.findForward(OSAFStrutsConstants.FWD_CANCEL);
+        }
+
+        User formUser = mgr.getUserByUsername(CosmoSecurityManager.USER_ROOT);
+        populateUser(formUser, userForm, true);
+
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("updating root user");
+            }
+            User user = mgr.updateUser(formUser);
+
+            request.setAttribute(ATTR_USER, user);
+            saveConfirmationMessage(request, MSG_CONFIRM_UPDATE);
+        } catch (DuplicateEmailException e) {
+            // the form does not contain username, first name or last
+            // name, but we want to display them on the form page, so
+            // we need to repopulate the form, preserving the invalid
+            // email address for symmetry with regular user update
+            // page
+            String badEmail = userForm.getEmail();
+            populateUpdateForm(userForm, formUser);
+            userForm.setEmail(badEmail);
+            saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
             return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
         }
 
@@ -230,19 +300,27 @@ public class UserAction extends CosmoAction {
     }
 
     private void populateUser(User user, UserForm form) {
-        user.setUsername(form.getUsername());
-        user.setFirstName(form.getFirstName());
-        user.setLastName(form.getLastName());
+        populateUser(user, form, false);
+    }
+
+    private void populateUser(User user, UserForm form, boolean isRoot) {
+        if (! isRoot) {
+            user.setUsername(form.getUsername());
+            user.setFirstName(form.getFirstName());
+            user.setLastName(form.getLastName());
+        }
         user.setEmail(form.getEmail());
         if (form.getPassword() != null && ! form.getPassword().equals("")) {
             user.setPassword(form.getPassword());
         }
 
-        Role userRole = mgr.getRoleByName(CosmoSecurityManager.ROLE_USER);
-        user.addRole(userRole);
+        if (! isRoot) {
+            Role userRole = mgr.getRoleByName(CosmoSecurityManager.ROLE_USER);
+            user.addRole(userRole);
+        }
 
         Role rootRole = mgr.getRoleByName(CosmoSecurityManager.ROLE_ROOT);
-        if (form.isAdmin()) {
+        if (form.isAdmin() || isRoot) {
             user.addRole(rootRole);
         }
         else {

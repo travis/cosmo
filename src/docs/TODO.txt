@@ -9,13 +9,18 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
+Misc:
+ * add cosmo id and version to server header
+
+WebDAV:
+ * filter caldav:uid from event resource dav properties
+
 CalDAV:
  * export command for calendar collections that returns an icalendar
    object
 
 UI:
  * final copy and format for mail messages
- * customizable login page welcome content
 
 
 LATER RELEASES

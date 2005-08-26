@@ -53,14 +53,14 @@ following steps:
 
     * Add $MAVEN_HOME/bin to your PATH.
 
-(3) Download the most recent version of the the Xalan XSLT processor
-    and install it into the Maven endorsed library directory:
+(3) Download the Xalan XSLT processor and install it into the Maven
+    endorsed library directory:
 
-    * Download a Xalan binary release from
+    * Download xalan-j_2_7_0-bin-2jars.tar.gz from
 
         http://www.apache.org/dyn/closer.cgi/xml/xalan-j
 
-    * Copy xalan-x.x.x.jar into $MAVEN_HOME/lib/endorsed
+    * Copy xalan.jar and serializer.jar into $MAVEN_HOME/lib/endorsed
 
 
 SOURCE CODE

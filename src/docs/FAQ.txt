@@ -52,6 +52,12 @@ Q: The build fails because Maven can't download one of my jars. What's
 
       and that it is not overridden in your build.properties file.
 
+Q: The build fails with a NoClassDefFoundError for
+   org/apache/xml/serializer/OutputPropertiesFactory. What's going on?
+
+    A: You forgot to copy serializer.jar from the Xalan distribution
+       into $MAVEN_HOME/lib/endorsed.
+
 
 DEPLOYMENT
 ==========

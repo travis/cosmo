@@ -158,14 +158,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     public void addMember(DavResource member,
                           InputStream in)
         throws DavException {
-        CosmoDavResourceImpl cdr = (CosmoDavResourceImpl) member;
-        if (cdr.isCalendarResource() && ! isCalendarCollection()) {
-            throw new DavException(CosmoDavResponse.SC_FORBIDDEN,
-                                   "Parent collection is not a calendar collection");
-        }
-
         super.addMember(member, in);
 
+        CosmoDavResourceImpl cdr = (CosmoDavResourceImpl) member;
         if (cdr.isCalendarResource()) {
             try {
                 // force the newly-created member's properties to be

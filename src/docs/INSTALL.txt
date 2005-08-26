@@ -25,13 +25,13 @@ In order to install and run Cosmo bundled with Tomcat, perform the
 following steps:
 
 
-(1) Download and install a Java Runtime Environment
+(1) Download and install a Java Development Environment
 
-    * Download a JRE release (version 1.4 or later) from:
+    * Download a JDK release (version 1.4, NOT 5.0) from:
 
         http://java.sun.com/j2se/
 
-    * Install the JRE according to the instructions included with the
+    * Install the JDK according to the instructions included with the
       release.
 
     * Set an environment variable JAVA_HOME to the pathname of the

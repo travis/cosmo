@@ -26,13 +26,13 @@ following steps:
 
 
 (1) If your operating system does not already provide it, download and
-    install a Java Runtime Environment (version 1.4 or later):
+    install a Java Development Environment (version 1.4, NOT 5.0):
 
-    * Download a JRE release from
+    * Download a JDK release from
 
         http://java.sun.com/j2se/
 
-    * Install the JRE according to the instructions included with the
+    * Install the JDK according to the instructions included with the
       release.
 
     * Set an environment variable JAVA_HOME to the pathname of the

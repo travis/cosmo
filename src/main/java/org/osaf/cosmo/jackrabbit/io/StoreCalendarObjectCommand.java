@@ -70,7 +70,6 @@ public class StoreCalendarObjectCommand extends AbstractCommand {
             return false;
         }
 
-
         Node resourceNode = context.getNode();
         if (resourceNode == null ||
             ! resourceNode.isNodeType(CosmoJcrConstants.NT_DAV_RESOURCE)) {

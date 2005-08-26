@@ -16,8 +16,6 @@
 package org.osaf.cosmo.dav;
 
 import org.apache.jackrabbit.webdav.DavResourceFactory;
-import org.apache.jackrabbit.webdav.lock.LockManager;
-import org.apache.jackrabbit.webdav.simple.ResourceFilter;
 
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
@@ -26,14 +24,6 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
  * {@link org.apache.jackrabbit.webdav.DavResource} factories.
  */
 public interface CosmoDavResourceFactory extends DavResourceFactory {
-
-    /**
-     */
-    public LockManager getLockManager();
-
-    /**
-     */
-    public ResourceFilter getResourceFilter();
 
     /**
      */

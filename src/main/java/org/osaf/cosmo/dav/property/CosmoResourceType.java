@@ -17,76 +17,50 @@ package org.osaf.cosmo.dav.property;
 
 import org.apache.jackrabbit.webdav.property.ResourceType;
 
+import org.apache.log4j.Logger;
+
 import org.jdom.Element;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 
 /**
  * Extends {@link org.apache.jackrabbit.webdav.property.ResourceType}
- * to define new resource types for dav extensions implemented by
- * Cosmo.
+ * to define new resource types for CalDAV:
+ *
+ * <ul>
+ * <li>{@link #CALENDAR_HOME CALDAV:calendar-home},</li>
+ * <li>{@link #CALENDAR_COLLECTION CALDAV:calendar-collection},</li>
+ * </ul>
  */
 public class CosmoResourceType extends ResourceType {
+    private static final Logger log = Logger.getLogger(CosmoResourceType.class);
 
     /**
      * The calendar home resource type
      */
-    public static final int CALENDAR_HOME = COLLECTION + 1;
+    public static final int CALENDAR_HOME = BASELINE + 1;
 
     /**
      * The calendar collection resource type
      */
     public static final int CALENDAR_COLLECTION = CALENDAR_HOME + 1;
 
+    static {
+        registerResourceType(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_HOME,
+                             CosmoDavConstants.NAMESPACE_CALDAV);
+        registerResourceType(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR,
+                             CosmoDavConstants.NAMESPACE_CALDAV);
+    }
+
     /**
-     * Create a single-valued resource type property
      */
     public CosmoResourceType(int resourceType) {
         super(resourceType);
     }
 
     /**
-     * Create a multi-valued resource type property
      */
     public CosmoResourceType(int[] resourceTypes) {
         super(resourceTypes);
-    }
-
-    /**
-     * Returns the Xml representation of an individual resource type,
-     * or <code>null</code> if the resource type has no Xml
-     * representation (e.g. {@link #DEFAULT_RESOURCE}).
-     *
-     * {@link #getValue()} uses this method to build the full set of
-     * Xml elements for the property's resource types. Subclasses
-     * should override this method to add support for resource types
-     * they define.
-     */
-    protected Element resourceTypeToXml(int resourceType) {
-        if (resourceType == CALENDAR_HOME) {
-            return new Element(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_HOME,
-                               CosmoDavConstants.NAMESPACE_CALDAV);
-        }
-        if (resourceType == CALENDAR_COLLECTION) {
-            return new Element(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR,
-                               CosmoDavConstants.NAMESPACE_CALDAV);
-        }
-        return super.resourceTypeToXml(resourceType);
-    }
-
-    /**
-     * Validates the specified resourceType. Subclasses should
-     * override this method to add support for resource types they
-     * define.
-     *
-     * @param resourceType
-     * @return true if the specified resourceType is valid.
-     */
-    public boolean isValidResourceType(int resourceType) {
-        if (resourceType >= CALENDAR_HOME &&
-            resourceType <= CALENDAR_COLLECTION) {
-            return true;
-        }
-        return super.isValidResourceType(resourceType);
     }
 }

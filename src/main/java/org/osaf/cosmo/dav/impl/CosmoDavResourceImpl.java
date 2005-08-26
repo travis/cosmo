@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.dav.impl;
 
-import java.io.InputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +35,7 @@ import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
+import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.jcr.JcrDavException;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
@@ -156,9 +156,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     /**
      */
     public void addMember(DavResource member,
-                          InputStream in)
+                          InputContext ctx)
         throws DavException {
-        super.addMember(member, in);
+        super.addMember(member, ctx);
 
         CosmoDavResourceImpl cdr = (CosmoDavResourceImpl) member;
         if (cdr.isCalendarResource()) {

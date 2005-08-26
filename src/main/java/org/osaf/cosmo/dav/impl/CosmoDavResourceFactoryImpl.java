@@ -25,33 +25,31 @@ import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.jcr.JcrDavException;
 import org.apache.jackrabbit.webdav.lock.LockManager;
+import org.apache.jackrabbit.webdav.simple.ResourceFactoryImpl;
 import org.apache.jackrabbit.webdav.simple.ResourceFilter;
 
+import org.osaf.cosmo.dav.CosmoDavMethods;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 /**
- * An implementation of 
- * {@link org.apache.jackrabbit.webdav.DavResourceFactory} that
+ * Extends 
+ * {@link org.apache.jackrabbit.webdav.simple.ResourceFactoryImpl} to
  * provides instances of {@link CosmoDavResource}.
  */
-public class CosmoDavResourceFactoryImpl implements CosmoDavResourceFactory {
+public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
+    implements CosmoDavResourceFactory {
 
-    private LockManager lockManager;
-    private ResourceFilter resourceFilter;
     private CosmoSecurityManager securityManager;
-
-    // DavResourceFactory methods
 
     /**
      */
-    public DavResource createResource(DavResourceLocator locator,
-                                      DavServletRequest request,
-                                      DavServletResponse response)
-        throws DavException {
-        return createResource(locator, request.getDavSession());
+    public CosmoDavResourceFactoryImpl() {
+        super(null, null);
     }
+
+    // DavResourceFactoryImpl methods
 
     /**
      */
@@ -61,27 +59,39 @@ public class CosmoDavResourceFactoryImpl implements CosmoDavResourceFactory {
         try {
             CosmoDavResourceImpl resource =
                 new CosmoDavResourceImpl(locator, this, session,
-                                         resourceFilter);
-            resource.addLockManager(lockManager);
+                                         getResourceFilter());
+            resource.addLockManager(getLockManager());
             return resource;
         } catch (RepositoryException e) {
             throw new JcrDavException(e);
         }
     }
 
+    /**
+     * Augments superclass method to also return <code>true</code> for
+     * <code>MKCALENDAR</code> requests.
+     */
+    protected boolean isCreateRequest(DavServletRequest request) {
+        if (CosmoDavMethods.getMethodCode(request.getMethod()) ==
+            CosmoDavMethods.DAV_MKCALENDAR) {
+            return true;
+        }
+        return super.isCreateRequest(request);
+    }
+
+    /**
+     * Augments superclass method to also return <code>true</code> for
+     * <code>MKCALENDAR</code> requests.
+     */
+    protected boolean isCreateCollectionRequest(DavServletRequest request) {
+        if (CosmoDavMethods.getMethodCode(request.getMethod()) ==
+            CosmoDavMethods.DAV_MKCALENDAR) {
+            return true;
+        }
+        return super.isCreateCollectionRequest(request);
+    }
+
     // CosmoDavResourceFactory methods
-
-    /**
-     */
-    public LockManager getLockManager() {
-        return lockManager;
-    }
-
-    /**
-     */
-    public ResourceFilter getResourceFilter() {
-        return resourceFilter;
-    }
 
     /**
      */
@@ -90,18 +100,6 @@ public class CosmoDavResourceFactoryImpl implements CosmoDavResourceFactory {
     }
 
     // our methods
-
-    /**
-     */
-    public void setLockManager(LockManager lockManager) {
-        this.lockManager = lockManager;
-    }
-
-    /**
-     */
-    public void setResourceFilter(ResourceFilter resourceFilter) {
-        this.resourceFilter = resourceFilter;
-    }
 
     /**
      */

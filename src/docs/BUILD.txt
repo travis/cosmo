@@ -26,7 +26,7 @@ following steps:
 
 
 (1) If your operating system does not already provide it, download and
-    install a Java Runtime Environment (version 1.4 or later)
+    install a Java Runtime Environment (version 1.4 or later):
 
     * Download a JRE release from
 
@@ -39,7 +39,7 @@ following steps:
       directory into which you installed the JDK release.
 
 (2) If your operating system does not already it, download and 
-    install the Maven build tool (version 1.0 or later, but NOT 2.0)
+    install the Maven build tool (version 1.0 or later, but NOT 2.0):
 
     * Download a Maven release from:
 
@@ -54,7 +54,7 @@ following steps:
     * Add $MAVEN_HOME/bin to your PATH.
 
 (3) Download the most recent version of the the Xalan XSLT processor
-    and install it into the Maven endorsed library directory
+    and install it into the Maven endorsed library directory:
 
     * Download a Xalan binary release from
 
@@ -102,8 +102,7 @@ TEST
 ====
 
 There aren't too many tests yet, but those that exist can be run with
-'maven test'. Before doing so, however, you will need to initialize the
-test database with 'maven test:dbsetup'.
+'maven test'.
 
 If you want to build or package cosmo without running the tests (often
 useful when making small incremental changes to the user interface),

@@ -137,10 +137,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public String getSupportedMethods() {
         // can only make a calendar collection inside a regular
-        // collection (NEVER inside another calendar collection or
-        // inside a calendar home collection).
-        if (exists () && isCollection() && ! isCalendarCollection() &&
-            ! isCalendarHomeCollection()) {
+        // collection (NEVER inside another calendar collection)
+        if (exists () && isCollection() && ! isCalendarCollection()) {
             return CosmoDavResource.METHODS + ", MKCALENDAR";
         }
         return CosmoDavResource.METHODS;

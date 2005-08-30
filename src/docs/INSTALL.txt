@@ -25,17 +25,17 @@ In order to install and run Cosmo bundled with Tomcat, perform the
 following steps:
 
 
-(1) Download and install a Java Development Environment
+(1) Download and install a Java Runtime Environment
 
-    * Download a JDK release (version 1.4, NOT 5.0) from:
+    * Download a JRE release (version 1.4, NOT 5.0) from:
 
         http://java.sun.com/j2se/
 
-    * Install the JDK according to the instructions included with the
+    * Install the JRE according to the instructions included with the
       release.
 
     * Set an environment variable JAVA_HOME to the pathname of the
-      directory into which you installed the JDK release.
+      directory into which you installed the JRE release.
 
 
 (2) Download and install the Cosmo binary distribution
@@ -57,7 +57,18 @@ following steps:
       release directory.
 
 
-(3) Configure SSL (OPTIONAL)
+(3) Secure the Tomcat configuration
+
+    * Change the Tomcat shutdown password from its default
+      ("SHUTDOWN") in $COSMO_HOME/tomcat/conf/server.xml:
+
+        <Server port="8005" shutdown="SHUTDOWN">
+
+    * Change permissions on server.xml so that only the user who will
+      be starting and stopping Cosmo can read and write it.
+
+
+(4) Configure SSL (OPTIONAL)
 
     * Create a certificate keystore by executing the following
       command as the user which will run Cosmo, specifying
@@ -86,7 +97,7 @@ following steps:
         http://jakarta.apache.org/tomcat/tomcat-5.0-doc/ssl-howto.html
 
 
-(4) Start Cosmo
+(5) Start Cosmo
 
     Cosmo can be started by executing the following command:
 
@@ -134,7 +145,7 @@ following steps:
     other than Tomcat startup notices.
 
 
-(5) Use Cosmo
+(6) Use Cosmo
 
     After startup, the server's welcome page is viewable at
     (username 'root', password 'cosmo'):

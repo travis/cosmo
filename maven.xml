@@ -129,6 +129,13 @@
          usetimestamp="true"/>
     <untar src="${maven.build.dir}/${ext.tomcat.package}.tar.gz"
            dest="${maven.build.dir}" compression="gzip"/>
+    <j:if test="${context.getVariable('cosmo.compat.14') == 'true'}">
+      <get src="${ext.tomcat.compat.url}"
+           dest="${maven.build.dir}/${ext.tomcat.compat.package}.tar.gz"
+           usetimestamp="true"/>
+      <untar src="${maven.build.dir}/${ext.tomcat.compat.package}.tar.gz"
+             dest="${maven.build.dir}" compression="gzip"/>
+    </j:if>
     <copy todir="${cosmo.dist.version}/tomcat">
       <fileset dir="${maven.build.dir}/${ext.tomcat.package}">
         <exclude name="**/conf/Catalina/localhost/*.xml"/>
@@ -168,9 +175,7 @@
       <fileset dir="${basedir}/src/docs/license"/>
     </copy>
     <copy todir="${cosmo.dist.version}/tomcat/conf"
-          file="${basedir}/src/main/resources/server/server.xml"/>
-    <copy todir="${cosmo.dist.version}/tomcat/conf/Catalina/localhost"
-          file="${basedir}/src/main/resources/server/cosmo.xml">
+          file="${basedir}/src/main/resources/server/server.xml">
       <filterset>
         <filter token="RELOADABLE" value="${cosmo.webapp.reloadable}"/>
         <filter token="VERSION" value="${pom.currentVersion}"/>
@@ -214,8 +219,13 @@
          setting up jndi resources -->
     <copy todir="${cosmo.dist.version}/tomcat/common/lib">
       <fileset dir="${maven.build.dir}/${pom.artifactId}/WEB-INF/lib">
-        <include name="jcr-*.jar"/>
+        <include name="jcr-1.0.jar"/>
+      </fileset>
+      <fileset dir="${maven.repo.local}/javamail/jars">
         <include name="mailapi-*.jar"/>
+        <include name="smtp-*.jar"/>
+      </fileset>
+      <fileset dir="${maven.repo.local}/jaf/jars">
         <include name="activation-*.jar"/>
       </fileset>
     </copy>

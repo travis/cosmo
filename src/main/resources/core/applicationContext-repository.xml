@@ -25,7 +25,7 @@
   <bean id="jcrRepository"
         class="org.springframework.jndi.JndiObjectFactoryBean">
     <property name="jndiName">
-      <value>jcr/repositoryFactory</value>
+      <value>jcr/cosmo</value>
     </property>
     <property name="resourceRef">
       <value>true</value>

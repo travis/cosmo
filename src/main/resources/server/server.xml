@@ -21,10 +21,46 @@
     <Connector port="8443" enableLookups="false" secure="true"
                scheme="https" clientAuth="want"
                keystorePass="osafcosmo"/>
--->
     <Engine name="Catalina" defaultHost="localhost">
+-->
       <Host name="localhost" appBase="webapps" autoDeploy="false"
-            deployOnStartup="false" debug="0"/>
+            deployOnStartup="false">
+        <Context path="" docBase="cosmo" reloadable="true">
+          <Environment name="cosmo/version" value="0.2-4"
+                       type="java.lang.String" override="false"/>
+          <Environment name="cosmo/serverAdmin" value="bcm@osafoundation.org"
+                       type="java.lang.String" override="false"/>
+          <Environment name="cosmo/repository/username"
+                       value="cosmo_repository"
+                       type="java.lang.String" override="false"/>
+          <Environment name="cosmo/repository/password"
+                       value=""
+                       type="java.lang.String" override="false"/>
+          <Resource name="jcr/cosmo"
+                    type="javax.jcr.Repository"
+                    factory="org.apache.jackrabbit.core.jndi.BindableRepositoryFactory"
+                    configFilePath="etc/repository.xml"
+                    repHomeDir="data/repository"/>
+          <Resource name="jdbc/cosmo"
+                    type="javax.sql.DataSource"
+                    maxActive="5"
+                    maxIdle="3"
+                    maxWait="10000"
+                    username="sa"
+                    parameter=""
+                    driverClassName="org.hsqldb.jdbcDriver"
+                    url="jdbc:hsqldb:file:data/db/userdb"/>
+          <Resource name="mail/cosmo"
+                    type="javax.mail.Session"
+                    mail.transport.protocol="smtp"
+                    mail.smtp.host="localhost"
+                    mail.smtps.host="localhost"
+                    mail.smtp.starttls.enable="false"/>
+          <Valve className="org.apache.catalina.valves.AccessLogValve"
+                 directory="../logs" prefix="access." suffix=".log"
+                 pattern="combined" resolveHosts="false"/>
+        </Context>
+      </Host>
     </Engine>
   </Service>
 </Server>

@@ -88,7 +88,7 @@ following steps:
 
         <Connector port="8443" enableLookups="false" secure="true"
                    scheme="https" clientAuth="want"
-                   keystorePass="osafcosmo"/>
+                   keystorePass="osafcosmo" sslProtocol="TLS"/>
 
     For more information on creating a keystore, importing an
     existing certificates into a keystore, and configuring the SSL

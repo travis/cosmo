@@ -20,7 +20,7 @@
 <!--
     <Connector port="8443" enableLookups="false" secure="true"
                scheme="https" clientAuth="want"
-               keystorePass="osafcosmo"/>
+               keystorePass="osafcosmo" sslProtocol="TLS"/>
     <Engine name="Catalina" defaultHost="localhost">
 -->
       <Host name="localhost" appBase="webapps" autoDeploy="false"

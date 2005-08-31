@@ -14,10 +14,6 @@ WebDAV:
  * figure out why creationdate property is in iso8861 format
 
 CalDAV:
- * use the dav content language property to set xml:lang when
-   PROPFINDing the caldav calendar-description property
- * honor Content-Language header when PROPPATCHing
-   the caldav calendar-description property
 
 UI:
  * final copy and format for mail messages
@@ -49,6 +45,11 @@ See "Deferred Features" section of the 0.2 Spec at
    server (cadaver, browsers, etc.) - low priority since chandler does
    not deal with the session cookie
  * consider adding cosmo product id and version to server header
+ * use Content-Language header to set xml:lang on
+   calendar home collection  when provisioning a homedir?
+ * use Content-Language header to set xml:lang on
+   calendar collection when handling MKCALENDAR and PROPPATCH for
+   CALDAV:calendar-description?
 
 
  Copyright 2005 Open Source Applications Foundation

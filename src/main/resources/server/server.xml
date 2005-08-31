@@ -21,8 +21,8 @@
     <Connector port="8443" enableLookups="false" secure="true"
                scheme="https" clientAuth="want"
                keystorePass="osafcosmo" sslProtocol="TLS"/>
-    <Engine name="Catalina" defaultHost="localhost">
 -->
+    <Engine name="Catalina" defaultHost="localhost">
       <Host name="localhost" appBase="webapps" autoDeploy="false"
             deployOnStartup="false">
         <Context path="" docBase="cosmo" reloadable="true">

@@ -77,7 +77,7 @@ public class StoreCalendarObjectCommand extends AbstractCommand {
         }
 
         // get a handle to the resource content
-        Node content = resourceNode.getNode(CosmoJcrConstants.NT_JCR_CONTENT);
+        Node content = resourceNode.getNode(CosmoJcrConstants.NN_JCR_CONTENT);
         InputStream in =
             content.getProperty(CosmoJcrConstants.NP_JCR_DATA).getStream();
 

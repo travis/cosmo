@@ -15,6 +15,11 @@
  */
 package org.osaf.cosmo.jackrabbit.io;
 
+import java.io.InputStream;
+
+import javax.jcr.Node;
+
+import org.apache.jackrabbit.server.io.ImportContext;
 import org.apache.jackrabbit.server.io.FileImportCommand;
 
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
@@ -30,5 +35,19 @@ public class DavResourceImportCommand extends FileImportCommand {
     public DavResourceImportCommand() {
         super();
         setNodeType(CosmoJcrConstants.NT_DAV_RESOURCE);
+    }
+
+    /**
+     */
+    public boolean importResource(ImportContext ctx,
+                                  Node parentNode,
+                                  InputStream in)
+        throws Exception {
+        super.importResource(ctx, parentNode, in);
+
+        parentNode.setProperty(CosmoJcrConstants.NP_DAV_CONTENTLANGUAGE,
+                               ctx.getContentLanguage());
+
+        return true;
     }
 }

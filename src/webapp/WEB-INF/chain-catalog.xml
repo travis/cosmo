@@ -33,9 +33,7 @@
   <chain name="import-resource">
     <command id="set-contenttype"
              className="org.apache.jackrabbit.server.io.SetContentTypeCommand"/>
-    <!-- would not be necessary if FileImportCommand's nodeType param
-             did anything -->
-    <command id="import-file"
+    <command id="import-dav-resource"
              className="org.osaf.cosmo.jackrabbit.io.DavResourceImportCommand"/>
     <command id="store-calendar-object"
              className="org.osaf.cosmo.jackrabbit.io.StoreCalendarObjectCommand"/>
@@ -59,7 +57,7 @@
 
   <!-- export webdav resource -->
   <chain name="export-resource">
-    <command id="export-file"
-             className="org.apache.jackrabbit.server.io.FileExportCommand"/>
+    <command id="export-dav-resource"
+             className="org.osaf.cosmo.jackrabbit.io.DavResourceExportCommand"/>
   </chain>
 </catalog>

@@ -22,6 +22,8 @@ package org.osaf.cosmo.jcr;
 public class CosmoJcrConstants {
 
     // node names
+    public static final String NN_JCR_CONTENT = "jcr:content";
+
     public static final String NN_TICKET = "ticket:ticket";
 
     public static final String NN_ICAL_CALENDAR = "icalendar:calendar";
@@ -84,8 +86,6 @@ public class CosmoJcrConstants {
 
     public static final String NT_FOLDER = "nt:folder";
 
-    public static final String NT_JCR_CONTENT = "jcr:content";
-
     public static final String NT_DAV_COLLECTION = "dav:collection";
     public static final String NT_DAV_RESOURCE = "dav:resource";
 
@@ -116,6 +116,8 @@ public class CosmoJcrConstants {
     public static final String NP_XML_LANG = "xml:lang";
 
     public static final String NP_DAV_DISPLAYNAME = "dav:displayname";
+    public static final String NP_DAV_CONTENTLANGUAGE =
+        "dav:contentlanguage";
 
     public static final String NP_CALDAV_CALENDARDESCRIPTION =
         "caldav:calendar-description";

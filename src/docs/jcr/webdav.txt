@@ -61,6 +61,15 @@ PropertyDef
   Protected false
   Multiple false
 PropertyDef
+  Name dav:contentlanguage
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
   Name *
   RequiredType UNDEFINED
   DefaultValues null

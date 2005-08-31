@@ -10,8 +10,6 @@ See
 for current development plan. Additional tasks:
 
 WebDAV:
- * honor Content-Language header when importing a resource, saving it
-   as the dav content language property
  * figure out why creationdate property is undefined for collections
  * figure out why creationdate property is in iso8861 format
 

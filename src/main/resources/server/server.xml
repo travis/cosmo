@@ -25,16 +25,16 @@
     <Engine name="Catalina" defaultHost="localhost">
       <Host name="localhost" appBase="webapps" autoDeploy="false"
             deployOnStartup="false">
-        <Context path="" docBase="cosmo" reloadable="true">
-          <Environment name="cosmo/version" value="0.2-4"
+        <Context path="" docBase="cosmo" reloadable="@RELOADABLE@">
+          <Environment name="cosmo/version" value="@VERSION@"
                        type="java.lang.String" override="false"/>
-          <Environment name="cosmo/serverAdmin" value="bcm@osafoundation.org"
+          <Environment name="cosmo/serverAdmin" value="@SERVER_ADMIN@"
                        type="java.lang.String" override="false"/>
           <Environment name="cosmo/repository/username"
-                       value="cosmo_repository"
+                       value="@REPOSITORY_USERNAME@"
                        type="java.lang.String" override="false"/>
           <Environment name="cosmo/repository/password"
-                       value=""
+                       value="@REPOSITORY_PASSWORD@"
                        type="java.lang.String" override="false"/>
           <Resource name="jcr/cosmo"
                     type="javax.jcr.Repository"
@@ -46,16 +46,16 @@
                     maxActive="5"
                     maxIdle="3"
                     maxWait="10000"
-                    username="sa"
-                    parameter=""
-                    driverClassName="org.hsqldb.jdbcDriver"
-                    url="jdbc:hsqldb:file:data/db/userdb"/>
+                    username="@DB_USERNAME@"
+                    parameter="@DB_PASSWORD@"
+                    driverClassName="@DB_DRIVER@"
+                    url="@DB_URL@"/>
           <Resource name="mail/cosmo"
                     type="javax.mail.Session"
-                    mail.transport.protocol="smtp"
-                    mail.smtp.host="localhost"
-                    mail.smtps.host="localhost"
-                    mail.smtp.starttls.enable="false"/>
+                    mail.transport.protocol="@MAIL_TRANSPORT_PROTOCOL@"
+                    mail.smtp.host="@MAIL_SMTP_HOST@"
+                    mail.smtps.host="@MAIL_SMTPS_HOST@"
+                    mail.smtp.starttls.enable="@MAIL_SMTP_STARTTLS_ENABLE@"/>
           <Valve className="org.apache.catalina.valves.AccessLogValve"
                  directory="../logs" prefix="access." suffix=".log"
                  pattern="combined" resolveHosts="false"/>

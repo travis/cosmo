@@ -10,8 +10,8 @@ See
 for current development plan. Additional tasks:
 
 WebDAV:
- * honor Content-Type header when importing a resource and when
-   deciding if a resource is a calendar resource
+ * honor Content-Type header when deciding if a resource is a calendar
+   resource
  * honor Content-Language header when importing a resource, saving it
    as the dav content language property
  * figure out why creationdate property is undefined for collections

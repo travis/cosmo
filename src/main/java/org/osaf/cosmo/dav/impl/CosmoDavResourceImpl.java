@@ -29,7 +29,6 @@ import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
 
 import org.apache.jackrabbit.server.io.ImportContext;
-import org.apache.jackrabbit.server.io.MimeResolver;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -87,7 +86,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
     private String baseUrl;
     private ApplicationContext applicationContext;
-    private MimeResolver mimeResolver;
     private boolean initializing;
     private Map tickets;
     private Map ownedTickets;
@@ -100,7 +98,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                                 ResourceFilter filter)
         throws RepositoryException, DavException {
         super(locator, factory, session, filter);
-        mimeResolver = new MimeResolver();
         initializing = false;
     }
 

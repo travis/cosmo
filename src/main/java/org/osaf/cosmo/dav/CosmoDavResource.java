@@ -81,12 +81,6 @@ public interface CosmoDavResource extends DavResource {
         throws DavException;
 
     /**
-     * Returns true if this resource represents a (non-collection)
-     * calendar resource.
-     */
-    public boolean isCalendarResource();
-
-    /**
      * Returns the entity tag for this resource.
      */
     public String getETag();

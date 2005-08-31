@@ -200,8 +200,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         }
 
         // caldav (section 4.6.2): return ETag header
-        if (cosmoResource.isCalendarResource() &&
-            ! cosmoResource.getETag().equals("")) {
+        if (! cosmoResource.getETag().equals("")) {
             response.setHeader("ETag", cosmoResource.getETag());
         }
     }

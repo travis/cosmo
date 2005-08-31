@@ -85,7 +85,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     private static final String BEAN_CALENDAR_DAO = "calendarDao";
     private static final String BEAN_TICKET_DAO = "ticketDao";
 
-    private boolean isCollection;
     private String baseUrl;
     private ApplicationContext applicationContext;
     private MimeResolver mimeResolver;
@@ -161,15 +160,13 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         super.addMember(member, ctx);
 
         CosmoDavResourceImpl cdr = (CosmoDavResourceImpl) member;
-        if (cdr.isCalendarResource()) {
-            try {
-                // force the newly-created member's properties to be
-                // initialized so we can use them in the dav response
-                cdr.init(getNode().getSession().
-                         getItem(cdr.getLocator().getResourcePath()));
-            } catch (RepositoryException e) {
-                log.warn("could not initialize properties for new resource", e);
-            }
+        try {
+            // force the newly-created member's properties to be
+            // initialized so we can use them in the dav response
+            cdr.init(getNode().getSession().
+                     getItem(cdr.getLocator().getResourcePath()));
+        } catch (RepositoryException e) {
+            log.warn("could not initialize properties for new resource", e);
         }
     }
 
@@ -242,27 +239,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             throw new DavException(CosmoDavResponse.SC_INTERNAL_SERVER_ERROR,
                                    e.getMessage());
         }
-    }
-
-    /**
-     * Returns true if this resource represents a (non-collection)
-     * calendar resource.
-     */
-    public boolean isCalendarResource() {
-        if (exists()) {
-            try {
-                return getNode().
-                    isNodeType(CosmoJcrConstants.NT_CALDAV_RESOURCE);
-            }
-            catch (RepositoryException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        // XXX figure out a way to examine the request's Content-Type
-        // header
-        return (! isCalendarCollection() &&
-                mimeResolver.getMimeType(getDisplayName()).
-                equals(CosmoDavConstants.CT_ICALENDAR));
     }
 
     /**

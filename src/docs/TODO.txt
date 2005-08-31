@@ -9,9 +9,6 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
-Misc:
- * add cosmo id and version to server header
-
 WebDAV:
  * honor Content-Type header when importing a resource and when
    deciding if a resource is a calendar resource
@@ -21,7 +18,6 @@ WebDAV:
  * figure out why creationdate property is in iso8861 format
 
 CalDAV:
- * filter caldav:uid from event resource dav properties
  * use the dav content language property to set xml:lang when
    PROPFINDing the caldav calendar-description property
  * honor Content-Language header when PROPPATCHing
@@ -56,6 +52,7 @@ See "Deferred Features" section of the 0.2 Spec at
    causes problems for clients that send the session cookie to the
    server (cadaver, browsers, etc.) - low priority since chandler does
    not deal with the session cookie
+ * consider adding cosmo product id and version to server header
 
 
  Copyright 2005 Open Source Applications Foundation

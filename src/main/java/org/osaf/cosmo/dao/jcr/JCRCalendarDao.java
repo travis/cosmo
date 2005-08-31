@@ -154,7 +154,7 @@ public class JCRCalendarDao implements CalendarDao {
             // change the resource's uid on an update, so always
             // verify and set it
             verifyUniqueUid(node, events.getUid());
-            node.setProperty(CosmoJcrConstants.NP_CALDAV_UID, events.getUid());
+            node.setProperty(CosmoJcrConstants.NP_ICAL_UID, events.getUid());
 
             // add calendar components
             setEventNodes(events, node);
@@ -202,7 +202,7 @@ public class JCRCalendarDao implements CalendarDao {
             append(CosmoJcrConstants.NT_CALDAV_RESOURCE).
             append(")");
         stmt.append("[@").
-            append(CosmoJcrConstants.NP_CALDAV_UID).
+            append(CosmoJcrConstants.NP_ICAL_UID).
             append(" = '").
             append(uid).
             append("']");
@@ -379,6 +379,7 @@ public class JCRCalendarDao implements CalendarDao {
                  resourceNode.getNodes(CosmoJcrConstants.NN_ICAL_EXEVENT);
              i.hasNext();) {
             VEvent exceptionEvent = new VEvent();
+            Node exeventNode = i.nextNode();
             // XXX event properties
             // XXX alarms
             events.add(exceptionEvent);

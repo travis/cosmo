@@ -119,7 +119,6 @@ public class CosmoJcrConstants {
 
     public static final String NP_CALDAV_CALENDARDESCRIPTION =
         "caldav:calendar-description";
-    public static final String NP_CALDAV_UID = "caldav:uid";
 
     public static final String NP_ID = "ticket:id";
     public static final String NP_OWNER = "ticket:owner";
@@ -176,6 +175,7 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_STATCODE = "icalendar:statcode";
     public static final String NP_ICAL_TEXT = "icalendar:text";
     public static final String NP_ICAL_TZID = "icalendar:tzid";
+    public static final String NP_ICAL_UID = "icalendar:uid";
     public static final String NP_ICAL_UNTIL = "icalendar:until";
     public static final String NP_ICAL_URI = "icalendar:uri";
     public static final String NP_ICAL_UTC = "icalendar:utc";

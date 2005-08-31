@@ -94,7 +94,7 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 PropertyDef
-  Name caldav:uid
+  Name icalendar:uid
   RequiredType STRING
   DefaultValues null
   AutoCreate false

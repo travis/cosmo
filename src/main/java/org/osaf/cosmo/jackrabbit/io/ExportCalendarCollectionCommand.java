@@ -23,6 +23,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 import javax.jcr.Node;
+import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -95,7 +96,14 @@ public class ExportCalendarCollectionCommand extends AbstractCommand {
         context.setContentLength(tmpfile.length());
         context.setModificationTime(tmpfile.lastModified());
         context.setContentType(CosmoICalendarConstants.CONTENT_TYPE +
-                               "; charset=\"utf8\"");
+                               "; charset=utf8");
+        Property contentLanguage =
+            resourceNode.getProperty(CosmoJcrConstants.NP_XML_LANG);
+        context.setContentLanguage(contentLanguage.getString());
+        java.util.Calendar creationTime =
+            resourceNode.getProperty(CosmoJcrConstants.NP_JCR_CREATED).
+            getDate();
+        context.setCreationTime(creationTime.getTime().getTime());
         context.setETag("");
 
         return true;

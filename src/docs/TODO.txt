@@ -9,12 +9,6 @@ See
 <http://wiki.osafoundation.org/bin/view/Journal/ZeroPointTwoCosmoPlanning>
 for current development plan. Additional tasks:
 
-WebDAV:
- * figure out why creationdate property is undefined for collections
- * figure out why creationdate property is in iso8861 format
-
-CalDAV:
-
 UI:
  * final copy and format for mail messages
 

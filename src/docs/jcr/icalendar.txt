@@ -77,6 +77,71 @@ PrimaryItemName
   null
 
 NodeTypeName
+  icalendar:dur
+SuperTypes
+  icalendar:valuetype
+IsMixin
+  false
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+PropertyDef
+  Name icalendar:days
+  RequiredType LONG
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:hours
+  RequiredType LONG
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:minutes
+  RequiredType LONG
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:seconds
+  RequiredType LONG
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:weeks
+  RequiredType LONG
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:negative
+  RequiredType BOOLEAN
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+
+NodeTypeName
   icalendar:period
 SuperTypes
   icalendar:valuetype
@@ -348,6 +413,16 @@ PropertyDef
   RequiredType BOOLEAN
   DefaultValues false
   AutoCreate true
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:datetimevalue
+  RequiredType STRING
+  ValueConstraints ["DATE-TIME", "DATE"]
+  DefaultValues null
+  AutoCreate false
   Mandatory false
   OnParentVersion COPY
   Protected false
@@ -703,15 +778,15 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:duration
-PropertyDef
-  Name icalendar:duration
-  RequiredType LONG
-  DefaultValues null
+ChildNodeDef
+  Name icalendar:dur
+  RequiredPrimaryTypes [icalendar:dur]
+  DefaultPrimaryType icalendar:dur
   AutoCreate false
   Mandatory true
-  OnParentVersion COPY
+  OnParentVersion VERSION
   Protected false
-  Multiple false
+  SameNamedSibs false
 
 NodeTypeName
   icalendar:freebusy
@@ -1181,10 +1256,20 @@ ChildNodeDef
   Mandatory true
   OnParentVersion VERSION
   Protected false
-  SameNamedSibs false
+  SameNamedSibs true
 PropertyDef
   Name icalendar:datetime
   RequiredType DATE
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple true
+PropertyDef
+  Name icalendar:rdatevalue
+  RequiredType STRING
+  ValueConstraints ["DATE-TIME", "DATE", "PERIOD"]
   DefaultValues null
   AutoCreate false
   Mandatory false
@@ -1266,19 +1351,19 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:value
+ChildNodeDef
+  Name icalendar:dur
+  RequiredPrimaryTypes [icalendar:dur]
+  DefaultPrimaryType icalendar:dur
+  AutoCreate false
+  Mandatory true
+  OnParentVersion VERSION
+  Protected false
+  SameNamedSibs false
 PropertyDef
   Name icalendar:related
   RequiredType STRING
   VaueConstraints ["START", "END"]
-  DefaultValues null
-  AutoCreate false
-  Mandatory false
-  OnParentVersion COPY
-  Protected false
-  Multiple false
-PropertyDef
-  Name icalendar:duration
-  RequiredType LONG
   DefaultValues null
   AutoCreate false
   Mandatory false

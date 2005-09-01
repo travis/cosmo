@@ -459,6 +459,12 @@ public class ICalendarUtils {
 
     /**
      */
+    public static Value getValue(Property property) {
+        return (Value) property.getParameters().getParameter(Parameter.VALUE);
+    }
+
+    /**
+     */
     public static Parameter getXParameter(Property property,
                                           String name) {
         return property.getParameters().getParameter(name);

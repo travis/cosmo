@@ -46,8 +46,7 @@ public class TestHelper {
         Calendar cal =new Calendar();
 
         cal.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
-        cal.getProperties().add(new Version(CosmoICalendarConstants.VERSION,
-                                            CosmoICalendarConstants.VERSION));
+        cal.getProperties().add(Version.VERSION_2_0);
 
         return cal;
     }
@@ -62,9 +61,10 @@ public class TestHelper {
         start.set(java.util.Calendar.HOUR_OF_DAY, 9);
         start.set(java.util.Calendar.MINUTE, 30);
 
-        int duration = 1000 * 60 * 60;
+        // 1 hour duration
+        Dur duration = new Dur(0, 1, 0, 0);
  
-        VEvent event = new VEvent(start.getTime(), duration, summary);
+        VEvent event = new VEvent(new Date(start.getTime()), duration, summary);
         event.getProperties().add(new Uid(serial));
  
         // add timezone information..
@@ -77,14 +77,15 @@ public class TestHelper {
             getParameters().add(tzParam);
 
         // add an alarm for 5 minutes before the event
-        VAlarm alarm = new VAlarm(-1000 * 60 * 6);
+        Dur trigger = new Dur(0, 0, -5, 0);
+        VAlarm alarm = new VAlarm(trigger);
         alarm.getProperties().add(Action.DISPLAY);
         alarm.getProperties().add(new Description("Meeting at 9:30am"));
         event.getAlarms().add(alarm);
 
         // add an x-property with an x-param
-        XParameter xparam = new XParameter("X-Cosmo-Test-Param", "deadbeef");
-        XProperty xprop = new XProperty("X-Cosmo-Test-Prop", "abc123");
+        XParameter xparam = new XParameter("X-COSMO-TEST-PARAM", "deadbeef");
+        XProperty xprop = new XProperty("X-COSMO-TEST-PROP", "abc123");
         xprop.getParameters().add(xparam);
         event.getProperties().add(xprop);
 

@@ -15,10 +15,13 @@
  */
 package org.osaf.cosmo.dao;
 
+import java.io.InputStream;
+
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -41,6 +44,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Brian Moseley
  */
+
 public class CalendarDaoTest extends BaseCoreTestCase {
     private static final Log log = LogFactory.getLog(CalendarDaoTest.class);
 
@@ -104,7 +108,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
 
         // get the calendar object from the repository
         Calendar calendar2 = dao.getCalendarObject(resource);
-        log.debug("calendar2:\n" + calendar2);
         assertTrue(calendar2.getComponents().size() == 2);
 
         session.logout();
@@ -162,5 +165,81 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         } finally {
             session.logout();
         }
+    }
+
+    public void testStoreAndGetSimpleEvent()
+        throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+        Session session = sessionFactory.getSession();
+
+        // load event1.ics
+        String name = "event1.ics";
+        InputStream in =
+            getClass().getClassLoader().getResourceAsStream(name);
+        CalendarBuilder builder = new CalendarBuilder();
+        Calendar calendar1 = builder.build(in);
+
+        // store the calendar object in the repository
+        Node resource = session.getRootNode().addNode(name);
+        dao.storeCalendarObject(resource, calendar1);
+        session.save();
+
+        // get the calendar object from the repository
+        Calendar calendar2 = dao.getCalendarObject(resource);
+
+        session.logout();
+    }
+
+    public void testStoreAndGetEventWithAlarm()
+        throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+        Session session = sessionFactory.getSession();
+
+        // load event1.ics
+        String name = "event2.ics";
+        InputStream in =
+            getClass().getClassLoader().getResourceAsStream(name);
+        CalendarBuilder builder = new CalendarBuilder();
+        Calendar calendar1 = builder.build(in);
+
+        // store the calendar object in the repository
+        Node resource = session.getRootNode().addNode(name);
+        dao.storeCalendarObject(resource, calendar1);
+        session.save();
+
+        // get the calendar object from the repository
+        Calendar calendar2 = dao.getCalendarObject(resource);
+
+        session.logout();
+    }
+
+    public void testStoreAndGetRecurringEventWithExceptions()
+        throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+        Session session = sessionFactory.getSession();
+
+        // load event1.ics
+        String name = "event3.ics";
+        InputStream in =
+            getClass().getClassLoader().getResourceAsStream(name);
+        CalendarBuilder builder = new CalendarBuilder();
+        Calendar calendar1 = builder.build(in);
+
+        // store the calendar object in the repository
+        Node resource = session.getRootNode().addNode(name);
+        dao.storeCalendarObject(resource, calendar1);
+        session.save();
+
+        // get the calendar object from the repository
+        Calendar calendar2 = dao.getCalendarObject(resource);
+        log.debug("calendar2:\n" + calendar2);
+
+        session.logout();
     }
 }

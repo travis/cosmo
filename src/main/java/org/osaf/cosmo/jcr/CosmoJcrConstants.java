@@ -50,6 +50,7 @@ public class CosmoJcrConstants {
     public static final String NN_ICAL_DTEND = "icalendar:dtend";
     public static final String NN_ICAL_DTSTAMP = "icalendar:dtstamp";
     public static final String NN_ICAL_DTSTART = "icalendar:dtstart";
+    public static final String NN_ICAL_DUR = "icalendar:dur";
     public static final String NN_ICAL_DURATION = "icalendar:duration";
     public static final String NN_ICAL_EXDATE = "icalendar:exdate";
     public static final String NN_ICAL_EXRULE = "icalendar:exrule";
@@ -145,16 +146,19 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_CN = "icalendar:cn";
     public static final String NP_ICAL_COUNT = "icalendar:count";
     public static final String NP_ICAL_CUTYPE = "icalendar:cutype";
+    public static final String NP_ICAL_DATETIMEVALUE =
+        "icalendar:datetimevalue";
     public static final String NP_ICAL_DELFROM = "icalendar:delfrom";
     public static final String NP_ICAL_DELTO = "icalendar:delto";
     public static final String NP_ICAL_DIR = "icalendar:dir";
     public static final String NP_ICAL_DATETIME = "icalendar:datetime";
+    public static final String NP_ICAL_DAYS = "icalendar:days";
     public static final String NP_ICAL_DESCRIPTION = "icalendar:description";
-    public static final String NP_ICAL_DURATION = "icalendar:duration";
     public static final String NP_ICAL_END = "icalendar:end";
     public static final String NP_ICAL_EXDATA = "icalendar:exdata";
     public static final String NP_ICAL_FMTTYPE = "icalendar:fmttype";
     public static final String NP_ICAL_FREQ = "icalendar:freq";
+    public static final String NP_ICAL_HOURS = "icalendar:hours";
     public static final String NP_ICAL_INTERVAL = "icalendar:interval";
     public static final String NP_ICAL_LANGUAGE = "icalendar:language";
     public static final String NP_ICAL_LATITUDE = "icalendar:latitude";
@@ -162,15 +166,19 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_LONGITUDE = "icalendar:longitude";
     public static final String NP_ICAL_MAXVERSION = "icalendar:maxversion";
     public static final String NP_ICAL_MEMBER = "icalendar:member";
+    public static final String NP_ICAL_MINUTES = "icalendar:minutes";
+    public static final String NP_ICAL_NEGATIVE = "icalendar:negative";
     public static final String NP_ICAL_OFFSET = "icalendar:offset";
     public static final String NP_ICAL_PARTSTAT = "icalendar:partstat";
     public static final String NP_ICAL_RANGE = "icalendar:range";
+    public static final String NP_ICAL_RDATEVALUE = "icalendar:rdatevalue";
     public static final String NP_ICAL_RELATED = "icalendar:related";
     public static final String NP_ICAL_RELTYPE = "icalendar:reltype";
     public static final String NP_ICAL_REQUESTSTATUS =
         "icalendar:requeststatus";
     public static final String NP_ICAL_ROLE = "icalendar:role";
     public static final String NP_ICAL_RSVP = "icalendar:rsvp";
+    public static final String NP_ICAL_SECONDS = "icalendar:seconds";
     public static final String NP_ICAL_SENTBY = "icalendar:sentby";
     public static final String NP_ICAL_SEQUENCENO = "icalendar:sequenceno";
     public static final String NP_ICAL_START = "icalendar:start";
@@ -182,5 +190,6 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_URI = "icalendar:uri";
     public static final String NP_ICAL_UTC = "icalendar:utc";
     public static final String NP_ICAL_VALUE = "icalendar:value";
+    public static final String NP_ICAL_WEEKS = "icalendar:weeks";
     public static final String NP_ICAL_WKST = "icalendar:wkst";
 }

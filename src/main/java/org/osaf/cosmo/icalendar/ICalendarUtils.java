@@ -385,6 +385,13 @@ public class ICalendarUtils {
 
     /**
      */
+    public static Encoding getEncoding(Property property) {
+        return (Encoding) property.getParameters().
+            getParameter(Parameter.ENCODING);
+    }
+
+    /**
+     */
     public static FmtType getFmtType(Property property) {
         return (FmtType)
             property.getParameters().getParameter(Parameter.FMTTYPE);

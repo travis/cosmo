@@ -154,6 +154,7 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_DATETIME = "icalendar:datetime";
     public static final String NP_ICAL_DAYS = "icalendar:days";
     public static final String NP_ICAL_DESCRIPTION = "icalendar:description";
+    public static final String NP_ICAL_ENCODING = "icalendar:encoding";
     public static final String NP_ICAL_END = "icalendar:end";
     public static final String NP_ICAL_EXDATA = "icalendar:exdata";
     public static final String NP_ICAL_FMTTYPE = "icalendar:fmttype";
@@ -170,8 +171,8 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_NEGATIVE = "icalendar:negative";
     public static final String NP_ICAL_OFFSET = "icalendar:offset";
     public static final String NP_ICAL_PARTSTAT = "icalendar:partstat";
+    public static final String NP_ICAL_PROPVALUE = "icalendar:propvalue";
     public static final String NP_ICAL_RANGE = "icalendar:range";
-    public static final String NP_ICAL_RDATEVALUE = "icalendar:rdatevalue";
     public static final String NP_ICAL_RELATED = "icalendar:related";
     public static final String NP_ICAL_RELTYPE = "icalendar:reltype";
     public static final String NP_ICAL_REQUESTSTATUS =

@@ -340,9 +340,9 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 PropertyDef
-  Name icalendar:value
+  Name icalendar:propvalue
   RequiredType STRING
   DefaultValues null
   AutoCreate false
@@ -369,7 +369,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 PropertyDef
   Name icalendar:altrep
   RequiredType STRING
@@ -418,7 +418,7 @@ PropertyDef
   Protected false
   Multiple false
 PropertyDef
-  Name icalendar:datetimevalue
+  Name icalendar:value
   RequiredType STRING
   ValueConstraints ["DATE-TIME", "DATE"]
   DefaultValues null
@@ -450,7 +450,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:method
@@ -461,7 +461,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:prodid
@@ -472,7 +472,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:version
@@ -536,6 +536,16 @@ PropertyDef
   Protected false
   Multiple false
 PropertyDef
+  Name icalendar:value
+  ValueContraints ["BINARY", "URI"]
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
   Name icalendar:fmttype
   RequiredType STRING
   DefaultValues null
@@ -583,7 +593,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:comment
@@ -594,7 +604,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:description
@@ -605,7 +615,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:geo
@@ -616,7 +626,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 PropertyDef
   Name icalendar:latitude
   RequiredType DOUBLE
@@ -645,7 +655,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:percentcomplete
@@ -656,7 +666,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:priority
@@ -687,7 +697,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:status
@@ -698,7 +708,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:summary
@@ -709,7 +719,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 #
 # 4.8.2 date and time component properties
@@ -826,7 +836,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 #
 # 4.8.3 time zone component properties
@@ -841,7 +851,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:tzname
@@ -852,7 +862,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 PropertyDef
   Name icalendar:language
   RequiredType STRING
@@ -1055,7 +1065,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:organizer
@@ -1143,7 +1153,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 PropertyDef
   Name icalendar:reltype
   RequiredType STRING
@@ -1183,7 +1193,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 #
 # 4.8.5 recurrence component properties
@@ -1192,31 +1202,13 @@ PrimaryItemName
 NodeTypeName
   icalendar:exdate
 SuperTypes
-  icalendar:property
+  icalendar:datetimeproperty
 IsMixin
   false
 HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:datetime
-PropertyDef
-  Name icalendar:datetime
-  RequiredType DATE
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
-PropertyDef
-  Name icalendar:tzid
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory false
-  OnParentVersion COPY
-  Protected false
-  Multiple false
 
 NodeTypeName
   icalendar:exrule
@@ -1247,7 +1239,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:datetime
 ChildNodeDef
   Name icalendar:period
   RequiredPrimaryTypes [icalendar:period]
@@ -1262,12 +1254,21 @@ PropertyDef
   RequiredType DATE
   DefaultValues null
   AutoCreate false
-  Mandatory false
+  Mandatory true
   OnParentVersion COPY
   Protected false
   Multiple true
 PropertyDef
-  Name icalendar:rdatevalue
+  Name icalendar:utc
+  RequiredType BOOLEAN
+  DefaultValues false
+  AutoCreate true
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:value
   RequiredType STRING
   ValueConstraints ["DATE-TIME", "DATE", "PERIOD"]
   DefaultValues null
@@ -1319,7 +1320,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 
 NodeTypeName
   icalendar:repeat
@@ -1350,7 +1351,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 ChildNodeDef
   Name icalendar:dur
   RequiredPrimaryTypes [icalendar:dur]
@@ -1363,7 +1364,17 @@ ChildNodeDef
 PropertyDef
   Name icalendar:related
   RequiredType STRING
-  VaueConstraints ["START", "END"]
+  ValueConstraints ["START", "END"]
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:value
+  RequiredType STRING
+  ValueConstraints ["DURATION", "DATE-TIME"]
   DefaultValues null
   AutoCreate false
   Mandatory false
@@ -1477,7 +1488,7 @@ IsMixin
 HasOrderableChildNodes
   false
 PrimaryItemName
-  icalendar:value
+  icalendar:propvalue
 PropertyDef
   Name icalendar:language
   RequiredType STRING

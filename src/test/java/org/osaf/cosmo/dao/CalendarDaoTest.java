@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import javax.jcr.Node;
@@ -32,8 +33,10 @@ import org.osaf.cosmo.BaseCoreTestCase;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.UnsupportedFeatureException;
 import org.osaf.cosmo.dao.CalendarDao;
+import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.icalendar.DuplicateUidException;
+import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.model.User;
 
 import org.apache.commons.logging.Log;
@@ -134,6 +137,52 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         }
     }
 
+    public void testStoreCalendarObjectInCalendarCollectionWithDuplicateUid()
+        throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+        Session session = sessionFactory.getSession();
+
+        // create a calendar object containing an event
+        // and a timezone
+        Calendar calendar = TestHelper.makeDummyCalendar();
+        VEvent event = TestHelper.makeDummyEvent();
+        calendar.getComponents().add(event);
+        calendar.getComponents().add(VTimeZone.getDefault());
+
+        // make a calendar collection in the repository
+        // XXX createCalendarCollection ought to return the created node
+        String collectionName = "dupcal";
+        dao.createCalendarCollection(session.getRootNode(), collectionName);
+        Node collection = session.getRootNode().getNode(collectionName);
+
+        // make a dav resource in the repository
+        String summary = ICalendarUtils.getSummary(event).getValue();
+        String name = summary +  ".ics";
+        // XXX createICalendarResource should be in the dao even if it
+        // isn't used by the dav server
+        Node resource = createICalendarResource(collection, name, calendar);
+
+        // store the calendar object with the dav resource
+        dao.storeCalendarObject(resource, calendar);
+        session.save();
+
+        // make another dav resource in the repository
+        name = summary + "-dup.ics";
+        Node dupResource = createICalendarResource(collection, name, calendar);
+
+        // now store the calendar with the second dav resource
+        try {
+            dao.storeCalendarObject(dupResource, calendar);
+            fail("should not have been able to store calendar object with duplicate uid");
+        } catch (DuplicateUidException e) {
+            // expected
+        } finally {
+            session.logout();
+        }
+    }
+
     public void testStoreCalendarObjectWithDuplicateUid() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("BEGIN");
@@ -159,9 +208,8 @@ public class CalendarDaoTest extends BaseCoreTestCase {
             name = ICalendarUtils.getSummary(event1).getValue() + "-dup.ics";
             resource = session.getRootNode().addNode(name);
             dao.storeCalendarObject(resource, calendar1);
-            fail("should not have been able to store calendar object with duplicate uid");
         } catch (DuplicateUidException e) {
-            // expected
+            fail("should have been able to store calendar object with duplicate uid");
         } finally {
             session.logout();
         }
@@ -240,5 +288,41 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         Calendar calendar2 = dao.getCalendarObject(resource);
 
         session.logout();
+    }
+
+    // helper methods
+
+    /**
+     */
+    protected Node createICalendarResource(Node collection, String name,
+                                           Calendar calendar)
+        throws Exception {
+        InputStream content =
+            new ByteArrayInputStream(calendar.toString().getBytes("utf8"));
+        return createDavResource(collection, name, content,
+                                 CosmoICalendarConstants.CONTENT_TYPE, "utf8");
+    }
+
+    /**
+     */
+    protected Node createDavResource(Node collection, String name,
+                                     InputStream content, String contentType,
+                                     String contentCharset)
+        throws Exception {
+        Node resourceNode = collection.
+            addNode(name, CosmoJcrConstants.NT_DAV_RESOURCE);
+        resourceNode.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
+        resourceNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
+        Node contentNode =
+            resourceNode.addNode(CosmoJcrConstants.NN_JCR_CONTENT,
+                                 CosmoJcrConstants.NT_RESOURCE);
+        contentNode.setProperty(CosmoJcrConstants.NN_JCR_DATA, content);
+        contentNode.setProperty(CosmoJcrConstants.NN_JCR_MIMETYPE,
+                                contentType);
+        contentNode.setProperty(CosmoJcrConstants.NN_JCR_ENCODING,
+                                contentCharset);
+        contentNode.setProperty(CosmoJcrConstants.NN_JCR_LASTMODIFIED,
+                                java.util.Calendar.getInstance());
+        return resourceNode;
     }
 }

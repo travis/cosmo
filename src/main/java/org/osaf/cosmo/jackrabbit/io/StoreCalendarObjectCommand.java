@@ -92,21 +92,25 @@ public class StoreCalendarObjectCommand extends AbstractCommand {
                 getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
             dao.storeCalendarObject(resourceNode, calendar);
         } catch (ParserException e) {
-            // indicates an incorrectly-formatted resource
-            throw new DavException(CosmoDavResponse.SC_FORBIDDEN,
-                                   "Error parsing calendar resource: " +
-                                   e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug("Error parsing calendar resource", e);
+            }
+            throw new DavException(CosmoDavResponse.SC_FORBIDDEN);
         } catch (UnsupportedFeatureException e) {
-            // indicates that no supported component types were found
-            // in the resource
-            throw new DavException(CosmoDavResponse.SC_CONFLICT,
-                                   e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug("Calendar object contains no supported components",
+                          e);
+            }
+            throw new DavException(CosmoDavResponse.SC_CONFLICT);
         } catch (RecurrenceException e) {
-            // indicates an incorrectly-constructed recurring event
-            // resource
-            throw new DavException(CosmoDavResponse.SC_FORBIDDEN,
-                                   e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug("Calendar object contains bad recurrence", e);
+            }
+            throw new DavException(CosmoDavResponse.SC_FORBIDDEN);
         } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error storing calendar object", e);
+            }
             if (e instanceof DataAccessException &&
                 e.getCause() instanceof RepositoryException) {
                 throw (RepositoryException) e.getCause();

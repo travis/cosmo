@@ -195,6 +195,14 @@ public class JCRCalendarDao implements CalendarDao {
      */
     protected void verifyUniqueUid(Node node, String uid)
         throws RepositoryException {
+        // monolithic calendar resources published into cosmo don't
+        // have to worry about uid duplication, so if the parent node
+        // is not a calendar collection, skip out
+        if (! node.getParent().
+            isNodeType(CosmoJcrConstants.NT_CALDAV_COLLECTION)) {
+            return;
+        }
+
         // look for nodes anywhere below the parent calendar
         // collection that have this same uid 
         StringBuffer stmt = new StringBuffer();

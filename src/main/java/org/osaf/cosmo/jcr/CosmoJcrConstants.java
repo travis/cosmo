@@ -23,6 +23,10 @@ public class CosmoJcrConstants {
 
     // node names
     public static final String NN_JCR_CONTENT = "jcr:content";
+    public static final String NN_JCR_DATA = "jcr:data";
+    public static final String NN_JCR_MIMETYPE = "jcr:mimeType";
+    public static final String NN_JCR_ENCODING = "jcr:encoding";
+    public static final String NN_JCR_LASTMODIFIED = "jcr:lastModified";
 
     public static final String NN_TICKET = "ticket:ticket";
 
@@ -86,6 +90,7 @@ public class CosmoJcrConstants {
     // node types
 
     public static final String NT_FOLDER = "nt:folder";
+    public static final String NT_RESOURCE = "nt:resource";
 
     public static final String NT_DAV_COLLECTION = "dav:collection";
     public static final String NT_DAV_RESOURCE = "dav:resource";

@@ -177,6 +177,7 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_RELTYPE = "icalendar:reltype";
     public static final String NP_ICAL_REQUESTSTATUS =
         "icalendar:requeststatus";
+    public static final String NP_ICAL_RESOURCE = "icalendar:resource";
     public static final String NP_ICAL_ROLE = "icalendar:role";
     public static final String NP_ICAL_RSVP = "icalendar:rsvp";
     public static final String NP_ICAL_SECONDS = "icalendar:seconds";

@@ -698,6 +698,15 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:propvalue
+PropertyDef
+  Name icalendar:resource
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple true
 
 NodeTypeName
   icalendar:status

@@ -49,6 +49,12 @@ public class ICalendarUtils {
 
     /**
      */
+    public static PropertyList getAttaches(Component component) {
+        return component.getProperties().getProperties(Property.ATTACH);
+    }
+
+    /**
+     */
     public static Attendee getAttendee(Component component) {
         return (Attendee)
             component.getProperties().getProperty(Property.ATTENDEE);
@@ -65,6 +71,12 @@ public class ICalendarUtils {
     public static Categories getCategories(Component component) {
         return (Categories)
             component.getProperties().getProperty(Property.CATEGORIES);
+    }
+
+    /**
+     */
+    public static PropertyList getCategorieses(Component component) {
+        return component.getProperties().getProperties(Property.CATEGORIES);
     }
 
     /**
@@ -91,6 +103,12 @@ public class ICalendarUtils {
     public static Contact getContact(Component component) {
         return (Contact)
             component.getProperties().getProperty(Property.CONTACT);
+    }
+
+    /**
+     */
+    public static PropertyList getContacts(Component component) {
+        return component.getProperties().getProperties(Property.CONTACT);
     }
 
     /**
@@ -142,8 +160,20 @@ public class ICalendarUtils {
 
     /**
      */
+    public static PropertyList getExDates(Component component) {
+        return component.getProperties().getProperties(Property.EXDATE);
+    }
+
+    /**
+     */
     public static ExRule getExRule(Component component) {
         return (ExRule) component.getProperties().getProperty(Property.EXRULE);
+    }
+
+    /**
+     */
+    public static PropertyList getExRules(Component component) {
+        return component.getProperties().getProperties(Property.EXRULE);
     }
 
     /**
@@ -208,6 +238,12 @@ public class ICalendarUtils {
 
     /**
      */
+    public static PropertyList getRelatedTos(Component component) {
+        return component.getProperties().getProperties(Property.RELATED_TO);
+    }
+
+    /**
+     */
     public static Repeat getRepeat(Component component) {
         return (Repeat)
             component.getProperties().getProperty(Property.REPEAT);
@@ -222,9 +258,21 @@ public class ICalendarUtils {
 
     /**
      */
+    public static PropertyList getRequestStatuses(Component component) {
+        return component.getProperties().getProperties(Property.REQUEST_STATUS);
+    }
+
+    /**
+     */
     public static Resources getResources(Component component) {
         return (Resources)
             component.getProperties().getProperty(Property.RESOURCES);
+    }
+
+    /**
+     */
+    public static PropertyList getResourceses(Component component) {
+        return component.getProperties().getProperties(Property.RESOURCES);
     }
 
     /**

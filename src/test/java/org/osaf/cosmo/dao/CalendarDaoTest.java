@@ -238,7 +238,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
 
         // get the calendar object from the repository
         Calendar calendar2 = dao.getCalendarObject(resource);
-        log.debug("calendar2:\n" + calendar2);
 
         session.logout();
     }

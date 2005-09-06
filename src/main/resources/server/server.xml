@@ -30,11 +30,7 @@
                        type="java.lang.String" override="false"/>
           <Environment name="cosmo/serverAdmin" value="@SERVER_ADMIN@"
                        type="java.lang.String" override="false"/>
-          <Environment name="cosmo/repository/username"
-                       value="@REPOSITORY_USERNAME@"
-                       type="java.lang.String" override="false"/>
-          <Environment name="cosmo/repository/password"
-                       value="@REPOSITORY_PASSWORD@"
+          <Environment name="cosmo/config" value="etc/cosmo.properties"
                        type="java.lang.String" override="false"/>
           <Resource name="jcr/cosmo"
                     type="javax.jcr.Repository"

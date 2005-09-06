@@ -34,25 +34,22 @@
     </constructor-arg>
   </bean>
 
-  <!-- repository -->
+  <!-- properties -->
 
-  <bean id="repositoryUsername" class="java.lang.String">
-    <constructor-arg type="java.lang.String">
-      <value>@REPOSITORY_USERNAME@</value>
-    </constructor-arg>
+  <bean id="propertyPlaceholderConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>classpath:cosmo.properties</value>
+      </list>
+    </property>
   </bean>
 
-  <bean id="repositoryPassword" class="java.lang.String">
-    <constructor-arg type="java.lang.String">
-      <value>@REPOSITORY_PASSWORD@</value>
-    </constructor-arg>
+  <!-- Cosmo security -->
+
+  <bean id="securityManager"
+        class="org.osaf.cosmo.TestSecurityManager">
   </bean>
-
-   <!-- Cosmo security -->
-
-   <bean id="securityManager"
-         class="org.osaf.cosmo.TestSecurityManager">
-   </bean>
 
   <!-- JDBC data source -->
 

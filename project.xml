@@ -466,6 +466,7 @@
       <resource>
         <directory>src/main/resources/server</directory>
         <includes>
+          <include>cosmo.properties</include>
           <include>hibernate.properties</include>
         </includes>
         <filtering>true</filtering>

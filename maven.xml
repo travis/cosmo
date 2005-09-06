@@ -180,10 +180,6 @@
         <filter token="RELOADABLE" value="${cosmo.webapp.reloadable}"/>
         <filter token="VERSION" value="${pom.currentVersion}"/>
         <filter token="SERVER_ADMIN" value="${cosmo.serverAdmin}"/>
-        <filter token="REPOSITORY_USERNAME"
-                value="${cosmo.dist.repository.username}"/>
-        <filter token="REPOSITORY_PASSWORD"
-                value="${cosmo.dist.repository.password}"/>
         <filter token="DB_USERNAME" value="${cosmo.dist.userdb.username}"/>
         <filter token="DB_PASSWORD" value="${cosmo.dist.userdb.password}"/>
         <filter token="DB_DRIVER" value="${cosmo.dist.userdb.driver}"/>
@@ -200,6 +196,15 @@
     </copy>
     <copy todir="${cosmo.dist.version}/etc"
           file="${basedir}/src/main/resources/server/repository.xml"/>
+    <copy todir="${cosmo.dist.version}/etc"
+          file="${basedir}/src/main/resources/server/cosmo.properties">
+      <filterset>
+        <filter token="REPOSITORY_USERNAME"
+                value="${cosmo.dist.repository.username}"/>
+        <filter token="REPOSITORY_PASSWORD"
+                value="${cosmo.dist.repository.password}"/>
+      </filterset>
+    </copy>
     <copy todir="${cosmo.dist.version}/tomcat/common/classes"
           file="${basedir}/src/main/resources/server/hibernate.properties">
       <filterset>
@@ -210,15 +215,17 @@
     <copy todir="${cosmo.dist.version}/tomcat/common/classes"
           file="${basedir}/src/main/resources/server/log4j.xml"/>
     <copy todir="${cosmo.dist.version}/tomcat/common/lib">
-      <fileset dir="${maven.build.dir}/${pom.artifactId}/WEB-INF/lib">
+      <fileset dir="${maven.repo.local}/commons-logging/jars">
         <include name="commons-logging-*.jar"/>
+      </fileset>
+      <fileset dir="${maven.repo.local}/log4j/jars">
         <include name="log4j-*.jar"/>
       </fileset>
     </copy>
     <!-- tomcat uses a different classloader to find these when
          setting up jndi resources -->
     <copy todir="${cosmo.dist.version}/tomcat/common/lib">
-      <fileset dir="${maven.build.dir}/${pom.artifactId}/WEB-INF/lib">
+      <fileset dir="${maven.repo.local}/jsr170/jars">
         <include name="jcr-1.0.jar"/>
       </fileset>
       <fileset dir="${maven.repo.local}/javamail/jars">

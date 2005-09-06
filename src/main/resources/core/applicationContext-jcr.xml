@@ -25,10 +25,10 @@
   <bean id="jcrAuthenticationProvider"
         class="org.osaf.cosmo.spring.jcr.UsernamePasswordAuthenticationProvider">
     <property name="username">
-      <ref bean="repositoryUsername"/>
+      <value>${cosmo.repository.username}</value>
     </property>
     <property name="password">
-      <ref bean="repositoryPassword"/>
+      <value>${cosmo.repository.password}</value>
     </property>
   </bean>
 

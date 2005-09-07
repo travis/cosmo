@@ -138,28 +138,23 @@ public class CosmoDavRequestImpl implements CosmoDavRequest {
 
         Element root = requestDocument.getRootElement();
 
-        if (! root.getName().equals(CosmoDavConstants.ELEMENT_PROP)) {
-            throw new IllegalArgumentException("ticket request missing prop");
-        }
-        if (root.getNamespace() == null ||
-            ! root.getNamespace().equals(DavConstants.NAMESPACE)) {
-            throw new IllegalArgumentException("ticket request contains ticketinfo with missing or incorrect namespace");
-        }
-        Element ticketinfo = root.getChild(CosmoDavConstants.ELEMENT_TICKETINFO,
-                                           CosmoDavConstants.NAMESPACE_TICKET);
-        if (ticketinfo == null) {
+        if (! root.getName().equals(CosmoDavConstants.ELEMENT_TICKETINFO)) {
             throw new IllegalArgumentException("ticket request missing ticketinfo");
         }
-        if (ticketinfo.getChild(CosmoDavConstants.ELEMENT_ID,
-                                CosmoDavConstants.NAMESPACE_TICKET) != null) {
+        if (root.getNamespace() == null ||
+            ! root.getNamespace().equals(CosmoDavConstants.NAMESPACE_TICKET)) {
+            throw new IllegalArgumentException("ticket request contains ticketinfo with missing or incorrect namespace");
+        }
+        if (root.getChild(CosmoDavConstants.ELEMENT_ID,
+                          CosmoDavConstants.NAMESPACE_TICKET) != null) {
             throw new IllegalArgumentException("ticket request must not include id");
         }
-        if (ticketinfo.getChild(CosmoDavConstants.ELEMENT_OWNER,
-                                CosmoDavConstants.NAMESPACE_TICKET) != null) {
+        if (root.getChild(CosmoDavConstants.ELEMENT_OWNER,
+                          CosmoDavConstants.NAMESPACE_TICKET) != null) {
             throw new IllegalArgumentException("ticket request must not include owner");
         }
 
-        String timeout = ticketinfo.
+        String timeout = root.
             getChildTextNormalize(CosmoDavConstants.ELEMENT_TIMEOUT,
                                   CosmoDavConstants.NAMESPACE_TICKET);
         if (timeout == null) {
@@ -169,8 +164,8 @@ public class CosmoDavRequestImpl implements CosmoDavRequest {
         // visit limits are not supported
 
         Element privilege =
-            ticketinfo.getChild(CosmoDavConstants.ELEMENT_PRIVILEGE,
-                                DavConstants.NAMESPACE);
+            root.getChild(CosmoDavConstants.ELEMENT_PRIVILEGE,
+                          DavConstants.NAMESPACE);
         if (privilege == null) {
             throw new IllegalArgumentException("ticket request missing privileges");
         }

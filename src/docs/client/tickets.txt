@@ -66,13 +66,11 @@ The Cosmo version of the example from section 2.3 of the spec is:
   Authorization: Basic dGVzdHVzZXI6dGVzdHVzZXI=
 
   <?xml version="1.0" encoding="utf-8" ?> 
-  <D:prop xmlns:D="DAV:"
+  <ticket:ticketinfo xmlns:D="DAV:"
           xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">
-    <ticket:ticketinfo>
-      <D:privilege><D:read/></D:privilege> 
-      <ticket:timeout>Second-3600</ticket:timeout> 
-    </ticket:ticketinfo>
-  </D:prop>
+    <D:privilege><D:read/></D:privilege> 
+    <ticket:timeout>Second-3600</ticket:timeout> 
+  </ticket:ticketinfo>
 
   >>Response
   HTTP/1.0 200 OK
@@ -117,20 +115,18 @@ spec. The complete list of spec differences is as follows:
       elements defined by the spec (ticketdiscovery, ticketinfo, id
       and timeout).
 
-  (3) The MKTICKET request content is wrapped in a DAV:prop element.
-
-  (4) If different ticket ids are included in the request headers and
+  (3) If different ticket ids are included in the request headers and
       URL, the id in the URL is used (the one from the Ticket header
       is ignored, even if the ticket identified by the URL is not
       found by the server).
 
-  (5) If a DELTICKET request is received for a resource on which the
+  (4) If a DELTICKET request is received for a resource on which the
       requesting user does not have appropriate access privileges,
       Cosmo returns a 403 (Forbidden) response. Example: User A owns
       resource X and creates ticket 123 on it. User B does not have
       privileges on resource X but attempts to delete the ticket.
 
-  (6) Similarly, only the owner of a ticket (the user who created
+  (5) Similarly, only the owner of a ticket (the user who created
       it via MKTICKET) or a user with root privileges can delete it
       with DELTICKET.
 

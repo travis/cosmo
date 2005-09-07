@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<D:prop xmlns:D="DAV:"
-        xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">
-  <ticket:ticketinfo>
-    <D:privilege><D:read/><D:write/></D:privilege> 
-  </ticket:ticketinfo>
-</D:prop>
+<ticket:ticketinfo xmlns:D="DAV:"
+                   xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">
+  <D:privilege><D:read/><D:write/></D:privilege> 
+</ticket:ticketinfo>

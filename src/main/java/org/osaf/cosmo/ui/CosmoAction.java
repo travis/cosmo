@@ -17,13 +17,27 @@ package org.osaf.cosmo.ui;
 
 import org.osaf.commons.struts.OSAFAction;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.ui.config.ServletContextConfigurer;
 
 /**
  * Base class for Cosmo actions, including security configuration.
  */
 public class CosmoAction extends OSAFAction {
 
+    private ServletContextConfigurer configurer;
     private CosmoSecurityManager securityManager;
+
+    /**
+     */
+    public ServletContextConfigurer getConfigurer() {
+        return configurer;
+    }
+
+    /**
+     */
+    public void setConfigurer(ServletContextConfigurer configurer) {
+        this.configurer = configurer;
+    }
 
     /**
      */

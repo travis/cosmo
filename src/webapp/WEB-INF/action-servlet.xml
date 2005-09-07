@@ -24,6 +24,9 @@
 
   <bean name="userAction" abstract="true" singleton="false"
         class="org.osaf.cosmo.ui.UserAction" >
+    <property name="configurer">
+      <ref bean="servletContextConfigurer"/>
+    </property>
     <property name="provisioningManager">
       <ref bean="provisioningManager"/>
     </property>

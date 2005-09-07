@@ -22,6 +22,7 @@ import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.ui.config.ServletContextConfigurer;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -225,6 +226,10 @@ public class UserAction extends CosmoAction {
                 log.debug("updating root user");
             }
             User user = mgr.updateUser(formUser);
+
+            // update the servlet context in case the email address
+            // has changed
+            getConfigurer().setServerAdmin();
 
             request.setAttribute(ATTR_USER, user);
             saveConfirmationMessage(request, MSG_CONFIRM_UPDATE);

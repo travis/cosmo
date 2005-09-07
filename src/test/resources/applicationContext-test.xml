@@ -71,17 +71,22 @@
 
   <!-- JCR repository -->
 
-  <bean id="jcrRepository"
-        class="org.osaf.commons.spring.jcr.jackrabbit.JackrabbitRepositoryFactoryBean">
-    <property name="configFilePath">
+  <bean id="jcrRepositoryConfig"
+        class="org.apache.jackrabbit.core.config.RepositoryConfig"
+        factory-method="create">
+    <constructor-arg type="java.lang.String" index="0">
       <value>@CONFIGFILEPATH@</value>
-    </property>
-    <property name="repositoryHomeDirPath">
+    </constructor-arg>
+    <constructor-arg type="java.lang.String" index="1">
       <value>@REPOSITORYHOMEDIRPATH@</value>
-    </property>
-    <property name="singleton">
-      <value>false</value>
-    </property>
+    </constructor-arg>
+  </bean>
+
+  <bean id="jcrRepository"
+        class="org.apache.jackrabbit.core.RepositoryImpl">
+    <constructor-arg>
+      <ref local="jcrRepositoryConfig"/>
+    </constructor-arg>
   </bean>
 
 </beans>

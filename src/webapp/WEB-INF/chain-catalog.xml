@@ -50,8 +50,8 @@
              className="org.osaf.cosmo.jackrabbit.io.ExportCalendarCollectionCommand"/>
     <command id="export-dirlisting"
              className="org.apache.jackrabbit.server.io.DirListingExportCommand"
-             nonCollectionNodeTypes="nt:resource, nt:file, dav:resource, caldav:resource"
-             collectionNodeTypes="nt:folder, dav:collection, caldav:collection"
+             nonCollectionNodeTypes="dav:resource, caldav:collection"
+             collectionNodeTypes="dav:collection"
              ignoredNodeTypes="rep:system, ticket:ticket, icalendar:calendar"/>
   </chain>
 

@@ -143,7 +143,6 @@ Some common development customizations:
     maven.compile.deprecation=on
     maven.compile.optimize=off
     cosmo.webapp.reloadable=true
-    cosmo.serverAdmin=<me@my.host>
 
 Maven downloads Tomcat 5.5.9 and its J2SE 1.4 compatibility
 package to package the bundled distribution. You can override the

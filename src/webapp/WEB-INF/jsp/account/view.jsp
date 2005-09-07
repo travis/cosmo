@@ -95,6 +95,7 @@
   
   </div>
   
+<%-- bug 3920
   <p class="hd">
     <fmt:message key="Account.View.HomeDirectory.Header"/>
   </p>
@@ -104,6 +105,7 @@
       ${baseurl}${homedir}
     </html:link>.
   </p>
+--%>
   
 <div class="widgetBorder" style="width:460px; margin-top:24px;">
 <div class="widgetContent" style="padding:8px;">  

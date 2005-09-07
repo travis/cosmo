@@ -68,10 +68,12 @@
                 <html:link page="/home/"><fmt:message key="Layout.Nav.Main.HomeDirectories"/></html:link>
               |
               </authz:authorize>
+              <%-- bug 3920
               <authz:authorize ifAllGranted="ROLE_USER">
                 <html:link page="/dirlisting.jsp?rtype=home&username=${user.username}"><fmt:message key="Layout.Nav.Main.HomeDirectory"/></html:link>
               |
               </authz:authorize>
+              --%>
               <html:link page="/logout">
                 <fmt:message key="Layout.Nav.Main.LogOut"/>
               </html:link>

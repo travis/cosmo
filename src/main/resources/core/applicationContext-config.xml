@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-          "http://www.springframework.org/dtd/spring-beans.dtd">
+          "http://www.springframework.org/dtd/spring-beans.dtd"> 
 
 <!--
     Copyright 2005 Open Source Applications Foundation
@@ -18,24 +18,10 @@
     limitations under the License.
 -->
 
-<!--
-    Application context making beans available to the web application
--->
-
 <beans>
 
-  <bean
-     class="org.springframework.web.context.support.ServletContextAttributeExporter">
-    <property name="attributes">
-      <map>
-        <entry key="cosmo.version">
-          <value>@VERSION@</value>
-        </entry>
-        <entry key="cosmo.serverAdmin">
-          <ref bean="cosmoServerAdmin"/>
-        </entry>
-      </map>
-    </property>
+  <bean id="servletContextConfigurer"
+        class="org.osaf.cosmo.ui.ServletContextConfigurer">
   </bean>
 
 </beans>

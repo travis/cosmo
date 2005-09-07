@@ -24,17 +24,17 @@
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
-      classpath:applicationContext-base.xml
+      classpath:applicationContext-bootstrap.xml
       classpath:applicationContext-datasource.xml
       classpath:applicationContext-repository.xml
       classpath:applicationContext-hibernate.xml
       classpath:applicationContext-jcr.xml
       classpath:applicationContext-provisioning.xml
       classpath:applicationContext-security.xml
-      classpath:applicationContext-webapp.xml
       classpath:applicationContext-security-web.xml
       classpath:applicationContext-adapter-dav.xml
       classpath:applicationContext-mail.xml
+      classpath:applicationContext-config-web.xml
     </param-value>
   </context-param>
   <context-param>
@@ -43,7 +43,17 @@
   </context-param>
   <listener>
     <listener-class>
+      org.osaf.cosmo.ui.LifecycleLoggerListener
+    </listener-class>
+  </listener>
+  <listener>
+    <listener-class>
       org.springframework.web.context.ContextLoaderListener
+    </listener-class>
+  </listener>
+  <listener>
+    <listener-class>
+      org.osaf.cosmo.ui.config.ConfigurationListener
     </listener-class>
   </listener>
   <filter>

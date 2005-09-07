@@ -442,6 +442,7 @@
           <include>ehcache.xml</include>
           <include>hibernate.cfg.xml</include>
         </includes>
+        <filtering>true</filtering>
       </resource>
       <resource>
         <directory>src/main/resources/webapp</directory>
@@ -450,7 +451,6 @@
           <include>*.tld</include>
           <include>applicationContext-*.xml</include>
         </includes>
-        <filtering>true</filtering>
       </resource>
       <resource>
         <directory>src/main/resources/server</directory>

@@ -20,25 +20,17 @@
 
 <beans>
 
-  <!-- Environment Entries -->
+  <!-- loads the servlet context configurer, which is used instead of
+       spring's servlet context export mechanism because config
+       information needs to be loaded from the database -->
 
-  <bean id="cosmoServerAdmin"
-        class="org.springframework.jndi.JndiObjectFactoryBean">
-    <property name="jndiName">
-      <value>cosmo/serverAdmin</value>
+  <bean id="servletContextConfigurer"
+        class="org.osaf.cosmo.ui.config.ServletContextConfigurer">
+    <property name="serverVersion">
+      <ref bean="serverVersion"/>
     </property>
-    <property name="resourceRef">
-      <value>true</value>
-    </property>
-  </bean>
-
-  <bean id="cosmoConfigPath"
-        class="org.springframework.jndi.JndiObjectFactoryBean">
-    <property name="jndiName">
-      <value>cosmo/config</value>
-    </property>
-    <property name="resourceRef">
-      <value>true</value>
+    <property name="userDao">
+      <ref bean="userDAO"/>
     </property>
   </bean>
 

@@ -26,11 +26,7 @@
       <Host name="localhost" appBase="webapps" autoDeploy="false"
             deployOnStartup="false">
         <Context path="" docBase="cosmo" reloadable="@RELOADABLE@">
-          <Environment name="cosmo/version" value="@VERSION@"
-                       type="java.lang.String" override="false"/>
-          <Environment name="cosmo/serverAdmin" value="@SERVER_ADMIN@"
-                       type="java.lang.String" override="false"/>
-          <Environment name="cosmo/config" value="etc/cosmo.properties"
+          <Environment name="cosmo/config" value="file:etc/cosmo.properties"
                        type="java.lang.String" override="false"/>
           <Resource name="jcr/cosmo"
                     type="javax.jcr.Repository"

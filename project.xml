@@ -450,6 +450,7 @@
           <include>*.tld</include>
           <include>applicationContext-*.xml</include>
         </includes>
+        <filtering>true</filtering>
       </resource>
       <resource>
         <directory>src/main/resources/server</directory>

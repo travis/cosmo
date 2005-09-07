@@ -22,16 +22,6 @@
 
   <!-- Environment Entries -->
 
-  <bean id="cosmoVersion"
-        class="org.springframework.jndi.JndiObjectFactoryBean">
-    <property name="jndiName">
-      <value>cosmo/version</value>
-    </property>
-    <property name="resourceRef">
-      <value>true</value>
-    </property>
-  </bean>
-
   <bean id="cosmoServerAdmin"
         class="org.springframework.jndi.JndiObjectFactoryBean">
     <property name="jndiName">

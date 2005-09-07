@@ -22,12 +22,6 @@
 
   <!-- Environment entries -->
 
-  <bean id="cosmoVersion" class="java.lang.String">
-    <constructor-arg type="java.lang.String">
-      <value>@VERSION@</value>
-    </constructor-arg>
-  </bean>
-
   <bean id="cosmoServerAdmin" class="java.lang.String">
     <constructor-arg type="java.lang.String">
       <value>@SERVER_ADMIN@</value>

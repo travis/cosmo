@@ -73,6 +73,10 @@
     </j:if>
   </preGoal>
 
+  <preGoal name="java:jar-resources">
+    <filter token="VERSION" value="${pom.currentVersion}"/>
+  </preGoal>
+
   <preGoal name="test:test-resources">
     <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
       <attainGoal name="test:dbsetup"/>
@@ -178,7 +182,6 @@
           file="${basedir}/src/main/resources/server/server.xml">
       <filterset>
         <filter token="RELOADABLE" value="${cosmo.webapp.reloadable}"/>
-        <filter token="VERSION" value="${pom.currentVersion}"/>
         <filter token="SERVER_ADMIN" value="${cosmo.serverAdmin}"/>
         <filter token="DB_USERNAME" value="${cosmo.dist.userdb.username}"/>
         <filter token="DB_PASSWORD" value="${cosmo.dist.userdb.password}"/>

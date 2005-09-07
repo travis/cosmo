@@ -29,7 +29,7 @@
     <property name="attributes">
       <map>
         <entry key="cosmo.version">
-          <ref bean="cosmoVersion"/>
+          <value>@VERSION@</value>
         </entry>
         <entry key="cosmo.serverAdmin">
           <ref bean="cosmoServerAdmin"/>

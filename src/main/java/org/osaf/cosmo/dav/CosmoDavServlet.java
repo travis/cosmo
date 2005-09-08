@@ -191,7 +191,8 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         } catch (DavException e) {
             // caldav (section 4.5): uid must be unique within a
             // calendar collection
-            if (e.getMessage().startsWith("Duplicate uid")) {
+            if (e.getMessage() != null &&
+                e.getMessage().startsWith("Duplicate uid")) {
                 response.sendError(DavServletResponse.SC_CONFLICT,
                                    "Duplicate uid");
                 return;

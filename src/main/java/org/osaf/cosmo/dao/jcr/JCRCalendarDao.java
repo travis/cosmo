@@ -3584,7 +3584,7 @@ public class JCRCalendarDao implements CalendarDao {
                                 Node node)
         throws RepositoryException {
         for (NodeIterator i=node.getNodes(name); i.hasNext();) {
-            i.remove();
+            i.nextNode().remove();
         }
     }
 

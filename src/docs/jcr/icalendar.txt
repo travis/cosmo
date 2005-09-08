@@ -1254,7 +1254,7 @@ ChildNodeDef
   RequiredPrimaryTypes [icalendar:period]
   DefaultPrimaryType icalendar:period
   AutoCreate false
-  Mandatory true
+  Mandatory false
   OnParentVersion VERSION
   Protected false
   SameNamedSibs true
@@ -1263,7 +1263,7 @@ PropertyDef
   RequiredType DATE
   DefaultValues null
   AutoCreate false
-  Mandatory true
+  Mandatory false
   OnParentVersion COPY
   Protected false
   Multiple true

@@ -51,4 +51,4 @@ export CATALINA_HOME=$COSMO_HOME/tomcat
 
 echo "Using COSMO_HOME:      $COSMO_HOME"
 
-exec "$CATALINA_HOME"/bin/"$EXECUTABLE" "$@"
+exec "$CATALINA_HOME"/bin/"$EXECUTABLE" "-Dical4j.unfolding.relaxed=true" "$@"

@@ -96,7 +96,7 @@ public class ExportCalendarCollectionCommand extends AbstractCommand {
         context.setContentLength(tmpfile.length());
         context.setModificationTime(tmpfile.lastModified());
         context.setContentType(CosmoICalendarConstants.CONTENT_TYPE +
-                               "; charset=utf8");
+                               "; charset=utf-8");
         Property contentLanguage =
             resourceNode.getProperty(CosmoJcrConstants.NP_XML_LANG);
         context.setContentLanguage(contentLanguage.getString());

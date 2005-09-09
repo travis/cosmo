@@ -49,7 +49,8 @@ PROPFIND (this property is protected).
 
 Clients may as usual use an OPTIONS request to discover whether or not
 MKTICKET and DELTICKET are supported methods for a particular Cosmo
-URI.
+URI. They may also examine the DAV response header for the string
+"ticket".
 
 Due to interoperability concerns and the age of the specification, the
 XML content for a MKTICKET request looks slightly different than

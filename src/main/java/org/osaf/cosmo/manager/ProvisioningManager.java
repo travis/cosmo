@@ -66,4 +66,8 @@ public interface ProvisioningManager extends Manager {
     /**
      */
     public void removeUser(String id);
+
+    /**
+     */
+    public void removeUserByUsername(String username);
 }

@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -27,6 +29,45 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  */
 public class User extends BaseModelObject {
+
+    /**
+     */
+    public static final int USERNAME_LEN_MIN = 3;
+    /**
+     */
+    public static final int USERNAME_LEN_MAX = 32;
+    /**
+     */
+    public static final Pattern USERNAME_PATTERN =
+        Pattern.compile("^[\\w\\s.\\-\\']+$");
+    /**
+     */
+    public static final int PASSWORD_LEN_MIN = 5;
+    /**
+     */
+    public static final int PASSWORD_LEN_MAX = 16;
+    /**
+     */
+    public static final int FIRSTNAME_LEN_MIN = 1;
+    /**
+     */
+    public static final int FIRSTNAME_LEN_MAX = 32;
+    /**
+     */
+    public static final int LASTNAME_LEN_MIN = 1;
+    /**
+     */
+    public static final int LASTNAME_LEN_MAX = 32;
+    /**
+     */
+    public static final Pattern PERSON_NAME_PATTERN =
+        Pattern.compile("^[\\w\\s.\\-\\']+$");
+    /**
+     */
+    public static final int EMAIL_LEN_MIN = 1;
+    /**
+     */
+    public static final int EMAIL_LEN_MAX = 32;
 
     private Long id;
     private String username;
@@ -231,5 +272,101 @@ public class User extends BaseModelObject {
             append("dateCreated", dateCreated).
             append("dateModified", dateModified).
             toString();
+    }
+
+    /**
+     */
+    public void validate() {
+        validateUsername();
+        validateFirstName();
+        validateLastName();
+        validateEmail();
+    }
+
+    /**
+     */
+    public void validateUsername() {
+        if (username == null) {
+            throw new ModelValidationException("username is null");
+        }
+        if (username.length() < USERNAME_LEN_MIN ||
+            username.length() > USERNAME_LEN_MAX) {
+            throw new ModelValidationException("username must be " +
+                                               USERNAME_LEN_MIN + " to " +
+                                               USERNAME_LEN_MAX +
+                                               " characters in length");
+        }
+        Matcher m = USERNAME_PATTERN.matcher(username);
+        if (! m.matches()) {
+            throw new ModelValidationException("username contains illegal characters");
+        }
+    }
+
+    /**
+     */
+    public void validateRawPassword() {
+        if (password == null) {
+            throw new ModelValidationException("password is null");
+        }
+        if (password.length() < PASSWORD_LEN_MIN ||
+            password.length() > PASSWORD_LEN_MAX) {
+            throw new ModelValidationException("password must be " +
+                                               PASSWORD_LEN_MIN + " to " +
+                                               PASSWORD_LEN_MAX +
+                                               " characters in length");
+        }
+    }
+
+    /**
+     */
+    public void validateFirstName() {
+        if (firstName == null) {
+            throw new ModelValidationException("firstName is null");
+        }
+        if (firstName.length() < FIRSTNAME_LEN_MIN ||
+            firstName.length() > FIRSTNAME_LEN_MAX) {
+            throw new ModelValidationException("firstName must be " +
+                                               FIRSTNAME_LEN_MIN + " to " + 
+                                               FIRSTNAME_LEN_MAX +
+                                               " characters in length");
+        }
+        Matcher m = PERSON_NAME_PATTERN.matcher(firstName);
+        if (! m.matches()) {
+            throw new ModelValidationException("firstName contains illegal characters");
+        }
+    }
+
+    /**
+     */
+    public void validateLastName() {
+        if (lastName == null) {
+            throw new ModelValidationException("lastName is null");
+        }
+        if (lastName.length() < LASTNAME_LEN_MIN ||
+            lastName.length() > LASTNAME_LEN_MAX) {
+            throw new ModelValidationException("lastName must be " +
+                                               LASTNAME_LEN_MIN + " to " +
+                                               LASTNAME_LEN_MAX +
+                                               " characters in length");
+        }
+        Matcher m = PERSON_NAME_PATTERN.matcher(lastName);
+        if (! m.matches()) {
+            throw new ModelValidationException("lastName contains illegal characters");
+        }
+    }
+
+    /**
+     */
+    public void validateEmail() {
+        if (email == null) {
+            throw new ModelValidationException("email is null");
+        }
+        if (email.length() < EMAIL_LEN_MIN ||
+            email.length() > EMAIL_LEN_MAX) {
+            throw new ModelValidationException("email must be " +
+                                               EMAIL_LEN_MIN + " to " +
+                                               EMAIL_LEN_MAX +
+                                               " characters in length");
+        }
     }
 }

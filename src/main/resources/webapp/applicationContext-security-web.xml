@@ -55,6 +55,8 @@
          /index.jsp=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /logout=ROLE_ROOT,ROLE_USER
          /dirlisting.jsp*=ROLE_ROOT,ROLE_USER
+         /api/users=ROLE_ROOT
+         /api/user/*=ROLE_ROOT
          /**=ROLE_ROOT
        </value>
      </property>
@@ -84,6 +86,17 @@
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
         /**=httpSessionContextIntegrationFilter,ticketProcessingFilter,basicProcessingFilter,davSecurityEnforcementFilter
+      </value>
+    </property>
+  </bean>
+
+  <bean id="apiFilterChainProxy"
+        class="net.sf.acegisecurity.util.FilterChainProxy">
+    <property name="filterInvocationDefinitionSource">
+      <value>
+        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+        PATTERN_TYPE_APACHE_ANT
+        /**=httpSessionContextIntegrationFilter,basicProcessingFilter,apiSecurityEnforcementFilter
       </value>
     </property>
   </bean>
@@ -208,6 +221,16 @@
   </bean>
 
   <bean id="davSecurityEnforcementFilter"
+        class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
+    <property name="filterSecurityInterceptor">
+      <ref local="filterInvocationInterceptor"/>
+    </property>
+    <property name="authenticationEntryPoint">
+      <ref local="basicAuthenticationEntryPoint"/>
+    </property>
+  </bean>
+
+  <bean id="apiSecurityEnforcementFilter"
         class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
     <property name="filterSecurityInterceptor">
       <ref local="filterInvocationInterceptor"/>

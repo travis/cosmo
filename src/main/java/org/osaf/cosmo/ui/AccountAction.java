@@ -146,6 +146,15 @@ public class AccountAction extends CosmoAction {
             }
             User user = mgr.updateUser(formUser);
 
+            // if the password was changed, update the security
+            // context with the new password
+            if (userForm.getPassword() != null &&
+                ! userForm.getPassword().equals("")) {
+                getSecurityManager().
+                    initiateSecurityContext(formUser.getUsername(),
+                                            userForm.getPassword());
+            }
+
             request.setAttribute(ATTR_USER, user);
             saveConfirmationMessage(request, MSG_CONFIRM_UPDATE);
         } catch (DuplicateEmailException e) {

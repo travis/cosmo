@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+
+<user xmlns="http://osafoundation.org/cosmo">
+  <username>bcm</username>
+  <password>abc123</password>
+  <firstName>Brian</firstName>
+  <lastName>Moseley</lastName>
+  <email>bcm@maz.org</email>
+</user>

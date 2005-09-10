@@ -10,7 +10,7 @@ dav: DAV:
 icalendar: http://osafoundation.org/jcr/icalendar/1.0
 caldav: urn:ietf:params:xml:ns:caldav
 ticket: http://www.xythos.com/namespaces/StorageServer
-
+cosmo: http://osafoundation.org/cosmo
 
 Copyright 2005 Open Source Applications Foundation
 

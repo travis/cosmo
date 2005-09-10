@@ -124,8 +124,9 @@ public class ProvisioningManagerImpl
     /**
      */
     public User saveUser(User user) {
-        String undigestedPassword = user.getPassword();
-        user.setPassword(digestPassword(undigestedPassword));
+        user.validateRawPassword();
+        user.setPassword(digestPassword(user.getPassword()));
+
         userDao.saveUser(user);
 
         if (! user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
@@ -138,8 +139,8 @@ public class ProvisioningManagerImpl
     /**
      */
     public User updateUser(User user) {
-        // XXX: make this configurable (2 * password-maxlength)
         if (user.getPassword().length() < 32) {
+            user.validateRawPassword();
             user.setPassword(digestPassword(user.getPassword()));
         }
 
@@ -166,6 +167,16 @@ public class ProvisioningManagerImpl
         userDao.removeUser(user);
     }
 
+    /**
+     */
+    public void removeUserByUsername(String username) {
+        User user = getUserByUsername(username);
+        if (! user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
+            shareDao.deleteHomedir(user.getUsername());
+        }
+        userDao.removeUser(user);
+    }
+
     // InitializingBean methods
 
     /**
@@ -186,7 +197,7 @@ public class ProvisioningManagerImpl
     // private methods
 
     private String digestPassword(String password) {
-        if (digest == null) {
+        if (digest == null || password == null) {
             return password;
         }
         return new String(Hex.encodeHex(digest.digest(password.getBytes())));

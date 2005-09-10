@@ -226,6 +226,20 @@ public class UserAction extends CosmoAction {
             }
             User user = mgr.updateUser(formUser);
 
+            // if the root user just changed his own password, update
+            // the security context with the new password
+            if (userForm.getPassword() != null &&
+                ! userForm.getPassword().equals("")) {
+                String currentUserName =
+                    getSecurityManager().getSecurityContext().
+                    getUser().getUsername();
+                if (currentUserName.equals(CosmoSecurityManager.USER_ROOT)) {
+                    getSecurityManager().
+                        initiateSecurityContext(currentUserName,
+                                                userForm.getPassword());
+                }
+            }
+
             // update the servlet context in case the email address
             // has changed
             getConfigurer().setServerAdmin();

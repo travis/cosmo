@@ -73,6 +73,14 @@
     </init-param>
   </filter>
   <filter>
+    <filter-name>api-security</filter-name>
+    <filter-class>net.sf.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <init-param>
+      <param-name>targetBean</param-name>
+      <param-value>apiFilterChainProxy</param-value>
+    </init-param>
+  </filter>
+  <filter>
     <filter-name>url-rewrite</filter-name>
     <filter-class>
       org.tuckey.web.filters.urlrewrite.UrlRewriteFilter
@@ -89,6 +97,10 @@
   <filter-mapping>
     <filter-name>dav-security</filter-name>
     <url-pattern>/home/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>api-security</filter-name>
+    <url-pattern>/api/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>ui-security</filter-name>
@@ -114,6 +126,7 @@
   <servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
     <init-param>
       <param-name>config</param-name>
       <param-value>/WEB-INF/struts-config.xml</param-value>
@@ -122,6 +135,10 @@
       <param-name>convertNull</param-name>
       <param-value>true</param-value>
     </init-param>
+  </servlet>
+  <servlet>
+    <servlet-name>api</servlet-name>
+    <servlet-class>org.osaf.cosmo.api.CosmoApiServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
@@ -132,15 +149,17 @@
     <servlet-name>webdav</servlet-name>
     <url-pattern>/home/*</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>api</servlet-name>
+    <url-pattern>/api/*</url-pattern>
+  </servlet-mapping>
   <error-page>
     <exception-type>java.lang.Throwable</exception-type>
     <location>/error.do</location>
   </error-page>
   <resource-env-ref>
     <resource-env-ref-name>jcr/cosmo</resource-env-ref-name>
-    <resource-env-ref-type>
-      javax.jcr.Repository
-    </resource-env-ref-type>
+    <resource-env-ref-type>javax.jcr.Repository</resource-env-ref-type>
   </resource-env-ref>
   <resource-env-ref>
     <resource-env-ref-name>jdbc/cosmo</resource-env-ref-name>

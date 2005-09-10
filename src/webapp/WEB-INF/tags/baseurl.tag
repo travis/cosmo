@@ -12,3 +12,7 @@
   <c:set var="result"
          value="${result}:${pageContext.request.serverPort}"/>
 </c:if>
+<c:if test="${pageContext.request.contextPath != '/'}">
+  <c:set var="result"
+         value="${result}${pageContext.request.contextPath}"/>
+</c:if>

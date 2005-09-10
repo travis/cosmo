@@ -109,6 +109,7 @@ public class UserDAOHibernate extends HibernateDaoSupport
     /**
      */
     public void saveUser(User user) {
+        user.validate();
         try {
             user.setDateModified(new Date());
             user.setDateCreated(user.getDateModified());
@@ -121,6 +122,7 @@ public class UserDAOHibernate extends HibernateDaoSupport
     /**
      */
     public void updateUser(final User user) {
+        user.validate();
         // because we cannot reliably get a data integrity violation
         // exception (hsqldb does a batch operation on update, which
         // throws a batch exception containing absolutely no info), we

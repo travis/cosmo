@@ -2201,11 +2201,11 @@ public class JCRCalendarDao implements CalendarDao {
             addNode(CosmoJcrConstants.NN_ICAL_EXDATE);
         setValueProperty(exDate, propertyNode);
         setXParameterProperties(exDate, propertyNode);
-        for (Iterator i=exDate.getDates().iterator(); i.hasNext();) {
-            java.util.Date date = (java.util.Date) i.next();
-            JCRUtils.setDateValue(propertyNode,
-                                  CosmoJcrConstants.NP_ICAL_DATETIME, date);
-        }
+        ValueFactory valueFactory =
+            propertyNode.getSession().getValueFactory();
+        propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_DATETIME,
+                                 mapDateValues(exDate.getDates().iterator(),
+                                               valueFactory));
         setValueParameterProperty(exDate, propertyNode);
         setTzIdParameterProperty(exDate, propertyNode);
     }
@@ -2567,11 +2567,11 @@ public class JCRCalendarDao implements CalendarDao {
         }
         else {
             // this handles both date and date-time values
-            for (Iterator i=rDate.getDates().iterator(); i.hasNext();) {
-                java.util.Date date = (java.util.Date) i.next();
-                JCRUtils.setDateValue(propertyNode,
-                                      CosmoJcrConstants.NP_ICAL_DATETIME, date);
-            }
+            ValueFactory valueFactory =
+                propertyNode.getSession().getValueFactory();
+            propertyNode.setProperty(CosmoJcrConstants.NP_ICAL_DATETIME,
+                                     mapDateValues(rDate.getDates().iterator(),
+                                                   valueFactory));
         }
     }
 
@@ -3627,6 +3627,19 @@ public class JCRCalendarDao implements CalendarDao {
         List values = new ArrayList();
         while (i.hasNext()) {
             values.add(vf.createValue(i.next().toString()));
+        }
+        return (javax.jcr.Value[]) values.toArray(new javax.jcr.Value[0]);
+    }
+
+    /**
+     */
+    protected javax.jcr.Value[] mapDateValues(Iterator i,
+                                              ValueFactory vf) {
+        List values = new ArrayList();
+        while (i.hasNext()) {
+            java.util.Calendar calendar = java.util.Calendar.getInstance();
+            calendar.setTime((Date) i.next());
+            values.add(vf.createValue(calendar));
         }
         return (javax.jcr.Value[]) values.toArray(new javax.jcr.Value[0]);
     }

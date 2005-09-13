@@ -3796,10 +3796,11 @@ public class JCRCalendarDao implements CalendarDao {
     protected DateList getDateValues(Node propertyNode)
         throws RepositoryException {
         DateList dates = new DateList(Value.DATE);
-        for (PropertyIterator i =
-                 propertyNode.getProperties(CosmoJcrConstants.NP_ICAL_DATETIME);
-             i.hasNext();) {
-            dates.add(new Date(i.nextProperty().getDate().getTime()));
+        javax.jcr.Property property =
+            propertyNode.getProperty(CosmoJcrConstants.NP_ICAL_DATETIME);
+        javax.jcr.Value[] values = property.getValues();
+        for (int i=0; i<values.length; i++) {
+            dates.add(new Date(values[i].getDate().getTime()));
         }
         return dates;
     }
@@ -3809,10 +3810,11 @@ public class JCRCalendarDao implements CalendarDao {
     protected DateList getDateTimeValues(Node propertyNode)
         throws RepositoryException {
         DateList dates = new DateList(Value.DATE_TIME);
-        for (PropertyIterator i =
-                 propertyNode.getProperties(CosmoJcrConstants.NP_ICAL_DATETIME);
-             i.hasNext();) {
-            dates.add(new DateTime(i.nextProperty().getDate().getTime()));
+        javax.jcr.Property property =
+            propertyNode.getProperty(CosmoJcrConstants.NP_ICAL_DATETIME);
+        javax.jcr.Value[] values = property.getValues();
+        for (int i=0; i<values.length; i++) {
+            dates.add(new DateTime(values[i].getDate().getTime()));
         }
         return dates;
     }

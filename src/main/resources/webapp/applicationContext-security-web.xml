@@ -173,7 +173,7 @@
   <bean id="basicAuthenticationEntryPoint"
         class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
     <property name="realmName">
-      <value>Cosmo Sharing server</value>
+      <value>Cosmo Sharing Server</value>
     </property>
   </bean>
 

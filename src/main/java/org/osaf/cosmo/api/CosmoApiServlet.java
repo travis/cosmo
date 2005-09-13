@@ -172,7 +172,8 @@ public class CosmoApiServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        if (req.getContentLength() == 0 ||
+        if (req.getContentLength() <= 0 ||
+            req.getContentType() == null ||
             ! req.getContentType().startsWith("text/xml") ||
             req.getHeader("Content-Transfer-Encoding") != null ||
             req.getHeader("Content-Encoding") != null ||

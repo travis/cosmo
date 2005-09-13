@@ -65,12 +65,13 @@ public class StoreCalendarObjectCommand extends AbstractCommand {
      */
     public boolean execute(ApplicationContextAwareImportContext context)
         throws Exception {
-        if (! context.getContentType().
-            equals(CosmoICalendarConstants.CONTENT_TYPE)) {
+        Node resourceNode = context.getNode();
+        if (! (context.getContentType().
+               startsWith(CosmoICalendarConstants.CONTENT_TYPE) ||
+               resourceNode.getName().
+               endsWith("." + CosmoICalendarConstants.FILE_EXTENSION))) {
             return false;
         }
-
-        Node resourceNode = context.getNode();
         if (resourceNode == null ||
             ! resourceNode.isNodeType(CosmoJcrConstants.NT_DAV_RESOURCE)) {
             return false;

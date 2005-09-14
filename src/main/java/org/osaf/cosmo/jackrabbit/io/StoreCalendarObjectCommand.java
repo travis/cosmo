@@ -66,14 +66,26 @@ public class StoreCalendarObjectCommand extends AbstractCommand {
     public boolean execute(ApplicationContextAwareImportContext context)
         throws Exception {
         Node resourceNode = context.getNode();
-        if (! (context.getContentType().
-               startsWith(CosmoICalendarConstants.CONTENT_TYPE) ||
-               resourceNode.getName().
-               endsWith("." + CosmoICalendarConstants.FILE_EXTENSION))) {
+        if (resourceNode == null) {
             return false;
         }
-        if (resourceNode == null ||
-            ! resourceNode.isNodeType(CosmoJcrConstants.NT_DAV_RESOURCE)) {
+
+        // if the node's parent is not a calendar collection, don't
+        // bother storing, since we'll never query "webcal"
+        // calendars.
+        if (! resourceNode.getParent().
+            isNodeType(CosmoJcrConstants.NT_CALDAV_COLLECTION)) {
+            return false;
+        }
+
+        // ensure that the resource is a dav resource and that either
+        // it is of type text/calendar or its name ends with .ics
+        if (! (resourceNode.
+               isNodeType(CosmoJcrConstants.NT_DAV_RESOURCE) &&
+               (context.getContentType().
+                startsWith(CosmoICalendarConstants.CONTENT_TYPE) ||
+                resourceNode.getName().
+                endsWith("." + CosmoICalendarConstants.FILE_EXTENSION)))) {
             return false;
         }
 

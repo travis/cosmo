@@ -76,15 +76,19 @@ public class TestHelper {
         event.getProperties().getProperty(Property.DTSTART).
             getParameters().add(tzParam);
 
-        // add an alarm for 5 minutes before the event
+        // add an alarm for 5 minutes before the event with an xparam
+        // on the description
         Dur trigger = new Dur(0, 0, -5, 0);
         VAlarm alarm = new VAlarm(trigger);
         alarm.getProperties().add(Action.DISPLAY);
+        Description description = new Description("Meeting at 9:30am");
+        XParameter xparam = new XParameter("X-COSMO-TEST-PARAM", "deadbeef");
+        description.getParameters().add(xparam);
+        alarm.getProperties().add(description);
         alarm.getProperties().add(new Description("Meeting at 9:30am"));
         event.getAlarms().add(alarm);
 
         // add an x-property with an x-param
-        XParameter xparam = new XParameter("X-COSMO-TEST-PARAM", "deadbeef");
         XProperty xprop = new XProperty("X-COSMO-TEST-PROP", "abc123");
         xprop.getParameters().add(xparam);
         event.getProperties().add(xprop);

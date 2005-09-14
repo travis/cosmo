@@ -428,6 +428,13 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     /**
      */
     protected void initTickets() {
+        // this should only happen before CosmoDavServlet.service
+        // executes - for instance validating preconditions when
+        // locking
+        if (applicationContext == null) {
+            return;
+        }
+
         if (isTicketable() && tickets == null && exists()) {
             tickets = new HashMap();
             ownedTickets = new HashMap();

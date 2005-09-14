@@ -358,7 +358,7 @@ PropertyDef
   Mandatory false
   OnParentVersion COPY
   Protected false
-  Multiple true
+  Multiple false
 
 NodeTypeName
   icalendar:textproperty
@@ -1211,13 +1211,50 @@ PrimaryItemName
 NodeTypeName
   icalendar:exdate
 SuperTypes
-  icalendar:datetimeproperty
+  icalendar:property
 IsMixin
   false
 HasOrderableChildNodes
   false
 PrimaryItemName
   icalendar:datetime
+PropertyDef
+  Name icalendar:datetime
+  RequiredType DATE
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple true
+PropertyDef
+  Name icalendar:utc
+  RequiredType BOOLEAN
+  DefaultValues false
+  AutoCreate true
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:value
+  RequiredType STRING
+  ValueConstraints ["DATE-TIME", "DATE"]
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name icalendar:tzid
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
 
 NodeTypeName
   icalendar:exrule

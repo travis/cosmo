@@ -111,7 +111,7 @@ public class TestHelper {
      */
     public static Ticket makeDummyTicket() {
         Ticket ticket = new Ticket();
-        ticket.setTimeout(CosmoDavConstants.VALUE_INFINITY);
+        ticket.setTimeout(CosmoDavConstants.VALUE_INFINITE);
         ticket.setPrivileges(new HashSet());
         ticket.getPrivileges().add(CosmoDavConstants.PRIVILEGE_READ);
         return ticket;

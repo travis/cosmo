@@ -74,6 +74,7 @@ public class CosmoDavConstants {
 
     // XML values
 
+    public static final String VALUE_INFINITE = "Infinite";
     public static final String VALUE_INFINITY = "infinity";
 
     // ACL privileges

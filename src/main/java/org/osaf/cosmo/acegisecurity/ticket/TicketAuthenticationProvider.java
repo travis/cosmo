@@ -99,7 +99,7 @@ public class TicketAuthenticationProvider
 
     public void checkTimeout(Ticket ticket)
         throws TicketTimeoutException, AuthenticationServiceException {
-        if (ticket.getTimeout().equals(CosmoDavConstants.VALUE_INFINITY)) {
+        if (ticket.getTimeout().equals(CosmoDavConstants.VALUE_INFINITE)) {
             return;
         }
 

@@ -158,7 +158,7 @@ public class CosmoDavRequestImpl implements CosmoDavRequest {
             getChildTextNormalize(CosmoDavConstants.ELEMENT_TIMEOUT,
                                   CosmoDavConstants.NAMESPACE_TICKET);
         if (timeout == null) {
-            timeout = CosmoDavConstants.VALUE_INFINITY;
+            timeout = CosmoDavConstants.VALUE_INFINITE;
         }
 
         // visit limits are not supported

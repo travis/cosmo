@@ -20,6 +20,7 @@ import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -40,10 +41,14 @@ public class CredentialsReminderAction extends CosmoAction {
         "Forgot.Confirm.Username";
     private static final String MSG_CONFIRM_PASSWORD =
         "Forgot.Confirm.Password";
+    private static final String MSG_USERNAME_REMINDER_FROMHANDLE =
+        "Email.UsernameReminder.FromHandle";
     private static final String MSG_USERNAME_REMINDER_SUBJECT =
         "Email.UsernameReminder.Subject";
     private static final String MSG_USERNAME_REMINDER_TEXT =
         "Email.UsernameReminder.Text";
+    private static final String MSG_PASSWORD_RESET_FROMHANDLE =
+        "Email.PasswordReset.FromHandle";
     private static final String MSG_PASSWORD_RESET_SUBJECT =
         "Email.PasswordReset.Subject";
     private static final String MSG_PASSWORD_RESET_TEXT =
@@ -87,14 +92,14 @@ public class CredentialsReminderAction extends CosmoAction {
         User user = mgr.getUserByEmail(email);
 
         if (wasUsernameButtonClicked(forgotForm)) {
-            sendUsernameReminderMessage(request, user);
+            sendUsernameReminderMessage(request, response, user);
             saveConfirmationMessage(request, MSG_CONFIRM_USERNAME);
         }
         if (wasPasswordButtonClicked(forgotForm)) {
             String newPassword = generatePassword();
             user.setPassword(newPassword);
             mgr.updateUser(user);
-            sendPasswordResetMessage(request, user, newPassword);
+            sendPasswordResetMessage(request, response, user, newPassword);
             saveConfirmationMessage(request, MSG_CONFIRM_PASSWORD);
         }
 
@@ -115,6 +120,7 @@ public class CredentialsReminderAction extends CosmoAction {
     }
 
     private void sendUsernameReminderMessage(final HttpServletRequest request,
+                                             final HttpServletResponse response,
                                              final User user) {
         mailSender.send(new MimeMessagePreparator() {
                 public void prepare(MimeMessage mimeMessage)
@@ -122,19 +128,28 @@ public class CredentialsReminderAction extends CosmoAction {
                     MessageResources resources = getResources(request);
                     Locale locale = getLocale(request);
 
-                    String from = (String) getServlet().getServletContext().
+                    User rootUser =
+                        mgr.getUserByUsername(CosmoSecurityManager.USER_ROOT);
+                    String fromAddr = (String) getServlet().getServletContext().
                         getAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN);
+                    String fromHandle =
+                        resources.getMessage(locale,
+                                             MSG_USERNAME_REMINDER_FROMHANDLE);
                     String subject =
                         resources.getMessage(locale,
                                              MSG_USERNAME_REMINDER_SUBJECT);
                     String text =
                         resources.getMessage(locale,
                                              MSG_USERNAME_REMINDER_TEXT,
-                                             user.getUsername());
+                                             user.getUsername(),
+                                             getContextRelativeURL(request,
+                                                                   "/"),
+                                             rootUser.getEmail());
 
                     MimeMessageHelper message =
                         new MimeMessageHelper(mimeMessage);
-                    message.setFrom(from);
+                    message.setFrom("\"" + fromHandle + "\" <" + fromAddr +
+                                    ">");
                     message.setTo(user.getEmail());
                     message.setSubject(subject);
                     message.setText(text);
@@ -143,6 +158,7 @@ public class CredentialsReminderAction extends CosmoAction {
     }
 
     private void sendPasswordResetMessage(final HttpServletRequest request,
+                                          final HttpServletResponse response,
                                           final User user,
                                           final String newPassword) {
         mailSender.send(new MimeMessagePreparator() {
@@ -151,19 +167,28 @@ public class CredentialsReminderAction extends CosmoAction {
                     MessageResources resources = getResources(request);
                     Locale locale = getLocale(request);
 
-                    String from = (String) getServlet().getServletContext().
+                    User rootUser =
+                        mgr.getUserByUsername(CosmoSecurityManager.USER_ROOT);
+                    String fromAddr = (String) getServlet().getServletContext().
                         getAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN);
+                    String fromHandle =
+                        resources.getMessage(locale,
+                                             MSG_PASSWORD_RESET_FROMHANDLE);
                     String subject =
                         resources.getMessage(locale,
                                              MSG_PASSWORD_RESET_SUBJECT);
                     String text =
                         resources.getMessage(locale,
                                              MSG_PASSWORD_RESET_TEXT,
-                                             newPassword);
+                                             newPassword,
+                                             getContextRelativeURL(request,
+                                                                   "/"),
+                                             rootUser.getEmail());
 
                     MimeMessageHelper message =
                         new MimeMessageHelper(mimeMessage);
-                    message.setFrom(from);
+                    message.setFrom("\"" + fromHandle + "\" <" + fromAddr +
+                                    ">");
                     message.setTo(user.getEmail());
                     message.setSubject(subject);
                     message.setText(text);

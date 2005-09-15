@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.ui;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.osaf.commons.struts.OSAFAction;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.ui.config.ServletContextConfigurer;
@@ -26,6 +28,28 @@ public class CosmoAction extends OSAFAction {
 
     private ServletContextConfigurer configurer;
     private CosmoSecurityManager securityManager;
+
+    /**
+     * Returns an absolute URL 
+     */
+    public String getContextRelativeURL(HttpServletRequest req,
+                                        String path) {
+        StringBuffer buf = new StringBuffer();
+        buf.append(req.getScheme()).
+            append("://").
+            append(req.getServerName());
+        if ((req.isSecure() && req.getServerPort() != 443) ||
+            (req.getServerPort() != 80)) {
+            buf.append(":").append(req.getServerPort());
+        }
+        if (! req.getContextPath().equals("/")) {
+            buf.append(req.getContextPath());
+        }
+        if (path != null) {
+            buf.append(path);
+        }
+        return buf.toString();
+    }
 
     /**
      */

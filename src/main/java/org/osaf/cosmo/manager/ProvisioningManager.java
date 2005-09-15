@@ -70,4 +70,8 @@ public interface ProvisioningManager extends Manager {
     /**
      */
     public void removeUserByUsername(String username);
+
+    /**
+     */
+    public String generatePassword();
 }

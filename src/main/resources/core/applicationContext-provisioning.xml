@@ -61,6 +61,9 @@
 
   <!-- Managers -->
 
+  <bean id="passwordGenerator"
+        class="org.apache.commons.id.random.SessionIdGenerator"/>
+
   <bean id="provisioningManagerTarget"
         class="org.osaf.cosmo.manager.impl.ProvisioningManagerImpl">
     <property name="roleDAO">
@@ -74,6 +77,9 @@
     </property>
     <property name="digest">
       <value>MD5</value>
+    </property>
+    <property name="passwordGenerator">
+      <ref bean="passwordGenerator"/>
     </property>
   </bean>
 

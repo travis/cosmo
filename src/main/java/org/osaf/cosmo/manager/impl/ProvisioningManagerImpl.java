@@ -27,6 +27,7 @@ import java.security.MessageDigest;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.id.StringIdentifierGenerator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +47,7 @@ public class ProvisioningManagerImpl
     private ShareDAO shareDao;
     private UserDAO userDao;
     private MessageDigest digest;
+    private StringIdentifierGenerator passwordGenerator;
 
     /**
      */
@@ -177,6 +179,13 @@ public class ProvisioningManagerImpl
         userDao.removeUser(user);
     }
 
+    /**
+     */
+    public String generatePassword() {
+        String password = passwordGenerator.nextStringIdentifier();
+        return password.length() <= 16 ? password : password.substring(0, 15);
+    }
+
     // InitializingBean methods
 
     /**
@@ -192,6 +201,14 @@ public class ProvisioningManagerImpl
         if (userDao == null) {
             throw new IllegalArgumentException("userDAO is required");
         }
+    }
+
+    // our methods
+
+    /**
+     */
+    public void setPasswordGenerator(StringIdentifierGenerator generator) {
+        passwordGenerator = generator;
     }
 
     // private methods

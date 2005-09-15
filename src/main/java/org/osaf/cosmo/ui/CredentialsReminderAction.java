@@ -96,7 +96,7 @@ public class CredentialsReminderAction extends CosmoAction {
             saveConfirmationMessage(request, MSG_CONFIRM_USERNAME);
         }
         if (wasPasswordButtonClicked(forgotForm)) {
-            String newPassword = generatePassword();
+            String newPassword = mgr.generatePassword();
             user.setPassword(newPassword);
             mgr.updateUser(user);
             sendPasswordResetMessage(request, response, user, newPassword);
@@ -112,11 +112,6 @@ public class CredentialsReminderAction extends CosmoAction {
 
     public boolean wasPasswordButtonClicked(BeanValidatorForm form) {
         return form.get(FORM_BUTTON_PASSWORD) != null;
-    }
-
-    private String generatePassword() {
-        // XXX
-        return "deadbeef";
     }
 
     private void sendUsernameReminderMessage(final HttpServletRequest request,

@@ -2,67 +2,64 @@
                             Cosmo Sharing Server 0.2
 
 
-   Copyright 2005 Open Source Applications Foundation
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-
 WHAT IS COSMO?
 ==============
 
-Cosmo is intended for people who want to share files, calendars,
-events, tasks, contacts, and things of that nature between multiple
-machines and multiple people. It speaks WebDAV and eventually also
-CalDAV. It allows individual resources to be completely private,
-accessible to specific persons, or available to the entire world. It
-includes an HTML user interface for administration and for individual
-account signup and management.
+Cosmo is a calendar server. With your favorite calendar program
+(Chandler, Apple iCal, Mozilla Sunbird, or any other WebDAV or CalDAV
+enabled client), you can share your calendar with other people by
+publishing it to Cosmo. Once your calendar is stored on the server,
+you can give permission for others to subscribe to it, and even modify
+it if their calendar client allows.
 
-Cosmo is a sharing server. It's smarter than a garden-variety WebDAV
-server, because it understands certain characteristics of some of the
-content that can be stored within it (like calendars, for
-instance). This allows the server to present multiple equivalent views
-of the same resource for different clients (ex. monolithic iCalendar
-calendar for Apple's iCal, individual iCalendar calendars and events
-for CalDAV clients, HTML indexes for web browsers).
+Cosmo is a file server. You can store arbitrary files in your home
+directory in Cosmo with any WebDAV client (including the Windows XP,
+Linux and Apple OS X file managers), and you can share them with
+others in the same way as your calendar.
 
 Cosmo is not a web-based personal information manager. It is a server
-that such a web application could use to access people's stored
-information via standard Internet protocols. In fact, a web-based PIM
-is the purview of a separate OSAF project (currently code-named
-"Scooby").
+that such an application could use to store and access many users'
+information over the Internet. OSAF's Scooby project aims to provide
+an innovative web interface for calendaring and will be tightly
+integrated with Cosmo.
 
-Cosmo is definitely not a full-on content management system. There is
-no support for features such as content editing or workflow. Cosmo
-simply acts as a mediator between many different types of clients and
-a content repository.
+Cosmo is not a content management system. There is no support for
+common CMS features such as versioning, content editing or
+workflow. Cosmo very simply allows calendar and file management
+applications to publish and subscribe to a content repository. 
 
 
 MORE INFO
 =========
 
-Instructions for building Cosmo from source and for installing and
-running Cosmo are found in BUILD.txt and INSTALL.txt respectively.
-
-Notes and known issues for the current release are found in
-RELEASE-NOTES.txt.
-
-Legal information is found in LICENSE.txt.
-
 Cosmo's project page is at
 <http://wiki.osafoundation.org/bin/view/Projects/CosmoHome>.
+
+Instructions for installing and running Cosmo are found at
+<http://wiki.osafoundation.org/bin/view/Documentation/CosmoAdministrator>.
+
+Legal information is found in LICENSE.txt, NOTICE.txt and in the
+license/ subdirectory.
 
 Issues are tracked at <http://bugzilla.osafoundation.org/>.
 
 Feel free to ask questions and report problems to
-cosmo@osafoundation.org.
+cosmo@osafoundation.org. Sign up at
+<http://lists.osafoundation.org/mailman/listinfo/cosmo>.
+
+
+
+
+Copyright 2005 Open Source Applications Foundation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

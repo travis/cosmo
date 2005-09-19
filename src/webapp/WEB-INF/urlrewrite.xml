@@ -25,6 +25,17 @@
     <to>/error.do</to>
   </rule>
 
+  <!-- Help/About rules -->
+
+  <rule>
+    <from>^/help$</from>
+    <to>/help.do</to>
+  </rule>
+  <rule>
+    <from>^/about$</from>
+    <to>/about.do</to>
+  </rule>
+
   <!-- login rules -->
 
   <rule>

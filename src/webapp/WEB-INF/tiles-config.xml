@@ -53,6 +53,18 @@
     <put name="showNav"      value="false"/>
   </definition>
 
+  <!-- Help/About defs -->
+  
+  <definition name="help" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/help.jsp"/>
+    <put name="prefix"       value="Help."/>
+  </definition>
+  
+  <definition name="about" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/about.jsp"/>
+    <put name="prefix"       value="About."/>
+  </definition>
+
   <!-- login defs -->
 
   <definition name="login" extends="layout.standard">

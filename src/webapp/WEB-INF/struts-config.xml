@@ -51,6 +51,14 @@
                redirect="false"/>
     </action>
 
+    <!-- Help and About pages -->
+    
+    <action path="/help"
+            forward="help"/>
+    
+    <action path="/about"
+            forward="about"/>
+
     <!-- login actions -->
 
     <action path="/login"

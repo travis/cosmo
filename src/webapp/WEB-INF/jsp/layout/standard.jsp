@@ -67,13 +67,9 @@
               |
               </authz:authorize>
               --%>
-              <html:link page="/help">
-                <fmt:message key="Layout.Nav.Main.Help"/>
-              </html:link>
+              <c:choose><c:when test="${fn:endsWith(body, '/help.jsp')}"><b><fmt:message key="Layout.Nav.Main.Help"/></b></c:when><c:otherwise><html:link page="/help"><fmt:message key="Layout.Nav.Main.Help"/></html:link></c:otherwise></c:choose>
               |
-              <html:link page="/about">
-                <fmt:message key="Layout.Nav.Main.About"/>
-              </html:link>
+              <c:choose><c:when test="${fn:endsWith(body, '/about.jsp')}"><b><fmt:message key="Layout.Nav.Main.About"/></b></c:when><c:otherwise><html:link page="/about"><fmt:message key="Layout.Nav.Main.About"/></html:link></c:otherwise></c:choose>
               |
               <html:link page="/logout">
                 <fmt:message key="Layout.Nav.Main.LogOut"/>

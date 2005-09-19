@@ -45,6 +45,7 @@
          /account=ROLE_ROOT,ROLE_USER
          /account/update.do=ROLE_ROOT,ROLE_USER
          /forgot=ROLE_ANONYMOUS
+         /about=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /remind.do=ROLE_ANONYMOUS
          /login=ROLE_ANONYMOUS
          /loginfailed=ROLE_ANONYMOUS
@@ -52,6 +53,7 @@
          /*.js=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /*.ico=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /*.gif=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /*.jpg=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /index.jsp=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /logout=ROLE_ROOT,ROLE_USER
          /dirlisting.jsp*=ROLE_ROOT,ROLE_USER

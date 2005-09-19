@@ -60,9 +60,10 @@
     <put name="prefix"       value="Help."/>
   </definition>
   
-  <definition name="about" extends="layout.standard">
+  <definition name="about" extends="layout.dialog">
     <put name="body"         value="/WEB-INF/jsp/about.jsp"/>
     <put name="prefix"       value="About."/>
+    <put name="showNav"      value="false"/>
   </definition>
 
   <!-- login defs -->

@@ -38,7 +38,6 @@
 </div>
 </div>
 
-
 <div class="widgetBorder" style="margin-top:4px; width:280px;">
 <div class="widgetContent" style="padding:16px;">
 
@@ -83,6 +82,11 @@
 
 <div class="mdData" style="margin-top:18px;"><fmt:message key="Login.NoAccount"/></div>
 <div><html:link page="/account/new"><fmt:message key="Login.CreateAccount"/></html:link></div>
+
+<div class="sm" style="margin-top:24px;">
+<html:link page="/about" onclick="simplePopUp('/about', 340, 280, false); return false;">About Cosmo Sharing Server ...</html:link>
+</div>
+
 
 </div>
 

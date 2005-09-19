@@ -67,9 +67,9 @@
               |
               </authz:authorize>
               --%>
-              <c:choose><c:when test="${fn:endsWith(body, '/help.jsp')}"><b><fmt:message key="Layout.Nav.Main.Help"/></b></c:when><c:otherwise><html:link page="/help"><fmt:message key="Layout.Nav.Main.Help"/></html:link></c:otherwise></c:choose>
+              <c:choose><c:when test="${fn:endsWith(body, '/help.jsp')}"><strong><fmt:message key="Layout.Nav.Main.Help"/></strong></c:when><c:otherwise><html:link page="/help"><fmt:message key="Layout.Nav.Main.Help"/></html:link></c:otherwise></c:choose>
               |
-              <c:choose><c:when test="${fn:endsWith(body, '/about.jsp')}"><b><fmt:message key="Layout.Nav.Main.About"/></b></c:when><c:otherwise><html:link page="/about"><fmt:message key="Layout.Nav.Main.About"/></html:link></c:otherwise></c:choose>
+              <html:link page="/about" onclick="simplePopUp('/about', 340, 280, false); return false;"><fmt:message key="Layout.Nav.Main.About"/></html:link>
               |
               <html:link page="/logout">
                 <fmt:message key="Layout.Nav.Main.LogOut"/>
@@ -92,7 +92,7 @@
           <!-- admin console navbar -->
           <div class="md">
             <fmt:message key="Layout.Nav.Console.Label"/>
-            <c:choose><c:when test="${fn:endsWith(body, '/user/list.jsp')}"><b><fmt:message key="Layout.Nav.Console.Users"/></b></c:when><c:otherwise><html:link page="/users"><fmt:message key="Layout.Nav.Console.Users"/></html:link></c:otherwise></c:choose>
+            <c:choose><c:when test="${fn:endsWith(body, '/user/list.jsp')}"><strong><fmt:message key="Layout.Nav.Console.Users"/></strong></c:when><c:otherwise><html:link page="/users"><fmt:message key="Layout.Nav.Console.Users"/></html:link></c:otherwise></c:choose>
             <!-- end admin console navbar -->
           </div>
           <hr noshade="noshade"/>

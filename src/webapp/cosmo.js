@@ -49,3 +49,24 @@ function popup (url, name, features) {
         popupWindow.focus();
     }
 }
+
+function simplePopUp(url, width, height, scrollable) {
+
+	// Center pop-up win on screen
+	var leftpos = parseInt((screen.width - width) / 2);
+	var toppos = parseInt((screen.height - height) / 2);
+	var scroll = scrollable ? 1 : 0;
+	var winsettings = ',left=' + leftpos + ',top=' + toppos + 'location=0,menubar=0,resizable=1,scrollbars=' + 
+		scroll + ',status=0,titlebar=1,toolbar=0';
+	var simpleWin = null;
+
+	simpleWin = window.open(url, 'simpleWin', 'width=' + width + ',height=' + height + winsettings);
+	if (window.focus) {
+                simpleWin.focus();
+        }
+}
+
+function goURLMainWin(url) {
+	opener.location = url;
+	window.close();
+}

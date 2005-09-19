@@ -28,13 +28,6 @@
   <cosmoui:user var="user"/>
 </c:if>
 
-<u:bind var="SERVER_ADMIN"
-        type="org.osaf.cosmo.CosmoConstants"
-        field="SC_ATTR_SERVER_ADMIN"/>
-<u:bind var="SERVER_VERSION"
-        type="org.osaf.cosmo.CosmoConstants"
-        field="SC_ATTR_SERVER_VERSION"/>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html:html xhtml="true">
   <head>
@@ -74,13 +67,17 @@
               |
               </authz:authorize>
               --%>
+              <html:link page="/help">
+                <fmt:message key="Layout.Nav.Main.Help"/>
+              </html:link>
+              |
+              <html:link page="/about">
+                <fmt:message key="Layout.Nav.Main.About"/>
+              </html:link>
+              |
               <html:link page="/logout">
                 <fmt:message key="Layout.Nav.Main.LogOut"/>
               </html:link>
-              |
-              <a href="mailto:${applicationScope[SERVER_ADMIN]}">
-                <fmt:message key="Layout.Nav.Main.Help"/>
-              </a>
             </div>
             <div class="mdData" style="margin-top:8px;">
               <fmt:message key="Layout.Nav.Main.LoggedInAs">
@@ -113,23 +110,5 @@
       <tiles:insert attribute="body" flush="false"/>
       <!-- end page body -->
     </div>
-    <!-- footer -->
-    <html:img page="/spacer.gif" width="1" height="60" alt=""
-              border="0" styleId="footerSpacer"/>
-    <hr noshade="noshade"/>
-    <div class="footer">
-      <a href="mailto:${applicationScope[SERVER_ADMIN]}">
-        <fmt:message key="Layout.Footer">
-          <fmt:param value="${applicationScope[SERVER_VERSION]}"/>
-        </fmt:message>
-      </a>
-      <jsp:useBean id="now" class="java.util.Date"/>
-      &nbsp;&nbsp;&nbsp;
-      <fmt:formatDate value="${now}" type="both"/>
-    </div>
-    <script language="JavaScript" type="text/javascript">
-      setFoot();
-    </script>
-    <!-- end footer -->
   </body>
 </html:html>

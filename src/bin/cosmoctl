@@ -48,7 +48,7 @@ cd $PRGDIR/../..
 
 export COSMO_HOME=`pwd`
 export CATALINA_HOME=$COSMO_HOME/tomcat
-export JAVA_OPTS="$JAVA_OPTS "-Dical4j.unfolding.relaxed=true
+export JAVA_OPTS="$JAVA_OPTS -server -Dical4j.unfolding.relaxed=true"
 
 echo "Using COSMO_HOME:      $COSMO_HOME"
 

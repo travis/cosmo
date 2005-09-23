@@ -120,6 +120,10 @@ public class CosmoApiServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
+        if (username.equals(CosmoSecurityManager.USER_ROOT)) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
         provisioningManager.removeUserByUsername(username);
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
@@ -216,6 +220,11 @@ public class CosmoApiServlet extends HttpServlet {
                 UserResource resource =
                     new UserResource(getUrlBase(req), xmldoc);
                 user = (User) resource.getEntity();
+                if (! user.getUsername().equals(username)) {
+                    log.error("Username does not match request URI");
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
                 Role userRole = provisioningManager.
                     getRoleByName(CosmoSecurityManager.ROLE_USER);
                 user.addRole(userRole);

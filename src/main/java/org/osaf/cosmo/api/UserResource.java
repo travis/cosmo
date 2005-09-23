@@ -137,9 +137,11 @@ public class UserResource implements CosmoApiResource {
         url.addContent(userUrl);
         e.addContent(url);
 
-        Element hurl = new Element(EL_HOMEDIRURL, NS_COSMO);
-        hurl.addContent(homedirUrl);
-        e.addContent(hurl);
+        if (! user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
+            Element hurl = new Element(EL_HOMEDIRURL, NS_COSMO);
+            hurl.addContent(homedirUrl);
+            e.addContent(hurl);
+        }
 
         return new Document(e);
     }

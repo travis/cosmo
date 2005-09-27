@@ -34,24 +34,7 @@ import org.apache.commons.logging.LogFactory;
 public class TicketDaoTest extends BaseCoreTestCase {
     private static final Log log = LogFactory.getLog(TicketDaoTest.class);
 
-    private static final String DAO_BEAN = "ticketDao";
-    private TicketDao dao = null;
-
-    /**
-     */
-    public TicketDaoTest(String name) {
-        super(name);
-    }
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        dao = (TicketDao) getAppContext().getBean(DAO_BEAN);
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        dao = null;
-    }
+    private TicketDao dao;
 
     public void testCRDTicket() throws Exception {
         User user = TestHelper.makeDummyUser();
@@ -109,5 +92,9 @@ public class TicketDaoTest extends BaseCoreTestCase {
         // get the removed ticket by id again and make sure it's gone
         ticket3 = dao.getTicket(path, ticket.getId());
         assertNull(ticket3);
+    }
+
+    public void setTicketDao(TicketDao ticketDao) {
+        dao = ticketDao;
     }
 }

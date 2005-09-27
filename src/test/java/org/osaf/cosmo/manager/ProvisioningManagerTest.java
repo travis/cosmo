@@ -35,24 +35,8 @@ import org.springframework.dao.DataRetrievalFailureException;
 public class ProvisioningManagerTest extends BaseCoreTestCase {
     private static final Log log =
         LogFactory.getLog(ProvisioningManagerTest.class);
-    private static final String MANAGER_BEAN = "provisioningManager";
-    private ProvisioningManager mgr = null;
 
-    /**
-     */
-    public ProvisioningManagerTest(String name) {
-        super(name);
-    }
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        mgr = (ProvisioningManager) getAppContext().getBean(MANAGER_BEAN);
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        mgr = null;
-    }
+    private ProvisioningManager mgr;
 
     public void testCRUDUser() throws Exception {
         if (log.isDebugEnabled()) {
@@ -90,5 +74,9 @@ public class ProvisioningManagerTest extends BaseCoreTestCase {
         }
 
         List users = mgr.getUsers();
+    }
+
+    public void setProvisioningManager(ProvisioningManager provisioningMgr) {
+        mgr = provisioningMgr;
     }
 }

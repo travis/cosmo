@@ -36,28 +36,9 @@ import org.springframework.dao.DataRetrievalFailureException;
  */
 public class RoleDAOTest extends BaseCoreTestCase {
     private static final Log log = LogFactory.getLog(RoleDAOTest.class);
-    private static final String DAO_BEAN = "roleDAO";
-    private static final String USER_DAO_BEAN = "userDAO";
-    private RoleDAO dao = null;
-    private UserDAO userDao = null;
 
-    /**
-     */
-    public RoleDAOTest(String name) {
-        super(name);
-    }
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        dao = (RoleDAO) getAppContext().getBean(DAO_BEAN);
-        userDao = (UserDAO) getAppContext().getBean(USER_DAO_BEAN);
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        dao = null;
-        userDao = null;
-    }
+    private RoleDAO dao;
+    private UserDAO userDao;
 
     public void testCRUDRole() throws Exception {
         if (log.isDebugEnabled()) {
@@ -124,5 +105,13 @@ public class RoleDAOTest extends BaseCoreTestCase {
 
         dao.removeRole(role);
         userDao.removeUser(user);
+    }
+
+    public void setRoleDAO(RoleDAO roleDao) {
+        dao = roleDao;
+    }
+
+    public void setUserDAO(UserDAO userDao) {
+        this.userDao = userDao;
     }
 }

@@ -51,29 +51,8 @@ import org.apache.commons.logging.LogFactory;
 public class CalendarDaoTest extends BaseCoreTestCase {
     private static final Log log = LogFactory.getLog(CalendarDaoTest.class);
 
-    private static final String DAO_BEAN = "calendarDao";
-    private static final String SESSIONFACTORY_BEAN = "homedirSessionFactory";
-
     private CalendarDao dao;
     private JCRSessionFactory sessionFactory;
-
-    /**
-     */
-    public CalendarDaoTest(String name) {
-        super(name);
-    }
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        dao = (CalendarDao) getAppContext().getBean(DAO_BEAN);
-        sessionFactory = (JCRSessionFactory)
-            getAppContext().getBean(SESSIONFACTORY_BEAN);
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        dao = null;
-    }
 
     public void testCreateCalendarCollection() throws Exception {
         if (log.isDebugEnabled()) {
@@ -324,5 +303,17 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         contentNode.setProperty(CosmoJcrConstants.NN_JCR_LASTMODIFIED,
                                 java.util.Calendar.getInstance());
         return resourceNode;
+    }
+
+    /**
+     */
+    public void setCalendarDao(CalendarDao calendarDao) {
+        this.dao = calendarDao;
+    }
+
+    /**
+     */
+    public void setSessionFactory(JCRSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 }

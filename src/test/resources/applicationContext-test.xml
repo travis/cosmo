@@ -45,8 +45,20 @@
 
   <!-- Cosmo security -->
 
+  <bean id="securityPrincipal"
+        class="org.osaf.cosmo.TestHelper"
+        factory-method="makeDummyRootPrincipal"/>
+
   <bean id="securityManager"
         class="org.osaf.cosmo.TestSecurityManager">
+  </bean>
+
+  <bean id="securityContext"
+        factory-bean="securityManager"
+        factory-method="setUpTestSecurityContext">
+    <constructor-arg type="java.security.Principal">
+      <ref local="securityPrincipal"/>
+    </constructor-arg>
   </bean>
 
   <!-- JDBC data source -->
@@ -81,7 +93,8 @@
   </bean>
 
   <bean id="jcrRepository"
-        class="org.apache.jackrabbit.core.RepositoryImpl">
+        class="org.apache.jackrabbit.core.RepositoryImpl"
+        destroy-method="shutdown">
     <constructor-arg>
       <ref local="jcrRepositoryConfig"/>
     </constructor-arg>

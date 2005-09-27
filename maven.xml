@@ -337,7 +337,7 @@
         <j:invoke on="${importer}" method="setRepositoryHomedirPath">
           <j:arg value="${repositoryHomedirPath}"/>
         </j:invoke>
-        <j:invoke on="${importer}" method="setSubject">
+        <j:invoke on="${importer}" method="setCredentials">
           <j:arg value="${username}"/>
           <j:arg value="${password}"/>
         </j:invoke>

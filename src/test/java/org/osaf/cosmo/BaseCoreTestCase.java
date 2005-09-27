@@ -15,60 +15,42 @@
  */
 package org.osaf.cosmo;
 
-import java.security.Principal;
-
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
- * Base class for Cosmo TestCases.
- *
- * @author Brian Moseley
+ * Base class for Cosmo tests.
  */
-public class BaseCoreTestCase extends TestCase {
+public abstract class BaseCoreTestCase
+    extends AbstractDependencyInjectionSpringContextTests {
     private static final Log log = LogFactory.getLog(BaseCoreTestCase.class);
-    private ApplicationContext appCtx;
+    
+    private static final String[] CONFIG_LOCATIONS = {
+        "/applicationContext-test.xml",
+        "/applicationContext-hibernate.xml",
+        "/applicationContext-jcr.xml",
+        "/applicationContext-provisioning.xml"
+    };
+    
     private TestSecurityManager securityManager;
 
     /**
      */
-    public BaseCoreTestCase(String name) {
-        super(name);
-        String[] paths = {
-            "/applicationContext-test.xml",
-            "/applicationContext-hibernate.xml",
-            "/applicationContext-jcr.xml",
-            "/applicationContext-provisioning.xml"
-        };
-        appCtx = new ClassPathXmlApplicationContext(paths);
-        securityManager = new TestSecurityManager();
+    protected String[] getConfigLocations() {
+        return CONFIG_LOCATIONS;
     }
 
     /**
      */
-    protected void setUp() throws Exception {
-        super.setUp();
-        // by default set up a root security context. subclasses can
-        // override.
-        Principal principal = TestHelper.makeDummyRootPrincipal();
-        securityManager.setUpTestSecurityContext(principal);
+    public TestSecurityManager getSecurityManager() {
+        return securityManager;
     }
 
     /**
      */
-    protected void tearDown() throws Exception {
-        securityManager.tearDownTestSecurityContext();
-        super.tearDown();
-    }
-
-    /**
-     */
-    public ApplicationContext getAppContext() {
-        return appCtx;
+    public void setSecurityManager(TestSecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
 }

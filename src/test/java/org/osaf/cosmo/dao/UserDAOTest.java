@@ -36,24 +36,8 @@ import org.springframework.dao.DataRetrievalFailureException;
  */
 public class UserDAOTest extends BaseCoreTestCase {
     private static final Log log = LogFactory.getLog(UserDAOTest.class);
-    private static final String DAO_BEAN = "userDAO";
-    private UserDAO dao = null;
 
-    /**
-     */
-    public UserDAOTest(String name) {
-        super(name);
-    }
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        dao = (UserDAO) getAppContext().getBean(DAO_BEAN);
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        dao = null;
-    }
+    private UserDAO dao;
 
     public void testCRUDUser() throws Exception {
         if (log.isDebugEnabled()) {
@@ -193,5 +177,9 @@ public class UserDAOTest extends BaseCoreTestCase {
         }
 
         List users = dao.getUsers();
+    }
+
+    public void setUserDAO(UserDAO userDao) {
+        dao = userDao;
     }
 }

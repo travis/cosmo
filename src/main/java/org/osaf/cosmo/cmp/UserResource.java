@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.api;
+package org.osaf.cosmo.cmp;
 
 import org.jdom.Content;
 import org.jdom.Document;
@@ -26,7 +26,7 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
 /**
  * A resource view of a {@link User}.
  */
-public class UserResource implements CosmoApiResource {
+public class UserResource implements CmpResource {
     /**
      */
     public static final String EL_USER = "user";
@@ -86,7 +86,7 @@ public class UserResource implements CosmoApiResource {
         calculateHomedirUrl();
     }
 
-    // CosmoApiResource methods
+    // CmpResource methods
 
     /**
      * Returns the <code>User</code> that backs this resource.
@@ -115,30 +115,30 @@ public class UserResource implements CosmoApiResource {
      * The user's password is not included in the XML representation.
      */
     public Document toXml() {
-        Element e = new Element(EL_USER, NS_COSMO);
+        Element e = new Element(EL_USER, NS_CMP);
 
-        Element username = new Element(EL_USERNAME, NS_COSMO);
+        Element username = new Element(EL_USERNAME, NS_CMP);
         username.addContent(user.getUsername());
         e.addContent(username);
 
-        Element firstName = new Element(EL_FIRSTNAME, NS_COSMO);
+        Element firstName = new Element(EL_FIRSTNAME, NS_CMP);
         firstName.addContent(user.getFirstName());
         e.addContent(firstName);
 
-        Element lastName = new Element(EL_LASTNAME, NS_COSMO);
+        Element lastName = new Element(EL_LASTNAME, NS_CMP);
         lastName.addContent(user.getLastName());
         e.addContent(lastName);
 
-        Element email = new Element(EL_EMAIL, NS_COSMO);
+        Element email = new Element(EL_EMAIL, NS_CMP);
         email.addContent(user.getEmail());
         e.addContent(email);
 
-        Element url = new Element(EL_URL, NS_COSMO);
+        Element url = new Element(EL_URL, NS_CMP);
         url.addContent(userUrl);
         e.addContent(url);
 
         if (! user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
-            Element hurl = new Element(EL_HOMEDIRURL, NS_COSMO);
+            Element hurl = new Element(EL_HOMEDIRURL, NS_CMP);
             hurl.addContent(homedirUrl);
             e.addContent(hurl);
         }
@@ -169,46 +169,46 @@ public class UserResource implements CosmoApiResource {
 
         Element root = doc.getRootElement();
         if (! (root.getName().equals(EL_USER) &&
-               root.getNamespace().equals(NS_COSMO))) {
-            throw new CosmoApiException("root element not user");
+               root.getNamespace().equals(NS_CMP))) {
+            throw new CmpException("root element not user");
         }
 
-        Element e = root.getChild(EL_USERNAME, NS_COSMO);
+        Element e = root.getChild(EL_USERNAME, NS_CMP);
         if (e != null) {
             if (user.getUsername() != null &&
                 user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
-                throw new CosmoApiException("root user's username may not " +
-                                            "be changed");
+                throw new CmpException("root user's username may not " +
+                                       "be changed");
             }
             user.setUsername(getTextContent(e));
         }
 
-        e = root.getChild(EL_PASSWORD, NS_COSMO);
+        e = root.getChild(EL_PASSWORD, NS_CMP);
         if (e != null) {
             user.setPassword(getTextContent(e));
         }
 
-        e = root.getChild(EL_FIRSTNAME, NS_COSMO);
+        e = root.getChild(EL_FIRSTNAME, NS_CMP);
         if (e != null) {
             if (user.getUsername() != null &&
                 user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
-                throw new CosmoApiException("root user's first name may not " +
-                                            "be changed");
+                throw new CmpException("root user's first name may not " +
+                                       "be changed");
             }
             user.setFirstName(getTextContent(e));
         }
 
-        e = root.getChild(EL_LASTNAME, NS_COSMO);
+        e = root.getChild(EL_LASTNAME, NS_CMP);
         if (e != null) {
             if (user.getUsername() != null &&
                 user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
-                throw new CosmoApiException("root user's last name may not " +
-                                            "be changed");
+                throw new CmpException("root user's last name may not " +
+                                       "be changed");
             }
             user.setLastName(getTextContent(e));
         }
 
-        e = root.getChild(EL_EMAIL, NS_COSMO);
+        e = root.getChild(EL_EMAIL, NS_CMP);
         if (e != null) {
             user.setEmail(getTextContent(e));
         }
@@ -230,11 +230,11 @@ public class UserResource implements CosmoApiResource {
      */
     protected String getTextContent(Element e) {
         if (e.getContentSize() != 1) {
-            throw new CosmoApiException(e.getName() + " must be single-valued");
+            throw new CmpException(e.getName() + " must be single-valued");
         }
         Content c = e.getContent(0);
         if (! (c instanceof Text)) {
-            throw new CosmoApiException(e.getName() + " content not text");
+            throw new CmpException(e.getName() + " content not text");
         }
         return ((Text) c).getText();
     }

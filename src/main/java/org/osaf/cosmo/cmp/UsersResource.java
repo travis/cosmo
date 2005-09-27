@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.api;
+package org.osaf.cosmo.cmp;
 
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +26,7 @@ import org.osaf.cosmo.model.User;
 /**
  * An interface for Cosmo API resources
  */
-public class UsersResource implements CosmoApiResource {
+public class UsersResource implements CmpResource {
     /**
      */
     public static final String EL_USERS = "users";
@@ -67,7 +67,7 @@ public class UsersResource implements CosmoApiResource {
      * by {@link UserResource}.
      */
     public Document toXml() {
-        Element e = new Element(EL_USERS, NS_COSMO);
+        Element e = new Element(EL_USERS, NS_CMP);
         for (Iterator i=users.iterator(); i.hasNext();) {
             User user = (User) i.next();
             Element ue = (Element)

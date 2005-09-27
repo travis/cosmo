@@ -57,8 +57,8 @@
          /index.jsp=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /logout=ROLE_ROOT,ROLE_USER
          /dirlisting.jsp*=ROLE_ROOT,ROLE_USER
-         /api/users=ROLE_ROOT
-         /api/user/*=ROLE_ROOT
+         /cmp/users=ROLE_ROOT
+         /cmp/user/*=ROLE_ROOT
          /**=ROLE_ROOT
        </value>
      </property>
@@ -92,13 +92,13 @@
     </property>
   </bean>
 
-  <bean id="apiFilterChainProxy"
+  <bean id="cmpFilterChainProxy"
         class="net.sf.acegisecurity.util.FilterChainProxy">
     <property name="filterInvocationDefinitionSource">
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=httpSessionContextIntegrationFilter,basicProcessingFilter,apiSecurityEnforcementFilter
+        /**=httpSessionContextIntegrationFilter,basicProcessingFilter,cmpSecurityEnforcementFilter
       </value>
     </property>
   </bean>
@@ -232,7 +232,7 @@
     </property>
   </bean>
 
-  <bean id="apiSecurityEnforcementFilter"
+  <bean id="cmpSecurityEnforcementFilter"
         class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
     <property name="filterSecurityInterceptor">
       <ref local="filterInvocationInterceptor"/>

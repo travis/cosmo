@@ -73,11 +73,11 @@
     </init-param>
   </filter>
   <filter>
-    <filter-name>api-security</filter-name>
+    <filter-name>cmp-security</filter-name>
     <filter-class>net.sf.acegisecurity.util.FilterToBeanProxy</filter-class>
     <init-param>
       <param-name>targetBean</param-name>
-      <param-value>apiFilterChainProxy</param-value>
+      <param-value>cmpFilterChainProxy</param-value>
     </init-param>
   </filter>
   <filter>
@@ -99,8 +99,8 @@
     <url-pattern>/home/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>api-security</filter-name>
-    <url-pattern>/api/*</url-pattern>
+    <filter-name>cmp-security</filter-name>
+    <url-pattern>/cmp/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>ui-security</filter-name>
@@ -137,8 +137,8 @@
     </init-param>
   </servlet>
   <servlet>
-    <servlet-name>api</servlet-name>
-    <servlet-class>org.osaf.cosmo.api.CosmoApiServlet</servlet-class>
+    <servlet-name>cmp</servlet-name>
+    <servlet-class>org.osaf.cosmo.cmp.CmpServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
@@ -150,8 +150,8 @@
     <url-pattern>/home/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>api</servlet-name>
-    <url-pattern>/api/*</url-pattern>
+    <servlet-name>cmp</servlet-name>
+    <url-pattern>/cmp/*</url-pattern>
   </servlet-mapping>
   <error-page>
     <exception-type>java.lang.Throwable</exception-type>

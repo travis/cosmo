@@ -147,7 +147,7 @@ sub create_account {
 
     my $xml = <<EOT;
 <?xml version="1.0" encoding="utf-8" ?>
-<user xmlns="http://osafoundation.org/cosmo">
+<user xmlns="http://osafoundation.org/cosmo/CMP">
   <username>$username</username>
   <password>$username</password>
   <firstName>$username</firstName>

@@ -103,7 +103,7 @@ sub user_url {
     my $self = shift;
     my $username = shift;
 
-    return sprintf("%sapi/user/%s", $client->server_url, $username);
+    return sprintf("%scmp/user/%s", $client->server_url, $username);
 }
 
 sub account_url {

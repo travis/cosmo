@@ -18,7 +18,7 @@ package org.osaf.cosmo.cmp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -38,7 +38,6 @@ import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
-import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
@@ -121,11 +120,11 @@ public class CmpServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        if (username.equals(CosmoSecurityManager.USER_ROOT)) {
+        if (username.equals(User.USERNAME_OVERLORD)) {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        provisioningManager.removeUserByUsername(username);
+        provisioningManager.removeUser(username);
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
@@ -141,7 +140,7 @@ public class CmpServlet extends HttpServlet {
                          HttpServletResponse resp)
         throws ServletException, IOException {
         if (req.getPathInfo().equals("/users")) {
-            List users = provisioningManager.getUsers();
+            Set users = provisioningManager.getUsers();
             resp.setStatus(HttpServletResponse.SC_OK);
             sendXmlResponse(resp, new UsersResource(users, getUrlBase(req)));
             return;
@@ -153,7 +152,7 @@ public class CmpServlet extends HttpServlet {
         }
         User user = null;
         try {
-            user = provisioningManager.getUserByUsername(username);
+            user = provisioningManager.getUser(username);
         } catch (ObjectRetrievalFailureException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -201,7 +200,7 @@ public class CmpServlet extends HttpServlet {
 
         User user = null;
         try {
-            user = provisioningManager.getUserByUsername(username);
+            user = provisioningManager.getUser(username);
         } catch (ObjectRetrievalFailureException e) {
             // this means we are creating the user
         }
@@ -226,9 +225,6 @@ public class CmpServlet extends HttpServlet {
                     resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
-                Role userRole = provisioningManager.
-                    getRoleByName(CosmoSecurityManager.ROLE_USER);
-                user.addRole(userRole);
                 provisioningManager.saveUser(user);
                 resp.setStatus(HttpServletResponse.SC_CREATED);
             }

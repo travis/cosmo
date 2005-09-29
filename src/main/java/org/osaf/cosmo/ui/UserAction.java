@@ -19,10 +19,10 @@ import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
-import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -98,29 +98,21 @@ public class UserAction extends CosmoAction {
         UserForm userForm = (UserForm) form;
 
         // the User may have previously been set by a request
-        // attribute. if not, look to see if the form has id info. if
-        // not, we're viewing the user for the first time.
+        // attribute. if not, look to see if the form has a
+        // username. if not, we're viewing the user for the first
+        // time.
         User user = (User) request.getAttribute(ATTR_USER);
         if (user == null) {
-            if (userForm.getId() != null && ! userForm.getId().equals("")) {
-                user = mgr.getUser(userForm.getId());
-                // the below condition happens when somebody tried to
-                // update the root user but fails to put in an email
-                // address. the form needs to be populated (but
-                // without the email address for sake of consistency
-                // with regular update page).
-                if (user.getUsername().equals(CosmoSecurityManager.USER_ROOT) &&
-                    userForm.getUsername() == null) {
-                    populateUpdateForm(userForm, user);
-                    userForm.setEmail(null);
-                }
+            if (userForm.getUsername() != null &&
+                ! userForm.getUsername().equals("")) {
+                user = mgr.getUser(userForm.getUsername());
             }
             else {
                 String username = request.getParameter(PARAM_USERNAME);
                 if (log.isDebugEnabled()) {
                     log.debug("viewing user " + username);
                 }
-                user = mgr.getUserByUsername(username);
+                user = mgr.getUser(username);
                 populateUpdateForm(userForm, user);
             }
         }
@@ -179,7 +171,7 @@ public class UserAction extends CosmoAction {
             return mapping.findForward(OSAFStrutsConstants.FWD_CANCEL);
         }
 
-        User formUser =  mgr.getUser(userForm.getId());
+        User formUser =  mgr.getUser(userForm.getUsername());
         populateUser(formUser, userForm);
 
         try {
@@ -217,7 +209,7 @@ public class UserAction extends CosmoAction {
             return mapping.findForward(OSAFStrutsConstants.FWD_CANCEL);
         }
 
-        User formUser = mgr.getUserByUsername(CosmoSecurityManager.USER_ROOT);
+        User formUser = mgr.getUser(User.USERNAME_OVERLORD);
         populateUser(formUser, userForm, true);
 
         try {
@@ -233,7 +225,7 @@ public class UserAction extends CosmoAction {
                 String currentUserName =
                     getSecurityManager().getSecurityContext().
                     getUser().getUsername();
-                if (currentUserName.equals(CosmoSecurityManager.USER_ROOT)) {
+                if (currentUserName.equals(User.USERNAME_OVERLORD)) {
                     getSecurityManager().
                         initiateSecurityContext(currentUserName,
                                                 userForm.getPassword());
@@ -303,7 +295,7 @@ public class UserAction extends CosmoAction {
         if (log.isDebugEnabled()) {
             log.debug("listing users");
         }
-        List users = mgr.getUsers();
+        List users = new ArrayList(mgr.getUsers());
         Collections.sort(users, new Comparator() {
                 public int compare(Object o1, Object o2) {
                     User u1 = (User) o1;
@@ -332,27 +324,15 @@ public class UserAction extends CosmoAction {
             user.setPassword(form.getPassword());
         }
 
-        if (! isRoot) {
-            Role userRole = mgr.getRoleByName(CosmoSecurityManager.ROLE_USER);
-            user.addRole(userRole);
-        }
-
-        Role rootRole = mgr.getRoleByName(CosmoSecurityManager.ROLE_ROOT);
-        if (form.isAdmin() || isRoot) {
-            user.addRole(rootRole);
-        }
-        else {
-            user.removeRole(rootRole);
-        }
+        user.setAdmin(new Boolean(form.isAdmin() || isRoot));
     }
 
     private void populateUpdateForm(UserForm form, User user) {
-        form.setId(user.getId());
         form.setUsername(user.getUsername());
         form.setFirstName(user.getFirstName());
         form.setLastName(user.getLastName());
         form.setEmail(user.getEmail());
         // never set password in the form
-        form.setAdmin(user.isInRole(CosmoSecurityManager.ROLE_ROOT));
+        form.setAdmin(user.isAdmin().booleanValue());
     }
 }

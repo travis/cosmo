@@ -55,6 +55,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
+<!--
     <dependency>
       <groupId>antlr</groupId>
       <artifactId>antlr</artifactId>
@@ -79,6 +80,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
+-->
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
@@ -159,6 +161,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
+<!--
     <dependency>
       <groupId>dom4j</groupId>
       <artifactId>dom4j</artifactId>
@@ -167,27 +170,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-    <dependency>
-      <groupId>ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <version>1.1</version>
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>hibernate</groupId>
-      <artifactId>hibernate</artifactId>
-      <version>2.1.8</version>
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>1.7.3.3</version>
-    </dependency>
+-->
     <dependency>
       <groupId>ical4j</groupId>
       <artifactId>ical4j</artifactId>
@@ -281,16 +264,6 @@
       </properties>
     </dependency>
     <dependency>
-      <!-- cannot be redistributed, therefore must be maintained in an
-           internal repository -->
-      <groupId>jta</groupId>
-      <artifactId>jta</artifactId>
-      <version>dist</version>
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.8</version>
@@ -307,14 +280,6 @@
       </properties>
     </dependency>
     <dependency>
-      <groupId>odmg</groupId>
-      <artifactId>odmg</artifactId>
-      <version>3.0</version>
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <dependency>
       <groupId>oro</groupId>
       <artifactId>oro</artifactId>
       <version>2.0.8</version>
@@ -323,7 +288,6 @@
       </properties>
     </dependency>
     <dependency>
-      <!-- from internal repository -->
       <groupId>osaf-commons</groupId>
       <artifactId>osaf-commons-spring</artifactId>
       <version>0.2</version>
@@ -332,13 +296,11 @@
       </properties>
     </dependency>
     <dependency>
-      <!-- from internal repository -->
       <groupId>osaf-commons</groupId>
       <artifactId>osaf-commons-jackrabbit</artifactId>
       <version>0.2</version>
     </dependency>
     <dependency>
-      <!-- from internal repository -->
       <groupId>osaf-commons</groupId>
       <artifactId>osaf-commons-jsp</artifactId>
       <version>0.1</version>
@@ -347,7 +309,6 @@
       </properties>
     </dependency>
     <dependency>
-      <!-- from internal repository -->
       <groupId>osaf-commons</groupId>
       <artifactId>osaf-commons-struts</artifactId>
       <version>0.2</version>
@@ -398,7 +359,6 @@
       </properties>
     </dependency>
     <dependency>
-      <!-- not currently on ibiblio -->
       <groupId>taglibs</groupId>
       <artifactId>unstandard</artifactId>
       <version>20050518</version>
@@ -407,7 +367,6 @@
       </properties>
     </dependency>
     <dependency>
-      <!-- not currently on ibiblio -->
       <groupId>urlrewrite</groupId>
       <artifactId>urlrewrite</artifactId>
       <version>2.0.1</version>
@@ -433,11 +392,8 @@
       <resource>
         <directory>src/main/resources/core</directory>
         <includes>
-          <include>*.hbm.xml</include>
           <include>applicationContext-*.xml</include>
           <include>*.tld</include>
-          <include>ehcache.xml</include>
-          <include>hibernate.cfg.xml</include>
         </includes>
         <filtering>true</filtering>
       </resource>
@@ -465,7 +421,6 @@
         <directory>src/main/resources/server</directory>
         <includes>
           <include>cosmo.properties</include>
-          <include>hibernate.properties</include>
         </includes>
         <filtering>true</filtering>
       </resource>

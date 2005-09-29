@@ -20,7 +20,7 @@ import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.User;
 
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,22 +46,17 @@ public class ProvisioningManagerTest extends BaseCoreTestCase {
         User user = TestHelper.makeDummyUser();
         mgr.saveUser(user);
 
-        // by id
-        User user2 = mgr.getUser(user.getId().toString());
-        assertTrue(user.equals(user2));
+        User user2 = mgr.getUser(user.getUsername());
+        assertTrue(user2.equals(user));
 
-        // by username
-        User user3 = mgr.getUserByUsername(user.getUsername());
-        assertTrue(user.equals(user2));
+        user2.setPassword("new password");
+        User user3 = mgr.updateUser(user2);
+        assertTrue(user3.getPassword().equals(user2.getPassword()));
+        assertTrue(! user3.getPassword().equals(user.getPassword()));
 
-        user3.setPassword("new password");
-        User user4 = mgr.updateUser(user3);
-        assertTrue(user4.getPassword().equals(user3.getPassword()));
-        assertTrue(! user4.getPassword().equals(user.getPassword()));
-
-        mgr.removeUser(user.getId().toString());
+        mgr.removeUser(user.getUsername());
         try {
-            mgr.getUser(user.getId().toString());
+            mgr.getUser(user.getUsername());
             fail("user not removed");
         } catch (DataRetrievalFailureException e) {
             // expected
@@ -73,7 +68,7 @@ public class ProvisioningManagerTest extends BaseCoreTestCase {
             log.debug("BEGIN");
         }
 
-        List users = mgr.getUsers();
+        Set users = mgr.getUsers();
     }
 
     public void setProvisioningManager(ProvisioningManager provisioningMgr) {

@@ -15,10 +15,9 @@
  */
 package org.osaf.cosmo.manager;
 
-import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Manager interface for the provisioning subsystem.
@@ -29,27 +28,11 @@ public interface ProvisioningManager extends Manager {
 
     /**
      */
-    public List getRoles();
+    public Set getUsers();
 
     /**
      */
-    public Role getRole(String id);
-
-    /**
-     */
-    public Role getRoleByName(String role);
-
-    /**
-     */
-    public List getUsers();
-
-    /**
-     */
-    public User getUser(String id);
-
-    /**
-     */
-    public User getUserByUsername(String username);
+    public User getUser(String username);
 
     /**
      */
@@ -65,11 +48,7 @@ public interface ProvisioningManager extends Manager {
 
     /**
      */
-    public void removeUser(String id);
-
-    /**
-     */
-    public void removeUserByUsername(String username);
+    public void removeUser(String username);
 
     /**
      */

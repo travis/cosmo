@@ -16,7 +16,6 @@
 package org.osaf.cosmo.security.impl;
 
 import org.osaf.cosmo.acegisecurity.ticket.TicketAuthenticationToken;
-import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
@@ -44,9 +43,9 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
     private static final Log log =
         LogFactory.getLog(CosmoSecurityContextImpl.class);
 
+    private boolean admin;
     private boolean anonymous;
     private Authentication authentication;
-    private boolean rootRole;
     private Ticket ticket;
     private User user;
 
@@ -55,7 +54,7 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
     public CosmoSecurityContextImpl(Authentication authentication) {
         this.anonymous = false;
         this.authentication = authentication;
-        this.rootRole = false;
+        this.admin = false;
 
         processAuthentication();
     }
@@ -104,11 +103,11 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
     }
 
     /**
-     * Determines whether or not the security context represents a
-     * user in the root role.
+     * Determines whether or not the security context represents an
+     * administrator
      */
-    public boolean inRootRole() {
-        return rootRole;
+    public boolean isAdmin() {
+        return admin;
     }
 
     /* ----- our methods ----- */
@@ -142,16 +141,7 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
 
         if (authentication instanceof UsernamePasswordAuthenticationToken) {
             user = ((CosmoUserDetails) authentication.getPrincipal()).getUser();
-
-            // determine if the user is in the root role
-            for (Iterator i=user.getRoles().iterator(); i.hasNext();) {
-                Role role = (Role) i.next();
-                if (role.getName().equals(CosmoSecurityManager.ROLE_ROOT)) {
-                    rootRole = true;
-                    break;
-                }
-            }
+            admin = user.isAdmin().booleanValue();
         }
-
     }
 }

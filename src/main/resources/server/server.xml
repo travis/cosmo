@@ -32,16 +32,7 @@
                     type="javax.jcr.Repository"
                     factory="org.apache.jackrabbit.core.jndi.BindableRepositoryFactory"
                     configFilePath="etc/repository.xml"
-                    repHomeDir="data/repository"/>
-          <Resource name="jdbc/cosmo"
-                    type="javax.sql.DataSource"
-                    maxActive="5"
-                    maxIdle="3"
-                    maxWait="10000"
-                    username="@DB_USERNAME@"
-                    parameter="@DB_PASSWORD@"
-                    driverClassName="@DB_DRIVER@"
-                    url="@DB_URL@"/>
+                    repHomeDir="data"/>
           <Resource name="mail/cosmo"
                     type="javax.mail.Session"
                     mail.transport.protocol="@MAIL_TRANSPORT_PROTOCOL@"

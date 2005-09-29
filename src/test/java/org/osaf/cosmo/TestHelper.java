@@ -26,7 +26,6 @@ import net.fortuna.ical4j.model.property.*;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
-import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -98,17 +97,6 @@ public class TestHelper {
 
     /**
      */
-    public static Role makeDummyRole() {
-        String serial = new Integer(++rseq).toString();
-
-        Role role = new Role();
-        role.setName("dummy" + serial);
-
-        return role;
-    }
-
-    /**
-     */
     public static Ticket makeDummyTicket() {
         Ticket ticket = new Ticket();
         ticket.setTimeout(CosmoDavConstants.VALUE_INFINITE);
@@ -170,9 +158,7 @@ public class TestHelper {
      */
     public static Principal makeDummyRootPrincipal() {
         User user = makeDummyUser();
-        Role role = new Role();
-        role.setName(CosmoSecurityManager.ROLE_ROOT);
-        user.addRole(role);
+        user.setAdmin(Boolean.TRUE);
         return new TestUserPrincipal(user);
     }
 }

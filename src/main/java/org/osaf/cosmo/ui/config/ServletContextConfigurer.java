@@ -67,8 +67,7 @@ public class ServletContextConfigurer {
      * attribute by looking up the root user's email address.
      */
     public void setServerAdmin() {
-        User rootUser =
-            userDao.getUserByUsername(CosmoSecurityManager.USER_ROOT);
+        User rootUser = userDao.getUser(User.USERNAME_OVERLORD);
         servletContext.setAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN,
                                     rootUser.getEmail());
     }

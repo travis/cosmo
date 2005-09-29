@@ -137,7 +137,7 @@ public class UserResource implements CmpResource {
         url.addContent(userUrl);
         e.addContent(url);
 
-        if (! user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
+        if (! user.isOverlord()) {
             Element hurl = new Element(EL_HOMEDIRURL, NS_CMP);
             hurl.addContent(homedirUrl);
             e.addContent(hurl);
@@ -168,15 +168,16 @@ public class UserResource implements CmpResource {
         }
 
         Element root = doc.getRootElement();
-        if (! (root.getName().equals(EL_USER) &&
-               root.getNamespace().equals(NS_CMP))) {
+        if (! root.getName().equals(EL_USER)) {
             throw new CmpException("root element not user");
+        }
+        if (! root.getNamespace().equals(NS_CMP)) {
+            throw new CmpException("root element not in CMP namespace");
         }
 
         Element e = root.getChild(EL_USERNAME, NS_CMP);
         if (e != null) {
-            if (user.getUsername() != null &&
-                user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
+            if (user.isOverlord()) {
                 throw new CmpException("root user's username may not " +
                                        "be changed");
             }
@@ -190,8 +191,7 @@ public class UserResource implements CmpResource {
 
         e = root.getChild(EL_FIRSTNAME, NS_CMP);
         if (e != null) {
-            if (user.getUsername() != null &&
-                user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
+            if (user.isOverlord()) {
                 throw new CmpException("root user's first name may not " +
                                        "be changed");
             }
@@ -200,8 +200,7 @@ public class UserResource implements CmpResource {
 
         e = root.getChild(EL_LASTNAME, NS_CMP);
         if (e != null) {
-            if (user.getUsername() != null &&
-                user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
+            if (user.isOverlord()) {
                 throw new CmpException("root user's last name may not " +
                                        "be changed");
             }

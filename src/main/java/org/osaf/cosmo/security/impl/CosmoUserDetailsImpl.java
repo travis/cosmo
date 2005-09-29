@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.security.impl;
 
-import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoUserDetails;
 
@@ -32,20 +31,15 @@ import org.apache.commons.logging.LogFactory;
  * A class that decorates the Cosmo core {@link User} to provide an
  * implementation of {@link CosmoUserDetails} suitable for use by Acegi
  * Security's {@link AuthenticationProvider}.
+ *
+ *
+ * If the associated user is an administrator, contains an authority
+ * named "ROLE_ROOT".
+ *
+ * If the associated user is not the overlord, contains an authority
+ * named "ROLE_USER".
  */
 public class CosmoUserDetailsImpl implements CosmoUserDetails {
-    /**
-     * The prefix to add to the name of the (uppercased) Cosmo role
-     * name to generate an Acegi Security GrantedAuthority (eg "root"
-     * becomes "ROLE_ROOT"). The GrantedAuthority is used by
-     * AcegiSecurity's
-     * {@link net.sf.acegisecurity.vote.RoleVoter} to
-     * decide whether or not the user is granted access to a
-     * resource by virtue of role membership.
-     * @see net.sf.acegisecurity.vote.RoleVoter
-     */
-    public static final String ROLE_PREFIX = "ROLE_";
-
     private static final Log log =
         LogFactory.getLog(CosmoUserDetailsImpl.class);
 
@@ -58,15 +52,16 @@ public class CosmoUserDetailsImpl implements CosmoUserDetails {
     public CosmoUserDetailsImpl(User user) {
         this.user = user;
 
-        // set granted authorities
-        ArrayList tmp = new ArrayList();
-        for (Iterator i=getUser().getRoles().iterator(); i.hasNext();) {
-            Role role = (Role) i.next();
-            String authority = ROLE_PREFIX + role.getName().toUpperCase();
-            tmp.add(new GrantedAuthorityImpl(authority));
+        ArrayList authorities = new ArrayList();
+        if (user.isAdmin().booleanValue()) {
+            authorities.add(new GrantedAuthorityImpl("ROLE_ROOT"));
         }
+        if (! user.isOverlord()) {
+            authorities.add(new GrantedAuthorityImpl("ROLE_USER"));
+        }
+
         this.authorities = (GrantedAuthority[])
-            tmp.toArray(new GrantedAuthority[0]);
+            authorities.toArray(new GrantedAuthority[0]);
     }
 
     /* ----- UserDetails methods ----- */

@@ -123,8 +123,7 @@ public class CredentialsReminderAction extends CosmoAction {
                     MessageResources resources = getResources(request);
                     Locale locale = getLocale(request);
 
-                    User rootUser =
-                        mgr.getUserByUsername(CosmoSecurityManager.USER_ROOT);
+                    User rootUser = mgr.getUser(User.USERNAME_OVERLORD);
                     String fromAddr = (String) getServlet().getServletContext().
                         getAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN);
                     String fromHandle =
@@ -162,8 +161,7 @@ public class CredentialsReminderAction extends CosmoAction {
                     MessageResources resources = getResources(request);
                     Locale locale = getLocale(request);
 
-                    User rootUser =
-                        mgr.getUserByUsername(CosmoSecurityManager.USER_ROOT);
+                    User rootUser = mgr.getUser(User.USERNAME_OVERLORD);
                     String fromAddr = (String) getServlet().getServletContext().
                         getAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN);
                     String fromHandle =

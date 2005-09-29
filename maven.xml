@@ -41,6 +41,9 @@
     <jackrabbit:generate
        catalog="${basedir}/src/docs/jcr/caldav.txt"
        descriptor="${basedir}/src/main/resources/jackrabbit/caldav_nodetypes.xml"/>
+    <jackrabbit:generate
+       catalog="${basedir}/src/docs/jcr/cosmo.txt"
+       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
   </goal>
 
   <preGoal name="test:test-resources">
@@ -54,13 +57,6 @@
               value="${basedir}/src/main/resources/server/repository.xml"/>
       <filter token="REPOSITORYHOMEDIRPATH"
               value="${maven.build.dir}/test-repository"/>
-      <filter token="DIALECT" value="${cosmo.test.userdb.dialect}"/>
-      <filter token="DRIVER" value="${cosmo.test.userdb.driver}"/>
-      <filter token="DB_URL" value="${cosmo.test.userdb.url}"/>
-      <filter token="DB_USERNAME"
-              value="${cosmo.test.userdb.username}"/>
-      <filter token="DB_PASSWORD"
-              value="${cosmo.test.userdb.password}"/>
       <filter token="MAIL_TRANSPORT_PROTOCOL"
               value="${cosmo.test.mail.transport.protocol}"/>
       <filter token="MAIL_SMTP_HOST"
@@ -78,23 +74,9 @@
 
   <preGoal name="test:test-resources">
     <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
-      <attainGoal name="test:dbsetup"/>
       <attainGoal name="test:reposetup"/>
     </j:if>
   </preGoal>
-
-  <goal name="test:dbsetup">
-    <echo>Setting up test db ${cosmo.test.userdb.url}</echo>
-    <sql driver="${cosmo.test.userdb.driver}"
-         url="${cosmo.test.userdb.url}"
-         userid="${cosmo.test.userdb.username}"
-         password="${cosmo.test.userdb.password}"
-         src="${basedir}/src/main/resources/db/${cosmo.test.userdb.schema}">
-      <classpath>
-        <path refid="maven.dependency.classpath"/>
-      </classpath>
-    </sql>
-  </goal>
 
   <goal name="test:reposetup">
     <delete dir="${maven.build.dir}/test-repository"/> 
@@ -123,6 +105,17 @@
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/caldav_nodetypes.xml"/>
+    <jackrabbit:import
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${maven.build.dir}/test-repository"
+       username="${cosmo.test.repository.username}"
+       password="${cosmo.test.repository.password}"
+       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
+    <jackrabbit:loadoverlord
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${maven.build.dir}/test-repository"
+       username="${cosmo.test.repository.username}"
+       password="${cosmo.test.repository.password}"/>
   </goal>
     
   <goal name="dist:tomcat">
@@ -181,10 +174,6 @@
           file="${basedir}/src/main/resources/server/server.xml">
       <filterset>
         <filter token="RELOADABLE" value="${cosmo.webapp.reloadable}"/>
-        <filter token="DB_USERNAME" value="${cosmo.dist.userdb.username}"/>
-        <filter token="DB_PASSWORD" value="${cosmo.dist.userdb.password}"/>
-        <filter token="DB_DRIVER" value="${cosmo.dist.userdb.driver}"/>
-        <filter token="DB_URL" value="${cosmo.dist.userdb.url}"/>
         <filter token="MAIL_TRANSPORT_PROTOCOL"
                 value="${cosmo.dist.mail.transport.protocol}"/>
         <filter token="MAIL_SMTP_HOST"
@@ -204,12 +193,6 @@
                 value="${cosmo.dist.repository.username}"/>
         <filter token="REPOSITORY_PASSWORD"
                 value="${cosmo.dist.repository.password}"/>
-      </filterset>
-    </copy>
-    <copy todir="${cosmo.dist.version}/tomcat/common/classes"
-          file="${basedir}/src/main/resources/server/hibernate.properties">
-      <filterset>
-        <filter token="DIALECT" value="${cosmo.dist.userdb.dialect}"/>
       </filterset>
     </copy>
     <!-- needed for tomcat's own logging -->
@@ -237,29 +220,10 @@
         <include name="activation-*.jar"/>
       </fileset>
     </copy>
-    <copy todir="${cosmo.dist.version}/tomcat/common/lib"
-          file="${cosmo.dist.userdb.jar}"/>
   </goal>
 
-  <goal name="dist:db">
-    <delete dir="${cosmo.dist.version}/data/db"/> 
-    <echo>Setting up db ${cosmo.dist.userdb.url}</echo>
-    <sql driver="${cosmo.dist.userdb.driver}"
-         url="${cosmo.dist.userdb.url}"
-         userid="${cosmo.dist.userdb.username}"
-         password="${cosmo.dist.userdb.password}"
-         src="${basedir}/src/main/resources/db/${cosmo.dist.userdb.schema}">
-      <classpath>
-        <path refid="maven.dependency.classpath"/>
-      </classpath>
-    </sql>
-    <move todir="${cosmo.dist.version}/data">
-      <fileset dir="${basedir}/data"/>
-    </move>
-  </goal>
-
-  <goal name="dist:repository">
-    <delete dir="${cosmo.dist.version}/data/repository"/> 
+  <goal name="dist:data">
+    <delete dir="${cosmo.dist.version}/data"/> 
     <echo>Initializing Jackrabbit repository</echo>
     <jackrabbit:import
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
@@ -285,11 +249,20 @@
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/caldav_nodetypes.xml"/>
-  </goal>
-
-  <goal name="dist:data">
-    <attainGoal name="dist:db"/>
-    <attainGoal name="dist:repository"/>
+    <jackrabbit:import
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       username="${cosmo.dist.repository.username}"
+       password="${cosmo.dist.repository.password}"
+       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
+/>
+<!--
+    <jackrabbit:loadoverlord
+       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       username="${cosmo.dist.repository.username}"
+       password="${cosmo.dist.repository.password}"/>
+-->
   </goal>
 
   <goal name="dist">
@@ -396,6 +369,43 @@
             </j:otherwise>
           </j:choose>
         </j:if>
+      </j:if>
+    </define:tag>
+
+    <define:tag name="loadoverlord">
+      <j:catch var="exception">
+        <ant:echo>loading overlord</ant:echo>
+        <j:new var="loader"
+               className="org.osaf.cosmo.jackrabbit.RepositoryLoader"/>
+        <j:invoke on="${importer}" method="setConfigFilePath">
+          <j:arg value="${configFilePath}"/>
+        </j:invoke>
+        <j:invoke on="${importer}" method="setRepositoryHomedirPath">
+          <j:arg value="${repositoryHomedirPath}"/>
+        </j:invoke>
+        <j:invoke on="${importer}" method="setCredentials">
+          <j:arg value="${username}"/>
+          <j:arg value="${password}"/>
+        </j:invoke>
+        <j:invoke on="${loader}" method="loadOverlord"/>
+      </j:catch>
+      <j:if test="${exception != null}">
+        <j:invoke on="${exception}" method="printStackTrace"/>
+        <j:choose>
+          <j:when test="${exception.cause != null}">
+            <j:choose>
+              <j:when test="${exception.cause.cause != null}">
+                <ant:fail>${exception.cause.cause.message}</ant:fail>
+              </j:when>
+              <j:otherwise>
+                <ant:fail>${exception.cause.message}</ant:fail>
+              </j:otherwise>
+            </j:choose>
+          </j:when>
+          <j:otherwise>
+            <ant:fail>${exception.message}</ant:fail>
+          </j:otherwise>
+        </j:choose>
       </j:if>
     </define:tag>
   </define:taglib>

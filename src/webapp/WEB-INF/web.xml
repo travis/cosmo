@@ -25,9 +25,7 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>
       classpath:applicationContext-bootstrap.xml
-      classpath:applicationContext-datasource.xml
       classpath:applicationContext-repository.xml
-      classpath:applicationContext-hibernate.xml
       classpath:applicationContext-jcr.xml
       classpath:applicationContext-provisioning.xml
       classpath:applicationContext-security.xml
@@ -160,10 +158,6 @@
   <resource-env-ref>
     <resource-env-ref-name>jcr/cosmo</resource-env-ref-name>
     <resource-env-ref-type>javax.jcr.Repository</resource-env-ref-type>
-  </resource-env-ref>
-  <resource-env-ref>
-    <resource-env-ref-name>jdbc/cosmo</resource-env-ref-name>
-    <resource-env-ref-type>javax.sql.DataSource</resource-env-ref-type>
   </resource-env-ref>
   <resource-env-ref>
     <resource-env-ref-name>mail/cosmo</resource-env-ref-name>

@@ -22,22 +22,8 @@
 
   <!-- DAOs -->
 
-  <bean id="roleDAO"
-        class="org.osaf.cosmo.dao.hibernate.RoleDAOHibernate">
-    <property name="sessionFactory">
-      <ref bean="sessionFactory"/>
-    </property>
-  </bean>
-
   <bean id="userDAO"
-        class="org.osaf.cosmo.dao.hibernate.UserDAOHibernate">
-    <property name="sessionFactory">
-      <ref bean="sessionFactory"/>
-    </property>
-  </bean>
-
-  <bean id="shareDAO"
-        class="org.osaf.cosmo.dao.jcr.ContentStoreDAOJCR">
+        class="org.osaf.cosmo.dao.jcr.JcrUserDao">
     <property name="template">
       <ref bean="homedirTemplate"/>
     </property>
@@ -66,12 +52,6 @@
 
   <bean id="provisioningManager"
         class="org.osaf.cosmo.manager.impl.ProvisioningManagerImpl">
-    <property name="roleDAO">
-      <ref bean="roleDAO"/>
-    </property>
-    <property name="shareDAO">
-      <ref bean="shareDAO"/>
-    </property>
     <property name="userDAO">
       <ref bean="userDAO"/>
     </property>

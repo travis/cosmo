@@ -61,24 +61,6 @@
     </constructor-arg>
   </bean>
 
-  <!-- JDBC data source -->
-
-  <bean id="dataSource"
-        class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-    <property name="driverClassName">
-      <value>@DRIVER@</value>
-    </property>
-    <property name="url">
-      <value>@DB_URL@</value>
-    </property>
-    <property name="username">
-      <value>@DB_USERNAME@</value>
-    </property>
-    <property name="password">
-      <value>@DB_PASSWORD@</value>
-    </property>
-  </bean>
-
   <!-- JCR repository -->
 
   <bean id="jcrRepositoryConfig"

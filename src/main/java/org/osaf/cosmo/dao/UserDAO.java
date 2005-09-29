@@ -17,7 +17,7 @@ package org.osaf.cosmo.dao;
 
 import org.osaf.cosmo.model.User;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * DAO interface for Users.
@@ -28,15 +28,11 @@ public interface UserDAO extends DAO {
 
     /**
      */
-    public List getUsers();
+    public Set getUsers();
 
     /**
      */
-    public User getUser(Long id);
-
-    /**
-     */
-    public User getUserByUsername(String username);
+    public User getUser(String username);
 
     /**
      */
@@ -52,9 +48,5 @@ public interface UserDAO extends DAO {
 
     /**
      */
-    public void removeUser(Long id);
-
-    /**
-     */
-    public void removeUser(User user);
+    public void removeUser(String username);
 }

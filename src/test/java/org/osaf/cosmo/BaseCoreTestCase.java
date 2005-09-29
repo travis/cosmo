@@ -29,7 +29,6 @@ public abstract class BaseCoreTestCase
     
     private static final String[] CONFIG_LOCATIONS = {
         "/applicationContext-test.xml",
-        "/applicationContext-hibernate.xml",
         "/applicationContext-jcr.xml",
         "/applicationContext-provisioning.xml"
     };

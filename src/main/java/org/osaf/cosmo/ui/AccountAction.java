@@ -19,7 +19,6 @@ import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
-import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -101,10 +100,6 @@ public class AccountAction extends CosmoAction {
         User formUser = new User();
         populateUser(formUser, userForm);
 
-        // assign the user role to the new account
-        Role userRole = mgr.getRoleByName(CosmoSecurityManager.ROLE_USER);
-        formUser.addRole(userRole);
-
         try {
             if (log.isDebugEnabled()) {
                 log.debug("signing up user " + formUser.getUsername());
@@ -171,7 +166,7 @@ public class AccountAction extends CosmoAction {
 
     private void populateUser(User user, UserForm form) {
         // user does not get to change his username once it's set
-        if (user.getId() == null) {
+        if (user.getUsername() == null) {
             user.setUsername(form.getUsername());
         }
         user.setFirstName(form.getFirstName());
@@ -186,7 +181,6 @@ public class AccountAction extends CosmoAction {
     }
 
     private void populateForm(UserForm form, User user) {
-        form.setId(user.getId());
         form.setUsername(user.getUsername());
         form.setFirstName(user.getFirstName());
         form.setLastName(user.getLastName());

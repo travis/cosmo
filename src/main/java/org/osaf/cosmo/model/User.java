@@ -32,6 +32,9 @@ public class User extends BaseModelObject {
 
     /**
      */
+    public static final String USERNAME_OVERLORD = "root";
+    /**
+     */
     public static final int USERNAME_LEN_MIN = 3;
     /**
      */
@@ -39,7 +42,7 @@ public class User extends BaseModelObject {
     /**
      */
     public static final Pattern USERNAME_PATTERN =
-        Pattern.compile("^[\\w\\s.\\-\\']+$");
+        Pattern.compile("^[^./:/[/]*'\"|\\s]+$"); // "
     /**
      */
     public static final int PASSWORD_LEN_MIN = 5;
@@ -60,42 +63,26 @@ public class User extends BaseModelObject {
     public static final int LASTNAME_LEN_MAX = 32;
     /**
      */
-    public static final Pattern PERSON_NAME_PATTERN =
-        Pattern.compile("^[\\w\\s.\\-\\']+$");
-    /**
-     */
     public static final int EMAIL_LEN_MIN = 1;
     /**
      */
     public static final int EMAIL_LEN_MAX = 32;
 
-    private Long id;
     private String username;
     private String oldUsername;
     private String password;
     private String firstName;
     private String lastName;
     private String email;
+    private String oldEmail;
+    private Boolean admin;
     private Date dateCreated;
     private Date dateModified;
-    private Set roles;
 
     /**
      */
     public User() {
-        roles = new HashSet();
-    }
-
-    /**
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     */
-    public void setId(Long id) {
-        this.id = id;
+        admin = Boolean.FALSE;
     }
 
     /**
@@ -168,7 +155,32 @@ public class User extends BaseModelObject {
     /**
      */
     public void setEmail(String email) {
+        oldEmail = this.email;
         this.email = email;
+    }
+
+    /**
+     */
+    public String getOldEmail() {
+        return oldEmail;
+    }
+
+    /**
+     */
+    public boolean isEmailChanged() {
+        return oldEmail != null && ! oldEmail.equals(email);
+    }
+
+    /**
+     */
+    public Boolean isAdmin() {
+        return admin;
+    }
+
+    /**
+     */
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
     }
 
     /**
@@ -197,38 +209,8 @@ public class User extends BaseModelObject {
 
     /**
      */
-    public boolean isInRole(String name) {
-        for (Iterator i=roles.iterator(); i.hasNext();) {
-            Role role = (Role) i.next();
-            if (role.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     */
-    public Set getRoles() {
-        return roles;
-    }
-
-    /**
-     */
-    public void addRole(Role role) {
-        roles.add(role);
-    }
-
-    /**
-     */
-    public void removeRole(Role role) {
-        roles.remove(role);
-    }
-
-    /**
-     */
-    public void setRoles(Set roles) {
-        this.roles = roles;
+    public boolean isOverlord() {
+        return username != null && username.equals(USERNAME_OVERLORD);
     }
 
     /**
@@ -244,6 +226,7 @@ public class User extends BaseModelObject {
             append(firstName, it.firstName).
             append(lastName, it.lastName).
             append(email, it.email).
+            append(admin, it.admin).
             isEquals();
     }
 
@@ -256,6 +239,7 @@ public class User extends BaseModelObject {
             append(firstName).
             append(lastName).
             append(email).
+            append(admin).
             toHashCode();
     }
 
@@ -263,12 +247,12 @@ public class User extends BaseModelObject {
      */
     public String toString() {
         return new ToStringBuilder(this).
-            append("id", id).
             append("username", username).
             append("password", "xxxxxx").
             append("firstName", firstName).
             append("lastName", lastName).
             append("email", email).
+            append("admin", admin).
             append("dateCreated", dateCreated).
             append("dateModified", dateModified).
             toString();
@@ -298,7 +282,8 @@ public class User extends BaseModelObject {
         }
         Matcher m = USERNAME_PATTERN.matcher(username);
         if (! m.matches()) {
-            throw new ModelValidationException("username contains illegal characters");
+            throw new ModelValidationException("username contains illegal " +
+                                               "characters");
         }
     }
 
@@ -330,10 +315,6 @@ public class User extends BaseModelObject {
                                                FIRSTNAME_LEN_MAX +
                                                " characters in length");
         }
-        Matcher m = PERSON_NAME_PATTERN.matcher(firstName);
-        if (! m.matches()) {
-            throw new ModelValidationException("firstName contains illegal characters");
-        }
     }
 
     /**
@@ -348,10 +329,6 @@ public class User extends BaseModelObject {
                                                LASTNAME_LEN_MIN + " to " +
                                                LASTNAME_LEN_MAX +
                                                " characters in length");
-        }
-        Matcher m = PERSON_NAME_PATTERN.matcher(lastName);
-        if (! m.matches()) {
-            throw new ModelValidationException("lastName contains illegal characters");
         }
     }
 

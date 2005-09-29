@@ -25,19 +25,6 @@ package org.osaf.cosmo.security;
 public interface CosmoSecurityManager {
 
     /**
-     * The name of the root user.
-     */
-    public static final String USER_ROOT = "root";
-    /**
-     * The name of the root role.
-     */
-    public static final String ROLE_ROOT = "root";
-    /**
-     * The name of the role which has all users as its members.
-     */
-    public static final String ROLE_USER = "user";
-
-    /**
      * Provide a <code>CosmoSecurityContext</code> representing a
      * Cosmo user previously authenticated by the Cosmo security
      * system.

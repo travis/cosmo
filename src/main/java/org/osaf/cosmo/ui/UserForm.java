@@ -27,7 +27,6 @@ import org.apache.struts.action.ActionMapping;
  */
 public class UserForm extends ValidatorForm {
 
-    private String id;
     private String username;
     private String firstName;
     private String lastName;
@@ -40,24 +39,6 @@ public class UserForm extends ValidatorForm {
      */
     public UserForm() {
         initialize();
-    }
-
-    /**
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     */
-    public void setId(Long id) {
-        this.id = id.toString();
     }
 
     /**
@@ -156,7 +137,6 @@ public class UserForm extends ValidatorForm {
      */
     public String toString() {
         return new ToStringBuilder(this).
-            append("id", id).
             append("username", username).
             append("firstName", firstName).
             append("lastName", lastName).

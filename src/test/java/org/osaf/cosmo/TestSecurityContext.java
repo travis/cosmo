@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo;
 
-import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
@@ -39,7 +38,7 @@ public class TestSecurityContext implements CosmoSecurityContext {
 
     private boolean anonymous;
     private Principal principal;
-    private boolean rootRole;
+    private boolean admin;
     private Ticket ticket;
     private User user;
 
@@ -48,7 +47,7 @@ public class TestSecurityContext implements CosmoSecurityContext {
     public TestSecurityContext(Principal principal) {
         this.anonymous = false;
         this.principal = principal;
-        this.rootRole = false;
+        this.admin = false;
 
         processPrincipal();
     }
@@ -97,11 +96,11 @@ public class TestSecurityContext implements CosmoSecurityContext {
     }
 
     /**
-     * Determines whether or not the security context represents a
-     * user in the root role.
+     * Determines whether or not the security context represents an
+     * administrative user.
      */
-    public boolean inRootRole() {
-        return rootRole;
+    public boolean isAdmin() {
+        return admin;
     }
 
     /* ----- our methods ----- */
@@ -125,15 +124,7 @@ public class TestSecurityContext implements CosmoSecurityContext {
         }
         else if (principal instanceof TestUserPrincipal) {
             user = ((TestUserPrincipal) principal).getUser();
-            
-            // determine if the user is in the root role
-            for (Iterator i=user.getRoles().iterator(); i.hasNext();) {
-                Role role = (Role) i.next();
-                if (role.getName().equals(CosmoSecurityManager.ROLE_ROOT)) {
-                    rootRole = true;
-                    break;
-                }
-            }
+            admin = user.isAdmin().booleanValue();
         }
         
     }

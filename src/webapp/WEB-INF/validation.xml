@@ -23,11 +23,8 @@
    <global>
       <constant>
         <constant-name>username</constant-name>
-        <constant-value>^[\w\s.\-\']+$</constant-value>
-      </constant>
-      <constant>
-        <constant-name>personName</constant-name>
-        <constant-value>^[\w\s.\-\']+$</constant-value>
+        <constant-value>^[^./:[]*'"|\s]+$</constant-value>
+        <!-- " fixes emacs syntax highlighting -->
       </constant>
    </global>
    <formset>
@@ -56,19 +53,14 @@
          </var>
        </field>
        <field property="firstName"
-              depends="required,mask,minlength,maxlength">
+              depends="required,minlength,maxlength">
          <msg name="required" key="Form.FieldRequired"/>
-         <msg name="mask" key="Form.PersonNameInvalid"/>
          <msg name="minlength" key="Form.Length"/>
          <msg name="maxlength" key="Form.Length"/>
          <arg0 name="minlength" key="${var:minlength}" resource="false"/>
          <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
          <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
          <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
-         <var>
-           <var-name>mask</var-name>
-           <var-value>${personName}</var-value>
-         </var>
          <var>
            <var-name>minlength</var-name>
            <var-value>1</var-value>
@@ -79,19 +71,14 @@
          </var>
        </field>
        <field property="lastName"
-              depends="required,mask,minlength,maxlength">
+              depends="required,minlength,maxlength">
          <msg name="required" key="Form.FieldRequired"/>
-         <msg name="mask" key="Form.PersonNameInvalid"/>
          <msg name="minlength" key="Form.Length"/>
          <msg name="maxlength" key="Form.Length"/>
          <arg0 name="minlength" key="${var:minlength}" resource="false"/>
          <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
          <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
          <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
-         <var>
-           <var-name>mask</var-name>
-           <var-value>${personName}</var-value>
-         </var>
          <var>
            <var-name>minlength</var-name>
            <var-value>1</var-value>
@@ -146,19 +133,14 @@
      </form>
      <form name="updateAccountForm">
        <field property="firstName"
-              depends="required,mask,minlength,maxlength">
+              depends="required,minlength,maxlength">
          <msg name="required" key="Form.FieldRequired"/>
-         <msg name="mask" key="Form.PersonNameInvalid"/>
          <msg name="minlength" key="Form.Length"/>
          <msg name="maxlength" key="Form.Length"/>
          <arg0 name="minlength" key="${var:minlength}" resource="false"/>
          <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
          <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
          <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
-         <var>
-           <var-name>mask</var-name>
-           <var-value>${personName}</var-value>
-         </var>
          <var>
            <var-name>minlength</var-name>
            <var-value>1</var-value>
@@ -169,19 +151,14 @@
          </var>
        </field>
        <field property="lastName"
-              depends="required,mask,minlength,maxlength">
+              depends="required,minlength,maxlength">
          <msg name="required" key="Form.FieldRequired"/>
-         <msg name="mask" key="Form.PersonNameInvalid"/>
          <msg name="minlength" key="Form.Length"/>
          <msg name="maxlength" key="Form.Length"/>
          <arg0 name="minlength" key="${var:minlength}" resource="false"/>
          <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
          <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
          <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
-         <var>
-           <var-name>mask</var-name>
-           <var-value>${personName}</var-value>
-         </var>
          <var>
            <var-name>minlength</var-name>
            <var-value>1</var-value>
@@ -274,19 +251,14 @@
          </var>
        </field>
        <field property="firstName"
-              depends="required,mask,minlength,maxlength">
+              depends="required,minlength,maxlength">
          <msg name="required" key="Form.FieldRequired"/>
-         <msg name="mask" key="Form.PersonNameInvalid"/>
          <msg name="minlength" key="Form.Length"/>
          <msg name="maxlength" key="Form.Length"/>
          <arg0 name="minlength" key="${var:minlength}" resource="false"/>
          <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
          <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
          <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
-         <var>
-           <var-name>mask</var-name>
-           <var-value>${personName}</var-value>
-         </var>
          <var>
            <var-name>minlength</var-name>
            <var-value>1</var-value>
@@ -297,19 +269,14 @@
          </var>
        </field>
        <field property="lastName"
-              depends="required,mask,minlength,maxlength">
+              depends="required,minlength,maxlength">
          <msg name="required" key="Form.FieldRequired"/>
-         <msg name="mask" key="Form.PersonNameInvalid"/>
          <msg name="minlength" key="Form.Length"/>
          <msg name="maxlength" key="Form.Length"/>
          <arg0 name="minlength" key="${var:minlength}" resource="false"/>
          <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
          <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
          <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
-         <var>
-           <var-name>mask</var-name>
-           <var-value>${personName}</var-value>
-         </var>
          <var>
            <var-name>minlength</var-name>
            <var-value>1</var-value>
@@ -387,19 +354,14 @@
          </var>
        </field>
        <field property="firstName"
-              depends="required,mask,minlength,maxlength">
+              depends="required,minlength,maxlength">
          <msg name="required" key="Form.FieldRequired"/>
-         <msg name="mask" key="Form.PersonNameInvalid"/>
          <msg name="minlength" key="Form.Length"/>
          <msg name="maxlength" key="Form.Length"/>
          <arg0 name="minlength" key="${var:minlength}" resource="false"/>
          <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
          <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
          <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
-         <var>
-           <var-name>mask</var-name>
-           <var-value>${personName}</var-value>
-         </var>
          <var>
            <var-name>minlength</var-name>
            <var-value>1</var-value>
@@ -410,19 +372,14 @@
          </var>
        </field>
        <field property="lastName"
-              depends="required,mask,minlength,maxlength">
+              depends="required,minlength,maxlength">
          <msg name="required" key="Form.FieldRequired"/>
-         <msg name="mask" key="Form.PersonNameInvalid"/>
          <msg name="minlength" key="Form.Length"/>
          <msg name="maxlength" key="Form.Length"/>
          <arg0 name="minlength" key="${var:minlength}" resource="false"/>
          <arg1 name="minlength" key="${var:maxlength}" resource="false"/>
          <arg0 name="maxlength" key="${var:minlength}" resource="false"/>
          <arg1 name="maxlength" key="${var:maxlength}" resource="false"/>
-         <var>
-           <var-name>mask</var-name>
-           <var-value>${personName}</var-value>
-         </var>
          <var>
            <var-name>minlength</var-name>
            <var-value>1</var-value>

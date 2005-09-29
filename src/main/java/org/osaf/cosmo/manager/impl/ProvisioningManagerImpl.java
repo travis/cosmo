@@ -15,16 +15,13 @@
  */
 package org.osaf.cosmo.manager.impl;
 
-import org.osaf.cosmo.dao.RoleDAO;
-import org.osaf.cosmo.dao.ShareDAO;
 import org.osaf.cosmo.dao.UserDAO;
 import org.osaf.cosmo.manager.ProvisioningManager;
-import org.osaf.cosmo.model.Role;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import java.security.MessageDigest;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.id.StringIdentifierGenerator;
@@ -43,23 +40,9 @@ public class ProvisioningManagerImpl
     implements InitializingBean, ProvisioningManager {
     private static final Log log =
         LogFactory.getLog(ProvisioningManagerImpl.class);
-    private RoleDAO roleDao;
-    private ShareDAO shareDao;
     private UserDAO userDao;
     private MessageDigest digest;
     private StringIdentifierGenerator passwordGenerator;
-
-    /**
-     */
-    public void setRoleDAO(RoleDAO roleDao) {
-        this.roleDao = roleDao;
-    }
-
-    /**
-     */
-    public void setShareDAO(ShareDAO shareDao) {
-        this.shareDao = shareDao;
-    }
 
     /**
      */
@@ -83,38 +66,14 @@ public class ProvisioningManagerImpl
 
     /**
      */
-    public List getRoles() {
-        return roleDao.getRoles();
-    }
-
-    /**
-     */
-    public Role getRole(String id) {
-        return roleDao.getRole(new Long(id));
-    }
-
-    /**
-     */
-    public Role getRoleByName(String name) {
-        return roleDao.getRole(name);
-    }
-
-    /**
-     */
-    public List getUsers() {
+    public Set getUsers() {
         return userDao.getUsers();
     }
 
     /**
      */
-    public User getUser(String id) {
-        return userDao.getUser(new Long(id));
-    }
-
-    /**
-     */
-    public User getUserByUsername(String username) {
-        return userDao.getUserByUsername(username);
+    public User getUser(String username) {
+        return userDao.getUser(username);
     }
 
     /**
@@ -131,11 +90,7 @@ public class ProvisioningManagerImpl
 
         userDao.saveUser(user);
 
-        if (! user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
-            shareDao.createHomedir(user.getUsername());
-        }
-
-        return userDao.getUserByUsername(user.getUsername());
+        return userDao.getUser(user.getUsername());
     }
 
     /**
@@ -148,35 +103,13 @@ public class ProvisioningManagerImpl
 
         userDao.updateUser(user);
 
-        // if the username was changed, rename the home directory. do
-        // this after the database update, because we can roll back
-        // the database if the homedir rename fails, but not vice
-        // versa.
-        if (user.isUsernameChanged()) {
-            shareDao.renameHomedir(user.getOldUsername(), user.getUsername());
-        }
-
-        return userDao.getUserByUsername(user.getUsername());
+        return userDao.getUser(user.getUsername());
     }
 
     /**
      */
-    public void removeUser(String id) {
-        User user = getUser(id);
-        if (! user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
-            shareDao.deleteHomedir(user.getUsername());
-        }
-        userDao.removeUser(user);
-    }
-
-    /**
-     */
-    public void removeUserByUsername(String username) {
-        User user = getUserByUsername(username);
-        if (! user.getUsername().equals(CosmoSecurityManager.USER_ROOT)) {
-            shareDao.deleteHomedir(user.getUsername());
-        }
-        userDao.removeUser(user);
+    public void removeUser(String username) {
+        userDao.removeUser(username);
     }
 
     /**
@@ -192,12 +125,6 @@ public class ProvisioningManagerImpl
      * Sanity check the object's properties.
      */
     public void afterPropertiesSet() throws Exception {
-        if (roleDao == null) {
-            throw new IllegalArgumentException("roleDAO is required");
-        }
-        if (shareDao == null) {
-            throw new IllegalArgumentException("shareDAO is required");
-        }
         if (userDao == null) {
             throw new IllegalArgumentException("userDAO is required");
         }

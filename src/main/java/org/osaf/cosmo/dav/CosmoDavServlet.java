@@ -344,12 +344,11 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
-        // must either be a root user or the user that created the
-        // ticket
+        // must either be an admin or the user that created the ticket
         String loggedInUsername =
             securityManager.getSecurityContext().getUser().getUsername();
         if (! (ticket.getOwner().equals(loggedInUsername) ||
-               securityManager.getSecurityContext().inRootRole())) {
+               securityManager.getSecurityContext().isAdmin())) {
             response.sendError(DavServletResponse.SC_FORBIDDEN);
             return;
         }

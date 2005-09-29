@@ -53,14 +53,4 @@
       <rtexprvalue>false</rtexprvalue>
     </attribute>
   </tag>
-  <function>
-    <name>isAdmin</name>
-    <function-class>org.osaf.cosmo.ui.jsp.CosmoJspFunctions</function-class>
-    <function-signature>java.lang.boolean isAdmin(org.osaf.cosmo.model.User)</function-signature>
-  </function>
-  <function>
-    <name>isRoot</name>
-    <function-class>org.osaf.cosmo.ui.jsp.CosmoJspFunctions</function-class>
-    <function-signature>java.lang.boolean isRoot(org.osaf.cosmo.model.User)</function-signature>
-  </function>
 </taglib>

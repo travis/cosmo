@@ -53,8 +53,8 @@ public interface CosmoSecurityContext {
     public Ticket getTicket();
 
     /**
-     * Determines whether or not the security context represents a
-     * user in the root role.
+     * Determines whether or not the security context represents an
+     * administrative user.
      */
-    public boolean inRootRole();
+    public boolean isAdmin();
 }

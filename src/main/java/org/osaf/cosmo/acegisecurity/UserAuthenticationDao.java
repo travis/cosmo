@@ -55,7 +55,7 @@ public class UserAuthenticationDao implements AuthenticationDao {
         throws UsernameNotFoundException, DataAccessException {
         try {
             return new
-                CosmoUserDetailsImpl(userDAO.getUserByUsername(username));
+                CosmoUserDetailsImpl(userDAO.getUser(username));
         } catch (DataRetrievalFailureException e) {
             throw new UsernameNotFoundException("user " + username +
                                                 " not found", e);

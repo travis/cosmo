@@ -1,19 +1,13 @@
 
 
-Custom JCR Node Types - WebDAV
-
-
-References
-==========
-
-http://www.faqs.org/rfcs/rfc2518.html
+Custom JCR Node Types - Cosmo
 
 
 Node Type Definitions
 =====================
 
 NodeTypeName
-  dav:collection
+  cosmo:user
 SuperTypes
   []
 IsMixin
@@ -23,7 +17,7 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 PropertyDef
-  Name dav:displayname
+  Name cosmo:username
   RequiredType STRING
   DefaultValues null
   AutoCreate false
@@ -32,27 +26,7 @@ PropertyDef
   Protected false
   Multiple false
 PropertyDef
-  Name *
-  RequiredType UNDEFINED
-  DefaultValues null
-  AutoCreate false
-  Mandatory false
-  OnParentVersion COPY
-  Protected false
-  Multiple false
-
-NodeTypeName
-  dav:resource
-SuperTypes
-  []
-IsMixin
-  true
-HasOrderableChildNodes
-  false
-PrimaryItemName
-  null
-PropertyDef
-  Name dav:displayname
+  Name cosmo:firstName
   RequiredType STRING
   DefaultValues null
   AutoCreate false
@@ -61,20 +35,56 @@ PropertyDef
   Protected false
   Multiple false
 PropertyDef
-  Name dav:contentlanguage
+  Name cosmo:lastName
   RequiredType STRING
   DefaultValues null
   AutoCreate false
-  Mandatory false
+  Mandatory true
   OnParentVersion COPY
   Protected false
   Multiple false
 PropertyDef
-  Name *
-  RequiredType UNDEFINED
+  Name cosmo:password
+  RequiredType STRING
   DefaultValues null
   AutoCreate false
-  Mandatory false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name cosmo:email
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name cosmo:admin
+  RequiredType BOOLEAN
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name cosmo:dateCreated
+  RequiredType DATE
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name cosmo:dateModified
+  RequiredType DATE
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
   OnParentVersion COPY
   Protected false
   Multiple false

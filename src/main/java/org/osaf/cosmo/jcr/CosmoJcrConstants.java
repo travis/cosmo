@@ -89,7 +89,9 @@ public class CosmoJcrConstants {
 
     // node types
 
+    public static final String NT_BASE = "nt:base";
     public static final String NT_FOLDER = "nt:folder";
+    public static final String NT_FILE = "nt:file";
     public static final String NT_RESOURCE = "nt:resource";
 
     public static final String NT_DAV_COLLECTION = "dav:collection";
@@ -112,6 +114,8 @@ public class CosmoJcrConstants {
     public static final String NT_ICAL_CALSCALE = "icalendar:calscale";
     public static final String NT_ICAL_METHOD = "icalendar:method";
     public static final String NT_ICAL_XPROPERTY = "icalendar:xproperty";
+
+    public static final String NT_COSMO_USER = "cosmo:user";
 
     // node properties
 
@@ -199,4 +203,13 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_VALUE = "icalendar:value";
     public static final String NP_ICAL_WEEKS = "icalendar:weeks";
     public static final String NP_ICAL_WKST = "icalendar:wkst";
+
+    public static final String NP_COSMO_USERNAME = "cosmo:username";
+    public static final String NP_COSMO_PASSWORD = "cosmo:password";
+    public static final String NP_COSMO_FIRSTNAME = "cosmo:firstName";
+    public static final String NP_COSMO_LASTNAME = "cosmo:lastName";
+    public static final String NP_COSMO_EMAIL = "cosmo:email";
+    public static final String NP_COSMO_ADMIN = "cosmo:admin";
+    public static final String NP_COSMO_DATECREATED = "cosmo:dateCreated";
+    public static final String NP_COSMO_DATEMODIFIED = "cosmo:dateModified";
 }

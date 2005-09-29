@@ -86,6 +86,34 @@ public class JCRUtils {
         return node;
     }
 
+    /**
+     */
+    public static Date getCreated(Node node)
+        throws RepositoryException {
+        return getDateValue(node, CosmoJcrConstants.NP_JCR_CREATED);
+    }
+
+    /**
+     */
+    public static void setCreated(Node node, Date date)
+        throws RepositoryException {
+        setDateValue(node, CosmoJcrConstants.NP_JCR_CREATED, null);
+    }
+
+    /**
+     */
+    public static Date getLastModified(Node node)
+        throws RepositoryException {
+        return getDateValue(node, CosmoJcrConstants.NP_JCR_LASTMODIFIED);
+    }
+
+    /**
+     */
+    public static void setLastModified(Node node, Date date)
+        throws RepositoryException {
+        setDateValue(node, CosmoJcrConstants.NP_JCR_LASTMODIFIED, null);
+    }
+
     // low level accessors and mutators for specifically-typed JCR
     // property values
 
@@ -112,6 +140,13 @@ public class JCRUtils {
     public static String getStringValue(Node node, String property)
         throws RepositoryException {
         return node.getProperty(property).getString();
+    }
+
+    /**
+     */
+    public static Boolean getBooleanValue(Node node, String property)
+        throws RepositoryException {
+        return new Boolean(node.getProperty(property).getBoolean());
     }
 
     /**

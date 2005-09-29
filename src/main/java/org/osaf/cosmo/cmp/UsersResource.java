@@ -16,7 +16,7 @@
 package org.osaf.cosmo.cmp;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -31,12 +31,12 @@ public class UsersResource implements CmpResource {
      */
     public static final String EL_USERS = "users";
 
-    private List users;
+    private Set users;
     private String urlBase;
 
     /**
      */
-    public UsersResource(List users, String urlBase) {
+    public UsersResource(Set users, String urlBase) {
         this.users = users;
         this.urlBase = urlBase;
     }

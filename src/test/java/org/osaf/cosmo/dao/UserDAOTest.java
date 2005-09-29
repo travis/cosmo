@@ -22,7 +22,7 @@ import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,35 +46,32 @@ public class UserDAOTest extends BaseCoreTestCase {
 
         User user = TestHelper.makeDummyUser();
         dao.saveUser(user);
-        assertNotNull(user.getId());
         assertNotNull(user.getDateCreated());
         assertNotNull(user.getDateModified());
 
-        // get by id
-        User user2 = dao.getUser(user.getId());
+        // get by username
+        User user2 = dao.getUser(user.getUsername());
         assertTrue(user2.equals(user));
         assertEquals(user2.hashCode(), user.hashCode());
-        assertNotNull(user2.getEmail());
 
-        // get by username
-        User user3 = dao.getUser(user.getId());
+        // get by email
+        User user3 = dao.getUserByEmail(user.getEmail());
         assertTrue(user3.equals(user));
         assertEquals(user3.hashCode(), user.hashCode());
-        assertNotNull(user3.getEmail());
 
         // change password
-        user3.setPassword("changed password");
-        dao.updateUser(user3);
-        assertTrue(user3.hashCode() != user.hashCode());
+        user2.setPassword("changed password");
+        dao.updateUser(user2);
+        assertTrue(user2.hashCode() != user.hashCode());
 
         //make sure the password was changed
-        User user4 = dao.getUser(user2.getId());
-        assertEquals(user4.getPassword(), user3.getPassword());
+        User user4 = dao.getUser(user.getUsername());
+        assertEquals(user4.getPassword(), user2.getPassword());
         assertTrue(! user4.getPassword().equals(user.getPassword()));
 
-        dao.removeUser(user);
+        dao.removeUser(user.getUsername());
         try {
-            dao.getUser(user.getId());
+            dao.getUser(user.getUsername());
             fail("user not removed");
         } catch (DataRetrievalFailureException e) {
             // expected
@@ -171,12 +168,12 @@ public class UserDAOTest extends BaseCoreTestCase {
         }
     }
 
-    public void testListUsers() throws Exception {
+    public void testGetUsers() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("BEGIN");
         }
 
-        List users = dao.getUsers();
+        Set users = dao.getUsers();
     }
 
     public void setUserDAO(UserDAO userDao) {

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+<!DOCTYPE config [
+        <!ELEMENT config ((collection | noncollection)? , filter?) >
+
+        <!ELEMENT collection (nodetypes) >
+        <!ELEMENT noncollection (nodetypes) >
+
+        <!ELEMENT filter (class, namespaces?, nodetypes?) >
+
+        <!ELEMENT class >
+        <!ATTLIST class
+            name  CDATA #REQUIRED
+        >
+        <!ELEMENT namespaces (prefix | uri)* >
+        <!ELEMENT prefix (CDATA) >
+        <!ELEMENT uri (CDATA) >
+
+        <!ELEMENT nodetypes (nodetype)* >
+        <!ELEMENT nodetype (CDATA) >
+]>
+-->
+
+<config>
+  <collection>
+    <nodetypes>
+      <nodetype>nt:folder</nodetype>
+    </nodetypes>
+  </collection>
+  <filter>
+    <class name="org.apache.jackrabbit.webdav.simple.DefaultResourceFilter"/>
+    <namespaces>
+      <prefix>rep</prefix>
+      <prefix>jcr</prefix>
+      <prefix>icalendar</prefix>
+      <prefix>ticket</prefix>
+      <prefix>xml</prefix>
+    </namespaces>
+  </filter>
+</config>

@@ -21,7 +21,7 @@ import javax.jcr.RepositoryException;
 
 import org.apache.jackrabbit.server.io.ExportContext;
 import org.apache.jackrabbit.webdav.DavResource;
-import org.apache.jackrabbit.webdav.simple.ChainBasedNodeResource;
+import org.apache.jackrabbit.webdav.simple.CollectionNodeResource;
 
 import org.apache.log4j.Logger;
 
@@ -31,17 +31,18 @@ import org.osaf.cosmo.jackrabbit.io.ApplicationContextAwareExportContext;
 
 /**
  * Extends
- *  {@link org.apache.jackrabbit.webdav.simple.ChainBasedNodeResource}
+ *  {@link org.apache.jackrabbit.webdav.simple.CollectionNodeResource}
  * to provide Cosmo-specific logic.
  */
-public class CosmoNodeResource extends ChainBasedNodeResource {
-    private static final Logger log = Logger.getLogger(CosmoNodeResource.class);
+public class CosmoCollectionNodeResource extends CollectionNodeResource {
+    private static final Logger log =
+        Logger.getLogger(CosmoCollectionNodeResource.class);
 
     private ApplicationContext applicationContext;
 
     /**
      */
-    public CosmoNodeResource(ApplicationContext applicationContext) {
+    public CosmoCollectionNodeResource(ApplicationContext applicationContext) {
         super();
         this.applicationContext = applicationContext;
     }

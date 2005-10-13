@@ -31,23 +31,4 @@
     </property>
   </bean>
 
-  <bean id="lockManager"
-        class="org.apache.jackrabbit.webdav.lock.SimpleLockManager"/>
-
-  <bean id="resourceFilter"
-        class="org.osaf.cosmo.dav.CosmoResourceFilter"/>
-
-  <bean id="resourceFactory"
-        class="org.osaf.cosmo.dav.impl.CosmoDavResourceFactoryImpl">
-    <property name="lockManager">
-      <ref local="lockManager"/>
-    </property>
-    <property name="resourceFilter">
-      <ref local="resourceFilter"/>
-    </property>
-    <property name="securityManager">
-      <ref bean="securityManager"/>
-    </property>
-  </bean>
-
 </beans>

@@ -196,31 +196,18 @@
                 value="${cosmo.dist.repository.password}"/>
       </filterset>
     </copy>
+
+    <j:forEach var="lib" items="${pom.artifacts}">
+      <j:set var="dep" value="${lib.dependency}"/>     
+      <j:if test="${dep.getProperty('tomcat.bundle')=='true'}">
+        <copy todir="${cosmo.dist.version}/tomcat/common/lib"
+              file="${lib.path}"/>  
+      </j:if>  
+    </j:forEach>
+
     <!-- needed for tomcat's own logging -->
     <copy todir="${cosmo.dist.version}/tomcat/common/classes"
           file="${basedir}/src/main/resources/server/log4j.xml"/>
-    <copy todir="${cosmo.dist.version}/tomcat/common/lib">
-      <fileset dir="${maven.repo.local}/commons-logging/jars">
-        <include name="commons-logging-*.jar"/>
-      </fileset>
-      <fileset dir="${maven.repo.local}/log4j/jars">
-        <include name="log4j-*.jar"/>
-      </fileset>
-    </copy>
-    <!-- tomcat uses a different classloader to find these when
-         setting up jndi resources -->
-    <copy todir="${cosmo.dist.version}/tomcat/common/lib">
-      <fileset dir="${maven.repo.local}/jsr170/jars">
-        <include name="jcr-1.0.jar"/>
-      </fileset>
-      <fileset dir="${maven.repo.local}/javamail/jars">
-        <include name="mailapi-*.jar"/>
-        <include name="smtp-*.jar"/>
-      </fileset>
-      <fileset dir="${maven.repo.local}/jaf/jars">
-        <include name="activation-*.jar"/>
-      </fileset>
-    </copy>
   </goal>
 
   <goal name="dist:data">

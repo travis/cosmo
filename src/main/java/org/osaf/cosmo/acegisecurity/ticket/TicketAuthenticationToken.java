@@ -41,7 +41,7 @@ public class TicketAuthenticationToken extends AbstractAuthenticationToken
     private Ticket ticket;
 
     /**
-     * @param path the absolute path to the ticketed resource
+     * @param path the absolute URI path to the ticketed resource
      * @param id the ticket id
      */
     public TicketAuthenticationToken(String path, String id) {

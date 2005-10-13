@@ -59,6 +59,7 @@ import org.osaf.cosmo.icalendar.DuplicateUidException;
 import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.icalendar.RecurrenceSet;
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
+import org.osaf.cosmo.jcr.JCREscapist;
 import org.osaf.cosmo.jcr.JCRUtils;
 
 /**
@@ -208,7 +209,8 @@ public class JCRCalendarDao implements CalendarDao {
         StringBuffer stmt = new StringBuffer();
         stmt.append("/jcr:root");
         if (! node.getParent().getPath().equals("/")) {
-            stmt.append(node.getParent().getPath());
+            stmt.append(JCREscapist.xmlEscapeJCRPath(node.getParent().
+                                                     getPath()));
         }
         stmt.append("//element(*, ").
             append(CosmoJcrConstants.NT_CALDAV_RESOURCE).
@@ -219,6 +221,9 @@ public class JCRCalendarDao implements CalendarDao {
             append(uid).
             append("']");
 
+        if (log.isDebugEnabled()) {
+            log.debug("verifying unique uid with query " + stmt);
+        }
         QueryManager qm =
             node.getSession().getWorkspace().getQueryManager();
         QueryResult qr =
@@ -1686,6 +1691,9 @@ public class JCRCalendarDao implements CalendarDao {
             java.util.Date date = propertyNode.
                 getProperty(CosmoJcrConstants.NP_ICAL_DATETIME).
                 getDate().getTime();
+            if (value != null && value.equals(Value.DATE)) {
+                return new DtEnd(parameters, new Date(date));
+            }
             return new DtEnd(parameters, new DateTime(date));
         } catch (PathNotFoundException e) {
             return null;

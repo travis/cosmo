@@ -25,8 +25,8 @@ import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.jcr.JcrDavException;
 import org.apache.jackrabbit.webdav.lock.LockManager;
+import org.apache.jackrabbit.webdav.simple.ResourceConfig;
 import org.apache.jackrabbit.webdav.simple.ResourceFactoryImpl;
-import org.apache.jackrabbit.webdav.simple.ResourceFilter;
 
 import org.osaf.cosmo.dav.CosmoDavMethods;
 import org.osaf.cosmo.dav.CosmoDavResource;
@@ -45,8 +45,15 @@ public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
 
     /**
      */
-    public CosmoDavResourceFactoryImpl() {
-        super(null, null);
+    public CosmoDavResourceFactoryImpl(LockManager lockMgr) {
+        super(lockMgr);
+    }
+
+    /**
+     */
+    public CosmoDavResourceFactoryImpl(LockManager lockMgr,
+                                       ResourceConfig resourceConfig) {
+        super(lockMgr, resourceConfig);
     }
 
     // DavResourceFactoryImpl methods
@@ -59,7 +66,7 @@ public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
         try {
             CosmoDavResourceImpl resource =
                 new CosmoDavResourceImpl(locator, this, session,
-                                         getResourceFilter());
+                                         getResourceConfig());
             resource.addLockManager(getLockManager());
             return resource;
         } catch (RepositoryException e) {

@@ -22,11 +22,11 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.data.*;
+import net.fortuna.ical4j.model.*;
+import net.fortuna.ical4j.model.component.*;
+import net.fortuna.ical4j.model.parameter.*;
+import net.fortuna.ical4j.model.property.*;
 
 import org.osaf.commons.spring.jcr.JCRSessionFactory;
 import org.osaf.cosmo.BaseCoreTestCase;
@@ -62,7 +62,7 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         // create the calendar collection in the repository
         Session session = sessionFactory.getSession();
         Node root = session.getRootNode();
-        dao.createCalendarCollection(root, "calendarcollection");
+        dao.createCalendarCollection(root, "calendar collection");
         session.save();
         session.logout();
 
@@ -116,6 +116,49 @@ public class CalendarDaoTest extends BaseCoreTestCase {
         }
     }
 
+    public void testStoreCalendarObjectInTwoCalendarCollections()
+        throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("BEGIN");
+        }
+
+        Session session = sessionFactory.getSession();
+
+        // create a calendar object containing an event
+        // and a timezone
+        Calendar calendar = TestHelper.makeDummyCalendar();
+        VEvent event = TestHelper.makeDummyEvent();
+        calendar.getComponents().add(event);
+        calendar.getComponents().add(VTimeZone.getDefault());
+        String summary = ICalendarUtils.getSummary(event).getValue();
+        String name = summary +  ".ics";
+
+        // make a calendar collection in the repository
+        String collectionName1 = "two cols #1";
+        dao.createCalendarCollection(session.getRootNode(), collectionName1);
+        Node collection1 = session.getRootNode().getNode(collectionName1);
+
+        // make a dav resource in twocols1
+        Node resource1 = createICalendarResource(collection1, name, calendar);
+
+        // store the calendar object with the dav resource
+        dao.storeCalendarObject(resource1, calendar);
+        session.save();
+
+        // make a second calendar collection
+        String collectionName2 = "two cols #2";
+        dao.createCalendarCollection(session.getRootNode(), collectionName2);
+        Node collection2 = session.getRootNode().getNode(collectionName2);
+
+        // make a dav resource in twocols2
+        Node resource2 = createICalendarResource(collection2, name, calendar);
+
+        // now store the same calendar object with the second resource
+        dao.storeCalendarObject(resource2, calendar);
+
+        session.logout();
+    }
+
     public void testStoreCalendarObjectInCalendarCollectionWithDuplicateUid()
         throws Exception {
         if (log.isDebugEnabled()) {
@@ -132,7 +175,7 @@ public class CalendarDaoTest extends BaseCoreTestCase {
 
         // make a calendar collection in the repository
         // XXX createCalendarCollection ought to return the created node
-        String collectionName = "dupcal";
+        String collectionName = "duplicate calendar";
         dao.createCalendarCollection(session.getRootNode(), collectionName);
         Node collection = session.getRootNode().getNode(collectionName);
 

@@ -72,6 +72,11 @@ public class ExportCalendarCollectionCommand extends AbstractCommand {
             return false;
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("exporting calendar object for " +
+                      resourceNode.getPath());
+        }
+
         // extract calendar components from the node
         CalendarDao dao = (CalendarDao) 
             context.getApplicationContext().

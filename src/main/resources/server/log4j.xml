@@ -45,11 +45,9 @@
     <level value="WARN"/>
   </logger>
 
-<!--
   <logger name="org.apache.jackrabbit.webdav">
     <level value="DEBUG"/>
   </logger>
--->
 
   <logger name="org.apache.catalina.startup.Catalina">
     <level value="INFO"/>

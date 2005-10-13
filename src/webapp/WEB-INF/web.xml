@@ -120,6 +120,10 @@
       <param-name>chain-catalog</param-name>
       <param-value>/WEB-INF/chain-catalog.xml</param-value>
     </init-param>
+    <init-param>
+      <param-name>resource-config</param-name>
+      <param-value>/WEB-INF/resource-config.xml</param-value>
+    </init-param>
   </servlet>
   <servlet>
     <servlet-name>action</servlet-name>

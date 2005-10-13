@@ -22,6 +22,7 @@ import org.apache.jackrabbit.server.io.AbstractContext;
 import org.apache.jackrabbit.server.io.ImportContext;
 
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
+import org.osaf.cosmo.jcr.JCREscapist;
 
 /**
  * An import command for setting the display name of a dav
@@ -48,8 +49,9 @@ public class SetDisplayNameCommand extends AbstractCommand {
             (node.isNodeType(CosmoJcrConstants.NT_DAV_COLLECTION) ||
              node.isNodeType(CosmoJcrConstants.NT_DAV_RESOURCE))) {
             if (! node.hasProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME)) {
-                node.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
-                                 context.getSystemId());
+                String name =
+                    JCREscapist.hexUnescapeJCRNames(context.getSystemId());
+                node.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
             }
         }
         return false;

@@ -99,13 +99,13 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
 
     // WebdavResponse methods
 
-    public void sendErrorResponse(DavException exception) throws IOException {
-        webdavResponse.sendErrorResponse(exception);
+    public void sendError(DavException exception) throws IOException {
+        webdavResponse.sendError(exception);
     }
 
-    public void sendMultiStatusResponse(MultiStatus multistatus)
+    public void sendMultiStatus(MultiStatus multistatus)
         throws IOException {
-        webdavResponse.sendMultiStatusResponse(multistatus);
+        webdavResponse.sendMultiStatus(multistatus);
     }
 
     public void sendLockResponse(ActiveLock lock) throws IOException {

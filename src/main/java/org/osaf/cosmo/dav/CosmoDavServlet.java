@@ -35,8 +35,10 @@ import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dav.CosmoDavResource;
+import org.osaf.cosmo.dav.impl.CosmoDavLocatorFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
+import org.osaf.cosmo.dav.impl.CosmoDavResourceFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResponseImpl;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -55,11 +57,6 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     private static final Logger log =
         Logger.getLogger(CosmoDavServlet.class);
 
-    /** The name of the Spring bean identifying the servlet's
-     * {@link org.apache.jackrabbit.webdav.DavResourceFactory}
-     */
-    public static final String BEAN_DAV_RESOURCE_FACTORY =
-        "resourceFactory";
     /** The name of the Spring bean identifying the servlet's
      * {@link org.apache.jackrabbit.webdav.DavSessionProvider}
      */
@@ -93,13 +90,18 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                     DavSessionProvider.class);
         setDavSessionProvider(sessionProvider);
 
-        DavResourceFactory resourceFactory = (DavResourceFactory)
-            getBean(BEAN_DAV_RESOURCE_FACTORY,
-                    DavResourceFactory.class);
-        setResourceFactory(resourceFactory);
-
         securityManager = (CosmoSecurityManager)
             getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
+
+        CosmoDavResourceFactoryImpl resourceFactory =
+            new CosmoDavResourceFactoryImpl(getLockManager(),
+                                            getResourceConfig());
+        resourceFactory.setSecurityManager(securityManager);
+        setResourceFactory(resourceFactory);
+
+        CosmoDavLocatorFactoryImpl locatorFactory =
+            new CosmoDavLocatorFactoryImpl(getPathPrefix());
+        setLocatorFactory(locatorFactory);
     }
 
 
@@ -200,9 +202,14 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             throw e;
         }
 
+        DavResource newResource =
+            getResourceFactory().createResource(request.getRequestLocator(),
+                                                request, response);
+        CosmoDavResource newCosmoResource = (CosmoDavResource) newResource;
+
         // caldav (section 4.6.2): return ETag header
-        if (! cosmoResource.getETag().equals("")) {
-            response.setHeader("ETag", cosmoResource.getETag());
+        if (! newCosmoResource.getETag().equals("")) {
+            response.setHeader("ETag", newCosmoResource.getETag());
         }
     }
 

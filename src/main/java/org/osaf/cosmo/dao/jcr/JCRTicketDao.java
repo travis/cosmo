@@ -53,7 +53,7 @@ public class JCRTicketDao extends JCRDaoSupport
     /**
      * Creates the given ticket in the repository.
      *
-     * @param path the repository path of the resource to which the
+     * @param path the absolute JCR path of the resource to which the
      * ticket is to be applied
      * @param ticket the ticket to be saved
      */

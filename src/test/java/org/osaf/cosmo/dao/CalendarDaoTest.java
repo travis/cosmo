@@ -288,10 +288,10 @@ public class CalendarDaoTest extends BaseCoreTestCase {
                                      InputStream content, String contentType,
                                      String contentCharset)
         throws Exception {
-        Node resourceNode = collection.
-            addNode(name, CosmoJcrConstants.NT_DAV_RESOURCE);
-        resourceNode.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
+        Node resourceNode = collection.addNode(name, CosmoJcrConstants.NT_FILE);
+        resourceNode.addMixin(CosmoJcrConstants.NT_DAV_RESOURCE);
         resourceNode.addMixin(CosmoJcrConstants.NT_TICKETABLE);
+        resourceNode.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
         Node contentNode =
             resourceNode.addNode(CosmoJcrConstants.NN_JCR_CONTENT,
                                  CosmoJcrConstants.NT_RESOURCE);

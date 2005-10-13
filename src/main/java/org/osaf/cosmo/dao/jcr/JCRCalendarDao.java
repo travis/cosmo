@@ -80,10 +80,10 @@ public class JCRCalendarDao implements CalendarDao {
                                          String name) {
         try {
             // add calendar node
-            Node cc =
-                node.addNode(name, CosmoJcrConstants.NT_DAV_COLLECTION);
-            cc.addMixin(CosmoJcrConstants.NT_TICKETABLE);
+            Node cc = node.addNode(name, CosmoJcrConstants.NT_FOLDER);
+            cc.addMixin(CosmoJcrConstants.NT_DAV_COLLECTION);
             cc.addMixin(CosmoJcrConstants.NT_CALDAV_COLLECTION);
+            cc.addMixin(CosmoJcrConstants.NT_TICKETABLE);
             cc.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
             cc.setProperty(CosmoJcrConstants.
                            NP_CALDAV_CALENDARDESCRIPTION, name);

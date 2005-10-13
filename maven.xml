@@ -111,11 +111,12 @@
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
-    <jackrabbit:loadoverlord
+    <jackrabbit:loadcontent
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
-       password="${cosmo.test.repository.password}"/>
+       password="${cosmo.test.repository.password}"
+       content="${basedir}/src/main/resources/jackrabbit/import-overlord.xml"/>
   </goal>
     
   <goal name="dist:tomcat">
@@ -256,13 +257,12 @@
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
 />
-<!--
-    <jackrabbit:loadoverlord
+    <jackrabbit:loadcontent
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data/repository"
        username="${cosmo.dist.repository.username}"
-       password="${cosmo.dist.repository.password}"/>
--->
+       password="${cosmo.dist.repository.password}"
+       content="${basedir}/src/main/resources/jackrabbit/import-overlord.xml"/>
   </goal>
 
   <goal name="dist">
@@ -372,11 +372,11 @@
       </j:if>
     </define:tag>
 
-    <define:tag name="loadoverlord">
+    <define:tag name="loadcontent">
       <j:catch var="exception">
-        <ant:echo>loading overlord</ant:echo>
-        <j:new var="loader"
-               className="org.osaf.cosmo.jackrabbit.RepositoryLoader"/>
+        <ant:echo>loading content from ${content}</ant:echo>
+        <j:new var="importer"
+               className="org.osaf.commons.jackrabbit.content.ContentImporter"/>
         <j:invoke on="${importer}" method="setConfigFilePath">
           <j:arg value="${configFilePath}"/>
         </j:invoke>
@@ -387,7 +387,9 @@
           <j:arg value="${username}"/>
           <j:arg value="${password}"/>
         </j:invoke>
-        <j:invoke on="${loader}" method="loadOverlord"/>
+        <j:invoke on="${importer}" method="importContent">
+          <j:arg value="${content}"/>
+        </j:invoke>
       </j:catch>
       <j:if test="${exception != null}">
         <j:invoke on="${exception}" method="printStackTrace"/>

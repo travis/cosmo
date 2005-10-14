@@ -215,37 +215,37 @@
     <echo>Initializing Jackrabbit repository</echo>
     <jackrabbit:import
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/webdav_nodetypes.xml"/>
     <jackrabbit:import
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/tickets_nodetypes.xml"/>
     <jackrabbit:import
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/icalendar_nodetypes.xml"/>
     <jackrabbit:import
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/caldav_nodetypes.xml"/>
     <jackrabbit:import
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
     <jackrabbit:loadcontent
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data/repository"
+       repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        content="${basedir}/src/main/resources/jackrabbit/import-overlord.xml"/>

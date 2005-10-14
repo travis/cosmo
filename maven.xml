@@ -17,6 +17,11 @@
 <project xmlns:j="jelly:core" xmlns:ant="jelly:ant"
          xmlns:define="jelly:define"
          xmlns:jackrabbit="jackrabbit">
+  <tstamp>
+    <format property="NOW" timezone="GMT"
+            pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"/>
+  </tstamp>
+
   <goal name="build">
     <attainGoal name="war:webapp"/>
   </goal>
@@ -116,7 +121,7 @@
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       content="${basedir}/src/main/resources/jackrabbit/import-overlord.xml"/>
+       content="${maven.build.dir}/import-overlord.xml"/>
   </goal>
     
   <goal name="dist:tomcat">
@@ -243,12 +248,18 @@
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
+    <copy todir="${maven.build.dir}" overwrite="true"
+          file="${basedir}/src/main/resources/jackrabbit/import-overlord.xml">
+      <filterset>
+        <filter token="NOW" value="${NOW}"/>
+      </filterset>
+    </copy>
     <jackrabbit:loadcontent
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
-       content="${basedir}/src/main/resources/jackrabbit/import-overlord.xml"/>
+       content="${maven.build.dir}/import-overlord.xml"/>
   </goal>
 
   <goal name="dist">

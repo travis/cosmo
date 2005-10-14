@@ -243,7 +243,6 @@
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
-/>
     <jackrabbit:loadcontent
        configFilePath="${basedir}/src/main/resources/server/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data/repository"
@@ -330,7 +329,6 @@
                     srcfile="${catalog}" targetfile="${descriptor}"/>
       <j:if test="${not descriptoruptodate}">
         <j:catch var="exception">
-          <ant:echo>generating node type descriptor ${descriptor} from catalog ${catalog}</ant:echo>
           <j:new var="generator"
                  className="org.osaf.commons.jackrabbit.NodeTypeDescriptorGenerator"/>
           <j:invoke on="${generator}" method="generateDescriptor">
@@ -361,7 +359,6 @@
 
     <define:tag name="loadcontent">
       <j:catch var="exception">
-        <ant:echo>loading content from ${content}</ant:echo>
         <j:new var="importer"
                className="org.osaf.commons.jackrabbit.content.ContentImporter"/>
         <j:invoke on="${importer}" method="setConfigFilePath">

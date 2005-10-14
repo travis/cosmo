@@ -40,10 +40,6 @@ public class UserDAOTest extends BaseCoreTestCase {
     private UserDAO dao;
 
     public void testCRUDUser() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
-
         User user = TestHelper.makeDummyUser();
         dao.saveUser(user);
         assertNotNull(user.getDateCreated());
@@ -79,10 +75,6 @@ public class UserDAOTest extends BaseCoreTestCase {
     }
 
     public void testCreateDuplicateUsername() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
-
         // put in a user
         User user1 = TestHelper.makeDummyUser();
         dao.saveUser(user1);
@@ -100,10 +92,6 @@ public class UserDAOTest extends BaseCoreTestCase {
     }
 
     public void testCreateDuplicateEmail() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
-
         // put in a user
         User user1 = TestHelper.makeDummyUser();
         dao.saveUser(user1);
@@ -121,10 +109,6 @@ public class UserDAOTest extends BaseCoreTestCase {
     }
 
     public void testUpdateDuplicateUsername() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
-
         // put in a user
         User user1 = TestHelper.makeDummyUser();
         dao.saveUser(user1);
@@ -145,10 +129,6 @@ public class UserDAOTest extends BaseCoreTestCase {
     }
 
     public void testUpdateDuplicateEmail() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
-
         // put in a user
         User user1 = TestHelper.makeDummyUser();
         dao.saveUser(user1);
@@ -169,10 +149,6 @@ public class UserDAOTest extends BaseCoreTestCase {
     }
 
     public void testGetUsers() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
-
         Set users = dao.getUsers();
     }
 

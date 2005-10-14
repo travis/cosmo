@@ -221,9 +221,6 @@ public class JCRCalendarDao implements CalendarDao {
             append(uid).
             append("']");
 
-        if (log.isDebugEnabled()) {
-            log.debug("verifying unique uid with query " + stmt);
-        }
         QueryManager qm =
             node.getSession().getWorkspace().getQueryManager();
         QueryResult qr =

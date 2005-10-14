@@ -55,10 +55,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
     private JCRSessionFactory sessionFactory;
 
     public void testCreateCalendarCollection() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
-
         // create the calendar collection in the repository
         Session session = sessionFactory.getSession();
         Node root = session.getRootNode();
@@ -69,9 +65,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
     }
 
     public void testStoreAndGetCalendarObject() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
         Session session = sessionFactory.getSession();
 
         // create a calendar object containing an event
@@ -96,9 +89,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
     }
 
     public void testStoreEmptyCalendarObject() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
         Session session = sessionFactory.getSession();
 
         // create an empty calendar object
@@ -118,10 +108,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
 
     public void testStoreCalendarObjectInTwoCalendarCollections()
         throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
-
         Session session = sessionFactory.getSession();
 
         // create a calendar object containing an event
@@ -161,9 +147,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
 
     public void testStoreCalendarObjectInCalendarCollectionWithDuplicateUid()
         throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
         Session session = sessionFactory.getSession();
 
         // create a calendar object containing an event
@@ -206,9 +189,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
     }
 
     public void testStoreCalendarObjectWithDuplicateUid() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
         Session session = sessionFactory.getSession();
 
         // create a calendar object containing an event
@@ -239,9 +219,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
 
     public void testStoreAndGetSimpleEvent()
         throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
         Session session = sessionFactory.getSession();
 
         // load event1.ics
@@ -264,9 +241,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
 
     public void testStoreAndGetEventWithAlarm()
         throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
         Session session = sessionFactory.getSession();
 
         // load event1.ics
@@ -289,9 +263,6 @@ public class CalendarDaoTest extends BaseCoreTestCase {
 
     public void testStoreAndGetRecurringEventWithExceptions()
         throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("BEGIN");
-        }
         Session session = sessionFactory.getSession();
 
         // load event1.ics

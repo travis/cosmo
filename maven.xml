@@ -317,6 +317,7 @@
           <j:arg value="${username}"/>
           <j:arg value="${password}"/>
         </j:invoke>
+        <echo>Importing descriptor ${descriptor}</echo>
         <j:invoke on="${importer}" method="importDescriptor">
           <j:arg value="${descriptor}"/>
         </j:invoke>
@@ -348,6 +349,7 @@
         <j:catch var="exception">
           <j:new var="generator"
                  className="org.osaf.commons.jackrabbit.NodeTypeDescriptorGenerator"/>
+          <echo>Generating descriptor ${descriptor}</echo>
           <j:invoke on="${generator}" method="generateDescriptor">
             <j:arg value="${catalog}"/>
             <j:arg value="${descriptor}"/>
@@ -388,6 +390,7 @@
           <j:arg value="${username}"/>
           <j:arg value="${password}"/>
         </j:invoke>
+        <echo>Loading content from ${content}</echo>
         <j:invoke on="${importer}" method="importContent">
           <j:arg value="${content}"/>
         </j:invoke>

@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.jcr;
+package org.osaf.cosmo.dao.jcr;
 
 /**
- * Provides constants for JCR items, node types,  etc. implemented by
- * Cosmo.
+ * Provides constants for JCR item names and node types used by Cosmo.
  */
-public class CosmoJcrConstants {
+public interface JcrConstants {
 
     // node names
     public static final String NN_JCR_CONTENT = "jcr:content";
@@ -115,7 +114,7 @@ public class CosmoJcrConstants {
     public static final String NT_ICAL_METHOD = "icalendar:method";
     public static final String NT_ICAL_XPROPERTY = "icalendar:xproperty";
 
-    public static final String NT_COSMO_USER = "cosmo:user";
+    public static final String NT_USER = "cosmo:user";
 
     // node properties
 
@@ -132,11 +131,11 @@ public class CosmoJcrConstants {
     public static final String NP_CALDAV_CALENDARDESCRIPTION =
         "caldav:calendar-description";
 
-    public static final String NP_ID = "ticket:id";
-    public static final String NP_OWNER = "ticket:owner";
-    public static final String NP_TIMEOUT = "ticket:timeout";
-    public static final String NP_PRIVILEGES = "ticket:privileges";
-    public static final String NP_CREATED = "ticket:created";
+    public static final String NP_TICKET_ID = "ticket:id";
+    public static final String NP_TICKET_OWNER = "ticket:owner";
+    public static final String NP_TICKET_TIMEOUT = "ticket:timeout";
+    public static final String NP_TICKET_PRIVILEGES = "ticket:privileges";
+    public static final String NP_TICKET_CREATED = "ticket:created";
 
     public static final String NP_ICAL_ALTREP = "icalendar:altrep";
     public static final String NP_ICAL_BINARY = "icalendar:binary";
@@ -204,12 +203,12 @@ public class CosmoJcrConstants {
     public static final String NP_ICAL_WEEKS = "icalendar:weeks";
     public static final String NP_ICAL_WKST = "icalendar:wkst";
 
-    public static final String NP_COSMO_USERNAME = "cosmo:username";
-    public static final String NP_COSMO_PASSWORD = "cosmo:password";
-    public static final String NP_COSMO_FIRSTNAME = "cosmo:firstName";
-    public static final String NP_COSMO_LASTNAME = "cosmo:lastName";
-    public static final String NP_COSMO_EMAIL = "cosmo:email";
-    public static final String NP_COSMO_ADMIN = "cosmo:admin";
-    public static final String NP_COSMO_DATECREATED = "cosmo:dateCreated";
-    public static final String NP_COSMO_DATEMODIFIED = "cosmo:dateModified";
+    public static final String NP_USER_USERNAME = "cosmo:username";
+    public static final String NP_USER_PASSWORD = "cosmo:password";
+    public static final String NP_USER_FIRSTNAME = "cosmo:firstName";
+    public static final String NP_USER_LASTNAME = "cosmo:lastName";
+    public static final String NP_USER_EMAIL = "cosmo:email";
+    public static final String NP_USER_ADMIN = "cosmo:admin";
+    public static final String NP_USER_DATECREATED = "cosmo:dateCreated";
+    public static final String NP_USER_DATEMODIFIED = "cosmo:dateModified";
 }

@@ -73,7 +73,7 @@ PropertyDef
   Multiple false
 
 NodeTypeName
-  mix:ticketable
+  ticket:ticketable
 SuperTypes
   []
 IsMixin

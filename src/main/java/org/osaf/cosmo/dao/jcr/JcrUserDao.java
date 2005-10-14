@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.jcr;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
@@ -25,7 +26,6 @@ import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-import javax.jcr.ValueFormatException;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
@@ -36,27 +36,36 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.commons.spring.jcr.JCRCallback;
 import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
 import org.osaf.cosmo.dao.UserDao;
-import org.osaf.cosmo.jcr.CosmoJcrConstants;
-import org.osaf.cosmo.jcr.JCRUtils;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.orm.ObjectRetrievalFailureException;
 
 /**
- * JCR implementation of <code>UserDao</code>.
+ * Implementation of <code>UserDao</code> that operates against a JCR
+ * repository.
  *
- * @author Brian Moseley
+ * A user account is persisted as a <code>nt:folder</code> node with
+ * the <code>cosmo:user</code> and <code>caldav:home</code> mixin
+ * types. This implementation places all user accounts as children of
+ * the root node.
+ *
+ * This implementation extends {@link JcrDaoSupport} to gain access to
+ * a {@link JcrTemmplate}, which it uses to obtain repository
+ * sessions. See the Spring Modules documentation for more information
+ * on how to configure the template with credentials, a repository
+ * reference and a workspace name.
  */
-public class JcrUserDao extends JCRDaoSupport implements UserDao {
+public class JcrUserDao extends JCRDaoSupport
+    implements JcrConstants, UserDao {
     private static final Log log = LogFactory.getLog(JcrUserDao.class);
 
     // UserDao methods
 
     /**
-     * Returns all of the <code>User</code>s in the system.
+     * Returns an unordered set of all user accounts in the repository.
      */
     public Set getUsers() {
         return (Set) getTemplate().execute(new JCRCallback() {
@@ -66,7 +75,7 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
                     for (NodeIterator i=session.getRootNode().getNodes();
                          i.hasNext();) {
                         Node node = i.nextNode();
-                        if (node.isNodeType(CosmoJcrConstants.NT_COSMO_USER)) {
+                        if (node.isNodeType(NT_USER)) {
                             users.add(nodeToUser(node));
                         }
                     }
@@ -77,6 +86,12 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
     }
 
     /**
+     * Returns the user account identified by the given username.
+     *
+     * @param username the username of the account to return
+     *
+     * @throws DataRetrievalFailureException if the account does not
+     * exist
      */
     public User getUser(final String username) {
         return (User) getTemplate().execute(new JCRCallback() {
@@ -84,8 +99,9 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
                     throws RepositoryException {
                     String path = calculateUserNodePath(username);
                     if (! session.itemExists(path)) {
-                        throw new ObjectRetrievalFailureException(User.class,
-                                                                  username);
+                        throw new DataRetrievalFailureException("account " +
+                                                                username +
+                                                                " not found");
                     }
 
                     return nodeToUser((Node) session.getItem(path));
@@ -94,6 +110,12 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
     }
 
     /**
+     * Returns the user account identified by the given email address.
+     *
+     * @param email the email address of the account to return
+     *
+     * @throws DataRetrievalFailureException if the account does not
+     * exist
      */
     public User getUserByEmail(final String email) {
         return (User) getTemplate().execute(new JCRCallback() {
@@ -102,8 +124,10 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
                     QueryResult qr = queryForUserByEmail(session, email);
                     NodeIterator i = qr.getNodes();
                     if (! i.hasNext()) {
-                        throw new ObjectRetrievalFailureException(User.class,
-                                                                  email);
+                        throw new DataRetrievalFailureException("account for " +
+                                                                " email " +
+                                                                email +
+                                                                " not found");
                     }
 
                     return nodeToUser(i.nextNode());
@@ -112,6 +136,15 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
     }
 
     /**
+     * Creates a user account in the repository. Returns a new
+     * instance of <code>User</code> after saving the original one.
+     *
+     * @param user the account to create
+     * 
+     * @throws DuplicateUsernameException if the username is already
+     * in use
+     * @throws DuplicateEmailException if the email address is already
+     * in use
      */
     public void createUser(final User user) {
         user.validate();
@@ -123,32 +156,29 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
 
                     // validate username uniquess
                     if (session.itemExists(path)) {
-                        throw new DuplicateUsernameException();
+                        throw new DuplicateUsernameException(user.getUsername());
                     }
                     // validate email uniqueness
                     QueryResult qr = queryForUserByEmail(session,
                                                          user.getEmail());
                     NodeIterator i = qr.getNodes();
                     if (i.hasNext()) {
-                        throw new DuplicateEmailException();
+                        throw new DuplicateEmailException(user.getEmail());
                     }
 
-                    Node node = parent.addNode(user.getUsername(),
-                                               CosmoJcrConstants.NT_FOLDER);
-                    node.addMixin(CosmoJcrConstants.NT_COSMO_USER);
+                    Node node = parent.addNode(user.getUsername(), NT_FOLDER);
+                    node.addMixin(NT_USER);
                     user.setDateModified(new Date());
                     user.setDateCreated(user.getDateModified());
                     userToNode(user, node);
 
-                    node.addMixin(CosmoJcrConstants.NT_TICKETABLE);
-                    node.addMixin(CosmoJcrConstants.NT_DAV_COLLECTION);
-                    node.addMixin(CosmoJcrConstants.NT_CALDAV_HOME);
-                    node.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME,
+                    node.addMixin(NT_TICKETABLE);
+                    node.addMixin(NT_DAV_COLLECTION);
+                    node.addMixin(NT_CALDAV_HOME);
+                    node.setProperty(NP_DAV_DISPLAYNAME, user.getUsername());
+                    node.setProperty(NP_CALDAV_CALENDARDESCRIPTION,
                                      user.getUsername());
-                    node.setProperty(CosmoJcrConstants.
-                                     NP_CALDAV_CALENDARDESCRIPTION,
-                                     user.getUsername());
-                    node.setProperty(CosmoJcrConstants.NP_XML_LANG,
+                    node.setProperty(NP_XML_LANG,
                                      Locale.getDefault().toString());
 
                     session.save();
@@ -158,6 +188,18 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
     }
 
     /**
+     * Updates a user account that exists in the repository. Returns a
+     * new instance of <code>User</code>  after saving the original
+     * one.
+     *
+     * @param user the account to update
+     *
+     * @throws DataRetrievalFailureException if the account does not
+     * exist
+     * @throws DuplicateUsernameException if the username is already
+     * in use
+     * @throws DuplicateEmailException if the email address is already
+     * in use
      */
     public void updateUser(final User user) {
         user.validate();
@@ -169,13 +211,14 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
                     if (user.isUsernameChanged()) {
                         // validate uniqueness of new username
                         if (session.itemExists(path)) {
-                            throw new DuplicateUsernameException();
+                            throw new DuplicateUsernameException(user.getUsername());
                         }
                     }
                     else if (! session.itemExists(path)) {
                         throw new
-                            ObjectRetrievalFailureException(User.class,
-                                                            user.getUsername());
+                            DataRetrievalFailureException("account " +
+                                                          user.getUsername() +
+                                                          " not found");
                     }
 
                     if (user.isEmailChanged()) {
@@ -185,7 +228,7 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
                         NodeIterator i = qr.getNodes();
                         if (i.hasNext() &&
                             ! i.nextNode().getPath().equals(path)) {
-                            throw new DuplicateEmailException();
+                            throw new DuplicateEmailException(user.getEmail());
                         }
                     }
 
@@ -200,6 +243,10 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
     }
 
     /**
+     * Removes the user account identified by the given username from
+     * the repository.
+     *
+     * @param username the username of the account to return
      */
     public void removeUser(final String username) {
         getTemplate().execute(new JCRCallback() {
@@ -239,6 +286,11 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
     // our methods
 
     /**
+     * Returns the JCR node underneath which user account nodes are
+     * created.
+     *
+     * This implementation places user account nodes underneath the
+     * root node of the workspace.
      */
     protected Node getUserNodeParentNode(Session session)
         throws RepositoryException {
@@ -246,12 +298,14 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
     }
 
     /**
+     * Returns the JCR path to a user account node.
      */
     protected String calculateUserNodePath(String username) {
         return "/" + username;
     }
 
     /**
+     * Simple helper method for executing an XPath query.
      */
     protected QueryResult executeXPathQuery(Session session,
                                             String statement)
@@ -263,16 +317,18 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
 
 
     /**
+     * Executes a query to find all of the user account nodes that
+     * match the given email address.
      */
     protected QueryResult queryForUserByEmail(Session session, String email)
         throws RepositoryException {
         StringBuffer stmt = new StringBuffer();
         stmt.append("/jcr:root").
             append("//element(*, ").
-            append(CosmoJcrConstants.NT_COSMO_USER).
+            append(NT_USER).
             append(")").
             append("[@").
-            append(CosmoJcrConstants.NP_COSMO_EMAIL).
+            append(NP_USER_EMAIL).
             append(" = '").
             append(email).
             append("']");
@@ -280,41 +336,49 @@ public class JcrUserDao extends JCRDaoSupport implements UserDao {
     }
 
     /**
+     * Returns a new instance of <code>User</code> populated from a
+     * user account node.
      */
     protected User nodeToUser(Node node)
         throws RepositoryException {
         User user = new User();
 
-        user.setUsername(node.getProperty(CosmoJcrConstants.NP_COSMO_USERNAME).getString());
-        user.setPassword(node.getProperty(CosmoJcrConstants.NP_COSMO_PASSWORD).getString());
-        user.setFirstName(node.getProperty(CosmoJcrConstants.NP_COSMO_FIRSTNAME).getString());
-        user.setLastName(node.getProperty(CosmoJcrConstants.NP_COSMO_LASTNAME).getString());
-        user.setEmail(node.getProperty(CosmoJcrConstants.NP_COSMO_EMAIL).getString());
-        user.setAdmin(JCRUtils.getBooleanValue(node, CosmoJcrConstants.NP_COSMO_ADMIN));
-        user.setDateCreated(JCRUtils.getDateValue(node, CosmoJcrConstants.NP_COSMO_DATECREATED));
-        user.setDateModified(JCRUtils.getDateValue(node, CosmoJcrConstants.NP_COSMO_DATEMODIFIED));
+        user.setUsername(node.getProperty(NP_USER_USERNAME).getString());
+        user.setPassword(node.getProperty(NP_USER_PASSWORD).getString());
+        user.setFirstName(node.getProperty(NP_USER_FIRSTNAME).getString());
+        user.setLastName(node.getProperty(NP_USER_LASTNAME).getString());
+        user.setEmail(node.getProperty(NP_USER_EMAIL).getString());
+        user.setAdmin(new Boolean(node.getProperty(NP_USER_ADMIN).
+                                  getBoolean()));
+        user.setDateCreated(node.getProperty(NP_USER_DATECREATED).
+                            getDate().getTime());
+        user.setDateModified(node.getProperty(NP_USER_DATEMODIFIED).
+                             getDate().getTime());
 
         return user;
     }
 
     /**
+     * Copies the properties of a <code>User</code> into a user
+     * account node.
      */
     protected void userToNode(User user, Node node)
         throws RepositoryException {
-        node.setProperty(CosmoJcrConstants.NP_COSMO_USERNAME,
-                         user.getUsername());
-        node.setProperty(CosmoJcrConstants.NP_COSMO_PASSWORD,
-                         user.getPassword());
-        node.setProperty(CosmoJcrConstants.NP_COSMO_FIRSTNAME,
-                         user.getFirstName());
-        node.setProperty(CosmoJcrConstants.NP_COSMO_LASTNAME,
-                         user.getLastName());
-        node.setProperty(CosmoJcrConstants.NP_COSMO_EMAIL, user.getEmail());
-        node.setProperty(CosmoJcrConstants.NP_COSMO_ADMIN,
-                         user.getAdmin().booleanValue());
-        JCRUtils.setDateValue(node, CosmoJcrConstants.NP_COSMO_DATECREATED,
-                              user.getDateCreated());
-        JCRUtils.setDateValue(node, CosmoJcrConstants.NP_COSMO_DATEMODIFIED,
-                              user.getDateModified());
+        node.setProperty(NP_USER_USERNAME, user.getUsername());
+        node.setProperty(NP_USER_PASSWORD, user.getPassword());
+        node.setProperty(NP_USER_FIRSTNAME, user.getFirstName());
+        node.setProperty(NP_USER_LASTNAME, user.getLastName());
+        node.setProperty(NP_USER_EMAIL, user.getEmail());
+        node.setProperty(NP_USER_ADMIN, user.getAdmin().booleanValue());
+        Calendar created = Calendar.getInstance();
+        if (user.getDateCreated() != null) {
+            created.setTime(user.getDateCreated());
+        }
+        node.setProperty(NP_USER_DATECREATED, created);
+        Calendar modified = Calendar.getInstance();
+        if (user.getDateModified() != null) {
+            created.setTime(user.getDateModified());
+        }
+        node.setProperty(NP_USER_DATEMODIFIED, modified);
     }
 }

@@ -273,7 +273,7 @@
     <dependency>
       <groupId>osaf-commons</groupId>
       <artifactId>osaf-commons-spring</artifactId>
-      <version>0.2</version>
+      <version>0.3</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -410,6 +410,7 @@
       <resource>
         <directory>src/test/resources</directory>
         <includes>
+          <include>test.properties</include>
           <include>applicationContext-test.xml</include>
           <include>log4j.xml</include>
         </includes>

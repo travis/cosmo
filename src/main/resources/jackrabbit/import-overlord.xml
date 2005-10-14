@@ -2,8 +2,8 @@
 
 <root xmlns:jcr="http://www.jcp.org/jcr/1.0"
       xmlns:cosmo="http://osafoundation.org/cosmo"
-      jcr:primaryType="nt:unstructured"
-      jcr:mixinTypes="mix:lockable"
+      jcr:primaryType="nt:base"
+      jcr:mixinTypes="cosmo:user"
       cosmo:username="root"
       cosmo:firstName="Cosmo"
       cosmo:lastName="Administrator"

@@ -32,19 +32,15 @@ public class DavResourceImportCommand extends FileImportCommand {
 
     /**
      */
-    public DavResourceImportCommand() {
-        super();
-        setNodeType(CosmoJcrConstants.NT_DAV_RESOURCE);
-    }
-
-    /**
-     */
     public boolean importResource(ImportContext ctx,
                                   Node parentNode,
                                   InputStream in)
         throws Exception {
         super.importResource(ctx, parentNode, in);
 
+        if (! parentNode.isNodeType(CosmoJcrConstants.NT_DAV_RESOURCE)) {
+            parentNode.addMixin(CosmoJcrConstants.NT_DAV_RESOURCE);
+        }
         parentNode.setProperty(CosmoJcrConstants.NP_DAV_CONTENTLANGUAGE,
                                ctx.getContentLanguage());
 

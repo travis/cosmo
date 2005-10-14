@@ -124,7 +124,7 @@ public class TestSecurityContext implements CosmoSecurityContext {
         }
         else if (principal instanceof TestUserPrincipal) {
             user = ((TestUserPrincipal) principal).getUser();
-            admin = user.isAdmin().booleanValue();
+            admin = user.getAdmin().booleanValue();
         }
         
     }

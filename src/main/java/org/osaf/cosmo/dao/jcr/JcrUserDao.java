@@ -62,14 +62,13 @@ public class JcrUserDao extends JCRDaoSupport implements UserDAO {
         return (Set) getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
-                    if (log.isDebugEnabled()) {
-                        log.debug("getting all user nodes");
-                    }
                     Set users = new HashSet();
-                    for (NodeIterator i=session.getRootNode().
-                             getNodes(CosmoJcrConstants.NT_COSMO_USER);
+                    for (NodeIterator i=session.getRootNode().getNodes();
                          i.hasNext();) {
-                        users.add(nodeToUser(i.nextNode()));
+                        Node node = i.nextNode();
+                        if (node.isNodeType(CosmoJcrConstants.NT_COSMO_USER)) {
+                            users.add(nodeToUser(node));
+                        }
                     }
 
                     return users;
@@ -89,9 +88,6 @@ public class JcrUserDao extends JCRDaoSupport implements UserDAO {
                                                                   username);
                     }
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("getting user node for username " + username);
-                    }
                     return nodeToUser((Node) session.getItem(path));
                 }
             });
@@ -103,9 +99,6 @@ public class JcrUserDao extends JCRDaoSupport implements UserDAO {
         return (User) getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
                     throws RepositoryException {
-                    if (log.isDebugEnabled()) {
-                        log.debug("getting user node for email " + email);
-                    }
                     QueryResult qr = queryForUserByEmail(session, email);
                     NodeIterator i = qr.getNodes();
                     if (! i.hasNext()) {
@@ -138,10 +131,6 @@ public class JcrUserDao extends JCRDaoSupport implements UserDAO {
                     NodeIterator i = qr.getNodes();
                     if (i.hasNext()) {
                         throw new DuplicateEmailException();
-                    }
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("adding user node " + path);
                     }
 
                     Node node = parent.addNode(user.getUsername(),
@@ -200,10 +189,6 @@ public class JcrUserDao extends JCRDaoSupport implements UserDAO {
                         }
                     }
 
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("updating user node " + path);
-                    }
                     Node node = (Node) session.getItem(path);
                     user.setDateModified(new Date());
                     userToNode(user, node);
@@ -225,9 +210,6 @@ public class JcrUserDao extends JCRDaoSupport implements UserDAO {
                         return null;
                     }
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("removing user node " + path);
-                    }
                     session.getItem(path).remove();
 
                     session.save();
@@ -309,7 +291,7 @@ public class JcrUserDao extends JCRDaoSupport implements UserDAO {
                          user.getLastName());
         node.setProperty(CosmoJcrConstants.NP_COSMO_EMAIL, user.getEmail());
         node.setProperty(CosmoJcrConstants.NP_COSMO_ADMIN,
-                         user.isAdmin().booleanValue());
+                         user.getAdmin().booleanValue());
         JCRUtils.setDateValue(node, CosmoJcrConstants.NP_COSMO_DATECREATED,
                               user.getDateCreated());
         JCRUtils.setDateValue(node, CosmoJcrConstants.NP_COSMO_DATEMODIFIED,

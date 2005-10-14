@@ -53,7 +53,7 @@ public class CosmoUserDetailsImpl implements CosmoUserDetails {
         this.user = user;
 
         ArrayList authorities = new ArrayList();
-        if (user.isAdmin().booleanValue()) {
+        if (user.getAdmin().booleanValue()) {
             authorities.add(new GrantedAuthorityImpl("ROLE_ROOT"));
         }
         if (! user.isOverlord()) {

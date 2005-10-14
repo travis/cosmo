@@ -60,8 +60,8 @@
               <fmt:message key="User.List.EditControl"/>
             </html:link>
             <c:choose>
-              <c:when test="${not cosmoui:isRoot(user)}">
-                <html:link page="/user/remove.do?id=${user.id}">
+              <c:when test="${not user.overlord}">
+                <html:link page="/user/remove.do?username=${user.username}">
                   <fmt:message key="User.List.RemoveControl"/>
                 </html:link>
               </c:when>
@@ -79,13 +79,13 @@
             ${user.username}
           </td>
           <td class="smTableData" style="text-align:center;">
-            <c:if test="${cosmoui:isAdmin(user)}">
+            <c:if test="${user.admin}">
               Yes
             </c:if>
           </td>
           <td class="smTableData">
             <c:choose>
-              <c:when test="${not cosmoui:isRoot(user)}">
+              <c:when test="${not user.overlord}">
                 <html:link target="homedir" page="${homedir}">
                   ${homedir}
                 </html:link>

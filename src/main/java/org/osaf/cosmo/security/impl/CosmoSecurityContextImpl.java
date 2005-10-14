@@ -141,7 +141,7 @@ public class CosmoSecurityContextImpl implements CosmoSecurityContext {
 
         if (authentication instanceof UsernamePasswordAuthenticationToken) {
             user = ((CosmoUserDetails) authentication.getPrincipal()).getUser();
-            admin = user.isAdmin().booleanValue();
+            admin = user.getAdmin().booleanValue();
         }
     }
 }

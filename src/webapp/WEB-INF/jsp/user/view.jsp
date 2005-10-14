@@ -19,8 +19,6 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<u:bind var="USER_ROOT" field="USER_ROOT" type="org.osaf.cosmo.security.CosmoSecurityManager"/>
-
 <div class="widgetBorder" style="width:460px; margin-top:24px;">
 <div class="widgetContent" style="padding:8px;">
 
@@ -31,7 +29,7 @@
 </div>
 
 <c:choose>
-  <c:when test="${cosmoui:isRoot(User)}">
+  <c:when test="${User.overlord}">
     <c:set var="action" value="/user/root/update"/>
   </c:when>
   <c:otherwise>
@@ -67,7 +65,7 @@
       	<div>
           <html:text property="username" size="32" maxlength="32"
                      styleClass="textInput"
-                     disabled="${cosmoui:isRoot(User)}"/>
+                     disabled="${User.overlord}"/>
       	</div>
       </td>
     </tr>
@@ -80,7 +78,7 @@
         <div>
           <html:text property="firstName" size="32" maxlength="32"
                      styleClass="textInput"
-                     disabled="${cosmoui:isRoot(User)}"/>
+                     disabled="${User.overlord}"/>
       	</div>
       </td>
     </tr>
@@ -93,7 +91,7 @@
         <div>
           <html:text property="lastName" size="32" maxlength="32"
                      styleClass="textInput"
-                     disabled="${cosmoui:isRoot(User)}"/>
+                     disabled="${User.overlord}"/>
       	</div>
       </td>
     </tr>
@@ -137,7 +135,7 @@
       <td>  
         <div style="margin-top:8px;">
           <html:checkbox property="admin" value="true"
-                         disabled="${cosmoui:isRoot(User)}"/>
+                         disabled="${User.overlord}"/>
           <fmt:message key="User.Form.MakeAdministrator"/>
         </div>
       </td>
@@ -158,8 +156,6 @@
       </div>
       <br style="clear:both;"/>
     </div>
-  
-  <html:hidden property="id"/>
 </html:form>
 
 </div>

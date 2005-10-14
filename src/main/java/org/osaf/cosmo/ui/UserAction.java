@@ -60,11 +60,6 @@ public class UserAction extends CosmoAction {
      */
     public static final String PARAM_USERNAME = "username";
     /**
-     * The request parameter that contains the id identifying a
-     * user.
-     */
-    public static final String PARAM_ID = "id";
-    /**
      * The request parameter that contains the email address of a user
      */
     public static final String PARAM_EMAIL = "email";
@@ -103,6 +98,8 @@ public class UserAction extends CosmoAction {
         // time.
         User user = (User) request.getAttribute(ATTR_USER);
         if (user == null) {
+            // XXX: we no longer have an id to key off of, so add old
+            // username to form bean
             if (userForm.getUsername() != null &&
                 ! userForm.getUsername().equals("")) {
                 user = mgr.getUser(userForm.getUsername());
@@ -262,13 +259,13 @@ public class UserAction extends CosmoAction {
                                 HttpServletRequest request,
                                 HttpServletResponse response)
         throws Exception {
-        String id = request.getParameter(PARAM_ID);
+        String username = request.getParameter(PARAM_USERNAME);
 
-        if (id != null) {
+        if (username != null) {
             if (log.isDebugEnabled()) {
-                log.debug("removing user " + id);
+                log.debug("removing user " + username);
             }
-            mgr.removeUser(id);
+            mgr.removeUser(username);
 
             saveConfirmationMessage(request, MSG_CONFIRM_REMOVE);
         }
@@ -302,6 +299,9 @@ public class UserAction extends CosmoAction {
                     User u2 = (User) o2;
                     String name1 = u1.getLastName() + " " + u1.getFirstName();
                     String name2 = u2.getLastName() + " " + u2.getFirstName();
+                    if (name1.equals(name2)) {
+                        return u1.getUsername().compareTo(u2.getUsername());
+                    }
                     return name1.compareTo(name2);
                 }
             });
@@ -333,6 +333,6 @@ public class UserAction extends CosmoAction {
         form.setLastName(user.getLastName());
         form.setEmail(user.getEmail());
         // never set password in the form
-        form.setAdmin(user.isAdmin().booleanValue());
+        form.setAdmin(user.getAdmin().booleanValue());
     }
 }

@@ -23,8 +23,7 @@
    <global>
       <constant>
         <constant-name>username</constant-name>
-        <constant-value>^[^./:[]*'"|\s]+$</constant-value>
-        <!-- " fixes emacs syntax highlighting -->
+        <constant-value>^[\S ]+$</constant-value>
       </constant>
    </global>
    <formset>

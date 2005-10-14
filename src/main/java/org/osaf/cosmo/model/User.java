@@ -42,7 +42,7 @@ public class User extends BaseModelObject {
     /**
      */
     public static final Pattern USERNAME_PATTERN =
-        Pattern.compile("^[^./:/[/]*'\"|\\s]+$"); // "
+        Pattern.compile("^[\\S ]+$");
     /**
      */
     public static final int PASSWORD_LEN_MIN = 5;
@@ -173,7 +173,7 @@ public class User extends BaseModelObject {
 
     /**
      */
-    public Boolean isAdmin() {
+    public Boolean getAdmin() {
         return admin;
     }
 

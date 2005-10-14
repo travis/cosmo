@@ -24,7 +24,7 @@ import net.fortuna.ical4j.model.Calendar;
 /**
  * Dao interface for calendar related activities.
  */
-public interface CalendarDao extends DAO {
+public interface CalendarDao extends Dao {
 
     /**
      * Creates a calendar collection in the repository.

@@ -190,6 +190,24 @@ public class JCRCalendarDao implements CalendarDao {
         }
     }
 
+    // Dao methods
+
+    /**
+     * Initializes the DAO, sanity checking required properties
+     * and defaulting optional properties.
+     */
+    public void init() {
+        // does nothing
+    }
+
+    /**
+     * Readies the DAO for garbage collection, shutting down any
+     * resources used.
+     */
+    public void destroy() {
+        // does nothing
+    }
+
     // our methods
 
     /**

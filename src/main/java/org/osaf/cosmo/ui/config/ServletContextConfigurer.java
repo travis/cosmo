@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.dao.UserDAO;
+import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
@@ -36,7 +36,7 @@ public class ServletContextConfigurer {
 
     private ServletContext servletContext;
     private String serverVersion;
-    private UserDAO userDao;
+    private UserDao userDao;
 
     /**
      * An entry point for configuration of the servlet context.
@@ -86,13 +86,13 @@ public class ServletContextConfigurer {
 
     /**
      */
-    public UserDAO getUserDao() {
+    public UserDao getUserDao() {
         return userDao;
     }
 
     /**
      */
-    public void setUserDao(UserDAO userDao) {
+    public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }
 }

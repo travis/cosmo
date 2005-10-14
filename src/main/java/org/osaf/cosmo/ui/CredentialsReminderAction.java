@@ -18,9 +18,9 @@ import org.apache.struts.validator.BeanValidatorForm;
 
 import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.service.UserService;
 
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -55,7 +55,7 @@ public class CredentialsReminderAction extends CosmoAction {
         "Email.PasswordReset.Text";
 
     private JavaMailSender mailSender;
-    private ProvisioningManager mgr;
+    private UserService userService;
 
     /**
      */
@@ -65,8 +65,8 @@ public class CredentialsReminderAction extends CosmoAction {
 
     /**
      */
-    public void setProvisioningManager(ProvisioningManager mgr) {
-        this.mgr = mgr;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     /**
@@ -89,16 +89,16 @@ public class CredentialsReminderAction extends CosmoAction {
         throws Exception {
         BeanValidatorForm forgotForm = (BeanValidatorForm) form;
         String email = (String) forgotForm.get(FORM_EMAIL);
-        User user = mgr.getUserByEmail(email);
+        User user = userService.getUserByEmail(email);
 
         if (wasUsernameButtonClicked(forgotForm)) {
             sendUsernameReminderMessage(request, response, user);
             saveConfirmationMessage(request, MSG_CONFIRM_USERNAME);
         }
         if (wasPasswordButtonClicked(forgotForm)) {
-            String newPassword = mgr.generatePassword();
+            String newPassword = userService.generatePassword();
             user.setPassword(newPassword);
-            mgr.updateUser(user);
+            userService.updateUser(user);
             sendPasswordResetMessage(request, response, user, newPassword);
             saveConfirmationMessage(request, MSG_CONFIRM_PASSWORD);
         }
@@ -123,7 +123,7 @@ public class CredentialsReminderAction extends CosmoAction {
                     MessageResources resources = getResources(request);
                     Locale locale = getLocale(request);
 
-                    User rootUser = mgr.getUser(User.USERNAME_OVERLORD);
+                    User rootUser = userService.getUser(User.USERNAME_OVERLORD);
                     String fromAddr = (String) getServlet().getServletContext().
                         getAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN);
                     String fromHandle =
@@ -161,7 +161,7 @@ public class CredentialsReminderAction extends CosmoAction {
                     MessageResources resources = getResources(request);
                     Locale locale = getLocale(request);
 
-                    User rootUser = mgr.getUser(User.USERNAME_OVERLORD);
+                    User rootUser = userService.getUser(User.USERNAME_OVERLORD);
                     String fromAddr = (String) getServlet().getServletContext().
                         getAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN);
                     String fromHandle =

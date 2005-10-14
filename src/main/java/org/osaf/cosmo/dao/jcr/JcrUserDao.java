@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.commons.spring.jcr.JCRCallback;
 import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
-import org.osaf.cosmo.dao.UserDAO;
+import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.jcr.CosmoJcrConstants;
 import org.osaf.cosmo.jcr.JCRUtils;
 import org.osaf.cosmo.model.DuplicateEmailException;
@@ -46,11 +46,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectRetrievalFailureException;
 
 /**
- * JCR implementation of <code>UserDAO</code>.
+ * JCR implementation of <code>UserDao</code>.
  *
  * @author Brian Moseley
  */
-public class JcrUserDao extends JCRDaoSupport implements UserDAO {
+public class JcrUserDao extends JCRDaoSupport implements UserDao {
     private static final Log log = LogFactory.getLog(JcrUserDao.class);
 
     // UserDao methods
@@ -113,7 +113,7 @@ public class JcrUserDao extends JCRDaoSupport implements UserDAO {
 
     /**
      */
-    public void saveUser(final User user) {
+    public void createUser(final User user) {
         user.validate();
         getTemplate().execute(new JCRCallback() {
                 public Object doInJCR(Session session)
@@ -217,6 +217,26 @@ public class JcrUserDao extends JCRDaoSupport implements UserDAO {
                 }
             });
     }
+
+    // Dao methods
+
+    /**
+     * Initializes the DAO, sanity checking required properties
+     * and defaulting optional properties.
+     */
+    public void init() {
+        // does nothing
+    }
+
+    /**
+     * Readies the DAO for garbage collection, shutting down any
+     * resources used.
+     */
+    public void destroy() {
+        // does nothing
+    }
+
+    // our methods
 
     /**
      */

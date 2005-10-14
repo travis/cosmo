@@ -22,8 +22,10 @@
 
   <!-- DAOs -->
 
-  <bean id="userDAO"
-        class="org.osaf.cosmo.dao.jcr.JcrUserDao">
+  <bean id="userDao"
+        class="org.osaf.cosmo.dao.jcr.JcrUserDao"
+        init-method="init"
+        destroy-method="destroy">
     <property name="template">
       <ref bean="homedirTemplate"/>
     </property>
@@ -33,7 +35,9 @@
         class="org.apache.commons.id.random.SessionIdGenerator"/>
 
   <bean id="ticketDao"
-        class="org.osaf.cosmo.dao.jcr.JCRTicketDao">
+        class="org.osaf.cosmo.dao.jcr.JCRTicketDao"
+        init-method="init"
+        destroy-method="destroy">
     <property name="template">
       <ref bean="homedirTemplate"/>
     </property>
@@ -43,20 +47,21 @@
   </bean>
 
   <bean id="calendarDao"
-        class="org.osaf.cosmo.dao.jcr.JCRCalendarDao"/>
+        class="org.osaf.cosmo.dao.jcr.JCRCalendarDao"
+        init-method="init"
+        destroy-method="destroy"/>
 
-  <!-- Managers -->
+  <!-- Services -->
 
   <bean id="passwordGenerator"
         class="org.apache.commons.id.random.SessionIdGenerator"/>
 
-  <bean id="provisioningManager"
-        class="org.osaf.cosmo.manager.impl.ProvisioningManagerImpl">
-    <property name="userDAO">
-      <ref bean="userDAO"/>
-    </property>
-    <property name="digest">
-      <value>MD5</value>
+  <bean id="userService"
+        class="org.osaf.cosmo.service.impl.StandardUserService"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="userDao">
+      <ref bean="userDao"/>
     </property>
     <property name="passwordGenerator">
       <ref bean="passwordGenerator"/>

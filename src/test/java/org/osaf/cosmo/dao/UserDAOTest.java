@@ -17,7 +17,7 @@ package org.osaf.cosmo.dao;
 
 import org.osaf.cosmo.BaseCoreTestCase;
 import org.osaf.cosmo.TestHelper;
-import org.osaf.cosmo.dao.UserDAO;
+import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
@@ -30,18 +30,18 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.DataRetrievalFailureException;
 
 /**
- * DAO Test Case for Users.
+ * Dao Test Case for Users.
  *
  * @author Brian Moseley
  */
 public class UserDAOTest extends BaseCoreTestCase {
     private static final Log log = LogFactory.getLog(UserDAOTest.class);
 
-    private UserDAO dao;
+    private UserDao dao;
 
     public void testCRUDUser() throws Exception {
         User user = TestHelper.makeDummyUser();
-        dao.saveUser(user);
+        dao.createUser(user);
         assertNotNull(user.getDateCreated());
         assertNotNull(user.getDateModified());
 
@@ -77,14 +77,14 @@ public class UserDAOTest extends BaseCoreTestCase {
     public void testCreateDuplicateUsername() throws Exception {
         // put in a user
         User user1 = TestHelper.makeDummyUser();
-        dao.saveUser(user1);
+        dao.createUser(user1);
 
         // try to create a new user with the same username
         User user2 = TestHelper.makeDummyUser();
         user2.setUsername(user1.getUsername());
 
         try {
-            dao.saveUser(user2);
+            dao.createUser(user2);
             fail("duplicate username accepted");
         } catch (DuplicateUsernameException e) {
             // expected
@@ -94,14 +94,14 @@ public class UserDAOTest extends BaseCoreTestCase {
     public void testCreateDuplicateEmail() throws Exception {
         // put in a user
         User user1 = TestHelper.makeDummyUser();
-        dao.saveUser(user1);
+        dao.createUser(user1);
 
         // try to create a new user with the same email
         User user2 = TestHelper.makeDummyUser();
         user2.setEmail(user1.getEmail());
 
         try {
-            dao.saveUser(user2);
+            dao.createUser(user2);
             fail("duplicate email accepted");
         } catch (DuplicateEmailException e) {
             // expected
@@ -111,11 +111,11 @@ public class UserDAOTest extends BaseCoreTestCase {
     public void testUpdateDuplicateUsername() throws Exception {
         // put in a user
         User user1 = TestHelper.makeDummyUser();
-        dao.saveUser(user1);
+        dao.createUser(user1);
 
         // put in another user
         User user2 = TestHelper.makeDummyUser();
-        dao.saveUser(user2);
+        dao.createUser(user2);
 
         // try to update user2 with user1's username
         user2.setUsername(user1.getUsername());
@@ -131,11 +131,11 @@ public class UserDAOTest extends BaseCoreTestCase {
     public void testUpdateDuplicateEmail() throws Exception {
         // put in a user
         User user1 = TestHelper.makeDummyUser();
-        dao.saveUser(user1);
+        dao.createUser(user1);
 
         // put in another user
         User user2 = TestHelper.makeDummyUser();
-        dao.saveUser(user2);
+        dao.createUser(user2);
 
         // try to update user2 with user1's email
         user2.setEmail(user1.getEmail());
@@ -152,7 +152,7 @@ public class UserDAOTest extends BaseCoreTestCase {
         Set users = dao.getUsers();
     }
 
-    public void setUserDAO(UserDAO userDao) {
+    public void setUserDao(UserDao userDao) {
         dao = userDao;
     }
 }

@@ -16,11 +16,11 @@
 package org.osaf.cosmo.ui;
 
 import org.osaf.commons.struts.OSAFStrutsConstants;
-import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.service.UserService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,12 +74,12 @@ public class UserAction extends CosmoAction {
      */
     public static final String ATTR_USERS = "Users";
 
-    private ProvisioningManager mgr;
+    private UserService userService;
 
     /**
      */
-    public void setProvisioningManager(ProvisioningManager mgr) {
-        this.mgr = mgr;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     /**
@@ -102,14 +102,14 @@ public class UserAction extends CosmoAction {
             // username to form bean
             if (userForm.getUsername() != null &&
                 ! userForm.getUsername().equals("")) {
-                user = mgr.getUser(userForm.getUsername());
+                user = userService.getUser(userForm.getUsername());
             }
             else {
                 String username = request.getParameter(PARAM_USERNAME);
                 if (log.isDebugEnabled()) {
                     log.debug("viewing user " + username);
                 }
-                user = mgr.getUser(username);
+                user = userService.getUser(username);
                 populateUpdateForm(userForm, user);
             }
         }
@@ -137,7 +137,7 @@ public class UserAction extends CosmoAction {
             if (log.isDebugEnabled()) {
                 log.debug("creating user " + formUser.getUsername());
             }
-            User user = mgr.saveUser(formUser);
+            User user = userService.createUser(formUser);
 
             request.setAttribute(ATTR_USER, user);
             saveConfirmationMessage(request, MSG_CONFIRM_CREATE);
@@ -168,14 +168,14 @@ public class UserAction extends CosmoAction {
             return mapping.findForward(OSAFStrutsConstants.FWD_CANCEL);
         }
 
-        User formUser =  mgr.getUser(userForm.getUsername());
+        User formUser =  userService.getUser(userForm.getUsername());
         populateUser(formUser, userForm);
 
         try {
             if (log.isDebugEnabled()) {
                 log.debug("updating user " + formUser.getUsername());
             }
-            User user = mgr.updateUser(formUser);
+            User user = userService.updateUser(formUser);
 
             request.setAttribute(ATTR_USER, user);
             saveConfirmationMessage(request, MSG_CONFIRM_UPDATE);
@@ -206,14 +206,14 @@ public class UserAction extends CosmoAction {
             return mapping.findForward(OSAFStrutsConstants.FWD_CANCEL);
         }
 
-        User formUser = mgr.getUser(User.USERNAME_OVERLORD);
+        User formUser = userService.getUser(User.USERNAME_OVERLORD);
         populateUser(formUser, userForm, true);
 
         try {
             if (log.isDebugEnabled()) {
                 log.debug("updating root user");
             }
-            User user = mgr.updateUser(formUser);
+            User user = userService.updateUser(formUser);
 
             // if the root user just changed his own password, update
             // the security context with the new password
@@ -265,7 +265,7 @@ public class UserAction extends CosmoAction {
             if (log.isDebugEnabled()) {
                 log.debug("removing user " + username);
             }
-            mgr.removeUser(username);
+            userService.removeUser(username);
 
             saveConfirmationMessage(request, MSG_CONFIRM_REMOVE);
         }
@@ -292,7 +292,7 @@ public class UserAction extends CosmoAction {
         if (log.isDebugEnabled()) {
             log.debug("listing users");
         }
-        List users = new ArrayList(mgr.getUsers());
+        List users = new ArrayList(userService.getUsers());
         Collections.sort(users, new Comparator() {
                 public int compare(Object o1, Object o2) {
                     User u1 = (User) o1;

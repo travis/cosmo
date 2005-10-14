@@ -34,7 +34,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import org.osaf.cosmo.manager.ProvisioningManager;
+import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
@@ -75,13 +75,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class CmpServlet extends HttpServlet {
     private static final Log log = LogFactory.getLog(CmpServlet.class);
 
-    private static final String BEAN_PROVISIONING_MANAGER =
-        "provisioningManager";
+    private static final String BEAN_USER_SERVICE =
+        "userService";
     private static final String BEAN_SECURITY_MANAGER =
         "securityManager";
 
     private WebApplicationContext wac;
-    private ProvisioningManager provisioningManager;
+    private UserService userService;
     private CosmoSecurityManager securityManager;
 
     /**
@@ -97,8 +97,8 @@ public class CmpServlet extends HttpServlet {
         wac = WebApplicationContextUtils.
             getRequiredWebApplicationContext(getServletContext());
 
-        provisioningManager = (ProvisioningManager)
-            getBean(BEAN_PROVISIONING_MANAGER, ProvisioningManager.class);
+        userService = (UserService)
+            getBean(BEAN_USER_SERVICE, UserService.class);
         securityManager = (CosmoSecurityManager)
             getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
     }
@@ -124,7 +124,7 @@ public class CmpServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        provisioningManager.removeUser(username);
+        userService.removeUser(username);
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
@@ -140,7 +140,7 @@ public class CmpServlet extends HttpServlet {
                          HttpServletResponse resp)
         throws ServletException, IOException {
         if (req.getPathInfo().equals("/users")) {
-            Set users = provisioningManager.getUsers();
+            Set users = userService.getUsers();
             resp.setStatus(HttpServletResponse.SC_OK);
             sendXmlResponse(resp, new UsersResource(users, getUrlBase(req)));
             return;
@@ -152,7 +152,7 @@ public class CmpServlet extends HttpServlet {
         }
         User user = null;
         try {
-            user = provisioningManager.getUser(username);
+            user = userService.getUser(username);
         } catch (ObjectRetrievalFailureException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -200,7 +200,7 @@ public class CmpServlet extends HttpServlet {
 
         User user = null;
         try {
-            user = provisioningManager.getUser(username);
+            user = userService.getUser(username);
         } catch (ObjectRetrievalFailureException e) {
             // this means we are creating the user
         }
@@ -209,7 +209,7 @@ public class CmpServlet extends HttpServlet {
             if (user != null) {
                 UserResource resource =
                     new UserResource(user, getUrlBase(req), xmldoc);
-                provisioningManager.updateUser(user);
+                userService.updateUser(user);
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 if (! username.equals(user.getUsername())) {
                     resp.setHeader("Content-Location",
@@ -225,7 +225,7 @@ public class CmpServlet extends HttpServlet {
                     resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
-                provisioningManager.saveUser(user);
+                userService.createUser(user);
                 resp.setStatus(HttpServletResponse.SC_CREATED);
             }
         } catch (DuplicateUsernameException e) {

@@ -20,13 +20,13 @@ import java.util.Set;
 import org.osaf.cosmo.model.Ticket;
 
 /**
- * DAO interface for Tickets.
+ * Interface for DAOs that manage ticket resources.
  *
- * A ticket is associated with an item in a repository located by a
- * path. An item may have more than one ticket, but each of the item's
- * tickets must have a unique id.
+ * A ticket is associated with an item in the repository. An item may
+ * have more  than one ticket granted for it, but each of the item's
+ * tickets must have an id unique within the scope of that item.
  */
-public interface TicketDao {
+public interface TicketDao extends Dao {
 
     /**
      * Creates the given ticket in the repository.
@@ -34,6 +34,11 @@ public interface TicketDao {
      * @param path the repository path of the resource to which the
      * ticket is to be applied
      * @param ticket the ticket to be saved
+     *
+     * @throws DataRetrievalFailureException if the item at the given
+     * path is not found
+     * @throws InvalidDataResourceUsageException if the item at the
+     * given path is not a node
      */
     public void createTicket(String path, Ticket ticket);
 
@@ -43,6 +48,11 @@ public interface TicketDao {
      *
      * String path the absolute JCR path of the ticketed node
      * be returned
+     *
+     * @throws DataRetrievalFailureException if the item at the given
+     * path is not found
+     * @throws InvalidDataResourceUsageException if the item at the
+     * given path is not a node
      */
     public Set getTickets(String path);
 
@@ -55,8 +65,10 @@ public interface TicketDao {
      * @param path the path of the ticketed item unique to the repository
      * @param id the id of the ticket unique to the parent item
      *
-     * @throws DataRetrievalFailureException if either the item or the
-     * ticket are not found
+     * @throws DataRetrievalFailureException if the ticket is not
+     * found on the given path
+     * @throws InvalidDataResourceUsageException if the item at the
+     * given path is not a node
      */
     public Ticket getTicket(String path, String id);
 
@@ -68,7 +80,8 @@ public interface TicketDao {
      * repository
      * @param ticket the <code>Ticket</code> to remove
      *
-     * @throws DataRetrievalFailureException if the item is not found
+     * @throws InvalidDataResourceUsageException if the item at the
+     * given path is not a node
      */
     public void removeTicket(String path, Ticket ticket);
 }

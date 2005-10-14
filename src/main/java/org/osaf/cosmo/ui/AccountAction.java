@@ -16,12 +16,12 @@
 package org.osaf.cosmo.ui;
 
 import org.osaf.commons.struts.OSAFStrutsConstants;
-import org.osaf.cosmo.manager.ProvisioningManager;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.service.UserService;
 
 import java.util.List;
 
@@ -62,12 +62,12 @@ public class AccountAction extends CosmoAction {
      */
     public static final String ATTR_USER = "User";
 
-    private ProvisioningManager mgr;
+    private UserService userService;
 
     /**
      */
-    public void setProvisioningManager(ProvisioningManager mgr) {
-        this.mgr = mgr;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     /**
@@ -104,7 +104,7 @@ public class AccountAction extends CosmoAction {
             if (log.isDebugEnabled()) {
                 log.debug("signing up user " + formUser.getUsername());
             }
-            User user = mgr.saveUser(formUser);
+            User user = userService.createUser(formUser);
             request.setAttribute(ATTR_USER, user);
 
             // set the new security context
@@ -139,7 +139,7 @@ public class AccountAction extends CosmoAction {
             if (log.isDebugEnabled()) {
                 log.debug("updating user " + formUser.getUsername());
             }
-            User user = mgr.updateUser(formUser);
+            User user = userService.updateUser(formUser);
 
             // if the password was changed, update the security
             // context with the new password

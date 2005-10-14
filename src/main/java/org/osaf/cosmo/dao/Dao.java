@@ -15,38 +15,20 @@
  */
 package org.osaf.cosmo.dao;
 
-import org.osaf.cosmo.model.User;
-
-import java.util.Set;
-
 /**
- * DAO interface for Users.
- *
- * @author Brian Moseley
+ * Data Access Object (DAO) interface.
  */
-public interface UserDAO extends DAO {
+public interface Dao {
 
     /**
+     * Initializes the DAO, sanity checking required properties
+     * and defaulting optional properties.
      */
-    public Set getUsers();
+    public void init();
 
     /**
+     * Readies the DAO for garbage collection, shutting down any
+     * resources used.
      */
-    public User getUser(String username);
-
-    /**
-     */
-    public User getUserByEmail(String email);
-
-    /**
-     */
-    public void saveUser(User user);
-
-    /**
-     */
-    public void updateUser(User user);
-
-    /**
-     */
-    public void removeUser(String username);
+    public void destroy();
 }

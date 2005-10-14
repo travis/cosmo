@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.acegisecurity;
 
-import org.osaf.cosmo.dao.UserDAO;
+import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.impl.CosmoUserDetailsImpl;
 
@@ -32,13 +32,13 @@ import org.springframework.dao.DataRetrievalFailureException;
 /**
  * A class that implements Acegi Security's
  * {@link net.acegisecurity.providers.dao.AuthenticationDao}
- * interface using the Cosmo {@link UserDAO}.
+ * interface using the Cosmo {@link UserDao}.
  */
 public class UserAuthenticationDao implements AuthenticationDao {
     private static final Log log =
         LogFactory.getLog(UserAuthenticationDao.class);
 
-    private UserDAO userDAO;
+    private UserDao userDao;
 
     /**
      * Locates the user based on the username.
@@ -55,7 +55,7 @@ public class UserAuthenticationDao implements AuthenticationDao {
         throws UsernameNotFoundException, DataAccessException {
         try {
             return new
-                CosmoUserDetailsImpl(userDAO.getUser(username));
+                CosmoUserDetailsImpl(userDao.getUser(username));
         } catch (DataRetrievalFailureException e) {
             throw new UsernameNotFoundException("user " + username +
                                                 " not found", e);
@@ -64,13 +64,13 @@ public class UserAuthenticationDao implements AuthenticationDao {
 
     /**
      */
-    public UserDAO getUserDAO() {
-        return userDAO;
+    public UserDao getUserDao() {
+        return userDao;
     }
 
     /**
      */
-    public void setUserDAO(UserDAO userDAO) {
-        this.userDAO = userDAO;
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
     }
 }

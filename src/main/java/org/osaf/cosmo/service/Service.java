@@ -13,13 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dao;
+package org.osaf.cosmo.service;
 
 /**
- * Data Access Object (DAO) marker interface. Common methods for each
- * DAO could be added here.
- *
- * @author Brian Moseley
+ * Service interface. Services provide facades that encapsulate
+ * business logic and interact with data access objects (DAOs) to
+ * execute business operations.
  */
-public interface DAO {
+public interface Service {
+
+    /**
+     * Initializes the service, sanity checking required properties
+     * and defaulting optional properties.
+     */
+    public void init();
+
+    /**
+     * Readies the service for garbage collection, shutting down any
+     * resources used.
+     */
+    public void destroy();
 }

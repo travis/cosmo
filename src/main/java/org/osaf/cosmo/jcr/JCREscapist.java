@@ -192,7 +192,6 @@ public class JCREscapist {
         for (int i = 0; i < length; i++) {
             int ch = str.charAt(i);
             switch (ch) {
-            case '.':
             case '/':
             case ':':
             case '[':
@@ -250,10 +249,7 @@ public class JCREscapist {
                     continue;
                 }
                 String hex = str.substring(i+1, i+3);
-                if (hex.equals("2e")) {
-                    buf.append(".");
-                }
-                else if (hex.equals("2f")) {
+                if (hex.equals("2f")) {
                     buf.append("/");
                 }
                 else if (hex.equals("3a")) {

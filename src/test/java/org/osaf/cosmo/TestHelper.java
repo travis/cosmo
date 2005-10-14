@@ -36,6 +36,7 @@ public class TestHelper {
     static int apseq = 0;
     static int eseq = 0;
     static int rseq = 0;
+    static int tseq = 0;
     static int useq = 0;
 
     private TestHelper() {
@@ -102,6 +103,15 @@ public class TestHelper {
         ticket.setTimeout(CosmoDavConstants.VALUE_INFINITE);
         ticket.setPrivileges(new HashSet());
         ticket.getPrivileges().add(CosmoDavConstants.PRIVILEGE_READ);
+        return ticket;
+    }
+
+    /**
+     */
+    public static Ticket makeDummyTicket(User user) {
+        Ticket ticket = makeDummyTicket();
+        ticket.setOwner(user.getUsername());
+        ticket.setId(new Integer(++tseq).toString());
         return ticket;
     }
 

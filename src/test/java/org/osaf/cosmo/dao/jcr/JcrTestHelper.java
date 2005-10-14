@@ -18,15 +18,18 @@ package org.osaf.cosmo.dao.jcr;
 import java.util.Calendar;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
 /**
  */
 public class JcrTestHelper implements JcrConstants {
-    static int useq = 0;
+    static int nseq = 0;
 
     private JcrTestHelper() {
     }
@@ -35,22 +38,14 @@ public class JcrTestHelper implements JcrConstants {
      */
     public static User makeAndStoreDummyUser(Session session)
         throws RepositoryException {
-        String serial = new Integer(++useq).toString();
-        String username = "dummy" + serial;
+        User user = TestHelper.makeDummyUser();
 
-        Node node = session.getRootNode().addNode(username);
+        Node node = session.getRootNode().addNode(user.getUsername());
         node.addMixin(NT_USER);
-        node.setProperty(NP_USER_USERNAME, username);
-        node.setProperty(NP_USER_PASSWORD, username);
-        node.setProperty(NP_USER_FIRSTNAME, username);
-        node.setProperty(NP_USER_LASTNAME, username);
-        node.setProperty(NP_USER_EMAIL, username);
-        node.setProperty(NP_USER_ADMIN, false);
-        node.setProperty(NP_USER_DATECREATED, Calendar.getInstance());
-        node.setProperty(NP_USER_DATEMODIFIED, Calendar.getInstance());
+        JcrUserMapper.userToNode(user, node);
         session.getRootNode().save();
 
-        return nodeToUser(node);
+        return user;
     }
 
     /**
@@ -58,7 +53,7 @@ public class JcrTestHelper implements JcrConstants {
     public static User findDummyUser(Session session, String username)
         throws RepositoryException {
         return session.getRootNode().hasNode(username) ?
-            nodeToUser(session.getRootNode().getNode(username)) :
+            JcrUserMapper.nodeToUser(session.getRootNode().getNode(username)) :
             null;
     }
 
@@ -70,22 +65,44 @@ public class JcrTestHelper implements JcrConstants {
         session.save();
     }
 
-    private static User nodeToUser(Node node)
+    /**
+     */
+    public static Node addTicketableNode(Session session)
         throws RepositoryException {
-        User user = new User();
+        String serial = new Integer(++nseq).toString();
+        String name = "dummy" + serial;
 
-        user.setUsername(node.getProperty(NP_USER_USERNAME).getString());
-        user.setPassword(node.getProperty(NP_USER_PASSWORD).getString());
-        user.setFirstName(node.getProperty(NP_USER_FIRSTNAME).getString());
-        user.setLastName(node.getProperty(NP_USER_LASTNAME).getString());
-        user.setEmail(node.getProperty(NP_USER_EMAIL).getString());
-        user.setAdmin(new Boolean(node.getProperty(NP_USER_ADMIN).
-                                  getBoolean()));
-        user.setDateCreated(node.getProperty(NP_USER_DATECREATED).
-                            getDate().getTime());
-        user.setDateModified(node.getProperty(NP_USER_DATEMODIFIED).
-                             getDate().getTime());
+        Node node = session.getRootNode().addNode(name);
+        node.addMixin(NT_TICKETABLE);
+        session.getRootNode().save();
 
-        return user;
+        return node;
+    }
+
+    /**
+     */
+    public static Ticket makeAndStoreDummyTicket(Node node,
+                                                 User user)
+        throws RepositoryException {
+        Ticket ticket = TestHelper.makeDummyTicket(user);
+
+        Node ticketNode = node.addNode(NN_TICKET, NT_TICKET);
+        JcrTicketMapper.ticketToNode(ticket, ticketNode);
+        node.save();
+
+        return ticket;
+    }
+
+    /**
+     */
+    public static Ticket findDummyTicket(Node node, String id)
+        throws RepositoryException {
+        for (NodeIterator i = node.getNodes(NN_TICKET); i.hasNext();) {
+            Node child = i.nextNode();
+            if (child.getProperty(NP_TICKET_ID).getString().equals(id)) {
+                return JcrTicketMapper.nodeToTicket(child);
+            }
+        }
+        return null;
     }
 }

@@ -76,7 +76,7 @@ public class JcrUserDao extends JCRDaoSupport
                          i.hasNext();) {
                         Node node = i.nextNode();
                         if (node.isNodeType(NT_USER)) {
-                            users.add(nodeToUser(node));
+                            users.add(JcrUserMapper.nodeToUser(node));
                         }
                     }
 
@@ -104,7 +104,8 @@ public class JcrUserDao extends JCRDaoSupport
                                                                 " not found");
                     }
 
-                    return nodeToUser((Node) session.getItem(path));
+                    return JcrUserMapper.
+                        nodeToUser((Node) session.getItem(path));
                 }
             });
     }
@@ -130,7 +131,7 @@ public class JcrUserDao extends JCRDaoSupport
                                                                 " not found");
                     }
 
-                    return nodeToUser(i.nextNode());
+                    return JcrUserMapper.nodeToUser(i.nextNode());
                 }
             });
     }
@@ -170,7 +171,7 @@ public class JcrUserDao extends JCRDaoSupport
                     node.addMixin(NT_USER);
                     user.setDateModified(new Date());
                     user.setDateCreated(user.getDateModified());
-                    userToNode(user, node);
+                    JcrUserMapper.userToNode(user, node);
 
                     node.addMixin(NT_TICKETABLE);
                     node.addMixin(NT_DAV_COLLECTION);
@@ -234,7 +235,7 @@ public class JcrUserDao extends JCRDaoSupport
 
                     Node node = (Node) session.getItem(path);
                     user.setDateModified(new Date());
-                    userToNode(user, node);
+                    JcrUserMapper.userToNode(user, node);
 
                     node.save();
                     return null;
@@ -333,52 +334,5 @@ public class JcrUserDao extends JCRDaoSupport
             append(email).
             append("']");
         return executeXPathQuery(session, stmt.toString());
-    }
-
-    /**
-     * Returns a new instance of <code>User</code> populated from a
-     * user account node.
-     */
-    protected User nodeToUser(Node node)
-        throws RepositoryException {
-        User user = new User();
-
-        user.setUsername(node.getProperty(NP_USER_USERNAME).getString());
-        user.setPassword(node.getProperty(NP_USER_PASSWORD).getString());
-        user.setFirstName(node.getProperty(NP_USER_FIRSTNAME).getString());
-        user.setLastName(node.getProperty(NP_USER_LASTNAME).getString());
-        user.setEmail(node.getProperty(NP_USER_EMAIL).getString());
-        user.setAdmin(new Boolean(node.getProperty(NP_USER_ADMIN).
-                                  getBoolean()));
-        user.setDateCreated(node.getProperty(NP_USER_DATECREATED).
-                            getDate().getTime());
-        user.setDateModified(node.getProperty(NP_USER_DATEMODIFIED).
-                             getDate().getTime());
-
-        return user;
-    }
-
-    /**
-     * Copies the properties of a <code>User</code> into a user
-     * account node.
-     */
-    protected void userToNode(User user, Node node)
-        throws RepositoryException {
-        node.setProperty(NP_USER_USERNAME, user.getUsername());
-        node.setProperty(NP_USER_PASSWORD, user.getPassword());
-        node.setProperty(NP_USER_FIRSTNAME, user.getFirstName());
-        node.setProperty(NP_USER_LASTNAME, user.getLastName());
-        node.setProperty(NP_USER_EMAIL, user.getEmail());
-        node.setProperty(NP_USER_ADMIN, user.getAdmin().booleanValue());
-        Calendar created = Calendar.getInstance();
-        if (user.getDateCreated() != null) {
-            created.setTime(user.getDateCreated());
-        }
-        node.setProperty(NP_USER_DATECREATED, created);
-        Calendar modified = Calendar.getInstance();
-        if (user.getDateModified() != null) {
-            created.setTime(user.getDateModified());
-        }
-        node.setProperty(NP_USER_DATEMODIFIED, modified);
     }
 }

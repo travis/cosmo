@@ -24,12 +24,13 @@ import org.jdom.Element;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
-import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 /**
  * Represents the CalDAV calendar-restrictions property.
  */
-public class CalendarRestrictions extends AbstractDavProperty {
+public class CalendarRestrictions extends AbstractDavProperty
+    implements ICalendarConstants {
 
     private boolean dataOnly;
 
@@ -73,9 +74,8 @@ public class CalendarRestrictions extends AbstractDavProperty {
             new Element(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
                         CosmoDavConstants.NAMESPACE_CALDAV);
         element.setAttribute(CosmoDavConstants.ATTR_CALDAV_CONTENT_TYPE,
-                             CosmoICalendarConstants.CONTENT_TYPE);
-        element.setAttribute(CosmoDavConstants.ATTR_CALDAV_VERSION,
-                             CosmoICalendarConstants.VERSION);
+                             CONTENT_TYPE);
+        element.setAttribute(CosmoDavConstants.ATTR_CALDAV_VERSION, VERSION);
         elements.add(element);
         return elements;
     }

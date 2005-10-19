@@ -18,7 +18,7 @@ package org.osaf.cosmo.dav.impl;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 
-import org.osaf.cosmo.jcr.JCREscapist;
+import org.osaf.cosmo.dao.jcr.JcrEscapist;
 
 /**
  * Wraps an instance of 
@@ -46,7 +46,7 @@ public class CosmoDavLocatorImpl implements DavResourceLocator {
         this.wrapped = locator;
         this.jcrPath = jcrPath != null ?
             jcrPath :
-            JCREscapist.hexEscapeJCRPath(locator.getResourcePath());
+            JcrEscapist.hexEscapeJcrPath(locator.getResourcePath());
     }
 
     /**

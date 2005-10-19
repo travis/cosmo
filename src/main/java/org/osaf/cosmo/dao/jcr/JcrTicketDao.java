@@ -84,11 +84,6 @@ public class JcrTicketDao extends JCRDaoSupport
                     }
                     Node parentNode = (Node) parentItem;
 
-                    if (log.isDebugEnabled()) {
-                        log.debug("adding node for ticket " +
-                                  ticket.getId() + " below " +
-                                  parentNode.getPath());
-                    }
                     Node ticketNode = parentNode.addNode(NN_TICKET, NT_TICKET);
                     JcrTicketMapper.ticketToNode(ticket, ticketNode);
 

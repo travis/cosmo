@@ -22,14 +22,15 @@ import javax.jcr.RepositoryException;
 import org.apache.jackrabbit.server.io.ExportContext;
 import org.apache.jackrabbit.server.io.FileExportCommand;
 
-import org.osaf.cosmo.jcr.CosmoJcrConstants;
+import org.osaf.cosmo.dao.jcr.JcrConstants;
 
 /**
  * Extends {@link org.apache.jackrabbit.server.io.FileExportCommand}
- * to provide logic for exporting the webdav properties of a
- * dav:resource node.
+ * to provide logic for exporting the WebDAV properties of a
+ * <code>dav:resource</coce> node.
  */
-public class DavResourceExportCommand extends FileExportCommand {
+public class DavResourceExportCommand extends FileExportCommand
+    implements JcrConstants {
 
     /**
      */
@@ -39,9 +40,8 @@ public class DavResourceExportCommand extends FileExportCommand {
         super.exportNode(context, content);
 
         Node parentNode = content.getParent();
-        if (parentNode.hasProperty(CosmoJcrConstants.NP_DAV_CONTENTLANGUAGE)) {
-            Property p = parentNode.
-                getProperty(CosmoJcrConstants.NP_DAV_CONTENTLANGUAGE);
+        if (parentNode.hasProperty(NP_DAV_CONTENTLANGUAGE)) {
+            Property p = parentNode.getProperty(NP_DAV_CONTENTLANGUAGE);
             context.setContentLanguage(p.getString());
         }
 
@@ -52,7 +52,7 @@ public class DavResourceExportCommand extends FileExportCommand {
      */
     public boolean canHandle(Node node) {
         try {
-            return node.isNodeType(CosmoJcrConstants.NT_DAV_RESOURCE);
+            return node.isNodeType(NT_DAV_RESOURCE);
         } catch (RepositoryException e) {
             return false;
         }

@@ -15,21 +15,24 @@
  */
 package org.osaf.cosmo.jackrabbit.io;
 
+import java.util.Locale;
+
 import javax.jcr.Node;
 
 import org.apache.jackrabbit.server.io.AbstractCommand;
 import org.apache.jackrabbit.server.io.AbstractContext;
 import org.apache.jackrabbit.server.io.ImportContext;
 
-import org.osaf.cosmo.jcr.CosmoJcrConstants;
-import org.osaf.cosmo.jcr.JCREscapist;
+import org.osaf.cosmo.dao.jcr.JcrConstants;
+import org.osaf.cosmo.dao.jcr.JcrEscapist;
 
 /**
- * An import command for setting the display name of a dav
- * resource. If the resource does not already have a display name, the
- * display name is set to be the same as the resource's name.
+ * An import command for adding the <code>caldav:collection</code>
+ * mixin type and setting associated properties to an existing
+ * <code>dav:collection</code> node.
  */
-public class SetDisplayNameCommand extends AbstractCommand {
+public class MakeCalendarCollectionCommand extends AbstractCommand
+    implements JcrConstants {
 
     /**
      */
@@ -45,15 +48,19 @@ public class SetDisplayNameCommand extends AbstractCommand {
      */
     public boolean execute(ImportContext context) throws Exception {
         Node node = context.getNode();
-        if (node != null &&
-            (node.isNodeType(CosmoJcrConstants.NT_DAV_COLLECTION) ||
-             node.isNodeType(CosmoJcrConstants.NT_DAV_RESOURCE))) {
-            if (! node.hasProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME)) {
-                String name =
-                    JCREscapist.hexUnescapeJCRNames(context.getSystemId());
-                node.setProperty(CosmoJcrConstants.NP_DAV_DISPLAYNAME, name);
-            }
+        if (! (node == null || node.isNodeType(NT_DAV_COLLECTION))) {
+            return false;
         }
+
+        if (! node.isNodeType(NT_CALDAV_COLLECTION)) {
+            node.addMixin(NT_CALDAV_COLLECTION);
+        }
+
+        String description =
+            JcrEscapist.hexUnescapeJcrNames(context.getSystemId());
+        node.setProperty(NP_CALDAV_CALENDARDESCRIPTION, description);
+        node.setProperty(NP_XML_LANG, Locale.getDefault().toString());
+
         return false;
     }
 }

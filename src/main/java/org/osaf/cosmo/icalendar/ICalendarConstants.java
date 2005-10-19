@@ -13,23 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo;
+package org.osaf.cosmo.icalendar;
 
 /**
- * An exception indicating that a particular feature is not (yet)
- * supported in Cosmo.
+ * Provides constants for ICalendar entities that are not otherwise
+ * defined by ical4j.
  */
-public class UnsupportedFeatureException extends RuntimeException {
+public interface ICalendarConstants {
 
     /**
      */
-    public UnsupportedFeatureException(String message) {
-        super(message);
-    }
+    public static final String VERSION = "2.0";
 
     /**
      */
-    public UnsupportedFeatureException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    public static final String CONTENT_TYPE = "text/calendar";
+
+    /**
+     */
+    public static final String FILE_EXTENSION = "ics";
+
+    /**
+     */
+    public static final String COMP_STANDARD = "STANDARD";
+    /**
+     */
+    public static final String COMP_DAYLIGHT = "DAYLIGHT";
 }

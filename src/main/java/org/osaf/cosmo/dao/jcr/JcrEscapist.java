@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.jcr;
+package org.osaf.cosmo.dao.jcr;
 
 import org.apache.xerces.util.XMLChar;
 
@@ -25,7 +25,7 @@ import org.apache.xerces.util.XMLChar;
  * The original code in this class was copied from the Apache
  * Jackrabbit class {@link org.apache.jackrabbit.test.api.EscapeJCRUtil}.
  */
-public class JCREscapist {
+public class JcrEscapist {
 
     private static final String utf16esc =
         "_x[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]_";
@@ -34,15 +34,15 @@ public class JCREscapist {
 
     private static int utf16length = 4;
 
-    public static String xmlEscapeJCRValues(String str) {
+    public static String xmlEscapeJcrValues(String str) {
         return xmlEscapeValues(str);
     }
 
-    public static String xmlEscapeJCRNames(String str) {
+    public static String xmlEscapeJcrNames(String str) {
         return xmlEscapeNames(str);
     }
 
-    public static String xmlEscapeJCRPath(String str) {
+    public static String xmlEscapeJcrPath(String str) {
         StringBuffer buf = new StringBuffer();
 
         String[] names = str.split("/");
@@ -56,11 +56,11 @@ public class JCREscapist {
         return buf.toString();
     }
 
-    public static String hexEscapeJCRNames(String str) {
+    public static String hexEscapeJcrNames(String str) {
         return hexEscape(str);
     }
 
-    public static String hexEscapeJCRPath(String str) {
+    public static String hexEscapeJcrPath(String str) {
         StringBuffer buf = new StringBuffer();
 
         String[] names = str.split("/");
@@ -74,11 +74,11 @@ public class JCREscapist {
         return buf.toString();
     }
 
-    public static String hexUnescapeJCRNames(String str) {
+    public static String hexUnescapeJcrNames(String str) {
         return hexUnescape(str);
     }
 
-    public static String hexUnescapeJCRPath(String str) {
+    public static String hexUnescapeJcrPath(String str) {
         StringBuffer buf = new StringBuffer();
 
         String[] names = str.split("/");

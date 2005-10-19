@@ -47,10 +47,9 @@ import org.apache.jackrabbit.webdav.simple.ResourceConfig;
 
 import org.apache.log4j.Logger;
 
-import org.osaf.cosmo.jcr.CosmoJcrConstants;
-import org.osaf.cosmo.jcr.JCRUtils;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.TicketDao;
+import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dav.CosmoCollectionNodeResource;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
@@ -63,8 +62,6 @@ import org.osaf.cosmo.dav.property.CalendarRestrictions;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.CosmoResourceType;
 import org.osaf.cosmo.dav.property.TicketDiscovery;
-import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
-import org.osaf.cosmo.icalendar.ICalendarUtils;
 import org.osaf.cosmo.jackrabbit.io.ApplicationContextAwareImportContext;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -80,7 +77,7 @@ import org.springframework.context.ApplicationContextAware;
  * that provides Cosmo-specific WebDAV behaviors.
  */
 public class CosmoDavResourceImpl extends DavResourceImpl 
-    implements CosmoDavResource, ApplicationContextAware {
+    implements CosmoDavResource, ApplicationContextAware, JcrConstants {
     private static final Logger log = Logger.getLogger(CosmoDavResource.class);
     private static final String BEAN_CALENDAR_DAO = "calendarDao";
     private static final String BEAN_TICKET_DAO = "ticketDao";
@@ -136,8 +133,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public boolean isTicketable() {
         try {
-            return exists() &&
-                getNode().isNodeType(CosmoJcrConstants.NT_TICKETABLE);
+            return exists() && getNode().isNodeType(NT_TICKETABLE);
         } catch (RepositoryException e) {
             throw new RuntimeException(e);
         }
@@ -149,8 +145,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public boolean isCalendarHomeCollection() {
         try {
-            return exists() &&
-                getNode().isNodeType(CosmoJcrConstants.NT_CALDAV_HOME);
+            return exists() && getNode().isNodeType(NT_CALDAV_HOME);
         } catch (RepositoryException e) {
             throw new RuntimeException(e);
         }
@@ -162,8 +157,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public boolean isCalendarCollection() {
         try {
-            return exists() &&
-                getNode().isNodeType(CosmoJcrConstants.NT_CALDAV_COLLECTION);
+            return exists() && getNode().isNodeType(NT_CALDAV_COLLECTION);
         } catch (RepositoryException e) {
             throw new RuntimeException(e);
         }
@@ -174,19 +168,19 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public void addCalendarCollection(CosmoDavResource child)
         throws DavException {
-        if (!exists()) {
-            throw new DavException(CosmoDavResponse.SC_CONFLICT);
-        }
-	if (isLocked(this)) {
+        if (isLocked(this) || isLocked(child)) {
             throw new DavException(CosmoDavResponse.SC_LOCKED);
         }
+        if (isFilteredResource(child)) {
+            throw new DavException(CosmoDavResponse.SC_FORBIDDEN);
+        }
         try {
-            Node parent = getNode();
-            String name = JCRUtils.getName(child.getLocator().getJcrPath());
-            CalendarDao dao = (CalendarDao) applicationContext.
-                getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
-            dao.createCalendarCollection(parent, name);
-            parent.save();
+            ImportContext ctx = createImportContext();
+            ctx.setSystemId(getJcrPathName(child.getLocator().getJcrPath()));
+            ctx.setContentType(CosmoDavConstants.
+                               CALENDAR_COLLECTION_CONTENT_TYPE);
+            createImportCollectionChain().execute(ctx);
+            getNode().save();
         } catch (DataIntegrityViolationException e) {
             log.error("resource " + child.getResourcePath() +
                       " already exists", e);
@@ -346,15 +340,12 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                 // calendar-description property (caldav section
                 // 4.4.1) has a language attribute
                 try {
-                    if (getNode().hasProperty(CosmoJcrConstants.
-                                              NP_CALDAV_CALENDARDESCRIPTION)) {
+                    if (getNode().hasProperty(NP_CALDAV_CALENDARDESCRIPTION)) {
                         String text = getNode().
-                            getProperty(CosmoJcrConstants.
-                                        NP_CALDAV_CALENDARDESCRIPTION).
+                            getProperty(NP_CALDAV_CALENDARDESCRIPTION).
                             getString();
-                        String lang = getNode().
-                            getProperty(CosmoJcrConstants.NP_XML_LANG).
-                            getString();
+                        String lang =
+                            getNode().getProperty(NP_XML_LANG).getString();
                         properties.add(new CalendarDescription(text, lang));
                     }
                 } catch (RepositoryException e) {
@@ -479,5 +470,10 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public ApplicationContext getApplicationContext() {
         return applicationContext;
+    }
+
+    private String getJcrPathName(String path) {
+        int pos = path.lastIndexOf('/');
+        return pos >= 0 ? path.substring(pos + 1) : "";
     }
 }

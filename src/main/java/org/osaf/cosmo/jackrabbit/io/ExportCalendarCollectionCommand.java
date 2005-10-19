@@ -38,14 +38,15 @@ import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dao.CalendarDao;
-import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
-import org.osaf.cosmo.jcr.CosmoJcrConstants;
+import org.osaf.cosmo.dao.jcr.JcrConstants;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 /**
  * A command for exporting a view of the calendar objects contained
  * within a calendar collection.
  */
-public class ExportCalendarCollectionCommand extends AbstractCommand {
+public class ExportCalendarCollectionCommand extends AbstractCommand
+    implements JcrConstants, ICalendarConstants {
     private static final Logger log =
         Logger.getLogger(ExportCalendarCollectionCommand.class);
     private static final String BEAN_CALENDAR_DAO = "calendarDao";
@@ -68,7 +69,7 @@ public class ExportCalendarCollectionCommand extends AbstractCommand {
         throws Exception {
         Node resourceNode = context.getNode();
         if (resourceNode == null ||
-            ! resourceNode.isNodeType(CosmoJcrConstants.NT_CALDAV_COLLECTION)) {
+            ! resourceNode.isNodeType(NT_CALDAV_COLLECTION)) {
             return false;
         }
 
@@ -81,13 +82,11 @@ public class ExportCalendarCollectionCommand extends AbstractCommand {
         CalendarDao dao = (CalendarDao) 
             context.getApplicationContext().
             getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
-        Calendar calendar = dao.getCalendarObject(resourceNode);
+        Calendar calendar = dao.getCalendarObject(resourceNode.getPath());
 
         // fill in the context
 
-        File tmpfile =
-            File.createTempFile("__cosmo",
-                                CosmoICalendarConstants.FILE_EXTENSION);
+        File tmpfile = File.createTempFile("__cosmo", FILE_EXTENSION);
         tmpfile.deleteOnExit();
         FileOutputStream out = new FileOutputStream(tmpfile);
 
@@ -100,14 +99,12 @@ public class ExportCalendarCollectionCommand extends AbstractCommand {
         context.setInputStream(new FileInputStream(tmpfile));
         context.setContentLength(tmpfile.length());
         context.setModificationTime(tmpfile.lastModified());
-        context.setContentType(CosmoICalendarConstants.CONTENT_TYPE +
-                               "; charset=utf-8");
+        context.setContentType(CONTENT_TYPE + "; charset=utf-8");
         Property contentLanguage =
-            resourceNode.getProperty(CosmoJcrConstants.NP_XML_LANG);
+            resourceNode.getProperty(NP_XML_LANG);
         context.setContentLanguage(contentLanguage.getString());
         java.util.Calendar creationTime =
-            resourceNode.getProperty(CosmoJcrConstants.NP_JCR_CREATED).
-            getDate();
+            resourceNode.getProperty(NP_JCR_CREATED).getDate();
         context.setCreationTime(creationTime.getTime().getTime());
         context.setETag("");
 

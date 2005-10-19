@@ -31,12 +31,12 @@ import org.apache.jackrabbit.webdav.DavException;
 
 import org.apache.log4j.Logger;
 
-import org.osaf.cosmo.UnsupportedFeatureException;
 import org.osaf.cosmo.dao.CalendarDao;
+import org.osaf.cosmo.dao.jcr.JcrConstants;
+import org.osaf.cosmo.dao.UnsupportedCalendarObjectException;
 import org.osaf.cosmo.dav.CosmoDavResponse;
-import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.icalendar.RecurrenceException;
-import org.osaf.cosmo.jcr.CosmoJcrConstants;
 
 import org.springframework.dao.DataAccessException;
 
@@ -44,7 +44,8 @@ import org.springframework.dao.DataAccessException;
  * An import command for storing the calendar object attached to a
  * dav resource.
  */
-public class StoreCalendarObjectCommand extends AbstractCommand {
+public class StoreCalendarObjectCommand extends AbstractCommand
+    implements JcrConstants, ICalendarConstants {
     private static final Logger log =
         Logger.getLogger(StoreCalendarObjectCommand.class);
     private static final String BEAN_CALENDAR_DAO = "calendarDao";
@@ -73,26 +74,21 @@ public class StoreCalendarObjectCommand extends AbstractCommand {
         // if the node's parent is not a calendar collection, don't
         // bother storing, since we'll never query "webcal"
         // calendars.
-        if (! resourceNode.getParent().
-            isNodeType(CosmoJcrConstants.NT_CALDAV_COLLECTION)) {
+        if (! resourceNode.getParent().isNodeType(NT_CALDAV_COLLECTION)) {
             return false;
         }
 
         // ensure that the resource is a dav resource and that either
         // it is of type text/calendar or its name ends with .ics
-        if (! (resourceNode.
-               isNodeType(CosmoJcrConstants.NT_DAV_RESOURCE) &&
-               (context.getContentType().
-                startsWith(CosmoICalendarConstants.CONTENT_TYPE) ||
-                resourceNode.getName().
-                endsWith("." + CosmoICalendarConstants.FILE_EXTENSION)))) {
+        if (! (resourceNode.isNodeType(NT_DAV_RESOURCE) &&
+               (context.getContentType().startsWith(CONTENT_TYPE) ||
+                resourceNode.getName().endsWith("." + FILE_EXTENSION)))) {
             return false;
         }
 
         // get a handle to the resource content
-        Node content = resourceNode.getNode(CosmoJcrConstants.NN_JCR_CONTENT);
-        InputStream in =
-            content.getProperty(CosmoJcrConstants.NP_JCR_DATA).getStream();
+        Node content = resourceNode.getNode(NN_JCR_CONTENT);
+        InputStream in = content.getProperty(NP_JCR_DATA).getStream();
 
         try {
             // parse the resource
@@ -103,13 +99,13 @@ public class StoreCalendarObjectCommand extends AbstractCommand {
             CalendarDao dao = (CalendarDao) 
                 context.getApplicationContext().
                 getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
-            dao.storeCalendarObject(resourceNode, calendar);
+            dao.storeCalendarObject(resourceNode.getPath(), calendar);
         } catch (ParserException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Error parsing calendar resource", e);
             }
             throw new DavException(CosmoDavResponse.SC_FORBIDDEN);
-        } catch (UnsupportedFeatureException e) {
+        } catch (UnsupportedCalendarObjectException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Calendar object contains no supported components",
                           e);

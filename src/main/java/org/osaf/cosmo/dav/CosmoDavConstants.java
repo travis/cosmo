@@ -93,4 +93,8 @@ public class CosmoDavConstants {
     // ticket properties
     public static final String PROPERTY_TICKET_TICKETDISCOVERY =
         "ticketdiscovery";
+
+    // import/export chain context attributes
+    public static final String CALENDAR_COLLECTION_CONTENT_TYPE =
+        "x-cosmo-calendar-collection";
 }

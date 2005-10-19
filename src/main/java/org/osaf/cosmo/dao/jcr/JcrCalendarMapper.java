@@ -3480,7 +3480,9 @@ public class JcrCalendarMapper implements ICalendarConstants, JcrConstants {
             getICalendarPropertyNode(NN_ICAL_RECUR, propertyNode);
         recurNode.setProperty(NP_ICAL_FREQ, recur.getFrequency());
         java.util.Calendar c = java.util.Calendar.getInstance();
-        c.setTime(recur.getUntil());
+        if (recur.getUntil() != null) {
+            c.setTime(recur.getUntil());
+        }
         propertyNode.setProperty(NP_ICAL_UNTIL, c);
         recurNode.setProperty(NP_ICAL_COUNT, recur.getCount());
         recurNode.setProperty(NP_ICAL_INTERVAL, recur.getInterval());

@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.dao.jcr;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 import javax.jcr.Node;
@@ -23,15 +26,17 @@ import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
 
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
 /**
  */
-public class JcrTestHelper implements JcrConstants {
+public class JcrTestHelper implements ICalendarConstants, JcrConstants {
     static int nseq = 0;
     static int pseq = 0;
 
@@ -42,11 +47,50 @@ public class JcrTestHelper implements JcrConstants {
      */
     public static Node addNode(Session session)
         throws RepositoryException {
+        return addNode(session.getRootNode());
+    }
+
+    /**
+     */
+    public static Node addNode(Node parent)
+        throws RepositoryException {
         String serial = new Integer(++nseq).toString();
         String name = "dummy" + serial;
 
-        Node node = session.getRootNode().addNode(name);
-        session.save();
+        Node node = parent.addNode(name);
+        parent.save();
+
+        return node;
+    }
+
+    /**
+     */
+    public static Node addFileNode(Session session,
+                                   InputStream data,
+                                   String mimetype,
+                                   String charset)
+        throws RepositoryException {
+        return addFileNode(session.getRootNode(), data, mimetype, charset);
+    }
+
+    /**
+     */
+    public static Node addFileNode(Node parent,
+                                   InputStream data,
+                                   String mimetype,
+                                   String charset)
+        throws RepositoryException {
+        String serial = new Integer(++nseq).toString();
+        String name = "dummy" + serial;
+
+        Node node = parent.addNode(name, NT_FILE);
+        Node content = node.addNode(NN_JCR_CONTENT, NT_RESOURCE);
+        content.setProperty(NP_JCR_DATA, data);
+        content.setProperty(NP_JCR_MIMETYPE, mimetype);
+        content.setProperty(NP_JCR_ENCODING, charset);
+        content.setProperty(NP_JCR_LASTMODIFIED,
+                            java.util.Calendar.getInstance());
+        parent.save();
 
         return node;
     }
@@ -150,6 +194,56 @@ public class JcrTestHelper implements JcrConstants {
 
     /**
      */
+    public static Node addDavResourceNode(Session session,
+                                          InputStream data,
+                                          String mimetype,
+                                          String charset)
+        throws RepositoryException {
+        return addDavResourceNode(session.getRootNode(), data, mimetype,
+                                  charset);
+    }
+
+    /**
+     */
+    public static Node addDavResourceNode(Node parent,
+                                          InputStream data,
+                                          String mimetype,
+                                          String charset)
+        throws RepositoryException {
+        Node node = addFileNode(parent, data, mimetype, charset);
+
+        node.addMixin(NT_DAV_RESOURCE);
+        node.addMixin(NT_TICKETABLE);
+        node.setProperty(NP_DAV_DISPLAYNAME, node.getName());
+        node.save();
+
+        return node;
+    }
+
+    /**
+     */
+    public static Node addCalendarResourceNode(Session session,
+                                               Calendar calendar)
+        throws RepositoryException {
+        return addCalendarResourceNode(session.getRootNode(), calendar);
+    }
+
+    /**
+     */
+    public static Node addCalendarResourceNode(Node node,
+                                               Calendar calendar)
+        throws RepositoryException {
+        try {
+            InputStream data =
+                new ByteArrayInputStream(calendar.toString().getBytes("utf8"));
+            return addDavResourceNode(node, data, CONTENT_TYPE, "utf8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("utf8 not supported?", e);
+        }
+    }
+
+    /**
+     */
     public static Calendar makeAndStoreDummyCalendar(Node node)
         throws RepositoryException {
         Calendar calendar = TestHelper.makeDummyCalendarWithEvent();
@@ -162,8 +256,30 @@ public class JcrTestHelper implements JcrConstants {
 
     /**
      */
+    public static Calendar makeAndStoreDummyCaldavCalendar(Node collection)
+        throws RepositoryException {
+        Calendar calendar = TestHelper.makeDummyCalendarWithEvent();
+
+        Node resource = addCalendarResourceNode(collection, calendar);
+        JcrCalendarMapper.calendarToNode(calendar, resource);
+        collection.save();
+
+        return calendar;
+    }
+
+    /**
+     */
     public static Calendar findDummyCalendar(Node node)
         throws RepositoryException {
         return JcrCalendarMapper.nodeToCalendar(node);
+    }
+
+    /**
+     */
+    public static Calendar loadCalendar(String name)
+        throws Exception {
+        InputStream in =
+            JcrTestHelper.class.getClassLoader().getResourceAsStream(name);
+        return new CalendarBuilder().build(in);
     }
 }

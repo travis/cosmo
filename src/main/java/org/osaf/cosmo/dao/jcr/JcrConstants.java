@@ -23,9 +23,6 @@ public interface JcrConstants {
     // node names
     public static final String NN_JCR_CONTENT = "jcr:content";
     public static final String NN_JCR_DATA = "jcr:data";
-    public static final String NN_JCR_MIMETYPE = "jcr:mimeType";
-    public static final String NN_JCR_ENCODING = "jcr:encoding";
-    public static final String NN_JCR_LASTMODIFIED = "jcr:lastModified";
 
     public static final String NN_TICKET = "ticket:ticket";
 
@@ -120,6 +117,8 @@ public interface JcrConstants {
 
     public static final String NP_JCR_DATA = "jcr:data";
     public static final String NP_JCR_CREATED = "jcr:created";
+    public static final String NP_JCR_MIMETYPE = "jcr:mimeType";
+    public static final String NP_JCR_ENCODING = "jcr:encoding";
     public static final String NP_JCR_LASTMODIFIED = "jcr:lastModified";
 
     public static final String NP_XML_LANG = "xml:lang";

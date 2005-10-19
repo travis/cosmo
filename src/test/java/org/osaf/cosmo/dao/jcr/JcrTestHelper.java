@@ -15,12 +15,15 @@
  */
 package org.osaf.cosmo.dao.jcr;
 
-import java.util.Calendar;
+import java.util.Locale;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
+import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+
+import net.fortuna.ical4j.model.Calendar;
 
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.model.Ticket;
@@ -30,8 +33,35 @@ import org.osaf.cosmo.model.User;
  */
 public class JcrTestHelper implements JcrConstants {
     static int nseq = 0;
+    static int pseq = 0;
 
     private JcrTestHelper() {
+    }
+
+    /**
+     */
+    public static Node addNode(Session session)
+        throws RepositoryException {
+        String serial = new Integer(++nseq).toString();
+        String name = "dummy" + serial;
+
+        Node node = session.getRootNode().addNode(name);
+        session.save();
+
+        return node;
+    }
+
+    /**
+     */
+    public static Property addProperty(Node node)
+        throws RepositoryException {
+        String serial = new Integer(++pseq).toString();
+        String name = "dummy" + serial;
+
+        Property property = node.setProperty(name, name);
+        node.save();
+
+        return property;
     }
 
     /**
@@ -69,10 +99,8 @@ public class JcrTestHelper implements JcrConstants {
      */
     public static Node addTicketableNode(Session session)
         throws RepositoryException {
-        String serial = new Integer(++nseq).toString();
-        String name = "dummy" + serial;
+        Node node = addNode(session);
 
-        Node node = session.getRootNode().addNode(name);
         node.addMixin(NT_TICKETABLE);
         session.getRootNode().save();
 
@@ -104,5 +132,38 @@ public class JcrTestHelper implements JcrConstants {
             }
         }
         return null;
+    }
+
+    /**
+     */
+    public static Node addCalendarCollectionNode(Session session)
+        throws RepositoryException {
+        Node node = addNode(session);
+
+        node.addMixin(NT_CALDAV_COLLECTION);
+        node.setProperty(NP_CALDAV_CALENDARDESCRIPTION, node.getName());
+        node.setProperty(NP_XML_LANG, Locale.getDefault().toString());
+        session.getRootNode().save();
+
+        return node;
+    }
+
+    /**
+     */
+    public static Calendar makeAndStoreDummyCalendar(Node node)
+        throws RepositoryException {
+        Calendar calendar = TestHelper.makeDummyCalendarWithEvent();
+
+        JcrCalendarMapper.calendarToNode(calendar, node);
+        node.save();
+
+        return calendar;
+    }
+
+    /**
+     */
+    public static Calendar findDummyCalendar(Node node)
+        throws RepositoryException {
+        return JcrCalendarMapper.nodeToCalendar(node);
     }
 }

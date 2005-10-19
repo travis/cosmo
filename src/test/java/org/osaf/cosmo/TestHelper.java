@@ -25,7 +25,6 @@ import net.fortuna.ical4j.model.property.*;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
-import org.osaf.cosmo.icalendar.CosmoICalendarConstants;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -47,6 +46,16 @@ public class TestHelper {
 
         cal.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
         cal.getProperties().add(Version.VERSION_2_0);
+
+        return cal;
+    }
+
+    public static Calendar makeDummyCalendarWithEvent() {
+        Calendar cal = makeDummyCalendar();
+
+        VEvent e1 = TestHelper.makeDummyEvent();
+        cal.getComponents().add(e1);
+        cal.getComponents().add(VTimeZone.getDefault());
 
         return cal;
     }

@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.jcr.Node;
+import javax.jcr.Property;
 import javax.jcr.Session;
 
 import org.apache.commons.id.random.SessionIdGenerator;
@@ -109,15 +110,13 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
     public void testCreateTicketOnProperty() throws Exception {
         Session session = acquireSession();
 
-        // make a node and a property
-        Node node = session.getRootNode().addNode("deadbeef");
-        node.setProperty("foobar", "ouch");
-        session.getRootNode().save();
+        Node node = JcrTestHelper.addNode(session);
+        Property property = JcrTestHelper.addProperty(node);
 
         Ticket t1 = TestHelper.makeDummyTicket();
 
         try {
-            dao.createTicket("/deadbeef/foobar", t1);
+            dao.createTicket(property.getPath(), t1);
             fail("Ticket created on property");
         } catch (InvalidDataAccessResourceUsageException e) {
             // expected
@@ -169,13 +168,11 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
     public void testGetTicketsOnProperty() throws Exception {
         Session session = acquireSession();
 
-        // make a node and a property
-        Node node = session.getRootNode().addNode("deadbeef");
-        node.setProperty("foobar", "ouch");
-        session.getRootNode().save();
+        Node node = JcrTestHelper.addNode(session);
+        Property property = JcrTestHelper.addProperty(node);
 
         try {
-            dao.getTickets("/deadbeef/foobar");
+            dao.getTickets(property.getPath());
             fail("Got tickets on property");
         } catch (InvalidDataAccessResourceUsageException e) {
             // expected
@@ -229,13 +226,11 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
     public void testGetTicketOnProperty() throws Exception {
         Session session = acquireSession();
 
-        // make a node and a property
-        Node node = session.getRootNode().addNode("deadbeef");
-        node.setProperty("foobar", "ouch");
-        session.getRootNode().save();
+        Node node = JcrTestHelper.addNode(session);
+        Property property = JcrTestHelper.addProperty(node);
 
         try {
-            dao.getTicket("/deadbeef/foobar", "cafebebe");
+            dao.getTicket(property.getPath(), "cafebebe");
             fail("Got ticket on property");
         } catch (InvalidDataAccessResourceUsageException e) {
             // expected
@@ -312,15 +307,13 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
     public void testRemoveTicketOnProperty() throws Exception {
         Session session = acquireSession();
 
-        // make a node and a property
-        Node node = session.getRootNode().addNode("deadbeef");
-        node.setProperty("foobar", "ouch");
-        session.getRootNode().save();
+        Node node = JcrTestHelper.addNode(session);
+        Property property = JcrTestHelper.addProperty(node);
 
         Ticket t1 = TestHelper.makeDummyTicket();
 
         try {
-            dao.removeTicket("/deadbeef/foobar", t1);
+            dao.removeTicket(property.getPath(), t1);
             fail("Removed ticket on property");
         } catch (InvalidDataAccessResourceUsageException e) {
             // expected

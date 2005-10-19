@@ -47,7 +47,7 @@
   </bean>
 
   <bean id="calendarDao"
-        class="org.osaf.cosmo.dao.jcr.JCRCalendarDao"
+        class="org.osaf.cosmo.dao.jcr.JcrCalendarDao"
         init-method="init"
         destroy-method="destroy"/>
 

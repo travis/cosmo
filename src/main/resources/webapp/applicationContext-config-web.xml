@@ -30,7 +30,7 @@
       <ref bean="serverVersion"/>
     </property>
     <property name="userDao">
-      <ref bean="userDAO"/>
+      <ref bean="userDao"/>
     </property>
   </bean>
 

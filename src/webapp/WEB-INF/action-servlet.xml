@@ -27,8 +27,8 @@
     <property name="configurer">
       <ref bean="servletContextConfigurer"/>
     </property>
-    <property name="provisioningManager">
-      <ref bean="provisioningManager"/>
+    <property name="userService">
+      <ref bean="userService"/>
     </property>
     <property name="securityManager">
       <ref bean="securityManager"/>
@@ -47,8 +47,8 @@
 
   <bean name="accountAction" abstract="true" singleton="false"
         class="org.osaf.cosmo.ui.AccountAction" >
-    <property name="provisioningManager">
-      <ref bean="provisioningManager"/>
+    <property name="userService">
+      <ref bean="userService"/>
     </property>
     <property name="securityManager">
       <ref bean="securityManager"/>
@@ -64,8 +64,8 @@
 
   <bean name="/remind" singleton="false"
         class="org.osaf.cosmo.ui.CredentialsReminderAction" >
-    <property name="provisioningManager">
-      <ref bean="provisioningManager"/>
+    <property name="userService">
+      <ref bean="userService"/>
     </property>
     <property name="mailSender">
       <ref bean="mailSender"/>

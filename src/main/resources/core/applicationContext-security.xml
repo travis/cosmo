@@ -28,8 +28,8 @@
 
   <bean id="authenticationDao"
         class="org.osaf.cosmo.acegisecurity.UserAuthenticationDao">
-     <property name="userDAO">
-       <ref bean="userDAO"/>
+     <property name="userDao">
+       <ref bean="userDao"/>
      </property>
   </bean>
 

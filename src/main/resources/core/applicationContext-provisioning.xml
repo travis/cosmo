@@ -49,7 +49,11 @@
   <bean id="calendarDao"
         class="org.osaf.cosmo.dao.jcr.JcrCalendarDao"
         init-method="init"
-        destroy-method="destroy"/>
+        destroy-method="destroy">
+    <property name="template">
+      <ref bean="homedirTemplate"/>
+    </property>
+  </bean>
 
   <!-- Services -->
 

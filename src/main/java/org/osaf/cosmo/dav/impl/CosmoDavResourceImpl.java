@@ -178,7 +178,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             ImportContext ctx = createImportContext();
             ctx.setSystemId(getJcrPathName(child.getLocator().getJcrPath()));
             ctx.setContentType(CosmoDavConstants.
-                               CALENDAR_COLLECTION_CONTENT_TYPE);
+                               CONTENT_TYPE_CALENDAR_COLLECTION);
             createImportCollectionChain().execute(ctx);
             getNode().save();
         } catch (DataIntegrityViolationException e) {

@@ -83,6 +83,7 @@ public class CosmoDavConstants {
     public static final String PRIVILEGE_WRITE = "write";
 
     // caldav properties
+
     public static final String PROPERTY_CALDAV_CALENDAR_DESCRIPTION =
         "calendar-description";
     public static final String PROPERTY_CALDAV_CALENDAR_COMPONENT_RESTRICTION_SET =
@@ -91,10 +92,12 @@ public class CosmoDavConstants {
         "calendar-restrictions";
 
     // ticket properties
+
     public static final String PROPERTY_TICKET_TICKETDISCOVERY =
         "ticketdiscovery";
 
-    // import/export chain context attributes
-    public static final String CALENDAR_COLLECTION_CONTENT_TYPE =
-        "x-cosmo-calendar-collection";
+    // caldav content types
+
+    public static final String CONTENT_TYPE_CALENDAR_COLLECTION =
+        "application/x-calendar-collection";
 }

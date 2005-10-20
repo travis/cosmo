@@ -45,8 +45,8 @@ public class DavCollectionImportCommand extends AddNodeCommand
         super.execute(context);
 
         Node node = context.getNode();
-        if (! node.isNodeType(NT_DAV_RESOURCE)) {
-            node.addMixin(NT_DAV_RESOURCE);
+        if (! node.isNodeType(NT_DAV_COLLECTION)) {
+            node.addMixin(NT_DAV_COLLECTION);
         }
         if (! node.isNodeType(NT_TICKETABLE)) {
             node.addMixin(NT_TICKETABLE);

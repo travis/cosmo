@@ -23,8 +23,11 @@ import org.apache.jackrabbit.server.io.AbstractCommand;
 import org.apache.jackrabbit.server.io.AbstractContext;
 import org.apache.jackrabbit.server.io.ImportContext;
 
+import org.apache.log4j.Logger;
+
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dao.jcr.JcrEscapist;
+import org.osaf.cosmo.dav.CosmoDavConstants;
 
 /**
  * An import command for adding the <code>caldav:collection</code>
@@ -33,6 +36,8 @@ import org.osaf.cosmo.dao.jcr.JcrEscapist;
  */
 public class MakeCalendarCollectionCommand extends AbstractCommand
     implements JcrConstants {
+    private static final Logger log =
+        Logger.getLogger(MakeCalendarCollectionCommand.class);
 
     /**
      */
@@ -48,7 +53,10 @@ public class MakeCalendarCollectionCommand extends AbstractCommand
      */
     public boolean execute(ImportContext context) throws Exception {
         Node node = context.getNode();
-        if (! (node == null || node.isNodeType(NT_DAV_COLLECTION))) {
+        if (! (node != null && node.isNodeType(NT_DAV_COLLECTION) &&
+               context.getContentType() != null &&
+               context.getContentType().
+               equals(CosmoDavConstants.CONTENT_TYPE_CALENDAR_COLLECTION))) {
             return false;
         }
 

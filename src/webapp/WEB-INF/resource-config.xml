@@ -35,6 +35,7 @@
       <prefix>icalendar</prefix>
       <prefix>ticket</prefix>
       <prefix>xml</prefix>
+      <prefix>cosmo</prefix>
     </namespaces>
   </filter>
 </config>

@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import javax.jcr.Repository;
 import javax.jcr.Session;
+import javax.jcr.SimpleCredentials;
 
 import junit.framework.TestCase;
 
@@ -28,9 +29,14 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.core.RepositoryImpl;
 import org.apache.jackrabbit.core.config.RepositoryConfig;
 
-import org.osaf.commons.spring.jcr.JCRSessionFactory;
-import org.osaf.commons.spring.jcr.JCRTemplate;
-import org.osaf.cosmo.dao.jcr.mock.MockAuthenticationProvider;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import org.springmodules.jcr.JcrSessionFactory;
+import org.springmodules.jcr.JcrTemplate;
+import org.springmodules.jcr.SessionHolder;
+import org.springmodules.jcr.SessionHolderProvider;
+import org.springmodules.jcr.SessionFactoryUtils;
+import org.springmodules.jcr.support.DefaultSessionHolderProvider;
 
 /**
  * Base class for test cases that operate against a JCR repository.
@@ -52,7 +58,9 @@ public class BaseJcrDaoTestCase extends TestCase implements JcrConstants {
     private String username;
     private String password;
     private Repository repository;
-    private JCRTemplate template;
+    private JcrSessionFactory sessionFactory;
+    private Session session;
+    private JcrTestHelper testHelper;
 
     /**
      */
@@ -74,7 +82,7 @@ public class BaseJcrDaoTestCase extends TestCase implements JcrConstants {
     }
     
     /**
-     * Open the repository and set up the <code>JCRTemplate</code>.
+     * Open the repository and set up the <code>JcrTemplate</code>.
      */
     protected void setUp() throws Exception {
         // set up repository
@@ -87,38 +95,45 @@ public class BaseJcrDaoTestCase extends TestCase implements JcrConstants {
         }
 
         // set up template
-        MockAuthenticationProvider authenticationProvider =
-            new MockAuthenticationProvider();
-        authenticationProvider.setUsername(username);
-        authenticationProvider.setPassword(password);
+        SimpleCredentials credentials =
+            new SimpleCredentials(username, password.toCharArray());
 
-        JCRSessionFactory sessionFactory = new JCRSessionFactory();
-        sessionFactory.setAuthenticationProvider(authenticationProvider);
+        sessionFactory = new JcrSessionFactory();
         sessionFactory.setRepository(repository);
-        sessionFactory.init();
+        sessionFactory.setCredentials(credentials);
 
-        template = new JCRTemplate();
-        template.setSessionFactory(sessionFactory);
-        template.init();
+        // open the session
+        session = SessionFactoryUtils.getSession(sessionFactory, true);
+        SessionHolder sessionHolder =
+            new DefaultSessionHolderProvider().createSessionHolder(session);
+        TransactionSynchronizationManager.bindResource(sessionFactory,
+                                                       sessionHolder);
+
+        testHelper = new JcrTestHelper(session);
     }
 
     /**
      */
     protected void tearDown() throws Exception {
+        testHelper = null;
+
+        // close the session
+        TransactionSynchronizationManager.unbindResource(sessionFactory);
+        session.refresh(false);
+        SessionFactoryUtils.releaseSession(session, sessionFactory);
+
         ((RepositoryImpl) repository).shutdown();
     }
 
     /**
-     * Returns a repository session so that tests can set up data to
-     * be tested.
      */
-    protected Session acquireSession() throws Exception {
-        return template.getSessionFactory().getSession();
+    protected JcrSessionFactory getSessionFactory() {
+        return sessionFactory;
     }
 
     /**
      */
-    protected JCRTemplate getTemplate() {
-        return template;
+    protected JcrTestHelper getTestHelper() {
+        return testHelper;
     }
 }

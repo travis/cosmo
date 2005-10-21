@@ -28,11 +28,11 @@ import org.apache.jackrabbit.webdav.simple.DavSessionImpl;
 import org.apache.log4j.Logger;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.osaf.commons.spring.jcr.JCRSessionFactory;
+import org.springmodules.jcr.JcrSessionFactory;
 
 /**
  * Implementation of the jcr-server {@link DavSessionProvider}
- * interface that uses a {@link JCRSessionFactory} to log into the
+ * interface that uses a {@link JcrSessionFactory} to log into the
  * repository and provide a
  * {@link org.apache.jackrabbit.webdav.DavSession} to the request.
  */
@@ -41,7 +41,7 @@ public class CosmoDavSessionProviderImpl
     private static final Logger log =
         Logger.getLogger(CosmoDavSessionProviderImpl.class);
 
-    private JCRSessionFactory sessionFactory;
+    private JcrSessionFactory sessionFactory;
 
     /**
      */
@@ -50,7 +50,7 @@ public class CosmoDavSessionProviderImpl
 
     /**
      */
-    public CosmoDavSessionProviderImpl(JCRSessionFactory sessionFactory) {
+    public CosmoDavSessionProviderImpl(JcrSessionFactory sessionFactory) {
         setSessionFactory(sessionFactory);
         afterPropertiesSet();
     }
@@ -106,13 +106,13 @@ public class CosmoDavSessionProviderImpl
 
     /**
      */
-    public JCRSessionFactory getSessionFactory() {
+    public JcrSessionFactory getSessionFactory() {
         return sessionFactory;
     }
 
     /**
      */
-    public void setSessionFactory(JCRSessionFactory sessionFactory) {
+    public void setSessionFactory(JcrSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 }

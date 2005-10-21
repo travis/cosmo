@@ -28,6 +28,8 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.security.mock.MockAnonymousPrincipal;
+import org.osaf.cosmo.security.mock.MockUserPrincipal;
 
 /**
  */
@@ -38,10 +40,7 @@ public class TestHelper {
     static int tseq = 0;
     static int useq = 0;
 
-    private TestHelper() {
-    }
-
-    public static Calendar makeDummyCalendar() {
+    public Calendar makeDummyCalendar() {
         Calendar cal =new Calendar();
 
         cal.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
@@ -50,17 +49,17 @@ public class TestHelper {
         return cal;
     }
 
-    public static Calendar makeDummyCalendarWithEvent() {
+    public Calendar makeDummyCalendarWithEvent() {
         Calendar cal = makeDummyCalendar();
 
-        VEvent e1 = TestHelper.makeDummyEvent();
+        VEvent e1 = makeDummyEvent();
         cal.getComponents().add(e1);
         cal.getComponents().add(VTimeZone.getDefault());
 
         return cal;
     }
 
-    public static VEvent makeDummyEvent() {
+    public VEvent makeDummyEvent() {
         String serial = new Integer(++eseq).toString();
         String summary = "dummy" + serial;
 
@@ -107,7 +106,7 @@ public class TestHelper {
 
     /**
      */
-    public static Ticket makeDummyTicket() {
+    public Ticket makeDummyTicket() {
         Ticket ticket = new Ticket();
         ticket.setTimeout(CosmoDavConstants.VALUE_INFINITE);
         ticket.setPrivileges(new HashSet());
@@ -117,7 +116,7 @@ public class TestHelper {
 
     /**
      */
-    public static Ticket makeDummyTicket(User user) {
+    public Ticket makeDummyTicket(User user) {
         Ticket ticket = makeDummyTicket();
         ticket.setOwner(user.getUsername());
         ticket.setId(new Integer(++tseq).toString());
@@ -126,8 +125,8 @@ public class TestHelper {
 
     /**
      */
-    public static User makeDummyUser(String username,
-                                     String password) {
+    public User makeDummyUser(String username,
+                              String password) {
         if (username == null) {
             throw new IllegalArgumentException("username required");
         }
@@ -147,7 +146,7 @@ public class TestHelper {
 
     /**
      */
-    public static User makeDummyUser() {
+    public User makeDummyUser() {
         String serial = new Integer(++useq).toString();
         String username = "dummy" + serial;
         return makeDummyUser(username, username);
@@ -155,29 +154,29 @@ public class TestHelper {
 
     /**
      */
-    public static Principal makeDummyUserPrincipal() {
-        return new TestUserPrincipal(makeDummyUser());
+    public Principal makeDummyUserPrincipal() {
+        return new MockUserPrincipal(makeDummyUser());
     }
 
     /**
      */
-    public static Principal makeDummyUserPrincipal(String name,
-                                                   String password) {
-        return new TestUserPrincipal(makeDummyUser(name, password));
+    public Principal makeDummyUserPrincipal(String name,
+                                            String password) {
+        return new MockUserPrincipal(makeDummyUser(name, password));
     }
 
     /**
      */
-    public static Principal makeDummyAnonymousPrincipal() {
+    public Principal makeDummyAnonymousPrincipal() {
         String serial = new Integer(++apseq).toString();
-        return new TestAnonymousPrincipal("dummy" + serial);
+        return new MockAnonymousPrincipal("dummy" + serial);
     }
 
     /**
      */
-    public static Principal makeDummyRootPrincipal() {
+    public Principal makeDummyRootPrincipal() {
         User user = makeDummyUser();
         user.setAdmin(Boolean.TRUE);
-        return new TestUserPrincipal(user);
+        return new MockUserPrincipal(user);
     }
 }

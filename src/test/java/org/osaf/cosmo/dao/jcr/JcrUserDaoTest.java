@@ -24,7 +24,6 @@ import javax.jcr.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
@@ -45,26 +44,33 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
         super.setUp();
 
         dao = new JcrUserDao();
-        dao.setTemplate(getTemplate());
-        dao.init();
+        dao.setSessionFactory(getSessionFactory());
+
+        try {
+            dao.init();
+        } catch (Exception e) {
+            tearDown();
+            throw e;
+        }
     }
 
     /**
      */
     protected void tearDown() throws Exception {
-        dao.destroy();
-        dao = null;
-        super.tearDown();
+        try {
+            dao.destroy();
+        } finally {
+            dao = null;
+            super.tearDown();
+        }
     }
 
     /**
      */
     public void testGetUsers() throws Exception {
-        Session session = acquireSession();
-
-        User u1 = JcrTestHelper.makeAndStoreDummyUser(session);
-        User u2 = JcrTestHelper.makeAndStoreDummyUser(session);
-        User u3 = JcrTestHelper.makeAndStoreDummyUser(session);
+        User u1 = getTestHelper().makeAndStoreDummyUser();
+        User u2 = getTestHelper().makeAndStoreDummyUser();
+        User u3 = getTestHelper().makeAndStoreDummyUser();
 
         Set users = dao.getUsers();
 
@@ -73,12 +79,6 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
         assertTrue("User 1 not found in users", users.contains(u1));
         assertTrue("User 2 not found in users", users.contains(u2));
         assertTrue("User 3 not found in users", users.contains(u3));
-
-        JcrTestHelper.removeDummyUser(session, u1);
-        JcrTestHelper.removeDummyUser(session, u2);
-        JcrTestHelper.removeDummyUser(session, u3);
-
-        session.logout();
     }
 
     /**
@@ -93,16 +93,10 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testGetUser() throws Exception {
-        Session session = acquireSession();
-
-        User u1 = JcrTestHelper.makeAndStoreDummyUser(session);
+        User u1 = getTestHelper().makeAndStoreDummyUser();
 
         User user = dao.getUser(u1.getUsername());
         assertNotNull("User " + u1.getUsername() + " null", user);
-
-        JcrTestHelper.removeDummyUser(session, u1);
-
-        session.logout();
     }
 
     /**
@@ -119,16 +113,14 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testGetUserByEmail() throws Exception {
-        Session session = acquireSession();
-
-        User u1 = JcrTestHelper.makeAndStoreDummyUser(session);
+        User u1 = getTestHelper().makeAndStoreDummyUser();
+        getTestHelper().getSession().save();
 
         User user = dao.getUserByEmail(u1.getEmail());
         assertNotNull("User " + u1.getEmail() + " null", user);
 
-        JcrTestHelper.removeDummyUser(session, u1);
-
-        session.logout();
+        getTestHelper().removeDummyUser(u1);
+        getTestHelper().getSession().save();
     }
 
     /**
@@ -145,25 +137,17 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testCreateUser() throws Exception {
-        Session session = acquireSession();
-
-        User u1 = TestHelper.makeDummyUser();
+        User u1 = getTestHelper().makeDummyUser();
 
         dao.createUser(u1);
-        User user = JcrTestHelper.findDummyUser(session, u1.getUsername());
+        User user = getTestHelper().findDummyUser(u1.getUsername());
         assertNotNull("User not stored", user);
-
-        JcrTestHelper.removeDummyUser(session, u1);
-
-        session.logout();
     }
 
     /**
      */
     public void testCreateUserDuplicateUsername() throws Exception {
-        Session session = acquireSession();
-
-        User u1 = JcrTestHelper.makeAndStoreDummyUser(session);
+        User u1 = getTestHelper().makeAndStoreDummyUser();
 
         try {
             dao.createUser(u1);
@@ -171,20 +155,15 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
         } catch (DuplicateUsernameException e) {
             // expected
         }
-
-        JcrTestHelper.removeDummyUser(session, u1);
-
-        session.logout();
     }
 
     /**
      */
     public void testCreateUserDuplicateEmail() throws Exception {
-        Session session = acquireSession();
+        User u1 = getTestHelper().makeAndStoreDummyUser();
+        getTestHelper().getSession().save();
 
-        User u1 = JcrTestHelper.makeAndStoreDummyUser(session);
         // ensure that username is different but email remains the same
-        String oldUsername = u1.getUsername();
         u1.setUsername("deadbeef");
 
         try {
@@ -192,48 +171,43 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
             fail("User with duplicate email created");
         } catch (DuplicateEmailException e) {
             // expected
+        } finally {
+            getTestHelper().removeDummyUser(u1);
+            getTestHelper().getSession().save();
         }
-
-        // restore username
-        u1.setUsername(oldUsername);
-        JcrTestHelper.removeDummyUser(session, u1);
-
-        session.logout();
     }
 
     /**
      */
     public void testUpdateUser() throws Exception {
-        Session session = acquireSession();
-
-        User u1 = JcrTestHelper.makeAndStoreDummyUser(session);
+        User u1 = getTestHelper().makeAndStoreDummyUser();
+        getTestHelper().getSession().save();
 
         // change password
         String oldPassword = u1.getPassword();
         u1.setPassword("changedpwd");
 
         dao.updateUser(u1);
-        User user = JcrTestHelper.findDummyUser(session, u1.getUsername());
+        User user = getTestHelper().findDummyUser(u1.getUsername());
         assertFalse("Original and stored password are the same",
                     user.getPassword().equals(oldPassword));
 
         // leave password
         dao.updateUser(u1);
         User user2 =
-            JcrTestHelper.findDummyUser(session, u1.getUsername());
+            getTestHelper().findDummyUser(u1.getUsername());
         assertTrue("Original and stored password are different",
                    user2.getPassword().equals(u1.getPassword()));
 
-        JcrTestHelper.removeDummyUser(session, u1);
-
-        session.logout();
+        getTestHelper().removeDummyUser(u1);
+        getTestHelper().getSession().save();
     }
 
     /**
      */
     public void testUpdateUserNotFound() throws Exception {
         try {
-            User u1 = TestHelper.makeDummyUser();
+            User u1 = getTestHelper().makeDummyUser();
             dao.updateUser(u1);
             fail("found user " + u1.getUsername());
         } catch (DataRetrievalFailureException e) {
@@ -244,13 +218,11 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testUpdateUserDuplicateUsername() throws Exception {
-        Session session = acquireSession();
-
-        User u1 = JcrTestHelper.makeAndStoreDummyUser(session);
-        User u2 = JcrTestHelper.makeAndStoreDummyUser(session);
+        User u1 = getTestHelper().makeAndStoreDummyUser();
+        User u2 = getTestHelper().makeAndStoreDummyUser();
+        getTestHelper().getSession().save();
 
         // change u1's username to that of u2 and then try to save
-        String oldUsername = u1.getUsername();
         u1.setUsername(u2.getUsername());
 
         try {
@@ -258,22 +230,19 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
             fail("User with duplicate username updated");
         } catch (DuplicateUsernameException e) {
             // expected
+        } finally {
+            getTestHelper().removeDummyUser(u1);
+            getTestHelper().removeDummyUser(u2);
+            getTestHelper().getSession().save();
         }
-
-        u1.setUsername(oldUsername);
-        JcrTestHelper.removeDummyUser(session, u1);
-        JcrTestHelper.removeDummyUser(session, u2);
-
-        session.logout();
     }
 
     /**
      */
     public void testUpdateUserDuplicateEmail() throws Exception {
-        Session session = acquireSession();
-
-        User u1 = JcrTestHelper.makeAndStoreDummyUser(session);
-        User u2 = JcrTestHelper.makeAndStoreDummyUser(session);
+        User u1 = getTestHelper().makeAndStoreDummyUser();
+        User u2 = getTestHelper().makeAndStoreDummyUser();
+        getTestHelper().getSession().save();
 
         // change u1's email to that of u2 and then try to save
         u1.setEmail(u2.getEmail());
@@ -283,26 +252,21 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
             fail("User with duplicate email updated");
         } catch (DuplicateEmailException e) {
             // expected
+        } finally {
+            getTestHelper().removeDummyUser(u1);
+            getTestHelper().removeDummyUser(u2);
+            getTestHelper().getSession().save();
         }
-
-        JcrTestHelper.removeDummyUser(session, u1);
-        JcrTestHelper.removeDummyUser(session, u2);
-
-        session.logout();
     }
 
     /**
      */
     public void testRemoveUser() throws Exception {
-        Session session = acquireSession();
-
-        User u1 = JcrTestHelper.makeAndStoreDummyUser(session);
+        User u1 = getTestHelper().makeAndStoreDummyUser();
 
         dao.removeUser(u1.getUsername());
 
-        User user = JcrTestHelper.findDummyUser(session, u1.getUsername());
+        User user = getTestHelper().findDummyUser(u1.getUsername());
         assertNull("User not removed", user);
-
-        session.logout();
     }
 }

@@ -36,49 +36,56 @@ import org.osaf.cosmo.model.User;
 
 /**
  */
-public class JcrTestHelper implements ICalendarConstants, JcrConstants {
+public class JcrTestHelper extends TestHelper
+    implements ICalendarConstants, JcrConstants {
     static int nseq = 0;
     static int pseq = 0;
 
-    private JcrTestHelper() {
+    private Session session;
+
+    public JcrTestHelper(Session session) {
+        super();
+        this.session = session;
     }
 
     /**
      */
-    public static Node addNode(Session session)
+    public Session getSession() {
+        return session;
+    }
+
+    /**
+     */
+    public Node addNode()
         throws RepositoryException {
         return addNode(session.getRootNode());
     }
 
     /**
      */
-    public static Node addNode(Node parent)
+    public Node addNode(Node parent)
         throws RepositoryException {
         String serial = new Integer(++nseq).toString();
         String name = "dummy" + serial;
 
-        Node node = parent.addNode(name);
-        parent.save();
-
-        return node;
+        return parent.addNode(name);
     }
 
     /**
      */
-    public static Node addFileNode(Session session,
-                                   InputStream data,
-                                   String mimetype,
-                                   String charset)
+    public Node addFileNode(InputStream data,
+                            String mimetype,
+                            String charset)
         throws RepositoryException {
         return addFileNode(session.getRootNode(), data, mimetype, charset);
     }
 
     /**
      */
-    public static Node addFileNode(Node parent,
-                                   InputStream data,
-                                   String mimetype,
-                                   String charset)
+    public Node addFileNode(Node parent,
+                            InputStream data,
+                            String mimetype,
+                            String charset)
         throws RepositoryException {
         String serial = new Integer(++nseq).toString();
         String name = "dummy" + serial;
@@ -90,41 +97,36 @@ public class JcrTestHelper implements ICalendarConstants, JcrConstants {
         content.setProperty(NP_JCR_ENCODING, charset);
         content.setProperty(NP_JCR_LASTMODIFIED,
                             java.util.Calendar.getInstance());
-        parent.save();
 
         return node;
     }
 
     /**
      */
-    public static Property addProperty(Node node)
+    public Property addProperty(Node node)
         throws RepositoryException {
         String serial = new Integer(++pseq).toString();
         String name = "dummy" + serial;
 
-        Property property = node.setProperty(name, name);
-        node.save();
-
-        return property;
+        return node.setProperty(name, name);
     }
 
     /**
      */
-    public static User makeAndStoreDummyUser(Session session)
+    public User makeAndStoreDummyUser()
         throws RepositoryException {
-        User user = TestHelper.makeDummyUser();
+        User user = makeDummyUser();
 
         Node node = session.getRootNode().addNode(user.getUsername());
         node.addMixin(NT_USER);
         JcrUserMapper.userToNode(user, node);
-        session.getRootNode().save();
 
         return user;
     }
 
     /**
      */
-    public static User findDummyUser(Session session, String username)
+    public User findDummyUser(String username)
         throws RepositoryException {
         return session.getRootNode().hasNode(username) ?
             JcrUserMapper.nodeToUser(session.getRootNode().getNode(username)) :
@@ -133,41 +135,42 @@ public class JcrTestHelper implements ICalendarConstants, JcrConstants {
 
     /**
      */
-    public static void removeDummyUser(Session session, User user)
+    public void removeDummyUser(User user)
         throws RepositoryException {
+        if (! session.getRootNode().hasNode(user.getUsername())) {
+            return;
+        }
         session.getRootNode().getNode(user.getUsername()).remove();
-        session.save();
     }
 
     /**
      */
-    public static Node addTicketableNode(Session session)
+    public Node addTicketableNode()
         throws RepositoryException {
-        Node node = addNode(session);
+        Node node = addNode();
 
         node.addMixin(NT_TICKETABLE);
-        session.getRootNode().save();
 
         return node;
     }
 
     /**
      */
-    public static Ticket makeAndStoreDummyTicket(Node node,
-                                                 User user)
+    public Ticket makeAndStoreDummyTicket(Node node,
+                                          User user)
         throws RepositoryException {
-        Ticket ticket = TestHelper.makeDummyTicket(user);
+        Ticket ticket = makeDummyTicket(user);
 
         Node ticketNode = node.addNode(NN_TICKET, NT_TICKET);
         JcrTicketMapper.ticketToNode(ticket, ticketNode);
-        node.save();
 
         return ticket;
     }
 
     /**
      */
-    public static Ticket findDummyTicket(Node node, String id)
+    public Ticket findDummyTicket(Node node,
+                                  String id)
         throws RepositoryException {
         for (NodeIterator i = node.getNodes(NN_TICKET); i.hasNext();) {
             Node child = i.nextNode();
@@ -180,24 +183,22 @@ public class JcrTestHelper implements ICalendarConstants, JcrConstants {
 
     /**
      */
-    public static Node addCalendarCollectionNode(Session session)
+    public Node addCalendarCollectionNode()
         throws RepositoryException {
-        Node node = addNode(session);
+        Node node = addNode();
 
         node.addMixin(NT_CALDAV_COLLECTION);
         node.setProperty(NP_CALDAV_CALENDARDESCRIPTION, node.getName());
         node.setProperty(NP_XML_LANG, Locale.getDefault().toString());
-        session.getRootNode().save();
 
         return node;
     }
 
     /**
      */
-    public static Node addDavResourceNode(Session session,
-                                          InputStream data,
-                                          String mimetype,
-                                          String charset)
+    public Node addDavResourceNode(InputStream data,
+                                   String mimetype,
+                                   String charset)
         throws RepositoryException {
         return addDavResourceNode(session.getRootNode(), data, mimetype,
                                   charset);
@@ -205,33 +206,31 @@ public class JcrTestHelper implements ICalendarConstants, JcrConstants {
 
     /**
      */
-    public static Node addDavResourceNode(Node parent,
-                                          InputStream data,
-                                          String mimetype,
-                                          String charset)
+    public Node addDavResourceNode(Node parent,
+                                   InputStream data,
+                                   String mimetype,
+                                   String charset)
         throws RepositoryException {
         Node node = addFileNode(parent, data, mimetype, charset);
 
         node.addMixin(NT_DAV_RESOURCE);
         node.addMixin(NT_TICKETABLE);
         node.setProperty(NP_DAV_DISPLAYNAME, node.getName());
-        node.save();
 
         return node;
     }
 
     /**
      */
-    public static Node addCalendarResourceNode(Session session,
-                                               Calendar calendar)
+    public Node addCalendarResourceNode(Calendar calendar)
         throws RepositoryException {
         return addCalendarResourceNode(session.getRootNode(), calendar);
     }
 
     /**
      */
-    public static Node addCalendarResourceNode(Node node,
-                                               Calendar calendar)
+    public Node addCalendarResourceNode(Node node,
+                                        Calendar calendar)
         throws RepositoryException {
         try {
             InputStream data =
@@ -244,42 +243,39 @@ public class JcrTestHelper implements ICalendarConstants, JcrConstants {
 
     /**
      */
-    public static Calendar makeAndStoreDummyCalendar(Node node)
+    public Calendar makeAndStoreDummyCalendar(Node node)
         throws RepositoryException {
-        Calendar calendar = TestHelper.makeDummyCalendarWithEvent();
+        Calendar calendar = makeDummyCalendarWithEvent();
 
         JcrCalendarMapper.calendarToNode(calendar, node);
-        node.save();
 
         return calendar;
     }
 
     /**
      */
-    public static Calendar makeAndStoreDummyCaldavCalendar(Node collection)
+    public Calendar makeAndStoreDummyCaldavCalendar(Node collection)
         throws RepositoryException {
-        Calendar calendar = TestHelper.makeDummyCalendarWithEvent();
+        Calendar calendar = makeDummyCalendarWithEvent();
 
         Node resource = addCalendarResourceNode(collection, calendar);
         JcrCalendarMapper.calendarToNode(calendar, resource);
-        collection.save();
 
         return calendar;
     }
 
     /**
      */
-    public static Calendar findDummyCalendar(Node node)
+    public Calendar findDummyCalendar(Node node)
         throws RepositoryException {
         return JcrCalendarMapper.nodeToCalendar(node);
     }
 
     /**
      */
-    public static Calendar loadCalendar(String name)
+    public Calendar loadCalendar(String name)
         throws Exception {
-        InputStream in =
-            JcrTestHelper.class.getClassLoader().getResourceAsStream(name);
+        InputStream in = getClass().getClassLoader().getResourceAsStream(name);
         return new CalendarBuilder().build(in);
     }
 }

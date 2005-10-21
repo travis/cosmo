@@ -33,8 +33,8 @@ import javax.jcr.query.QueryResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.commons.spring.jcr.JCRCallback;
-import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
+import org.springmodules.jcr.JcrCallback;
+import org.springmodules.jcr.support.JcrDaoSupport;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
@@ -44,21 +44,22 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 
 /**
- * Implementation of <code>UserDao</code> that operates against a JCR
- * repository.
+ * Implementation of <code>UserDao</code> that operates against a
+ * JCR repository.
+ *
+ * This implementation extends
+ * {@link org.springmodules.jcr.JcrDaoSupport} to gain access to
+ * a {@link org.springmodules.jcr.JcrTemplate}, which it uses to
+ * obtain repository sessions. See the Spring Modules documentation
+ * for more information on how to configure the template with
+ * credentials, a repository reference and a workspace name.
  *
  * A user account is persisted as a <code>nt:folder</code> node with
  * the <code>cosmo:user</code> and <code>caldav:home</code> mixin
  * types. This implementation places all user accounts as children of
  * the root node.
- *
- * This implementation extends {@link JcrDaoSupport} to gain access to
- * a {@link JcrTemmplate}, which it uses to obtain repository
- * sessions. See the Spring Modules documentation for more information
- * on how to configure the template with credentials, a repository
- * reference and a workspace name.
  */
-public class JcrUserDao extends JCRDaoSupport
+public class JcrUserDao extends JcrDaoSupport
     implements JcrConstants, UserDao {
     private static final Log log = LogFactory.getLog(JcrUserDao.class);
 
@@ -68,8 +69,8 @@ public class JcrUserDao extends JCRDaoSupport
      * Returns an unordered set of all user accounts in the repository.
      */
     public Set getUsers() {
-        return (Set) getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
+        return (Set) getJcrTemplate().execute(new JcrCallback() {
+                public Object doInJcr(Session session)
                     throws RepositoryException {
                     Set users = new HashSet();
                     for (NodeIterator i=session.getRootNode().getNodes();
@@ -94,8 +95,8 @@ public class JcrUserDao extends JCRDaoSupport
      * exist
      */
     public User getUser(final String username) {
-        return (User) getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
+        return (User) getJcrTemplate().execute(new JcrCallback() {
+                public Object doInJcr(Session session)
                     throws RepositoryException {
                     String path = calculateUserNodePath(username);
                     if (! session.itemExists(path)) {
@@ -119,8 +120,8 @@ public class JcrUserDao extends JCRDaoSupport
      * exist
      */
     public User getUserByEmail(final String email) {
-        return (User) getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
+        return (User) getJcrTemplate().execute(new JcrCallback() {
+                public Object doInJcr(Session session)
                     throws RepositoryException {
                     QueryResult qr = queryForUserByEmail(session, email);
                     NodeIterator i = qr.getNodes();
@@ -149,8 +150,8 @@ public class JcrUserDao extends JCRDaoSupport
      */
     public void createUser(final User user) {
         user.validate();
-        getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
+        getJcrTemplate().execute(new JcrCallback() {
+                public Object doInJcr(Session session)
                     throws RepositoryException {
                     Node parent = getUserNodeParentNode(session);
                     String path = calculateUserNodePath(user.getUsername());
@@ -204,8 +205,8 @@ public class JcrUserDao extends JCRDaoSupport
      */
     public void updateUser(final User user) {
         user.validate();
-        getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
+        getJcrTemplate().execute(new JcrCallback() {
+                public Object doInJcr(Session session)
                     throws RepositoryException {
                     String path = calculateUserNodePath(user.getUsername());
 
@@ -250,8 +251,8 @@ public class JcrUserDao extends JCRDaoSupport
      * @param username the username of the account to return
      */
     public void removeUser(final String username) {
-        getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
+        getJcrTemplate().execute(new JcrCallback() {
+                public Object doInJcr(Session session)
                     throws RepositoryException {
                     String path = calculateUserNodePath(username);
                     if (! session.itemExists(path)) {

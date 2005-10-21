@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo;
+package org.osaf.cosmo.security.mock;
 
 import java.security.Principal;
 
 /**
  */
 
-public class TestAnonymousPrincipal implements Principal {
+public class MockAnonymousPrincipal implements Principal {
     private String name;
 
-    public TestAnonymousPrincipal(String name) {
+    public MockAnonymousPrincipal(String name) {
         this.name = name;
     }
 
     public boolean equals(Object another) {
-        if (!(another instanceof TestAnonymousPrincipal)) {
+        if (!(another instanceof MockAnonymousPrincipal)) {
             return false;
         }
-        return name.equals(((TestAnonymousPrincipal)another).getName());
+        return name.equals(((MockAnonymousPrincipal)another).getName());
     }
 
     public String toString() {

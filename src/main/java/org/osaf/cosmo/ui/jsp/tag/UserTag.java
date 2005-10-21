@@ -16,7 +16,6 @@
 package org.osaf.cosmo.ui.jsp.tag;
 
 import org.osaf.commons.jsp.tag.SimpleVarSetterTag;
-import org.osaf.commons.spring.web.util.WebApplicationContextAwareTagUtils;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -56,8 +55,8 @@ public class UserTag extends SimpleVarSetterTag {
             ServletContext sc =
                 ((PageContext)getJspContext()).getServletContext();
             CosmoSecurityManager securityManager = (CosmoSecurityManager)
-                WebApplicationContextAwareTagUtils.
-                getBean(sc, BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
+                TagUtils.getBean(sc, BEAN_SECURITY_MANAGER,
+                                 CosmoSecurityManager.class);
             return securityManager.getSecurityContext().getUser();
         } catch (CosmoSecurityException e) {
             throw new JspException("can't get security context", e);

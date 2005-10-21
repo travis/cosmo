@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo;
+package org.osaf.cosmo.security.mock;
 
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -29,12 +29,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A test implementation of {@link CosmoSecurityContext} that provides
- * dummy instances for use with unit tests.
+ * A mock implementation of {@link CosmoSecurityContext} that provides
+ * dummy instances for use with unit mocks.
  */
-public class TestSecurityContext implements CosmoSecurityContext {
+public class MockSecurityContext implements CosmoSecurityContext {
     private static final Log log =
-        LogFactory.getLog(TestSecurityContext.class);
+        LogFactory.getLog(MockSecurityContext.class);
 
     private boolean anonymous;
     private Principal principal;
@@ -44,7 +44,7 @@ public class TestSecurityContext implements CosmoSecurityContext {
 
     /**
      */
-    public TestSecurityContext(Principal principal) {
+    public MockSecurityContext(Principal principal) {
         this.anonymous = false;
         this.principal = principal;
         this.admin = false;
@@ -119,11 +119,11 @@ public class TestSecurityContext implements CosmoSecurityContext {
     }
 
     private void processPrincipal() {
-        if (principal instanceof TestAnonymousPrincipal) {
+        if (principal instanceof MockAnonymousPrincipal) {
             anonymous = true;
         }
-        else if (principal instanceof TestUserPrincipal) {
-            user = ((TestUserPrincipal) principal).getUser();
+        else if (principal instanceof MockUserPrincipal) {
+            user = ((MockUserPrincipal) principal).getUser();
             admin = user.getAdmin().booleanValue();
         }
         

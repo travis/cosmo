@@ -13,28 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo;
-
-
-import org.osaf.cosmo.security.CosmoSecurityContext;
-import org.osaf.cosmo.security.CosmoSecurityException;
-import org.osaf.cosmo.security.CosmoSecurityManager;
+package org.osaf.cosmo.security.mock;
 
 import java.security.Principal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.security.CosmoSecurityContext;
+import org.osaf.cosmo.security.CosmoSecurityException;
+import org.osaf.cosmo.security.CosmoSecurityManager;
+
 /**
- * A test implementation of the {@link CosmoSecurityManager}
+ * A mock implementation of the {@link CosmoSecurityManager}
  * interface that provides a dummy {@link CosmoSecurityContext} for
- * unit tests.
+ * unit mocks.
  */
-public class TestSecurityManager implements CosmoSecurityManager {
+public class MockSecurityManager implements CosmoSecurityManager {
     private static final Log log =
-        LogFactory.getLog(TestSecurityManager.class);
+        LogFactory.getLog(MockSecurityManager.class);
 
     private static ThreadLocal contexts = new ThreadLocal();
+
+    private TestHelper testHelper;
+
+    /**
+     */
+    public MockSecurityManager() {
+        testHelper = new TestHelper();
+    }
 
     /* ----- CosmoSecurityManager methods ----- */
 
@@ -68,7 +76,7 @@ public class TestSecurityManager implements CosmoSecurityManager {
         if (log.isDebugEnabled()) {
             log.debug("initiating security context for " + username);
         }
-        Principal principal = TestHelper.makeDummyUserPrincipal(username,
+        Principal principal = testHelper.makeDummyUserPrincipal(username,
                                                                 password);
         CosmoSecurityContext context = createSecurityContext(principal);
         contexts.set(context);
@@ -94,7 +102,7 @@ public class TestSecurityManager implements CosmoSecurityManager {
 
     /**
      */
-    public CosmoSecurityContext setUpTestSecurityContext(Principal principal) {
+    public CosmoSecurityContext setUpMockSecurityContext(Principal principal) {
         CosmoSecurityContext context = createSecurityContext(principal);
         contexts.set(context);
         if (log.isDebugEnabled()) {
@@ -105,7 +113,7 @@ public class TestSecurityManager implements CosmoSecurityManager {
 
     /**
      */
-    public void tearDownTestSecurityContext() {
+    public void tearDownMockSecurityContext() {
         CosmoSecurityContext context = (CosmoSecurityContext) contexts.get();
         if (context == null) {
             return;
@@ -119,6 +127,6 @@ public class TestSecurityManager implements CosmoSecurityManager {
     /**
      */
     protected CosmoSecurityContext createSecurityContext(Principal principal) {
-        return new TestSecurityContext(principal);
+        return new MockSecurityContext(principal);
     }
 }

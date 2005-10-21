@@ -26,8 +26,8 @@
         class="org.osaf.cosmo.dao.jcr.JcrUserDao"
         init-method="init"
         destroy-method="destroy">
-    <property name="template">
-      <ref bean="homedirTemplate"/>
+    <property name="sessionFactory">
+      <ref bean="homedirSessionFactory"/>
     </property>
   </bean>
 
@@ -38,8 +38,8 @@
         class="org.osaf.cosmo.dao.jcr.JcrTicketDao"
         init-method="init"
         destroy-method="destroy">
-    <property name="template">
-      <ref bean="homedirTemplate"/>
+    <property name="sessionFactory">
+      <ref bean="homedirSessionFactory"/>
     </property>
     <property name="idGenerator">
       <ref local="ticketIdGenerator"/>
@@ -50,8 +50,8 @@
         class="org.osaf.cosmo.dao.jcr.JcrCalendarDao"
         init-method="init"
         destroy-method="destroy">
-    <property name="template">
-      <ref bean="homedirTemplate"/>
+    <property name="sessionFactory">
+      <ref bean="homedirSessionFactory"/>
     </property>
   </bean>
 

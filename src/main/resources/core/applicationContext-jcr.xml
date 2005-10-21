@@ -22,33 +22,26 @@
 
   <!-- JCR Resources -->
 
-  <bean id="jcrAuthenticationProvider"
-        class="org.osaf.cosmo.spring.jcr.UsernamePasswordAuthenticationProvider">
-    <property name="username">
+  <bean id="homedirCredentials"
+        class="javax.jcr.SimpleCredentials">
+    <constructor-arg>
       <value>${cosmo.repository.username}</value>
-    </property>
-    <property name="password">
+    </constructor-arg>
+    <constructor-arg>
       <value>${cosmo.repository.password}</value>
-    </property>
+    </constructor-arg>
   </bean>
 
   <bean id="homedirSessionFactory"
-        class="org.osaf.commons.spring.jcr.JCRSessionFactory">
-    <property name="authenticationProvider">
-      <ref bean="jcrAuthenticationProvider"/>
+        class="org.springmodules.jcr.JcrSessionFactory">
+    <property name="credentials">
+      <ref bean="homedirCredentials"/>
     </property>
     <property name="repository">
       <ref bean="jcrRepository"/>
     </property>
     <property name="workspaceName">
       <value>homedir</value>
-    </property>
-  </bean>
-
-  <bean id="homedirTemplate"
-        class="org.osaf.commons.spring.jcr.JCRTemplate">
-    <property name="sessionFactory">
-      <ref local="homedirSessionFactory"/>
     </property>
   </bean>
 

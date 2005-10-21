@@ -31,7 +31,6 @@ import net.fortuna.ical4j.model.property.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.dao.UnsupportedCalendarObjectException;
 import org.osaf.cosmo.icalendar.DuplicateUidException;
 import org.osaf.cosmo.icalendar.RecurrenceException;
@@ -49,154 +48,100 @@ public class JcrCalendarMapperTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testCalendarToNode() throws Exception {
-        Session session = acquireSession();
-
-        Calendar c1 = TestHelper.makeDummyCalendarWithEvent();
-
-        Node n1 = JcrTestHelper.addNode(session);
+        Calendar c1 = getTestHelper().makeDummyCalendarWithEvent();
+        Node n1 = getTestHelper().addNode();
 
         JcrCalendarMapper.calendarToNode(c1, n1);
-        Calendar calendar = JcrTestHelper.findDummyCalendar(n1);
+        Calendar calendar = getTestHelper().findDummyCalendar(n1);
         assertNotNull("Calendar object not stored", calendar);
         assertTrue("Node does not have event resource type",
                    n1.isNodeType(NT_CALDAV_EVENT_RESOURCE));
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
     /**
      */
     public void testEmptyCalendarToNode() throws Exception {
-        Session session = acquireSession();
-
-        Calendar c1 = TestHelper.makeDummyCalendar();
-
-        Node n1 = JcrTestHelper.addNode(session);
+        Calendar c1 = getTestHelper().makeDummyCalendar();
+        Node n1 = getTestHelper().addNode();
 
         try {
             JcrCalendarMapper.calendarToNode(c1, n1);
             fail("Empty calendar stored");
         } catch (UnsupportedCalendarObjectException e) {
             // expected
-        } finally {
-            n1.remove();
-            session.save();
-            session.logout();
         }
     }
 
     /**
      */
     public void testCalendarWithDuplicateUidToNode() throws Exception {
-        Session session = acquireSession();
-
-        Node n1 = JcrTestHelper.addNode(session);
-        Calendar c1 = JcrTestHelper.makeAndStoreDummyCalendar(n1);
-
-        Node n2 = JcrTestHelper.addNode(session);
+        Node n1 = getTestHelper().addNode();
+        Calendar c1 = getTestHelper().makeAndStoreDummyCalendar(n1);
+        Node n2 = getTestHelper().addNode();
 
         try {
             JcrCalendarMapper.calendarToNode(c1, n2);
             // expected
         } catch (DuplicateUidException e) {
             fail("Calendar with duplicate uid stored");
-        } finally {
-            n1.remove();
-            n2.remove();
-            session.save();
-            session.logout();
         }
     }
 
     /**
      */
     public void testSimpleEventToNode() throws Exception {
-        Session session = acquireSession();
-
-        Calendar c1 = JcrTestHelper.loadCalendar("event1.ics");
-
-        Node n1 = JcrTestHelper.addNode(session);
+        Calendar c1 = getTestHelper().loadCalendar("event1.ics");
+        Node n1 = getTestHelper().addNode();
 
         JcrCalendarMapper.calendarToNode(c1, n1);
-        Calendar calendar = JcrTestHelper.findDummyCalendar(n1);
+        Calendar calendar = getTestHelper().findDummyCalendar(n1);
         assertNotNull("Calendar object not stored", calendar);
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
     /**
      */
     public void testEventWithAlarmToNode() throws Exception {
-        Session session = acquireSession();
-
-        Calendar c1 = JcrTestHelper.loadCalendar("event2.ics");
-
-        Node n1 = JcrTestHelper.addNode(session);
+        Calendar c1 = getTestHelper().loadCalendar("event2.ics");
+        Node n1 = getTestHelper().addNode();
 
         JcrCalendarMapper.calendarToNode(c1, n1);
-        Calendar calendar = JcrTestHelper.findDummyCalendar(n1);
+        Calendar calendar = getTestHelper().findDummyCalendar(n1);
         assertNotNull("Calendar object not stored", calendar);
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
     /**
      */
     public void testRecurringEventToNode() throws Exception {
-        Session session = acquireSession();
-
-        Calendar c1 = JcrTestHelper.loadCalendar("event3.ics");
-
-        Node n1 = JcrTestHelper.addNode(session);
+        Calendar c1 = getTestHelper().loadCalendar("event3.ics");
+        Node n1 = getTestHelper().addNode();
 
         JcrCalendarMapper.calendarToNode(c1, n1);
-        Calendar calendar = JcrTestHelper.findDummyCalendar(n1);
+        Calendar calendar = getTestHelper().findDummyCalendar(n1);
         assertNotNull("Calendar object not stored", calendar);
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
     /**
      */
     public void testCaldavCalendarToNode() throws Exception {
-        Session session = acquireSession();
-
-        Calendar c1 = TestHelper.makeDummyCalendarWithEvent();
-
-        Node n1 = JcrTestHelper.addCalendarCollectionNode(session);
-        Node r1 = JcrTestHelper.addCalendarResourceNode(n1, c1);
+        Calendar c1 = getTestHelper().makeDummyCalendarWithEvent();
+        Node n1 = getTestHelper().addCalendarCollectionNode();
+        Node r1 = getTestHelper().addCalendarResourceNode(n1, c1);
 
         JcrCalendarMapper.calendarToNode(c1, r1);
-        Calendar calendar = JcrTestHelper.findDummyCalendar(r1);
+        Calendar calendar = getTestHelper().findDummyCalendar(r1);
         assertNotNull("Calendar object not stored", calendar);
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
     /**
      */
     public void testCaldavCalendarWithDuplicateUidToNode() throws Exception {
-        Session session = acquireSession();
+        Node n1 = getTestHelper().addCalendarCollectionNode();
+        Calendar c1 = getTestHelper().makeAndStoreDummyCaldavCalendar(n1);
+        // have to save the first node so that it's visible to the
+        // query manager
+        getTestHelper().getSession().save();
 
-        Node n1 = JcrTestHelper.addCalendarCollectionNode(session);
-        Calendar c1 = JcrTestHelper.makeAndStoreDummyCaldavCalendar(n1);
-
-        Node r2 = JcrTestHelper.addCalendarResourceNode(n1, c1);
+        Node r2 = getTestHelper().addCalendarResourceNode(n1, c1);
 
         try {
             JcrCalendarMapper.calendarToNode(c1, r2);
@@ -205,61 +150,40 @@ public class JcrCalendarMapperTest extends BaseJcrDaoTestCase {
             // expected
         } finally {
             n1.remove();
-            session.save();
-            session.logout();
+            getTestHelper().getSession().save();
         }
     }
 
     /**
      */
     public void testNodeToCalendar() throws Exception {
-        Session session = acquireSession();
-
-        Node n1 = JcrTestHelper.addNode(session);
-        Calendar c1 = JcrTestHelper.makeAndStoreDummyCalendar(n1);
+        Node n1 = getTestHelper().addNode();
+        Calendar c1 = getTestHelper().makeAndStoreDummyCalendar(n1);
 
         Calendar calendar = JcrCalendarMapper.nodeToCalendar(n1);
         assertNotNull("Calendar null", calendar);
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
     /**
      */
     public void testNonEventResourceNodeToCalendar() throws Exception {
-        Session session = acquireSession();
-
-        Node n1 = JcrTestHelper.addNode(session);
+        Node n1 = getTestHelper().addNode();
 
         try {
             JcrCalendarMapper.nodeToCalendar(n1);
             fail("Non event resource node allowed");
         } catch (UnsupportedCalendarObjectException e) {
             // expected
-        } finally {
-            n1.remove();
-            session.save();
-            session.logout();
         }
     }
 
     /**
      */
     public void testNodeToCaldavCalendar() throws Exception {
-        Session session = acquireSession();
-
-        Node n1 = JcrTestHelper.addCalendarCollectionNode(session);
-        Calendar c1 = JcrTestHelper.makeAndStoreDummyCaldavCalendar(n1);
+        Node n1 = getTestHelper().addCalendarCollectionNode();
+        Calendar c1 = getTestHelper().makeAndStoreDummyCaldavCalendar(n1);
 
         Calendar calendar = JcrCalendarMapper.nodeToCalendar(n1);
         assertNotNull("Calendar null", calendar);
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 }

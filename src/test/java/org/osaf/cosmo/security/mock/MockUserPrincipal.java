@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo;
+package org.osaf.cosmo.security.mock;
 
 import java.security.Principal;
 
@@ -21,18 +21,18 @@ import org.osaf.cosmo.model.User;
 
 /**
  */
-public class TestUserPrincipal implements Principal {
+public class MockUserPrincipal implements Principal {
     private User user;
 
-    public TestUserPrincipal(User user) {
+    public MockUserPrincipal(User user) {
         this.user = user;
     }
 
     public boolean equals(Object another) {
-        if (!(another instanceof TestUserPrincipal)) {
+        if (!(another instanceof MockUserPrincipal)) {
             return false;
         }
-        return user.equals(((TestUserPrincipal)another).getUser());
+        return user.equals(((MockUserPrincipal)another).getUser());
     }
 
     public String toString() {

@@ -39,10 +39,12 @@ public class StandardUserServiceTest extends TestCase {
 
     private StandardUserService service;
     private MockUserDao userDao;
+    private TestHelper testHelper;
 
     /**
      */
     protected void setUp() throws Exception {
+        testHelper = new TestHelper();
         userDao = new MockUserDao();
         service = new StandardUserService();
         service.setUserDao(userDao);
@@ -53,11 +55,11 @@ public class StandardUserServiceTest extends TestCase {
     /**
      */
     public void testGetUsers() throws Exception {
-        User u1 = TestHelper.makeDummyUser();
+        User u1 = testHelper.makeDummyUser();
         userDao.createUser(u1);
-        User u2 = TestHelper.makeDummyUser();
+        User u2 = testHelper.makeDummyUser();
         userDao.createUser(u2);
-        User u3 = TestHelper.makeDummyUser();
+        User u3 = testHelper.makeDummyUser();
         userDao.createUser(u3);
 
         Set users = service.getUsers();
@@ -71,7 +73,7 @@ public class StandardUserServiceTest extends TestCase {
     /**
      */
     public void testGetUser() throws Exception {
-        User u1 = TestHelper.makeDummyUser();
+        User u1 = testHelper.makeDummyUser();
         String username1 = u1.getUsername();
         userDao.createUser(u1);
 
@@ -82,7 +84,7 @@ public class StandardUserServiceTest extends TestCase {
     /**
      */
     public void testGetUserByEmail() throws Exception {
-        User u1 = TestHelper.makeDummyUser();
+        User u1 = testHelper.makeDummyUser();
         String email1 = u1.getEmail();
         userDao.createUser(u1);
 
@@ -93,7 +95,7 @@ public class StandardUserServiceTest extends TestCase {
     /**
      */
     public void testCreateUser() throws Exception {
-        User u1 = TestHelper.makeDummyUser();
+        User u1 = testHelper.makeDummyUser();
         String password = u1.getPassword();
 
         User user = service.createUser(u1);
@@ -106,7 +108,7 @@ public class StandardUserServiceTest extends TestCase {
     /**
      */
     public void testUpdateUser() throws Exception {
-        User u1 = TestHelper.makeDummyUser();
+        User u1 = testHelper.makeDummyUser();
         u1.setPassword(service.digestPassword(u1.getPassword()));
         String digestedPassword = u1.getPassword();
         u1.setDateCreated(new Date());
@@ -145,7 +147,7 @@ public class StandardUserServiceTest extends TestCase {
     /**
      */
     public void testRemoveUser() throws Exception {
-        User u1 = TestHelper.makeDummyUser();
+        User u1 = testHelper.makeDummyUser();
         userDao.createUser(u1);
 
         service.removeUser(u1.getUsername());

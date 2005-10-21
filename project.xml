@@ -272,14 +272,6 @@
     </dependency>
     <dependency>
       <groupId>osaf-commons</groupId>
-      <artifactId>osaf-commons-spring</artifactId>
-      <version>0.3</version>
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>osaf-commons</groupId>
       <artifactId>osaf-commons-jackrabbit</artifactId>
       <version>0.3</version>
     </dependency>
@@ -313,9 +305,9 @@
       </properties>
     </dependency>
     <dependency>
-      <groupId>springframework</groupId>
-      <artifactId>spring-mock</artifactId>
-      <version>1.2.5</version>
+      <groupId>springmodules</groupId>
+      <artifactId>springmodules-sandbox-jcr</artifactId>
+      <version>dev-20051020</version>
     </dependency>
     <dependency>
       <groupId>struts</groupId>
@@ -411,7 +403,6 @@
         <directory>src/test/resources</directory>
         <includes>
           <include>test.properties</include>
-          <include>applicationContext-test.xml</include>
           <include>log4j.xml</include>
         </includes>
         <filtering>true</filtering>

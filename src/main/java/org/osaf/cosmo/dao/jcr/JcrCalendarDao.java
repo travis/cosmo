@@ -25,28 +25,30 @@ import net.fortuna.ical4j.model.Calendar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.commons.spring.jcr.JCRCallback;
-import org.osaf.commons.spring.jcr.support.JCRDaoSupport;
 import org.osaf.cosmo.dao.CalendarDao;
 
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
+import org.springmodules.jcr.JcrCallback;
+import org.springmodules.jcr.support.JcrDaoSupport;
+
 /**
  * Implementation of <code>CalendarDao</code> that operates against a
  * JCR repository.
  *
- * This implementation extends {@link JcrDaoSupport} to gain access to
- * a {@link JcrTemmplate}, which it uses to obtain repository
- * sessions. See the Spring Modules documentation for more information
- * on how to configure the template with credentials, a repository
- * reference and a workspace name.
+ * This implementation extends
+ * {@link org.springmodules.jcr.JcrDaoSupport} to gain access to
+ * a {@link org.springmodules.jcr.JcrTemplate}, which it uses to
+ * obtain repository sessions. See the Spring Modules documentation
+ * for more information on how to configure the template with
+ * credentials, a repository reference and a workspace name.
  *
  * It uses {@link JcrCalendarMapper} to convert JCR nodes and
  * properties to and from instances of
  * {@link net.fortuna.ical4j.model.Calendar}.
  */
-public class JcrCalendarDao extends JCRDaoSupport
+public class JcrCalendarDao extends JcrDaoSupport
     implements JcrConstants, CalendarDao {
     private static final Log log = LogFactory.getLog(JcrCalendarDao.class);
 
@@ -55,6 +57,9 @@ public class JcrCalendarDao extends JCRDaoSupport
     /**
      * Attaches a calendar object to a calendar resource, or updates a
      * calendar object already attached to a resource.
+     *
+     * This method does not save the calendar resource node. The
+     * caller is responsible for saving!
      *
      * @param path the repository path of the resource to which
      * the calendar object is to be attached
@@ -71,8 +76,8 @@ public class JcrCalendarDao extends JCRDaoSupport
      */
     public void storeCalendarObject(final String path,
                                     final Calendar calendar) {
-        getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
+        getJcrTemplate().execute(new JcrCallback() {
+                public Object doInJcr(Session session)
                     throws RepositoryException {
                     if (! session.itemExists(path)) {
                         throw new DataRetrievalFailureException("item at path " + path + " not found");
@@ -84,7 +89,6 @@ public class JcrCalendarDao extends JCRDaoSupport
                     Node node = (Node) item;
 
                     JcrCalendarMapper.calendarToNode(calendar, node);
-                    node.save();
 
                     return null;
                 }
@@ -102,8 +106,8 @@ public class JcrCalendarDao extends JCRDaoSupport
      * given path is not a node
      */
     public Calendar getCalendarObject(final String path) {
-        return (Calendar) getTemplate().execute(new JCRCallback() {
-                public Object doInJCR(Session session)
+        return (Calendar) getJcrTemplate().execute(new JcrCallback() {
+                public Object doInJcr(Session session)
                     throws RepositoryException {
                     if (! session.itemExists(path)) {
                         throw new DataRetrievalFailureException("item at path " + path + " not found");

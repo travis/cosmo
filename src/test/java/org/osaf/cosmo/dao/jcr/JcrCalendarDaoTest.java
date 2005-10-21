@@ -31,7 +31,6 @@ import net.fortuna.ical4j.model.property.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.dao.UnsupportedCalendarObjectException;
 import org.osaf.cosmo.icalendar.RecurrenceException;
 
@@ -52,7 +51,7 @@ public class JcrCalendarDaoTest extends BaseJcrDaoTestCase {
         super.setUp();
 
         dao = new JcrCalendarDao();
-        dao.setTemplate(getTemplate());
+        dao.setSessionFactory(getSessionFactory());
 
         try {
             dao.init();
@@ -76,26 +75,18 @@ public class JcrCalendarDaoTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testStoreCalendarObject() throws Exception {
-        Session session = acquireSession();
-
-        Calendar c1 = TestHelper.makeDummyCalendarWithEvent();
-
-        Node n1 = JcrTestHelper.addNode(session);
+        Calendar c1 = getTestHelper().makeDummyCalendarWithEvent();
+        Node n1 = getTestHelper().addNode();
 
         dao.storeCalendarObject(n1.getPath(), c1);
-        Calendar calendar = JcrTestHelper.findDummyCalendar(n1);
+        Calendar calendar = getTestHelper().findDummyCalendar(n1);
         assertNotNull("Calendar object not stored", calendar);
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
     /**
      */
     public void testStoreCalendarObjectOnNonExistentNode() throws Exception {
-        Calendar c1 = TestHelper.makeDummyCalendarWithEvent();
+        Calendar c1 = getTestHelper().makeDummyCalendarWithEvent();
 
         try {
             dao.storeCalendarObject("/dead/beef", c1);
@@ -108,40 +99,26 @@ public class JcrCalendarDaoTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testStoreCalendarObjectOnProperty() throws Exception {
-        Session session = acquireSession();
-
-        Node node = JcrTestHelper.addNode(session);
-        Property property = JcrTestHelper.addProperty(node);
-
-        Calendar c1 = TestHelper.makeDummyCalendarWithEvent();
+        Calendar c1 = getTestHelper().makeDummyCalendarWithEvent();
+        Node node = getTestHelper().addNode();
+        Property property = getTestHelper().addProperty(node);
 
         try {
             dao.storeCalendarObject(property.getPath(), c1);
             fail("Calendar stored on property");
         } catch (InvalidDataAccessResourceUsageException e) {
             // expected
-        } finally {
-            node.remove();
-            session.getRootNode().save();
-            session.logout();
         }
     }
 
     /**
      */
     public void testGetCalendarObject() throws Exception {
-        Session session = acquireSession();
-
-        Node n1 = JcrTestHelper.addNode(session);
-        Calendar c1 = JcrTestHelper.makeAndStoreDummyCalendar(n1);
+        Node n1 = getTestHelper().addNode();
+        Calendar c1 = getTestHelper().makeAndStoreDummyCalendar(n1);
 
         Calendar calendar = dao.getCalendarObject(n1.getPath());
         assertNotNull("Calendar null", calendar);
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
 
@@ -159,20 +136,14 @@ public class JcrCalendarDaoTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testGetCalendarObjectOnProperty() throws Exception {
-        Session session = acquireSession();
-
-        Node node = JcrTestHelper.addNode(session);
-        Property property = JcrTestHelper.addProperty(node);
+        Node node = getTestHelper().addNode();
+        Property property = getTestHelper().addProperty(node);
 
         try {
             dao.getCalendarObject(property.getPath());
             fail("Calendar found for property");
         } catch (InvalidDataAccessResourceUsageException e) {
             // expected
-        } finally {
-            node.remove();
-            session.getRootNode().save();
-            session.logout();
-        }
+         }
     }
 }

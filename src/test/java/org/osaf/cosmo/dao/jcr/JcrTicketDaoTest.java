@@ -20,13 +20,11 @@ import java.util.Set;
 
 import javax.jcr.Node;
 import javax.jcr.Property;
-import javax.jcr.Session;
 
 import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
@@ -46,10 +44,10 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        dao = new JcrTicketDao();
-        dao.setTemplate(getTemplate());
-
         SessionIdGenerator idGenerator = new SessionIdGenerator();
+
+        dao = new JcrTicketDao();
+        dao.setSessionFactory(getSessionFactory());
         dao.setIdGenerator(idGenerator);
 
         try {
@@ -74,28 +72,25 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testCreateTicket() throws Exception {
-        Session session = acquireSession();
+        User u1 = getTestHelper().makeDummyUser();
+        Node n1 = getTestHelper().addTicketableNode();
+        getTestHelper().getSession().save();
 
-        User u1 = TestHelper.makeDummyUser();
-        Node n1 = JcrTestHelper.addTicketableNode(session);
-
-        Ticket t1 = TestHelper.makeDummyTicket();
+        Ticket t1 = getTestHelper().makeDummyTicket();
         t1.setOwner(u1.getUsername());
 
         dao.createTicket(n1.getPath(), t1);
-        Ticket ticket = JcrTestHelper.findDummyTicket(n1, t1.getId());
+        Ticket ticket = getTestHelper().findDummyTicket(n1, t1.getId());
         assertNotNull("Ticket not stored", ticket);
 
         n1.remove();
-        session.save();
-
-        session.logout();
+        getTestHelper().getSession().save();
     }
 
     /**
      */
     public void testCreateTicketOnNonExistentNode() throws Exception {
-        Ticket t1 = TestHelper.makeDummyTicket();
+        Ticket t1 = getTestHelper().makeDummyTicket();
 
         try {
             dao.createTicket("/dead/beef", t1);
@@ -108,36 +103,28 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testCreateTicketOnProperty() throws Exception {
-        Session session = acquireSession();
+        Node node = getTestHelper().addNode();
+        Property property = getTestHelper().addProperty(node);
 
-        Node node = JcrTestHelper.addNode(session);
-        Property property = JcrTestHelper.addProperty(node);
-
-        Ticket t1 = TestHelper.makeDummyTicket();
+        Ticket t1 = getTestHelper().makeDummyTicket();
 
         try {
             dao.createTicket(property.getPath(), t1);
             fail("Ticket created on property");
         } catch (InvalidDataAccessResourceUsageException e) {
             // expected
-        } finally {
-            node.remove();
-            session.getRootNode().save();
-            session.logout();
         }
     }
 
     /**
      */
     public void testGetTickets() throws Exception {
-        Session session = acquireSession();
+        User u1 = getTestHelper().makeDummyUser();
+        Node n1 = getTestHelper().addTicketableNode();
 
-        User u1 = TestHelper.makeDummyUser();
-        Node n1 = JcrTestHelper.addTicketableNode(session);
-
-        Ticket t1 = JcrTestHelper.makeAndStoreDummyTicket(n1, u1);
-        Ticket t2 = JcrTestHelper.makeAndStoreDummyTicket(n1, u1);
-        Ticket t3 = JcrTestHelper.makeAndStoreDummyTicket(n1, u1);
+        Ticket t1 = getTestHelper().makeAndStoreDummyTicket(n1, u1);
+        Ticket t2 = getTestHelper().makeAndStoreDummyTicket(n1, u1);
+        Ticket t3 = getTestHelper().makeAndStoreDummyTicket(n1, u1);
 
         Set tickets = dao.getTickets(n1.getPath());
 
@@ -145,11 +132,6 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
         assertTrue("Ticket 1 not found in tickets", tickets.contains(t1));
         assertTrue("Ticket 2 not found in tickets", tickets.contains(t2));
         assertTrue("Ticket 3 not found in tickets", tickets.contains(t3));
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
     /**
@@ -166,107 +148,73 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
     /**
      */
     public void testGetTicketsOnProperty() throws Exception {
-        Session session = acquireSession();
-
-        Node node = JcrTestHelper.addNode(session);
-        Property property = JcrTestHelper.addProperty(node);
+        Node node = getTestHelper().addNode();
+        Property property = getTestHelper().addProperty(node);
 
         try {
             dao.getTickets(property.getPath());
             fail("Got tickets on property");
         } catch (InvalidDataAccessResourceUsageException e) {
             // expected
-        } finally {
-            node.remove();
-            session.getRootNode().save();
-            session.logout();
         }
     }
 
     /**
      */
     public void testGetTicket() throws Exception {
-        Session session = acquireSession();
+        User u1 = getTestHelper().makeDummyUser();
+        Node n1 = getTestHelper().addTicketableNode();
 
-        User u1 = TestHelper.makeDummyUser();
-        Node n1 = JcrTestHelper.addTicketableNode(session);
-
-        Ticket t1 = JcrTestHelper.makeAndStoreDummyTicket(n1, u1);
+        Ticket t1 = getTestHelper().makeAndStoreDummyTicket(n1, u1);
 
         Ticket ticket = dao.getTicket(n1.getPath(), t1.getId());
         assertNotNull("Ticket " + t1.getId() + " null", ticket);
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
     /**
      */
     public void testGetTicketNotFound() throws Exception {
-        Session session = acquireSession();
-
-        Node n1 = JcrTestHelper.addTicketableNode(session);
+        Node n1 = getTestHelper().addTicketableNode();
 
         try {
             dao.getTicket(n1.getPath(), "deadbeef");
             fail("nonexistent ticket found");
         } catch (DataRetrievalFailureException e) {
             // expected
-        } finally {
-            n1.remove();
-            session.save();
-            session.logout();
         }
     }
 
     /**
      */
     public void testGetTicketOnProperty() throws Exception {
-        Session session = acquireSession();
-
-        Node node = JcrTestHelper.addNode(session);
-        Property property = JcrTestHelper.addProperty(node);
+        Node node = getTestHelper().addNode();
+        Property property = getTestHelper().addProperty(node);
 
         try {
             dao.getTicket(property.getPath(), "cafebebe");
             fail("Got ticket on property");
         } catch (InvalidDataAccessResourceUsageException e) {
             // expected
-        } finally {
-            node.remove();
-            session.getRootNode().save();
-            session.logout();
         }
     }
 
     /**
      */
     public void testGetInheritedTicket() throws Exception {
-        Session session = acquireSession();
+        User u1 = getTestHelper().makeDummyUser();
+        Node n1 = getTestHelper().addTicketableNode();
 
-        User u1 = TestHelper.makeDummyUser();
-        Node n1 = JcrTestHelper.addTicketableNode(session);
-
-        Ticket t1 = JcrTestHelper.makeAndStoreDummyTicket(n1, u1);
+        Ticket t1 = getTestHelper().makeAndStoreDummyTicket(n1, u1);
 
         String path = n1.getPath() + "/foobar";
         Ticket ticket = dao.getTicket(path, t1.getId());
         assertNotNull("Ticket " + t1.getId() + " null", ticket);
-
-        n1.remove();
-        session.save();
-
-        session.logout();
     }
 
     /**
      */
     public void testGetInheritedTicketNotFound() throws Exception {
-        Session session = acquireSession();
-
-        Node n1 = JcrTestHelper.addTicketableNode(session);
+        Node n1 = getTestHelper().addTicketableNode();
 
         try {
             String path = n1.getPath() + "/foobar";
@@ -274,75 +222,59 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
             fail("nonexistent ticket found");
         } catch (DataRetrievalFailureException e) {
             // expected
-        } finally {
-            n1.remove();
-            session.save();
-            session.logout();
         }
     }
 
     /**
      */
     public void testRemoveTicket() throws Exception {
-        Session session = acquireSession();
+        User u1 = getTestHelper().makeDummyUser();
+        Node n1 = getTestHelper().addTicketableNode();
+        getTestHelper().getSession().save();
 
-        User u1 = TestHelper.makeDummyUser();
-        Node n1 = JcrTestHelper.addTicketableNode(session);
-
-        Ticket t1 = JcrTestHelper.makeAndStoreDummyTicket(n1, u1);
+        Ticket t1 = getTestHelper().makeAndStoreDummyTicket(n1, u1);
 
         dao.removeTicket(n1.getPath(), t1);
 
-        Ticket ticket = JcrTestHelper.findDummyTicket(n1, t1.getId());
+        Ticket ticket = getTestHelper().findDummyTicket(n1, t1.getId());
         assertNull("Ticket not removed", ticket);
 
         n1.remove();
-        session.save();
-
-        session.logout();
+        getTestHelper().getSession().save();
     }
 
     /**
      */
     public void testRemoveTicketOnProperty() throws Exception {
-        Session session = acquireSession();
+        Node node = getTestHelper().addNode();
+        Property property = getTestHelper().addProperty(node);
 
-        Node node = JcrTestHelper.addNode(session);
-        Property property = JcrTestHelper.addProperty(node);
-
-        Ticket t1 = TestHelper.makeDummyTicket();
+        Ticket t1 = getTestHelper().makeDummyTicket();
 
         try {
             dao.removeTicket(property.getPath(), t1);
             fail("Removed ticket on property");
         } catch (InvalidDataAccessResourceUsageException e) {
             // expected
-        } finally {
-            node.remove();
-            session.getRootNode().save();
-            session.logout();
         }
     }
 
     /**
      */
     public void testRemoveInheritedTicket() throws Exception {
-        Session session = acquireSession();
+        User u1 = getTestHelper().makeDummyUser();
+        Node n1 = getTestHelper().addTicketableNode();
+        getTestHelper().getSession().save();
 
-        User u1 = TestHelper.makeDummyUser();
-        Node n1 = JcrTestHelper.addTicketableNode(session);
-
-        Ticket t1 = JcrTestHelper.makeAndStoreDummyTicket(n1, u1);
+        Ticket t1 = getTestHelper().makeAndStoreDummyTicket(n1, u1);
 
         String path = n1.getPath() + "/foobar";
         dao.removeTicket(path, t1);
 
-        Ticket ticket = JcrTestHelper.findDummyTicket(n1, t1.getId());
+        Ticket ticket = getTestHelper().findDummyTicket(n1, t1.getId());
         assertNull("Ticket not removed", ticket);
 
         n1.remove();
-        session.save();
-
-        session.logout();
+        getTestHelper().getSession().save();
     }
 }

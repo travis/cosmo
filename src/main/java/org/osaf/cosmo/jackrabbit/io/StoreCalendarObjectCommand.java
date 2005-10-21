@@ -31,7 +31,7 @@ import org.apache.jackrabbit.webdav.DavException;
 
 import org.apache.log4j.Logger;
 
-import org.osaf.cosmo.dao.CalendarDao;
+import org.osaf.cosmo.dao.jcr.JcrCalendarMapper;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dao.UnsupportedCalendarObjectException;
 import org.osaf.cosmo.dav.CosmoDavResponse;
@@ -48,14 +48,13 @@ public class StoreCalendarObjectCommand extends AbstractCommand
     implements JcrConstants, ICalendarConstants {
     private static final Logger log =
         Logger.getLogger(StoreCalendarObjectCommand.class);
-    private static final String BEAN_CALENDAR_DAO = "calendarDao";
 
     /**
      */
     public boolean execute(AbstractContext context)
         throws Exception {
-        if (context instanceof ApplicationContextAwareImportContext) {
-            return execute((ApplicationContextAwareImportContext) context);
+        if (context instanceof ImportContext) {
+            return execute((ImportContext) context);
         }
         else {
             return false;
@@ -64,7 +63,7 @@ public class StoreCalendarObjectCommand extends AbstractCommand
 
     /**
      */
-    public boolean execute(ApplicationContextAwareImportContext context)
+    public boolean execute(ImportContext context)
         throws Exception {
         Node resourceNode = context.getNode();
         if (resourceNode == null) {
@@ -96,10 +95,7 @@ public class StoreCalendarObjectCommand extends AbstractCommand
             Calendar calendar = builder.build(in);
 
             // store the resource in the repository
-            CalendarDao dao = (CalendarDao) 
-                context.getApplicationContext().
-                getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
-            dao.storeCalendarObject(resourceNode.getPath(), calendar);
+            JcrCalendarMapper.calendarToNode(calendar, resourceNode);
         } catch (ParserException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Error parsing calendar resource", e);

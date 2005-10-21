@@ -47,22 +47,18 @@ import org.apache.jackrabbit.webdav.simple.ResourceConfig;
 
 import org.apache.log4j.Logger;
 
-import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
-import org.osaf.cosmo.dav.CosmoCollectionNodeResource;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
-import org.osaf.cosmo.dav.CosmoNodeResource;
 import org.osaf.cosmo.dav.property.CalendarComponentRestrictionSet;
 import org.osaf.cosmo.dav.property.CalendarDescription;
 import org.osaf.cosmo.dav.property.CalendarRestrictions;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.CosmoResourceType;
 import org.osaf.cosmo.dav.property.TicketDiscovery;
-import org.osaf.cosmo.jackrabbit.io.ApplicationContextAwareImportContext;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
@@ -79,7 +75,6 @@ import org.springframework.context.ApplicationContextAware;
 public class CosmoDavResourceImpl extends DavResourceImpl 
     implements CosmoDavResource, ApplicationContextAware, JcrConstants {
     private static final Logger log = Logger.getLogger(CosmoDavResource.class);
-    private static final String BEAN_CALENDAR_DAO = "calendarDao";
     private static final String BEAN_TICKET_DAO = "ticketDao";
 
     private String baseUrl;
@@ -412,30 +407,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                 log.warn("error getting tickets for node", e);
             }
         }
-    }
-
-    /**
-     */
-    protected NodeResource createNodeResource()
-        throws RepositoryException {
-        if (isCollection()) {
-            CosmoCollectionNodeResource nr =
-                new CosmoCollectionNodeResource(getApplicationContext());
-            nr.init(this, getNode());
-            return nr;
-        }
-        CosmoNodeResource nr = new CosmoNodeResource(getApplicationContext());
-        nr.init(this, getNode());
-        return nr;
-    }
-
-    /**
-     */
-    protected ImportContext createImportContext() {
-        ApplicationContextAwareImportContext ctx =
-            new ApplicationContextAwareImportContext(getNode());
-        ctx.setApplicationContext(getApplicationContext());
-        return ctx;
     }
 
     // ApplicationContextAware methods

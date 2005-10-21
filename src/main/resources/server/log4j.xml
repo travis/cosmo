@@ -49,6 +49,10 @@
     <level value="DEBUG"/>
   </logger>
 
+  <logger name="org.apache.jackrabbit.server">
+    <level value="DEBUG"/>
+  </logger>
+
   <logger name="org.apache.catalina.startup.Catalina">
     <level value="INFO"/>
   </logger>

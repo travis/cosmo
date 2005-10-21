@@ -37,7 +37,7 @@ import org.apache.jackrabbit.webdav.DavException;
 import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.dao.CalendarDao;
+import org.osaf.cosmo.dao.jcr.JcrCalendarMapper;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 
@@ -49,14 +49,13 @@ public class ExportCalendarCollectionCommand extends AbstractCommand
     implements JcrConstants, ICalendarConstants {
     private static final Logger log =
         Logger.getLogger(ExportCalendarCollectionCommand.class);
-    private static final String BEAN_CALENDAR_DAO = "calendarDao";
 
     /**
      */
     public boolean execute(AbstractContext context)
         throws Exception {
-        if (context instanceof ApplicationContextAwareExportContext) {
-            return execute((ApplicationContextAwareExportContext) context);
+        if (context instanceof ExportContext) {
+            return execute((ExportContext) context);
         }
         else {
             return false;
@@ -65,7 +64,7 @@ public class ExportCalendarCollectionCommand extends AbstractCommand
 
     /**
      */
-    public boolean execute(ApplicationContextAwareExportContext context)
+    public boolean execute(ExportContext context)
         throws Exception {
         Node resourceNode = context.getNode();
         if (resourceNode == null ||
@@ -73,16 +72,8 @@ public class ExportCalendarCollectionCommand extends AbstractCommand
             return false;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("exporting calendar object for " +
-                      resourceNode.getPath());
-        }
-
-        // extract calendar components from the node
-        CalendarDao dao = (CalendarDao) 
-            context.getApplicationContext().
-            getBean(BEAN_CALENDAR_DAO, CalendarDao.class);
-        Calendar calendar = dao.getCalendarObject(resourceNode.getPath());
+        // extract calendar object from the node
+        Calendar calendar = JcrCalendarMapper.nodeToCalendar(resourceNode);
 
         // fill in the context
 
@@ -100,13 +91,9 @@ public class ExportCalendarCollectionCommand extends AbstractCommand
         context.setContentLength(tmpfile.length());
         context.setModificationTime(tmpfile.lastModified());
         context.setContentType(CONTENT_TYPE + "; charset=utf-8");
-        Property contentLanguage =
-            resourceNode.getProperty(NP_XML_LANG);
-        context.setContentLanguage(contentLanguage.getString());
-        java.util.Calendar creationTime =
-            resourceNode.getProperty(NP_JCR_CREATED).getDate();
-        context.setCreationTime(creationTime.getTime().getTime());
-        context.setETag("");
+        String contentLanguage =
+            resourceNode.getProperty(NP_XML_LANG).getString();
+        context.setContentLanguage(contentLanguage);
 
         return true;
     }

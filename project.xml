@@ -308,6 +308,9 @@
       <groupId>springmodules</groupId>
       <artifactId>springmodules-sandbox-jcr</artifactId>
       <version>dev-20051020</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
     </dependency>
     <dependency>
       <groupId>struts</groupId>

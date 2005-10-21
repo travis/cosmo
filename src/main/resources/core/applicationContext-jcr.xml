@@ -22,13 +22,22 @@
 
   <!-- JCR Resources -->
 
+  <bean id="homedirPassword"
+        class="java.lang.String">
+    <constructor-arg>
+      <value>${cosmo.repository.password}</value>
+    </constructor-arg>
+  </bean>
+
   <bean id="homedirCredentials"
         class="javax.jcr.SimpleCredentials">
     <constructor-arg>
       <value>${cosmo.repository.username}</value>
     </constructor-arg>
     <constructor-arg>
-      <value>${cosmo.repository.password}</value>
+      <bean id="homedirPasswordChars"
+            factory-bean="homedirPassword"
+            factory-method="toCharArray"/>
     </constructor-arg>
   </bean>
 

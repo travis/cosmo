@@ -25,7 +25,7 @@
        information needs to be loaded from the database -->
 
   <bean id="servletContextConfigurer"
-        class="org.osaf.cosmo.ui.config.ServletContextConfigurer">
+        class="org.osaf.cosmo.ui.config.jcr.JcrServletContextConfigurer">
     <property name="serverVersion">
       <ref bean="serverVersion"/>
     </property>

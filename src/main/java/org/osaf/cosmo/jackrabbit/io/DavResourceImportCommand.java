@@ -50,10 +50,6 @@ public class DavResourceImportCommand extends FileImportCommand
         node.setProperty(NP_DAV_DISPLAYNAME, name);
         node.setProperty(NP_DAV_CONTENTLANGUAGE, context.getContentLanguage());
 
-        // XXX: remove this when springmodules is integrated and the
-        // dao is running in the same session as the dav server
-        node.getParent().save();
-
         return true;
     }
 }

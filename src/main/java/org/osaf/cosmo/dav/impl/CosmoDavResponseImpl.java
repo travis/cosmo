@@ -15,18 +15,26 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.URLEncoder;
+import java.util.Iterator;
+import java.util.Locale;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.ServletOutputStream;
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.util.Iterator;
-import java.util.Locale;
+
+import net.fortuna.ical4j.data.CalendarOutputter;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.ValidationException;
 
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
+import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
+import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.WebdavResponse;
 import org.apache.jackrabbit.webdav.lock.ActiveLock;
@@ -58,6 +66,78 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
      */
     public CosmoDavResponseImpl(WebdavResponse response) {
         webdavResponse = response;
+    }
+
+    // CosmoDavResponse methods
+
+    /**
+     * Send an HTML listing of a collection's contents in response to
+     * a <code>GET</code> request.
+     */
+    public void sendHtmlCollectionListingResponse(CosmoDavResource resource)
+        throws IOException {
+        setStatus(SC_OK);
+        setContentType("text/html; charset=UTF-8");
+        Writer writer = getWriter();
+        String title = resource.getLocator().getResourcePath(); 
+        writer.write("<html><head><title>");
+        writer.write(title); // XXX: html escape
+        writer.write("</title></head>");
+        writer.write("<body>");
+        writer.write("<h1>");
+        writer.write(title); // XXX: html escape
+        writer.write("</h1>");
+        writer.write("<ul>");
+        if (! resource.getLocator().getResourcePath().equals("/")) {
+            writer.write("<li><a href=\"../\">../</a></li>");
+        }
+        for (DavResourceIterator i=resource.getMembers(); i.hasNext();) {
+            DavResource child = i.nextResource();
+            String name = getName(child.getLocator().getResourcePath()); 
+            writer.write("<li><a href=\"");
+            try {
+                writer.write(URLEncoder.encode(name, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                log.warn("UTF-8 not supported?!", e);
+                writer.write(name);
+            }
+            if (child.isCollection()) {
+                writer.write("/");
+            }
+            writer.write("\">");
+            writer.write(name);
+            if (child.isCollection()) {
+                writer.write("/");
+            }
+            writer.write("</a></li>");
+        }
+        writer.write("</ul>");
+        writer.write("</body>");
+        writer.write("</html>");
+    }
+
+    /**
+     * Send an iCalendar view of a calendar collection's contents in
+     * response to a <code>GET</code> request.
+     */
+    public void sendICalendarCollectionListingResponse(CosmoDavResource resource)
+        throws IOException {
+        if (! resource.isCalendarCollection()) {
+            throw new IllegalArgumentException("resource not a calendar collection");
+        }
+        setStatus(SC_OK);
+        setContentType("text/icalendar; charset=UTF-8");
+        Writer writer = getWriter();
+        CalendarOutputter outputter = new CalendarOutputter();
+        try {
+            outputter.output(resource.getCollectionCalendar(), writer);
+        } catch (ValidationException e) {
+            log.error("error outputting icalendar view of calendar collection",
+                      e);
+            setStatus(SC_INTERNAL_SERVER_ERROR);
+        } catch (DavException e) {
+            sendError(e);
+        }
     }
 
     // TicketDavResponse methods
@@ -257,5 +337,12 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
 
     public Locale getLocale() {
         return webdavResponse.getLocale();
+    }
+
+    // private methods
+
+    private String getName(String path) {
+        int pos = path.lastIndexOf('/');
+        return pos >= 0 ? path.substring(pos + 1) : "";
     }
 }

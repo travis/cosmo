@@ -18,6 +18,8 @@ package org.osaf.cosmo.dav;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jackrabbit.j2ee.SimpleWebdavServlet;
 import org.apache.jackrabbit.webdav.DavException;
@@ -27,7 +29,9 @@ import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavSessionProvider;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.WebdavRequest;
+import org.apache.jackrabbit.webdav.WebdavRequestImpl;
 import org.apache.jackrabbit.webdav.WebdavResponse;
+import org.apache.jackrabbit.webdav.WebdavResponseImpl;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
@@ -144,6 +148,40 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         }
 
         return true;
+    }
+
+    /**
+     * The HEAD method
+     *
+     * @param request
+     * @param response
+     * @param resource
+     * @throws java.io.IOException
+     */
+    protected void doHead(WebdavRequest request, WebdavResponse response,
+                          DavResource resource) throws IOException {
+        if (! resource.isCollection()) {
+            super.doHead(request, response, resource);
+            return;
+        }
+        generateDirectoryListing(request, response, resource);
+    }
+
+    /**
+     * The GET method
+     *
+     * @param request
+     * @param response
+     * @param resource
+     * @throws IOException
+     */
+    protected void doGet(WebdavRequest request, WebdavResponse response,
+                         DavResource resource) throws IOException {
+        if (! resource.isCollection()) {
+            super.doGet(request, response, resource);
+            return;
+        }
+        generateDirectoryListing(request, response, resource);
     }
 
     /**
@@ -370,6 +408,23 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     }
 
     // our methods
+
+    /**
+     */
+    protected void generateDirectoryListing(WebdavRequest request,
+                                            WebdavResponse response,
+                                            DavResource resource)
+        throws IOException {
+        CosmoDavRequestImpl cosmoRequest = new CosmoDavRequestImpl(request);
+        CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
+        CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
+
+        if (cosmoResource.isCalendarCollection()) {
+            cosmoResponse.sendICalendarCollectionListingResponse(cosmoResource);
+            return;
+        }
+        cosmoResponse.sendHtmlCollectionListingResponse(cosmoResource);
+    }
 
     /**
      * Looks up the bean with given name and class in the web

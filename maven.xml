@@ -128,6 +128,10 @@
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        content="${maven.build.dir}/import-overlord.xml"/>
+    <copy todir="${maven.build.dir}/test-repository/version/db"
+          file="${basedir}/src/test/resources/je.properties"/>
+    <copy todir="${maven.build.dir}/test-repository/workspaces/homedir/db"
+          file="${basedir}/src/test/resources/je.properties"/>
   </goal>
     
   <goal name="dist:tomcat">

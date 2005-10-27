@@ -29,6 +29,12 @@
     <level value="WARN"/>
   </logger>
 
+<!--
+  <logger name="org.apache.jackrabbit.core.state.bdb">
+    <level value="DEBUG"/>
+  </logger>
+-->
+
   <logger name="net.sf">
     <level value="WARN"/>
   </logger>

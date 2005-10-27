@@ -35,17 +35,6 @@
              className="org.osaf.cosmo.jackrabbit.io.StoreCalendarObjectCommand"/>
   </chain>
 
-  <!-- export webdav collection -->
-  <chain name="export-collection">
-    <command id="export-calendar-collection"
-             className="org.osaf.cosmo.jackrabbit.io.ExportCalendarCollectionCommand"/>
-    <command id="export-dirlisting"
-             className="org.apache.jackrabbit.server.io.DirListingExportCommand"
-             nonCollectionNodeTypes="dav:resource, caldav:collection"
-             collectionNodeTypes="dav:collection"
-             ignoredNodeTypes="rep:system, ticket:ticket, icalendar:calendar"/>
-  </chain>
-
   <!-- export webdav resource -->
   <chain name="export-resource">
     <command id="export-dav-resource"

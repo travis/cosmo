@@ -352,16 +352,27 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                                                       ISCOLLECTION,
                                                       "1"));
 
+                // content-language property
+                String contentLanguage = null;
+                try {
+                    if (getNode().hasProperty(NP_XML_LANG)) {
+                        contentLanguage =
+                            getNode().getProperty(NP_XML_LANG).getString();
+                        setContentLanguage(contentLanguage);
+                    }
+                } catch (RepositoryException e) {
+                    log.warn("Unable to retrieve content language", e);
+                }
+
                 // calendar-description property (caldav section
-                // 4.4.1) has a language attribute
+                // 4.4.1)
                 try {
                     if (getNode().hasProperty(NP_CALDAV_CALENDARDESCRIPTION)) {
                         String text = getNode().
                             getProperty(NP_CALDAV_CALENDARDESCRIPTION).
                             getString();
-                        String lang =
-                            getNode().getProperty(NP_XML_LANG).getString();
-                        properties.add(new CalendarDescription(text, lang));
+                        properties.add(new CalendarDescription(text,
+                                                               contentLanguage));
                     }
                 } catch (RepositoryException e) {
                     log.warn("Unable to retrieve calendar description", e);

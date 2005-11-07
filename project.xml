@@ -155,7 +155,7 @@
     <dependency>
       <groupId>ical4j</groupId>
       <artifactId>ical4j</artifactId>
-      <version>0.9.14</version>
+      <version>0.9.17</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

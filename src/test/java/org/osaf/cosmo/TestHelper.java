@@ -17,6 +17,7 @@ package org.osaf.cosmo;
 
 import java.security.Principal;
 import java.util.HashSet;
+import java.util.TimeZone;
 
 import net.fortuna.ical4j.model.*;
 import net.fortuna.ical4j.model.component.*;
@@ -54,7 +55,10 @@ public class TestHelper {
 
         VEvent e1 = makeDummyEvent();
         cal.getComponents().add(e1);
-        cal.getComponents().add(VTimeZone.getDefault());
+
+        VTimeZone tz1 = TimeZoneRegistryFactory.getInstance().createRegistry().
+            getTimeZone(TimeZone.getDefault().getID()).getVTimeZone();
+        cal.getComponents().add(tz1);
 
         return cal;
     }
@@ -75,8 +79,9 @@ public class TestHelper {
         VEvent event = new VEvent(new Date(start.getTime()), duration, summary);
         event.getProperties().add(new Uid(serial));
  
-        // add timezone information..
-        VTimeZone tz = VTimeZone.getDefault();
+        // add timezone information
+        VTimeZone tz = TimeZoneRegistryFactory.getInstance().createRegistry().
+            getTimeZone(TimeZone.getDefault().getID()).getVTimeZone();
         String tzValue =
             tz.getProperties().getProperty(Property.TZID).getValue();
         net.fortuna.ical4j.model.parameter.TzId tzParam =

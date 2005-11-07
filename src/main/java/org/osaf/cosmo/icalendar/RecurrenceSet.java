@@ -128,7 +128,7 @@ public class RecurrenceSet {
         if (recurid == null) {
             return KEY_NO_RECUR;
         }
-        return new Long(recurid.getTime().getTime());
+        return new Long(recurid.getDate().getTime());
     }
 
     /**

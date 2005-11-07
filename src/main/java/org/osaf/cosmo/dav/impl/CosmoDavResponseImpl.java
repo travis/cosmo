@@ -125,18 +125,30 @@ public class CosmoDavResponseImpl implements CosmoDavResponse {
         if (! resource.isCalendarCollection()) {
             throw new IllegalArgumentException("resource not a calendar collection");
         }
+
+        Calendar calendar = null;
+        try {
+            calendar = resource.getCollectionCalendar();
+        } catch (DavException e) {
+            sendError(e);
+            return;
+        }
+
+        if (calendar.getComponents().isEmpty()) {
+            setStatus(SC_NO_CONTENT);
+            return;
+        }
+
         setStatus(SC_OK);
         setContentType("text/icalendar; charset=UTF-8");
         Writer writer = getWriter();
         CalendarOutputter outputter = new CalendarOutputter();
         try {
-            outputter.output(resource.getCollectionCalendar(), writer);
+            outputter.output(calendar, writer);
         } catch (ValidationException e) {
             log.error("error outputting icalendar view of calendar collection",
                       e);
             setStatus(SC_INTERNAL_SERVER_ERROR);
-        } catch (DavException e) {
-            sendError(e);
         }
     }
 

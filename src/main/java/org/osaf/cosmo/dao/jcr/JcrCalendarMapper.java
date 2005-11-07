@@ -191,14 +191,6 @@ public class JcrCalendarMapper implements ICalendarConstants, JcrConstants {
             calendar.getComponents().add((Component) i.next());
         }
 
-        // if the calendar is empty (no components), add the default
-        // timezone to the calendar so that it has a component (and
-        // therefore is a valid calendar object)
-
-        if (calendar.getComponents().isEmpty()) {
-            calendar.getComponents().add(VTimeZone.getDefault());
-        }
-
         return calendar;
     }
 
@@ -319,7 +311,7 @@ public class JcrCalendarMapper implements ICalendarConstants, JcrConstants {
         for (Iterator i=events.getExceptions().iterator(); i.hasNext();) {
             VEvent exceptionEvent = (VEvent) i.next();
             java.util.Date recurid =
-                ICalendarUtils.getRecurrenceId(exceptionEvent).getTime();
+                ICalendarUtils.getRecurrenceId(exceptionEvent).getDate();
             Node eventNode = (Node) updateIdx.get(recurid);
             if (eventNode == null) {
                 eventNode = resourceNode.addNode(NN_ICAL_EXEVENT);
@@ -691,7 +683,7 @@ public class JcrCalendarMapper implements ICalendarConstants, JcrConstants {
             componentNodes.nextNode().remove();
         }
         // set new component nodes
-        for (Iterator i=timezone.getTypes().iterator(); i.hasNext();) {
+        for (Iterator i=timezone.getObservances().iterator(); i.hasNext();) {
             setTimeZoneComponentNode((Component) i.next(), timezoneNode);
         }
         setXPropertyNodes(timezone, timezoneNode);
@@ -928,7 +920,7 @@ public class JcrCalendarMapper implements ICalendarConstants, JcrConstants {
             setValueProperty(dtStart, propertyNode);
             setXParameterProperties(dtStart, propertyNode);
             java.util.Calendar c = java.util.Calendar.getInstance();
-            c.setTime(dtStart.getTime());
+            c.setTime(dtStart.getDate());
             propertyNode.setProperty(NP_ICAL_DATETIME, c);
             propertyNode.setProperty(NP_ICAL_UTC, dtStart.isUtc());
             setTzIdParameterProperty(dtStart, propertyNode);
@@ -1482,7 +1474,7 @@ public class JcrCalendarMapper implements ICalendarConstants, JcrConstants {
             setValueProperty(recurrenceId, propertyNode);
             setXParameterProperties(recurrenceId, propertyNode);
             java.util.Calendar c = java.util.Calendar.getInstance();
-            c.setTime(recurrenceId.getTime());
+            c.setTime(recurrenceId.getDate());
             propertyNode.setProperty(NP_ICAL_DATETIME, c);
             propertyNode.setProperty(NP_ICAL_UTC, recurrenceId.isUtc());
             setValueParameterProperty(recurrenceId, propertyNode);

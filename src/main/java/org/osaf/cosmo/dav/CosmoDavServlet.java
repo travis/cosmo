@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.jackrabbit.j2ee.SimpleWebdavServlet;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
+import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavSessionProvider;
@@ -44,6 +45,8 @@ import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResponseImpl;
+import org.osaf.cosmo.dav.report.Report;
+import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -53,86 +56,88 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * An extension of Jackrabbit's 
- * {@link org.apache.jackrabbit.server.simple.WebdavServlet} which
- * integrates the Spring Framework for configuring support objects.
+ * An extension of Jackrabbit's
+ * {@link org.apache.jackrabbit.server.simple.WebdavServlet} which integrates
+ * the Spring Framework for configuring support objects.
  */
 public class CosmoDavServlet extends SimpleWebdavServlet {
-    private static final Logger log =
-        Logger.getLogger(CosmoDavServlet.class);
+    private static final Logger log = Logger.getLogger(CosmoDavServlet.class);
 
-    /** The name of the Spring bean identifying the servlet's
+    /**
+     * The name of the Spring bean identifying the servlet's
      * {@link org.apache.jackrabbit.webdav.DavSessionProvider}
      */
-    public static final String BEAN_DAV_SESSION_PROVIDER =
-        "sessionProvider";
+    public static final String BEAN_DAV_SESSION_PROVIDER = "sessionProvider";
+
     /**
-     * The name of the Spring bean identifying the Cosmo security
-     * manager
+     * The name of the Spring bean identifying the Cosmo security manager
      */
-    public static final String BEAN_SECURITY_MANAGER =
-        "securityManager";
+    public static final String BEAN_SECURITY_MANAGER = "securityManager";
 
     private CosmoSecurityManager securityManager;
+
     private WebApplicationContext wac;
 
     /**
      * Load the servlet context's
-     * {@link org.springframework.web.context.WebApplicationContext}
-     * and look up support objects.
-     *
+     * {@link org.springframework.web.context.WebApplicationContext} and look up
+     * support objects.
+     * 
      * @throws ServletException
      */
     public void init() throws ServletException {
         super.init();
 
-        wac = WebApplicationContextUtils.
-            getRequiredWebApplicationContext(getServletContext());
+        wac = WebApplicationContextUtils
+                .getRequiredWebApplicationContext(getServletContext());
 
-        DavSessionProvider sessionProvider = (DavSessionProvider)
-            getBean(BEAN_DAV_SESSION_PROVIDER,
-                    DavSessionProvider.class);
+        DavSessionProvider sessionProvider = (DavSessionProvider) getBean(
+                BEAN_DAV_SESSION_PROVIDER, DavSessionProvider.class);
         setDavSessionProvider(sessionProvider);
 
-        securityManager = (CosmoSecurityManager)
-            getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
+        securityManager = (CosmoSecurityManager) getBean(BEAN_SECURITY_MANAGER,
+                CosmoSecurityManager.class);
 
-        CosmoDavResourceFactoryImpl resourceFactory =
-            new CosmoDavResourceFactoryImpl(getLockManager(),
-                                            getResourceConfig());
+        CosmoDavResourceFactoryImpl resourceFactory = new CosmoDavResourceFactoryImpl(
+                getLockManager(), getResourceConfig());
         resourceFactory.setSecurityManager(securityManager);
         setResourceFactory(resourceFactory);
 
-        CosmoDavLocatorFactoryImpl locatorFactory =
-            new CosmoDavLocatorFactoryImpl(getPathPrefix());
+        CosmoDavLocatorFactoryImpl locatorFactory = new CosmoDavLocatorFactoryImpl(
+                getPathPrefix());
         setLocatorFactory(locatorFactory);
     }
 
-
     /**
      * Dispatch dav methods that jcr-server does not know about.
-     *
+     * 
      * @throws ServletException
      * @throws IOException
      * @throws DavException
      */
-    protected boolean execute(WebdavRequest request,
-                              WebdavResponse response,
-                              int method,
-                              DavResource resource)
-            throws ServletException, IOException, DavException {
+    protected boolean execute(WebdavRequest request, WebdavResponse response,
+            int method, DavResource resource) throws ServletException,
+            IOException, DavException {
         CosmoDavRequestImpl cosmoRequest = new CosmoDavRequestImpl(request);
         CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
         CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
         cosmoResource.setBaseUrl(cosmoRequest.getBaseUrl());
         cosmoResource.setApplicationContext(wac);
 
-        if (method > 0) {
+        // TODO We handle REPORT ourselves for now. Eventually this will be
+        // punted up into jackrabbit
+        if ((method > 0) && (method != DavMethods.DAV_REPORT)) {
             return super.execute(request, response, method, resource);
+        } else if (method != DavMethods.DAV_REPORT) {
+            method = CosmoDavMethods.getMethodCode(request.getMethod());
         }
 
-        method = CosmoDavMethods.getMethodCode(request.getMethod());
         switch (method) {
+        // TODO We handle REPORT ourselves for now. Eventually this will be
+        // punted up into jackrabbit
+        case DavMethods.DAV_REPORT:
+            doReport(cosmoRequest, cosmoResponse, cosmoResource);
+            break;
         case CosmoDavMethods.DAV_MKCALENDAR:
             doMkCalendar(cosmoRequest, cosmoResponse, cosmoResource);
             break;
@@ -152,15 +157,15 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
     /**
      * The HEAD method
-     *
+     * 
      * @param request
      * @param response
      * @param resource
      * @throws java.io.IOException
      */
     protected void doHead(WebdavRequest request, WebdavResponse response,
-                          DavResource resource) throws IOException {
-        if (! resource.isCollection()) {
+            DavResource resource) throws IOException {
+        if (!resource.isCollection()) {
             super.doHead(request, response, resource);
             return;
         }
@@ -169,15 +174,15 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
     /**
      * The GET method
-     *
+     * 
      * @param request
      * @param response
      * @param resource
      * @throws IOException
      */
     protected void doGet(WebdavRequest request, WebdavResponse response,
-                         DavResource resource) throws IOException {
-        if (! resource.isCollection()) {
+            DavResource resource) throws IOException {
+        if (!resource.isCollection()) {
             super.doGet(request, response, resource);
             return;
         }
@@ -186,10 +191,8 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
     /**
      */
-    protected void doPut(WebdavRequest request,
-                         WebdavResponse response,
-                         DavResource resource)
-        throws IOException, DavException {
+    protected void doPut(WebdavRequest request, WebdavResponse response,
+            DavResource resource) throws IOException, DavException {
         CosmoDavRequestImpl cosmoRequest = new CosmoDavRequestImpl(request);
         CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
         CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
@@ -198,13 +201,13 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         String ifNoneMatch = request.getHeader("If-None-Match");
         if (ifNoneMatch != null) {
             // fail if it's "*" and the resource exists at all
-            if ((ifNoneMatch.equals("*") && resource.exists()) ||
-                // fail if the resource exists and both etags are
-                // strong and they match
-                (resource.exists() &&
-                 ! ifNoneMatch.startsWith("W/") &&
-                 ! cosmoResource.getETag().startsWith("W/") &&
-                 cosmoResource.getETag().equals(ifNoneMatch))) {
+            if ((ifNoneMatch.equals("*") && resource.exists())
+                    ||
+                    // fail if the resource exists and both etags are
+                    // strong and they match
+                    (resource.exists() && !ifNoneMatch.startsWith("W/")
+                            && !cosmoResource.getETag().startsWith("W/") && cosmoResource
+                            .getETag().equals(ifNoneMatch))) {
                 response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
                 return;
             }
@@ -214,13 +217,13 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         String ifMatch = request.getHeader("If-Match");
         if (ifMatch != null) {
             // fail if it's "*" and the resource does not exist
-            if ((ifMatch.equals("*") && ! resource.exists()) ||
-                // fail if the resource does not exist, one or both of
-                // the etags are weak, or if the etags don't match
-                (! resource.exists() ||
-                 ifMatch.startsWith("W/") ||
-                 cosmoResource.getETag().startsWith("W/") ||
-                 ! cosmoResource.getETag().equals(ifMatch))) {
+            if ((ifMatch.equals("*") && !resource.exists())
+                    ||
+                    // fail if the resource does not exist, one or both of
+                    // the etags are weak, or if the etags don't match
+                    (!resource.exists() || ifMatch.startsWith("W/")
+                            || cosmoResource.getETag().startsWith("W/") || !cosmoResource
+                            .getETag().equals(ifMatch))) {
                 response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
                 return;
             }
@@ -231,57 +234,75 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         } catch (DavException e) {
             // caldav (section 4.5): uid must be unique within a
             // calendar collection
-            if (e.getMessage() != null &&
-                e.getMessage().startsWith("Duplicate uid")) {
+            if (e.getMessage() != null
+                    && e.getMessage().startsWith("Duplicate uid")) {
                 response.sendError(DavServletResponse.SC_CONFLICT,
-                                   "Duplicate uid");
+                        "Duplicate uid");
                 return;
             }
             throw e;
         }
 
-        DavResource newResource =
-            getResourceFactory().createResource(request.getRequestLocator(),
-                                                request, response);
+        DavResource newResource = getResourceFactory().createResource(
+                request.getRequestLocator(), request, response);
         CosmoDavResource newCosmoResource = (CosmoDavResource) newResource;
 
         // caldav (section 4.6.2): return ETag header
-        if (! newCosmoResource.getETag().equals("")) {
+        if (!newCosmoResource.getETag().equals("")) {
             response.setHeader("ETag", newCosmoResource.getETag());
         }
     }
 
+    // TODO We handle REPORT ourselves for now. Eventually this will be
+    // punted up into jackrabbit
+    /**
+     * The REPORT method
+     * 
+     * @param request
+     * @param response
+     * @param resource
+     * @throws DavException
+     * @throws IOException
+     */
+    protected void doReport(CosmoDavRequest request, CosmoDavResponse response,
+            CosmoDavResource resource) throws DavException, IOException {
+
+        ReportInfo info = ((CosmoDavRequestImpl) request).getCosmoReportInfo();
+        Report report = ((CosmoDavResourceImpl) resource).getReport(info);
+        response.sendXmlResponse(report.toXml(),
+                DavServletResponse.SC_MULTI_STATUS);
+    }
+
     /**
      * Executes the MKTICKET method
-     *
+     * 
      * @throws IOException
      * @throws DavException
      */
     protected void doMkCalendar(CosmoDavRequest request,
-                                CosmoDavResponse response,
-                                CosmoDavResource resource)
-        throws IOException, DavException {
+            CosmoDavResponse response, CosmoDavResource resource)
+            throws IOException, DavException {
         WebdavRequest webdavRequest = request.getWebdavRequest();
 
         // resource must be null
         if (resource.exists()) {
             if (log.isDebugEnabled()) {
-                log.debug("cannot make calendar at " +
-                          resource.getResourcePath() + ": resource exists");
+                log.debug("cannot make calendar at "
+                        + resource.getResourcePath() + ": resource exists");
             }
             response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
             return;
         }
 
         // one or more intermediate collections must be created
-        CosmoDavResource parentResource =
-            (CosmoDavResource) resource.getCollection();
-        if (parentResource == null ||
-            ! parentResource.exists()) {
+        CosmoDavResource parentResource = (CosmoDavResource) resource
+                .getCollection();
+        if (parentResource == null || !parentResource.exists()) {
             if (log.isDebugEnabled()) {
-                log.debug("cannot make calendar at " +
-                          resource.getResourcePath() +
-                          ": one or more intermediate collections must be created");
+                log
+                        .debug("cannot make calendar at "
+                                + resource.getResourcePath()
+                                + ": one or more intermediate collections must be created");
             }
             response.sendError(DavServletResponse.SC_CONFLICT);
             return;
@@ -290,24 +311,24 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         // parent resource must be a regular collection - calendar
         // collections are not allowed within other calendar
         // collections
-        if (! parentResource.isCollection() ||
-            parentResource.isCalendarCollection()) {
+        if (!parentResource.isCollection()
+                || parentResource.isCalendarCollection()) {
             if (log.isDebugEnabled()) {
-                log.debug("cannot make calendar at " +
-                          resource.getResourcePath() +
-                          ": parent resource must be a regular collection");
+                log.debug("cannot make calendar at "
+                        + resource.getResourcePath()
+                        + ": parent resource must be a regular collection");
             }
             response.sendError(DavServletResponse.SC_FORBIDDEN);
             return;
         }
 
         // we do not allow request bodies
-        if (webdavRequest.getContentLength() > 0 ||
-            webdavRequest.getHeader("Transfer-Encoding") != null) {
+        if (webdavRequest.getContentLength() > 0
+                || webdavRequest.getHeader("Transfer-Encoding") != null) {
             if (log.isDebugEnabled()) {
-                log.debug("cannot make calendar at " +
-                          resource.getResourcePath() +
-                          ": request body not allowed");
+                log.debug("cannot make calendar at "
+                        + resource.getResourcePath()
+                        + ": request body not allowed");
             }
             response.sendError(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
             return;
@@ -316,10 +337,10 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         // also could return INSUFFICIENT_STORAGE if we do not have
         // enough space for the collection, but how do we determine
         // that?
-        
+
         if (log.isDebugEnabled()) {
-            log.debug("adding calendar collection at " +
-                      resource.getResourcePath());
+            log.debug("adding calendar collection at "
+                    + resource.getResourcePath());
         }
         parentResource.addCalendarCollection(resource);
         response.setStatus(DavServletResponse.SC_CREATED);
@@ -327,14 +348,13 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
     /**
      * Executes the MKTICKET method
-     *
+     * 
      * @throws IOException
      * @throws DavException
      */
     protected void doMkTicket(CosmoDavRequest request,
-                              CosmoDavResponse response,
-                              CosmoDavResource resource)
-        throws IOException, DavException {
+            CosmoDavResponse response, CosmoDavResource resource)
+            throws IOException, DavException {
         if (!resource.exists()) {
             response.sendError(DavServletResponse.SC_NOT_FOUND);
             return;
@@ -344,14 +364,14 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         try {
             ticket = request.getTicketInfo();
         } catch (IllegalArgumentException e) {
-            response.sendError(DavServletResponse.SC_BAD_REQUEST,
-                               e.getMessage());
+            response.sendError(DavServletResponse.SC_BAD_REQUEST, e
+                    .getMessage());
             return;
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("saving ticket for resource " +
-                      resource.getResourcePath());
+            log.debug("saving ticket for resource "
+                    + resource.getResourcePath());
         }
         resource.saveTicket(ticket);
 
@@ -360,14 +380,13 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
     /**
      * Executes the DELTICKET method
-     *
+     * 
      * @throws IOException
      * @throws DavException
      */
     protected void doDelTicket(CosmoDavRequest request,
-                               CosmoDavResponse response,
-                               CosmoDavResource resource)
-        throws IOException, DavException {
+            CosmoDavResponse response, CosmoDavResource resource)
+            throws IOException, DavException {
         if (!resource.exists()) {
             response.sendError(DavServletResponse.SC_NOT_FOUND);
             return;
@@ -379,28 +398,28 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         String ticketId = request.getTicketId();
         if (ticketId == null) {
             response.sendError(DavServletResponse.SC_BAD_REQUEST,
-                               "No ticket was specified.");
+                    "No ticket was specified.");
             return;
         }
         Ticket ticket = resource.getTicket(ticketId);
         if (ticket == null) {
             response.sendError(DavServletResponse.SC_PRECONDITION_FAILED,
-                               "The ticket specified does not exist.");
+                    "The ticket specified does not exist.");
             return;
         }
 
         // must either be an admin or the user that created the ticket
-        String loggedInUsername =
-            securityManager.getSecurityContext().getUser().getUsername();
-        if (! (ticket.getOwner().equals(loggedInUsername) ||
-               securityManager.getSecurityContext().isAdmin())) {
+        String loggedInUsername = securityManager.getSecurityContext()
+                .getUser().getUsername();
+        if (!(ticket.getOwner().equals(loggedInUsername) || securityManager
+                .getSecurityContext().isAdmin())) {
             response.sendError(DavServletResponse.SC_FORBIDDEN);
             return;
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("removing ticket " + ticket.getId() + " for resource " +
-                      resource.getResourcePath());
+            log.debug("removing ticket " + ticket.getId() + " for resource "
+                    + resource.getResourcePath());
         }
         resource.removeTicket(ticket);
 
@@ -412,9 +431,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     /**
      */
     protected void generateDirectoryListing(WebdavRequest request,
-                                            WebdavResponse response,
-                                            DavResource resource)
-        throws IOException {
+            WebdavResponse response, DavResource resource) throws IOException {
         CosmoDavRequestImpl cosmoRequest = new CosmoDavRequestImpl(request);
         CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
         CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
@@ -427,20 +444,20 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     }
 
     /**
-     * Looks up the bean with given name and class in the web
-     * application context.
-     *
-     * @param name the bean's name
-     * @param clazz the bean's class
+     * Looks up the bean with given name and class in the web application
+     * context.
+     * 
+     * @param name
+     *            the bean's name
+     * @param clazz
+     *            the bean's class
      */
-    protected Object getBean(String name, Class clazz)
-        throws ServletException {
+    protected Object getBean(String name, Class clazz) throws ServletException {
         try {
             return wac.getBean(name, clazz);
         } catch (BeansException e) {
-            throw new ServletException("Error retrieving bean " + name +
-                                       " of type " + clazz +
-                                       " from web application context", e);
+            throw new ServletException("Error retrieving bean " + name
+                    + " of type " + clazz + " from web application context", e);
         }
     }
 

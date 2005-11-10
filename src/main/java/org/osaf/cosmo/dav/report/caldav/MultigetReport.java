@@ -37,8 +37,8 @@ import org.osaf.cosmo.dav.report.ReportType;
  * <p/> CalDAV specifies the following required format for the request body:
  * 
  * <pre>
- *                     &lt;!ELEMENT calendar-multiget (DAV:allprop | DAV:propname | DAV:prop)?
- *                                    DAV:href+&gt;
+ *                      &lt;!ELEMENT calendar-multiget (DAV:allprop | DAV:propname | DAV:prop)?
+ *                                     DAV:href+&gt;
  * </pre>
  * 
  */
@@ -63,7 +63,8 @@ public class MultigetReport extends AbstractCalendarDataReport {
      *             DAV:expand-property element.
      * @see Report#setInfo(ReportInfo)
      */
-    public void setInfo(ReportInfo info) throws IllegalArgumentException {
+    public void setInfo(ReportInfo info)
+        throws IllegalArgumentException {
         if (info == null
                 || !CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_MULTIGET
                         .equals(info.getReportElement().getName())) {

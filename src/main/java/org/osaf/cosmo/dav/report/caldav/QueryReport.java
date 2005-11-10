@@ -47,8 +47,8 @@ import org.osaf.cosmo.dav.report.ReportType;
  * specifies the following required format for the request body:
  * 
  * <pre>
- *                                        &lt;!ELEMENT calendar-query (DAV:allprop | DAV:propname | DAV:prop)?
- *                                                filter&gt;
+ *    &lt;!ELEMENT calendar-query (DAV:allprop | DAV:propname | DAV:prop)?
+ *                  filter&gt;
  * </pre>
  * 
  */
@@ -75,7 +75,8 @@ public class QueryReport extends AbstractCalendarDataReport {
      *             DAV:expand-property element.
      * @see Report#setInfo(ReportInfo)
      */
-    public void setInfo(ReportInfo info) throws IllegalArgumentException {
+    public void setInfo(ReportInfo info)
+        throws IllegalArgumentException {
         if (info == null
                 || !CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_QUERY.equals(info
                         .getReportElement().getName())) {
@@ -164,7 +165,8 @@ public class QueryReport extends AbstractCalendarDataReport {
      * 
      * @see org.osaf.cosmo.dav.report.caldav.AbstractCalendarDataReport#toXml()
      */
-    public Document toXml() throws DavException {
+    public Document toXml()
+        throws DavException {
         // This is the meaty part of the query report. What wse do here is
         // execute the query and generate the list of hrefs that match. We then
         // hand that off to the base class to complete the actual multi-status
@@ -196,7 +198,8 @@ public class QueryReport extends AbstractCalendarDataReport {
      * @return
      * @throws RepositoryException
      */
-    private Query getQuery() throws RepositoryException {
+    private Query getQuery()
+        throws RepositoryException {
 
         // Create the XPath expression
         String statement = "/jcr:root" + resource.getLocator().getJcrPath();
@@ -223,7 +226,7 @@ public class QueryReport extends AbstractCalendarDataReport {
      * @throws RepositoryException
      */
     private void queryResultToHrefs(QueryResult qResult)
-            throws RepositoryException {
+        throws RepositoryException {
 
         DavResourceLocator locator = resource.getLocator();
 

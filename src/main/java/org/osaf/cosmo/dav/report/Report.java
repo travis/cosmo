@@ -67,5 +67,6 @@ public interface Report {
      *             if an error occurs while running the report or creating the
      *             <code>Document</code>.
      */
-    public Document toXml() throws DavException;
+    public Document toXml()
+        throws DavException;
 }

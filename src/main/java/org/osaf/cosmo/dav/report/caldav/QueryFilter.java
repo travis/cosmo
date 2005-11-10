@@ -50,7 +50,6 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
 public class QueryFilter {
 
     private static HashMap prop2jcr = new HashMap();
-
     private static HashMap param2jcr = new HashMap();
 
     /**
@@ -129,8 +128,7 @@ public class QueryFilter {
         prop2jcr.put("LAST-MODIFIED", JcrConstants.NN_ICAL_LASTMODIFIED);
         prop2jcr.put("LOCATION", JcrConstants.NN_ICAL_LOCATION);
         prop2jcr.put("ORGANIZER", JcrConstants.NN_ICAL_ORGANIZER);
-        prop2jcr.put("PERCENT-COMPLETE",
-                JcrConstants.NN_ICAL_PERCENT_COMPLETE);
+        prop2jcr.put("PERCENT-COMPLETE", JcrConstants.NN_ICAL_PERCENT_COMPLETE);
         prop2jcr.put("PERIOD", JcrConstants.NN_ICAL_PERIOD);
         prop2jcr.put("PRIORITY", JcrConstants.NN_ICAL_PRIORITY);
         prop2jcr.put("RANGE", JcrConstants.NN_ICAL_RANGE);
@@ -199,11 +197,8 @@ public class QueryFilter {
     private class compfilter {
 
         protected String name;
-
         protected boolean isDefined;
-
         protected boolean useTimeRange;
-
         protected Period timeRange;
 
         /**
@@ -352,8 +347,8 @@ public class QueryFilter {
             // element.
             String prop = null;
             if (name.equals("VCALENDAR"))
-                prop = "element(*, "
-                        + JcrConstants.NT_CALDAV_EVENT_RESOURCE + ")";
+                prop = "element(*, " + JcrConstants.NT_CALDAV_EVENT_RESOURCE
+                        + ")";
             else if (Component.VEVENT.equals(name))
                 prop = JcrConstants.NN_ICAL_REVENT;
             else if (Component.VTIMEZONE.equals(name))
@@ -431,17 +426,11 @@ public class QueryFilter {
     private class propfilter {
 
         protected String name;
-
         protected boolean isDefined;
-
         protected boolean useTimeRange;
-
         protected Period timeRange;
-
         protected boolean useTextMatch;
-
         protected String textMatch;
-
         protected boolean isCaseless;
 
         /**
@@ -617,8 +606,8 @@ public class QueryFilter {
                 // surround
                 // our text with *'s to get substring style test.
                 paramChecks.add("jcr:contains(@"
-                        + JcrConstants.NP_ICAL_PROPVALUE + ", '*"
-                        + textMatch + "*')");
+                        + JcrConstants.NP_ICAL_PROPVALUE + ", '*" + textMatch
+                        + "*')");
             }
 
             // Add any parameter filters
@@ -658,13 +647,9 @@ public class QueryFilter {
     private class paramfilter {
 
         protected String name;
-
         protected boolean isDefined;
-
         protected boolean useTextMatch;
-
         protected String textMatch;
-
         protected boolean isCaseless;
 
         /**

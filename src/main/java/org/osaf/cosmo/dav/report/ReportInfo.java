@@ -34,9 +34,7 @@ import org.jdom.Element;
 public class ReportInfo {
 
     private final Element reportElement;
-
     private final int depth;
-
     private final DavSession session;
 
     /**

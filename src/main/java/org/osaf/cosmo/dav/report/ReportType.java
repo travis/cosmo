@@ -38,19 +38,15 @@ import org.osaf.cosmo.dav.report.caldav.QueryReport;
 public class ReportType implements DeltaVConstants {
 
     private static final HashMap types = new HashMap();
-
     public static final ReportType CALDAV_QUERY = register(
             CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_QUERY,
             CosmoDavConstants.NAMESPACE_CALDAV, QueryReport.class);
-
     public static final ReportType CALDAV_MULTIGET = register(
             CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_MULTIGET,
             CosmoDavConstants.NAMESPACE_CALDAV, MultigetReport.class);
 
     private final String name;
-
     private final Namespace namespace;
-
     private final Class reportClass;
 
     /**
@@ -70,7 +66,8 @@ public class ReportType implements DeltaVConstants {
      * @return
      * @throws DavException
      */
-    public Report createReport() throws DavException {
+    public Report createReport()
+        throws DavException {
         try {
             return (Report) reportClass.getConstructor(new Class[0])
                     .newInstance(new Object[0]);
@@ -122,8 +119,9 @@ public class ReportType implements DeltaVConstants {
      *             class does not implement the {@link Report} interface or if
      *             it does not provide an empty constructor.
      */
-    public static ReportType register(String name, Namespace namespace,
-            Class reportClass) {
+    public static ReportType register(String name,
+                                      Namespace namespace,
+                                      Class reportClass) {
         if (name == null || namespace == null || reportClass == null) {
             throw new IllegalArgumentException(
                     "A ReportType cannot be registered with a null name, namespace or report class");

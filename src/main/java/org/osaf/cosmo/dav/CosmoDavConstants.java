@@ -19,8 +19,9 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.jdom.Namespace;
 
 /**
- * Provides constants for request and response headers, XML elements and
- * property names defined by the WebDAV extensions implemented by Cosmo.
+ * Provides constants for request and response headers, XML elements
+ * and property names defined by the WebDAV extensions implemented by
+ * Cosmo.
  */
 public class CosmoDavConstants {
 
@@ -39,66 +40,43 @@ public class CosmoDavConstants {
     // XML namespaces
 
     // defined by Xythos
-    public static final Namespace NAMESPACE_TICKET = Namespace.getNamespace(
-            "ticket", "http://www.xythos.com/namespaces/StorageServer");
-
-    public static final Namespace NAMESPACE_CALDAV = Namespace.getNamespace(
-            "C", "urn:ietf:params:xml:ns:caldav");
+    public static final Namespace NAMESPACE_TICKET =
+        Namespace.getNamespace("ticket", "http://www.xythos.com/namespaces/StorageServer");
+    public static final Namespace NAMESPACE_CALDAV =
+        Namespace.getNamespace("C", "urn:ietf:params:xml:ns:caldav");
 
     // XML elements
 
     public static final String ELEMENT_PROP = "prop";
-
     public static final String ELEMENT_TICKETINFO = "ticketinfo";
-
     public static final String ELEMENT_ID = "id";
-
     public static final String ELEMENT_OWNER = "owner";
-
     public static final String ELEMENT_HREF = "href";
-
     public static final String ELEMENT_TIMEOUT = "timeout";
-
     public static final String ELEMENT_VISITS = "visits";
-
     public static final String ELEMENT_PRIVILEGE = "privilege";
-
     public static final String ELEMENT_READ = "read";
-
     public static final String ELEMENT_WRITE = "write";
 
     public static final String ELEMENT_CALDAV_CALENDAR_HOME = "calendar-home";
-
     public static final String ELEMENT_CALDAV_CALENDAR = "calendar";
-
     public static final String ELEMENT_CALDAV_COMP = "comp";
-
-    public static final String ELEMENT_CALDAV_CALENDAR_DATA_ONLY = "calendar-data-only";
-
+    public static final String ELEMENT_CALDAV_CALENDAR_DATA_ONLY =
+        "calendar-data-only";
     public static final String ELEMENT_CALDAV_CALENDAR_DATA = "calendar-data";
-
     public static final String ELEMENT_CALDAV_ALLCOMP = "allcomp";
-
     public static final String ELEMENT_CALDAV_ALLPROP = "allprop";
-
     public static final String ELEMENT_CALDAV_PROP = "prop";
-
-    public static final String ELEMENT_CALDAV_EXPAND_RECURRENCE_SET = "expand-recurrence-set";
-
-    public static final String ELEMENT_CALDAV_LIMIT_RECURRENCE_SET = "limit-recurrence-set";
-
+    public static final String ELEMENT_CALDAV_EXPAND_RECURRENCE_SET =
+        "expand-recurrence-set";
+    public static final String ELEMENT_CALDAV_LIMIT_RECURRENCE_SET =
+        "limit-recurrence-set";
     public static final String ELEMENT_CALDAV_FILTER = "filter";
-
     public static final String ELEMENT_CALDAV_COMP_FILTER = "comp-filter";
-
     public static final String ELEMENT_CALDAV_PROP_FILTER = "prop-filter";
-
     public static final String ELEMENT_CALDAV_PARAM_FILTER = "param-filter";
-
     public static final String ELEMENT_CALDAV_IS_DEFINED = "is-defined";
-
     public static final String ELEMENT_CALDAV_TIME_RANGE = "time-range";
-
     public static final String ELEMENT_CALDAV_TEXT_MATCH = "text-match";
 
     // XML attributes
@@ -106,55 +84,50 @@ public class CosmoDavConstants {
     public static final String ATTR_XML_LANG = "lang";
 
     public static final String ATTR_CALDAV_NAME = "name";
-
     public static final String ATTR_CALDAV_CONTENT_TYPE = "content-type";
-
     public static final String ATTR_CALDAV_VERSION = "version";
-
     public static final String ATTR_CALDAV_NOVALUE = "novalue";
-
     public static final String ATTR_CALDAV_CASELESS = "caseless";
-
     public static final String ATTR_CALDAV_START = "start";
-
     public static final String ATTR_CALDAV_END = "end";
 
     // XML values
 
     public static final String VALUE_INFINITE = "Infinite";
-
     public static final String VALUE_INFINITY = "infinity";
-
     public static final String VALUE_YES = "yes";
-
     public static final String VALUE_NO = "no";
 
     // ACL privileges
 
     public static final String PRIVILEGE_READ = "read";
-
     public static final String PRIVILEGE_WRITE = "write";
 
     // caldav properties
-    public static final String PROPERTY_CALDAV_CALENDAR_DESCRIPTION = "calendar-description";
 
-    public static final String PROPERTY_CALDAV_CALENDAR_COMPONENT_RESTRICTION_SET = "calendar-component-restriction-set";
-
-    public static final String PROPERTY_CALDAV_CALENDAR_RESTRICTIONS = "calendar-restrictions";
+    public static final String PROPERTY_CALDAV_CALENDAR_DESCRIPTION =
+        "calendar-description";
+    public static final String PROPERTY_CALDAV_CALENDAR_COMPONENT_RESTRICTION_SET =
+        "calendar-component-restriction-set";
+    public static final String PROPERTY_CALDAV_CALENDAR_RESTRICTIONS =
+        "calendar-restrictions";
 
     // caldav reports
-    public static final String ELEMENT_CALDAV_CALENDAR_MULTIGET = "calendar-multiget";
 
-    public static final String ELEMENT_CALDAV_CALENDAR_QUERY = "calendar-query";
-
+    public static final String ELEMENT_CALDAV_CALENDAR_MULTIGET =
+        "calendar-multiget";
+    public static final String ELEMENT_CALDAV_CALENDAR_QUERY =
+        "calendar-query";
     public static final DavPropertyName CALENDARDATA = DavPropertyName.create(
             ELEMENT_CALDAV_CALENDAR_DATA, NAMESPACE_CALDAV);
 
     // ticket properties
 
-    public static final String PROPERTY_TICKET_TICKETDISCOVERY = "ticketdiscovery";
+    public static final String PROPERTY_TICKET_TICKETDISCOVERY =
+        "ticketdiscovery";
 
     // caldav content types
 
-    public static final String CONTENT_TYPE_CALENDAR_COLLECTION = "application/x-calendar-collection";
+    public static final String CONTENT_TYPE_CALENDAR_COLLECTION =
+        "application/x-calendar-collection";
 }

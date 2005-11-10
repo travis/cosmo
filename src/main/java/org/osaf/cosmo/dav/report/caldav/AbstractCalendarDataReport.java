@@ -55,19 +55,12 @@ public abstract class AbstractCalendarDataReport implements Report,
         DavConstants {
 
     protected DavResource resource;
-
     protected ReportInfo info;
-
     protected int propfindType = PROPFIND_ALL_PROP;
-
     protected DavPropertyNameSet propfindProps;
-
     protected List hrefs;
-
     protected boolean hasOldStyleCalendarData;
-
     protected Element calendarDataElement;
-
     protected OutputFilter outputFilter;
 
     /**
@@ -79,7 +72,7 @@ public abstract class AbstractCalendarDataReport implements Report,
      * @see Report#setResource(org.apache.jackrabbit.webdav.version.DavResource)
      */
     public void setResource(DavResource resource)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
         if (resource == null) {
             throw new IllegalArgumentException(
                     "The resource specified must not be null.");
@@ -95,7 +88,8 @@ public abstract class AbstractCalendarDataReport implements Report,
      * @throws DavException
      * @see Report#toXml()
      */
-    public Document toXml() throws DavException {
+    public Document toXml()
+        throws DavException {
         if (info == null || resource == null) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Error while running CALDAV:"
@@ -162,7 +156,7 @@ public abstract class AbstractCalendarDataReport implements Report,
      * @see #getResponse(DavResource, List)
      */
     protected void buildMultiStatus(DavResource res, MultiStatus ms)
-            throws DavException {
+        throws DavException {
 
         // Generate response
         CalDAVMultiStatusResponse response = new CalDAVMultiStatusResponse(res,

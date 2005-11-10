@@ -35,7 +35,8 @@ public class CalDAVMultiStatusResponse extends MultiStatusResponse {
     private boolean oldStyle;
 
     public CalDAVMultiStatusResponse(DavResource resource,
-            DavPropertyNameSet propNameSet, int propFindType) {
+                                     DavPropertyNameSet propNameSet,
+                                     int propFindType) {
         super(resource, propNameSet, propFindType);
     }
 

@@ -33,10 +33,10 @@ import org.jdom.Element;
  * reports that are supported by the given resource.
  * 
  * <pre>
- *   &lt;!ELEMENT supported-report-set (supported-report*)&gt;
- *   &lt;!ELEMENT supported-report report&gt;
- *   &lt;!ELEMENT report ANY&gt;
- *   ANY value: a report element type
+ *    &lt;!ELEMENT supported-report-set (supported-report*)&gt;
+ *    &lt;!ELEMENT supported-report report&gt;
+ *    &lt;!ELEMENT report ANY&gt;
+ *    ANY value: a report element type
  * </pre>
  */
 public class SupportedReportSetProperty extends AbstractDavProperty {

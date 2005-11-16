@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.jackrabbit.core.query.lucene.TextFilterFactory;
 import org.apache.jackrabbit.j2ee.SimpleWebdavServlet;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
@@ -49,6 +50,7 @@ import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.query.TextCalendarTextFilter;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import org.springframework.beans.BeansException;
@@ -109,6 +111,10 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         CosmoDavLocatorFactoryImpl locatorFactory =
             new CosmoDavLocatorFactoryImpl(getPathPrefix());
         setLocatorFactory(locatorFactory);
+
+        // Add our special text/calendar data indexer to the list of data
+        // indexers used by Jackrabbit
+        TextFilterFactory.addTextFilter(new TextCalendarTextFilter());
     }
 
 

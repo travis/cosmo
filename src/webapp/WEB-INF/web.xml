@@ -54,6 +54,11 @@
       org.osaf.cosmo.ui.config.ConfigurationListener
     </listener-class>
   </listener>
+  <listener>
+    <listener-class>
+      org.osaf.cosmo.jackrabbit.query.TextFilterListener
+    </listener-class>
+  </listener>
   <filter>
     <filter-name>jcr-session</filter-name>
     <filter-class>org.springmodules.jcr.support.OpenSessionInViewFilter</filter-class>

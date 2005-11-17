@@ -26,8 +26,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.context.security.SecureContext;
-import net.sf.acegisecurity.context.security.SecureContextUtils;
+import net.sf.acegisecurity.context.SecurityContext;
+import net.sf.acegisecurity.context.SecurityContextHolder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,7 +71,7 @@ public class TicketProcessingFilter implements Filter {
                          ServletResponse response,
                          FilterChain chain)
         throws IOException, ServletException {
-        SecureContext sc = SecureContextUtils.getSecureContext();
+        SecurityContext sc = SecurityContextHolder.getContext();
         if (sc.getAuthentication() == null) {
             if (request instanceof HttpServletRequest) {
                 HttpServletRequest httpRequest = (HttpServletRequest) request;

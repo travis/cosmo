@@ -22,8 +22,8 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationException;
 import net.sf.acegisecurity.AuthenticationManager;
-import net.sf.acegisecurity.context.security.SecureContext;
-import net.sf.acegisecurity.context.security.SecureContextUtils;
+import net.sf.acegisecurity.context.SecurityContext;
+import net.sf.acegisecurity.context.SecurityContextHolder;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
 import org.apache.commons.logging.Log;
@@ -49,11 +49,11 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
      */
     public CosmoSecurityContext getSecurityContext()
         throws CosmoSecurityException {
-        SecureContext context = SecureContextUtils.getSecureContext();
+        SecurityContext context = SecurityContextHolder.getContext();
         Authentication authen = context.getAuthentication();
         if (authen == null) {
             throw new CosmoSecurityException("no Authentication found in " +
-                                             "SecureContext");
+                                             "SecurityContext");
         }
 
         return createSecurityContext(authen);
@@ -74,7 +74,7 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
                 new UsernamePasswordAuthenticationToken(username, password);
             Authentication authentication =
                 authenticationManager.authenticate(credentials);
-            SecureContext sc = SecureContextUtils.getSecureContext();
+            SecurityContext sc = SecurityContextHolder.getContext();
             sc.setAuthentication(authentication);
             return createSecurityContext(authentication);
         } catch (AuthenticationException e) {

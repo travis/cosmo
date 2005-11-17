@@ -55,15 +55,6 @@ HasOrderableChildNodes
   false
 PrimaryItemName
   null
-ChildNodeDef
-  Name icalendar:calendar
-  RequiredPrimaryTypes [icalendar:calendar]
-  DefaultPrimaryType icalendar:calendar
-  AutoCreate false
-  Mandatory false
-  OnParentVersion VERSION
-  Protected false
-  SameNamedSibs false
 PropertyDef
   Name caldav:calendar-description
   RequiredType STRING
@@ -94,7 +85,7 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 PropertyDef
-  Name icalendar:uid
+  Name caldav:uid
   RequiredType STRING
   DefaultValues null
   AutoCreate false
@@ -102,44 +93,6 @@ PropertyDef
   OnParentVersion COPY
   Protected false
   Multiple false
-
-NodeTypeName
-  caldav:eventresource
-SuperTypes
-  caldav:resource
-IsMixin
-  true
-HasOrderableChildNodes
-  false
-PrimaryItemName
-  null
-ChildNodeDef
-  Name icalendar:revent
-  RequiredPrimaryTypes [icalendar:event]
-  DefaultPrimaryType icalendar:event
-  AutoCreate false
-  Mandatory true
-  OnParentVersion VERSION
-  Protected false
-  SameNamedSibs false
-ChildNodeDef
-  Name icalendar:exevent
-  RequiredPrimaryTypes [icalendar:event]
-  DefaultPrimaryType icalendar:event
-  AutoCreate false
-  Mandatory false
-  OnParentVersion VERSION
-  Protected false
-  SameNamedSibs true
-ChildNodeDef
-  Name icalendar:timezone
-  RequiredPrimaryTypes [icalendar:timezone]
-  DefaultPrimaryType icalendar:timezone
-  AutoCreate false
-  Mandatory false
-  OnParentVersion VERSION
-  Protected false
-  SameNamedSibs true
 
 
 Copyright 2005 Open Source Applications Foundation

@@ -50,7 +50,7 @@
     <dependency>
       <groupId>acegisecurity</groupId>
       <artifactId>acegi-security</artifactId>
-      <version>0.8.2</version>
+      <version>0.9.0</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -154,10 +154,18 @@
     </dependency>
     <dependency>
       <groupId>ical4j</groupId>
-      <artifactId>ical4j</artifactId>
+      <artifactId>ical4j-osaf</artifactId>
       <version>0.9.17</version>
       <properties>
         <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>10.1.1.0</version>
+      <properties>
+        <tomcat.bundle>true</tomcat.bundle>
       </properties>
     </dependency>
     <dependency>

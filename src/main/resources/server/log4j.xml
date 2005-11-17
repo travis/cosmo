@@ -45,18 +45,6 @@
     <level value="WARN"/>
   </logger>
 
-  <logger name="org.apache.jackrabbit.webdav">
-    <level value="DEBUG"/>
-  </logger>
-
-  <logger name="org.apache.jackrabbit.webdav.header.IfHeader">
-    <level value="WARN"/>
-  </logger>
-
-  <logger name="org.apache.jackrabbit.server">
-    <level value="DEBUG"/>
-  </logger>
-
   <logger name="org.apache.catalina.startup.Catalina">
     <level value="INFO"/>
   </logger>
@@ -66,7 +54,7 @@
   </logger>
 
   <logger name="org.osaf">
-    <level value="DEBUG"/>
+    <level value="WARN"/>
   </logger>
 
   <logger name="org.tuckey">

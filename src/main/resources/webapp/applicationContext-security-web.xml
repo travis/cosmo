@@ -46,6 +46,7 @@
          /account/update.do=ROLE_ROOT,ROLE_USER
          /forgot=ROLE_ANONYMOUS
          /about=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /help=ROLE_ROOT,ROLE_USER
          /remind.do=ROLE_ANONYMOUS
          /login=ROLE_ANONYMOUS
          /loginfailed=ROLE_ANONYMOUS
@@ -76,7 +77,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=httpSessionContextIntegrationFilter,formBasedProcessingFilter,anonymousProcessingFilter,uiSecurityEnforcementFilter
+        /**=httpSessionContextIntegrationFilterWithASCTrue,formBasedProcessingFilter,anonymousProcessingFilter,uiSecurityEnforcementFilter
       </value>
     </property>
   </bean>
@@ -87,7 +88,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=httpSessionContextIntegrationFilter,ticketProcessingFilter,basicProcessingFilter,davSecurityEnforcementFilter
+        /**=httpSessionContextIntegrationFilterWithASCFalse,ticketProcessingFilter,basicProcessingFilter,davSecurityEnforcementFilter
       </value>
     </property>
   </bean>
@@ -98,7 +99,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=httpSessionContextIntegrationFilter,basicProcessingFilter,cmpSecurityEnforcementFilter
+        /**=httpSessionContextIntegrationFilterWithASCFalse,basicProcessingFilter,cmpSecurityEnforcementFilter
       </value>
     </property>
   </bean>
@@ -131,12 +132,19 @@
     </property>
   </bean>
 
-  <!-- filter that integrates SecureContext into HTTP Session -->
+  <!-- filters that integrate SecurityContext into HTTP Session -->
 
-  <bean id="httpSessionContextIntegrationFilter"
+  <bean id="httpSessionContextIntegrationFilterWithASCTrue"
         class="net.sf.acegisecurity.context.HttpSessionContextIntegrationFilter">
-    <property name="context">
-      <value>net.sf.acegisecurity.context.security.SecureContextImpl</value>
+    <property name="allowSessionCreation">
+      <value>true</value>
+    </property>
+  </bean>
+
+  <bean id="httpSessionContextIntegrationFilterWithASCFalse"
+        class="net.sf.acegisecurity.context.HttpSessionContextIntegrationFilter">
+    <property name="allowSessionCreation">
+      <value>false</value>
     </property>
   </bean>
 

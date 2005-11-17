@@ -32,11 +32,4 @@ public interface ICalendarConstants {
     /**
      */
     public static final String FILE_EXTENSION = "ics";
-
-    /**
-     */
-    public static final String COMP_STANDARD = "STANDARD";
-    /**
-     */
-    public static final String COMP_DAYLIGHT = "DAYLIGHT";
 }

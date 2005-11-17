@@ -81,7 +81,7 @@ public class QueryFilter {
         // Look at elements that are event resources and look in the content
         // node
         // of those resources for indexed data
-        String path = "/element(*, " + JcrConstants.NT_CALDAV_EVENT_RESOURCE
+        String path = "/element(*, " + JcrConstants.NT_CALDAV_RESOURCE
                 + ")/" + JcrConstants.NN_JCR_CONTENT + "[";
 
         // Generate a list of terms to use in the XPath expression

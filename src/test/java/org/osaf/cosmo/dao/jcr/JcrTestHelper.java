@@ -243,36 +243,6 @@ public class JcrTestHelper extends TestHelper
 
     /**
      */
-    public Calendar makeAndStoreDummyCalendar(Node node)
-        throws RepositoryException {
-        Calendar calendar = makeDummyCalendarWithEvent();
-
-        JcrCalendarMapper.calendarToNode(calendar, node);
-
-        return calendar;
-    }
-
-    /**
-     */
-    public Calendar makeAndStoreDummyCaldavCalendar(Node collection)
-        throws RepositoryException {
-        Calendar calendar = makeDummyCalendarWithEvent();
-
-        Node resource = addCalendarResourceNode(collection, calendar);
-        JcrCalendarMapper.calendarToNode(calendar, resource);
-
-        return calendar;
-    }
-
-    /**
-     */
-    public Calendar findDummyCalendar(Node node)
-        throws RepositoryException {
-        return JcrCalendarMapper.nodeToCalendar(node);
-    }
-
-    /**
-     */
     public Calendar loadCalendar(String name)
         throws Exception {
         InputStream in = getClass().getClassLoader().getResourceAsStream(name);

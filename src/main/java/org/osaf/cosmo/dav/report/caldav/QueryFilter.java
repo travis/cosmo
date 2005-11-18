@@ -40,7 +40,7 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
  * 
  */
 
-public class QueryFilter {
+public class QueryFilter implements JcrConstants {
 
     /**
      * The parsed top-level filter object.
@@ -81,8 +81,8 @@ public class QueryFilter {
         // Look at elements that are event resources and look in the content
         // node
         // of those resources for indexed data
-        String path = "/element(*, " + JcrConstants.NT_CALDAV_RESOURCE
-                + ")/" + JcrConstants.NN_JCR_CONTENT + "[";
+        String path = "/element(*, " + NT_CALDAV_RESOURCE + ")/"
+                + NN_JCR_CONTENT + "[";
 
         // Generate a list of terms to use in the XPath expression
         Vector tests = new Vector();
@@ -439,7 +439,6 @@ public class QueryFilter {
 
             return true;
         }
-
 
         /**
          * Generate an XPath element for testing components.

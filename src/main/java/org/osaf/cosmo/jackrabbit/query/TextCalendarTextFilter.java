@@ -152,10 +152,9 @@ public class TextCalendarTextFilter implements TextFilter {
                 List result = new Vector();
                 while (tokenizer.hasMoreTokens()) {
 
-                    String fullkey = fullprefix
-                            + tokenizer.nextToken().toLowerCase();
-                    String propkey = propprefix
-                            + tokenizer.nextToken().toLowerCase();
+                    String key = tokenizer.nextToken().toLowerCase();
+                    String fullkey = fullprefix + key;
+                    String propkey = propprefix + key;
                     String value = tokenizer.nextToken();
 
                     // Add the field for the actual data

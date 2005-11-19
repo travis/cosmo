@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -31,7 +32,12 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.jackrabbit.core.query.TextFilter;
 import org.apache.jackrabbit.core.query.lucene.FieldNames;
@@ -54,6 +60,10 @@ import org.apache.jackrabbit.core.value.InternalValue;
  * and then split into key/value pairs, and the key becomes the indexer field.
  */
 public class TextCalendarTextFilter implements TextFilter {
+
+    static final public String TIME_RANGE_FIELD_SUFFIX = "--TIMERANGE";
+    static final public String TIME_RANGE_FIELD_SUFFIX_LOWERCASE = TIME_RANGE_FIELD_SUFFIX
+            .toLowerCase();
 
     /**
      * Returns <code>true</code> for <code>text/calendar</code>;
@@ -102,10 +112,11 @@ public class TextCalendarTextFilter implements TextFilter {
 
                 // Parse the calendar data into an iCalendar object, then write
                 // it out in the 'flat' format
+                Calendar calendar;
                 String calendarData = "";
                 try {
                     CalendarBuilder builder = new CalendarBuilder();
-                    Calendar calendar = builder.build(reader);
+                    calendar = builder.build(reader);
 
                     // Write the calendar object back using the flat format
                     StringWriter out = new StringWriter();
@@ -167,6 +178,10 @@ public class TextCalendarTextFilter implements TextFilter {
                             FieldNames.PROPERTIES,
                             propkey + '\uFFFF' + "begin", false));
                 }
+
+                // Now do time range indexing
+                doTimeRange(calendar, prefix, result);
+
                 return result;
             } catch (UnsupportedEncodingException e) {
                 throw new RepositoryException(e);
@@ -176,5 +191,60 @@ public class TextCalendarTextFilter implements TextFilter {
             throw new RepositoryException(
                     "Multi-valued binary properties not supported.");
         }
+    }
+
+    private void doTimeRange(Calendar calendar, String prefix, List result) {
+
+        // TODO For now we just index a single start/end for each component,
+        // ignoring recurrence
+
+        String flatPrefix = prefix + ":" + FieldNames.FULLTEXT_PREFIX
+                + "VCALENDAR-".toLowerCase();
+
+        // Look at each VEVENT/VTODO/VJOURNAL/VALARM
+        for (Iterator iter = calendar.getComponents().iterator(); iter
+                .hasNext();) {
+            Component comp = (Component) iter.next();
+            if (comp instanceof VEvent) {
+                VEvent vcomp = (VEvent) comp;
+                String key = flatPrefix + "vevent"
+                        + TIME_RANGE_FIELD_SUFFIX_LOWERCASE;
+
+                // Get start/end normalised to UTC
+                DateTime start = normaliseDateTime((Date) vcomp.getStartDate()
+                        .getDate());
+                DateTime end = normaliseDateTime((Date) vcomp.getEndDate()
+                        .getDate());
+
+                Period period = new Period(start, end);
+                String textPeriod = period.toString();
+
+                // Add the field for the actual data
+                result.add(new TextFilter.TextFilterIndexString(key,
+                        textPeriod, false));
+            }
+            // TODO Handle other components
+        }
+    }
+
+    /**
+     * Convert a Date/DateTime into a DateTime specified in UTC.
+     * 
+     * @param date
+     * @return
+     */
+    private DateTime normaliseDateTime(Date date) {
+
+        DateTime dt = new DateTime(date);
+
+        if (date instanceof DateTime) {
+
+            // Convert it to UTC
+            if (!dt.isUtc()) {
+                dt.setUtc(true);
+            }
+        }
+
+        return dt;
     }
 }

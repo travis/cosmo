@@ -18,28 +18,37 @@ package org.osaf.cosmo.jackrabbit.query;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.jackrabbit.core.query.QueryTreeBuilderRegistry;
 import org.apache.jackrabbit.core.query.lucene.TextFilterFactory;
 
 /**
  * @author cyrusdaboo
- *
+ * 
  * Initialises the required text filters on webapp startup.
  * 
  */
 public class TextFilterListener implements ServletContextListener {
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent arg0) {
- 
+
         // Add our special text/calendar data indexer to the list of data
         // indexers used by Jackrabbit
         TextFilterFactory.addTextFilter(new TextCalendarTextFilter());
 
+        // Add our extended XPath query builder to Jabkrabbit.
+        QueryTreeBuilderRegistry.addBuilder(
+                XPathTimeRangeQueryBuilder.XPATH_TIMERANGE,
+                new TimeRangeQueryBuilder());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent arg0) {

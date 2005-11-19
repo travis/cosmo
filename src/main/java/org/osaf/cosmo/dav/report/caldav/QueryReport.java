@@ -37,6 +37,7 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.dav.report.ReportType;
+import org.osaf.cosmo.jackrabbit.query.XPathTimeRangeQueryBuilder;
 
 /**
  * @author cyrusdaboo
@@ -208,7 +209,7 @@ public class QueryReport extends AbstractCalendarDataReport {
         // Now create an XPath query
         QueryManager qMgr = info.getSession().getRepositorySession()
                 .getWorkspace().getQueryManager();
-        Query result = qMgr.createQuery(statement, Query.XPATH);
+        Query result = qMgr.createQuery(statement, XPathTimeRangeQueryBuilder.XPATH_TIMERANGE);
 
         return result;
     }

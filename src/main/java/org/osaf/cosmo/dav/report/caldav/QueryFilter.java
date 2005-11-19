@@ -26,6 +26,7 @@ import net.fortuna.ical4j.model.Period;
 import org.jdom.Element;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
+import org.osaf.cosmo.jackrabbit.query.TextCalendarTextFilter;
 
 /**
  * @author cyrusdaboo
@@ -103,7 +104,13 @@ public class QueryFilter implements JcrConstants {
             // iCal value, if the value is null we are checking for the presence
             // (is-defined) of an iCal property of parameter
             if (value != null) {
-                path += "jcr:contains(@" + parameter + ", '" + value + "')";
+                // For period test the parameter name will include the special value
+                if (parameter.indexOf(TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE) == -1) {
+                    path += "jcr:contains(@" + parameter + ", '" + value + "')";
+                } else {
+                    path += "jcr:timerange(@" + parameter + ", '" + value
+                            + "')";
+                }
             } else {
                 path += "@" + parameter;
             }
@@ -279,8 +286,9 @@ public class QueryFilter implements JcrConstants {
                 }
             } else if (useTimeRange) {
                 // Always add time-range as a separate test
-
-                // TODO Do time range tests
+                result.add(myprefix
+                        + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE);
+                result.add(timeRange.toString());
             }
 
             // For each sub-component and property test, generate more tests

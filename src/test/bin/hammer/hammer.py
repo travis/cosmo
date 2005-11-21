@@ -26,8 +26,8 @@ Executes stress tests the WebDAV portion of Cosmo.
 Usage: python hammer.py [options]
 
 Options:
-  -t        use specified number of threads (default is 10)
-  -i        specify number of GET/PUTs to do on each thread (default is 100)
+  -t        number of threads to deploy (default is 10)
+  -i        number of GET/PUTs to do on each thread (default is 100)
   -s        servername (default is cosmo-test.osafoundation.org)
   -p        port (default is 8201)
   -l        size of datafile to GET/PUT in bytes (default is 10000)
@@ -41,16 +41,23 @@ Examples:
   hammer.py -p 80 runs default test on port 80
 
 Tip:
-  Use createaccounts.py to setup a batch of test accounts before running
+  Use createaccounts.py to set up a batch of test accounts before running
   this script.
   
 """
 
 from threading import Thread
+from threading import Lock
 import pycurl
 import sys, getopt, time
 import string, random
 
+def LogEvent(*attr):
+    s = "\t".join(attr)
+    outputLock.acquire()
+    print "%s\t%s" % (time.strftime("%m/%d/%Y %H:%M:%S"), s)
+    outputLock.release()
+    
 class TestCosmo(Thread):
     def __init__(self, url, datalength, iterations, timeout):
         Thread.__init__(self)
@@ -84,13 +91,14 @@ class TestCosmo(Thread):
         try:
             start = time.clock()
             curl.perform()
-            print "PUT: %.3f" % (time.clock() - start)
+            LogEvent("PUT", "%.3f" % (time.clock() - start))
+            
         except:
             exctype, value = sys.exc_info()[:2]
             if exctype == pycurl.error:
-                print "ERROR in PUT: %s" % value[1]
+                LogEvent("PUT ERROR", value[1])
             else:
-                print "ERROR in PUT: %s: %s" % (str(exctype), str(value))
+                LogEvent("PUT ERROR", str(exctype), str(value))
             return False
         curl.close()
         return True
@@ -104,13 +112,13 @@ class TestCosmo(Thread):
         try:
             start = time.clock()
             curl.perform()
-            print "GET: %.3f" % (time.clock() - start)
+            LogEvent("GET", "%.3f" % (time.clock() - start))
         except:
             exctype, value = sys.exc_info()[:2]
             if exctype == pycurl.error:
-                print "ERROR in GET: %s" % value[1]
+                LogEvent("GET ERROR", value[1])
             else:
-                print "ERROR in GET: %s: %s" % (str(exctype), str(value))
+                LogEvent("GET ERROR", str(exctype), str(value))
             return False
         curl.close()
         return True
@@ -179,8 +187,10 @@ def main(argv):
     except ImportError:
         pass
 
-    print "[%s] Starting test..." % time.ctime()
-    print "Running %d threads through %d iterations. File length is %d." % (threads, iterations, datalength)
+    global outputLock
+    outputLock = Lock()
+    
+    LogEvent("Starting test with %d threads, %d iterations, %d bytes per file" % (threads, iterations, datalength))
 
     startTime = time.time()    
 
@@ -210,14 +220,16 @@ def main(argv):
 
     elapsedTime = endTime - startTime
     dataTransfered = iterations * threads * datalength * 2 / 1024
-    print ""
-    if failed: print "*** WARNING: %d tests of %d failed, %d passed." % (failed, threads, threads-failed)
-    print "Total Elapsed Time: %d seconds" % elapsedTime
-    print "Total data transfered: %d KB" % dataTransfered
-    print "Throughput: %d KB/sec" % (dataTransfered / elapsedTime)
+
+    if failed: LogEvent("** WARNING: %d tests failed" % failed)
+    LogEvent("%d tests passed" % (threads-failed))
+    LogEvent("Success rate is %d%%" % ((threads-failed) / threads * 100))
+    LogEvent("Total Elapsed Time: %d seconds" % elapsedTime)
+    LogEvent("Total data transfered: %d KB" % dataTransfered)
+    LogEvent("Throughput: %d KB/sec" % (dataTransfered / elapsedTime))
     
-    print "Ran %d threads through %d iterations." % (threads, iterations)
-    print "[%s] Test completed: %s." % (time.ctime(), sf)
+    LogEvent("Ran %d threads through %d iterations." % (threads, iterations))
+    LogEvent("Test completed: %s." % sf)
 
     if failed: sys.exit(2)    
         

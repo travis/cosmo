@@ -24,7 +24,7 @@ import org.apache.jackrabbit.core.query.lucene.TextFilterFactory;
 /**
  * @author cyrusdaboo
  * 
- * Initialises the required text filters on webapp startup.
+ * Initialises the required text filters and custom queries on webapp startup.
  * 
  */
 public class TextFilterListener implements ServletContextListener {

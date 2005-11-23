@@ -28,10 +28,8 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
  * 
  * This class extends the jackrabbit MultiStatusResponse by adding the ability
  * to return a calendar-data elements as needed by some CalDAV reports.
- * 
- * TODO Update to latest CalDAV draft approach of including calendar-data inside
- * of propstat.
  */
+
 public class CalDAVMultiStatusResponse extends MultiStatusResponse {
 
     /**

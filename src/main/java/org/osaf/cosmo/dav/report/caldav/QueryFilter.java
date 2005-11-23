@@ -472,8 +472,9 @@ public class QueryFilter implements JcrConstants {
                 }
             } else if (useTimeRange) {
                 // Always add time-range as a separate test
-
-                // TODO Do time range tests
+                result.add(myprefix
+                        + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE);
+                result.add(timeRange.toString());
             } else if (useTextMatch) {
                 // Always add time-range as a separate test
                 result.add(myprefix);

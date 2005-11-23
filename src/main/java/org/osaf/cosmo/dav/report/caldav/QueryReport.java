@@ -29,6 +29,7 @@ import javax.jcr.query.RowIterator;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
+import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.jdom.Document;
@@ -48,8 +49,8 @@ import org.osaf.cosmo.jackrabbit.query.XPathTimeRangeQueryBuilder;
  * specifies the following required format for the request body:
  * 
  * <pre>
- *    &lt;!ELEMENT calendar-query (DAV:allprop | DAV:propname | DAV:prop)?
- *                  filter&gt;
+ *     &lt;!ELEMENT calendar-query (DAV:allprop | DAV:propname | DAV:prop)?
+ *                   filter&gt;
  * </pre>
  * 
  */
@@ -153,8 +154,9 @@ public class QueryReport extends AbstractCalendarDataReport {
 
             } else if (CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA
                     .equals(nodeName)) {
-                // TODO this is the old-style calendar-data location. We need to
-                // change calendar-data to being a property.
+                // TODO this is the old-style calendar-data location. Eventually
+                // the option to handle this will go away as old-style clients
+                // are updated.
                 hasOldStyleCalendarData = true;
                 calendarDataElement = child;
             }
@@ -185,8 +187,9 @@ public class QueryReport extends AbstractCalendarDataReport {
             queryResultToHrefs(qR);
 
         } catch (RepositoryException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Error while running CALDAV:"
+                            + info.getReportElement().getName() + " report");
         }
 
         // Hand off to parent with list of matching hrefs now complete
@@ -209,7 +212,8 @@ public class QueryReport extends AbstractCalendarDataReport {
         // Now create an XPath query
         QueryManager qMgr = info.getSession().getRepositorySession()
                 .getWorkspace().getQueryManager();
-        Query result = qMgr.createQuery(statement, XPathTimeRangeQueryBuilder.XPATH_TIMERANGE);
+        Query result = qMgr.createQuery(statement,
+                XPathTimeRangeQueryBuilder.XPATH_TIMERANGE);
 
         return result;
     }

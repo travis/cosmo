@@ -37,8 +37,8 @@ import org.osaf.cosmo.dav.report.ReportType;
  * <p/> CalDAV specifies the following required format for the request body:
  * 
  * <pre>
- *                      &lt;!ELEMENT calendar-multiget (DAV:allprop | DAV:propname | DAV:prop)?
- *                                     DAV:href+&gt;
+ *                       &lt;!ELEMENT calendar-multiget (DAV:allprop | DAV:propname | DAV:prop)?
+ *                                      DAV:href+&gt;
  * </pre>
  * 
  */
@@ -130,10 +130,11 @@ public class MultigetReport extends AbstractCalendarDataReport {
             } else if (XML_HREF.equals(nodeName)) {
                 hrefs.add(child.getText());
 
-                // TODO this is the old-style calendar-data location. We need to
-                // change calendar-data to being a property.
             } else if (CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA
                     .equals(nodeName)) {
+                // TODO this is the old-style calendar-data location. Eventually
+                // the option to handle this will go away as old-style clients
+                // are updated.
                 hasOldStyleCalendarData = true;
                 calendarDataElement = child;
             }

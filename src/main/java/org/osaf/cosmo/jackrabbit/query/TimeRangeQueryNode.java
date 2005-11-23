@@ -1,13 +1,12 @@
 /*
- * Copyright 2004-2005 The Apache Software Foundation or its licensors,
- *                     as applicable.
- *
+ * Copyright 2005 Open Source Applications Foundation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,33 +45,33 @@ public class TimeRangeQueryNode extends CustomQueryNode {
 
     /**
      * Limits the scope of this time-range clause to properties with this name.
-     * If <code>null</code> the scope of this time-range clause is the fulltext
-     * index of all properties of a node.
+     * If <code>null</code> the scope of this time-range clause is the
+     * fulltext index of all properties of a node.
      */
     private QName propertyName;
 
     /**
-     * Creates a new <code>time-rangeQueryNode</code> with a <code>parent</code>
-     * and a time-range <code>query</code> statement. The scope of the query
-     * is the fulltext index of the node, that contains all properties.
-     *
-     * @param parent the parent node of this query node.
-     * @param query  the time-range statement.
+     * Creates a new <code>TimeRangeQueryNode</code> with a
+     * <code>parent</code> for the specified period.
+     * 
+     * @param parent
+     * @param period
      */
     public TimeRangeQueryNode(QueryNode parent, String period) {
         this(parent, period, null);
     }
 
     /**
-     * Creates a new <code>time-rangeQueryNode</code> with a <code>parent</code>
-     * and a time-range <code>query</code> statement. The scope of the query
-     * is property with name <code>propertyName</code>.
+     * Creates a new <code>TimeRangeQueryNode</code> with a
+     * <code>parent</code> for the specified period.
      *
-     * @param parent the parent node of this query node.
-     * @param query  the time-range statement.
-     * @param propertyName scope of the fulltext search.
+     * @param parent
+     * @param period
+     * @param propertyName
      */
-    public TimeRangeQueryNode(QueryNode parent, String period, QName propertyName) {
+    public TimeRangeQueryNode(QueryNode parent,
+                              String period,
+                              QName propertyName) {
         super(parent);
         this.period = period;
         this.propertyName = propertyName;
@@ -86,13 +85,12 @@ public class TimeRangeQueryNode extends CustomQueryNode {
     }
 
     public String getCustomType() {
-        // This type of node behaves like a TextSearchQueryNode
         return TYPE_TIMERANGE;
     }
 
     /**
-     * Returns the time-range statement.
-     *
+     * Returns the time-range period.
+     * 
      * @return the time-range statement.
      */
     public String getPeriod() {
@@ -103,7 +101,7 @@ public class TimeRangeQueryNode extends CustomQueryNode {
      * Returns a property name if the scope is limited to just a single property
      * or <code>null</code> if the scope is spawned across all properties of a
      * node.
-     *
+     * 
      * @return property name or <code>null</code>.
      */
     public QName getPropertyName() {
@@ -112,8 +110,9 @@ public class TimeRangeQueryNode extends CustomQueryNode {
 
     /**
      * Sets a new name as the search scope for this fulltext query.
-     *
-     * @param property the name of the property.
+     * 
+     * @param property
+     *            the name of the property.
      */
     public void setPropertyName(QName property) {
         this.propertyName = property;
@@ -125,13 +124,17 @@ public class TimeRangeQueryNode extends CustomQueryNode {
     public boolean equals(Object obj) {
         if (obj instanceof TimeRangeQueryNode) {
             TimeRangeQueryNode other = (TimeRangeQueryNode) obj;
-            return (period == null ? other.period == null : period.equals(other.period))
-                    && (propertyName == null ? other.propertyName == null : propertyName.equals(other.propertyName));
+            return (period == null ? other.period == null : period
+                    .equals(other.period))
+                    && (propertyName == null ? other.propertyName == null
+                            : propertyName.equals(other.propertyName));
         }
         return false;
     }
 
-    public Object build(Object data, NamespaceMappings nsMappings, List exceptions) {
+    public Object build(Object data,
+                        NamespaceMappings nsMappings,
+                        List exceptions) {
         try {
             String fieldname;
             if (getPropertyName() == null) {
@@ -152,7 +155,10 @@ public class TimeRangeQueryNode extends CustomQueryNode {
         return null;
     }
 
-    public void format(String type, StringBuffer buffer, NamespaceResolver resolver, List exceptions) {
+    public void format(String type,
+                       StringBuffer buffer,
+                       NamespaceResolver resolver,
+                       List exceptions) {
         if (Query.XPATH.equals(type)) {
             formatXPath(buffer, resolver, exceptions);
         } else if (Query.SQL.equals(type)) {
@@ -160,14 +166,18 @@ public class TimeRangeQueryNode extends CustomQueryNode {
         }
     }
 
-    private void formatXPath(StringBuffer buffer, NamespaceResolver resolver, List exceptions) {
+    private void formatXPath(StringBuffer buffer,
+                             NamespaceResolver resolver,
+                             List exceptions) {
         try {
-            buffer.append(XPathTimeRangeQueryBuilder.JCR_TIMERANGE.toJCRName(resolver));
+            buffer.append(XPathTimeRangeQueryBuilder.JCR_TIMERANGE
+                    .toJCRName(resolver));
             buffer.append("(");
             if (getPropertyName() == null) {
                 buffer.append(".");
             } else {
-                buffer.append(ISO9075.encode(getPropertyName()).toJCRName(resolver));
+                buffer.append(ISO9075.encode(getPropertyName()).toJCRName(
+                        resolver));
             }
             buffer.append(", '");
             buffer.append(getPeriod().replaceAll("'", "''"));
@@ -177,7 +187,9 @@ public class TimeRangeQueryNode extends CustomQueryNode {
         }
     }
 
-    private void formatSQL(StringBuffer buffer, NamespaceResolver resolver, List exceptions) {
+    private void formatSQL(StringBuffer buffer,
+                           NamespaceResolver resolver,
+                           List exceptions) {
         // escape quote
         String period = getPeriod().replaceAll("'", "''");
         buffer.append("TIMERANGE(");

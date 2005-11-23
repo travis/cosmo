@@ -49,13 +49,13 @@ Tip:
 from threading import Thread
 from threading import Lock
 import pycurl
-import sys, getopt, time
+import sys, getopt, datetime, time
 import string, random
 
 def LogEvent(*attr):
     s = "\t".join(attr)
     outputLock.acquire()
-    print "%s\t%s" % (time.strftime("%m/%d/%Y %H:%M:%S"), s)
+    print "%s\t%s" % (datetime.datetime.now().isoformat(' '), s)
     outputLock.release()
     
 class TestCosmo(Thread):

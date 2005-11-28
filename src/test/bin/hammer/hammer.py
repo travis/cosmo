@@ -227,7 +227,8 @@ def main(argv):
     LogEvent("Total Elapsed Time: %d seconds" % elapsedTime)
     LogEvent("Total data transfered: %d KB" % dataTransfered)
     LogEvent("Throughput: %d KB/sec" % (dataTransfered / elapsedTime))
-    
+    LogEvent("Performance: %d req/sec" % (threads * iterations / elapsedTime))
+
     LogEvent("Ran %d threads through %d iterations." % (threads, iterations))
     LogEvent("Test completed: %s." % sf)
 

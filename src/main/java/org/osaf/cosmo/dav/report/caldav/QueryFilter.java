@@ -22,6 +22,9 @@ import java.util.Vector;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.util.Dates;
 
 import org.jdom.Element;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
@@ -47,8 +50,17 @@ public class QueryFilter implements JcrConstants {
      * The parsed top-level filter object.
      */
     protected compfilter filter;
+    protected VTimeZone timezone;
 
     public QueryFilter() {
+    }
+
+    /**
+     * @param tz
+     *            The tz to set.
+     */
+    public void setTimezone(VTimeZone timezone) {
+        this.timezone = timezone;
     }
 
     /**
@@ -104,8 +116,10 @@ public class QueryFilter implements JcrConstants {
             // iCal value, if the value is null we are checking for the presence
             // (is-defined) of an iCal property of parameter
             if (value != null) {
-                // For period test the parameter name will include the special value
-                if (parameter.indexOf(TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE) == -1) {
+                // For period test the parameter name will include the special
+                // value
+                if (parameter
+                        .indexOf(TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE) == -1) {
                     path += "jcr:contains(@" + parameter + ", '" + value + "')";
                 } else {
                     path += "jcr:timerange(@" + parameter + ", '" + value
@@ -117,6 +131,29 @@ public class QueryFilter implements JcrConstants {
         }
         path += "]";
         return path;
+    }
+
+    /**
+     * Generate fixed and floating time periods as a string.
+     * 
+     * @param period
+     *            UTC period to convert
+     * @return string representing both sets of periods
+     */
+    protected String generatePeriods(Period period) {
+
+        // Get fixed start/end time
+        DateTime dstart = period.getStart();
+        DateTime dend = period.getEnd();
+
+        // Get float start/end
+        DateTime fstart = (DateTime) Dates.getInstance(dstart, dstart);
+        DateTime fend = (DateTime) Dates.getInstance(dend, dend);
+        fstart.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
+        fend.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
+
+        return dstart.toString() + '/' + dend.toString() + ','
+                + fstart.toString() + '/' + fend.toString();
     }
 
     /**
@@ -286,9 +323,10 @@ public class QueryFilter implements JcrConstants {
                 }
             } else if (useTimeRange) {
                 // Always add time-range as a separate test
-                result.add(myprefix
-                        + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE);
-                result.add(timeRange.toString());
+                result
+                        .add(myprefix
+                                + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE);
+                result.add(generatePeriods(timeRange));
             }
 
             // For each sub-component and property test, generate more tests
@@ -472,9 +510,10 @@ public class QueryFilter implements JcrConstants {
                 }
             } else if (useTimeRange) {
                 // Always add time-range as a separate test
-                result.add(myprefix
-                        + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE);
-                result.add(timeRange.toString());
+                result
+                        .add(myprefix
+                                + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE);
+                result.add(generatePeriods(timeRange));
             } else if (useTextMatch) {
                 // Always add time-range as a separate test
                 result.add(myprefix);

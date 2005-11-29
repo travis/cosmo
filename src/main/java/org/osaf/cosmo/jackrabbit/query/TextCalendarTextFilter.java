@@ -21,11 +21,10 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.jcr.NamespaceException;
@@ -36,18 +35,16 @@ import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Parameter;
-import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.PeriodList;
+import net.fortuna.ical4j.model.Instance;
+import net.fortuna.ical4j.model.InstanceList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DateProperty;
-import net.fortuna.ical4j.model.property.DtEnd;
-import net.fortuna.ical4j.model.property.DtStart;
-import net.fortuna.ical4j.model.property.RecurrenceId;
 
 import org.apache.jackrabbit.core.query.TextFilter;
 import org.apache.jackrabbit.core.query.lucene.FieldNames;
@@ -171,14 +168,16 @@ public class TextCalendarTextFilter implements TextFilter {
                 // Tokenise the flat calendar data into key/value pairs and add
                 // those as items for the indexer
                 StringTokenizer tokenizer = new StringTokenizer(calendarData,
-                        ":\n");
+                        "\n");
                 List result = new Vector();
                 while (tokenizer.hasMoreTokens()) {
 
-                    String key = tokenizer.nextToken().toLowerCase();
+                    String line = tokenizer.nextToken().toLowerCase();
+                    int colon = line.indexOf(':');
+                    String key = line.substring(0, colon);
                     String fullkey = fullprefix + key;
                     String propkey = propprefix + key;
-                    String value = tokenizer.nextToken();
+                    String value = (colon + 1 < line.length()) ? line.substring(colon + 1) : new String();
 
                     // Add the field for the actual data
                     result.add(new TextFilter.TextFilterIndexString(fullkey,
@@ -210,20 +209,24 @@ public class TextCalendarTextFilter implements TextFilter {
         // What we do is collect the master instance recurrence set out to our
         // maxmimum cache value. Then we collect the overriden instance set.
         // Then we need to merge the overridden ones with the master ones taking
-        // into account
-        // the nastiness of THISANDFUTURE.
+        // into account the nastiness of THISANDFUTURE.
 
         // TODO Yes I am ignoring THISANDPRIOR...
 
-        PeriodList masterInstances = new PeriodList();
-        Map overriddenInstances = new HashMap();
+        InstanceList instances = new InstanceList();
 
         String flatPrefix = prefix + ":" + FieldNames.FULLTEXT_PREFIX
                 + "VCALENDAR-".toLowerCase();
         String key = null;
         String propKey = null;
 
+        // Do two passes - first one gets the master instance, second one gets
+        // the overridden ones. We have to do this because there is no guarantee
+        // that the master instance appears before the overridden ones in the
+        // iCalendar stream.
+
         // Look at each VEVENT/VTODO/VJOURNAL/VALARM
+        ComponentList overrides = new ComponentList();
         for (Iterator iter = calendar.getComponents().iterator(); iter
                 .hasNext();) {
             Component comp = (Component) iter.next();
@@ -236,94 +239,86 @@ public class TextCalendarTextFilter implements TextFilter {
 
                 // See if this is the master instance
                 if (vcomp.getReccurrenceId() == null) {
-                    masterInstances = getMasterInstances(vcomp);
+                    addMasterInstances(vcomp, instances);
                 } else {
-                    addOverrideInstance(vcomp, overriddenInstances);
+                    overrides.add(vcomp);
                 }
 
                 // Now do indexes for the date valued properties
                 doEventPropertyTimeRange(vcomp, propKey, result);
-
-                // TODO Handle alarms. This gets problematic with recurrences or
-                // repeating alarms.
             }
             // TODO Handle other components
         }
 
+        for (Iterator iterator = overrides.iterator(); iterator.hasNext();) {
+            Component comp = (Component) iterator.next();
+            addOverrideInstance(comp, instances);
+        }
+
         // See if there is nothing to do (should not really happen)
-        if (masterInstances.size() == 0) {
+        if (instances.size() == 0) {
             return;
         }
 
-        // Now check to see if this is a non-recurring item
-        if ((masterInstances.size() == 1) && (overriddenInstances.size() == 0)) {
-
-            // Just add the one period to the indexer
-            String textPeriod = ((Period) masterInstances.first()).toString();
-
-            // Add the field for the actual data
-            result.add(new TextFilter.TextFilterIndexString(key, textPeriod,
-                    false));
-
-            return;
-        }
-
-        // Now check whether there are no overrides
-        if (overriddenInstances.size() != 0) {
-
-            // Now we have the nasty case of merging overridden instances.
-            // What we do is put the master instance periods into a map keying
-            // off the start of each period. Then we lookup each overridden
-            // instance's recurrence-id in the map and replace the map value by
-            // the one from the instance.
-            // If THISANDFUTURE is specified we then iterate over the remainder
-            // of items in the map and adjust those with the appropriate
-            // relative offset.
-
-            Map masterMap = new HashMap();
-            for (Iterator iter = masterInstances.iterator(); iter.hasNext();) {
-                Period period = (Period) iter.next();
-                masterMap.put(period.getStart().toString(), period);
-            }
-
-            for (Iterator iter = overriddenInstances.keySet().iterator(); iter
-                    .hasNext();) {
-                String rid = (String) iter.next();
-                if (masterMap.containsKey(rid)) {
-                    InstanceInfo info = (InstanceInfo) overriddenInstances
-                            .get(rid);
-                    if (info.isFuture()) {
-                        // TODO Handle THISANDFUTURE adjustment
-                    } else {
-                        masterMap.put(rid, info.getPeriod());
-                    }
-                }
-            }
-
-            masterInstances = new PeriodList();
-            for (Iterator iter = masterMap.entrySet().iterator(); iter
-                    .hasNext();) {
-                Period period = (Period) iter.next();
-                masterInstances.add(period);
-            }
-        }
-
-        // Now just add each master period as a comma separated list
+        // Now just add each master start/end as a comma separated list,
+        // converting DATE values into floating DATE-TIMEs, and doing it in
+        // ascending order
         String textPeriod = null;
-        for (Iterator iter = masterInstances.iterator(); iter.hasNext();) {
-            Period period = (Period) iter.next();
+        TreeSet sortedKeys = new TreeSet(instances.keySet());
+        for (Iterator iter = sortedKeys.iterator(); iter.hasNext();) {
+            String ikey = (String) iter.next();
+            Instance instance = (Instance) instances.get(ikey);
             if (textPeriod == null) {
                 textPeriod = new String();
             } else {
-                textPeriod += ", ";
+                textPeriod += ',';
             }
-            textPeriod += period.toString();
+            String start = normaliseDateTime(instance.getStart()).toString();
+            String end = normaliseDateTime(instance.getEnd()).toString();
+            textPeriod += start + '/' + end;
         }
 
         // Add the field for the actual data
         result
                 .add(new TextFilter.TextFilterIndexString(key, textPeriod,
                         false));
+
+        // Handle VALARMs. We do this by looking at each instance to see if it
+        // has a VALARM attached to it. If so the trigger information for the
+        // VALARM is expanded based on that instance's start time. A list of
+        // sorted date-times for the trigger is then indexed.
+
+        TreeSet sortedAlarms = new TreeSet();
+        for (Iterator iter = sortedKeys.iterator(); iter.hasNext();) {
+            String ikey = (String) iter.next();
+            Instance instance = (Instance) instances.get(ikey);
+            DateList dtl = instance.getAlarmTriggers();
+            if (dtl != null) {
+                for (Iterator iterator = dtl.iterator(); iterator.hasNext();) {
+                    Date date = (Date) iterator.next();
+                    sortedAlarms.add(date.toString());
+                }
+            }
+        }
+
+        String alarms = null;
+        for (Iterator iter = sortedAlarms.iterator(); iter.hasNext();) {
+            String date = (String) iter.next();
+            if (alarms == null) {
+                alarms = new String();
+            } else {
+                alarms += ',';
+            }
+            alarms += date;
+        }
+
+        // Add the field for the actual data
+        if (alarms != null) {
+            String alarmKey = propKey + "-valarm"
+                    + TIME_RANGE_FIELD_SUFFIX_LOWERCASE;
+            result.add(new TextFilter.TextFilterIndexString(alarmKey, alarms,
+                    false));
+        }
     }
 
     private void doEventPropertyTimeRange(VEvent vcomp,
@@ -380,7 +375,7 @@ public class TextCalendarTextFilter implements TextFilter {
      *            the time-range of the original request
      * @return
      */
-    private PeriodList getMasterInstances(VEvent vevent) {
+    private void addMasterInstances(VEvent vevent, InstanceList instances) {
 
         DateTime maxRange = null;
         try {
@@ -388,27 +383,8 @@ public class TextCalendarTextFilter implements TextFilter {
         } catch (ParseException e) {
             // Never happens
         }
-        PeriodList intermediateResult = vevent.getInstances(vevent
-                .getStartDate().getDate(), maxRange);
-
-        // NB The periods we get back from ical4j may be in start/duration
-        // format, but we want start/end format for our indexer comparisons, so
-        // we need to check and convert them here.
-        PeriodList result = new PeriodList();
-        for (Iterator iter = intermediateResult.iterator(); iter.hasNext();) {
-            Period period = (Period) iter.next();
-            Period startEnd = new Period(period.getStart(), period.getEnd());
-
-            // ical4j issue: when the start/end times are copied they end up
-            // using TZID=GMT, but we want these in UTC, so we have to coerce
-            // them directly. Really ical4j should preserve the original UTC
-            // state.
-            startEnd.getStart().setUtc(true);
-            startEnd.getEnd().setUtc(true);
-            result.add(startEnd);
-        }
-
-        return result;
+        instances.addComponent(vevent, vevent.getStartDate().getDate(),
+                maxRange);
     }
 
     /**
@@ -421,46 +397,8 @@ public class TextCalendarTextFilter implements TextFilter {
      * @param instances
      *            the map to add details to
      */
-    private void addOverrideInstance(VEvent vevent, Map instances) {
-
-        // First check to see that the appropriate properties are present.
-
-        // We need a RECURRENCE-ID
-        RecurrenceId rid = vevent.getReccurrenceId();
-        if (rid == null)
-            return;
-
-        // We need a DTSTART. Note that in an overridden instance, if the
-        // DTSTART has not changed (i.e. some other property has been changed)
-        // it may not be rpesent, and if so there is no need to treat this as a
-        // seperate instance with regards to time-range.
-        DtStart dtstart = vevent.getStartDate();
-        if (dtstart == null)
-            return;
-
-        // We need either DTEND or DURATION.
-        DtEnd dtend = vevent.getEndDate();
-        if (dtend == null)
-            return;
-
-        // Now create the map entry
-        Date riddt = rid.getDate();
-        Parameter range = rid.getParameters().getParameter(Parameter.RANGE);
-        boolean future = (range != null)
-                && "THISANDFUTURE".equals(range.getValue());
-        Period period = getNormalisedPeriod(vevent);
-
-        instances.put(riddt.toString(), new InstanceInfo(period, future));
-    }
-
-    private Period getNormalisedPeriod(VEvent vevent) {
-
-        // Get start/end normalised to UTC
-        DateTime start = normaliseDateTime((Date) vevent.getStartDate()
-                .getDate());
-        DateTime end = normaliseDateTime((Date) vevent.getEndDate().getDate());
-
-        return new Period(start, end);
+    private void addOverrideInstance(Component comp, InstanceList instances) {
+        instances.addComponent(comp, null, null);
     }
 
     /**
@@ -475,42 +413,12 @@ public class TextCalendarTextFilter implements TextFilter {
 
         if (date instanceof DateTime) {
 
-            // Convert it to UTC
-            if (!dt.isUtc()) {
+            // Convert it to UTC if it has a timezone
+            if (!dt.isUtc() && (dt.getTimeZone() != null)) {
                 dt.setUtc(true);
             }
         }
 
         return dt;
-    }
-
-    private class InstanceInfo {
-
-        private Period period;
-        private boolean future;
-
-        InstanceInfo(Period period) {
-            this(period, false);
-        }
-
-        InstanceInfo(Period period, boolean future) {
-            this.period = period;
-            this.future = future;
-        }
-
-        /**
-         * @return Returns the future.
-         */
-        public boolean isFuture() {
-            return future;
-        }
-
-        /**
-         * @return Returns the period.
-         */
-        public Period getPeriod() {
-            return period;
-        }
-
     }
 }

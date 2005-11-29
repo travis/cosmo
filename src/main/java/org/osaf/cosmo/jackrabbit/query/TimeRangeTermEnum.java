@@ -37,6 +37,8 @@ public final class TimeRangeTermEnum extends FilteredTermEnum {
     String field = "";
     String startTime = "";
     String endTime = "";
+    String startFloat = "";
+    String endFloat = "";
 
     /**
      * Constructor for enumeration of all terms from specified
@@ -53,9 +55,19 @@ public final class TimeRangeTermEnum extends FilteredTermEnum {
         super();
         searchTerm = term;
         field = searchTerm.field();
-        StringTokenizer tokens = new StringTokenizer(searchTerm.text(), "/");
-        startTime = tokens.nextToken();
-        endTime = tokens.nextToken();
+
+        StringTokenizer periods = new StringTokenizer(searchTerm.text(), ",");
+        String absPeriod = periods.nextToken();
+        String floatPeriod = periods.nextToken();
+
+        StringTokenizer tokens1 = new StringTokenizer(absPeriod, "/");
+        startTime = tokens1.nextToken();
+        endTime = tokens1.nextToken();
+
+        StringTokenizer tokens2 = new StringTokenizer(floatPeriod, "/");
+        startFloat = tokens2.nextToken();
+        endFloat = tokens2.nextToken();
+
         setEnum(reader.terms(new Term(searchTerm.field(), "")));
     }
 
@@ -81,23 +93,26 @@ public final class TimeRangeTermEnum extends FilteredTermEnum {
                 String testEnd = (slashPos != -1) ? token
                         .substring(slashPos + 1) : null;
 
+                // Check whether floating or fixed test required
+                boolean fixed = (testStart.indexOf('Z') != -1);
+
                 // Period range compare
                 if (testEnd != null) {
                     // Period overlaps
-                    if (!((testStart.compareTo(endTime) >= 0) || (testEnd
-                            .compareTo(startTime) <= 0)))
+                    if (!((testStart.compareTo(fixed ? endTime : endFloat) >= 0) || (testEnd
+                            .compareTo(fixed ? startTime : startFloat) <= 0)))
                         return true;
                 } else {
                     // Time inside period
-                    if ((testStart.compareTo(startTime) >= 0)
-                            && (testStart.compareTo(endTime) < 0))
+                    if ((testStart.compareTo(fixed ? startTime : startFloat) >= 0)
+                            && (testStart.compareTo(fixed ? endTime : endFloat) < 0))
                         return true;
                 }
 
                 // Since the period list is sorted by increasing start time, if
                 // the period we just tested is past the time-range we want,
                 // there is no need to test any more as they can never match.
-                if (testStart.compareTo(endTime) >= 0)
+                if (testStart.compareTo(fixed ? endTime : endFloat) >= 0)
                     break;
             }
 

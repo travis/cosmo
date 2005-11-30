@@ -56,6 +56,14 @@
       </properties>
     </dependency>
     <dependency>
+      <groupId>activation</groupId>
+      <artifactId>activation</artifactId>
+      <version>1.0.2</version>
+      <properties>
+        <tomcat.bundle>true</tomcat.bundle>
+      </properties>
+    </dependency>
+    <dependency>
       <groupId>antlr</groupId>
       <artifactId>antlr</artifactId>
       <version>2.7.2</version>
@@ -220,14 +228,6 @@
       <groupId>jsr170</groupId>
       <artifactId>jcr</artifactId>
       <version>1.0</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
-    </dependency>
-    <dependency>
-      <groupId>jaf</groupId>
-      <artifactId>activation</artifactId>
-      <version>1.0.2</version>
       <properties>
         <tomcat.bundle>true</tomcat.bundle>
       </properties>

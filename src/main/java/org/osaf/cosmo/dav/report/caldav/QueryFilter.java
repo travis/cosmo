@@ -98,38 +98,9 @@ public class QueryFilter implements JcrConstants {
                 + NN_JCR_CONTENT + "[";
 
         // Generate a list of terms to use in the XPath expression
-        Vector tests = new Vector();
-        filter.generateTests("", tests);
-
-        // Add each term to the XPath expression
-        boolean first = true;
-        for (Iterator iter = tests.iterator(); iter.hasNext();) {
-            // NB Vector will always contain and even number of items
-            String parameter = (String) iter.next();
-            String value = (String) iter.next();
-            if (first)
-                first = false;
-            else
-                path += " and ";
-
-            // If the value is non-null then we are searching for text in an
-            // iCal value, if the value is null we are checking for the presence
-            // (is-defined) of an iCal property of parameter
-            if (value != null) {
-                // For period test the parameter name will include the special
-                // value
-                if (parameter
-                        .indexOf(TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE) == -1) {
-                    path += "jcr:contains(@" + parameter + ", '" + value + "')";
-                } else {
-                    path += "jcr:timerange(@" + parameter + ", '" + value
-                            + "')";
-                }
-            } else {
-                path += "@" + parameter;
-            }
-        }
+        path += filter.generateTests("");
         path += "]";
+
         return path;
     }
 
@@ -156,16 +127,46 @@ public class QueryFilter implements JcrConstants {
                 + fstart.toString() + '/' + fend.toString();
     }
 
+    private abstract class filter {
+
+        abstract protected String generateTests(String prefix);
+
+        protected String generateOrList(List items, String prefix, String result) {
+
+            if (items.size() != 0) {
+                boolean andExpression = (result.length() != 0);
+                if (andExpression) {
+                    result = result + " and ";
+                    if (items.size() > 1)
+                        result += '(';
+                }
+
+                boolean first = true;
+                for (Iterator iter1 = items.iterator(); iter1.hasNext();) {
+                    if (first)
+                        first = false;
+                    else
+                        result += " or ";
+                    result += ((filter) iter1.next()).generateTests(prefix);
+                }
+
+                if (andExpression && (items.size() > 1))
+                    result += ')';
+            }
+
+            return result;
+        }
+    }
+
     /**
      * @author cyrusdaboo
      * 
      * Object that models the <comp-filter> element.
      * 
      */
-    private class compfilter {
+    private class compfilter extends filter {
 
         protected String name;
-        protected boolean isDefined;
         protected boolean useTimeRange;
         protected Period timeRange;
 
@@ -180,7 +181,6 @@ public class QueryFilter implements JcrConstants {
         protected List propFilters;
 
         public compfilter() {
-            isDefined = false;
             useTimeRange = false;
         }
 
@@ -204,6 +204,10 @@ public class QueryFilter implements JcrConstants {
             for (Iterator iter = element.getChildren().iterator(); iter
                     .hasNext();) {
                 Element child = (Element) iter.next();
+
+                // TODO is-defined has been removed in the -09 draft. We will
+                // continue to support it for older clients for now, but
+                // eventually this should be removed.
                 if (CosmoDavConstants.ELEMENT_CALDAV_IS_DEFINED.equals(child
                         .getName())) {
 
@@ -211,9 +215,6 @@ public class QueryFilter implements JcrConstants {
                     if (got_one)
                         return false;
                     got_one = true;
-
-                    // Mark the value
-                    isDefined = true;
 
                 } else if (CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE
                         .equals(child.getName())) {
@@ -285,11 +286,6 @@ public class QueryFilter implements JcrConstants {
                 }
             }
 
-            // Must have one of is-defined or time-range
-            if (!got_one) {
-                return false;
-            }
-
             return true;
         }
 
@@ -298,10 +294,11 @@ public class QueryFilter implements JcrConstants {
          * 
          * @param prefix
          *            the prefix string used for the flat iCal namespace
-         * @param result
-         *            a list of tests to incorporate in the XPath expression
+         * @return the XPath element
          */
-        public void generateTests(String prefix, Vector result) {
+        public String generateTests(String prefix) {
+
+            String result = new String();
 
             // If this is the top-level item, then prepend the icalendar
             // namespace to the prefix
@@ -314,35 +311,29 @@ public class QueryFilter implements JcrConstants {
             int compSize = (compFilters != null) ? compFilters.size() : 0;
             int propSize = (propFilters != null) ? propFilters.size() : 0;
 
-            if (isDefined) {
+            if (useTimeRange) {
+                String key = myprefix
+                        + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE;
+                String value = generatePeriods(timeRange);
+                result = "jcr:timerange(@" + key + ", '" + value + "')";
+            } else { // is-defined
                 if ((compSize == 0) && (propSize == 0)) {
                     // If there are no component or property filters then we
                     // must explicitly test for this component
-                    result.add(myprefix);
-                    result.add("begin");
+                    result = "jcr:contains(@" + myprefix + ", 'begin')";
                 }
-            } else if (useTimeRange) {
-                // Always add time-range as a separate test
-                result
-                        .add(myprefix
-                                + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE);
-                result.add(generatePeriods(timeRange));
             }
 
             // For each sub-component and property test, generate more tests
             if (compSize != 0) {
-                for (Iterator iter1 = compFilters.iterator(); iter1.hasNext();) {
-
-                    ((compfilter) iter1.next()).generateTests(myprefix, result);
-                }
+                result = generateOrList(compFilters, myprefix, result);
             }
 
             if (propSize != 0) {
-                for (Iterator iter1 = propFilters.iterator(); iter1.hasNext();) {
-
-                    ((propfilter) iter1.next()).generateTests(myprefix, result);
-                }
+                result = generateOrList(propFilters, myprefix, result);
             }
+
+            return result;
         }
     }
 
@@ -352,10 +343,9 @@ public class QueryFilter implements JcrConstants {
      * Object that models the <prop-filter> element.
      * 
      */
-    private class propfilter {
+    private class propfilter extends filter {
 
         protected String name;
-        protected boolean isDefined;
         protected boolean useTimeRange;
         protected Period timeRange;
         protected boolean useTextMatch;
@@ -368,7 +358,6 @@ public class QueryFilter implements JcrConstants {
         protected List paramFilters;
 
         public propfilter() {
-            isDefined = false;
             useTimeRange = false;
             useTextMatch = false;
         }
@@ -391,6 +380,10 @@ public class QueryFilter implements JcrConstants {
             for (Iterator iter = element.getChildren().iterator(); iter
                     .hasNext();) {
                 Element child = (Element) iter.next();
+
+                // TODO is-defined has been removed in the -09 draft. We will
+                // continue to support it for older clients for now, but
+                // eventually this should be removed.
                 if (CosmoDavConstants.ELEMENT_CALDAV_IS_DEFINED.equals(child
                         .getName())) {
 
@@ -398,9 +391,6 @@ public class QueryFilter implements JcrConstants {
                     if (got_one)
                         return false;
                     got_one = true;
-
-                    // Mark the value
-                    isDefined = true;
 
                 } else if (CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE
                         .equals(child.getName())) {
@@ -478,11 +468,6 @@ public class QueryFilter implements JcrConstants {
                 }
             }
 
-            // Must have one of is-defined, time-range or text-match
-            if (!got_one) {
-                return false;
-            }
-
             return true;
         }
 
@@ -491,42 +476,37 @@ public class QueryFilter implements JcrConstants {
          * 
          * @param prefix
          *            the prefix string used for the flat iCal namespace
-         * @param result
-         *            a list of tests to incorporate in the XPath expression
+         * @return the XPath element
          */
-        public void generateTests(String prefix, Vector result) {
+        public String generateTests(String prefix) {
 
-            String myprefix;
-            myprefix = prefix + "_" + name.toLowerCase();
+            String result = new String();
+
+            String myprefix = prefix + "_" + name.toLowerCase();
 
             int paramSize = (paramFilters != null) ? paramFilters.size() : 0;
 
-            if (isDefined) {
+            if (useTimeRange) {
+                String key = myprefix
+                        + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE;
+                String value = generatePeriods(timeRange);
+                result = "jcr:timerange(@" + key + ", '" + value + "')";
+            } else if (useTextMatch) {
+                result = "jcr:contains(@" + myprefix + ", '*" + textMatch
+                        + "*')";
+            } else { // is-defined
                 if (paramSize == 0) {
                     // If there are no parameter filters then we must
                     // explicitly test for this component
-                    result.add(myprefix);
-                    result.add(null);
+                    result = "@" + myprefix;
                 }
-            } else if (useTimeRange) {
-                // Always add time-range as a separate test
-                result
-                        .add(myprefix
-                                + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE);
-                result.add(generatePeriods(timeRange));
-            } else if (useTextMatch) {
-                // Always add time-range as a separate test
-                result.add(myprefix);
-                result.add("*" + textMatch + "*");
             }
 
             if (paramSize != 0) {
-                for (Iterator iter1 = paramFilters.iterator(); iter1.hasNext();) {
-
-                    ((paramfilter) iter1.next())
-                            .generateTests(myprefix, result);
-                }
+                result = generateOrList(paramFilters, myprefix, result);
             }
+
+            return result;
         }
     }
 
@@ -536,10 +516,9 @@ public class QueryFilter implements JcrConstants {
      * Object that models the <param-filter> element.
      * 
      */
-    private class paramfilter {
+    private class paramfilter extends filter {
 
         protected String name;
-        protected boolean isDefined;
         protected boolean useTextMatch;
         protected String textMatch;
         protected boolean isCaseless;
@@ -549,7 +528,6 @@ public class QueryFilter implements JcrConstants {
          */
         public paramfilter() {
 
-            isDefined = false;
             useTextMatch = false;
         }
 
@@ -572,10 +550,13 @@ public class QueryFilter implements JcrConstants {
                 return false;
 
             Element child = (Element) childrenList.get(0);
+
+            // TODO is-defined has been removed in the -09 draft. We will
+            // continue to support it for older clients for now, but
+            // eventually this should be removed.
             if (CosmoDavConstants.ELEMENT_CALDAV_IS_DEFINED.equals(child
                     .getName())) {
 
-                isDefined = true;
                 return true;
 
             } else if (CosmoDavConstants.ELEMENT_CALDAV_TEXT_MATCH.equals(child
@@ -601,29 +582,27 @@ public class QueryFilter implements JcrConstants {
         }
 
         /**
-         * Generate an XPath element for testing components.
+         * Generate an XPath element for testing parameters.
          * 
          * @param prefix
          *            the prefix string used for the flat iCal namespace
-         * @param result
-         *            a list of tests to incorporate in the XPath expression
+         * @return the XPath element
          */
-        public void generateTests(String prefix, Vector result) {
+        public String generateTests(String prefix) {
 
-            String myprefix;
-            myprefix = prefix + "_" + name.toLowerCase();
+            String result = new String();
 
-            if (isDefined) {
-                result.add(myprefix);
-                result.add(null);
-            } else if (useTextMatch) {
-                // Always add time-range as a separate test
+            String myprefix = prefix + "_" + name.toLowerCase();
 
+            if (useTextMatch) {
                 // TODO Figure out how to do caseless matching
-
-                result.add(myprefix);
-                result.add("*" + textMatch + "*");
+                result = "jcr:contains(@" + myprefix + ", '*" + textMatch
+                        + "*')";
+            } else { // is-defined
+                result = "@" + myprefix;
             }
+
+            return result;
         }
     }
 }

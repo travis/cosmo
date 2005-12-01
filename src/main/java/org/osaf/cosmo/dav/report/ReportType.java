@@ -23,6 +23,7 @@ import org.apache.jackrabbit.webdav.version.DeltaVConstants;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.osaf.cosmo.dav.CosmoDavConstants;
+import org.osaf.cosmo.dav.report.caldav.FreeBusyReport;
 import org.osaf.cosmo.dav.report.caldav.MultigetReport;
 import org.osaf.cosmo.dav.report.caldav.QueryReport;
 
@@ -43,6 +44,9 @@ public class ReportType implements DeltaVConstants {
     public static final ReportType CALDAV_MULTIGET = register(
             CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_MULTIGET,
             CosmoDavConstants.NAMESPACE_CALDAV, MultigetReport.class);
+    public static final ReportType CALDAV_FREEBUSY = register(
+            CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_FREEBUSY,
+            CosmoDavConstants.NAMESPACE_CALDAV, FreeBusyReport.class);
 
     private final String name;
     private final Namespace namespace;

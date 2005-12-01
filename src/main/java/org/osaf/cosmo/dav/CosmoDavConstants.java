@@ -118,6 +118,8 @@ public class CosmoDavConstants {
         "calendar-multiget";
     public static final String ELEMENT_CALDAV_CALENDAR_QUERY =
         "calendar-query";
+    public static final String ELEMENT_CALDAV_CALENDAR_FREEBUSY =
+        "free-busy-query";
     public static final DavPropertyName CALENDARDATA = DavPropertyName.create(
             ELEMENT_CALDAV_CALENDAR_DATA, NAMESPACE_CALDAV);
 

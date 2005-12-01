@@ -529,7 +529,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     protected void initSupportedReports() {
         if (exists()) {
             supportedReports = new SupportedReportSetProperty(new ReportType[] {
-                    ReportType.CALDAV_QUERY, ReportType.CALDAV_MULTIGET });
+                    ReportType.CALDAV_QUERY, ReportType.CALDAV_MULTIGET, ReportType.CALDAV_FREEBUSY });
         }
     }
 

@@ -21,14 +21,9 @@ import java.util.Vector;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.query.Query;
-import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
-import javax.jcr.query.Row;
-import javax.jcr.query.RowIterator;
 
-import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
@@ -38,7 +33,6 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.dav.report.ReportType;
-import org.osaf.cosmo.jackrabbit.query.XPathTimeRangeQueryBuilder;
 
 /**
  * @author cyrusdaboo
@@ -54,9 +48,7 @@ import org.osaf.cosmo.jackrabbit.query.XPathTimeRangeQueryBuilder;
  * </pre>
  * 
  */
-public class QueryReport extends AbstractCalendarDataReport {
-
-    protected QueryFilter filter;
+public class QueryReport extends AbstractCalendarQueryReport {
 
     /**
      * Returns {@link ReportType#CALDAV_QUERY}.
@@ -194,74 +186,5 @@ public class QueryReport extends AbstractCalendarDataReport {
 
         // Hand off to parent with list of matching hrefs now complete
         return super.toXml();
-    }
-
-    /**
-     * Generate a JCR query for the caldav filter items.
-     * 
-     * @return
-     * @throws RepositoryException
-     */
-    private Query getQuery()
-        throws RepositoryException {
-
-        // Create the XPath expression
-        String statement = "/jcr:root" + resource.getLocator().getJcrPath();
-        statement += filter.toXPath();
-
-        // Now create an XPath query
-        QueryManager qMgr = info.getSession().getRepositorySession()
-                .getWorkspace().getQueryManager();
-        Query result = qMgr.createQuery(statement,
-                XPathTimeRangeQueryBuilder.XPATH_TIMERANGE);
-
-        return result;
-    }
-
-    /**
-     * Turns a query result into a list of hrefs. This is pretty much copied
-     * vebatim from org.apache.jackrabbit.webdav.jcr.search.SearchResourceImpl
-     * 
-     * NB Because currently Jackrabbit does not support the node axis in
-     * predicates the paths we get are the paths to the end nodes/parameters.
-     * However we need to extract the path to the actual .ics resources, which
-     * means trunctaing the ones we get at the appropriate place.
-     * 
-     * @param qResult
-     * @throws RepositoryException
-     */
-    private void queryResultToHrefs(QueryResult qResult)
-        throws RepositoryException {
-
-        DavResourceLocator locator = resource.getLocator();
-
-        // Get the JCR path segment of the root. We will use this to help
-        // truncate the results up to the .ics resources.
-        String root = resource.getLocator().getJcrPath();
-        int rootLength = root.length();
-
-        RowIterator rowIter = qResult.getRows();
-        while (rowIter.hasNext()) {
-            Row row = rowIter.nextRow();
-
-            // get the jcr:path column indicating the node path and build
-            // a webdav compliant resource path of it.
-            String itemPath = row.getValue(JcrConstants.JCR_PATH).getString();
-
-            // Truncate to .ics resource
-            if (itemPath.length() > rootLength) {
-                int pathLen = itemPath.indexOf("/", rootLength + 1);
-                if (pathLen > 0)
-                    itemPath = itemPath.substring(0, pathLen);
-            }
-
-            // create a new ms-response for this row of the result set
-            DavResourceLocator loc = locator.getFactory()
-                    .createResourceLocator(locator.getPrefix(),
-                            locator.getWorkspacePath(), itemPath, false);
-            String href = loc.getHref(true);
-
-            hrefs.add(href);
-        }
     }
 }

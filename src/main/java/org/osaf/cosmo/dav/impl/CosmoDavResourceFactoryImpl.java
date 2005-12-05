@@ -28,6 +28,8 @@ import org.apache.jackrabbit.webdav.lock.LockManager;
 import org.apache.jackrabbit.webdav.simple.ResourceConfig;
 import org.apache.jackrabbit.webdav.simple.ResourceFactoryImpl;
 
+import org.apache.log4j.Logger;
+
 import org.osaf.cosmo.dav.CosmoDavMethods;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
@@ -40,6 +42,8 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
  */
 public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
     implements CosmoDavResourceFactory {
+    private static final Logger log =
+        Logger.getLogger(CosmoDavResourceFactoryImpl.class);
 
     private CosmoSecurityManager securityManager;
 

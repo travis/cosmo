@@ -105,4 +105,14 @@
     <put name="prefix"       value="User.List."/>
   </definition>
 
+  <!-- status defs -->
+
+  <definition name="status.view" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/status/view.jsp"/>
+    <put name="prefix"       value="Status."/>
+  </definition>
+
+  <definition name="status.dump" page="/WEB-INF/jsp/status/dump.jsp">
+  </definition>
+
 </tiles-definitions>

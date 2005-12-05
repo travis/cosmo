@@ -533,6 +533,12 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         }
     }
 
+    /**
+     */
+    protected ImportContext createImportContext() {
+        return new ImportContext(getNode());
+    }
+
     // ApplicationContextAware methods
 
     /**

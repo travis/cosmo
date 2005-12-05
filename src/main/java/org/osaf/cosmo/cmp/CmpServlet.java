@@ -42,7 +42,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import org.springframework.beans.BeansException;
-import org.springframework.orm.ObjectRetrievalFailureException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -59,7 +59,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <dd>A resource representing an individual user</dd>
  * </dl>
  *
- * CMP defines the following operations:
+ * CMP defines the following admin-only operations:
  *
  * <dl>
  * <dt><code>GET /users</code></dt>
@@ -70,6 +70,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <dd>Includes an XML representation of a user as per {@link UserResource}, creating or modifying the user's properties within Cosmo, with all associated side effects including home directory creation.</dd>
  * <dt><code>DELETE /user/&lgt;username&gt;</code></dt>
  * <dd>Causes a user to be removed, with all associated side effects including home directory removal.</dd>
+ * </dl>
+ *
+ * CMP defines the following anonymous (unauthenticated) operations:
+ *
+ * <dl>
+ * <dt><code>PUT /signup</code></dt>
+ * <dd>Includes an XML representation of a user, creating a user
+ * account and home directory within Cosmo.
  * </dl>
  */
 public class CmpServlet extends HttpServlet {
@@ -153,7 +161,7 @@ public class CmpServlet extends HttpServlet {
         User user = null;
         try {
             user = userService.getUser(username);
-        } catch (ObjectRetrievalFailureException e) {
+        } catch (DataRetrievalFailureException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -166,26 +174,13 @@ public class CmpServlet extends HttpServlet {
      *
      * <ul>
      * <li><code>PUT /user/&lgt;username&gt;</code></li>
+     * <li><code>PUT /signup</code></li>
      * </ul>
      */
     protected void doPut(HttpServletRequest req,
                          HttpServletResponse resp)
         throws ServletException, IOException {
-        String username = usernameFromPathInfo(req.getPathInfo());
-        if (username == null) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        if (req.getContentLength() <= 0 ||
-            req.getContentType() == null ||
-            ! req.getContentType().startsWith("text/xml") ||
-            req.getHeader("Content-Transfer-Encoding") != null ||
-            req.getHeader("Content-Encoding") != null ||
-            req.getHeader("Content-Base") != null ||
-            req.getHeader("Content-Location") != null ||
-            req.getHeader("Content-MD5") != null ||
-            req.getHeader("Content-Range") != null) {
-            resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+        if (! checkPutPreconditions(req, resp)) {
             return;
         }
 
@@ -193,46 +188,147 @@ public class CmpServlet extends HttpServlet {
         try {
             xmldoc = readXmlRequest(req);
         } catch (JDOMException e) {
-            log.error("Error parsing request body", e);
+            log.error("Error parsing request body: " + e.getMessage());
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        User user = null;
-        try {
-            user = userService.getUser(username);
-        } catch (ObjectRetrievalFailureException e) {
-            // this means we are creating the user
+        if (req.getPathInfo().equals("/signup")) {
+            processSignup(req, resp, xmldoc);
+            return;
+        }
+
+        String urlUsername = usernameFromPathInfo(req.getPathInfo());
+        if (urlUsername == null) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
 
         try {
-            if (user != null) {
-                UserResource resource =
-                    new UserResource(user, getUrlBase(req), xmldoc);
-                userService.updateUser(user);
-                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                if (! username.equals(user.getUsername())) {
-                    resp.setHeader("Content-Location",
-                                   resource.getUserUrl());
-                }
-            }
-            else {
-                UserResource resource =
-                    new UserResource(getUrlBase(req), xmldoc);
-                user = (User) resource.getEntity();
-                if (! user.getUsername().equals(username)) {
-                    log.error("Username does not match request URI");
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    return;
-                }
-                userService.createUser(user);
+            User user = userService.getUser(urlUsername);
+            processUserUpdate(req, resp, user, xmldoc);
+        } catch (DataRetrievalFailureException e) {
+            processUserCreate(req, resp, xmldoc);
+        }
+    }
+
+    // our methods
+
+    /**
+     * Enforces preconditions on all PUT requests, including content
+     * length and content type checks. Returns <code>true</code> if
+     * all preconditions are met, otherwise sets the appropriate
+     * error response code and returns <code>false</code>.
+     */
+    protected boolean checkPutPreconditions(HttpServletRequest req,
+                                            HttpServletResponse resp) {
+        if (req.getContentLength() <= 0) {
+            resp.setStatus(HttpServletResponse.SC_LENGTH_REQUIRED);
+            return false;
+        }
+        if (req.getContentType() == null ||
+            ! req.getContentType().startsWith("text/xml")) {
+            resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+            return false;
+        }
+        if (req.getHeader("Content-Transfer-Encoding") != null ||
+            req.getHeader("Content-Encoding") != null ||
+            req.getHeader("Content-Base") != null ||
+            req.getHeader("Content-Location") != null ||
+            req.getHeader("Content-MD5") != null ||
+            req.getHeader("Content-Range") != null) {
+            resp.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Delegated to by {@link #doPut} to handle signup
+     * requests, creating the user account and setting the response
+     * status and headers.
+     */
+    protected void processSignup(HttpServletRequest req,
+                                 HttpServletResponse resp,
+                                 Document xmldoc)
+        throws ServletException, IOException {
+        try {
+            UserResource resource = new UserResource(getUrlBase(req), xmldoc);
+            userService.createUser(resource.getUser());
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+            resp.setHeader("Content-Location", resource.getHomedirUrl()); 
+        } catch (DuplicateUsernameException e) {
+            log.error("Chosen username is already in use");
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+        } catch (DuplicateEmailException e) {
+            log.error("Chosen email is already in use");
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+        } catch (CmpException e) {
+            log.error("Error validating request body: " + e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Delegated to by {@link #doPut} to handle account creation
+     * requests, creating the user account and setting the response
+     * status and headers.
+     */
+    protected void processUserCreate(HttpServletRequest req,
+                                     HttpServletResponse resp,
+                                     Document xmldoc)
+        throws ServletException, IOException {
+        try {
+             UserResource resource = new UserResource(getUrlBase(req), xmldoc);
+             User user = resource.getUser();
+             if (! user.getUsername().
+                 equals(usernameFromPathInfo(req.getPathInfo()))) {
+                 log.error("Username does not match request URI");
+                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                 return;
+             }
+             userService.createUser(user);
+             resp.setStatus(HttpServletResponse.SC_CREATED);
+         } catch (DuplicateUsernameException e) {
+             log.error("Chosen username is already in use");
+             resp.setStatus(HttpServletResponse.SC_CONFLICT);
+         } catch (DuplicateEmailException e) {
+             log.error("Chosen email is already in use");
+             resp.setStatus(HttpServletResponse.SC_CONFLICT);
+         } catch (CmpException e) {
+             log.error("Error validating request body: " + e.getMessage());
+             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+         } catch (ModelValidationException e) {
+             log.error("Error validating user: " + e.getMessage());
+             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Delegated to by {@link #doPut} to handle account update
+     * requests, saving the modified account and setting the response
+     * status and headers.
+     */
+    protected void processUserUpdate(HttpServletRequest req,
+                                     HttpServletResponse resp,
+                                     User user,
+                                     Document xmldoc)
+        throws ServletException, IOException {
+        try {
+            UserResource resource =
+                new UserResource(user, getUrlBase(req), xmldoc);
+            userService.updateUser(user);
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            if (! user.getUsername().
+                equals(usernameFromPathInfo(req.getPathInfo()))) {
+                resp.setHeader("Content-Location", resource.getUserUrl());
                 resp.setStatus(HttpServletResponse.SC_CREATED);
             }
         } catch (DuplicateUsernameException e) {
-            log.error("New username is already in use");
+            log.error("Chosen username is already in use");
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
         } catch (DuplicateEmailException e) {
-            log.error("New email is already in use");
+            log.error("Chosen email is already in use");
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
         } catch (CmpException e) {
             log.error("Error validating request body: " + e.getMessage());
@@ -242,8 +338,6 @@ public class CmpServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
-
-    // our methods
 
     /**
      * Looks up the bean with given name and class in the web

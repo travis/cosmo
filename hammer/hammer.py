@@ -28,7 +28,7 @@ Usage: python hammer.py [options]
 Options:
   -t        number of threads to deploy (default is 10)
   -i        number of GET/PUTs to do on each thread (default is 100)
-  -s        servername (default is cosmo-test.osafoundation.org)
+  -s        servername (default is cosmo-demo.osafoundation.org)
   -p        port (default is 8201)
   -l        size of datafile to GET/PUT in bytes (default is 10000)
   -u        username (default is test; thread number is appended to username)

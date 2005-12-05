@@ -57,10 +57,6 @@
           <td align="right" valign="top">
             <!-- main navbar -->
             <div class="mdData">
-              <authz:authorize ifAllGranted="ROLE_ROOT">
-                <html:link page="/home/"><fmt:message key="Layout.Nav.Main.HomeDirectories"/></html:link>
-              |
-              </authz:authorize>
               <%-- bug 3920
               <authz:authorize ifAllGranted="ROLE_USER">
                 <html:link page="/dirlisting.jsp?rtype=home&username=${user.username}"><fmt:message key="Layout.Nav.Main.HomeDirectory"/></html:link>
@@ -93,6 +89,10 @@
           <div class="md">
             <fmt:message key="Layout.Nav.Console.Label"/>
             <c:choose><c:when test="${fn:endsWith(body, '/user/list.jsp')}"><strong><fmt:message key="Layout.Nav.Console.Users"/></strong></c:when><c:otherwise><html:link page="/users"><fmt:message key="Layout.Nav.Console.Users"/></html:link></c:otherwise></c:choose>
+            |
+            <html:link page="/home/"><fmt:message key="Layout.Nav.Console.HomeDirectories"/></html:link>
+            |
+            <c:choose><c:when test="${fn:endsWith(body, '/status/view.jsp')}"><strong><fmt:message key="Layout.Nav.Console.ServerStatus"/></strong></c:when><c:otherwise><html:link page="/status"><fmt:message key="Layout.Nav.Console.ServerStatus"/></html:link></c:otherwise></c:choose>
             <!-- end admin console navbar -->
           </div>
           <hr noshade="noshade"/>

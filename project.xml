@@ -18,7 +18,7 @@
   <name>Cosmo</name>
   <groupId>cosmo</groupId>
   <artifactId>cosmo</artifactId>
-  <currentVersion>0.3a-pre</currentVersion>
+  <currentVersion>0.3a</currentVersion>
   <organization>
     <name>OSAF</name>
     <url>http://osafoundation.org/</url>
@@ -45,8 +45,41 @@
       <organization>OSAF</organization>
       <timezone>-8</timezone>
     </developer>
+    <developer>
+      <name>Matthew Eernisse</name>
+      <id>mde</id>
+      <email>mde@osafoundation.org</email>
+      <organization>OSAF</organization>
+      <timezone>-6</timezone>
+    </developer>
+    <developer>
+      <name>Todd Agulnick</name>
+      <id>todda</id>
+      <email>todd@agulnick.com</email>
+      <organization>KEI</organization>
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <name>Mike Taylor</name>
+      <id>bear</id>
+      <email>bear@osafoundation.org</email>
+      <organization>OSAF</organization>
+      <timezone>-5</timezone>
+    </developer>
+    <developer>
+      <name>Brian Kirsch</name>
+      <id>bkirsch</id>
+      <email>bkirsch@osafoundation.org</email>
+      <organization>OSAF</organization>
+      <timezone>-10</timezone>
+    </developer>
   </developers>
   <dependencies>
+    <!--
+        dependencies with the war.bundle property are included in the
+        war's WEB-INF/lib directory. those with the tomcat.bundle
+        property are included in tomcat's common/lib directory.
+      -->
     <dependency>
       <groupId>acegisecurity</groupId>
       <artifactId>acegi-security</artifactId>
@@ -59,6 +92,14 @@
       <groupId>activation</groupId>
       <artifactId>activation</artifactId>
       <version>1.0.2</version>
+      <properties>
+        <tomcat.bundle>true</tomcat.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>antlr</groupId>
+      <artifactId>antlr</artifactId>
+      <version>2.7.2</version>
       <properties>
         <tomcat.bundle>true</tomcat.bundle>
       </properties>
@@ -171,7 +212,7 @@
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
-      <version>10.1.1.0</version>
+      <version>10.1.2.1</version>
       <properties>
         <tomcat.bundle>true</tomcat.bundle>
       </properties>
@@ -377,9 +418,20 @@
       </properties>
     </dependency>
     <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.7.0</version> 
+      <properties>
+        <tomcat.bundle>true</tomcat.bundle>
+      </properties>
+    </dependency>
+    <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
       <version>2.6.2</version>
+      <properties>
+        <tomcat.bundle>true</tomcat.bundle>
+      </properties>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>

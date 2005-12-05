@@ -45,6 +45,11 @@
     <level value="WARN"/>
   </logger>
 
+  <!-- logs the original exception for dav error responses -->
+  <logger name="org.apache.jackrabbit.webdav.jcr.JcrDavException">
+    <level value="DEBUG"/>
+  </logger>
+
   <logger name="org.apache.catalina.startup.Catalina">
     <level value="INFO"/>
   </logger>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 
-<user xmlns="http://osafoundation.org/cosmo">
+<user xmlns="http://osafoundation.org/cosmo/CMP">
   <username>bcm</username>
   <password>abc123</password>
   <firstName>Brian</firstName>

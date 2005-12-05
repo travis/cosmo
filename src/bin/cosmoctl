@@ -14,10 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Wrapper script for Tomcat's catalina.sh
+# Wrapper script for Tomcat's catalina.sh that sets up the environment
+# and changes the directory to run in the Cosmo distribution directory.
 #
 # Ripped off from Tomcat's shutdown.sh
 # -----------------------------------------------------------------------------
+
+function check_feature() {
+    if [ -z "$1" ] ; then
+        return 1;
+    elif [ "$1" == "false" ] || [ "$1" == "0" ] ; then
+        return 2;
+    fi
+    return 0;
+}
 
 # resolve links - $0 may be a softlink
 PRG="$0"
@@ -31,25 +41,66 @@ while [ -h "$PRG" ] ; do
     PRG=`dirname "$PRG"`/"$link"
   fi
 done
- 
-PRGDIR=`dirname "$PRG"`/../tomcat/bin
-EXECUTABLE=catalina.sh
 
-# Check that target executable exists
-if [ ! -x "$PRGDIR"/"$EXECUTABLE" ]; then
-  echo "Cannot find $PRGDIR/$EXECUTABLE"
+# move into cosmo home directory
+COSMO_HOME=`dirname "$PRG"`/..
+cd $COSMO_HOME
+export COSMO_HOME=`pwd`
+COSMO_BINDIR="$COSMO_HOME"/bin
+
+# tomcat is found one level above this directory
+export CATALINA_HOME="$COSMO_HOME"/tomcat
+CATALINA_BINDIR="$CATALINA_HOME"/bin
+TOMCAT_SCRIPT=catalina.sh
+
+# check that the tomcat control script exists
+if [ ! -x "$CATALINA_BINDIR"/"$TOMCAT_SCRIPT" ]; then
+  echo "Cannot find $CATALINA_BINDIR/$TOMCAT_SCRIPT"
   echo "This file is needed to run this program"
   exit 1
 fi
 
+# source the config script if it exists
+CFGSCRIPT=cosmocfg
+if [ -f "$COSMO_BINDIR"/"$CFGSCRIPT" ]; then
+    . "$COSMO_BINDIR"/"$CFGSCRIPT"
+fi
+
+# enable/disable features
+COSMO_OPTS="-server"
+check_feature $COSMO_JMX_LOCAL
+if [ $? -lt 2 ]; then
+    COSMO_OPTS="$COSMO_OPTS -Dcom.sun.management.jmxremote"
+else
+    echo "Disabling JMX"
+fi
+check_feature $COSMO_ICAL4J_UNFOLDING_RELAXED
+if [ $? -lt 2 ]; then
+    COSMO_OPTS="$COSMO_OPTS -Dical4j.unfolding.relaxed=true"
+else
+    COSMO_OPTS="$COSMO_OPTS -Dical4j.unfolding.relaxed=false"
+    echo "Disabling ical4j relaxed unfolding"
+fi
+if [ -n "$COSMO_DERBY_ERROR_LOG" ]; then
+    COSMO_OPTS="$COSMO_OPTS -Dderby.stream.error.file=$COSMO_DERBY_ERROR_LOG";
+    echo "Logging derby output to $COSMO_DERBY_ERROR_LOG"
+else
+    COSMO_OPTS="$COSMO_OPTS -Dderby.stream.error.file=logs/derby.log"
+fi
+check_feature $COSMO_DERBY_ERROR_LOG_APPEND
+if [ $? -lt 2 ]; then
+    COSMO_OPTS="$COSMO_OPTS -Dderby.infolog.append=true"
+else
+    COSMO_OPTS="$COSMO_OPTS -Dderby.infolog.append=false"
+    echo "Disabling appending for derby log"
+fi
+
 # move into the cosmo homedir so that paths relative to the current
 # working directory resolve correctly
-cd $PRGDIR/../..
+cd $COSMO_HOME
 
-export COSMO_HOME=`pwd`
-export CATALINA_HOME=$COSMO_HOME/tomcat
-export JAVA_OPTS="$JAVA_OPTS -server -Dical4j.unfolding.relaxed=true -Dderby.stream.error.file=logs/derby.log -Dderby.infolog.append=true"
+export JAVA_OPTS="$JAVA_OPTS $COSMO_OPTS"
 
 echo "Using COSMO_HOME:      $COSMO_HOME"
 
-exec "$CATALINA_HOME"/bin/"$EXECUTABLE" "$@"
+exec "$CATALINA_BINDIR"/"$TOMCAT_SCRIPT" "$@"

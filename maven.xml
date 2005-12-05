@@ -136,13 +136,6 @@
          usetimestamp="true"/>
     <untar src="${maven.build.dir}/${ext.tomcat.package}.tar.gz"
            dest="${maven.build.dir}" compression="gzip"/>
-    <j:if test="${context.getVariable('cosmo.compat.14') == 'true'}">
-      <get src="${ext.tomcat.compat.url}"
-           dest="${maven.build.dir}/${ext.tomcat.compat.package}.tar.gz"
-           usetimestamp="true"/>
-      <untar src="${maven.build.dir}/${ext.tomcat.compat.package}.tar.gz"
-             dest="${maven.build.dir}" compression="gzip"/>
-    </j:if>
     <copy todir="${cosmo.dist.version}/tomcat">
       <fileset dir="${maven.build.dir}/${ext.tomcat.package}">
         <exclude name="**/conf/Catalina/localhost/*.xml"/>
@@ -173,6 +166,8 @@
     <copy todir="${cosmo.dist.version}/bin"
           file="${basedir}/src/bin/cosmoctl"/>
     <chmod file="${cosmo.dist.version}/bin/cosmoctl" perm="755"/>
+    <copy todir="${cosmo.dist.version}/bin"
+          file="${basedir}/src/bin/cosmocfg"/>
     <copy todir="${cosmo.dist.version}">
       <fileset dir="${basedir}/src/docs">
         <include name="*.txt"/>

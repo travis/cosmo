@@ -149,6 +149,14 @@ public class UserResource implements CmpResource {
     // our methods
 
     /**
+     * Just as {@link #getEntity}, except the returned object is cast
+     * to <code>User</code>.
+     */
+    public User getUser() {
+        return (User) getEntity();
+    }
+
+    /**
      */
     public String getUserUrl() {
         return userUrl;

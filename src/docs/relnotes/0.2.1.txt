@@ -1,0 +1,49 @@
+
+Cosmo Sharing Server 0.2.1
+Release Notes
+        
+
+UPGRADING FROM A PREVIOUS RELEASE
+=================================
+
+Due to incompatible schema changes, 0.2.1 cannot operate against
+repositories created by earlier versions of Cosmo.
+
+
+BUGS FIXED
+==========
+
+2854: WebDAV resources with spaces in their names have their URLs
+      correctly escaped in PROPFIND responses
+3068: WebDAV resource names may now contain any Unicode character
+      except for non-space whitespace characters
+4102: The `root' user can no longer be deleted via CMP
+4103: CMP ensures that the username in the URI and in the XML request
+      content are the same
+4104: CMP no longer includes a homedirUrl in the XML representation of
+      the `root' user
+4212: "Expensive" WebDAV properties are no longer calculated when
+      those properties are not needed in the response
+4225: The repository is now cleanly shut down when the server is
+      stopped.
+4226: Ticket validation now properly handles lookups for resources
+      with spaces in their names
+4255: Duplicate UID queries for CalDAV event resources now properly
+      handle resources with spaces in their names
+
+
+
+
+Copyright 2005 Open Source Applications Foundation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

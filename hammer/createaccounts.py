@@ -50,7 +50,7 @@ import sys, getopt, time
 
 def createAccount(server, port, username, password, adminuser, adminpass):
     xmlCreateAccount = """<?xml version="1.0" encoding="utf-8" ?> 
-<user xmlns="http://osafoundation.org/cosmo">
+<user xmlns="http://osafoundation.org/cosmo/CMP">
   <username>%s</username>
   <password>%s</password>
   <firstName>Tommy</firstName>
@@ -60,7 +60,7 @@ def createAccount(server, port, username, password, adminuser, adminpass):
 """ % (username, password, username)
 
     body = StringAsFile(xmlCreateAccount.encode("utf-8"))
-    url = "http://%s:%s@%s:%d/api/user/%s" % (adminuser, adminpass, server, port, username)
+    url = "http://%s:%s@%s:%d/cmp/user/%s" % (adminuser, adminpass, server, port, username)
     response = StringAsFile()
     curl = pycurl.Curl()
     curl.setopt(pycurl.URL, url)

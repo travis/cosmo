@@ -25,6 +25,17 @@
     <to>/error.do</to>
   </rule>
 
+  <!-- status rules -->
+  <rule>
+    <from>^/status$</from>
+    <to>/status.do</to>
+  </rule>
+
+  <rule>
+    <from>^/status/dump$</from>
+    <to>/status/dump.do</to>
+  </rule>
+
   <!-- Help/About rules -->
 
   <rule>

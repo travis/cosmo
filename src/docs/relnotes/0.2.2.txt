@@ -1,0 +1,51 @@
+
+Cosmo Sharing Server 0.2.2
+Release Notes
+        
+
+UPGRADING FROM A PREVIOUS RELEASE
+=================================
+
+Due to a change in the way that repository data is stored on disk,
+0.2.2 cannot operate against repositories created by earlier versions
+of Cosmo.
+
+
+BUGS FIXED
+==========
+
+4350: Expanded timezone support provided by ical4j 0.9.17.
+4388: The Content-Type response header is properly set when GETing
+      collections.
+4390: Temporary files are no longer used when creating the response
+      contents for GET requests against collections, which should get
+      rid of the "too many open files" error message seen in
+      cosmo.log.
+4521: The If-Match and If-None-Match headers are now supported for all
+      HTTP methods.
+4526: GET requests including If-Modified-Since headers now cause 304
+      (Unmodified) responses as appropriate.
+4527: The date value of the Last-Modified response header is now in
+      the same timezone as the other date headers in the response.
+4563: Unusually formatted timezones within PUT calendar objects are
+      more robustly handled with ical4j 0.9.17.
+4575: Intermittent failures making collections and PUTing resources
+      are guarded against by using a filesystem storage scheme that
+      does not run up against operating system limits for inode
+      links.
+
+
+
+Copyright 2005 Open Source Applications Foundation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

@@ -130,6 +130,24 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         cosmoResource.setBaseUrl(cosmoRequest.getBaseUrl());
         cosmoResource.setApplicationContext(wac);
 
+        if (ifNoneMatch(request, cosmoResource)) {
+            switch (method) {
+            case DavMethods.DAV_GET:
+            case DavMethods.DAV_HEAD:
+                response.setStatus(DavServletResponse.SC_NOT_MODIFIED);
+                response.setHeader("ETag", cosmoResource.getETag());
+                return true;
+            default:
+                response.setStatus(DavServletResponse.SC_PRECONDITION_FAILED);
+                return true;
+            }
+        }
+
+        if (ifMatch(request, cosmoResource)) {
+            response.setStatus(DavServletResponse.SC_PRECONDITION_FAILED);
+            return true;
+        }
+
         // TODO We handle REPORT ourselves for now. Eventually this will be
         // punted up into jackrabbit
         if ((method > 0) && (method != DavMethods.DAV_REPORT)) {
@@ -201,41 +219,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                          WebdavResponse response,
                          DavResource resource)
         throws IOException, DavException {
-        CosmoDavRequestImpl cosmoRequest = new CosmoDavRequestImpl(request);
-        CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
         CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
-
-        // caldav (section 4.6.2): honor "If-None-Match"
-        String ifNoneMatch = request.getHeader("If-None-Match");
-        if (ifNoneMatch != null) {
-            // fail if it's "*" and the resource exists at all
-            if ((ifNoneMatch.equals("*") && resource.exists()) ||
-                // fail if the resource exists and both etags are
-                // strong and they match
-                (resource.exists() &&
-                 ! ifNoneMatch.startsWith("W/") &&
-                 ! cosmoResource.getETag().startsWith("W/") &&
-                 cosmoResource.getETag().equals(ifNoneMatch))) {
-                response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
-                return;
-            }
-        }
-
-        // caldav (section 4.6.2): honor "If-Match" header
-        String ifMatch = request.getHeader("If-Match");
-        if (ifMatch != null) {
-            // fail if it's "*" and the resource does not exist
-            if ((ifMatch.equals("*") && ! resource.exists()) ||
-                // fail if the resource does not exist, one or both of
-                // the etags are weak, or if the etags don't match
-                (! resource.exists() ||
-                 ifMatch.startsWith("W/") ||
-                 cosmoResource.getETag().startsWith("W/") ||
-                 ! cosmoResource.getETag().equals(ifMatch))) {
-                response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
-                return;
-            }
-        }
 
         try {
             super.doPut(request, response, resource);
@@ -443,6 +427,14 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     // our methods
 
     /**
+     * Checks if an <code>If-None-Match</code> header is present in
+     * the request; if so, compares the specified value to the entity
+     * tag of the resource and returns <code>true</code> if the
+     * request should fail.
+     *
+     * @param request
+     * @param resource
+     * @return
      */
     protected boolean ifNoneMatch(WebdavRequest request,
                                   CosmoDavResource resource) {

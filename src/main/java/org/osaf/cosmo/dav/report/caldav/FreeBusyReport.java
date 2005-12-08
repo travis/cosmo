@@ -61,6 +61,7 @@ import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
 import org.osaf.cosmo.dav.report.Report;
@@ -76,7 +77,7 @@ import org.osaf.cosmo.dav.report.ReportType;
  * required format for the request body:
  * 
  * <pre>
- *                        &lt;!ELEMENT free-busy-query (time-range)&gt;
+ *                         &lt;!ELEMENT free-busy-query (time-range)&gt;
  * </pre>
  * 
  */
@@ -332,11 +333,7 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
         Calendar calendar = new Calendar();
         calendar.getProperties().add(Version.VERSION_2_0);
         calendar.getProperties().add(CalScale.GREGORIAN);
-        calendar
-                .getProperties()
-                .add(
-                        new ProdId(
-                                "-//Open Source Applications Foundation//Cosmo//EN"));
+        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
 
         VFreeBusy vfb = new VFreeBusy(freeBusyRange.getStart(), freeBusyRange
                 .getEnd());
@@ -388,7 +385,8 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
      * calendar taking into account the different types of busy time supported
      * by iCalendar. Recurrences are expanded.
      * 
-     * @param calendar      the calendar contains components
+     * @param calendar
+     *            the calendar contains components
      * @param busyPeriods
      * @param busyTentativePeriods
      * @param busyUnavailablePeriods

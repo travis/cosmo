@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,6 +28,8 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.filter.OutputFilter;
 
@@ -283,6 +286,9 @@ public abstract class AbstractCalendarDataReport implements Report,
     private OutputFilter parseCalendarData(Element cdata) {
 
         OutputFilter result = null;
+        Period expand = null;
+        Period limit = null;
+        Period limitfb = null;
 
         // Look at each child element of calendar-data
         for (Iterator iter = cdata.getChildren().iterator(); iter.hasNext();) {
@@ -305,13 +311,38 @@ public abstract class AbstractCalendarDataReport implements Report,
                 // Now parse filter item
                 result = parseCalendarDataComp(child);
 
+                // TODO expand-recurrence-set was removed in -08 draft, but is
+                // here for backwards compatability
             } else if (CosmoDavConstants.ELEMENT_CALDAV_EXPAND_RECURRENCE_SET
-                    .equals(child.getName())) {
-                // TODO Handle this element
+                    .equals(child.getName())
+                    || CosmoDavConstants.ELEMENT_CALDAV_EXPAND.equals(child
+                            .getName())) {
+                expand = parsePeriod(child);
             } else if (CosmoDavConstants.ELEMENT_CALDAV_LIMIT_RECURRENCE_SET
                     .equals(child.getName())) {
-                // TODO Handle this element
+                limit = parsePeriod(child);
+            } else if (CosmoDavConstants.ELEMENT_CALDAV_LIMIT_FREEBUSY_SET
+                    .equals(child.getName())) {
+                limitfb = parsePeriod(child);
             }
+        }
+
+        // Now add any limit/expand options, creating a filter if one is not
+        // already present
+        if ((result == null)
+                && ((expand != null) || (limit != null) || (limitfb != null))) {
+            result = new OutputFilter("VCALENDAR");
+            result.setAllSubComponents();
+            result.setAllProperties();
+        }
+        if (expand != null) {
+            result.setExpand(expand);
+        }
+        if (limit != null) {
+            result.setLimit(limit);
+        }
+        if (limitfb != null) {
+            result.setLimitfb(limitfb);
         }
 
         return result;
@@ -399,5 +430,27 @@ public abstract class AbstractCalendarDataReport implements Report,
         }
 
         return result;
+    }
+
+    private Period parsePeriod(Element node) {
+        try {
+            // Get start (must be present)
+            String start = node
+                    .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_START);
+            if (start == null)
+                return null;
+            DateTime trstart = new DateTime(start);
+
+            // Get end (must be present)
+            String end = node
+                    .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_END);
+            if (end == null)
+                return null;
+            DateTime trend = new DateTime(end);
+
+            return new Period(trstart, trend);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 }

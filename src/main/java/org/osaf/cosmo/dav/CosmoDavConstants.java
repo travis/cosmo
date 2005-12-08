@@ -69,8 +69,12 @@ public class CosmoDavConstants {
     public static final String ELEMENT_CALDAV_PROP = "prop";
     public static final String ELEMENT_CALDAV_EXPAND_RECURRENCE_SET =
         "expand-recurrence-set";
+    public static final String ELEMENT_CALDAV_EXPAND =
+        "expand";
     public static final String ELEMENT_CALDAV_LIMIT_RECURRENCE_SET =
         "limit-recurrence-set";
+    public static final String ELEMENT_CALDAV_LIMIT_FREEBUSY_SET =
+        "limit-freebusy-set";
     public static final String ELEMENT_CALDAV_FILTER = "filter";
     public static final String ELEMENT_CALDAV_COMP_FILTER = "comp-filter";
     public static final String ELEMENT_CALDAV_PROP_FILTER = "prop-filter";

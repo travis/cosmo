@@ -25,10 +25,10 @@ import org.apache.jackrabbit.core.query.QueryNode;
 import org.apache.jackrabbit.core.query.QueryNodeVisitor;
 import org.apache.jackrabbit.core.query.lucene.FieldNames;
 import org.apache.jackrabbit.core.query.lucene.NamespaceMappings;
-import org.apache.jackrabbit.core.util.ISO9075;
 import org.apache.jackrabbit.name.NamespaceResolver;
 import org.apache.jackrabbit.name.NoPrefixDeclaredException;
 import org.apache.jackrabbit.name.QName;
+import org.apache.jackrabbit.util.ISO9075;
 import org.apache.lucene.index.Term;
 
 /**

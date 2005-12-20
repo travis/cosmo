@@ -13,29 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.model;
+package org.osaf.cosmo.io;
+
+import org.apache.jackrabbit.server.io.DefaultIOManager;
 
 /**
- * An exception indicating that an existing user is already using the
- * specified email.
+ * Extends {@link org.apache.jackrabbit.server.io.DefaultIOManager}
+ * to provide a set of custom IO handlers.
  */
-public class DuplicateEmailException extends ModelValidationException {
+public class CosmoIOManager extends DefaultIOManager {
 
     /**
+     * Overwrites the handler list to include the following handlers:
+     *
+     * <ol>
+     * <li> {@link DavCollectionHandler}</li>
+     * <li> {@link CosmoHandler}</li>
+     * </ol>
      */
-    public DuplicateEmailException() {
-        super("duplicate email");
-    }
-
-    /**
-     */
-    public DuplicateEmailException(String message) {
-        super(message);
-    }
-
-    /**
-     */
-    public DuplicateEmailException(String message, Throwable cause) {
-        super(message, cause);
+    protected void init() {
+        addIOHandler(new DavCollectionHandler(this));
+        addIOHandler(new CosmoHandler(this));
     }
 }

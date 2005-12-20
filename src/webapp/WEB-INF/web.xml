@@ -30,7 +30,6 @@
       classpath:applicationContext-provisioning.xml
       classpath:applicationContext-security.xml
       classpath:applicationContext-security-web.xml
-      classpath:applicationContext-adapter-dav.xml
       classpath:applicationContext-mail.xml
       classpath:applicationContext-config-web.xml
     </param-value>

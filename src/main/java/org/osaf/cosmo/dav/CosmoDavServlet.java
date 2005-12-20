@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dav;
 
+import java.io.InputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -27,33 +28,38 @@ import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
-import org.apache.jackrabbit.webdav.DavSessionProvider;
+import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.WebdavRequest;
 import org.apache.jackrabbit.webdav.WebdavRequestImpl;
 import org.apache.jackrabbit.webdav.WebdavResponse;
 import org.apache.jackrabbit.webdav.WebdavResponseImpl;
+import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 
 import org.apache.log4j.Logger;
 
+import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.impl.CosmoDavLocatorFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResponseImpl;
+import org.osaf.cosmo.dav.impl.CosmoDavSessionProviderImpl;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
+import org.osaf.cosmo.io.CosmoInputContext;
 import org.osaf.cosmo.model.Ticket;
-import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import org.springmodules.jcr.JcrSessionFactory;
 
 /**
  * An extension of Jackrabbit's 
@@ -64,17 +70,22 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     private static final Logger log =
         Logger.getLogger(CosmoDavServlet.class);
 
-    /** The name of the Spring bean identifying the servlet's
-     * {@link org.apache.jackrabbit.webdav.DavSessionProvider}
+    /**
+     * The name of the Spring bean identifying the
+     * {@link org.osaf.commons.spring.jcr.JCRSessionFactory} that
+     * produces JCR sessions for this servlet.
      */
-    public static final String BEAN_DAV_SESSION_PROVIDER =
-        "sessionProvider";
+    public static final String BEAN_DAV_SESSION_FACTORY =
+        "homedirSessionFactory";
     /**
      * The name of the Spring bean identifying the Cosmo security
      * manager
      */
-    public static final String BEAN_SECURITY_MANAGER =
-        "securityManager";
+    public static final String BEAN_SECURITY_MANAGER = "securityManager";
+    /**
+     * The name of the Spring bean identifying the Cosmo ticket DAO.
+     */
+    public static final String BEAN_TICKET_DAO = "ticketDao";
 
     private CosmoSecurityManager securityManager;
     private WebApplicationContext wac;
@@ -92,18 +103,23 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         wac = WebApplicationContextUtils.
             getRequiredWebApplicationContext(getServletContext());
 
-        DavSessionProvider sessionProvider = (DavSessionProvider)
-            getBean(BEAN_DAV_SESSION_PROVIDER,
-                    DavSessionProvider.class);
-        setDavSessionProvider(sessionProvider);
-
+        JcrSessionFactory sessionFactory = (JcrSessionFactory)
+            getBean(BEAN_DAV_SESSION_FACTORY, JcrSessionFactory.class);
         securityManager = (CosmoSecurityManager)
             getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
+        TicketDao ticketDao = (TicketDao)
+            getBean(BEAN_TICKET_DAO, TicketDao.class);
+
+        CosmoDavSessionProviderImpl sessionProvider =
+            new CosmoDavSessionProviderImpl();
+        sessionProvider.setSessionFactory(sessionFactory);
+        setDavSessionProvider(sessionProvider);
 
         CosmoDavResourceFactoryImpl resourceFactory =
             new CosmoDavResourceFactoryImpl(getLockManager(),
                                             getResourceConfig());
         resourceFactory.setSecurityManager(securityManager);
+        resourceFactory.setTicketDao(ticketDao);
         setResourceFactory(resourceFactory);
 
         CosmoDavLocatorFactoryImpl locatorFactory =
@@ -124,29 +140,9 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                               int method,
                               DavResource resource)
             throws ServletException, IOException, DavException {
-        CosmoDavRequestImpl cosmoRequest = new CosmoDavRequestImpl(request);
-        CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
+        CosmoDavRequest cosmoRequest = (CosmoDavRequest) request;
+        CosmoDavResponse cosmoResponse = (CosmoDavResponse) response;
         CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
-        cosmoResource.setBaseUrl(cosmoRequest.getBaseUrl());
-        cosmoResource.setApplicationContext(wac);
-
-        if (ifNoneMatch(request, cosmoResource)) {
-            switch (method) {
-            case DavMethods.DAV_GET:
-            case DavMethods.DAV_HEAD:
-                response.setStatus(DavServletResponse.SC_NOT_MODIFIED);
-                response.setHeader("ETag", cosmoResource.getETag());
-                return true;
-            default:
-                response.setStatus(DavServletResponse.SC_PRECONDITION_FAILED);
-                return true;
-            }
-        }
-
-        if (ifMatch(request, cosmoResource)) {
-            response.setStatus(DavServletResponse.SC_PRECONDITION_FAILED);
-            return true;
-        }
 
         // TODO We handle REPORT ourselves for now. Eventually this will be
         // punted up into jackrabbit
@@ -180,47 +176,11 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     }
 
     /**
-     * The HEAD method
-     *
-     * @param request
-     * @param response
-     * @param resource
-     * @throws java.io.IOException
-     */
-    protected void doHead(WebdavRequest request, WebdavResponse response,
-                          DavResource resource) throws IOException {
-        if (! (resource.exists() && resource.isCollection())) {
-            super.doHead(request, response, resource);
-            return;
-        }
-        generateDirectoryListing(request, response, resource);
-    }
-
-    /**
-     * The GET method
-     *
-     * @param request
-     * @param response
-     * @param resource
-     * @throws IOException
-     */
-    protected void doGet(WebdavRequest request, WebdavResponse response,
-                         DavResource resource) throws IOException {
-        if (! (resource.exists() && resource.isCollection())) {
-            super.doGet(request, response, resource);
-            return;
-        }
-        generateDirectoryListing(request, response, resource);
-    }
-
-    /**
      */
     protected void doPut(WebdavRequest request,
                          WebdavResponse response,
                          DavResource resource)
         throws IOException, DavException {
-        CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
-
         try {
             super.doPut(request, response, resource);
         } catch (DavException e) {
@@ -235,15 +195,13 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             throw e;
         }
 
-        DavResource newResource =
-            getResourceFactory().createResource(request.getRequestLocator(),
-                                                request, response);
-        CosmoDavResource newCosmoResource = (CosmoDavResource) newResource;
-
         // caldav (section 4.6.2): return ETag header
-        if (! newCosmoResource.getETag().equals("")) {
-            response.setHeader("ETag", newCosmoResource.getETag());
-        }
+        // since we can't force a resource to reload its properties,
+        // we have to get a new copy of the resource which will
+        // contain the etag
+        DavResource newResource = getResourceFactory().
+            createResource(request.getRequestLocator(), request, response);
+        response.setHeader("ETag", newResource.getETag());
     }
 
     // TODO We handle REPORT ourselves for now. Eventually this will be
@@ -278,8 +236,6 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                                 CosmoDavResponse response,
                                 CosmoDavResource resource)
         throws IOException, DavException {
-        WebdavRequest webdavRequest = request.getWebdavRequest();
-
         // resource must be null
         if (resource.exists()) {
             if (log.isDebugEnabled()) {
@@ -319,8 +275,8 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         }
 
         // we do not allow request bodies
-        if (webdavRequest.getContentLength() > 0 ||
-            webdavRequest.getHeader("Transfer-Encoding") != null) {
+        if (request.getContentLength() > 0 ||
+            request.getHeader("Transfer-Encoding") != null) {
             if (log.isDebugEnabled()) {
                 log.debug("cannot make calendar at " +
                           resource.getResourcePath() +
@@ -338,7 +294,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             log.debug("adding calendar collection at " +
                       resource.getResourcePath());
         }
-        parentResource.addCalendarCollection(resource);
+        parentResource.addMember(resource, getInputContext(request, null));
         response.setStatus(DavServletResponse.SC_CREATED);
     }
 
@@ -424,127 +380,26 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         response.sendDelTicketResponse(resource, ticket.getId());
     }
 
+    /**
+     */
+    protected WebdavRequest createWebdavRequest(HttpServletRequest request) {
+        return new CosmoDavRequestImpl(request, getLocatorFactory());
+    }
+
+    /**
+     */
+    protected WebdavResponse createWebdavResponse(HttpServletResponse response) {
+        return new CosmoDavResponseImpl(response);
+    }
+
+    /**
+     */
+    public InputContext getInputContext(DavServletRequest request,
+                                        InputStream in) {
+        return new CosmoInputContext(request, in);
+    }
+
     // our methods
-
-    /**
-     * Checks if an <code>If-None-Match</code> header is present in
-     * the request; if so, compares the specified value to the entity
-     * tag of the resource and returns <code>true</code> if the
-     * request should fail.
-     *
-     * @param request
-     * @param resource
-     * @return
-     */
-    protected boolean ifNoneMatch(WebdavRequest request,
-                                  CosmoDavResource resource) {
-        String ifNoneMatch = request.getHeader("If-None-Match");
-        if (ifNoneMatch == null) {
-            return false;
-        }
-
-        // fail if it's "*" and the resource exists at all
-        if (ifNoneMatch.equals("*") && resource.exists()) {
-            return true;
-        }
-
-        // fail if the resource exists and the etags match
-        // XXX: account for multiple etags in the header
-        if (resource.exists()) {
-            if (request.getMethod().equals(CosmoDavMethods.METHOD_GET) ||
-                request.getMethod().equals(CosmoDavMethods.METHOD_HEAD)) {
-                return isWeakEtagMatch(ifNoneMatch, resource.getETag());
-            }
-            return isStrongEtagMatch(ifNoneMatch, resource.getETag());
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if an <code>If-Match</code> header is present in
-     * the request; if so, compares the specified value to the entity
-     * tag of the resource and returns <code>true</code> if the
-     * request should fail.
-     *
-     * @param request
-     * @param resource
-     * @return
-     */
-    protected boolean ifMatch(WebdavRequest request,
-                              CosmoDavResource resource) {
-        String ifMatch = request.getHeader("If-Match");
-        if (ifMatch == null) {
-            return false;
-        }
-
-        // fail if it's "*" and the resource does not exist
-        if (ifMatch.equals("*") && ! resource.exists()) {
-            return true;
-        }
-
-        // fail if the resource doesn't exist, or if the resource
-        // exists but there is no match
-        // XXX: account for multiple etags in the header
-        if (! resource.exists() ||
-            (resource.exists() &&
-             ! isStrongEtagMatch(ifMatch, resource.getETag()))) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Uses the strong comparison function to determine if two etags
-     * match.
-     */
-    protected boolean isStrongEtagMatch(String etag,
-                                        String test) {
-        if (etag == null || test == null) {
-            return false;
-        }
-        // both etags must be strong
-        return (! etag.startsWith("W/") &&
-                ! test.startsWith("W/") &&
-                etag.equals(test));
-    }
-
-    /**
-     * Uses the weak comparison function to determine if two etags
-     * match.
-     */
-    protected boolean isWeakEtagMatch(String etag,
-                                      String test) {
-        if (etag == null || test == null) {
-            return false;
-        }
-        // either etag may be weak or strong
-        if (etag.startsWith("W/")) {
-            etag = etag.substring(2);
-        }
-        if (test.startsWith("W/")) {
-            test = test.substring(2);
-        }
-        return etag.equals(test);
-    }
-
-    /**
-     */
-    protected void generateDirectoryListing(WebdavRequest request,
-                                            WebdavResponse response,
-                                            DavResource resource)
-        throws IOException {
-        CosmoDavRequestImpl cosmoRequest = new CosmoDavRequestImpl(request);
-        CosmoDavResponseImpl cosmoResponse = new CosmoDavResponseImpl(response);
-        CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
-
-        if (cosmoResource.isCalendarCollection()) {
-            cosmoResponse.sendICalendarCollectionListingResponse(cosmoResource);
-            return;
-        }
-        cosmoResponse.sendHtmlCollectionListingResponse(cosmoResource);
-    }
 
     /**
      * Looks up the bean with given name and class in the web
@@ -562,17 +417,5 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                                        " of type " + clazz +
                                        " from web application context", e);
         }
-    }
-
-    /**
-     */
-    public WebApplicationContext getWebApplicationContext() {
-        return wac;
-    }
-
-    // private methods
-
-    private User getLoggedInUser() {
-        return securityManager.getSecurityContext().getUser();
     }
 }

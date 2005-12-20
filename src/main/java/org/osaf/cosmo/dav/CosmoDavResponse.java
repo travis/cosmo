@@ -15,29 +15,14 @@
  */
 package org.osaf.cosmo.dav;
 
-import java.io.IOException;
-
 import org.apache.jackrabbit.webdav.WebdavResponse;
 
 import org.osaf.cosmo.dav.ticket.TicketDavResponse;
 
 /**
  * An empty interface collecting the functionality defined by various
- * WebDAV extensions implemented by Cosmo.
+ * WebDAV extensions implemented by Cosmo. Extends
+ * {@link org.apache.jackrabbit.webdav.WebdavResponse}.
  */
 public interface CosmoDavResponse extends WebdavResponse, TicketDavResponse {
-
-    /**
-     * Send an HTML listing of a collection's contents in response to
-     * a <code>GET</code> request.
-     */
-    public void sendHtmlCollectionListingResponse(CosmoDavResource resource)
-        throws IOException;
-
-    /**
-     * Send an iCalendar view of a calendar collection's contents in
-     * response to a <code>GET</code> request.
-     */
-    public void sendICalendarCollectionListingResponse(CosmoDavResource resource)
-        throws IOException;
 }

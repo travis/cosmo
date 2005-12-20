@@ -48,7 +48,7 @@
       </td>
       <td>
         <div class="smData"><cosmo:errmsg property="firstName"/></div>
-        <div><html:text property="firstName" size="32" maxlength="32" styleClass="textInput"/></iv>
+        <div><html:text property="firstName" size="32" maxlength="128" styleClass="textInput"/></iv>
       </td>
     </tr>
     <tr>
@@ -57,7 +57,7 @@
       </td>
       <td>
         <div class="smData"><cosmo:errmsg property="lastName"/></div>
-        <div><html:text property="lastName" size="32" maxlength="32" styleClass="textInput"/></iv>
+        <div><html:text property="lastName" size="32" maxlength="128" styleClass="textInput"/></iv>
       </td>
     </tr>
     <tr>
@@ -66,7 +66,7 @@
       </td>
       <td class="mdData">
         <div class="smData"><cosmo:errmsg property="email"/></div>
-        <div><html:text property="email" size="32" maxlength="32" styleClass="textInput"/></div>
+        <div><html:text property="email" size="32" maxlength="128" styleClass="textInput"/></div>
       </td>
     </tr>
     <tr>

@@ -27,7 +27,6 @@ import org.apache.jackrabbit.webdav.simple.DavSessionImpl;
 
 import org.apache.log4j.Logger;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springmodules.jcr.JcrSessionFactory;
 
 /**
@@ -36,24 +35,11 @@ import org.springmodules.jcr.JcrSessionFactory;
  * repository and provide a
  * {@link org.apache.jackrabbit.webdav.DavSession} to the request.
  */
-public class CosmoDavSessionProviderImpl
-    implements DavSessionProvider, InitializingBean {
+public class CosmoDavSessionProviderImpl implements DavSessionProvider {
     private static final Logger log =
         Logger.getLogger(CosmoDavSessionProviderImpl.class);
 
     private JcrSessionFactory sessionFactory;
-
-    /**
-     */
-    public CosmoDavSessionProviderImpl() {
-    }
-
-    /**
-     */
-    public CosmoDavSessionProviderImpl(JcrSessionFactory sessionFactory) {
-        setSessionFactory(sessionFactory);
-        afterPropertiesSet();
-    }
 
     // DavSessionProvider methods
 
@@ -69,7 +55,6 @@ public class CosmoDavSessionProviderImpl
      * @throws DavException if a problem occurred while obtaining the session
      */
     public boolean attachSession(WebdavRequest request) throws DavException {
-        // XXX cache dav session in web session?
         try {
             Session session = sessionFactory.getSession();
             DavSession davSession = new DavSessionImpl(session);
@@ -88,18 +73,8 @@ public class CosmoDavSessionProviderImpl
      * @param request
      */
     public void releaseSession(WebdavRequest request) {
+        request.getDavSession().getRepositorySession().logout();
         request.setDavSession(null);
-    }
-
-    // InitializingBean methods
-
-    /**
-     * Sanity check the object's properties.
-     */
-    public void afterPropertiesSet() {
-        if (sessionFactory == null) {
-            throw new IllegalArgumentException("sessionFactory is required");
-        }
     }
 
     // our methods

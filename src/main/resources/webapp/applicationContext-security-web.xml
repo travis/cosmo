@@ -50,6 +50,7 @@
          /remind.do=ROLE_ANONYMOUS
          /login=ROLE_ANONYMOUS
          /loginfailed=ROLE_ANONYMOUS
+         /robots.txt=ROLE_ANONYMOUS
          /*.css=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /*.js=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /*.ico=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
@@ -61,6 +62,7 @@
          /cmp/users=ROLE_ROOT
          /cmp/user/*=ROLE_ROOT
          /cmp/signup=ROLE_ANONYMOUS
+         /cmp/account=ROLE_USER
          /**=ROLE_ROOT
        </value>
      </property>

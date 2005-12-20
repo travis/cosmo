@@ -39,7 +39,7 @@
   <html:form action="/remind">
     <p>
       <b><fmt:message key="Forgot.Label.Email"/></b>
-      <html:text property="email" size="32" maxlength="32"
+      <html:text property="email" size="32" maxlength="128"
                  styleClass="md"/>
       <cosmo:errmsg property="email"/>
     </p>

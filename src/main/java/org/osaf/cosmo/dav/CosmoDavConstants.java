@@ -127,13 +127,12 @@ public class CosmoDavConstants {
     public static final DavPropertyName CALENDARDATA = DavPropertyName.create(
             ELEMENT_CALDAV_CALENDAR_DATA, NAMESPACE_CALDAV);
 
+    // caldav content types
+    public static final String CONTENT_TYPE_CALENDAR_COLLECTION =
+        "application/x-calendar-collection";
+
     // ticket properties
 
     public static final String PROPERTY_TICKET_TICKETDISCOVERY =
         "ticketdiscovery";
-
-    // caldav content types
-
-    public static final String CONTENT_TYPE_CALENDAR_COLLECTION =
-        "application/x-calendar-collection";
 }

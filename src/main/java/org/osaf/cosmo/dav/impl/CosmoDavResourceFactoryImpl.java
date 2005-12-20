@@ -30,7 +30,9 @@ import org.apache.jackrabbit.webdav.simple.ResourceFactoryImpl;
 
 import org.apache.log4j.Logger;
 
+import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.dav.CosmoDavMethods;
+import org.osaf.cosmo.dav.CosmoDavRequest;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -46,6 +48,7 @@ public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
         Logger.getLogger(CosmoDavResourceFactoryImpl.class);
 
     private CosmoSecurityManager securityManager;
+    private TicketDao ticketDao;
 
     /**
      */
@@ -65,6 +68,22 @@ public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
     /**
      */
     public DavResource createResource(DavResourceLocator locator,
+                                      DavServletRequest request,
+                                      DavServletResponse response)
+        throws DavException {
+        CosmoDavResourceImpl resource = (CosmoDavResourceImpl)
+            super.createResource(locator, request, response);
+        CosmoDavRequest cosmoRequest = (CosmoDavRequest) request;
+        if (isCreateRequest(request)) {
+            resource.setIsCalendarCollection(isCreateCalendarCollectionRequest(request));
+        }
+        resource.setBaseUrl(cosmoRequest.getBaseUrl());
+        return resource;
+    }
+
+    /**
+     */
+    public DavResource createResource(DavResourceLocator locator,
                                       DavSession session)
         throws DavException {
         try {
@@ -72,6 +91,7 @@ public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
                 new CosmoDavResourceImpl(locator, this, session,
                                          getResourceConfig());
             resource.addLockManager(getLockManager());
+            resource.setTicketDao(ticketDao);
             return resource;
         } catch (RepositoryException e) {
             throw new JcrDavException(e);
@@ -113,8 +133,26 @@ public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
     // our methods
 
     /**
+     * Augments superclass method to also return <code>true</code> for
+     * <code>MKCALENDAR</code> requests.
+     */
+    protected boolean isCreateCalendarCollectionRequest(DavServletRequest request) {
+        if (CosmoDavMethods.getMethodCode(request.getMethod()) ==
+            CosmoDavMethods.DAV_MKCALENDAR) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      */
     public void setSecurityManager(CosmoSecurityManager securityManager) {
         this.securityManager = securityManager;
+    }
+
+    /**
+     */
+    public void setTicketDao(TicketDao ticketDao) {
+        this.ticketDao = ticketDao;
     }
 }

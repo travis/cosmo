@@ -18,6 +18,7 @@ package org.osaf.cosmo.dav.report.caldav;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.ParseException;
@@ -39,9 +40,14 @@ import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
+import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+
+import org.apache.log4j.Logger;
+
 import org.jdom.Document;
 import org.jdom.Element;
+
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
 import org.osaf.cosmo.dav.report.Report;
@@ -54,8 +60,10 @@ import org.osaf.cosmo.dav.report.ReportInfo;
  * that use properties and calendar-data elements.
  * 
  */
-public abstract class AbstractCalendarDataReport implements Report,
-        DavConstants {
+public abstract class AbstractCalendarDataReport
+    implements Report, DavConstants {
+    private static final Logger log =
+        Logger.getLogger(AbstractCalendarDataReport.class);
 
     protected DavResource resource;
     protected ReportInfo info;
@@ -239,48 +247,46 @@ public abstract class AbstractCalendarDataReport implements Report,
      * @return the resource data as a string.
      */
     protected String readCalendarData(DavResource res) {
+        OutputContext ctx = new OutputContext() {
+                // simple output context that ignores all setters,
+                // simply used to collect the output content
+                private ByteArrayOutputStream out =
+                    new ByteArrayOutputStream();
 
-        // Generate calendar data string from resource
-        String calendarData = null;
+                public boolean hasStream() {
+                    return true;
+                }
 
-        // spool content in case of 'GET' request
-        InputStream in = res.getStream();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                public OutputStream getOutputStream() {
+                    return out;
+                }
+
+                public void setContentLanguage(String contentLanguage) {
+                }
+
+                public void setContentLength(long contentLength) {
+                }
+
+                public void setContentType(String contentType) {
+                }
+
+                public void setModificationTime(long modificationTime) {
+                }
+
+                public void setETag(String etag) {
+                }
+
+                public void setProperty(String propertyName,
+                                        String propertyValue) {
+                }
+            };
         try {
-            if (in != null) {
-                byte[] buffer = new byte[8192];
-                int read;
-                while ((read = in.read(buffer)) >= 0) {
-                    out.write(buffer, 0, read);
-                }
-                buffer = null;
-                out.flush();
-            }
+            res.spool(ctx);
         } catch (IOException e) {
-
-            // Just let finally handle it
-        } finally {
-            // also close stream if not sending content
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-            if (out != null) {
-                try {
-                    out.flush();
-                    calendarData = out.toString();
-                    out.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-
-            }
+            log.error("unable to read calendar data", e);
+            return null;
         }
-
-        return calendarData;
+        return ctx.getOutputStream().toString();
     }
 
     private OutputFilter parseCalendarData(Element cdata) {

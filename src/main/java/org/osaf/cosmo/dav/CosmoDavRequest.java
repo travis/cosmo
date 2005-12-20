@@ -21,19 +21,14 @@ import org.osaf.cosmo.dav.ticket.TicketDavRequest;
 
 /**
  * An interface collecting the functionality defined by various
- * WebDAV extensions implemented by Cosmo. Wraps a
+ * WebDAV extensions implemented by Cosmo. Extends
  * {@link org.apache.jackrabbit.webdav.WebdavRequest}.
  */
-public interface CosmoDavRequest extends TicketDavRequest {
+public interface CosmoDavRequest extends WebdavRequest, TicketDavRequest {
 
     /**
      * Return the base URL for this request (including scheme, server
      * name, and port if not the scheme's default port).
      */
     public String getBaseUrl();
-
-    /**
-     * Return the wrapped <code>WebdavRequest</code>.
-     */
-    public WebdavRequest getWebdavRequest();
 }

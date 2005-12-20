@@ -42,7 +42,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import org.springframework.beans.BeansException;
-import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -70,6 +70,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <dd>Includes an XML representation of a user as per {@link UserResource}, creating or modifying the user's properties within Cosmo, with all associated side effects including home directory creation.</dd>
  * <dt><code>DELETE /user/&lgt;username&gt;</code></dt>
  * <dd>Causes a user to be removed, with all associated side effects including home directory removal.</dd>
+ * </dl>
+ *
+ * CMP defines the following authenticated operations:
+ *
+ * <dl>
+ * <dt><code>GET /account</code></td>
+ * <dd>Returns an XML representation of the authenticated user as per {@link UserResource}.</dd>
+ * <dt><code>PUT /account</code></dt>
+ * <dd>Includes an XML representation of the authenticated user as per {@link UserResource}, modifying the user's properties within Cosmo.</dd>
  * </dl>
  *
  * CMP defines the following anonymous (unauthenticated) operations:
@@ -123,23 +132,18 @@ public class CmpServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest req,
                             HttpServletResponse resp)
         throws ServletException, IOException {
-        String username = usernameFromPathInfo(req.getPathInfo());
-        if (username == null) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        if (req.getPathInfo().startsWith("/user/")) {
+            processUserDelete(req, resp);
             return;
         }
-        if (username.equals(User.USERNAME_OVERLORD)) {
-            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
-        userService.removeUser(username);
-        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     /**
      * Responds to the following operations:
      *
      * <ul>
+     * <li><code>GET /account</code></li>
      * <li><code>GET /users</code></li>
      * <li><code>GET /user/&lgt;username&gt;</code></li>
      * </ul>
@@ -147,34 +151,28 @@ public class CmpServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp)
         throws ServletException, IOException {
+        if (req.getPathInfo().equals("/account")) {
+            processAccountGet(req, resp);
+            return;
+        }
         if (req.getPathInfo().equals("/users")) {
-            Set users = userService.getUsers();
-            resp.setStatus(HttpServletResponse.SC_OK);
-            sendXmlResponse(resp, new UsersResource(users, getUrlBase(req)));
+            processUsersGet(req, resp);
             return;
         }
-        String username = usernameFromPathInfo(req.getPathInfo());
-        if (username == null) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        if (req.getPathInfo().startsWith("/user/")) {
+            processUserGet(req, resp);
             return;
         }
-        User user = null;
-        try {
-            user = userService.getUser(username);
-        } catch (DataRetrievalFailureException e) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        resp.setStatus(HttpServletResponse.SC_OK);
-        sendXmlResponse(resp, new UserResource(user, getUrlBase(req)));
+        resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     /**
      * Responds to the following operations:
      *
      * <ul>
-     * <li><code>PUT /user/&lgt;username&gt;</code></li>
      * <li><code>PUT /signup</code></li>
+     * <li><code>PUT /account</code></li>
+     * <li><code>PUT /user/&lgt;username&gt;</code></li>
      * </ul>
      */
     protected void doPut(HttpServletRequest req,
@@ -184,32 +182,30 @@ public class CmpServlet extends HttpServlet {
             return;
         }
 
-        Document xmldoc = null;
-        try {
-            xmldoc = readXmlRequest(req);
-        } catch (JDOMException e) {
-            log.error("Error parsing request body: " + e.getMessage());
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
         if (req.getPathInfo().equals("/signup")) {
-            processSignup(req, resp, xmldoc);
+            processSignup(req, resp);
             return;
         }
-
-        String urlUsername = usernameFromPathInfo(req.getPathInfo());
-        if (urlUsername == null) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        if (req.getPathInfo().equals("/account")) {
+            processAccountUpdate(req, resp);
             return;
         }
-
-        try {
-            User user = userService.getUser(urlUsername);
-            processUserUpdate(req, resp, user, xmldoc);
-        } catch (DataRetrievalFailureException e) {
-            processUserCreate(req, resp, xmldoc);
+        if (req.getPathInfo().startsWith("/user/")) {
+            String urlUsername = usernameFromPathInfo(req.getPathInfo());
+            if (urlUsername == null) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            try {
+                User user = userService.getUser(urlUsername);
+                processUserUpdate(req, resp, user);
+                return;
+            } catch (ObjectRetrievalFailureException e) {
+                processUserCreate(req, resp);
+                return;
+            }
         }
+        resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     // our methods
@@ -242,6 +238,79 @@ public class CmpServlet extends HttpServlet {
         }
         return true;
     }
+    /**
+     * Delegated to by {@link #doDelete} to handle user DELETE
+     * requests, removing the user and setting the response status and
+     * headers.
+     */
+    protected void processUserDelete(HttpServletRequest req,
+                                     HttpServletResponse resp)
+        throws ServletException, IOException {
+        String username = usernameFromPathInfo(req.getPathInfo());
+        if (username == null) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        if (username.equals(User.USERNAME_OVERLORD)) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        userService.removeUser(username);
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
+
+    /**
+     * Delegated to by {@link #doGet} to handle account GET
+     * requests, retrieving the account for the currently logged in
+     * user, setting the response status and headers, and writing the
+     * response content.
+     */
+    protected void processAccountGet(HttpServletRequest req,
+                                     HttpServletResponse resp)
+        throws ServletException, IOException {
+        User user = getLoggedInUser();
+        UserResource resource = new UserResource(user, getUrlBase(req));
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.setHeader("ETag", resource.getEntityTag());
+        sendXmlResponse(resp, resource);
+    }
+
+    /**
+     * Delegated to by {@link #doGet} to handle users GET
+     * requests, retrieving all user accounts, setting the response
+     * status and headers, and writing the response content.
+     */
+    protected void processUsersGet(HttpServletRequest req,
+                                   HttpServletResponse resp)
+        throws ServletException, IOException {
+        Set users = userService.getUsers();
+        resp.setStatus(HttpServletResponse.SC_OK);
+        sendXmlResponse(resp, new UsersResource(users, getUrlBase(req)));
+    }
+
+    /**
+     * Delegated to by {@link #doGet} to handle user GET
+     * requests, retrieving the user account, setting the response
+     * status and headers, and writing the response content.
+     */
+    protected void processUserGet(HttpServletRequest req,
+                                  HttpServletResponse resp)
+        throws ServletException, IOException {
+        String username = usernameFromPathInfo(req.getPathInfo());
+        if (username == null) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        try {
+            User user = userService.getUser(username);
+            UserResource resource = new UserResource(user, getUrlBase(req));
+            resp.setHeader("ETag", resource.getEntityTag());
+            sendXmlResponse(resp, resource);
+        } catch (ObjectRetrievalFailureException e) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+    }
 
     /**
      * Delegated to by {@link #doPut} to handle signup
@@ -249,23 +318,61 @@ public class CmpServlet extends HttpServlet {
      * status and headers.
      */
     protected void processSignup(HttpServletRequest req,
-                                 HttpServletResponse resp,
-                                 Document xmldoc)
+                                 HttpServletResponse resp)
         throws ServletException, IOException {
         try {
+            Document xmldoc = readXmlRequest(req);
             UserResource resource = new UserResource(getUrlBase(req), xmldoc);
             userService.createUser(resource.getUser());
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("Content-Location", resource.getHomedirUrl()); 
-        } catch (DuplicateUsernameException e) {
-            log.error("Chosen username is already in use");
-            resp.setStatus(HttpServletResponse.SC_CONFLICT);
-        } catch (DuplicateEmailException e) {
-            log.error("Chosen email is already in use");
-            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+            resp.setHeader("ETag", resource.getEntityTag());
+        } catch (JDOMException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                           "Error parsing request body: " + e.getMessage());
+            return;
         } catch (CmpException e) {
-            log.error("Error validating request body: " + e.getMessage());
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                           e.getMessage());
+        } catch (ModelValidationException e) {
+            handleModelValidationError(resp, e);
+        }
+    }
+
+    /**
+     * Delegated to by {@link #doPut} to handle account update
+     * requests for the currently logged in user, saving the modified
+     * account and setting the response status and headers.
+     */
+    protected void processAccountUpdate(HttpServletRequest req,
+                                        HttpServletResponse resp)
+        throws ServletException, IOException {
+        try {
+            Document xmldoc = readXmlRequest(req);
+            String urlUsername = usernameFromPathInfo(req.getPathInfo());
+            User user = getLoggedInUser();
+            String oldUsername = user.getUsername();
+            UserResource resource =
+                new UserResource(user, getUrlBase(req), xmldoc);
+            if (user.isUsernameChanged()) {
+                // reset logged in user's username
+                user.setUsername(oldUsername);
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Username may not be changed");
+                return;
+            }
+            userService.updateUser(user);
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            resp.setHeader("ETag", resource.getEntityTag());
+        } catch (JDOMException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                           "Error parsing request body: " + e.getMessage());
+            return;
+        } catch (CmpException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                           e.getMessage());
+        } catch (ModelValidationException e) {
+            handleModelValidationError(resp, e);
         }
     }
 
@@ -275,32 +382,31 @@ public class CmpServlet extends HttpServlet {
      * status and headers.
      */
     protected void processUserCreate(HttpServletRequest req,
-                                     HttpServletResponse resp,
-                                     Document xmldoc)
+                                     HttpServletResponse resp)
         throws ServletException, IOException {
         try {
-             UserResource resource = new UserResource(getUrlBase(req), xmldoc);
-             User user = resource.getUser();
-             if (! user.getUsername().
-                 equals(usernameFromPathInfo(req.getPathInfo()))) {
-                 log.error("Username does not match request URI");
-                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                 return;
-             }
-             userService.createUser(user);
-             resp.setStatus(HttpServletResponse.SC_CREATED);
-         } catch (DuplicateUsernameException e) {
-             log.error("Chosen username is already in use");
-             resp.setStatus(HttpServletResponse.SC_CONFLICT);
-         } catch (DuplicateEmailException e) {
-             log.error("Chosen email is already in use");
-             resp.setStatus(HttpServletResponse.SC_CONFLICT);
-         } catch (CmpException e) {
-             log.error("Error validating request body: " + e.getMessage());
-             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-         } catch (ModelValidationException e) {
-             log.error("Error validating user: " + e.getMessage());
-             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            Document xmldoc = readXmlRequest(req);
+            String urlUsername = usernameFromPathInfo(req.getPathInfo());
+            UserResource resource = new UserResource(getUrlBase(req), xmldoc);
+            User user = resource.getUser();
+            if (user.getUsername() != null &&
+                ! user.getUsername().equals(urlUsername)) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Username does not match request URI");
+                return;
+            }
+            userService.createUser(user);
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+            resp.setHeader("ETag", resource.getEntityTag());
+        } catch (JDOMException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                           "Error parsing request body: " + e.getMessage());
+            return;
+        } catch (CmpException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                           e.getMessage());
+        } catch (ModelValidationException e) {
+            handleModelValidationError(resp, e);
         }
     }
 
@@ -311,32 +417,54 @@ public class CmpServlet extends HttpServlet {
      */
     protected void processUserUpdate(HttpServletRequest req,
                                      HttpServletResponse resp,
-                                     User user,
-                                     Document xmldoc)
+                                     User user)
         throws ServletException, IOException {
         try {
+            Document xmldoc = readXmlRequest(req);
+            String urlUsername = usernameFromPathInfo(req.getPathInfo());
             UserResource resource =
                 new UserResource(user, getUrlBase(req), xmldoc);
             userService.updateUser(user);
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            if (! user.getUsername().
-                equals(usernameFromPathInfo(req.getPathInfo()))) {
+            resp.setHeader("ETag", resource.getEntityTag());
+            if (! user.getUsername().equals(urlUsername)) {
                 resp.setHeader("Content-Location", resource.getUserUrl());
-                resp.setStatus(HttpServletResponse.SC_CREATED);
             }
-        } catch (DuplicateUsernameException e) {
-            log.error("Chosen username is already in use");
-            resp.setStatus(HttpServletResponse.SC_CONFLICT);
-        } catch (DuplicateEmailException e) {
-            log.error("Chosen email is already in use");
-            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+        } catch (JDOMException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                           "Error parsing request body: " + e.getMessage());
+            return;
         } catch (CmpException e) {
-            log.error("Error validating request body: " + e.getMessage());
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                           e.getMessage());
         } catch (ModelValidationException e) {
-            log.error("Error validating user: " + e.getMessage());
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            handleModelValidationError(resp, e);
         }
+    }
+
+    /**
+     */
+    protected void handleModelValidationError(HttpServletResponse resp,
+                                              ModelValidationException e)
+        throws IOException {
+        if (e instanceof DuplicateUsernameException) {
+            sendApiError(resp, CmpConstants.SC_USERNAME_IN_USE);
+            return;
+        }
+        if (e instanceof DuplicateEmailException) {
+            sendApiError(resp, CmpConstants.SC_EMAIL_IN_USE);
+            return;
+        }
+        resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                       e.getMessage());
+    }
+
+    /**
+     */
+    protected void sendApiError(HttpServletResponse resp,
+                                int errorCode)
+        throws IOException {
+        resp.sendError(errorCode, CmpConstants.getReasonPhrase(errorCode));
     }
 
     /**
@@ -363,13 +491,15 @@ public class CmpServlet extends HttpServlet {
         return wac;
     }
 
-    // private methods
-
-    private User getLoggedInUser() {
+    /**
+     */
+    protected User getLoggedInUser() {
         return securityManager.getSecurityContext().getUser();
     }
 
-    private String usernameFromPathInfo(String pathInfo) {
+    /**
+     */
+    protected String usernameFromPathInfo(String pathInfo) {
         if (pathInfo.startsWith("/user/")) {
             String username = pathInfo.substring(6);
             if (! (username.equals("") ||
@@ -380,7 +510,9 @@ public class CmpServlet extends HttpServlet {
         return null;
     }
 
-    private Document readXmlRequest(HttpServletRequest req)
+    /**
+     */
+    protected Document readXmlRequest(HttpServletRequest req)
         throws JDOMException, IOException {
         InputStream in = req.getInputStream();
         if (in == null) {
@@ -390,8 +522,10 @@ public class CmpServlet extends HttpServlet {
         return builder.build(in);
     }
 
-    private void sendXmlResponse(HttpServletResponse resp,
-                                 CmpResource resource)
+    /**
+     */
+    protected void sendXmlResponse(HttpServletResponse resp,
+                                   CmpResource resource)
         throws IOException {
         // pretty format is easier for CMP scripters to read
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
@@ -405,9 +539,11 @@ public class CmpServlet extends HttpServlet {
         resp.getOutputStream().write(bytes);
     }
 
-    // like response.encodeUrl() except does not include servlet path
-    // or session id
-    private String getUrlBase(HttpServletRequest req) {
+    /**
+     */
+    protected String getUrlBase(HttpServletRequest req) {
+        // like response.encodeUrl() except does not include servlet
+        // path or session id
         StringBuffer buf = new StringBuffer();
         buf.append(req.getScheme()).
             append("://").

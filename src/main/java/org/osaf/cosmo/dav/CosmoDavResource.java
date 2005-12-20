@@ -18,8 +18,6 @@ package org.osaf.cosmo.dav;
 import java.io.InputStream;
 import java.util.Set;
 
-import net.fortuna.ical4j.model.Calendar;
-
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
@@ -73,27 +71,6 @@ public interface CosmoDavResource extends DavResource {
      * collection.
      */
     public boolean isCalendarCollection();
-
-    /**
-     * Adds the given resoure as an internal member to this resource.
-     *
-     * @param resource {@link CosmoDavResource} to be added
-     */
-    public void addCalendarCollection(CosmoDavResource resource)
-        throws DavException;
-
-    /**
-     * For calendar collection resources, returns a
-     * <code>Calendar</code> representing the calendar objects
-     * contained within the collection.
-     */
-    public Calendar getCollectionCalendar()
-        throws DavException;
-
-    /**
-     * Returns the entity tag for this resource.
-     */
-    public String getETag();
 
     /**
      * Associates a ticket with this resource and saves it into

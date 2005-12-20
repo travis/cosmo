@@ -140,6 +140,7 @@
       <fileset dir="${maven.build.dir}/${ext.tomcat.package}">
         <exclude name="**/conf/Catalina/localhost/*.xml"/>
         <exclude name="**/conf/server.xml"/>
+        <exclude name="**/common/classes/logging.properties"/>
       </fileset>
     </copy>
     <!-- XXX can't figure out the right pattern to use to not copy

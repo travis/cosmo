@@ -149,6 +149,19 @@ public class UserResource implements CmpResource {
     // our methods
 
     /**
+     * Returns an entity tag as defined in RFC 2616 that uniqely
+     * identifies the state of the <code>User</code> backing this
+     * resource.
+     */
+    public String getEntityTag() {
+        if (user == null) {
+            return "";
+        }
+        return "\"" + user.hashCode() + "-" +
+            user.getDateModified().getTime() + "\"";
+    }
+
+    /**
      * Just as {@link #getEntity}, except the returned object is cast
      * to <code>User</code>.
      */

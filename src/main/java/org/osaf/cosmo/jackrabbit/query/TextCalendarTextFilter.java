@@ -46,6 +46,9 @@ import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DateProperty;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.core.query.TextFilter;
 import org.apache.jackrabbit.core.query.lucene.FieldNames;
 import org.apache.jackrabbit.core.query.lucene.NamespaceMappings;
@@ -67,6 +70,8 @@ import org.apache.jackrabbit.core.value.InternalValue;
  * and then split into key/value pairs, and the key becomes the indexer field.
  */
 public class TextCalendarTextFilter implements TextFilter {
+    private static final Log log =
+        LogFactory.getLog(TextCalendarTextFilter.class);
 
     static final public String TIME_RANGE_FIELD_SUFFIX = "--TIMERANGE";
     static final public String TIME_RANGE_FIELD_SUFFIX_LOWERCASE = TIME_RANGE_FIELD_SUFFIX

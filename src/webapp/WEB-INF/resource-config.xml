@@ -1,27 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-<!DOCTYPE config [
-        <!ELEMENT config ((collection | noncollection)? , filter?) >
-
-        <!ELEMENT collection (nodetypes) >
-        <!ELEMENT noncollection (nodetypes) >
-
-        <!ELEMENT filter (class, namespaces?, nodetypes?) >
-
-        <!ELEMENT class >
-        <!ATTLIST class
-            name  CDATA #REQUIRED
-        >
-        <!ELEMENT namespaces (prefix | uri)* >
-        <!ELEMENT prefix (CDATA) >
-        <!ELEMENT uri (CDATA) >
-
-        <!ELEMENT nodetypes (nodetype)* >
-        <!ELEMENT nodetype (CDATA) >
-]>
--->
-
 <config>
+  <iomanager>
+    <class name="org.osaf.cosmo.io.CosmoIOManager"/>
+  </iomanager>
   <collection>
     <nodetypes>
       <nodetype>nt:folder</nodetype>

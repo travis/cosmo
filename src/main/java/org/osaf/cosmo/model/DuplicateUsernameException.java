@@ -15,14 +15,11 @@
  */
 package org.osaf.cosmo.model;
 
-import org.springframework.dao.DataIntegrityViolationException;
-
 /**
  * An exception indicating that an existing user is already using the
  * specified username.
  */
-public class DuplicateUsernameException
-    extends DataIntegrityViolationException {
+public class DuplicateUsernameException extends ModelValidationException {
 
     /**
      */

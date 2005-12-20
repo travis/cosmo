@@ -1,0 +1,70 @@
+
+Cosmo Sharing Server 0.2.4
+Release Notes
+        
+
+UPGRADING FROM A PREVIOUS RELEASE
+=================================
+
+Cosmo now requires Java 5.0 (sometimes called 1.5). No configuration
+changes other than pointing $JAVA_HOME at a 5.0 JRE are required to
+run Cosmo.
+
+Due to changes in how Cosmo stores data into its embedded Derby
+databases, 0.2.4 cannot operate against repositories created by
+earlier versions of Cosmo.
+
+The Tomcat configuration file ($COSMO_HOME/tomcat/conf/server.xml)
+explicitly includes attributes for configuring the HTTP connector's
+thread pool. These attributes can be easily rewritten manually or by
+scripts to reconfigure the thread pool. See the Tomcat configuration
+guide for more information on configuring the HTTP connector.
+
+NEW FEATURES
+============
+
+Certain Cosmo features may be enabled/disabled/configured via
+environment variables passed into the cosmoctl script. These
+environment variables may be set in the user's environment before
+running the script or in $COSMO_HOME/bin/cosmocfg. See that file and
+the Cosmo Administrator's Guide for more information.
+
+The web UI's admin console now has a "server status" page that shows
+basic memory usage statistics pulled from the JVM. These statistics
+can be dumped into a simple key/value text format for use by
+monitoring tools. A button on the page allows garbage collection to be
+triggered manually. The Cosmo Administrator's Guide has more details.
+
+A new CMP "signup" operation has been added that allows programs
+working on behalf of anonymous users to sign up for user accounts in
+Cosmo. See the Cosmo Developer's Guide for more information.
+
+
+BUGS FIXED
+==========
+
+4739: Jackrabbit no longer enters a deadlocked state under heavy
+      load.
+4740: Jackrabbit no longer creates large numbers of repository index
+      files, causing the process file descriptor limit to be reached.
+4742: The "home directories" page in the web UI now displays as
+      expected.
+4755: Derby has been upgraded to 10.1.2.1, fixing issues with database
+      creation on OS X.
+
+
+
+
+Copyright 2005 Open Source Applications Foundation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

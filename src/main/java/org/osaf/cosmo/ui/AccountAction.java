@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.ui;
 
-import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
@@ -85,7 +84,7 @@ public class AccountAction extends CosmoAction {
 
         request.setAttribute(ATTR_USER, user);
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_OK);
+        return mapping.findForward(UIConstants.FWD_OK);
     }
 
     /**
@@ -113,14 +112,14 @@ public class AccountAction extends CosmoAction {
                                         userForm.getPassword());
         } catch (DuplicateEmailException e) {
             saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
-            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+            return mapping.findForward(UIConstants.FWD_FAILURE);
         } catch (DuplicateUsernameException e) {
             saveErrorMessage(request, MSG_ERROR_USERNAME_EXISTS,
                              PARAM_USERNAME);
-            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+            return mapping.findForward(UIConstants.FWD_FAILURE);
         }
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
+        return mapping.findForward(UIConstants.FWD_SUCCESS);
     }
     
     /**
@@ -154,14 +153,14 @@ public class AccountAction extends CosmoAction {
             saveConfirmationMessage(request, MSG_CONFIRM_UPDATE);
         } catch (DuplicateEmailException e) {
             saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
-            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+            return mapping.findForward(UIConstants.FWD_FAILURE);
         } catch (DuplicateUsernameException e) {
             saveErrorMessage(request, MSG_ERROR_USERNAME_EXISTS,
                              PARAM_USERNAME);
-            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+            return mapping.findForward(UIConstants.FWD_FAILURE);
         }
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
+        return mapping.findForward(UIConstants.FWD_SUCCESS);
     }
 
     private void populateUser(User user, UserForm form) {

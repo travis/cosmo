@@ -16,7 +16,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.MessageResources;
 import org.apache.struts.validator.BeanValidatorForm;
 
-import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -80,7 +79,7 @@ public class CredentialsReminderAction extends CosmoAction {
      * password to the user's email address
      * </ul>
      *
-     * @see OSAFStrutsConstants#FWD_OK
+     * @see UIConstants#FWD_OK
      */
     public ActionForward execute(ActionMapping mapping,
                                  ActionForm form,
@@ -103,7 +102,7 @@ public class CredentialsReminderAction extends CosmoAction {
             saveConfirmationMessage(request, MSG_CONFIRM_PASSWORD);
         }
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_OK);
+        return mapping.findForward(UIConstants.FWD_OK);
     }
 
     public boolean wasUsernameButtonClicked(BeanValidatorForm form) {

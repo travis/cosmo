@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.ui;
 
-import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
@@ -118,7 +117,7 @@ public class UserAction extends CosmoAction {
 
         addTitleParam(request, user.getUsername());
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_OK);
+        return mapping.findForward(UIConstants.FWD_OK);
     }
 
     /**
@@ -143,14 +142,14 @@ public class UserAction extends CosmoAction {
             saveConfirmationMessage(request, MSG_CONFIRM_CREATE);
         } catch (DuplicateEmailException e) {
             saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
-            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+            return mapping.findForward(UIConstants.FWD_FAILURE);
         } catch (DuplicateUsernameException e) {
             saveErrorMessage(request, MSG_ERROR_USERNAME_EXISTS,
                              PARAM_USERNAME);
-            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+            return mapping.findForward(UIConstants.FWD_FAILURE);
         }
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
+        return mapping.findForward(UIConstants.FWD_SUCCESS);
     }
 
     /**
@@ -165,7 +164,7 @@ public class UserAction extends CosmoAction {
 
         if (isCancelled(request)) {
             userForm.reset(mapping, request);
-            return mapping.findForward(OSAFStrutsConstants.FWD_CANCEL);
+            return mapping.findForward(UIConstants.FWD_CANCEL);
         }
 
         User formUser =  userService.getUser(userForm.getUsername());
@@ -181,14 +180,14 @@ public class UserAction extends CosmoAction {
             saveConfirmationMessage(request, MSG_CONFIRM_UPDATE);
         } catch (DuplicateEmailException e) {
             saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
-            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+            return mapping.findForward(UIConstants.FWD_FAILURE);
         } catch (DuplicateUsernameException e) {
             saveErrorMessage(request, MSG_ERROR_USERNAME_EXISTS,
                              PARAM_USERNAME);
-            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+            return mapping.findForward(UIConstants.FWD_FAILURE);
         }
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
+        return mapping.findForward(UIConstants.FWD_SUCCESS);
     }
 
     /**
@@ -203,7 +202,7 @@ public class UserAction extends CosmoAction {
 
         if (isCancelled(request)) {
             userForm.reset(mapping, request);
-            return mapping.findForward(OSAFStrutsConstants.FWD_CANCEL);
+            return mapping.findForward(UIConstants.FWD_CANCEL);
         }
 
         User formUser = userService.getUser(User.USERNAME_OVERLORD);
@@ -245,10 +244,10 @@ public class UserAction extends CosmoAction {
             populateUpdateForm(userForm, formUser);
             userForm.setEmail(badEmail);
             saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
-            return mapping.findForward(OSAFStrutsConstants.FWD_FAILURE);
+            return mapping.findForward(UIConstants.FWD_FAILURE);
         }
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
+        return mapping.findForward(UIConstants.FWD_SUCCESS);
     }
 
     /**
@@ -270,7 +269,7 @@ public class UserAction extends CosmoAction {
             saveConfirmationMessage(request, MSG_CONFIRM_REMOVE);
         }
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_SUCCESS);
+        return mapping.findForward(UIConstants.FWD_SUCCESS);
     }
 
     /**
@@ -285,7 +284,7 @@ public class UserAction extends CosmoAction {
 
         request.setAttribute(ATTR_USERS, getSortedUsers());
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_OK);
+        return mapping.findForward(UIConstants.FWD_OK);
     }
 
     private List getSortedUsers() {

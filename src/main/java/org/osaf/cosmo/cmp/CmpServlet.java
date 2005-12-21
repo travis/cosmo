@@ -42,7 +42,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import org.springframework.beans.BeansException;
-import org.springframework.orm.ObjectRetrievalFailureException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -200,7 +200,7 @@ public class CmpServlet extends HttpServlet {
                 User user = userService.getUser(urlUsername);
                 processUserUpdate(req, resp, user);
                 return;
-            } catch (ObjectRetrievalFailureException e) {
+            } catch (DataRetrievalFailureException e) {
                 processUserCreate(req, resp);
                 return;
             }
@@ -306,7 +306,7 @@ public class CmpServlet extends HttpServlet {
             UserResource resource = new UserResource(user, getUrlBase(req));
             resp.setHeader("ETag", resource.getEntityTag());
             sendXmlResponse(resp, resource);
-        } catch (ObjectRetrievalFailureException e) {
+        } catch (DataRetrievalFailureException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }

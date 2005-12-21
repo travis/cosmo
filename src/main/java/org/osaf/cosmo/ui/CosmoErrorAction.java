@@ -15,11 +15,9 @@
  */
 package org.osaf.cosmo.ui;
 
-import org.osaf.commons.struts.OSAFErrorAction;
-import org.osaf.commons.struts.OSAFStrutsConstants;
-
 import java.net.ConnectException;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,13 +30,19 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.orm.ObjectRetrievalFailureException;
+import org.springframework.dao.DataRetrievalFailureException;
 
 /**
- * An OSAFErrorAction that chooses the appropriate error view based on
- * the discovered exception.
+ * An action thats control the handling of exceptions
+ * caught by Struts (and, if configured in the web application
+ * deployment descriptor, by the servlet container). Chooses the
+ * appropriate error view based on the discovered exception.
  */
-public class CosmoErrorAction extends OSAFErrorAction {
+public class CosmoErrorAction extends Action {
+    private static final String ATTR_CONTAINER_SOURCE =
+        "javax.servlet.error.exception";
+    private static final String ATTR_STRUTS_SOURCE =
+        "org.apache.struts.action.EXCEPTION";
     private static final Log log = LogFactory.getLog(CosmoErrorAction.class);
 
     public static final String ATTR_EXCEPTION = "Exception";
@@ -58,6 +62,37 @@ public class CosmoErrorAction extends OSAFErrorAction {
      */
     public static final String FWD_ERROR_NOT_FOUND = "error.notfound";
 
+    /** Finds the exception thrown by the container or a library and
+     * stores it in the exception named by
+     * <code>UIConstants.ATTR_EXCEPTION</code>. Delegates to
+     * <code>findForward</code> to generate the return value.
+     */
+    public ActionForward execute(ActionMapping mapping,
+                                 ActionForm form,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response)
+        throws Exception {
+        Throwable t = (Throwable) request.getAttribute(ATTR_CONTAINER_SOURCE);
+        if (t == null) {
+            t = (Throwable) request.getAttribute(ATTR_STRUTS_SOURCE);
+        }
+        if (t == null) {
+            t = (Throwable) request.getAttribute(UIConstants.ATTR_EXCEPTION);
+        }
+
+        if (t != null && t instanceof ServletException) {
+            ServletException se = (ServletException) t;
+            Throwable st = (Throwable) se.getRootCause();
+            if (st != null) {
+                t = st;
+            }
+        }
+
+        request.setAttribute(UIConstants.ATTR_EXCEPTION, t);
+
+        return findForward(mapping, form, request, response);
+    }
+
     /**
      * Examines the discovered exception to choose the appropriate
      * error view:
@@ -76,7 +111,7 @@ public class CosmoErrorAction extends OSAFErrorAction {
                                      HttpServletRequest request,
                                      HttpServletResponse response) {
         Throwable t = (Throwable)
-            request.getAttribute(OSAFStrutsConstants.ATTR_EXCEPTION);
+            request.getAttribute(UIConstants.ATTR_EXCEPTION);
 
         if (isServerConnectionError(t)) {
             return mapping.findForward(FWD_ERROR_CONNECT);
@@ -101,6 +136,6 @@ public class CosmoErrorAction extends OSAFErrorAction {
     }
 
     private boolean isNotFoundError(Throwable t) {
-        return t instanceof ObjectRetrievalFailureException;
+        return t instanceof DataRetrievalFailureException;
     }
 }

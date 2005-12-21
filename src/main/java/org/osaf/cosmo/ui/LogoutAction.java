@@ -11,14 +11,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import org.osaf.commons.struts.OSAFAction;
-import org.osaf.commons.struts.OSAFStrutsConstants;
-
 /**
  * An {@link OSAFAction} that logs the current user out of the
  * application.
  */
-public class LogoutAction extends OSAFAction {
+public class LogoutAction extends CosmoAction {
     private static final Log log = LogFactory.getLog(LogoutAction.class);
 
     /**
@@ -26,7 +23,7 @@ public class LogoutAction extends OSAFAction {
      * {@link javax.servlet.http.HttpSession} and then returns the
      * <code>OK</code> forward.
      *
-     * @see OSAFStrutsConstants#FWD_OK
+     * @see UIConstants#FWD_OK
      */
     public ActionForward execute(ActionMapping mapping,
                                  ActionForm form,
@@ -35,6 +32,6 @@ public class LogoutAction extends OSAFAction {
         throws Exception {
         request.getSession().invalidate();
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_OK);
+        return mapping.findForward(UIConstants.FWD_OK);
     }
 }

@@ -15,8 +15,8 @@
  */
 package org.osaf.cosmo.ui.status;
 
-import org.osaf.commons.struts.OSAFStrutsConstants;
 import org.osaf.cosmo.ui.CosmoAction;
+import org.osaf.cosmo.ui.UIConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +45,7 @@ public class StatusAction extends CosmoAction {
      * Causes a snapshot of the server status to be taken and stored
      * in the request underneath the {@link #ATTR_STATUS} request
      * attribute and forwards to the
-     * {@link OSAFStrutsConstants#FWD_OK} forward.
+     * {@link UIConstants#FWD_OK} forward.
      */
     public ActionForward status(ActionMapping mapping,
                                 ActionForm form,
@@ -56,13 +56,13 @@ public class StatusAction extends CosmoAction {
 
         request.setAttribute(ATTR_STATUS, snapshot);
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_OK);
+        return mapping.findForward(UIConstants.FWD_OK);
     }
 
     /**
      * Causes the JVM to begin a garbage collection run
      * (asynchronously, in a separate thread) and forwards to the
-     * {@link OSAFStrutsConstants#FWD_OK} forward.
+     * {@link UIConstants#FWD_OK} forward.
      */
     public ActionForward gc(ActionMapping mapping,
                             ActionForm form,
@@ -73,7 +73,7 @@ public class StatusAction extends CosmoAction {
 
         saveConfirmationMessage(request, MSG_CONFIRM_GC);
 
-        return mapping.findForward(OSAFStrutsConstants.FWD_OK);
+        return mapping.findForward(UIConstants.FWD_OK);
     }
 
     /**

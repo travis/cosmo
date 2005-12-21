@@ -33,7 +33,7 @@
 
   <global-exceptions>
     <exception type="java.lang.Throwable" key="ignore"
-               handler="org.osaf.commons.struts.OSAFExceptionHandler"/>
+               handler="org.osaf.cosmo.ui.CosmoExceptionHandler"/>
   </global-exceptions>
 
   <global-forwards type="org.apache.struts.action.ActionForward">

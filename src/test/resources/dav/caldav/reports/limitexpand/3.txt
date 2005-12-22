@@ -1,0 +1,23 @@
+REPORT /CosmoServer/home/test/calendars/temp/ HTTP/1.1
+Host: localhost:8080
+Authorization: Basic dGVzdDp0ZXN0MQ==
+Content-Length: 495
+Content-Type: text/xml; charset=utf-8
+
+<?xml version="1.0" encoding="utf-8" ?>
+<C:calendar-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">
+<D:prop>
+<D:getetag/>
+<C:calendar-data>
+<C:expand-recurrence-set start="20060102T000000Z" end="20060105T000000Z"/>
+</C:calendar-data>
+</D:prop>
+<C:filter>
+<C:comp-filter name="VCALENDAR">
+<C:is-defined/>
+<C:comp-filter name="VEVENT">
+<C:time-range start="20060102T000000Z" end="20060105T000000Z"/>
+</C:comp-filter>
+</C:comp-filter>
+</C:filter>
+</C:calendar-query>

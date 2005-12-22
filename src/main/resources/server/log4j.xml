@@ -62,10 +62,6 @@
     <level value="WARN"/>
   </logger>
 
-  <logger name="org.osaf.cosmo">
-    <level value="DEBUG"/>
-  </logger>
-
   <logger name="org.osaf.cosmo.ui.LifecycleLoggerListener">
     <level value="INFO"/>
   </logger>

@@ -21,6 +21,5 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
 <p>
-  <fmt:message key="Error.Connect.UnableToConnect"/>
+  <fmt:message key="Error.Messaging.UnableToSend"/>
 </p>
-<cosmo:stacktrace exception="${Exception}"/>

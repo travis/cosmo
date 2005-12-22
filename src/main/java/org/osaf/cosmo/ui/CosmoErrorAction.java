@@ -29,8 +29,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.mail.MailSendException;
 
 /**
  * An action thats control the handling of exceptions
@@ -52,10 +52,10 @@ public class CosmoErrorAction extends Action {
      */
     public static final String FWD_ERROR_GENERAL = "error.general";
     /**
-     * The Struts forward representing the "Connection Error" page:
-     * <code>error.connect</code>
+     * The Struts forward representing the "Messaging Error" page:
+     * <code>error.messaging</code>
      */
-    public static final String FWD_ERROR_CONNECT = "error.connect";
+    public static final String FWD_ERROR_MESSAGING = "error.messaging";
     /**
      * The Struts forward representing the "Resource Not Found" page:
      * <code>error.notfound</code>
@@ -98,10 +98,8 @@ public class CosmoErrorAction extends Action {
      * error view:
      *
      * <ol>
-     * <li> ConnectException, or DataAccessResourceFailureException
-     * with a root ConnectException:
-     * <code>FWD_ERROR_CONNECT</code></li>
-     * <li> WebdavResourceNotFoundException: <code>
+     * <li> MailSendException: <code>FWD_ERROR_MESSAGING</code></li>
+     * <li> ObjectRetrievalFailureException: <code>
      * FWD_ERROR_NOT_FOUND</code></li>
      * <li> all others: <code>FWD_ERROR_GENERAL</code></li>
      * </ol>
@@ -113,8 +111,8 @@ public class CosmoErrorAction extends Action {
         Throwable t = (Throwable)
             request.getAttribute(UIConstants.ATTR_EXCEPTION);
 
-        if (isServerConnectionError(t)) {
-            return mapping.findForward(FWD_ERROR_CONNECT);
+        if (isMessagingError(t)) {
+            return mapping.findForward(FWD_ERROR_MESSAGING);
         }
         else if (isNotFoundError(t)) {
             return mapping.findForward(FWD_ERROR_NOT_FOUND);
@@ -122,17 +120,8 @@ public class CosmoErrorAction extends Action {
         return mapping.findForward(FWD_ERROR_GENERAL);
     }
 
-    private boolean isServerConnectionError(Throwable t) {
-        if (t instanceof ConnectException) {
-            return true;
-        }
-        if (t instanceof DataAccessResourceFailureException) {
-            Throwable rc = (Throwable) t.getCause();
-            if (rc instanceof ConnectException) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isMessagingError(Throwable t) {
+        return t instanceof MailSendException;
     }
 
     private boolean isNotFoundError(Throwable t) {

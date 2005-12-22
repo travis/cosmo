@@ -48,7 +48,7 @@
       <tr>
         <td align="left" valign="top">
           <div class="lg">
-            <html:link page="/">
+            <html:link page="/console/">
               <img src="/cosmo_logo.gif" alt="Cosmo Sharing Server"/>
             </html:link>
           </div>
@@ -59,15 +59,15 @@
             <div class="mdData">
               <%-- bug 3920
               <authz:authorize ifAllGranted="ROLE_USER">
-                <html:link page="/dirlisting.jsp?rtype=home&username=${user.username}"><fmt:message key="Layout.Nav.Main.HomeDirectory"/></html:link>
+                <html:link page="/console/dirlisting.jsp?rtype=home&username=${user.username}"><fmt:message key="Layout.Nav.Main.HomeDirectory"/></html:link>
               |
               </authz:authorize>
               --%>
-              <c:choose><c:when test="${fn:endsWith(body, '/help.jsp')}"><strong><fmt:message key="Layout.Nav.Main.Help"/></strong></c:when><c:otherwise><html:link page="/help"><fmt:message key="Layout.Nav.Main.Help"/></html:link></c:otherwise></c:choose>
+              <c:choose><c:when test="${fn:endsWith(body, '/help.jsp')}"><strong><fmt:message key="Layout.Nav.Main.Help"/></strong></c:when><c:otherwise><html:link page="/console/help"><fmt:message key="Layout.Nav.Main.Help"/></html:link></c:otherwise></c:choose>
               |
-              <html:link page="/about" onclick="simplePopUp('/about', 340, 280, false); return false;"><fmt:message key="Layout.Nav.Main.About"/></html:link>
+              <html:link page="/console/about" onclick="simplePopUp('/about', 340, 280, false); return false;"><fmt:message key="Layout.Nav.Main.About"/></html:link>
               |
-              <html:link page="/logout">
+              <html:link page="/console/logout">
                 <fmt:message key="Layout.Nav.Main.LogOut"/>
               </html:link>
             </div>
@@ -88,11 +88,11 @@
           <!-- admin console navbar -->
           <div class="md">
             <fmt:message key="Layout.Nav.Console.Label"/>
-            <c:choose><c:when test="${fn:endsWith(body, '/user/list.jsp')}"><strong><fmt:message key="Layout.Nav.Console.Users"/></strong></c:when><c:otherwise><html:link page="/users"><fmt:message key="Layout.Nav.Console.Users"/></html:link></c:otherwise></c:choose>
+            <c:choose><c:when test="${fn:endsWith(body, '/user/list.jsp')}"><strong><fmt:message key="Layout.Nav.Console.Users"/></strong></c:when><c:otherwise><html:link page="/console/users"><fmt:message key="Layout.Nav.Console.Users"/></html:link></c:otherwise></c:choose>
             |
             <html:link page="/home/"><fmt:message key="Layout.Nav.Console.HomeDirectories"/></html:link>
             |
-            <c:choose><c:when test="${fn:endsWith(body, '/status/view.jsp')}"><strong><fmt:message key="Layout.Nav.Console.ServerStatus"/></strong></c:when><c:otherwise><html:link page="/status"><fmt:message key="Layout.Nav.Console.ServerStatus"/></html:link></c:otherwise></c:choose>
+            <c:choose><c:when test="${fn:endsWith(body, '/status/view.jsp')}"><strong><fmt:message key="Layout.Nav.Console.ServerStatus"/></strong></c:when><c:otherwise><html:link page="/console/status"><fmt:message key="Layout.Nav.Console.ServerStatus"/></html:link></c:otherwise></c:choose>
             <!-- end admin console navbar -->
           </div>
           <hr noshade="noshade"/>

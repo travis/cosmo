@@ -19,9 +19,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<authz:authorize ifAnyGranted="ROLE_ANONYMOUS">
-  <jsp:forward page="/login.do"/>
-</authz:authorize>
 <authz:authorize ifAnyGranted="ROLE_USER,ROLE_ROOT">
-  <jsp:forward page="/account.do"/>
+  <jsp:forward page="/console/account"/>
 </authz:authorize>
+<jsp:forward page="/console/login"/>

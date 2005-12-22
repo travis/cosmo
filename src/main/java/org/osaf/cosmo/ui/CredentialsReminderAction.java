@@ -21,6 +21,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.UserService;
 
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -36,6 +37,8 @@ public class CredentialsReminderAction extends CosmoAction {
     private static final String FORM_EMAIL = "email";
     private static final String FORM_BUTTON_USERNAME = "username";
     private static final String FORM_BUTTON_PASSWORD = "password";
+    private static final String MSG_ERROR_EMAIL_NOT_FOUND =
+        "Forgot.Error.EmailNotFound";
     private static final String MSG_CONFIRM_USERNAME =
         "Forgot.Confirm.Username";
     private static final String MSG_CONFIRM_PASSWORD =
@@ -88,7 +91,13 @@ public class CredentialsReminderAction extends CosmoAction {
         throws Exception {
         BeanValidatorForm forgotForm = (BeanValidatorForm) form;
         String email = (String) forgotForm.get(FORM_EMAIL);
-        User user = userService.getUserByEmail(email);
+        User user = null;
+        try {
+            user = userService.getUserByEmail(email);
+        } catch (DataRetrievalFailureException e) {
+            saveErrorMessage(request, MSG_ERROR_EMAIL_NOT_FOUND);
+            return mapping.findForward(UIConstants.FWD_FAILURE);
+        }
 
         if (wasUsernameButtonClicked(forgotForm)) {
             sendUsernameReminderMessage(request, response, user);

@@ -37,18 +37,15 @@
   </global-exceptions>
 
   <global-forwards type="org.apache.struts.action.ActionForward">
-    <forward name="error" path="/error.do" redirect="false"/>
+    <forward name="error" path="/console/error" redirect="false"/>
   </global-forwards>
 
   <action-mappings>
     <action path="/error"
             type="org.osaf.cosmo.ui.CosmoErrorAction">
-      <forward name="error.general" path="error.general"
-               redirect="false"/>
-      <forward name="error.connect" path="error.connect"
-               redirect="false"/>
-      <forward name="error.notfound" path="error.notfound"
-               redirect="false"/>
+      <forward name="error.general" path="error.general"/>
+      <forward name="error.messaging" path="error.messaging"/>
+      <forward name="error.notfound" path="error.notfound"/>
     </action>
 
     <!-- Help and About pages -->
@@ -71,9 +68,10 @@
             name="forgotForm"
             scope="request"
             validate="true"
-            input="/forgot.do"
+            input="/console/forgot"
             type="org.osaf.cosmo.ui.CredentialsReminderAction">
       <forward name="ok" path="forgot"/>
+      <forward name="failure" path="forgot"/>
     </action>
 
     <action path="/logout"
@@ -91,10 +89,10 @@
             name="signupAccountForm"
             scope="request"
             validate="true"
-            input="/account/new.do"
+            input="/console/account/new"
             parameter="signup">
-      <forward name="failure" path="/account/new.do"/>
-      <forward name="success" path="/account" redirect="true"/>
+      <forward name="failure" path="/console/account/new"/>
+      <forward name="success" path="/console/account" redirect="true"/>
     </action>
 
     <action path="/account"
@@ -111,10 +109,10 @@
             name="updateAccountForm"
             scope="request"
             validate="true"
-            input="/account.do"
+            input="/console/account"
             parameter="update">
-      <forward name="failure" path="/account.do"/>
-      <forward name="success" path="/account" redirect="true"/>
+      <forward name="failure" path="/console/account"/>
+      <forward name="success" path="/console/account" redirect="true"/>
     </action>
 
     <!-- user admin actions -->
@@ -133,11 +131,11 @@
             name="updateUserForm"
             scope="request"
             validate="true"
-            input="/user.do"
+            input="/console/user"
             parameter="update">
-      <forward name="cancel" path="/users" redirect="true"/>
-      <forward name="failure" path="/user.do"/>
-      <forward name="success" path="/users" redirect="true"/>
+      <forward name="cancel" path="/console/users" redirect="true"/>
+      <forward name="failure" path="/console/user"/>
+      <forward name="success" path="/console/users" redirect="true"/>
     </action>
 
     <!-- root user requires totally different form validation -->
@@ -156,17 +154,17 @@
             name="updateRootForm"
             scope="request"
             validate="true"
-            input="/user/root.do"
+            input="/console/user/root"
             parameter="updateRoot">
-      <forward name="cancel" path="/users" redirect="true"/>
-      <forward name="failure" path="/user.do"/>
-      <forward name="success" path="/users" redirect="true"/>
+      <forward name="cancel" path="/console/users" redirect="true"/>
+      <forward name="failure" path="/console/user"/>
+      <forward name="success" path="/console/users" redirect="true"/>
     </action>
 
     <action path="/user/remove"
             type="org.osaf.cosmo.ui.UserAction"
             parameter="remove">
-      <forward name="success" path="/users" redirect="true"/>
+      <forward name="success" path="/console/users" redirect="true"/>
     </action>
 
     <action path="/users"
@@ -183,10 +181,10 @@
             name="createUserForm"
             scope="request"
             validate="true"
-            input="/users.do"
+            input="/console/users"
             parameter="create">
-      <forward name="failure" path="/users.do"/>
-      <forward name="success" path="/users" redirect="true"/>
+      <forward name="failure" path="/console/users"/>
+      <forward name="success" path="/console/users" redirect="true"/>
     </action>
 
     <!-- status page -->
@@ -205,7 +203,7 @@
     <action path="/status/gc"
             type="org.osaf.cosmo.ui.status.StatusAction"
             parameter="gc">
-      <forward name="ok" path="/status" redirect="true"/>
+      <forward name="ok" path="/console/status" redirect="true"/>
     </action>
   </action-mappings>
 

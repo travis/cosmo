@@ -19,88 +19,20 @@
 -->
 
 <urlrewrite>
-  <!-- error rules -->
   <rule>
-    <from>^/error$</from>
-    <to>/error.do</to>
-  </rule>
-
-  <!-- status rules -->
-  <rule>
-    <from>^/status$</from>
-    <to>/status.do</to>
-  </rule>
-
-  <rule>
-    <from>^/status/dump$</from>
-    <to>/status/dump.do</to>
-  </rule>
-
-  <!-- Help/About rules -->
-
-  <rule>
-    <from>^/help$</from>
-    <to>/help.do</to>
+    <from>^/console/loginfailed$</from>
+    <to>/console/login?login_failed=1</to>
   </rule>
   <rule>
-    <from>^/about$</from>
-    <to>/about.do</to>
-  </rule>
-
-  <!-- login rules -->
-
-  <rule>
-    <from>^/login$</from>
-    <to>/login.do</to>
+    <from>^/console/user/update$</from>
+    <to>/console/user/update</to>
   </rule>
   <rule>
-    <from>^/loginfailed$</from>
-    <to>/login.do?login_failed=1</to>
+    <from>^/console/user/root$</from>
+    <to>/console/user/root?username=root</to>
   </rule>
   <rule>
-    <from>^/forgot$</from>
-    <to>/forgot.do</to>
-  </rule>
-  <rule>
-    <from>^/remind$</from>
-    <to>/remind.do</to>
-  </rule>
-  <rule>
-    <from>^/logout$</from>
-    <to>/logout.do</to>
-  </rule>
-
-  <!-- account rules -->
-  <rule>
-    <from>^/account/new$</from>
-    <to>/account/new.do</to>
-  </rule>
-  <rule>
-    <from>^/account$</from>
-    <to>/account.do</to>
-  </rule>
-
-  <!-- user rules -->
-  <rule>
-    <from>^/users$</from>
-    <to>/users.do</to>
-  </rule>
-  <rule>
-    <from>^/user/(.+\.do)$</from>
-    <to>/user/$1</to>
-  </rule>
-  <rule>
-    <from>^/user/root$</from>
-    <to>/user/root.do?username=root</to>
-  </rule>
-  <rule>
-    <from>^/user/([\w\s.\-\']+)$</from>
-    <to>/user.do?username=$1</to>
-  </rule>
-
-  <!-- homedir rules -->
-  <rule>
-    <from>^/home$</from>
-    <to>/home/</to>
+    <from>^/console/user/([\w\s.\-\']+)$</from>
+    <to>/console/user?username=$1</to>
   </rule>
 </urlrewrite>

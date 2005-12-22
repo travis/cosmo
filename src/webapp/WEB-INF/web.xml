@@ -29,7 +29,9 @@
       classpath:applicationContext-jcr.xml
       classpath:applicationContext-provisioning.xml
       classpath:applicationContext-security.xml
-      classpath:applicationContext-security-web.xml
+      classpath:applicationContext-security-console.xml
+      classpath:applicationContext-security-dav.xml
+      classpath:applicationContext-security-cmp.xml
       classpath:applicationContext-mail.xml
       classpath:applicationContext-config-web.xml
     </param-value>
@@ -67,11 +69,11 @@
     </init-param>
   </filter>
   <filter>
-    <filter-name>ui-security</filter-name>
+    <filter-name>console-security</filter-name>
     <filter-class>net.sf.acegisecurity.util.FilterToBeanProxy</filter-class>
     <init-param>
       <param-name>targetBean</param-name>
-      <param-value>uiFilterChainProxy</param-value>
+      <param-value>consoleFilterChainProxy</param-value>
     </init-param>
   </filter>
   <filter>
@@ -109,6 +111,10 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
+    <filter-name>console-security</filter-name>
+    <url-pattern>/console/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
     <filter-name>dav-security</filter-name>
     <url-pattern>/home/*</url-pattern>
   </filter-mapping>
@@ -116,13 +122,10 @@
     <filter-name>cmp-security</filter-name>
     <url-pattern>/cmp/*</url-pattern>
   </filter-mapping>
-  <filter-mapping>
-    <filter-name>ui-security</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
+  <!-- url rewriting has to happen after security -->
   <filter-mapping>
     <filter-name>url-rewrite</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/console/*</url-pattern>
   </filter-mapping>
   <servlet>
     <servlet-name>webdav</servlet-name>
@@ -131,10 +134,6 @@
     <init-param>
       <param-name>resource-path-prefix</param-name>
       <param-value>/home</param-value>
-    </init-param>
-    <init-param>
-      <param-name>chain-catalog</param-name>
-      <param-value>/WEB-INF/chain-catalog.xml</param-value>
     </init-param>
     <init-param>
       <param-name>resource-config</param-name>
@@ -161,7 +160,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>action</servlet-name>
-    <url-pattern>*.do</url-pattern>
+    <url-pattern>/console/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>webdav</servlet-name>
@@ -173,7 +172,7 @@
   </servlet-mapping>
   <error-page>
     <exception-type>java.lang.Throwable</exception-type>
-    <location>/error.do</location>
+    <location>/console/error</location>
   </error-page>
   <resource-env-ref>
     <resource-env-ref-name>jcr/cosmo</resource-env-ref-name>

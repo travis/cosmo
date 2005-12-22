@@ -33,6 +33,7 @@
   <p class="hd">
     <fmt:message key="Forgot.Header"/>
   </p>
+  <cosmo:errmsg/>
   <p>
     <fmt:message key="Forgot.Instructions"/>
   </p>

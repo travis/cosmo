@@ -56,12 +56,12 @@
         <cosmo:fullName var="fullName" user="${user}"/>
         <tr>
           <td class="smTableData" style="text-align:center; white-space:nowrap;">
-            <html:link page="/user/${user.username}">
+            <html:link page="/console/user/${user.username}">
               <fmt:message key="User.List.EditControl"/>
             </html:link>
             <c:choose>
               <c:when test="${not user.overlord}">
-                <html:link page="/user/remove.do?username=${user.username}">
+                <html:link page="/console/user/remove?username=${user.username}">
                   <fmt:message key="User.List.RemoveControl"/>
                 </html:link>
               </c:when>

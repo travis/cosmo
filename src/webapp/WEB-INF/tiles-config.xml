@@ -41,9 +41,9 @@
     <put name="showNav"      value="false"/>
   </definition>
 
-  <definition name="error.connect" extends="layout.standard">
-    <put name="body"         value="/WEB-INF/jsp/error/connect.jsp"/>
-    <put name="prefix"       value="Error.Connect."/>
+  <definition name="error.messaging" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/error/messaging.jsp"/>
+    <put name="prefix"       value="Error.Messaging."/>
     <put name="showNav"      value="false"/>
   </definition>
 

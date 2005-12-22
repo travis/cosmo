@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+    Copyright 2005 Open Source Applications Foundation
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<!--
+    Application context containing cmp security beans
+-->
+
+<beans>
+
+  <!-- interceptor which specifies access control rules for the
+       URL space, invoked by security enforcement filter -->
+
+   <bean id="cmpFilterInvocationInterceptor"
+         class="net.sf.acegisecurity.intercept.web.FilterSecurityInterceptor">
+     <property name="authenticationManager">
+       <ref bean="authenticationManager"/>
+     </property>
+     <property name="accessDecisionManager">
+       <ref bean="accessDecisionManager"/>
+     </property>
+     <property name="objectDefinitionSource">
+       <value>
+	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+	 PATTERN_TYPE_APACHE_ANT
+         /cmp/users=ROLE_ROOT
+         /cmp/user/*=ROLE_ROOT
+         /cmp/signup=ROLE_ANONYMOUS
+         /cmp/account=ROLE_USER
+         /**=ROLE_ROOT
+       </value>
+     </property>
+   </bean>
+
+  <!-- filter chain that kicks off request-time processing -->
+
+  <bean id="cmpFilterChainProxy"
+        class="net.sf.acegisecurity.util.FilterChainProxy">
+    <property name="filterInvocationDefinitionSource">
+      <value>
+        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+        PATTERN_TYPE_APACHE_ANT
+        /**=cmpHttpRequestContextIntegrationFilter,cmpBasicProcessingFilter,cmpAnonymousProcessingFilter,cmpSecurityEnforcementFilter
+      </value>
+    </property>
+  </bean>
+
+  <!-- filter that integrates SecurityContext into HTTP request -->
+
+  <bean id="cmpHttpRequestContextIntegrationFilter"
+        class="org.osaf.cosmo.acegisecurity.HttpRequestContextIntegrationFilter"/>
+
+   <!-- filter that performs BASIC authentication -->
+
+  <bean id="cmpBasicAuthenticationEntryPoint"
+        class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
+    <property name="realmName">
+      <value>Cosmo Sharing Server</value>
+    </property>
+  </bean>
+
+  <bean id="cmpBasicProcessingFilter"
+        class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilter">
+    <property name="authenticationManager">
+      <ref bean="authenticationManager"/>
+    </property>
+    <property name="authenticationEntryPoint">
+      <ref local="cmpBasicAuthenticationEntryPoint"/>
+    </property>
+  </bean>
+
+  <!-- filter that performs anonymous authentication -->
+
+  <bean id="cmpAnonymousProcessingFilter"
+        class="net.sf.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+    <property name="key">
+      <value>badgerbadgerbadger</value>
+    </property>
+    <property name="userAttribute">
+      <value>anonymous,ROLE_ANONYMOUS</value>
+    </property>
+  </bean>
+
+  <!-- filter that enforces security constraints on cmp requests -->
+
+  <bean id="cmpSecurityEnforcementFilter"
+        class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
+    <property name="filterSecurityInterceptor">
+      <ref local="cmpFilterInvocationInterceptor"/>
+    </property>
+    <property name="authenticationEntryPoint">
+      <ref local="cmpBasicAuthenticationEntryPoint"/>
+    </property>
+  </bean>
+
+</beans>

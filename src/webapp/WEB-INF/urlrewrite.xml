@@ -36,7 +36,11 @@
     <to>/console/user?username=$1</to>
   </rule>
   <rule>
-    <from>^/console/home(/.*)$</from>
-    <to>/console/home?path=$1</to>
+    <from>^/console/home/browse(/.*)$</from>
+    <to>/console/home/browse?path=$1</to>
+  </rule>
+  <rule>
+    <from>^/console/home/download(/.*)$</from>
+    <to>/console/home/download?path=$1</to>
   </rule>
 </urlrewrite>

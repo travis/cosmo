@@ -29,6 +29,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import org.osaf.cosmo.dao.NoSuchResourceException;
+
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.mail.MailSendException;
 
@@ -125,6 +127,7 @@ public class CosmoErrorAction extends Action {
     }
 
     private boolean isNotFoundError(Throwable t) {
-        return t instanceof DataRetrievalFailureException;
+        return (t instanceof DataRetrievalFailureException ||
+                t instanceof NoSuchResourceException);
     }
 }

@@ -188,10 +188,14 @@
     </action>
 
     <!-- home directory browser actions -->
-    <action path="/home"
+    <action path="/home/browse"
             type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
             parameter="browse">
       <forward name="collection" path="home.collection"/>
+    </action>
+    <action path="/home/download"
+            type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
+            parameter="download">
     </action>
 
     <!-- status page -->

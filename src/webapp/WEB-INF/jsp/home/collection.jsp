@@ -48,9 +48,10 @@
       </td>
     </tr>
     <c:forEach var="resource" items="${Collection.resources}">
+      <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.CollectionResource'}"><c:set var="homeurl" value="/console/home/browse${resource.path}"/></c:when><c:otherwise><c:set var="homeurl" value="/console/home/download${resource.path}"/></c:otherwise></c:choose>
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        <html:link page="/console/home${resource.path}">
+        <html:link page="${homeurl}">
         [browse]
         </html:link>    
       </td>

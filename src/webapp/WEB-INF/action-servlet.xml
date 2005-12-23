@@ -87,6 +87,6 @@
     </property>
   </bean>
 
-  <bean name="/home"           parent="homeDirectoryBrowserAction"/>
-
+  <bean name="/home/browse"     parent="homeDirectoryBrowserAction"/>
+  <bean name="/home/download"   parent="homeDirectoryBrowserAction"/>
 </beans>

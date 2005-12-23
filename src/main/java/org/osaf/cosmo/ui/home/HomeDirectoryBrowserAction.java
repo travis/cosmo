@@ -30,11 +30,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.model.CollectionResource;
 import org.osaf.cosmo.model.FileResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.service.HomeDirectoryService;
 import org.osaf.cosmo.ui.CosmoAction;
+
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * Action for browsing a user's home directory.
@@ -56,6 +59,9 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
     public static final String FWD_COLLECTION = "collection";
 
     /**
+     * Retrieves the collection specified by the {@link #PARAM_PATH}
+     * parameter and sets it into the {@link #ATTR_COLLECTION} request
+     * attribute.
      */
     public ActionForward browse(ActionMapping mapping,
                                 ActionForm form,
@@ -64,55 +70,69 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         throws Exception {
         String path = request.getParameter(PARAM_PATH);
 
-        Resource resource = homeDirectoryService.getResource(path);
-
-        if (resource instanceof CollectionResource) {
-            request.setAttribute(ATTR_COLLECTION, resource);
-            addTitleParam(request, resource.getPath());
-            return mapping.findForward(FWD_COLLECTION);
+        Resource resource = getResource(path);
+        if (! (resource instanceof CollectionResource)) {
+            throw new ServletException("resource at path " + path +
+                                       " not a collection");
         }
-        else if (resource instanceof FileResource) {
-            FileResource file = (FileResource) resource;
 
-            // set headers
-            response.setStatus(HttpServletResponse.SC_OK);
-            if (file.getContentType() != null) {
-                response.setContentType(file.getContentType());
-            }
-            else {
-                response.setContentType("application/octet-stream");
-            }
-            if (file.getContentLength() != null) {
-                response.setContentLength(file.getContentLength().intValue());
-            }
-            if (file.getContentEncoding() != null) {
-                response.setCharacterEncoding(file.getContentEncoding());
-            }
-            if (file.getContentLanguage() != null) {
-                response.setHeader("Content-Language",
-                                   file.getContentLanguage());
-            }
+        request.setAttribute(ATTR_COLLECTION, resource);
+        addTitleParam(request, resource.getPath());
+        return mapping.findForward(FWD_COLLECTION);
+    }
 
-            // spool data
-            InputStream in = file.getContent();
-            OutputStream out = response.getOutputStream();
-            try {
-                byte[] buffer = new byte[8192];
-                int read;
-                while ((read = in.read(buffer)) >= 0) {
-                    out.write(buffer, 0, read);
-                }
-            } finally {
-                in.close();
-            }
-            response.flushBuffer();
+    /**
+     * Downloads the contents of the file specified by the
+     * {@link #PARAM_PATH} parameter.
+     */
+    public ActionForward download(ActionMapping mapping,
+                                ActionForm form,
+                                HttpServletRequest request,
+                                HttpServletResponse response)
+        throws Exception {
+        String path = request.getParameter(PARAM_PATH);
 
-            return null;
+        Resource resource = getResource(path);
+        if (! (resource instanceof FileResource)) {
+            throw new ServletException("resource at path " + path +
+                                       " not a file");
+        }
+        FileResource file = (FileResource) resource;
+
+        // set headers
+        response.setStatus(HttpServletResponse.SC_OK);
+        if (file.getContentType() != null) {
+            response.setContentType(file.getContentType());
         }
         else {
-            throw new ServletException("resource at path " + path +
-                                       " neither file nor collection");
+            response.setContentType("application/octet-stream");
         }
+        if (file.getContentLength() != null) {
+            response.setContentLength(file.getContentLength().intValue());
+        }
+        if (file.getContentEncoding() != null) {
+            response.setCharacterEncoding(file.getContentEncoding());
+        }
+        if (file.getContentLanguage() != null) {
+            response.setHeader("Content-Language",
+                               file.getContentLanguage());
+        }
+
+        // spool data
+        InputStream in = file.getContent();
+        OutputStream out = response.getOutputStream();
+        try {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) >= 0) {
+                out.write(buffer, 0, read);
+            }
+        } finally {
+            in.close();
+        }
+        response.flushBuffer();
+        
+        return null;
     }
 
     /**
@@ -125,5 +145,17 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
      */
     public void setHomeDirectoryService(HomeDirectoryService service) {
         this.homeDirectoryService = service;
+    }
+
+    private Resource getResource(String path) {
+        try {
+            return homeDirectoryService.getResource(path);
+        } catch (InvalidDataAccessResourceUsageException e) {
+            // this happens when an item exists in the repository at
+            // that path, but it does not represent a dav resource or
+            // collection, so pretend that there's no resource there
+            // at all
+            throw new NoSuchResourceException(path);
+        }
     }
 }

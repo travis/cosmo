@@ -49,7 +49,6 @@
         </td>
       </tr>
       <c:forEach var="user" items="${Users}">
-        <cosmo:homedir var="homedir" user="${user}"/>
         <cosmo:fullName var="fullName" user="${user}"/>
         <tr>
           <td class="smTableData" style="text-align:center; white-space:nowrap;">
@@ -58,7 +57,7 @@
             </html:link>
             <c:choose>
               <c:when test="${not user.overlord}">
-                <html:link page="/console/home/${user.username}">
+                <html:link page="/console/home/browse/${user.username}">
                   <fmt:message key="User.List.HomeDirectoryControl"/>
                 </html:link>
                 <html:link page="/console/user/remove?username=${user.username}">
@@ -83,20 +82,6 @@
             <c:if test="${user.admin}">
               Yes
             </c:if>
-          </td>
-          <td class="smTableData">
-            <c:choose>
-              <c:when test="${not user.overlord}">
-                <html:link target="homedir" page="${homedir}">
-                  ${homedir}
-                </html:link>
-              </c:when>
-              <c:otherwise>
-              <span class="disabled">
-                <fmt:message key="User.List.NotApplicable"/>
-              </span>
-              </c:otherwise>
-            </c:choose>
           </td>
           <td class="smTableData">
             <html:link href="mailto:${user.email}">${user.email}</html:link>

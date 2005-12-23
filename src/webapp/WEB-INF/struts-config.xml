@@ -187,6 +187,13 @@
       <forward name="success" path="/console/users" redirect="true"/>
     </action>
 
+    <!-- home directory browser actions -->
+    <action path="/home"
+            type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
+            parameter="browse">
+      <forward name="collection" path="home.collection"/>
+    </action>
+
     <!-- status page -->
     <action path="/status"
             type="org.osaf.cosmo.ui.status.StatusAction"

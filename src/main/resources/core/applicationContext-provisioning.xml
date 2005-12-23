@@ -31,6 +31,15 @@
     </property>
   </bean>
 
+  <bean id="homeDirectoryDao"
+        class="org.osaf.cosmo.dao.jcr.JcrHomeDirectoryDao"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="sessionFactory">
+      <ref bean="homedirSessionFactory"/>
+    </property>
+  </bean>
+
   <bean id="ticketIdGenerator"
         class="org.apache.commons.id.random.SessionIdGenerator"/>
 
@@ -60,6 +69,15 @@
     </property>
     <property name="passwordGenerator">
       <ref bean="passwordGenerator"/>
+    </property>
+  </bean>
+
+  <bean id="homeDirectoryService"
+        class="org.osaf.cosmo.service.impl.StandardHomeDirectoryService"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="homeDirectoryDao">
+      <ref bean="homeDirectoryDao"/>
     </property>
   </bean>
 

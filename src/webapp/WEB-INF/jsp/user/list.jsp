@@ -39,9 +39,6 @@
           <fmt:message key="User.List.TH.IsAdmin"/>
         </td>
         <td class="smTableColHead">
-          <fmt:message key="User.List.TH.Homedir"/>
-        </td>
-        <td class="smTableColHead">
           <fmt:message key="User.List.TH.Email"/>
         </td>
         <td class="smTableColHead">
@@ -61,12 +58,16 @@
             </html:link>
             <c:choose>
               <c:when test="${not user.overlord}">
+                <html:link page="/console/home/${user.username}">
+                  <fmt:message key="User.List.HomeDirectoryControl"/>
+                </html:link>
                 <html:link page="/console/user/remove?username=${user.username}">
                   <fmt:message key="User.List.RemoveControl"/>
                 </html:link>
               </c:when>
               <c:otherwise>
                 <span class="disabled">
+                  <fmt:message key="User.List.HomeDirectoryControl"/>
                   <fmt:message key="User.List.RemoveControl"/>
                 </span>
               </c:otherwise>

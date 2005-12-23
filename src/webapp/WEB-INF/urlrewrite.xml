@@ -35,4 +35,8 @@
     <from>^/console/user/([\w\s.\-\']+)$</from>
     <to>/console/user?username=$1</to>
   </rule>
+  <rule>
+    <from>^/console/home(/.*)$</from>
+    <to>/console/home?path=$1</to>
+  </rule>
 </urlrewrite>

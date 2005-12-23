@@ -105,6 +105,13 @@
     <put name="prefix"       value="User.List."/>
   </definition>
 
+  <!-- home directory browser defs -->
+
+  <definition name="home.collection" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/home/collection.jsp"/>
+    <put name="prefix"       value="HomeDirectory.Collection."/>
+  </definition>
+
   <!-- status defs -->
 
   <definition name="status.view" extends="layout.standard">

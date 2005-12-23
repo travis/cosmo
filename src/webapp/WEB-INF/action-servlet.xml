@@ -75,4 +75,18 @@
     </property>
   </bean>
 
+  <!-- home directory browser actions -->
+
+  <bean name="homeDirectoryBrowserAction" abstract="true" singleton="false"
+        class="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction" >
+    <property name="homeDirectoryService">
+      <ref bean="homeDirectoryService"/>
+    </property>
+    <property name="securityManager">
+      <ref bean="securityManager"/>
+    </property>
+  </bean>
+
+  <bean name="/home"           parent="homeDirectoryBrowserAction"/>
+
 </beans>

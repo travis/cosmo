@@ -17,7 +17,6 @@ package org.osaf.cosmo.acegisecurity.ticket;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Calendar;
 
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationException;
@@ -70,14 +69,12 @@ public class TicketAuthenticationProvider
                                                   "at " + repositoryPath);
             }
 
-            try {
-                checkTimeout(ticket);
-            } catch (TicketTimeoutException e) {
+            if (ticket.hasTimedOut()) {
                 if (log.isDebugEnabled()) {
-                    log.debug("removing timed out ticket " + token.getId());
+                    log.debug("removing timed out ticket " + ticket.getId());
                 }
                 ticketDao.removeTicket(repositoryPath, ticket);
-                throw e;
+                throw new TicketTimeoutException(ticket.getId());
             }
 
             token.setTicket(ticket);
@@ -102,31 +99,6 @@ public class TicketAuthenticationProvider
     }
 
     // our methods
-
-    public void checkTimeout(Ticket ticket)
-        throws TicketTimeoutException, AuthenticationServiceException {
-        if (ticket.getTimeout().equals(CosmoDavConstants.VALUE_INFINITE)) {
-            return;
-        }
-
-        Integer timeout = null;
-        try {
-            timeout = Integer.valueOf(ticket.getTimeout().substring(7));
-        } catch (NumberFormatException e) {
-            throw new AuthenticationServiceException("illegal ticket " +
-                                                     "timeout: " +
-                                                     ticket.getTimeout());
-        }
-
-        Calendar expiry = Calendar.getInstance();
-        expiry.setTime(ticket.getCreated());
-        expiry.add(Calendar.SECOND, timeout.intValue());
-
-        if (Calendar.getInstance().after(expiry)) {
-            throw new TicketTimeoutException("ticket timed out at " +
-                                             expiry.getTime());
-        }
-    }
 
     /**
      */

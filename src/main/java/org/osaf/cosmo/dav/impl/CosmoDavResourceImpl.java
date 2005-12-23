@@ -360,6 +360,15 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                          iterator();
                      i.hasNext();) {
                     Ticket ticket = (Ticket) i.next();
+
+                    if (ticket.hasTimedOut()) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("removing timed out ticket " +
+                                      ticket.getId());
+                        }
+                        ticketDao.removeTicket(getNode().getPath(), ticket);
+                    }
+
                     tickets.put(ticket.getId(), ticket);
                     Set ownedBy = (Set) ownedTickets.get(ticket.getOwner());
                     if (ownedBy == null) {

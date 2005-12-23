@@ -19,6 +19,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<fmt:message var="signupButton" key="Forgot.Button.Signup"/>
 <fmt:message var="cancelButton" key="Button.Cancel"/>
 <fmt:message var="closeButton" key="Button.Close"/>
 
@@ -51,6 +52,8 @@
       <html:submit property="password" styleClass="md">
         <fmt:message key="Forgot.Button.Password"/>
       </html:submit>
+      <input type="submit" name="signup" value="${signupButton}"
+             class="md" onClick="window.opener.location='<html:rewrite page="/console/account/new"/>'; window.close()"/>
       <input type="submit" name="cancel" value="${cancelButton}"
              class="md" onClick="window.close()"/>
     </p>

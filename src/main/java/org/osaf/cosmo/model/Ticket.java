@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.model;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,6 +36,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * XML.
  */
 public class Ticket {
+
+    public static final String INFINITE = "Infinite";
 
     private String id;
     private String owner;
@@ -106,6 +109,22 @@ public class Ticket {
      */
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    /**
+     */
+    public boolean hasTimedOut() {
+        if (timeout == null || timeout.equals(INFINITE)) {
+            return false;
+        }
+
+        int seconds = Integer.parseInt(timeout.substring(7));
+
+        Calendar expiry = Calendar.getInstance();
+        expiry.setTime(created);
+        expiry.add(Calendar.SECOND, seconds);
+
+        return Calendar.getInstance().after(expiry);
     }
 
     /**

@@ -15,66 +15,59 @@
  */
 package org.osaf.cosmo.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * A bean encapsulating the information about a dav resource.
+ * Extends {@link Resource} to represent a collection of
+ * resources.
  */
-public class DavResource extends BaseModelObject {
+public class CollectionResource extends Resource {
 
-    private String displayName;
-    private String path;
+    private Set resources;
 
     /**
      */
-    public DavResource() {
+    public CollectionResource() {
+        super();
+        resources = new HashSet();
     }
 
     /**
      */
-    public String getDisplayName() {
-        return displayName;
+    public Set getResources() {
+        return resources;
     }
 
     /**
      */
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    /**
-     */
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     */
-    public void setPath(String path) {
-        this.path = path;
+    public void addResource(Resource resource) {
+        resources.add(resource);
     }
 
     /**
      */
     public boolean equals(Object o) {
-        if (! (o instanceof DavResource)) {
+        if (! (o instanceof CollectionResource)) {
             return false;
         }
-        DavResource it = (DavResource) o;
+        CollectionResource it = (CollectionResource) o;
         return new EqualsBuilder().
-            append(displayName, it.displayName).
-            append(path, it.path).
+            appendSuper(super.equals(o)).
+            append(resources, it.resources).
             isEquals();
     }
 
     /**
      */
     public int hashCode() {
-        return new HashCodeBuilder(7, 11).
-            append(displayName).
-            append(path).
+        return new HashCodeBuilder(13, 15).
+            appendSuper(super.hashCode()).
+            append(resources).
             toHashCode();
     }
 
@@ -82,8 +75,8 @@ public class DavResource extends BaseModelObject {
      */
     public String toString() {
         return new ToStringBuilder(this).
-            append("displayName", displayName).
-            append("path", path).
+            appendSuper(super.toString()).
+            append("resources", resources).
             toString();
     }
 }

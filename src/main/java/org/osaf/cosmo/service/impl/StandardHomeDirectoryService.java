@@ -17,7 +17,7 @@ package org.osaf.cosmo.service.impl;
 
 import org.osaf.cosmo.dao.HomeDirectoryDao;
 import org.osaf.cosmo.service.HomeDirectoryService;
-import org.osaf.cosmo.model.DavResource;
+import org.osaf.cosmo.model.Resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,7 +40,7 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
      * @throws NoSuchResourceException if a resource does not exist at
      * the specified path
      */
-    public DavResource getResource(String path) {
+    public Resource getResource(String path) {
         return homeDirectoryDao.getResource(path);
     }
 

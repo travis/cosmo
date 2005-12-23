@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dao.HomeDirectoryDao;
 import org.osaf.cosmo.dao.NoSuchResourceException;
-import org.osaf.cosmo.model.DavResource;
+import org.osaf.cosmo.model.Resource;
 
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
@@ -45,7 +45,7 @@ import org.springmodules.jcr.support.JcrDaoSupport;
  *
  * It uses {@link JcrResourceMapper} to convert JCR nodes and
  * properties to and from instances of
- * {@link DavResource}.
+ * {@link Resource}.
  */
 public class JcrHomeDirectoryDao extends JcrDaoSupport
     implements JcrConstants, HomeDirectoryDao {
@@ -64,8 +64,8 @@ public class JcrHomeDirectoryDao extends JcrDaoSupport
      * the specified path is not a node of type
      * <code>dav:resource</code> or <code>dav:collection</code>
      */
-    public DavResource getResource(final String path) {
-        return (DavResource) getJcrTemplate().execute(new JcrCallback() {
+    public Resource getResource(final String path) {
+        return (Resource) getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
                     String jcrPath = JcrEscapist.hexEscapeJcrPath(path);

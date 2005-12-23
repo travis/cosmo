@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.dao;
 
-import org.osaf.cosmo.model.DavResource;
+import org.osaf.cosmo.model.Resource;
 
 /**
  * Interface for DAOs that manage access to user home directories.
@@ -29,5 +29,5 @@ public interface HomeDirectoryDao extends Dao {
      * @throws NoSuchResourceException if a resource does not exist at
      * the specified path
      */
-    public DavResource getResource(String path);
+    public Resource getResource(String path);
 }

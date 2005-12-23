@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.ui.home;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
@@ -28,8 +30,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import org.osaf.cosmo.model.DavCollection;
-import org.osaf.cosmo.model.DavResource;
+import org.osaf.cosmo.model.CollectionResource;
+import org.osaf.cosmo.model.FileResource;
+import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.service.HomeDirectoryService;
 import org.osaf.cosmo.ui.CosmoAction;
 
@@ -61,25 +64,55 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         throws Exception {
         String path = request.getParameter(PARAM_PATH);
 
-        DavResource resource = homeDirectoryService.getResource(path);
+        Resource resource = homeDirectoryService.getResource(path);
 
-        if (resource instanceof DavCollection) {
+        if (resource instanceof CollectionResource) {
             request.setAttribute(ATTR_COLLECTION, resource);
             addTitleParam(request, resource.getPath());
             return mapping.findForward(FWD_COLLECTION);
         }
+        else if (resource instanceof FileResource) {
+            FileResource file = (FileResource) resource;
 
-        // XXX: write the resource's stream directly
+            // set headers
+            response.setStatus(HttpServletResponse.SC_OK);
+            if (file.getContentType() != null) {
+                response.setContentType(file.getContentType());
+            }
+            else {
+                response.setContentType("application/octet-stream");
+            }
+            if (file.getContentLength() != null) {
+                response.setContentLength(file.getContentLength().intValue());
+            }
+            if (file.getContentEncoding() != null) {
+                response.setCharacterEncoding(file.getContentEncoding());
+            }
+            if (file.getContentLanguage() != null) {
+                response.setHeader("Content-Language",
+                                   file.getContentLanguage());
+            }
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("text/plain");
-        response.setCharacterEncoding("UTF-8");
+            // spool data
+            InputStream in = file.getContent();
+            OutputStream out = response.getOutputStream();
+            try {
+                byte[] buffer = new byte[8192];
+                int read;
+                while ((read = in.read(buffer)) >= 0) {
+                    out.write(buffer, 0, read);
+                }
+            } finally {
+                in.close();
+            }
+            response.flushBuffer();
 
-        PrintWriter writer = response.getWriter();
-        writer.write("display name: " + resource.getDisplayName() + "\n");
-        writer.write("path: " + resource.getPath() + "\n");
-
-        return null;
+            return null;
+        }
+        else {
+            throw new ServletException("resource at path " + path +
+                                       " neither file nor collection");
+        }
     }
 
     /**

@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.service;
 
-import org.osaf.cosmo.model.DavResource;
+import org.osaf.cosmo.model.Resource;
 
 /**
  * Interface for services that manage access to user home
@@ -30,5 +30,5 @@ public interface HomeDirectoryService extends Service {
      * @throws NoSuchResourceException if a resource does not exist at
      * the specified path
      */
-    public DavResource getResource(String path);
+    public Resource getResource(String path);
 }

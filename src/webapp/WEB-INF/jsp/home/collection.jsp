@@ -19,25 +19,57 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<div class="widgetBorder" style="width:460px; margin-top:24px;">
-<div class="widgetContent" style="padding:8px;">
-
-<div class="hd" style="margin-bottom:4px;">
+<div class="hd" style="margin-top: 12px;">
   <fmt:message key="HomeDirectory.Collection.Title">
     <fmt:param value="${Collection.path}"/>
   </fmt:message>
 </div>
 
-<table cellpadding="3" cellspacing="1" border="0">
-  <tr>
-    <td class="mdLabel" style="text-align:right;">
-      <fmt:message key="HomeDirectory.Collection.DisplayName"/>
-    </td>
-    <td class="mdData">
-      ${Collection.displayName}
-    </td>
-  </tr>
-</table>
-
-</div>
+<div style="margin-top:12px;">
+  <table cellpadding="4" cellspacing="1" border="0" width="100%">
+    <tr>
+      <td class="smTableColHead" style="width:1%;">
+        &nbsp;
+      </td>
+      <td class="smTableColHead">
+        Name
+      </td>
+      <td class="smTableColHead">
+        Type
+      </td>
+      <td class="smTableColHead">
+        Created
+      </td>
+      <td class="smTableColHead">
+        Last Modified
+      </td>
+      <td class="smTableColHead">
+        Size
+      </td>
+    </tr>
+    <c:forEach var="resource" items="${Collection.resources}">
+    <tr>
+      <td class="smTableData" style="text-align:center; white-space:nowrap;">
+        <html:link page="/console/home${resource.path}">
+        [browse]
+        </html:link>    
+      </td>
+      <td class="smTableData">
+        ${resource.displayName}
+      </td>
+      <td class="smTableData" style="text-align:center;">
+        <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.CollectionResource'}">Folder</c:when><c:otherwise>File</c:otherwise></c:choose>
+      </td>
+      <td class="smTableData" style="text-align:center;">         
+        <fmt:formatDate value="${resource.dateCreated}" type="both"/>
+      </td>
+      <td class="smTableData" style="text-align:center;">
+        <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.FileResource'}"><fmt:formatDate value="${resource.dateModified}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+      <td class="smTableData" style="text-align:center;">
+        <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.FileResource'}"><fmt:formatNumber value="${resource.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    </c:forEach>
+  </table>
 </div>

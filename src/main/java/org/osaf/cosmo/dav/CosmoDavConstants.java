@@ -97,6 +97,7 @@ public class CosmoDavConstants {
 
     // XML values
 
+    public static final String VALUE_INFINITE = "Infinite";
     public static final String VALUE_INFINITY = "infinity";
     public static final String VALUE_YES = "yes";
     public static final String VALUE_NO = "no";

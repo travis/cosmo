@@ -53,6 +53,9 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
     public static final String PARAM_PATH = "path";
     /**
      */
+    public static final String PARAM_TICKET = "ticket";
+    /**
+     */
     public static final String ATTR_COLLECTION = "Collection";
     /**
      */
@@ -78,6 +81,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
 
         request.setAttribute(ATTR_COLLECTION, resource);
         addTitleParam(request, resource.getPath());
+
         return mapping.findForward(FWD_COLLECTION);
     }
 
@@ -133,6 +137,32 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         response.flushBuffer();
         
         return null;
+    }
+
+    /**
+     * Revokes the ticket specified by the {@link PARAM_TICKET}
+     * parameter from the resource specified by the
+     * {@link #PARAM_PATH} parameter.
+     */
+    public ActionForward revoke(ActionMapping mapping,
+                                ActionForm form,
+                                HttpServletRequest request,
+                                HttpServletResponse response)
+        throws Exception {
+        String path = request.getParameter(PARAM_PATH);
+        String id = request.getParameter(PARAM_TICKET);
+
+        if (log.isDebugEnabled()) {
+            log.debug("revoking ticket " + id + " from resource at " + path);
+        }
+
+        homeDirectoryService.revokeTicket(path, id);
+
+        ActionForward forward = mapping.findForward(FWD_COLLECTION);
+        return new ActionForward(forward.getName(),
+                                 forward.getPath() + path,
+                                 forward.getRedirect(),
+                                 forward.getModule());
     }
 
     /**

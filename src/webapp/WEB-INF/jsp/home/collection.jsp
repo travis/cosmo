@@ -31,7 +31,7 @@
       <td class="smTableColHead" style="width:1%;">
         &nbsp;
       </td>
-      <td class="smTableColHead">
+      <td class="smTableColHead" style="text-align:left;">
         Name
       </td>
       <td class="smTableColHead">
@@ -48,12 +48,9 @@
       </td>
     </tr>
     <c:forEach var="resource" items="${Collection.resources}">
-      <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.CollectionResource'}"><c:set var="homeurl" value="/console/home/browse${resource.path}"/></c:when><c:otherwise><c:set var="homeurl" value="/console/home/download${resource.path}"/></c:otherwise></c:choose>
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        <html:link page="${homeurl}">
-        [browse]
-        </html:link>    
+      <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.CollectionResource'}"><html:link page="/console/home/browse${resource.path}">[browse]</html:link></c:when><c:otherwise><html:link page="/console/home/download${resource.path}">[download]</html:link></c:otherwise></c:choose>
       </td>
       <td class="smTableData">
         ${resource.displayName}
@@ -69,6 +66,88 @@
       </td>
       <td class="smTableData" style="text-align:center;">
         <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.FileResource'}"><fmt:formatNumber value="${resource.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    </c:forEach>
+  </table>
+</div>
+
+<div class="hd" style="margin-top: 12px;">
+  Tickets
+</div>
+
+<div style="margin-top:12px;">
+  <table cellpadding="4" cellspacing="1" border="0" width="100%">
+    <tr>
+      <td class="smTableColHead" style="width:1%;">
+        &nbsp;
+      </td>
+      <td class="smTableColHead" style="text-align:left;">
+        Id
+      </td>
+      <td class="smTableColHead">
+        Owner
+      </td>
+      <td class="smTableColHead">
+        Timeout
+      </td>
+      <td class="smTableColHead">
+        Privileges
+      </td>
+      <td class="smTableColHead">
+        Created
+      </td>
+    </tr>
+    <c:forEach var="ticket" items="${Collection.tickets}">
+    <tr>
+      <td class="smTableData" style="text-align:center; white-space:nowrap;">
+        <html:link page="/console/home${Collection.path}/ticket/${ticket.id}/revoke">
+          [revoke]
+        </html:link>    
+      </td>
+      <td class="smTableData">
+        ${ticket.id}
+      </td>
+      <td class="smTableData" style="text-align:center;">
+        ${ticket.owner}
+      </td>
+      <td class="smTableData" style="text-align:center;">
+        ${ticket.timeout}
+      </td>
+      <td class="smTableData" style="text-align:center;">
+        <c:forEach var="privilege" items="${ticket.privileges}">
+          ${privilege}
+        </c:forEach>
+      </td>
+      <td class="smTableData" style="text-align:center;">
+        <fmt:formatDate value="${ticket.created}" type="both"/>
+      </td>
+    </tr>
+    </c:forEach>
+  </table>
+</div>
+
+<div class="hd" style="margin-top: 12px;">
+  Properties
+</div>
+
+<div style="margin-top:12px;">
+  <table cellpadding="4" cellspacing="1" border="0" width="100%">
+    <tr>
+      <td class="smTableColHead" style="text-align:left;">
+        Name
+      </td>
+      <td class="smTableColHead" style="text-align:left;">
+        Value
+      </td>
+    </tr>
+    <c:forEach var="property" items="${Collection.properties}">
+    <tr>
+      <td class="smTableData" width="50%">
+        ${property.name}
+      </td>
+      <td class="smTableData" width="50%">
+        ${property.value}
       </td>
     </tr>
     </c:forEach>

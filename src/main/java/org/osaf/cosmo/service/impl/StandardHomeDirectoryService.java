@@ -16,8 +16,10 @@
 package org.osaf.cosmo.service.impl;
 
 import org.osaf.cosmo.dao.HomeDirectoryDao;
+import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.service.HomeDirectoryService;
 import org.osaf.cosmo.model.Resource;
+import org.osaf.cosmo.model.Ticket;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +32,7 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
         LogFactory.getLog(StandardHomeDirectoryService.class);
 
     private HomeDirectoryDao homeDirectoryDao;
+    private TicketDao ticketDao;
 
     // HomeDirectoryService methods
 
@@ -42,6 +45,29 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
      */
     public Resource getResource(String path) {
         return homeDirectoryDao.getResource(path);
+    }
+
+    /**
+     * Creates a ticket on the resource at the specified path within
+     * the repository.
+     *
+     * @throws NoSuchResourceException if a resource does not exist at
+     * the specified path
+     */
+    public void grantTicket(String path, Ticket ticket) {
+        ticketDao.createTicket(path, ticket);
+    }
+
+    /**
+     * Removes the identified ticket from the resource at the
+     * specified path within the repository.
+     *
+     * @throws NoSuchResourceException if a resource does not exist at
+     * the specified path
+     */
+
+    public void revokeTicket(String path, String id) {
+        ticketDao.removeTicket(path, getResource(path).getTicket(id));
     }
 
     // Service methods
@@ -74,5 +100,17 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
      */
     public void setHomeDirectoryDao(HomeDirectoryDao homeDirectoryDao) {
         this.homeDirectoryDao = homeDirectoryDao;
+    }
+
+    /**
+     */
+    public TicketDao getTicketDao() {
+        return this.ticketDao;
+    }
+
+    /**
+     */
+    public void setTicketDao(TicketDao ticketDao) {
+        this.ticketDao = ticketDao;
     }
 }

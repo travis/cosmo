@@ -43,4 +43,8 @@
     <from>^/console/home/download(/.*)$</from>
     <to>/console/home/download?path=$1</to>
   </rule>
+  <rule>
+    <from>^/console/home(/.*)/ticket/(.+)/revoke$</from>
+    <to>/console/home/ticket/revoke?path=$1&amp;ticket=$2</to>
+  </rule>
 </urlrewrite>

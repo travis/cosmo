@@ -16,6 +16,7 @@
 package org.osaf.cosmo.service;
 
 import org.osaf.cosmo.model.Resource;
+import org.osaf.cosmo.model.Ticket;
 
 /**
  * Interface for services that manage access to user home
@@ -31,4 +32,22 @@ public interface HomeDirectoryService extends Service {
      * the specified path
      */
     public Resource getResource(String path);
+
+    /**
+     * Creates a ticket on the resource at the specified path within
+     * the repository.
+     *
+     * @throws NoSuchResourceException if a resource does not exist at
+     * the specified path
+     */
+    public void grantTicket(String path, Ticket ticket);
+
+    /**
+     * Removes the identified ticket from the resource at the
+     * specified path within the repository.
+     *
+     * @throws NoSuchResourceException if a resource does not exist at
+     * the specified path
+     */
+    public void revokeTicket(String path, String id);
 }

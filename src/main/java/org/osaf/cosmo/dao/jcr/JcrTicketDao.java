@@ -190,6 +190,9 @@ public class JcrTicketDao extends JcrDaoSupport
         getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
+                    if (ticket == null) {
+                        return null;
+                    }
                     Node parentNode =
                         findDeepestExistingNodeInPath(session, path);
                     Node ticketNode = findChildTicketNode(parentNode, ticket);

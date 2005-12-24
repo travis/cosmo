@@ -16,7 +16,8 @@
 package org.osaf.cosmo.model;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -31,13 +32,15 @@ public abstract class Resource extends BaseModelObject {
 
     private String path;
     private String displayName;
-    private HashMap properties;
+    private HashSet properties;
+    private HashSet tickets;
     private Date dateCreated;
 
     /**
      */
     public Resource() {
-        properties = new HashMap();
+        properties = new HashSet();
+        tickets = new HashSet();
     }
 
     /**
@@ -67,25 +70,37 @@ public abstract class Resource extends BaseModelObject {
     /**
      */
     public Set getProperties() {
-        return properties.keySet();
+        return properties;
     }
 
     /**
      */
-    public String getProperty(String name) {
-        return (String) properties.get(name);
+    public ResourceProperty getProperty(String name) {
+        for (Iterator i=properties.iterator(); i.hasNext();) {
+            ResourceProperty property = (ResourceProperty) i.next();
+            if (property.getName().equals(name)) {
+                return property;
+            }
+        }
+        return null;
     }
 
     /**
      */
-    public void setProperty(String name, String value) {
-        properties.put(name, value);
+    public Set getTickets() {
+        return tickets;
     }
 
     /**
      */
-    public void removeProperty(String name) {
-        properties.remove(name);
+    public Ticket getTicket(String id) {
+        for (Iterator i=tickets.iterator(); i.hasNext();) {
+            Ticket ticket = (Ticket) i.next();
+            if (ticket.getId().equals(id)) {
+                return ticket;
+            }
+        }
+        return null;
     }
 
     /**
@@ -111,6 +126,7 @@ public abstract class Resource extends BaseModelObject {
             append(path, it.path).
             append(displayName, it.displayName).
             append(properties, it.properties).
+            append(tickets, it.tickets).
             isEquals();
     }
 
@@ -121,6 +137,7 @@ public abstract class Resource extends BaseModelObject {
             append(path).
             append(displayName).
             append(properties).
+            append(tickets).
             toHashCode();
     }
 
@@ -131,6 +148,7 @@ public abstract class Resource extends BaseModelObject {
             append("path", path).
             append("displayName", displayName).
             append("properties", properties).
+            append("tickets", tickets).
             toString();
     }
 }

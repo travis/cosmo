@@ -79,6 +79,9 @@
     <property name="homeDirectoryDao">
       <ref bean="homeDirectoryDao"/>
     </property>
+    <property name="ticketDao">
+      <ref bean="ticketDao"/>
+    </property>
   </bean>
 
 </beans>

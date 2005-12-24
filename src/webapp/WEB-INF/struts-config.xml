@@ -193,9 +193,16 @@
             parameter="browse">
       <forward name="collection" path="home.collection"/>
     </action>
+
     <action path="/home/download"
             type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
             parameter="download">
+    </action>
+
+    <action path="/home/ticket/revoke"
+            type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
+            parameter="revoke">
+      <forward name="collection" path="/console/home/browse" redirect="true"/>
     </action>
 
     <!-- status page -->

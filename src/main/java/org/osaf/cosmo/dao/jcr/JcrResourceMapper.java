@@ -18,6 +18,7 @@ package org.osaf.cosmo.dao.jcr;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
 
 import org.apache.commons.logging.Log;
@@ -26,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.CollectionResource;
 import org.osaf.cosmo.model.FileResource;
 import org.osaf.cosmo.model.Resource;
+import org.osaf.cosmo.model.ResourceProperty;
 
 /**
  * Utility class that converts between {@link Resource}s and
@@ -77,6 +79,7 @@ public class JcrResourceMapper implements JcrConstants {
         throws RepositoryException {
         node.setProperty(NP_DAV_DISPLAYNAME, resource.getDisplayName());
         // XXX: all other properties
+        // XXX: tickets
     }
 
     private static void setCommonResourceAttributes(Resource resource,
@@ -87,7 +90,25 @@ public class JcrResourceMapper implements JcrConstants {
                                 getString());
         resource.setDateCreated(node.getProperty(NP_JCR_CREATED).getDate().
                                 getTime());
-        // all other properties
+
+        for (PropertyIterator i=node.getProperties(); i.hasNext();) {
+            Property p = i.nextProperty();
+            if (p.getName().startsWith("cosmo:") ||
+                p.getName().startsWith("jcr:") ||
+                p.getName().startsWith("dav:") ||
+                p.getName().startsWith("xml")) {
+                if (log.isDebugEnabled()) {
+                    log.debug("skipping property " + p.getName());
+                }
+                continue;
+            }
+            resource.getProperties().add(propToResourceProperty(p));
+        }
+
+        for (NodeIterator i=node.getNodes(NN_TICKET); i.hasNext();) {
+            Node child = i.nextNode();
+            resource.getTickets().add(JcrTicketMapper.nodeToTicket(child));
+        }
     }
 
     private static FileResource nodeToFile(Node node)
@@ -143,12 +164,20 @@ public class JcrResourceMapper implements JcrConstants {
                 else {
                     if (log.isDebugEnabled()) {
                         log.debug("skipping child node of type " +
-                                  node.getPrimaryNodeType().getName());
+                                  child.getPrimaryNodeType().getName());
                     }
                 }
             }
         }
 
         return collection;
+    }
+
+    private static ResourceProperty propToResourceProperty(Property property)
+        throws RepositoryException {
+        ResourceProperty rp = new ResourceProperty();
+        rp.setName(property.getName());
+        rp.setValue(property.getString());
+        return rp;
     }
 }

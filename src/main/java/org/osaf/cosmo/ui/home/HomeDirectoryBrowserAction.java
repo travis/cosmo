@@ -133,16 +133,14 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         addTitleParam(request, resource.getPath());
 
         if (resource instanceof EventResource) {
-            Calendar calendar = ((EventResource) resource).getCalendar();
-
+            EventResource event = (EventResource) resource;
             request.setAttribute(ATTR_RESOURCE, resource);
-            request.setAttribute(ATTR_EVENT, new EventBean(calendar));
+            request.setAttribute(ATTR_EVENT, new EventBean(event));
             return mapping.findForward(FWD_EVENT);
         }
         else if (resource instanceof CalendarCollectionResource) {
-            Calendar calendar =
-                ((CalendarCollectionResource) resource).getCalendar();
-
+            CalendarCollectionResource calendar =
+                (CalendarCollectionResource) resource;
             request.setAttribute(ATTR_COLLECTION, resource);
             request.setAttribute(ATTR_CALENDAR, new CalendarBean(calendar));
             return mapping.findForward(FWD_CALENDAR);

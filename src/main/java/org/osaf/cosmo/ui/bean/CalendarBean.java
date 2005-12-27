@@ -15,9 +15,17 @@
  */
 package org.osaf.cosmo.ui.bean;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.Property;
+
+import org.osaf.cosmo.model.Resource;
+import org.osaf.cosmo.model.EventResource;
+import org.osaf.cosmo.model.CalendarCollectionResource;
 
 /**
  * A simple bean that translates the information about a set of
@@ -26,12 +34,36 @@ import net.fortuna.ical4j.model.Property;
  */
 public class CalendarBean {
 
+    private CalendarCollectionResource resource;
     private Calendar vcalendar;
+    private HashSet events;
 
     /**
      */
-    public CalendarBean(Calendar calendar) {
-        this.vcalendar = calendar;
+    public CalendarBean(CalendarCollectionResource resource)
+        throws IOException, ParserException {
+        this.resource = resource;
+        vcalendar = resource.getCalendar();
+        events = new HashSet();
+
+        for (Iterator i=resource.getResources().iterator(); i.hasNext();) {
+            Resource child = (Resource) i.next();
+            if (child instanceof EventResource) {
+                events.add(new EventBean((EventResource) child));
+            }
+        }
+    }
+
+    /**
+     */
+    public CalendarCollectionResource getResource() {
+        return resource;
+    }
+
+    /**
+     */
+    public Set getEvents() {
+        return events;
     }
 
     /**

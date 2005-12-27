@@ -15,10 +15,11 @@
  */
 package org.osaf.cosmo.ui.bean;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.TimeZone;
 
-import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Property;
@@ -26,6 +27,8 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.Duration;
+
+import org.osaf.cosmo.model.EventResource;
 
 /**
  * A simple bean that translates the information about an event from
@@ -35,12 +38,21 @@ import net.fortuna.ical4j.model.property.Duration;
 public class EventBean {
 
     private VEvent vevent;
+    private EventResource resource;
 
     /**
      */
-    public EventBean(Calendar calendar) {
-        vevent = (VEvent) calendar.getComponents().
+    public EventBean(EventResource resource)
+        throws IOException, ParserException {
+        this.resource = resource;
+        this.vevent = (VEvent) resource.getCalendar().getComponents().
             getComponents(Component.VEVENT).get(0);
+    }
+
+    /**
+     */
+    public EventResource getResource() {
+        return resource;
     }
 
     /**

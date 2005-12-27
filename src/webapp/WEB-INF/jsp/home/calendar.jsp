@@ -25,8 +25,90 @@
   </fmt:message>
 </div>
 
-<div class="vevent" style="margin-top:12px;">
-Here is where the list of events goes.
+<div style="margin-top:12px;">
+  <table cellpadding="4" cellspacing="1" border="0" width="100%" class="vcalendar">
+    <tr>
+      <td class="smTableColHead" style="width:1%;">
+        &nbsp;
+      </td>
+      <td class="smTableColHead" style="text-align:left;">
+        Summary
+      </td>
+      <td class="smTableColHead">
+        Location
+      </td>
+      <td class="smTableColHead">
+        Starts At
+      </td>
+      <td class="smTableColHead">
+        Ends At
+      </td>
+    </tr>
+    <c:forEach var="event" items="${Calendar.events}">
+      <c:if test="${not empty event.timeZone}">
+        <c:set var="tz" value="${event.timeZone.ID}"/>
+      </c:if>
+    <tr class="vevent">
+      <td class="smTableData" style="text-align:center; white-space:nowrap;">
+        <html:link page="/console/home/view${event.resource.path}">
+          [view]
+        </html:link>
+      </td>
+      <td class="smTableData">
+        <c:choose><c:when test="${not empty event.summary}"><span class="summary">${event.summary}</span></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+      <td class="smTableData" style="text-align:center;">
+        <c:choose><c:when test="${not empty event.location}"><span class="location">${event.location}</span></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose> 
+      </td>
+      <td class="smTableData" style="text-align:center;">         
+        <c:choose>
+          <c:when test="${event.hasStartTime}">
+            <c:set var="type" value="both"/>
+            <c:set var="pattern" value="MMM d, yyyy h:mm a zzz"/>
+          </c:when>
+          <c:otherwise>
+            <c:set var="type" value="date"/>
+            <c:set var="pattern" value="MMM d, yyyy"/>
+          </c:otherwise>
+        </c:choose>
+        <abbr class="dtstart" title="${event.dtStart}">
+          <fmt:formatDate value="${event.start}"
+                          type="${type}"
+                          pattern="${pattern}"
+                          timeZone="${tz}"/>
+        </abbr>
+      </td>
+      <td class="smTableData" style="text-align:center;">
+        <c:choose>
+          <c:when test="${not empty event.dtEnd}">
+            <c:set var="class" value="dtend"/>
+            <c:set var="title" value="${event.dtEnd}"/>
+          </c:when>
+          <c:when test="${not empty event.duration}">
+            <c:set var="class" value="duration"/>
+            <c:set var="title" value="${event.duration}"/>
+          </c:when>
+        </c:choose>
+        <c:choose>
+          <c:when test="${event.hasEndTime}">
+            <c:set var="type" value="both"/>
+            <c:set var="pattern" value="MMM d, yyyy h:mm a zzz"/>
+          </c:when>
+          <c:otherwise>
+            <c:set var="type" value="date"/>
+            <c:set var="pattern" value="MMM d, yyyy"/>
+          </c:otherwise>
+        </c:choose>
+        <abbr class="${class}" title="${title}">
+          <fmt:formatDate value="${event.end}"
+                          type="${type}"
+                          pattern="${pattern}"
+                          timeZone="${tz}"/>
+        </abbr>
+      </td>
+    </tr>
+    </c:forEach>
+  </table>
 </div>
 
 <p>
@@ -38,11 +120,3 @@ of the page (default UTF-8 US English).
 Note 2: hCalendar spec doesn't seem to address including timezones for
 <strong>dtstart</strong> and <strong>dtend</strong>.
 </p>
-
-<div class="hd" style="margin-top: 12px;">
-  Original iCalendar
-</div>
-
-<pre>
-${Calendar}
-</pre>

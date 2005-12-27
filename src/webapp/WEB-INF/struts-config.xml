@@ -192,11 +192,18 @@
             type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
             parameter="browse">
       <forward name="collection" path="home.collection"/>
+      <forward name="resource" path="home.resource"/>
     </action>
 
     <action path="/home/download"
             type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
             parameter="download">
+    </action>
+
+    <action path="/home/view"
+            type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
+            parameter="view">
+      <forward name="event" path="home.event"/>
     </action>
 
     <action path="/home/ticket/revoke"

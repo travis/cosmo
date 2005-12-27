@@ -94,7 +94,7 @@ public class QueryFilter implements JcrConstants {
         // Look at elements that are event resources and look in the content
         // node
         // of those resources for indexed data
-        String path = "/element(*, " + NT_CALDAV_RESOURCE + ")/"
+        String path = "/element(*, " + NT_CALENDAR_RESOURCE + ")/"
                 + NN_JCR_CONTENT + "[";
 
         // Generate a list of terms to use in the XPath expression

@@ -89,5 +89,6 @@
 
   <bean name="/home/browse"        parent="homeDirectoryBrowserAction"/>
   <bean name="/home/download"      parent="homeDirectoryBrowserAction"/>
+  <bean name="/home/view"          parent="homeDirectoryBrowserAction"/>
   <bean name="/home/ticket/revoke" parent="homeDirectoryBrowserAction"/>
 </beans>

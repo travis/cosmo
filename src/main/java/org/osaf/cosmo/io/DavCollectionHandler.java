@@ -138,8 +138,8 @@ public class DavCollectionHandler implements IOHandler, JcrConstants {
             collectionNode.setProperty(NP_DAV_DISPLAYNAME, displayName);
             if (context.getMimeType().
                 equals(CosmoDavConstants.CONTENT_TYPE_CALENDAR_COLLECTION)) {
-                collectionNode.addMixin(NT_CALDAV_COLLECTION);
-                collectionNode.setProperty(NP_CALDAV_CALENDARDESCRIPTION,
+                collectionNode.addMixin(NT_CALENDAR_COLLECTION);
+                collectionNode.setProperty(NP_CALENDAR_DESCRIPTION,
                                            displayName);
                 collectionNode.setProperty(NP_XML_LANG,
                                            Locale.getDefault().toString());
@@ -338,7 +338,7 @@ public class DavCollectionHandler implements IOHandler, JcrConstants {
         Property tzId = null;
         for (NodeIterator i=resourceNode.getNodes(); i.hasNext();) {
             childNode = i.nextNode();
-            if (! childNode.isNodeType(NT_CALDAV_RESOURCE)) {
+            if (! childNode.isNodeType(NT_CALENDAR_RESOURCE)) {
                 continue;
             }
 

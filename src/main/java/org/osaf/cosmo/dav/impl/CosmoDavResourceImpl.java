@@ -103,9 +103,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
         initializing = false;
         isCalendarHomeCollection = exists() &&
-            getNode().isNodeType(NT_CALDAV_HOME);
+            getNode().isNodeType(NT_CALENDAR_HOME);
         isCalendarCollection = exists() &&
-            getNode().isNodeType(NT_CALDAV_COLLECTION);
+            getNode().isNodeType(NT_CALENDAR_COLLECTION);
     }
 
     // DavResource methods
@@ -291,9 +291,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                 // calendar-description property (caldav section
                 // 4.4.1)
                 try {
-                    if (getNode().hasProperty(NP_CALDAV_CALENDARDESCRIPTION)) {
+                    if (getNode().hasProperty(NP_CALENDAR_DESCRIPTION)) {
                         String text = getNode().
-                            getProperty(NP_CALDAV_CALENDARDESCRIPTION).
+                            getProperty(NP_CALENDAR_DESCRIPTION).
                             getString();
                         String lang = getNode().getProperty(NP_XML_LANG).
                             getString();

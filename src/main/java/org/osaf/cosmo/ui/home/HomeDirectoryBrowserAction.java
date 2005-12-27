@@ -23,6 +23,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.model.Calendar;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,10 +35,12 @@ import org.apache.struts.action.ActionMapping;
 
 import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.model.CollectionResource;
+import org.osaf.cosmo.model.EventResource;
 import org.osaf.cosmo.model.FileResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.service.HomeDirectoryService;
 import org.osaf.cosmo.ui.CosmoAction;
+import org.osaf.cosmo.ui.bean.EventBean;
 
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
@@ -59,12 +64,28 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
     public static final String ATTR_COLLECTION = "Collection";
     /**
      */
+    public static final String ATTR_RESOURCE = "Resource";
+    /**
+     */
+    public static final String ATTR_CALENDAR = "Calendar";
+    /**
+     */
+    public static final String ATTR_EVENT = "Event";
+    /**
+     */
     public static final String FWD_COLLECTION = "collection";
+    /**
+     */
+    public static final String FWD_RESOURCE = "resource";
+    /**
+     */
+    public static final String FWD_EVENT = "event";
 
     /**
-     * Retrieves the collection specified by the {@link #PARAM_PATH}
-     * parameter and sets it into the {@link #ATTR_COLLECTION} request
-     * attribute.
+     * Retrieves the resource or collection specified by the
+     * {@link #PARAM_PATH} parameter and sets it into the
+     * {@link #ATTR_COLLECTION} or {@link #ATTR_RESOURCE} request
+     * attribute as appropriate.
      */
     public ActionForward browse(ActionMapping mapping,
                                 ActionForm form,
@@ -74,15 +95,48 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         String path = request.getParameter(PARAM_PATH);
 
         Resource resource = getResource(path);
-        if (! (resource instanceof CollectionResource)) {
-            throw new ServletException("resource at path " + path +
-                                       " not a collection");
-        }
-
-        request.setAttribute(ATTR_COLLECTION, resource);
         addTitleParam(request, resource.getPath());
 
-        return mapping.findForward(FWD_COLLECTION);
+        if (resource instanceof CollectionResource) {
+            request.setAttribute(ATTR_COLLECTION, resource);
+            return mapping.findForward(FWD_COLLECTION);
+        }
+ 
+        request.setAttribute(ATTR_RESOURCE, resource);
+        return mapping.findForward(FWD_RESOURCE);
+    }
+
+    /**
+     * Retrieves the event resource or calendar collection specified
+     * by the {@link #PARAM_PATH} parameter, extracts the calendar
+     * content and sets it into the {@link #ATTR_CALENDAR} or
+     * {@link #ATTR_EVENT} request attribute, and sets the collection
+     * or resource into the {@link #ATTR_COLLECTION} or
+     * {@link #ATTR_RESOURCE} request attribute as appropriate.
+     */
+    public ActionForward view(ActionMapping mapping,
+                              ActionForm form,
+                              HttpServletRequest request,
+                              HttpServletResponse response)
+        throws Exception {
+        String path = request.getParameter(PARAM_PATH);
+
+        Resource resource = getResource(path);
+        addTitleParam(request, resource.getPath());
+
+        if (resource instanceof EventResource) {
+            CalendarBuilder builder = new CalendarBuilder();
+            Calendar calendar =
+                builder.build(((EventResource) resource).getContent());
+
+            request.setAttribute(ATTR_RESOURCE, resource);
+            request.setAttribute(ATTR_EVENT, new EventBean(calendar));
+            return mapping.findForward(FWD_EVENT);
+        }
+
+        throw new ServletException("resource of type " +
+                                   resource.getClass().getName() + " at " +
+                                   path + " cannot be viewed" );
     }
 
     /**

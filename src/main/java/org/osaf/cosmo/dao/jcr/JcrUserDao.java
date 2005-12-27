@@ -176,9 +176,9 @@ public class JcrUserDao extends JcrDaoSupport
 
                     node.addMixin(NT_TICKETABLE);
                     node.addMixin(NT_DAV_COLLECTION);
-                    node.addMixin(NT_CALDAV_HOME);
+                    node.addMixin(NT_CALENDAR_HOME);
                     node.setProperty(NP_DAV_DISPLAYNAME, user.getUsername());
-                    node.setProperty(NP_CALDAV_CALENDARDESCRIPTION,
+                    node.setProperty(NP_CALENDAR_DESCRIPTION,
                                      user.getUsername());
                     node.setProperty(NP_XML_LANG,
                                      Locale.getDefault().toString());

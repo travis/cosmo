@@ -1,23 +1,19 @@
 
 
-Custom JCR Node Types - CalDAV
+Custom JCR Node Types - Calendar
 
 
 References
 ==========
 
-http://ietf.webdav.org/caldav/draft-dusseault-caldav.txt
+http://ietf.webdav.org/calendar/draft-dusseault-calendar.txt
 
 
 Node Type Definitions
 =====================
 
-Note 1: caldav:home is defined as a mixin, since a particular
-dav:collection could presumably play the role of both a caldav home
-collection and, say, a principal collection.
-
 NodeTypeName
-  caldav:home
+  calendar:home
 SuperTypes
   []
 IsMixin
@@ -27,7 +23,7 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 PropertyDef
-  Name caldav:calendar-description
+  Name calendar:description
   RequiredType STRING
   DefaultValues null
   AutoCreate false
@@ -46,7 +42,7 @@ PropertyDef
   Multiple false
 
 NodeTypeName
-  caldav:collection
+  calendar:collection
 SuperTypes
   []
 IsMixin
@@ -56,7 +52,7 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 PropertyDef
-  Name caldav:calendar-description
+  Name calendar:description
   RequiredType STRING
   DefaultValues null
   AutoCreate false
@@ -75,7 +71,7 @@ PropertyDef
   Multiple false
 
 NodeTypeName
-  caldav:resource
+  calendar:resource
 SuperTypes
   []
 IsMixin
@@ -85,7 +81,7 @@ HasOrderableChildNodes
 PrimaryItemName
   null
 PropertyDef
-  Name caldav:uid
+  Name calendar:uid
   RequiredType STRING
   DefaultValues null
   AutoCreate false
@@ -93,6 +89,17 @@ PropertyDef
   OnParentVersion COPY
   Protected false
   Multiple false
+
+NodeTypeName
+  calendar:event
+SuperTypes
+  []
+IsMixin
+  true
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
 
 
 Copyright 2005 Open Source Applications Foundation

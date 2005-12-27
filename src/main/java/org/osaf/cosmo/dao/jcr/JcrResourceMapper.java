@@ -24,8 +24,12 @@ import javax.jcr.RepositoryException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.CalendarCollectionResource;
+import org.osaf.cosmo.model.CalendarResource;
 import org.osaf.cosmo.model.CollectionResource;
+import org.osaf.cosmo.model.EventResource;
 import org.osaf.cosmo.model.FileResource;
+import org.osaf.cosmo.model.HomeCollectionResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.model.ResourceProperty;
 
@@ -53,9 +57,20 @@ public class JcrResourceMapper implements JcrConstants {
      */
     public static Resource nodeToResource(Node node, int depth)
         throws RepositoryException {
-        if (node.getPath().equals("/") ||
-            node.isNodeType(NT_DAV_COLLECTION)) {
+        if (node.getPath().equals("/")) {
+            return nodeToRootCollection(node);
+        }
+        if (node.isNodeType(NT_CALENDAR_HOME)) {
+            return nodeToHomeCollection(node);
+        }
+        if (node.isNodeType(NT_CALENDAR_COLLECTION)) {
+            return nodeToCalendarCollection(node);
+        }
+        if (node.isNodeType(NT_DAV_COLLECTION)) {
             return nodeToCollection(node, depth);
+        }
+        if (node.isNodeType(NT_EVENT_RESOURCE)) {
+            return nodeToEvent(node);
         }
         return nodeToFile(node);
     }
@@ -96,10 +111,9 @@ public class JcrResourceMapper implements JcrConstants {
             if (p.getName().startsWith("cosmo:") ||
                 p.getName().startsWith("jcr:") ||
                 p.getName().startsWith("dav:") ||
+// XXX                p.getName().startsWith("calendar:") ||
+                p.getName().startsWith("caldav:") ||
                 p.getName().startsWith("xml")) {
-                if (log.isDebugEnabled()) {
-                    log.debug("skipping property " + p.getName());
-                }
                 continue;
             }
             resource.getProperties().add(propToResourceProperty(p));
@@ -111,9 +125,31 @@ public class JcrResourceMapper implements JcrConstants {
         }
     }
 
+    private static EventResource nodeToEvent(Node node)
+        throws RepositoryException {
+        EventResource event = new EventResource();
+        nodeToCalendarObject(node, event);
+
+        return event;
+    }
+
+    private static void nodeToCalendarObject(Node node,
+                                             CalendarResource resource)
+        throws RepositoryException {
+        nodeToFile(node, resource);
+        resource.setUid(node.getProperty(NP_CALENDAR_UID).getString());
+    }
+
     private static FileResource nodeToFile(Node node)
         throws RepositoryException {
         FileResource resource = new FileResource();
+        nodeToFile(node, resource);
+        return resource;
+    }
+
+    private static void nodeToFile(Node node,
+                                   FileResource resource)
+        throws RepositoryException {
         setCommonResourceAttributes(resource, node);
 
         Node contentNode = node.getNode(NN_JCR_CONTENT);
@@ -134,8 +170,82 @@ public class JcrResourceMapper implements JcrConstants {
         Property content = contentNode.getProperty(NP_JCR_DATA);
         resource.setContentLength(new Long(content.getLength()));
         resource.setContent(content.getStream());
+    }
 
-        return resource;
+    private static CollectionResource nodeToRootCollection(Node node)
+        throws RepositoryException {
+        CollectionResource collection = new CollectionResource();
+
+        collection.setDisplayName("/");
+        collection.setPath("/");
+
+        // JCR 1.0 does not define a standard node type for the
+        // root node, so we have no way of knowing what it's
+        // creation date was or whether it has extra properties
+
+        for (NodeIterator i=node.getNodes(); i.hasNext();) {
+            Node child = i.nextNode();
+            if (child.isNodeType(NT_DAV_COLLECTION) ||
+                child.isNodeType(NT_DAV_RESOURCE)) {
+                collection.addResource(nodeToResource(child, 0));
+            }
+        }
+
+        return collection;
+    }
+
+    private static HomeCollectionResource nodeToHomeCollection(Node node)
+        throws RepositoryException {
+        HomeCollectionResource collection = new HomeCollectionResource();
+
+        setCommonResourceAttributes(collection, node);
+
+        if (node.hasProperty(NP_CALENDAR_DESCRIPTION)) {
+            collection.setDescription(node.
+                                      getProperty(NP_CALENDAR_DESCRIPTION).
+                                      getString());
+        }
+        if (node.hasProperty(NP_XML_LANG)) {
+            collection.setLanguage(node.getProperty(NP_XML_LANG).getString());
+        }
+
+        for (NodeIterator i=node.getNodes(); i.hasNext();) {
+            Node child = i.nextNode();
+            if (child.isNodeType(NT_DAV_COLLECTION) ||
+                child.isNodeType(NT_DAV_RESOURCE)) {
+                collection.addResource(nodeToResource(child, 0));
+            }
+        }
+
+        return collection;
+    }
+
+    private static CalendarCollectionResource nodeToCalendarCollection(Node node)
+        throws RepositoryException {
+        CalendarCollectionResource collection =
+            new CalendarCollectionResource();
+
+        setCommonResourceAttributes(collection, node);
+
+        if (node.hasProperty(NP_CALENDAR_DESCRIPTION)) {
+            collection.setDescription(node.
+                                      getProperty(NP_CALENDAR_DESCRIPTION).
+                                      getString());
+        }
+        if (node.hasProperty(NP_XML_LANG)) {
+            collection.setLanguage(node.getProperty(NP_XML_LANG).getString());
+        }
+
+        for (NodeIterator i=node.getNodes(); i.hasNext();) {
+            Node child = i.nextNode();
+            if (child.isNodeType(NT_EVENT_RESOURCE) ||
+                child.isNodeType(NT_DAV_COLLECTION) ||
+                child.isNodeType(NT_DAV_RESOURCE)) {
+                collection.addResource(nodeToResource(child, 0));
+            }
+        }
+
+        return collection;
     }
 
     private static CollectionResource nodeToCollection(Node node,
@@ -160,12 +270,6 @@ public class JcrResourceMapper implements JcrConstants {
                 if (child.isNodeType(NT_DAV_COLLECTION) ||
                     child.isNodeType(NT_DAV_RESOURCE)) {
                     collection.addResource(nodeToResource(child, depth-1));
-                }
-                else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("skipping child node of type " +
-                                  child.getPrimaryNodeType().getName());
-                    }
                 }
             }
         }

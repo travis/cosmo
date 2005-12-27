@@ -20,26 +20,29 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
 <div class="hd" style="margin-top: 12px;">
-  <fmt:message key="HomeDirectory.Collection.Title">
-    <fmt:param value="${Collection.path}"/>
+  <fmt:message key="HomeDirectory.Resource.Title">
+    <fmt:param value="${Resource.path}"/>
   </fmt:message>
 </div>
 
-<c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionResource'}">
 <div style="margin-top:12px;">
-<html:link page="/console/home/download${Collection.path}">
+<c:choose>
+<c:when test="${Resource.class.name == 'org.osaf.cosmo.model.EventResource'}">
+<html:link page="/console/home/download${Resource.path}">
   [download as iCalendar]
 </html:link>
-<html:link page="/console/home/view${Collection.path}">
+<html:link page="/console/home/view${Resource.path}">
   [view as HTML]
 </html:link>
-<html:link page="/console/home/feed${Collection.path}">
-  [subscribe to feed]
+</c:when>
+<c:otherwise>
+<html:link page="/console/home/download${Resource.path}">
+  [download]
 </html:link>
+</c:otherwise>
+</c:choose>
 </div>
-</c:if>
 
-<c:if test="${Collection.path != '/'}">
 <div style="margin-top:12px;">
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>
@@ -47,16 +50,31 @@
         Display Name
       </td>
       <td class="mdData">
-        ${Collection.displayName}
+        ${Resource.displayName}
       </td>
     </tr>
-    <c:if test="${Collection.class.name == 'org.osaf.cosmo.model.HomeCollectionResource' || Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionResource'}">
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        Description
+        Size
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Collection.description}">${Collection.description}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <fmt:formatNumber value="${Resource.contentLength}"/> b
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Media Type
+      </td>
+      <td class="mdData">
+        ${Resource.contentType}
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Encoding
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${Resource.contentEncoding}">${Resource.contentEncoding}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -64,70 +82,25 @@
         Language
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Collection.language}">${Collection.language}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${Resource.contentLanguage}">${Resource.contentLanguage}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
-    </c:if>
     <tr>
       <td class="mdLabel" style="text-align:right;">
         Created
       </td>
       <td class="mdData">
-        <fmt:formatDate value="${Collection.dateCreated}" type="both"/>
+        <fmt:formatDate value="${Resource.dateCreated}" type="both"/>
       </td>
     </tr>
-  </table>
-</div>
-</c:if>
-
-<div class="hd" style="margin-top: 12px;">
-  Contents
-</div>
-
-<div style="margin-top:12px;">
-  <table cellpadding="4" cellspacing="1" border="0" width="100%">
     <tr>
-      <td class="smTableColHead" style="width:1%;">
-        &nbsp;
-      </td>
-      <td class="smTableColHead" style="text-align:left;">
-        Name
-      </td>
-      <td class="smTableColHead">
-        Type
-      </td>
-      <td class="smTableColHead">
-        Created
-      </td>
-      <td class="smTableColHead">
+      <td class="mdLabel" style="text-align:right;">
         Last Modified
       </td>
-      <td class="smTableColHead">
-        Size
+      <td class="mdData">
+        <fmt:formatDate value="${Resource.dateModified}" type="both"/>
       </td>
     </tr>
-    <c:forEach var="resource" items="${Collection.resources}">
-    <tr>
-      <td class="smTableData" style="text-align:center; white-space:nowrap;">
-      <html:link page="/console/home/browse${resource.path}">[browse]</html:link>
-      </td>
-      <td class="smTableData">
-        ${resource.displayName}
-      </td>
-      <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.HomeCollectionResource'}">Home</c:when><c:when test="${resource.class.name == 'org.osaf.cosmo.model.CollectionResource'}">Folder</c:when><c:when test="${resource.class.name == 'org.osaf.cosmo.model.CalendarCollectionResource'}">Calendar</c:when><c:when test="${resource.class.name == 'org.osaf.cosmo.model.EventResource'}">Event</c:when><c:otherwise>File</c:otherwise></c:choose>
-      </td>
-      <td class="smTableData" style="text-align:center;">         
-        <fmt:formatDate value="${resource.dateCreated}" type="both"/>
-      </td>
-      <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.FileResource' || resource.class.name == 'org.osaf.cosmo.model.EventResource'}"><fmt:formatDate value="${resource.dateModified}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
-      </td>
-      <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.FileResource' || resource.class.name == 'org.osaf.cosmo.model.EventResource'}"><fmt:formatNumber value="${resource.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
-      </td>
-    </tr>
-    </c:forEach>
   </table>
 </div>
 
@@ -157,10 +130,10 @@
         Created
       </td>
     </tr>
-    <c:forEach var="ticket" items="${Collection.tickets}">
+    <c:forEach var="ticket" items="${Resource.tickets}">
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        <html:link page="/console/home${Collection.path}/ticket/${ticket.id}/revoke">
+        <html:link page="/console/home${Resource.path}/ticket/${ticket.id}/revoke">
           [revoke]
         </html:link>    
       </td>
@@ -200,7 +173,7 @@
         Value
       </td>
     </tr>
-    <c:forEach var="property" items="${Collection.properties}">
+    <c:forEach var="property" items="${Resource.properties}">
     <tr>
       <td class="smTableData" width="50%">
         ${property.name}

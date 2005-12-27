@@ -74,13 +74,13 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
      * <li> Adds the <code>dav:resource</code> and
      * <code>mix:ticketable</code> mixin type to the resource node if
      * it does not already have them.</li>
-     * <li> If importing a calendar resource into a caldav collection:
+     * <li> If importing a calendar resource into a calendar collection:
      * <ol>
      * <li> Ensures that the calendar object contains at least one
      * event.</li>
      * <li> Ensures that uid of the calendar object is unique within
      * the calendar collection.</li>
-     * <li> Adds the <code>caldav:resource</code> mixin type to the
+     * <li> Adds the <code>calendar:resource</code> mixin type to the
      * resource node if it does not already have that type.</li>
      * </ol>
      * </ol>
@@ -108,7 +108,7 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
         }
 
         if (cosmoContext.isCalendarContent() &&
-            resourceNode.getParent().isNodeType(NT_CALDAV_COLLECTION)) {
+            resourceNode.getParent().isNodeType(NT_CALENDAR_COLLECTION)) {
             Calendar calendar = cosmoContext.getCalendar();
 
             // since we are importing a calendar resource into a
@@ -135,9 +135,14 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
                 throw new DuplicateUidException(uid.getValue());
             }
 
-            // 3) add caldav resource mixin type
-            if (! resourceNode.isNodeType(NT_CALDAV_RESOURCE)) {
-                resourceNode.addMixin(NT_CALDAV_RESOURCE);
+            // 3) add calendarv resource mixin type
+            if (! resourceNode.isNodeType(NT_CALENDAR_RESOURCE)) {
+                resourceNode.addMixin(NT_CALENDAR_RESOURCE);
+            }
+
+            // 4) add event mixin type
+            if (! resourceNode.isNodeType(NT_EVENT_RESOURCE)) {
+                resourceNode.addMixin(NT_EVENT_RESOURCE);
             }
         }
 
@@ -152,8 +157,8 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
      * node's <code>dav:displayname</code> property.</li>
      * <li> The resource node's <code>dav:contentlanguage</code>
      * property is set from the import context.</li>
-     * <li> If importing a calendar resource into a caldav collection,
-     * set the resource node's <code>caldav:uid</code> property.</li>
+     * <li> If importing a calendar resource into a calendar collection,
+     * set the resource node's <code>calendar:uid</code> property.</li>
      *</ol>
      */
     protected boolean importProperties(ImportContext context,
@@ -177,15 +182,15 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
             resourceNode.setProperty(NP_DAV_CONTENTLANGUAGE,
                                      context.getContentLanguage());
 
-            if (resourceNode.isNodeType(NT_CALDAV_RESOURCE)) {
-                // set the uid property on caldav resources
+            if (resourceNode.isNodeType(NT_CALENDAR_RESOURCE)) {
+                // set the uid property on calendar resources
                 Calendar calendar = cosmoContext.getCalendar();
                 Component event = (Component)
                     calendar.getComponents().getComponents(Component.VEVENT).
                     get(0);
                 Property uid = (Property)
                     event.getProperties().getProperty(Property.UID);
-                resourceNode.setProperty(NP_CALDAV_UID, uid.getValue());
+                resourceNode.setProperty(NP_CALENDAR_UID, uid.getValue());
             }
         } catch (IOException e) {
             // XXX ugh swallowing
@@ -216,10 +221,10 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
                                                      getPath()));
         }
         stmt.append("//element(*, ").
-            append(NT_CALDAV_RESOURCE).
+            append(NT_CALENDAR_RESOURCE).
             append(")").
             append("[@").
-            append(NP_CALDAV_UID).
+            append(NP_CALENDAR_UID).
             append(" = '").
             append(uid).
             append("']");

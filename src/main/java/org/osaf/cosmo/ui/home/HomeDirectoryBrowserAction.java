@@ -23,7 +23,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
 
 import org.apache.commons.logging.Log;
@@ -125,9 +124,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         addTitleParam(request, resource.getPath());
 
         if (resource instanceof EventResource) {
-            CalendarBuilder builder = new CalendarBuilder();
-            Calendar calendar =
-                builder.build(((EventResource) resource).getContent());
+            Calendar calendar = ((EventResource) resource).getCalendar();
 
             request.setAttribute(ATTR_RESOURCE, resource);
             request.setAttribute(ATTR_EVENT, new EventBean(calendar));

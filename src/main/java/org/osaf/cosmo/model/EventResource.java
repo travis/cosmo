@@ -15,14 +15,36 @@
  */
 package org.osaf.cosmo.model;
 
+import java.io.IOException;
+
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
+
 /**
  * Extends {@link CalendarResource} to represent an event resource.
  */
 public class EventResource extends CalendarResource {
 
+    private Calendar calendar;
+
     /**
      */
     public EventResource() {
         super();
+    }
+
+    /**
+     * Returns a {@link net.fortuna.ical4j.model.Calendar}
+     * representing the content of this resource. This method will
+     * only parse the content once, returning the same calendar
+     * instance on subsequent invocations.
+     */
+    public Calendar getCalendar()
+        throws IOException, ParserException {
+        if (calendar == null) {
+            calendar = new CalendarBuilder().build(getContent());
+        }
+        return calendar;
     }
 }

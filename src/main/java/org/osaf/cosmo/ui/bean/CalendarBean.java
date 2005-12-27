@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.Calendar;
 
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.model.EventResource;
@@ -35,7 +34,6 @@ import org.osaf.cosmo.model.CalendarCollectionResource;
 public class CalendarBean {
 
     private CalendarCollectionResource resource;
-    private Calendar vcalendar;
     private HashSet events;
 
     /**
@@ -43,7 +41,6 @@ public class CalendarBean {
     public CalendarBean(CalendarCollectionResource resource)
         throws IOException, ParserException {
         this.resource = resource;
-        vcalendar = resource.getCalendar();
         events = new HashSet();
 
         for (Iterator i=resource.getResources().iterator(); i.hasNext();) {
@@ -69,6 +66,14 @@ public class CalendarBean {
     /**
      */
     public String toString() {
-        return vcalendar.toString();
+        StringBuffer buf = new StringBuffer();
+        for (Iterator i=events.iterator(); i.hasNext();) {
+            EventResource event = (EventResource) i.next();
+            buf.append(event.toString());
+            if (i.hasNext()) {
+                buf.append("\n");
+            }
+        }
+        return buf.toString();
     }
 }

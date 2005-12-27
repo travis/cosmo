@@ -55,7 +55,7 @@ import org.springframework.dao.DataIntegrityViolationException;
  * credentials, a repository reference and a workspace name.
  *
  * A user account is persisted as a <code>nt:folder</code> node with
- * the <code>cosmo:user</code> and <code>caldav:home</code> mixin
+ * the <code>cosmo:user</code> and <code>calendar:home</code> mixin
  * types. This implementation places all user accounts as children of
  * the root node.
  */

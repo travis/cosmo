@@ -311,7 +311,7 @@
     <dependency>
       <groupId>osaf-commons</groupId>
       <artifactId>osaf-commons-jackrabbit</artifactId>
-      <version>0.3</version>
+      <version>0.4</version>
     </dependency>
     <dependency>
       <groupId>springframework</groupId>

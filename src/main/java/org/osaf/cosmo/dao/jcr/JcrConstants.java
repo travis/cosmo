@@ -39,18 +39,10 @@ public interface JcrConstants {
     public static final String NT_TICKETABLE = "ticket:ticketable";
     public static final String NT_TICKET = "ticket:ticket";
 
-    // XXX
-    // public static final String NT_CALENDAR_HOME = "calendar:home";
-    public static final String NT_CALENDAR_HOME = "caldav:home";
-    // XXX
-    // public static final String NT_CALENDAR_COLLECTION = "calendar:collection";
-    public static final String NT_CALENDAR_COLLECTION = "caldav:collection";
-    // XXX
-    // public static final String NT_CALENDAR_RESOURCE = "calendar:resource";
-    public static final String NT_CALENDAR_RESOURCE = "caldav:resource";
-    // XXX
-    // public static final String NT_EVENT_RESOURCE = "calendar:event";
-    public static final String NT_EVENT_RESOURCE = "caldav:resource";
+    public static final String NT_CALENDAR_HOME = "calendar:home";
+    public static final String NT_CALENDAR_COLLECTION = "calendar:collection";
+    public static final String NT_CALENDAR_RESOURCE = "calendar:resource";
+    public static final String NT_EVENT_RESOURCE = "calendar:event";
 
     public static final String NT_USER = "cosmo:user";
 
@@ -68,14 +60,9 @@ public interface JcrConstants {
     public static final String NP_DAV_CONTENTLANGUAGE =
         "dav:contentlanguage";
 
-    // XXX
-    // public static final String NP_CALENDAR_UID = "calendar:uid";
-    public static final String NP_CALENDAR_UID = "caldav:uid";
-    // XXX
-    // public static final String NP_CALENDAR_DESCRIPTION =
-    // "calendar:description";
+    public static final String NP_CALENDAR_UID = "calendar:uid";
     public static final String NP_CALENDAR_DESCRIPTION =
-        "caldav:calendar-description";
+        "calendar:description";
 
     public static final String NP_TICKET_ID = "ticket:id";
     public static final String NP_TICKET_OWNER = "ticket:owner";

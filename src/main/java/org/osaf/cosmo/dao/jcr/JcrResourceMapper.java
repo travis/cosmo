@@ -111,8 +111,7 @@ public class JcrResourceMapper implements JcrConstants {
             if (p.getName().startsWith("cosmo:") ||
                 p.getName().startsWith("jcr:") ||
                 p.getName().startsWith("dav:") ||
-// XXX                p.getName().startsWith("calendar:") ||
-                p.getName().startsWith("caldav:") ||
+                p.getName().startsWith("calendar:") ||
                 p.getName().startsWith("xml")) {
                 continue;
             }

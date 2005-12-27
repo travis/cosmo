@@ -187,8 +187,8 @@ public class JcrTestHelper extends TestHelper
         throws RepositoryException {
         Node node = addNode();
 
-        node.addMixin(NT_CALDAV_COLLECTION);
-        node.setProperty(NP_CALDAV_CALENDARDESCRIPTION, node.getName());
+        node.addMixin(NT_CALENDAR_COLLECTION);
+        node.setProperty(NP_CALENDAR_DESCRIPTION, node.getName());
         node.setProperty(NP_XML_LANG, Locale.getDefault().toString());
 
         return node;

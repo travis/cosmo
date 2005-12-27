@@ -56,9 +56,9 @@
       <filter token="REPOSITORY_PASSWORD"
               value="${cosmo.test.repository.password}"/>
       <filter token="CONFIGFILEPATH"
-              value="${basedir}/src/main/resources/server/repository.xml"/>
+              value="src/main/resources/server/repository.xml"/>
       <filter token="REPOSITORYHOMEDIRPATH"
-              value="${maven.build.dir}/test-repository"/>
+              value="target/test-repository"/>
       <filter token="MAIL_TRANSPORT_PROTOCOL"
               value="${cosmo.test.mail.transport.protocol}"/>
       <filter token="MAIL_SMTP_HOST"

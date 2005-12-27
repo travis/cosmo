@@ -16,6 +16,7 @@
 package org.osaf.cosmo.ui.home;
 
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
@@ -23,7 +24,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.fortuna.ical4j.data.CalendarOutputter;
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.ValidationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,6 +37,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import org.osaf.cosmo.dao.NoSuchResourceException;
+import org.osaf.cosmo.model.CalendarCollectionResource;
 import org.osaf.cosmo.model.CollectionResource;
 import org.osaf.cosmo.model.EventResource;
 import org.osaf.cosmo.model.FileResource;
@@ -40,6 +45,7 @@ import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.service.HomeDirectoryService;
 import org.osaf.cosmo.ui.CosmoAction;
 import org.osaf.cosmo.ui.bean.EventBean;
+import org.osaf.cosmo.ui.bean.CalendarBean;
 
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
@@ -79,6 +85,9 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
     /**
      */
     public static final String FWD_EVENT = "event";
+    /**
+     */
+    public static final String FWD_CALENDAR = "calendar";
 
     /**
      * Retrieves the resource or collection specified by the
@@ -130,6 +139,14 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
             request.setAttribute(ATTR_EVENT, new EventBean(calendar));
             return mapping.findForward(FWD_EVENT);
         }
+        else if (resource instanceof CalendarCollectionResource) {
+            Calendar calendar =
+                ((CalendarCollectionResource) resource).getCalendar();
+
+            request.setAttribute(ATTR_COLLECTION, resource);
+            request.setAttribute(ATTR_CALENDAR, new CalendarBean(calendar));
+            return mapping.findForward(FWD_CALENDAR);
+        }
 
         throw new ServletException("resource of type " +
                                    resource.getClass().getName() + " at " +
@@ -141,53 +158,25 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
      * {@link #PARAM_PATH} parameter.
      */
     public ActionForward download(ActionMapping mapping,
-                                ActionForm form,
-                                HttpServletRequest request,
-                                HttpServletResponse response)
+                                  ActionForm form,
+                                  HttpServletRequest request,
+                                  HttpServletResponse response)
         throws Exception {
         String path = request.getParameter(PARAM_PATH);
 
         Resource resource = getResource(path);
-        if (! (resource instanceof FileResource)) {
-            throw new ServletException("resource at path " + path +
-                                       " not a file");
-        }
-        FileResource file = (FileResource) resource;
 
-        // set headers
-        response.setStatus(HttpServletResponse.SC_OK);
-        if (file.getContentType() != null) {
-            response.setContentType(file.getContentType());
+        if (resource instanceof FileResource) {
+            spoolFile((FileResource) resource, response);
+            return null;
         }
-        else {
-            response.setContentType("application/octet-stream");
+        else if (resource instanceof CalendarCollectionResource) {
+            spoolCalendar((CalendarCollectionResource) resource, response);
+            return null;
         }
-        if (file.getContentLength() != null) {
-            response.setContentLength(file.getContentLength().intValue());
-        }
-        if (file.getContentEncoding() != null) {
-            response.setCharacterEncoding(file.getContentEncoding());
-        }
-        if (file.getContentLanguage() != null) {
-            response.setHeader("Content-Language",
-                               file.getContentLanguage());
-        }
-
-        // spool data
-        InputStream in = file.getContent();
-        OutputStream out = response.getOutputStream();
-        try {
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = in.read(buffer)) >= 0) {
-                out.write(buffer, 0, read);
-            }
-        } finally {
-            in.close();
-        }
-        response.flushBuffer();
-        
-        return null;
+        throw new ServletException("resource of type " +
+                                   resource.getClass().getName() +
+                                   " at " + path + " cannot be downloaded");
     }
 
     /**
@@ -238,5 +227,66 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
             // at all
             throw new NoSuchResourceException(path);
         }
+    }
+
+    private void spoolFile(FileResource file,
+                           HttpServletResponse response)
+        throws IOException {
+        // set headers
+        response.setStatus(HttpServletResponse.SC_OK);
+        if (file.getContentType() != null) {
+            response.setContentType(file.getContentType());
+        }
+        else {
+            response.setContentType("application/octet-stream");
+        }
+        if (file.getContentLength() != null) {
+            response.setContentLength(file.getContentLength().intValue());
+        }
+        if (file.getContentEncoding() != null) {
+            response.setCharacterEncoding(file.getContentEncoding());
+        }
+        if (file.getContentLanguage() != null) {
+            response.setHeader("Content-Language",
+                               file.getContentLanguage());
+        }
+
+        // spool data
+        InputStream in = file.getContent();
+        OutputStream out = response.getOutputStream();
+        try {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) >= 0) {
+                out.write(buffer, 0, read);
+            }
+        } finally {
+            in.close();
+        }
+        response.flushBuffer();
+    }
+
+    private void spoolCalendar(CalendarCollectionResource collection,
+                               HttpServletResponse response)
+        throws IOException, ParserException {
+        // set headers
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("text/calendar");
+        response.setCharacterEncoding("UTF-8");
+        // XXX we can't know content length unless we write to a temp
+        // file and then spool that
+
+        // spool data
+        CalendarOutputter outputter = new CalendarOutputter();
+        // since the content was validated when the event resource was
+        // imported, there's no need to do it here
+        outputter.setValidating(false);
+        try {
+            outputter.output(collection.getCalendar(),
+                             response.getOutputStream());
+        } catch (ValidationException e) {
+            log.error("invalid output calendar?!", e);
+        }
+        response.flushBuffer();
     }
 }

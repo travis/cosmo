@@ -203,6 +203,7 @@
     <action path="/home/view"
             type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
             parameter="view">
+      <forward name="calendar" path="home.calendar"/>
       <forward name="event" path="home.event"/>
     </action>
 

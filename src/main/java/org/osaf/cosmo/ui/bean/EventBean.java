@@ -16,9 +16,11 @@
 package org.osaf.cosmo.ui.bean;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DtStart;
@@ -42,6 +44,8 @@ public class EventBean {
     }
 
     /**
+     * Returns the event summary, or <code>null</code> if one was not
+     * specified. 
      */
     public String getSummary() {
         Property summary = (Property)
@@ -50,6 +54,8 @@ public class EventBean {
     }
 
     /**
+     * Returns the event location, or <code>null</code> if one was not
+     * specified.
      */
     public String getLocation() {
         Property location = (Property)
@@ -58,6 +64,24 @@ public class EventBean {
     }
 
     /**
+     * Returns the time zone of the event's start date, or
+     * <code>null</code> if a start date was not specified or if the
+     * start date did not include a time zone specification.
+     */
+    public TimeZone getTimeZone() {
+        DtStart dtstart = (DtStart)
+            vevent.getProperties().getProperty(Property.DTSTART);
+        if (dtstart != null) {
+            if (dtstart.getDate() instanceof DateTime) {
+                return ((DateTime) dtstart.getDate()).getTimeZone();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the event start date as a <code>Date</code>, or
+     * <code>null</code> if one was not specified.
      */
     public Date getStart() {
         DtStart dtstart = (DtStart)
@@ -66,6 +90,9 @@ public class EventBean {
     }
 
     /**
+     * Returns the event start date as a ISO8601-formatted
+     * <code>String</code>, or <code>null</code> if one was not
+     * specified.
      */
     public String getDtStart() {
         DtStart dtstart = (DtStart)
@@ -74,6 +101,19 @@ public class EventBean {
     }
 
     /**
+     * Returns <code>true</code> if the start date has a time
+     * associated with it, <code>false</code> otherwise.
+     */
+    public boolean getHasStartTime() {
+        Date start = getStart();
+        return start != null && start instanceof DateTime;
+    }
+
+    /**
+     * Returns the event end date as a <code>Date</code>, or
+     * <code>null</code> if one was not specified. If a duration was
+     * provided instead of an end date, an end date is calculated
+     * using the duration.
      */
     public Date getEnd() {
         DtEnd dtend = (DtEnd)
@@ -89,6 +129,9 @@ public class EventBean {
     }
 
     /**
+     * Returns the event end date as a ISO8601-formatted
+     * <code>String</code>, or <code>null</code> if one was not
+     * specified.
      */
     public String getDtEnd() {
         DtEnd dtend = (DtEnd)
@@ -97,6 +140,18 @@ public class EventBean {
     }
 
     /**
+     * Returns <code>true</code> if the end date has a time
+     * associated with it, <code>false</code> otherwise.
+     */
+    public boolean getHasEndTime() {
+        Date end = getEnd();
+        return end != null && end instanceof DateTime;
+    }
+
+    /**
+     * Returns the event duration as a <code>String</code> formatted
+     * as per RFC 2445, or <code>null</code> if one was not
+     * specified.
      */
     public String getDuration() {
         Duration duration = (Duration)
@@ -105,6 +160,7 @@ public class EventBean {
     }
 
     /**
+     * Returns the original iCalendar-formatted event.
      */
     public String toString() {
         return vevent.toString();

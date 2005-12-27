@@ -25,8 +25,11 @@
   </fmt:message>
 </div>
 
+<c:if test="${not empty Event.timeZone}">
+  <c:set var="tz" value="${Event.timeZone.ID}"/>
+</c:if>
+
 <div class="vevent" style="margin-top:12px;">
-<fmt:timeZone value="${Event.start.timeZone.ID}">
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>
       <td class="mdLabel" style="text-align:right;">
@@ -49,9 +52,21 @@
         Starts At
       </td>
       <td class="mdData">
+        <c:choose>
+          <c:when test="${Event.hasStartTime}">
+            <c:set var="type" value="both"/>
+            <c:set var="pattern" value="MMM d, yyyy h:mm a zzz"/>
+          </c:when>
+          <c:otherwise>
+            <c:set var="type" value="date"/>
+            <c:set var="pattern" value="MMM d, yyyy"/>
+          </c:otherwise>
+        </c:choose>
         <abbr class="dtstart" title="${Event.dtStart}">
-          <fmt:formatDate value="${Event.start}" type="both"
-                          pattern="MMM d, yyyy h:mm zzz"/>
+          <fmt:formatDate value="${Event.start}"
+                          type="${type}"
+                          pattern="${pattern}"
+                          timeZone="${tz}"/>
         </abbr>
       </td>
     </tr>
@@ -64,22 +79,33 @@
         <c:choose>
           <c:when test="${not empty Event.dtEnd}">
             <c:set var="class" value="dtend"/>
-            <c:set var="title" value="${Event.dtend}"/>
+            <c:set var="title" value="${Event.dtEnd}"/>
           </c:when>
           <c:when test="${not empty Event.duration}">
             <c:set var="class" value="duration"/>
             <c:set var="title" value="${Event.duration}"/>
           </c:when>
         </c:choose>
+        <c:choose>
+          <c:when test="${Event.hasEndTime}">
+            <c:set var="type" value="both"/>
+            <c:set var="pattern" value="MMM d, yyyy h:mm a zzz"/>
+          </c:when>
+          <c:otherwise>
+            <c:set var="type" value="date"/>
+            <c:set var="pattern" value="MMM d, yyyy"/>
+          </c:otherwise>
+        </c:choose>
         <abbr class="${class}" title="${title}">
-          <fmt:formatDate value="${Event.end}" type="both"
-                          pattern="MMM d, yyyy h:mm zzz"/>
+          <fmt:formatDate value="${Event.end}"
+                          type="${type}"
+                          pattern="${pattern}"
+                          timeZone="${tz}"/>
         </abbr>
       </td>
     </tr>
     </c:if>
   </table>
-</fmt:timeZone>
 </div>
 
 <p>

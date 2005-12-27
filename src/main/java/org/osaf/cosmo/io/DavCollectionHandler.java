@@ -30,18 +30,12 @@ import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.ValidationException;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import net.fortuna.ical4j.data.CalendarOutputter;
 
 import org.apache.jackrabbit.server.io.ExportContext;
 import org.apache.jackrabbit.server.io.ImportContext;
@@ -51,11 +45,12 @@ import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 
-import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dao.jcr.JcrEscapist;
+import org.osaf.cosmo.dao.jcr.JcrResourceMapper;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
+import org.osaf.cosmo.model.CalendarCollectionResource;
 
 /**
  * Implements {@link org.apache.jackrabbit.server.io.IOHandler}
@@ -229,14 +224,22 @@ public class DavCollectionHandler implements IOHandler, JcrConstants {
                                              DavResource resource)
         throws IOException {
         try {
-            Calendar calendar =
-                getAggregateCalendarObject((Node) context.getExportRoot());
+            // XXX: cache the calendar as a property of the resource
+            // node
+            Node node = (Node) context.getExportRoot();
+            CalendarCollectionResource collection =
+                (CalendarCollectionResource)
+                JcrResourceMapper.nodeToResource(node);
+            Calendar calendar = collection.getCalendar();
             if (calendar.getComponents().isEmpty()) {
                 return true;
             }
 
             context.setContentType("text/icalendar", "UTF-8");
             CalendarOutputter outputter = new CalendarOutputter();
+            // since the content was validated when the event resource
+            // was imported, there's no need to do it here
+            outputter.setValidating(false);
             outputter.output(calendar, context.getOutputStream());
 
             return true;
@@ -310,63 +313,5 @@ public class DavCollectionHandler implements IOHandler, JcrConstants {
     private String getResourceName(String path) {
         int pos = path.lastIndexOf('/');
         return pos >= 0 ? path.substring(pos + 1) : "";
-    }
-
-    private Calendar getAggregateCalendarObject(Node resourceNode)
-        throws Exception {
-        Calendar calendar = new Calendar();
-        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
-        calendar.getProperties().add(Version.VERSION_2_0);
-        calendar.getProperties().add(CalScale.GREGORIAN);
-
-        // extract the events and timezones for each child event and
-        // add them to the collection calendar object
-        // XXX: cache the built calendar as a property of the resource
-        // node
-        // index the timezones by tzid so that we only include each tz
-        // once. if for some reason different event resources have
-        // different tz definitions for a tzid, *shrug* last one wins
-        // for this same reason, we use a single calendar builder/time
-        // zone registry
-        HashMap tzIdx = new HashMap();
-        Node childNode = null;
-        Node contentNode = null;
-        InputStream data = null;
-        CalendarBuilder builder = new CalendarBuilder();
-        Calendar childCalendar = null;
-        Component tz = null;
-        Property tzId = null;
-        for (NodeIterator i=resourceNode.getNodes(); i.hasNext();) {
-            childNode = i.nextNode();
-            if (! childNode.isNodeType(NT_CALENDAR_RESOURCE)) {
-                continue;
-            }
-
-            contentNode = childNode.getNode(NN_JCR_CONTENT);
-            data = contentNode.getProperty(NP_JCR_DATA).getStream();
-            childCalendar = builder.build(data);
-
-            for (Iterator j=childCalendar.getComponents().
-                     getComponents(Component.VEVENT).iterator();
-                 j.hasNext();) {
-                calendar.getComponents().add((Component) j.next());
-            }
-
-            for (Iterator j=childCalendar.getComponents().
-                     getComponents(Component.VTIMEZONE).iterator();
-                 j.hasNext();) {
-                tz = (Component) j.next();
-                tzId = tz.getProperties().getProperty(Property.TZID);
-                if (! tzIdx.containsKey(tzId.getValue())) {
-                    tzIdx.put(tzId.getValue(), tz);
-                }
-            }
-        }
-
-        for (Iterator i=tzIdx.values().iterator(); i.hasNext();) {
-            calendar.getComponents().add((Component) i.next());
-        }
-
-        return calendar;
     }
 }

@@ -15,6 +15,12 @@
  */
 package org.osaf.cosmo;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
 /**
  * Constant definitions for Cosmo
  */
@@ -27,14 +33,38 @@ public class CosmoConstants {
         "-//Open Source Applications Foundation//NONSGML Cosmo Sharing Server//EN";
 
     /**
-     * The servlet context attribute which contains the Cosmo version
-     * number.
+     * The URL of the Cosmo product web site.
      */
-    public static final String SC_ATTR_SERVER_VERSION = "cosmo.server.version";
+    public static final String PRODUCT_URL =
+        "http://cosmo.osafoundation.org/";
+
+    /**
+     * The Cosmo release version number.
+     */
+    public static final String PRODUCT_VERSION;
 
     /**
      * The servlet context attribute which contains the Cosmo server
      * administrator's email address.
      */
     public static final String SC_ATTR_SERVER_ADMIN = "cosmo.server.admin";
+
+    private static String VERSION_FILE = "cosmo.version.txt";
+
+    static {
+        try {
+            Charset utf8 = Charset.forName("UTF-8");
+            InputStream in = CosmoConstants.class.getClassLoader().
+                getResourceAsStream(VERSION_FILE);
+            if (in == null) {
+                throw new RuntimeException("can't find " + VERSION_FILE);
+            }
+            BufferedReader reader =
+                new BufferedReader(new InputStreamReader(in, utf8));
+            PRODUCT_VERSION = reader.readLine();
+            in.close();
+        } catch (IOException e) {
+            throw new RuntimeException("can't load" + VERSION_FILE, e);
+        }
+    }
 }

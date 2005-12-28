@@ -314,6 +314,14 @@
       <version>0.4</version>
     </dependency>
     <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+      <version>0.8</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
       <groupId>springframework</groupId>
       <artifactId>spring-beans</artifactId>
       <version>1.2.6</version>
@@ -441,7 +449,6 @@
           <include>applicationContext-*.xml</include>
           <include>*.tld</include>
         </includes>
-        <filtering>true</filtering>
       </resource>
       <resource>
         <directory>src/main/resources/webapp</directory>
@@ -454,8 +461,10 @@
       <resource>
         <directory>src/main/resources/server</directory>
         <includes>
+          <include>cosmo.version.txt</include>
           <include>log4j.xml</include>
         </includes>
+        <filtering>true</filtering>
       </resource>
     </resources>
     <unitTest>
@@ -467,6 +476,7 @@
         <directory>src/main/resources/server</directory>
         <includes>
           <include>cosmo.properties</include>
+          <include>cosmo.version.txt</include>
         </includes>
         <filtering>true</filtering>
       </resource>

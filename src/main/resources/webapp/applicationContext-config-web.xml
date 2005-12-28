@@ -26,9 +26,6 @@
 
   <bean id="servletContextConfigurer"
         class="org.osaf.cosmo.ui.config.jcr.JcrServletContextConfigurer">
-    <property name="serverVersion">
-      <ref bean="serverVersion"/>
-    </property>
     <property name="userDao">
       <ref bean="userDao"/>
     </property>

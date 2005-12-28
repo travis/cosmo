@@ -20,15 +20,6 @@
 
 <beans>
 
-  <!-- define the cosmo version -->
-  <!-- XXX: should be immutable -->
-
-  <bean id="serverVersion" class="java.lang.String">
-    <constructor-arg type="java.lang.String">
-      <value>@VERSION@</value>
-    </constructor-arg>
-  </bean>
-
   <!-- load the cosmo properties file and make the cosmo
        config properties available to other spring beans -->
 

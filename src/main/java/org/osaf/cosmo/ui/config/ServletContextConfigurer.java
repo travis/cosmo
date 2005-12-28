@@ -35,7 +35,6 @@ public class ServletContextConfigurer {
         LogFactory.getLog(ServletContextConfigurer.class);
 
     private ServletContext servletContext;
-    private String serverVersion;
     private UserDao userDao;
 
     /**
@@ -43,23 +42,12 @@ public class ServletContextConfigurer {
      * Calls the following methods:
      *
      * <ul>
-     * <li>{@link #setServerVersion}</li>
      * <li>{@link #setServerAdmin}</li>
      * </ul>
      */
     public void configure(ServletContext sc) {
         this.servletContext = sc;
-        setServerVersion();
         setServerAdmin();
-    }
-
-    /**
-     * Sets the {@link CosmoConstants#SC_ATTR_SERVER_VERSION} servlet context
-     * attribute.
-     */
-    public void setServerVersion() {
-        servletContext.setAttribute(CosmoConstants.SC_ATTR_SERVER_VERSION,
-                                    serverVersion);
     }
 
     /**
@@ -70,18 +58,6 @@ public class ServletContextConfigurer {
         User rootUser = userDao.getUser(User.USERNAME_OVERLORD);
         servletContext.setAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN,
                                     rootUser.getEmail());
-    }
-
-    /**
-     */
-    public String getServerVersion() {
-        return serverVersion;
-    }
-
-    /**
-     */
-    public void setServerVersion(String serverVersion) {
-        this.serverVersion = serverVersion;
     }
 
     /**

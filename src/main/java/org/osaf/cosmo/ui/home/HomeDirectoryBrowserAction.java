@@ -15,10 +15,17 @@
  */
 package org.osaf.cosmo.ui.home;
 
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Feed;
+import com.sun.syndication.feed.atom.Link;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.WireFeedOutput;
+
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -165,14 +172,38 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         Resource resource = getResource(path);
 
         if (resource instanceof FileResource) {
-            spoolFile((FileResource) resource, response);
+            spoolFile((FileResource) resource, request, response);
             return null;
         }
         else if (resource instanceof CalendarCollectionResource) {
-            spoolCalendar((CalendarCollectionResource) resource, response);
+            spoolCalendar((CalendarCollectionResource) resource, request,
+                          response);
             return null;
         }
         throw new ServletException("resource of type " +
+                                   resource.getClass().getName() +
+                                   " at " + path + " cannot be downloaded");
+    }
+
+    /**
+     * Downloads an Atom feed document describing the collection
+     * specified by the {@link #PARAM_PATH} parameter.
+     */
+    public ActionForward feed(ActionMapping mapping,
+                              ActionForm form,
+                              HttpServletRequest request,
+                              HttpServletResponse response)
+        throws Exception {
+        String path = request.getParameter(PARAM_PATH);
+
+        Resource resource = getResource(path);
+
+        if (resource instanceof CollectionResource) {
+            spoolFeed((CollectionResource) resource, request, response,
+                      mapping);
+            return null;
+        }
+        throw new ServletException("feed for resource of type " +
                                    resource.getClass().getName() +
                                    " at " + path + " cannot be downloaded");
     }
@@ -228,6 +259,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
     }
 
     private void spoolFile(FileResource file,
+                           HttpServletRequest request,
                            HttpServletResponse response)
         throws IOException {
         // set headers
@@ -265,6 +297,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
     }
 
     private void spoolCalendar(CalendarCollectionResource collection,
+                               HttpServletRequest request,
                                HttpServletResponse response)
         throws IOException, ParserException {
         // set headers
@@ -286,5 +319,69 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
             log.error("invalid output calendar?!", e);
         }
         response.flushBuffer();
+    }
+
+    private void spoolFeed(CollectionResource collection,
+                           HttpServletRequest request,
+                           HttpServletResponse response,
+                           ActionMapping mapping)
+        throws IOException, FeedException {
+        // set headers
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/atom+xml");
+        response.setCharacterEncoding("UTF-8");
+        // XXX we can't know content length unless we write to a temp
+        // file and then spool that
+
+        Feed feed = collection.getAtomFeed();
+
+        // add context and servlet paths to link hrefs and set xml
+        // base hrefs
+        String feedPath = mapping.findForward("feed").getPath();
+        String viewPath = mapping.findForward("view").getPath();
+        for (Iterator i=feed.getAlternateLinks().iterator(); i.hasNext();) {
+            Link link = (Link) i.next();
+            if (link.getRel().equals("self")) {
+                link.setHref(encodeUrl(request, feedPath + link.getHref()));
+            }
+            else if (link.getRel().equals("alternate")) {
+                link.setHref(encodeUrl(request, viewPath + link.getHref()));
+            }
+        }
+        for (Iterator i=feed.getEntries().iterator(); i.hasNext();) {
+            Entry entry = (Entry) i.next();
+            for (Iterator j=entry.getAlternateLinks().iterator();
+                 j.hasNext();) {
+                Link link = (Link) j.next();
+                if (link.getRel().equals("alternate")) {
+                    link.setHref(encodeUrl(request,
+                                           viewPath + link.getHref()));
+                }
+            }
+        }
+
+        // spool data
+        WireFeedOutput outputter = new WireFeedOutput();
+        outputter.output(feed, response.getWriter());
+        response.flushBuffer();
+    }
+
+    private String encodeUrl(HttpServletRequest request,
+                             String path) {
+        // like response.encodeUrl() except does not include servlet
+        // path or session id
+        StringBuffer buf = new StringBuffer();
+        buf.append(request.getScheme()).
+            append("://").
+            append(request.getServerName());
+        if ((request.isSecure() && request.getServerPort() != 443) ||
+            (request.getServerPort() != 80)) {
+            buf.append(":").append(request.getServerPort());
+        }
+        if (! request.getContextPath().equals("/")) {
+            buf.append(request.getContextPath());
+        }
+        buf.append(path);
+        return buf.toString();
     }
 }

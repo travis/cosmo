@@ -207,6 +207,13 @@
       <forward name="event" path="home.event"/>
     </action>
 
+    <action path="/home/feed"
+            type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
+            parameter="feed">
+      <forward name="feed" path="/home/feed"/>
+      <forward name="view" path="/home/view"/>
+    </action>
+
     <action path="/home/ticket/revoke"
             type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
             parameter="revoke">

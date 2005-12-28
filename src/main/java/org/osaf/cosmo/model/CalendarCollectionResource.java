@@ -15,6 +15,11 @@
  */
 package org.osaf.cosmo.model;
 
+import com.sun.syndication.feed.atom.Content;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Feed;
+import com.sun.syndication.io.FeedException;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -88,6 +93,36 @@ public class CalendarCollectionResource extends CollectionResource {
             calendar = loadCalendarResources();
         }
         return calendar;
+    }
+
+    /**
+     */
+    protected void addAtomFeedEntries(Feed feed)
+        throws FeedException {
+        for (Iterator i=getResources().iterator(); i.hasNext();) {
+            Resource resource = (Resource) i.next();
+            if (resource instanceof EventResource) {
+                feed.getEntries().add(getAtomEntry((EventResource) resource));
+            }
+        }
+    }
+
+    /**
+     */
+    protected Entry getAtomEntry(EventResource event)
+        throws FeedException {
+        Entry entry = super.getAtomEntry(event);
+
+        try {
+            Content content= new Content();
+            content.setType(Content.HTML);
+            content.setValue(event.toHCalendar());
+            entry.getContents().add(content);
+        } catch (Exception e) {
+            throw new FeedException("error converting event to hCalendar", e);
+        }
+
+        return entry;
     }
 
     /**

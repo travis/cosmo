@@ -48,6 +48,10 @@
     <to>/console/home/view?path=$1</to>
   </rule>
   <rule>
+    <from>^/console/home/feed(/.*)$</from>
+    <to>/console/home/feed?path=$1</to>
+  </rule>
+  <rule>
     <from>^/console/home(/.*)/ticket/(.+)/revoke$</from>
     <to>/console/home/ticket/revoke?path=$1&amp;ticket=$2</to>
   </rule>

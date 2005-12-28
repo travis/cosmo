@@ -342,10 +342,10 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         for (Iterator i=feed.getAlternateLinks().iterator(); i.hasNext();) {
             Link link = (Link) i.next();
             if (link.getRel().equals("self")) {
-                link.setHref(encodeUrl(request, feedPath + link.getHref()));
+                link.setHref(encodeURL(request, feedPath + link.getHref()));
             }
             else if (link.getRel().equals("alternate")) {
-                link.setHref(encodeUrl(request, viewPath + link.getHref()));
+                link.setHref(encodeURL(request, viewPath + link.getHref()));
             }
         }
         for (Iterator i=feed.getEntries().iterator(); i.hasNext();) {
@@ -354,7 +354,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
                  j.hasNext();) {
                 Link link = (Link) j.next();
                 if (link.getRel().equals("alternate")) {
-                    link.setHref(encodeUrl(request,
+                    link.setHref(encodeURL(request,
                                            viewPath + link.getHref()));
                 }
             }
@@ -366,10 +366,11 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         response.flushBuffer();
     }
 
-    private String encodeUrl(HttpServletRequest request,
+    private String encodeURL(HttpServletRequest request,
                              String path) {
-        // like response.encodeUrl() except does not include servlet
-        // path or session id
+        // like response.encodeURL() but is guaranteed to include the
+        // scheme, host, port, context and servlet paths regardless of
+        // where the session id comes from
         StringBuffer buf = new StringBuffer();
         buf.append(request.getScheme()).
             append("://").
@@ -381,6 +382,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         if (! request.getContextPath().equals("/")) {
             buf.append(request.getContextPath());
         }
+        buf.append(request.getServletPath());
         buf.append(path);
         return buf.toString();
     }

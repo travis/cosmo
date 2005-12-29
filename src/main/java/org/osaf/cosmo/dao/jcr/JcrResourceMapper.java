@@ -129,16 +129,17 @@ public class JcrResourceMapper implements JcrConstants {
 
     private static User findOwner(Node node)
         throws RepositoryException {
+        if (node.getPath().equals("/")) {
+            return null;
+        }
+        if (node.isNodeType(NT_USER)) {
+            return JcrUserMapper.nodeToUser(node);
+        }
         Node parent = node.getParent();
         if (parent == null) {
             return null;
         }
-        if (parent.getPath().equals("/")) {
-            return null;
-        }
-        return parent.isNodeType(NT_USER) ?
-            JcrUserMapper.nodeToUser(parent) :
-            findOwner(parent);
+        return findOwner(parent);
     }
 
     private static EventResource nodeToEvent(Node node)

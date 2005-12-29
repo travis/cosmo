@@ -82,7 +82,10 @@ public class CollectionResource extends Resource {
         feed.setGenerator(generator);
 
         Person owner = new Person();
-        owner.setName(getOwner().getUsername());
+        String name = getOwner() != null ?
+            getOwner().getUsername() :
+            User.USERNAME_OVERLORD;
+        owner.setName(name);
         feed.getAuthors().add(owner);
 
         Link feedLink = new Link();

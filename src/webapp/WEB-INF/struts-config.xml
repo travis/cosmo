@@ -195,6 +195,12 @@
       <forward name="resource" path="home.resource"/>
     </action>
 
+    <action path="/home/remove"
+            type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
+            parameter="remove">
+      <forward name="success" path="/console/home/browse" redirect="true"/>
+    </action>
+
     <action path="/home/download"
             type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
             parameter="download">

@@ -88,6 +88,7 @@
   </bean>
 
   <bean name="/home/browse"        parent="homeDirectoryBrowserAction"/>
+  <bean name="/home/remove"        parent="homeDirectoryBrowserAction"/>
   <bean name="/home/download"      parent="homeDirectoryBrowserAction"/>
   <bean name="/home/view"          parent="homeDirectoryBrowserAction"/>
   <bean name="/home/feed"          parent="homeDirectoryBrowserAction"/>

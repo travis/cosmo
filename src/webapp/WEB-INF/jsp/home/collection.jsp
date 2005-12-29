@@ -110,6 +110,7 @@
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
       <html:link page="/console/home/browse${resource.path}">[browse]</html:link>
+        <c:if test="${resource.class.name != 'org.osaf.cosmo.model.HomeCollectionResource'}"><html:link page="/console/home/remove${resource.path}">[remove]</html:link></c:if>
       </td>
       <td class="smTableData">
         ${resource.displayName}

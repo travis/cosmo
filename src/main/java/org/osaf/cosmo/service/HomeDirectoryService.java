@@ -34,6 +34,12 @@ public interface HomeDirectoryService extends Service {
     public Resource getResource(String path);
 
     /**
+     * Removes the resource at the specified path within the
+     * repository.
+     */
+    public void removeResource(String path);
+
+    /**
      * Creates a ticket on the resource at the specified path within
      * the repository.
      *

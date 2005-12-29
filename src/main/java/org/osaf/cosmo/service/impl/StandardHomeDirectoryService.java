@@ -48,6 +48,14 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
     }
 
     /**
+     * Removes the resource at the specified path within the
+     * repository.
+     */
+    public void removeResource(String path) {
+        homeDirectoryDao.removeResource(path);
+    }
+
+    /**
      * Creates a ticket on the resource at the specified path within
      * the repository.
      *

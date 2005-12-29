@@ -40,6 +40,10 @@
     <to>/console/home/browse?path=$1</to>
   </rule>
   <rule>
+    <from>^/console/home/remove(/.*)$</from>
+    <to>/console/home/remove?path=$1</to>
+  </rule>
+  <rule>
     <from>^/console/home/download(/.*)$</from>
     <to>/console/home/download?path=$1</to>
   </rule>

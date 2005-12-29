@@ -51,6 +51,7 @@ import org.osaf.cosmo.model.FileResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.service.HomeDirectoryService;
 import org.osaf.cosmo.ui.CosmoAction;
+import org.osaf.cosmo.ui.UIConstants;
 import org.osaf.cosmo.ui.bean.EventBean;
 import org.osaf.cosmo.ui.bean.CalendarBean;
 
@@ -119,6 +120,32 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
  
         request.setAttribute(ATTR_RESOURCE, resource);
         return mapping.findForward(FWD_RESOURCE);
+    }
+
+    /**
+     * Revokes the resource or collection specified by the
+     * {@link PARAM_PATH} parameter.
+     */
+    public ActionForward remove(ActionMapping mapping,
+                                ActionForm form,
+                                HttpServletRequest request,
+                                HttpServletResponse response)
+        throws Exception {
+        String path = request.getParameter(PARAM_PATH);
+
+        if (log.isDebugEnabled()) {
+            log.debug("removing resource at " + path);
+        }
+
+        homeDirectoryService.removeResource(path);
+
+        String parentPath = path.substring(0, path.lastIndexOf('/'));
+
+        ActionForward forward = mapping.findForward(UIConstants.FWD_SUCCESS);
+        return new ActionForward(forward.getName(),
+                                 forward.getPath() + parentPath,
+                                 forward.getRedirect(),
+                                 forward.getModule());
     }
 
     /**

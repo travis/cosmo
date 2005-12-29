@@ -90,6 +90,24 @@ public class JcrHomeDirectoryDao extends JcrDaoSupport
             });
     }
 
+    /**
+     * Removes the resource at the specified path within the
+     * repository.
+     */
+    public void removeResource(final String path) {
+        getJcrTemplate().execute(new JcrCallback() {
+                public Object doInJcr(Session session)
+                    throws RepositoryException {
+                    String jcrPath = JcrEscapist.hexEscapeJcrPath(path);
+                    if (session.itemExists(jcrPath)) {
+                        session.getItem(jcrPath).remove();
+                        session.save();
+                    }
+                    return null;
+                }
+            });
+    }
+
     // Dao methods
 
     /**

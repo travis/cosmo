@@ -23,11 +23,17 @@ import org.osaf.cosmo.model.Resource;
 public interface HomeDirectoryDao extends Dao {
 
     /**
-     * Returns the resource at the specified path within the specified
-     * user's home directory.
+     * Returns the resource at the specified path within the
+     * repository.
      *
      * @throws NoSuchResourceException if a resource does not exist at
      * the specified path
      */
     public Resource getResource(String path);
+
+    /**
+     * Removes the resource at the specified path within the
+     * repository.
+     */
+    public void removeResource(String path);
 }

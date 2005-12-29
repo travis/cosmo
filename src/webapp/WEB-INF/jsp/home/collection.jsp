@@ -25,19 +25,19 @@
   </fmt:message>
 </div>
 
-<c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionResource'}">
 <div style="margin-top:12px;">
+<c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionResource'}">
 <html:link page="/console/home/download${Collection.path}">
   [download as iCalendar]
 </html:link>
 <html:link page="/console/home/view${Collection.path}">
   [view as HTML]
 </html:link>
+</c:if>
 <html:link page="/console/home/feed${Collection.path}">
   [subscribe to feed]
 </html:link>
 </div>
-</c:if>
 
 <c:if test="${Collection.path != '/'}">
 <div style="margin-top:12px;">

@@ -34,6 +34,7 @@ public abstract class Resource extends BaseModelObject {
     private String displayName;
     private HashSet properties;
     private HashSet tickets;
+    private User owner;
     private Date dateCreated;
 
     /**
@@ -101,6 +102,18 @@ public abstract class Resource extends BaseModelObject {
             }
         }
         return null;
+    }
+
+    /**
+     */
+    public User getOwner() {
+        return owner;
+    }
+
+    /**
+     */
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     /**

@@ -335,10 +335,10 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
 
         Feed feed = collection.getAtomFeed();
 
-        // add context and servlet paths to link hrefs and set xml
-        // base hrefs
+        // make ids and link hrefs absolute
         String feedPath = mapping.findForward("feed").getPath();
         String viewPath = mapping.findForward("view").getPath();
+        feed.setId(encodeURL(request, viewPath + feed.getId()));
         for (Iterator i=feed.getAlternateLinks().iterator(); i.hasNext();) {
             Link link = (Link) i.next();
             if (link.getRel().equals("self")) {
@@ -350,6 +350,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         }
         for (Iterator i=feed.getEntries().iterator(); i.hasNext();) {
             Entry entry = (Entry) i.next();
+            entry.setId(encodeURL(request, viewPath + entry.getId()));
             for (Iterator j=entry.getAlternateLinks().iterator();
                  j.hasNext();) {
                 Link link = (Link) j.next();

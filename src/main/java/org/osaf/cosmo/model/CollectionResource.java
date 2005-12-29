@@ -21,6 +21,7 @@ import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.feed.atom.Generator;
 import com.sun.syndication.feed.atom.Link;
+import com.sun.syndication.feed.atom.Person;
 import com.sun.syndication.io.FeedException;
 
 import java.util.HashSet;
@@ -63,9 +64,8 @@ public class CollectionResource extends Resource {
     }
 
     /**
-     * Expects the caller to set the <code>xmlBase</code>,
-     * <code>alternateLinks</code>, and <code>otherLinks</code>
-     * properties.
+     * Expects the caller to set the <code>alternateLinks</code>, and
+     * <code>otherLinks</code> properties.
      */
     public Feed getAtomFeed()
         throws FeedException {
@@ -78,7 +78,12 @@ public class CollectionResource extends Resource {
         Generator generator = new Generator();
         generator.setUrl(CosmoConstants.PRODUCT_URL);
         generator.setVersion(CosmoConstants.PRODUCT_VERSION);
+        generator.setValue(CosmoConstants.PRODUCT_NAME);
         feed.setGenerator(generator);
+
+        Person owner = new Person();
+        owner.setName(getOwner().getUsername());
+        feed.getAuthors().add(owner);
 
         Link feedLink = new Link();
         feedLink.setRel("self");

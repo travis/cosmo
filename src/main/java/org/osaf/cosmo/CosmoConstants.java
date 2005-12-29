@@ -26,6 +26,11 @@ import java.nio.charset.Charset;
  */
 public class CosmoConstants {
     /**
+     * The "friendly" name of the product used for casual identification.
+     */
+    public static final String PRODUCT_NAME = "Cosmo Sharing Server";
+
+    /**
      * A string identifier for Cosmo used to distinguish it from other
      * software producs.
      */

@@ -32,6 +32,7 @@ import org.osaf.cosmo.model.FileResource;
 import org.osaf.cosmo.model.HomeCollectionResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.model.ResourceProperty;
+import org.osaf.cosmo.model.User;
 
 /**
  * Utility class that converts between {@link Resource}s and
@@ -122,6 +123,22 @@ public class JcrResourceMapper implements JcrConstants {
             Node child = i.nextNode();
             resource.getTickets().add(JcrTicketMapper.nodeToTicket(child));
         }
+
+        resource.setOwner(findOwner(node));
+    }
+
+    private static User findOwner(Node node)
+        throws RepositoryException {
+        Node parent = node.getParent();
+        if (parent == null) {
+            return null;
+        }
+        if (parent.getPath().equals("/")) {
+            return null;
+        }
+        return parent.isNodeType(NT_USER) ?
+            JcrUserMapper.nodeToUser(parent) :
+            findOwner(parent);
     }
 
     private static EventResource nodeToEvent(Node node)

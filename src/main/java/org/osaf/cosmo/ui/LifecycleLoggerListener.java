@@ -21,6 +21,8 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.log4j.LogManager;
+
 /**
  * A {@link javax.servlet.ServletContextListener} that logs
  * information about Cosmo servlet context lifecycle events.
@@ -42,5 +44,8 @@ public class LifecycleLoggerListener implements ServletContextListener {
      */
     public void contextDestroyed(ServletContextEvent sce) {
         log.info("Cosmo webapp stopping");
+        LogManager.shutdown();
+        java.beans.Introspector.flushCaches();
+        LogFactory.releaseAll();
     }
 }

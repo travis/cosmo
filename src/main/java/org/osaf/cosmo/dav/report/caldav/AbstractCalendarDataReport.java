@@ -115,7 +115,8 @@ public abstract class AbstractCalendarDataReport
         String host = parentHref.substring(0, parentHref.indexOf("/", 8));
 
         // Look for and parse any filter items here
-        if (calendarDataElement.getChildren().size() != 0) {
+        if (calendarDataElement != null
+                && calendarDataElement.getChildren().size() != 0) {
 
             // Grab an ical4j calendar data output filter
             outputFilter = parseCalendarData(calendarDataElement);

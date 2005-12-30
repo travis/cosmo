@@ -279,7 +279,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-server</artifactId>
-      <version>osaf-20051216</version>
+      <version>osaf-20051230</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

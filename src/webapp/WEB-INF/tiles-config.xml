@@ -117,6 +117,12 @@
     <put name="prefix"       value="HomeDirectory.Resource."/>
   </definition>
 
+  <definition name="home.inc.tickets"
+              page="/WEB-INF/jsp/home/inc-tickets.jsp"/>
+
+  <definition name="home.inc.properties"
+              page="/WEB-INF/jsp/home/inc-properties.jsp"/>
+
   <definition name="home.calendar" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/home/calendar.jsp"/>
     <put name="prefix"       value="HomeDirectory.Calendar."/>

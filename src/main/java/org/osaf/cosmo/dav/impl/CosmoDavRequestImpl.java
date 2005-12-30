@@ -149,11 +149,11 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
         ticket.setTimeout(timeout);
         if (privilege.getChild(CosmoDavConstants.ELEMENT_READ,
                                DavConstants.NAMESPACE) != null) {
-            ticket.getPrivileges().add(CosmoDavConstants.PRIVILEGE_READ);
+            ticket.getPrivileges().add(Ticket.PRIVILEGE_READ);
         }
         if (privilege.getChild(CosmoDavConstants.ELEMENT_WRITE,
                                DavConstants.NAMESPACE) != null) {
-            ticket.getPrivileges().add(CosmoDavConstants.PRIVILEGE_WRITE);
+            ticket.getPrivileges().add(Ticket.PRIVILEGE_WRITE);
         }
 
         return ticket;

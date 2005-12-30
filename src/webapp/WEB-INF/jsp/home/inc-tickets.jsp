@@ -26,6 +26,12 @@
 </div>
 
 <div style="margin-top:12px;">
+<html:link page="/console/home${Collection.path}/ticket/new">
+  [new ticket]
+</html:link>
+</div>
+
+<div style="margin-top:12px;">
   <table cellpadding="4" cellspacing="1" border="0" width="100%">
     <tr>
       <td class="smTableColHead" style="width:1%;">

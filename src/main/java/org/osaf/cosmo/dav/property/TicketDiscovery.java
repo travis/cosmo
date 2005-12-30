@@ -101,13 +101,12 @@ public class TicketDiscovery extends AbstractDavProperty {
 
         Element privilege = new Element(CosmoDavConstants.ELEMENT_PRIVILEGE,
                                         DavConstants.NAMESPACE);
-        if (ticket.getPrivileges().contains(CosmoDavConstants.PRIVILEGE_READ)) {
+        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ)) {
             Element read = new Element(CosmoDavConstants.ELEMENT_READ,
                                        DavConstants.NAMESPACE);
             privilege.addContent(read);
         }
-        if (ticket.getPrivileges().
-            contains(CosmoDavConstants.PRIVILEGE_WRITE)) {
+        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE)) {
             Element write = new Element(CosmoDavConstants.ELEMENT_WRITE,
                                         DavConstants.NAMESPACE);
             privilege.addContent(write);

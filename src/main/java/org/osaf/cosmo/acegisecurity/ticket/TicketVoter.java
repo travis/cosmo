@@ -28,7 +28,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.webdav.DavMethods;
 
-import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavMethods;
 import org.osaf.cosmo.model.Ticket;
 
@@ -83,15 +82,13 @@ public class TicketVoter implements AccessDecisionVoter {
         String method = fi.getHttpRequest().getMethod();
 
         if (readMethods.contains(method)) {
-            return ticket.getPrivileges().
-                contains(CosmoDavConstants.PRIVILEGE_READ) ?
+            return ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ) ?
                 ACCESS_GRANTED :
                 ACCESS_DENIED;
         }
 
         if (writeMethods.contains(method)) {
-            return ticket.getPrivileges().
-                contains(CosmoDavConstants.PRIVILEGE_WRITE) ?
+            return ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE) ?
                 ACCESS_GRANTED :
                 ACCESS_DENIED;
         }

@@ -133,6 +133,11 @@
     <put name="prefix"       value="HomeDirectory.Event."/>
   </definition>
 
+  <definition name="home.ticket.new" extends="layout.dialog">
+    <put name="body"         value="/WEB-INF/jsp/home/ticket/new.jsp"/>
+    <put name="prefix"       value="HomeDirectory.Ticket.New."/>
+  </definition>
+
   <!-- status defs -->
 
   <definition name="status.view" extends="layout.standard">

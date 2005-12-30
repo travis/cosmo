@@ -37,7 +37,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class Ticket {
 
-    public static final String INFINITE = "Infinite";
+    /** */
+    public static final String TIMEOUT_INFINITE = "Infinite";
+    /** */
+    public static final String PRIVILEGE_READ = "read";
+    /** */
+    public static final String PRIVILEGE_WRITE = "write";
 
     private String id;
     private String owner;
@@ -89,6 +94,12 @@ public class Ticket {
 
     /**
      */
+    public void setTimeout(Integer timeout) {
+        this.timeout = "Second-" + timeout;
+    }
+
+    /**
+     */
     public Set getPrivileges() {
         return privileges;
     }
@@ -114,7 +125,7 @@ public class Ticket {
     /**
      */
     public boolean hasTimedOut() {
-        if (timeout == null || timeout.equals(INFINITE)) {
+        if (timeout == null || timeout.equals(TIMEOUT_INFINITE)) {
             return false;
         }
 

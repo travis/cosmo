@@ -29,6 +29,7 @@
     <form-bean name="createUserForm" type="org.osaf.cosmo.ui.UserForm"/>
     <form-bean name="updateUserForm" type="org.osaf.cosmo.ui.UserForm"/>
     <form-bean name="updateRootForm" type="org.osaf.cosmo.ui.UserForm"/>
+    <form-bean name="ticketForm" type="org.osaf.cosmo.ui.home.TicketForm"/>
   </form-beans>
 
   <global-exceptions>
@@ -220,10 +221,27 @@
       <forward name="view" path="/home/view"/>
     </action>
 
+    <action path="/home/ticket/new"
+            name="ticketForm"
+            scope="request"
+            validate="false"
+            forward="home.ticket.new"/>
+
+    <action path="/home/ticket/grant"
+            type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
+            name="ticketForm"
+            scope="request"
+            validate="true"
+            input="/console/home/ticket/new"
+            parameter="grantTicket">
+      <forward name="cancel" path="/console/home/browse" redirect="true"/>
+      <forward name="success" path="/console/home/browse" redirect="true"/>
+    </action>
+
     <action path="/home/ticket/revoke"
             type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
-            parameter="revoke">
-      <forward name="collection" path="/console/home/browse" redirect="true"/>
+            parameter="revokeTicket">
+      <forward name="success" path="/console/home/browse" redirect="true"/>
     </action>
 
     <!-- status page -->

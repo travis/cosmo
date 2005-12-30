@@ -163,6 +163,21 @@ public class CosmoAction extends Action {
     }
 
     /**
+     * Copies an {@link org.apache.struts.ActionForward}, appending
+     * the given path to the copied forward's original path.
+     */
+    public ActionForward copyForward(ActionForward forward,
+                                     String path) {
+        String newPath = forward.getPath();
+        if (path != null) {
+            newPath = newPath + path;
+        }
+        return new ActionForward(forward.getName(), newPath,
+                                 forward.getRedirect(),
+                                 forward.getModule());
+    }
+
+    /**
      * Returns an absolute URL 
      */
     public String getContextRelativeURL(HttpServletRequest req,

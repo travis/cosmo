@@ -49,6 +49,7 @@ import org.osaf.cosmo.model.CollectionResource;
 import org.osaf.cosmo.model.EventResource;
 import org.osaf.cosmo.model.FileResource;
 import org.osaf.cosmo.model.Resource;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.service.HomeDirectoryService;
 import org.osaf.cosmo.ui.CosmoAction;
 import org.osaf.cosmo.ui.UIConstants;
@@ -123,7 +124,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
     }
 
     /**
-     * Revokes the resource or collection specified by the
+     * Removes the resource or collection specified by the
      * {@link PARAM_PATH} parameter.
      */
     public ActionForward remove(ActionMapping mapping,
@@ -141,11 +142,8 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
 
         String parentPath = path.substring(0, path.lastIndexOf('/'));
 
-        ActionForward forward = mapping.findForward(UIConstants.FWD_SUCCESS);
-        return new ActionForward(forward.getName(),
-                                 forward.getPath() + parentPath,
-                                 forward.getRedirect(),
-                                 forward.getModule());
+        return copyForward(mapping.findForward(UIConstants.FWD_SUCCESS),
+                           parentPath);
     }
 
     /**
@@ -236,14 +234,47 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
     }
 
     /**
+     * Grants the ticket specified by the input form to the resource
+     * specified by the form.
+     */
+    public ActionForward grantTicket(ActionMapping mapping,
+                                     ActionForm form,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response)
+        throws Exception {
+        TicketForm ticketForm = (TicketForm) form;
+
+        if (isCancelled(request)) {
+            String path = ticketForm.getPath();
+            ticketForm.reset(mapping, request);
+            return copyForward(mapping.findForward(UIConstants.FWD_CANCEL),
+                               path);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("granting ticket to resource at " +
+                      ticketForm.getPath());
+        }
+
+        Ticket ticket = ticketForm.getTicket();
+        ticket.setOwner(getSecurityManager().getSecurityContext().getUser().
+                        getUsername());
+
+        homeDirectoryService.grantTicket(ticketForm.getPath(), ticket);
+
+        return copyForward(mapping.findForward(UIConstants.FWD_SUCCESS),
+                           ticketForm.getPath());
+    }
+
+    /**
      * Revokes the ticket specified by the {@link PARAM_TICKET}
      * parameter from the resource specified by the
      * {@link #PARAM_PATH} parameter.
      */
-    public ActionForward revoke(ActionMapping mapping,
-                                ActionForm form,
-                                HttpServletRequest request,
-                                HttpServletResponse response)
+    public ActionForward revokeTicket(ActionMapping mapping,
+                                      ActionForm form,
+                                      HttpServletRequest request,
+                                      HttpServletResponse response)
         throws Exception {
         String path = request.getParameter(PARAM_PATH);
         String id = request.getParameter(PARAM_TICKET);
@@ -254,11 +285,8 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
 
         homeDirectoryService.revokeTicket(path, id);
 
-        ActionForward forward = mapping.findForward(FWD_COLLECTION);
-        return new ActionForward(forward.getName(),
-                                 forward.getPath() + path,
-                                 forward.getRedirect(),
-                                 forward.getModule());
+        return copyForward(mapping.findForward(UIConstants.FWD_SUCCESS),
+                           path);
     }
 
     /**

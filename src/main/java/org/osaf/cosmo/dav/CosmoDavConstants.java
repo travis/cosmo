@@ -102,11 +102,6 @@ public class CosmoDavConstants {
     public static final String VALUE_YES = "yes";
     public static final String VALUE_NO = "no";
 
-    // ACL privileges
-
-    public static final String PRIVILEGE_READ = "read";
-    public static final String PRIVILEGE_WRITE = "write";
-
     // caldav properties
 
     public static final String PROPERTY_CALDAV_CALENDAR_DESCRIPTION =

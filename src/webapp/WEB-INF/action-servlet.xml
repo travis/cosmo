@@ -92,5 +92,6 @@
   <bean name="/home/download"      parent="homeDirectoryBrowserAction"/>
   <bean name="/home/view"          parent="homeDirectoryBrowserAction"/>
   <bean name="/home/feed"          parent="homeDirectoryBrowserAction"/>
+  <bean name="/home/ticket/grant"  parent="homeDirectoryBrowserAction"/>
   <bean name="/home/ticket/revoke" parent="homeDirectoryBrowserAction"/>
 </beans>

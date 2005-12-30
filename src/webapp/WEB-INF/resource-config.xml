@@ -10,10 +10,14 @@
   </collection>
   <filter>
     <class name="org.apache.jackrabbit.webdav.simple.DefaultResourceFilter"/>
+    <nodetypes>
+      <nodetype>nt:base</nodetype>
+    </nodetypes>
     <namespaces>
       <prefix>rep</prefix>
       <prefix>jcr</prefix>
       <prefix>icalendar</prefix>
+      <prefix>calendar</prefix>
       <prefix>ticket</prefix>
       <prefix>xml</prefix>
       <prefix>cosmo</prefix>

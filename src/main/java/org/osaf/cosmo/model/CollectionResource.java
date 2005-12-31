@@ -22,7 +22,6 @@ import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.feed.atom.Generator;
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.feed.atom.Person;
-import com.sun.syndication.io.FeedException;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -67,8 +66,7 @@ public class CollectionResource extends Resource {
      * Expects the caller to set the <code>alternateLinks</code>, and
      * <code>otherLinks</code> properties.
      */
-    public Feed getAtomFeed()
-        throws FeedException {
+    public Feed getAtomFeed() {
         Feed feed = new Feed("atom_1.0");
 
         feed.setTitle(getDisplayName());
@@ -107,8 +105,7 @@ public class CollectionResource extends Resource {
 
     /**
      */
-    protected void addAtomFeedEntries(Feed feed)
-        throws FeedException {
+    protected void addAtomFeedEntries(Feed feed) {
         for (Iterator i=resources.iterator(); i.hasNext();) {
             Resource resource = (Resource) i.next();
             if (resource instanceof FileResource) {
@@ -119,8 +116,7 @@ public class CollectionResource extends Resource {
 
     /**
      */
-    protected Entry getAtomEntry(FileResource file)
-        throws FeedException {
+    protected Entry getAtomEntry(FileResource file) {
         Entry entry = new Entry();
         entry.setId(file.getPath());
         entry.setPublished(file.getDateCreated());

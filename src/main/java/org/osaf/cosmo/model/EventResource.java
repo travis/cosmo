@@ -15,11 +15,9 @@
  */
 package org.osaf.cosmo.model;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Date;
@@ -50,18 +48,21 @@ public class EventResource extends CalendarResource {
      * only parse the content once, returning the same calendar
      * instance on subsequent invocations.
      */
-    public Calendar getCalendar()
-        throws IOException, ParserException {
+    public Calendar getCalendar() {
         if (calendar == null) {
-            calendar = new CalendarBuilder().build(getContent());
+            try {
+                calendar = new CalendarBuilder().build(getContent());
+            } catch (Exception e) {
+                throw new ModelConversionException("cannot parse iCalendar " +
+                                                   "stream", e);
+            }
         }
         return calendar;
     }
 
     /**
      */
-    public VEvent getMasterEvent()
-        throws IOException, ParserException {
+    public VEvent getMasterEvent() {
         return (VEvent) getCalendar().getComponents().
             getComponents(Component.VEVENT).get(0);
     }
@@ -69,16 +70,14 @@ public class EventResource extends CalendarResource {
     /**
      * Returns the event formatted as an iCalendar component.
      */
-    public String toICalendar()
-        throws IOException, ParserException {
+    public String toICalendar() {
         return getMasterEvent().toString();
     }
 
     /**
      * Returns the event formatted as an hCalendar document fragment.
      */
-    public String toHCalendar()
-        throws IOException, ParserException {
+    public String toHCalendar() {
         StringBuffer buf = new StringBuffer();
         buf.append("<div class=\"vevent\">");
 

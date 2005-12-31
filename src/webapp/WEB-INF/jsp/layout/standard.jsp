@@ -48,7 +48,7 @@
       <tr>
         <td align="left" valign="top">
           <div class="lg">
-            <html:link page="/console/">
+            <html:link page="/console/account">
               <img src="/cosmo_logo.gif" alt="Cosmo Sharing Server"/>
             </html:link>
           </div>
@@ -65,7 +65,7 @@
               --%>
               <c:choose><c:when test="${fn:endsWith(body, '/help.jsp')}"><strong><fmt:message key="Layout.Nav.Main.Help"/></strong></c:when><c:otherwise><html:link page="/console/help"><fmt:message key="Layout.Nav.Main.Help"/></html:link></c:otherwise></c:choose>
               |
-              <html:link page="/console/about" onclick="simplePopUp('/about', 340, 280, false); return false;"><fmt:message key="Layout.Nav.Main.About"/></html:link>
+              <html:link page="/console/about" onclick="simplePopUp('/console/about', 340, 280, false); return false;"><fmt:message key="Layout.Nav.Main.About"/></html:link>
               |
               <html:link page="/console/logout">
                 <fmt:message key="Layout.Nav.Main.LogOut"/>

@@ -34,7 +34,7 @@
   [view as HTML]
 </html:link>
 </c:if>
-<html:link page="/console/home/feed${Collection.path}">
+<html:link page="/feed/atom/1.0${Collection.path}">
   [subscribe to feed]
 </html:link>
 </div>

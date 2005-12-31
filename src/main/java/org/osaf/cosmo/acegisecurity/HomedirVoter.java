@@ -50,15 +50,20 @@ public class HomedirVoter implements AccessDecisionVoter {
         String username = details.getUser().getUsername();
 
         FilterInvocation fi = (FilterInvocation) object;
+        String path = findResourcePath(fi);
+
+        return path.startsWith(username) ? ACCESS_GRANTED : ACCESS_DENIED;
+    }
+
+    private String findResourcePath(FilterInvocation fi) {
         String path = fi.getHttpRequest().getPathInfo();
         if (path == null) {
-            path = "/";
+            return null;
         }
-        if (! path.equals("/") && path.endsWith("/")) {
-            path = path.substring(0, path.length()-1);
+        if (path.startsWith("/atom/1.0")) {
+            path = path.substring("/atom/1.0".length());
         }
-
-        return path.startsWith("/" + username) ? ACCESS_GRANTED : ACCESS_DENIED;
+        return path.substring(1);
     }
 
     /**

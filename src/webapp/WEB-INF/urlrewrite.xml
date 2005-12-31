@@ -20,6 +20,10 @@
 
 <urlrewrite>
   <rule>
+    <from>^/feed/atom/1.0(/.*)$</from>
+    <to>/feed?path=$1</to>
+  </rule>
+  <rule>
     <from>^/console/loginfailed$</from>
     <to>/console/login?login_failed=1</to>
   </rule>
@@ -50,10 +54,6 @@
   <rule>
     <from>^/console/home/view(/.*)$</from>
     <to>/console/home/view?path=$1</to>
-  </rule>
-  <rule>
-    <from>^/console/home/feed(/.*)$</from>
-    <to>/console/home/feed?path=$1</to>
   </rule>
   <rule>
     <from>^/console/home(/.*)/ticket/new$</from>

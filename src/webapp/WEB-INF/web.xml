@@ -119,6 +119,10 @@
     <url-pattern>/home/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
+    <filter-name>dav-security</filter-name>
+    <url-pattern>/feed/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
     <filter-name>cmp-security</filter-name>
     <url-pattern>/cmp/*</url-pattern>
   </filter-mapping>
@@ -126,6 +130,10 @@
   <filter-mapping>
     <filter-name>url-rewrite</filter-name>
     <url-pattern>/console/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>url-rewrite</filter-name>
+    <url-pattern>/feed/*</url-pattern>
   </filter-mapping>
   <servlet>
     <servlet-name>webdav</servlet-name>
@@ -158,6 +166,19 @@
     <servlet-class>org.osaf.cosmo.cmp.CmpServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
+  <servlet>
+    <servlet-name>feed</servlet-name>
+    <servlet-class>org.osaf.cosmo.feed.FeedServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <init-param>
+      <param-name>home-path</param-name>
+      <param-value>/home</param-value>
+    </init-param>
+    <init-param>
+      <param-name>browse-path</param-name>
+      <param-value>/console/home/browse</param-value>
+    </init-param>
+  </servlet>
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/console/*</url-pattern>
@@ -169,6 +190,10 @@
   <servlet-mapping>
     <servlet-name>cmp</servlet-name>
     <url-pattern>/cmp/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>feed</servlet-name>
+    <url-pattern>/feed/*</url-pattern>
   </servlet-mapping>
   <error-page>
     <exception-type>java.lang.Throwable</exception-type>

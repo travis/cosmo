@@ -15,12 +15,6 @@
  */
 package org.osaf.cosmo.ui.home;
 
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Feed;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedOutput;
-
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -211,29 +205,6 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
     }
 
     /**
-     * Downloads an Atom feed document describing the collection
-     * specified by the {@link #PARAM_PATH} parameter.
-     */
-    public ActionForward feed(ActionMapping mapping,
-                              ActionForm form,
-                              HttpServletRequest request,
-                              HttpServletResponse response)
-        throws Exception {
-        String path = request.getParameter(PARAM_PATH);
-
-        Resource resource = getResource(path);
-
-        if (resource instanceof CollectionResource) {
-            spoolFeed((CollectionResource) resource, request, response,
-                      mapping);
-            return null;
-        }
-        throw new ServletException("feed for resource of type " +
-                                   resource.getClass().getName() +
-                                   " at " + path + " cannot be downloaded");
-    }
-
-    /**
      * Grants the ticket specified by the input form to the resource
      * specified by the form.
      */
@@ -374,72 +345,5 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
             log.error("invalid output calendar?!", e);
         }
         response.flushBuffer();
-    }
-
-    private void spoolFeed(CollectionResource collection,
-                           HttpServletRequest request,
-                           HttpServletResponse response,
-                           ActionMapping mapping)
-        throws IOException, FeedException {
-        // set headers
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/atom+xml");
-        response.setCharacterEncoding("UTF-8");
-        // XXX we can't know content length unless we write to a temp
-        // file and then spool that
-
-        Feed feed = collection.getAtomFeed();
-
-        // make ids and link hrefs absolute
-        String feedPath = mapping.findForward("feed").getPath();
-        String viewPath = mapping.findForward("view").getPath();
-        feed.setId(encodeURL(request, viewPath + feed.getId()));
-        for (Iterator i=feed.getAlternateLinks().iterator(); i.hasNext();) {
-            Link link = (Link) i.next();
-            if (link.getRel().equals("self")) {
-                link.setHref(encodeURL(request, feedPath + link.getHref()));
-            }
-            else if (link.getRel().equals("alternate")) {
-                link.setHref(encodeURL(request, viewPath + link.getHref()));
-            }
-        }
-        for (Iterator i=feed.getEntries().iterator(); i.hasNext();) {
-            Entry entry = (Entry) i.next();
-            entry.setId(encodeURL(request, viewPath + entry.getId()));
-            for (Iterator j=entry.getAlternateLinks().iterator();
-                 j.hasNext();) {
-                Link link = (Link) j.next();
-                if (link.getRel().equals("alternate")) {
-                    link.setHref(encodeURL(request,
-                                           viewPath + link.getHref()));
-                }
-            }
-        }
-
-        // spool data
-        WireFeedOutput outputter = new WireFeedOutput();
-        outputter.output(feed, response.getWriter());
-        response.flushBuffer();
-    }
-
-    private String encodeURL(HttpServletRequest request,
-                             String path) {
-        // like response.encodeURL() but is guaranteed to include the
-        // scheme, host, port, context and servlet paths regardless of
-        // where the session id comes from
-        StringBuffer buf = new StringBuffer();
-        buf.append(request.getScheme()).
-            append("://").
-            append(request.getServerName());
-        if ((request.isSecure() && request.getServerPort() != 443) ||
-            (request.getServerPort() != 80)) {
-            buf.append(":").append(request.getServerPort());
-        }
-        if (! request.getContextPath().equals("/")) {
-            buf.append(request.getContextPath());
-        }
-        buf.append(request.getServletPath());
-        buf.append(path);
-        return buf.toString();
     }
 }

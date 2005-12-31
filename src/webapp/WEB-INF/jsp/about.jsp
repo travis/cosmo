@@ -19,9 +19,9 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<u:bind var="SERVER_VERSION"
+<u:bind var="PRODUCT_VERSION"
         type="org.osaf.cosmo.CosmoConstants"
-        field="SC_ATTR_SERVER_VERSION"/>
+        field="PRODUCT_VERSION"/>
 
 <div style="width:100%;" align="center">
 
@@ -34,7 +34,7 @@
                key="About.LogoAltText"/>"/></html:link>    
     </div>
     <div class="smLabel" style="margin-top:2px;"><fmt:message 
-         key="About.VersionString"/>${applicationScope[SERVER_VERSION]}
+         key="About.VersionString"/>${PRODUCT_VERSION}
     </div>
     <div style="margin-top:28px;"><fmt:message key="About.LicenseOpen"/>
     <html:link page="http://www.apache.org/licenses/LICENSE-2.0" 

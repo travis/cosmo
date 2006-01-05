@@ -15,11 +15,15 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import java.util.Iterator;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.WebdavRequestImpl;
+import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
 
 import org.apache.log4j.Logger;
 
@@ -39,6 +43,7 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
     private static final Logger log =
         Logger.getLogger(CosmoDavRequestImpl.class);
 
+    private DavPropertySet mkcalendarSet;
     private Ticket ticket;
 
     /**
@@ -65,6 +70,20 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
             buf.append(getServerPort());
         }
         return buf.toString();
+    }
+
+    // CaldavRequest methods
+
+    /**
+     * Return the list of 'set' entries in the MKCALENDAR request
+     * body. The list is empty if the request body could not be parsed
+     * or if the request body did not contain any 'set' elements.
+     */
+    public DavPropertySet getMkCalendarSetProperties() {
+        if (mkcalendarSet == null) {
+            mkcalendarSet = parseMkCalendarRequest();
+        }
+        return mkcalendarSet;
     }
 
     // TicketDavRequest methods
@@ -99,6 +118,42 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
 
     // private methods
 
+    private DavPropertySet parseMkCalendarRequest() {
+        DavPropertySet propertySet = new DavPropertySet();
+
+        Document requestDocument = getRequestDocument();
+        if (requestDocument == null) {
+            return propertySet;
+        }
+
+        Element root = requestDocument.getRootElement();
+        if (! root.getName().
+            equals(CosmoDavConstants.ELEMENT_CALDAV_MKCALENDAR)) {
+            throw new IllegalArgumentException("mkcalendar request missing mkcalendar element");
+        }
+        if (root.getNamespace() == null ||
+            ! root.getNamespace().equals(CosmoDavConstants.NAMESPACE_CALDAV)) {
+            throw new IllegalArgumentException("mkcalendar request contains mkcalendar element with missing or incorrect namespace");
+        }
+
+        Element set = root.getChild(CosmoDavConstants.ELEMENT_SET,
+                                    DavConstants.NAMESPACE);
+        if (set == null) {
+            throw new IllegalArgumentException("mkcalendar request missing set element");
+        }
+        Element prop = set.getChild(CosmoDavConstants.ELEMENT_PROP,
+                                    DavConstants.NAMESPACE);
+        if (prop == null) {
+            throw new IllegalArgumentException("mkcalendar request missing prop element");
+        }
+        for (Iterator i=prop.getChildren().iterator(); i.hasNext();) {
+            Element property = (Element) i.next();
+            propertySet.add(DefaultDavProperty.createFromXml(property));
+        }
+
+        return propertySet;
+    }
+
     private Ticket parseTicketRequest() {
         Document requestDocument = getRequestDocument();
         if (requestDocument == null) {
@@ -106,7 +161,6 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
         }
 
         Element root = requestDocument.getRootElement();
-
         if (! root.getName().equals(CosmoDavConstants.ELEMENT_TICKETINFO)) {
             throw new IllegalArgumentException("ticket request missing ticketinfo");
         }

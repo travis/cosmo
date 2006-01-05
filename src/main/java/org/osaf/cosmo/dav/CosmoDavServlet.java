@@ -30,6 +30,8 @@ import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.apache.jackrabbit.webdav.DavServletResponse;
+import org.apache.jackrabbit.webdav.MultiStatus;
+import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.WebdavRequest;
 import org.apache.jackrabbit.webdav.WebdavRequestImpl;
 import org.apache.jackrabbit.webdav.WebdavResponse;
@@ -37,6 +39,8 @@ import org.apache.jackrabbit.webdav.WebdavResponseImpl;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
+import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 
 import org.apache.log4j.Logger;
@@ -274,28 +278,29 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
-        // we do not allow request bodies
-        if (request.getContentLength() > 0 ||
-            request.getHeader("Transfer-Encoding") != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("cannot make calendar at " +
-                          resource.getResourcePath() +
-                          ": request body not allowed");
-            }
-            response.sendError(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-            return;
-        }
-
         // also could return INSUFFICIENT_STORAGE if we do not have
         // enough space for the collection, but how do we determine
         // that?
-        
+
+        CosmoInputContext ctx = (CosmoInputContext)
+            getInputContext(request, null);
+        try {
+            DavPropertySet properties = request.getMkCalendarSetProperties();
+            ctx.setCalendarCollectionProperties(properties);
+        } catch (IllegalArgumentException e) {
+            response.sendError(DavServletResponse.SC_BAD_REQUEST,
+                               e.getMessage());
+            return;
+        }
+
         if (log.isDebugEnabled()) {
             log.debug("adding calendar collection at " +
                       resource.getResourcePath());
         }
-        parentResource.addMember(resource, getInputContext(request, null));
+        parentResource.addMember(resource, ctx);
+
         response.setStatus(DavServletResponse.SC_CREATED);
+        return;
     }
 
     /**

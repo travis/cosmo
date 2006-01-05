@@ -17,14 +17,17 @@ package org.osaf.cosmo.dav;
 
 import org.apache.jackrabbit.webdav.WebdavRequest;
 
+import org.osaf.cosmo.dav.caldav.CaldavRequest;
 import org.osaf.cosmo.dav.ticket.TicketDavRequest;
 
 /**
  * An interface collecting the functionality defined by various
  * WebDAV extensions implemented by Cosmo. Extends
- * {@link org.apache.jackrabbit.webdav.WebdavRequest}.
+ * {@link org.apache.jackrabbit.webdav.WebdavRequest},
+ * {@link TicketDavRequest}, and {@link CaldavRequest};
  */
-public interface CosmoDavRequest extends WebdavRequest, TicketDavRequest {
+public interface CosmoDavRequest
+    extends WebdavRequest, TicketDavRequest, CaldavRequest {
 
     /**
      * Return the base URL for this request (including scheme, server

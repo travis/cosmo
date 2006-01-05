@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<C:mkcalendar xmlns:D="DAV:"
+              xmlns:C="urn:ietf:params:xml:ns:caldav"
+              xmlns:my="my:custom:namespace">
+  <D:set>
+    <D:prop>
+      <D:displayname>My calendar</D:displayname>
+      <my:test>test property</my:test>
+    </D:prop>
+  </D:set>
+</C:mkcalendar>

@@ -47,6 +47,7 @@ public class CosmoDavConstants {
 
     // XML elements
 
+    public static final String ELEMENT_SET = "set";
     public static final String ELEMENT_PROP = "prop";
     public static final String ELEMENT_TICKETINFO = "ticketinfo";
     public static final String ELEMENT_ID = "id";
@@ -58,6 +59,7 @@ public class CosmoDavConstants {
     public static final String ELEMENT_READ = "read";
     public static final String ELEMENT_WRITE = "write";
 
+    public static final String ELEMENT_CALDAV_MKCALENDAR = "mkcalendar";
     public static final String ELEMENT_CALDAV_CALENDAR = "calendar";
     public static final String ELEMENT_CALDAV_COMP = "comp";
     public static final String ELEMENT_CALDAV_CALENDAR_DATA = "calendar-data";

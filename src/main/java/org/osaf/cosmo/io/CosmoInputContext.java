@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.webdav.io.InputContextImpl;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavMethods;
@@ -35,6 +36,7 @@ public class CosmoInputContext extends InputContextImpl {
     private static final Log log = LogFactory.getLog(CosmoInputContext.class);
 
     private String contentType;
+    private DavPropertySet calendarCollectionProperties;
 
     /**
      * If the HTTP request method is MKCALENDAR, sets the context's
@@ -59,5 +61,19 @@ public class CosmoInputContext extends InputContextImpl {
             return contentType;
         }
         return super.getContentType();
+    }
+
+    // our methods
+
+    /**
+     */
+    public DavPropertySet getCalendarCollectionProperties() {
+        return calendarCollectionProperties;
+    }
+
+    /**
+     */
+    public void setCalendarCollectionProperties(DavPropertySet properties) {
+        calendarCollectionProperties = properties;
     }
 }

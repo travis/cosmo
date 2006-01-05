@@ -105,10 +105,10 @@ public class CosmoDavConstants {
 
     public static final String PROPERTY_CALDAV_CALENDAR_DESCRIPTION =
         "calendar-description";
-    public static final String PROPERTY_CALDAV_CALENDAR_COMPONENT_RESTRICTION_SET =
-        "calendar-component-restriction-set";
-    public static final String PROPERTY_CALDAV_CALENDAR_RESTRICTIONS =
-        "calendar-restrictions";
+    public static final String PROPERTY_CALDAV_SUPPORTED_CALENDAR_COMPONENT_SET =
+        "supported-calendar-component-set";
+    public static final String PROPERTY_CALDAV_SUPPORTED_CALENDAR_DATA =
+        "supported-calendar-data";
 
     // caldav reports
 

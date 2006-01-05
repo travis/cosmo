@@ -27,25 +27,24 @@ import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.icalendar.ComponentTypes;
 
 /**
- * Represents the CalDAV calendar-component-restriction-set
- * property. Valid component types are {@link #VEVENT},
- * {@link #VTODO}, {@link #VJOURNAL}, {@link #VFREEBUSY},
- * {@link #VTIMEZONE}.
+ * Represents the CalDAV supported-calendar-component-set
+ * property. Valid component types are defined by
+ * {@link ComponentTypes}.
  */
-public class CalendarComponentRestrictionSet extends AbstractDavProperty {
+public class SupportedCalendarComponentSet extends AbstractDavProperty {
 
     private int[] componentTypes;
 
     /**
      */
-    public CalendarComponentRestrictionSet() {
+    public SupportedCalendarComponentSet() {
         this(ComponentTypes.getAllSupportedComponentTypes());
     }
 
     /**
      */
-    public CalendarComponentRestrictionSet(int[] componentTypes) {
-        super(CosmoDavPropertyName.CALENDARCOMPONENTRESTRICTIONSET, true);
+    public SupportedCalendarComponentSet(int[] componentTypes) {
+        super(CosmoDavPropertyName.SUPPORTEDCALENDARCOMPONENTSET, true);
         for (int i=0; i<componentTypes.length; i++) {
             if (! ComponentTypes.isValidComponentType(componentTypes[i])) {
                 throw new IllegalArgumentException("Invalid component type '" +

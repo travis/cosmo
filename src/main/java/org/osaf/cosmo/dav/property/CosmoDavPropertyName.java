@@ -36,16 +36,16 @@ public class CosmoDavPropertyName {
 
     /**
      */
-    public static final DavPropertyName CALENDARCOMPONENTRESTRICTIONSET =
+    public static final DavPropertyName SUPPORTEDCALENDARCOMPONENTSET =
         DavPropertyName.create(CosmoDavConstants.
-                               PROPERTY_CALDAV_CALENDAR_COMPONENT_RESTRICTION_SET,
+                               PROPERTY_CALDAV_SUPPORTED_CALENDAR_COMPONENT_SET,
                                CosmoDavConstants.NAMESPACE_CALDAV);
 
     /**
      */
-    public static final DavPropertyName CALENDARRESTRICTIONS =
+    public static final DavPropertyName SUPPORTEDCALENDARDATA =
         DavPropertyName.create(CosmoDavConstants.
-                               PROPERTY_CALDAV_CALENDAR_RESTRICTIONS,
+                               PROPERTY_CALDAV_SUPPORTED_CALENDAR_DATA,
                                CosmoDavConstants.NAMESPACE_CALDAV);
 
     /**

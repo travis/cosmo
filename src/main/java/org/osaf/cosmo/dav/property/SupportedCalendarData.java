@@ -27,15 +27,15 @@ import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 /**
- * Represents the CalDAV calendar-restrictions property.
+ * Represents the CalDAV supported-calendar-data property.
  */
-public class CalendarRestrictions extends AbstractDavProperty
+public class SupportedCalendarData extends AbstractDavProperty
     implements ICalendarConstants {
 
     /**
      */
-    public CalendarRestrictions() {
-        super(CosmoDavPropertyName.CALENDARRESTRICTIONS, true);
+    public SupportedCalendarData() {
+        super(CosmoDavPropertyName.SUPPORTEDCALENDARDATA, true);
     }
 
     /**
@@ -51,7 +51,7 @@ public class CalendarRestrictions extends AbstractDavProperty
 
     /**
      * (Returns a <code>Set</code> of <code>Element</code>s
-     * representing the restrictions of this property.
+     * representing the data of this property.
      */
     public Object getValue() {
         Set elements = new HashSet();

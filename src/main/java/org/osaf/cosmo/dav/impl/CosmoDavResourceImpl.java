@@ -55,11 +55,11 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
-import org.osaf.cosmo.dav.property.CalendarComponentRestrictionSet;
 import org.osaf.cosmo.dav.property.CalendarDescription;
-import org.osaf.cosmo.dav.property.CalendarRestrictions;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.CosmoResourceType;
+import org.osaf.cosmo.dav.property.SupportedCalendarComponentSet;
+import org.osaf.cosmo.dav.property.SupportedCalendarData;
 import org.osaf.cosmo.dav.property.TicketDiscovery;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
@@ -288,14 +288,14 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                     log.warn("Unable to retrieve calendar description", e);
                 }
 
-                // calendar-component-restriction-set property (caldav
+                // supported-calendar-component-set property (caldav
                 // section 4.3.2)
-                DavProperty davprop = new CalendarComponentRestrictionSet();
+                DavProperty davprop = new SupportedCalendarComponentSet();
                 properties.add(davprop);
 
-                // calendar-restrictions property (caldav section
+                // supported-calendar-data property (caldav section
                 // 4.3.3)
-                properties.add(new CalendarRestrictions());
+                properties.add(new SupportedCalendarData());
             }
 
             if (isTicketable()) {

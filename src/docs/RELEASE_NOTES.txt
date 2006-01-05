@@ -1,14 +1,14 @@
 
-Cosmo Sharing Server 0.2.5
+Cosmo Sharing Server 0.2.6
 Release Notes
         
 
 UPGRADING FROM A PREVIOUS RELEASE
 =================================
 
-If upgrading from 0.2.4, no configuration changes are
-required. Repositories created by 0.2.4 may be used by this version
-with no changes.
+If upgrading from 0.2.4 or later, no configuration changes are
+required. Repositories created by 0.2.4 or later may be used by this
+version with no changes.
 
 Releases prior to 0.2.4 required Java 1.4, but starting with 0.2.4,
 Cosmo now requires Java 5.0 (1.5).
@@ -17,23 +17,34 @@ Cosmo now requires Java 5.0 (1.5).
 NEW FEATURES
 ============
 
-4345: Responses to CMP user create and update operations now contain
-      ETags
-4817: CMP user create and update operations return specific status
-      codes for "username in use" and "email in use" errors
-4830: new CMP operations for authenticated users to view and update
-      their account information
-4854: User first name, last name and email may now be up to 128 bytes
-      long.
-4864: Avoid NPE when PROPPATCHing a dav displayname with no value
+4045: The web console (formerly called WebUI) now lives at the URI
+      /console. The root URI (/) forwards a user to the console's login
+      page, or to the account page if the user is logged in.
 
 
 BUGS FIXED
 ==========
 
-4858: Memory leak caused by not logging out of repository sessions is
-      plugged
-4794: Tomcat no longer creates unwanted log files
+4741: CMP and *DAV protocols ignore the web console's session so that
+      their tickets cannot leak into the session and cause a session
+      persistence problem when tomcat stops.
+4820: CMP and *DAV ignore the web console's session so that cached
+      authentication credentials from the session cannot leak into
+      those protocols' security contexts and cause authentication or
+      authorization errors.
+4883: when filling out the forgotten username/password form, if the
+      user enters an email address that is not found in the user
+      database, show a friendly error message to that effect and a
+      button that allows the user to sign up for a new account.
+4888: CMP and *DAV protocols ignore the web console's session so that
+      a client application can use multiple protocols with different
+      credentials and consequently different server-side security
+      contexts.
+4891: when the SMTP server can't be contacted, show a friendly error
+      message rather than a stack trace.
+4899: the ticket:ticketdiscovery WebDAV property will never
+      contains expired tickets.
+4919: jackrabbit starts up successfully even with 1000+ users.
 
 
 Copyright 2005 Open Source Applications Foundation

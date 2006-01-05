@@ -263,7 +263,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit</artifactId>
-      <version>osaf-20051216</version>
+      <version>osaf-20060104</version>
       <properties>
         <tomcat.bundle>true</tomcat.bundle>
       </properties>

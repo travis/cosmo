@@ -1,0 +1,51 @@
+
+Cosmo Sharing Server 0.2.5
+Release Notes
+        
+
+UPGRADING FROM A PREVIOUS RELEASE
+=================================
+
+If upgrading from 0.2.4, no configuration changes are
+required. Repositories created by 0.2.4 may be used by this version
+with no changes.
+
+Releases prior to 0.2.4 required Java 1.4, but starting with 0.2.4,
+Cosmo now requires Java 5.0 (1.5).
+
+
+NEW FEATURES
+============
+
+4345: Responses to CMP user create and update operations now contain
+      ETags
+4817: CMP user create and update operations return specific status
+      codes for "username in use" and "email in use" errors
+4830: new CMP operations for authenticated users to view and update
+      their account information
+4854: User first name, last name and email may now be up to 128 bytes
+      long.
+4864: Avoid NPE when PROPPATCHing a dav displayname with no value
+
+
+BUGS FIXED
+==========
+
+4858: Memory leak caused by not logging out of repository sessions is
+      plugged
+4794: Tomcat no longer creates unwanted log files
+
+
+Copyright 2005 Open Source Applications Foundation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

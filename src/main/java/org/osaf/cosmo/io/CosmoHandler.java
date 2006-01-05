@@ -41,6 +41,7 @@ import org.apache.jackrabbit.webdav.DavResource;
 
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dao.jcr.JcrEscapist;
+import org.osaf.cosmo.icalendar.ComponentTypes;
 
 /**
  * Extends {@link org.apache.jackrabbit.server.io.DefaultHandler}
@@ -115,10 +116,19 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
             Calendar calendar = cosmoContext.getCalendar();
 
             // 1) make sure that the calendar object contains at least
-            // one event
-            if (calendar.getComponents().getComponents(Component.VEVENT).
-                isEmpty()) {
-                throw new UnsupportedCalendarComponentException("No events");
+            // one supported component type
+            boolean found = false;
+            String[] types =
+                ComponentTypes.getAllSupportedComponentTypeNames();
+            for (int i=0; i<types.length; i++) {
+                if (! calendar.getComponents().getComponents(types[i]).
+                    isEmpty()) {
+                    found = true;
+                    break;
+                }
+            }
+            if (! found) {
+                throw new UnsupportedCalendarComponentException();
             }
 
             // 2) make sure that the calendar object's uid is

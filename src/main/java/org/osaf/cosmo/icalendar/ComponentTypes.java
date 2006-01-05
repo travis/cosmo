@@ -26,18 +26,12 @@ public class ComponentTypes {
      */
     public static final int VEVENT = 0;
 
-    /**
-     */
-    public static final int VFREEBUSY = 1;
-
-    /**
-     */
-    public static final int VTIMEZONE = 2;
-
     private static int[] SUPPORTED_COMPONENT_TYPES = {
-        VEVENT,
-        VFREEBUSY,
-        VTIMEZONE
+        VEVENT
+    };
+
+    private static String[] SUPPORTED_COMPONENT_TYPE_NAMES = {
+        Component.VEVENT
     };
 
     /**
@@ -46,16 +40,27 @@ public class ComponentTypes {
         return SUPPORTED_COMPONENT_TYPES;
     }
 
+    public static String[] getAllSupportedComponentTypeNames() {
+        return SUPPORTED_COMPONENT_TYPE_NAMES;
+    }
+
+    public static String getAllSupportedComponentTypeNamesAsString() {
+        StringBuffer buf = new StringBuffer();
+        for (int i=0; i<SUPPORTED_COMPONENT_TYPE_NAMES.length; i++) {
+            buf.append(SUPPORTED_COMPONENT_TYPE_NAMES[i]);
+            if (i<SUPPORTED_COMPONENT_TYPE_NAMES.length-1) {
+                buf.append("|");
+            }
+        }
+        return buf.toString();
+    }
+
     /**
      */
     public static String getComponentTypeName(int componentType) {
         switch (componentType) {
         case VEVENT:
             return Component.VEVENT;
-        case VFREEBUSY:
-            return Component.VFREEBUSY;
-        case VTIMEZONE:
-            return Component.VTIMEZONE;
         }
         throw new IllegalArgumentException("Invalid component type '" +
                                            componentType + "'.");
@@ -64,6 +69,6 @@ public class ComponentTypes {
     /**
      */
     public static boolean isValidComponentType(int componentType) {
-        return componentType >= VEVENT && componentType <= VTIMEZONE;
+        return componentType == VEVENT;
     }
 }

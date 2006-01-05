@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.io;
 
+import org.osaf.cosmo.icalendar.ComponentTypes;
+
 /**
  * An exception indicating that a calendar resource submitted for
  * import did not contain at least one type of calendar component
@@ -23,6 +25,12 @@ package org.osaf.cosmo.io;
  * @see org.osaf.cosmo.icalendar.ComponentTypes;
  */
 public class UnsupportedCalendarComponentException extends RuntimeException {
+
+    /**
+     */
+    public UnsupportedCalendarComponentException() {
+        super(ComponentTypes.getAllSupportedComponentTypeNamesAsString());
+    }
 
     /**
      */

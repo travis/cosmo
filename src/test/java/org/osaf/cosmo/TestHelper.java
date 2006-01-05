@@ -25,7 +25,6 @@ import net.fortuna.ical4j.model.parameter.*;
 import net.fortuna.ical4j.model.property.*;
 
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -113,9 +112,9 @@ public class TestHelper {
      */
     public Ticket makeDummyTicket() {
         Ticket ticket = new Ticket();
-        ticket.setTimeout(CosmoDavConstants.VALUE_INFINITE);
+        ticket.setTimeout(Ticket.TIMEOUT_INFINITE);
         ticket.setPrivileges(new HashSet());
-        ticket.getPrivileges().add(CosmoDavConstants.PRIVILEGE_READ);
+        ticket.getPrivileges().add(Ticket.PRIVILEGE_READ);
         return ticket;
     }
 

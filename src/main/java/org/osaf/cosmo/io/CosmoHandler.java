@@ -39,10 +39,8 @@ import org.apache.jackrabbit.server.io.IOManager;
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavResource;
 
-import org.osaf.cosmo.dao.UnsupportedCalendarObjectException;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dao.jcr.JcrEscapist;
-import org.osaf.cosmo.icalendar.DuplicateUidException;
 
 /**
  * Extends {@link org.apache.jackrabbit.server.io.DefaultHandler}
@@ -107,21 +105,20 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
             resourceNode.addMixin(NT_TICKETABLE);
         }
 
-        if (cosmoContext.isCalendarContent() &&
-            resourceNode.getParent().isNodeType(NT_CALENDAR_COLLECTION)) {
-            Calendar calendar = cosmoContext.getCalendar();
+        if (resourceNode.getParent().isNodeType(NT_CALENDAR_COLLECTION)) {
+            // calendar collections can only contain calendar object
+            // resources
+            if (! ((CosmoImportContext) context).isCalendarContent()) {
+                throw new UnsupportedMediaTypeException(context.getMimeType());
+            }
 
-            // since we are importing a calendar resource into a
-            // calendar collection, we have to:
+            Calendar calendar = cosmoContext.getCalendar();
 
             // 1) make sure that the calendar object contains at least
             // one event
             if (calendar.getComponents().getComponents(Component.VEVENT).
                 isEmpty()) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Calendar contains no events");
-                }
-                throw new UnsupportedCalendarObjectException("No events");
+                throw new UnsupportedCalendarComponentException("No events");
             }
 
             // 2) make sure that the calendar object's uid is
@@ -132,7 +129,7 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
             Property uid = (Property)
                 event.getProperties().getProperty(Property.UID);
             if (! isUidUnique(resourceNode, uid.getValue())) {
-                throw new DuplicateUidException(uid.getValue());
+                throw new UidConflictException(uid.getValue());
             }
 
             // 3) add calendarv resource mixin type

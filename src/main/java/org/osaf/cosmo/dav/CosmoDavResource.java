@@ -47,14 +47,6 @@ public interface CosmoDavResource extends DavResource {
     public String METHODS = DavResource.METHODS + ", MKTICKET, DELTICKET";
 
     /**
-     * An array of int constants representing the iCalendar
-     * components supported in a calendar collection.
-     */
-    public int[] ICALENDAR_COMPONENTS = {
-        CalendarComponentRestrictionSet.VEVENT
-    };
-
-    /**
      * Returns true if this resource represents a ticketable dav
      * resource.
      */

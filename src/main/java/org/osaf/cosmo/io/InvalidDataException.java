@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.model;
+package org.osaf.cosmo.io;
 
 /**
- * An exception indicating that converting a model object to or from a
- * particular data format failed.
+ * An exception indicating that a resource submitted for import was
+ * incorrectly formatted or otherwise invalid.
  */
-public class ModelConversionException extends RuntimeException {
+public class InvalidDataException extends RuntimeException {
 
     /**
      */
-    public ModelConversionException(String message) {
+    public InvalidDataException(String message) {
         super(message);
-    }
-
-    /**
-     */
-    public ModelConversionException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

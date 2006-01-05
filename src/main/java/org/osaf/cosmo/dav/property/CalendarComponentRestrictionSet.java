@@ -24,6 +24,7 @@ import org.jdom.Element;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
+import org.osaf.cosmo.icalendar.ComponentTypes;
 
 /**
  * Represents the CalDAV calendar-component-restriction-set
@@ -33,26 +34,20 @@ import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
  */
 public class CalendarComponentRestrictionSet extends AbstractDavProperty {
 
-    /**
-     */
-    public static final int VEVENT = 0;
-
-    /**
-     */
-    public static final int VFREEBUSY = 1;
-
-    /**
-     */
-    public static final int VTIMEZONE = 2;
-
     private int[] componentTypes;
+
+    /**
+     */
+    public CalendarComponentRestrictionSet() {
+        this(ComponentTypes.getAllSupportedComponentTypes());
+    }
 
     /**
      */
     public CalendarComponentRestrictionSet(int[] componentTypes) {
         super(CosmoDavPropertyName.CALENDARCOMPONENTRESTRICTIONSET, true);
         for (int i=0; i<componentTypes.length; i++) {
-            if (! isValidComponentType(componentTypes[i])) {
+            if (! ComponentTypes.isValidComponentType(componentTypes[i])) {
                 throw new IllegalArgumentException("Invalid component type '" +
                                                    componentTypes[i] + "'.");
             }
@@ -81,6 +76,7 @@ public class CalendarComponentRestrictionSet extends AbstractDavProperty {
             Element element = new Element(CosmoDavConstants.ELEMENT_CALDAV_COMP,
                                           CosmoDavConstants.NAMESPACE_CALDAV);
             element.setAttribute(CosmoDavConstants.ATTR_CALDAV_NAME,
+                                 ComponentTypes.
                                  getComponentTypeName(componentTypes[i]));
             elements.add(element);
         }
@@ -92,27 +88,5 @@ public class CalendarComponentRestrictionSet extends AbstractDavProperty {
      */
     public int[] getComponentTypes() {
         return componentTypes;
-    }
-
-    /**
-     */
-    public String getComponentTypeName(int componentType) {
-        switch (componentType) {
-        case VEVENT:
-            return "VEVENT";
-        case VFREEBUSY:
-            return "VFREEBUSY";
-        case VTIMEZONE:
-            return "VTIMEZONE";
-        }
-        throw new IllegalArgumentException("Invalid component type '" +
-                                           componentType + "'.");
-    }
-
-    /**
-     * Validates the specified component type.
-     */
-    public boolean isValidComponentType(int componentType) {
-        return componentType >= VEVENT && componentType <= VTIMEZONE;
     }
 }

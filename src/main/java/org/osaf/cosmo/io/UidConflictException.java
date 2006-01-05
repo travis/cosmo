@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.model;
+package org.osaf.cosmo.io;
 
 /**
- * An exception indicating that converting a model object to or from a
- * particular data format failed.
+ * An exception indicating that a calendar resource submitted for
+ * import specified a uid that is already in use by another calendar
+ * resource within the same calendar collection or a subcollection
+ * thereof.
  */
-public class ModelConversionException extends RuntimeException {
+public class UidConflictException extends RuntimeException {
+
+    private String uid;
 
     /**
      */
-    public ModelConversionException(String message) {
-        super(message);
+    public UidConflictException(String uid) {
+        super(uid);
+        this.uid = uid;
     }
 
     /**
      */
-    public ModelConversionException(String message, Throwable cause) {
-        super(message, cause);
+    public String getUid() {
+        return uid;
     }
 }

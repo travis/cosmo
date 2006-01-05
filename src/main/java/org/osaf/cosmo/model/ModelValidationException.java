@@ -18,7 +18,8 @@ package org.osaf.cosmo.model;
 import org.springframework.dao.DataIntegrityViolationException;
 
 /**
- * An exception indicating that a model object is somehow invalid.
+ * An exception indicating that a model object's data is syntactically
+ * incorrect.
  */
 public class ModelValidationException
     extends DataIntegrityViolationException {

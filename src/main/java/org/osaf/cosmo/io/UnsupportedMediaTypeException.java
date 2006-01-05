@@ -13,29 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dao;
+package org.osaf.cosmo.io;
 
 /**
- * An exception indicating that a particular calendar object is not
- * (yet) supported in Cosmo.
+ * An exception indicating that a resource submitted for import was
+ * not of a media type supported by the server in the specified
+ * location.
  */
-public class UnsupportedCalendarObjectException extends RuntimeException {
+public class UnsupportedMediaTypeException extends RuntimeException {
+
+    private String mediaType;
 
     /**
      */
-    public UnsupportedCalendarObjectException() {
-        super("no supported calendar components found within calendar object");
+    public UnsupportedMediaTypeException(String mediaType) {
+        super(mediaType);
+        this.mediaType = mediaType;
     }
 
     /**
      */
-    public UnsupportedCalendarObjectException(String message) {
-        super(message);
-    }
-
-    /**
-     */
-    public UnsupportedCalendarObjectException(String message, Throwable cause) {
-        super(message, cause);
+    public String getMediaType() {
+        return mediaType;
     }
 }

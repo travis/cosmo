@@ -290,11 +290,10 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
                 // calendar-component-restriction-set property (caldav
                 // section 4.3.2)
-                // the entire Cosmo server allows only the components
-                // specified by this constant, and this behavior can
-                // not be modified by clients
-                DavProperty davprop =
-                    new CalendarComponentRestrictionSet(ICALENDAR_COMPONENTS);
+                // the entire Cosmo server allows the same set of
+                // calendar components, and this behavior can not be
+                // modified by clients
+                DavProperty davprop = new CalendarComponentRestrictionSet();
                 properties.add(davprop);
 
                 // calendar-restrictions property (caldav section

@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.icalendar;
+package org.osaf.cosmo.io;
 
 /**
- * An exception indicating that an existing calendar resource is
- * already using the specified uid.
+ * An exception indicating that a calendar resource submitted for
+ * import did not contain at least one type of calendar component
+ * supported by Cosmo.
+ *
+ * @see org.osaf.cosmo.icalendar.ComponentTypes;
  */
-public class DuplicateUidException extends RuntimeException {
+public class UnsupportedCalendarComponentException extends RuntimeException {
 
     /**
      */
-    public DuplicateUidException(String message) {
+    public UnsupportedCalendarComponentException(String message) {
         super(message);
-    }
-
-    /**
-     */
-    public DuplicateUidException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

@@ -56,6 +56,12 @@ import org.osaf.cosmo.dav.impl.CosmoDavSessionProviderImpl;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.io.CosmoInputContext;
+import org.osaf.cosmo.io.InvalidCalendarObjectException;
+import org.osaf.cosmo.io.InvalidDataException;
+import org.osaf.cosmo.io.UidConflictException;
+import org.osaf.cosmo.io.UnsupportedCalendarComponentException;
+import org.osaf.cosmo.io.UnsupportedMediaTypeException;
+import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
@@ -187,16 +193,34 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         throws IOException, DavException {
         try {
             super.doPut(request, response, resource);
-        } catch (DavException e) {
-            // caldav (section 4.5): uid must be unique within a
-            // calendar collection
-            if (e.getMessage() != null &&
-                e.getMessage().startsWith("Duplicate uid")) {
-                response.sendError(DavServletResponse.SC_CONFLICT,
-                                   "Duplicate uid");
-                return;
-            }
-            throw e;
+        } catch (UnsupportedMediaTypeException e) {
+            // {CALDAV:supported-calendar-data}
+            response.sendError(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
+                               e.getMediaType());
+            return;
+        } catch (InvalidDataException e) {
+            // {CALDAV:valid-calendar-data
+            response.sendError(DavServletResponse.SC_BAD_REQUEST,
+                               e.getMessage());
+            return;
+        } catch (InvalidCalendarObjectException e) {
+            // {CALDAV:valid-calendar-object-resource
+            response.sendError(DavServletResponse.SC_PRECONDITION_FAILED,
+                               "Resource does not obey all calendar data " +
+                               "restrictions: " + e.getMessage());
+            return;
+        } catch (UnsupportedCalendarComponentException e) {
+            // {CALDAV:supported-calendar-component
+            response.sendError(DavServletResponse.SC_PRECONDITION_FAILED,
+                               "Resource does not contain at least one " +
+                               "supported calendar component: " +
+                               e.getMessage());
+            return;
+        } catch (UidConflictException e) {
+            // {CALDAV:no-uid-conflict
+            response.sendError(DavServletResponse.SC_CONFLICT,
+                               "Uid conflict: " + e.getUid());
+            return;
         }
 
         // caldav (section 4.6.2): return ETag header

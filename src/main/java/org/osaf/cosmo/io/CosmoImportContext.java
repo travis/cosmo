@@ -33,6 +33,7 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
+import org.osaf.cosmo.model.ModelConversionException;
 
 /**
  * Extends {@link org.apache.jackrabbit.server.io.ImportContextImpl}
@@ -94,7 +95,7 @@ public class CosmoImportContext extends ImportContextImpl
                 CalendarBuilder builder = new CalendarBuilder();
                 calendar = builder.build(getInputStream());
             } catch (ParserException e) {
-                throw new IOException(e.getMessage());
+                throw new InvalidDataException(e.getMessage());
             }
         }
         return calendar;

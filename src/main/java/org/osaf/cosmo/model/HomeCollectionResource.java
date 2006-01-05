@@ -21,74 +21,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * Extends {@link CollectionResource} to represent a user home
- * directory collection.
+ * directory collection. This is simply a placeholder for anticipated
+ * future functionality.
  */
 public class HomeCollectionResource extends CollectionResource {
-
-    private String description;
-    private String language;
-
-    /**
-     */
-    public HomeCollectionResource() {
-        super();
-    }
-
-    /**
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     */
-    public String getLanguage() {
-        return language;
-    }
-
-    /**
-     */
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    /**
-     */
-    public boolean equals(Object o) {
-        if (! (o instanceof HomeCollectionResource)) {
-            return false;
-        }
-        HomeCollectionResource it = (HomeCollectionResource) o;
-        return new EqualsBuilder().
-            appendSuper(super.equals(o)).
-            append(description, it.description).
-            append(language, it.language).
-            isEquals();
-    }
-
-    /**
-     */
-    public int hashCode() {
-        return new HashCodeBuilder(19, 23).
-            appendSuper(super.hashCode()).
-            append(description).
-            append(language).
-            toHashCode();
-    }
-
-    /**
-     */
-    public String toString() {
-        return new ToStringBuilder(this).
-            appendSuper(super.toString()).
-            append("description", description).
-            append("language", language).
-            toString();
-    }
 }

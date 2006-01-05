@@ -13,35 +13,6 @@ Node Type Definitions
 =====================
 
 NodeTypeName
-  calendar:home
-SuperTypes
-  []
-IsMixin
-  true
-HasOrderableChildNodes
-  false
-PrimaryItemName
-  null
-PropertyDef
-  Name calendar:description
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory false
-  OnParentVersion COPY
-  Protected false
-  Multiple false
-PropertyDef
-  Name xml:lang
-  RequiredType STRING
-  DefaultValues null
-  AutoCreate false
-  Mandatory true
-  OnParentVersion COPY
-  Protected false
-  Multiple false
-
-NodeTypeName
   calendar:collection
 SuperTypes
   []

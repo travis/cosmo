@@ -7,6 +7,17 @@ Node Type Definitions
 =====================
 
 NodeTypeName
+  cosmo:homecollection
+SuperTypes
+  []
+IsMixin
+  true
+HasOrderableChildNodes
+  false
+PrimaryItemName
+  null
+
+NodeTypeName
   cosmo:user
 SuperTypes
   []

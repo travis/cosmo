@@ -61,7 +61,7 @@ public class JcrResourceMapper implements JcrConstants {
         if (node.getPath().equals("/")) {
             return nodeToRootCollection(node, depth);
         }
-        if (node.isNodeType(NT_CALENDAR_HOME)) {
+        if (node.isNodeType(NT_HOME_COLLECTION)) {
             return nodeToHomeCollection(node, depth);
         }
         if (node.isNodeType(NT_CALENDAR_COLLECTION)) {
@@ -220,15 +220,6 @@ public class JcrResourceMapper implements JcrConstants {
         HomeCollectionResource collection = new HomeCollectionResource();
 
         setCommonResourceAttributes(collection, node);
-
-        if (node.hasProperty(NP_CALENDAR_DESCRIPTION)) {
-            collection.setDescription(node.
-                                      getProperty(NP_CALENDAR_DESCRIPTION).
-                                      getString());
-        }
-        if (node.hasProperty(NP_XML_LANG)) {
-            collection.setLanguage(node.getProperty(NP_XML_LANG).getString());
-        }
 
         if (depth > 0) {
             for (NodeIterator i=node.getNodes(); i.hasNext();) {

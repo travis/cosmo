@@ -85,7 +85,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     private Map ownedTickets;
     protected SupportedReportSetProperty supportedReports =
         new SupportedReportSetProperty();
-    private boolean isCalendarHomeCollection;
     private boolean isCalendarCollection;
 
     /**
@@ -102,8 +101,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         initSupportedReports();
 
         initializing = false;
-        isCalendarHomeCollection = exists() &&
-            getNode().isNodeType(NT_CALENDAR_HOME);
         isCalendarCollection = exists() &&
             getNode().isNodeType(NT_CALENDAR_COLLECTION);
     }
@@ -137,14 +134,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         } catch (RepositoryException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Returns true if this resource represents a calendar home
-     * collection.
-     */
-    public boolean isCalendarHomeCollection() {
-        return isCalendarHomeCollection;
     }
 
     /**
@@ -270,26 +259,22 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             super.initProperties();
             DavPropertySet properties = getProperties();
 
-            if (isCalendarCollection() ||
-                isCalendarHomeCollection()) {
-
+            if (isCalendarCollection()) {
                 // override the default resource type property with
                 // our own that sets the appropriate resource types
-                // for calendar home collections (caldav section 4.2)
-                // and calendar collections (caldav section 4.3)
+                // for calendar collections (caldav section 4.2)
                 int[] resourceTypes = new int[2];
                 resourceTypes[0] = CosmoResourceType.COLLECTION;
-                resourceTypes[1] = isCalendarCollection() ?
-                    CosmoResourceType.CALENDAR_COLLECTION :
-                    CosmoResourceType.CALENDAR_HOME;
+                resourceTypes[1] = CosmoResourceType.CALENDAR_COLLECTION;
                 properties.add(new CosmoResourceType(resourceTypes));
+
                 // Windows XP support
                 properties.add(new DefaultDavProperty(DavPropertyName.
                                                       ISCOLLECTION,
                                                       "1"));
 
                 // calendar-description property (caldav section
-                // 4.4.1)
+                // 4.3.1)
                 try {
                     if (getNode().hasProperty(NP_CALENDAR_DESCRIPTION)) {
                         String text = getNode().
@@ -302,11 +287,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                 } catch (RepositoryException e) {
                     log.warn("Unable to retrieve calendar description", e);
                 }
-            }
 
-            if (isCalendarCollection()) {
                 // calendar-component-restriction-set property (caldav
-                // section 4.4.2)
+                // section 4.3.2)
                 // the entire Cosmo server allows only the components
                 // specified by this constant, and this behavior can
                 // not be modified by clients
@@ -315,7 +298,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                 properties.add(davprop);
 
                 // calendar-restrictions property (caldav section
-                // 4.4.3)
+                // 4.3.3)
                 properties.add(new CalendarRestrictions());
             }
 

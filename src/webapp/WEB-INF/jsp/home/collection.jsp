@@ -50,7 +50,7 @@
         ${Collection.displayName}
       </td>
     </tr>
-    <c:if test="${Collection.class.name == 'org.osaf.cosmo.model.HomeCollectionResource' || Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionResource'}">
+    <c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionResource'}">
     <tr>
       <td class="mdLabel" style="text-align:right;">
         Description

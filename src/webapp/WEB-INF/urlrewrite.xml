@@ -28,6 +28,10 @@
     <to>/console/login?login_failed=1</to>
   </rule>
   <rule>
+    <from>^/console/user/create$</from>
+    <to>/console/user/create</to>
+  </rule>
+  <rule>
     <from>^/console/user/update$</from>
     <to>/console/user/update</to>
   </rule>

@@ -39,12 +39,12 @@ public interface JcrConstants {
     public static final String NT_TICKETABLE = "ticket:ticketable";
     public static final String NT_TICKET = "ticket:ticket";
 
-    public static final String NT_CALENDAR_HOME = "calendar:home";
     public static final String NT_CALENDAR_COLLECTION = "calendar:collection";
     public static final String NT_CALENDAR_RESOURCE = "calendar:resource";
     public static final String NT_EVENT_RESOURCE = "calendar:event";
 
     public static final String NT_USER = "cosmo:user";
+    public static final String NT_HOME_COLLECTION = "cosmo:homecollection";
 
     // node properties
 

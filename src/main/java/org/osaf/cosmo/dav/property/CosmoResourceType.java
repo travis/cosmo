@@ -28,7 +28,6 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
  * to define new resource types for CalDAV:
  *
  * <ul>
- * <li>{@link #CALENDAR_HOME CALDAV:calendar-home},</li>
  * <li>{@link #CALENDAR_COLLECTION CALDAV:calendar-collection},</li>
  * </ul>
  */
@@ -36,18 +35,11 @@ public class CosmoResourceType extends ResourceType {
     private static final Logger log = Logger.getLogger(CosmoResourceType.class);
 
     /**
-     * The calendar home resource type
-     */
-    public static final int CALENDAR_HOME = BASELINE + 1;
-
-    /**
      * The calendar collection resource type
      */
-    public static final int CALENDAR_COLLECTION = CALENDAR_HOME + 1;
+    public static final int CALENDAR_COLLECTION = BASELINE + 1;
 
     static {
-        registerResourceType(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_HOME,
-                             CosmoDavConstants.NAMESPACE_CALDAV);
         registerResourceType(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR,
                              CosmoDavConstants.NAMESPACE_CALDAV);
     }

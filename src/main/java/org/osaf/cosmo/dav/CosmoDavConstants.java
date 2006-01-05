@@ -61,8 +61,6 @@ public class CosmoDavConstants {
     public static final String ELEMENT_CALDAV_CALENDAR_HOME = "calendar-home";
     public static final String ELEMENT_CALDAV_CALENDAR = "calendar";
     public static final String ELEMENT_CALDAV_COMP = "comp";
-    public static final String ELEMENT_CALDAV_CALENDAR_DATA_ONLY =
-        "calendar-data-only";
     public static final String ELEMENT_CALDAV_CALENDAR_DATA = "calendar-data";
     public static final String ELEMENT_CALDAV_ALLCOMP = "allcomp";
     public static final String ELEMENT_CALDAV_ALLPROP = "allprop";

@@ -32,19 +32,10 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
 public class CalendarRestrictions extends AbstractDavProperty
     implements ICalendarConstants {
 
-    private boolean dataOnly;
-
-    /**
-     */
-    public CalendarRestrictions(boolean dataOnly) {
-        super(CosmoDavPropertyName.CALENDARRESTRICTIONS, true);
-        this.dataOnly = dataOnly;
-    }
-
     /**
      */
     public CalendarRestrictions() {
-        this(false);
+        super(CosmoDavPropertyName.CALENDARRESTRICTIONS, true);
     }
 
     /**
@@ -64,12 +55,6 @@ public class CalendarRestrictions extends AbstractDavProperty
      */
     public Object getValue() {
         Set elements = new HashSet();
-        if (dataOnly) {
-            Element element =
-                new Element(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA_ONLY,
-                            CosmoDavConstants.NAMESPACE_CALDAV);
-            elements.add(element);
-        }
         Element element =
             new Element(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
                         CosmoDavConstants.NAMESPACE_CALDAV);

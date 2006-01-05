@@ -316,9 +316,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
                 // calendar-restrictions property (caldav section
                 // 4.4.3)
-                // the entire Cosmo server allows non-calendar data
-                // within calendar collections, and this behavior can
-                // not be modified by clients
                 properties.add(new CalendarRestrictions());
             }
 

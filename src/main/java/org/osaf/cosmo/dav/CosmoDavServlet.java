@@ -264,41 +264,28 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                                 CosmoDavResponse response,
                                 CosmoDavResource resource)
         throws IOException, DavException {
-        // resource must be null
+        // {DAV:resource-must-be-null}
         if (resource.exists()) {
-            if (log.isDebugEnabled()) {
-                log.debug("cannot make calendar at " +
-                          resource.getResourcePath() + ": resource exists");
-            }
-            response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+            response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED,
+                               "Resource exists");
             return;
         }
 
-        // one or more intermediate collections must be created
+        // {DAV:calendar-collection-location-ok}
         CosmoDavResource parentResource =
             (CosmoDavResource) resource.getCollection();
         if (parentResource == null ||
             ! parentResource.exists()) {
-            if (log.isDebugEnabled()) {
-                log.debug("cannot make calendar at " +
-                          resource.getResourcePath() +
-                          ": one or more intermediate collections must be created");
-            }
-            response.sendError(DavServletResponse.SC_CONFLICT);
+            response.sendError(DavServletResponse.SC_CONFLICT,
+                               "One or more intermediate collections must be created");
             return;
         }
 
-        // parent resource must be a regular collection - calendar
-        // collections are not allowed within other calendar
-        // collections
+        // {DAV:calendar-collection-location-ok}
         if (! parentResource.isCollection() ||
             parentResource.isCalendarCollection()) {
-            if (log.isDebugEnabled()) {
-                log.debug("cannot make calendar at " +
-                          resource.getResourcePath() +
-                          ": parent resource must be a regular collection");
-            }
-            response.sendError(DavServletResponse.SC_FORBIDDEN);
+            response.sendError(DavServletResponse.SC_FORBIDDEN,
+                               "Parent resource must be a regular collection");
             return;
         }
 

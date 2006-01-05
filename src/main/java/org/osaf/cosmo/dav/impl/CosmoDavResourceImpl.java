@@ -274,7 +274,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                                                       "1"));
 
                 // calendar-description property (caldav section
-                // 4.3.1)
+                // 5.2.1)
                 try {
                     if (getNode().hasProperty(NP_CALENDAR_DESCRIPTION)) {
                         String text = getNode().
@@ -289,12 +289,12 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                 }
 
                 // supported-calendar-component-set property (caldav
-                // section 4.3.2)
+                // section 5.2.3)
                 DavProperty davprop = new SupportedCalendarComponentSet();
                 properties.add(davprop);
 
                 // supported-calendar-data property (caldav section
-                // 4.3.3)
+                // 5.2.4)
                 properties.add(new SupportedCalendarData());
             }
 

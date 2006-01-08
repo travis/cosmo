@@ -42,7 +42,7 @@
   </logger>
 
   <logger name="org.apache.jackrabbit">
-    <level value="DEBUG"/>
+    <level value="WARN"/>
   </logger>
 
   <!-- logs the original exception for dav error responses -->

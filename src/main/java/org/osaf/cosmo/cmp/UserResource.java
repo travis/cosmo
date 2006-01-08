@@ -107,7 +107,7 @@ public class UserResource implements CmpResource {
      *   <firstName>Brian</firstName>
      *   <lastName>Moseley</firstName>
      *   <email>bcm@osafoundation.org</email>
-     *   <url>http://localhost:8080/api/user/bcm</url>
+     *   <url>http://localhost:8080/cmp/user/bcm</url>
      *   <homedirUrl>http://localhost:8080/home/bcm</homedirUrl>
      * </user>
      * </pre>
@@ -237,7 +237,7 @@ public class UserResource implements CmpResource {
     /**
      */
     protected void calculateUserUrl() {
-        userUrl = urlBase + "/api/user/" + user.getUsername();
+        userUrl = urlBase + "/cmp/user/" + user.getUsername();
     }
 
     /**

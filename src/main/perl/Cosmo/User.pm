@@ -76,7 +76,7 @@ sub to_xml {
 
     return <<EOT;
 <?xml version="1.0" encoding="utf-8" ?>
-<user xmlns="http://osafoundation.org/cosmo">
+<user xmlns="http://osafoundation.org/cosmo/CMP">
   <username>$username</username>
   <password>$password</password>
   <firstName>$first_name</firstName>

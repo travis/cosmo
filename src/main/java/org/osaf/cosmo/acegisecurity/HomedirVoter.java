@@ -51,6 +51,9 @@ public class HomedirVoter implements AccessDecisionVoter {
 
         FilterInvocation fi = (FilterInvocation) object;
         String path = findResourcePath(fi);
+        if (path == null) {
+            return ACCESS_DENIED;
+        }
 
         return path.startsWith(username) ? ACCESS_GRANTED : ACCESS_DENIED;
     }

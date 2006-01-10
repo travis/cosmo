@@ -263,7 +263,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit</artifactId>
-      <version>osaf-20060104</version>
+      <version>osaf-20060110</version>
       <properties>
         <tomcat.bundle>true</tomcat.bundle>
       </properties>
@@ -271,7 +271,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-commons</artifactId>
-      <version>osaf-20051216</version>
+      <version>osaf-20060110</version>
       <properties>
         <tomcat.bundle>true</tomcat.bundle>
       </properties>
@@ -279,7 +279,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-server</artifactId>
-      <version>osaf-20051230</version>
+      <version>osaf-20060110</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -287,7 +287,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-server</artifactId>
-      <version>osaf-20051216</version>
+      <version>osaf-20060110</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -295,7 +295,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-webdav</artifactId>
-      <version>osaf-20051216</version>
+      <version>osaf-20060110</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

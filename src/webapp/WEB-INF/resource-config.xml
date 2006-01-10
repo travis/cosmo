@@ -9,7 +9,7 @@
     </nodetypes>
   </collection>
   <filter>
-    <class name="org.apache.jackrabbit.webdav.simple.DefaultResourceFilter"/>
+    <class name="org.apache.jackrabbit.webdav.simple.DefaultItemFilter"/>
     <nodetypes>
       <nodetype>nt:base</nodetype>
     </nodetypes>

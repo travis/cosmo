@@ -59,4 +59,6 @@
       <param name="schemaObjectPrefix" value="version_"/>
     </PersistenceManager>
   </Versioning>
+  <!-- don't specify a repository SearchIndex, so that /jcr:system is
+       not indexed -->
 </Repository>

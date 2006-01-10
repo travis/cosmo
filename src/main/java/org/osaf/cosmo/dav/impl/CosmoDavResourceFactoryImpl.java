@@ -74,8 +74,8 @@ public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
         CosmoDavResourceImpl resource = (CosmoDavResourceImpl)
             super.createResource(locator, request, response);
         CosmoDavRequest cosmoRequest = (CosmoDavRequest) request;
-        if (isCreateRequest(request)) {
-            resource.setIsCalendarCollection(isCreateCalendarCollectionRequest(request));
+        if (CosmoDavMethods.isCreateRequest(request)) {
+            resource.setIsCalendarCollection(CosmoDavMethods.isCreateCalendarCollectionRequest(request));
         }
         resource.setBaseUrl(cosmoRequest.getBaseUrl());
         return resource;
@@ -98,30 +98,6 @@ public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
         }
     }
 
-    /**
-     * Augments superclass method to also return <code>true</code> for
-     * <code>MKCALENDAR</code> requests.
-     */
-    protected boolean isCreateRequest(DavServletRequest request) {
-        if (CosmoDavMethods.getMethodCode(request.getMethod()) ==
-            CosmoDavMethods.DAV_MKCALENDAR) {
-            return true;
-        }
-        return super.isCreateRequest(request);
-    }
-
-    /**
-     * Augments superclass method to also return <code>true</code> for
-     * <code>MKCALENDAR</code> requests.
-     */
-    protected boolean isCreateCollectionRequest(DavServletRequest request) {
-        if (CosmoDavMethods.getMethodCode(request.getMethod()) ==
-            CosmoDavMethods.DAV_MKCALENDAR) {
-            return true;
-        }
-        return super.isCreateCollectionRequest(request);
-    }
-
     // CosmoDavResourceFactory methods
 
     /**
@@ -131,18 +107,6 @@ public class CosmoDavResourceFactoryImpl extends ResourceFactoryImpl
     }
 
     // our methods
-
-    /**
-     * Augments superclass method to also return <code>true</code> for
-     * <code>MKCALENDAR</code> requests.
-     */
-    protected boolean isCreateCalendarCollectionRequest(DavServletRequest request) {
-        if (CosmoDavMethods.getMethodCode(request.getMethod()) ==
-            CosmoDavMethods.DAV_MKCALENDAR) {
-            return true;
-        }
-        return false;
-    }
 
     /**
      */

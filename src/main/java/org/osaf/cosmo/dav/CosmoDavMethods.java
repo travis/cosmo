@@ -18,6 +18,7 @@ package org.osaf.cosmo.dav;
 import java.util.HashMap;
 
 import org.apache.jackrabbit.webdav.DavMethods;
+import org.apache.jackrabbit.webdav.DavServletRequest;
 
 /**
  * Mimics {@link org.apache.jackrabbit.webdav.DavMethods} to define
@@ -49,6 +50,40 @@ public class CosmoDavMethods extends DavMethods {
      */
     public static final int DAV_MKCALENDAR = DAV_DELTICKET + 1;
     public static final String METHOD_MKCALENDAR = "MKCALENDAR";
+
+    /**
+     * Augments superclass method to also return <code>true</code> for
+     * <code>MKCALENDAR</code> requests.
+     */
+    public static boolean isCreateRequest(DavServletRequest request) {
+        if (getMethodCode(request.getMethod()) == DAV_MKCALENDAR) {
+            return true;
+        }
+        return DavMethods.isCreateRequest(request);
+    }
+
+    /**
+     * Augments superclass method to also return <code>true</code> for
+     * <code>MKCALENDAR</code> requests.
+     */
+    public static boolean isCreateCollectionRequest(DavServletRequest request) {
+        if (getMethodCode(request.getMethod()) == DAV_MKCALENDAR) {
+            return true;
+        }
+        return DavMethods.isCreateCollectionRequest(request);
+    }
+
+    /**
+     * Augments superclass method to also return <code>true</code> for
+     * <code>MKCALENDAR</code> requests.
+     */
+    public static boolean
+        isCreateCalendarCollectionRequest(DavServletRequest request) {
+        if (getMethodCode(request.getMethod()) == DAV_MKCALENDAR) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Return the type code for a dav method. Valid type codes are

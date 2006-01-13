@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.mock;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -48,6 +49,8 @@ public class MockUserDao implements UserDao {
         overlord.setPassword("32a8bd4d676f4fef0920c7da8db2bad7");
         overlord.setEmail("root@localhost");
         overlord.setAdmin(true);
+        overlord.setDateCreated(new Date());
+        overlord.setDateModified(new Date());
         createUser(overlord);
     }
 

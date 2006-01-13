@@ -29,8 +29,9 @@ import org.jdom.input.SAXBuilder;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.cmp.CmpServlet;
 import org.osaf.cosmo.dao.mock.MockUserDao;
-import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.mock.MockSecurityManager;
+import org.osaf.cosmo.security.mock.MockUserPrincipal;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.impl.StandardUserService;
 
@@ -50,7 +51,7 @@ public abstract class BaseCmpServletTestCase extends TestCase {
 
     protected TestHelper testHelper;
     protected UserService userService;
-    protected CosmoSecurityManager securityManager;
+    protected MockSecurityManager securityManager;
     protected MockServletContext servletContext;
     protected CmpServlet servlet;
 
@@ -89,6 +90,12 @@ public abstract class BaseCmpServletTestCase extends TestCase {
         request.setServletPath(SERVLET_PATH);
         request.setPathInfo(cmpPath);
         return request;
+    }
+
+    /**
+     */
+    protected void logInUser(User user) {
+        securityManager.setUpMockSecurityContext(new MockUserPrincipal(user));
     }
 
     /**

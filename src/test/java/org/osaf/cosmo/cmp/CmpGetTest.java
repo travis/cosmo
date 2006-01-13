@@ -40,6 +40,38 @@ public class CmpGetTest extends BaseCmpServletTestCase {
 
     /**
      */
+    public void testGetAccount() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        u1 = userService.createUser(u1);
+
+        logInUser(u1);
+
+        MockHttpServletRequest request = createMockRequest("GET", "/account");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals(response.getStatus(), MockHttpServletResponse.SC_OK);
+        assertNotNull(response.getHeader("ETag"));
+
+        CmpUser user = createUserFromXml(readXmlResponse(response));
+        assertNotNull("user null", user);
+        assertNotNull("user has no username", user.getUsername());
+        assertEquals("usernames don't match", user.getUsername(),
+                     u1.getUsername());
+        assertNotNull("user has no first name", user.getFirstName());
+        assertEquals("first names don't match", user.getFirstName(),
+                     u1.getFirstName());
+        assertNotNull("user has no last name", user.getLastName());
+        assertEquals("last names don't match", user.getLastName(),
+                     u1.getLastName());
+        assertNotNull("user has no email", user.getEmail());
+        assertEquals("emails don't match", user.getEmail(), u1.getEmail());
+        assertNotNull("user has no url", user.getUrl());
+        assertNotNull("user has no homedir url", user.getHomedirUrl());
+    }
+
+    /**
+     */
     public void testGetUsers() throws Exception {
         User u1 = testHelper.makeDummyUser();
         userService.createUser(u1);
@@ -52,9 +84,9 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
 
-        Document xmldoc = readXmlResponse(response);
-        Set users = createUsersFromXml(xmldoc);
+        assertEquals(response.getStatus(), MockHttpServletResponse.SC_OK);
 
+        Set users = createUsersFromXml(readXmlResponse(response));
         assertTrue(users.size() == 4); // account for overlord
         // can't just blindly check users.contains(u1) cos users read
         // from the response don't have passwords
@@ -76,6 +108,96 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         assertNotNull("overlord has no email", overlord.getEmail());
         assertNotNull("overlord has no url", overlord.getUrl());
         assertNull("overlord has a homedir url", overlord.getHomedirUrl());
+    }
+
+    /**
+     */
+    public void testGetUser() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        u1 = userService.createUser(u1);
+
+        MockHttpServletRequest request =
+            createMockRequest("GET", "/user/" + u1.getUsername());
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals(response.getStatus(), MockHttpServletResponse.SC_OK);
+        assertNotNull(response.getHeader("ETag"));
+
+        CmpUser user = createUserFromXml(readXmlResponse(response));
+        assertNotNull("user null", user);
+        assertNotNull("user has no username", user.getUsername());
+        assertEquals("usernames don't match", user.getUsername(),
+                     u1.getUsername());
+        assertNotNull("user has no first name", user.getFirstName());
+        assertEquals("first names don't match", user.getFirstName(),
+                     u1.getFirstName());
+        assertNotNull("user has no last name", user.getLastName());
+        assertEquals("last names don't match", user.getLastName(),
+                     u1.getLastName());
+        assertNotNull("user has no email", user.getEmail());
+        assertEquals("emails don't match", user.getEmail(), u1.getEmail());
+        assertNotNull("user has no url", user.getUrl());
+        assertNotNull("user has no homedir url", user.getHomedirUrl());
+    }
+
+    /**
+     */
+    public void testGetOverlord() throws Exception {
+        MockHttpServletRequest request =
+            createMockRequest("GET", "/user/" + User.USERNAME_OVERLORD);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals(response.getStatus(), MockHttpServletResponse.SC_OK);
+        assertNotNull(response.getHeader("ETag"));
+
+        CmpUser overlord = createUserFromXml(readXmlResponse(response));
+        assertNotNull("overlord null", overlord);
+        assertNotNull("overlord has no username", overlord.getUsername());
+        assertEquals("usernames don't match", overlord.getUsername(),
+                     User.USERNAME_OVERLORD);
+        assertNotNull("overlord has no first name", overlord.getFirstName());
+        assertNotNull("overlord has no last name", overlord.getLastName());
+        assertNotNull("overlord has no email", overlord.getEmail());
+        assertNotNull("overlord has no url", overlord.getUrl());
+        assertNull("overlord has a homedir url", overlord.getHomedirUrl());
+    }
+
+    /**
+     */
+    public void testGetNonExistentUser() throws Exception {
+        MockHttpServletRequest request =
+            createMockRequest("GET", "/user/deadbeef");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertTrue(response.getStatus() ==
+                   MockHttpServletResponse.SC_NOT_FOUND);
+    }
+
+    /**
+     */
+    public void testGetUserWithoutUsername() throws Exception {
+        MockHttpServletRequest request =
+            createMockRequest("GET", "/user/");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertTrue(response.getStatus() ==
+                   MockHttpServletResponse.SC_NOT_FOUND);
+    }
+
+    /**
+     */
+    public void testGetBadCommand() throws Exception {
+        MockHttpServletRequest request =
+            createMockRequest("GET", "/deadbeef");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertTrue(response.getStatus() ==
+                   MockHttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     private Set createUsersFromXml(Document doc)

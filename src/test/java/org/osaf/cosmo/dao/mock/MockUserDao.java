@@ -39,6 +39,16 @@ public class MockUserDao implements UserDao {
     public MockUserDao() {
         usernameIdx = new HashMap();
         emailIdx = new HashMap();
+
+        // add overlord user
+        User overlord = new User();
+        overlord.setUsername(User.USERNAME_OVERLORD);
+        overlord.setFirstName("Cosmo");
+        overlord.setLastName("Administrator");
+        overlord.setPassword("32a8bd4d676f4fef0920c7da8db2bad7");
+        overlord.setEmail("root@localhost");
+        overlord.setAdmin(true);
+        createUser(overlord);
     }
 
     // UserDao methods

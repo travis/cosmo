@@ -355,6 +355,11 @@
     </dependency>
     <dependency>
       <groupId>springframework</groupId>
+      <artifactId>spring-mock</artifactId>
+      <version>1.2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>springframework</groupId>
       <artifactId>spring-support</artifactId>
       <version>1.2.6</version>
       <properties>

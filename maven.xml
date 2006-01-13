@@ -78,7 +78,13 @@
     <delete file="${basedir}/derby.log"/>
   </postGoal>
 
-  <preGoal name="test:test-resources">
+  <preGoal name="test:test">
+    <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
+      <attainGoal name="test:reposetup"/>
+    </j:if>
+  </preGoal>
+
+  <preGoal name="test:single">
     <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
       <attainGoal name="test:reposetup"/>
     </j:if>

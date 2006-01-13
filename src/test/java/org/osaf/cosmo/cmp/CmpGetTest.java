@@ -61,6 +61,21 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         assertTrue("User 1 not found in users", containsUser(users, u1));
         assertTrue("User 2 not found in users", containsUser(users, u2));
         assertTrue("User 3 not found in users", containsUser(users, u3));
+
+        CmpUser regular = findUser(users, u1.getUsername());
+        assertNotNull("regular user has no first name", regular.getFirstName());
+        assertNotNull("regular user has no last name", regular.getLastName());
+        assertNotNull("regular user has no email", regular.getEmail());
+        assertNotNull("regular user has no url", regular.getUrl());
+        assertNotNull("regular user has no homedir url",
+                      regular.getHomedirUrl());
+
+        CmpUser overlord = findUser(users, User.USERNAME_OVERLORD);
+        assertNotNull("overlord has no first name", overlord.getFirstName());
+        assertNotNull("overlord has no last name", overlord.getLastName());
+        assertNotNull("overlord has no email", overlord.getEmail());
+        assertNotNull("overlord has no url", overlord.getUrl());
+        assertNull("overlord has a homedir url", overlord.getHomedirUrl());
     }
 
     private Set createUsersFromXml(Document doc)
@@ -76,14 +91,14 @@ public class CmpGetTest extends BaseCmpServletTestCase {
                                          CmpResource.NS_CMP).iterator();
              i.hasNext();) {
             Element e = (Element) i.next();
-            User u = createUserFromXml(e);
+            CmpUser u = createUserFromXml(e);
             users.add(u);
         }
 
         return users;
     }
 
-    private User createUserFromXml(Document doc)
+    private CmpUser createUserFromXml(Document doc)
         throws Exception {
         if (doc == null) {
             return null;
@@ -91,13 +106,13 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         return createUserFromXml(doc.getRootElement());
     }
 
-    private User createUserFromXml(Element root)
+    private CmpUser createUserFromXml(Element root)
         throws Exception {
         if (root == null) {
             return null;
         }
 
-        User u = new User();
+        CmpUser u = new CmpUser();
 
         Element e = root.getChild(UserResource.EL_USERNAME, CmpResource.NS_CMP);
         u.setUsername(getTextContent(e));
@@ -111,6 +126,14 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         e = root.getChild(UserResource.EL_EMAIL, CmpResource.NS_CMP);
         u.setEmail(getTextContent(e));
 
+        e = root.getChild(UserResource.EL_URL, CmpResource.NS_CMP);
+        u.setUrl(getTextContent(e));
+
+        e = root.getChild(UserResource.EL_HOMEDIRURL, CmpResource.NS_CMP);
+        if (e != null) {
+            u.setHomedirUrl(getTextContent(e));
+        }
+
         return u;
     }
 
@@ -119,12 +142,37 @@ public class CmpGetTest extends BaseCmpServletTestCase {
     }
 
     private boolean containsUser(Set users, User test) {
+        return findUser(users, test.getUsername()) != null;
+    }
+
+    private CmpUser findUser(Set users, String username) {
         for (Iterator i=users.iterator(); i.hasNext();) {
-            User u = (User) i.next();
-            if (u.getUsername().equals(test.getUsername())) {
-                return true;
+            CmpUser u = (CmpUser) i.next();
+            if (u.getUsername().equals(username)) {
+                return u;
             }
         }
-        return false;
+        return null;
+    }
+
+    public class CmpUser extends User {
+        private String url;
+        private String homedirUrl;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getHomedirUrl() {
+            return homedirUrl;
+        }
+
+        public void setHomedirUrl(String homedirUrl) {
+            this.homedirUrl = homedirUrl;
+        }
     }
 }

@@ -255,7 +255,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     }
 
     /**
-     * Executes the MKTICKET method
+     * Executes the MKCALENDARmethod
      *
      * @throws IOException
      * @throws DavException

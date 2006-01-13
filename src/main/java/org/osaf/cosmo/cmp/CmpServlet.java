@@ -112,12 +112,16 @@ public class CmpServlet extends HttpServlet {
         super.init();
 
         wac = WebApplicationContextUtils.
-            getRequiredWebApplicationContext(getServletContext());
+            getWebApplicationContext(getServletContext());
 
-        userService = (UserService)
-            getBean(BEAN_USER_SERVICE, UserService.class);
-        securityManager = (CosmoSecurityManager)
-            getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
+        if (userService == null) {
+            userService = (UserService)
+                getBean(BEAN_USER_SERVICE, UserService.class);
+        }
+        if (securityManager == null) {
+            securityManager = (CosmoSecurityManager)
+                getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
+        }
     }
 
     // HttpServlet methods
@@ -211,13 +215,39 @@ public class CmpServlet extends HttpServlet {
     // our methods
 
     /**
+     */
+    public UserService getUserService() {
+        return userService;
+    }
+
+    /**
+     */
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    /**
+     */
+    public CosmoSecurityManager getSecurityManager() {
+        return securityManager;
+    }
+
+    /**
+     */
+    public void setSecurityManager(CosmoSecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
+    // private methods
+
+    /**
      * Enforces preconditions on all PUT requests, including content
      * length and content type checks. Returns <code>true</code> if
      * all preconditions are met, otherwise sets the appropriate
      * error response code and returns <code>false</code>.
      */
-    protected boolean checkPutPreconditions(HttpServletRequest req,
-                                            HttpServletResponse resp) {
+    private boolean checkPutPreconditions(HttpServletRequest req,
+                                          HttpServletResponse resp) {
         if (req.getContentLength() <= 0) {
             resp.setStatus(HttpServletResponse.SC_LENGTH_REQUIRED);
             return false;
@@ -243,8 +273,8 @@ public class CmpServlet extends HttpServlet {
      * requests, removing the user and setting the response status and
      * headers.
      */
-    protected void processUserDelete(HttpServletRequest req,
-                                     HttpServletResponse resp)
+    private void processUserDelete(HttpServletRequest req,
+                                   HttpServletResponse resp)
         throws ServletException, IOException {
         String username = usernameFromPathInfo(req.getPathInfo());
         if (username == null) {
@@ -265,8 +295,8 @@ public class CmpServlet extends HttpServlet {
      * user, setting the response status and headers, and writing the
      * response content.
      */
-    protected void processAccountGet(HttpServletRequest req,
-                                     HttpServletResponse resp)
+    private void processAccountGet(HttpServletRequest req,
+                                   HttpServletResponse resp)
         throws ServletException, IOException {
         User user = getLoggedInUser();
         UserResource resource = new UserResource(user, getUrlBase(req));
@@ -280,8 +310,8 @@ public class CmpServlet extends HttpServlet {
      * requests, retrieving all user accounts, setting the response
      * status and headers, and writing the response content.
      */
-    protected void processUsersGet(HttpServletRequest req,
-                                   HttpServletResponse resp)
+    private void processUsersGet(HttpServletRequest req,
+                                 HttpServletResponse resp)
         throws ServletException, IOException {
         Set users = userService.getUsers();
         resp.setStatus(HttpServletResponse.SC_OK);
@@ -293,8 +323,8 @@ public class CmpServlet extends HttpServlet {
      * requests, retrieving the user account, setting the response
      * status and headers, and writing the response content.
      */
-    protected void processUserGet(HttpServletRequest req,
-                                  HttpServletResponse resp)
+    private void processUserGet(HttpServletRequest req,
+                                HttpServletResponse resp)
         throws ServletException, IOException {
         String username = usernameFromPathInfo(req.getPathInfo());
         if (username == null) {
@@ -317,8 +347,8 @@ public class CmpServlet extends HttpServlet {
      * requests, creating the user account and setting the response
      * status and headers.
      */
-    protected void processSignup(HttpServletRequest req,
-                                 HttpServletResponse resp)
+    private void processSignup(HttpServletRequest req,
+                               HttpServletResponse resp)
         throws ServletException, IOException {
         try {
             Document xmldoc = readXmlRequest(req);
@@ -344,8 +374,8 @@ public class CmpServlet extends HttpServlet {
      * requests for the currently logged in user, saving the modified
      * account and setting the response status and headers.
      */
-    protected void processAccountUpdate(HttpServletRequest req,
-                                        HttpServletResponse resp)
+    private void processAccountUpdate(HttpServletRequest req,
+                                      HttpServletResponse resp)
         throws ServletException, IOException {
         try {
             Document xmldoc = readXmlRequest(req);
@@ -381,8 +411,8 @@ public class CmpServlet extends HttpServlet {
      * requests, creating the user account and setting the response
      * status and headers.
      */
-    protected void processUserCreate(HttpServletRequest req,
-                                     HttpServletResponse resp)
+    private void processUserCreate(HttpServletRequest req,
+                                   HttpServletResponse resp)
         throws ServletException, IOException {
         try {
             Document xmldoc = readXmlRequest(req);
@@ -415,9 +445,9 @@ public class CmpServlet extends HttpServlet {
      * requests, saving the modified account and setting the response
      * status and headers.
      */
-    protected void processUserUpdate(HttpServletRequest req,
-                                     HttpServletResponse resp,
-                                     User user)
+    private void processUserUpdate(HttpServletRequest req,
+                                   HttpServletResponse resp,
+                                   User user)
         throws ServletException, IOException {
         try {
             Document xmldoc = readXmlRequest(req);
@@ -444,8 +474,8 @@ public class CmpServlet extends HttpServlet {
 
     /**
      */
-    protected void handleModelValidationError(HttpServletResponse resp,
-                                              ModelValidationException e)
+    private void handleModelValidationError(HttpServletResponse resp,
+                                            ModelValidationException e)
         throws IOException {
         if (e instanceof DuplicateUsernameException) {
             sendApiError(resp, CmpConstants.SC_USERNAME_IN_USE);
@@ -461,8 +491,8 @@ public class CmpServlet extends HttpServlet {
 
     /**
      */
-    protected void sendApiError(HttpServletResponse resp,
-                                int errorCode)
+    private void sendApiError(HttpServletResponse resp,
+                              int errorCode)
         throws IOException {
         resp.sendError(errorCode, CmpConstants.getReasonPhrase(errorCode));
     }
@@ -474,7 +504,7 @@ public class CmpServlet extends HttpServlet {
      * @param name the bean's name
      * @param clazz the bean's class
      */
-    protected Object getBean(String name, Class clazz)
+    private Object getBean(String name, Class clazz)
         throws ServletException {
         try {
             return wac.getBean(name, clazz);
@@ -487,19 +517,13 @@ public class CmpServlet extends HttpServlet {
 
     /**
      */
-    public WebApplicationContext getWebApplicationContext() {
-        return wac;
-    }
-
-    /**
-     */
-    protected User getLoggedInUser() {
+    private User getLoggedInUser() {
         return securityManager.getSecurityContext().getUser();
     }
 
     /**
      */
-    protected String usernameFromPathInfo(String pathInfo) {
+    private String usernameFromPathInfo(String pathInfo) {
         if (pathInfo.startsWith("/user/")) {
             String username = pathInfo.substring(6);
             if (! (username.equals("") ||
@@ -512,7 +536,7 @@ public class CmpServlet extends HttpServlet {
 
     /**
      */
-    protected Document readXmlRequest(HttpServletRequest req)
+    private Document readXmlRequest(HttpServletRequest req)
         throws JDOMException, IOException {
         InputStream in = req.getInputStream();
         if (in == null) {
@@ -524,8 +548,8 @@ public class CmpServlet extends HttpServlet {
 
     /**
      */
-    protected void sendXmlResponse(HttpServletResponse resp,
-                                   CmpResource resource)
+    private void sendXmlResponse(HttpServletResponse resp,
+                                 CmpResource resource)
         throws IOException {
         // pretty format is easier for CMP scripters to read
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
@@ -541,7 +565,7 @@ public class CmpServlet extends HttpServlet {
 
     /**
      */
-    protected String getUrlBase(HttpServletRequest req) {
+    private String getUrlBase(HttpServletRequest req) {
         // like response.encodeUrl() except does not include servlet
         // path or session id
         StringBuffer buf = new StringBuffer();

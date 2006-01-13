@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.cmp;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -27,6 +30,8 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
  * A resource view of a {@link User}.
  */
 public class UserResource implements CmpResource {
+    private static final Log log = LogFactory.getLog(UserResource.class);
+
     /**
      */
     public static final String EL_USER = "user";
@@ -58,6 +63,7 @@ public class UserResource implements CmpResource {
     private String homedirUrl;
 
     /**
+     * Constructs a resource that represents the given {@link User}.
      */
     public UserResource(User user, String urlBase) {
         this.user = user;
@@ -67,21 +73,25 @@ public class UserResource implements CmpResource {
     }
 
     /**
+     * Constructs a resource that represents the given {@link User}
+     * and updates its properties as per the given
+     * {@link org.jdom.Document}.
      */
     public UserResource(User user, String urlBase, Document doc) {
         this.user = user;
         this.urlBase = urlBase;
-        setUserProperties(doc);
+        setUser(doc);
         calculateUserUrl();
         calculateHomedirUrl();
     }
 
     /**
+     * Constructs a resource that represents a {@link User}
+     * with properties as per the given {@link org.jdom.Document}.
      */
     public UserResource(String urlBase, Document doc) {
-        this.user = new User();
         this.urlBase = urlBase;
-        setUserProperties(doc);
+        setUser(doc);
         calculateUserUrl();
         calculateHomedirUrl();
     }
@@ -183,7 +193,7 @@ public class UserResource implements CmpResource {
 
     /**
      */
-    protected void setUserProperties(Document doc) {
+    protected void setUser(Document doc) {
         if (doc == null) {
             return;
         }

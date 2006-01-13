@@ -15,8 +15,12 @@
  */
 package org.osaf.cosmo.cmp;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -27,6 +31,8 @@ import org.osaf.cosmo.model.User;
  * An interface for Cosmo API resources
  */
 public class UsersResource implements CmpResource {
+    private static final Log log = LogFactory.getLog(UsersResource.class);
+
     /**
      */
     public static final String EL_USERS = "users";
@@ -35,6 +41,7 @@ public class UsersResource implements CmpResource {
     private String urlBase;
 
     /**
+     * Constructs a resource that represents the given {@link User}s.
      */
     public UsersResource(Set users, String urlBase) {
         this.users = users;
@@ -75,5 +82,13 @@ public class UsersResource implements CmpResource {
             e.addContent(ue);
         }
         return new Document(e);
+    }
+
+    // our methods
+
+    /**
+     */
+    public Set getUsers() {
+        return users;
     }
 }

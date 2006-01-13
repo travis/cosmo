@@ -64,7 +64,7 @@ public class StandardUserServiceTest extends TestCase {
 
         Set users = service.getUsers();
 
-        assertTrue(users.size() == 3);
+        assertTrue(users.size() == 4); // account for overlord
         assertTrue("User 1 not found in users", users.contains(u1));
         assertTrue("User 2 not found in users", users.contains(u2));
         assertTrue("User 3 not found in users", users.contains(u3));

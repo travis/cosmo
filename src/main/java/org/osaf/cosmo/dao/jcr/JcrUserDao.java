@@ -40,7 +40,6 @@ import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * Implementation of <code>UserDao</code> that operates against a

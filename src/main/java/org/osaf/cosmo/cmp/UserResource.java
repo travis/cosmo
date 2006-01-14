@@ -91,6 +91,7 @@ public class UserResource implements CmpResource {
      */
     public UserResource(String urlBase, Document doc) {
         this.urlBase = urlBase;
+        this.user = new User();
         setUser(doc);
         calculateUserUrl();
         calculateHomedirUrl();

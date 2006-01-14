@@ -16,6 +16,7 @@
 package org.osaf.cosmo.cmp;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 import junit.framework.TestCase;
 
@@ -25,6 +26,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.cmp.CmpServlet;
@@ -96,6 +99,19 @@ public abstract class BaseCmpServletTestCase extends TestCase {
      */
     protected void logInUser(User user) {
         securityManager.setUpMockSecurityContext(new MockUserPrincipal(user));
+    }
+
+    /**
+     */
+    protected void sendXmlRequest(MockHttpServletRequest request,
+                                  Document doc)
+        throws Exception {
+        XMLOutputter outputter = new XMLOutputter(Format.getCompactFormat());
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        outputter.output(doc, buf);
+        request.setContentType("text/xml");
+        request.setCharacterEncoding("UTF-8");
+        request.setContent(buf.toByteArray());;
     }
 
     /**

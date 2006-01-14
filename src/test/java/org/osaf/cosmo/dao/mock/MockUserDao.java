@@ -22,9 +22,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.osaf.cosmo.dao.UserDao;
+import org.osaf.cosmo.model.DuplicateEmailException;
+import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DataRetrievalFailureException;
 
 /**
@@ -96,11 +97,12 @@ public class MockUserDao implements UserDao {
         if (user == null) {
             throw new IllegalArgumentException("null user");
         }
+        user.validate();
         if (usernameIdx.containsKey(user.getUsername())) {
-            throw new DataIntegrityViolationException("username in use");
+            throw new DuplicateUsernameException("username in use");
         }
         if (emailIdx.containsKey(user.getEmail())) {
-            throw new DataIntegrityViolationException("email in use");
+            throw new DuplicateEmailException("email in use");
         }
         usernameIdx.put(user.getUsername(), user);
         emailIdx.put(user.getEmail(), user);
@@ -112,6 +114,7 @@ public class MockUserDao implements UserDao {
         if (user == null) {
             throw new IllegalArgumentException("null user");
         }
+        user.validate();
         String key = user.isUsernameChanged() ?
             user.getOldUsername() :
             user.getUsername();
@@ -120,10 +123,10 @@ public class MockUserDao implements UserDao {
         }
         if (user.isUsernameChanged() &&
             usernameIdx.containsKey(user.getUsername())) {
-            throw new DataIntegrityViolationException("username in use");
+            throw new DuplicateUsernameException("username in use");
         }
         if (user.isEmailChanged() && emailIdx.containsKey(user.getEmail())) {
-            throw new DataIntegrityViolationException("email in use");
+            throw new DuplicateEmailException("email in use");
         }
         usernameIdx.put(user.getUsername(), user);
         if (user.isUsernameChanged()) {

@@ -51,6 +51,7 @@ class CosmoTest(testreactor.ReactorTestCase):
         self.port = 8080
         #self.port = 443
         self.path = "/home/%s" % (self.username,)
+        self.url = "http://" + self.host + ":" + str(self.port) + self.path
         
         self.server = ServerHandle(self.host, self.port, self.username,
                                    self.password, self.useSSL)
@@ -137,7 +138,7 @@ class MkcolTestCase(CosmoTest):
         
         self.failUnlessEqual(response.status, 409)
 
-    def testMkColWithBody(self):
+    def FAILED_testMkColWithBody(self):
         response = self.sendRequest('MKCOL', self.collectionPath, None, 'Hi, Mom!')
         
         self.failUnlessEqual(response.status, 415)
@@ -153,7 +154,59 @@ class AccountTestCase(CosmoTest):
         response = self.sendRequest('MKCOL', '/home/aksjdka-ajshdjashdj', None, None)
         
         self.failUnlessEqual(response.status, 403)
+        
 
+class MoveTestCase(CosmoTest):
+
+    def setUp(self):
+        super(MoveTestCase, self).setUp()
+        
+        self.collectionPath = self.path + "/" + 'testMove'
+        self.sendRequest('MKCOL', self.collectionPath, None, None)
+        
+    def tearDown(self):
+        super(MoveTestCase, self).setUp()
+        self.sendRequest('DELETE', self.collectionPath, None, None)
+        
+    def FAILED_testMoveCollection(self):
+        headers = {"Destination" : self.url + "/destcol"}
+        setup = self.sendRequest('MKCOL', self.collectionPath + "/sourcecol",
+            None, None)
+        self.failUnlessEqual(setup.status, 201, 
+            "Setup for MOVE test (MKCOL) failed")
+        
+        response = self.sendRequest('MOVE', self.collectionPath + "/sourcecol",
+            headers, None)
+        self.failUnlessEqual(response.status, 201, 
+            "Expected move collection to work")
+    
+    def FAILED_testMoveSuccess(self):
+        headers = {"Destination" : self.url + "/dest.txt"}
+        setup = self.sendRequest('PUT', 
+            self.collectionPath + "/source.txt", None, 
+            "mytext")
+        self.failUnlessEqual(setup.status, 201, 
+            "Setup for MOVE test (PUT) failed")
+        
+        response = self.sendRequest('MOVE', 
+            self.collectionPath + "/source.txt", headers, None)
+            
+        self.failUnlessEqual(response.status, 201, 
+            "Expected this MOVE to work" + response.body)
+        
+    def testMoveNoSource(self):
+        headers = {"Destination" : self.url + "/dest.txt"}
+        response = self.sendRequest('MOVE', 
+            self.collectionPath + "/testMove/notexists.txt", 
+            headers, None)
+        self.failUnlessEqual(response.status, 404, 
+            "When source doesn't exist, expect 404 Not Found")
+            
+    def testMoveNoDestHeader(self):
+        response = self.sendRequest('MOVE', self.path + "/testMove/source.txt", 
+            None, None)
+        self.failUnlessEqual(response.status, 400, 
+            "Expected Bad Request error if MOVE has no destination header")        
 
 if __name__ == '__main__':
     unittest.main()

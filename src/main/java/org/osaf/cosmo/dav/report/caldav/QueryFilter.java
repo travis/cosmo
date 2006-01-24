@@ -23,9 +23,13 @@ import java.util.Vector;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.util.Dates;
+import net.fortuna.ical4j.util.TimeZones;
 
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
@@ -45,7 +49,9 @@ import org.osaf.cosmo.jackrabbit.query.TextCalendarTextFilter;
  */
 
 public class QueryFilter implements JcrConstants {
-
+    private static final Logger log =
+        Logger.getLogger(QueryFilter.class);
+    
     /**
      * The parsed top-level filter object.
      */
@@ -114,14 +120,21 @@ public class QueryFilter implements JcrConstants {
     protected String generatePeriods(Period period) {
 
         // Get fixed start/end time
+
         DateTime dstart = period.getStart();
         DateTime dend = period.getEnd();
 
         // Get float start/end
         DateTime fstart = (DateTime) Dates.getInstance(dstart, dstart);
         DateTime fend = (DateTime) Dates.getInstance(dend, dend);
-        fstart.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
-        fend.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
+        
+        if (timezone != null){
+            fstart.setTimeZone(new TimeZone(timezone));
+            fend.setTimeZone(new TimeZone(timezone));
+        } else {
+            fstart.setUtc(true);
+            fend.setUtc(true);
+        }
 
         return dstart.toString() + '/' + dend.toString() + ','
                 + fstart.toString() + '/' + fend.toString();

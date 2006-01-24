@@ -180,7 +180,7 @@
     <dependency>
       <groupId>ical4j</groupId>
       <artifactId>ical4j-osaf</artifactId>
-      <version>0.9.18</version>
+      <version>0.9.18-20060124</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

@@ -449,25 +449,7 @@
     <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
     <resources>
       <resource>
-        <directory>src/main/resources/core</directory>
-        <includes>
-          <include>applicationContext-*.xml</include>
-          <include>*.tld</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/main/resources/webapp</directory>
-        <includes>
-          <include>*.properties</include>
-          <include>*.tld</include>
-          <include>applicationContext-*.xml</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/main/resources/server</directory>
-        <includes>
-          <include>cosmo.version.txt</include>
-        </includes>
+        <directory>src/main/resources</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
@@ -477,19 +459,21 @@
       </includes>
       <resources>
       <resource>
-        <directory>src/main/resources/server</directory>
+        <directory>src/main/config</directory>
         <includes>
           <include>cosmo.properties</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
           <include>cosmo.version.txt</include>
         </includes>
         <filtering>true</filtering>
       </resource>
       <resource>
         <directory>src/test/resources</directory>
-        <includes>
-          <include>test.properties</include>
-          <include>log4j.xml</include>
-        </includes>
         <filtering>true</filtering>
       </resource>
       <resource>

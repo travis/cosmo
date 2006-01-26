@@ -30,22 +30,22 @@
   regenerating node type -->
   <goal name="build:nodetypes">
     <delete>
-      <fileset dir="${basedir}/src/main/resources/jackrabbit">
+      <fileset dir="${basedir}/src/main/data">
         <include name="*_nodetypes.xml"/>
       </fileset>
     </delete>
     <jackrabbit:generate
        catalog="${basedir}/src/docs/jcr/webdav.txt"
-       descriptor="${basedir}/src/main/resources/jackrabbit/webdav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/webdav_nodetypes.xml"/>
     <jackrabbit:generate
        catalog="${basedir}/src/docs/jcr/tickets.txt"
-       descriptor="${basedir}/src/main/resources/jackrabbit/tickets_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/tickets_nodetypes.xml"/>
     <jackrabbit:generate
        catalog="${basedir}/src/docs/jcr/caldav.txt"
-       descriptor="${basedir}/src/main/resources/jackrabbit/caldav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/caldav_nodetypes.xml"/>
     <jackrabbit:generate
        catalog="${basedir}/src/docs/jcr/cosmo.txt"
-       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/cosmo_nodetypes.xml"/>
   </goal>
 
   <preGoal name="test:test-resources">
@@ -56,7 +56,7 @@
       <filter token="REPOSITORY_PASSWORD"
               value="${cosmo.test.repository.password}"/>
       <filter token="CONFIGFILEPATH"
-              value="src/main/resources/server/repository.xml"/>
+              value="src/main/config/repository.xml"/>
       <filter token="REPOSITORYHOMEDIRPATH"
               value="target/test-repository"/>
       <filter token="MAIL_TRANSPORT_PROTOCOL"
@@ -94,37 +94,37 @@
     <delete dir="${maven.build.dir}/test-repository"/> 
     <echo>Setting up test repository</echo>
     <jackrabbit:import
-       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       descriptor="${basedir}/src/main/resources/jackrabbit/webdav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/webdav_nodetypes.xml"/>
     <jackrabbit:import
-       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       descriptor="${basedir}/src/main/resources/jackrabbit/tickets_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/tickets_nodetypes.xml"/>
     <jackrabbit:import
-       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       descriptor="${basedir}/src/main/resources/jackrabbit/caldav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/caldav_nodetypes.xml"/>
     <jackrabbit:import
-       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/cosmo_nodetypes.xml"/>
     <copy todir="${maven.build.dir}" overwrite="true"
-          file="${basedir}/src/main/resources/jackrabbit/import-overlord.xml">
+          file="${basedir}/src/main/data/import-overlord.xml">
       <filterset>
         <filter token="NOW" value="${NOW}"/>
       </filterset>
     </copy>
     <jackrabbit:loadcontent
-       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
@@ -180,7 +180,7 @@
       <fileset dir="${basedir}/src/docs/license"/>
     </copy>
     <copy todir="${cosmo.dist.version}/tomcat/conf"
-          file="${basedir}/src/main/resources/server/server.xml">
+          file="${basedir}/src/main/config/server.xml">
       <filterset>
         <filter token="RELOADABLE" value="${cosmo.webapp.reloadable}"/>
         <filter token="MAIL_TRANSPORT_PROTOCOL"
@@ -194,9 +194,9 @@
       </filterset>
     </copy>
     <copy todir="${cosmo.dist.version}/etc"
-          file="${basedir}/src/main/resources/server/repository.xml"/>
+          file="${basedir}/src/main/config/repository.xml"/>
     <copy todir="${cosmo.dist.version}/etc"
-          file="${basedir}/src/main/resources/server/cosmo.properties">
+          file="${basedir}/src/main/config/cosmo.properties">
       <filterset>
         <filter token="REPOSITORY_USERNAME"
                 value="${cosmo.dist.repository.username}"/>
@@ -215,44 +215,44 @@
 
     <!-- needed for tomcat's own logging -->
     <copy todir="${cosmo.dist.version}/tomcat/common/classes"
-          file="${basedir}/src/main/resources/server/log4j.xml"/>
+          file="${basedir}/src/main/config/log4j.xml"/>
   </goal>
 
   <goal name="dist:data">
     <delete dir="${cosmo.dist.version}/data"/> 
     <echo>Initializing Jackrabbit repository</echo>
     <jackrabbit:import
-       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
-       descriptor="${basedir}/src/main/resources/jackrabbit/webdav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/webdav_nodetypes.xml"/>
     <jackrabbit:import
-       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
-       descriptor="${basedir}/src/main/resources/jackrabbit/tickets_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/tickets_nodetypes.xml"/>
     <jackrabbit:import
-       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
-       descriptor="${basedir}/src/main/resources/jackrabbit/caldav_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/caldav_nodetypes.xml"/>
     <jackrabbit:import
-       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
-       descriptor="${basedir}/src/main/resources/jackrabbit/cosmo_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/cosmo_nodetypes.xml"/>
     <copy todir="${maven.build.dir}" overwrite="true"
-          file="${basedir}/src/main/resources/jackrabbit/import-overlord.xml">
+          file="${basedir}/src/main/data/import-overlord.xml">
       <filterset>
         <filter token="NOW" value="${NOW}"/>
       </filterset>
     </copy>
     <jackrabbit:loadcontent
-       configFilePath="${basedir}/src/main/resources/server/repository.xml"
+       configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"

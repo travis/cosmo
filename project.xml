@@ -310,8 +310,9 @@
     </dependency>
     <dependency>
       <groupId>osaf-commons</groupId>
-      <artifactId>osaf-commons-jackrabbit</artifactId>
+      <artifactId>osaf-commons-jackrabbit-maven-plugin</artifactId>
       <version>0.4</version>
+      <type>plugin</type>
     </dependency>
     <dependency>
       <groupId>rome</groupId>

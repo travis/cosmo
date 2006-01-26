@@ -14,8 +14,8 @@
    limitations under the License.
 -->
 
-<project xmlns:j="jelly:core" xmlns:ant="jelly:ant"
-         xmlns:define="jelly:define"
+<project xmlns:j="jelly:core"
+         xmlns:ant="jelly:ant"
          xmlns:jackrabbit="jackrabbit">
   <tstamp>
     <format property="NOW" timezone="GMT"
@@ -93,25 +93,25 @@
   <goal name="test:reposetup">
     <delete dir="${maven.build.dir}/test-repository"/> 
     <echo>Setting up test repository</echo>
-    <jackrabbit:import
+    <jackrabbit:importschema
        configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        descriptor="${basedir}/src/main/data/webdav_nodetypes.xml"/>
-    <jackrabbit:import
+    <jackrabbit:importschema
        configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        descriptor="${basedir}/src/main/data/tickets_nodetypes.xml"/>
-    <jackrabbit:import
+    <jackrabbit:importschema
        configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        descriptor="${basedir}/src/main/data/caldav_nodetypes.xml"/>
-    <jackrabbit:import
+    <jackrabbit:importschema
        configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
@@ -123,7 +123,7 @@
         <filter token="NOW" value="${NOW}"/>
       </filterset>
     </copy>
-    <jackrabbit:loadcontent
+    <jackrabbit:importcontent
        configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
@@ -221,25 +221,25 @@
   <goal name="dist:data">
     <delete dir="${cosmo.dist.version}/data"/> 
     <echo>Initializing Jackrabbit repository</echo>
-    <jackrabbit:import
+    <jackrabbit:importschema
        configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/data/webdav_nodetypes.xml"/>
-    <jackrabbit:import
+    <jackrabbit:importschema
        configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/data/tickets_nodetypes.xml"/>
-    <jackrabbit:import
+    <jackrabbit:importschema
        configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
        password="${cosmo.dist.repository.password}"
        descriptor="${basedir}/src/main/data/caldav_nodetypes.xml"/>
-    <jackrabbit:import
+    <jackrabbit:importschema
        configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
@@ -251,7 +251,7 @@
         <filter token="NOW" value="${NOW}"/>
       </filterset>
     </copy>
-    <jackrabbit:loadcontent
+    <jackrabbit:importcontent
        configFilePath="${basedir}/src/main/config/repository.xml"
        repositoryHomedirPath="${cosmo.dist.version}/data"
        username="${cosmo.dist.repository.username}"
@@ -292,119 +292,4 @@
   <goal name="dist:clean-data">
     <delete file="${cosmo.dist.version}/data"/>
   </goal>
-
-  <define:taglib uri="jackrabbit">
-    <define:tag name="import">
-      <j:catch var="exception">
-        <j:new var="importer"
-               className="org.osaf.commons.jackrabbit.NodeTypeImporter"/>
-        <j:invoke on="${importer}" method="setConfigFilePath">
-          <j:arg value="${configFilePath}"/>
-        </j:invoke>
-        <j:invoke on="${importer}" method="setRepositoryHomedirPath">
-          <j:arg value="${repositoryHomedirPath}"/>
-        </j:invoke>
-        <j:invoke on="${importer}" method="setCredentials">
-          <j:arg value="${username}"/>
-          <j:arg value="${password}"/>
-        </j:invoke>
-        <echo>Importing descriptor ${descriptor}</echo>
-        <j:invoke on="${importer}" method="importDescriptor">
-          <j:arg value="${descriptor}"/>
-        </j:invoke>
-      </j:catch>
-      <j:if test="${exception != null}">
-        <j:invoke on="${exception}" method="printStackTrace"/>
-        <j:choose>
-          <j:when test="${exception.cause != null}">
-            <j:choose>
-              <j:when test="${exception.cause.cause != null}">
-                <ant:fail>${exception.cause.cause.message}</ant:fail>
-              </j:when>
-              <j:otherwise>
-                <ant:fail>${exception.cause.message}</ant:fail>
-              </j:otherwise>
-            </j:choose>
-          </j:when>
-          <j:otherwise>
-            <ant:fail>${exception.message}</ant:fail>
-          </j:otherwise>
-        </j:choose>
-      </j:if>
-    </define:tag>
-
-    <define:tag name="generate">
-      <ant:uptodate property="descriptoruptodate"
-                    srcfile="${catalog}" targetfile="${descriptor}"/>
-      <j:if test="${not descriptoruptodate}">
-        <j:catch var="exception">
-          <j:new var="generator"
-                 className="org.osaf.commons.jackrabbit.NodeTypeDescriptorGenerator"/>
-          <echo>Generating descriptor ${descriptor}</echo>
-          <j:invoke on="${generator}" method="generateDescriptor">
-            <j:arg value="${catalog}"/>
-            <j:arg value="${descriptor}"/>
-          </j:invoke>
-        </j:catch>
-        <j:if test="${exception != null}">
-          <j:invoke on="${exception}" method="printStackTrace"/>
-          <j:choose>
-            <j:when test="${exception.cause != null}">
-              <j:choose>
-                <j:when test="${exception.cause.cause != null}">
-                  <ant:fail>${exception.cause.cause.message}</ant:fail>
-                </j:when>
-                <j:otherwise>
-                  <ant:fail>${exception.cause.message}</ant:fail>
-                </j:otherwise>
-              </j:choose>
-            </j:when>
-            <j:otherwise>
-              <ant:fail>${exception.message}</ant:fail>
-            </j:otherwise>
-          </j:choose>
-        </j:if>
-      </j:if>
-    </define:tag>
-
-    <define:tag name="loadcontent">
-      <j:catch var="exception">
-        <j:new var="importer"
-               className="org.osaf.commons.jackrabbit.content.ContentImporter"/>
-        <j:invoke on="${importer}" method="setConfigFilePath">
-          <j:arg value="${configFilePath}"/>
-        </j:invoke>
-        <j:invoke on="${importer}" method="setRepositoryHomedirPath">
-          <j:arg value="${repositoryHomedirPath}"/>
-        </j:invoke>
-        <j:invoke on="${importer}" method="setCredentials">
-          <j:arg value="${username}"/>
-          <j:arg value="${password}"/>
-        </j:invoke>
-        <echo>Loading content from ${content}</echo>
-        <j:invoke on="${importer}" method="importContent">
-          <j:arg value="${content}"/>
-        </j:invoke>
-      </j:catch>
-      <j:if test="${exception != null}">
-        <j:invoke on="${exception}" method="printStackTrace"/>
-        <j:choose>
-          <j:when test="${exception.cause != null}">
-            <j:choose>
-              <j:when test="${exception.cause.cause != null}">
-                <ant:fail>${exception.cause.cause.message}</ant:fail>
-              </j:when>
-              <j:otherwise>
-                <ant:fail>${exception.cause.message}</ant:fail>
-              </j:otherwise>
-            </j:choose>
-          </j:when>
-          <j:otherwise>
-            <ant:fail>${exception.message}</ant:fail>
-          </j:otherwise>
-        </j:choose>
-      </j:if>
-    </define:tag>
-  </define:taglib>
-
 </project>

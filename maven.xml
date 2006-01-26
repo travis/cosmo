@@ -16,6 +16,7 @@
 
 <project xmlns:j="jelly:core"
          xmlns:ant="jelly:ant"
+         xmlns:maven="jelly:maven"
          xmlns:jackrabbit="jackrabbit">
   <tstamp>
     <format property="NOW" timezone="GMT"
@@ -27,7 +28,7 @@
   </goal>
 
   <!-- not used in the standard build, but only for manually
-  regenerating node type -->
+       regenerating node type -->
   <goal name="build:nodetypes">
     <delete>
       <fileset dir="${basedir}/src/main/data">
@@ -50,13 +51,12 @@
 
   <preGoal name="test:test-resources">
     <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
-      <filter token="VERSION" value="${pom.currentVersion}"/>
       <filter token="REPOSITORY_USERNAME"
               value="${cosmo.test.repository.username}"/>
       <filter token="REPOSITORY_PASSWORD"
               value="${cosmo.test.repository.password}"/>
       <filter token="CONFIGFILEPATH"
-              value="src/main/config/repository.xml"/>
+              value="src/test/config/repository.xml"/>
       <filter token="REPOSITORYHOMEDIRPATH"
               value="target/test-repository"/>
       <filter token="MAIL_TRANSPORT_PROTOCOL"
@@ -76,6 +76,9 @@
 
   <postGoal name="clean:clean">
     <delete file="${basedir}/derby.log"/>
+    <delete dir="${maven.src.dir}/webapp/WEB-INF/classes"/>
+    <delete dir="${maven.src.dir}/webapp/WEB-INF/lib"/>
+    <delete dir="${maven.src.dir}/webapp/WEB-INF/tld"/>
   </postGoal>
 
   <preGoal name="test:test">
@@ -94,25 +97,25 @@
     <delete dir="${maven.build.dir}/test-repository"/> 
     <echo>Setting up test repository</echo>
     <jackrabbit:importschema
-       configFilePath="${basedir}/src/main/config/repository.xml"
+       configFilePath="${basedir}/src/test/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        descriptor="${basedir}/src/main/data/webdav_nodetypes.xml"/>
     <jackrabbit:importschema
-       configFilePath="${basedir}/src/main/config/repository.xml"
+       configFilePath="${basedir}/src/test/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        descriptor="${basedir}/src/main/data/tickets_nodetypes.xml"/>
     <jackrabbit:importschema
-       configFilePath="${basedir}/src/main/config/repository.xml"
+       configFilePath="${basedir}/src/test/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        descriptor="${basedir}/src/main/data/caldav_nodetypes.xml"/>
     <jackrabbit:importschema
-       configFilePath="${basedir}/src/main/config/repository.xml"
+       configFilePath="${basedir}/src/test/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
@@ -124,146 +127,35 @@
       </filterset>
     </copy>
     <jackrabbit:importcontent
-       configFilePath="${basedir}/src/main/config/repository.xml"
+       configFilePath="${basedir}/src/test/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
        content="${maven.build.dir}/import-overlord.xml"/>
   </goal>
-    
-  <goal name="dist:tomcat">
-    <attainGoal name="java:prepare-filesystem"/>
-    <get src="${ext.tomcat.url}"
-         dest="${maven.build.dir}/${ext.tomcat.package}.tar.gz"
-         usetimestamp="true"/>
-    <untar src="${maven.build.dir}/${ext.tomcat.package}.tar.gz"
-           dest="${maven.build.dir}" compression="gzip"/>
-    <copy todir="${cosmo.dist.version}/tomcat">
-      <fileset dir="${maven.build.dir}/${ext.tomcat.package}">
-        <exclude name="**/conf/Catalina/localhost/*.xml"/>
-        <exclude name="**/conf/server.xml"/>
-        <exclude name="**/common/classes/logging.properties"/>
-      </fileset>
-    </copy>
-    <!-- XXX can't figure out the right pattern to use to not copy
-         this dir in the first place -->
-    <delete dir="${cosmo.dist.version}/tomcat/webapps"/>
-    <mkdir dir="${cosmo.dist.version}/tomcat/webapps"/>
-    <mkdir dir="${cosmo.dist.version}/tomcat/logs"/>
-    <chmod perm="755">
-      <fileset dir="${cosmo.dist.version}/tomcat/bin">
-        <include name="*.sh"/>
-      </fileset>
-    </chmod>
-  </goal>
 
-  <goal name="dist:webapp">
-    <attainGoal name="war:webapp"/>
-    <copy todir="${cosmo.dist.version}/tomcat/webapps/${pom.artifactId}">
-      <fileset dir="${maven.build.dir}/${pom.artifactId}"/>
-    </copy>
-  </goal>
-
-  <goal name="dist:server">
-    <mkdir dir="${cosmo.dist.version}/logs"/>
-    <copy todir="${cosmo.dist.version}/bin"
-          file="${basedir}/src/bin/cosmoctl"/>
-    <chmod file="${cosmo.dist.version}/bin/cosmoctl" perm="755"/>
-    <copy todir="${cosmo.dist.version}/bin"
-          file="${basedir}/src/bin/cosmocfg"/>
+  <goal name="dist">
+    <attainGoal name="war:war"/>
+    <mkdir dir="${cosmo.dist.version}"/>
+    <maven:get var="cosmo.war.build.dir" plugin="maven-war-plugin"
+               property="maven.war.build.dir"/>
+    <maven:get var="cosmo.war.name" plugin="maven-war-plugin"
+               property="maven.war.final.name"/>
+    <copy todir="${cosmo.dist.version}"
+          file="${cosmo.war.build.dir}/${cosmo.war.name}"/>
     <copy todir="${cosmo.dist.version}">
       <fileset dir="${basedir}/src/docs">
         <include name="*.txt"/>
       </fileset>
     </copy>
-    <copy todir="${cosmo.dist.version}/docs/license">
+    <copy todir="${cosmo.dist.version}/license">
       <fileset dir="${basedir}/src/docs/license"/>
     </copy>
-    <copy todir="${cosmo.dist.version}/tomcat/conf"
-          file="${basedir}/src/main/config/server.xml">
-      <filterset>
-        <filter token="RELOADABLE" value="${cosmo.webapp.reloadable}"/>
-        <filter token="MAIL_TRANSPORT_PROTOCOL"
-                value="${cosmo.dist.mail.transport.protocol}"/>
-        <filter token="MAIL_SMTP_HOST"
-                value="${cosmo.dist.mail.smtp.host}"/>
-        <filter token="MAIL_SMTP_STARTTLS_ENABLE"
-                value="${cosmo.dist.mail.smtp.starttls.enable}"/>
-        <filter token="MAIL_SMTPS_HOST"
-                value="${cosmo.dist.mail.smtps.host}"/>
-      </filterset>
+    <copy todir="${cosmo.dist.version}/data">
+      <fileset dir="${basedir}/src/main/data">
+        <include name="*.xml"/>
+      </fileset>
     </copy>
-    <copy todir="${cosmo.dist.version}/etc"
-          file="${basedir}/src/main/config/repository.xml"/>
-    <copy todir="${cosmo.dist.version}/etc"
-          file="${basedir}/src/main/config/cosmo.properties">
-      <filterset>
-        <filter token="REPOSITORY_USERNAME"
-                value="${cosmo.dist.repository.username}"/>
-        <filter token="REPOSITORY_PASSWORD"
-                value="${cosmo.dist.repository.password}"/>
-      </filterset>
-    </copy>
-
-    <j:forEach var="lib" items="${pom.artifacts}">
-      <j:set var="dep" value="${lib.dependency}"/>     
-      <j:if test="${dep.getProperty('tomcat.bundle')=='true'}">
-        <copy todir="${cosmo.dist.version}/tomcat/common/lib"
-              file="${lib.path}"/>  
-      </j:if>  
-    </j:forEach>
-
-    <!-- needed for tomcat's own logging -->
-    <copy todir="${cosmo.dist.version}/tomcat/common/classes"
-          file="${basedir}/src/main/config/log4j.xml"/>
-  </goal>
-
-  <goal name="dist:data">
-    <delete dir="${cosmo.dist.version}/data"/> 
-    <echo>Initializing Jackrabbit repository</echo>
-    <jackrabbit:importschema
-       configFilePath="${basedir}/src/main/config/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data"
-       username="${cosmo.dist.repository.username}"
-       password="${cosmo.dist.repository.password}"
-       descriptor="${basedir}/src/main/data/webdav_nodetypes.xml"/>
-    <jackrabbit:importschema
-       configFilePath="${basedir}/src/main/config/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data"
-       username="${cosmo.dist.repository.username}"
-       password="${cosmo.dist.repository.password}"
-       descriptor="${basedir}/src/main/data/tickets_nodetypes.xml"/>
-    <jackrabbit:importschema
-       configFilePath="${basedir}/src/main/config/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data"
-       username="${cosmo.dist.repository.username}"
-       password="${cosmo.dist.repository.password}"
-       descriptor="${basedir}/src/main/data/caldav_nodetypes.xml"/>
-    <jackrabbit:importschema
-       configFilePath="${basedir}/src/main/config/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data"
-       username="${cosmo.dist.repository.username}"
-       password="${cosmo.dist.repository.password}"
-       descriptor="${basedir}/src/main/data/cosmo_nodetypes.xml"/>
-    <copy todir="${maven.build.dir}" overwrite="true"
-          file="${basedir}/src/main/data/import-overlord.xml">
-      <filterset>
-        <filter token="NOW" value="${NOW}"/>
-      </filterset>
-    </copy>
-    <jackrabbit:importcontent
-       configFilePath="${basedir}/src/main/config/repository.xml"
-       repositoryHomedirPath="${cosmo.dist.version}/data"
-       username="${cosmo.dist.repository.username}"
-       password="${cosmo.dist.repository.password}"
-       content="${maven.build.dir}/import-overlord.xml"/>
-  </goal>
-
-  <goal name="dist">
-    <attainGoal name="dist:tomcat"/>
-    <attainGoal name="dist:webapp"/>
-    <attainGoal name="dist:server"/>
-    <attainGoal name="dist:data"/>
   </goal>
 
   <goal name="dist:release">
@@ -271,25 +163,13 @@
     <attainGoal name="dist"/>
     <tar destfile="${cosmo.dist.version}.tar.gz"
          compression="gzip" longfile="gnu">
-      <tarfileset dir="${cosmo.dist.version}" mode="755"
-                  prefix="cosmo-${pom.currentVersion}">
-        <include name="bin/cosmoctl"/>
-        <include name="tomcat/bin/*.sh"/>
-      </tarfileset>
       <tarfileset dir="${cosmo.dist.version}"
-                  prefix="cosmo-${pom.currentVersion}">
-        <exclude name="bin/cosmoctl"/>
-        <exclude name="tomcat/bin/*.sh"/>
-      </tarfileset>
+                  prefix="cosmo-${pom.currentVersion}"/>
     </tar>
   </goal>
 
   <goal name="dist:clean">
     <delete file="${cosmo.dist.version}.tar.gz"/>
     <delete dir="${cosmo.dist.version}"/>
-  </goal>
-
-  <goal name="dist:clean-data">
-    <delete file="${cosmo.dist.version}/data"/>
   </goal>
 </project>

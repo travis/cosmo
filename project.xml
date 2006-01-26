@@ -19,66 +19,10 @@
   <groupId>cosmo</groupId>
   <artifactId>cosmo</artifactId>
   <currentVersion>0.3a</currentVersion>
-  <organization>
-    <name>OSAF</name>
-    <url>http://osafoundation.org/</url>
-    <logo>http://osafoundation.org/images/OSAFLogo.gif</logo>
-  </organization>
-  <inceptionYear>2005</inceptionYear>
-  <package>org.osaf.cosmo</package>
-  <!-- <logo></logo> -->
-  <description>Personal information sharing server</description>
-  <url>http://wiki.osafoundation.org/Cosmo/CosmoHome</url>
-  <issueTrackingUrl>http://bugzilla.osafoundation.org/</issueTrackingUrl>
-  <mailingLists>
-    <mailingList>
-      <name>cosmo</name>
-      <subscribe>http://lists.osafoundation.org/mailman/listinfo/cosmo</subscribe>
-      <unsubscribe>http://lists.osafoundation.org/mailman/listinfo/cosmo</unsubscribe>
-    </mailingList>
-  </mailingLists>
-  <developers>
-    <developer>
-      <name>Brian Moseley</name>
-      <id>bcm</id>
-      <email>bcm@osafoundation.org</email>
-      <organization>OSAF</organization>
-      <timezone>-8</timezone>
-    </developer>
-    <developer>
-      <name>Matthew Eernisse</name>
-      <id>mde</id>
-      <email>mde@osafoundation.org</email>
-      <organization>OSAF</organization>
-      <timezone>-6</timezone>
-    </developer>
-    <developer>
-      <name>Todd Agulnick</name>
-      <id>todda</id>
-      <email>todd@agulnick.com</email>
-      <organization>KEI</organization>
-      <timezone>-8</timezone>
-    </developer>
-    <developer>
-      <name>Mike Taylor</name>
-      <id>bear</id>
-      <email>bear@osafoundation.org</email>
-      <organization>OSAF</organization>
-      <timezone>-5</timezone>
-    </developer>
-    <developer>
-      <name>Brian Kirsch</name>
-      <id>bkirsch</id>
-      <email>bkirsch@osafoundation.org</email>
-      <organization>OSAF</organization>
-      <timezone>-10</timezone>
-    </developer>
-  </developers>
   <dependencies>
     <!--
         dependencies with the war.bundle property are included in the
-        war's WEB-INF/lib directory. those with the tomcat.bundle
-        property are included in tomcat's common/lib directory.
+        war's WEB-INF/lib directory.
       -->
     <dependency>
       <groupId>acegisecurity</groupId>
@@ -92,9 +36,6 @@
       <groupId>activation</groupId>
       <artifactId>activation</artifactId>
       <version>1.0.2</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>antlr</groupId>
@@ -116,9 +57,6 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
       <version>3.1</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
@@ -158,7 +96,6 @@
       <version>1.0.4</version>
       <properties>
         <war.bundle>true</war.bundle>
-        <tomcat.bundle>true</tomcat.bundle>
       </properties>
     </dependency>
     <dependency>
@@ -173,9 +110,6 @@
       <groupId>concurrent</groupId>
       <artifactId>concurrent</artifactId>
       <version>1.3.4</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>ical4j</groupId>
@@ -207,25 +141,16 @@
       <groupId>jsr170</groupId>
       <artifactId>jcr</artifactId>
       <version>1.0</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>javamail</groupId>
       <artifactId>mailapi</artifactId>
       <version>1.3.2</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>javamail</groupId>
       <artifactId>smtp</artifactId>
       <version>1.3.2</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>jdom</groupId>
@@ -241,40 +166,27 @@
       <version>1.2.9</version>
       <properties>
         <war.bundle>true</war.bundle>
-        <tomcat.bundle>true</tomcat.bundle>
       </properties>
     </dependency>
     <dependency>
       <groupId>lucene</groupId>
       <artifactId>lucene</artifactId>
       <version>1.4.3</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
       <version>10.1.2.1</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit</artifactId>
       <version>osaf-20060110</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-commons</artifactId>
       <version>osaf-20060110</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
@@ -427,17 +339,11 @@
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
       <version>2.7.0</version> 
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
       <version>2.6.2</version>
-      <properties>
-        <tomcat.bundle>true</tomcat.bundle>
-      </properties>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
@@ -459,30 +365,16 @@
         <include>**/*Test.java</include>
       </includes>
       <resources>
-      <resource>
-        <directory>src/main/config</directory>
-        <includes>
-          <include>cosmo.properties</include>
-        </includes>
-        <filtering>true</filtering>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>cosmo.version.txt</include>
-        </includes>
-        <filtering>true</filtering>
-      </resource>
-      <resource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-      <resource>
-        <directory>src/test/resources/dav/caldav</directory>
-        <includes>
-          <include>*.ics</include>
-        </includes>
-      </resource>
+        <resource>
+          <directory>src/test/resources</directory>
+          <filtering>true</filtering>
+        </resource>
+        <resource>
+          <directory>src/test/resources/dav/caldav</directory>
+          <includes>
+            <include>*.ics</include>
+          </includes>
+        </resource>
       </resources>
     </unitTest>
   </build>

@@ -141,8 +141,8 @@
                property="maven.war.build.dir"/>
     <maven:get var="cosmo.war.name" plugin="maven-war-plugin"
                property="maven.war.final.name"/>
-    <copy todir="${cosmo.dist.version}"
-          file="${cosmo.war.build.dir}/${cosmo.war.name}"/>
+    <copy file="${cosmo.war.build.dir}/${cosmo.war.name}"
+          tofile="${cosmo.dist.version}/${pom.artifactId}-${pom.currentVersion}.war"/>
     <copy todir="${cosmo.dist.version}">
       <fileset dir="${basedir}/src/docs">
         <include name="*.txt"/>
@@ -150,11 +150,6 @@
     </copy>
     <copy todir="${cosmo.dist.version}/license">
       <fileset dir="${basedir}/src/docs/license"/>
-    </copy>
-    <copy todir="${cosmo.dist.version}/data">
-      <fileset dir="${basedir}/src/main/data">
-        <include name="*.xml"/>
-      </fileset>
     </copy>
   </goal>
 
@@ -164,12 +159,11 @@
     <tar destfile="${cosmo.dist.version}.tar.gz"
          compression="gzip" longfile="gnu">
       <tarfileset dir="${cosmo.dist.version}"
-                  prefix="cosmo-${pom.currentVersion}"/>
+                  prefix="${pom.artifactId}-${pom.currentVersion}"/>
     </tar>
   </goal>
 
   <goal name="dist:clean">
-    <delete file="${cosmo.dist.version}.tar.gz"/>
-    <delete dir="${cosmo.dist.version}"/>
+    <delete file="${cosmo.dist}"/>
   </goal>
 </project>

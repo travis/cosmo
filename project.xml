@@ -16,9 +16,9 @@
 
 <project>
   <name>Cosmo</name>
-  <groupId>cosmo</groupId>
+  <groupId>org.osaf</groupId>
   <artifactId>cosmo</artifactId>
-  <currentVersion>0.3a</currentVersion>
+  <currentVersion>0.3-SNAPSHOT</currentVersion>
   <dependencies>
     <!--
         dependencies with the war.bundle property are included in the

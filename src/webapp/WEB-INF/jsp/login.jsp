@@ -21,7 +21,7 @@
 
 <fmt:message var="okButton" key="Login.Button.Ok"/>
 
-<form method="POST" action="/console/j_acegi_security_check">
+<form method="POST" action="<html:rewrite page="/console/j_acegi_security_check"/>">
 
 <div style="width:100%;" align="center">
 
@@ -74,7 +74,7 @@
 
 <div class="sm" style="margin-top:12px;">
 <c:url var="forgotUrl" value="/console/forgot"/>
-<html:link page="${forgotUrl}" onclick="popup('${forgotUrl}', 'forgot', 'resizable=yes,width=560,height=300,left=40,screenx=40,top=20,screeny=20,scrollbars'); return false"><fmt:message key="Login.Forgot"/></html:link>
+<html:link href="${forgotUrl}" onclick="popup('${forgotUrl}', 'forgot', 'resizable=yes,width=560,height=300,left=40,screenx=40,top=20,screeny=20,scrollbars'); return false"><fmt:message key="Login.Forgot"/></html:link>
 </div>
   
 </div>
@@ -84,7 +84,8 @@
 <div><html:link page="/console/account/new"><fmt:message key="Login.CreateAccount"/></html:link></div>
 
 <div class="sm" style="margin-top:24px;">
-<html:link page="/console/about" onclick="simplePopUp('/console/about', 340, 280, false); return false;"><fmt:message key="Login.AboutCosmo"/></html:link>
+<c:url var="aboutUrl" value="/console/about"/>
+<html:link href="${aboutUrl}" onclick="simplePopUp('${aboutUrl}', 340, 280, false); return false;"><fmt:message key="Login.AboutCosmo"/></html:link>
 </div>
 
 

@@ -93,12 +93,15 @@
     <property name="authenticationManager">
       <ref bean="authenticationManager"/>
     </property>
-      <property name="authenticationFailureUrl">
-        <value>/console/loginfailed</value>
-      </property>
-      <property name="defaultTargetUrl">
-        <value>/console/account</value>
-      </property>
+    <property name="filterProcessesUrl">
+      <value>/console/j_acegi_security_check</value>
+    </property>
+    <property name="authenticationFailureUrl">
+      <value>/console/loginfailed</value>
+    </property>
+    <property name="defaultTargetUrl">
+      <value>/console/account</value>
+    </property>
   </bean>
 
   <!-- filter that performs anonymous authentication -->

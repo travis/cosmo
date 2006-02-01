@@ -31,8 +31,7 @@ account's username.
 Usage: python createaccounts.py [options]
 
 Options:
-  -s        servername (default is cosmo-test.osafoundation.org)
-  -p        port (default is 8201)
+  -s        url (default is http://localhost:8080/cosmo)
   -u        username (default is root)
   -w        password (default is cosmo)
   -n        number of accounts to create (default is 100)
@@ -48,7 +47,7 @@ from threading import Thread
 import pycurl
 import sys, getopt, time
 
-def createAccount(server, port, username, password, adminuser, adminpass):
+def createAccount(server, port, path, username, password, adminuser, adminpass):
     xmlCreateAccount = """<?xml version="1.0" encoding="utf-8" ?> 
 <user xmlns="http://osafoundation.org/cosmo/CMP">
   <username>%s</username>
@@ -60,7 +59,7 @@ def createAccount(server, port, username, password, adminuser, adminpass):
 """ % (username, password, username)
 
     body = StringAsFile(xmlCreateAccount.encode("utf-8"))
-    url = "http://%s:%s@%s:%d/cmp/user/%s" % (adminuser, adminpass, server, port, username)
+    url = "http://%s:%s@%s:%d%s/cmp/user/%s" % (adminuser, adminpass, server, port, path, username)
     response = StringAsFile()
     curl = pycurl.Curl()
     curl.setopt(pycurl.URL, url)
@@ -114,25 +113,68 @@ class StringAsFile:
 
 def usage():
     print __doc__
+
+def parseURL(url):
+    """
+    Parse URL to host, port, path.
     
+    >>> print parseURL('http://localhost:8080/cosmo')
+    ('localhost', 8080, '/cosmo')
+    >>> print parseURL('https://localhost')
+    ('localhost', 443, '')
+    >>> print parseURL('localhost')
+    ('localhost', 80, '')
+    >>> print parseURL('localhost/')
+    ('localhost', 80, '')
+    """
+    import urlparse
+    parsed = urlparse.urlparse(url, scheme="http", allow_fragments=0)
+    
+    if parsed[0] == "http":
+        port = 80
+    elif parsed[0] == "https":
+        port = 443
+    else:
+        raise Exception("Unknown protocol")
+    
+    host = parsed[1]
+    
+    colon = host.rfind(":")
+    if colon != -1:
+        port = int(host[colon + 1:])
+        host = host[:colon]
+        
+    path = parsed[2]
+    
+    # Work around some urlparse bugs
+    if host == "":
+        host = path
+        slash = host.rfind("/")
+        if slash != -1:
+            host = host[:slash]
+        path = ""
+            
+    return host, port, path
+
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "s:p:u:w:n:f:h")
+        opts, args = getopt.getopt(argv, "s:u:w:n:f:h")
     except getopt.GetoptError:
         usage()
         sys.exit(2)
 
     # establish defaults
-    server = "cosmo-demo.osafoundation.org"
-    port = 8201
+    server = "localhost"
+    port = 8080
+    path = "/cosmo"
+    url = "http://%s:%s%s" % (server, port, path)
     username = "root"
     password = "cosmo"
     start = 1
     count = 100
     
     for (opt, arg) in opts:
-        if opt =="-s":      server = arg
-        elif opt == "-p":   port = int(arg)
+        if opt =="-s":      url = arg
         elif opt == "-u":   username = arg
         elif opt == "-w":   password = arg
         elif opt == "-n":   count = int(arg)
@@ -140,6 +182,8 @@ def main(argv):
         elif opt == "-h":
             usage()
             sys.exit()
+
+    server, port, path = parseURL(url)
                 
     # We should ignore SIGPIPE when using pycurl.NOSIGNAL - see
     # the libcurl tutorial for more info.
@@ -151,7 +195,7 @@ def main(argv):
         pass
 
     for i in range(start, start + count):
-        if createAccount(server, port, \
+        if createAccount(server, port, path, \
             "test" + str(i), "test" + str(i), \
             username, password) == False:
             sys.exit(2)

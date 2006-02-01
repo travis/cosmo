@@ -28,8 +28,7 @@ Usage: python hammer.py [options]
 Options:
   -t        number of threads to deploy (default is 10)
   -i        number of GET/PUTs to do on each thread (default is 100)
-  -s        servername (default is cosmo-demo.osafoundation.org)
-  -p        port (default is 8201)
+  -s        url (default is http://localhost:8080/cosmo)
   -l        size of datafile to GET/PUT in bytes (default is 10000)
   -u        username (default is test; thread number is appended to username)
   -w        password (default is test; thread number is appended to password)
@@ -38,7 +37,7 @@ Options:
 
 Examples:
   hammer.py runs test using default parameters
-  hammer.py -p 80 runs default test on port 80
+  hammer.py -s http://localhost:80 runs default test on localhost port 80
 
 Tip:
   Use createaccounts.py to set up a batch of test accounts before running
@@ -50,6 +49,8 @@ from twisted.internet import reactor, defer
 import zanshin.util, zanshin.http
 import sys, getopt, datetime, time
 import string, random
+
+import createaccounts
 
 def LogEvent(*attr):
     s = "\t".join(attr)
@@ -155,8 +156,10 @@ def main(argv):
     # establish defaults
     threads = 10
     iterations = 100
-    server = "cosmo-demo.osafoundation.org"
-    port = 8201
+    server = "localhost"
+    port = 8080
+    path = "/cosmo"
+    url = "http://%s:%s%s" % (server, port, path)
     datalength = 10000
     username = "test"
     password = "test"
@@ -166,7 +169,6 @@ def main(argv):
         if opt == "-t":      threads = int(arg)
         elif opt == "-i":    iterations = int(arg)
         elif opt == "-s":    server = arg
-        elif opt == "-p":    port = int(arg)
         elif opt == "-l":    datalength = int(arg)
         elif opt == "-u":    username = arg
         elif opt == "-w":    password = arg
@@ -174,6 +176,8 @@ def main(argv):
         elif opt == "-h":
             usage()
             sys.exit()
+
+    server, port, path = createaccounts.parseURL(url)
 
     def endTests(resultList):
         global failed
@@ -218,7 +222,7 @@ def main(argv):
         for thread in range(1, threads + 1):
             u = username + str(thread)
             p = password + str(thread)
-            url = "http://%s:%s@%s:%d/home/%s/testfile.txt" % (u, p, server, port, u)
+            url = "http://%s:%s@%s:%d%s/home/%s/testfile.txt" % (u, p, server, port, path, u)
             c = TestCosmo(url, str(thread), datalength, iterations, timeout)
             c.run()
             deferreds.append(c.deferred)

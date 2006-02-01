@@ -18,7 +18,7 @@
 #   1) It's an anagram of litmus, which is a WebDAV test suite.
 #   2) It's Finnish for buds.
 
-import sys, getopt, httplib, base64
+import sys, getopt, httplib, base64, time
 
 # Defaults
 host = "localhost"
@@ -46,17 +46,19 @@ def tickets():
     >>> global host, port
     >>> auth = 'Basic %s' % base64.encodestring('test1:test1').strip()
     >>> authHeaders = {'Authorization': auth}
-    >>> hourTicket = """<?xml version="1.0" encoding="UTF-8"?>
+    >>> auth2 = 'Basic %s' % base64.encodestring('test2:test2').strip()
+    >>> authHeaders2 = {'Authorization': auth2}
+    >>> minTicket = """<?xml version="1.0" encoding="UTF-8"?>
     ... <X:ticketinfo xmlns:D="DAV:" 
     ...               xmlns:X="http://www.xythos.com/namespaces/StorageServer">
     ... <D:privilege><D:read/></D:privilege>
-    ... <X:timeout>Second-3600</X:timeout>
+    ... <X:timeout>Second-60</X:timeout>
     ... <D:visits>infinity</D:visits>
     ... </X:ticketinfo>"""
     >>> badNSTicket = """<?xml version="1.0" encoding="UTF-8"?>
     ... <D:ticketinfo xmlns:D="DAV:">
     ... <D:privilege><D:read/></D:privilege>
-    ... <D:timeout>Second-3600</D:timeout>
+    ... <D:timeout>Second-60</D:timeout>
     ... <D:visits>infinity</D:visits>
     ... </D:ticketinfo>"""
     
@@ -66,10 +68,11 @@ def tickets():
 
     OK
     
-    >>> r = request('MKTICKET', '/home/test1', body=hourTicket,
+    >>> r = request('MKTICKET', '/home/test1', body=minTicket,
     ...             headers=authHeaders)
     >>> print r.status # MKTICKET OK
     200
+    >>> ticket = r.getheader('Ticket')
 
     Bad XML
     
@@ -86,7 +89,7 @@ def tickets():
     
     No access privileges
     
-    >>> r = request('MKTICKET', '/home/test2', body=hourTicket,
+    >>> r = request('MKTICKET', '/home/test2', body=minTicket,
     ...             headers=authHeaders)
     >>> print r.status # MKTICKET no access
     403
@@ -97,23 +100,48 @@ def tickets():
     >>> print r.status # MKTICKET no access, no body
     403
 
-    No such resource
-    
-    >>> r = request('MKTICKET', '/home/test1/doesnotexist', headers=authHeaders)
-    >>> print r.status # MKTICKET no such resource
-    404
-
     No such resource, no body
     
-    >>> r = request('MKTICKET', '/home/test1/doesnotexist', body=hourTicket,
-    ...             headers=authHeaders)
+    >>> r = request('MKTICKET', '/home/test1/doesnotexist', headers=authHeaders)
     >>> print r.status # MKTICKET no such resource, no body
     404
+
+    No such resource
+    
+    >>> r = request('MKTICKET', '/home/test1/doesnotexist', body=minTicket,
+    ...             headers=authHeaders)
+    >>> print r.status # MKTICKET no such resource
+    404
+    
+    No access, no such resource
+    
+    >>> r = request('MKTICKET', '/home/test2/doesnotexist',
+    ...             headers=authHeaders)
+    >>> print r.status # MKTICKET no access, no such resource
+    403
     
     
     DELTICKET
     
     Status Codes
+    
+    No access
+    
+    >>> t = authHeaders2.copy()
+    >>> t['Ticket'] = ticket
+    >>> r = request('DELTICKET', '/home/test1?ticket=%s' % ticket,
+    ...             headers=t)
+    >>> print r.status # DELTICKET no access
+    403
+        
+    OK (No Content)
+    
+    >>> t = authHeaders.copy()
+    >>> t['Ticket'] = ticket
+    >>> r = request('DELTICKET', '/home/test1?ticket=%s' % ticket,
+    ...             headers=t)
+    >>> print r.status # DELTICKET OK (No Content)
+    204
     
     Ticket does not exist
     
@@ -129,7 +157,7 @@ def tickets():
     >>> t = authHeaders.copy()
     >>> t['Ticket'] = 'nosuchticket5dfe45210787'
     >>> r = request('DELTICKET', '/home/test1?ticket=nosuchticket5dfe45210787',
-    ...             body=hourTicket, headers=t)
+    ...             body=minTicket, headers=t)
     >>> print r.status # DELTICKET no such ticket, body
     412
     
@@ -147,9 +175,59 @@ def tickets():
     >>> t = authHeaders.copy()
     >>> t['Ticket'] = 'nosuchticket5dfe45210787'
     >>> r = request('DELTICKET', '/home/test1/doesnotexist?ticket=nosuchticket5dfe45210787',
-    ...             body=hourTicket, headers=t)
+    ...             body=minTicket, headers=t)
     >>> print r.status # DELTICKET no such ticket or resource, body
     404    
+
+
+    Miscellaneous
+
+    Try to delete an already deleted ticket
+    
+    >>> r = request('MKTICKET', '/home/test1', body=minTicket,
+    ...             headers=authHeaders)
+    >>> print r.status # MKTICKET OK
+    200
+    >>> ticket = r.getheader('Ticket')
+    >>> t = authHeaders.copy()
+    >>> t['Ticket'] = ticket
+    >>> r = request('DELTICKET', '/home/test1?ticket=%s' % ticket,
+    ...             headers=t)
+    >>> print r.status # DELTICKET OK (No Content)
+    204
+    >>> r = request('DELTICKET', '/home/test1?ticket=%s' % ticket,
+    ...             headers=t)
+    >>> print r.status # DELTICKET ticket already deleted
+    412
+    
+    GET a resource with ticket
+    
+    >>> r = request('MKTICKET', '/home/test1', body=minTicket,
+    ...             headers=authHeaders)
+    >>> print r.status # MKTICKET OK
+    200
+    >>> ticket = r.getheader('Ticket')
+    >>> t = authHeaders.copy()
+    >>> t['Ticket'] = ticket
+    >>> r = request('GET', '/home/test1?ticket=%s' % ticket,
+    ...             headers=t)
+    >>> print r.status # GET with ticket OK
+    200
+    
+    GET with timed out ticket
+    
+    >>> time.sleep(61)
+    >>> r = request('GET', '/home/test1?ticket=%s' % ticket,
+    ...             headers=t)
+    >>> print r.status # GET ticket timed out
+    412
+    
+    DELTICKET the timed out ticket
+    
+    >>> r = request('DELTICKET', '/home/test1?ticket=%s' % ticket,
+    ...             headers=t)
+    >>> print r.status # DELTICKET ticket already timed out
+    412
     '''
 
 

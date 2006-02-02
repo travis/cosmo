@@ -43,12 +43,10 @@ Examples:
   createaccounts.py -f 101 -n 100 Create accounts test101 through test200.
 """
 
-from threading import Thread
-import pycurl
-import sys, getopt, time
+import sys, getopt, httplib, base64
 
-def createAccount(server, port, path, username, password, adminuser, adminpass):
-    xmlCreateAccount = """<?xml version="1.0" encoding="utf-8" ?> 
+def createAccount(tls, server, port, path, username, password, adminuser, adminpass):
+    body = """<?xml version="1.0" encoding="utf-8" ?> 
 <user xmlns="http://osafoundation.org/cosmo/CMP">
   <username>%s</username>
   <password>%s</password>
@@ -57,28 +55,27 @@ def createAccount(server, port, path, username, password, adminuser, adminpass):
   <email>%s@nojunkmailplease.com</email>
 </user>
 """ % (username, password, username)
+    body = body.encode("utf-8")
 
-    body = StringAsFile(xmlCreateAccount.encode("utf-8"))
-    url = "http://%s:%s@%s:%d%s/cmp/user/%s" % (adminuser, adminpass, server, port, path, username)
-    response = StringAsFile()
-    curl = pycurl.Curl()
-    curl.setopt(pycurl.URL, url)
-    curl.setopt(pycurl.UPLOAD, 1)
-    curl.setopt(pycurl.NOSIGNAL, 1)
-    curl.setopt(pycurl.READFUNCTION, body.read)
-    curl.setopt(pycurl.HTTPHEADER, ["Content-Length: %d" % len(str(body)), "Content-Type: text/xml"])
-    curl.setopt(pycurl.VERBOSE, 0)
-    curl.setopt(pycurl.HEADERFUNCTION, response.write)
-    curl.setopt(pycurl.TIMEOUT, 10)
     try:
-        curl.perform()
+        if not tls:
+            c = httplib.HTTPConnection(server, port)
+        else:
+            c = httplib.HTTPSConnection(server, port)
+        auth = "Basic %s" % base64.encodestring("%s:%s" % (adminuser, 
+                                                adminpass)).strip()
+        headers = {"Authorization": auth, "Content-Type": "text/xml",
+                   "Content-Length": "%d" % len(body)}
+        c.request("PUT", "%s/cmp/user/%s" % (path, username), body=body, 
+                  headers=headers)
+        response = c.getresponse()
     except:
         import traceback
         traceback.print_exc(file=sys.stderr, limit=1)
         sys.stderr.flush()
         return False
 
-    code = curl.getinfo(pycurl.HTTP_CODE)
+    code = response.status
     if code == 201:
         print "Created user account %s" % username
         return True
@@ -93,23 +90,6 @@ def createAccount(server, port, path, username, password, adminuser, adminpass):
         return False
 
     return True
-
-class StringAsFile:
-    def __init__(self, str = ""):
-        self.str = str
-        self.index = 0
-
-    def read(self, size):
-        p = self.index
-        numchars = int(size / 2)
-        self.index += numchars
-        return self.str[p:p+numchars]
-    
-    def write(self, str):
-        self.str += str
-
-    def __repr__(self):
-        return self.str
 
 def usage():
     print __doc__
@@ -132,8 +112,10 @@ def parseURL(url):
     
     if parsed[0] == "http":
         port = 80
+        tls = False
     elif parsed[0] == "https":
         port = 443
+        tls = True
     else:
         raise Exception("Unknown protocol")
     
@@ -154,7 +136,18 @@ def parseURL(url):
             host = host[:slash]
         path = ""
             
-    return host, port, path
+    return host, port, path, tls
+
+def request(tls, *args, **kw):
+    """
+    Helper function to make requests easier to make.
+    """
+    if not tls:
+        c = httplib.HTTPConnection(host, port)
+    else:
+        c = httplib.HTTPSConnection(host, port)
+    c.request(*args, **kw)
+    return c.getresponse()
 
 def main(argv):
     try:
@@ -170,6 +163,7 @@ def main(argv):
     url = "http://%s:%s%s" % (server, port, path)
     username = "root"
     password = "cosmo"
+    tls = False
     start = 1
     count = 100
     
@@ -183,21 +177,11 @@ def main(argv):
             usage()
             sys.exit()
 
-    server, port, path = parseURL(url)
+    server, port, path, tls = parseURL(url)
                 
-    # We should ignore SIGPIPE when using pycurl.NOSIGNAL - see
-    # the libcurl tutorial for more info.
-    try:
-        import signal
-        from signal import SIGPIPE, SIG_IGN
-        signal.signal(signal.SIGPIPE, signal.SIG_IGN)
-    except ImportError:
-        pass
-
     for i in range(start, start + count):
-        if createAccount(server, port, path, \
-            "test" + str(i), "test" + str(i), \
-            username, password) == False:
+        if createAccount(tls, server, port, path, "test" + str(i), 
+            "test" + str(i), username, password) == False:
             sys.exit(2)
 
 if __name__ == "__main__":

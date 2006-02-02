@@ -21,12 +21,15 @@
 import sys, getopt, httplib, base64, time
 
 # Defaults
-url = 'http://localhost:8080/cosmo'
 host = 'localhost'
 port = 8080
 path = '/cosmo'
+url = 'http://%s:%s%s' % (host, port, path)
 tls  = False
-
+user1 = 'test1'
+password1 = 'test1'
+user2 = 'test2'
+password2 = 'test2'
 
 
 def request(*args, **kw):
@@ -49,13 +52,26 @@ def usage():
     
     Options:
       -u      url (default is http://localhost:8080/cosmo)
+      -1      user1:password1 (default is test1:test1)
+      -2      user2:password2 (default is test2:test2)
       -h      display this help text
     
-    Assumes test1 and test2 are valid users on the server, and the passwords
-    to be test1 and test2, respectively. Use createaccounts.py to set up 
-    these accounts, for example.
+    This test requires that two test accounts already exist on the server.
     """
     print usage.__doc__
+
+
+def parseUser(userPassword):
+    """
+    Parse user and password.
+    
+    >>> print parseUser('test1:test1password')
+    ('test1', 'test1password')
+    """
+    colon = userPassword.find(':')
+    user = userPassword[:colon]
+    password = userPassword[colon + 1:]
+    return user, password
 
 
 def parseURL(url):
@@ -116,8 +132,7 @@ def delticket():
     
     Initialization
         
-    >>> global host, port, path
-    >>> auth = 'Basic %s' % base64.encodestring('test1:test1').strip()
+    >>> auth = 'Basic %s' % base64.encodestring('%s:%s' % (user1, password1)).strip()
     >>> authHeaders = {'Authorization': auth}
     >>> minTicket = """<?xml version="1.0" encoding="UTF-8"?>
     ... <X:ticketinfo xmlns:D="DAV:" 
@@ -125,7 +140,7 @@ def delticket():
     ... <D:privilege><D:read/></D:privilege>
     ... <X:timeout>Second-60</X:timeout>
     ... </X:ticketinfo>"""
-    >>> home1 = '%s/home/test1' % path
+    >>> home1 = '%s/home/%s' % (path, user1)
 
     Create ticket, works
 
@@ -142,6 +157,10 @@ def delticket():
     >>> print r.status # GET with ticket OK 
     200
                      
+    >>> r = request('GET', '%s?ticket=%s' % (home1, ticket))
+    >>> print r.status # GET with ticket OK 
+    200
+
     DELTICKET does not seem to work, status 501 (not implemented)
     
     >>> t = {'Ticket': ticket, 'Authorization': auth}
@@ -165,10 +184,9 @@ def delticket():
     '''
     Initialization
         
-    >>> global host, port, path
-    >>> auth = 'Basic %s' % base64.encodestring('test1:test1').strip()
+    >>> auth = 'Basic %s' % base64.encodestring('%s:%s' % (user1, password1)).strip()
     >>> authHeaders = {'Authorization': auth}
-    >>> auth2 = 'Basic %s' % base64.encodestring('test2:test2').strip()
+    >>> auth2 = 'Basic %s' % base64.encodestring('%s:%s' % (user2, password2)).strip()
     >>> authHeaders2 = {'Authorization': auth2}
     >>> minTicket = """<?xml version="1.0" encoding="UTF-8"?>
     ... <X:ticketinfo xmlns:D="DAV:" 
@@ -181,8 +199,8 @@ def delticket():
     ... <D:privilege><D:read/></D:privilege>
     ... <D:timeout>Second-60</D:timeout>
     ... </D:ticketinfo>"""
-    >>> home1 = '%s/home/test1' % path
-    >>> home2 = '%s/home/test2' % path
+    >>> home1 = '%s/home/%s' % (path, user1)
+    >>> home2 = '%s/home/%s' % (path, user2)
     
     MKTICKET
     
@@ -356,22 +374,29 @@ def delticket():
 
 
 def main(argv):
-    global host, port, path, tls, url
+    global host, port, path, tls, url, user1, password1, user2, password2
     
     try:
-        opts, args = getopt.getopt(argv, 'u:h',)
+        opts, args = getopt.getopt(argv, 'u:1:2:h',)
     except getopt.GetoptError:
         usage()
         sys.exit(1)
 
+    up1 = '%s:%s' % (user1, password1)
+    up2 = '%s:%s' % (user2, password2)
+    
     for (opt, arg) in opts:
         if   opt == '-u': url = arg
+        if   opt == '-1': up1 = arg
+        if   opt == '-2': up2 = arg
         elif opt == '-h':
             usage()
             sys.exit()
 
     host, port, path, tls = parseURL(url)
-
+    user1, password1 = parseUser(up1)
+    user2, password2 = parseUser(up2)
+    
     import socket
     try:
         request('OPTIONS', '/')

@@ -110,7 +110,47 @@ def caldav():
     urn:ietf:params:xml:ns:caldav
     '''
 
-def tickets():
+def delticket():
+    '''
+    Temporary, to debug problems with tickets.
+    
+    Initialization
+        
+    >>> global host, port, path
+    >>> auth = 'Basic %s' % base64.encodestring('test1:test1').strip()
+    >>> authHeaders = {'Authorization': auth}
+    >>> minTicket = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <X:ticketinfo xmlns:D="DAV:" 
+    ...               xmlns:X="http://www.xythos.com/namespaces/StorageServer">
+    ... <D:privilege><D:read/></D:privilege>
+    ... <X:timeout>Second-60</X:timeout>
+    ... </X:ticketinfo>"""
+    >>> home1 = '%s/home/test1' % path
+
+    Create ticket, works
+
+    >>> r = request('MKTICKET', home1, body=minTicket, headers=authHeaders)
+    >>> print r.status # MKTICKET OK
+    200
+    >>> ticket = r.getheader('Ticket')
+    >>> print ticket
+
+    GET with ticket, does not seem to work, status 401 (unauthorized)
+
+    >>> t = {'Ticket': ticket}
+    >>> r = request('GET', home1, headers=t)
+    >>> print r.status # GET with ticket OK 
+    200
+                     
+    DELTICKET does not seem to work, status 501 (not implemented)
+    
+    >>> t = {'Ticket': ticket, 'Authorization': auth}
+    >>> r = request('DELTICKET', home1, headers=t)
+    >>> print r.status # DELTICKET OK (No Content)
+    204
+    '''
+
+#def tickets():
     # Tests still TODO (from cosmo 0.2 spec):
     # -make sure MKTICKET request only shows tickets for current account
     # -make sure ticket timeouts followed

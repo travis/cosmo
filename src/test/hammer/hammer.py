@@ -179,7 +179,7 @@ def main(argv):
             usage()
             sys.exit()
 
-    server, port, path = createaccounts.parseURL(url)
+    server, port, path, tls = createaccounts.parseURL(url)
                 
     # We should ignore SIGPIPE when using pycurl.NOSIGNAL - see
     # the libcurl tutorial for more info.

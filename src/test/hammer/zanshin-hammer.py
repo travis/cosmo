@@ -177,7 +177,7 @@ def main(argv):
             usage()
             sys.exit()
 
-    server, port, path = createaccounts.parseURL(url)
+    server, port, path, tls = createaccounts.parseURL(url)
 
     def endTests(resultList):
         global failed

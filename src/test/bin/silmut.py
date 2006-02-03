@@ -65,7 +65,7 @@ def parseUser(userPassword):
     """
     Parse user and password.
     
-    >>> print parseUser('test1:test1password')
+    >>> parseUser('test1:test1password')
     ('test1', 'test1password')
     """
     colon = userPassword.find(':')
@@ -78,13 +78,13 @@ def parseURL(url):
     """
     Parse URL to host, port, path and tls.
     
-    >>> print parseURL('http://localhost:8080/cosmo')
+    >>> parseURL('http://localhost:8080/cosmo')
     ('localhost', 8080, '/cosmo', False)
-    >>> print parseURL('https://localhost')
+    >>> parseURL('https://localhost')
     ('localhost', 443, '', True)
-    >>> print parseURL('localhost')
+    >>> parseURL('localhost')
     ('localhost', 80, '', False)
-    >>> print parseURL('localhost/')
+    >>> parseURL('localhost/')
     ('localhost', 80, '', False)
     """
     import urlparse
@@ -145,27 +145,27 @@ def delticket():
     Create ticket, works
 
     >>> r = request('MKTICKET', home1, body=minTicket, headers=authHeaders)
-    >>> print r.status # MKTICKET OK
+    >>> r.status # MKTICKET OK
     200
     >>> ticket = r.getheader('Ticket')
-    >>> print ticket
+    >>> ticket
 
     GET with ticket, does not seem to work, status 401 (unauthorized)
 
     >>> t = {'Ticket': ticket}
     >>> r = request('GET', home1, headers=t)
-    >>> print r.status # GET with ticket OK 
+    >>> r.status # GET with ticket OK 
     200
                      
     >>> r = request('GET', '%s?ticket=%s' % (home1, ticket))
-    >>> print r.status # GET with ticket OK 
+    >>> r.status # GET with ticket OK 
     200
 
     DELTICKET does not seem to work, status 501 (not implemented)
     
     >>> t = {'Ticket': ticket, 'Authorization': auth}
     >>> r = request('DELTICKET', home1, headers=t)
-    >>> print r.status # DELTICKET OK (No Content)
+    >>> r.status # DELTICKET OK (No Content)
     204
     '''
 
@@ -210,7 +210,7 @@ def delticket():
     
     >>> r = request('MKTICKET', home1, body=minTicket,
     ...             headers=authHeaders)
-    >>> print r.status # MKTICKET OK
+    >>> r.status # MKTICKET OK
     200
     >>> ticket = r.getheader('Ticket')
 
@@ -218,47 +218,47 @@ def delticket():
     
     >>> r = request('MKTICKET', home1, body=badNSTicket,
     ...             headers=authHeaders)
-    >>> print r.status # MKTICKET bad XML
+    >>> r.status # MKTICKET bad XML
     400
 
     No XML body
     
     >>> r = request('MKTICKET', home1, headers=authHeaders)
-    >>> print r.status # MKTICKET no body
+    >>> r.status # MKTICKET no body
     400
     
     No access privileges
     
     >>> r = request('MKTICKET', home2, body=minTicket,
     ...             headers=authHeaders)
-    >>> print r.status # MKTICKET no access
+    >>> r.status # MKTICKET no access
     403
 
     No access privileges, no body
         
     >>> r = request('MKTICKET', home2, headers=authHeaders)
-    >>> print r.status # MKTICKET no access, no body
+    >>> r.status # MKTICKET no access, no body
     403
 
     No such resource, no body
     
     >>> r = request('MKTICKET', '%s/%s' % (home1, 'doesnotexist'),
     ...              headers=authHeaders)
-    >>> print r.status # MKTICKET no such resource, no body
+    >>> r.status # MKTICKET no such resource, no body
     404
 
     No such resource
     
     >>> r = request('MKTICKET', '%s/%s' % (home1, 'doesnotexist'), 
     ...             body=minTicket, headers=authHeaders)
-    >>> print r.status # MKTICKET no such resource
+    >>> r.status # MKTICKET no such resource
     404
     
     No access, no such resource
     
     >>> r = request('MKTICKET', '%s/%s' % (home2, 'doesnotexist'),
     ...             headers=authHeaders)
-    >>> print r.status # MKTICKET no access, no such resource
+    >>> r.status # MKTICKET no access, no such resource
     403
     
     
@@ -272,7 +272,7 @@ def delticket():
     >>> t['Ticket'] = ticket
     >>> r = request('DELTICKET', '%s?ticket=%s' % (home1, ticket),
     ...             headers=t)
-    >>> print r.status # DELTICKET no access
+    >>> r.status # DELTICKET no access
     403
         
     OK (No Content)
@@ -281,7 +281,7 @@ def delticket():
     >>> t['Ticket'] = ticket
     >>> r = request('DELTICKET', '%s?ticket=%s' % (home1, ticket),
     ...             headers=t)
-    >>> print r.status # DELTICKET OK (No Content)
+    >>> r.status # DELTICKET OK (No Content)
     204
     
     Ticket does not exist
@@ -291,7 +291,7 @@ def delticket():
     >>> t['Ticket'] = nosuchticket
     >>> r = request('DELTICKET', '%s?ticket=%s' % (home1, nosuchticket),
     ...             headers=t)
-    >>> print r.status # DELTICKET no such ticket
+    >>> r.status # DELTICKET no such ticket
     412
     
     Ticket does not exist, body
@@ -300,7 +300,7 @@ def delticket():
     >>> t['Ticket'] = 'nosuchticket5dfe45210787'
     >>> r = request('DELTICKET', '%s?ticket=%s' % (home1, nosuchticket),
     ...             body=minTicket, headers=t)
-    >>> print r.status # DELTICKET no such ticket, body
+    >>> r.status # DELTICKET no such ticket, body
     412
     
     Ticket does not exist, resource does not exist
@@ -309,7 +309,7 @@ def delticket():
     >>> t['Ticket'] = 'nosuchticket5dfe45210787'
     >>> r = request('DELTICKET', '%s/doesnotexist?ticket=%s' % (home1, nosuchticket),
     ...             headers=t)
-    >>> print r.status # DELTICKET no such ticket or resource
+    >>> r.status # DELTICKET no such ticket or resource
     404
     
     Ticket does not exist, resource does not exist, body
@@ -318,7 +318,7 @@ def delticket():
     >>> t['Ticket'] = 'nosuchticket5dfe45210787'
     >>> r = request('DELTICKET', '%s/doesnotexist?ticket=%s' % (home1, nosuchticket),
     ...             body=minTicket, headers=t)
-    >>> print r.status # DELTICKET no such ticket or resource, body
+    >>> r.status # DELTICKET no such ticket or resource, body
     404    
 
 
@@ -328,32 +328,32 @@ def delticket():
     
     >>> r = request('MKTICKET', home1, body=minTicket,
     ...             headers=authHeaders)
-    >>> print r.status # MKTICKET OK
+    >>> r.status # MKTICKET OK
     200
     >>> ticket = r.getheader('Ticket')
     >>> t = authHeaders.copy()
     >>> t['Ticket'] = ticket
     >>> r = request('DELTICKET', '%s?ticket=%s' % (home1, ticket),
     ...             headers=t)
-    >>> print r.status # DELTICKET OK (No Content)
+    >>> r.status # DELTICKET OK (No Content)
     204
     >>> r = request('DELTICKET', '%s?ticket=%s' % (home1, ticket),
     ...             headers=t)
-    >>> print r.status # DELTICKET ticket already deleted
+    >>> r.status # DELTICKET ticket already deleted
     412
     
     GET a resource with ticket
     
     >>> r = request('MKTICKET', home1, body=minTicket,
     ...             headers=authHeaders)
-    >>> print r.status # MKTICKET OK
+    >>> r.status # MKTICKET OK
     200
     >>> ticket = r.getheader('Ticket')
     >>> t = authHeaders.copy()
     >>> t['Ticket'] = ticket
     >>> r = request('GET', '%s?ticket=%s' % (home1, ticket),
     ...             headers=t)
-    >>> print r.status # GET with ticket OK
+    >>> r.status # GET with ticket OK
     200
     
     GET with timed out ticket
@@ -361,14 +361,14 @@ def delticket():
     >>> time.sleep(61)
     >>> r = request('GET', '%s?ticket=%s' % (home1, ticket),
     ...             headers=t)
-    >>> print r.status # GET ticket timed out
+    >>> r.status # GET ticket timed out
     412
     
     DELTICKET the timed out ticket
     
     >>> r = request('DELTICKET', '%s?ticket=%s' % (home1, ticket),
     ...             headers=t)
-    >>> print r.status # DELTICKET ticket already timed out
+    >>> r.status # DELTICKET ticket already timed out
     412
     '''
 

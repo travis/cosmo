@@ -53,7 +53,16 @@ def request(method, url, body=None, headers={},
         if header == 'Host':
             h['Host'] = '%s:%s' % (host, port)
     c.request(method, url, body, h)
-    return c.getresponse()
+    r = c.getresponse()
+    
+    # Automatically follow 302 GET (same host only)
+    if method == 'GET' and r.status == 302:
+        redirectHost, redirectPort, url, redirectTLS = parseURL(r.getheader('Location'))
+        if redirectHost != host or redirectPort != port:
+            raise Exception('Redirect allowed to same server only')
+        return request(method, url, body, headers)
+    
+    return r
 
 
 def usage():
@@ -159,7 +168,7 @@ def delticket():
     ... <D:privilege><D:read/></D:privilege>
     ... <X:timeout>Second-60</X:timeout>
     ... </X:ticketinfo>"""
-    >>> home1 = '%s/home/%s/' % (path, user1)
+    >>> home1 = '%s/home/%s' % (path, user1)
 
     Create ticket, works
 

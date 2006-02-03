@@ -57,9 +57,15 @@ def request(method, url, body=None, headers={},
     
     # Automatically follow 302 GET (same host only)
     if method == 'GET' and r.status == 302:
+        q = url.find('?')
+        query = ''
+        if q != -1:
+            query = url[q:]
         redirectHost, redirectPort, url, redirectTLS = parseURL(r.getheader('Location'))
         if redirectHost != host or redirectPort != port:
             raise Exception('Redirect allowed to same server only')
+        if url.find('?') == -1:
+            url = '%s%s' % (url, query)
         return request(method, url, body, headers)
     
     return r

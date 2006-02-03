@@ -32,7 +32,9 @@ user2 = 'test2'
 password2 = 'test2'
 
 
-def request(*args, **kw):
+def request(method, url, body=None, headers={}, 
+            autoheaders=('Content-Length', 'Content-Type', 'User-Agent',
+                          'Host')):
     """
     Helper function to make requests easier to make.
     """
@@ -40,7 +42,17 @@ def request(*args, **kw):
         c = httplib.HTTPConnection(host, port)
     else:
         c = httplib.HTTPSConnection(host, port)
-    c.request(*args, **kw)
+    h = headers.copy()
+    for header in autoheaders:
+        if header == 'Content-Length' and body is not None:
+            h['Content-Length'] = '%d' % len(body)
+        if header == 'Content-Type' and body is not None:
+            h['Content-Type'] = 'text/xml'
+        if header == 'User-Agent':
+            h['User-Agent'] = 'silmut'
+        if header == 'Host':
+            h['Host'] = '%s:%s' % (host, port)
+    c.request(method, url, body, h)
     return c.getresponse()
 
 
@@ -86,6 +98,10 @@ def parseURL(url):
     ('localhost', 80, '', False)
     >>> parseURL('localhost/')
     ('localhost', 80, '', False)
+    >>> parseURL('http://localhost:8080')
+    ('localhost', 8080, '', False)
+    >>> parseURL('http://localhost:8080/')
+    ('localhost', 8080, '', False)
     """
     import urlparse
     parsed = urlparse.urlparse(url, scheme='http', allow_fragments=0)
@@ -115,6 +131,9 @@ def parseURL(url):
         if slash != -1:
             host = host[:slash]
         path = ''
+        
+    if path == '/':
+        path = ''
             
     return host, port, path, tls
 
@@ -140,7 +159,7 @@ def delticket():
     ... <D:privilege><D:read/></D:privilege>
     ... <X:timeout>Second-60</X:timeout>
     ... </X:ticketinfo>"""
-    >>> home1 = '%s/home/%s' % (path, user1)
+    >>> home1 = '%s/home/%s/' % (path, user1)
 
     Create ticket, works
 
@@ -148,7 +167,6 @@ def delticket():
     >>> r.status # MKTICKET OK
     200
     >>> ticket = r.getheader('Ticket')
-    >>> ticket
 
     GET with ticket, does not seem to work, status 401 (unauthorized)
 
@@ -199,8 +217,8 @@ def delticket():
     ... <D:privilege><D:read/></D:privilege>
     ... <D:timeout>Second-60</D:timeout>
     ... </D:ticketinfo>"""
-    >>> home1 = '%s/home/%s' % (path, user1)
-    >>> home2 = '%s/home/%s' % (path, user2)
+    >>> home1 = '%s/home/%s/' % (path, user1)
+    >>> home2 = '%s/home/%s/' % (path, user2)
     
     MKTICKET
     
@@ -242,21 +260,21 @@ def delticket():
 
     No such resource, no body
     
-    >>> r = request('MKTICKET', '%s/%s' % (home1, 'doesnotexist'),
+    >>> r = request('MKTICKET', '%s%s' % (home1, 'doesnotexist'),
     ...              headers=authHeaders)
     >>> r.status # MKTICKET no such resource, no body
     404
 
     No such resource
     
-    >>> r = request('MKTICKET', '%s/%s' % (home1, 'doesnotexist'), 
+    >>> r = request('MKTICKET', '%s%s' % (home1, 'doesnotexist'), 
     ...             body=minTicket, headers=authHeaders)
     >>> r.status # MKTICKET no such resource
     404
     
     No access, no such resource
     
-    >>> r = request('MKTICKET', '%s/%s' % (home2, 'doesnotexist'),
+    >>> r = request('MKTICKET', '%s%s' % (home2, 'doesnotexist'),
     ...             headers=authHeaders)
     >>> r.status # MKTICKET no access, no such resource
     403
@@ -307,7 +325,7 @@ def delticket():
     
     >>> t = authHeaders.copy()
     >>> t['Ticket'] = 'nosuchticket5dfe45210787'
-    >>> r = request('DELTICKET', '%s/doesnotexist?ticket=%s' % (home1, nosuchticket),
+    >>> r = request('DELTICKET', '%sdoesnotexist?ticket=%s' % (home1, nosuchticket),
     ...             headers=t)
     >>> r.status # DELTICKET no such ticket or resource
     404
@@ -316,7 +334,7 @@ def delticket():
     
     >>> t = authHeaders.copy()
     >>> t['Ticket'] = 'nosuchticket5dfe45210787'
-    >>> r = request('DELTICKET', '%s/doesnotexist?ticket=%s' % (home1, nosuchticket),
+    >>> r = request('DELTICKET', '%sdoesnotexist?ticket=%s' % (home1, nosuchticket),
     ...             body=minTicket, headers=t)
     >>> r.status # DELTICKET no such ticket or resource, body
     404    

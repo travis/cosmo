@@ -36,6 +36,7 @@ Options:
   -w        password (default is cosmo)
   -n        number of accounts to create (default is 100)
   -f        first account number in sequence (default is 1)
+  -d        run doctests for this module
   -h        display this help text
 
 Examples:
@@ -99,13 +100,17 @@ def parseURL(url):
     Parse URL to host, port, path.
     
     >>> print parseURL('http://localhost:8080/cosmo')
-    ('localhost', 8080, '/cosmo')
+    ('localhost', 8080, '/cosmo', False)
     >>> print parseURL('https://localhost')
-    ('localhost', 443, '')
+    ('localhost', 443, '', True)
     >>> print parseURL('localhost')
-    ('localhost', 80, '')
+    ('localhost', 80, '', False)
     >>> print parseURL('localhost/')
-    ('localhost', 80, '')
+    ('localhost', 80, '', False)
+    >>> print parseURL('http://localhost:8080')
+    ('localhost', 8080, '', False)
+    >>> print parseURL('http://localhost:8080/')
+    ('localhost', 8080, '', False)
     """
     import urlparse
     parsed = urlparse.urlparse(url, scheme="http", allow_fragments=0)
@@ -135,7 +140,10 @@ def parseURL(url):
         if slash != -1:
             host = host[:slash]
         path = ""
-            
+    
+    if path == "/":
+        path = ""
+    
     return host, port, path, tls
 
 def request(tls, *args, **kw):
@@ -151,7 +159,7 @@ def request(tls, *args, **kw):
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "s:u:w:n:f:h")
+        opts, args = getopt.getopt(argv, "ds:u:w:n:f:h")
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -173,6 +181,10 @@ def main(argv):
         elif opt == "-w":   password = arg
         elif opt == "-n":   count = int(arg)
         elif opt == "-f":   start = int(arg)
+        elif opt == "-d":
+            import doctest
+            doctest.testmod()
+            sys.exit()
         elif opt == "-h":
             usage()
             sys.exit()

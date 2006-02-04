@@ -358,10 +358,12 @@ public class CmpServlet extends HttpServlet {
             resp.setHeader("Content-Location", resource.getHomedirUrl()); 
             resp.setHeader("ETag", resource.getEntityTag());
         } catch (JDOMException e) {
+            log.warn("error parsing request body: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            "Error parsing request body: " + e.getMessage());
             return;
         } catch (CmpException e) {
+            log.warn("bad request for signup: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            e.getMessage());
         } catch (ModelValidationException e) {
@@ -387,6 +389,8 @@ public class CmpServlet extends HttpServlet {
             if (user.isUsernameChanged()) {
                 // reset logged in user's username
                 user.setUsername(oldUsername);
+                log.warn("bad request for account update: " +
+                         "username may not be changed");
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                "Username may not be changed");
                 return;
@@ -395,10 +399,12 @@ public class CmpServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             resp.setHeader("ETag", resource.getEntityTag());
         } catch (JDOMException e) {
+            log.warn("error parsing request body: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            "Error parsing request body: " + e.getMessage());
             return;
         } catch (CmpException e) {
+            log.warn("bad request for account update: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            e.getMessage());
         } catch (ModelValidationException e) {
@@ -421,6 +427,8 @@ public class CmpServlet extends HttpServlet {
             User user = resource.getUser();
             if (user.getUsername() != null &&
                 ! user.getUsername().equals(urlUsername)) {
+                log.warn("bad request for user create: " +
+                         "username does not match request URI");
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                "Username does not match request URI");
                 return;
@@ -429,10 +437,12 @@ public class CmpServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("ETag", resource.getEntityTag());
         } catch (JDOMException e) {
+            log.warn("error parsing request body: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            "Error parsing request body: " + e.getMessage());
             return;
         } catch (CmpException e) {
+            log.warn("bad request for user create: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            e.getMessage());
         } catch (ModelValidationException e) {
@@ -461,10 +471,12 @@ public class CmpServlet extends HttpServlet {
                 resp.setHeader("Content-Location", resource.getUserUrl());
             }
         } catch (JDOMException e) {
+            log.warn("error parsing request body: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            "Error parsing request body: " + e.getMessage());
             return;
         } catch (CmpException e) {
+            log.warn("bad request for user update: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            e.getMessage());
         } catch (ModelValidationException e) {
@@ -485,6 +497,7 @@ public class CmpServlet extends HttpServlet {
             sendApiError(resp, CmpConstants.SC_EMAIL_IN_USE);
             return;
         }
+        log.warn("model validation error: " + e.getMessage());
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                        e.getMessage());
     }

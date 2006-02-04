@@ -199,6 +199,14 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                          WebdavResponse response,
                          DavResource resource)
         throws IOException, DavException {
+        // if the request is not chunked, require a content length
+        String transferEncoding = request.getHeader("Transfer-Encoding");
+        if ((transferEncoding == null || transferEncoding.equals("identity")) &&
+            request.getContentLength() <= 0) {
+            response.sendError(DavServletResponse.SC_LENGTH_REQUIRED);
+            return;
+        }
+
         try {
             super.doPut(request, response, resource);
         } catch (UnsupportedMediaTypeException e) {
@@ -424,6 +432,12 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     }
 
     // our methods
+
+    /**
+     */
+    public CosmoSecurityManager getSecurityManager() {
+        return securityManager;
+    }
 
     /**
      * Looks up the bean with given name and class in the web

@@ -33,6 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springmodules.jcr.JcrCallback;
+import org.springmodules.jcr.JcrTemplate;
 import org.springmodules.jcr.support.JcrDaoSupport;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
@@ -148,7 +149,15 @@ public class JcrUserDao extends JcrDaoSupport
      */
     public void createUser(final User user) {
         user.validate();
-        getJcrTemplate().execute(new JcrCallback() {
+        // bug 5095: synchronize access to the template so that only
+        // one thread (and therefore jcr session) is modifying the
+        // root node at any given time. a better solution might be to
+        // use intermediary nodes between the root node and the
+        // homedir node, but even then there is still the possibility,
+        // however low, of concurrent modification of a parent node.
+        JcrTemplate template = getJcrTemplate();
+        synchronized (template) {
+            template.execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
                     Node parent = getUserNodeParentNode(session);
@@ -181,6 +190,7 @@ public class JcrUserDao extends JcrDaoSupport
                     return null;
                 }
             });
+        }
     }
 
     /**

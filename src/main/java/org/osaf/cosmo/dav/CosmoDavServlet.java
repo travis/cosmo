@@ -105,6 +105,11 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
      * {@link org.springframework.web.context.WebApplicationContext}
      * and look up support objects.
      *
+     * If no web application context is found in the servlet context,
+     * the caller is responsible for setting the servlet's
+     * {@link DavSessionProvider}, {@link ResourceFactory} and
+     * {@link LocatorFactory}.
+     *
      * @throws ServletException
      */
     public void init() throws ServletException {
@@ -114,37 +119,29 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             getWebApplicationContext(getServletContext());
 
         if (wac != null) {
-            if (securityManager == null) {
-                securityManager = (CosmoSecurityManager)
-                    getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
-            }
+            securityManager = (CosmoSecurityManager)
+                getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
 
             JcrSessionFactory sessionFactory = (JcrSessionFactory)
                 getBean(BEAN_DAV_SESSION_FACTORY, JcrSessionFactory.class);
             TicketDao ticketDao = (TicketDao)
                 getBean(BEAN_TICKET_DAO, TicketDao.class);
 
-            if (getDavSessionProvider() == null) {
-                CosmoDavSessionProviderImpl sessionProvider =
-                    new CosmoDavSessionProviderImpl();
-                sessionProvider.setSessionFactory(sessionFactory);
-                setDavSessionProvider(sessionProvider);
-            }
+            CosmoDavSessionProviderImpl sessionProvider =
+                new CosmoDavSessionProviderImpl();
+            sessionProvider.setSessionFactory(sessionFactory);
+            setDavSessionProvider(sessionProvider);
 
-            if (getResourceFactory() == null) {
-                CosmoDavResourceFactoryImpl resourceFactory =
-                    new CosmoDavResourceFactoryImpl(getLockManager(),
-                                                    getResourceConfig());
-                resourceFactory.setSecurityManager(securityManager);
-                resourceFactory.setTicketDao(ticketDao);
-                setResourceFactory(resourceFactory);
-            }
+            CosmoDavResourceFactoryImpl resourceFactory =
+                new CosmoDavResourceFactoryImpl(getLockManager(),
+                                                getResourceConfig());
+            resourceFactory.setSecurityManager(securityManager);
+            resourceFactory.setTicketDao(ticketDao);
+            setResourceFactory(resourceFactory);
 
-            if (getLocatorFactory() == null) {
-                CosmoDavLocatorFactoryImpl locatorFactory =
-                    new CosmoDavLocatorFactoryImpl(getPathPrefix());
-                setLocatorFactory(locatorFactory);
-            }
+            CosmoDavLocatorFactoryImpl locatorFactory =
+                new CosmoDavLocatorFactoryImpl(getPathPrefix());
+            setLocatorFactory(locatorFactory);
         }
     }
 

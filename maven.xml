@@ -164,6 +164,6 @@
   </goal>
 
   <goal name="dist:clean">
-    <delete file="${cosmo.dist}"/>
+    <delete dir="${cosmo.dist}"/>
   </goal>
 </project>

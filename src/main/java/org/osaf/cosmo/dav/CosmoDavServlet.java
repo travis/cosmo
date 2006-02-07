@@ -195,6 +195,23 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
     /**
      */
+    protected void doDelete(WebdavRequest request,
+                            WebdavResponse response,
+                            DavResource resource)
+        throws IOException, DavException {
+        // home collections cannot be deleted directly - they are
+        // deleted only when a user is deleted
+        if (((CosmoDavResource) resource).isHomeCollection()) {
+            response.sendError(DavServletResponse.SC_FORBIDDEN,
+                               "Home collection may not be deleted");
+            return;
+        }
+
+        super.doDelete(request, response, resource);
+    }
+
+    /**
+     */
     protected void doPut(WebdavRequest request,
                          WebdavResponse response,
                          DavResource resource)

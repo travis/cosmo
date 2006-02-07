@@ -86,6 +86,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     protected SupportedReportSetProperty supportedReports =
         new SupportedReportSetProperty();
     private boolean isCalendarCollection;
+    private boolean isHomeCollection;
 
     /**
      */
@@ -103,6 +104,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         initializing = false;
         isCalendarCollection = exists() &&
             getNode().isNodeType(NT_CALENDAR_COLLECTION);
+        isHomeCollection = exists() &&
+            getNode().isNodeType(NT_HOME_COLLECTION);
     }
 
     // DavResource methods
@@ -148,6 +151,14 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public void setIsCalendarCollection(boolean isCalendarCollection) {
         this.isCalendarCollection = isCalendarCollection;
+    }
+
+    /**
+     * Returns true if this resource represents a home
+     * collection.
+     */
+    public boolean isHomeCollection() {
+        return isHomeCollection;
     }
 
     /**

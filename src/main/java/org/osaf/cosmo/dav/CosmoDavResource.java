@@ -58,6 +58,11 @@ public interface CosmoDavResource extends DavResource {
     public boolean isCalendarCollection();
 
     /**
+     * Returns true if this resource represents a home collection.
+     */
+    public boolean isHomeCollection();
+
+    /**
      * Associates a ticket with this resource and saves it into
      * persistent storage.
      */

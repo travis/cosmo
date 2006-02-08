@@ -1,0 +1,7 @@
+TODO
+
+urn:ietf:params:xml:ns:caldav
+
+First, bring the framework environment
+
+	>>> from silmut import *

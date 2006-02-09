@@ -176,12 +176,8 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
     public void testGetTicketNotFound() throws Exception {
         Node n1 = getTestHelper().addTicketableNode();
 
-        try {
-            dao.getTicket(n1.getPath(), "deadbeef");
-            fail("nonexistent ticket found");
-        } catch (DataRetrievalFailureException e) {
-            // expected
-        }
+        Ticket ticket = dao.getTicket(n1.getPath(), "deadbeef");
+        assertNull("nonexistent ticket found", ticket);
     }
 
     /**
@@ -216,13 +212,9 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
     public void testGetInheritedTicketNotFound() throws Exception {
         Node n1 = getTestHelper().addTicketableNode();
 
-        try {
-            String path = n1.getPath() + "/foobar";
-            dao.getTicket(path, "deadbeef");
-            fail("nonexistent ticket found");
-        } catch (DataRetrievalFailureException e) {
-            // expected
-        }
+        String path = n1.getPath() + "/foobar";
+        Ticket ticket = dao.getTicket(path, "deadbeef");
+        assertNull("nonexistent ticket found", ticket);
     }
 
     /**

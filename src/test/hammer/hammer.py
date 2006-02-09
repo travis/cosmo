@@ -35,6 +35,7 @@ Options:
   -m        timeout setting in seconds (default is 30)
   -a        test account creation (# created is -t * -i)
   -o	    initial offset for account creation
+  -y        Use Python httplib instead of pycurl
   -h        display this help text
 
 Examples:
@@ -51,7 +52,7 @@ from threading import Thread
 from threading import Lock
 import pycurl
 import sys, getopt, datetime, time
-import string, random
+import string, random, base64, socket, httplib
 import createaccounts
 
 def LogEvent(*attr):
@@ -59,7 +60,103 @@ def LogEvent(*attr):
     outputLock.acquire()
     print "%s\t%s" % (datetime.datetime.now().isoformat(' '), s)
     outputLock.release()
+
+def request(tls, host, port, method, url, body=None, 
+            username=None, password=None,
+            headers={}, 
+            autoheaders=('Content-Length', 'Content-Type', 'User-Agent',
+                          'Host', 'Authorization')):
+    """
+    Helper function to make requests easier to make.
+    """
+    if not tls:
+        c = httplib.HTTPConnection(host, port)
+    else:
+        c = httplib.HTTPSConnection(host, port)
+    h = headers.copy()
+    for header in autoheaders:
+        if header == 'Content-Length' and body is not None:
+            h[header] = '%d' % len(body)
+        if header == 'Content-Type' and body is not None:
+            h[header] = 'text/txt'
+        if header == 'User-Agent':
+            h[header] = 'Cosmo hammer'
+        if header == 'Host':
+            h[header] = '%s:%s' % (host, port)
+        if header == 'Authorization' and username is not None and \
+            password is not None:
+            auth = 'Basic %s' % base64.encodestring('%s:%s' % (username, password)).strip()
+            h[header] = auth
+    c.request(method, url, body, h)
+    r = c.getresponse()
     
+    # Automatically follow 302 GET (same host only)
+    if method == 'GET' and r.status == 302:
+        q = url.find('?')
+        query = ''
+        if q != -1:
+            query = url[q:]
+        redirectHost, redirectPort, url, redirectTLS = parseURL(r.getheader('Location'))
+        if redirectHost != host or redirectPort != port:
+            raise Exception('Redirect allowed to same server only')
+        if url.find('?') == -1:
+            url = '%s%s' % (url, query)
+        return request(method, url, body, headers)
+    
+    return r
+
+class TestCosmoPurePython(Thread):
+    def __init__(self, tls, server, port, url, datalength, iterations, username, password):
+        Thread.__init__(self)
+        self.tls = tls
+        self.server = server
+        self.port = port
+        self.url = url
+        self.datalength = datalength
+        self.iterations = iterations
+        self.passed = False
+        self.username = username
+        self.password = password
+    
+    def run(self):
+         for i in range(self.iterations):
+            strToWrite = randomString(self.datalength)
+            strRead = ''
+            if self.write(strToWrite) is not True: return
+            strRead = self.read()
+            if strRead == "": return
+            if strToWrite != strRead:
+                print "\nDownloaded string didn't match uploaded string"
+                return
+#            print "#",
+         self.passed = True
+
+    def write(self, data):
+        try:
+            start = time.clock()
+            r = request(self.tls, self.server, self.port, "PUT", self.url, 
+                        data, self.username, self.password)
+            LogEvent("PUT", "%.3f" % (time.clock() - start))
+        except:
+            exctype, value = sys.exc_info()[:2]
+            LogEvent("PUT ERROR", str(exctype), str(value))
+            return False
+        return True
+
+    def read(self):
+        try:
+            start = time.clock()
+            r = request(self.tls, self.server, self.port, "GET", self.url, 
+                        username=self.username, password=self.password)
+            LogEvent("GET", "%.3f" % (time.clock() - start))
+            return r.read()
+        except:
+            exctype, value = sys.exc_info()[:2]
+            LogEvent("GET ERROR", str(exctype), str(value))
+            return ""
+        return ""
+
+
 class TestCosmo(Thread):
     def __init__(self, url, datalength, iterations, timeout):
         Thread.__init__(self)
@@ -172,7 +269,7 @@ def usage():
     
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "t:i:s:p:l:u:w:m:o:ah")
+        opts, args = getopt.getopt(argv, "t:i:s:p:l:u:w:m:o:ayh")
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -190,6 +287,7 @@ def main(argv):
     timeout = 30
     accountCreation = False
     offset = 1
+    pythonHammer = False
     
     for (opt, arg) in opts:
         if opt == "-t":      threads = int(arg)
@@ -201,6 +299,7 @@ def main(argv):
         elif opt == "-m":    timeout = int(arg)
         elif opt == "-a":    accountCreation = True
         elif opt == "-o":    offset = int(arg)
+        elif opt == "-y":    pythonHammer = True
         elif opt == "-h":
             usage()
             sys.exit()
@@ -231,6 +330,12 @@ def main(argv):
             c = TestCosmoAccountCreation(tls, server, port, path, first,
                                          iterations)
             first += iterations
+        elif pythonHammer:
+            u = username + str(thread)
+            p = password + str(thread)
+            url = "%s/home/%s/testfile.txt" % (path, u)
+            c = TestCosmoPurePython(tls, server, port, url, datalength, 
+                                    iterations, u, p)
         else:
             u = username + str(thread)
             p = password + str(thread)

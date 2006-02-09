@@ -105,9 +105,8 @@ def createAccount(tls, server, port, path, username, password,
         return False
     else:
         print "Unhandled response code: %d" % code
-        return False
 
-    return True
+    return False
 
 
 def usage():

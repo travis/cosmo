@@ -36,7 +36,8 @@
        <value>
 	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
 	 PATTERN_TYPE_APACHE_ANT
-         /console/welcome=ROLE_ANONYMOUS
+         /console/error=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
+         /console/error/**=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
          /console/account/new=ROLE_ANONYMOUS
          /console/account/signup=ROLE_ANONYMOUS
          /console/account=ROLE_ROOT,ROLE_USER

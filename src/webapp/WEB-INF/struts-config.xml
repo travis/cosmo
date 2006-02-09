@@ -42,13 +42,15 @@
   </global-forwards>
 
   <action-mappings>
+    <!-- errors -->
     <action path="/error"
             type="org.osaf.cosmo.ui.CosmoErrorAction">
       <forward name="error.general" path="error.general"/>
       <forward name="error.messaging" path="error.messaging"/>
       <forward name="error.notfound" path="error.notfound"/>
+      <forward name="error.forbidden" path="error.forbidden"/>
     </action>
-
+    
     <!-- Help and About pages -->
     
     <action path="/help"

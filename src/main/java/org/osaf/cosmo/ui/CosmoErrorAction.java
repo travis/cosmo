@@ -45,6 +45,8 @@ public class CosmoErrorAction extends Action {
         "javax.servlet.error.exception";
     private static final String ATTR_STRUTS_SOURCE =
         "org.apache.struts.action.EXCEPTION";
+    private static final String ATTR_CONTAINER_STATUS_CODE =
+        "javax.servlet.error.status_code";
     private static final Log log = LogFactory.getLog(CosmoErrorAction.class);
 
     public static final String ATTR_EXCEPTION = "Exception";
@@ -63,6 +65,11 @@ public class CosmoErrorAction extends Action {
      * <code>error.notfound</code>
      */
     public static final String FWD_ERROR_NOT_FOUND = "error.notfound";
+    /**
+     * The Struts forward representing the "Forbidden" page:
+     * <code>error.forbidden</code>
+     */
+    public static final String FWD_ERROR_FORBIDDEN = "error.forbidden";
 
     /** Finds the exception thrown by the container or a library and
      * stores it in the exception named by
@@ -119,6 +126,18 @@ public class CosmoErrorAction extends Action {
         else if (isNotFoundError(t)) {
             return mapping.findForward(FWD_ERROR_NOT_FOUND);
         }
+
+        Integer statusCode =
+            (Integer) request.getAttribute(ATTR_CONTAINER_STATUS_CODE);
+        if (statusCode != null) {
+            if (statusCode.intValue() == HttpServletResponse.SC_FORBIDDEN) {
+                return mapping.findForward(FWD_ERROR_FORBIDDEN);
+            }
+            if (statusCode.intValue() == HttpServletResponse.SC_NOT_FOUND) {
+                return mapping.findForward(FWD_ERROR_NOT_FOUND);
+            }
+        }
+
         return mapping.findForward(FWD_ERROR_GENERAL);
     }
 

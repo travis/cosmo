@@ -193,6 +193,14 @@
     <exception-type>java.lang.Throwable</exception-type>
     <location>/console/error</location>
   </error-page>
+  <error-page>
+    <error-code>403</error-code>
+    <location>/console/error</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/console/error</location>
+  </error-page>
   <resource-env-ref>
     <resource-env-ref-name>jcr/cosmo</resource-env-ref-name>
     <resource-env-ref-type>javax.jcr.Repository</resource-env-ref-type>

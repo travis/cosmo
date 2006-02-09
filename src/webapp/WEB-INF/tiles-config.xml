@@ -53,6 +53,12 @@
     <put name="showNav"      value="false"/>
   </definition>
 
+  <definition name="error.forbidden" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/error/forbidden.jsp"/>
+    <put name="prefix"       value="Error.Forbidden."/>
+    <put name="showNav"      value="false"/>
+  </definition>
+
   <!-- Help/About defs -->
   
   <definition name="help" extends="layout.standard">

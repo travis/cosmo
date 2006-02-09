@@ -16,6 +16,9 @@
 package org.osaf.cosmo.acegisecurity.ticket;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -48,8 +51,6 @@ public class TicketProcessingFilter implements Filter {
     /** the request header containing a ticket: <code>Ticket</code> */
     public static final String HEADER_TICKET = "Ticket";
 
-    private String resourcePathPrefix;
-
     // Filter methods
 
     /**
@@ -60,12 +61,17 @@ public class TicketProcessingFilter implements Filter {
     }
 
     /**
-     * Examines HTTP servlet requests for a ticket, creating a
-     * {@link TicketAuthenticationToken} if one is found.
+     * Examines HTTP servlet requests for ticket ids, creating a
+     * {@link TicketAuthenticationToken} if any are found.
      *
-     * Looks first for the request parameter named
-     * by <code>PARAM_TICKET</code>. If one is not found, then looks
-     * for the request header named by <code>HEADER_TICKET</code>.
+     * This method consults {@link #findTicketIds(HttpServletRequest)}
+     * to find the set of ticket ids present in the request.
+     *
+     * Tokens are created with the
+     * {@link #createAuthentication(String, Set)} method.
+     *
+     * A token's path is the path info of the request URI less any
+     * trailing "/", or "/" if the URI represents the root resource.
      */
     public void doFilter(ServletRequest request,
                          ServletResponse response,
@@ -75,34 +81,17 @@ public class TicketProcessingFilter implements Filter {
         if (sc.getAuthentication() == null) {
             if (request instanceof HttpServletRequest) {
                 HttpServletRequest httpRequest = (HttpServletRequest) request;
-                String id = httpRequest.getParameter(PARAM_TICKET);
-                if (id == null || id.equals("")) {
-                    id = httpRequest.getHeader(HEADER_TICKET);
-                }
-                if (id != null && ! id.equals("")) {
-                    // fix up the path to remove the resource path
-                    // prefix (often the servlet path but not always),
-                    // to remove trailing slashes (used by webdav
-                    // to indicate collections), and to use "/" for
-                    // the root item
-                    String path = httpRequest.getRequestURI();
-                    if (resourcePathPrefix != null &&
-                        path.startsWith(resourcePathPrefix)) {
-                        path = path.substring(resourcePathPrefix.length());
-                    }
+                Set ids = findTicketIds(httpRequest);
+                if (! ids.isEmpty()) {
+                    String path = httpRequest.getPathInfo();
                     if (path == null || path.equals("")) {
                         path = "/";
                     }
                     if (! path.equals("/") && path.endsWith("/")) {
                         path = path.substring(0, path.length()-1);
                     }
-                    // cadaver for some reason appends a "/" to the
-                    // ticket query param when doing "open
-                    // http://localhost:8080/home/bcm/?ticket=deadbeef"
-                    if (id.endsWith("/")) {
-                        id = id.substring(0, id.length()-1);
-                    }
-                    Authentication token = createAuthentication(path, id);
+
+                    Authentication token = createAuthentication(path, ids);
                     sc.setAuthentication(token);
                     if (log.isDebugEnabled()) {
                         log.debug("Replaced ContextHolder with ticket token: " +
@@ -124,22 +113,37 @@ public class TicketProcessingFilter implements Filter {
     // our methods
 
     /**
+     * Returns a {@link java.util.Set} of all ticket ids found in the
+     * request, both in the {@link #HEADER_TICKET} header and the
+     * {@link #PARAM_TICKET} parameter.
+     */
+    protected Set findTicketIds(HttpServletRequest request) {
+        HashSet ids = new HashSet();
+        Enumeration headerValues = request.getHeaders(HEADER_TICKET);
+        if (headerValues != null) {
+            while (headerValues.hasMoreElements()) {
+                String value = (String) headerValues.nextElement();
+                String[] atoms = value.split(", ");
+                for (int i=0; i<atoms.length; i++) {
+                    ids.add(atoms[i]);
+                }
+            }
+        }
+        String[] paramValues = request.getParameterValues(PARAM_TICKET);
+        if (paramValues != null) {
+            for (int i=0; i<paramValues.length; i++) {
+                ids.add(paramValues[i]);
+            }
+        }
+        return ids;
+    }
+
+    /**
      * Returns a {@link TicketAuthenticationToken} for the given
-     * ticket.
+     * path and ticket ids
      */
-    protected Authentication createAuthentication(String path, String id) {
-        return new TicketAuthenticationToken(path, id);
-    }
-
-    /**
-     */
-    public String getResourcePathPrefix() {
-        return resourcePathPrefix;
-    }
-
-    /**
-     */
-    public void setResourcePathPrefix(String resourcePathPrefix) {
-        this.resourcePathPrefix = resourcePathPrefix;
+    protected Authentication createAuthentication(String path,
+                                                  Set ids) {
+        return new TicketAuthenticationToken(path, ids);
     }
 }

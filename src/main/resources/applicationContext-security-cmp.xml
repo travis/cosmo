@@ -18,9 +18,7 @@
     limitations under the License.
 -->
 
-<!--
-    Application context containing cmp security beans
--->
+<!-- Security configuration for CMP -->
 
 <beans>
 
@@ -66,7 +64,7 @@
   <bean id="cmpHttpRequestContextIntegrationFilter"
         class="org.osaf.cosmo.acegisecurity.HttpRequestContextIntegrationFilter"/>
 
-   <!-- filter that performs BASIC authentication -->
+  <!-- filter that performs Basic authentication -->
 
   <bean id="cmpBasicAuthenticationEntryPoint"
         class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">

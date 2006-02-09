@@ -152,8 +152,6 @@ public class JcrTicketDao extends JcrDaoSupport
      * @param path the absolute JCR path of the ticketed node
      * @param id the id of the ticket unique to the parent node
      *
-     * @throws DataRetrievalFailureException if the ticket is not
-     * found on the given path
      * @throws InvalidDataResourceUsageException if the item at the
      * given path is not a node
      */
@@ -167,7 +165,7 @@ public class JcrTicketDao extends JcrDaoSupport
                     Node ticketNode = findChildTicketNode(parentNode, id);
                     if (ticketNode == null) {
                         if (parentNode.getDepth() == 0) {
-                            throw new DataRetrievalFailureException("ticket " + id + " not found on path " + path);
+                            return null;
                         }
                         return getTicket(parentNode.getParent().getPath(), id);
                     }

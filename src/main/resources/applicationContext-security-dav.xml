@@ -18,9 +18,7 @@
     limitations under the License.
 -->
 
-<!--
-    Application context containing webapp security beans
--->
+<!-- Security configuration for WebDAV and Atom -->
 
 <beans>
 
@@ -65,13 +63,9 @@
   <!-- filter that performs ticket authentication -->
 
   <bean id="davTicketProcessingFilter"
-        class="org.osaf.cosmo.acegisecurity.ticket.TicketProcessingFilter">
-    <property name="resourcePathPrefix">
-      <value>/home</value>
-    </property>
-  </bean>
+        class="org.osaf.cosmo.acegisecurity.ticket.TicketProcessingFilter"/>
 
-   <!-- filter that performs BASIC authentication -->
+  <!-- filter that performs Basic authentication -->
 
   <bean id="davBasicAuthenticationEntryPoint"
         class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">

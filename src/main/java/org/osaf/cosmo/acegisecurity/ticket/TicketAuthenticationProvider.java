@@ -17,6 +17,7 @@ package org.osaf.cosmo.acegisecurity.ticket;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Iterator;
 
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationException;
@@ -55,40 +56,18 @@ public class TicketAuthenticationProvider
 
         TicketAuthenticationToken token =
             (TicketAuthenticationToken) authentication;
-        String repositoryPath = null;
-        try {
-            repositoryPath = URLDecoder.decode(token.getPath(), "UTF-8");
-            if (log.isDebugEnabled()) {
-                log.debug("authenticating ticket " + token.getId() +
-                          " for resource at path " + repositoryPath);
+        String repositoryPath = tokenPathToRepositoryPath(token.getPath());
+        for (Iterator i=token.getIds().iterator(); i.hasNext();) {
+            String id = (String) i.next();
+            Ticket ticket = findTicket(repositoryPath, id);
+            if (ticket != null) {
+                token.setTicket(ticket);
+                token.setAuthenticated(true);
+                return token;
             }
-            Ticket ticket = ticketDao.getTicket(repositoryPath, token.getId());
-            if (ticket == null) {
-                throw new BadCredentialsException("Ticket " + token.getId() +
-                                                  " not found for resource " +
-                                                  "at " + repositoryPath);
-            }
-
-            if (ticket.hasTimedOut()) {
-                if (log.isDebugEnabled()) {
-                    log.debug("removing timed out ticket " + ticket.getId());
-                }
-                ticketDao.removeTicket(repositoryPath, ticket);
-                throw new TicketTimeoutException(ticket.getId());
-            }
-
-            token.setTicket(ticket);
-            token.setAuthenticated(true);
-            return token;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("UTF-8 not supported?!");
-        } catch (DataRetrievalFailureException e) {
-            throw new TicketedItemNotFoundException("Resource at " +
-                                                    repositoryPath + 
-                                                    " not found");
-        } catch (DataAccessException e) {
-            throw new AuthenticationServiceException(e.getMessage(), e);
         }
+        throw new BadCredentialsException("No valid tickets found for" +
+                                          " resource at " + repositoryPath);
     }
 
     /**
@@ -110,5 +89,47 @@ public class TicketAuthenticationProvider
      */
     public void setTicketDao(TicketDao ticketDao) {
         this.ticketDao = ticketDao;
+    }
+
+    /**
+     */
+    protected Ticket findTicket(String repositoryPath,
+                                String id) {
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("authenticating ticket " + id +
+                          " for resource at path " + repositoryPath);
+            }
+            Ticket ticket = ticketDao.getTicket(repositoryPath, id);
+            if (ticket == null) {
+                return null;
+            }
+
+            if (ticket.hasTimedOut()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("removing timed out ticket " + ticket.getId());
+                }
+                ticketDao.removeTicket(repositoryPath, ticket);
+                return null;
+            }
+
+            return ticket;
+        } catch (DataRetrievalFailureException e) {
+            throw new TicketedItemNotFoundException("Resource at " +
+                                                    repositoryPath + 
+                                                    " not found");
+        } catch (DataAccessException e) {
+            throw new AuthenticationServiceException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     */
+    private String tokenPathToRepositoryPath(String tokenPath) {
+        try {
+            return URLDecoder.decode(tokenPath, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("UTF-8 not supported?!");
+        }
     }
 }

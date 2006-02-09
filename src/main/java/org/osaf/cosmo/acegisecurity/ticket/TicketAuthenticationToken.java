@@ -16,6 +16,7 @@
 package org.osaf.cosmo.acegisecurity.ticket;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.providers.AbstractAuthenticationToken;
@@ -37,22 +38,22 @@ public class TicketAuthenticationToken extends AbstractAuthenticationToken
 
     private boolean authenticated;
     private String path;
-    private String id;
+    private Set ids;
     private Ticket ticket;
 
     /**
      * @param path the absolute URI path to the ticketed resource
-     * @param id the ticket id
+     * @param id all ticket ids provided for the resource
      */
-    public TicketAuthenticationToken(String path, String id) {
+    public TicketAuthenticationToken(String path, Set ids) {
         if (path == null || path.equals("")) {
             throw new IllegalArgumentException("path may not be null or empty");
         }
-        if (id == null || id.equals("")) {
-            throw new IllegalArgumentException("id may not be null or empty");
+        if (ids == null || ids.isEmpty()) {
+            throw new IllegalArgumentException("ids may not be null or empty");
         }
         this.path = path;
-        this.id = id;
+        this.ids = ids;
         authenticated = false;
     }
 
@@ -106,8 +107,8 @@ public class TicketAuthenticationToken extends AbstractAuthenticationToken
 
     /**
      */
-    public String getId() {
-        return id;
+    public Set getIds() {
+        return ids;
     }
 
     /**

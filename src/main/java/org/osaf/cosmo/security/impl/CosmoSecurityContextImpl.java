@@ -24,10 +24,10 @@ import org.osaf.cosmo.security.CosmoUserDetails;
 
 import java.util.Iterator;
 
-import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.GrantedAuthority;
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import net.sf.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
+import org.acegisecurity.Authentication;
+import org.acegisecurity.GrantedAuthority;
+import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -37,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * The default implementation of {@link CosmoSecurityContext}. Wraps
  * an instance of Acegi Security's
- * {@link net.sf.acegisecurity.Authentication}.
+ * {@link org.acegisecurity.Authentication}.
  */
 public class CosmoSecurityContextImpl implements CosmoSecurityContext {
     private static final Log log =

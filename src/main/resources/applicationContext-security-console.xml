@@ -22,11 +22,10 @@
 
 <beans>
 
-  <!-- interceptor which specifies access control rules for the
-       URL space, invoked by security enforcement filter -->
+  <!-- interceptor which performs authorization for web requests -->
 
    <bean id="consoleFilterInvocationInterceptor"
-         class="net.sf.acegisecurity.intercept.web.FilterSecurityInterceptor">
+         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
      <property name="authenticationManager">
        <ref bean="authenticationManager"/>
      </property>
@@ -50,7 +49,6 @@
          /console/loginfailed=ROLE_ANONYMOUS
          /console/logout=ROLE_ROOT,ROLE_USER
          /console/home/**=ROLE_ROOT,ROLE_USER
-         /console/dirlisting.jsp*=ROLE_ROOT,ROLE_USER
          /**=ROLE_ROOT
        </value>
      </property>
@@ -59,12 +57,12 @@
   <!-- filter chain that kicks off request-time processing -->
 
   <bean id="consoleFilterChainProxy"
-        class="net.sf.acegisecurity.util.FilterChainProxy">
+        class="org.acegisecurity.util.FilterChainProxy">
     <property name="filterInvocationDefinitionSource">
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=consoleHttpSessionContextIntegrationFilter,consoleFormBasedProcessingFilter,consoleAnonymousProcessingFilter,consoleSecurityEnforcementFilter
+        /**=consoleHttpSessionContextIntegrationFilter,consoleFormBasedProcessingFilter,consoleAnonymousProcessingFilter,consoleExceptionTranslationFilter,consoleFilterInvocationInterceptor
       </value>
     </property>
   </bean>
@@ -72,12 +70,12 @@
   <!-- filter that integrates SecurityContext into HTTP Session -->
 
   <bean id="consoleHttpSessionContextIntegrationFilter"
-        class="net.sf.acegisecurity.context.HttpSessionContextIntegrationFilter"/>
+        class="org.acegisecurity.context.HttpSessionContextIntegrationFilter"/>
 
    <!-- filter that performs form-based authentication -->
 
   <bean id="consoleFormBasedAuthenticationEntryPoint"
-        class="net.sf.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+        class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
     <property name="loginFormUrl">
       <value>/console/login</value>
     </property>
@@ -87,7 +85,7 @@
   </bean>
 
   <bean id="consoleFormBasedProcessingFilter"
-        class="net.sf.acegisecurity.ui.webapp.AuthenticationProcessingFilter">
+        class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter">
     <property name="authenticationManager">
       <ref bean="authenticationManager"/>
     </property>
@@ -105,7 +103,7 @@
   <!-- filter that performs anonymous authentication -->
 
   <bean id="consoleAnonymousProcessingFilter"
-        class="net.sf.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+        class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
     <property name="key">
       <value>badgerbadgerbadger</value>
     </property>
@@ -114,13 +112,10 @@
     </property>
   </bean>
 
-  <!-- filter that enforces security constraints on console requests -->
+  <!-- filter that converts authen/authz exceptions to web pages -->
 
-  <bean id="consoleSecurityEnforcementFilter"
-        class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
-    <property name="filterSecurityInterceptor">
-      <ref local="consoleFilterInvocationInterceptor"/>
-    </property>
+  <bean id="consoleExceptionTranslationFilter"
+        class="org.acegisecurity.ui.ExceptionTranslationFilter">
     <property name="authenticationEntryPoint">
       <ref local="consoleFormBasedAuthenticationEntryPoint"/>
     </property>

@@ -17,11 +17,12 @@ package org.osaf.cosmo.security;
 
 import org.osaf.cosmo.model.User;
 
-import net.sf.acegisecurity.UserDetails;
+import org.acegisecurity.userdetails.UserDetails;
 
 /**
- * An interface that extends Acegi Security's {@link UserDetails}
- * interface to provide additional Cosmo-specific information for use
+ * An interface that extends
+ * {@link org.acegisecurity.userdetails.UserDetails}
+ * to provide additional Cosmo-specific information for use
  * by security components.
  *
  * For now this interface simply allows access to the Cosmo

@@ -28,16 +28,16 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.context.SecurityContext;
-import net.sf.acegisecurity.context.SecurityContextHolder;
+import org.acegisecurity.Authentication;
+import org.acegisecurity.context.SecurityContext;
+import org.acegisecurity.context.SecurityContextHolder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Servlet filter that populates the
- * {@link net.sf.acegisecurity.ContextHolder} with a
+ * {@link org.acegisecurity.ContextHolder} with a
  * {@link TicketAuthenticationToken} if needed.
  *
  * @see http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt

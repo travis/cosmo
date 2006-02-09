@@ -15,12 +15,12 @@
  */
 package org.osaf.cosmo.acegisecurity;
 
-import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.ConfigAttribute;
-import net.sf.acegisecurity.ConfigAttributeDefinition;
-import net.sf.acegisecurity.intercept.web.FilterInvocation;
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import net.sf.acegisecurity.vote.AccessDecisionVoter;
+import org.acegisecurity.Authentication;
+import org.acegisecurity.ConfigAttribute;
+import org.acegisecurity.ConfigAttributeDefinition;
+import org.acegisecurity.intercept.web.FilterInvocation;
+import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import org.acegisecurity.vote.AccessDecisionVoter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,7 +79,7 @@ public class HomedirVoter implements AccessDecisionVoter {
 
     /**
      * Returns true if the secure object is a
-     * {@link net.sf.acegisecurity.intercept.web.FilterInvocation}
+     * {@link org.acegisecurity.intercept.web.FilterInvocation}
      */
     public boolean supports(Class clazz) {
         return (FilterInvocation.class.isAssignableFrom(clazz));

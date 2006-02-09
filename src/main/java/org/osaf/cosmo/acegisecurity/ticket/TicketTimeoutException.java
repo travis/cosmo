@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.acegisecurity.ticket;
 
-import net.sf.acegisecurity.AuthenticationException;
+import org.acegisecurity.AuthenticationException;
 
 /**
  */

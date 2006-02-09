@@ -27,7 +27,7 @@
     <dependency>
       <groupId>acegisecurity</groupId>
       <artifactId>acegi-security</artifactId>
-      <version>0.9.0</version>
+      <version>1.0.0-RC2</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

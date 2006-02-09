@@ -22,11 +22,10 @@
 
 <beans>
 
-  <!-- interceptor which specifies access control rules for the
-       URL space, invoked by security enforcement filter -->
+  <!-- interceptor which performs authorization for CMP requests -->
 
    <bean id="cmpFilterInvocationInterceptor"
-         class="net.sf.acegisecurity.intercept.web.FilterSecurityInterceptor">
+         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
      <property name="authenticationManager">
        <ref bean="authenticationManager"/>
      </property>
@@ -49,12 +48,12 @@
   <!-- filter chain that kicks off request-time processing -->
 
   <bean id="cmpFilterChainProxy"
-        class="net.sf.acegisecurity.util.FilterChainProxy">
+        class="org.acegisecurity.util.FilterChainProxy">
     <property name="filterInvocationDefinitionSource">
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=cmpHttpRequestContextIntegrationFilter,cmpBasicProcessingFilter,cmpAnonymousProcessingFilter,cmpSecurityEnforcementFilter
+        /**=cmpHttpRequestContextIntegrationFilter,cmpBasicProcessingFilter,cmpAnonymousProcessingFilter,cmpExceptionTranslationFilter,cmpFilterInvocationInterceptor
       </value>
     </property>
   </bean>
@@ -67,14 +66,14 @@
   <!-- filter that performs Basic authentication -->
 
   <bean id="cmpBasicAuthenticationEntryPoint"
-        class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
+        class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
     <property name="realmName">
       <value>Cosmo Sharing Server</value>
     </property>
   </bean>
 
   <bean id="cmpBasicProcessingFilter"
-        class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilter">
+        class="org.acegisecurity.ui.basicauth.BasicProcessingFilter">
     <property name="authenticationManager">
       <ref bean="authenticationManager"/>
     </property>
@@ -86,7 +85,7 @@
   <!-- filter that performs anonymous authentication -->
 
   <bean id="cmpAnonymousProcessingFilter"
-        class="net.sf.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+        class="org.osaf.cosmo.acegisecurity.NoSessionAnonymousProcessingFilter">
     <property name="key">
       <value>badgerbadgerbadger</value>
     </property>
@@ -95,15 +94,15 @@
     </property>
   </bean>
 
-  <!-- filter that enforces security constraints on cmp requests -->
+  <!-- filter that converts authn/authz exceptions to CMP responses -->
 
-  <bean id="cmpSecurityEnforcementFilter"
-        class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
-    <property name="filterSecurityInterceptor">
-      <ref local="cmpFilterInvocationInterceptor"/>
-    </property>
+  <bean id="cmpExceptionTranslationFilter"
+        class="org.acegisecurity.ui.ExceptionTranslationFilter">
     <property name="authenticationEntryPoint">
       <ref local="cmpBasicAuthenticationEntryPoint"/>
+    </property>
+    <property name="createSessionAllowed">
+      <value>false</value>
     </property>
   </bean>
 

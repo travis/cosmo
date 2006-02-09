@@ -22,11 +22,10 @@
 
 <beans>
 
-  <!-- interceptor which specifies access control rules for the
-       URL space, invoked by security enforcement filter -->
+  <!-- interceptor which performs authorization for DAV requests -->
 
    <bean id="davFilterInvocationInterceptor"
-         class="net.sf.acegisecurity.intercept.web.FilterSecurityInterceptor">
+         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
      <property name="authenticationManager">
        <ref bean="authenticationManager"/>
      </property>
@@ -45,12 +44,12 @@
   <!-- filter chain that kicks off request-time processing -->
 
   <bean id="davFilterChainProxy"
-        class="net.sf.acegisecurity.util.FilterChainProxy">
+        class="org.acegisecurity.util.FilterChainProxy">
     <property name="filterInvocationDefinitionSource">
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=davHttpRequestContextIntegrationFilter,davTicketProcessingFilter,davBasicProcessingFilter,davSecurityEnforcementFilter
+        /**=davHttpRequestContextIntegrationFilter,davTicketProcessingFilter,davBasicProcessingFilter,davExceptionTranslationFilter,davFilterInvocationInterceptor
       </value>
     </property>
   </bean>
@@ -68,14 +67,14 @@
   <!-- filter that performs Basic authentication -->
 
   <bean id="davBasicAuthenticationEntryPoint"
-        class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
+        class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
     <property name="realmName">
       <value>Cosmo Sharing Server</value>
     </property>
   </bean>
 
   <bean id="davBasicProcessingFilter"
-        class="net.sf.acegisecurity.ui.basicauth.BasicProcessingFilter">
+        class="org.acegisecurity.ui.basicauth.BasicProcessingFilter">
     <property name="authenticationManager">
       <ref bean="authenticationManager"/>
     </property>
@@ -84,15 +83,15 @@
     </property>
   </bean>
 
-  <!-- filter that enforces security constraints on dav requests -->
+  <!-- filter that converts authn/authz exceptions to DAV responses -->
 
-  <bean id="davSecurityEnforcementFilter"
-        class="net.sf.acegisecurity.intercept.web.SecurityEnforcementFilter">
-    <property name="filterSecurityInterceptor">
-      <ref local="davFilterInvocationInterceptor"/>
-    </property>
+  <bean id="davExceptionTranslationFilter"
+        class="org.acegisecurity.ui.ExceptionTranslationFilter">
     <property name="authenticationEntryPoint">
       <ref local="davBasicAuthenticationEntryPoint"/>
+    </property>
+    <property name="createSessionAllowed">
+      <value>false</value>
     </property>
   </bean>
 

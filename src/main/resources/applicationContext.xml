@@ -171,20 +171,20 @@
 
   <!-- authentication resources -->
 
-  <bean id="authenticationDao"
-        class="org.osaf.cosmo.acegisecurity.UserAuthenticationDao">
+  <bean id="userDetailsService"
+        class="org.osaf.cosmo.acegisecurity.CosmoUserDetailsService">
      <property name="userDao">
        <ref bean="userDao"/>
      </property>
   </bean>
 
   <bean id="passwordEncoder"
-        class="net.sf.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
+        class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
 
   <bean id="daoAuthenticationProvider"
-        class="net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider">
-    <property name="authenticationDao">
-      <ref local="authenticationDao"/>
+        class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+    <property name="userDetailsService">
+      <ref local="userDetailsService"/>
     </property>
     <property name="passwordEncoder">
       <ref local="passwordEncoder"/>
@@ -192,7 +192,7 @@
   </bean>
 
   <bean id="anonymousAuthenticationProvider"
-        class="net.sf.acegisecurity.providers.anonymous.AnonymousAuthenticationProvider">
+        class="org.acegisecurity.providers.anonymous.AnonymousAuthenticationProvider">
     <property name="key">
       <value>badgerbadgerbadger</value>
     </property>
@@ -206,7 +206,7 @@
   </bean>
 
   <bean id="authenticationManager"
-        class="net.sf.acegisecurity.providers.ProviderManager">
+        class="org.acegisecurity.providers.ProviderManager">
     <property name="providers">
       <list>
         <ref local="daoAuthenticationProvider"/>
@@ -221,10 +221,10 @@
   <bean id="ticketVoter"
         class="org.osaf.cosmo.acegisecurity.ticket.TicketVoter"/>
   <bean id="homedirVoter" class="org.osaf.cosmo.acegisecurity.HomedirVoter"/>
-  <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter"/>
+  <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
 
   <bean id="accessDecisionManager"
-        class="net.sf.acegisecurity.vote.AffirmativeBased">
+        class="org.acegisecurity.vote.AffirmativeBased">
     <property name="allowIfAllAbstainDecisions">
       <value>false</value>
     </property>

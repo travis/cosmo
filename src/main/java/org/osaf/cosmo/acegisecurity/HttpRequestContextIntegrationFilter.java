@@ -25,9 +25,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import net.sf.acegisecurity.context.SecurityContext;
-import net.sf.acegisecurity.context.SecurityContextHolder;
-import net.sf.acegisecurity.context.SecurityContextImpl;
+import org.acegisecurity.context.SecurityContext;
+import org.acegisecurity.context.SecurityContextHolder;
+import org.acegisecurity.context.SecurityContextImpl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,7 +43,7 @@ import org.springframework.beans.factory.InitializingBean;
  * The created <code>SecurityContext</code> is an instance of the
  * class defined by the {@link #setContext(Class)} method (which
  * defaults to {@link
- * net.sf.acegisecurity.context.SecurityContextImpl}.
+ * org.acegisecurity.context.SecurityContextImpl}.
  *
  * This filter will only execute once per request, to resolve servlet
  * container (specifically Weblogic) incompatibilities.
@@ -75,7 +75,7 @@ public class HttpRequestContextIntegrationFilter
     public void afterPropertiesSet() throws Exception {
         if (context == null ||
             ! SecurityContext.class.isAssignableFrom(context)) {
-            throw new IllegalArgumentException("context must be defined and implement SecurityContext (typically use net.sf.acegisecurity.context.SecurityContextImpl; existing class is " + context + ")");
+            throw new IllegalArgumentException("context must be defined and implement SecurityContext (typically use org.acegisecurity.context.SecurityContextImpl; existing class is " + context + ")");
         }
     }
 
@@ -114,7 +114,7 @@ public class HttpRequestContextIntegrationFilter
             throw se;
         } finally {
             // do clean up, even if there was an exception
-            SecurityContextHolder.setContext(generateNewContext());
+            SecurityContextHolder.clearContext();
             if (log.isDebugEnabled()) {
                 log.debug("SecurityContextHolder refreshed, as request processing completed");
             }

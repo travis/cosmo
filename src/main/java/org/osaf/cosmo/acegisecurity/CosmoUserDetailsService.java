@@ -19,9 +19,9 @@ import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.impl.CosmoUserDetailsImpl;
 
-import net.sf.acegisecurity.UserDetails;
-import net.sf.acegisecurity.providers.dao.AuthenticationDao;
-import net.sf.acegisecurity.providers.dao.UsernameNotFoundException;
+import org.acegisecurity.userdetails.UserDetails;
+import org.acegisecurity.userdetails.UserDetailsService;
+import org.acegisecurity.userdetails.UsernameNotFoundException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,12 +31,12 @@ import org.springframework.dao.DataRetrievalFailureException;
 
 /**
  * A class that implements Acegi Security's
- * {@link net.acegisecurity.providers.dao.AuthenticationDao}
+ * {@link org.acegisecurity.userdetails.UserDetailsService}
  * interface using the Cosmo {@link UserDao}.
  */
-public class UserAuthenticationDao implements AuthenticationDao {
+public class CosmoUserDetailsService implements UserDetailsService {
     private static final Log log =
-        LogFactory.getLog(UserAuthenticationDao.class);
+        LogFactory.getLog(CosmoUserDetailsService.class);
 
     private UserDao userDao;
 

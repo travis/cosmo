@@ -156,6 +156,7 @@
       </div>
       <br style="clear:both;"/>
     </div>
+  <html:hidden property="id"/>
 </html:form>
 
 </div>

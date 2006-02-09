@@ -212,37 +212,45 @@ public class JcrUserDao extends JcrDaoSupport
         getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    String path = calculateUserNodePath(user.getUsername());
+                    String oldPath =
+                        calculateUserNodePath(user.getOldUsername());
+                    String newPath =
+                        calculateUserNodePath(user.getUsername());
+
+                    if (! session.itemExists(oldPath)) {
+                        throw new DataRetrievalFailureException("account " + user.getOldUsername() + " not found");
+                    }
 
                     if (user.isUsernameChanged()) {
                         // validate uniqueness of new username
-                        if (session.itemExists(path)) {
+                        if (session.itemExists(newPath)) {
                             throw new DuplicateUsernameException(user.getUsername());
                         }
-                    }
-                    else if (! session.itemExists(path)) {
-                        throw new
-                            DataRetrievalFailureException("account " +
-                                                          user.getUsername() +
-                                                          " not found");
                     }
 
                     if (user.isEmailChanged()) {
                         // validate email uniqueness
-                        QueryResult qr = queryForUserByEmail(session,
-                                                             user.getEmail());
+                        QueryResult qr =
+                            queryForUserByEmail(session, user.getEmail());
                         NodeIterator i = qr.getNodes();
                         if (i.hasNext() &&
-                            ! i.nextNode().getPath().equals(path)) {
+                            ! i.nextNode().getPath().equals(oldPath)) {
                             throw new DuplicateEmailException(user.getEmail());
                         }
                     }
 
-                    Node node = (Node) session.getItem(path);
+                    Node node = (Node) session.getItem(oldPath);
                     user.setDateModified(new Date());
                     JcrUserMapper.userToNode(user, node);
 
-                    node.save();
+                    if (user.isUsernameChanged()) {
+                        session.move(oldPath, newPath);
+                        session.save();
+                    }
+                    else {
+                        node.save();
+                    }
+
                     return null;
                 }
             });

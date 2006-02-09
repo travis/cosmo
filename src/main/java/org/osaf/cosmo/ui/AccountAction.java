@@ -140,8 +140,8 @@ public class AccountAction extends CosmoAction {
             }
             User user = userService.updateUser(formUser);
 
-            // if the password was changed, update the security
-            // context with the new password
+            // if the password was changed, update the
+            // security context with the new password
             if (userForm.getPassword() != null &&
                 ! userForm.getPassword().equals("")) {
                 getSecurityManager().

@@ -27,6 +27,7 @@ import org.apache.struts.action.ActionMapping;
  */
 public class UserForm extends ValidatorForm {
 
+    private String id;
     private String username;
     private String firstName;
     private String lastName;
@@ -39,6 +40,21 @@ public class UserForm extends ValidatorForm {
      */
     public UserForm() {
         initialize();
+    }
+
+    /**
+     * Used to uniquely identify an existing user. The id should
+     * remain fixed even if the username is changed. Is irrelevant for
+     * new users (those that have not yet been persistent).
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
@@ -137,6 +153,7 @@ public class UserForm extends ValidatorForm {
      */
     public String toString() {
         return new ToStringBuilder(this).
+            append("id", id).
             append("username", username).
             append("firstName", firstName).
             append("lastName", lastName).
@@ -148,6 +165,7 @@ public class UserForm extends ValidatorForm {
     /**
      */
     private void initialize() {
+        id = null;
         username = null;
         firstName = null;
         lastName = null;

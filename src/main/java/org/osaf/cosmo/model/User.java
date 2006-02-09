@@ -101,7 +101,7 @@ public class User extends BaseModelObject {
     /**
      */
     public String getOldUsername() {
-        return oldUsername;
+        return oldUsername != null ? oldUsername : username;
     }
 
     /**

@@ -329,6 +329,10 @@
        </field>
      </form>
      <form name="updateUserForm">
+       <field property="id"
+              depends="required">
+         <msg name="required" key="Form.FieldRequired"/>
+       </field>
        <field property="username"
               depends="required,mask,minlength,maxlength">
          <msg name="required" key="Form.FieldRequired"/>

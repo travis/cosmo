@@ -92,16 +92,14 @@ public class UserAction extends CosmoAction {
         UserForm userForm = (UserForm) form;
 
         // the User may have previously been set by a request
-        // attribute. if not, look to see if the form has a
-        // username. if not, we're viewing the user for the first
+        // attribute. if not, look to see if the form has an
+        // id. if not, we're viewing the user for the first
         // time.
         User user = (User) request.getAttribute(ATTR_USER);
         if (user == null) {
-            // XXX: we no longer have an id to key off of, so add old
-            // username to form bean
-            if (userForm.getUsername() != null &&
+            if (userForm.getId() != null &&
                 ! userForm.getUsername().equals("")) {
-                user = userService.getUser(userForm.getUsername());
+                user = userService.getUser(userForm.getId());
             }
             else {
                 String username = request.getParameter(PARAM_USERNAME);
@@ -167,12 +165,12 @@ public class UserAction extends CosmoAction {
             return mapping.findForward(UIConstants.FWD_CANCEL);
         }
 
-        User formUser =  userService.getUser(userForm.getUsername());
+        User formUser =  userService.getUser(userForm.getId());
         populateUser(formUser, userForm);
 
         try {
             if (log.isDebugEnabled()) {
-                log.debug("updating user " + formUser.getUsername());
+                log.debug("updating user " + userForm.getId());
             }
             User user = userService.updateUser(formUser);
 
@@ -327,6 +325,7 @@ public class UserAction extends CosmoAction {
     }
 
     private void populateUpdateForm(UserForm form, User user) {
+        form.setId(user.getUsername());
         form.setUsername(user.getUsername());
         form.setFirstName(user.getFirstName());
         form.setLastName(user.getLastName());

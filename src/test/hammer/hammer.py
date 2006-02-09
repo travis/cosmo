@@ -50,10 +50,15 @@ Tip:
 
 from threading import Thread
 from threading import Lock
-import pycurl
 import sys, getopt, datetime, time
 import string, random, base64, socket, httplib
 import createaccounts
+
+try:
+    import pycurl
+except ImportError:
+    pycurl = None
+
 
 def LogEvent(*attr):
     s = "\t".join(attr)
@@ -128,7 +133,7 @@ class TestCosmoPurePython(Thread):
             if strToWrite != strRead:
                 print "\nDownloaded string didn't match uploaded string"
                 return
-#            print "#",
+            #print "#",
          self.passed = True
 
     def write(self, data):
@@ -148,8 +153,9 @@ class TestCosmoPurePython(Thread):
             start = time.clock()
             r = request(self.tls, self.server, self.port, "GET", self.url, 
                         username=self.username, password=self.password)
+            data = r.read()
             LogEvent("GET", "%.3f" % (time.clock() - start))
-            return r.read()
+            return data
         except:
             exctype, value = sys.exc_info()[:2]
             LogEvent("GET ERROR", str(exctype), str(value))
@@ -157,70 +163,90 @@ class TestCosmoPurePython(Thread):
         return ""
 
 
-class TestCosmo(Thread):
-    def __init__(self, url, datalength, iterations, timeout):
-        Thread.__init__(self)
-        self.url = url
-        self.datalength = datalength
-        self.iterations = iterations
-        self.strToWrite = "";
-        self.strRead = "";
-        self.passed = False
-        self.timeout = timeout
+if pycurl is not None:
+    class TestCosmo(Thread):
+        def __init__(self, url, datalength, iterations, timeout):
+            Thread.__init__(self)
+            self.url = url
+            self.datalength = datalength
+            self.iterations = iterations
+            self.strToWrite = "";
+            self.strRead = "";
+            self.passed = False
+            self.timeout = timeout
+    
+        def run(self):
+             for i in range(self.iterations):
+                self.strToWrite = StringAsFile(randomString(self.datalength))
+                self.strRead = StringAsFile()
+                if self.write(self.strToWrite) is not True: return
+                if self.read(self.strRead) is not True: return
+                if str(self.strToWrite) != str(self.strRead):
+                    print "\nDownloaded string didn't match uploaded string"
+                    return
+                #print "#",
+             self.passed = True
+    
+        def write(self, fp):
+            curl = pycurl.Curl()
+            curl.setopt(pycurl.URL, self.url)
+            curl.setopt(pycurl.UPLOAD, 1)
+            curl.setopt(pycurl.NOSIGNAL, 1)
+            curl.setopt(pycurl.READFUNCTION, fp.read)
+            if self.timeout > 0: curl.setopt(pycurl.TIMEOUT, self.timeout)
+            try:
+                start = time.clock()
+                curl.perform()
+                LogEvent("PUT", "%.3f" % (time.clock() - start))
+                
+            except:
+                exctype, value = sys.exc_info()[:2]
+                if exctype == pycurl.error:
+                    LogEvent("PUT ERROR", value[1])
+                else:
+                    LogEvent("PUT ERROR", str(exctype), str(value))
+                return False
+            curl.close()
+            return True
+    
+        def read(self, fp):
+            curl = pycurl.Curl()
+            curl.setopt(pycurl.URL, self.url)
+            curl.setopt(pycurl.WRITEFUNCTION, fp.write)
+            curl.setopt(pycurl.NOSIGNAL, 1)
+            if self.timeout > 0: curl.setopt(pycurl.TIMEOUT, self.timeout)
+            try:
+                start = time.clock()
+                curl.perform()
+                LogEvent("GET", "%.3f" % (time.clock() - start))
+            except:
+                exctype, value = sys.exc_info()[:2]
+                if exctype == pycurl.error:
+                    LogEvent("GET ERROR", value[1])
+                else:
+                    LogEvent("GET ERROR", str(exctype), str(value))
+                return False
+            curl.close()
+            return True
 
-    def run(self):
-         for i in range(self.iterations):
-            self.strToWrite = StringAsFile(randomString(self.datalength))
-            self.strRead = StringAsFile()
-            if self.write(self.strToWrite) is not True: return
-            if self.read(self.strRead) is not True: return
-            if str(self.strToWrite) != str(self.strRead):
-                print "\nDownloaded string didn't match uploaded string"
-                return
-#            print "#",
-         self.passed = True
 
-    def write(self, fp):
-        curl = pycurl.Curl()
-        curl.setopt(pycurl.URL, self.url)
-        curl.setopt(pycurl.UPLOAD, 1)
-        curl.setopt(pycurl.NOSIGNAL, 1)
-        curl.setopt(pycurl.READFUNCTION, fp.read)
-        if self.timeout > 0: curl.setopt(pycurl.TIMEOUT, self.timeout)
-        try:
-            start = time.clock()
-            curl.perform()
-            LogEvent("PUT", "%.3f" % (time.clock() - start))
-            
-        except:
-            exctype, value = sys.exc_info()[:2]
-            if exctype == pycurl.error:
-                LogEvent("PUT ERROR", value[1])
-            else:
-                LogEvent("PUT ERROR", str(exctype), str(value))
-            return False
-        curl.close()
-        return True
+    class StringAsFile:
+        def __init__(self, str = ""):
+            self.str = str
+            self.index = 0
+    
+        def read(self, size):
+            p = self.index
+            numchars = int(size / 2)
+            self.index += numchars
+            return self.str[p:p+numchars]
+        
+        def write(self, str):
+            self.str += str
+    
+        def __repr__(self):
+            return self.str
 
-    def read(self, fp):
-        curl = pycurl.Curl()
-        curl.setopt(pycurl.URL, self.url)
-        curl.setopt(pycurl.WRITEFUNCTION, fp.write)
-        curl.setopt(pycurl.NOSIGNAL, 1)
-        if self.timeout > 0: curl.setopt(pycurl.TIMEOUT, self.timeout)
-        try:
-            start = time.clock()
-            curl.perform()
-            LogEvent("GET", "%.3f" % (time.clock() - start))
-        except:
-            exctype, value = sys.exc_info()[:2]
-            if exctype == pycurl.error:
-                LogEvent("GET ERROR", value[1])
-            else:
-                LogEvent("GET ERROR", str(exctype), str(value))
-            return False
-        curl.close()
-        return True
 
 class TestCosmoAccountCreation(Thread):
     def __init__(self, tls, server, port, path, first, count):
@@ -237,35 +263,22 @@ class TestCosmoAccountCreation(Thread):
         for i in range(self.first, self.first + self.count):
             username = "test" + str(i)
             password = "test" + str(i)
-            if createaccounts.createAccount(self.tls, self.server, self.port, \
-                    self.path, username, password) == False:
+            if createaccounts.createAccount(self.tls, self.server, self.port,
+                                            self.path, username, 
+                                            password) == False:
                 return False
         self.passed = True
                
         
-class StringAsFile:
-    def __init__(self, str = ""):
-        self.str = str
-        self.index = 0
-
-    def read(self, size):
-        p = self.index
-        numchars = int(size / 2)
-        self.index += numchars
-        return self.str[p:p+numchars]
-    
-    def write(self, str):
-        self.str += str
-
-    def __repr__(self):
-        return self.str
 
 def randomString(length = 10000):
     item = string.letters + string.digits
     return "".join([random.choice(item) for i in range(length)])
 
+
 def usage():
     print __doc__
+
     
 def main(argv):
     try:
@@ -305,15 +318,24 @@ def main(argv):
             sys.exit()
 
     server, port, path, tls = createaccounts.parseURL(url)
-                
-    # We should ignore SIGPIPE when using pycurl.NOSIGNAL - see
-    # the libcurl tutorial for more info.
-    try:
-        import signal
-        from signal import SIGPIPE, SIG_IGN
-        signal.signal(signal.SIGPIPE, signal.SIG_IGN)
-    except ImportError:
-        pass
+    
+    if pythonHammer or accountCreation:
+        # This is nasty, but httplib.HTTP(S)Connection keeps
+        # socket private, so we cannot set per socket timeouts. 
+        socket.setdefaulttimeout(timeout)
+    else:
+        if pycurl is None:
+            print "pycurl is not available. Either install pycurl,"
+            print "or run hammer with -y to run the httplib version of hammer."
+            sys.exit(1)
+        # We should ignore SIGPIPE when using pycurl.NOSIGNAL - see
+        # the libcurl tutorial for more info.
+        try:
+            import signal
+            from signal import SIGPIPE, SIG_IGN
+            signal.signal(signal.SIGPIPE, signal.SIG_IGN)
+        except ImportError:
+            pass
 
     global outputLock
     outputLock = Lock()
@@ -339,7 +361,8 @@ def main(argv):
         else:
             u = username + str(thread)
             p = password + str(thread)
-            url = "http://%s:%s@%s:%d%s/home/%s/testfile.txt" % (u, p, server, port, path, u)
+            url = "http://%s:%s@%s:%d%s/home/%s/testfile.txt" % (u, p, server,
+                                                                 port, path, u)
             c = TestCosmo(url, datalength, iterations, timeout)
         c.start()
         cosmotesters.append(c)

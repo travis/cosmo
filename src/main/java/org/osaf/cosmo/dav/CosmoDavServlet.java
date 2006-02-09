@@ -199,8 +199,6 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                             WebdavResponse response,
                             DavResource resource)
         throws IOException, DavException {
-        // home collections cannot be deleted directly - they are
-        // deleted only when a user is deleted
         if (((CosmoDavResource) resource).isHomeCollection()) {
             response.sendError(DavServletResponse.SC_FORBIDDEN,
                                "Home collection may not be deleted");
@@ -208,6 +206,36 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         }
 
         super.doDelete(request, response, resource);
+    }
+
+    /**
+     */
+    protected void doCopy(WebdavRequest request,
+                          WebdavResponse response,
+                          DavResource resource)
+        throws IOException, DavException {
+        if (((CosmoDavResource) resource).isHomeCollection()) {
+            response.sendError(DavServletResponse.SC_FORBIDDEN,
+                               "Home collection may not be copied");
+            return;
+        }
+
+        super.doCopy(request, response, resource);
+    }
+
+    /**
+     */
+    protected void doMove(WebdavRequest request,
+                          WebdavResponse response,
+                          DavResource resource)
+        throws IOException, DavException {
+        if (((CosmoDavResource) resource).isHomeCollection()) {
+            response.sendError(DavServletResponse.SC_FORBIDDEN,
+                               "Home collection may not be moved");
+            return;
+        }
+
+        super.doMove(request, response, resource);
     }
 
     /**

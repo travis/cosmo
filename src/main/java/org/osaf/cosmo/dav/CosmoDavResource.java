@@ -32,18 +32,19 @@ import org.osaf.cosmo.model.Ticket;
 public interface CosmoDavResource extends DavResource {
 
     /**
-     * String constant representing the WebDAV 1 and 2 compliance
-     * classes as well as the Cosmo extended classes.
+     * String constant representing the WebDAV 1 compliance
+     * class as well as the Cosmo extended classes.
      */
-    public String COMPLIANCE_CLASS =
-        DavResource.COMPLIANCE_CLASS + ", calendar-access, ticket";
+    // see bug 5137 for why we don't include class 2
+    public String COMPLIANCE_CLASS = "1, calendar-access, ticket";
 
     /**
-     * String constant representing the WebDAV 1 and 2 method set as
+     * String constant representing the WebDAV 1 method set as
      * well as the Cosmo extended method set (excluding MKCALENDAR,
      * which is only supported for certain resources).
      */
-    public String METHODS = DavResource.METHODS + ", MKTICKET, DELTICKET";
+    // see bug 5137 for why we don't include LOCK and UNLOCK
+    public String METHODS = "OPTIONS, GET, HEAD, POST, TRACE, PROPFIND, PROPPATCH, MKCOL, COPY, PUT, DELETE, MOVE, MKTICKET, DELTICKET";
 
     /**
      * Returns true if this resource represents a ticketable dav

@@ -1,6 +1,6 @@
-TODO
+Cosmo CalDAV tests
 
-urn:ietf:params:xml:ns:caldav
+http://wiki.osafoundation.org/bin/view/Projects/CosmoCaldav
 
 First, bring the framework environment
 

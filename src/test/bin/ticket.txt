@@ -1,5 +1,6 @@
 TICKET compliance tests
 
+http://wiki.osafoundation.org/bin/view/Projects/CosmoTickets
 
     # Tests still TODO (from cosmo 0.2 spec):
     # -make sure MKTICKET request only shows tickets for current account

@@ -18,7 +18,7 @@
 #   1) It's an anagram of litmus, which is a WebDAV test suite.
 #   2) It's Finnish for buds.
 
-import sys, getopt, httplib, urlparse, base64, time, doctest, socket
+import sys, getopt, httplib, urlparse, doctest, socket
 
 # The silmut framework that is usable from the test suites.
 __all__ = ['host', 'port', 'path', 'user1', 'user2',
@@ -49,13 +49,13 @@ def request(method, url, body=None, headers={},
     h = headers.copy()
     for header in autoheaders:
         if header == 'Content-Length' and body is not None:
-            h['Content-Length'] = '%d' % len(body)
+            h[header] = '%d' % len(body)
         if header == 'Content-Type' and body is not None:
-            h['Content-Type'] = 'text/xml'
+            h[header] = 'text/xml'
         if header == 'User-Agent':
-            h['User-Agent'] = 'silmut'
+            h[header] = 'silmut'
         if header == 'Host':
-            h['Host'] = '%s:%s' % (host, port)
+            h[header] = '%s:%s' % (host, port)
     c.request(method, url, body, h)
     r = c.getresponse()
     

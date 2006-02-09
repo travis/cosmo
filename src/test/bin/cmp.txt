@@ -1,0 +1,7 @@
+Tests for Cosmo Management Protocol
+
+http://wiki.osafoundation.org/bin/view/Projects/CosmoManagementProtocol
+
+First, bring the framework environment
+
+	>>> from silmut import *

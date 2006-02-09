@@ -191,7 +191,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-server</artifactId>
-      <version>osaf-20060131</version>
+      <version>osaf-20060208</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

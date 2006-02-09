@@ -49,7 +49,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=davHttpRequestContextIntegrationFilter,davTicketProcessingFilter,davBasicProcessingFilter,davExceptionTranslationFilter,davFilterInvocationInterceptor
+        /**=davHttpRequestContextIntegrationFilter,davBasicProcessingFilter,davTicketProcessingFilter,davExceptionTranslationFilter,davFilterInvocationInterceptor
       </value>
     </property>
   </bean>
@@ -80,6 +80,9 @@
     </property>
     <property name="authenticationEntryPoint">
       <ref local="davBasicAuthenticationEntryPoint"/>
+    </property>
+    <property name="ignoreFailure">
+      <value>true</value>
     </property>
   </bean>
 

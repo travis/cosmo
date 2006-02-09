@@ -33,6 +33,8 @@ Options:
   -u        username (default is test; thread number is appended to username)
   -w        password (default is test; thread number is appended to password)
   -m        timeout setting in seconds (default is 30)
+  -a        test account creation (# created is -t * -i)
+  -o	    initial offset for account creation
   -h        display this help text
 
 Examples:
@@ -50,7 +52,6 @@ from threading import Lock
 import pycurl
 import sys, getopt, datetime, time
 import string, random
-
 import createaccounts
 
 def LogEvent(*attr):
@@ -123,6 +124,27 @@ class TestCosmo(Thread):
             return False
         curl.close()
         return True
+
+class TestCosmoAccountCreation(Thread):
+    def __init__(self, tls, server, port, path, first, count):
+        Thread.__init__(self)
+        self.tls = tls
+        self.server = server
+        self.port = port
+        self.path = path
+        self.first = first
+        self.count = count
+        self.passed = False
+        
+    def run(self):
+        for i in range(self.first, self.first + self.count):
+            username = "test" + str(i)
+            password = "test" + str(i)
+            if createaccounts.createAccount(self.tls, self.server, self.port, \
+                    self.path, username, password) == False:
+                return False
+        self.passed = True
+               
         
 class StringAsFile:
     def __init__(self, str = ""):
@@ -150,7 +172,7 @@ def usage():
     
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "t:i:s:l:u:w:m:ch")
+        opts, args = getopt.getopt(argv, "t:i:s:p:l:u:w:m:o:ah")
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -166,6 +188,8 @@ def main(argv):
     username = "test"
     password = "test"
     timeout = 30
+    accountCreation = False
+    offset = 1
     
     for (opt, arg) in opts:
         if opt == "-t":      threads = int(arg)
@@ -175,6 +199,8 @@ def main(argv):
         elif opt == "-u":    username = arg
         elif opt == "-w":    password = arg
         elif opt == "-m":    timeout = int(arg)
+        elif opt == "-a":    accountCreation = True
+        elif opt == "-o":    offset = int(arg)
         elif opt == "-h":
             usage()
             sys.exit()
@@ -199,11 +225,17 @@ def main(argv):
 
     # start up our threads
     cosmotesters = []
+    first = offset
     for thread in range(1, threads + 1):
-        u = username + str(thread)
-        p = password + str(thread)
-        url = "http://%s:%s@%s:%d%s/home/%s/testfile.txt" % (u, p, server, port, path, u)
-        c = TestCosmo(url, datalength, iterations, timeout)
+        if accountCreation:
+            c = TestCosmoAccountCreation(tls, server, port, path, first,
+                                         iterations)
+            first += iterations
+        else:
+            u = username + str(thread)
+            p = password + str(thread)
+            url = "http://%s:%s@%s:%d%s/home/%s/testfile.txt" % (u, p, server, port, path, u)
+            c = TestCosmo(url, datalength, iterations, timeout)
         c.start()
         cosmotesters.append(c)
 

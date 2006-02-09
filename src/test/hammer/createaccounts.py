@@ -36,6 +36,8 @@ Options:
   -w        password (default is cosmo)
   -n        number of accounts to create (default is 100)
   -f        first account number in sequence (default is 1)
+  -a        create accounts as admin (default is anonymous)
+  -t        timeout (default is None)
   -d        run doctests for this module
   -h        display this help text
 
@@ -44,9 +46,17 @@ Examples:
   createaccounts.py -f 101 -n 100 Create accounts test101 through test200.
 """
 
-import sys, getopt, httplib, base64
+import sys, getopt, httplib, base64, socket
 
-def createAccount(tls, server, port, path, username, password, adminuser, adminpass):
+    
+def createAccount(tls, server, port, path, username, password, 
+                  adminuser=None, adminpass=None):
+    """
+    Create account on the server.
+    
+    @param adminuser: Administrator username. If None, create account
+                      anonymously.
+    """
     body = """<?xml version="1.0" encoding="utf-8" ?> 
 <user xmlns="http://osafoundation.org/cosmo/CMP">
   <username>%s</username>
@@ -63,12 +73,19 @@ def createAccount(tls, server, port, path, username, password, adminuser, adminp
             c = httplib.HTTPConnection(server, port)
         else:
             c = httplib.HTTPSConnection(server, port)
-        auth = "Basic %s" % base64.encodestring("%s:%s" % (adminuser, 
-                                                adminpass)).strip()
-        headers = {"Authorization": auth, "Content-Type": "text/xml",
+
+        headers = {"Content-Type": 'text/xml; charset="utf-8"',
                    "Content-Length": "%d" % len(body)}
-        c.request("PUT", "%s/cmp/user/%s" % (path, username), body=body, 
-                  headers=headers)
+       
+        if adminuser is not None:
+            auth = "Basic %s" % base64.encodestring("%s:%s" % (adminuser, 
+                                                    adminpass)).strip()
+            headers["Authorization"] = auth
+            signupUrl = "%s/cmp/user/%s" % (path, username)
+        else:
+            signupUrl = "%s/cmp/signup" % path
+        
+        c.request("PUT", signupUrl, body=body, headers=headers)
         response = c.getresponse()
     except:
         import traceback
@@ -80,7 +97,7 @@ def createAccount(tls, server, port, path, username, password, adminuser, adminp
     if code == 201:
         print "Created user account %s" % username
         return True
-    elif code == 204:
+    elif code == 204 or code == 431:
         print "WARNING: Account %s already exists." % username
         return True
     elif code == 401:
@@ -92,8 +109,10 @@ def createAccount(tls, server, port, path, username, password, adminuser, adminp
 
     return True
 
+
 def usage():
     print __doc__
+
 
 def parseURL(url):
     """
@@ -146,20 +165,10 @@ def parseURL(url):
     
     return host, port, path, tls
 
-def request(tls, *args, **kw):
-    """
-    Helper function to make requests easier to make.
-    """
-    if not tls:
-        c = httplib.HTTPConnection(host, port)
-    else:
-        c = httplib.HTTPSConnection(host, port)
-    c.request(*args, **kw)
-    return c.getresponse()
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "ds:u:w:n:f:h")
+        opts, args = getopt.getopt(argv, "ads:u:w:n:f:t:h")
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -174,13 +183,19 @@ def main(argv):
     tls = False
     start = 1
     count = 100
-    
+    admin = False
+ 
     for (opt, arg) in opts:
         if opt =="-s":      url = arg
         elif opt == "-u":   username = arg
         elif opt == "-w":   password = arg
         elif opt == "-n":   count = int(arg)
         elif opt == "-f":   start = int(arg)
+        elif opt == "-a":   admin = True
+        elif opt == "-t":   
+            # This is nasty, but httplib.HTTP(S)Connection keeps
+            # socket private, so we cannot set per socket timeouts. 
+            socket.setdefaulttimeout(float(arg))
         elif opt == "-d":
             import doctest
             doctest.testmod()
@@ -190,11 +205,16 @@ def main(argv):
             sys.exit()
 
     server, port, path, tls = parseURL(url)
-                
+
+    if not admin: 
+        username = password = None
+        
     for i in range(start, start + count):
-        if createAccount(tls, server, port, path, "test" + str(i), 
-            "test" + str(i), username, password) == False:
+
+        if createAccount(tls, server, port, path, "test" + str(i),
+                         "test" + str(i), username, password) == False:
             sys.exit(2)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])    

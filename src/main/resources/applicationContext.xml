@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd"> 
+
+<!--
+    Copyright 2005 Open Source Applications Foundation
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<beans>
+
+  <!-- load the cosmo properties file and make the cosmo
+       config properties available to other spring beans -->
+
+  <bean id="cosmoConfigPath"
+        class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName">
+      <value>cosmo/config</value>
+    </property>
+    <property name="resourceRef">
+      <value>true</value>
+    </property>
+  </bean>
+
+  <bean id="propertyPlaceholderConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <ref local="cosmoConfigPath"/>
+      </list>
+    </property>
+  </bean>
+
+  <!-- resources needed to connect to the JCR repository -->
+
+  <bean id="jcrRepository"
+        class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName">
+      <value>jcr/cosmo</value>
+    </property>
+    <property name="resourceRef">
+      <value>true</value>
+    </property>
+  </bean>
+
+  <bean id="homedirPassword"
+        class="java.lang.String">
+    <constructor-arg>
+      <value>${cosmo.repository.password}</value>
+    </constructor-arg>
+  </bean>
+
+  <bean id="homedirCredentials"
+        class="javax.jcr.SimpleCredentials">
+    <constructor-arg>
+      <value>${cosmo.repository.username}</value>
+    </constructor-arg>
+    <constructor-arg>
+      <bean id="homedirPasswordChars"
+            factory-bean="homedirPassword"
+            factory-method="toCharArray"/>
+    </constructor-arg>
+  </bean>
+
+  <bean id="homedirSessionFactory"
+        class="org.springmodules.jcr.JcrSessionFactory">
+    <property name="credentials">
+      <ref bean="homedirCredentials"/>
+    </property>
+    <property name="repository">
+      <ref bean="jcrRepository"/>
+    </property>
+    <property name="workspaceName">
+      <value>homedir</value>
+    </property>
+  </bean>
+
+  <!-- resources needed to send mail -->
+
+  <bean id="mailSession"
+        class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName">
+      <value>mail/cosmo</value>
+    </property>
+    <property name="resourceRef">
+      <value>true</value>
+    </property>
+  </bean>
+
+  <bean id="mailSender"
+        class="org.springframework.mail.javamail.JavaMailSenderImpl">
+    <property name="session">
+      <ref local="mailSession"/>
+    </property>
+  </bean>
+
+  <!-- data access objects (DAOs) -->
+
+  <bean id="userDao"
+        class="org.osaf.cosmo.dao.jcr.JcrUserDao"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="sessionFactory">
+      <ref bean="homedirSessionFactory"/>
+    </property>
+  </bean>
+
+  <bean id="homeDirectoryDao"
+        class="org.osaf.cosmo.dao.jcr.JcrHomeDirectoryDao"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="sessionFactory">
+      <ref bean="homedirSessionFactory"/>
+    </property>
+  </bean>
+
+  <bean id="ticketIdGenerator"
+        class="org.apache.commons.id.random.SessionIdGenerator"/>
+
+  <bean id="ticketDao"
+        class="org.osaf.cosmo.dao.jcr.JcrTicketDao"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="sessionFactory">
+      <ref bean="homedirSessionFactory"/>
+    </property>
+    <property name="idGenerator">
+      <ref local="ticketIdGenerator"/>
+    </property>
+  </bean>
+
+  <!-- services -->
+
+  <bean id="passwordGenerator"
+        class="org.apache.commons.id.random.SessionIdGenerator"/>
+
+  <bean id="userService"
+        class="org.osaf.cosmo.service.impl.StandardUserService"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="userDao">
+      <ref bean="userDao"/>
+    </property>
+    <property name="passwordGenerator">
+      <ref bean="passwordGenerator"/>
+    </property>
+  </bean>
+
+  <bean id="homeDirectoryService"
+        class="org.osaf.cosmo.service.impl.StandardHomeDirectoryService"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="homeDirectoryDao">
+      <ref bean="homeDirectoryDao"/>
+    </property>
+    <property name="ticketDao">
+      <ref bean="ticketDao"/>
+    </property>
+  </bean>
+
+  <!-- authentication resources -->
+
+  <bean id="authenticationDao"
+        class="org.osaf.cosmo.acegisecurity.UserAuthenticationDao">
+     <property name="userDao">
+       <ref bean="userDao"/>
+     </property>
+  </bean>
+
+  <bean id="passwordEncoder"
+        class="net.sf.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
+
+  <bean id="daoAuthenticationProvider"
+        class="net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider">
+    <property name="authenticationDao">
+      <ref local="authenticationDao"/>
+    </property>
+    <property name="passwordEncoder">
+      <ref local="passwordEncoder"/>
+    </property>
+  </bean>
+
+  <bean id="anonymousAuthenticationProvider"
+        class="net.sf.acegisecurity.providers.anonymous.AnonymousAuthenticationProvider">
+    <property name="key">
+      <value>badgerbadgerbadger</value>
+    </property>
+  </bean>
+
+  <bean id="ticketAuthenticationProvider"
+        class="org.osaf.cosmo.acegisecurity.ticket.TicketAuthenticationProvider">
+    <property name="ticketDao">
+      <ref bean="ticketDao"/>
+    </property>
+  </bean>
+
+  <bean id="authenticationManager"
+        class="net.sf.acegisecurity.providers.ProviderManager">
+    <property name="providers">
+      <list>
+        <ref local="daoAuthenticationProvider"/>
+        <ref local="anonymousAuthenticationProvider"/>
+        <ref local="ticketAuthenticationProvider"/>
+      </list>
+    </property>
+  </bean>
+
+  <!-- authorization resources -->
+
+  <bean id="ticketVoter"
+        class="org.osaf.cosmo.acegisecurity.ticket.TicketVoter"/>
+  <bean id="homedirVoter" class="org.osaf.cosmo.acegisecurity.HomedirVoter"/>
+  <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter"/>
+
+  <bean id="accessDecisionManager"
+        class="net.sf.acegisecurity.vote.AffirmativeBased">
+    <property name="allowIfAllAbstainDecisions">
+      <value>false</value>
+    </property>
+    <property name="decisionVoters">
+      <list>
+        <ref bean="ticketVoter"/>
+        <ref bean="homedirVoter"/>
+        <ref bean="roleVoter"/>
+      </list>
+    </property>
+  </bean>
+
+  <!-- security facade resources -->
+
+  <bean id="securityManager"
+        class="org.osaf.cosmo.security.impl.CosmoSecurityManagerImpl">
+    <property name="authenticationManager">
+      <ref local="authenticationManager"/>
+    </property>
+  </bean>
+
+  <!-- the servlet context configurer, which is used instead of
+       spring's servlet context export mechanism because config
+       information needs to be loaded from the repository -->
+
+  <bean id="servletContextConfigurer"
+        class="org.osaf.cosmo.ui.config.jcr.JcrServletContextConfigurer">
+    <property name="userDao">
+      <ref bean="userDao"/>
+    </property>
+  </bean>
+
+</beans>

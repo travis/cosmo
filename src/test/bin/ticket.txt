@@ -22,6 +22,7 @@ First, bring the framework environment
 
 Initialization
     
+    >>> import base64, time
     >>> auth = 'Basic %s' % base64.encodestring('%s:%s' % (user1, password1)).strip()
     >>> authHeaders = {'Authorization': auth}
     >>> auth2 = 'Basic %s' % base64.encodestring('%s:%s' % (user2, password2)).strip()
@@ -157,7 +158,7 @@ Ticket does not exist, resource does not exist, body
     >>> r = request('DELTICKET', '%sdoesnotexist?ticket=%s' % (home1, nosuchticket),
     ...             body=minTicket, headers=t)
     >>> r.status # DELTICKET no such ticket or resource, body
-    404    
+    404
 
 
 Miscellaneous

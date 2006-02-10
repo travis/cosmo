@@ -109,15 +109,14 @@ GET with OK ticket
     >>> r.status # GET OK
     200
 
-#GET with nonexisting ticket
-#    
-#    >>> t = authHeaders.copy()
-#    >>> nosuchticket = 'nosuchticket5dfe45210787'
-#    >>> t['Ticket'] = nosuchticket
-#    >>> r = request('GET', '%s?ticket=%s' % (home1, nosuchticket),
-#    ...             headers=t)
-#    >>> r.status # GET no such ticket
-#    412
+GET with nonexisting ticket
+    
+    >>> t = authHeaders.copy()
+    >>> nosuchticket = 'nosuchticket5dfe45210787'
+    >>> t['Ticket'] = nosuchticket
+    >>> r = request('GET', '%s?ticket=%s' % (home1, nosuchticket))
+    >>> r.status # GET no such ticket
+    401
 
 
 DELTICKET
@@ -237,29 +236,55 @@ Mismatched ticket in URL and header
     
 GET a resource with ticket
 
-    >>> r = request('MKTICKET', home1, body=minTicket,
+    >>> shortTicket = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <X:ticketinfo xmlns:D="DAV:" 
+    ...               xmlns:X="http://www.xythos.com/namespaces/StorageServer">
+    ... <D:privilege><D:read/></D:privilege>
+    ... <X:timeout>Second-10</X:timeout>
+    ... </X:ticketinfo>"""
+    >>> r = request('MKTICKET', home1, body=shortTicket,
     ...             headers=authHeaders)
     >>> r.status # MKTICKET OK
     200
     >>> ticket = r.getheader('Ticket')
     >>> t = authHeaders.copy()
     >>> t['Ticket'] = ticket
-    >>> r = request('GET', '%s?ticket=%s' % (home1, ticket),
-    ...             headers=t)
+    >>> r = request('GET', '%s?ticket=%s' % (home1, ticket))
     >>> r.status # GET with ticket OK
     200
     
-#GET with timed out ticket
+GET with timed out ticket
+
+    >>> time.sleep(12)
+    >>> r = request('HEAD', '%s?ticket=%s' % (home1, ticket))
+    >>> r.status # GET ticket timed out
+    401
+    
+DELTICKET the timed out ticket
+
+    >>> r = request('DELTICKET', home1,
+    ...             headers=t)
+    >>> r.status # DELTICKET ticket already timed out
+    412
+
+# Commented out until bug 5172 gets fixed.
+#DELTICKET immediately after ticket times out
 #
-#    >>> time.sleep(61)
-#    >>> r = request('GET', '%s?ticket=%s' % (home1, ticket),
-#    ...             headers=t)
-#    >>> r.status # GET ticket timed out
-#    412
-#    
-#DELTICKET the timed out ticket
-#
-#    >>> r = request('DELTICKET', '%s?ticket=%s' % (home1, ticket),
+#    >>> secTicket = """<?xml version="1.0" encoding="UTF-8"?>
+#    ... <X:ticketinfo xmlns:D="DAV:" 
+#    ...               xmlns:X="http://www.xythos.com/namespaces/StorageServer">
+#    ... <D:privilege><D:read/></D:privilege>
+#    ... <X:timeout>Second-1</X:timeout>
+#    ... </X:ticketinfo>"""
+#    >>> r = request('MKTICKET', home1, body=secTicket,
+#    ...             headers=authHeaders)
+#    >>> r.status # MKTICKET OK
+#    200
+#    >>> ticket = r.getheader('Ticket')
+#    >>> t = authHeaders.copy()
+#    >>> t['Ticket'] = ticket
+#    >>> time.sleep(2)
+#    >>> r = request('DELTICKET', home1,
 #    ...             headers=t)
 #    >>> r.status # DELTICKET ticket already timed out
 #    412

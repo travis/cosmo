@@ -204,7 +204,7 @@ def main(argv):
 
     for test in tests.split(','):
         doctest.testfile('%s.txt' % test.strip(), verbose=verbose)
-        
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])    

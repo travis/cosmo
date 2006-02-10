@@ -4,13 +4,10 @@ http://wiki.osafoundation.org/bin/view/Projects/CosmoTickets
 
     # Tests still TODO (from cosmo 0.2 spec):
     # -make sure MKTICKET request only shows tickets for current account
-    # -make sure ticket timeouts followed
-    # -make sure PROPFIND on ticketdiscovery property not supported
     # -make sure that visits element always returns infinity
     # -make sure that http://www.xythos.com/namespaces/StorageServer is used for 
     #  the ticketdiscovery, ticketinfo, id and timeout elements
     # -valid values for timeout element are infinity and Seconds-xxxx
-    # -if different ticket in headers and URL, URL is used
     #
     # Also more tests from ticket spec.
 
@@ -233,6 +230,10 @@ Mismatched ticket in URL and header
     ...             headers=t)
     >>> r.status # DELTICKET ticket already deleted
     412
+
+
+Timeout tests follow, do not write any other kind of tests after this
+---------------------------------------------------------------------
     
 GET a resource with ticket
 

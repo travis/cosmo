@@ -18,7 +18,12 @@
 #   1) It's an anagram of litmus, which is a WebDAV test suite.
 #   2) It's Finnish for buds.
 
-import sys, getopt, httplib, urlparse, doctest, socket
+import sys, getopt, httplib, urlparse, doctest, socket, xml
+
+try:
+    from elementtree import ElementTree
+except ImportError:
+    ElementTree = None
 
 # The silmut framework that is usable from the test suites.
 __all__ = ['host', 'port', 'path', 'user1', 'user2',
@@ -34,11 +39,13 @@ user1 = 'test1'
 password1 = 'test1'
 user2 = 'test2'
 password2 = 'test2'
+parseXML = True
 
 
 def request(method, url, body=None, headers={}, 
             autoheaders=('Content-Length', 'Content-Type', 'User-Agent',
-                          'Host')):
+                          'Host'),
+            xmlExpectedStatusCodes=(200, 207,)):
     """
     Helper function to make requests easier to make.
     """
@@ -71,13 +78,63 @@ def request(method, url, body=None, headers={},
         if url.find('?') == -1:
             url = '%s%s' % (url, query)
         return request(method, url, body, headers)
+
+    if parseXML:
+        xmlMethods = ('MKTICKET', 'PROPFIND')
+        if (method in xmlMethods and r.status in xmlExpectedStatusCodes) or \
+           xmlContent(r):
+            #print method, r.status, r.getheader('Content-Type')
+            parse(r.read())
     
     return r
 
 
+def xmlContent(response):
+    """
+    Does the response have an XML Content-Type header?
+    """
+    try:
+        xml = response.getheader('Content-Type').find('xml') != -1
+    except AttributeError:
+        return False
+    else:
+        return xml
+
+
+def parse(text):
+    """
+    Parse text as XML.
+    
+    >>> parse('<doc/>')
+    <Element doc ...>
+
+    >>> parse('')
+    Traceback (most recent call last):
+        ...
+    Exception: 
+    <BLANKLINE>
+    xml.parsers.expat.ExpatError: no element found: line 1, column 0
+    >>> parse('<doc><foo></doc>')
+    Traceback (most recent call last):
+        ...
+    Exception: 
+    <doc><foo></doc>
+    xml.parsers.expat.ExpatError: mismatched tag: line 1, column 12
+    """
+    try:
+        doc = ElementTree.XML(text)
+    except xml.parsers.expat.ExpatError, e:
+        # This cuts out a little bit of the Python traceback
+        # and shows the bad XML at the end, right above the
+        # error description.
+        raise Exception('\n%s\n%s: %s' % (text, e.__class__, e))
+    
+    return doc
+
+
 def usage():
     """
-    Silmut is a CalDAV and TICKET compliance testsuite for Cosmo.
+    Silmut is a CalDAV, TICKET etc. compliance testsuite for Cosmo.
 
     Usage: python silmut.py [options]
     
@@ -88,6 +145,7 @@ def usage():
       -t      timeout (default is None)
       -r      tests to run (default is caldav,ticket)
       -v      verbose mode (default is quiet mode)
+      -x      do not parse XML, which requires elementtree (parse by default)
       -h      display this help text
     
     This test requires that two test accounts already exist on the server.
@@ -160,7 +218,8 @@ def parseURL(url):
 
 
 def main(argv):
-    global host, port, path, tls, url, user1, password1, user2, password2
+    global host, port, path, tls, url, user1, password1, user2, password2, \
+           parseXML
     
     try:
         opts, args = getopt.getopt(argv, 'u:1:2:r:t:vdh',)
@@ -185,12 +244,17 @@ def main(argv):
             socket.setdefaulttimeout(float(arg))
         elif opt == '-r': tests = arg
         elif opt == '-v': verbose = True
+        elif opt == '-x': parseXML = False
         elif opt == '-d':
-            doctest.testmod()
+            doctest.testmod(optionflags=doctest.ELLIPSIS)
             sys.exit()
         elif opt == '-h':
             usage()
             sys.exit()
+
+    if parseXML and ElementTree is None:
+        print 'XML support requires the elementtree module.'
+        sys.exit(1)
 
     host, port, path, tls = parseURL(url)
     user1, password1 = parseUser(up1)

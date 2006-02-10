@@ -95,7 +95,8 @@ public class CosmoImportContext extends ImportContextImpl
                 CalendarBuilder builder = new CalendarBuilder();
                 calendar = builder.build(getInputStream());
             } catch (ParserException e) {
-                throw new InvalidDataException(e.getMessage());
+                throw new InvalidDataException("error parsing calendar stream",
+                                               e);
             }
         }
         return calendar;

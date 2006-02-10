@@ -261,6 +261,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         } catch (InvalidDataException e) {
             // {CALDAV:valid-calendar-data
+            log.warn(e.getMessage(), e.getCause());
             response.sendError(DavServletResponse.SC_BAD_REQUEST,
                                e.getMessage());
             return;

@@ -48,6 +48,9 @@ def request(method, url, body=None, headers={},
             xmlExpectedStatusCodes=(200, 207,)):
     """
     Helper function to make requests easier to make.
+    
+    @return: Customized httplib.HTTPResponse object: read() will always return
+             full data that was received.
     """
     if not tls:
         c = httplib.HTTPConnection(host, port)
@@ -79,6 +82,10 @@ def request(method, url, body=None, headers={},
             url = '%s%s' % (url, query)
         return request(method, url, body, headers)
 
+    # This is needed because once read(), more read()s would just return empty.
+    r.body = r.read()
+    r.read = lambda: r.body
+    
     if parseXML:
         xmlMethods = ('MKTICKET', 'PROPFIND')
         if (method in xmlMethods and r.status in xmlExpectedStatusCodes) or \

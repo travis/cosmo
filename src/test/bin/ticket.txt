@@ -137,14 +137,22 @@ GET with nonexisting ticket
 
 PUT with read-only ticket
 
+    >>> uniqueFile = 'test%s.xml' % md5.md5(str(random.random())).hexdigest()
     >>> doc = '<my><doc/></my>'
-    >>> r = request('PUT', '%s?ticket=%s' % (home1, ticket), body=doc)
+    >>> r = request('PUT', '%s%s?ticket=%s' % (home1, uniqueFile,
+    ...             ticket), body=doc)
     >>> r.status # PUT no access with read-only ticket
     403
 
+PUT with nonexisting ticket
+    
+    >>> r = request('PUT', '%s%s?ticket=%s' % (home1, uniqueFile,
+    ...             nosuchticket))
+    >>> r.status # PUT no such ticket
+    401
+
 PUT with read-write ticket
 
-    >>> uniqueFile = 'test%s.xml' % md5.md5(str(random.random())).hexdigest()
     >>> r = request('PUT', '%s%s?ticket=%s' % (home1, uniqueFile,
     ...             rwTicketId), body=doc)
     >>> r.status # PUT ok (created) with read-write ticket
@@ -160,6 +168,13 @@ DELETE with read-only ticket
     ...             ticket))
     >>> r.status # DELETE no access with read-only ticket
     403
+
+DELETE with nonexisting ticket
+    
+    >>> r = request('DELETE', '%s%s?ticket=%s' % (home1, uniqueFile,
+    ...             nosuchticket))
+    >>> r.status # DELETE no such ticket
+    401
 
 DELETE with read-write ticket
 

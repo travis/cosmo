@@ -19,12 +19,12 @@ First, bring the framework environment
 
 Initialization
     
-    >>> import base64, time
+    >>> import base64, time, md5, random
     >>> auth = 'Basic %s' % base64.encodestring('%s:%s' % (user1, password1)).strip()
     >>> authHeaders = {'Authorization': auth}
     >>> auth2 = 'Basic %s' % base64.encodestring('%s:%s' % (user2, password2)).strip()
     >>> authHeaders2 = {'Authorization': auth2}
-    >>> minTicket = """<?xml version="1.0" encoding="UTF-8"?>
+    >>> rTicket = """<?xml version="1.0" encoding="UTF-8"?>
     ... <X:ticketinfo xmlns:D="DAV:" 
     ...               xmlns:X="http://www.xythos.com/namespaces/StorageServer">
     ... <D:privilege><D:read/></D:privilege>
@@ -35,6 +35,12 @@ Initialization
     ... <D:privilege><D:read/></D:privilege>
     ... <D:timeout>Second-60</D:timeout>
     ... </D:ticketinfo>"""
+    >>> rwTicket = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <X:ticketinfo xmlns:D="DAV:" 
+    ...               xmlns:X="http://www.xythos.com/namespaces/StorageServer">
+    ... <D:privilege><D:read/><D:write/></D:privilege>
+    ... <X:timeout>Second-60</X:timeout>
+    ... </X:ticketinfo>"""
     >>> home1 = '%s/home/%s/' % (path, user1)
     >>> home2 = '%s/home/%s/' % (path, user2)
     
@@ -42,13 +48,21 @@ MKTICKET
 
 Status codes
 
-OK
+OK (read-only)
 
-    >>> r = request('MKTICKET', home1, body=minTicket,
+    >>> r = request('MKTICKET', home1, body=rTicket,
     ...             headers=authHeaders)
-    >>> r.status # MKTICKET OK
+    >>> r.status # MKTICKET OK (read-only ticket)
     200
     >>> ticket = r.getheader('Ticket')
+
+OK (read-write)
+
+    >>> r = request('MKTICKET', home1, body=rwTicket,
+    ...             headers=authHeaders)
+    >>> r.status # MKTICKET OK (read-write ticket)
+    200
+    >>> rwTicketId = r.getheader('Ticket')
 
 Bad XML
 
@@ -65,7 +79,7 @@ No XML body
     
 No access privileges
 
-    >>> r = request('MKTICKET', home2, body=minTicket,
+    >>> r = request('MKTICKET', home2, body=rTicket,
     ...             headers=authHeaders)
     >>> r.status # MKTICKET no access
     403
@@ -86,7 +100,7 @@ No such resource, no body
 No such resource
 
     >>> r = request('MKTICKET', '%s%s' % (home1, 'doesnotexist'), 
-    ...             body=minTicket, headers=authHeaders)
+    ...             body=rTicket, headers=authHeaders)
     >>> r.status # MKTICKET no such resource
     404
     
@@ -97,23 +111,69 @@ No access, no such resource
     >>> r.status # MKTICKET no access, no such resource
     403
 
+
+GET/PUT/DELETE
+
+Status Codes
+
 GET with OK ticket
     
-    >>> t = authHeaders.copy()
-    >>> t['Ticket'] = ticket
-    >>> r = request('GET', '%s?ticket=%s' % (home1, ticket),
-    ...             headers=t)
+    >>> r = request('GET', '%s?ticket=%s' % (home1, ticket))
     >>> r.status # GET OK
+    200
+
+GET with read-write ticket
+
+    >>> r = request('GET', '%s?ticket=%s' % (home1, rwTicketId))
+    >>> r.status # GET OK (read-write)
     200
 
 GET with nonexisting ticket
     
-    >>> t = authHeaders.copy()
     >>> nosuchticket = 'nosuchticket5dfe45210787'
-    >>> t['Ticket'] = nosuchticket
     >>> r = request('GET', '%s?ticket=%s' % (home1, nosuchticket))
     >>> r.status # GET no such ticket
     401
+
+PUT with read-only ticket
+
+    >>> doc = '<my><doc/></my>'
+    >>> r = request('PUT', '%s?ticket=%s' % (home1, ticket), body=doc)
+    >>> r.status # PUT no access with read-only ticket
+    403
+
+PUT with read-write ticket
+
+    >>> uniqueFile = 'test%s.xml' % md5.md5(str(random.random())).hexdigest()
+    >>> r = request('PUT', '%s%s?ticket=%s' % (home1, uniqueFile,
+    ...             rwTicketId), body=doc)
+    >>> r.status # PUT ok (created) with read-write ticket
+    201
+    >>> r = request('PUT', '%s%s?ticket=%s' % (home1, uniqueFile,
+    ...             rwTicketId), body=doc)
+    >>> r.status # PUT ok (updated) with read-write ticket
+    204
+
+DELETE with read-only ticket
+
+    >>> r = request('DELETE', '%s%s?ticket=%s' % (home1, uniqueFile,
+    ...             ticket))
+    >>> r.status # DELETE no access with read-only ticket
+    403
+
+DELETE with read-write ticket
+
+    >>> r = request('DELETE', '%s%s?ticket=%s' % (home1, uniqueFile,
+    ...             rwTicketId))
+    >>> r.status # DELETE ok with read-only ticket
+    204
+
+GET deleted file
+
+    >>> r = request('GET', '%s%s?ticket=%s' % (home1, uniqueFile,
+    ...             rwTicketId))
+    >>> r.status # GET deleted file
+    404
 
 
 DELTICKET
@@ -137,7 +197,15 @@ OK (No Content)
     ...             headers=t)
     >>> r.status # DELTICKET OK (No Content)
     204
-    
+
+# Commented out because of bug 5183
+#OK (DELTICKET with read-write ticket auth)
+#    
+#    >>> t = {'Ticket': rwTicketId}
+#    >>> r = request('DELTICKET', '%s?ticket=%s' % (home1, rwTicketId))
+#    >>> r.status # DELTICKET OK (No Content, read-write ticket auth)
+#    204
+
 Ticket does not exist
 
     >>> t = authHeaders.copy()
@@ -153,7 +221,7 @@ Ticket does not exist, body
     >>> t = authHeaders.copy()
     >>> t['Ticket'] = 'nosuchticket5dfe45210787'
     >>> r = request('DELTICKET', '%s?ticket=%s' % (home1, nosuchticket),
-    ...             body=minTicket, headers=t)
+    ...             body=rTicket, headers=t)
     >>> r.status # DELTICKET no such ticket, body
     412
     
@@ -171,16 +239,17 @@ Ticket does not exist, resource does not exist, body
     >>> t = authHeaders.copy()
     >>> t['Ticket'] = 'nosuchticket5dfe45210787'
     >>> r = request('DELTICKET', '%sdoesnotexist?ticket=%s' % (home1, nosuchticket),
-    ...             body=minTicket, headers=t)
+    ...             body=rTicket, headers=t)
     >>> r.status # DELTICKET no such ticket or resource, body
     404
+
 
 
 Miscellaneous
 
 Try to delete an already deleted ticket
 
-    >>> r = request('MKTICKET', home1, body=minTicket,
+    >>> r = request('MKTICKET', home1, body=rTicket,
     ...             headers=authHeaders)
     >>> r.status # MKTICKET OK
     200
@@ -198,12 +267,12 @@ Try to delete an already deleted ticket
     
 Mismatched ticket in URL and header
 
-    >>> r = request('MKTICKET', home1, body=minTicket,
+    >>> r = request('MKTICKET', home1, body=rTicket,
     ...             headers=authHeaders)
     >>> r.status # MKTICKET OK
     200
     >>> ticket = r.getheader('Ticket')
-    >>> r = request('MKTICKET', home1, body=minTicket,
+    >>> r = request('MKTICKET', home1, body=rTicket,
     ...             headers=authHeaders)
     >>> r.status # MKTICKET OK
     200

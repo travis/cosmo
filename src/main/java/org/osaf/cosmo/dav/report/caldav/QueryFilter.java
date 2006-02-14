@@ -41,17 +41,12 @@ import org.osaf.cosmo.jackrabbit.query.TextCalendarTextFilter;
  * This class represents an object model for the calendar-query report's
  * <filter> element. It parses the element out and then provides methods to
  * generate XPATH queries as needed for JCR.
- * 
- * TODO Right now this class simply returns null/false on parse errors. Ideally
- * it should throw exceptions with more information about exactly what went
- * wrong to aid debugging clients.
- * 
  */
 
 public class QueryFilter implements JcrConstants {
     private static final Logger log =
         Logger.getLogger(QueryFilter.class);
-    
+
     /**
      * The parsed top-level filter object.
      */
@@ -74,20 +69,26 @@ public class QueryFilter implements JcrConstants {
      * 
      * @param element
      */
-    public boolean parseElement(Element element) {
+    public void parseElement(Element element) {
 
         // Can only have a single comp-filter element
         List childrenList = element.getChildren(
                 CosmoDavConstants.ELEMENT_CALDAV_COMP_FILTER,
                 CosmoDavConstants.NAMESPACE_CALDAV);
-        if (childrenList.size() != 1)
-            return false;
+
+        if (childrenList.size() == 0)
+            throw new IllegalArgumentException("CALDAV:filter must contain a comp-filter");
+
+        else if (childrenList.size() != 1)
+            throw new IllegalArgumentException("CALDAV:filter can contain only one comp-filter");
 
         Element child = (Element) childrenList.get(0);
 
         // Create new component filter and have it parse the element
         filter = new compfilter();
-        return filter.parseElement(child);
+
+        //raises an IllegalArgumentException if parsing fails
+        filter.parseElement(child);
     }
 
     /**
@@ -127,7 +128,10 @@ public class QueryFilter implements JcrConstants {
         // Get float start/end
         DateTime fstart = (DateTime) Dates.getInstance(dstart, dstart);
         DateTime fend = (DateTime) Dates.getInstance(dend, dend);
-        
+
+        //[bk] Timezone and UTC
+        // Check that a time zone is passed on query else check the calenaar
+        // for a timezone otherwise use UTC?
         if (timezone != null){
             fstart.setTimeZone(new TimeZone(timezone));
             fend.setTimeZone(new TimeZone(timezone));
@@ -202,39 +206,32 @@ public class QueryFilter implements JcrConstants {
          * 
          * @param element
          *            <comp-filter> element to parse
-         * @return true on successful parse, false otherwise
+         *
          */
-        public boolean parseElement(Element element) {
-
+        public void parseElement(Element element) {
             // Name must be present
             name = element
                     .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NAME);
-            if (name == null)
-                return false;
+
+            if (name == null) {
+                throw new IllegalArgumentException("CALDAV:comp-filter a calendar component name " +
+                                                   "(e.g., \"VEVENT\") is required");
+            }
 
             // Look at each child component
             boolean got_one = false;
+
             for (Iterator iter = element.getChildren().iterator(); iter
                     .hasNext();) {
                 Element child = (Element) iter.next();
 
-                // TODO is-defined has been removed in the -09 draft. We will
-                // continue to support it for older clients for now, but
-                // eventually this should be removed.
-                if (CosmoDavConstants.ELEMENT_CALDAV_IS_DEFINED.equals(child
-                        .getName())) {
-
-                    // Can only have one of is-defined, time-range
-                    if (got_one)
-                        return false;
-                    got_one = true;
-
-                } else if (CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE
+                if (CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE
                         .equals(child.getName())) {
 
-                    // Can only have one of is-defined, time-range
+                    // Can only have one time-range element in a comp-filter
                     if (got_one)
-                        return false;
+                        throw new IllegalArgumentException("CALDAV:comp-filter only one time-range element permitted");
+
                     got_one = true;
 
                     // Mark the value
@@ -244,23 +241,26 @@ public class QueryFilter implements JcrConstants {
                         // Get start (must be present)
                         String start = child
                                 .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_START);
+
                         if (start == null)
-                            return false;
+                            throw new IllegalArgumentException("CALDAV:comp-filter time-range requires a start time");
+
                         DateTime trstart;
                         trstart = new DateTime(start);
 
                         // Get end (must be present)
                         String end = child
                                 .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_END);
+
                         if (end == null)
-                            return false;
+                            throw new IllegalArgumentException("CALDAV:comp-filter time-range requires an end time");
+
                         DateTime trend = new DateTime(end);
 
                         timeRange = new Period(trstart, trend);
 
                     } catch (ParseException e) {
-
-                        return false;
+                        throw new IllegalArgumentException("CALDAV:comp-filter error while parsing XML", e);
                     }
 
                 } else if (CosmoDavConstants.ELEMENT_CALDAV_COMP_FILTER
@@ -273,9 +273,8 @@ public class QueryFilter implements JcrConstants {
                     // Create new component filter
                     compfilter cfilter = new compfilter();
 
-                    // Parse it and make sure it is valid
-                    if (!cfilter.parseElement(child))
-                        return false;
+                    //throws an IllegalArgumentException if an error occurs during parsing
+                    cfilter.parseElement(child);
 
                     // Add to list
                     compFilters.add(cfilter);
@@ -290,16 +289,13 @@ public class QueryFilter implements JcrConstants {
                     // Create new prop filter
                     propfilter pfilter = new propfilter();
 
-                    // Parse it and make sure it is valid
-                    if (!pfilter.parseElement(child))
-                        return false;
+                    //throws an IllegalArgumentException if an error occurs during parsing
+                    pfilter.parseElement(child);
 
                     // Add to list
                     propFilters.add(pfilter);
                 }
             }
-
-            return true;
         }
 
         /**
@@ -329,12 +325,6 @@ public class QueryFilter implements JcrConstants {
                         + TextCalendarTextFilter.TIME_RANGE_FIELD_SUFFIX_LOWERCASE;
                 String value = generatePeriods(timeRange);
                 result = "jcr:timerange(@" + key + ", '" + value + "')";
-            } else { // is-defined
-                if ((compSize == 0) && (propSize == 0)) {
-                    // If there are no component or property filters then we
-                    // must explicitly test for this component
-                    result = "jcr:contains(@" + myprefix + ", 'begin')";
-                }
             }
 
             // For each sub-component and property test, generate more tests
@@ -380,37 +370,31 @@ public class QueryFilter implements JcrConstants {
          * 
          * @param element
          */
-        public boolean parseElement(Element element) {
+        public void parseElement(Element element) {
 
             // Name must be present
             name = element
-                    .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NAME);
+                .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NAME);
+
             if (name == null)
-                return false;
+                throw new IllegalArgumentException("CALDAV:prop-filter a calendar property name " +
+                                                   "(e.g., \"ATTENDEE\") is required");
 
             // Look at each child component
             boolean got_one = false;
+
             for (Iterator iter = element.getChildren().iterator(); iter
                     .hasNext();) {
                 Element child = (Element) iter.next();
 
-                // TODO is-defined has been removed in the -09 draft. We will
-                // continue to support it for older clients for now, but
-                // eventually this should be removed.
-                if (CosmoDavConstants.ELEMENT_CALDAV_IS_DEFINED.equals(child
-                        .getName())) {
-
-                    // Can only have one of is-defined, time-range, text-match
-                    if (got_one)
-                        return false;
-                    got_one = true;
-
-                } else if (CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE
+                if (CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE
                         .equals(child.getName())) {
 
-                    // Can only have one of is-defined, time-range, text-match
+                    // Can only have one time-range or text-match
                     if (got_one)
-                        return false;
+                        throw new IllegalArgumentException("CALDAV:prop-filter only one time-range or " +
+                                                           "text-match element permitted");
+
                     got_one = true;
 
                     // Get value
@@ -420,31 +404,36 @@ public class QueryFilter implements JcrConstants {
                         // Get start (must be present)
                         String start = child
                                 .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_START);
+
                         if (start == null)
-                            return false;
+                            throw new IllegalArgumentException("CALDAV:prop-filter time-range requires a start time");
+
                         DateTime trstart;
                         trstart = new DateTime(start);
 
                         // Get end (must be present)
                         String end = child
                                 .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_END);
+
                         if (end == null)
-                            return false;
+                            throw new IllegalArgumentException("CALDAV:prop-filter time-range requires an end time");
+
                         DateTime trend = new DateTime(end);
 
                         timeRange = new Period(trstart, trend);
 
                     } catch (ParseException e) {
-
-                        return false;
+                        throw new IllegalArgumentException("CALDAV:param-filter error while parsing XML", e);
                     }
 
                 } else if (CosmoDavConstants.ELEMENT_CALDAV_TEXT_MATCH
                         .equals(child.getName())) {
 
-                    // Can only have one of is-defined, time-range, text-match
-                    if (got_one)
-                        return false;
+                    // Can only have one time-range or text-match
+                    if (got_one) 
+                        throw new IllegalArgumentException("CALDAV:prop-filter only one time-range or " +
+                                                           "text-match element permitted");
+
                     got_one = true;
 
                     // Get value
@@ -472,16 +461,13 @@ public class QueryFilter implements JcrConstants {
                     // Create new param filter
                     paramfilter pfilter = new paramfilter();
 
-                    // Parse it and make sure it is valid
-                    if (!pfilter.parseElement(child))
-                        return false;
+                    //throws an IllegalArgumentException if an error occurs during parsing
+                    pfilter.parseElement(child);
 
                     // Add to list
                     paramFilters.add(pfilter);
                 }
             }
-
-            return true;
         }
 
         /**
@@ -507,12 +493,6 @@ public class QueryFilter implements JcrConstants {
             } else if (useTextMatch) {
                 result = "jcr:contains(@" + myprefix + ", '*" + textMatch
                         + "*')";
-            } else { // is-defined
-                if (paramSize == 0) {
-                    // If there are no parameter filters then we must
-                    // explicitly test for this component
-                    result = "@" + myprefix;
-                }
             }
 
             if (paramSize != 0) {
@@ -546,33 +526,28 @@ public class QueryFilter implements JcrConstants {
 
         /**
          * Parse the <param-filter> XML element.
-         * 
+         *
          * @param element
          */
-        public boolean parseElement(Element element) {
+        public void parseElement(Element element) {
 
             // Get name which must be present
             name = element
                     .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NAME);
-            if (name == null)
-                return false;
 
-            // Can only have a single is-defined or text-match element
+            if (name == null)
+                throw new IllegalArgumentException("CALDAV:param-filter a property parameter name " +
+                                                   "(e.g., \"PARTSTAT\") is required");
+
+            // Can only have a single ext-match element
             List childrenList = element.getChildren();
+
             if (childrenList.size() != 1)
-                return false;
+                throw new IllegalArgumentException("CALDAV:param-filter only a single text-match element is allowed");
 
             Element child = (Element) childrenList.get(0);
 
-            // TODO is-defined has been removed in the -09 draft. We will
-            // continue to support it for older clients for now, but
-            // eventually this should be removed.
-            if (CosmoDavConstants.ELEMENT_CALDAV_IS_DEFINED.equals(child
-                    .getName())) {
-
-                return true;
-
-            } else if (CosmoDavConstants.ELEMENT_CALDAV_TEXT_MATCH.equals(child
+            if (CosmoDavConstants.ELEMENT_CALDAV_TEXT_MATCH.equals(child
                     .getName())) {
 
                 useTextMatch = true;
@@ -589,9 +564,8 @@ public class QueryFilter implements JcrConstants {
                 else
                     isCaseless = true;
 
-                return true;
             } else
-                return false;
+                throw new IllegalArgumentException("CALDAV:prop-filter an invalid element name found");
         }
 
         /**
@@ -611,8 +585,6 @@ public class QueryFilter implements JcrConstants {
                 // TODO Figure out how to do caseless matching
                 result = "jcr:contains(@" + myprefix + ", '*" + textMatch
                         + "*')";
-            } else { // is-defined
-                result = "@" + myprefix;
             }
 
             return result;

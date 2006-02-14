@@ -5,3 +5,143 @@ http://wiki.osafoundation.org/bin/view/Projects/CosmoManagementProtocol
 First, bring the framework environment
 
 	>>> from silmut import *
+
+Initialization
+
+    >>> import md5, random, base64
+    >>> accountXML = """<?xml version="1.0" encoding="utf-8" ?> 
+    ... <user xmlns="http://osafoundation.org/cosmo/CMP">
+    ...   <username>test%s</username>
+    ...   <password>%s</password>
+    ...   <firstName>Ex</firstName>
+    ...   <lastName>Ample</lastName>
+    ...   <email>%s@example.com</email>
+    ... </user>"""
+    >>> accountXMLBadNS = """<?xml version="1.0" encoding="utf-8" ?> 
+    ... <user xmlns="http://osafoundation.org/cosmo">
+    ...   <username>test%s</username>
+    ...   <password>%s</password>
+    ...   <firstName>Ex</firstName>
+    ...   <lastName>Ample</lastName>
+    ...   <email>%s@example.com</email>
+    ... </user>"""
+    >>> accountXMLNoNS = """<?xml version="1.0" encoding="utf-8" ?> 
+    ... <user>
+    ...   <username>test%s</username>
+    ...   <password>%s</password>
+    ...   <firstName>Ex</firstName>
+    ...   <lastName>Ample</lastName>
+    ...   <email>%s@example.com</email>
+    ... </user>"""
+
+
+Protocol Specification
+----------------------
+
+Data Model
+----------
+
+Anonymous Operations
+-------------------------
+
+Signup
+
+    >>> randomText = md5.md5(str(random.random())).hexdigest()[:16]
+    >>> user1 = 'test%s' % randomText
+    >>> password1 = randomText
+    >>> body = accountXML % (randomText, randomText, randomText)
+    >>> r = request('PUT', '%s/cmp/signup' % path, body=body)
+    >>> r.status # PUT signup ok (created)
+    201
+    
+    >>> r = request('PUT', '%s/cmp/signup' % path, body=body)
+    >>> r.status # PUT signup failed (already exists)
+    431
+    
+    >>> randomText = md5.md5(str(random.random())).hexdigest()[:16]
+    >>> body = accountXML % (randomText, randomText, randomText)
+    >>> auth = 'Basic %s' % base64.encodestring('%s:%s' % (user1, password1)).strip()
+    >>> authHeaders = {'Authorization': auth}
+    >>> r = request('PUT', '%s/cmp/signup' % path, body=body,
+    ...             headers=authHeaders)
+    >>> r.status # PUT signup failed (authorization not allowed with anonymous)
+    403
+
+Operations not allowed when anonymous
+    
+    >>> r = request('GET', '%s/cmp/account' % path)
+    >>> r.status # GET account failed, anonymous mode
+    401
+
+
+Authenticated Operations
+-------------------------
+
+View account
+
+    >>> auth = 'Basic %s' % base64.encodestring('%s:%s' % (user1, password1)).strip()
+    >>> authHeaders = {'Authorization': auth}
+    >>> r = request('GET', '%s/cmp/account' % path, headers=authHeaders)
+    >>> r.status # GET account ok
+    200
+
+Modify account
+
+    >>> accountChange = """<?xml version="1.0" encoding="utf-8" ?> 
+    ... <user xmlns="http://osafoundation.org/cosmo/CMP">
+    ...   <lastName>Ample</lastName>
+    ... </user>"""
+    >>> r = request('PUT', '%s/cmp/account' % path, body=accountChange,
+    ...             headers=authHeaders)
+    >>> r.status # GET account ok
+    204
+
+    >>> accountChange = """<?xml version="1.0" encoding="utf-8" ?> 
+    ... <user xmlns="http://osafoundation.org/cosmo/CMP">
+    ...   <username>Ample</username>
+    ... </user>"""
+    >>> r = request('PUT', '%s/cmp/account' % path, body=accountChange,
+    ...             headers=authHeaders)
+    >>> r.status # PUT not allowed, authenticated can not change username
+    400
+
+# Commented out because of bug 5189
+#    >>> accountChange = """<?xml version="1.0" encoding="utf-8" ?> 
+#    ... <user xmlns="http://osafoundation.org/cosmo/CMP">
+#    ...   <LastName1>AmpleSample</LastName1>
+#    ... </user>"""
+#    >>> r = request('PUT', '%s/cmp/account' % path, body=accountChange,
+#    ...             headers=authHeaders)
+#    >>> r.status # PUT not allowed, bad XML
+#    400
+
+    >>> randomText = md5.md5(str(random.random())).hexdigest()[:16]
+    >>> user2 = 'test%s' % randomText
+    >>> user2email = randomText
+    >>> body = accountXML % (randomText, randomText, randomText)
+    >>> r = request('PUT', '%s/cmp/signup' % path, body=body)
+    >>> r.status # PUT signup ok (created)
+    201
+    >>> accountChange = """<?xml version="1.0" encoding="utf-8" ?> 
+    ... <user xmlns="http://osafoundation.org/cosmo/CMP">
+    ...   <email>%s@example.com</email>
+    ... </user>""" % user2email
+    >>> r = request('PUT', '%s/cmp/account' % path, body=accountChange,
+    ...             headers=authHeaders)
+    >>> r.status # PUT not allowed, email exists
+    432
+
+
+Administrative Operations
+-------------------------
+
+List accounts
+
+View account
+
+Create account
+
+Modify account
+
+Delete account
+

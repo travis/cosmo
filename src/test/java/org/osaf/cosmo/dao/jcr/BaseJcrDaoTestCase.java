@@ -15,101 +15,33 @@
  */
 package org.osaf.cosmo.dao.jcr;
 
-import java.util.Properties;
-
-import javax.jcr.Repository;
 import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.jackrabbit.core.RepositoryImpl;
-import org.apache.jackrabbit.core.config.RepositoryConfig;
-
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.osaf.cosmo.jackrabbit.JackrabbitTestSessionManager;
 
 import org.springmodules.jcr.JcrSessionFactory;
-import org.springmodules.jcr.JcrTemplate;
-import org.springmodules.jcr.SessionHolder;
-import org.springmodules.jcr.SessionHolderProvider;
-import org.springmodules.jcr.SessionFactoryUtils;
-import org.springmodules.jcr.support.DefaultSessionHolderProvider;
 
 /**
- * Base class for test cases that operate against a JCR repository.
+ * Base class for dao test cases that operate against a JCR repository.
  */
-public class BaseJcrDaoTestCase extends TestCase implements JcrConstants {
+public class BaseJcrDaoTestCase extends TestCase {
     private static final Log log = LogFactory.getLog(BaseJcrDaoTestCase.class);
 
-    public static final String PROP_CONFIG_FILE_PATH =
-        "jackrabbit.repository.config";
-    public static final String PROP_REP_HOME_DIR =
-        "jackrabbit.repository.homedir";
-    public static final String PROP_USERNAME =
-        "jackrabbit.repository.username";
-    public static final String PROP_PASSWORD =
-        "jackrabbit.repository.password";
-
-    private String configFilePath;
-    private String repositoryHomedirPath;
-    private String username;
-    private String password;
-    private Repository repository;
-    private JcrSessionFactory sessionFactory;
-    private Session session;
+    private JackrabbitTestSessionManager sessionManager;
     private JcrTestHelper testHelper;
 
     /**
      */
-    public BaseJcrDaoTestCase() {
-        // load test properties (accessible to subclasses)
-        Properties testprops = new Properties();
-        try {
-            testprops.load(getClass().getClassLoader().
-                           getResourceAsStream("test.properties"));
-        } catch (Exception e) {
-            throw new RuntimeException("can't load test.properties", e);
-        }
-
-        // extract test props used by this class
-        configFilePath = testprops.getProperty(PROP_CONFIG_FILE_PATH);
-        repositoryHomedirPath = testprops.getProperty(PROP_REP_HOME_DIR);
-        username = testprops.getProperty(PROP_USERNAME);
-        password = testprops.getProperty(PROP_PASSWORD);
-    }
-    
-    /**
-     * Open the repository and set up the <code>JcrTemplate</code>.
-     */
     protected void setUp() throws Exception {
-        // set up repository
-        try {
-            RepositoryConfig config =
-                RepositoryConfig.create(configFilePath, repositoryHomedirPath);
-            repository = RepositoryImpl.create(config);
-        } catch (Exception e) {
-            throw new RuntimeException("can't open repository", e);
-        }
+        sessionManager = new JackrabbitTestSessionManager();
+        sessionManager.setUp();
 
-        // set up template
-        SimpleCredentials credentials =
-            new SimpleCredentials(username, password.toCharArray());
-
-        sessionFactory = new JcrSessionFactory();
-        sessionFactory.setRepository(repository);
-        sessionFactory.setCredentials(credentials);
-
-        // open the session
-        session = SessionFactoryUtils.getSession(sessionFactory, true);
-        SessionHolder sessionHolder =
-            new DefaultSessionHolderProvider().createSessionHolder(session);
-        TransactionSynchronizationManager.bindResource(sessionFactory,
-                                                       sessionHolder);
-
-        testHelper = new JcrTestHelper(session);
+        testHelper = new JcrTestHelper(sessionManager.getSession());
     }
 
     /**
@@ -117,18 +49,13 @@ public class BaseJcrDaoTestCase extends TestCase implements JcrConstants {
     protected void tearDown() throws Exception {
         testHelper = null;
 
-        // close the session
-        TransactionSynchronizationManager.unbindResource(sessionFactory);
-        session.refresh(false);
-        SessionFactoryUtils.releaseSession(session, sessionFactory);
-
-        ((RepositoryImpl) repository).shutdown();
+        sessionManager.tearDown();
     }
 
     /**
      */
     protected JcrSessionFactory getSessionFactory() {
-        return sessionFactory;
+        return sessionManager.getSessionFactory();
     }
 
     /**

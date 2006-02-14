@@ -466,17 +466,11 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         }
 
         if (supportedReports.isSupportedReport(reportInfo)) {
-            try {
-                Report report = ReportType.getType(reportInfo).createReport();
-                report.setInfo(reportInfo);
-                report.setResource(this);
-                return report;
-            } catch (IllegalArgumentException e) {
-                // should never occur.
-                throw new DavException(
-                        DavServletResponse.SC_INTERNAL_SERVER_ERROR, e
-                                .getMessage());
-            }
+            Report report = ReportType.getType(reportInfo).createReport();
+            report.setInfo(reportInfo);
+            report.setResource(this);
+            return report;
+
         } else {
             throw new DavException(DavServletResponse.SC_UNPROCESSABLE_ENTITY,
                     "Unkown report "

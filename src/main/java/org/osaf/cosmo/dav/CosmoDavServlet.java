@@ -310,10 +310,17 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                             CosmoDavResource resource)
         throws DavException, IOException {
 
-        ReportInfo info = ((CosmoDavRequestImpl) request).getCosmoReportInfo();
-        Report report = ((CosmoDavResourceImpl) resource).getReport(info);
-        response.sendXmlResponse(report.toXml(),
-                                 DavServletResponse.SC_MULTI_STATUS);
+        try {
+
+            ReportInfo info = ((CosmoDavRequestImpl) request).getCosmoReportInfo();
+            Report report = ((CosmoDavResourceImpl) resource).getReport(info);
+            response.sendXmlResponse(report.toXml(),
+                                     DavServletResponse.SC_MULTI_STATUS);
+        } catch (IllegalArgumentException e) {
+            response.sendError(DavServletResponse.SC_BAD_REQUEST,
+                               e.getMessage());
+            return;
+        }
     }
 
     /**
@@ -321,6 +328,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
      *
      * @throws IOException
      * @throws DavException
+     * [bk] bug 4940
      */
     protected void doMkCalendar(CosmoDavRequest request,
                                 CosmoDavResponse response,
@@ -354,6 +362,10 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         // also could return INSUFFICIENT_STORAGE if we do not have
         // enough space for the collection, but how do we determine
         // that?
+
+        //[bk] seems like need to add properties to the resource before adding
+        //to parent and wrap the entire process in a transaction
+        //XXX: do we need to validate set properties?
 
         CosmoInputContext ctx = (CosmoInputContext)
             getInputContext(request, null);

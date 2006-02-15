@@ -375,6 +375,19 @@
             <include>*.ics</include>
           </includes>
         </resource>
+        <resource>
+          <directory>src/test/resources/dav/caldav/reports</directory>
+          <includes>
+            <include>*.ics</include>
+            <include>*.xml</include>
+          </includes>
+        </resource>
+        <resource>
+          <directory>src/webapp/WEB-INF</directory>
+          <includes>
+            <include>resource-config.xml</include>
+          </includes>
+        </resource>
       </resources>
     </unitTest>
   </build>

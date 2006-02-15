@@ -246,6 +246,11 @@ public class JcrTestHelper extends TestHelper
     public Calendar loadCalendar(String name)
         throws Exception {
         InputStream in = getClass().getClassLoader().getResourceAsStream(name);
-        return new CalendarBuilder().build(in);
+        if (in == null) {
+            throw new IllegalStateException("resource " + name + " not found");
+        }
+        Calendar calendar = new CalendarBuilder().build(in);
+        in.close();
+        return calendar;
     }
 }

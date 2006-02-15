@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo;
 
+import java.io.InputStream;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.TimeZone;
@@ -23,6 +24,9 @@ import net.fortuna.ical4j.model.*;
 import net.fortuna.ical4j.model.component.*;
 import net.fortuna.ical4j.model.parameter.*;
 import net.fortuna.ical4j.model.property.*;
+
+import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.model.Ticket;
@@ -182,5 +186,17 @@ public class TestHelper {
         User user = makeDummyUser();
         user.setAdmin(Boolean.TRUE);
         return new MockUserPrincipal(user);
+    }
+
+    /**
+     */
+    public Document loadXml(String name)
+        throws Exception {
+        InputStream in = getClass().getClassLoader().getResourceAsStream(name);
+        if (in == null) {
+            throw new IllegalStateException("resource " + name + " not found");
+        }
+        SAXBuilder builder = new SAXBuilder(false);
+        return builder.build(in);
     }
 }

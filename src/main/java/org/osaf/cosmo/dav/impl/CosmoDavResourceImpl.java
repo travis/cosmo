@@ -457,20 +457,14 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public Report getReport(ReportInfo reportInfo)
         throws DavException {
-        if (reportInfo == null) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST,
-                    "A REPORT request must provide a valid XML request body.");
-        }
         if (!exists()) {
             throw new DavException(DavServletResponse.SC_NOT_FOUND);
         }
-
         if (supportedReports.isSupportedReport(reportInfo)) {
             Report report = ReportType.getType(reportInfo).createReport();
             report.setInfo(reportInfo);
             report.setResource(this);
             return report;
-
         } else {
             throw new DavException(DavServletResponse.SC_UNPROCESSABLE_ENTITY,
                     "Unkown report "

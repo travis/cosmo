@@ -230,6 +230,9 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
     public org.osaf.cosmo.dav.report.ReportInfo getCosmoReportInfo() {
         org.osaf.cosmo.dav.report.ReportInfo rInfo = null;
         Document requestDocument = getRequestDocument();
+        if (requestDocument == null) {
+            throw new IllegalArgumentException("report request missing body");
+        }
         if (requestDocument != null) {
             rInfo = new org.osaf.cosmo.dav.report.ReportInfo(requestDocument
                     .getRootElement(), getDepth(DEPTH_0), getDavSession());

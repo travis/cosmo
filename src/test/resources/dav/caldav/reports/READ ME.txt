@@ -12,7 +12,7 @@ ____________
 
 *Create new calendar for user test:
 
-	MKCALENDAR /CosmoServer/home/test/calendars/temp/
+	MKCALENDAR /cosmo/home/test/calendars/temp/
 
 
 Testing Procedure

@@ -1,4 +1,4 @@
-PUT /CosmoServer/home/test/calendars/temp/1.ics HTTP/1.1
+PUT /cosmo/home/test/calendars/temp/1.ics HTTP/1.1
 Host: localhost:8080
 Authorization: Basic dGVzdDp0ZXN0MQ==
 Content-Length: 665

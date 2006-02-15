@@ -1,4 +1,4 @@
-REPORT /CosmoServer/home/test/calendars/temp/ HTTP/1.1
+REPORT /cosmo/home/test/calendars/temp/ HTTP/1.1
 Host: localhost:8080
 Authorization: Basic dGVzdDp0ZXN0MQ==
 Content-Length: 601

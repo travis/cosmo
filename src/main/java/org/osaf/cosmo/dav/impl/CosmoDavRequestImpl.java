@@ -180,7 +180,8 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
         String timeout = root.
             getChildTextNormalize(CosmoDavConstants.ELEMENT_TIMEOUT,
                                   CosmoDavConstants.NAMESPACE_TICKET);
-        if (timeout != null) {
+        if (timeout != null &&
+            ! timeout.equals(CosmoDavConstants.VALUE_INFINITE)) {
             try {
                 int seconds = Integer.parseInt(timeout.substring(7));
             } catch (NumberFormatException e) {

@@ -98,6 +98,8 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     public static final String BEAN_TICKET_DAO = "ticketDao";
 
     private CosmoSecurityManager securityManager;
+    private JcrSessionFactory sessionFactory;
+    private TicketDao ticketDao;
     private WebApplicationContext wac;
 
     /**
@@ -107,8 +109,8 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
      *
      * If no web application context is found in the servlet context,
      * the caller is responsible for setting the servlet's
-     * {@link DavSessionProvider}, {@link ResourceFactory} and
-     * {@link LocatorFactory}.
+     * {@link CosmoSecurityManager}, {@link JcrSessionFactory} and
+     * {@link TicketDao}.
      *
      * @throws ServletException
      */
@@ -119,30 +121,35 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             getWebApplicationContext(getServletContext());
 
         if (wac != null) {
-            securityManager = (CosmoSecurityManager)
-                getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
-
-            JcrSessionFactory sessionFactory = (JcrSessionFactory)
-                getBean(BEAN_DAV_SESSION_FACTORY, JcrSessionFactory.class);
-            TicketDao ticketDao = (TicketDao)
-                getBean(BEAN_TICKET_DAO, TicketDao.class);
-
-            CosmoDavSessionProviderImpl sessionProvider =
-                new CosmoDavSessionProviderImpl();
-            sessionProvider.setSessionFactory(sessionFactory);
-            setDavSessionProvider(sessionProvider);
-
-            CosmoDavResourceFactoryImpl resourceFactory =
-                new CosmoDavResourceFactoryImpl(getLockManager(),
-                                                getResourceConfig());
-            resourceFactory.setSecurityManager(securityManager);
-            resourceFactory.setTicketDao(ticketDao);
-            setResourceFactory(resourceFactory);
-
-            CosmoDavLocatorFactoryImpl locatorFactory =
-                new CosmoDavLocatorFactoryImpl(getPathPrefix());
-            setLocatorFactory(locatorFactory);
+            if (securityManager == null) {
+                securityManager = (CosmoSecurityManager)
+                    getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
+            }
+            if (sessionFactory == null) {
+                sessionFactory = (JcrSessionFactory)
+                    getBean(BEAN_DAV_SESSION_FACTORY, JcrSessionFactory.class);
+            }
+            if (ticketDao == null) {
+                ticketDao = (TicketDao)
+                    getBean(BEAN_TICKET_DAO, TicketDao.class);
+            }
         }
+
+        CosmoDavSessionProviderImpl sessionProvider =
+            new CosmoDavSessionProviderImpl();
+        sessionProvider.setSessionFactory(sessionFactory);
+        setDavSessionProvider(sessionProvider);
+
+        CosmoDavResourceFactoryImpl resourceFactory =
+            new CosmoDavResourceFactoryImpl(getLockManager(),
+                                            getResourceConfig());
+        resourceFactory.setSecurityManager(securityManager);
+        resourceFactory.setTicketDao(ticketDao);
+        setResourceFactory(resourceFactory);
+
+        CosmoDavLocatorFactoryImpl locatorFactory =
+            new CosmoDavLocatorFactoryImpl(getPathPrefix());
+        setLocatorFactory(locatorFactory);
     }
 
 
@@ -309,14 +316,19 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                             CosmoDavResponse response,
                             CosmoDavResource resource)
         throws DavException, IOException {
+        if (!resource.exists()) {
+            response.sendError(DavServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         try {
-
-            ReportInfo info = ((CosmoDavRequestImpl) request).getCosmoReportInfo();
+            ReportInfo info =
+                ((CosmoDavRequestImpl) request).getCosmoReportInfo();
             Report report = ((CosmoDavResourceImpl) resource).getReport(info);
             response.sendXmlResponse(report.toXml(),
                                      DavServletResponse.SC_MULTI_STATUS);
         } catch (IllegalArgumentException e) {
+            log.warn("error parsing request content", e);
             response.sendError(DavServletResponse.SC_BAD_REQUEST,
                                e.getMessage());
             return;
@@ -373,6 +385,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             DavPropertySet properties = request.getMkCalendarSetProperties();
             ctx.setCalendarCollectionProperties(properties);
         } catch (IllegalArgumentException e) {
+            log.warn("error parsing request content", e);
             response.sendError(DavServletResponse.SC_BAD_REQUEST,
                                e.getMessage());
             return;
@@ -407,6 +420,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         try {
             ticket = request.getTicketInfo();
         } catch (IllegalArgumentException e) {
+            log.warn("error parsing request content", e);
             response.sendError(DavServletResponse.SC_BAD_REQUEST,
                                e.getMessage());
             return;
@@ -495,6 +509,36 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
      */
     public CosmoSecurityManager getSecurityManager() {
         return securityManager;
+    }
+
+    /**
+     */
+    public void setSecurityManager(CosmoSecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
+    /**
+     */
+    public JcrSessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    /**
+     */
+    public void setSessionFactory(JcrSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    /**
+     */
+    public TicketDao getTicketDao() {
+        return ticketDao;
+    }
+
+    /**
+     */
+    public void setTicketDao(TicketDao ticketDao) {
+        this.ticketDao = ticketDao;
     }
 
     /**

@@ -26,7 +26,7 @@ except ImportError:
     ElementTree = None
 
 # The silmut framework that is usable from the test suites.
-__all__ = ['host', 'port', 'path', 'adminuser', 'user1', 'user2',
+__all__ = ['host', 'port', 'path', 'url', 'adminuser', 'user1', 'user2',
            'adminpassword', 'password1', 'password2', 'request']
 
 # Defaults
@@ -44,10 +44,30 @@ adminpassword = 'cosmo'
 parseXML = True
 
 
+def headerValidator(response, method=None, sentHeaders=None):
+    """
+    Validate response headers
+    """
+    # If we have a body, make sure Content-Length is correct
+    bodyLen = len(response.read())
+    if bodyLen > 0:
+        contentLen = long(response.getheader('Content-Length'))
+        if bodyLen != contentLen:
+            raise Exception('Content-Length (%d) does not match body (%d)' % \
+                            (bodyLen, contentLen))
+    
+    if hasattr(response, 'getheaders'):
+        for header, value in response.getheaders():
+            if header == 'etag':
+                if len(value) == 0:
+                    raise Exception('ETag should not be empty') 
+
+
 def request(method, url, body=None, headers={}, 
             autoheaders=('Content-Length', 'Content-Type', 'User-Agent',
                           'Host'),
-            xmlExpectedStatusCodes=(200, 207,)):
+            xmlExpectedStatusCodes=(200, 207,),
+            headerValidator=headerValidator):
     """
     Helper function to make requests easier to make.
     
@@ -94,6 +114,8 @@ def request(method, url, body=None, headers={},
            xmlContent(r):
             #print method, r.status, r.getheader('Content-Type')
             parse(r.read())
+    
+    headerValidator(r, method, headers)
     
     return r
 

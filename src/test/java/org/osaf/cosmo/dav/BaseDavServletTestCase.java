@@ -148,4 +148,12 @@ public abstract class BaseDavServletTestCase extends TestCase {
         SAXBuilder builder = new SAXBuilder(false);
         return builder.build(in);
     }
+
+    /**
+     */
+    protected MultiStatus
+        readMultiStatusResponse(MockHttpServletResponse response)
+        throws Exception {
+        return MultiStatus.createFromXml(readXmlResponse(response));
+    }
 }

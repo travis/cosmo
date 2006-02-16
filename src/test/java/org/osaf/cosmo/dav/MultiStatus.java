@@ -1,0 +1,358 @@
+/*
+ * Copyright 2005 Open Source Applications Foundation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.osaf.cosmo.dav;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+
+/**
+ * Bean that encapsulates information about a DAV multistatus
+ * response.
+ */
+public class MultiStatus {
+    private static final Log log = LogFactory.getLog(MultiStatus.class);
+    private static final Namespace NS = Namespace.getNamespace("D", "DAV:");
+
+    private Set responses;
+    private String responseDescription;
+
+    /**
+     */
+    public MultiStatus() {
+        responses = new HashSet();
+    }
+
+    /**
+     */
+    public Set getResponses() {
+        return responses;
+    }
+
+    /**
+     */
+    public String getResponseDescription() {
+        return responseDescription;
+    }
+
+    /**
+     */
+    public void setResponseDescription(String responseDescription) {
+        this.responseDescription = responseDescription;
+    }
+
+    /**
+     */
+    public static MultiStatus createFromXml(Document doc) {
+        if (doc == null) {
+            throw new IllegalArgumentException("null document");
+        }
+
+        Element mse = doc.getRootElement();
+        if (!(mse.getName().equals("multistatus") &&
+              mse.getNamespace().equals(NS))) {
+            throw new IllegalArgumentException("root element not DAV:multistatus");
+        }
+
+        MultiStatus ms = new MultiStatus();
+
+        for (Iterator i=mse.getChildren("response", NS).iterator();
+             i.hasNext();) {
+            Element msre = (Element) i.next();
+            MultiStatusResponse msr = MultiStatusResponse.createFromXml(msre);
+            ms.getResponses().add(msr);
+        }
+
+        String msrd = mse.getChildText("responsedescription", NS);
+        ms.setResponseDescription(msrd);
+
+        return ms;
+    }
+
+    /**
+     */
+    public String toString() {
+        return new ToStringBuilder(this).
+            append("responses", responses).
+            append("responseDescription", responseDescription).
+            toString();
+    }
+
+    /**
+     */
+    public static class MultiStatusResponse {
+        private String href;
+        private Status status;
+        private Set propstats;
+        private String responseDescription;
+
+        /**
+         */
+        public MultiStatusResponse() {
+            this.propstats = new HashSet();
+        }
+
+        /**
+         */
+        public String getHref() {
+            return href;
+        }
+
+        /**
+         */
+        public void setHref(String href) {
+            this.href = href;
+        }
+
+        /**
+         */
+        public Status getStatus() {
+            return status;
+        }
+
+        /**
+         */
+        public void setStatus(Status status) {
+            this.status = status;
+        }
+
+        /**
+         */
+        public Set getPropStats() {
+            return propstats;
+        }
+
+        /**
+         */
+        public String getResponseDescription() {
+            return responseDescription;
+        }
+
+        /**
+         */
+        public void setResponseDescription(String responseDescription) {
+            this.responseDescription = responseDescription;
+        }
+
+        /**
+         */
+        public static MultiStatusResponse createFromXml(Element e) {
+            if (e == null) {
+                throw new IllegalArgumentException("null DAV:response element");
+            }
+
+            MultiStatusResponse msr = new MultiStatusResponse();
+
+            Element he = e.getChild("href", NS);
+            if (he == null) {
+                throw new IllegalArgumentException("expected DAV:href child for DAV:response element");
+            }
+            msr.setHref(he.getText());
+
+            String statusLine = e.getChildText("status", NS);
+            if (statusLine != null) {
+                msr.setStatus(Status.createFromStatusLine(statusLine));
+            }
+
+            for (Iterator i=e.getChildren("propstat", NS).iterator();
+                 i.hasNext();) {
+                Element pse = (Element) i.next();
+                PropStat ps = PropStat.createFromXml(pse);
+                msr.getPropStats().add(ps);
+            }
+
+            String msrrd = e.getChildText("responsedescription", NS);
+            msr.setResponseDescription(msrrd);
+
+            return msr;
+        }
+
+        /**
+         */
+        public String toString() {
+            return new ToStringBuilder(this).
+                append("href", href).
+                append("status", status).
+                append("propstats", propstats).
+                append("responseDescription", responseDescription).
+                toString();
+        }
+    }
+
+    /**
+     */
+    public static class PropStat {
+        private Set props;
+        private Status status;
+        private String responseDescription;
+
+        /**
+         */
+        public PropStat() {
+        }
+
+        /**
+         */
+        public Set getProps() {
+            return props;
+        }
+
+        /**
+         */
+        public Status getStatus() {
+            return status;
+        }
+
+        /**
+         */
+        public void setStatus(Status status) {
+            this.status = status;
+        }
+
+        /**
+         */
+        public String getResponseDescription() {
+            return responseDescription;
+        }
+
+        /**
+         */
+        public void setResponseDescription(String responseDescription) {
+            this.responseDescription = responseDescription;
+        }
+
+        /**
+         */
+        public static PropStat createFromXml(Element e) {
+            if (e == null) {
+                throw new IllegalArgumentException("null DAV:propstat element");
+            }
+
+            PropStat ps = new PropStat();
+
+            Element pe = e.getChild("prop", NS);
+            if (pe == null) {
+                throw new IllegalArgumentException("expected DAV:prop child for DAV:propstat element");
+            }
+            for (Iterator i=pe.getChildren().iterator(); i.hasNext();) {
+                ps.getProps().add((Element) i.next());
+            }
+
+            String statusLine = e.getChildText("status", NS);
+            if (statusLine != null) {
+                ps.setStatus(Status.createFromStatusLine(statusLine));
+            }
+
+            String psrd = e.getChildText("responsedescription", NS);
+            ps.setResponseDescription(psrd);
+
+            return ps;
+        }
+
+        /**
+         */
+        public String toString() {
+            return new ToStringBuilder(this).
+                append("props", props).
+                append("status", status).
+                append("responseDescription", responseDescription).
+                toString();
+        }
+    }
+
+    /**
+     */
+    public static class Status {
+        private String protocol;
+        private int code;
+        private String reasonPhrase;
+
+        /**
+         */
+        public String getProtocol() {
+            return protocol;
+        }
+
+        /**
+         */
+        public void setProtocol(String protocol) {
+            this.protocol = protocol;
+        }
+
+        /**
+         */
+        public int getCode() {
+            return code;
+        }
+
+        /**
+         */
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        /**
+         */
+        public String getReasonPhrase() {
+            return reasonPhrase;
+        }
+
+        /**
+         */
+        public void setReasonPhrase(String reasonPhrase) {
+            this.reasonPhrase = reasonPhrase;
+        }
+
+        /**
+         */
+        public static Status createFromStatusLine(String line) {
+            if (line == null) {
+                throw new IllegalArgumentException("null status line");
+            }
+
+            String[] chunks = line.trim().split("\\w", 3);
+            if (chunks.length < 3) {
+                throw new IllegalArgumentException("status line " + line + " does not contain proto/version, code, reason phrase");
+            }
+
+            Status status = new Status();
+
+            status.setProtocol(chunks[0]);
+            status.setCode(Integer.parseInt(chunks[1]));
+            status.setReasonPhrase(chunks[2]);
+
+            return status;
+        }
+
+        /**
+         */
+        public String toString() {
+            return new ToStringBuilder(this).
+                append("protocol", protocol).
+                append("code", code).
+                append("reasonPhrase", reasonPhrase).
+                toString();
+        }
+    }
+}

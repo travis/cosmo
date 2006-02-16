@@ -26,8 +26,8 @@ except ImportError:
     ElementTree = None
 
 # The silmut framework that is usable from the test suites.
-__all__ = ['host', 'port', 'path', 'user1', 'user2',
-           'password1', 'password2', 'request']
+__all__ = ['host', 'port', 'path', 'adminuser', 'user1', 'user2',
+           'adminpassword', 'password1', 'password2', 'request']
 
 # Defaults
 host = 'localhost'
@@ -39,6 +39,8 @@ user1 = 'test1'
 password1 = 'test1'
 user2 = 'test2'
 password2 = 'test2'
+adminuser = 'root'
+adminpassword = 'cosmo'
 parseXML = True
 
 
@@ -147,6 +149,7 @@ def usage():
     
     Options:
       -u      url (default is http://localhost:8080/cosmo)
+      -0      adminuser:adminpassword (default is root:cosmo)
       -1      user1:password1 (default is test1:test1)
       -2      user2:password2 (default is test2:test2)
       -t      timeout (default is None)
@@ -226,14 +229,15 @@ def parseURL(url):
 
 def main(argv):
     global host, port, path, tls, url, user1, password1, user2, password2, \
-           parseXML
+           parseXML, adminuser, adminpassword
     
     try:
-        opts, args = getopt.getopt(argv, 'u:1:2:r:t:vdh',)
+        opts, args = getopt.getopt(argv, 'u:0:1:2:r:t:vdh',)
     except getopt.GetoptError:
         usage()
         sys.exit(1)
 
+    up0 = '%s:%s' % (adminuser, adminpassword)
     up1 = '%s:%s' % (user1, password1)
     up2 = '%s:%s' % (user2, password2)
     
@@ -243,6 +247,7 @@ def main(argv):
     
     for (opt, arg) in opts:
         if   opt == '-u': url = arg
+        elif opt == '-0': up0 = arg
         elif opt == '-1': up1 = arg
         elif opt == '-2': up2 = arg
         elif opt == '-t':
@@ -264,6 +269,7 @@ def main(argv):
         sys.exit(1)
 
     host, port, path, tls = parseURL(url)
+    adminuser, adminpassword = parseUser(up0)
     user1, password1 = parseUser(up1)
     user2, password2 = parseUser(up2)
     

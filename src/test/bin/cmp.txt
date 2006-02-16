@@ -204,7 +204,16 @@ Modify account
     ...             headers=authHeaders)
     >>> r.status # PUT username changed ok
     204
-    >>> user1 = 'test%s' % randomText
+    >>> user1new = 'test%s' % randomText
+    >>> r.getheader('Content-Location') == '%s/cmp/user/%s' % (url, user1new)
+    True
+    >>> r = request('GET', '%s/cmp/user/%s' % (path, user1), headers=authHeaders)
+    >>> r.status # GET account renamed
+    404
+    >>> user1 = user1new
+    >>> r = request('GET', '%s/cmp/user/%s' % (path, user1), headers=authHeaders)
+    >>> r.status # GET account ok
+    200
 
 # Commented out because of bug 5189
 #    >>> accountChange = """<?xml version="1.0" encoding="utf-8" ?> 
@@ -265,5 +274,3 @@ Delete account
     ...             headers=authHeaders)
     >>> r.status # DELETE user ok
     204
-
-    

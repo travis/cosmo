@@ -27,8 +27,13 @@ import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.jdom.Document;
 import org.jdom.Element;
+
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
@@ -49,6 +54,7 @@ import org.osaf.cosmo.dav.report.ReportType;
  * 
  */
 public class QueryReport extends AbstractCalendarQueryReport {
+    private static final Log log = LogFactory.getLog(QueryReport.class);
 
     /**
      * Returns {@link ReportType#CALDAV_QUERY}.
@@ -179,9 +185,11 @@ public class QueryReport extends AbstractCalendarQueryReport {
             queryResultToHrefs(qR);
 
         } catch (RepositoryException e) {
+            String msg = "Error while running CALDAV:" +
+                info.getReportElement().getName() + " report";
+            log.error(msg, e);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Error while running CALDAV:"
-                            + info.getReportElement().getName() + " report");
+                                   msg);
         }
 
         // Hand off to parent with list of matching hrefs now complete

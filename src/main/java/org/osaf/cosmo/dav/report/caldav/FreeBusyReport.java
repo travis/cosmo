@@ -59,8 +59,13 @@ import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.jdom.Document;
 import org.jdom.Element;
+
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
@@ -82,6 +87,7 @@ import org.osaf.cosmo.dav.report.ReportType;
  * 
  */
 public class FreeBusyReport extends AbstractCalendarQueryReport {
+    private static final Log log = LogFactory.getLog(FreeBusyReport.class);
 
     Period freeBusyRange;
 
@@ -242,16 +248,20 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
             queryResultToHrefs(qR);
 
         } catch (RepositoryException e) {
+            String msg = "Error while running CALDAV:" +
+                info.getReportElement().getName() + " report";
+            log.error(msg, e);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Error while running CALDAV:"
-                            + info.getReportElement().getName() + " report");
+                                   msg);
         }
 
         String calendarData = generateFreeBusy();
         if (calendarData == null) {
+            String msg = "no calendar data for CALDAV:" +
+                info.getReportElement().getName() + " report";
+            log.error(msg);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Error while running CALDAV:"
-                            + info.getReportElement().getName() + " report");
+                                   msg);
         }
 
         // Generate multi-status response for this data
@@ -311,15 +321,19 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
                         busyUnavailablePeriods);
 
             } catch (IOException e) {
-                throw new DavException(
-                        DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        "Error while running CALDAV:"
-                                + info.getReportElement().getName() + " report");
+                String msg = "Error while running CALDAV:" +
+                    info.getReportElement().getName() + " report";
+                log.error(msg, e);
+                throw new DavException(DavServletResponse.
+                                       SC_INTERNAL_SERVER_ERROR,
+                                       msg);
             } catch (ParserException e) {
-                throw new DavException(
-                        DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        "Error while running CALDAV:"
-                                + info.getReportElement().getName() + " report");
+                String msg = "Error while running CALDAV:" +
+                    info.getReportElement().getName() + " report";
+                log.error(msg, e);
+                throw new DavException(DavServletResponse.
+                                       SC_INTERNAL_SERVER_ERROR,
+                                       msg);
             }
 
         }
@@ -364,13 +378,17 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
             result = out.toString();
             out.close();
         } catch (IOException e) {
+            String msg = "Error while running CALDAV:" +
+                info.getReportElement().getName() + " report";
+            log.error(msg, e);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Error while running CALDAV:"
-                            + info.getReportElement().getName() + " report");
+                                   msg);
         } catch (ValidationException e) {
+            String msg = "Error while running CALDAV:" +
+                info.getReportElement().getName() + " report";
+            log.error(msg, e);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Error while running CALDAV:"
-                            + info.getReportElement().getName() + " report");
+                                   msg);
         }
 
         // NB ical4j's outputter generates \r\n line ends but we

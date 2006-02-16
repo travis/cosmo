@@ -22,8 +22,12 @@ import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
+
 import org.osaf.cosmo.jackrabbit.query.XPathTimeRangeQueryBuilder;
 
 /**
@@ -33,8 +37,10 @@ import org.osaf.cosmo.jackrabbit.query.XPathTimeRangeQueryBuilder;
  * that use queries to determine matching items.
  * 
  */
-public abstract class AbstractCalendarQueryReport extends
-        AbstractCalendarDataReport {
+public abstract class AbstractCalendarQueryReport
+    extends AbstractCalendarDataReport {
+    private static final Log log =
+        LogFactory.getLog(AbstractCalendarDataReport.class);
 
     protected QueryFilter filter;
 
@@ -50,6 +56,10 @@ public abstract class AbstractCalendarQueryReport extends
         // Create the XPath expression
         String statement = "/jcr:root" + resource.getLocator().getJcrPath();
         statement += filter.toXPath();
+
+        if (log.isDebugEnabled()) {
+            log.debug("executing JCR query " + statement);
+        }
 
         // Now create an XPath query
         QueryManager qMgr = info.getSession().getRepositorySession()

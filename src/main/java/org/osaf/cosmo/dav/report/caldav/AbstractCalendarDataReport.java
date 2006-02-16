@@ -43,7 +43,8 @@ import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -62,8 +63,8 @@ import org.osaf.cosmo.dav.report.ReportInfo;
  */
 public abstract class AbstractCalendarDataReport
     implements Report, DavConstants {
-    private static final Logger log =
-        Logger.getLogger(AbstractCalendarDataReport.class);
+    private static final Log log =
+        LogFactory.getLog(AbstractCalendarDataReport.class);
 
     protected DavResource resource;
     protected ReportInfo info;
@@ -101,12 +102,6 @@ public abstract class AbstractCalendarDataReport
      */
     public Document toXml()
         throws DavException {
-        if (info == null || resource == null) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Error while running CALDAV:"
-                            + info.getReportElement().getName() + " report");
-        }
-
         // Get parent's href as we use this a bit
         String parentHref = resource.getHref();
 
@@ -200,23 +195,26 @@ public abstract class AbstractCalendarDataReport
                     calendarData = calendarData.replaceAll("\r", "");
 
                 } catch (IOException e) {
-                    throw new DavException(
-                            DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                            "Error while running CALDAV:"
-                                    + info.getReportElement().getName()
-                                    + " report");
+                    String msg = "Error while running CALDAV:" +
+                        info.getReportElement().getName() + " report";
+                    log.error(msg, e);
+                    throw new DavException(DavServletResponse.
+                                           SC_INTERNAL_SERVER_ERROR,
+                                           msg);
                 } catch (ParserException e) {
-                    throw new DavException(
-                            DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                            "Error while running CALDAV:"
-                                    + info.getReportElement().getName()
-                                    + " report");
+                    String msg = "Error while running CALDAV:" +
+                        info.getReportElement().getName() + " report";
+                    log.error(msg, e);
+                    throw new DavException(DavServletResponse.
+                                           SC_INTERNAL_SERVER_ERROR,
+                                           msg);
                 } catch (ValidationException e) {
-                    throw new DavException(
-                            DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                            "Error while running CALDAV:"
-                                    + info.getReportElement().getName()
-                                    + " report");
+                    String msg = "Error while running CALDAV:" +
+                        info.getReportElement().getName() + " report";
+                    log.error(msg, e);
+                    throw new DavException(DavServletResponse.
+                                           SC_INTERNAL_SERVER_ERROR,
+                                           msg);
                 }
             }
 
@@ -228,10 +226,12 @@ public abstract class AbstractCalendarDataReport
             if (calendarData != null) {
                 response.setCalendarData(calendarData, hasOldStyleCalendarData);
             } else {
-                throw new DavException(
-                        DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        "Error while running CALDAV:"
-                                + info.getReportElement().getName() + " report");
+                String msg = "no calendar data for CALDAV:" +
+                    info.getReportElement().getName() + " report";
+                log.error(msg);
+                throw new DavException(DavServletResponse.
+                                       SC_INTERNAL_SERVER_ERROR,
+                                       msg);
             }
         }
 

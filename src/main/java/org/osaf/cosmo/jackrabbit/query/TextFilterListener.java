@@ -18,8 +18,13 @@ package org.osaf.cosmo.jackrabbit.query;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.core.query.QueryTreeBuilderRegistry;
 import org.apache.jackrabbit.core.query.lucene.TextFilterFactory;
+
+import org.osaf.cosmo.CosmoConstants;
 
 /**
  * @author cyrusdaboo
@@ -28,31 +33,34 @@ import org.apache.jackrabbit.core.query.lucene.TextFilterFactory;
  * 
  */
 public class TextFilterListener implements ServletContextListener {
+    private static final Log log = LogFactory.getLog(TextFilterListener.class);
+
+    /**
+     */
+    public static final String INIT_PARAM_USE_TEXT_FILTER = "use-text-filter";
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
-    public void contextInitialized(ServletContextEvent arg0) {
+    public void contextInitialized(ServletContextEvent sce) {
 
-        // Add our special text/calendar data indexer to the list of data
-        // indexers used by Jackrabbit
-        TextFilterFactory.addTextFilter(new TextCalendarTextFilter());
+        if (CosmoConstants.INDEX_VIRTUAL_PROPERTIES) {
+            // Add our special text/calendar data indexer to the list of data
+            // indexers used by Jackrabbit
+            if (log.isDebugEnabled()) {
+                log.debug("loading text/calendar text filter");
+            }
+            TextFilterFactory.addTextFilter(new TextCalendarTextFilter());
+        }
 
-        // Add our extended XPath query builder to Jabkrabbit.
+        // Add our extended XPath query builder to Jackrabbit.
         QueryTreeBuilderRegistry.addBuilder(
                 XPathTimeRangeQueryBuilder.XPATH_TIMERANGE,
                 new TimeRangeQueryBuilder());
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
-    public void contextDestroyed(ServletContextEvent arg0) {
+    public void contextDestroyed(ServletContextEvent sce) {
         // Does nothing
     }
-
 }

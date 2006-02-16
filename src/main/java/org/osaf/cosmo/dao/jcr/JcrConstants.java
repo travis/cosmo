@@ -20,6 +20,13 @@ package org.osaf.cosmo.dao.jcr;
  */
 public interface JcrConstants {
 
+    // prefixes
+    public static final String PREFIX_DAV = "dav";
+    public static final String PREFIX_ICALENDAR = "icalendar";
+    public static final String PREFIX_CALENDAR = "calendar";
+    public static final String PREFIX_TICKET = "ticket";
+    public static final String PREFIX_COSMO = "cosmo";
+
     // node names
     public static final String NN_JCR_CONTENT = "jcr:content";
     public static final String NN_JCR_DATA = "jcr:data";

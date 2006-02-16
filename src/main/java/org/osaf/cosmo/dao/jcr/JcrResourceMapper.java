@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.dao.jcr;
 
+import java.util.Iterator;
+
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
@@ -88,14 +90,68 @@ public class JcrResourceMapper implements JcrConstants {
 
     /**
      * Copies the properties of a <code>Resource</code> into a resource
-     * node.
+     * node. The resource node is found by escaping the resource's
+     * display name and using the result to find the appropriate child
+     * node of the given parent node, creating a new one if
+     * necessary. The resource node itself is returned.
      */
-    public static void resourceToNode(Resource resource,
-                                      Node node)
+    public static Node resourceToNode(Resource resource,
+                                      Node parentNode)
+        throws RepositoryException {
+        String name = JcrEscapist.hexEscapeJcrNames(resource.getDisplayName());
+        Node resourceNode = parentNode.hasNode(name) ?
+            parentNode.getNode(name) :
+            parentNode.addNode(name);
+
+        setCommonResourceProperties(resource, resourceNode);
+
+        if (resource instanceof CollectionResource) {
+            collectionToNode(((CollectionResource)resource), resourceNode);
+        }
+        if (resource instanceof CalendarCollectionResource) {
+            calendarCollectionToNode(((CalendarCollectionResource)resource),
+                                     resourceNode);
+        }
+        // XXX: other resource types
+
+        return resourceNode;
+    }
+
+    private static void setCommonResourceProperties(Resource resource,
+                                                    Node node)
         throws RepositoryException {
         node.setProperty(NP_DAV_DISPLAYNAME, resource.getDisplayName());
-        // XXX: all other properties
-        // XXX: tickets
+
+        for (Iterator i=resource.getProperties().iterator(); i.hasNext();) {
+            ResourceProperty rp = (ResourceProperty) i.next();
+            node.setProperty(rp.getName(), rp.getValue());
+        }
+    }
+
+    /**
+     */
+    public static void
+        calendarCollectionToNode(CalendarCollectionResource resource,
+                                 Node node)
+        throws RepositoryException {
+        if (! node.isNodeType(NT_CALENDAR_COLLECTION)) {
+            node.addMixin(NT_CALENDAR_COLLECTION);
+        }
+        node.setProperty(NP_CALENDAR_DESCRIPTION, resource.getDescription());
+        node.setProperty(NP_XML_LANG, resource.getLanguage());
+    }
+
+    /**
+     */
+    public static void collectionToNode(CollectionResource resource,
+                                        Node node)
+        throws RepositoryException {
+        if (! node.isNodeType(NT_DAV_COLLECTION)) {
+            node.addMixin(NT_DAV_COLLECTION);
+        }
+        if (! node.isNodeType(NT_TICKETABLE)) {
+            node.addMixin(NT_TICKETABLE);
+        }
     }
 
     private static void setCommonResourceAttributes(Resource resource,

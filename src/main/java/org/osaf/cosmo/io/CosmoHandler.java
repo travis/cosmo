@@ -16,7 +16,9 @@
 package org.osaf.cosmo.io;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -39,6 +41,8 @@ import org.apache.jackrabbit.server.io.IOManager;
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavResource;
 
+import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.dao.jcr.JcrCalendarFlattener;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dao.jcr.JcrEscapist;
 import org.osaf.cosmo.icalendar.ComponentTypes;
@@ -142,12 +146,13 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
                 throw new UidConflictException(uid.getValue());
             }
 
-            // 3) add calendarv resource mixin type
+            // 3) add calendar resource mixin type
             if (! resourceNode.isNodeType(NT_CALENDAR_RESOURCE)) {
                 resourceNode.addMixin(NT_CALENDAR_RESOURCE);
             }
 
-            // 4) add event mixin type
+            // 4) add event mixin type - assumes that the only
+            // calendar component we support is event
             if (! resourceNode.isNodeType(NT_EVENT_RESOURCE)) {
                 resourceNode.addMixin(NT_EVENT_RESOURCE);
             }
@@ -198,6 +203,29 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
                 Property uid = (Property)
                     event.getProperties().getProperty(Property.UID);
                 resourceNode.setProperty(NP_CALENDAR_UID, uid.getValue());
+
+                if (! CosmoConstants.INDEX_VIRTUAL_PROPERTIES) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("storing flattened properties");
+                    }
+                    // set flattened properties
+                    // XXX: if the node is being updated, find the
+                    // properties that previously existed but are not in
+                    // the new entity and nuke them
+                    JcrCalendarFlattener flattener = new JcrCalendarFlattener();
+                    Map flattened = flattener.flattenCalendarObject(calendar);
+                    for (Iterator i=flattened.entrySet().iterator();
+                         i.hasNext();) {
+                        Map.Entry entry = (Map.Entry) i.next();
+                        if (log.isDebugEnabled()) {
+                            log.debug("setting flattened property " +
+                                      entry.getKey() +
+                                      " = " + entry.getValue());
+                        }
+                        resourceNode.setProperty(entry.getKey().toString(),
+                                                 entry.getValue().toString());
+                    }
+                }
             }
         } catch (IOException e) {
             // XXX ugh swallowing

@@ -126,6 +126,7 @@ public class DavCollectionHandler implements IOHandler, JcrConstants {
             if (parentNode.hasNode(name)) {
                 return false;
             }
+            // XXX: refactor to use JcrResourceMapper
             String displayName = JcrEscapist.hexUnescapeJcrNames(name);
             Node collectionNode = parentNode.addNode(name, NT_FOLDER);
             collectionNode.addMixin(NT_DAV_COLLECTION);

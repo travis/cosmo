@@ -31,6 +31,8 @@ import net.fortuna.ical4j.util.TimeZones;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+
+import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.jackrabbit.query.TextCalendarTextFilter;
@@ -97,16 +99,20 @@ public class QueryFilter implements JcrConstants {
      * @return the XPath query as a string.
      */
     public String toXPath() {
+        // Look at only calendar resources
+        String path = "/element(*, " + NT_CALENDAR_RESOURCE + ")";
 
-        // Look at elements that are event resources and look in the content
-        // node
-        // of those resources for indexed data
-        String path = "/element(*, " + NT_CALENDAR_RESOURCE + ")/"
-                + NN_JCR_CONTENT + "[";
+        if (CosmoConstants.INDEX_VIRTUAL_PROPERTIES) {
+            path += "/" + NN_JCR_CONTENT;
+        }
 
         // Generate a list of terms to use in the XPath expression
-        path += filter.generateTests("");
-        path += "]";
+        String tests = filter.generateTests("");
+        if (tests != null && ! tests.equals("")) {
+            path += "[";
+            path += filter.generateTests("");
+            path += "]";
+        }
 
         return path;
     }
@@ -306,7 +312,6 @@ public class QueryFilter implements JcrConstants {
          * @return the XPath element
          */
         public String generateTests(String prefix) {
-
             String result = new String();
 
             // If this is the top-level item, then prepend the icalendar

@@ -54,6 +54,8 @@ public class CosmoConstants {
      */
     public static final String SC_ATTR_SERVER_ADMIN = "cosmo.server.admin";
 
+    public static final boolean INDEX_VIRTUAL_PROPERTIES = false;
+
     private static String VERSION_FILE = "cosmo.version.txt";
 
     static {

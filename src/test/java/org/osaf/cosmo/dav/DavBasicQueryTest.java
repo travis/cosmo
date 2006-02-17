@@ -17,8 +17,6 @@ package org.osaf.cosmo.dav;
 
 import javax.jcr.Node;
 
-import net.fortuna.ical4j.model.Calendar;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,7 +33,15 @@ import org.springframework.mock.web.MockHttpServletResponse;
 public class DavBasicQueryTest extends BaseDavServletTestCase {
     private static final Log log = LogFactory.getLog(DavBasicQueryTest.class);
 
-    private Node calendarCollectionNode;
+    private static final String[] REPORT_EVENTS = {
+        "report-event1.ics",
+        //        "report-event2.ics",
+        //        "report-event3.ics",
+        //        "report-event4.ics",
+        //        "report-event5.ics",
+        //        "report-event6.ics",
+        //        "report-event7.ics"
+    };
 
      /**
      */
@@ -43,32 +49,24 @@ public class DavBasicQueryTest extends BaseDavServletTestCase {
         super.setUp();
 
         // make a calendar collection to put events into
-        calendarCollectionNode = testHelper.addCalendarCollectionNode();
+        Node calendarCollectionNode = testHelper.addCalendarCollectionNode();
         // XXX: not sure why we have to save, since theoretically
         // testHelper and the servlet are using the same jcr session
         calendarCollectionNode.getParent().save();
+
+        // put all test events in the calendar collection
+        for (int i=0; i<REPORT_EVENTS.length; i++) {
+            Node resourceNode =
+                testHelper.addCalendarResourceNode(calendarCollectionNode,
+                                                   REPORT_EVENTS[i]);
+        }
+        calendarCollectionNode.save();
     }
 
    /**
      */
     public void testBasicEvent() throws Exception {
-        if (true) {
-            // the test doesn't actually work, but we need at least
-            // one test* method in the class
-            return;
-        }
-
-        // put a calendar resource into the calendar collection
-        Calendar calendar = testHelper.loadCalendar("report-event1.ics");
-        Node resourceNode =
-            testHelper.addCalendarResourceNode(calendarCollectionNode,
-                                               calendar);
-        resourceNode.getParent().save();
-
-        // load the request content
         Document content = testHelper.loadXml("report-basic1.xml");
-
-        // perform the report
         MockHttpServletRequest request =
             createMockRequest("REPORT", calendarCollectionNode.getPath()); 
         sendXmlRequest(request, content);
@@ -76,9 +74,9 @@ public class DavBasicQueryTest extends BaseDavServletTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
         assertEquals(CosmoDavResponse.SC_MULTI_STATUS, response.getStatus());
+        log.debug(new String(response.getContentAsByteArray()));
 
         MultiStatus ms = readMultiStatusResponse(response);
-        // log.debug("ms: " + ms);
         assertEquals(1, ms.getResponses().size());
     }
 }

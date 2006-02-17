@@ -210,6 +210,7 @@ public class MultiStatus {
         /**
          */
         public PropStat() {
+            props = new HashSet();
         }
 
         /**
@@ -331,7 +332,7 @@ public class MultiStatus {
                 throw new IllegalArgumentException("null status line");
             }
 
-            String[] chunks = line.trim().split("\\w", 3);
+            String[] chunks = line.trim().split("\\s", 3);
             if (chunks.length < 3) {
                 throw new IllegalArgumentException("status line " + line + " does not contain proto/version, code, reason phrase");
             }

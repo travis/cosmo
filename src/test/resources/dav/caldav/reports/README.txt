@@ -28,7 +28,7 @@ _________________
   calendar collection on the server before running any of the
   tests. Example:
 
-    curl -i -u test1:test1 -t put/1.ics \
+    curl -i -u test1:test1 -T put/1.ics \
          http://localhost:8080/cosmo/home/test1/calendar/
 
 * Testing is done by sending REPORT requests to the server with

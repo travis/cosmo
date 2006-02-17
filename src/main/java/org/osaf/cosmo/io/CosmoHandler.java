@@ -17,7 +17,6 @@ package org.osaf.cosmo.io;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.jcr.Node;
@@ -188,6 +187,8 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
                 resourceNode = contentNode.getParent();
             }
 
+            // XXX: move into JcrResourceMapper!!@#$!@!@
+
             String displayName = 
                 JcrEscapist.hexUnescapeJcrNames(context.getSystemId());
             resourceNode.setProperty(NP_DAV_DISPLAYNAME, displayName);
@@ -195,10 +196,14 @@ public class CosmoHandler extends DefaultHandler implements JcrConstants {
                                      context.getContentLanguage());
 
             if (resourceNode.isNodeType(NT_CALENDAR_RESOURCE)) {
-                // set the uid property on calendar resources
+                // set calendar:uid
+                // XXX: if not using NDEX_VIRTUAL_PROPERTIES, there is
+                // no need to store this property - the calendar
+                // collection uid uniqueness check can look directly
+                // at the icalendar uid property
                 Calendar calendar = cosmoContext.getCalendar();
-                Component event = (Component)
-                    calendar.getComponents().getComponents(Component.VEVENT).
+                Component event = (Component) calendar.getComponents().
+                    getComponents(Component.VEVENT).
                     get(0);
                 Property uid = (Property)
                     event.getProperties().getProperty(Property.UID);

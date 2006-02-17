@@ -131,20 +131,21 @@ public class QueryFilter implements JcrConstants {
         DateTime dstart = period.getStart();
         DateTime dend = period.getEnd();
 
+        // if a timezone isn't passed with the report or set on the
+        // calendar collection, we have to choose a timezone to use
+        // when converting the given UTC period to a floating
+        // period. GMT seems like a logical choice.
+        // XXX: ical4j doesn't give us a way to get a VTimeZone for
+        // GMT, which we need to set a TimeZone on a DateTime, so for
+        // now we convert to floating relative to the system default
+        // timezone (which is what happens when a DateTime has no
+        // timezone set on it).
+
         // Get float start/end
         DateTime fstart = (DateTime) Dates.getInstance(dstart, dstart);
         DateTime fend = (DateTime) Dates.getInstance(dend, dend);
-
-        //[bk] Timezone and UTC
-        // Check that a time zone is passed on query else check the calenaar
-        // for a timezone otherwise use UTC?
-        if (timezone != null){
-            fstart.setTimeZone(new TimeZone(timezone));
-            fend.setTimeZone(new TimeZone(timezone));
-        } else {
-            fstart.setUtc(true);
-            fend.setUtc(true);
-        }
+        fstart.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
+        fend.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
 
         return dstart.toString() + '/' + dend.toString() + ','
                 + fstart.toString() + '/' + fend.toString();

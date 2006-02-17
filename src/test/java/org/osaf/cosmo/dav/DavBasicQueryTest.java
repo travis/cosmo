@@ -33,6 +33,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 public class DavBasicQueryTest extends BaseDavServletTestCase {
     private static final Log log = LogFactory.getLog(DavBasicQueryTest.class);
 
+    private String testpath;
+
     private static final String[] REPORT_EVENTS = {
         "report-event1.ics",
         //        "report-event2.ics",
@@ -49,10 +51,13 @@ public class DavBasicQueryTest extends BaseDavServletTestCase {
         super.setUp();
 
         // make a calendar collection to put events into
-        Node calendarCollectionNode = testHelper.addCalendarCollectionNode();
+        Node calendarCollectionNode =
+            testHelper.addCalendarCollectionNode(getName());
         // XXX: not sure why we have to save, since theoretically
         // testHelper and the servlet are using the same jcr session
         calendarCollectionNode.getParent().save();
+
+        testpath = calendarCollectionNode.getPath();
 
         // put all test events in the calendar collection
         for (int i=0; i<REPORT_EVENTS.length; i++) {
@@ -67,8 +72,7 @@ public class DavBasicQueryTest extends BaseDavServletTestCase {
      */
     public void testBasicEvent() throws Exception {
         Document content = testHelper.loadXml("report-basic1.xml");
-        MockHttpServletRequest request =
-            createMockRequest("REPORT", calendarCollectionNode.getPath()); 
+        MockHttpServletRequest request = createMockRequest("REPORT", testpath);
         sendXmlRequest(request, content);
 
         MockHttpServletResponse response = new MockHttpServletResponse();

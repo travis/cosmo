@@ -321,18 +321,25 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
+        ReportInfo info = null;
         try {
-            ReportInfo info =
-                ((CosmoDavRequestImpl) request).getCosmoReportInfo();
-            Report report = ((CosmoDavResourceImpl) resource).getReport(info);
-            response.sendXmlResponse(report.toXml(),
-                                     DavServletResponse.SC_MULTI_STATUS);
+            info = ((CosmoDavRequestImpl) request).getCosmoReportInfo();
         } catch (IllegalArgumentException e) {
-            log.warn("error parsing request content", e);
+            log.warn("error reading or parsing REPORT request content", e);
             response.sendError(DavServletResponse.SC_BAD_REQUEST,
                                e.getMessage());
             return;
         }
+        if (info == null) {
+            log.warn("REPORT request missing report info");
+            response.sendError(DavServletResponse.SC_BAD_REQUEST,
+                               "REPORT request missing report info");
+            return;
+        }
+
+        Report report = ((CosmoDavResourceImpl) resource).getReport(info);
+        response.sendXmlResponse(report.toXml(),
+                                 DavServletResponse.SC_MULTI_STATUS);
     }
 
     /**
@@ -385,7 +392,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             DavPropertySet properties = request.getMkCalendarSetProperties();
             ctx.setCalendarCollectionProperties(properties);
         } catch (IllegalArgumentException e) {
-            log.warn("error parsing request content", e);
+            log.warn("error parsing MKCALENDAR properties", e);
             response.sendError(DavServletResponse.SC_BAD_REQUEST,
                                e.getMessage());
             return;

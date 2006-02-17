@@ -32,6 +32,7 @@ import org.jdom.Element;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavRequest;
+import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.model.Ticket;
 
 /**
@@ -225,19 +226,14 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
      * This is the Cosmo specific report handling.
      * 
      * TODO Eventually this will be punted up into jackrabbit.
-     * 
-     * @return
      */
-    public org.osaf.cosmo.dav.report.ReportInfo getCosmoReportInfo() {
-        org.osaf.cosmo.dav.report.ReportInfo rInfo = null;
+    public ReportInfo getCosmoReportInfo() {
         Document requestDocument = getRequestDocument();
         if (requestDocument == null) {
-            throw new IllegalArgumentException("report request missing body");
+            return null;
         }
-        if (requestDocument != null) {
-            rInfo = new org.osaf.cosmo.dav.report.ReportInfo(requestDocument
-                    .getRootElement(), getDepth(DEPTH_0), getDavSession());
-        }
-        return rInfo;
+        return new ReportInfo(requestDocument.getRootElement(),
+                              getDepth(DEPTH_0),
+                              getDavSession());
     }
 }

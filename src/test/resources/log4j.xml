@@ -29,14 +29,6 @@
     <level value="WARN"/>
   </logger>
 
-  <logger name="org.apache.jackrabbit.webdav">
-    <level value="DEBUG"/>
-  </logger>
-
-  <logger name="org.apache.jackrabbit.server">
-    <level value="DEBUG"/>
-  </logger>
-
   <logger name="net.sf">
     <level value="WARN"/>
   </logger>
@@ -54,6 +46,10 @@
   </logger>
 
   <logger name="org.osaf.cosmo.dav">
+    <level value="DEBUG"/>
+  </logger>
+
+  <logger name="org.osaf.cosmo.jackrabbit">
     <level value="DEBUG"/>
   </logger>
 

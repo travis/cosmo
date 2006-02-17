@@ -29,6 +29,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Test Case for DAV <code>REPORT</code> operations.
+ *
+ * Note: this is essentially an integration test that requires the
+ * full jcr-server + cosmo dav, io, and jackrabbit.query layers to be
+ * set up. a real unit test would mock up the repository and the
+ * dav request, response and resource classes.
  */
 public class DavBasicQueryTest extends BaseDavServletTestCase {
     private static final Log log = LogFactory.getLog(DavBasicQueryTest.class);
@@ -37,12 +42,12 @@ public class DavBasicQueryTest extends BaseDavServletTestCase {
 
     private static final String[] REPORT_EVENTS = {
         "report-event1.ics",
-        //        "report-event2.ics",
-        //        "report-event3.ics",
-        //        "report-event4.ics",
-        //        "report-event5.ics",
-        //        "report-event6.ics",
-        //        "report-event7.ics"
+        "report-event2.ics",
+        "report-event3.ics",
+        "report-event4.ics",
+        "report-event5.ics",
+        "report-event6.ics",
+        "report-event7.ics"
     };
 
      /**
@@ -78,9 +83,9 @@ public class DavBasicQueryTest extends BaseDavServletTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
         assertEquals(CosmoDavResponse.SC_MULTI_STATUS, response.getStatus());
-        log.debug(new String(response.getContentAsByteArray()));
+        //        log.debug(new String(response.getContentAsByteArray()));
 
         MultiStatus ms = readMultiStatusResponse(response);
-        assertEquals(1, ms.getResponses().size());
+        assertEquals(7, ms.getResponses().size());
     }
 }

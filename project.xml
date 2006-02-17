@@ -370,6 +370,12 @@
           <filtering>true</filtering>
         </resource>
         <resource>
+          <directory>src/webapp/WEB-INF</directory>
+          <includes>
+            <include>resource-config.xml</include>
+          </includes>
+        </resource>
+        <resource>
           <directory>src/test/resources/dav/caldav</directory>
           <includes>
             <include>*.ics</include>

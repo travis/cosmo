@@ -84,6 +84,9 @@ public abstract class BaseDavServletTestCase extends TestCase {
         servletConfig.
             addInitParameter(CosmoDavServlet.INIT_PARAM_RESOURCE_PATH_PREFIX,
                              "/home");
+        servletConfig.
+            addInitParameter(CosmoDavServlet.INIT_PARAM_RESOURCE_CONFIG,
+                             "/resource-config.xml");
 
         servlet = new CosmoDavServlet();
         servlet.setSecurityManager(securityManager);

@@ -7,39 +7,47 @@ ____________
 
 *Test account on server with:
 
-	user id:  'test'
-	password: 'test1'
+    username:  'test'
+    password: 'test1'
 
 *Create new calendar for user test:
 
-	MKCALENDAR /cosmo/home/test/calendars/temp/
+    curl -i -u test1:test1 -X MKCALENDAR \
+         http://localhost:8080/cosmo/home/test1/calendar/
+
+The multiget test files have hardcoded URLs in them, so if you choose
+a different username, calendar name, etc  you will need to locally
+modify those test files.
 
 
 Testing Procedure
 _________________
 
-* Testing is done by telnet'ing to the server and pasting in the test's
-request data from the appropriate file.
+* The put subdirectory contains a set of calendar resources to store on
+  the server as test data. These resources should be PUT into a
+  calendar collection on the server before running any of the
+  tests. Example:
 
-* A set of calendar resource to store on the server is available in the
-put directory. Each xxx.txt file contains a PUT request to initialise
-the iCal data needed for report testing on the server. Each of the PUT's
-stores a resource with the name 1.ics, 2.ics etc.
+    curl -i -u test1:test1 -t put/1.ics \
+         http://localhost:8080/cosmo/home/test1/calendar/
 
-* Each test suite consists of a set of xxx.txt data files that contain
-the REPORT requests that are used for actual testing
+* Testing is done by sending REPORT requests to the server with
+  content from XML files in the various subdirectories. Example:
+
+    curl -i -u test1:test1 -X REPORT \
+         -H 'Content-type: text/xml; charst="utf-8"' \
+         -d @basicquery/1.xml \
+         http://localhost:8080/cosmo/home/test1/calendar/
 
 * The current set of test suites are:
 
-	- multiget			: multiget reports (used for testing various
-calendar-data element variants too)
-	- basicquery		: basic text queries
-	- timerangequery	: time-range queries
-	- freebusy			: free busy reports
-	- limitexpand		: queries using limit/expand recurrence
-	
-* The xxx.txt requests should all be executed first, then each xxx.txt
-request run with verification of the response of each
+        - multiget       : multiget reports (used for testing various
+                           calendar-data element variants too)
+        - basicquery     : basic text queries
+        - timerangequery : time-range queries
+        - freebusy       : free busy reports
+        - limitexpand    : queries using limit/expand recurrence
+
 
 Resources
 _________
@@ -53,6 +61,7 @@ description
 6.txt: recurring VEVENT (5 consecutive days, one exception), summary
 "event 6"
 7.txt: as 6.txt but with THISANDFUTURE, summary "event 7"
+
 
 Detail
 ______

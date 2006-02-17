@@ -46,9 +46,6 @@ public class MockTicketDao implements TicketDao {
      * @param path the repository path of the resource to which the
      * ticket is to be applied
      * @param ticket the ticket to be saved
-     *
-     * @throws DataRetrievalFailureException if the item at the given
-     * path is not found
      */
     public void createTicket(String path,
                              Ticket ticket) {
@@ -62,9 +59,6 @@ public class MockTicketDao implements TicketDao {
      *
      * String path the absolute JCR path of the ticketed node
      * be returned
-     *
-     * @throws DataRetrievalFailureException if the item at the given
-     * path is not found
      */
     public Set getTickets(String path) {
         return findTickets(path);
@@ -81,13 +75,11 @@ public class MockTicketDao implements TicketDao {
      */
     public Ticket getTicket(String path,
                             String id) {
-        Set tickets = findTickets(path, false);
-        if (tickets != null) {
-            for (Iterator i=tickets.iterator(); i.hasNext();) {
-                Ticket ticket = (Ticket) i.next();
-                if (ticket.getId().equals(id)) {
-                    return ticket;
-                }
+        Set tickets = findTickets(path);
+        for (Iterator i=tickets.iterator(); i.hasNext();) {
+            Ticket ticket = (Ticket) i.next();
+            if (ticket.getId().equals(id)) {
+                return ticket;
             }
         }
         // the ticket might be on an ancestor, so check the parent
@@ -110,8 +102,8 @@ public class MockTicketDao implements TicketDao {
      */
     public void removeTicket(String path,
                              Ticket ticket) {
-        Set tickets = findTickets(path, false);
-        if (tickets != null) {
+        Set tickets = findTickets(path);
+        if (tickets.contains(ticket)) {
             tickets.remove(ticket);
             return;
         }
@@ -145,18 +137,6 @@ public class MockTicketDao implements TicketDao {
     // our methods
 
     private Set findTickets(String path) {
-        return findTickets(path, true);
-    }
-
-    private Set findTickets(String path,
-                            boolean itemMustExist) {
-        if (! items.containsKey(path)) {
-            if (itemMustExist) {
-                throw new DataRetrievalFailureException("item at path " + path +
-                                                        " not found");
-            }
-            return null;
-        }
         Set tickets = (Set) items.get(path);
         if (tickets == null) {
             tickets = new HashSet();

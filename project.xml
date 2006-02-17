@@ -207,7 +207,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-webdav</artifactId>
-      <version>osaf-20060216</version>
+      <version>osaf-20060217</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

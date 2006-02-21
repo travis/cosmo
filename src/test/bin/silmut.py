@@ -50,7 +50,7 @@ def headerValidator(response, method=None, sentHeaders=None):
     """
     # If we have a body, make sure Content-Length is correct
     bodyLen = len(response.read())
-    if bodyLen > 0:
+    if bodyLen > 0 and response.getheader('Transfer-Encoding') != 'chunked':
         contentLen = long(response.getheader('Content-Length'))
         if bodyLen != contentLen:
             raise Exception('Content-Length (%d) does not match body (%d)' % \

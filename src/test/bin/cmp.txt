@@ -38,6 +38,39 @@ Initialization
 Protocol Specification
 ----------------------
 
+Request Content Headers for PUT Requests
+
+# Commented out until I can figure our why these fail 
+#    >>> h = {'Content-Transfer-Encoding': '1'}
+#    >>> r = request('GET', path, headers=h)
+#    >>> r.status # GET failed because of unhandled headers
+#    501
+#
+#    >>> h = {'Content-Encoding': '1'}
+#    >>> r = request('GET', path, headers=h)
+#    >>> r.status # GET failed because of unhandled headers
+#    501
+#
+#    >>> h = {'Content-Base': '1'}
+#    >>> r = request('GET', path, headers=h)
+#    >>> r.status # GET failed because of unhandled headers
+#    501
+#
+#    >>> h = {'Content-Location': '1'}
+#    >>> r = request('GET', path, headers=h)
+#    >>> r.status # GET failed because of unhandled headers
+#    501
+#
+#    >>> h = {'Content-MD5': '1'}
+#    >>> r = request('GET', path, headers=h)
+#    >>> r.status # GET failed because of unhandled headers
+#    501
+#
+#    >>> h = {'Content-Range': '1'}
+#    >>> r = request('GET', path, headers=h)
+#    >>> r.status # GET failed because of unhandled headers
+#    501
+
 Data Model
 ----------
 
@@ -57,6 +90,8 @@ Signup
     >>> r = request('PUT', '%s/cmp/signup' % path, body=body)
     >>> r.status # PUT signup failed (already exists)
     431
+    
+    Protocol: Authentication and Access Control
     
     >>> randomText = md5.md5(str(random.random())).hexdigest()[:16]
     >>> body = accountXML % (randomText, randomText, randomText)

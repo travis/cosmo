@@ -338,8 +338,14 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         }
 
         Report report = ((CosmoDavResourceImpl) resource).getReport(info);
-        response.sendXmlResponse(report.toXml(),
-                                 DavServletResponse.SC_MULTI_STATUS);
+        try {
+            response.sendXmlResponse(report.toXml(),
+                                     DavServletResponse.SC_MULTI_STATUS);
+        } catch (IllegalArgumentException e) {
+            log.warn("error parsing REPORT filter", e);
+            response.sendError(DavServletResponse.SC_BAD_REQUEST,
+                               "error parsing REPORT filter");
+        }
     }
 
     /**

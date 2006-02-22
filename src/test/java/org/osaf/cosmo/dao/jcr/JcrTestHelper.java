@@ -32,6 +32,8 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
 
+import org.apache.jackrabbit.util.Text;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -96,7 +98,8 @@ public class JcrTestHelper extends TestHelper
     public Node addNode(Node parent,
                         String name)
         throws RepositoryException {
-        return parent.addNode(name);
+        String trimmed = name.indexOf("/") >= 0 ? Text.getName(name) : name;
+        return parent.addNode(trimmed);
     }
 
     /**
@@ -126,7 +129,8 @@ public class JcrTestHelper extends TestHelper
                             String charset,
                             String name)
         throws RepositoryException {
-        Node node = parent.addNode(name, NT_FILE);
+        String trimmed = name.indexOf("/") >= 0 ? Text.getName(name) : name;
+        Node node = parent.addNode(trimmed, NT_FILE);
 
         Node content = node.addNode(NN_JCR_CONTENT, NT_RESOURCE);
         content.setProperty(NP_JCR_DATA, data);

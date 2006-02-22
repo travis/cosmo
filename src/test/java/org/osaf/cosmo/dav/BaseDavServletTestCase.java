@@ -18,6 +18,7 @@ package org.osaf.cosmo.dav;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import javax.jcr.Node;
 import javax.servlet.ServletContextEvent;
 
 import junit.framework.TestCase;
@@ -53,11 +54,22 @@ public abstract class BaseDavServletTestCase extends TestCase {
 
     private static final String SERVLET_PATH = "/home";
 
+    private static final String[] REPORT_EVENTS = {
+        "reports/put/1.ics",
+        "reports/put/2.ics",
+        "reports/put/3.ics",
+        "reports/put/4.ics",
+        "reports/put/5.ics",
+        "reports/put/6.ics",
+        "reports/put/7.ics"
+    };
+
     private JackrabbitTestSessionManager sessionManager;
     protected MockSecurityManager securityManager;
     protected JcrTestHelper testHelper;
     protected MockServletContext servletContext;
     protected CosmoDavServlet servlet;
+    protected String testUri;
 
     /**
      */
@@ -93,6 +105,24 @@ public abstract class BaseDavServletTestCase extends TestCase {
         servlet.setSessionFactory(sessionManager.getSessionFactory());
         servlet.setTicketDao(new MockTicketDao());
         servlet.init(servletConfig);
+
+        // make a calendar collection to put events into
+        Node calendarCollectionNode =
+            testHelper.addCalendarCollectionNode(getName());
+
+        // put all test events in the calendar collection
+        for (int i=0; i<REPORT_EVENTS.length; i++) {
+            Node resourceNode =
+                testHelper.addCalendarResourceNode(calendarCollectionNode,
+                                                   REPORT_EVENTS[i]);
+        }
+
+        // XXX: not sure why we have to save, since theoretically
+        // testHelper and the servlet are using the same jcr session
+        calendarCollectionNode.getParent().save();
+
+        // XXX: URL-escape
+        testUri = calendarCollectionNode.getPath();
     }
 
     protected void tearDown() throws Exception {

@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.dav;
 
-import javax.jcr.Node;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,60 +36,12 @@ import org.springframework.mock.web.MockHttpServletResponse;
 public class DavBasicQueryTest extends BaseDavServletTestCase {
     private static final Log log = LogFactory.getLog(DavBasicQueryTest.class);
 
-    private String testpath;
-
-
-
-    private static final String[] REPORT_EVENTS = {
-    //XXX: These files are currently not part of the cosmo svn
-    // source tree
-    //    "report-event1.ics",
-    //    "report-event2.ics",
-    //    "report-event3.ics",
-    //    "report-event4.ics",
-    //    "report-event5.ics",
-    //    "report-event6.ics",
-    //    "report-event7.ics"
-    };
-
-     /**
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        // make a calendar collection to put events into
-        Node calendarCollectionNode =
-            testHelper.addCalendarCollectionNode(getName());
-        // XXX: not sure why we have to save, since theoretically
-        // testHelper and the servlet are using the same jcr session
-        calendarCollectionNode.getParent().save();
-
-        testpath = calendarCollectionNode.getPath();
-
-        // put all test events in the calendar collection
-        for (int i=0; i<REPORT_EVENTS.length; i++) {
-            Node resourceNode =
-                testHelper.addCalendarResourceNode(calendarCollectionNode,
-                                                   REPORT_EVENTS[i]);
-        }
-        calendarCollectionNode.save();
-    }
-
-   /**
+    /**
      */
     public void testBasicEvent() throws Exception {
-        Document content = null;
-        try {
-            //XXX: This file is currently not part of the cosmo svn
-            // source tree. Wrapped loading in an exception
-            // to prevent test from failing.
-            content = testHelper.loadXml("report-basic1.xml");
-        } catch(IllegalStateException e) {
-           log.warn(e);
-           return;
-        }
+        Document content = testHelper.loadXml("reports/basicquery/1.xml");
 
-        MockHttpServletRequest request = createMockRequest("REPORT", testpath);
+        MockHttpServletRequest request = createMockRequest("REPORT", testUri);
         sendXmlRequest(request, content);
 
         MockHttpServletResponse response = new MockHttpServletResponse();

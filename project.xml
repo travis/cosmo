@@ -368,6 +368,10 @@
         <resource>
           <directory>src/test/resources</directory>
           <filtering>true</filtering>
+          <includes>
+            <include>log4j.xml</include>
+            <include>test.properties</include>
+          </includes>
         </resource>
         <resource>
           <directory>src/webapp/WEB-INF</directory>
@@ -379,19 +383,8 @@
           <directory>src/test/resources/dav/caldav</directory>
           <includes>
             <include>*.ics</include>
-          </includes>
-        </resource>
-        <resource>
-          <directory>src/test/resources/dav/caldav/reports</directory>
-          <includes>
-            <include>*.ics</include>
-            <include>*.xml</include>
-          </includes>
-        </resource>
-        <resource>
-          <directory>src/webapp/WEB-INF</directory>
-          <includes>
-            <include>resource-config.xml</include>
+            <include>**/reports/**/*.ics</include>
+            <include>**/reports/**/*.xml</include>
           </includes>
         </resource>
       </resources>

@@ -32,21 +32,12 @@
   <goal name="build:nodetypes">
     <delete>
       <fileset dir="${basedir}/src/main/data">
-        <include name="*_nodetypes.xml"/>
+        <include name="nodetypes.xml"/>
       </fileset>
     </delete>
     <jackrabbit:generate
-       catalog="${basedir}/src/docs/jcr/webdav.txt"
-       descriptor="${basedir}/src/main/data/webdav_nodetypes.xml"/>
-    <jackrabbit:generate
-       catalog="${basedir}/src/docs/jcr/tickets.txt"
-       descriptor="${basedir}/src/main/data/tickets_nodetypes.xml"/>
-    <jackrabbit:generate
-       catalog="${basedir}/src/docs/jcr/caldav.txt"
-       descriptor="${basedir}/src/main/data/caldav_nodetypes.xml"/>
-    <jackrabbit:generate
-       catalog="${basedir}/src/docs/jcr/cosmo.txt"
-       descriptor="${basedir}/src/main/data/cosmo_nodetypes.xml"/>
+       catalog="${basedir}/src/main/data/nodetypes.txt"
+       descriptor="${basedir}/src/main/data/nodetypes.xml"/>
   </goal>
 
   <preGoal name="test:test-resources">
@@ -101,25 +92,7 @@
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
-       descriptor="${basedir}/src/main/data/webdav_nodetypes.xml"/>
-    <jackrabbit:importschema
-       configFilePath="${basedir}/src/test/config/repository.xml"
-       repositoryHomedirPath="${maven.build.dir}/test-repository"
-       username="${cosmo.test.repository.username}"
-       password="${cosmo.test.repository.password}"
-       descriptor="${basedir}/src/main/data/tickets_nodetypes.xml"/>
-    <jackrabbit:importschema
-       configFilePath="${basedir}/src/test/config/repository.xml"
-       repositoryHomedirPath="${maven.build.dir}/test-repository"
-       username="${cosmo.test.repository.username}"
-       password="${cosmo.test.repository.password}"
-       descriptor="${basedir}/src/main/data/caldav_nodetypes.xml"/>
-    <jackrabbit:importschema
-       configFilePath="${basedir}/src/test/config/repository.xml"
-       repositoryHomedirPath="${maven.build.dir}/test-repository"
-       username="${cosmo.test.repository.username}"
-       password="${cosmo.test.repository.password}"
-       descriptor="${basedir}/src/main/data/cosmo_nodetypes.xml"/>
+       descriptor="${basedir}/src/main/data/nodetypes.xml"/>
     <copy todir="${maven.build.dir}" overwrite="true"
           file="${basedir}/src/main/data/import-overlord.xml">
       <filterset>

@@ -497,8 +497,8 @@ public class QueryFilter implements JcrConstants {
                 String value = generatePeriods(timeRange);
                 result = "jcr:timerange(@" + key + ", '" + value + "')";
             } else if (useTextMatch) {
-                result = "jcr:contains(@" + myprefix + ", '*" + textMatch
-                        + "*')";
+                result = "jcr:contains(@" + myprefix + ", '" + textMatch
+                        + "')";
             }
 
             if (paramSize != 0) {
@@ -589,8 +589,8 @@ public class QueryFilter implements JcrConstants {
 
             if (useTextMatch) {
                 // TODO Figure out how to do caseless matching
-                result = "jcr:contains(@" + myprefix + ", '*" + textMatch
-                        + "*')";
+                result = "jcr:contains(@" + myprefix + ", '" + textMatch
+                        + "')";
             }
 
             return result;

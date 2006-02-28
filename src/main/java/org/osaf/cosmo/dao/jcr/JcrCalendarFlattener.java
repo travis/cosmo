@@ -99,9 +99,9 @@ public class JcrCalendarFlattener implements JcrConstants {
         StringTokenizer tokenizer = new StringTokenizer(calendarData, "\n");
         Map result = new HashMap();
         while (tokenizer.hasMoreTokens()) {
-            String line = tokenizer.nextToken().toLowerCase();
+            String line = tokenizer.nextToken();
             int colon = line.indexOf(':');
-            String rawKey = line.substring(0, colon);
+            String rawKey = line.substring(0, colon).toLowerCase();
             String key = PREFIX_ICALENDAR + ":" + rawKey;
             String value = (colon + 1 < line.length()) ?
                 line.substring(colon + 1) :

@@ -26,14 +26,9 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
- * Test Case for DAV <code>REPORT</code> operations.
- *
- * Note: this is essentially an integration test that requires the
- * full jcr-server + cosmo dav, io, and jackrabbit.query layers to be
- * set up. a real unit test would mock up the repository and the
- * dav request, response and resource classes.
+ * Test Case for simple CalDAV calendar-query <code>REPORT</code>s.
  */
-public class DavBasicQueryTest extends BaseDavServletTestCase {
+public class DavBasicQueryTest extends BaseReportTestCase {
     private static final Log log = LogFactory.getLog(DavBasicQueryTest.class);
 
     /**

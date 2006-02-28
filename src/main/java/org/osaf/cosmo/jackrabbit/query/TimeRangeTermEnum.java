@@ -18,6 +18,9 @@ package org.osaf.cosmo.jackrabbit.query;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.FilteredTermEnum;
@@ -31,6 +34,8 @@ import org.apache.lucene.search.FilteredTermEnum;
  * enumeration is greater than all that precede it.
  */
 public final class TimeRangeTermEnum extends FilteredTermEnum {
+    private static final Log log = LogFactory.getLog(TimeRangeTermEnum.class);
+
     boolean endEnum = false;
 
     Term searchTerm = null;
@@ -94,7 +99,14 @@ public final class TimeRangeTermEnum extends FilteredTermEnum {
                         .substring(slashPos + 1) : null;
 
                 // Check whether floating or fixed test required
-                boolean fixed = (testStart.indexOf('Z') != -1);
+                // bug 5254: values are lowercased so we look for z
+                // instead of Z
+                boolean fixed = (testStart.indexOf('z') != -1);
+
+                if (log.isDebugEnabled()) {
+                    log.debug("testing " + token + " using " +
+                              (fixed ? "fixed" : "floating") + " test");
+                }
 
                 // Period range compare
                 if (testEnd != null) {

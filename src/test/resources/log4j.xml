@@ -45,6 +45,11 @@
     <level value="WARN"/>
   </logger>
 
+<!--
+  <logger name="org.osaf.cosmo.dao.jcr">
+    <level value="DEBUG"/>
+  </logger>
+
   <logger name="org.osaf.cosmo.dav">
     <level value="DEBUG"/>
   </logger>
@@ -52,6 +57,7 @@
   <logger name="org.osaf.cosmo.jackrabbit">
     <level value="DEBUG"/>
   </logger>
+-->
 
   <logger name="org.osaf.cosmo.cmp.CmpServlet">
     <level value="ERROR"/>

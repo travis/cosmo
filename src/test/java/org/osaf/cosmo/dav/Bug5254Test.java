@@ -15,12 +15,19 @@
  */
 package org.osaf.cosmo.dav;
 
+import java.io.StringReader;
 import javax.jcr.Node;
+
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Property;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.jdom.Document;
+import org.jdom.Element;
 
 import org.osaf.cosmo.dav.CosmoDavResponse;
 
@@ -48,10 +55,44 @@ public class Bug5254Test extends BaseReportTestCase {
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
-        assertEquals(CosmoDavResponse.SC_MULTI_STATUS, response.getStatus());
-        //        log.debug(new String(response.getContentAsByteArray()));
+        assertEquals("response status not MULTI_STATUS",
+                     CosmoDavResponse.SC_MULTI_STATUS, response.getStatus());
+        // log.debug(new String(response.getContentAsByteArray()));
 
         MultiStatus ms = readMultiStatusResponse(response);
         assertEquals(1, ms.getResponses().size());
+
+        MultiStatus.MultiStatusResponse msr = (MultiStatus.MultiStatusResponse)
+            ms.getResponses().iterator().next();
+        assertNotNull("null dav response", msr);
+        assertNotNull("null href for dav response", msr.getHref());
+        assertTrue("dav response href does not end with 5254.ics",
+                   msr.getHref().endsWith("5254.ics"));
+
+        MultiStatus.PropStat ps = (MultiStatus.PropStat)
+            msr.getPropStats().iterator().next();
+        assertNotNull("null propstat", ps);
+        assertNotNull("null propstat status", ps.getStatus());
+        assertEquals("propstat status not OK", CosmoDavResponse.SC_OK,
+                     ps.getStatus().getCode());
+
+        Element prop = (Element) ps.getProps().iterator().next();
+        assertNotNull("null prop", prop);
+        assertEquals("prop not calendar-data", "calendar-data", prop.getName());
+
+        String calendarData = prop.getTextTrim();
+        assertNotNull("null calendar-data text", calendarData);
+        // log.debug("calendar data:\n" + calendarData);
+
+        CalendarBuilder builder = new CalendarBuilder();
+        Calendar calendar = builder.build(new StringReader(calendarData));
+
+        Component event =
+            calendar.getComponents().getComponent(Component.VEVENT);
+        assertNotNull("null event", event);
+
+        Property uid = event.getProperties().getProperty(Property.UID);
+        assertNotNull("null uid", uid);
+        assertEquals("0F94FE7B-8E01-4B27-835E-CD1431FD6475", uid.getValue());
     }
 }

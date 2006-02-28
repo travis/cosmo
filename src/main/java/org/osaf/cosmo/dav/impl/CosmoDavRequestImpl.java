@@ -70,6 +70,9 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
             buf.append(":");
             buf.append(getServerPort());
         }
+        if (! getContextPath().equals("/")) {
+            buf.append(getContextPath());
+        }
         return buf.toString();
     }
 

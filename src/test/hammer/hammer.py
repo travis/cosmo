@@ -263,10 +263,13 @@ class TestCosmoAccountCreation(Thread):
         for i in range(self.first, self.first + self.count):
             username = "test" + str(i)
             password = "test" + str(i)
+            start = time.time()
             if createaccounts.createAccount(self.tls, self.server, self.port,
                                             self.path, username, 
                                             password) == False:
                 return False
+            else:
+		LogEvent("Created Account %s" % username, "%.3f" % (time.time() - start))
         self.passed = True
                
         
@@ -347,7 +350,7 @@ def main(argv):
     # start up our threads
     cosmotesters = []
     first = offset
-    for thread in range(1, threads + 1):
+    for thread in range(offset, offset + threads):
         if accountCreation:
             c = TestCosmoAccountCreation(tls, server, port, path, first,
                                          iterations)

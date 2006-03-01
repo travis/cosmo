@@ -138,10 +138,10 @@ class TestCosmoPurePython(Thread):
 
     def write(self, data):
         try:
-            start = time.clock()
+            start = time.time()
             r = request(self.tls, self.server, self.port, "PUT", self.url, 
                         data, self.username, self.password)
-            LogEvent("PUT", "%.3f" % (time.clock() - start))
+            LogEvent("PUT", "%.3f" % (time.time() - start))
         except:
             exctype, value = sys.exc_info()[:2]
             LogEvent("PUT ERROR", str(exctype), str(value))
@@ -150,11 +150,11 @@ class TestCosmoPurePython(Thread):
 
     def read(self):
         try:
-            start = time.clock()
+            start = time.time()
             r = request(self.tls, self.server, self.port, "GET", self.url, 
                         username=self.username, password=self.password)
             data = r.read()
-            LogEvent("GET", "%.3f" % (time.clock() - start))
+            LogEvent("GET", "%.3f" % (time.time() - start))
             return data
         except:
             exctype, value = sys.exc_info()[:2]
@@ -195,9 +195,9 @@ if pycurl is not None:
             curl.setopt(pycurl.READFUNCTION, fp.read)
             if self.timeout > 0: curl.setopt(pycurl.TIMEOUT, self.timeout)
             try:
-                start = time.clock()
+                start = time.time()
                 curl.perform()
-                LogEvent("PUT", "%.3f" % (time.clock() - start))
+                LogEvent("PUT", "%.3f" % (time.time() - start))
                 
             except:
                 exctype, value = sys.exc_info()[:2]
@@ -216,9 +216,9 @@ if pycurl is not None:
             curl.setopt(pycurl.NOSIGNAL, 1)
             if self.timeout > 0: curl.setopt(pycurl.TIMEOUT, self.timeout)
             try:
-                start = time.clock()
+                start = time.time()
                 curl.perform()
-                LogEvent("GET", "%.3f" % (time.clock() - start))
+                LogEvent("GET", "%.3f" % (time.time() - start))
             except:
                 exctype, value = sys.exc_info()[:2]
                 if exctype == pycurl.error:

@@ -19,12 +19,16 @@ import java.util.Set;
 import java.util.HashSet;
 
 import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
-
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.icalendar.ComponentTypes;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Document;
 
 /**
  * Represents the CalDAV supported-calendar-component-set
@@ -55,31 +59,18 @@ public class SupportedCalendarComponentSet extends AbstractDavProperty {
     }
 
     /**
-     * Returns an <code>Element</code> representing this property.
-     */
-    public Element toXml() {
-        Element element = getName().toXml();
-        if (getValue() != null) {
-            element.addContent((Set) getValue());
-        }
-        return element;
-    }
-
-    /**
-     * (Returns a <code>Set</code> of <code>Element</code>s
-     * representing the component types for this property.
+     * (Returns a <code>Set</code> of
+     * <code>SupportedCalendarComponentSet.CalendarComponentInfo</code>s
+     * for this property.
      */
     public Object getValue() {
-        Set elements = new HashSet();
+        Set infos = new HashSet();
         for (int i=0; i<componentTypes.length; i++) {
-            Element element = new Element(CosmoDavConstants.ELEMENT_CALDAV_COMP,
-                                          CosmoDavConstants.NAMESPACE_CALDAV);
-            element.setAttribute(CosmoDavConstants.ATTR_CALDAV_NAME,
-                                 ComponentTypes.
-                                 getComponentTypeName(componentTypes[i]));
-            elements.add(element);
+            String type =
+                ComponentTypes.getComponentTypeName(componentTypes[i]);
+            infos.add(new CalendarComponentInfo(type));
         }
-        return elements;
+        return infos;
     }
 
     /**
@@ -87,5 +78,29 @@ public class SupportedCalendarComponentSet extends AbstractDavProperty {
      */
     public int[] getComponentTypes() {
         return componentTypes;
+    }
+
+    /**
+     */
+    public class CalendarComponentInfo implements XmlSerializable {
+        private String type;
+
+        /**
+         */
+        public CalendarComponentInfo(String type) {
+            this.type = type;
+        }
+
+        /**
+         */
+        public Element toXml(Document document) {
+            Element elem =
+                DomUtil.createElement(document,
+                                      CosmoDavConstants.ELEMENT_CALDAV_COMP,
+                                      CosmoDavConstants.NAMESPACE_CALDAV);
+            DomUtil.setAttribute(elem, CosmoDavConstants.ATTR_CALDAV_NAME,
+                                 CosmoDavConstants.NAMESPACE_CALDAV, type);
+            return elem;
+        }
     }
 }

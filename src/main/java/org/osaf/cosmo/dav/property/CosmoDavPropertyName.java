@@ -17,8 +17,6 @@ package org.osaf.cosmo.dav.property;
 
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 
-import org.jdom.Element;
-
 import org.osaf.cosmo.dav.CosmoDavConstants;
 
 /**

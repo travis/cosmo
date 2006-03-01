@@ -20,8 +20,12 @@ import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+
 import org.osaf.cosmo.dav.CosmoDavConstants;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author cyrusdaboo
@@ -60,18 +64,16 @@ public class CalDAVMultiStatusResponse extends MultiStatusResponse {
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.jackrabbit.webdav.MultiStatusResponse#toXml()
      */
-    public Element toXml() {
-
+    public Element toXml(Document doc) {
         // Generate calendar-data element if required
         Element cdata = null;
         if (calendarData != null) {
-            cdata = new Element(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
-                    CosmoDavConstants.NAMESPACE_CALDAV);
-            cdata.setText(calendarData);
+            cdata =
+                DomUtil.createElement(doc,
+                                      CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
+                                      CosmoDavConstants.NAMESPACE_CALDAV);
+            DomUtil.setText(cdata, calendarData);
         }
 
         // TODO We currently support the old-style and new-style of
@@ -86,11 +88,11 @@ public class CalDAVMultiStatusResponse extends MultiStatusResponse {
         }
 
         // Get standard multistatus response from superclass
-        Element response = super.toXml();
+        Element response = super.toXml(doc);
 
         // Now add the calendar-data element if required
         if ((cdata != null) && oldStyle) {
-            response.addContent(cdata);
+            response.appendChild(cdata);
         }
 
         return response;
@@ -112,11 +114,8 @@ public class CalDAVMultiStatusResponse extends MultiStatusResponse {
         }
 
         /*
-         * (non-Javadoc)
-         * 
-         * @see org.apache.jackrabbit.webdav.property.AbstractDavProperty#toXml()
          */
-        public Element toXml() {
+        public Element toXml(Document doc) {
             return calendarData;
         }
     }

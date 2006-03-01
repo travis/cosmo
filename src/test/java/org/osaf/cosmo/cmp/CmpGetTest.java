@@ -22,15 +22,17 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Text;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
 import org.osaf.cosmo.cmp.CmpServlet;
 import org.osaf.cosmo.model.User;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Test Case for CMP <code>GET</code> operations.
@@ -203,17 +205,15 @@ public class CmpGetTest extends BaseCmpServletTestCase {
     private Set createUsersFromXml(Document doc)
         throws Exception {
         HashSet users = new HashSet();
-
         if (doc == null) {
-            return users;
+            return null;
         }
 
-        Element root = doc.getRootElement();
-        for (Iterator i=root.getChildren(UserResource.EL_USER,
-                                         CmpResource.NS_CMP).iterator();
-             i.hasNext();) {
-            Element e = (Element) i.next();
-            CmpUser u = createUserFromXml(e);
+        ElementIterator i =
+            DomUtil.getChildren(doc.getDocumentElement(), UserResource.EL_USER,
+                                CmpResource.NS_CMP);
+        while (i.hasNext()) {
+            CmpUser u = createUserFromXml(i.nextElement());
             users.add(u);
         }
 
@@ -225,7 +225,7 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         if (doc == null) {
             return null;
         }
-        return createUserFromXml(doc.getRootElement());
+        return createUserFromXml(doc.getDocumentElement());
     }
 
     private CmpUser createUserFromXml(Element root)
@@ -236,31 +236,21 @@ public class CmpGetTest extends BaseCmpServletTestCase {
 
         CmpUser u = new CmpUser();
 
-        Element e = root.getChild(UserResource.EL_USERNAME, CmpResource.NS_CMP);
-        u.setUsername(getTextContent(e));
-
-        e = root.getChild(UserResource.EL_FIRSTNAME, CmpResource.NS_CMP);
-        u.setFirstName(getTextContent(e));
-
-        e = root.getChild(UserResource.EL_LASTNAME, CmpResource.NS_CMP);
-        u.setLastName(getTextContent(e));
-
-        e = root.getChild(UserResource.EL_EMAIL, CmpResource.NS_CMP);
-        u.setEmail(getTextContent(e));
-
-        e = root.getChild(UserResource.EL_URL, CmpResource.NS_CMP);
-        u.setUrl(getTextContent(e));
-
-        e = root.getChild(UserResource.EL_HOMEDIRURL, CmpResource.NS_CMP);
-        if (e != null) {
-            u.setHomedirUrl(getTextContent(e));
-        }
+        u.setUsername(DomUtil.getChildTextTrim(root, UserResource.EL_USERNAME,
+                                               CmpResource.NS_CMP));
+        u.setFirstName(DomUtil.getChildTextTrim(root, UserResource.EL_FIRSTNAME,
+                                                CmpResource.NS_CMP));
+        u.setLastName(DomUtil.getChildTextTrim(root, UserResource.EL_LASTNAME,
+                                               CmpResource.NS_CMP));
+        u.setEmail(DomUtil.getChildTextTrim(root, UserResource.EL_EMAIL,
+                                            CmpResource.NS_CMP));
+        u.setUrl(DomUtil.getChildTextTrim(root, UserResource.EL_URL,
+                                          CmpResource.NS_CMP));
+        u.setHomedirUrl(DomUtil.getChildTextTrim(root,
+                                                 UserResource.EL_HOMEDIRURL,
+                                                 CmpResource.NS_CMP));
 
         return u;
-    }
-
-    private String getTextContent(Element e) {
-        return ((Text) e.getContent(0)).getText();
     }
 
     private boolean containsUser(Set users, User test) {

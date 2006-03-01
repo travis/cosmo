@@ -20,7 +20,11 @@ import java.util.Iterator;
 
 import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
 import org.apache.jackrabbit.webdav.version.DeltaVConstants;
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.XmlSerializable;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class is copied pretty much verbatim from
@@ -91,32 +95,46 @@ public class SupportedReportSetProperty extends AbstractDavProperty {
     }
 
     /**
-     * Returns the Xml representation of this property.
-     * 
-     * @return Xml representation listing all supported reports
-     * @see org.apache.jackrabbit.webdav.property.DavProperty#toXml()
-     */
-    public Element toXml() {
-        Element elem = getName().toXml();
-        Iterator it = reportTypes.iterator();
-        while (it.hasNext()) {
-            Element sr = new Element(DeltaVConstants.XML_SUPPORTED_REPORT,
-                    DeltaVConstants.NAMESPACE);
-            Element r = new Element(DeltaVConstants.XML_REPORT,
-                    DeltaVConstants.NAMESPACE);
-            elem.addContent(sr.addContent(r.addContent(((ReportType) it.next())
-                    .toXml())));
-        }
-        return elem;
-    }
-
-    /**
-     * Returns a set of report types.
-     * 
-     * @return set of {@link ReportType}.
-     * @see org.apache.jackrabbit.webdav.property.DavProperty#getValue()
+     * Returns a <code>Set</code> of
+     <code>SupportedReportSetProperty.ReportTypeInfo</code>s for this
+     * property.
      */
     public Object getValue() {
-        return reportTypes;
+        HashSet infos = new HashSet();
+        for (Iterator i=reportTypes.iterator(); i.hasNext();) {
+            infos.add(new ReportTypeInfo((ReportType) i.next()));
+        }
+        return infos;
+    }
+
+
+    /**
+     */
+    public class ReportTypeInfo implements XmlSerializable {
+        private ReportType reportType;
+
+        /**
+         */
+        public ReportTypeInfo(ReportType reportType) {
+            this.reportType = reportType;
+        }
+
+        /**
+         */
+        public Element toXml(Document document) {
+            Element r =
+                DomUtil.createElement(document,
+                                      DeltaVConstants.XML_REPORT,
+                                      DeltaVConstants.NAMESPACE);
+            r.appendChild(reportType.toXml(document));
+
+            Element sr =
+                DomUtil.createElement(document,
+                                      DeltaVConstants.XML_SUPPORTED_REPORT,
+                                      DeltaVConstants.NAMESPACE);
+            sr.appendChild(r);
+
+            return sr;
+        }
     }
 }

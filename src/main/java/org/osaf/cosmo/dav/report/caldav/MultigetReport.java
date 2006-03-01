@@ -21,11 +21,15 @@ import java.util.Vector;
 
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.ElementIterator;
+
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.dav.report.ReportType;
+
+import org.w3c.dom.Element;
 
 /**
  * @author cyrusdaboo
@@ -67,7 +71,7 @@ public class MultigetReport extends AbstractCalendarDataReport {
         throws IllegalArgumentException {
         if (info == null
                 || !CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_MULTIGET
-                        .equals(info.getReportElement().getName())) {
+                        .equals(info.getReportElement().getLocalName())) {
             throw new IllegalArgumentException(
                     "CALDAV:calendar-multiget element expected.");
         }
@@ -84,10 +88,10 @@ public class MultigetReport extends AbstractCalendarDataReport {
         hasOldStyleCalendarData = false;
         boolean gotPropType = false;
 
-        List childList = info.getReportElement().getChildren();
-        for (int i = 0; i < childList.size(); i++) {
-            Element child = (Element) childList.get(i);
-            String nodeName = child.getName();
+        ElementIterator i = DomUtil.getChildren(info.getReportElement());
+        while (i.hasNext()) {
+            Element child = i.nextElement();
+            String nodeName = child.getLocalName();
             if (XML_PROP.equals(nodeName)) {
                 if (gotPropType) {
                     throw new IllegalArgumentException(
@@ -108,7 +112,8 @@ public class MultigetReport extends AbstractCalendarDataReport {
 
                         // Now find the calendar-data element inside the prop
                         // element and cache that
-                        calendarDataElement = child.getChild(
+                        calendarDataElement =
+                            DomUtil.getChildElement(child,
                                 CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
                                 CosmoDavConstants.NAMESPACE_CALDAV);
                     }
@@ -128,7 +133,7 @@ public class MultigetReport extends AbstractCalendarDataReport {
                 propfindType = PROPFIND_ALL_PROP;
                 gotPropType = true;
             } else if (XML_HREF.equals(nodeName)) {
-                hrefs.add(child.getText());
+                hrefs.add(DomUtil.getTextTrim(child));
 
             } else if (CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA
                     .equals(nodeName)) {

@@ -17,7 +17,7 @@ package org.osaf.cosmo.dav.report;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
-import org.jdom.Document;
+import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
 /**
  * This class is copied pretty much verbatim from
@@ -31,7 +31,7 @@ import org.jdom.Document;
  * 
  * @see DavResource#getReport(ReportInfo)
  */
-public interface Report {
+public interface Report extends XmlSerializable {
 
     /**
      * Returns the registered type of this report.
@@ -55,18 +55,4 @@ public interface Report {
      *            providing in detail requirements for this report.
      */
     public void setInfo(ReportInfo info);
-
-    /**
-     * Returns the report {@link Document Xml document} defined by the this
-     * <code>ReportType</code>. The document will be returned in the response
-     * body.
-     * 
-     * @return Xml <code>Document</code> object representing the generated
-     *         report in the proper format.
-     * @throws DavException
-     *             if an error occurs while running the report or creating the
-     *             <code>Document</code>.
-     */
-    public Document toXml()
-        throws DavException;
 }

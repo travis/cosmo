@@ -21,13 +21,17 @@ import java.util.Set;
 
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
-
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.model.Ticket;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Document;
 
 /**
  * Represents the WebDAV Tickets ticketdiscovery property.
@@ -44,75 +48,89 @@ public class TicketDiscovery extends AbstractDavProperty {
     }
 
     /**
-     * Returns an <code>Element</code> representing this property.
-     */
-    public Element toXml() {
-        Element element = getName().toXml();
-        if (getValue() != null) {
-            element.addContent((Set) getValue());
-        }
-        return element;
-    }
-
-    /**
-     * (Returns a <code>Set</code> of <code>Element</code>s
-     * representing the restrictions of this property.
+     * Returns a <code>Set</code> of
+     * <code>TicketDiscovery.TicketInfo</code>s for this property.
      */
     public Object getValue() {
         Set elements = new HashSet();
         for (Iterator i=resource.getLoggedInUserTickets().iterator();
              i.hasNext();) {
-            Ticket ticket = (Ticket) i.next();
-            elements.add(ticketToXml(ticket));
+            elements.add(new TicketInfo((Ticket) i.next()));
         }
         return elements;
     }
 
-    private Element ticketToXml(Ticket ticket) {
-        Element ticketInfo = new Element(CosmoDavConstants.ELEMENT_TICKETINFO,
-                                         CosmoDavConstants.NAMESPACE_TICKET);
+    public class TicketInfo implements XmlSerializable {
+        private Ticket ticket;
+  
+        public TicketInfo(Ticket ticket) {
+            this.ticket = ticket;
+        }
 
-        Element id = new Element(CosmoDavConstants.ELEMENT_ID,
-                                 CosmoDavConstants.NAMESPACE_TICKET);
-        id.addContent(ticket.getId());
-        ticketInfo.addContent(id);
-
-        Element owner = new Element(CosmoDavConstants.ELEMENT_OWNER,
-                                    DavConstants.NAMESPACE);
-        Element href = new Element(CosmoDavConstants.ELEMENT_HREF,
-                                   DavConstants.NAMESPACE);
-        String url =
-            resource.getHomedirLocator(ticket.getOwner()).getHref(true);
-        href.addContent(url);
-        owner.addContent(href);
-        ticketInfo.addContent(owner);
-
-        Element timeout = new Element(CosmoDavConstants.ELEMENT_TIMEOUT,
+        public Element toXml(Document document) {
+            Element ticketInfo =
+                DomUtil.createElement(document,
+                                      CosmoDavConstants.ELEMENT_TICKETINFO,
                                       CosmoDavConstants.NAMESPACE_TICKET);
-        timeout.addContent(ticket.getTimeout());
-        ticketInfo.addContent(timeout);
 
-        // visit limits are not supported; the element remains to
-        // comply with the current draft of the spec
-        Element visits = new Element(CosmoDavConstants.ELEMENT_VISITS,
-                                     CosmoDavConstants.NAMESPACE_TICKET);
-        visits.addContent(CosmoDavConstants.VALUE_INFINITY);
-        ticketInfo.addContent(visits);
+            Element id =
+                DomUtil.createElement(document,
+                                      CosmoDavConstants.ELEMENT_ID,
+                                      CosmoDavConstants.NAMESPACE_TICKET);
+            DomUtil.setText(id, ticket.getId());
+            ticketInfo.appendChild(id);
 
-        Element privilege = new Element(CosmoDavConstants.ELEMENT_PRIVILEGE,
-                                        DavConstants.NAMESPACE);
-        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ)) {
-            Element read = new Element(CosmoDavConstants.ELEMENT_READ,
-                                       DavConstants.NAMESPACE);
-            privilege.addContent(read);
+            Element owner =
+                DomUtil.createElement(document,
+                                      CosmoDavConstants.ELEMENT_OWNER,
+                                      DavConstants.NAMESPACE);
+            Element href =
+                DomUtil.createElement(document,
+                                      CosmoDavConstants.ELEMENT_HREF,
+                                      DavConstants.NAMESPACE);
+            String url =
+                resource.getHomedirLocator(ticket.getOwner()).getHref(true);
+            DomUtil.setText(href, url);
+            owner.appendChild(href);
+            ticketInfo.appendChild(owner);
+
+            Element timeout =
+                DomUtil.createElement(document,
+                                      CosmoDavConstants.ELEMENT_TIMEOUT,
+                                      CosmoDavConstants.NAMESPACE_TICKET);
+            DomUtil.setText(timeout, ticket.getTimeout());
+            ticketInfo.appendChild(timeout);
+ 
+            // visit limits are not supported; the element remains to
+            // comply with the current draft of the spec
+            Element visits =
+                DomUtil.createElement(document,
+                                      CosmoDavConstants.ELEMENT_VISITS,
+                                      CosmoDavConstants.NAMESPACE_TICKET);
+            DomUtil.setText(visits, CosmoDavConstants.VALUE_INFINITY);
+            ticketInfo.appendChild(visits);
+ 
+            Element privilege =
+                DomUtil.createElement(document,
+                                      CosmoDavConstants.ELEMENT_PRIVILEGE,
+                                      DavConstants.NAMESPACE);
+            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ)) {
+                Element read =
+                    DomUtil.createElement(document,
+                                          CosmoDavConstants.ELEMENT_READ,
+                                          DavConstants.NAMESPACE);
+                privilege.appendChild(read);
+            }
+            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE)) {
+                Element write =
+                    DomUtil.createElement(document,
+                                          CosmoDavConstants.ELEMENT_WRITE,
+                                          DavConstants.NAMESPACE);
+                privilege.appendChild(write);
+            }
+            ticketInfo.appendChild(privilege);
+ 
+            return ticketInfo;
         }
-        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE)) {
-            Element write = new Element(CosmoDavConstants.ELEMENT_WRITE,
-                                        DavConstants.NAMESPACE);
-            privilege.addContent(write);
-        }
-        ticketInfo.addContent(privilege);
-
-        return ticketInfo;
     }
 }

@@ -153,14 +153,6 @@
       <version>1.3.2</version>
     </dependency>
     <dependency>
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>1.0</version>
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.9</version>
@@ -181,17 +173,17 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit</artifactId>
-      <version>osaf-20060131</version>
+      <version>0.9-incubating-osaf-20060221</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-commons</artifactId>
-      <version>osaf-20060131</version>
+      <version>0.9-incubating-osaf-20060221</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-server</artifactId>
-      <version>osaf-20060208</version>
+      <version>1.0-SNAPSHOT-osaf-20060221</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -199,7 +191,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-server</artifactId>
-      <version>osaf-20060131</version>
+      <version>1.0-SNAPSHOT-osaf-20060221</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -207,7 +199,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-webdav</artifactId>
-      <version>osaf-20060217</version>
+      <version>1.0-SNAPSHOT-osaf-20060221</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

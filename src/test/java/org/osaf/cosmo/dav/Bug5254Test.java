@@ -26,13 +26,15 @@ import net.fortuna.ical4j.model.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
 
 import org.osaf.cosmo.dav.CosmoDavResponse;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Test Case for Bug 5254.
@@ -78,9 +80,10 @@ public class Bug5254Test extends BaseReportTestCase {
 
         Element prop = (Element) ps.getProps().iterator().next();
         assertNotNull("null prop", prop);
-        assertEquals("prop not calendar-data", "calendar-data", prop.getName());
+        assertEquals("prop not calendar-data", "calendar-data",
+                     prop.getLocalName());
 
-        String calendarData = prop.getTextTrim();
+        String calendarData = DomUtil.getTextTrim(prop);
         assertNotNull("null calendar-data text", calendarData);
         // log.debug("calendar data:\n" + calendarData);
 

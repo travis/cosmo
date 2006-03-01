@@ -467,11 +467,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             return report;
         } else {
             throw new DavException(DavServletResponse.SC_UNPROCESSABLE_ENTITY,
-                    "Unkown report "
-                            + reportInfo.getReportElement()
-                                    .getNamespacePrefix()
-                            + reportInfo.getReportElement().getName()
-                            + "requested.");
+                    "Unkown report " + reportInfo.getReportElement().getTagName() + "requested.");
         }
     }
 }

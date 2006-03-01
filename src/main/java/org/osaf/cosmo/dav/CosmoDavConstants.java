@@ -16,7 +16,7 @@
 package org.osaf.cosmo.dav;
 
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.jdom.Namespace;
+import org.apache.jackrabbit.webdav.xml.Namespace;
 
 /**
  * Provides constants for request and response headers, XML elements
@@ -39,7 +39,9 @@ public class CosmoDavConstants {
 
     // XML namespaces
 
-    // defined by Xythos
+    public static final Namespace NAMESPACE_XML =
+        Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+
     public static final Namespace NAMESPACE_TICKET =
         Namespace.getNamespace("ticket", "http://www.xythos.com/namespaces/StorageServer");
     public static final Namespace NAMESPACE_CALDAV =

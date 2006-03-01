@@ -30,12 +30,16 @@ import net.fortuna.ical4j.util.Dates;
 import net.fortuna.ical4j.util.TimeZones;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
+
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.jackrabbit.query.TextCalendarTextFilter;
+
+import org.w3c.dom.Element;
 
 /**
  * @author cyrusdaboo
@@ -74,17 +78,19 @@ public class QueryFilter implements JcrConstants {
     public void parseElement(Element element) {
 
         // Can only have a single comp-filter element
-        List childrenList = element.getChildren(
-                CosmoDavConstants.ELEMENT_CALDAV_COMP_FILTER,
-                CosmoDavConstants.NAMESPACE_CALDAV);
-
-        if (childrenList.size() == 0)
+        ElementIterator i =
+            DomUtil.getChildren(element,
+                                CosmoDavConstants.ELEMENT_CALDAV_COMP_FILTER,
+                                CosmoDavConstants.NAMESPACE_CALDAV);
+        if (! i.hasNext()) {
             throw new IllegalArgumentException("CALDAV:filter must contain a comp-filter");
+        }
 
-        else if (childrenList.size() != 1)
+        Element child = i.nextElement();
+
+        if (i.hasNext()) {
             throw new IllegalArgumentException("CALDAV:filter can contain only one comp-filter");
-
-        Element child = (Element) childrenList.get(0);
+        }
 
         // Create new component filter and have it parse the element
         filter = new compfilter();
@@ -217,8 +223,9 @@ public class QueryFilter implements JcrConstants {
          */
         public void parseElement(Element element) {
             // Name must be present
-            name = element
-                    .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NAME);
+            name =
+                DomUtil.getAttribute(element,
+                                     CosmoDavConstants.ATTR_CALDAV_NAME, null);
 
             if (name == null) {
                 throw new IllegalArgumentException("CALDAV:comp-filter a calendar component name " +
@@ -228,12 +235,12 @@ public class QueryFilter implements JcrConstants {
             // Look at each child component
             boolean got_one = false;
 
-            for (Iterator iter = element.getChildren().iterator(); iter
-                    .hasNext();) {
-                Element child = (Element) iter.next();
+            ElementIterator i = DomUtil.getChildren(element);
+            while (i.hasNext()) {
+                Element child = i.nextElement();
 
                 if (CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE
-                        .equals(child.getName())) {
+                        .equals(child.getLocalName())) {
 
                     // Can only have one time-range element in a comp-filter
                     if (got_one)
@@ -246,9 +253,9 @@ public class QueryFilter implements JcrConstants {
 
                     try {
                         // Get start (must be present)
-                        String start = child
-                                .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_START);
-
+                        String start =
+                            DomUtil.getAttribute(child,
+                                CosmoDavConstants.ATTR_CALDAV_START, null);
                         if (start == null)
                             throw new IllegalArgumentException("CALDAV:comp-filter time-range requires a start time");
 
@@ -256,9 +263,9 @@ public class QueryFilter implements JcrConstants {
                         trstart = new DateTime(start);
 
                         // Get end (must be present)
-                        String end = child
-                                .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_END);
-
+                        String end =
+                            DomUtil.getAttribute(child,
+                                CosmoDavConstants.ATTR_CALDAV_END, null);
                         if (end == null)
                             throw new IllegalArgumentException("CALDAV:comp-filter time-range requires an end time");
 
@@ -271,7 +278,7 @@ public class QueryFilter implements JcrConstants {
                     }
 
                 } else if (CosmoDavConstants.ELEMENT_CALDAV_COMP_FILTER
-                        .equals(child.getName())) {
+                        .equals(child.getLocalName())) {
 
                     // Create new list if needed
                     if (compFilters == null)
@@ -287,7 +294,7 @@ public class QueryFilter implements JcrConstants {
                     compFilters.add(cfilter);
 
                 } else if (CosmoDavConstants.ELEMENT_CALDAV_PROP_FILTER
-                        .equals(child.getName())) {
+                        .equals(child.getLocalName())) {
 
                     // Create new list if needed
                     if (propFilters == null)
@@ -379,9 +386,9 @@ public class QueryFilter implements JcrConstants {
         public void parseElement(Element element) {
 
             // Name must be present
-            name = element
-                .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NAME);
-
+            name =
+                DomUtil.getAttribute(element,
+                                     CosmoDavConstants.ATTR_CALDAV_NAME, null);
             if (name == null)
                 throw new IllegalArgumentException("CALDAV:prop-filter a calendar property name " +
                                                    "(e.g., \"ATTENDEE\") is required");
@@ -389,12 +396,12 @@ public class QueryFilter implements JcrConstants {
             // Look at each child component
             boolean got_one = false;
 
-            for (Iterator iter = element.getChildren().iterator(); iter
-                    .hasNext();) {
-                Element child = (Element) iter.next();
+            ElementIterator i = DomUtil.getChildren(element);
+            while (i.hasNext()) {
+                Element child = i.nextElement();
 
                 if (CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE
-                        .equals(child.getName())) {
+                        .equals(child.getLocalName())) {
 
                     // Can only have one time-range or text-match
                     if (got_one)
@@ -408,9 +415,9 @@ public class QueryFilter implements JcrConstants {
 
                     try {
                         // Get start (must be present)
-                        String start = child
-                                .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_START);
-
+                        String start =
+                            DomUtil.getAttribute(child,
+                                CosmoDavConstants.ATTR_CALDAV_START, null);
                         if (start == null)
                             throw new IllegalArgumentException("CALDAV:prop-filter time-range requires a start time");
 
@@ -418,9 +425,9 @@ public class QueryFilter implements JcrConstants {
                         trstart = new DateTime(start);
 
                         // Get end (must be present)
-                        String end = child
-                                .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_END);
-
+                        String end =
+                            DomUtil.getAttribute(child,
+                                CosmoDavConstants.ATTR_CALDAV_END, null);
                         if (end == null)
                             throw new IllegalArgumentException("CALDAV:prop-filter time-range requires an end time");
 
@@ -433,7 +440,7 @@ public class QueryFilter implements JcrConstants {
                     }
 
                 } else if (CosmoDavConstants.ELEMENT_CALDAV_TEXT_MATCH
-                        .equals(child.getName())) {
+                        .equals(child.getLocalName())) {
 
                     // Can only have one time-range or text-match
                     if (got_one) 
@@ -446,11 +453,12 @@ public class QueryFilter implements JcrConstants {
                     useTextMatch = true;
 
                     // Element data is string to match
-                    textMatch = child.getValue();
+                    textMatch = DomUtil.getTextTrim(child);
 
                     // Check attribute for caseless
-                    String caseless = child
-                            .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_CASELESS);
+                    String caseless =
+                        DomUtil.getAttribute(child,
+                            CosmoDavConstants.ATTR_CALDAV_CASELESS, null);
                     if ((caseless == null)
                             || !CosmoDavConstants.VALUE_YES.equals(caseless))
                         isCaseless = false;
@@ -458,7 +466,7 @@ public class QueryFilter implements JcrConstants {
                         isCaseless = true;
 
                 } else if (CosmoDavConstants.ELEMENT_CALDAV_PARAM_FILTER
-                        .equals(child.getName())) {
+                        .equals(child.getLocalName())) {
 
                     // Create new list if needed
                     if (paramFilters == null)
@@ -538,32 +546,37 @@ public class QueryFilter implements JcrConstants {
         public void parseElement(Element element) {
 
             // Get name which must be present
-            name = element
-                    .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NAME);
-
+            String name =
+                DomUtil.getAttribute(element,
+                                     CosmoDavConstants.ATTR_CALDAV_NAME, null);
             if (name == null)
                 throw new IllegalArgumentException("CALDAV:param-filter a property parameter name " +
                                                    "(e.g., \"PARTSTAT\") is required");
 
             // Can only have a single ext-match element
-            List childrenList = element.getChildren();
-
-            if (childrenList.size() != 1)
+            ElementIterator i = DomUtil.getChildren(element);
+            if (! i.hasNext()) {
                 throw new IllegalArgumentException("CALDAV:param-filter only a single text-match element is allowed");
+            }
 
-            Element child = (Element) childrenList.get(0);
+            Element child = i.nextElement();
+
+            if (i.hasNext()) {
+                throw new IllegalArgumentException("CALDAV:param-filter only a single text-match element is allowed");
+            }
 
             if (CosmoDavConstants.ELEMENT_CALDAV_TEXT_MATCH.equals(child
-                    .getName())) {
+                    .getLocalName())) {
 
                 useTextMatch = true;
 
                 // Element data is string to match
-                textMatch = child.getValue();
+                textMatch = DomUtil.getTextTrim(child);
 
                 // Check attribute for caseless
-                String caseless = child
-                        .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_CASELESS);
+                String caseless =
+                    DomUtil.getAttribute(child,
+                        CosmoDavConstants.ATTR_CALDAV_CASELESS, null);
                 if ((caseless == null)
                         || !CosmoDavConstants.VALUE_YES.equals(caseless))
                     isCaseless = false;

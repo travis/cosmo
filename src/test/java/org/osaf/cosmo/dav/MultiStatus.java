@@ -23,9 +23,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.ElementIterator;
+import org.apache.jackrabbit.webdav.xml.Namespace;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Bean that encapsulates information about a DAV multistatus
@@ -69,22 +72,20 @@ public class MultiStatus {
             throw new IllegalArgumentException("null document");
         }
 
-        Element mse = doc.getRootElement();
-        if (!(mse.getName().equals("multistatus") &&
-              mse.getNamespace().equals(NS))) {
+        Element mse = doc.getDocumentElement();
+        if (! DomUtil.matches(mse, "multistatus", NS)) {
             throw new IllegalArgumentException("root element not DAV:multistatus");
         }
 
         MultiStatus ms = new MultiStatus();
 
-        for (Iterator i=mse.getChildren("response", NS).iterator();
-             i.hasNext();) {
-            Element msre = (Element) i.next();
-            MultiStatusResponse msr = MultiStatusResponse.createFromXml(msre);
-            ms.getResponses().add(msr);
+        ElementIterator i = DomUtil.getChildren(mse, "response", NS);
+        while (i.hasNext()) {
+            ms.getResponses().
+                add(MultiStatusResponse.createFromXml(i.nextElement()));
         }
 
-        String msrd = mse.getChildText("responsedescription", NS);
+        String msrd = DomUtil.getChildTextTrim(mse, "responsedescription", NS);
         ms.setResponseDescription(msrd);
 
         return ms;
@@ -164,25 +165,24 @@ public class MultiStatus {
 
             MultiStatusResponse msr = new MultiStatusResponse();
 
-            Element he = e.getChild("href", NS);
+            Element he = DomUtil.getChildElement(e, "href", NS);
             if (he == null) {
                 throw new IllegalArgumentException("expected DAV:href child for DAV:response element");
             }
-            msr.setHref(he.getText());
+            msr.setHref(DomUtil.getTextTrim(he));
 
-            String statusLine = e.getChildText("status", NS);
+            String statusLine = DomUtil.getChildTextTrim(e, "status", NS);
             if (statusLine != null) {
                 msr.setStatus(Status.createFromStatusLine(statusLine));
             }
 
-            for (Iterator i=e.getChildren("propstat", NS).iterator();
-                 i.hasNext();) {
-                Element pse = (Element) i.next();
-                PropStat ps = PropStat.createFromXml(pse);
-                msr.getPropStats().add(ps);
+            ElementIterator i = DomUtil.getChildren(e, "propstat", NS);
+            while (i.hasNext()) {
+                msr.getPropStats().add(PropStat.createFromXml(i.nextElement()));
             }
 
-            String msrrd = e.getChildText("responsedescription", NS);
+            String msrrd =
+                DomUtil.getChildTextTrim(e, "responsedescription", NS);
             msr.setResponseDescription(msrrd);
 
             return msr;
@@ -252,20 +252,23 @@ public class MultiStatus {
 
             PropStat ps = new PropStat();
 
-            Element pe = e.getChild("prop", NS);
+            Element pe = DomUtil.getChildElement(e, "prop", NS);
             if (pe == null) {
                 throw new IllegalArgumentException("expected DAV:prop child for DAV:propstat element");
             }
-            for (Iterator i=pe.getChildren().iterator(); i.hasNext();) {
-                ps.getProps().add((Element) i.next());
+
+            ElementIterator i = DomUtil.getChildren(pe);
+            while (i.hasNext()) {
+                ps.getProps().add(i.next());
             }
 
-            String statusLine = e.getChildText("status", NS);
+            String statusLine = DomUtil.getChildTextTrim(e, "status", NS);
             if (statusLine != null) {
                 ps.setStatus(Status.createFromStatusLine(statusLine));
             }
 
-            String psrd = e.getChildText("responsedescription", NS);
+            String psrd =
+                DomUtil.getChildTextTrim(e, "responsedescription", NS);
             ps.setResponseDescription(psrd);
 
             return ps;

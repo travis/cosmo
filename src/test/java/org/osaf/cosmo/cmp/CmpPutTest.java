@@ -18,8 +18,8 @@ package org.osaf.cosmo.cmp;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
 import org.osaf.cosmo.cmp.CmpConstants;
 import org.osaf.cosmo.cmp.CmpServlet;
@@ -28,6 +28,9 @@ import org.osaf.cosmo.model.User;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Test Case for CMP <code>PUT</code> operations.
@@ -41,7 +44,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         User u1 = testHelper.makeDummyUser();
 
         MockHttpServletRequest request = createMockRequest("PUT", "/signup");
-        sendXmlRequest(request, userToXml(u1));
+        sendXmlRequest(request, new UserContent(u1));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -56,10 +59,12 @@ public class CmpPutTest extends BaseCmpServletTestCase {
     /**
      */
     public void testBadlyFormattedSignup() throws Exception {
-        Element e = new Element("deadbeef", UserResource.NS_CMP);
+        Document doc = BUILDER_FACTORY.newDocumentBuilder().newDocument();
+        Element e = DomUtil.createElement(doc, "deadbeef", UserResource.NS_CMP);
+        doc.appendChild(e);
 
         MockHttpServletRequest request = createMockRequest("PUT", "/signup");
-        sendXmlRequest(request, new Document(e));
+        sendXmlRequest(request, doc);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -79,7 +84,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         u2.setUsername(u1.getUsername());
 
         MockHttpServletRequest request = createMockRequest("PUT", "/signup");
-        sendXmlRequest(request, userToXml(u2));
+        sendXmlRequest(request, new UserContent(u2));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -99,7 +104,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         u2.setEmail(u1.getEmail());
 
         MockHttpServletRequest request = createMockRequest("PUT", "/signup");
-        sendXmlRequest(request, userToXml(u2));
+        sendXmlRequest(request, new UserContent(u2));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -116,7 +121,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         u1.setUsername("a");
 
         MockHttpServletRequest request = createMockRequest("PUT", "/signup");
-        sendXmlRequest(request, userToXml(u1));
+        sendXmlRequest(request, new UserContent(u1));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -140,7 +145,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         cmpUser.setUsername(u1.getUsername());
 
         MockHttpServletRequest request = createMockRequest("PUT", "/account");
-        sendXmlRequest(request, userToXml(cmpUser));
+        sendXmlRequest(request, new UserContent(cmpUser));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -179,7 +184,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         User cmpUser = testHelper.makeDummyUser();
 
         MockHttpServletRequest request = createMockRequest("PUT", "/account");
-        sendXmlRequest(request, userToXml(cmpUser));
+        sendXmlRequest(request, new UserContent(cmpUser));
         
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -202,7 +207,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
 
         MockHttpServletRequest request =
             createMockRequest("PUT", "/user/" + cmpUser.getUsername());
-        sendXmlRequest(request, userToXml(cmpUser));
+        sendXmlRequest(request, new UserContent(cmpUser));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -237,7 +242,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         // cmp user's username won't match uri
         MockHttpServletRequest request =
             createMockRequest("PUT", "/user/deadbeef");
-        sendXmlRequest(request, userToXml(cmpUser));
+        sendXmlRequest(request, new UserContent(cmpUser));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -255,7 +260,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
 
         MockHttpServletRequest request =
             createMockRequest("PUT", "/user/" + cmpUser.getUsername());
-        sendXmlRequest(request, userToXml(cmpUser));
+        sendXmlRequest(request, new UserContent(cmpUser));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -277,7 +282,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
 
         MockHttpServletRequest request =
             createMockRequest("PUT", "/user/" + u1.getUsername());
-        sendXmlRequest(request, userToXml(cmpUser));
+        sendXmlRequest(request, new UserContent(cmpUser));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -326,7 +331,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
 
         MockHttpServletRequest request =
             createMockRequest("PUT", "/user/" + overlord.getUsername());
-        sendXmlRequest(request, userToXml(cmpUser));
+        sendXmlRequest(request, new UserContent(cmpUser));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -403,44 +408,64 @@ public class CmpPutTest extends BaseCmpServletTestCase {
                      response.getStatus());
     }
 
-    private Document userToXml(User user) {
-        Element e = new Element(UserResource.EL_USER, UserResource.NS_CMP);
+    /**
+     */
+    public class UserContent implements XmlSerializable {
+        private User user;
 
-        if (user.getUsername() != null) {
-            Element username = new Element(UserResource.EL_USERNAME,
-                                           UserResource.NS_CMP);
-            username.addContent(user.getUsername());
-            e.addContent(username);
+        /**
+         */
+        public UserContent(User user) {
+            this.user = user;
         }
 
-        if (user.getPassword() != null) {
-            Element password = new Element(UserResource.EL_PASSWORD,
-                                           UserResource.NS_CMP);
-            password.addContent(user.getPassword());
-            e.addContent(password);
-        }
+        /**
+         */
+        public Element toXml(Document doc) {
+            Element e = DomUtil.createElement(doc, UserResource.EL_USER,
+                                              UserResource.NS_CMP);
 
-        if (user.getFirstName() != null) {
-            Element firstName = new Element(UserResource.EL_FIRSTNAME,
-                                            UserResource.NS_CMP);
-            firstName.addContent(user.getFirstName());
-            e.addContent(firstName);
-        }
+            if (user.getUsername() != null) {
+                Element username =
+                    DomUtil.createElement(doc, UserResource.EL_USERNAME,
+                                          UserResource.NS_CMP);
+                DomUtil.setText(username, user.getUsername());
+                e.appendChild(username);
+            }
 
-        if (user.getLastName() != null) {
-            Element lastName = new Element(UserResource.EL_LASTNAME,
-                                           UserResource.NS_CMP);
-            lastName.addContent(user.getLastName());
-            e.addContent(lastName);
-        }
+            if (user.getPassword() != null) {
+                Element password =
+                    DomUtil.createElement(doc, UserResource.EL_PASSWORD,
+                                          UserResource.NS_CMP);
+                DomUtil.setText(password, user.getPassword());
+                e.appendChild(password);
+            }
 
-        if (user.getEmail() != null) {
-            Element email = new Element(UserResource.EL_EMAIL,
-                                        UserResource.NS_CMP);
-            email.addContent(user.getEmail());
-            e.addContent(email);
-        }
+            if (user.getFirstName() != null) {
+                Element firstName =
+                    DomUtil.createElement(doc, UserResource.EL_FIRSTNAME,
+                                          UserResource.NS_CMP);
+                DomUtil.setText(firstName, user.getFirstName());
+                e.appendChild(firstName);
+            }
 
-        return new Document(e);
+            if (user.getLastName() != null) {
+                Element lastName =
+                    DomUtil.createElement(doc, UserResource.EL_LASTNAME,
+                                          UserResource.NS_CMP);
+                DomUtil.setText(lastName, user.getLastName());
+                e.appendChild(lastName);
+            }
+
+            if (user.getEmail() != null) {
+                Element email =
+                    DomUtil.createElement(doc, UserResource.EL_EMAIL,
+                                          UserResource.NS_CMP);
+                DomUtil.setText(email, user.getEmail());
+                e.appendChild(email);
+            }
+
+            return e;
+        }
     }
 }

@@ -18,12 +18,12 @@ package org.osaf.cosmo.dav;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Document;
-
 import org.osaf.cosmo.dav.CosmoDavResponse;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import org.w3c.dom.Document;
 
 /**
  * Test Case for simple CalDAV calendar-query <code>REPORT</code>s.

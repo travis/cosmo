@@ -27,13 +27,15 @@ import net.fortuna.ical4j.model.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
 
 import org.osaf.cosmo.dav.CosmoDavResponse;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Test Case for Bug 5175.
@@ -82,9 +84,9 @@ public class Bug5175Test extends BaseReportTestCase {
         boolean foundEtag = false;
         for (Iterator i=ps.getProps().iterator(); i.hasNext();) {
             Element prop = (Element) i.next();
-            if (prop.getName().equals("calendar-data")) {
+            if (prop.getLocalName().equals("calendar-data")) {
                 foundCalendarData = true;
-                String calendarData = prop.getTextTrim();
+                String calendarData = DomUtil.getTextTrim(prop);
                 assertNotNull("null calendar-data text", calendarData);
                 // log.debug("calendar data:\n" + calendarData);
 
@@ -100,15 +102,15 @@ public class Bug5175Test extends BaseReportTestCase {
                 assertNotNull("null uid", uid);
                 assertEquals("NEW_UID", uid.getValue());
             }
-            else if (prop.getName().equals("getetag")) {
+            else if (prop.getLocalName().equals("getetag")) {
                 foundEtag = true;
-                String etag = prop.getTextTrim();
+                String etag = DomUtil.getTextTrim(prop);
                 assertNotNull("null getetag text", etag);
                 // can't check etag equality since it's different for
                 // every test run
             }
             else {
-                fail("unknown dav prop " + prop.getName());
+                fail("unknown dav prop " + prop.getLocalName());
             }
         }
         assertTrue("calendar-data prop not found", foundCalendarData);

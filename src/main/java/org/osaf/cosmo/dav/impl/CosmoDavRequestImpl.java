@@ -24,16 +24,18 @@ import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.WebdavRequestImpl;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
 import org.apache.log4j.Logger;
-
-import org.jdom.Document;
-import org.jdom.Element;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavRequest;
 import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.model.Ticket;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Extends {@link org.apache.jackrabbit.webdav.WebdavRequest}. and
@@ -130,29 +132,28 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
             return propertySet;
         }
 
-        Element root = requestDocument.getRootElement();
-        if (! root.getName().
-            equals(CosmoDavConstants.ELEMENT_CALDAV_MKCALENDAR)) {
-            throw new IllegalArgumentException("mkcalendar request missing mkcalendar element");
-        }
-        if (root.getNamespace() == null ||
-            ! root.getNamespace().equals(CosmoDavConstants.NAMESPACE_CALDAV)) {
-            throw new IllegalArgumentException("mkcalendar request contains mkcalendar element with missing or incorrect namespace");
+        Element root = requestDocument.getDocumentElement();
+        if (! DomUtil.matches(root, CosmoDavConstants.ELEMENT_CALDAV_MKCALENDAR,
+                              CosmoDavConstants.NAMESPACE_CALDAV)) {
+            throw new IllegalArgumentException("mkcalendar request missing DAV:mkcalendar");
         }
 
-        Element set = root.getChild(CosmoDavConstants.ELEMENT_SET,
+        Element set =
+            DomUtil.getChildElement(root, CosmoDavConstants.ELEMENT_SET,
                                     DavConstants.NAMESPACE);
         if (set == null) {
-            throw new IllegalArgumentException("mkcalendar request missing set element");
+            throw new IllegalArgumentException("mkcalendar request missing DAV:set element");
         }
-        Element prop = set.getChild(CosmoDavConstants.ELEMENT_PROP,
+        Element prop =
+            DomUtil.getChildElement(set, CosmoDavConstants.ELEMENT_PROP,
                                     DavConstants.NAMESPACE);
         if (prop == null) {
-            throw new IllegalArgumentException("mkcalendar request missing prop element");
+            throw new IllegalArgumentException("mkcalendar request missing DAV:prop element");
         }
-        for (Iterator i=prop.getChildren().iterator(); i.hasNext();) {
-            Element property = (Element) i.next();
-            propertySet.add(DefaultDavProperty.createFromXml(property));
+
+        ElementIterator i = DomUtil.getChildren(prop);
+        while (i.hasNext()) {
+            propertySet.add(DefaultDavProperty.createFromXml(i.nextElement()));
         }
 
         return propertySet;
@@ -164,33 +165,30 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
             throw new IllegalArgumentException("ticket request missing body");
         }
 
-        Element root = requestDocument.getRootElement();
-        if (! root.getName().equals(CosmoDavConstants.ELEMENT_TICKETINFO)) {
-            throw new IllegalArgumentException("ticket request missing ticketinfo");
-        }
-        if (root.getNamespace() == null ||
-            ! root.getNamespace().equals(CosmoDavConstants.NAMESPACE_TICKET)) {
-            throw new IllegalArgumentException("ticket request contains ticketinfo with missing or incorrect namespace");
-        }
-        if (root.getChild(CosmoDavConstants.ELEMENT_ID,
-                          CosmoDavConstants.NAMESPACE_TICKET) != null) {
-            throw new IllegalArgumentException("ticket request must not include id");
-        }
-        if (root.getChild(CosmoDavConstants.ELEMENT_OWNER,
-                          CosmoDavConstants.NAMESPACE_TICKET) != null) {
-            throw new IllegalArgumentException("ticket request must not include owner");
+        Element root = requestDocument.getDocumentElement();
+        if (! DomUtil.matches(root, CosmoDavConstants.ELEMENT_TICKETINFO,
+                              CosmoDavConstants.NAMESPACE_TICKET)) {
+            throw new IllegalArgumentException("ticket request has missing ticket:ticketinfo");
         }
 
-        String timeout = root.
-            getChildTextNormalize(CosmoDavConstants.ELEMENT_TIMEOUT,
-                                  CosmoDavConstants.NAMESPACE_TICKET);
+        if (DomUtil.hasChildElement(root, CosmoDavConstants.ELEMENT_ID,
+                                    CosmoDavConstants.NAMESPACE_TICKET)) {
+            throw new IllegalArgumentException("ticket request must not include ticket:id");
+        }
+        if (DomUtil.hasChildElement(root, CosmoDavConstants.ELEMENT_OWNER,
+                                    CosmoDavConstants.NAMESPACE_TICKET)) {
+            throw new IllegalArgumentException("ticket request must not include ticket:owner");
+        }
+
+        String timeout =
+            DomUtil.getChildTextTrim(root, CosmoDavConstants.ELEMENT_TIMEOUT,
+                                     CosmoDavConstants.NAMESPACE_TICKET);
         if (timeout != null &&
             ! timeout.equals(CosmoDavConstants.VALUE_INFINITE)) {
             try {
                 int seconds = Integer.parseInt(timeout.substring(7));
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("malformed timeout value " +
-                                                   timeout);
+                throw new IllegalArgumentException("malformed ticket:timeout value " + timeout);
             }
         } else {
             timeout = CosmoDavConstants.VALUE_INFINITE;
@@ -199,26 +197,27 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
         // visit limits are not supported
 
         Element privilege =
-            root.getChild(CosmoDavConstants.ELEMENT_PRIVILEGE,
-                          DavConstants.NAMESPACE);
+            DomUtil.getChildElement(root, CosmoDavConstants.ELEMENT_PRIVILEGE,
+                                    DavConstants.NAMESPACE);
         if (privilege == null) {
-            throw new IllegalArgumentException("ticket request missing privileges");
+            throw new IllegalArgumentException("ticket request missing DAV:privileges");
         }
-        if (privilege.getChild(CosmoDavConstants.ELEMENT_READ,
-                               DavConstants.NAMESPACE) == null &&
-            privilege.getChild(CosmoDavConstants.ELEMENT_WRITE,
-                               DavConstants.NAMESPACE) == null) {
-            throw new IllegalArgumentException("ticket request contains empty or invalid privileges");
+        Element read =
+            DomUtil.getChildElement(privilege, CosmoDavConstants.ELEMENT_READ,
+                                    DavConstants.NAMESPACE);
+        Element write =
+            DomUtil.getChildElement(privilege, CosmoDavConstants.ELEMENT_WRITE,
+                                    DavConstants.NAMESPACE);
+        if (read == null && write == null) {
+            throw new IllegalArgumentException("ticket request contains empty or invalid DAV:privileges");
         }
 
         Ticket ticket = new Ticket();
         ticket.setTimeout(timeout);
-        if (privilege.getChild(CosmoDavConstants.ELEMENT_READ,
-                               DavConstants.NAMESPACE) != null) {
+        if (read != null) {
             ticket.getPrivileges().add(Ticket.PRIVILEGE_READ);
         }
-        if (privilege.getChild(CosmoDavConstants.ELEMENT_WRITE,
-                               DavConstants.NAMESPACE) != null) {
+        if (write != null) {
             ticket.getPrivileges().add(Ticket.PRIVILEGE_WRITE);
         }
 
@@ -227,7 +226,7 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
 
     /**
      * This is the Cosmo specific report handling.
-     * 
+     *
      * TODO Eventually this will be punted up into jackrabbit.
      */
     public ReportInfo getCosmoReportInfo() {
@@ -235,7 +234,7 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
         if (requestDocument == null) {
             return null;
         }
-        return new ReportInfo(requestDocument.getRootElement(),
+        return new ReportInfo(requestDocument.getDocumentElement(),
                               getDepth(DEPTH_0),
                               getDavSession());
     }

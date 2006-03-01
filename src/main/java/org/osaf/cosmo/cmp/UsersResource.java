@@ -22,10 +22,12 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
 
 import org.osaf.cosmo.model.User;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * An interface for Cosmo API resources
@@ -58,7 +60,7 @@ public class UsersResource implements CmpResource {
 
     /**
      * Returns an XML representation of the resource in the form of a
-     * {@link org.jdom.Document}.
+     * {@link org.w3c.dom.Element}.
      *
      * The XML is structured like so:
      *
@@ -73,15 +75,14 @@ public class UsersResource implements CmpResource {
      * where the structure of the <code>user</code> element is defined
      * by {@link UserResource}.
      */
-    public Document toXml() {
-        Element e = new Element(EL_USERS, NS_CMP);
+    public Element toXml(Document doc) {
+        Element e = DomUtil.createElement(doc, EL_USERS, NS_CMP);
         for (Iterator i=users.iterator(); i.hasNext();) {
             User user = (User) i.next();
-            Element ue = (Element)
-                (new UserResource(user, urlBase)).toXml().getContent(0).clone();
-            e.addContent(ue);
+            UserResource ur = new UserResource(user, urlBase);
+            e.appendChild(ur.toXml(doc));
         }
-        return new Document(e);
+        return e;
     }
 
     // our methods

@@ -24,17 +24,20 @@ import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.WebdavResponseImpl;
 import org.apache.jackrabbit.webdav.property.DavProperty;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
 import org.apache.log4j.Logger;
-
-import org.jdom.Document;
-import org.jdom.Element;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResponse;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
+import org.osaf.cosmo.dav.property.TicketDiscovery;
 import org.osaf.cosmo.model.Ticket;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Extends {@link org.apache.jackrabbit.webdav.WebdavResponseImpl} and
@@ -47,8 +50,9 @@ public class CosmoDavResponseImpl extends WebdavResponseImpl
 
     /**
      */
-    public CosmoDavResponseImpl(HttpServletResponse response) {
-        super(response);
+    public CosmoDavResponseImpl(HttpServletResponse response,
+                                boolean noCache) {
+        super(response, noCache);
     }
 
     // TicketDavResponse methods
@@ -65,15 +69,27 @@ public class CosmoDavResponseImpl extends WebdavResponseImpl
         throws DavException, IOException {
         setHeader(CosmoDavConstants.HEADER_TICKET, ticketId);
 
-        Element prop = new Element(CosmoDavConstants.ELEMENT_PROP,
-                                   DavConstants.NAMESPACE);
-        prop.addNamespaceDeclaration(CosmoDavConstants.NAMESPACE_TICKET);
-
-        DavProperty ticketdiscovery =
+        TicketDiscovery ticketdiscovery = (TicketDiscovery)
             resource.getProperties().get(CosmoDavPropertyName.TICKETDISCOVERY);
-        prop.addContent(ticketdiscovery.toXml());
+        MkTicketInfo info = new MkTicketInfo(ticketdiscovery);
 
-        sendXmlResponse(new Document(prop), SC_OK);
+        sendXmlResponse(info, SC_OK);
+    }
+
+    private class MkTicketInfo implements XmlSerializable {
+        private TicketDiscovery td;
+
+        public MkTicketInfo(TicketDiscovery td) {
+            this.td = td;
+        }
+
+        public Element toXml(Document document) {
+            Element prop =
+                DomUtil.createElement(document, CosmoDavConstants.ELEMENT_PROP,
+                                      DavConstants.NAMESPACE);
+            prop.appendChild(td.toXml(document));
+            return prop;
+        }
     }
 
     /**

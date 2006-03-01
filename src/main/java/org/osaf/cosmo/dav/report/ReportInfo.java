@@ -18,7 +18,9 @@ package org.osaf.cosmo.dav.report;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+
+import org.w3c.dom.Element;
 
 /**
  * This class is copied pretty much verbatim from
@@ -92,8 +94,9 @@ public class ReportInfo {
      *         element or an empty set.
      */
     public DavPropertyNameSet getPropertyNameSet() {
-        Element propElement = reportElement.getChild(DavConstants.XML_PROP,
-                DavConstants.NAMESPACE);
+        Element propElement =
+            DomUtil.getChildElement(reportElement, DavConstants.XML_PROP,
+                                    DavConstants.NAMESPACE);
         if (propElement != null) {
             return new DavPropertyNameSet(propElement);
         } else {

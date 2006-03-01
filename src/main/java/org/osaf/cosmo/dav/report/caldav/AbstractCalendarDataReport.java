@@ -42,17 +42,19 @@ import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.jdom.Document;
-import org.jdom.Element;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author cyrusdaboo
@@ -94,14 +96,8 @@ public abstract class AbstractCalendarDataReport
 
     /**
      * Run the report
-     * 
-     * @return Xml <code>Document</code> as defined by <a
-     *         href="http://www.ietf.org/rfc/rfc2518.txt">RFC 2518</a>
-     * @throws DavException
-     * @see Report#toXml()
      */
-    public Document toXml()
-        throws DavException {
+    public Element toXml(Document document) {
         // Get parent's href as we use this a bit
         String parentHref = resource.getHref();
 
@@ -110,8 +106,8 @@ public abstract class AbstractCalendarDataReport
         String host = parentHref.substring(0, parentHref.indexOf("/", 8));
 
         // Look for and parse any filter items here
-        if (calendarDataElement != null
-                && calendarDataElement.getChildren().size() != 0) {
+        if (calendarDataElement != null &&
+            DomUtil.getChildren(calendarDataElement).hasNext()) {
 
             // Grab an ical4j calendar data output filter
             outputFilter = parseCalendarData(calendarDataElement);
@@ -133,7 +129,7 @@ public abstract class AbstractCalendarDataReport
             if (!Text.isDescendantOrEqual(parentHref, href)) {
                 throw new IllegalArgumentException(
                         "CALDAV:"
-                                + info.getReportElement().getName()
+                                + info.getReportElement().getNodeName()
                                 + " href element is not a child or equal to request href.");
             }
 
@@ -144,13 +140,13 @@ public abstract class AbstractCalendarDataReport
             // Check it is a child or the same
             if (hrefResource == null) {
                 throw new IllegalArgumentException("CALDAV:"
-                        + info.getReportElement().getName()
+                        + info.getReportElement().getNodeName()
                         + " href element could not be resolved.");
             }
 
             buildMultiStatus(hrefResource, ms);
         }
-        return ms.toXml();
+        return ms.toXml(document);
     }
 
     /**
@@ -162,9 +158,7 @@ public abstract class AbstractCalendarDataReport
      * @throws DavException
      * @see #getResponse(DavResource, List)
      */
-    protected void buildMultiStatus(DavResource res, MultiStatus ms)
-        throws DavException {
-
+    protected void buildMultiStatus(DavResource res, MultiStatus ms) {
         // Generate response
         CalDAVMultiStatusResponse response = new CalDAVMultiStatusResponse(res,
                 propfindProps, propfindType);
@@ -196,25 +190,19 @@ public abstract class AbstractCalendarDataReport
 
                 } catch (IOException e) {
                     String msg = "Error while running CALDAV:" +
-                        info.getReportElement().getName() + " report";
+                        info.getReportElement().getNodeName() + " report";
                     log.error(msg, e);
-                    throw new DavException(DavServletResponse.
-                                           SC_INTERNAL_SERVER_ERROR,
-                                           msg);
+                    throw new RuntimeException(msg, e);
                 } catch (ParserException e) {
                     String msg = "Error while running CALDAV:" +
-                        info.getReportElement().getName() + " report";
+                        info.getReportElement().getNodeName() + " report";
                     log.error(msg, e);
-                    throw new DavException(DavServletResponse.
-                                           SC_INTERNAL_SERVER_ERROR,
-                                           msg);
+                    throw new RuntimeException(msg, e);
                 } catch (ValidationException e) {
                     String msg = "Error while running CALDAV:" +
-                        info.getReportElement().getName() + " report";
+                        info.getReportElement().getNodeName() + " report";
                     log.error(msg, e);
-                    throw new DavException(DavServletResponse.
-                                           SC_INTERNAL_SERVER_ERROR,
-                                           msg);
+                    throw new RuntimeException(msg, e);
                 }
             }
 
@@ -227,11 +215,9 @@ public abstract class AbstractCalendarDataReport
                 response.setCalendarData(calendarData, hasOldStyleCalendarData);
             } else {
                 String msg = "no calendar data for CALDAV:" +
-                    info.getReportElement().getName() + " report";
+                    info.getReportElement().getNodeName() + " report";
                 log.error(msg);
-                throw new DavException(DavServletResponse.
-                                       SC_INTERNAL_SERVER_ERROR,
-                                       msg);
+                throw new RuntimeException(msg);
             }
         }
 
@@ -298,10 +284,11 @@ public abstract class AbstractCalendarDataReport
         Period limitfb = null;
 
         // Look at each child element of calendar-data
-        for (Iterator iter = cdata.getChildren().iterator(); iter.hasNext();) {
+        for (ElementIterator iter = DomUtil.getChildren(cdata);
+             iter.hasNext();) {
 
-            Element child = (Element) iter.next();
-            if (CosmoDavConstants.ELEMENT_CALDAV_COMP.equals(child.getName())) {
+            Element child = iter.nextElement();
+            if (CosmoDavConstants.ELEMENT_CALDAV_COMP.equals(child.getLocalName())) {
 
                 // At the top-level of calendar-data there should only be one
                 // <comp> element as VCALENDAR components are the only top-level
@@ -310,8 +297,10 @@ public abstract class AbstractCalendarDataReport
                     return null;
 
                 // Get required name attribute and verify it is VCALENDAR
-                String name = child
-                        .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NAME);
+                String name = 
+                    DomUtil.getAttribute(child,
+                                         CosmoDavConstants.ATTR_CALDAV_NAME,
+                                         null);
                 if ((name == null) || !Calendar.VCALENDAR.equals(name))
                     return null;
 
@@ -321,15 +310,15 @@ public abstract class AbstractCalendarDataReport
                 // TODO expand-recurrence-set was removed in -08 draft, but is
                 // here for backwards compatability
             } else if (CosmoDavConstants.ELEMENT_CALDAV_EXPAND_RECURRENCE_SET
-                    .equals(child.getName())
+                    .equals(child.getLocalName())
                     || CosmoDavConstants.ELEMENT_CALDAV_EXPAND.equals(child
-                            .getName())) {
+                            .getLocalName())) {
                 expand = parsePeriod(child);
             } else if (CosmoDavConstants.ELEMENT_CALDAV_LIMIT_RECURRENCE_SET
-                    .equals(child.getName())) {
+                    .equals(child.getLocalName())) {
                 limit = parsePeriod(child);
             } else if (CosmoDavConstants.ELEMENT_CALDAV_LIMIT_FREEBUSY_SET
-                    .equals(child.getName())) {
+                    .equals(child.getLocalName())) {
                 limitfb = parsePeriod(child);
             }
         }
@@ -356,10 +345,10 @@ public abstract class AbstractCalendarDataReport
     }
 
     private OutputFilter parseCalendarDataComp(Element comp) {
-
         // Get required name attribute
-        String name = comp
-                .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NAME);
+        String name =
+            DomUtil.getAttribute(comp, CosmoDavConstants.ATTR_CALDAV_NAME,
+                                 null);
         if (name == null)
             return null;
 
@@ -367,10 +356,11 @@ public abstract class AbstractCalendarDataReport
         OutputFilter result = new OutputFilter(name);
 
         // Look at each child element
-        for (Iterator iter = comp.getChildren().iterator(); iter.hasNext();) {
-            Element child = (Element) iter.next();
+        ElementIterator i = DomUtil.getChildren(comp);
+        while (i.hasNext()) {
+            Element child = i.nextElement();
             if (CosmoDavConstants.ELEMENT_CALDAV_ALLCOMP
-                    .equals(child.getName())) {
+                    .equals(child.getLocalName())) {
                 // Validity check
                 if (result.hasSubComponentFilters()) {
                     result = null;
@@ -379,7 +369,7 @@ public abstract class AbstractCalendarDataReport
                 result.setAllSubComponents();
 
             } else if (CosmoDavConstants.ELEMENT_CALDAV_ALLPROP.equals(child
-                    .getName())) {
+                    .getLocalName())) {
                 // Validity check
                 if (result.hasPropertyFilters()) {
                     result = null;
@@ -388,7 +378,7 @@ public abstract class AbstractCalendarDataReport
                 result.setAllProperties();
 
             } else if (CosmoDavConstants.ELEMENT_CALDAV_COMP.equals(child
-                    .getName())) {
+                    .getLocalName())) {
                 // Validity check
                 if (result.isAllSubComponents()) {
                     result = null;
@@ -401,7 +391,7 @@ public abstract class AbstractCalendarDataReport
                 } else
                     result.addSubComponent(subfilter);
             } else if (CosmoDavConstants.ELEMENT_CALDAV_PROP.equals(child
-                    .getName())) {
+                    .getLocalName())) {
                 // Validity check
                 if (result.isAllProperties()) {
                     result = null;
@@ -409,8 +399,10 @@ public abstract class AbstractCalendarDataReport
                 }
 
                 // Get required name attribute
-                String propname = child
-                        .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NAME);
+                String propname =
+                    DomUtil.getAttribute(child,
+                                         CosmoDavConstants.ATTR_CALDAV_NAME,
+                                         null);
                 if (propname == null) {
                     result = null;
                     return null;
@@ -418,8 +410,10 @@ public abstract class AbstractCalendarDataReport
 
                 // Get optional novalue attribute
                 boolean novalue = false;
-                String novaluetxt = child
-                        .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_NOVALUE);
+                String novaluetxt =
+                    DomUtil.getAttribute(child,
+                                         CosmoDavConstants.ATTR_CALDAV_NOVALUE,
+                                         null);
                 if (novaluetxt != null) {
                     if (CosmoDavConstants.VALUE_YES.equals(novaluetxt))
                         novalue = true;
@@ -442,15 +436,17 @@ public abstract class AbstractCalendarDataReport
     private Period parsePeriod(Element node) {
         try {
             // Get start (must be present)
-            String start = node
-                    .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_START);
+            String start =
+                DomUtil.getAttribute(node,
+                                     CosmoDavConstants.ATTR_CALDAV_START, null);
             if (start == null)
                 return null;
             DateTime trstart = new DateTime(start);
 
             // Get end (must be present)
-            String end = node
-                    .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_END);
+            String end =
+                DomUtil.getAttribute(node,
+                                     CosmoDavConstants.ATTR_CALDAV_END, null);
             if (end == null)
                 return null;
             DateTime trend = new DateTime(end);

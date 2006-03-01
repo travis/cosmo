@@ -16,7 +16,6 @@
 package org.osaf.cosmo.dav.report.caldav;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Vector;
 
 import javax.jcr.RepositoryException;
@@ -27,17 +26,19 @@ import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.jdom.Document;
-import org.jdom.Element;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.dav.report.ReportType;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author cyrusdaboo
@@ -79,7 +80,7 @@ public class QueryReport extends AbstractCalendarQueryReport {
         throws IllegalArgumentException {
         if (info == null
                 || !CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_QUERY.equals(info
-                        .getReportElement().getName())) {
+                        .getReportElement().getLocalName())) {
             throw new IllegalArgumentException(
                     "CALDAV:calendar-query element expected.");
         }
@@ -95,10 +96,10 @@ public class QueryReport extends AbstractCalendarQueryReport {
         hasOldStyleCalendarData = false;
         boolean gotPropType = false;
 
-        List childList = info.getReportElement().getChildren();
-        for (int i = 0; i < childList.size(); i++) {
-            Element child = (Element) childList.get(i);
-            String nodeName = child.getName();
+        ElementIterator i = DomUtil.getChildren(info.getReportElement());
+        while (i.hasNext()) {
+            Element child = i.nextElement();
+            String nodeName = child.getLocalName();
             if (XML_PROP.equals(nodeName)) {
                 if (gotPropType) {
                     throw new IllegalArgumentException(
@@ -119,7 +120,8 @@ public class QueryReport extends AbstractCalendarQueryReport {
 
                         // Now find the calendar-data element inside the prop
                         // element and cache that
-                        calendarDataElement = child.getChild(
+                        calendarDataElement =
+                            DomUtil.getChildElement(child,
                                 CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
                                 CosmoDavConstants.NAMESPACE_CALDAV);
                     }
@@ -162,12 +164,8 @@ public class QueryReport extends AbstractCalendarQueryReport {
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see org.osaf.cosmo.dav.report.caldav.AbstractCalendarDataReport#toXml()
      */
-    public Document toXml()
-        throws DavException {
+    public Element toXml(Document doc) {
         // This is the meaty part of the query report. What wse do here is
         // execute the query and generate the list of hrefs that match. We then
         // hand that off to the base class to complete the actual multi-status
@@ -186,13 +184,14 @@ public class QueryReport extends AbstractCalendarQueryReport {
 
         } catch (RepositoryException e) {
             String msg = "Error while running CALDAV:" +
-                info.getReportElement().getName() + " report";
+                info.getReportElement().getLocalName() + " report";
             log.error(msg, e);
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                                   msg);
+            // XXX: refactor so that the query is executed in a
+            // different method that throws a checked exception
+            throw new RuntimeException(msg, e);
         }
 
         // Hand off to parent with list of matching hrefs now complete
-        return super.toXml();
+        return super.toXml(doc);
     }
 }

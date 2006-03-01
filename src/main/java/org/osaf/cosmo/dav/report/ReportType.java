@@ -20,12 +20,18 @@ import java.util.HashMap;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.version.DeltaVConstants;
-import org.jdom.Element;
-import org.jdom.Namespace;
+
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.report.caldav.FreeBusyReport;
 import org.osaf.cosmo.dav.report.caldav.MultigetReport;
 import org.osaf.cosmo.dav.report.caldav.QueryReport;
+
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.Namespace;
+import org.apache.jackrabbit.webdav.xml.XmlSerializable;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class is copied pretty much verbatim from
@@ -35,7 +41,7 @@ import org.osaf.cosmo.dav.report.caldav.QueryReport;
 /**
  * <code>ReportType</code>...
  */
-public class ReportType implements DeltaVConstants {
+public class ReportType implements DeltaVConstants, XmlSerializable {
 
     private static final HashMap types = new HashMap();
     public static final ReportType CALDAV_QUERY = register(
@@ -87,8 +93,8 @@ public class ReportType implements DeltaVConstants {
      * 
      * @return Xml representation
      */
-    public Element toXml() {
-        return new Element(name, namespace);
+    public Element toXml(Document document) {
+        return DomUtil.createElement(document, name, namespace);
     }
 
     /**
@@ -102,8 +108,10 @@ public class ReportType implements DeltaVConstants {
         if (reqInfo != null) {
             Element elem = reqInfo.getReportElement();
             if (elem != null) {
-                return name.equals(elem.getName())
-                        && namespace.equals(elem.getNamespace());
+                Namespace ns = Namespace.getNamespace(elem.getPrefix(),
+                                                      elem.getNamespaceURI());
+                return (name.equals(elem.getLocalName()) &&
+                        namespace.equals(ns));
             }
         }
         return false;
@@ -130,7 +138,7 @@ public class ReportType implements DeltaVConstants {
                     "A ReportType cannot be registered with a null name, namespace or report class");
         }
 
-        String key = buildKey(namespace, name);
+        String key = buildKey(namespace.getURI(), name);
         if (types.containsKey(key)) {
             return (ReportType) types.get(key);
         } else {
@@ -177,8 +185,8 @@ public class ReportType implements DeltaVConstants {
         if (reportInfo == null) {
             throw new IllegalArgumentException("ReportInfo must not be null.");
         }
-        String key = buildKey(reportInfo.getReportElement().getNamespace(),
-                reportInfo.getReportElement().getName());
+        String key = buildKey(reportInfo.getReportElement().getNamespaceURI(),
+                reportInfo.getReportElement().getLocalName());
         if (types.containsKey(key)) {
             return (ReportType) types.get(key);
         } else {
@@ -188,13 +196,13 @@ public class ReportType implements DeltaVConstants {
     }
 
     /**
-     * Build the key from the given namespace and name.
+     * Build the key from the given namespace URI and local name.
      * 
-     * @param namespace
-     * @param name
+     * @param namespace URI
+     * @param local name
      * @return key identifying the report with the given namespace and name
      */
-    private static String buildKey(Namespace namespace, String name) {
-        return "{" + namespace.getURI() + "}" + name;
+    private static String buildKey(String uri, String name) {
+        return "{" + uri + "}" + name;
     }
 }

@@ -20,13 +20,13 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.TimeZone;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import net.fortuna.ical4j.model.*;
 import net.fortuna.ical4j.model.component.*;
 import net.fortuna.ical4j.model.parameter.*;
 import net.fortuna.ical4j.model.property.*;
-
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.model.Ticket;
@@ -35,9 +35,14 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.mock.MockAnonymousPrincipal;
 import org.osaf.cosmo.security.mock.MockUserPrincipal;
 
+import org.w3c.dom.Document;
+
 /**
  */
 public class TestHelper {
+    protected static final DocumentBuilderFactory BUILDER_FACTORY =
+        DocumentBuilderFactory.newInstance();
+
     static int apseq = 0;
     static int eseq = 0;
     static int rseq = 0;
@@ -196,7 +201,8 @@ public class TestHelper {
         if (in == null) {
             throw new IllegalStateException("resource " + name + " not found");
         }
-        SAXBuilder builder = new SAXBuilder(false);
-        return builder.build(in);
+        BUILDER_FACTORY.setNamespaceAware(true);
+        DocumentBuilder docBuilder = BUILDER_FACTORY.newDocumentBuilder();
+        return docBuilder.parse(in);
     }
 }

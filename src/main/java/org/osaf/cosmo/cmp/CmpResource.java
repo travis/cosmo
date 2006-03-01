@@ -15,13 +15,16 @@
  */
 package org.osaf.cosmo.cmp;
 
-import org.jdom.Document;
-import org.jdom.Namespace;
+import org.apache.jackrabbit.webdav.xml.Namespace;
+import org.apache.jackrabbit.webdav.xml.XmlSerializable;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * An interface for CMP resources.
  */
-public interface CmpResource {
+public interface CmpResource extends XmlSerializable {
 
     /**
      */
@@ -32,10 +35,4 @@ public interface CmpResource {
      * Returns the entity instance that backs this resource.
      */
     public Object getEntity();
-
-    /**
-     * Returns an XML representation of the resource in the form of a
-     * {@link org.jdom.Document}.
-     */
-    public Document toXml();
 }

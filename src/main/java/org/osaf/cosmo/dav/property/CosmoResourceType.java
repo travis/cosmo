@@ -19,8 +19,6 @@ import org.apache.jackrabbit.webdav.property.ResourceType;
 
 import org.apache.log4j.Logger;
 
-import org.jdom.Element;
-
 import org.osaf.cosmo.dav.CosmoDavConstants;
 
 /**

@@ -15,21 +15,12 @@
  */
 package org.osaf.cosmo.dav;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
 import javax.servlet.ServletContextEvent;
-
-import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
+import org.osaf.cosmo.BaseMockServletTestCase;
 import org.osaf.cosmo.dao.jcr.JcrTestHelper;
 import org.osaf.cosmo.dao.mock.MockTicketDao;
 import org.osaf.cosmo.dav.CosmoDavServlet;
@@ -39,29 +30,27 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.mock.MockSecurityManager;
 import org.osaf.cosmo.security.mock.MockUserPrincipal;
 
-import org.springframework.mock.web.MockServletConfig;
-import org.springframework.mock.web.MockServletContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Base class for WebDAV+extensions servlet test cases.
  */
-public abstract class BaseDavServletTestCase extends TestCase {
+public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
     private static final Log log =
         LogFactory.getLog(BaseDavServletTestCase.class);
 
     private static final String SERVLET_PATH = "/home";
 
     private JackrabbitTestSessionManager sessionManager;
-    protected MockSecurityManager securityManager;
     protected JcrTestHelper testHelper;
-    protected MockServletContext servletContext;
     protected CosmoDavServlet servlet;
 
     /**
      */
     protected void setUp() throws Exception {
+        super.setUp();
+
         // XXX: refactor CosmoDavServlet.init so that we can provide
         // our own mock session provider, locator factory, and
         // resource factory; then we never need to actually hit the
@@ -70,66 +59,31 @@ public abstract class BaseDavServletTestCase extends TestCase {
         sessionManager = new JackrabbitTestSessionManager();
         sessionManager.setUp();
 
-        securityManager = new MockSecurityManager();
-
         testHelper = new JcrTestHelper(sessionManager.getSession());
-
-        servletContext = new MockServletContext();
 
         // load special query language extension
         TextFilterListener listener = new TextFilterListener();
-        listener.contextInitialized(new ServletContextEvent(servletContext));
+        listener.
+            contextInitialized(new ServletContextEvent(getServletContext()));
 
-        MockServletConfig servletConfig = new MockServletConfig(servletContext);
-        servletConfig.
+        getServletConfig().
             addInitParameter(CosmoDavServlet.INIT_PARAM_RESOURCE_PATH_PREFIX,
                              "/home");
-        servletConfig.
+        getServletConfig().
             addInitParameter(CosmoDavServlet.INIT_PARAM_RESOURCE_CONFIG,
                              "/resource-config.xml");
 
         servlet = new CosmoDavServlet();
-        servlet.setSecurityManager(securityManager);
+        servlet.setSecurityManager(getSecurityManager());
         servlet.setSessionFactory(sessionManager.getSessionFactory());
         servlet.setTicketDao(new MockTicketDao());
-        servlet.init(servletConfig);
+        servlet.init(getServletConfig());
     }
 
     protected void tearDown() throws Exception {
         servlet.destroy();
-
         sessionManager.tearDown();
-    }
-
-    /**
-     */
-    protected MockHttpServletRequest createMockRequest(String method,
-                                                       String davPath) {
-        MockHttpServletRequest request =
-            new MockHttpServletRequest(servletContext, method,
-                                       SERVLET_PATH + davPath);
-        request.setServletPath(SERVLET_PATH);
-        request.setPathInfo(davPath);
-        return request;
-    }
-
-    /**
-     */
-    protected void logInUser(User user) {
-        securityManager.setUpMockSecurityContext(new MockUserPrincipal(user));
-    }
-
-    /**
-     */
-    protected void sendXmlRequest(MockHttpServletRequest request,
-                                  Document doc)
-        throws Exception {
-        XMLOutputter outputter = new XMLOutputter(Format.getCompactFormat());
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        outputter.output(doc, buf);
-        request.setContentType("text/xml");
-        request.setCharacterEncoding("UTF-8");
-        request.setContent(buf.toByteArray());;
+        super.tearDown();
     }
 
     /**
@@ -144,19 +98,15 @@ public abstract class BaseDavServletTestCase extends TestCase {
 
     /**
      */
-    protected Document readXmlResponse(MockHttpServletResponse response)
-        throws Exception {
-        ByteArrayInputStream in =
-            new ByteArrayInputStream(response.getContentAsByteArray());
-        SAXBuilder builder = new SAXBuilder(false);
-        return builder.build(in);
-    }
-
-    /**
-     */
     protected MultiStatus
         readMultiStatusResponse(MockHttpServletResponse response)
         throws Exception {
         return MultiStatus.createFromXml(readXmlResponse(response));
+    }
+
+    /**
+     */
+    public String getServletPath() {
+        return SERVLET_PATH;
     }
 }

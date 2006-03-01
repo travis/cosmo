@@ -19,12 +19,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
-
-import org.jdom.Element;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Document;
 
 /**
  * Represents the CalDAV supported-calendar-data property.
@@ -39,29 +43,34 @@ public class SupportedCalendarData extends AbstractDavProperty
     }
 
     /**
-     * Returns an <code>Element</code> representing this property.
+     * (Returns a
+     * <code>SupportedCalendarData.SupportedCalendarDataInfo</code>
+     * for this property.
      */
-    public Element toXml() {
-        Element element = getName().toXml();
-        if (getValue() != null) {
-            element.addContent((Set) getValue());
-        }
-        return element;
+    public Object getValue() {
+        return new SupportedCalendarDataInfo();
     }
 
     /**
-     * (Returns a <code>Set</code> of <code>Element</code>s
-     * representing the data of this property.
      */
-    public Object getValue() {
-        Set elements = new HashSet();
-        Element element =
-            new Element(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
-                        CosmoDavConstants.NAMESPACE_CALDAV);
-        element.setAttribute(CosmoDavConstants.ATTR_CALDAV_CONTENT_TYPE,
-                             CONTENT_TYPE);
-        element.setAttribute(CosmoDavConstants.ATTR_CALDAV_VERSION, VERSION);
-        elements.add(element);
-        return elements;
+    public class SupportedCalendarDataInfo implements XmlSerializable {
+  
+        /**
+         */
+        public Element toXml(Document document) {
+            Element element = DomUtil.
+                createElement(document,
+                              CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
+                              CosmoDavConstants.NAMESPACE_CALDAV);
+            DomUtil.setAttribute(element,
+                                 CosmoDavConstants.ATTR_CALDAV_CONTENT_TYPE,
+                                 CosmoDavConstants.NAMESPACE_CALDAV,
+                                 CONTENT_TYPE);
+            DomUtil.setAttribute(element,
+                                 CosmoDavConstants.ATTR_CALDAV_VERSION,
+                                 CosmoDavConstants.NAMESPACE_CALDAV,
+                                 VERSION);
+            return element;
+        }
     }
 }

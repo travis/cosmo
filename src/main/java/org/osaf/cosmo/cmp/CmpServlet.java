@@ -18,21 +18,22 @@ package org.osaf.cosmo.cmp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
 
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.model.ModelValidationException;
@@ -45,6 +46,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import org.w3c.dom.Document;
+
+import org.xml.sax.SAXException;
 
 /**
  * A servlet which implements a RESTful HTTP-based protocol for Cosmo
@@ -91,6 +96,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class CmpServlet extends HttpServlet {
     private static final Log log = LogFactory.getLog(CmpServlet.class);
+    private static final DocumentBuilderFactory BUILDER_FACTORY =
+        DocumentBuilderFactory.newInstance();
 
     private static final String BEAN_USER_SERVICE =
         "userService";
@@ -357,7 +364,7 @@ public class CmpServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("Content-Location", resource.getHomedirUrl()); 
             resp.setHeader("ETag", resource.getEntityTag());
-        } catch (JDOMException e) {
+        } catch (SAXException e) {
             log.warn("error parsing request body: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            "Error parsing request body: " + e.getMessage());
@@ -398,7 +405,7 @@ public class CmpServlet extends HttpServlet {
             userService.updateUser(user);
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             resp.setHeader("ETag", resource.getEntityTag());
-        } catch (JDOMException e) {
+        } catch (SAXException e) {
             log.warn("error parsing request body: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            "Error parsing request body: " + e.getMessage());
@@ -436,7 +443,7 @@ public class CmpServlet extends HttpServlet {
             userService.createUser(user);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("ETag", resource.getEntityTag());
-        } catch (JDOMException e) {
+        } catch (SAXException e) {
             log.warn("error parsing request body: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            "Error parsing request body: " + e.getMessage());
@@ -470,7 +477,7 @@ public class CmpServlet extends HttpServlet {
             if (! user.getUsername().equals(urlUsername)) {
                 resp.setHeader("Content-Location", resource.getUserUrl());
             }
-        } catch (JDOMException e) {
+        } catch (SAXException e) {
             log.warn("error parsing request body: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                            "Error parsing request body: " + e.getMessage());
@@ -550,26 +557,54 @@ public class CmpServlet extends HttpServlet {
     /**
      */
     private Document readXmlRequest(HttpServletRequest req)
-        throws JDOMException, IOException {
+        throws SAXException, IOException {
+        if (req.getContentLength() == 0) {
+            return null;
+        }
         InputStream in = req.getInputStream();
         if (in == null) {
             return null;
         }
-        SAXBuilder builder = new SAXBuilder(false);
-        return builder.build(in);
+
+        // check to see if there's any data to read
+        PushbackInputStream filtered =
+            new PushbackInputStream(in, 1);
+        int read = filtered.read();
+        if (read == -1) {
+            return null;
+        }
+        filtered.unread(read);
+
+        // there is data, so read the stream
+        try {
+            BUILDER_FACTORY.setNamespaceAware(true);
+            DocumentBuilder docBuilder = BUILDER_FACTORY.newDocumentBuilder();
+            return docBuilder.parse(filtered);
+        } catch (ParserConfigurationException e) {
+            throw new CmpException("error configuring xml builder", e);
+        }
     }
 
     /**
      */
     private void sendXmlResponse(HttpServletResponse resp,
                                  CmpResource resource)
-        throws IOException {
-        // pretty format is easier for CMP scripters to read
-        XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-        // write xml into a byte array so we can calculate length
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        outputter.output(resource.toXml(), buf);
-        byte[] bytes = buf.toByteArray();
+        throws ServletException, IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+ 
+        try {
+            Document doc =
+                BUILDER_FACTORY.newDocumentBuilder().newDocument();
+            doc.appendChild(resource.toXml(doc));
+            OutputFormat format = new OutputFormat("xml", "UTF-8", true);
+            XMLSerializer serializer = new XMLSerializer(out, format);
+            serializer.setNamespaces(true);
+            serializer.asDOMSerializer().serialize(doc);
+        } catch (ParserConfigurationException e) {
+            throw new CmpException("error configuring xml builder", e);
+        }
+ 
+        byte[] bytes = out.toByteArray();
         resp.setContentType("text/xml");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentLength(bytes.length);

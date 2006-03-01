@@ -59,12 +59,11 @@ import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.jdom.Document;
-import org.jdom.Element;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
@@ -72,6 +71,9 @@ import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.dav.report.ReportType;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author cyrusdaboo
@@ -114,7 +116,7 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
         throws IllegalArgumentException {
         if (info == null
                 || !CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_FREEBUSY
-                        .equals(info.getReportElement().getName())) {
+                        .equals(info.getReportElement().getLocalName())) {
             throw new IllegalArgumentException(
                     "CALDAV:free-busy-query element expected.");
         }
@@ -122,10 +124,10 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
 
         // Parse the report element.
 
-        List childList = info.getReportElement().getChildren();
-        for (int i = 0; i < childList.size(); i++) {
-            Element child = (Element) childList.get(i);
-            String nodeName = child.getName();
+        ElementIterator i = DomUtil.getChildren(info.getReportElement());
+        while (i.hasNext()) {
+            Element child = i.nextElement();
+            String nodeName = child.getLocalName();
             if (CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE.equals(nodeName)) {
 
                 // Can only have one filter
@@ -150,66 +152,75 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
                 // </C:comp-filter>
                 // </C:filter>
 
-                Element calendarFilter = new Element(
+                Document doc = info.getReportElement().getOwnerDocument();
+                Element calendarFilter =
+                    DomUtil.createElement(doc,
                         CosmoDavConstants.ELEMENT_CALDAV_FILTER,
                         CosmoDavConstants.NAMESPACE_CALDAV);
 
-                Element compFilterVCalendar = new Element(
+                Element compFilterVCalendar =
+                    DomUtil.createElement(doc,
                         CosmoDavConstants.ELEMENT_CALDAV_COMP_FILTER,
                         CosmoDavConstants.NAMESPACE_CALDAV);
                 compFilterVCalendar.setAttribute(
                         CosmoDavConstants.ATTR_CALDAV_NAME, "VCALENDAR");
-                calendarFilter.getChildren().add(compFilterVCalendar);
+                calendarFilter.appendChild(compFilterVCalendar);
 
-                Element compFilterVEvent = new Element(
+                Element compFilterVEvent =
+                    DomUtil.createElement(doc,
                         CosmoDavConstants.ELEMENT_CALDAV_COMP_FILTER,
                         CosmoDavConstants.NAMESPACE_CALDAV);
                 compFilterVEvent.setAttribute(
                         CosmoDavConstants.ATTR_CALDAV_NAME, "VEVENT");
-                compFilterVCalendar.getChildren().add(compFilterVEvent);
+                compFilterVCalendar.appendChild(compFilterVEvent);
 
-                Element timeRange = new Element(
+                Element timeRange =
+                    DomUtil.createElement(doc,
                         CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE,
                         CosmoDavConstants.NAMESPACE_CALDAV);
-                timeRange
-                        .setAttribute(
-                                CosmoDavConstants.ATTR_CALDAV_START,
-                                child
-                                        .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_START));
-                timeRange.setAttribute(CosmoDavConstants.ATTR_CALDAV_END, child
-                        .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_END));
-                compFilterVEvent.getChildren().add(timeRange);
+                timeRange.setAttribute(CosmoDavConstants.ATTR_CALDAV_START,
+                        DomUtil.getAttribute(child,
+                            CosmoDavConstants.ATTR_CALDAV_START, null));
+                timeRange.setAttribute(CosmoDavConstants.ATTR_CALDAV_END,
+                        DomUtil.getAttribute(child,
+                            CosmoDavConstants.ATTR_CALDAV_END, null));
+                compFilterVEvent.appendChild(timeRange);
 
-                Element compFilterVFreeBusy = new Element(
+                Element compFilterVFreeBusy =
+                    DomUtil.createElement(doc,
                         CosmoDavConstants.ELEMENT_CALDAV_COMP_FILTER,
                         CosmoDavConstants.NAMESPACE_CALDAV);
                 compFilterVFreeBusy.setAttribute(
                         CosmoDavConstants.ATTR_CALDAV_NAME, "VFREEBUSY");
-                compFilterVCalendar.getChildren().add(compFilterVFreeBusy);
+                compFilterVCalendar.appendChild(compFilterVFreeBusy);
 
-                timeRange = new Element(
+                timeRange =
+                    DomUtil.createElement(doc,
                         CosmoDavConstants.ELEMENT_CALDAV_TIME_RANGE,
                         CosmoDavConstants.NAMESPACE_CALDAV);
-                timeRange
-                        .setAttribute(
-                                CosmoDavConstants.ATTR_CALDAV_START,
-                                child
-                                        .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_START));
-                timeRange.setAttribute(CosmoDavConstants.ATTR_CALDAV_END, child
-                        .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_END));
-                compFilterVFreeBusy.getChildren().add(timeRange);
+                timeRange.setAttribute(CosmoDavConstants.ATTR_CALDAV_START,
+                        DomUtil.getAttribute(child,
+                            CosmoDavConstants.ATTR_CALDAV_START, null));
+                timeRange.setAttribute(CosmoDavConstants.ATTR_CALDAV_END,
+                        DomUtil.getAttribute(child,
+                            CosmoDavConstants.ATTR_CALDAV_END, null));
+                compFilterVFreeBusy.appendChild(timeRange);
 
                 // Parse out fake filter element
                 filter = new QueryFilter();
                 filter.parseElement(calendarFilter);
 
                 try {
-                    DateTime start = new DateTime(
-                            child
-                                    .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_START));
-                    DateTime end = new DateTime(
-                            child
-                                    .getAttributeValue(CosmoDavConstants.ATTR_CALDAV_END));
+                    String s =
+                        DomUtil.getAttribute(child,
+                                             CosmoDavConstants.ATTR_CALDAV_START,
+                                             null);
+                    DateTime start = new DateTime(s);
+                    String e =
+                        DomUtil.getAttribute(child,
+                                             CosmoDavConstants.ATTR_CALDAV_END,
+                                             null);
+                    DateTime end = new DateTime(e);
                     freeBusyRange = new Period(start, end);
                 } catch (ParseException e) {
                     throw new IllegalArgumentException(
@@ -226,12 +237,8 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see org.osaf.cosmo.dav.report.caldav.AbstractCalendarDataReport#toXml()
      */
-    public Document toXml()
-        throws DavException {
+    public Element toXml(Document doc) {
         // This is the meaty part of the query report. What we do here is
         // execute the query and generate the list of hrefs that match. Then we
         // extract the VFREEBUSY info for each matching event.
@@ -249,19 +256,17 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
 
         } catch (RepositoryException e) {
             String msg = "Error while running CALDAV:" +
-                info.getReportElement().getName() + " report";
+                info.getReportElement().getLocalName() + " report";
             log.error(msg, e);
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                                   msg);
+            throw new RuntimeException(msg, e);
         }
 
         String calendarData = generateFreeBusy();
         if (calendarData == null) {
             String msg = "no calendar data for CALDAV:" +
-                info.getReportElement().getName() + " report";
+                info.getReportElement().getLocalName() + " report";
             log.error(msg);
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                                   msg);
+            throw new RuntimeException(msg);
         }
 
         // Generate multi-status response for this data
@@ -271,7 +276,7 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
         response.setCalendarData(calendarData, false);
         ms.addResponse(response);
 
-        return ms.toXml();
+        return ms.toXml(doc);
     }
 
     /**
@@ -280,8 +285,7 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
      * @return the iCalendar data
      * @throws DavException
      */
-    private String generateFreeBusy()
-        throws DavException {
+    private String generateFreeBusy() {
         // Policy: iterate over each href and extract the set of periods for
         // busy
         // time for each instance within the free-busy time-range request. Then
@@ -303,7 +307,7 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
             // Check it is a child or the same
             if (hrefResource == null) {
                 throw new IllegalArgumentException("CALDAV:"
-                        + info.getReportElement().getName()
+                        + info.getReportElement().getLocalName()
                         + " href element could not be resolved.");
             }
 
@@ -322,18 +326,14 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
 
             } catch (IOException e) {
                 String msg = "Error while running CALDAV:" +
-                    info.getReportElement().getName() + " report";
+                    info.getReportElement().getLocalName() + " report";
                 log.error(msg, e);
-                throw new DavException(DavServletResponse.
-                                       SC_INTERNAL_SERVER_ERROR,
-                                       msg);
+                throw new RuntimeException(msg, e);
             } catch (ParserException e) {
                 String msg = "Error while running CALDAV:" +
-                    info.getReportElement().getName() + " report";
+                    info.getReportElement().getLocalName() + " report";
                 log.error(msg, e);
-                throw new DavException(DavServletResponse.
-                                       SC_INTERNAL_SERVER_ERROR,
-                                       msg);
+                throw new RuntimeException(msg, e);
             }
 
         }
@@ -379,16 +379,14 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
             out.close();
         } catch (IOException e) {
             String msg = "Error while running CALDAV:" +
-                info.getReportElement().getName() + " report";
+                info.getReportElement().getLocalName() + " report";
             log.error(msg, e);
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                                   msg);
+            throw new RuntimeException(msg, e);
         } catch (ValidationException e) {
             String msg = "Error while running CALDAV:" +
-                info.getReportElement().getName() + " report";
+                info.getReportElement().getLocalName() + " report";
             log.error(msg, e);
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                                   msg);
+            throw new RuntimeException(msg, e);
         }
 
         // NB ical4j's outputter generates \r\n line ends but we

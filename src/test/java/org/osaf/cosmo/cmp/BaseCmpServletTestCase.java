@@ -15,38 +15,22 @@
  */
 package org.osaf.cosmo.cmp;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
-import junit.framework.TestCase;
-
 import org.apache.commons.id.random.SessionIdGenerator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
+import org.osaf.cosmo.BaseMockServletTestCase;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.cmp.CmpServlet;
 import org.osaf.cosmo.dao.mock.MockUserDao;
-import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.mock.MockSecurityManager;
-import org.osaf.cosmo.security.mock.MockUserPrincipal;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.impl.StandardUserService;
-
-import org.springframework.mock.web.MockServletConfig;
-import org.springframework.mock.web.MockServletContext;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Base class for CMP servlet test cases.
  */
-public abstract class BaseCmpServletTestCase extends TestCase {
+public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
     private static final Log log =
         LogFactory.getLog(BaseCmpServletTestCase.class);
 
@@ -54,26 +38,22 @@ public abstract class BaseCmpServletTestCase extends TestCase {
 
     protected TestHelper testHelper;
     protected UserService userService;
-    protected MockSecurityManager securityManager;
-    protected MockServletContext servletContext;
     protected CmpServlet servlet;
 
     /**
      */
     protected void setUp() throws Exception {
+        super.setUp();
+
         userService = createMockUserService();
         userService.init();
 
-        securityManager = new MockSecurityManager();
-
         testHelper = new TestHelper();
-
-        servletContext = new MockServletContext();
 
         servlet = new CmpServlet();
         servlet.setUserService(userService);
-        servlet.setSecurityManager(securityManager);
-        servlet.init(new MockServletConfig(servletContext));
+        servlet.setSecurityManager(getSecurityManager());
+        servlet.init(getServletConfig());
    }
 
     private UserService createMockUserService() {
@@ -85,42 +65,7 @@ public abstract class BaseCmpServletTestCase extends TestCase {
 
     /**
      */
-    protected MockHttpServletRequest createMockRequest(String method,
-                                                       String cmpPath) {
-        MockHttpServletRequest request =
-            new MockHttpServletRequest(servletContext, method,
-                                       SERVLET_PATH + cmpPath);
-        request.setServletPath(SERVLET_PATH);
-        request.setPathInfo(cmpPath);
-        return request;
-    }
-
-    /**
-     */
-    protected void logInUser(User user) {
-        securityManager.setUpMockSecurityContext(new MockUserPrincipal(user));
-    }
-
-    /**
-     */
-    protected void sendXmlRequest(MockHttpServletRequest request,
-                                  Document doc)
-        throws Exception {
-        XMLOutputter outputter = new XMLOutputter(Format.getCompactFormat());
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        outputter.output(doc, buf);
-        request.setContentType("text/xml");
-        request.setCharacterEncoding("UTF-8");
-        request.setContent(buf.toByteArray());;
-    }
-
-    /**
-     */
-    protected Document readXmlResponse(MockHttpServletResponse response)
-        throws Exception {
-        ByteArrayInputStream in =
-            new ByteArrayInputStream(response.getContentAsByteArray());
-        SAXBuilder builder = new SAXBuilder(false);
-        return builder.build(in);
+    public String getServletPath() {
+        return SERVLET_PATH;
     }
 }

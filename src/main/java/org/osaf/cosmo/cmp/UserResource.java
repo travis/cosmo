@@ -18,13 +18,13 @@ package org.osaf.cosmo.cmp;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.jdom.Content;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Text;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
 
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * A resource view of a {@link User}.
@@ -75,7 +75,7 @@ public class UserResource implements CmpResource {
     /**
      * Constructs a resource that represents the given {@link User}
      * and updates its properties as per the given
-     * {@link org.jdom.Document}.
+     * {@link org.w3c.dom.Document}.
      */
     public UserResource(User user, String urlBase, Document doc) {
         this.user = user;
@@ -87,7 +87,7 @@ public class UserResource implements CmpResource {
 
     /**
      * Constructs a resource that represents a {@link User}
-     * with properties as per the given {@link org.jdom.Document}.
+     * with properties as per the given {@link org.w3c.dom.Document}.
      */
     public UserResource(String urlBase, Document doc) {
         this.urlBase = urlBase;
@@ -108,7 +108,7 @@ public class UserResource implements CmpResource {
 
     /**
      * Returns an XML representation of the resource in the form of a
-     * {@link org.jdom.Document}.
+     * {@link org.w3c.dom.Element}.
      *
      * The XML is structured like so:
      *
@@ -125,36 +125,36 @@ public class UserResource implements CmpResource {
      *
      * The user's password is not included in the XML representation.
      */
-    public Document toXml() {
-        Element e = new Element(EL_USER, NS_CMP);
+    public Element toXml(Document doc) {
+        Element e =  DomUtil.createElement(doc, EL_USER, NS_CMP);
 
-        Element username = new Element(EL_USERNAME, NS_CMP);
-        username.addContent(user.getUsername());
-        e.addContent(username);
+        Element username = DomUtil.createElement(doc, EL_USERNAME, NS_CMP);
+        DomUtil.setText(username, user.getUsername());
+        e.appendChild(username);
 
-        Element firstName = new Element(EL_FIRSTNAME, NS_CMP);
-        firstName.addContent(user.getFirstName());
-        e.addContent(firstName);
+        Element firstName = DomUtil.createElement(doc, EL_FIRSTNAME, NS_CMP);
+        DomUtil.setText(firstName, user.getFirstName());
+        e.appendChild(firstName);
 
-        Element lastName = new Element(EL_LASTNAME, NS_CMP);
-        lastName.addContent(user.getLastName());
-        e.addContent(lastName);
+        Element lastName = DomUtil.createElement(doc, EL_LASTNAME, NS_CMP);
+        DomUtil.setText(lastName, user.getLastName());
+        e.appendChild(lastName);
 
-        Element email = new Element(EL_EMAIL, NS_CMP);
-        email.addContent(user.getEmail());
-        e.addContent(email);
+        Element email = DomUtil.createElement(doc, EL_EMAIL, NS_CMP);
+        DomUtil.setText(email, user.getEmail());
+        e.appendChild(email);
 
-        Element url = new Element(EL_URL, NS_CMP);
-        url.addContent(userUrl);
-        e.addContent(url);
+        Element url = DomUtil.createElement(doc, EL_URL, NS_CMP);
+        DomUtil.setText(url, userUrl);
+        e.appendChild(url);
 
-        if (! user.isOverlord()) {
-            Element hurl = new Element(EL_HOMEDIRURL, NS_CMP);
-            hurl.addContent(homedirUrl);
-            e.addContent(hurl);
+        if (! user.getUsername().equals(User.USERNAME_OVERLORD)) {
+            Element hurl = DomUtil.createElement(doc, EL_HOMEDIRURL, NS_CMP);
+            DomUtil.setText(hurl, homedirUrl);
+            e.appendChild(hurl);
         }
 
-        return new Document(e);
+        return e;
     }
 
     // our methods
@@ -199,49 +199,49 @@ public class UserResource implements CmpResource {
             return;
         }
 
-        Element root = doc.getRootElement();
-        if (! root.getName().equals(EL_USER)) {
+        Element root = doc.getDocumentElement();
+        if (! DomUtil.matches(root, EL_USER, NS_CMP)) {
             throw new CmpException("root element not user");
         }
-        if (! root.getNamespace().equals(NS_CMP)) {
-            throw new CmpException("root element not in CMP namespace");
-        }
 
-        Element e = root.getChild(EL_USERNAME, NS_CMP);
+        Element e = DomUtil.getChildElement(root, EL_USERNAME, NS_CMP);
         if (e != null) {
-            if (user.isOverlord()) {
+            if (user.getUsername() != null &&
+                user.getUsername().equals(User.USERNAME_OVERLORD)) {
                 throw new CmpException("root user's username may not " +
                                        "be changed");
             }
-            user.setUsername(getTextContent(e));
+            user.setUsername(DomUtil.getTextTrim(e));
         }
 
-        e = root.getChild(EL_PASSWORD, NS_CMP);
+        e = DomUtil.getChildElement(root, EL_PASSWORD, NS_CMP);
         if (e != null) {
-            user.setPassword(getTextContent(e));
+            user.setPassword(DomUtil.getTextTrim(e));
         }
 
-        e = root.getChild(EL_FIRSTNAME, NS_CMP);
+        e = DomUtil.getChildElement(root, EL_FIRSTNAME, NS_CMP);
         if (e != null) {
-            if (user.isOverlord()) {
+            if (user.getUsername() != null &&
+                user.getUsername().equals(User.USERNAME_OVERLORD)) {
                 throw new CmpException("root user's first name may not " +
                                        "be changed");
             }
-            user.setFirstName(getTextContent(e));
+            user.setFirstName(DomUtil.getTextTrim(e));
         }
 
-        e = root.getChild(EL_LASTNAME, NS_CMP);
+        e = DomUtil.getChildElement(root, EL_LASTNAME, NS_CMP);
         if (e != null) {
-            if (user.isOverlord()) {
+            if (user.getUsername() != null &&
+                user.getUsername().equals(User.USERNAME_OVERLORD)) {
                 throw new CmpException("root user's last name may not " +
                                        "be changed");
             }
-            user.setLastName(getTextContent(e));
+            user.setLastName(DomUtil.getTextTrim(e));
         }
 
-        e = root.getChild(EL_EMAIL, NS_CMP);
+        e = DomUtil.getChildElement(root, EL_EMAIL, NS_CMP);
         if (e != null) {
-            user.setEmail(getTextContent(e));
+            user.setEmail(DomUtil.getTextTrim(e));
         }
     }
 
@@ -255,18 +255,5 @@ public class UserResource implements CmpResource {
      */
     protected void calculateHomedirUrl() {
         homedirUrl = urlBase + "/home/" + user.getUsername();
-    }
-
-    /**
-     */
-    protected String getTextContent(Element e) {
-        if (e.getContentSize() != 1) {
-            throw new CmpException(e.getName() + " must be single-valued");
-        }
-        Content c = e.getContent(0);
-        if (! (c instanceof Text)) {
-            throw new CmpException(e.getName() + " content not text");
-        }
-        return ((Text) c).getText();
     }
 }

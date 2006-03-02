@@ -76,7 +76,8 @@ import org.osaf.cosmo.model.User;
  */
 public class CosmoDavResourceImpl extends DavResourceImpl 
     implements CosmoDavResource, JcrConstants {
-    private static final Logger log = Logger.getLogger(CosmoDavResource.class);
+    private static final Logger log =
+        Logger.getLogger(CosmoDavResourceImpl.class);
 
     private String baseUrl;
     private boolean initializing;
@@ -354,6 +355,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                                       ticket.getId());
                         }
                         ticketDao.removeTicket(getNode().getPath(), ticket);
+                        continue;
                     }
 
                     tickets.put(ticket.getId(), ticket);

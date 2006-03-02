@@ -102,6 +102,14 @@ public class JcrCalendarFlattener implements JcrConstants {
             String line = tokenizer.nextToken();
             int colon = line.indexOf(':');
             String rawKey = line.substring(0, colon).toLowerCase();
+
+            // do not store attachments as jcr properties; they
+            // don't need to be indexed for reports and we don't allow
+            // independent access to them
+            if (rawKey.startsWith(Property.ATTACH.toLowerCase())) {
+                continue;
+            }
+
             String key = PREFIX_ICALENDAR + ":" + rawKey;
             String value = (colon + 1 < line.length()) ?
                 line.substring(colon + 1) :

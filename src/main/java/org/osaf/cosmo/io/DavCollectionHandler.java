@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -37,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
 
+import org.apache.jackrabbit.util.Text;
 import org.apache.jackrabbit.server.io.ExportContext;
 import org.apache.jackrabbit.server.io.ImportContext;
 import org.apache.jackrabbit.server.io.IOHandler;
@@ -261,7 +260,7 @@ public class DavCollectionHandler implements IOHandler, JcrConstants {
         PrintWriter writer =
             new PrintWriter(new OutputStreamWriter(context.getOutputStream(),
                                                    "utf8"));
-        String title = resource.getLocator().getResourcePath(); 
+        String title = resource.getLocator().getResourcePath();
         writer.write("<html><head><title>");
         writer.write(title); // XXX: html escape
         writer.write("</title></head>");
@@ -275,20 +274,14 @@ public class DavCollectionHandler implements IOHandler, JcrConstants {
         }
         for (DavResourceIterator i=resource.getMembers(); i.hasNext();) {
             DavResource child = i.nextResource();
-            String name = getResourceName(child.getLocator().
-                                          getResourcePath()); 
+            String name = Text.getName(child.getLocator().getResourcePath()); 
             writer.write("<li><a href=\"");
-            try {
-                writer.write(URLEncoder.encode(name, "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                log.warn("UTF-8 not supported?!", e);
-                writer.write(name);
-            }
+            writer.write(Text.escape(name));
             if (child.isCollection()) {
                 writer.write("/");
             }
             writer.write("\">");
-            writer.write(name);
+            writer.write(name); // XXX: html escape
             writer.write("</a></li>");
         }
         writer.write("</ul>");
@@ -307,12 +300,5 @@ public class DavCollectionHandler implements IOHandler, JcrConstants {
                                  boolean isCollection)
         throws IOException {
         throw new RuntimeException("unimplemented");
-    }
-
-    // private methods
-
-    private String getResourceName(String path) {
-        int pos = path.lastIndexOf('/');
-        return pos >= 0 ? path.substring(pos + 1) : "";
     }
 }

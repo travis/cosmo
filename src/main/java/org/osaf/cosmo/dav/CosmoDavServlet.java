@@ -63,6 +63,7 @@ import org.osaf.cosmo.io.UnsupportedCalendarComponentException;
 import org.osaf.cosmo.io.UnsupportedMediaTypeException;
 import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import org.springframework.beans.BeansException;
@@ -479,13 +480,28 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
-        // must either be an admin or the user that created the ticket
-        String loggedInUsername =
-            securityManager.getSecurityContext().getUser().getUsername();
-        if (! (ticket.getOwner().equals(loggedInUsername) ||
-               securityManager.getSecurityContext().isAdmin())) {
-            response.sendError(DavServletResponse.SC_FORBIDDEN);
-            return;
+        // in order to delete a ticket, the authenticated principal
+        // must meet one of these conditions:
+        // 1) admin user
+        // 2) owner of the ticket
+        // 3) a write ticket on this resource (security layer
+        //    will have already validated the ticket)
+
+        User user = securityManager.getSecurityContext().getUser();
+        if (user != null) {
+            if (! (ticket.getOwner().equals(user.getUsername()) ||
+                   securityManager.getSecurityContext().isAdmin())) {
+                response.sendError(DavServletResponse.SC_FORBIDDEN);
+                return;
+            }
+        }
+        else {
+            Ticket authTicket =
+                securityManager.getSecurityContext().getTicket();
+            if (authTicket == null) {
+                response.sendError(DavServletResponse.SC_FORBIDDEN);
+                return;
+            }
         }
 
         if (log.isDebugEnabled()) {

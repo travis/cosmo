@@ -32,6 +32,12 @@
   <cosmo:homedir var="homedir" user="${user}"/>
   <cosmo:baseurl var="baseurl"/>
 
+  <p>
+    <html:link page="/console/home/browse/${user.username}">
+      <fmt:message key="Account.View.BrowseHomeDirectory"/>
+    </html:link>
+  </p>
+
   <p class="hd">
     <fmt:message key="Account.View.ClientSetup.Header"/>
   </p>

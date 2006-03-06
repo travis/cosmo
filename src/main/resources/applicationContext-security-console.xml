@@ -49,7 +49,6 @@
          /console/login=ROLE_ANONYMOUS
          /console/loginfailed=ROLE_ANONYMOUS
          /console/logout=ROLE_ROOT,ROLE_USER
-         /console/home/**=ROLE_ROOT,ROLE_USER
          /**=ROLE_ROOT
        </value>
      </property>

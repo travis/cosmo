@@ -63,7 +63,10 @@ public class HomedirVoter implements AccessDecisionVoter {
         if (path == null) {
             return null;
         }
-        if (path.startsWith("/atom/1.0")) {
+        if (path.startsWith("/home/browse")) {
+            path = path.substring("/home/browse".length());
+        }
+        else if (path.startsWith("/atom/1.0")) {
             path = path.substring("/atom/1.0".length());
         }
         return path.substring(1);

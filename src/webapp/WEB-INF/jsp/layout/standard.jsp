@@ -57,12 +57,6 @@
           <td align="right" valign="top">
             <!-- main navbar -->
             <div class="mdData">
-              <%-- bug 3920
-              <authz:authorize ifAllGranted="ROLE_USER">
-                <html:link page="/console/dirlisting.jsp?rtype=home&username=${user.username}"><fmt:message key="Layout.Nav.Main.HomeDirectory"/></html:link>
-              |
-              </authz:authorize>
-              --%>
               <c:choose><c:when test="${fn:endsWith(body, '/help.jsp')}"><strong><fmt:message key="Layout.Nav.Main.Help"/></strong></c:when><c:otherwise><html:link page="/console/help"><fmt:message key="Layout.Nav.Main.Help"/></html:link></c:otherwise></c:choose>
               |
               <c:url var="aboutUrl" value="/console/about"/>

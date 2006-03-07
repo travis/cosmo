@@ -157,7 +157,13 @@ public class EventBean {
      */
     public boolean getHasEndTime() {
         Date end = getEnd();
-        return end != null && end instanceof DateTime;
+        // the date could be a java Date as returned by a
+        // Duration as opposed to a ical4j Date or DateTime returned
+        // by a DateProperty - if it's a regular java Date, it has a
+        // time attached
+        return end != null &&
+            (end instanceof DateTime ||
+             ! (end instanceof net.fortuna.ical4j.model.Date));
     }
 
     /**

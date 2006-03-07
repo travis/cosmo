@@ -83,14 +83,14 @@
               Yes
             </c:if>
           </td>
-          <td class="smTableData">
+          <td class="smTableData" style="text-align:center;">
             <html:link href="mailto:${user.email}">${user.email}</html:link>
           </td>
           <td class="smTableData" style="text-align:center; white-space:nowrap;">
-            <fmt:formatDate value="${user.dateCreated}" type="both" pattern="MM-dd-yyyy"/>
+            <fmt:formatDate value="${user.dateCreated}" type="date" pattern="MM-dd-yyyy"/>
           </td>
           <td class="smTableData" style="text-align:center; white-space:nowrap;">
-            <fmt:formatDate value="${user.dateModified}" type="both" pattern="MM-dd-yyyy"/>
+            <fmt:formatDate value="${user.dateModified}" type="date" pattern="MM-dd-yyyy"/>
           </td>
         </tr>
       </c:forEach>

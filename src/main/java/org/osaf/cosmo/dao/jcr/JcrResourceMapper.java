@@ -169,6 +169,7 @@ public class JcrResourceMapper implements JcrConstants {
                 p.getName().startsWith("jcr:") ||
                 p.getName().startsWith("dav:") ||
                 p.getName().startsWith("calendar:") ||
+                p.getName().startsWith("icalendar:") ||
                 p.getName().startsWith("xml")) {
                 continue;
             }

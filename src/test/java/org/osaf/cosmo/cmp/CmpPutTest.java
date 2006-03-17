@@ -19,7 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
 import org.osaf.cosmo.cmp.CmpConstants;
 import org.osaf.cosmo.cmp.CmpServlet;
@@ -69,7 +68,8 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
 
-        assertEquals("incorrect status", MockHttpServletResponse.SC_BAD_REQUEST,
+        assertEquals("incorrect status",
+                     MockHttpServletResponse.SC_BAD_REQUEST,
                      response.getStatus());
     }
 
@@ -379,7 +379,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
             createMockRequest("PUT", "/deadbeef");
         // add real content but also Content-Encoding header
         // that is not allowed
-        request.setContentType("text/sml");
+        request.setContentType("text/xml");
         request.setContent("deadbeef".getBytes());
         request.addHeader("Content-Encoding", "my-encoding");
 
@@ -387,7 +387,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         servlet.service(request, response);
 
         assertEquals("incorrect status",
-                     MockHttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
+                     MockHttpServletResponse.SC_NOT_IMPLEMENTED,
                      response.getStatus());
     }
 
@@ -406,66 +406,5 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         assertEquals("incorrect status",
                      MockHttpServletResponse.SC_METHOD_NOT_ALLOWED,
                      response.getStatus());
-    }
-
-    /**
-     */
-    public class UserContent implements XmlSerializable {
-        private User user;
-
-        /**
-         */
-        public UserContent(User user) {
-            this.user = user;
-        }
-
-        /**
-         */
-        public Element toXml(Document doc) {
-            Element e = DomUtil.createElement(doc, UserResource.EL_USER,
-                                              UserResource.NS_CMP);
-
-            if (user.getUsername() != null) {
-                Element username =
-                    DomUtil.createElement(doc, UserResource.EL_USERNAME,
-                                          UserResource.NS_CMP);
-                DomUtil.setText(username, user.getUsername());
-                e.appendChild(username);
-            }
-
-            if (user.getPassword() != null) {
-                Element password =
-                    DomUtil.createElement(doc, UserResource.EL_PASSWORD,
-                                          UserResource.NS_CMP);
-                DomUtil.setText(password, user.getPassword());
-                e.appendChild(password);
-            }
-
-            if (user.getFirstName() != null) {
-                Element firstName =
-                    DomUtil.createElement(doc, UserResource.EL_FIRSTNAME,
-                                          UserResource.NS_CMP);
-                DomUtil.setText(firstName, user.getFirstName());
-                e.appendChild(firstName);
-            }
-
-            if (user.getLastName() != null) {
-                Element lastName =
-                    DomUtil.createElement(doc, UserResource.EL_LASTNAME,
-                                          UserResource.NS_CMP);
-                DomUtil.setText(lastName, user.getLastName());
-                e.appendChild(lastName);
-            }
-
-            if (user.getEmail() != null) {
-                Element email =
-                    DomUtil.createElement(doc, UserResource.EL_EMAIL,
-                                          UserResource.NS_CMP);
-                DomUtil.setText(email, user.getEmail());
-                e.appendChild(email);
-            }
-
-            return e;
-        }
     }
 }

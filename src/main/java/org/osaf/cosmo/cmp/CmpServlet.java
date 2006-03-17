@@ -178,6 +178,16 @@ public class CmpServlet extends HttpServlet {
     }
 
     /**
+     * Simply delegates to
+     {@link doPut(HttpServletRequest, HttpServletResponse)
+     */
+    protected void doPost(HttpServletRequest req,
+                          HttpServletResponse resp)
+        throws ServletException, IOException {
+        doPut(req, resp);
+    }
+
+    /**
      * Responds to the following operations:
      *
      * <ul>

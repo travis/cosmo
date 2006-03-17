@@ -1,0 +1,135 @@
+Foxcloud client compliance tests
+
+    # Tests TODO (from cosmo 0.2 spec):
+    # if none match etag 
+    # cosmo cmp
+    #  
+    #
+    # Also more tests from ticket spec.
+
+
+First, bring the framework environment
+
+    >>> from silmut import *
+
+
+Initialization
+    
+    >>> import base64, time, md5, random
+    >>> auth = 'Basic %s' % base64.encodestring('%s:%s' % (user1, password1)).strip()
+    >>> authHeaders = {'Authorization': auth}
+    >>> foxHeaders = {'Host' : "sync.foxcloud.com",
+    ... 'User-Agent': "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.1) Gecko/20060111 Firefox/1.5.0.1 Foxmarks/0.56",
+    ... 'Accept' : "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
+    ... 'Accept-Language' : "en-us,en;q=0.5",
+    ... 'Accept-Encoding' : "gzip,deflate",
+    ... 'Accept-Charset' : "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+    ... 'Keep-Alive' : "300",
+    ... 'Connection' : "keep-alive",
+    ... 'Content-Length' : "255",
+    ... 'Content-Type' : "text/xml; charset=UTF-8"}
+    >>> auth2 = 'Basic %s' % base64.encodestring('%s:%s' % (user2, password2)).strip()
+    >>> authHeaders2 = {'Authorization': auth2}
+    >>> rTicket = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <X:ticketinfo xmlns:D="DAV:" 
+    ...               xmlns:X="http://www.xythos.com/namespaces/StorageServer">
+    ... <D:privilege><D:read/></D:privilege>
+    ... <X:timeout>Second-60</X:timeout>
+    ... </X:ticketinfo>"""
+    >>> badNSTicket = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <D:ticketinfo xmlns:D="DAV:">
+    ... <D:privilege><D:read/></D:privilege>
+    ... <D:timeout>Second-60</D:timeout>
+    ... </D:ticketinfo>"""
+    >>> rwTicket = """<?xml version="1.0" encoding="UTF-8"?>
+    ... <X:ticketinfo xmlns:D="DAV:" 
+    ...               xmlns:X="http://www.xythos.com/namespaces/StorageServer">
+    ... <D:privilege><D:read/><D:write/></D:privilege>
+    ... <X:timeout>Second-60</X:timeout>
+    ... </X:ticketinfo>"""
+    >>> 
+    >>> home1 = '%s/home/%s/' % (path, user1)
+    >>> home2 = '%s/home/%s/' % (path, user2)
+    >>> cmp = '/api/signup'
+    >>> rCMPExistingEmail = """<?xml version="1.0" encoding="utf-8" ?>
+    ... <user xmlns="http://osafoundation.org/cosmo">
+    ... <username>mikeal-test</username><password>vulga00</password>
+    ... <firstName>Mikeal</firstName
+    ... <lastName>Rogers2</lastName>
+    ... <email>mikeal@osafoundation.org</email>
+    ... </user>"""
+    
+MKTICKET
+
+Status codes
+
+CMP (signup existing email)
+	>>> r = request('PUT', cmp, body=rCMPExistingEmail,
+	...             headers=foxHeaders)
+	>>> host
+	>>> r.status # Existing email
+	432
+	
+
+OK (read-only)
+
+    >>> r = request('MKTICKET', home1, body=rTicket,
+    ...             headers=authHeaders)
+    >>> r.status # MKTICKET OK (read-only ticket)
+    200
+    >>> ticket = r.getheader('Ticket')
+
+OK (read-write)
+
+    >>> r = request('MKTICKET', home1, body=rwTicket,
+    ...             headers=authHeaders)
+    >>> r.status # MKTICKET OK (read-write ticket)
+    200
+    >>> rwTicketId = r.getheader('Ticket')
+
+Bad XML
+
+    >>> r = request('MKTICKET', home1, body=badNSTicket,
+    ...             headers=authHeaders)
+    >>> r.status # MKTICKET bad XML
+    400
+
+No XML body
+
+    >>> r = request('MKTICKET', home1, headers=authHeaders)
+    >>> r.status # MKTICKET no body
+    400
+    
+No access privileges
+
+    >>> r = request('MKTICKET', home2, body=rTicket,
+    ...             headers=authHeaders)
+    >>> r.status # MKTICKET no access
+    403
+
+No access privileges, no body
+    
+    >>> r = request('MKTICKET', home2, headers=authHeaders)
+    >>> r.status # MKTICKET no access, no body
+    403
+
+No such resource, no body
+
+    >>> r = request('MKTICKET', '%s%s' % (home1, 'doesnotexist'),
+    ...              headers=authHeaders)
+    >>> r.status # MKTICKET no such resource, no body
+    404
+
+No such resource
+
+    >>> r = request('MKTICKET', '%s%s' % (home1, 'doesnotexist'), 
+    ...             body=rTicket, headers=authHeaders)
+    >>> r.status # MKTICKET no such resource
+    404
+    
+No access, no such resource
+
+    >>> r = request('MKTICKET', '%s%s' % (home2, 'doesnotexist'),
+    ...             headers=authHeaders)
+    >>> r.status # MKTICKET no access, no such resource
+    403

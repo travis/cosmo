@@ -190,6 +190,26 @@ PropertyDef
   Protected false
   Multiple false
 
+PropertyDef
+  Name calendar:supportedComponentSet
+  RequiredType STRING
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple true
+
+PropertyDef
+  Name calendar:timezone
+  RequiredType BINARY
+  DefaultValues null
+  AutoCreate false
+  Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+
 NodeTypeName
   calendar:resource
 SuperTypes

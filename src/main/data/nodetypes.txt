@@ -192,7 +192,7 @@ PropertyDef
 
 PropertyDef
   Name calendar:supportedComponentSet
-  RequiredType STRING
+  RequiredType LONG
   DefaultValues null
   AutoCreate false
   Mandatory false

@@ -35,6 +35,7 @@ import org.osaf.cosmo.model.HomeCollectionResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.model.ResourceProperty;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
@@ -99,7 +100,7 @@ public class JcrResourceMapper implements SchemaConstants {
     public static Node resourceToNode(Resource resource,
                                       Node parentNode)
         throws RepositoryException {
-        String name = JcrEscapist.hexEscapeJcrNames(resource.getDisplayName());
+        String name = PathTranslator.hexEscapeJcrNames(resource.getDisplayName());
         Node resourceNode = parentNode.hasNode(name) ?
             parentNode.getNode(name) :
             parentNode.addNode(name);
@@ -158,7 +159,7 @@ public class JcrResourceMapper implements SchemaConstants {
     private static void setCommonResourceAttributes(Resource resource,
                                                     Node node)
         throws RepositoryException {
-        resource.setPath(JcrEscapist.hexUnescapeJcrPath(node.getPath()));
+        resource.setPath(PathTranslator.hexUnescapeJcrPath(node.getPath()));
         resource.setDisplayName(node.getProperty(NP_DAV_DISPLAYNAME).
                                 getString());
         resource.setDateCreated(node.getProperty(NP_JCR_CREATED).getDate().

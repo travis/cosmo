@@ -42,8 +42,8 @@ import org.apache.jackrabbit.webdav.DavResource;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dao.jcr.JcrCalendarFlattener;
-import org.osaf.cosmo.dao.jcr.JcrEscapist;
 import org.osaf.cosmo.icalendar.ComponentTypes;
+import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
@@ -190,7 +190,7 @@ public class CosmoHandler extends DefaultHandler implements SchemaConstants {
             // XXX: move into JcrResourceMapper!!@#$!@!@
 
             String displayName = 
-                JcrEscapist.hexUnescapeJcrNames(context.getSystemId());
+                PathTranslator.hexUnescapeJcrNames(context.getSystemId());
             resourceNode.setProperty(NP_DAV_DISPLAYNAME, displayName);
             resourceNode.setProperty(NP_DAV_CONTENTLANGUAGE,
                                      context.getContentLanguage());
@@ -257,8 +257,8 @@ public class CosmoHandler extends DefaultHandler implements SchemaConstants {
         StringBuffer stmt = new StringBuffer();
         stmt.append("/jcr:root");
         if (! resourceNode.getParent().getPath().equals("/")) {
-            stmt.append(JcrEscapist.xmlEscapeJcrPath(resourceNode.getParent().
-                                                     getPath()));
+            stmt.append(PathTranslator.
+                        xmlEscapeJcrNames(resourceNode.getParent().getPath()));
         }
         stmt.append("//element(*, ").
             append(NT_CALENDAR_RESOURCE).

@@ -13,23 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dao.jcr;
+package org.osaf.cosmo.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.jackrabbit.util.ISO9075;
+
 import org.apache.xerces.util.XMLChar;
 
 /**
- * Class providing some character escape methods. The escape schemata are
- * defined in chapter 6.4.3 (for JCR names) and (6.4.4 for JCR values) in the
- * JCR specification.
+ * Converts paths between the formats used by the various views of the
+ * Cosmo repository.
  *
- * The original code in this class was copied from the Apache
- * Jackrabbit class {@link org.apache.jackrabbit.test.api.EscapeJCRUtil}.
+ * The "client view", which the majority of server classes work
+ * with, provides the external, simple addressing of repository
+ * items (eg /home/bcm/Brian's Calendar/deadbeef.ics)
+ *
+ * The "repository view", used by data access objects that
+ * directly use the JCR api, in which items are addressed by valid JCR
+ * paths and where storage requirements often dictate a structure that
+ * is not exposed to clients
+ * (eg /home/b/bc/bcm/Brian's Calendar/d/de/deadbeef.ics)
  */
-public class JcrEscapist {
-    private static final Log log = LogFactory.getLog(JcrEscapist.class);
+public class PathTranslator {
+    private static final Log log = LogFactory.getLog(PathTranslator.class);
 
     private static final String utf16esc =
         "_x[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]_";

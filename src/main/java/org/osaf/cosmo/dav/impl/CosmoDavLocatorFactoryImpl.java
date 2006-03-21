@@ -18,7 +18,7 @@ package org.osaf.cosmo.dav.impl;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 
-import org.osaf.cosmo.dao.jcr.JcrEscapist;
+import org.osaf.cosmo.repository.PathTranslator;
 
 /**
  * Extends
@@ -64,7 +64,7 @@ public class CosmoDavLocatorFactoryImpl extends LocatorFactoryImpl {
                                                     boolean isResourcePath) {
         String jcrPath = isResourcePath ? null : path;
         String resourcePath = isResourcePath ? path :
-            JcrEscapist.hexUnescapeJcrPath(jcrPath);
+            PathTranslator.hexUnescapeJcrPath(jcrPath);
         DavResourceLocator locator =
             super.createResourceLocator(prefix, workspacePath, resourcePath,
                                         true);

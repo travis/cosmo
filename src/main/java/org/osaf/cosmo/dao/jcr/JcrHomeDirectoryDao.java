@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.HomeDirectoryDao;
 import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.model.Resource;
+import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.SchemaConstants;
 
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -69,7 +70,7 @@ public class JcrHomeDirectoryDao extends JcrDaoSupport
         return (Resource) getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    String jcrPath = JcrEscapist.hexEscapeJcrPath(path);
+                    String jcrPath = PathTranslator.hexEscapeJcrPath(path);
                     if (! session.itemExists(jcrPath)) {
                         throw new NoSuchResourceException(path);
                     }
@@ -99,7 +100,7 @@ public class JcrHomeDirectoryDao extends JcrDaoSupport
         getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    String jcrPath = JcrEscapist.hexEscapeJcrPath(path);
+                    String jcrPath = PathTranslator.hexEscapeJcrPath(path);
                     if (session.itemExists(jcrPath)) {
                         session.getItem(jcrPath).remove();
                         session.save();

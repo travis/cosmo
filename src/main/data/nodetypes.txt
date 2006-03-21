@@ -189,17 +189,16 @@ PropertyDef
   OnParentVersion COPY
   Protected false
   Multiple false
-
 PropertyDef
   Name calendar:supportedComponentSet
   RequiredType STRING
+  ValueConstraints []
   DefaultValues null
   AutoCreate false
   Mandatory false
   OnParentVersion COPY
   Protected false
   Multiple true
-
 PropertyDef
   Name calendar:timezone
   RequiredType BINARY

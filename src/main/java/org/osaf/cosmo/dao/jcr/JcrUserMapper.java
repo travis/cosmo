@@ -25,12 +25,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
  * Utility class that converts between {@link User}s and
  * {@link javax.jcr.Node}s.
  */
-public class JcrUserMapper implements JcrConstants {
+public class JcrUserMapper implements SchemaConstants {
     private static final Log log = LogFactory.getLog(JcrUserMapper.class);
 
     /**

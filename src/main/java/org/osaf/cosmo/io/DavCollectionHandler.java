@@ -44,19 +44,19 @@ import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 
-import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dao.jcr.JcrEscapist;
 import org.osaf.cosmo.dao.jcr.JcrResourceMapper;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.model.CalendarCollectionResource;
+import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
  * Implements {@link org.apache.jackrabbit.server.io.IOHandler}
  * to provide custom logic for importing and exporting dav
  * collections.
  */
-public class DavCollectionHandler implements IOHandler, JcrConstants {
+public class DavCollectionHandler implements IOHandler, SchemaConstants {
     private static final Log log =
         LogFactory.getLog(DavCollectionHandler.class);
 

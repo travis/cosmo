@@ -42,11 +42,12 @@ import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
  */
 public class JcrTestHelper extends TestHelper
-    implements ICalendarConstants, JcrConstants {
+    implements ICalendarConstants, SchemaConstants {
     private static final Log log = LogFactory.getLog(JcrTestHelper.class);
 
     static int nseq = 0;

@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.HomeDirectoryDao;
 import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.model.Resource;
+import org.osaf.cosmo.repository.SchemaConstants;
 
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
@@ -48,7 +49,7 @@ import org.springmodules.jcr.support.JcrDaoSupport;
  * {@link Resource}.
  */
 public class JcrHomeDirectoryDao extends JcrDaoSupport
-    implements JcrConstants, HomeDirectoryDao {
+    implements SchemaConstants, HomeDirectoryDao {
     private static final Log log =
         LogFactory.getLog(JcrHomeDirectoryDao.class);
 

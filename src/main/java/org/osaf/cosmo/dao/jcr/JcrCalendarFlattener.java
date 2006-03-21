@@ -44,6 +44,8 @@ import net.fortuna.ical4j.model.property.DateProperty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.repository.SchemaConstants;
+
 /**
  * @author cyrusdaboo
  * @author bcm
@@ -59,7 +61,7 @@ import org.apache.commons.logging.LogFactory;
  * key can be used as the JCR property name and the value as the
  * (string) JCR property value.
  */
-public class JcrCalendarFlattener implements JcrConstants {
+public class JcrCalendarFlattener implements SchemaConstants {
     private static final Log log =
         LogFactory.getLog(JcrCalendarFlattener.class);
 

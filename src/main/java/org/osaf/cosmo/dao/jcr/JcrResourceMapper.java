@@ -35,6 +35,7 @@ import org.osaf.cosmo.model.HomeCollectionResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.model.ResourceProperty;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
  * Utility class that converts between {@link Resource}s and
@@ -49,7 +50,7 @@ import org.osaf.cosmo.model.User;
  * with the <code>dav:collection</code> and
  * <code>ticket:ticketable</code> mixin types.
  */
-public class JcrResourceMapper implements JcrConstants {
+public class JcrResourceMapper implements SchemaConstants {
     private static final Log log = LogFactory.getLog(JcrResourceMapper.class);
 
     /**

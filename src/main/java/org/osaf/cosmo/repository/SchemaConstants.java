@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dao.jcr;
+package org.osaf.cosmo.repository;
 
 /**
- * Provides constants for JCR item names and node types used by Cosmo.
+ * Provides constants for schema items (namespaces, node types, node
+ * names, properties, etc) in the Cosmo repository.
  */
-public interface JcrConstants {
+public interface SchemaConstants {
 
     // prefixes
     public static final String PREFIX_DAV = "dav";

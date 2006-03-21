@@ -35,9 +35,9 @@ import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.jackrabbit.query.TextCalendarTextFilter;
+import org.osaf.cosmo.repository.SchemaConstants;
 
 import org.w3c.dom.Element;
 
@@ -49,7 +49,7 @@ import org.w3c.dom.Element;
  * generate XPATH queries as needed for JCR.
  */
 
-public class QueryFilter implements JcrConstants {
+public class QueryFilter implements SchemaConstants {
     private static final Logger log =
         Logger.getLogger(QueryFilter.class);
 

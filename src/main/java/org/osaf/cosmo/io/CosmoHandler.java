@@ -42,16 +42,16 @@ import org.apache.jackrabbit.webdav.DavResource;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dao.jcr.JcrCalendarFlattener;
-import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dao.jcr.JcrEscapist;
 import org.osaf.cosmo.icalendar.ComponentTypes;
+import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
  * Extends {@link org.apache.jackrabbit.server.io.DefaultHandler}
  * to provide custom logic for importing and exporting Cosmo
  * resources.
  */
-public class CosmoHandler extends DefaultHandler implements JcrConstants {
+public class CosmoHandler extends DefaultHandler implements SchemaConstants {
     private static final Log log = LogFactory.getLog(CosmoHandler.class);
 
     /**

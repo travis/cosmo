@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.repository.SchemaConstants;
 
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -61,7 +62,7 @@ import org.springmodules.jcr.support.JcrDaoSupport;
  * {@link org.apache.commons.id.StringIdentifierGenerator}.
  */
 public class JcrTicketDao extends JcrDaoSupport
-    implements JcrConstants, TicketDao {
+    implements SchemaConstants, TicketDao {
     private static final Log log = LogFactory.getLog(JcrTicketDao.class);
 
     private StringIdentifierGenerator idGenerator;

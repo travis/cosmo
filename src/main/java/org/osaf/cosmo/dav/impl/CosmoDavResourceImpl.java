@@ -50,7 +50,6 @@ import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dao.TicketDao;
-import org.osaf.cosmo.dao.jcr.JcrConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
@@ -68,6 +67,7 @@ import org.osaf.cosmo.dav.report.SupportedReportSetProperty;
 import org.osaf.cosmo.io.CosmoImportContext;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
  * A subclass of
@@ -75,7 +75,7 @@ import org.osaf.cosmo.model.User;
  * that provides Cosmo-specific WebDAV behaviors.
  */
 public class CosmoDavResourceImpl extends DavResourceImpl 
-    implements CosmoDavResource, JcrConstants {
+    implements CosmoDavResource, SchemaConstants {
     private static final Logger log =
         Logger.getLogger(CosmoDavResourceImpl.class);
 

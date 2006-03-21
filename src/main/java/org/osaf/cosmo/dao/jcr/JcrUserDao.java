@@ -35,10 +35,12 @@ import org.apache.commons.logging.LogFactory;
 import org.springmodules.jcr.JcrCallback;
 import org.springmodules.jcr.JcrTemplate;
 import org.springmodules.jcr.support.JcrDaoSupport;
+
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.SchemaConstants;
 
 import org.springframework.dao.DataRetrievalFailureException;
 
@@ -59,7 +61,7 @@ import org.springframework.dao.DataRetrievalFailureException;
  * the root node.
  */
 public class JcrUserDao extends JcrDaoSupport
-    implements JcrConstants, UserDao {
+    implements SchemaConstants, UserDao {
     private static final Log log = LogFactory.getLog(JcrUserDao.class);
 
     // UserDao methods

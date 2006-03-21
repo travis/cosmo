@@ -46,7 +46,7 @@ public class CosmoDavLocatorImpl implements DavResourceLocator {
         this.wrapped = locator;
         this.jcrPath = jcrPath != null ?
             jcrPath :
-            PathTranslator.hexEscapeJcrPath(locator.getResourcePath());
+            PathTranslator.toRepositoryPath(locator.getResourcePath());
     }
 
     /**

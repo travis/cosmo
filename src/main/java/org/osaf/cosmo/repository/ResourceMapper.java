@@ -90,16 +90,16 @@ public class ResourceMapper implements SchemaConstants {
 
     /**
      * Copies the properties of a <code>Resource</code> into a resource
-     * node. The resource node is found by escaping the resource's
-     * display name and using the result to find the appropriate child
-     * node of the given parent node, creating a new one if
-     * necessary. The resource node itself is returned.
+     * node. The resource node is found by converting the client view
+     * name into a repository view name and using the result to find
+     * the appropriate child node of the given parent node, creating a
+     * new one if necessary. The resource node itself is returned.
      */
     public static Node resourceToNode(Resource resource,
                                       Node parentNode)
         throws RepositoryException {
         String name =
-            PathTranslator.hexEscapeJcrNames(resource.getDisplayName());
+            PathTranslator.toRepositoryPath(resource.getDisplayName());
         Node resourceNode = parentNode.hasNode(name) ?
             parentNode.getNode(name) :
             parentNode.addNode(name);
@@ -158,7 +158,7 @@ public class ResourceMapper implements SchemaConstants {
     private static void setCommonResourceAttributes(Resource resource,
                                                     Node node)
         throws RepositoryException {
-        resource.setPath(PathTranslator.hexUnescapeJcrPath(node.getPath()));
+        resource.setPath(PathTranslator.toClientPath(node.getPath()));
         resource.setDisplayName(node.getProperty(NP_DAV_DISPLAYNAME).
                                 getString());
         resource.setDateCreated(node.getProperty(NP_JCR_CREATED).getDate().

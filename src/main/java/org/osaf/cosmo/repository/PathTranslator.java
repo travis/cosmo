@@ -20,8 +20,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.util.ISO9075;
 
-import org.apache.xerces.util.XMLChar;
-
 /**
  * Converts paths between the formats used by the various views of the
  * Cosmo repository.
@@ -46,6 +44,8 @@ public class PathTranslator {
      * strings into valid XML element names. This is necessary since
      * XPath queries are executed against the logical XML document
      * view of the repository.
+     *
+     * @see {@link org.apache.jackrabbit.util.ISO9075}
      */
     public static String toQueryableRepositoryPath(String path) {
         if (path.equals("/")) {
@@ -65,25 +65,27 @@ public class PathTranslator {
         return buf.toString();
     }
 
-    // XXX: replace hex* apis with ones that convert client paths to
-    // and from repository paths without describing the encoding
-    // technique. perhaps use the strategy pattern to allow either hex
-    // or ISO 9075 encoding to be used.
-
-    public static String hexEscapeJcrNames(String str) {
-        return hexEscape(str);
-    }
-
-    public static String hexEscapeJcrPath(String str) {
-        if (str.equals("/")) {
-            return str;
+    /**
+     * Converts a client path into a repository path, taking into
+     * account the internal storage structure of the repository schema
+     * and escaping characters that are illegal in JCR names.
+     *
+     * Note that individual path segments cannot contain the '/'
+     * character, as this character is used as the path delimiter for
+     * both the client and repository views.
+     *
+     * @see {@link HexEscaper}
+     */
+    public static String toRepositoryPath(String clientPath) {
+        if (clientPath.equals("/")) {
+            return clientPath;
         }
 
         StringBuffer buf = new StringBuffer();
 
-        String[] names = str.split("/");
+        String[] names = clientPath.split("/");
         for (int i=0; i<names.length; i++) {
-            buf.append(hexEscape(names[i]));
+            buf.append(HexEscaper.escape(names[i]));
             if (i < names.length-1) {
                 buf.append("/");
             }
@@ -92,131 +94,28 @@ public class PathTranslator {
         return buf.toString();
     }
 
-    public static String hexUnescapeJcrNames(String str) {
-        return hexUnescape(str);
-    }
-
-    public static String hexUnescapeJcrPath(String str) {
-        if (str.equals("/")) {
-            return str;
+    /**
+     * Converts a repository path into a client path, removing nodes
+     * that are part of the internal storage structure of the
+     * repository schema and hex-unescaping path segments.
+     *
+     * @see {@link HexEscaper}
+     */
+    public static String toClientPath(String repositoryPath) {
+        if (repositoryPath.equals("/")) {
+            return repositoryPath;
         }
 
         StringBuffer buf = new StringBuffer();
 
-        String[] names = str.split("/");
+        String[] names = repositoryPath.split("/");
         for (int i=0; i<names.length; i++) {
-            buf.append(hexUnescape(names[i]));
+            buf.append(HexEscaper.unescape(names[i]));
             if (i < names.length-1) {
                 buf.append("/");
             }
         }
 
-        return buf.toString();
-    }
-
-    // private methods
-
-    private static String hexEscape(String str) {
-        StringBuffer buf = null;
-        int length = str.length();
-        int pos = 0;
-        for (int i = 0; i < length; i++) {
-            int ch = str.charAt(i);
-            switch (ch) {
-            case '/':
-            case ':':
-            case '[':
-            case ']':
-            case '*':
-            case '"':
-            case '|':
-            case '\'':
-                if (buf == null) {
-                    buf = new StringBuffer();
-                }
-                if (i > 0) {
-                    buf.append(str.substring(pos, i));
-                }
-                pos = i + 1;
-                break;
-            default:
-                continue;
-            }
-            buf.append("%").append(Integer.toHexString(ch));
-        }
-        
-        if (buf == null) {
-            return str;
-        }
-
-        if (pos < length) {
-            buf.append(str.substring(pos));
-        }
-        return buf.toString();
-    }
-
-    private static String hexUnescape(String str) {
-        StringBuffer buf = null;
-        int length = str.length();
-        int pos = 0;
-        for (int i = 0; i < length; i++) {
-            int ch = str.charAt(i);
-            switch (ch) {
-            case '%':
-                if (i+3 > length) {
-                    continue;
-                }
-                if (buf == null) {
-                    buf = new StringBuffer();
-                }
-                if (i > 0) {
-                    buf.append(str.substring(pos, i));
-                }
-                pos = i + 1;
-                break;
-            default:
-                continue;
-            }
-            if (ch == '%') {
-                String hex = str.substring(i+1, i+3);
-                if (hex.equals("2f")) {
-                    buf.append("/");
-                }
-                else if (hex.equals("3a")) {
-                    buf.append(":");
-                }
-                else if (hex.equals("5b")) {
-                    buf.append("[");
-                }
-                else if (hex.equals("5d")) {
-                    buf.append("]");
-                }
-                else if (hex.equals("2a")) {
-                    buf.append("*");
-                }
-                else if (hex.equals("22")) {
-                    buf.append("\"");
-                }
-                else if (hex.equals("7c")) {
-                    buf.append("|");
-                }
-                else if (hex.equals("27")) {
-                    buf.append("'");
-                }
-                else {
-                    continue;
-                }
-                i += 2;
-                pos = i + 1;
-            }
-        }
-        if (buf == null) {
-            return str;
-        }
-
-        if (pos < length) {
-            buf.append(str.substring(pos));
-        }
         return buf.toString();
     }
 }

@@ -34,9 +34,9 @@ public class PathTranslatorTest extends TestCase {
 
     public void testEscapedQueryableRepositoryPath()
         throws Exception {
-        String in = "/home/bcm/My Documents";
+        String in = "/bcm/My Documents";
         String out = PathTranslator.toQueryableRepositoryPath(in);
-        assertEquals("/home/bcm/My_x0020_Documents", out);
+        assertEquals("/bcm/My_x0020_Documents", out);
     }
 
     public void testUnescapedQueryableRepositoryName()
@@ -48,7 +48,7 @@ public class PathTranslatorTest extends TestCase {
 
     public void testUnescapedQueryableRepositoryPath()
         throws Exception {
-        String in = "/home/bcm/My_Documents";
+        String in = "/bcm/My_Documents";
         String out = PathTranslator.toQueryableRepositoryPath(in);
         assertEquals(in, out);
     }
@@ -58,5 +58,19 @@ public class PathTranslatorTest extends TestCase {
         String in = "My_x0020_Documents";
         String out = PathTranslator.toQueryableRepositoryPath(in);
         assertEquals("My_x005f_x0020_Documents", out);
+    }
+
+    public void testToRepositoryPath()
+        throws Exception {
+        String in = "/bcm/My[Documents]";
+        String out = PathTranslator.toRepositoryPath(in);
+        assertEquals("/bcm/My%5bDocuments%5d", out);
+    }
+
+    public void testToClientPath()
+        throws Exception {
+        String in = "/bcm/My%5bDocuments%5d";
+        String out = PathTranslator.toClientPath(in);
+        assertEquals("/bcm/My[Documents]", out);
     }
 }

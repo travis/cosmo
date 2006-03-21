@@ -71,7 +71,7 @@ public class JcrHomeDirectoryDao extends JcrDaoSupport
         return (Resource) getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    String jcrPath = PathTranslator.hexEscapeJcrPath(path);
+                    String jcrPath = PathTranslator.toRepositoryPath(path);
                     if (! session.itemExists(jcrPath)) {
                         throw new NoSuchResourceException(path);
                     }
@@ -101,7 +101,7 @@ public class JcrHomeDirectoryDao extends JcrDaoSupport
         getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    String jcrPath = PathTranslator.hexEscapeJcrPath(path);
+                    String jcrPath = PathTranslator.toRepositoryPath(path);
                     if (session.itemExists(jcrPath)) {
                         session.getItem(jcrPath).remove();
                         session.save();

@@ -189,8 +189,8 @@ public class CosmoHandler extends DefaultHandler implements SchemaConstants {
 
             // XXX: move into JcrResourceMapper!!@#$!@!@
 
-            String displayName = 
-                PathTranslator.hexUnescapeJcrNames(context.getSystemId());
+            String displayName =
+                PathTranslator.toClientPath(context.getSystemId());
             resourceNode.setProperty(NP_DAV_DISPLAYNAME, displayName);
             resourceNode.setProperty(NP_DAV_CONTENTLANGUAGE,
                                      context.getContentLanguage());

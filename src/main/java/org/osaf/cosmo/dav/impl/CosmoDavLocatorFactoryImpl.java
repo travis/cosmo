@@ -64,7 +64,7 @@ public class CosmoDavLocatorFactoryImpl extends LocatorFactoryImpl {
                                                     boolean isResourcePath) {
         String jcrPath = isResourcePath ? null : path;
         String resourcePath = isResourcePath ? path :
-            PathTranslator.hexUnescapeJcrPath(jcrPath);
+            PathTranslator.toClientPath(jcrPath);
         DavResourceLocator locator =
             super.createResourceLocator(prefix, workspacePath, resourcePath,
                                         true);

@@ -50,9 +50,8 @@ import org.springmodules.jcr.support.JcrDaoSupport;
  * for more information on how to configure the template with
  * credentials, a repository reference and a workspace name.
  *
- * It uses {@link JcrCalendarMapper} to convert JCR nodes and
- * properties to and from instances of
- * {@link net.fortuna.ical4j.model.Calendar}.
+ * It uses {@link TicketMapper} to convert JCR nodes and
+ * properties to and from instances of {@link Ticket}.
  * 
  * Tickets can only be assigned to nodes of type
  * <code>ticket:ticketable</code>. Tickets are persisted as child

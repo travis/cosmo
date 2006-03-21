@@ -257,8 +257,8 @@ public class CosmoHandler extends DefaultHandler implements SchemaConstants {
         StringBuffer stmt = new StringBuffer();
         stmt.append("/jcr:root");
         if (! resourceNode.getParent().getPath().equals("/")) {
-            stmt.append(PathTranslator.
-                        xmlEscapeJcrNames(resourceNode.getParent().getPath()));
+            String parentPath = resourceNode.getParent().getPath();
+            stmt.append(PathTranslator.toQueryableRepositoryPath(parentPath));
         }
         stmt.append("//element(*, ").
             append(NT_CALENDAR_RESOURCE).

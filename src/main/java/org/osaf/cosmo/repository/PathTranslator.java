@@ -28,42 +28,35 @@ import org.apache.xerces.util.XMLChar;
  *
  * The "client view", which the majority of server classes work
  * with, provides the external, simple addressing of repository
- * items (eg /home/bcm/Brian's Calendar/deadbeef.ics)
+ * items (eg /bcm/Brian's Calendar/deadbeef.ics)
  *
  * The "repository view", used by data access objects that
- * directly use the JCR api, in which items are addressed by valid JCR
+ * directly use the JCR API, in which items are addressed by valid JCR
  * paths and where storage requirements often dictate a structure that
  * is not exposed to clients
- * (eg /home/b/bc/bcm/Brian's Calendar/d/de/deadbeef.ics)
+ * (eg /b/bc/bcm/Brian's Calendar/d/de/deadbeef.ics)
  */
 public class PathTranslator {
     private static final Log log = LogFactory.getLog(PathTranslator.class);
 
-    private static final String utf16esc =
-        "_x[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]_";
-
-    private static char[] Utf16Padding = {'0', '0', '0'};
-
-    private static int utf16length = 4;
-
-    public static String xmlEscapeJcrValues(String str) {
-        return xmlEscapeValues(str);
-    }
-
-    public static String xmlEscapeJcrNames(String str) {
-        return xmlEscapeNames(str);
-    }
-
-    public static String xmlEscapeJcrPath(String str) {
-        if (str.equals("/")) {
-            return str;
+    /**
+     * Converts a standard repository path into one that is suitable
+     * for use in JCR queries using the XPath syntax. The path is
+     * escaped using the ISO 9075 scheme for converting arbitrary
+     * strings into valid XML element names. This is necessary since
+     * XPath queries are executed against the logical XML document
+     * view of the repository.
+     */
+    public static String toQueryableRepositoryPath(String path) {
+        if (path.equals("/")) {
+            return path;
         }
 
         StringBuffer buf = new StringBuffer();
 
-        String[] names = str.split("/");
+        String[] names = path.split("/");
         for (int i=0; i<names.length; i++) {
-            buf.append(xmlEscapeNames(names[i]));
+            buf.append(ISO9075.encode(names[i]));
             if (i < names.length-1) {
                 buf.append("/");
             }
@@ -71,6 +64,11 @@ public class PathTranslator {
 
         return buf.toString();
     }
+
+    // XXX: replace hex* apis with ones that convert client paths to
+    // and from repository paths without describing the encoding
+    // technique. perhaps use the strategy pattern to allow either hex
+    // or ISO 9075 encoding to be used.
 
     public static String hexEscapeJcrNames(String str) {
         return hexEscape(str);
@@ -117,97 +115,6 @@ public class PathTranslator {
     }
 
     // private methods
-
-    private static String xmlEscapeNames(String str) {
-        String[] split = str.split(":");
-        if (split.length == 2) {
-            // prefix should yet be a valid xml name
-            String localname = xmlEscape(split[1]);
-            String name = split[0] + ":" + localname;
-            return name;
-        } else {
-            String localname = xmlEscape(split[0]);
-            return localname;
-        }
-    }
-
-    private static String xmlEscapeValues(String str) {
-        char[] chars = str.toCharArray();
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < chars.length; i++) {
-            char c = chars[i];
-            if (c == '\u0020'
-                    || c == '\u0009'
-                    || c == '\n'
-                    || c == '\r') {
-                buf.append(xmlEscapeChar(c));
-            } else {
-                buf.append(c);
-            }
-        }
-        return buf.toString();
-    }
-
-    // Check if a substring can be misinterpreted as an xml escape
-    // sequence.
-    private static boolean canMisinterpret(String str) {
-        boolean misinterprete = false;
-        // check if is like "_xXXXX_"
-        if (str.length() >= 7) {
-            String sub16 = str.substring(0, 7);
-            if (sub16.matches(utf16esc)) {
-                misinterprete = true;
-            }
-        }
-        return misinterprete;
-    }
-
-    // Escapes a single (invalid xml) character.
-    private static String xmlEscapeChar(char c) {
-        String unicodeRepr = Integer.toHexString(c);
-        StringBuffer escaped = new StringBuffer();
-        escaped.append("_x");
-        escaped.append(Utf16Padding, 0, utf16length - unicodeRepr.length());
-        escaped.append(unicodeRepr);
-        escaped.append("_");
-        return escaped.toString();
-    }
-
-    // Escapes a string containing invalid xml character(s).
-    private static String xmlEscape(String str) {
-        char[] chars = str.toCharArray();
-        StringBuffer buf = new StringBuffer();
-
-        for (int i = 0; i < chars.length; i++) {
-            char c = chars[i];
-            // handle start character
-            if (i == 0) {
-                if (!XMLChar.isNameStart(c)) {
-                    String escaped = xmlEscapeChar(c);
-                    buf.append(escaped);
-                } else {
-                    String substr = str.substring(i, str.length());
-                    if (canMisinterpret(substr)) {
-                        buf.append(xmlEscapeChar(c));
-                    } else {
-                        buf.append(c);
-                    }
-                }
-            } else {
-                if (!XMLChar.isName(c)) {
-                    buf.append(xmlEscapeChar(c));
-                } else {
-                    String substr = str.substring(i, str.length());
-                    if (canMisinterpret(substr)) {
-                        buf.append(xmlEscapeChar(c));
-                    } else {
-                        buf.append(c);
-                    }
-                }
-            }
-        }
-        return buf.toString();
-    }
 
     private static String hexEscape(String str) {
         StringBuffer buf = null;

@@ -46,7 +46,7 @@ import org.springmodules.jcr.support.JcrDaoSupport;
  * for more information on how to configure the template with
  * credentials, a repository reference and a workspace name.
  *
- * It uses {@link JcrResourceMapper} to convert JCR nodes and
+ * It uses {@link ResourceMapper} to convert JCR nodes and
  * properties to and from instances of
  * {@link Resource}.
  */

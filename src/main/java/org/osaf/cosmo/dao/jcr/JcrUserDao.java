@@ -177,6 +177,8 @@ public class JcrUserDao extends JcrDaoSupport
                         throw new DuplicateEmailException(user.getEmail());
                     }
 
+                    // XXX: use ResourceMapper to make the node a home
+                    // collection
                     Node node = parent.addNode(user.getUsername(), NT_FOLDER);
                     node.addMixin(NT_USER);
                     user.setDateModified(new Date());

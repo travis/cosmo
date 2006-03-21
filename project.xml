@@ -191,7 +191,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-server</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060307</version>
+      <version>1.0-SNAPSHOT-osaf-20060321</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -199,7 +199,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-server</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060307</version>
+      <version>1.0-SNAPSHOT-osaf-20060321</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

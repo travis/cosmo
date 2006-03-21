@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dao.jcr;
+package org.osaf.cosmo.repository;
 
 import java.util.Iterator;
 
@@ -35,8 +35,6 @@ import org.osaf.cosmo.model.HomeCollectionResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.model.ResourceProperty;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.repository.PathTranslator;
-import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
  * Utility class that converts between {@link Resource}s and
@@ -51,8 +49,8 @@ import org.osaf.cosmo.repository.SchemaConstants;
  * with the <code>dav:collection</code> and
  * <code>ticket:ticketable</code> mixin types.
  */
-public class JcrResourceMapper implements SchemaConstants {
-    private static final Log log = LogFactory.getLog(JcrResourceMapper.class);
+public class ResourceMapper implements SchemaConstants {
+    private static final Log log = LogFactory.getLog(ResourceMapper.class);
 
     /**
      * Returns a new instance of <code>Resource</code> populated from a
@@ -100,7 +98,8 @@ public class JcrResourceMapper implements SchemaConstants {
     public static Node resourceToNode(Resource resource,
                                       Node parentNode)
         throws RepositoryException {
-        String name = PathTranslator.hexEscapeJcrNames(resource.getDisplayName());
+        String name =
+            PathTranslator.hexEscapeJcrNames(resource.getDisplayName());
         Node resourceNode = parentNode.hasNode(name) ?
             parentNode.getNode(name) :
             parentNode.addNode(name);
@@ -180,7 +179,7 @@ public class JcrResourceMapper implements SchemaConstants {
 
         for (NodeIterator i=node.getNodes(NN_TICKET); i.hasNext();) {
             Node child = i.nextNode();
-            resource.getTickets().add(JcrTicketMapper.nodeToTicket(child));
+            resource.getTickets().add(TicketMapper.nodeToTicket(child));
         }
 
         resource.setOwner(findOwner(node));
@@ -192,7 +191,7 @@ public class JcrResourceMapper implements SchemaConstants {
             return null;
         }
         if (node.isNodeType(NT_USER)) {
-            return JcrUserMapper.nodeToUser(node);
+            return UserMapper.nodeToUser(node);
         }
         Node parent = node.getParent();
         if (parent == null) {

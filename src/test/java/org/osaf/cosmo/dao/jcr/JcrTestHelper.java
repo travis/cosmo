@@ -42,7 +42,10 @@ import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.CalendarFlattener;
 import org.osaf.cosmo.repository.SchemaConstants;
+import org.osaf.cosmo.repository.TicketMapper;
+import org.osaf.cosmo.repository.UserMapper;
 
 /**
  */
@@ -161,7 +164,7 @@ public class JcrTestHelper extends TestHelper
 
         Node node = session.getRootNode().addNode(user.getUsername());
         node.addMixin(NT_USER);
-        JcrUserMapper.userToNode(user, node);
+        UserMapper.userToNode(user, node);
 
         return user;
     }
@@ -171,7 +174,7 @@ public class JcrTestHelper extends TestHelper
     public User findDummyUser(String username)
         throws RepositoryException {
         return session.getRootNode().hasNode(username) ?
-            JcrUserMapper.nodeToUser(session.getRootNode().getNode(username)) :
+            UserMapper.nodeToUser(session.getRootNode().getNode(username)) :
             null;
     }
 
@@ -204,7 +207,7 @@ public class JcrTestHelper extends TestHelper
         Ticket ticket = makeDummyTicket(user);
 
         Node ticketNode = node.addNode(NN_TICKET, NT_TICKET);
-        JcrTicketMapper.ticketToNode(ticket, ticketNode);
+        TicketMapper.ticketToNode(ticket, ticketNode);
 
         return ticket;
     }
@@ -217,7 +220,7 @@ public class JcrTestHelper extends TestHelper
         for (NodeIterator i = node.getNodes(NN_TICKET); i.hasNext();) {
             Node child = i.nextNode();
             if (child.getProperty(NP_TICKET_ID).getString().equals(id)) {
-                return JcrTicketMapper.nodeToTicket(child);
+                return TicketMapper.nodeToTicket(child);
             }
         }
         return null;
@@ -336,7 +339,7 @@ public class JcrTestHelper extends TestHelper
             // XXX: if the node is being updated, find the
             // properties that previously existed but are not in
             // the new entity and nuke them
-            JcrCalendarFlattener flattener = new JcrCalendarFlattener();
+            CalendarFlattener flattener = new CalendarFlattener();
             Map flattened = flattener.flattenCalendarObject(calendar);
             for (Iterator i=flattened.entrySet().iterator();
                  i.hasNext();) {

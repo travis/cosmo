@@ -41,8 +41,8 @@ import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavResource;
 
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.dao.jcr.JcrCalendarFlattener;
 import org.osaf.cosmo.icalendar.ComponentTypes;
+import org.osaf.cosmo.repository.CalendarFlattener;
 import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.SchemaConstants;
 
@@ -217,7 +217,7 @@ public class CosmoHandler extends DefaultHandler implements SchemaConstants {
                     // XXX: if the node is being updated, find the
                     // properties that previously existed but are not in
                     // the new entity and nuke them
-                    JcrCalendarFlattener flattener = new JcrCalendarFlattener();
+                    CalendarFlattener flattener = new CalendarFlattener();
                     Map flattened = flattener.flattenCalendarObject(calendar);
                     for (Iterator i=flattened.entrySet().iterator();
                          i.hasNext();) {

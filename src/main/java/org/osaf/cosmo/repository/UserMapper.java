@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dao.jcr;
+package org.osaf.cosmo.repository;
 
 import java.util.Calendar;
 
@@ -25,14 +25,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
  * Utility class that converts between {@link User}s and
  * {@link javax.jcr.Node}s.
  */
-public class JcrUserMapper implements SchemaConstants {
-    private static final Log log = LogFactory.getLog(JcrUserMapper.class);
+public class UserMapper implements SchemaConstants {
+    private static final Log log = LogFactory.getLog(UserMapper.class);
 
     /**
      * Returns a new instance of <code>User</code> populated from a

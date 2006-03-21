@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.repository.SchemaConstants;
+import org.osaf.cosmo.repository.TicketMapper;
 
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -99,7 +100,7 @@ public class JcrTicketDao extends JcrDaoSupport
                     Node parentNode = (Node) parentItem;
 
                     Node ticketNode = parentNode.addNode(NN_TICKET, NT_TICKET);
-                    JcrTicketMapper.ticketToNode(ticket, ticketNode);
+                    TicketMapper.ticketToNode(ticket, ticketNode);
 
                     parentNode.save();
                     return null;
@@ -135,7 +136,7 @@ public class JcrTicketDao extends JcrDaoSupport
                     Set tickets = new HashSet();
                     while (i.hasNext()) {
                         Node child = i.nextNode();
-                        tickets.add(JcrTicketMapper.nodeToTicket(child));
+                        tickets.add(TicketMapper.nodeToTicket(child));
                     }
 
                     return tickets;
@@ -170,7 +171,7 @@ public class JcrTicketDao extends JcrDaoSupport
                         }
                         return getTicket(parentNode.getParent().getPath(), id);
                     }
-                    return JcrTicketMapper.nodeToTicket(ticketNode);
+                    return TicketMapper.nodeToTicket(ticketNode);
                 }
             });
     }

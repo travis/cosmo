@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dao.jcr;
+package org.osaf.cosmo.repository;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -44,8 +44,6 @@ import net.fortuna.ical4j.model.property.DateProperty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.repository.SchemaConstants;
-
 /**
  * @author cyrusdaboo
  * @author bcm
@@ -61,9 +59,8 @@ import org.osaf.cosmo.repository.SchemaConstants;
  * key can be used as the JCR property name and the value as the
  * (string) JCR property value.
  */
-public class JcrCalendarFlattener implements SchemaConstants {
-    private static final Log log =
-        LogFactory.getLog(JcrCalendarFlattener.class);
+public class CalendarFlattener implements SchemaConstants {
+    private static final Log log = LogFactory.getLog(CalendarFlattener.class);
 
     static final public String TIME_RANGE_FIELD_SUFFIX = "--TIMERANGE";
     static final public String TIME_RANGE_FIELD_SUFFIX_LOWERCASE =

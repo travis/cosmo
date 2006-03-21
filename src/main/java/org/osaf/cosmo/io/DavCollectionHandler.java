@@ -44,11 +44,11 @@ import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 
-import org.osaf.cosmo.dao.jcr.JcrResourceMapper;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.model.CalendarCollectionResource;
 import org.osaf.cosmo.repository.PathTranslator;
+import org.osaf.cosmo.repository.ResourceMapper;
 import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
@@ -125,7 +125,7 @@ public class DavCollectionHandler implements IOHandler, SchemaConstants {
             if (parentNode.hasNode(name)) {
                 return false;
             }
-            // XXX: refactor to use JcrResourceMapper
+            // XXX: refactor to use ResourceMapper
             String displayName = PathTranslator.hexUnescapeJcrNames(name);
             Node collectionNode = parentNode.addNode(name, NT_FOLDER);
             collectionNode.addMixin(NT_DAV_COLLECTION);
@@ -229,7 +229,7 @@ public class DavCollectionHandler implements IOHandler, SchemaConstants {
             Node node = (Node) context.getExportRoot();
             CalendarCollectionResource collection =
                 (CalendarCollectionResource)
-                JcrResourceMapper.nodeToResource(node);
+                ResourceMapper.nodeToResource(node);
             Calendar calendar = collection.getCalendar();
             if (calendar.getComponents().isEmpty()) {
                 return true;

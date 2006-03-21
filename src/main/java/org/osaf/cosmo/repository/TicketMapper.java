@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dao.jcr;
+package org.osaf.cosmo.repository;
 
 import java.util.Calendar;
 
@@ -25,14 +25,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.Ticket;
-import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
  * Utility class that converts between {@link Ticket}s and
  * {@link javax.jcr.Node}s.
  */
-public class JcrTicketMapper implements SchemaConstants {
-    private static final Log log = LogFactory.getLog(JcrTicketMapper.class);
+public class TicketMapper implements SchemaConstants {
+    private static final Log log = LogFactory.getLog(TicketMapper.class);
 
     /**
      * Returns a new instance of <code>Ticket</code> populated from a

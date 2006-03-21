@@ -27,6 +27,7 @@ import org.osaf.cosmo.dao.HomeDirectoryDao;
 import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.repository.PathTranslator;
+import org.osaf.cosmo.repository.ResourceMapper;
 import org.osaf.cosmo.repository.SchemaConstants;
 
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -87,7 +88,7 @@ public class JcrHomeDirectoryDao extends JcrDaoSupport
                         throw new InvalidDataAccessResourceUsageException("item at path " + jcrPath + " not a resource node");
                     }
 
-                    return JcrResourceMapper.nodeToResource(node);
+                    return ResourceMapper.nodeToResource(node);
                 }
             });
     }

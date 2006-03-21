@@ -41,6 +41,7 @@ import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.repository.SchemaConstants;
+import org.osaf.cosmo.repository.UserMapper;
 
 import org.springframework.dao.DataRetrievalFailureException;
 
@@ -78,7 +79,7 @@ public class JcrUserDao extends JcrDaoSupport
                          i.hasNext();) {
                         Node node = i.nextNode();
                         if (node.isNodeType(NT_USER)) {
-                            users.add(JcrUserMapper.nodeToUser(node));
+                            users.add(UserMapper.nodeToUser(node));
                         }
                     }
 
@@ -106,8 +107,7 @@ public class JcrUserDao extends JcrDaoSupport
                                                                 " not found");
                     }
 
-                    return JcrUserMapper.
-                        nodeToUser((Node) session.getItem(path));
+                    return UserMapper.nodeToUser((Node) session.getItem(path));
                 }
             });
     }
@@ -133,7 +133,7 @@ public class JcrUserDao extends JcrDaoSupport
                                                                 " not found");
                     }
 
-                    return JcrUserMapper.nodeToUser(i.nextNode());
+                    return UserMapper.nodeToUser(i.nextNode());
                 }
             });
     }
@@ -181,7 +181,7 @@ public class JcrUserDao extends JcrDaoSupport
                     node.addMixin(NT_USER);
                     user.setDateModified(new Date());
                     user.setDateCreated(user.getDateModified());
-                    JcrUserMapper.userToNode(user, node);
+                    UserMapper.userToNode(user, node);
 
                     node.addMixin(NT_TICKETABLE);
                     node.addMixin(NT_HOME_COLLECTION);
@@ -243,7 +243,7 @@ public class JcrUserDao extends JcrDaoSupport
 
                     Node node = (Node) session.getItem(oldPath);
                     user.setDateModified(new Date());
-                    JcrUserMapper.userToNode(user, node);
+                    UserMapper.userToNode(user, node);
 
                     if (user.isUsernameChanged()) {
                         session.move(oldPath, newPath);

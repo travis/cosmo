@@ -7,7 +7,7 @@ ____________
 
 *Test account on server with:
 
-    username:  'test1'
+    username: 'test1'
     password: 'test1'
 
 *Create new calendar for user test:

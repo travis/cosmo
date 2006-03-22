@@ -197,7 +197,7 @@ public class CosmoHandler extends DefaultHandler implements SchemaConstants {
 
             if (resourceNode.isNodeType(NT_CALENDAR_RESOURCE)) {
                 // set calendar:uid
-                // XXX: if not using NDEX_VIRTUAL_PROPERTIES, there is
+                // XXX: if not using INDEX_VIRTUAL_PROPERTIES, there is
                 // no need to store this property - the calendar
                 // collection uid uniqueness check can look directly
                 // at the icalendar uid property

@@ -73,4 +73,32 @@ public class PathTranslatorTest extends TestCase {
         String out = PathTranslator.toClientPath(in);
         assertEquals("/bcm/My[Documents]", out);
     }
+
+    public void testToRepositoryPathWithInternalSlash()
+        throws Exception {
+        String in = "/bcm/My[Docu/ments]";
+        String out = PathTranslator.toRepositoryPath(in);
+        assertEquals("/bcm/My%5bDocu/ments%5d", out);
+    }
+
+    public void testToClientPathWithInternalSlash()
+        throws Exception {
+        String in = "/bcm/My%5bDocu/ments%5d";
+        String out = PathTranslator.toClientPath(in);
+        assertEquals("/bcm/My[Docu/ments]", out);
+    }
+
+    public void testToRepositoryName()
+        throws Exception {
+        String in = "My[Docu/ments]";
+        String out = PathTranslator.toRepositoryPath(in);
+        assertEquals("My%5bDocu%2fments%5d", out);
+    }
+
+    public void testToClientName()
+        throws Exception {
+        String in = "My%5bDocu%2fments%5d";
+        String out = PathTranslator.toClientPath(in);
+        assertEquals("My[Docu/ments]", out);
+    }
 }

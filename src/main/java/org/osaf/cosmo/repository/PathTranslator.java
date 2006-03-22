@@ -32,7 +32,7 @@ import org.apache.jackrabbit.util.ISO9075;
  * directly use the JCR API, in which items are addressed by valid JCR
  * paths and where storage requirements often dictate a structure that
  * is not exposed to clients
- * (eg /b/bc/bcm/Brian's Calendar/d/de/deadbeef.ics)
+ * (eg /b/bc/bcm/Brian's Calendar/deadbeef.ics)
  */
 public class PathTranslator {
     private static final Log log = LogFactory.getLog(PathTranslator.class);
@@ -66,17 +66,26 @@ public class PathTranslator {
     }
 
     /**
-     * Converts a client path into a repository path, taking into
-     * account the internal storage structure of the repository schema
-     * and escaping characters that are illegal in JCR names.
+     * Converts a client path into a repository path, escaping
+     * characters that are illegal in JCR names.
      *
-     * Note that individual path segments cannot contain the '/'
-     * character, as this character is used as the path delimiter for
-     * both the client and repository views.
+     * If the path starts with a '/', it is interpreted as an absolute
+     * path (one ore more path segments separated by '/'). In this
+     * case, path segments cannot contain the '/' character, for
+     * obvious reasons. Note that additional path segments may be
+     * inserted into the path to account for the repository schema's
+     * internal storage structure.
+     *
+     * If the path does not start with '/', it is assumed to be a
+     * simple name, and the '/' character is escaped.
      *
      * @see {@link HexEscaper}
      */
     public static String toRepositoryPath(String clientPath) {
+        if (! clientPath.startsWith("/")) {
+            return HexEscaper.escape(clientPath);
+        }
+
         if (clientPath.equals("/")) {
             return clientPath;
         }
@@ -95,13 +104,21 @@ public class PathTranslator {
     }
 
     /**
-     * Converts a repository path into a client path, removing nodes
-     * that are part of the internal storage structure of the
-     * repository schema and hex-unescaping path segments.
+     * Converts a repository path into a client path, converting
+     * escape sequences back into the original JCR-illegal
+     * characters.
+     *
+     * If the path starts with a '/', it is interpreted as an absolute
+     * path, and any segments representing internal storage nodes are
+     * removed.
      *
      * @see {@link HexEscaper}
      */
     public static String toClientPath(String repositoryPath) {
+        if (! repositoryPath.startsWith("/")) {
+            return HexEscaper.unescape(repositoryPath);
+        }
+
         if (repositoryPath.equals("/")) {
             return repositoryPath;
         }

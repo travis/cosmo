@@ -68,7 +68,23 @@ public class ComponentTypes {
 
     /**
      */
+    public static int getComponentType(String componentTypeName) {
+        if (componentTypeName.equalsIgnoreCase(Component.VEVENT))
+            return VEVENT;
+
+        throw new IllegalArgumentException("Invalid component type name '" +
+                                           componentTypeName + "'.");
+    }
+
+    /**
+     */
     public static boolean isValidComponentType(int componentType) {
         return componentType == VEVENT;
+    }
+
+    /**
+     */
+    public static boolean isValidComponentTypeName(String componentTypeName) {
+        return componentTypeName.equalsIgnoreCase(Component.VEVENT);
     }
 }

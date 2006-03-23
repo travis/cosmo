@@ -69,8 +69,9 @@ public interface SchemaConstants {
         "dav:contentlanguage";
 
     public static final String NP_CALENDAR_UID = "calendar:uid";
-    public static final String NP_CALENDAR_DESCRIPTION =
-        "calendar:description";
+    public static final String NP_CALENDAR_DESCRIPTION = "calendar:description";
+    public static final String NP_CALENDAR_TIMEZONE = "calendar:timezone";
+    public static final String NP_CALENDAR_SUPPORTED_COMPONENT_SET = "calendar:supportedComponentSet";  
 
     public static final String NP_TICKET_ID = "ticket:id";
     public static final String NP_TICKET_OWNER = "ticket:owner";

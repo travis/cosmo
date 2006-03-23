@@ -32,6 +32,11 @@ public class CosmoDavPropertyName {
                                PROPERTY_CALDAV_CALENDAR_DESCRIPTION,
                                CosmoDavConstants.NAMESPACE_CALDAV);
 
+    public static final DavPropertyName CALENDARTIMEZONE =
+        DavPropertyName.create(CosmoDavConstants.
+                               PROPERTY_CALDAV_CALENDAR_TIMEZONE,
+                               CosmoDavConstants.NAMESPACE_CALDAV);
+
     /**
      */
     public static final DavPropertyName SUPPORTEDCALENDARCOMPONENTSET =

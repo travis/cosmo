@@ -91,6 +91,10 @@ public class SupportedCalendarComponentSet extends AbstractDavProperty {
             this.type = type;
         }
 
+        public String toString() {
+            return type;
+        }
+
         /**
          */
         public Element toXml(Document document) {

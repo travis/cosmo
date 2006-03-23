@@ -16,6 +16,7 @@
 package org.osaf.cosmo.dav.impl;
 
 import java.util.Iterator;
+import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,6 +34,11 @@ import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavRequest;
 import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.dav.property.CalendarTimezone;
+import org.osaf.cosmo.dav.property.CalendarDescription;
+import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
+import org.osaf.cosmo.dav.property.SupportedCalendarComponentSet;
+import org.osaf.cosmo.icalendar.ComponentTypes;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -82,8 +88,10 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
 
     /**
      * Return the list of 'set' entries in the MKCALENDAR request
-     * body. The list is empty if the request body could not be parsed
-     * or if the request body did not contain any 'set' elements.
+     * body. The list is empty if the request body did not
+     * contain any 'set' elements.
+     * An <code>IllegalArgumentException</code> is raised if the request body can not
+     * be parsed
      */
     public DavPropertySet getMkCalendarSetProperties() {
         if (mkcalendarSet == null) {
@@ -128,36 +136,162 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
         DavPropertySet propertySet = new DavPropertySet();
 
         Document requestDocument = getRequestDocument();
+
         if (requestDocument == null) {
+            //The request did not contain an XML body
+            log.info("parseMkCalendarRequest requestDocument is null");
             return propertySet;
         }
 
         Element root = requestDocument.getDocumentElement();
         if (! DomUtil.matches(root, CosmoDavConstants.ELEMENT_CALDAV_MKCALENDAR,
                               CosmoDavConstants.NAMESPACE_CALDAV)) {
-            throw new IllegalArgumentException("mkcalendar request missing DAV:mkcalendar");
+            throw new IllegalArgumentException("MKCALENDAR request missing DAV:mkcalendar");
         }
 
         Element set =
             DomUtil.getChildElement(root, CosmoDavConstants.ELEMENT_SET,
                                     DavConstants.NAMESPACE);
+
         if (set == null) {
-            throw new IllegalArgumentException("mkcalendar request missing DAV:set element");
+            throw new IllegalArgumentException("MKCALENDAR request missing DAV:set element");
         }
         Element prop =
             DomUtil.getChildElement(set, CosmoDavConstants.ELEMENT_PROP,
                                     DavConstants.NAMESPACE);
         if (prop == null) {
-            throw new IllegalArgumentException("mkcalendar request missing DAV:prop element");
+            throw new IllegalArgumentException("MKCALENDAR request missing DAV:prop element");
         }
 
         ElementIterator i = DomUtil.getChildren(prop);
+
         while (i.hasNext()) {
-            propertySet.add(DefaultDavProperty.createFromXml(i.nextElement()));
+            Element e = i.nextElement();
+
+            //{CALDAV:calendar-timezone}
+            if (DomUtil.matches(e, CosmoDavConstants.PROPERTY_CALDAV_CALENDAR_TIMEZONE,
+                                CosmoDavConstants.NAMESPACE_CALDAV)) {
+                parseCalendarTimezone(propertySet, e);
+
+            }
+            // {CALDAV:supported-calendar-component-set}
+            else if (DomUtil.matches(e, 
+                           CosmoDavConstants.PROPERTY_CALDAV_SUPPORTED_CALENDAR_COMPONENT_SET,
+                                CosmoDavConstants.NAMESPACE_CALDAV)) {
+                parseSupportedCalendarSet(propertySet, e);
+            }
+            //CALDAV:calendar-description
+            else if (DomUtil.matches(e, CosmoDavConstants.PROPERTY_CALDAV_CALENDAR_DESCRIPTION,
+                                     CosmoDavConstants.NAMESPACE_CALDAV)) {
+                parseDescription(propertySet, e);
+            }
+            //CALDAV:supported-calendar-data
+            else if (DomUtil.matches(e, CosmoDavConstants.PROPERTY_CALDAV_SUPPORTED_CALENDAR_DATA,
+                                     CosmoDavConstants.NAMESPACE_CALDAV)) {
+                throw new IllegalArgumentException("MKCALENDAR CALDAV:supported-calendar-data " +
+                                                   "property is not allowed");
+
+            }
+            //CALDAV: namespace
+            else if (DomUtil.getNamespace(e).equals(CosmoDavConstants.NAMESPACE_CALDAV)) {
+                //No other properties should be specifed in the CALDAV namespace.
+                //Raise error if one or more found.
+                throw new IllegalArgumentException("Invalid MKCALENDAR property in " +
+                                                   "CALDAV namespace: " + e.toString());
+            }
+            //DAV:displayname
+            else if (DomUtil.matches(e, DavConstants.PROPERTY_DISPLAYNAME,
+                                     DavConstants.NAMESPACE)) {
+                propertySet.add(DefaultDavProperty.createFromXml(e));
+            }
+            //DAV: namespace
+            else if (DomUtil.getNamespace(e).equals(DavConstants.NAMESPACE)) {
+                //No other properties should be specifed in the DAV namespace. Verify and 
+                //raise error if one or more found.
+                throw new IllegalArgumentException("Invalid MKCALENDAR property in " +
+                                                   "DAV namespace: " + e.toString());
+            }
+            //Handle all dead properties
+            else {
+                propertySet.add(DefaultDavProperty.createFromXml(e));
+            }
         }
 
         return propertySet;
     }
+
+    private void parseDescription(DavPropertySet propertySet, Element e) {
+        DefaultDavProperty d = DefaultDavProperty.createFromXml(e);
+
+        String lang = DomUtil.getAttribute(e, CosmoDavConstants.ATTR_XML_LANG,
+                                           CosmoDavConstants.NAMESPACE_XML);
+
+        if (lang != null) {
+            propertySet.add(new CalendarDescription((String) d.getValue(), lang));
+        } else {
+            propertySet.add(new CalendarDescription((String) d.getValue()));
+        }
+    }
+
+    private void parseCalendarTimezone(DavPropertySet propertySet, Element e) {
+        String icalTz = DomUtil.getTextTrim(e);
+
+        if (icalTz == null)
+            throw new IllegalArgumentException("MKCALENDAR request error parsing " +
+                                               "calendar:timezone CDATA required");
+
+        propertySet.add(new CalendarTimezone(icalTz));
+    }
+
+    private void parseSupportedCalendarSet(DavPropertySet propertySet, Element e) {
+        ElementIterator i = DomUtil.getChildren(e);
+
+        if (! i.hasNext()) {
+            //No C:comp elements were contained in the supported-calendar-component-set
+            throw new IllegalArgumentException("MKCALENDAR request error parsing " +
+                                             "supported-calendar-component-set " + 
+                                             " no comp elements found");
+        }
+
+        ArrayList a = new ArrayList();
+
+        while (i.hasNext()) {
+            Element el = i.nextElement();
+
+            if (!DomUtil.matches(el, CosmoDavConstants.ELEMENT_CALDAV_COMP,
+                CosmoDavConstants.NAMESPACE_CALDAV)) {
+                    throw new IllegalArgumentException("MKCALENDAR request error parsing " +
+                                                       "supported-calendar-component-set " +
+                                                       "only comp elements allowed");
+            }
+
+            String type = el.getAttribute(CosmoDavConstants.ATTR_CALDAV_NAME);
+
+            if (type == null) {
+                throw new IllegalArgumentException("MKCALENDAR request error parsing " +
+                                                   "supported-calendar-component-set " +
+                                                   "comp element missing name attribute");
+             }
+
+             try {
+                 a.add(new Integer(ComponentTypes.getComponentType(type.trim())));
+             } catch (IllegalArgumentException e1) {
+                 throw new IllegalArgumentException("MKCALENDAR request error parsing " +
+                                                    "supported-calendar-component-set. " +
+                                                    "Unsupported type " + type + " found.");
+             }
+        }
+
+        int size = a.size();
+
+        int[] compTypes = new int[size];
+
+        for (int j = 0; j < size; j++)
+            compTypes[j] = ((Integer) a.get(j)).intValue();
+
+        propertySet.add(new SupportedCalendarComponentSet(compTypes));
+    }
+
 
     private Ticket parseTicketRequest() {
         Document requestDocument = getRequestDocument();
@@ -224,6 +358,7 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
         return ticket;
     }
 
+
     /**
      * This is the Cosmo specific report handling.
      *
@@ -239,3 +374,4 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
                               getDavSession());
     }
 }
+

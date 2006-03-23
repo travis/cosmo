@@ -16,8 +16,12 @@
 package org.osaf.cosmo.repository;
 
 import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.jcr.Node;
+import javax.jcr.Value;
+import javax.jcr.ValueFormatException;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
@@ -140,6 +144,22 @@ public class ResourceMapper implements SchemaConstants {
         }
         node.setProperty(NP_CALENDAR_DESCRIPTION, resource.getDescription());
         node.setProperty(NP_XML_LANG, resource.getLanguage());
+
+        if (resource.hasTimezone())
+            node.setProperty(NP_CALENDAR_TIMEZONE, resource.getTimezone().toString());
+
+
+        if (resource.hasSupportedComponentSet()) {
+            Set cs = resource.getSupportedComponentSet();
+            Iterator i = cs.iterator();
+            String[] comps = new String[cs.size()];
+            int pos = 0;
+
+            while (i.hasNext())
+                comps[pos++] = i.next().toString();
+
+            node.setProperty(NP_CALENDAR_SUPPORTED_COMPONENT_SET, comps);
+        }
     }
 
     /**
@@ -308,6 +328,27 @@ public class ResourceMapper implements SchemaConstants {
         }
         if (node.hasProperty(NP_XML_LANG)) {
             collection.setLanguage(node.getProperty(NP_XML_LANG).getString());
+        }
+        if (node.hasProperty(NP_CALENDAR_TIMEZONE)) {
+            try {
+            collection.setTimezone(node.getProperty(NP_CALENDAR_TIMEZONE).getString());
+            } catch (Exception e) {
+                log.warn("Unable to set calendar timezone", e);
+            }
+        }
+        if (node.hasProperty(NP_CALENDAR_SUPPORTED_COMPONENT_SET)) {
+            try {
+                Value[] vals = node.getProperty(NP_CALENDAR_SUPPORTED_COMPONENT_SET).getValues();
+                HashSet comps = new HashSet();
+
+                for (int i = 0; i < vals.length; i++)
+                    comps.add(vals[i]);
+
+                collection.setSupportedComponentSet(comps);
+
+            } catch (ValueFormatException e) {
+                log.warn("Unable to set calendar supported component set", e);
+            }
         }
 
         if (depth > 0) {

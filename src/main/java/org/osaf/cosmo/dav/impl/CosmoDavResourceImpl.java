@@ -26,15 +26,20 @@ import java.util.Set;
 import javax.jcr.Item;
 import javax.jcr.ItemExistsException;
 import javax.jcr.Node;
+import javax.jcr.nodetype.NodeType;
+import javax.jcr.Value;
+import javax.jcr.Session;
+import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
-import javax.jcr.ValueFormatException;
 
 import org.apache.jackrabbit.server.io.ImportContext;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
+import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.io.InputContext;
@@ -42,9 +47,11 @@ import org.apache.jackrabbit.webdav.jcr.JcrDavException;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
+import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
 import org.apache.jackrabbit.webdav.simple.ResourceConfig;
+import org.apache.jackrabbit.webdav.MultiStatusResponse;
 
 import org.apache.log4j.Logger;
 
@@ -55,6 +62,7 @@ import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavResourceFactory;
 import org.osaf.cosmo.dav.CosmoDavResponse;
 import org.osaf.cosmo.dav.property.CalendarDescription;
+import org.osaf.cosmo.dav.property.CalendarTimezone;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.CosmoResourceType;
 import org.osaf.cosmo.dav.property.SupportedCalendarComponentSet;
@@ -68,13 +76,14 @@ import org.osaf.cosmo.io.CosmoImportContext;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.repository.SchemaConstants;
+import org.osaf.cosmo.icalendar.ComponentTypes;
 
 /**
  * A subclass of
  * {@link org.apache.jackrabbit.server.simple.dav.DavResourceImpl}
  * that provides Cosmo-specific WebDAV behaviors.
  */
-public class CosmoDavResourceImpl extends DavResourceImpl 
+public class CosmoDavResourceImpl extends DavResourceImpl
     implements CosmoDavResource, SchemaConstants {
     private static final Logger log =
         Logger.getLogger(CosmoDavResourceImpl.class);
@@ -294,16 +303,53 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                             getString();
                         String lang = getNode().getProperty(NP_XML_LANG).
                             getString();
-                        properties.add(new CalendarDescription(text, lang));
+
+                        if (lang != null)
+                            properties.add(new CalendarDescription(text, lang));
+                        else
+                            properties.add(new CalendarDescription(text));
                     }
                 } catch (RepositoryException e) {
                     log.warn("Unable to retrieve calendar description", e);
                 }
 
+                // calendar-timezone property
+                try {
+                    if (getNode().hasProperty(NP_CALENDAR_TIMEZONE)) {
+                        String text = getNode().
+                            getProperty(NP_CALENDAR_TIMEZONE).
+                            getString();
+
+                        properties.add(new CalendarTimezone(text));
+                    }
+                } catch (RepositoryException e) {
+                    log.warn("Unable to retrieve calendar timezone", e);
+                }
+
                 // supported-calendar-component-set property (caldav
                 // section 5.2.3)
-                DavProperty davprop = new SupportedCalendarComponentSet();
-                properties.add(davprop);
+                try {
+                    if (getNode().hasProperty(NP_CALENDAR_SUPPORTED_COMPONENT_SET)) {
+                        Value[] vals = getNode().getProperty(
+                                         NP_CALENDAR_SUPPORTED_COMPONENT_SET).getValues();
+
+                        int[] comps = new int[vals.length];
+
+                        for (int i = 0; i < vals.length; i++)
+                            comps[i] = ComponentTypes.getComponentType(vals[i].toString());
+
+                        properties.add(new SupportedCalendarComponentSet(comps));
+                    } else {
+                        properties.add(new SupportedCalendarComponentSet());
+                    }
+
+                } catch(IllegalArgumentException e) {
+                    log.warn("Invalid component type found using default values", e);
+                    properties.add(new SupportedCalendarComponentSet());
+                } catch (RepositoryException e) {
+                    log.warn("Unable to retrieve calendar component set using default values", e);
+                    properties.add(new SupportedCalendarComponentSet());
+                }
 
                 // supported-calendar-data property (caldav section
                 // 5.2.4)
@@ -472,4 +518,185 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                     "Unkown report " + reportInfo.getReportElement().getTagName() + "requested.");
         }
     }
+
+    /**
+     * Adds a new member to this resource and set the member properties.
+     */
+    public MultiStatusResponse addMember(DavResource member, InputContext inputContext,
+                                         DavPropertySet setProperties) throws DavException {
+        MultiStatusResponse msr = null;
+        DavResource savedMember = null;
+
+        if (setProperties == null || setProperties.isEmpty()) {
+            throw new IllegalArgumentException("invalid call to addMember with properties. " +
+                                               "The property set is null or empty");
+        }
+
+        try {
+            addMember(member, inputContext);
+            savedMember = getMember(member.getResourcePath());
+
+            if (savedMember == null) {
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
+                                       "Unable to retrieve member " + member.getResourcePath());
+            }
+        } catch (Exception e) {
+            log.error("Unable to addMember with properties to resource: addMember failed", e);
+            if (e instanceof DavException)
+                throw (DavException) e;
+            else
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+        try {
+            msr = savedMember.alterProperties(setProperties, new DavPropertyNameSet());
+        } catch (Exception e) {
+            log.error("Unable to addMember with properties to resource: alterProperties failed", e);
+            try {
+                //If an exception is raised while altering properties we want to remove the member we just created.
+                removeMember(savedMember);
+            } catch(DavException e1) {
+                log.error("Unable to removeMember after an alterProperties failure ", e1);
+            }
+
+            if (e instanceof DavException)
+                throw (DavException) e;
+            else
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+
+        if (! msr.hasStatusKey(DavServletResponse.SC_OK)) {
+            try {
+                //The setting of properties failed. We want to remove the member we just created.
+                removeMember(savedMember);
+            } catch(DavException e) {
+                log.error("Unable to removeMember after examining MultiStatusResponse", e);
+            }
+        }
+
+        return msr;
+    }
+
+    /**
+     * @param property
+     * @throws RepositoryException
+     */
+    protected void setJcrProperty(DavProperty property) throws RepositoryException {
+        //XXX What to do for: dav:contenttype -> jcr:mediaType, jcr:encoding
+
+        String value = property.getValue() != null ?
+                property.getValue().toString() :
+                null;
+
+        if (property instanceof CalendarTimezone) {
+            getNode().setProperty(NP_CALENDAR_TIMEZONE, value);
+        }
+        else if (property instanceof CalendarDescription) {
+            CalendarDescription c = (CalendarDescription) property;
+
+            getNode().setProperty(NP_CALENDAR_DESCRIPTION, value);
+            getNode().setProperty(NP_XML_LANG, c.getLanguage());
+        }
+        else if (property instanceof SupportedCalendarComponentSet) {
+            Object[] compTypes = ((Set) property.getValue()).toArray();
+            String[] values = new String[compTypes.length];
+
+            for(int i = 0; i < compTypes.length; i++)
+                values[i] = compTypes[i].toString();
+
+            getNode().setProperty(NP_CALENDAR_SUPPORTED_COMPONENT_SET, values);
+        }
+        else {
+            getNode().setProperty(getJcrName(property.getName()), value);
+        }
+    }
+
+    protected DavResource getMember(String resourcePath) {
+        DavResourceIterator it = getMembers();
+
+        //This is not the most efficient way to do this but since
+        //the DavResourceImpl jackrabbit class keeps its member variables private
+        //it is the only way to get the Resource.
+        while (it.hasNext()) {
+            DavResource r = it.nextResource();
+
+            if (r.getResourcePath().equals(resourcePath))
+                return r;
+        }
+
+        return null;
+    }
+
+
+    //XXX This could be moved to a utility class
+    protected String resourceNodeToString(DavResource r) {
+        String parPath = getResourcePath();
+
+        if (! parPath.endsWith("/")) parPath += "/";
+
+        String relPath = (r.getResourcePath().split(parPath))[1];
+
+        try {
+            Node n = getNode().getNode(relPath);
+            return nodeToString(n);
+
+        } catch(Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    //XXX This could be moved to a utility class
+    protected String nodeToString(Node n) {
+        StringBuffer buffer = new StringBuffer();
+
+        try {
+            buffer.append("Node: ").append(n.getName())
+                  .append("  Type: ").append( n.getPrimaryNodeType().getName());
+
+            NodeType[] nt = n.getMixinNodeTypes();
+
+            if (nt.length > 0) {
+                buffer.append("\nMixin Types: ");
+
+                for (int j = 0; j < nt.length; j++)
+                    buffer.append(" | ").append(nt[j].getName());
+            }
+
+            buffer.append("\n--------------------\n");
+
+            PropertyIterator i = n.getProperties();
+
+            while(i.hasNext()) {
+                Property p = i.nextProperty();
+                buffer.append("\t").append(p.getName()).append(" = \"")
+                      .append(p.getString()).append("\"\n");
+            }
+        } catch (Exception e) {
+            buffer.append(e.getMessage());
+        }
+
+        return buffer.toString();
+    }
+
+
+    //XXX This could be moved to a utility class
+    protected String propertiesToString(DavPropertySet propertySet) {
+        StringBuffer buffer = new StringBuffer();
+
+        buffer.append("Properties:\n------------------\n");
+
+        try {
+            Iterator it = propertySet.iterator();
+
+            while(it.hasNext()) {
+                DavProperty d = (DavProperty) it.next();
+                buffer.append("\t").append(d.getName()).append(" - \"")
+                      .append(d.getValue().toString()).append("\"\n");
+            }
+        } catch (Exception e) {
+            buffer.append(e.getMessage());
+        }
+
+        return buffer.toString();
+    }
 }
+

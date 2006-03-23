@@ -20,7 +20,10 @@ import java.util.Set;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
+import org.apache.jackrabbit.webdav.io.InputContext;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
+import org.apache.jackrabbit.webdav.MultiStatusResponse;
 
 import org.osaf.cosmo.dav.ticket.TicketDavRequest;
 import org.osaf.cosmo.model.Ticket;
@@ -100,4 +103,11 @@ public interface CosmoDavResource extends DavResource {
      * Returns a resource locator for the named principal's homedir.
      */
     public DavResourceLocator getHomedirLocator(String principal);
+
+    /**
+     * Adds a new member to this resource and set the member properties.
+     */
+    public  MultiStatusResponse addMember(DavResource member, InputContext inputContext,
+                                          DavPropertySet setProperties) throws DavException;
+
 }

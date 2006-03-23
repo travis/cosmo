@@ -20,8 +20,10 @@ import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -47,6 +49,8 @@ public class CalendarCollectionResource extends CollectionResource {
 
     private String description;
     private String language;
+    private Calendar timezone;
+    private Set supportedComponentSet;
     private Calendar calendar;
 
     /**
@@ -78,6 +82,52 @@ public class CalendarCollectionResource extends CollectionResource {
     public void setLanguage(String language) {
         this.language = language;
     }
+
+    /**
+     */
+    public void setTimezone(String icalendar)
+             throws IOException, ParserException {
+        CalendarBuilder builder = new CalendarBuilder();
+        this.calendar = builder.build(new StringReader(icalendar));
+    }
+
+
+    /**
+     */
+    public void setTimezone(Calendar timezone) {
+        this.timezone = timezone;
+    }
+
+    /**
+     */
+    public Calendar getTimezone() {
+        return timezone;
+    }
+
+    /**
+     */
+    public boolean hasTimezone() {
+        return timezone != null;
+    }
+
+    /**
+     */
+    public void setSupportedComponentSet(Set supportedComponentSet) {
+        this.supportedComponentSet = supportedComponentSet;
+    }
+
+    /**
+     */
+    public Set getSupportedComponentSet() {
+        return supportedComponentSet;
+    }
+
+    /**
+     */
+    public boolean hasSupportedComponentSet() {
+        return supportedComponentSet != null;
+    }
+
 
     /**
      * Returns a {@link net.fortuna.ical4j.model.Calendar}
@@ -138,6 +188,8 @@ public class CalendarCollectionResource extends CollectionResource {
         return new HashCodeBuilder(13, 15).
             appendSuper(super.hashCode()).
             append(description).
+            append(timezone).
+            append(supportedComponentSet).
             append(language).
             toHashCode();
     }
@@ -147,8 +199,10 @@ public class CalendarCollectionResource extends CollectionResource {
     public String toString() {
         return new ToStringBuilder(this).
             appendSuper(super.toString()).
-            append("description", description).
-            append("language", language).
+            append("description; ", description).
+            append("language; ", language).
+            append("timezone; ", timezone != null ? timezone.toString() : "null").
+            append(supportedComponentSet != null ? supportedComponentSet.toString() : "null").
             toString();
     }
 

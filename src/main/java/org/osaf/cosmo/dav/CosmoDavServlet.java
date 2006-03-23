@@ -16,6 +16,7 @@
 package org.osaf.cosmo.dav;
 
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -47,6 +48,7 @@ import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.dav.CosmoDavResource;
+import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.impl.CosmoDavLocatorFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
@@ -65,12 +67,24 @@ import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.dav.property.CalendarTimezone;
+import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
+import org.osaf.cosmo.dav.property.SupportedCalendarComponentSet;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import org.springmodules.jcr.JcrSessionFactory;
+
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.component.VTimeZone;
+
+import java.util.Iterator;
 
 /**
  * An extension of Jackrabbit's 
@@ -350,11 +364,10 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
     }
 
     /**
-     * Executes the MKCALENDARmethod
+     * Executes the MKCALENDAR method
      *
      * @throws IOException
      * @throws DavException
-     * [bk] bug 4940
      */
     protected void doMkCalendar(CosmoDavRequest request,
                                 CosmoDavResponse response,
@@ -370,6 +383,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         // {DAV:calendar-collection-location-ok}
         CosmoDavResource parentResource =
             (CosmoDavResource) resource.getCollection();
+
         if (parentResource == null ||
             ! parentResource.exists()) {
             response.sendError(DavServletResponse.SC_CONFLICT,
@@ -385,23 +399,45 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
+        //XXX: {DAV:needs-privilege}
+        //The DAV:bind privilege MUST be granted to
+        //     the current user on the parent collection of the Request-URI.
+
         // also could return INSUFFICIENT_STORAGE if we do not have
         // enough space for the collection, but how do we determine
         // that?
 
-        //[bk] seems like need to add properties to the resource before adding
-        //to parent and wrap the entire process in a transaction
-        //XXX: do we need to validate set properties?
-
         CosmoInputContext ctx = (CosmoInputContext)
-            getInputContext(request, null);
+                                getInputContext(request, null);
+
+        DavPropertySet properties = null;
+
         try {
-            DavPropertySet properties = request.getMkCalendarSetProperties();
+            properties = request.getMkCalendarSetProperties();
+
+            // {CALDAV:valid-calendar-data}
+            try {
+                validateVtimezone((CalendarTimezone)
+                                  properties.get(CosmoDavPropertyName.CALENDARTIMEZONE));
+            } catch (ValidationException e) {
+                log.warn("error parsing MKCALENDAR properties invalid timezone", e);
+                response.sendError(DavServletResponse.SC_BAD_REQUEST, e.getMessage());
+                return;
+            }
+
+            //if no supported calendar component set specified with the MKCALENDAR request
+            //then add the default values for the new jcr calendar collection
+            DavProperty supComp = properties.get(
+                                        CosmoDavPropertyName.SUPPORTEDCALENDARCOMPONENTSET);
+
+            if (supComp == null)
+                properties.add(new SupportedCalendarComponentSet());
+
             ctx.setCalendarCollectionProperties(properties);
+
         } catch (IllegalArgumentException e) {
             log.warn("error parsing MKCALENDAR properties", e);
-            response.sendError(DavServletResponse.SC_BAD_REQUEST,
-                               e.getMessage());
+            response.sendError(DavServletResponse.SC_BAD_REQUEST, e.getMessage());
             return;
         }
 
@@ -409,10 +445,24 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             log.debug("adding calendar collection at " +
                       resource.getResourcePath());
         }
-        parentResource.addMember(resource, ctx);
 
-        response.setStatus(DavServletResponse.SC_CREATED);
-        return;
+        //If no properties passed then just create the new Calendar Collection node
+        if (properties.isEmpty()) {
+            parentResource.addMember(resource, ctx);
+            response.setStatus(DavServletResponse.SC_CREATED);
+            return;
+        }
+
+        MultiStatusResponse msr = parentResource.addMember(resource, ctx, properties);
+
+        if (msr.hasStatusKey(DavServletResponse.SC_OK)) {
+            response.setStatus(DavServletResponse.SC_CREATED);
+            return;
+        }
+
+        MultiStatus m = new MultiStatus();
+        m.addResponse(msr);
+        response.sendMultiStatus(m);
     }
 
     /**
@@ -586,6 +636,59 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             throw new ServletException("Error retrieving bean " + name +
                                        " of type " + clazz +
                                        " from web application context", e);
+        }
+    }
+
+    //XXX this should be moved to some sort of utility class
+    protected VTimeZone validateVtimezone(CalendarTimezone ct)
+                          throws ValidationException {
+
+        if (ct == null) return null;
+
+            Calendar calendar;
+
+            try {
+                calendar = validateCalendar((String) ct.getValue());
+            } catch (ValidationException e) {
+                throw new ValidationException("The calendar-timezone element icalendar text is not valid: " + e.getMessage());
+            }
+
+            boolean found = false;
+            VTimeZone tz = null;
+
+            Iterator it = calendar.getComponents().iterator();
+
+            while (it.hasNext()) {
+                Object next = it.next();
+                if (!(next instanceof VTimeZone)) 
+                    throw new ValidationException("calendar:timezone can only contain a VTIMEZONE");
+                if (found)
+                    throw new ValidationException("calendar:timezone must contain a single VTIMEZONE more than one found");
+
+                tz = (VTimeZone) next;
+                found = true;
+            }
+
+            if (!found)
+                throw new ValidationException("calendar:timezone must contain a single VTIMEZONE none found");
+
+            return tz;
+    }
+
+    //XXX this should be moved to some sort of utility class
+    protected Calendar validateCalendar(String icalendar)
+                        throws ValidationException {
+        try {
+            CalendarBuilder builder = new CalendarBuilder();
+            Calendar calendar = builder.build(new StringReader(icalendar));
+            calendar.validate(true);
+
+            return calendar;
+
+        } catch (IOException e) {
+            throw new ValidationException(e.getMessage());
+        } catch (ParserException e) {
+            throw new ValidationException(e.getMessage());
         }
     }
 }

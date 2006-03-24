@@ -79,6 +79,10 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
         assertTrue("User 1 not found in users", users.contains(u1));
         assertTrue("User 2 not found in users", users.contains(u2));
         assertTrue("User 3 not found in users", users.contains(u3));
+
+        getTestHelper().removeDummyUser(u1);
+        getTestHelper().removeDummyUser(u2);
+        getTestHelper().removeDummyUser(u3);
     }
 
     /**
@@ -114,13 +118,11 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
      */
     public void testGetUserByEmail() throws Exception {
         User u1 = getTestHelper().makeAndStoreDummyUser();
-        getTestHelper().getSession().save();
 
         User user = dao.getUserByEmail(u1.getEmail());
         assertNotNull("User " + u1.getEmail() + " null", user);
 
         getTestHelper().removeDummyUser(u1);
-        getTestHelper().getSession().save();
     }
 
     /**
@@ -161,7 +163,6 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
      */
     public void testCreateUserDuplicateEmail() throws Exception {
         User u1 = getTestHelper().makeAndStoreDummyUser();
-        getTestHelper().getSession().save();
 
         // ensure that username is different but email remains the same
         u1.setUsername("deadbeef");
@@ -173,7 +174,6 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
             // expected
         } finally {
             getTestHelper().removeDummyUser(u1);
-            getTestHelper().getSession().save();
         }
     }
 
@@ -181,7 +181,6 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
      */
     public void testUpdateUser() throws Exception {
         User u1 = getTestHelper().makeAndStoreDummyUser();
-        getTestHelper().getSession().save();
 
         // change password
         String oldPassword = u1.getPassword();
@@ -189,6 +188,7 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
 
         dao.updateUser(u1);
         User user = getTestHelper().findDummyUser(u1.getUsername());
+        assertNotNull("Updated user is null", user);
         assertFalse("Original and stored password are the same",
                     user.getPassword().equals(oldPassword));
 
@@ -200,7 +200,6 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
                    user2.getPassword().equals(u1.getPassword()));
 
         getTestHelper().removeDummyUser(u1);
-        getTestHelper().getSession().save();
     }
 
     /**
@@ -220,7 +219,6 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
     public void testUpdateUserDuplicateUsername() throws Exception {
         User u1 = getTestHelper().makeAndStoreDummyUser();
         User u2 = getTestHelper().makeAndStoreDummyUser();
-        getTestHelper().getSession().save();
 
         // change u1's username to that of u2 and then try to save
         u1.setUsername(u2.getUsername());
@@ -233,7 +231,6 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
         } finally {
             getTestHelper().removeDummyUser(u1);
             getTestHelper().removeDummyUser(u2);
-            getTestHelper().getSession().save();
         }
     }
 
@@ -242,7 +239,6 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
     public void testUpdateUserDuplicateEmail() throws Exception {
         User u1 = getTestHelper().makeAndStoreDummyUser();
         User u2 = getTestHelper().makeAndStoreDummyUser();
-        getTestHelper().getSession().save();
 
         // change u1's email to that of u2 and then try to save
         u1.setEmail(u2.getEmail());
@@ -255,7 +251,6 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
         } finally {
             getTestHelper().removeDummyUser(u1);
             getTestHelper().removeDummyUser(u2);
-            getTestHelper().getSession().save();
         }
     }
 

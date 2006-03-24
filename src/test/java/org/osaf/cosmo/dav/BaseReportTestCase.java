@@ -20,6 +20,8 @@ import javax.jcr.Node;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.User;
+
 /**
  * Base class for servlet test cases using the REPORT method.
  */
@@ -43,9 +45,12 @@ public abstract class BaseReportTestCase extends BaseDavServletTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
+        User user = testHelper.makeAndStoreDummyUser();
+
         // make a calendar collection to put events into
         Node calendarCollectionNode =
-            testHelper.addCalendarCollectionNode(getName());
+            testHelper.addCalendarCollectionNode("/" + user.getUsername(),
+                                                 getName());
         setUpDavData(calendarCollectionNode);
 
         // XXX: not sure why we have to save, since theoretically
@@ -53,7 +58,7 @@ public abstract class BaseReportTestCase extends BaseDavServletTestCase {
         calendarCollectionNode.getParent().save();
 
         // XXX: URL-escape
-        testUri = calendarCollectionNode.getPath();
+        testUri = "/" + user.getUsername() + "/" + getName() + "/";
     }
 
     /**

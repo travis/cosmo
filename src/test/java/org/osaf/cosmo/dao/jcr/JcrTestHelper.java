@@ -43,6 +43,7 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.repository.CalendarFlattener;
+import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.SchemaConstants;
 import org.osaf.cosmo.repository.TicketMapper;
 import org.osaf.cosmo.repository.UserMapper;
@@ -92,18 +93,51 @@ public class JcrTestHelper extends TestHelper
 
     /**
      */
-    public Node addNode(Node parent)
-        throws RepositoryException {
-        return addNode(parent, newNodeName());
-    }
-
-    /**
-     */
     public Node addNode(Node parent,
                         String name)
         throws RepositoryException {
         String trimmed = name.indexOf("/") >= 0 ? Text.getName(name) : name;
         return parent.addNode(trimmed);
+    }
+
+    /**
+     */
+    public Node addFolderNode()
+        throws RepositoryException {
+        return addFolderNode(newNodeName());
+    }
+
+    /**
+     */
+    public Node addFolderNode(String name)
+        throws RepositoryException {
+        return addFolderNode(session.getRootNode(), name);
+    }
+
+    /**
+     */
+    public Node addFolderNode(Node parent)
+        throws RepositoryException {
+        return addFolderNode(parent, newNodeName());
+    }
+
+    /**
+     */
+    public Node addFolderNode(Node parent,
+                              String name)
+        throws RepositoryException {
+        String trimmed = name.indexOf("/") >= 0 ? Text.getName(name) : name;
+        Node node =  parent.addNode(PathTranslator.toRepositoryPath(trimmed),
+                                    NT_FOLDER);
+        return node;
+    }
+
+    public Node addFolderNode(String path,
+                              String name)
+        throws RepositoryException {
+        Node parent =
+            (Node) session.getItem(PathTranslator.toRepositoryPath(path));
+        return addFolderNode(parent, name);
     }
 
     /**
@@ -134,7 +168,8 @@ public class JcrTestHelper extends TestHelper
                             String name)
         throws RepositoryException {
         String trimmed = name.indexOf("/") >= 0 ? Text.getName(name) : name;
-        Node node = parent.addNode(trimmed, NT_FILE);
+        Node node = parent.addNode(PathTranslator.toRepositoryPath(trimmed),
+                                   NT_FILE);
 
         Node content = node.addNode(NN_JCR_CONTENT, NT_RESOURCE);
         content.setProperty(NP_JCR_DATA, data);
@@ -162,9 +197,27 @@ public class JcrTestHelper extends TestHelper
         throws RepositoryException {
         User user = makeDummyUser();
 
-        Node node = session.getRootNode().addNode(user.getUsername());
+        // create intermediary structural nodes if necessary
+        String n1 = user.getUsername().substring(0, 1);
+        Node l1 = session.getRootNode().hasNode(n1) ?
+            session.getRootNode().getNode(n1) :
+            session.getRootNode().addNode(n1, NT_UNSTRUCTURED);
+
+        String n2 = user.getUsername().substring(0, 2);
+        Node l2 = l1.hasNode(n2) ?
+            l1.getNode(n2) :
+            l1.addNode(n2, NT_UNSTRUCTURED);
+
+        Node node = l2.addNode(user.getUsername(), NT_FOLDER);
         node.addMixin(NT_USER);
         UserMapper.userToNode(user, node);
+
+        node.addMixin(NT_TICKETABLE);
+        node.addMixin(NT_HOME_COLLECTION);
+        node.addMixin(NT_DAV_COLLECTION);
+        node.setProperty(NP_DAV_DISPLAYNAME, user.getUsername());
+
+        session.save();
 
         return user;
     }
@@ -173,8 +226,9 @@ public class JcrTestHelper extends TestHelper
      */
     public User findDummyUser(String username)
         throws RepositoryException {
-        return session.getRootNode().hasNode(username) ?
-            UserMapper.nodeToUser(session.getRootNode().getNode(username)) :
+        String path = PathTranslator.toRepositoryPath("/" + username);
+        return session.itemExists(path) ?
+            UserMapper.nodeToUser((Node) session.getItem(path)) :
             null;
     }
 
@@ -182,17 +236,19 @@ public class JcrTestHelper extends TestHelper
      */
     public void removeDummyUser(User user)
         throws RepositoryException {
-        if (! session.getRootNode().hasNode(user.getUsername())) {
+        String path = PathTranslator.toRepositoryPath("/" + user.getUsername());
+        if (! session.itemExists(path)) {
             return;
         }
-        session.getRootNode().getNode(user.getUsername()).remove();
+        session.getItem(path).remove();
+        session.save();
     }
 
     /**
      */
     public Node addTicketableNode()
         throws RepositoryException {
-        Node node = addNode();
+        Node node = addFolderNode();
 
         node.addMixin(NT_TICKETABLE);
 
@@ -228,6 +284,30 @@ public class JcrTestHelper extends TestHelper
 
     /**
      */
+    public Node addDavCollectionNode(String path,
+                                     String name)
+        throws RepositoryException {
+        Node parent =
+            (Node) session.getItem(PathTranslator.toRepositoryPath(path));
+        return addDavCollectionNode(parent, name);
+    }
+
+    /**
+     */
+    public Node addDavCollectionNode(Node parent,
+                                     String name)
+        throws RepositoryException {
+        Node node = addFolderNode(parent, name);
+        node.addMixin(NT_DAV_COLLECTION);
+        node.addMixin(NT_TICKETABLE);
+        String trimmed = name.indexOf("/") >= 0 ? Text.getName(name) : name;
+        node.setProperty(NP_DAV_DISPLAYNAME,
+                         PathTranslator.toClientPath(trimmed));
+        return node;
+    }
+
+    /**
+     */
     public Node addCalendarCollectionNode()
         throws RepositoryException {
         return addCalendarCollectionNode(newNodeName());
@@ -237,7 +317,15 @@ public class JcrTestHelper extends TestHelper
      */
     public Node addCalendarCollectionNode(String name)
         throws RepositoryException {
-        Node node = addNode(name);
+        return addCalendarCollectionNode("/", name);
+    }
+
+    /**
+     */
+    public Node addCalendarCollectionNode(String path,
+                                          String name)
+        throws RepositoryException {
+        Node node = addDavCollectionNode(path, name);
 
         node.addMixin(NT_CALENDAR_COLLECTION);
         node.setProperty(NP_CALENDAR_DESCRIPTION, node.getName());

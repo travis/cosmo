@@ -183,16 +183,6 @@ public class JcrTestHelper extends TestHelper
 
     /**
      */
-    public javax.jcr.Property addProperty(Node node)
-        throws RepositoryException {
-        String serial = new Integer(++pseq).toString();
-        String name = "dummy" + serial;
-
-        return node.setProperty(name, name);
-    }
-
-    /**
-     */
     public User makeAndStoreDummyUser()
         throws RepositoryException {
         User user = makeDummyUser();
@@ -257,12 +247,14 @@ public class JcrTestHelper extends TestHelper
 
     /**
      */
-    public Ticket makeAndStoreDummyTicket(Node node,
-                                          User user)
+    public Ticket makeAndStoreDummyTicket(User user)
         throws RepositoryException {
         Ticket ticket = makeDummyTicket(user);
 
-        Node ticketNode = node.addNode(NN_TICKET, NT_TICKET);
+        String repoPath =
+            PathTranslator.toRepositoryPath("/" + user.getUsername());
+        Node userNode = (Node) session.getItem(repoPath);
+        Node ticketNode = userNode.addNode(NN_TICKET, NT_TICKET);
         TicketMapper.ticketToNode(ticket, ticketNode);
 
         return ticket;
@@ -270,9 +262,11 @@ public class JcrTestHelper extends TestHelper
 
     /**
      */
-    public Ticket findDummyTicket(Node node,
+    public Ticket findDummyTicket(String path,
                                   String id)
         throws RepositoryException {
+        Node node =
+            (Node) session.getItem(PathTranslator.toRepositoryPath(path));
         for (NodeIterator i = node.getNodes(NN_TICKET); i.hasNext();) {
             Node child = i.nextNode();
             if (child.getProperty(NP_TICKET_ID).getString().equals(id)) {

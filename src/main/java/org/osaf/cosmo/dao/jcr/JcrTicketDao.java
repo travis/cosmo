@@ -174,9 +174,9 @@ public class JcrTicketDao extends JcrDaoSupport
                         if (parentNode.getDepth() == 0) {
                             return null;
                         }
-                        String parentRepoPath = PathTranslator.
-                            toRepositoryPath(parentNode.getParent().getPath());
-                        return getTicket(parentRepoPath, id);
+                        String parentClientPath = PathTranslator.
+                            toClientPath(parentNode.getParent().getPath());
+                        return getTicket(parentClientPath, id);
                     }
                     return TicketMapper.nodeToTicket(ticketNode);
                 }
@@ -214,9 +214,9 @@ public class JcrTicketDao extends JcrDaoSupport
                         }
                         // the ticket might be on an ancestor, so step
                         // up the tree and look for it on the parent
-                        String parentRepoPath = PathTranslator.
-                            toRepositoryPath(parentNode.getParent().getPath());
-                        removeTicket(parentRepoPath, ticket);
+                        String parentClientPath = PathTranslator.
+                            toClientPath(parentNode.getParent().getPath());
+                        removeTicket(parentClientPath, ticket);
                         return null;
                     }
                     ticketNode.remove();

@@ -36,6 +36,18 @@ import org.osaf.cosmo.security.CosmoUserDetails;
 public class HomedirVoter implements AccessDecisionVoter {
     private static final Log log = LogFactory.getLog(HomedirVoter.class);
 
+    private static final String[] HOMEDIR_PATHS = {
+        "/home/browse",
+        "/home/view",
+        "/home/download",
+        "/home/ticket",
+        "/atom/1.0",
+    };
+
+    private static final String[] POST_PATHS = {
+        "/home/ticket/grant",
+    };
+
     /**
      */
     public int vote(Authentication authentication,
@@ -63,19 +75,29 @@ public class HomedirVoter implements AccessDecisionVoter {
         if (path == null) {
             return null;
         }
-        if (path.startsWith("/home/browse")) {
-            path = path.substring("/home/browse".length());
+        String resourcePath = null;
+        for (int i=0; i<POST_PATHS.length; i++) {
+            if (path.startsWith(POST_PATHS[i])) {
+                String paramPath = fi.getHttpRequest().getParameter("path");
+                if (paramPath != null) {
+                    resourcePath = paramPath;
+                    break;
+                }
+            }
         }
-        else if (path.startsWith("/home/view")) {
-            path = path.substring("/home/view".length());
+        if (resourcePath == null) {
+            for (int i=0; i<HOMEDIR_PATHS.length; i++) { 
+                if (path.startsWith(HOMEDIR_PATHS[i])) {
+                    resourcePath = path.substring(HOMEDIR_PATHS[i].length());
+                    break;
+                }
+            }
         }
-        else if (path.startsWith("/home/download")) {
-            path = path.substring("/home/download".length());
+        if (resourcePath == null) {
+            // probably a dav path
+            resourcePath = path;
         }
-        else if (path.startsWith("/atom/1.0")) {
-            path = path.substring("/atom/1.0".length());
-        }
-        return path.substring(1);
+        return resourcePath.substring(1);
     }
 
     /**

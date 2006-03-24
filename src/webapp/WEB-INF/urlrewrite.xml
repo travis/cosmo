@@ -60,11 +60,11 @@
     <to>/console/home/view?path=$1</to>
   </rule>
   <rule>
-    <from>^/console/home(/.*)/ticket/new$</from>
+    <from>^/console/home/ticket(/.*)/new$</from>
     <to>/console/home/ticket/new?path=$1</to>
   </rule>
   <rule>
-    <from>^/console/home(/.*)/ticket/(.+)/revoke$</from>
+    <from>^/console/home/ticket(/.*)/revoke/(.+)$</from>
     <to>/console/home/ticket/revoke?path=$1&amp;ticket=$2</to>
   </rule>
 </urlrewrite>

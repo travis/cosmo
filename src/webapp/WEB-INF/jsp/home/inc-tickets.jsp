@@ -26,7 +26,7 @@
 </div>
 
 <div style="margin-top:12px;">
-<html:link page="/console/home${Collection.path}/ticket/new">
+<html:link page="/console/home/ticket${resource.path}/new">
   [new ticket]
 </html:link>
 </div>
@@ -56,7 +56,7 @@
     <c:forEach var="ticket" items="${resource.tickets}">
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        <html:link page="/console/home${resource.path}/ticket/${ticket.id}/revoke">
+        <html:link page="/console/home/ticket${resource.path}/revoke/${ticket.id}">
           [revoke]
         </html:link>    
       </td>

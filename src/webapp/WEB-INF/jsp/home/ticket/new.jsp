@@ -40,7 +40,7 @@
         <div>
         <html:text property="timeout" size="8" styleClass="textInput"/>
         seconds<br/>
-        leave blank for infinite)
+        (leave blank for infinite)
         </div>
       </td>
     </tr>

@@ -37,6 +37,7 @@ public interface SchemaConstants {
     // node types
 
     public static final String NT_BASE = "nt:base";
+    public static final String NT_UNSTRUCTURED = "nt:unstructured";
     public static final String NT_FOLDER = "nt:folder";
     public static final String NT_FILE = "nt:file";
     public static final String NT_RESOURCE = "nt:resource";

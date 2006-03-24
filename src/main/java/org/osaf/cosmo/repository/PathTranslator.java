@@ -47,17 +47,17 @@ public class PathTranslator {
      *
      * @see {@link org.apache.jackrabbit.util.ISO9075}
      */
-    public static String toQueryableRepositoryPath(String path) {
-        if (path.equals("/")) {
-            return path;
+    public static String toQueryableRepositoryPath(String repositoryPath) {
+        if (repositoryPath.equals("/")) {
+            return repositoryPath;
         }
 
         StringBuffer buf = new StringBuffer();
 
-        String[] names = path.split("/");
-        for (int i=0; i<names.length; i++) {
-            buf.append(ISO9075.encode(names[i]));
-            if (i < names.length-1) {
+        String[] segments = repositoryPath.split("/");
+        for (int i=0; i<segments.length; i++) {
+            buf.append(ISO9075.encode(segments[i]));
+            if (i < segments.length-1) {
                 buf.append("/");
             }
         }
@@ -82,25 +82,40 @@ public class PathTranslator {
      * @see {@link HexEscaper}
      */
     public static String toRepositoryPath(String clientPath) {
+        if (clientPath.equals("/")) {
+            return clientPath;
+        }
         if (! clientPath.startsWith("/")) {
             return HexEscaper.escape(clientPath);
         }
 
-        if (clientPath.equals("/")) {
-            return clientPath;
-        }
+        // remove the leading / that signifies the root node and add
+        // it to the repo path
+        clientPath = clientPath.substring(1);
+        StringBuffer repositoryPath = new StringBuffer("/");
 
-        StringBuffer buf = new StringBuffer();
+        // the first segment of the remaining client path is the
+        // username. add two layers of structural segments and then
+        // the username segment to the repo path
+        String[] segments = clientPath.split("/");
+        String username = segments[0];
+        repositoryPath.
+            append(username.substring(0, 1)).
+            append("/").
+            append(username.substring(0, 2)).
+            append("/").
+            append(username).
+            append("/");
 
-        String[] names = clientPath.split("/");
-        for (int i=0; i<names.length; i++) {
-            buf.append(HexEscaper.escape(names[i]));
-            if (i < names.length-1) {
-                buf.append("/");
+        // add the rest of the segments to the repo path
+        for (int i=1; i<segments.length; i++) {
+            repositoryPath.append(HexEscaper.escape(segments[i]));
+            if (i < segments.length-1) {
+                repositoryPath.append("/");
             }
         }
-
-        return buf.toString();
+        
+        return repositoryPath.toString();
     }
 
     /**
@@ -115,24 +130,28 @@ public class PathTranslator {
      * @see {@link HexEscaper}
      */
     public static String toClientPath(String repositoryPath) {
+        if (repositoryPath.equals("/")) {
+            return repositoryPath;
+        }
         if (! repositoryPath.startsWith("/")) {
             return HexEscaper.unescape(repositoryPath);
         }
 
-        if (repositoryPath.equals("/")) {
-            return repositoryPath;
-        }
+        // remove the leading / that signifies the root node and add
+        // it to the client path
+        repositoryPath = repositoryPath.substring(1);
+        StringBuffer clientPath = new StringBuffer("/");
 
-        StringBuffer buf = new StringBuffer();
-
-        String[] names = repositoryPath.split("/");
-        for (int i=0; i<names.length; i++) {
-            buf.append(HexEscaper.unescape(names[i]));
-            if (i < names.length-1) {
-                buf.append("/");
+        // the first two segments of the remaining client path are
+        // structural segments that are not added to the client path
+        String[] segments = repositoryPath.split("/");
+        for (int i=2; i<segments.length; i++) {
+            clientPath.append(HexEscaper.unescape(segments[i]));
+            if (i < segments.length-1) {
+                clientPath.append("/");
             }
         }
 
-        return buf.toString();
+        return clientPath.toString();
     }
 }

@@ -25,8 +25,7 @@ import org.osaf.cosmo.model.Ticket;
 public interface HomeDirectoryService extends Service {
 
     /**
-     * Returns the resource at the specified path within the
-     * repository.
+     * Returns the resource at the specified client path.
      *
      * @throws NoSuchResourceException if a resource does not exist at
      * the specified path
@@ -34,14 +33,12 @@ public interface HomeDirectoryService extends Service {
     public Resource getResource(String path);
 
     /**
-     * Removes the resource at the specified path within the
-     * repository.
+     * Removes the resource at the specified client path.
      */
     public void removeResource(String path);
 
     /**
-     * Creates a ticket on the resource at the specified path within
-     * the repository.
+     * Creates a ticket on the resource at the specified client path.
      *
      * @throws NoSuchResourceException if a resource does not exist at
      * the specified path
@@ -50,7 +47,7 @@ public interface HomeDirectoryService extends Service {
 
     /**
      * Removes the identified ticket from the resource at the
-     * specified path within the repository.
+     * specified client path.
      *
      * @throws NoSuchResourceException if a resource does not exist at
      * the specified path

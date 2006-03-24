@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.SchemaConstants;
 import org.osaf.cosmo.repository.TicketMapper;
 
@@ -70,9 +71,10 @@ public class JcrTicketDao extends JcrDaoSupport
     // TicketDao methods
 
     /**
-     * Creates the given ticket in the repository.
+     * Creates the given ticket for the node at the given client
+     * path.
      *
-     * @param path the repository path of the resource to which the
+     * @param path the client path of the resource to which the
      * ticket is to be applied
      * @param ticket the ticket to be saved
      *
@@ -89,10 +91,11 @@ public class JcrTicketDao extends JcrDaoSupport
         getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    if (! session.itemExists(path)) {
+                    String repoPath = PathTranslator.toRepositoryPath(path);
+                    if (! session.itemExists(repoPath)) {
                         throw new DataRetrievalFailureException("item at path " + path + " not found");
                     }
-                    Item parentItem = session.getItem(path);
+                    Item parentItem = session.getItem(repoPath);
                     if (! parentItem.isNode()) {
                         throw new InvalidDataAccessResourceUsageException("item at path " + path + " not a node");
                     }
@@ -108,10 +111,11 @@ public class JcrTicketDao extends JcrDaoSupport
     }
 
     /**
-     * Returns all tickets for the node at the given path, or an empty
-     * <code>Set</code> if the resource does not have any tickets.
+     * Returns all tickets for the node at the given client path, or
+     * an empty * <code>Set</code> if the resource does not have any
+     * tickets.
      *
-     * @param String path the absolute JCR path of the ticketed node
+     * @param String path the client path of the ticketed node
      *
      * @throws DataRetrievalFailureException if the item at the given
      * path is not found
@@ -122,10 +126,11 @@ public class JcrTicketDao extends JcrDaoSupport
         return (Set) getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    if (! session.itemExists(path)) {
+                    String repoPath = PathTranslator.toRepositoryPath(path);
+                    if (! session.itemExists(repoPath)) {
                         throw new DataRetrievalFailureException("item at path " + path + " not found");
                     }
-                    Item parentItem = session.getItem(path);
+                    Item parentItem = session.getItem(repoPath);
                     if (! parentItem.isNode()) {
                         throw new InvalidDataAccessResourceUsageException("item at path " + path + " not a node");
                     }
@@ -144,13 +149,13 @@ public class JcrTicketDao extends JcrDaoSupport
     }
 
     /**
-     * Returns the identified ticket for the node at the given path
-     * (or the nearest existing ancestor), or <code>null</code> if the
-     * ticket does not exist. Tickets are inherited, so if the
+     * Returns the identified ticket for the node at the given client
+     * path (or the nearest existing ancestor), or <code>null</code>
+     * if the ticket does not exist. Tickets are inherited, so if the
      * specified node does not have the ticket but an ancestor does,
      * it will still be returned.
      *
-     * @param path the absolute JCR path of the ticketed node
+     * @param path the client path of the ticketed node
      * @param id the id of the ticket unique to the parent node
      *
      * @throws InvalidDataResourceUsageException if the item at the
@@ -161,14 +166,17 @@ public class JcrTicketDao extends JcrDaoSupport
         return (Ticket) getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
+                    String repoPath = PathTranslator.toRepositoryPath(path);
                     Node parentNode =
-                        findDeepestExistingNodeInPath(session, path);
+                        findDeepestExistingNodeInPath(session, repoPath);
                     Node ticketNode = findChildTicketNode(parentNode, id);
                     if (ticketNode == null) {
                         if (parentNode.getDepth() == 0) {
                             return null;
                         }
-                        return getTicket(parentNode.getParent().getPath(), id);
+                        String parentRepoPath = PathTranslator.
+                            toRepositoryPath(parentNode.getParent().getPath());
+                        return getTicket(parentRepoPath, id);
                     }
                     return TicketMapper.nodeToTicket(ticketNode);
                 }
@@ -176,9 +184,10 @@ public class JcrTicketDao extends JcrDaoSupport
     }
 
     /**
-     * Removes the given ticket from the node at the given path.
+     * Removes the given ticket from the node at the given client
+     * path.
      *
-     * @param path the absolute JCR path of the ticketed node
+     * @param path the client path of the ticketed node
      * @param ticket the <code>Ticket</code> to remove
      *
      * @throws InvalidDataResourceUsageException if the item at the
@@ -192,8 +201,9 @@ public class JcrTicketDao extends JcrDaoSupport
                     if (ticket == null) {
                         return null;
                     }
+                    String repoPath = PathTranslator.toRepositoryPath(path);
                     Node parentNode =
-                        findDeepestExistingNodeInPath(session, path);
+                        findDeepestExistingNodeInPath(session, repoPath);
                     Node ticketNode = findChildTicketNode(parentNode, ticket);
                     if (ticketNode == null) {
                         if (parentNode.getDepth() == 0) {
@@ -204,7 +214,9 @@ public class JcrTicketDao extends JcrDaoSupport
                         }
                         // the ticket might be on an ancestor, so step
                         // up the tree and look for it on the parent
-                        removeTicket(parentNode.getParent().getPath(), ticket);
+                        String parentRepoPath = PathTranslator.
+                            toRepositoryPath(parentNode.getParent().getPath());
+                        removeTicket(parentRepoPath, ticket);
                         return null;
                     }
                     ticketNode.remove();

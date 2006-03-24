@@ -18,6 +18,8 @@ package org.osaf.cosmo.dav.impl;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 
+import org.apache.log4j.Logger;
+
 import org.osaf.cosmo.repository.PathTranslator;
 
 /**
@@ -26,6 +28,8 @@ import org.osaf.cosmo.repository.PathTranslator;
  * to return instances of {@link CosmoDavLocatorImpl}.
  */
 public class CosmoDavLocatorFactoryImpl extends LocatorFactoryImpl {
+    private static final Logger log =
+        Logger.getLogger(CosmoDavLocatorFactoryImpl.class);
 
     /**
      */

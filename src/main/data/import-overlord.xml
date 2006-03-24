@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root xmlns:jcr="http://www.jcp.org/jcr/1.0"
-      xmlns:cosmo="http://osafoundation.org/cosmo"
-      jcr:primaryType="nt:base"
-      jcr:mixinTypes="cosmo:user"
-      cosmo:username="root"
-      cosmo:firstName="Cosmo"
-      cosmo:lastName="Administrator"
-      cosmo:password="32a8bd4d676f4fef0920c7da8db2bad7"
-      cosmo:email="root@localhost"
-      cosmo:admin="true"
-      cosmo:dateCreated="@NOW@"
-      cosmo:dateModified="@NOW@"/>
+<r xmlns:jcr="http://www.jcp.org/jcr/1.0"
+   jcr:primaryType="nt:unstructured">
+  <ro xmlns:jcr="http://www.jcp.org/jcr/1.0"
+     jcr:primaryType="nt:unstructured">
+    <root xmlns:jcr="http://www.jcp.org/jcr/1.0"
+          xmlns:cosmo="http://osafoundation.org/cosmo"
+          jcr:primaryType="nt:base"
+          jcr:mixinTypes="cosmo:user"
+          cosmo:username="root"
+          cosmo:firstName="Cosmo"
+          cosmo:lastName="Administrator"
+          cosmo:password="32a8bd4d676f4fef0920c7da8db2bad7"
+          cosmo:email="root@localhost"
+          cosmo:admin="true"
+          cosmo:dateCreated="@NOW@"
+          cosmo:dateModified="@NOW@"/>
+  </ro>
+</r>

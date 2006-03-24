@@ -40,6 +40,7 @@ import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.SchemaConstants;
 import org.osaf.cosmo.repository.UserMapper;
 
@@ -75,12 +76,10 @@ public class JcrUserDao extends JcrDaoSupport
                 public Object doInJcr(Session session)
                     throws RepositoryException {
                     Set users = new HashSet();
-                    for (NodeIterator i=session.getRootNode().getNodes();
+                    for (NodeIterator i=queryForUsers(session).getNodes();
                          i.hasNext();) {
                         Node node = i.nextNode();
-                        if (node.isNodeType(NT_USER)) {
-                            users.add(UserMapper.nodeToUser(node));
-                        }
+                        users.add(UserMapper.nodeToUser(node));
                     }
 
                     return users;
@@ -100,14 +99,14 @@ public class JcrUserDao extends JcrDaoSupport
         return (User) getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    String path = calculateUserNodePath(username);
-                    if (! session.itemExists(path)) {
-                        throw new DataRetrievalFailureException("account " +
+                    Node node = findUser(session, username);
+                    if (node == null) {
+                        throw new DataRetrievalFailureException("account for " +
+                                                                " username " +
                                                                 username +
                                                                 " not found");
                     }
-
-                    return UserMapper.nodeToUser((Node) session.getItem(path));
+                    return UserMapper.nodeToUser(node);
                 }
             });
     }
@@ -162,24 +161,32 @@ public class JcrUserDao extends JcrDaoSupport
             template.execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    Node parent = getUserNodeParentNode(session);
-                    String path = calculateUserNodePath(user.getUsername());
-
                     // validate username uniquess
-                    if (session.itemExists(path)) {
+                    Node un = findUser(session, user.getUsername());
+                    if (un != null) {
                         throw new DuplicateUsernameException(user.getUsername());
                     }
                     // validate email uniqueness
-                    QueryResult qr = queryForUserByEmail(session,
-                                                         user.getEmail());
-                    NodeIterator i = qr.getNodes();
-                    if (i.hasNext()) {
+                    QueryResult eqr =
+                        queryForUserByEmail(session, user.getEmail());
+                    if (eqr.getNodes().hasNext()) {
                         throw new DuplicateEmailException(user.getEmail());
                     }
 
+                    // create intermediary structural nodes if necessary
+                    String n1 = user.getUsername().substring(0, 1);
+                    Node l1 = session.getRootNode().hasNode(n1) ?
+                        session.getRootNode().getNode(n1) :
+                        session.getRootNode().addNode(n1, NT_UNSTRUCTURED);
+
+                    String n2 = user.getUsername().substring(0, 2);
+                    Node l2 = l1.hasNode(n2) ?
+                        l1.getNode(n2) :
+                        l1.addNode(n2, NT_UNSTRUCTURED);
+
                     // XXX: use ResourceMapper to make the node a home
                     // collection
-                    Node node = parent.addNode(user.getUsername(), NT_FOLDER);
+                    Node node = l2.addNode(user.getUsername(), NT_FOLDER);
                     node.addMixin(NT_USER);
                     user.setDateModified(new Date());
                     user.setDateCreated(user.getDateModified());
@@ -216,43 +223,51 @@ public class JcrUserDao extends JcrDaoSupport
         getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    String oldPath =
-                        calculateUserNodePath(user.getOldUsername());
-                    String newPath =
-                        calculateUserNodePath(user.getUsername());
-
-                    if (! session.itemExists(oldPath)) {
+                    // find the user node corresponding to the old
+                    // username - this must exist
+                    Node on = findUser(session, user.getOldUsername());
+                    if (on == null) {
                         throw new DataRetrievalFailureException("account " + user.getOldUsername() + " not found");
                     }
 
                     if (user.isUsernameChanged()) {
-                        // validate uniqueness of new username
-                        if (session.itemExists(newPath)) {
+                        // find the user node corresponding to the new
+                        // username - this must not exist
+                        Node nn = findUser(session, user.getUsername());
+                        if (nn != null) {
                             throw new DuplicateUsernameException(user.getUsername());
                         }
                     }
 
                     if (user.isEmailChanged()) {
-                        // validate email uniqueness
-                        QueryResult qr =
+                        // find the user node corresponding to the new
+                        // email address - if one exists, it must be
+                        // the node for the old username (in other
+                        // words, the one we are updating, not some
+                        // random other user's node)
+                        QueryResult eqr =
                             queryForUserByEmail(session, user.getEmail());
-                        NodeIterator i = qr.getNodes();
-                        if (i.hasNext() &&
-                            ! i.nextNode().getPath().equals(oldPath)) {
+                        if (eqr.getNodes().hasNext() &&
+                            ! eqr.getNodes().nextNode().getPath().
+                            equals(on.getPath())) {
                             throw new DuplicateEmailException(user.getEmail());
                         }
                     }
 
-                    Node node = (Node) session.getItem(oldPath);
+                    // update the old node
                     user.setDateModified(new Date());
-                    UserMapper.userToNode(user, node);
+                    UserMapper.userToNode(user, on);
 
                     if (user.isUsernameChanged()) {
-                        session.move(oldPath, newPath);
+                        // move the node to the location for its new
+                        // username
+                        String newPath = PathTranslator.
+                            toRepositoryPath("/" + user.getUsername());
+                        session.move(on.getPath(), newPath);
                         session.save();
                     }
                     else {
-                        node.save();
+                        on.save();
                     }
 
                     return null;
@@ -270,14 +285,11 @@ public class JcrUserDao extends JcrDaoSupport
         getJcrTemplate().execute(new JcrCallback() {
                 public Object doInJcr(Session session)
                     throws RepositoryException {
-                    String path = calculateUserNodePath(username);
-                    if (! session.itemExists(path)) {
-                        return null;
+                    Node n = findUser(session, username);
+                    if (n != null) {
+                        n.remove();
+                        session.save();
                     }
-
-                    session.getItem(path).remove();
-
-                    session.save();
                     return null;
                 }
             });
@@ -304,22 +316,12 @@ public class JcrUserDao extends JcrDaoSupport
     // our methods
 
     /**
-     * Returns the JCR node underneath which user account nodes are
-     * created.
-     *
-     * This implementation places user account nodes underneath the
-     * root node of the workspace.
      */
-    protected Node getUserNodeParentNode(Session session)
+    protected Node findUser(Session session,
+                            String username)
         throws RepositoryException {
-        return session.getRootNode();
-    }
-
-    /**
-     * Returns the JCR path to a user account node.
-     */
-    protected String calculateUserNodePath(String username) {
-        return "/" + username;
+        String path = PathTranslator.toRepositoryPath("/" + username);
+        return session.itemExists(path) ? (Node) session.getItem(path) : null;
     }
 
     /**
@@ -333,6 +335,19 @@ public class JcrUserDao extends JcrDaoSupport
         return qm.createQuery(statement.toString(), Query.XPATH).execute();
     }
 
+    /**
+     */
+    protected QueryResult queryForUsers(Session session)
+        throws RepositoryException {
+        StringBuffer stmt = new StringBuffer();
+        stmt.append("/jcr:root//element(*, ").
+            append(NT_USER).
+            append(")").
+            append("[@").
+            append(NP_USER_USERNAME).
+            append("]");
+        return executeXPathQuery(session, stmt.toString());
+    }
 
     /**
      * Executes a query to find all of the user account nodes that

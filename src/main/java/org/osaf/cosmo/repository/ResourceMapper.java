@@ -275,16 +275,29 @@ public class ResourceMapper implements SchemaConstants {
         collection.setDisplayName("/");
         collection.setPath("/");
 
+        for (NodeIterator i=node.getNodes(NN_TICKET); i.hasNext();) {
+            Node child = i.nextNode();
+            collection.getTickets().add(TicketMapper.nodeToTicket(child));
+        }
+
         // JCR 1.0 does not define a standard node type for the
         // root node, so we have no way of knowing what it's
         // creation date was or whether it has extra properties
 
         if (depth > 0) {
+            // the next resource nodes are two levels deep
             for (NodeIterator i=node.getNodes(); i.hasNext();) {
-                Node child = i.nextNode();
-                if (child.isNodeType(NT_DAV_COLLECTION) ||
-                    child.isNodeType(NT_DAV_RESOURCE)) {
-                    collection.addResource(nodeToResource(child, depth-1));
+                Node l1 = i.nextNode();
+                for (NodeIterator j=l1.getNodes(); j.hasNext();) {
+                    Node l2 = j.nextNode();
+                    for (NodeIterator k=l2.getNodes(); k.hasNext();) {
+                        Node child = k.nextNode();
+                        if (child.isNodeType(NT_DAV_COLLECTION) ||
+                            child.isNodeType(NT_DAV_RESOURCE)) {
+                            collection.addResource(nodeToResource(child,
+                                                                  depth-1));
+                        }
+                    }
                 }
             }
         }

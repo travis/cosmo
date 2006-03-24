@@ -37,8 +37,7 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
     // HomeDirectoryService methods
 
     /**
-     * Returns the resource at the specified path within the
-     * repository.
+     * Returns the resource at the specified client path.
      *
      * @throws NoSuchResourceException if a resource does not exist at
      * the specified path
@@ -48,16 +47,14 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
     }
 
     /**
-     * Removes the resource at the specified path within the
-     * repository.
+     * Removes the resource at the specified client path.
      */
     public void removeResource(String path) {
         homeDirectoryDao.removeResource(path);
     }
 
     /**
-     * Creates a ticket on the resource at the specified path within
-     * the repository.
+     * Creates a ticket on the resource at the specified client path.
      *
      * @throws NoSuchResourceException if a resource does not exist at
      * the specified path
@@ -68,7 +65,7 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
 
     /**
      * Removes the identified ticket from the resource at the
-     * specified path within the repository.
+     * specified client path.
      *
      * @throws NoSuchResourceException if a resource does not exist at
      * the specified path

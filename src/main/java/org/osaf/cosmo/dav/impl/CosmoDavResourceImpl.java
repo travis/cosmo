@@ -75,6 +75,7 @@ import org.osaf.cosmo.dav.report.SupportedReportSetProperty;
 import org.osaf.cosmo.io.CosmoImportContext;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.SchemaConstants;
 import org.osaf.cosmo.icalendar.ComponentTypes;
 
@@ -219,7 +220,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         }
 
         try {
-            ticketDao.removeTicket(getNode().getPath(), ticket);
+            String clientPath =
+                PathTranslator.toClientPath(getNode().getPath());
+            ticketDao.removeTicket(clientPath, ticket);
         } catch (Exception e) {
             log.error("cannot remove ticket " + ticket.getId() +
                       " for resource " + getResourcePath(), e);
@@ -390,8 +393,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             ownedTickets = new HashMap();
 
             try {
-                for (Iterator i=ticketDao.getTickets(getNode().getPath()).
-                         iterator();
+                String clientPath =
+                    PathTranslator.toClientPath(getNode().getPath());
+                for (Iterator i=ticketDao.getTickets(clientPath).iterator();
                      i.hasNext();) {
                     Ticket ticket = (Ticket) i.next();
 
@@ -400,7 +404,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                             log.debug("removing timed out ticket " +
                                       ticket.getId());
                         }
-                        ticketDao.removeTicket(getNode().getPath(), ticket);
+                        ticketDao.removeTicket(clientPath, ticket);
                         continue;
                     }
 
@@ -455,11 +459,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
      */
     public void setTicketDao(TicketDao ticketDao) {
         this.ticketDao = ticketDao;
-    }
-
-    private String getJcrPathName(String path) {
-        int pos = path.lastIndexOf('/');
-        return pos >= 0 ? path.substring(pos + 1) : "";
     }
 
     /**

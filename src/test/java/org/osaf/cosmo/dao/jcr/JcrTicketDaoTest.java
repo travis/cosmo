@@ -112,6 +112,8 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
         assertTrue("Ticket 1 not found in tickets", tickets.contains(t1));
         assertTrue("Ticket 2 not found in tickets", tickets.contains(t2));
         assertTrue("Ticket 3 not found in tickets", tickets.contains(t3));
+
+        getTestHelper().removeDummyUser(u1);
     }
 
     /**

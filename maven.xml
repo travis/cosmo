@@ -47,7 +47,7 @@
       <filter token="REPOSITORY_PASSWORD"
               value="${cosmo.test.repository.password}"/>
       <filter token="CONFIGFILEPATH"
-              value="src/test/config/repository.xml"/>
+              value="src/test/unit/config/repository.xml"/>
       <filter token="REPOSITORYHOMEDIRPATH"
               value="target/test-repository"/>
       <filter token="MAIL_TRANSPORT_PROTOCOL"
@@ -88,7 +88,7 @@
     <delete dir="${maven.build.dir}/test-repository"/> 
     <echo>Setting up test repository</echo>
     <jackrabbit:importschema
-       configFilePath="${basedir}/src/test/config/repository.xml"
+       configFilePath="${basedir}/src/test/unit/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"
@@ -100,7 +100,7 @@
       </filterset>
     </copy>
     <jackrabbit:importcontent
-       configFilePath="${basedir}/src/test/config/repository.xml"
+       configFilePath="${basedir}/src/test/unit/config/repository.xml"
        repositoryHomedirPath="${maven.build.dir}/test-repository"
        username="${cosmo.test.repository.username}"
        password="${cosmo.test.repository.password}"

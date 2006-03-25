@@ -353,7 +353,7 @@
   </dependencies>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
-    <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
+    <unitTestSourceDirectory>src/test/unit/java</unitTestSourceDirectory>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -366,7 +366,7 @@
       </includes>
       <resources>
         <resource>
-          <directory>src/test/resources</directory>
+          <directory>src/test/unit/resources</directory>
           <filtering>true</filtering>
           <includes>
             <include>log4j.xml</include>
@@ -380,7 +380,7 @@
           </includes>
         </resource>
         <resource>
-          <directory>src/test/resources/dav/caldav</directory>
+          <directory>src/test/unit/resources/dav/caldav</directory>
           <includes>
             <include>*.ics</include>
             <include>**/reports/**/*.ics</include>

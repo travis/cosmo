@@ -85,7 +85,7 @@ class FoxCloud(HTTPTest):
         #print self.results[0]
         self.test_response = self.request('PUT', self.cmp, body=rCMPNewCurreEmail, headers=self.foxHeaders)
         self.checkStatus(201)
-        print self.test_response.read()
+        
         #print self.results[1]
         
         self.test_response = self.request('PUT', putfox, body=self.rPutFox, headers=putFoxHeaders)
@@ -112,9 +112,11 @@ if __name__ == "__main__":
         if args[0] == "host":
             host = args[1]
         elif args[0] == "port":
-            port = args[1]
+            port = args[1]._int()
         elif args[0] == "path":
             path = args[1]
+        elif args[0] == "recurring":
+            counter = int(args[1])
         
     print "host %s port %s recurring %s path %s" % (host, port, counter, path)
     
@@ -136,13 +138,11 @@ if __name__ == "__main__":
     while x < counter:
         
         foxcloudTest.recurringRun(x)
-        foxcloudTest.end()
         x = x + 1
-        print x
-        print counter
 
 
 
+    foxcloudTest.end()
 
 
 

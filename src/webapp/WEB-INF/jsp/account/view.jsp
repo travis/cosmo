@@ -32,86 +32,24 @@
   <cosmo:homedir var="homedir" user="${user}"/>
   <cosmo:baseurl var="baseurl"/>
 
+  <p class="hd">
+    <fmt:message key="Account.View.HomeDirectory.Header"/>
+  </p>
+
+  <p style="line-height:18px;">
+    <fmt:message key="Account.View.HomeDirectory.YourHomeDirectoryIs"/>
+  </p>
+
+  <p style="line-height:18px;">
+    <fmt:message key="Account.View.HomeDirectory.FullURLIs"/><br/>
+    <strong>${baseurl}${homedir}</strong>
+  </p>
+
   <p>
     <html:link page="/console/home/browse/${user.username}">
       <fmt:message key="Account.View.BrowseHomeDirectory"/>
     </html:link>
   </p>
-
-  <p class="hd">
-    <fmt:message key="Account.View.ClientSetup.Header"/>
-  </p>
-  <p>
-    <fmt:message key="Account.View.ClientSetup.Info"/>
-  </p>
-  
-  <div class="widgetBorder" style="width:460px;">
-  
-  <table cellpadding="3" cellspacing="0" border="0">
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.View.ClientSetup.Server"/>
-      </td>
-      <td class="mdData">
-        ${pageContext.request.serverName}
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.View.ClientSetup.Path"/>
-      </td>
-      <td class="mdData">
-        ${homedir}
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.View.ClientSetup.Username"/>
-      </td>
-      <td class="mdData">
-        ${user.username}
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.View.ClientSetup.Password"/>
-      </td>
-      <td class="mdData">
-        <i><fmt:message key="Account.View.ClientSetup.PasswordHidden"/></i>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.View.ClientSetup.Port"/>
-      </td>
-      <td class="mdData">
-        ${pageContext.request.serverPort}
-      </td>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.View.ClientSetup.Secure"/>
-      </td>
-      <td class="mdData">
-        <c:choose><c:when test="${pageContext.request.secure}"><fmt:message key="Yes"/></c:when><c:otherwise><fmt:message key="No"/></c:otherwise></c:choose>
-      </td>
-    </tr>
-  </table>
-  
-  </div>
-  
-<%-- bug 3920
-  <p class="hd">
-    <fmt:message key="Account.View.HomeDirectory.Header"/>
-  </p>
-  <p style="line-height:18px;">
-    <fmt:message key="Account.View.HomeDirectory.YourHomeDirectoryIs"/>
-    <html:link page="${homedir}">
-      ${baseurl}${homedir}
-    </html:link>.
-  </p>
---%>
   
 <div class="widgetBorder" style="width:460px; margin-top:24px;">
 <div class="widgetContent" style="padding:8px;">  

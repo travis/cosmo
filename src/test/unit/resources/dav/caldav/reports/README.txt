@@ -1,3 +1,11 @@
+
+    curl -i -u test1:test1 -X REPORT \
+         -H 'Content-type: text/xml; charst="utf-8"' \
+         -d @timerangequery/1.xml \
+         http://localhost:8080/cosmo/home/test1/testcalendar/
+
+* The current set of test suites are:
+
 Test Suite for Cosmo CalDAV report testing.
 
 Requirements

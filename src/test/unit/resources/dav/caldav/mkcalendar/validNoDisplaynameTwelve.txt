@@ -1,4 +1,4 @@
-MKCALENDAR /cosmo/home/test1/testcalendar12/ HTTP/1.1
+MKCALENDAR /cosmo/home/test1/calendar12/ HTTP/1.1
 Authorization: Basic dGVzdDE6dGVzdDE=
 Host: localhost:8080
 Content-Length: 1030

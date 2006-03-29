@@ -1,20 +1,15 @@
-MKCALENDAR /cosmo/home/test1/calendar13/ HTTP/1.1
+REPORT /cosmo/home/test1/calendar/ HTTP/1.1
 Authorization: Basic dGVzdDE6dGVzdDE=
 Host: localhost:8080
-Content-Length: 1080
+Content-Length: 1075
 Content-Type: application/xml; charset="utf-8"
 
 <?xml version="1.0" encoding="utf-8" ?>
-<C:mkcalendar xmlns:D="DAV:"
-              xmlns:C="urn:ietf:params:xml:ns:caldav">
-     <D:set>
-       <D:prop>
-         <D:displayname>Lisa's Events</D:displayname>
-         <C:calendar-description xml:lang="en">Calendar restricted to events.</C:calendar-description>
-         <C:supported-calendar-component-set>
-           <C:comp name="BOGUS"/>
-         </C:supported-calendar-component-set>
-         <C:calendar-timezone><![CDATA[BEGIN:VCALENDAR
+<C:calendar-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">
+  <D:prop>
+    <D:getetag/>
+    <C:calendar-data/>
+    <C:timezone><![CDATA[BEGIN:VCALENDAR
 PRODID:-//Example Corp.//CalDAV Client//EN
 VERSION:2.0
 BEGIN:VTIMEZONE
@@ -36,8 +31,16 @@ TZNAME:Eastern Daylight Time (US & Canada)
 END:DAYLIGHT
 END:VTIMEZONE
 END:VCALENDAR
-   ]]>
-</C:calendar-timezone>
-</D:prop>
-</D:set>
-</C:mkcalendar>
+]]>
+    </C:timezone>
+  </D:prop>
+  <C:filter>
+    <C:comp-filter name="VCALENDAR">
+      <C:comp-filter name="VEVENT">
+        <C:prop-filter name="DTSTART">
+          <C:time-range start="20060101T000000Z" end="20060102T000000Z"/>
+        </C:prop-filter>
+      </C:comp-filter>
+    </C:comp-filter>
+  </C:filter>
+</C:calendar-query>

@@ -8,7 +8,6 @@
   </D:prop>
   <C:filter>
     <C:comp-filter name="VCALENDAR">
-      <C:is-defined/>
       <C:comp-filter name="VEVENT">
         <C:time-range start="20060102T000000Z" end="20060105T000000Z"/>
       </C:comp-filter>

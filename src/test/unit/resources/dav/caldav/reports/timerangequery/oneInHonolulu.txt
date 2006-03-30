@@ -1,7 +1,7 @@
 REPORT /cosmo/home/test1/calendar/ HTTP/1.1
 Authorization: Basic dGVzdDE6dGVzdDE=
 Host: localhost:8080
-Content-Length: 1075
+Content-Length: 800
 Content-Type: application/xml; charset="utf-8"
 
 <?xml version="1.0" encoding="utf-8" ?>
@@ -13,22 +13,15 @@ Content-Type: application/xml; charset="utf-8"
 PRODID:-//Example Corp.//CalDAV Client//EN
 VERSION:2.0
 BEGIN:VTIMEZONE
-TZID:US-Eastern
-LAST-MODIFIED:19870101T000000Z
+LAST-MODIFIED:20040110T032845Z
+TZID:US/Hawaii
 BEGIN:STANDARD
-DTSTART:19671029T020000
-RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10
-TZOFFSETFROM:-0400
-TZOFFSETTO:-0500
-TZNAME:Eastern Standard Time (US & Canada)
+DTSTART:20000101T000000
+RRULE:FREQ=YEARLY;BYMONTH=1
+TZNAME:US/Hawaii
+TZOFFSETFROM:-1000
+TZOFFSETTO:-1000
 END:STANDARD
-BEGIN:DAYLIGHT
-DTSTART:19870405T020000
-RRULE:FREQ=YEARLY;BYDAY=1SU;BYMONTH=4
-TZOFFSETFROM:-0500
-TZOFFSETTO:-0400
-TZNAME:Eastern Daylight Time (US & Canada)
-END:DAYLIGHT
 END:VTIMEZONE
 END:VCALENDAR
 ]]>
@@ -37,9 +30,7 @@ END:VCALENDAR
   <C:filter>
     <C:comp-filter name="VCALENDAR">
       <C:comp-filter name="VEVENT">
-        <C:prop-filter name="DTSTART">
-          <C:time-range start="20060101T000000Z" end="20060102T000000Z"/>
-        </C:prop-filter>
+        <C:time-range start="20060330T170000Z" end="20060330T230000Z"/>
       </C:comp-filter>
     </C:comp-filter>
   </C:filter>

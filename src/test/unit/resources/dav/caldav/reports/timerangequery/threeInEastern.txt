@@ -1,7 +1,7 @@
 REPORT /cosmo/home/test1/calendar/ HTTP/1.1
 Authorization: Basic dGVzdDE6dGVzdDE=
 Host: localhost:8080
-Content-Length: 1300
+Content-Length: 1005
 Content-Type: application/xml; charset="utf-8"
 
 <?xml version="1.0" encoding="utf-8" ?>
@@ -37,15 +37,7 @@ END:VCALENDAR
   <C:filter>
     <C:comp-filter name="VCALENDAR">
       <C:comp-filter name="VEVENT">
-        <C:prop-filter name="DTSTART">
-          <C:time-range start="20060101T000000Z" end="20060107T000000Z"/>
-          <C:param-filter name="TZID">
-            <C:text-match>Paci</C:text-match>
-          </C:param-filter>
-          <C:param-filter name="TZID">
-            <C:text-match>Moun</C:text-match>
-          </C:param-filter>
-        </C:prop-filter>
+          <C:time-range start="20060330T170000Z" end="20060330T230000Z"/>
       </C:comp-filter>
     </C:comp-filter>
   </C:filter>

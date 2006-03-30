@@ -65,6 +65,7 @@ public class CosmoDavConstants {
     public static final String ELEMENT_CALDAV_CALENDAR = "calendar";
     public static final String ELEMENT_CALDAV_COMP = "comp";
     public static final String ELEMENT_CALDAV_CALENDAR_DATA = "calendar-data";
+    public static final String ELEMENT_CALDAV_TIMEZONE = "timezone";
     public static final String ELEMENT_CALDAV_ALLCOMP = "allcomp";
     public static final String ELEMENT_CALDAV_ALLPROP = "allprop";
     public static final String ELEMENT_CALDAV_PROP = "prop";
@@ -124,6 +125,9 @@ public class CosmoDavConstants {
         "free-busy-query";
     public static final DavPropertyName CALENDARDATA = DavPropertyName.create(
             ELEMENT_CALDAV_CALENDAR_DATA, NAMESPACE_CALDAV);
+
+    public static final DavPropertyName TIMEZONE = DavPropertyName.create(
+            ELEMENT_CALDAV_TIMEZONE, NAMESPACE_CALDAV);
 
     // caldav content types
     public static final String CONTENT_TYPE_CALENDAR_COLLECTION =

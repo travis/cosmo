@@ -481,6 +481,7 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
             if (instance.getStart() instanceof DateTime) {
                 DateTime start = (DateTime) instance.getStart();
                 DateTime end = (DateTime) instance.getEnd();
+
                 if (start.compareTo(freeBusyRange.getStart()) < 0) {
                     start = (DateTime) Dates.getInstance(freeBusyRange
                             .getStart(), freeBusyRange.getStart());

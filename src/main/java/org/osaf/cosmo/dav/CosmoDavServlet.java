@@ -16,7 +16,6 @@
 package org.osaf.cosmo.dav;
 
 import java.io.InputStream;
-import java.io.StringReader;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -46,6 +45,7 @@ import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 
 import org.apache.log4j.Logger;
 
+import org.osaf.cosmo.util.CosmoUtil;
 import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavConstants;
@@ -77,12 +77,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import org.springmodules.jcr.JcrSessionFactory;
 
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ValidationException;
-import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.component.VTimeZone;
 
 import java.util.Iterator;
 
@@ -352,14 +347,13 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
-        Report report = ((CosmoDavResourceImpl) resource).getReport(info);
         try {
+            Report report = ((CosmoDavResourceImpl) resource).getReport(info);
             response.sendXmlResponse(report,
                                      DavServletResponse.SC_MULTI_STATUS);
         } catch (IllegalArgumentException e) {
-            log.warn("error parsing REPORT filter", e);
-            response.sendError(DavServletResponse.SC_BAD_REQUEST,
-                               "error parsing REPORT filter");
+            log.warn("error in REPORT module ", e);
+            response.sendError(DavServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
 
@@ -417,8 +411,10 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
             // {CALDAV:valid-calendar-data}
             try {
-                validateVtimezone((CalendarTimezone)
-                                  properties.get(CosmoDavPropertyName.CALENDARTIMEZONE));
+                DavProperty ct = properties.get(CosmoDavPropertyName.CALENDARTIMEZONE);
+
+                if (ct != null) 
+                    CosmoUtil.validateVtimezone((String) ct.getValue());
             } catch (ValidationException e) {
                 log.warn("error parsing MKCALENDAR properties invalid timezone", e);
                 response.sendError(DavServletResponse.SC_BAD_REQUEST, e.getMessage());
@@ -638,57 +634,5 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                                        " from web application context", e);
         }
     }
-
-    //XXX this should be moved to some sort of utility class
-    protected VTimeZone validateVtimezone(CalendarTimezone ct)
-                          throws ValidationException {
-
-        if (ct == null) return null;
-
-            Calendar calendar;
-
-            try {
-                calendar = validateCalendar((String) ct.getValue());
-            } catch (ValidationException e) {
-                throw new ValidationException("The calendar-timezone element icalendar text is not valid: " + e.getMessage());
-            }
-
-            boolean found = false;
-            VTimeZone tz = null;
-
-            Iterator it = calendar.getComponents().iterator();
-
-            while (it.hasNext()) {
-                Object next = it.next();
-                if (!(next instanceof VTimeZone)) 
-                    throw new ValidationException("calendar:timezone can only contain a VTIMEZONE");
-                if (found)
-                    throw new ValidationException("calendar:timezone must contain a single VTIMEZONE more than one found");
-
-                tz = (VTimeZone) next;
-                found = true;
-            }
-
-            if (!found)
-                throw new ValidationException("calendar:timezone must contain a single VTIMEZONE none found");
-
-            return tz;
-    }
-
-    //XXX this should be moved to some sort of utility class
-    protected Calendar validateCalendar(String icalendar)
-                        throws ValidationException {
-        try {
-            CalendarBuilder builder = new CalendarBuilder();
-            Calendar calendar = builder.build(new StringReader(icalendar));
-            calendar.validate(true);
-
-            return calendar;
-
-        } catch (IOException e) {
-            throw new ValidationException(e.getMessage());
-        } catch (ParserException e) {
-            throw new ValidationException(e.getMessage());
-        }
-    }
 }
+

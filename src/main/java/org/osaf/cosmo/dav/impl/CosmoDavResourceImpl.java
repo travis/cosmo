@@ -23,16 +23,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.jcr.Item;
-import javax.jcr.ItemExistsException;
 import javax.jcr.Node;
-import javax.jcr.nodetype.NodeType;
 import javax.jcr.Value;
-import javax.jcr.Session;
-import javax.jcr.Property;
-import javax.jcr.PropertyIterator;
-import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
+import javax.jcr.ValueFormatException;
 
 import org.apache.jackrabbit.server.io.ImportContext;
 import org.apache.jackrabbit.webdav.DavException;
@@ -338,11 +332,19 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
                         int[] comps = new int[vals.length];
 
-                        for (int i = 0; i < vals.length; i++)
-                            comps[i] = ComponentTypes.getComponentType(vals[i].toString());
+                        for (int i = 0; i < vals.length; i++) {
+                            try {
+                                comps[i] = ComponentTypes.getComponentType(vals[i].getString());
+                            } catch (ValueFormatException e) {
+                                throw new IllegalArgumentException(e.getMessage());
+                            } catch (IllegalStateException e1) {
+                                throw new IllegalArgumentException(e1.getMessage());
+                            }
+                        }
 
                         properties.add(new SupportedCalendarComponentSet(comps));
-                    } else {
+                    }
+                    else {
                         properties.add(new SupportedCalendarComponentSet());
                     }
 
@@ -509,8 +511,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         }
         if (supportedReports.isSupportedReport(reportInfo)) {
             Report report = ReportType.getType(reportInfo).createReport();
-            report.setInfo(reportInfo);
             report.setResource(this);
+            report.setInfo(reportInfo);
             return report;
         } else {
             throw new DavException(DavServletResponse.SC_UNPROCESSABLE_ENTITY,
@@ -623,79 +625,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         }
 
         return null;
-    }
-
-
-    //XXX This could be moved to a utility class
-    protected String resourceNodeToString(DavResource r) {
-        String parPath = getResourcePath();
-
-        if (! parPath.endsWith("/")) parPath += "/";
-
-        String relPath = (r.getResourcePath().split(parPath))[1];
-
-        try {
-            Node n = getNode().getNode(relPath);
-            return nodeToString(n);
-
-        } catch(Exception e) {
-            return e.getMessage();
-        }
-    }
-
-    //XXX This could be moved to a utility class
-    protected String nodeToString(Node n) {
-        StringBuffer buffer = new StringBuffer();
-
-        try {
-            buffer.append("Node: ").append(n.getName())
-                  .append("  Type: ").append( n.getPrimaryNodeType().getName());
-
-            NodeType[] nt = n.getMixinNodeTypes();
-
-            if (nt.length > 0) {
-                buffer.append("\nMixin Types: ");
-
-                for (int j = 0; j < nt.length; j++)
-                    buffer.append(" | ").append(nt[j].getName());
-            }
-
-            buffer.append("\n--------------------\n");
-
-            PropertyIterator i = n.getProperties();
-
-            while(i.hasNext()) {
-                Property p = i.nextProperty();
-                buffer.append("\t").append(p.getName()).append(" = \"")
-                      .append(p.getString()).append("\"\n");
-            }
-        } catch (Exception e) {
-            buffer.append(e.getMessage());
-        }
-
-        return buffer.toString();
-    }
-
-
-    //XXX This could be moved to a utility class
-    protected String propertiesToString(DavPropertySet propertySet) {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append("Properties:\n------------------\n");
-
-        try {
-            Iterator it = propertySet.iterator();
-
-            while(it.hasNext()) {
-                DavProperty d = (DavProperty) it.next();
-                buffer.append("\t").append(d.getName()).append(" - \"")
-                      .append(d.getValue().toString()).append("\"\n");
-            }
-        } catch (Exception e) {
-            buffer.append(e.getMessage());
-        }
-
-        return buffer.toString();
     }
 }
 

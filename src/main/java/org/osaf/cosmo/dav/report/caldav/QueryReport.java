@@ -25,6 +25,7 @@ import javax.jcr.query.QueryResult;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
+import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
@@ -33,9 +34,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
+import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.report.Report;
 import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.dav.report.ReportType;
+import org.osaf.cosmo.util.CosmoUtil;
+
+import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.model.component.VTimeZone;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -93,30 +99,34 @@ public class QueryReport extends AbstractCalendarQueryReport {
         // WebdavRequestImpl.parsePropFindRequest.
 
         propfindProps = new DavPropertyNameSet();
-        hasOldStyleCalendarData = false;
+        VTimeZone tz  = null;
+        Element filterEl = null;
         boolean gotPropType = false;
 
         ElementIterator i = DomUtil.getChildren(info.getReportElement());
+
         while (i.hasNext()) {
             Element child = i.nextElement();
             String nodeName = child.getLocalName();
+
+            //prop element
             if (XML_PROP.equals(nodeName)) {
                 if (gotPropType) {
                     throw new IllegalArgumentException(
-                            "CALDAV:calendar-query must contain only one prop/propname/allprop element.");
+                            "CALDAV:calendar-query must contain only one " +
+                            "prop/propname/allprop element.");
                 }
                 propfindType = PROPFIND_BY_PROPERTY;
                 propfindProps = new DavPropertyNameSet(child);
                 gotPropType = true;
 
-                // Look for CALDAV:calendar-data element as a property
                 Iterator iter = propfindProps.iterator();
+
                 while (iter.hasNext()) {
                     DavPropertyName name = (DavPropertyName) iter.next();
+
+                    //CALDAV:calendar-data
                     if (CosmoDavConstants.CALENDARDATA.equals(name)) {
-                        // Remove it from the property list that the report will
-                        // return as we will handle this one ourselves
-                        propfindProps.remove(name);
 
                         // Now find the calendar-data element inside the prop
                         // element and cache that
@@ -125,7 +135,33 @@ public class QueryReport extends AbstractCalendarQueryReport {
                                 CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
                                 CosmoDavConstants.NAMESPACE_CALDAV);
                     }
+                    //CALDAV:timezone
+                    else if (CosmoDavConstants.TIMEZONE.equals(name)) {
+
+                        Element tzEl =
+                            DomUtil.getChildElement(child,
+                                CosmoDavConstants.ELEMENT_CALDAV_TIMEZONE,
+                                CosmoDavConstants.NAMESPACE_CALDAV);
+
+                        String icalTz = DomUtil.getTextTrim(tzEl);
+
+                        //(CALDAV:valid-calendar-data)
+                        try {
+                            tz = CosmoUtil.validateVtimezone(icalTz);
+                        } catch (ValidationException e) {
+                            throw new IllegalArgumentException(e.getMessage());
+                        }
+                    }
                 }
+                //If a CALDAV:calendar-data and /or a CALDAV:timezone found
+                //remove theses values from the propfindProps since they
+                //are managed explicitly.
+                if (calendarDataElement != null) 
+                    propfindProps.remove(CosmoDavConstants.CALENDARDATA);
+
+                if (tz != null) 
+                    propfindProps.remove(CosmoDavConstants.TIMEZONE);
+
             } else if (XML_PROPNAME.equals(nodeName)) {
                 if (gotPropType) {
                     throw new IllegalArgumentException(
@@ -148,18 +184,37 @@ public class QueryReport extends AbstractCalendarQueryReport {
                             "CALDAV:calendar-query must contain only one filter element.");
                 }
 
-                // Parse out filter element
+                //Create the filter. Since the order of xml elements is arbitrary
+                //we do not parse the element at this time.
+                //Once the request has been fully digested and the timezone
+                //retrieved or not then we parse the element.
                 filter = new QueryFilter();
-                filter.parseElement(child);
-
-            } else if (CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA
-                    .equals(nodeName)) {
-                // TODO this is the old-style calendar-data location. Eventually
-                // the option to handle this will go away as old-style clients
-                // are updated.
-                hasOldStyleCalendarData = true;
-                calendarDataElement = child;
+                filterEl = child;
             }
+        }
+
+        if (filter != null) {
+            if (tz == null) {
+                //If no CALDAV:timezone was specified with the REPORT query
+                //then try and get the timezone of the calendar collection
+                DavProperty ptz = resource.getProperty(CosmoDavPropertyName.CALENDARTIMEZONE);
+
+                if (ptz != null) {
+                    try {
+                        tz = CosmoUtil.validateVtimezone((String) ptz.getValue());
+                    } catch (ValidationException e) {
+                        //This exception should never be raised since the
+                        //timezone was validated when it was added as a property of
+                        //the calendar collection
+                        throw new IllegalArgumentException(e.getMessage());
+                    }
+                }
+            }
+
+            //The value of tz will either be null or a Vtimezone
+            filter.setTimezone(tz);
+
+            filter.parseElement(filterEl);
         }
     }
 

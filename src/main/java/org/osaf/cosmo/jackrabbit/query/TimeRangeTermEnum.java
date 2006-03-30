@@ -91,7 +91,7 @@ public final class TimeRangeTermEnum extends FilteredTermEnum {
             while (periodTokens.hasMoreTokens()) {
                 // Try to parse term data into start/end period items, or just a
                 // start (which may happen if querying a single date property)
-                String token = periodTokens.nextToken();
+                String token = periodTokens.nextToken().toUpperCase();
                 int slashPos = token.indexOf('/');
                 String testStart = (slashPos != -1) ? token.substring(0,
                         slashPos) : token;
@@ -99,9 +99,7 @@ public final class TimeRangeTermEnum extends FilteredTermEnum {
                         .substring(slashPos + 1) : null;
 
                 // Check whether floating or fixed test required
-                // bug 5254: values are lowercased so we look for z
-                // instead of Z
-                boolean fixed = (testStart.indexOf('z') != -1);
+                boolean fixed = (testStart.indexOf('Z') != -1);
 
                 if (log.isDebugEnabled()) {
                     log.debug("testing " + token + " using " +
@@ -120,8 +118,6 @@ public final class TimeRangeTermEnum extends FilteredTermEnum {
                             && (testStart.compareTo(fixed ? endTime : endFloat) < 0))
                         return true;
                 }
-
-                // Since the period list is sorted by increasing start time, if
                 // the period we just tested is past the time-range we want,
                 // there is no need to test any more as they can never match.
                 if (testStart.compareTo(fixed ? endTime : endFloat) >= 0)

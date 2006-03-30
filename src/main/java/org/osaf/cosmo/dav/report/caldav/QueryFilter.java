@@ -131,26 +131,19 @@ public class QueryFilter implements SchemaConstants {
      * @return string representing both sets of periods
      */
     protected String generatePeriods(Period period) {
-
         // Get fixed start/end time
-
         DateTime dstart = period.getStart();
         DateTime dend = period.getEnd();
 
-        // if a timezone isn't passed with the report or set on the
-        // calendar collection, we have to choose a timezone to use
-        // when converting the given UTC period to a floating
-        // period. GMT seems like a logical choice.
-        // XXX: ical4j doesn't give us a way to get a VTimeZone for
-        // GMT, which we need to set a TimeZone on a DateTime, so for
-        // now we convert to floating relative to the system default
-        // timezone (which is what happens when a DateTime has no
-        // timezone set on it).
 
         // Get float start/end
         DateTime fstart = (DateTime) Dates.getInstance(dstart, dstart);
         DateTime fend = (DateTime) Dates.getInstance(dend, dend);
+
+        //if the timezone is null then default system timezone is used
         fstart.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
+
+        //if the timezone is null then default system timezone is used
         fend.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
 
         return dstart.toString() + '/' + dend.toString() + ','
@@ -177,6 +170,7 @@ public class QueryFilter implements SchemaConstants {
                         first = false;
                     else
                         result += " or ";
+
                     result += ((filter) iter1.next()).generateTests(prefix);
                 }
 
@@ -523,6 +517,8 @@ public class QueryFilter implements SchemaConstants {
      * Object that models the <param-filter> element.
      * 
      */
+
+     //This class is raising errors
     private class paramfilter extends filter {
 
         protected String name;
@@ -546,9 +542,9 @@ public class QueryFilter implements SchemaConstants {
         public void parseElement(Element element) {
 
             // Get name which must be present
-            String name =
-                DomUtil.getAttribute(element,
+            name = DomUtil.getAttribute(element,
                                      CosmoDavConstants.ATTR_CALDAV_NAME, null);
+
             if (name == null)
                 throw new IllegalArgumentException("CALDAV:param-filter a property parameter name " +
                                                    "(e.g., \"PARTSTAT\") is required");
@@ -556,13 +552,15 @@ public class QueryFilter implements SchemaConstants {
             // Can only have a single ext-match element
             ElementIterator i = DomUtil.getChildren(element);
             if (! i.hasNext()) {
-                throw new IllegalArgumentException("CALDAV:param-filter only a single text-match element is allowed");
+                throw new IllegalArgumentException("CALDAV:param-filter only a " +
+                                                   "single text-match element is allowed");
             }
 
             Element child = i.nextElement();
 
             if (i.hasNext()) {
-                throw new IllegalArgumentException("CALDAV:param-filter only a single text-match element is allowed");
+                throw new IllegalArgumentException("CALDAV:param-filter only a single " +
+                                                   "text-match element is allowed");
             }
 
             if (CosmoDavConstants.ELEMENT_CALDAV_TEXT_MATCH.equals(child
@@ -577,14 +575,15 @@ public class QueryFilter implements SchemaConstants {
                 String caseless =
                     DomUtil.getAttribute(child,
                         CosmoDavConstants.ATTR_CALDAV_CASELESS, null);
+
                 if ((caseless == null)
                         || !CosmoDavConstants.VALUE_YES.equals(caseless))
                     isCaseless = false;
                 else
                     isCaseless = true;
-
             } else
-                throw new IllegalArgumentException("CALDAV:prop-filter an invalid element name found");
+                throw new IllegalArgumentException("CALDAV:prop-filter an invalid " +
+                                                   "element name found");
         }
 
         /**
@@ -605,7 +604,6 @@ public class QueryFilter implements SchemaConstants {
                 result = "jcr:contains(@" + myprefix + ", '" + textMatch
                         + "')";
             }
-
             return result;
         }
     }

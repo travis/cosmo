@@ -97,9 +97,9 @@ ChildNodeDef
 NodeTypeName
   dav:collection
 SuperTypes
-  []
+  nt:folder
 IsMixin
-  true
+  false
 HasOrderableChildNodes
   false
 PrimaryItemName
@@ -126,9 +126,9 @@ PropertyDef
 NodeTypeName
   dav:resource
 SuperTypes
-  []
+  nt:file
 IsMixin
-  true
+  false
 HasOrderableChildNodes
   false
 PrimaryItemName
@@ -243,9 +243,9 @@ PrimaryItemName
 NodeTypeName
   cosmo:homecollection
 SuperTypes
-  []
+  dav:collection
 IsMixin
-  true
+  false
 HasOrderableChildNodes
   false
 PrimaryItemName

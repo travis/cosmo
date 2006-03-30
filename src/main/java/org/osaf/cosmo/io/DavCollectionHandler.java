@@ -127,8 +127,7 @@ public class DavCollectionHandler implements IOHandler, SchemaConstants {
             }
             // XXX: refactor to use ResourceMapper
             String displayName = PathTranslator.toClientPath(name);
-            Node collectionNode = parentNode.addNode(name, NT_FOLDER);
-            collectionNode.addMixin(NT_DAV_COLLECTION);
+            Node collectionNode = parentNode.addNode(name, NT_DAV_COLLECTION);
             collectionNode.addMixin(NT_TICKETABLE);
             collectionNode.setProperty(NP_DAV_DISPLAYNAME, displayName);
             if (context.getMimeType().

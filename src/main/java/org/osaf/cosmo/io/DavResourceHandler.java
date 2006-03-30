@@ -51,22 +51,14 @@ import org.osaf.cosmo.repository.SchemaConstants;
  * to provide custom logic for importing and exporting Cosmo
  * resources.
  */
-public class CosmoHandler extends DefaultHandler implements SchemaConstants {
-    private static final Log log = LogFactory.getLog(CosmoHandler.class);
+public class DavResourceHandler extends DefaultHandler
+    implements SchemaConstants {
+    private static final Log log = LogFactory.getLog(DavResourceHandler.class);
 
     /**
      */
-    public CosmoHandler(IOManager ioManager) {
-        super(ioManager);
-    }
-
-    /**
-     */
-    public CosmoHandler(IOManager ioManager,
-                        String collectionNodetype,
-                        String defaultNodetype,
-                        String contentNodetype) {
-        super(ioManager, collectionNodetype, defaultNodetype, contentNodetype);
+    public DavResourceHandler(IOManager ioManager) {
+        super(ioManager, NT_DAV_COLLECTION, NT_DAV_RESOURCE, NT_RESOURCE);
     }
 
     /**
@@ -101,10 +93,7 @@ public class CosmoHandler extends DefaultHandler implements SchemaConstants {
             resourceNode = contentNode.getParent();
         }
 
-        // add dav resource and ticketable mixin types for all resources
-        if (! resourceNode.isNodeType(NT_DAV_RESOURCE)) {
-            resourceNode.addMixin(NT_DAV_RESOURCE);
-        }
+        // add ticketable mixin type for all resources
         if (! resourceNode.isNodeType(NT_TICKETABLE)) {
             resourceNode.addMixin(NT_TICKETABLE);
         }

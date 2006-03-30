@@ -19,7 +19,12 @@ import org.apache.jackrabbit.server.io.DefaultIOManager;
 
 /**
  * Extends {@link org.apache.jackrabbit.server.io.DefaultIOManager}
- * to provide a set of custom IO handlers.
+ * to provide a set of custom IO handlers:
+ *
+ * <ol>
+ * <li> {@link DavCollectionHandler} </li>
+ * <li> {@link DavResourceHandler} </li>
+ * </ol>
  */
 public class CosmoIOManager extends DefaultIOManager {
 
@@ -33,6 +38,6 @@ public class CosmoIOManager extends DefaultIOManager {
      */
     protected void init() {
         addIOHandler(new DavCollectionHandler(this));
-        addIOHandler(new CosmoHandler(this));
+        addIOHandler(new DavResourceHandler(this));
     }
 }

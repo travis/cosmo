@@ -126,18 +126,37 @@ public class JcrTestHelper extends TestHelper
     public Node addFolderNode(Node parent,
                               String name)
         throws RepositoryException {
+        return addFolderNode(parent, name, null);
+    }
+
+    /**
+     */
+    public Node addFolderNode(Node parent,
+                              String name,
+                              String nodeType)
+        throws RepositoryException {
+        if (nodeType == null) {
+            nodeType = NT_FOLDER;
+        }
+
         String trimmed = name.indexOf("/") >= 0 ? Text.getName(name) : name;
-        Node node =  parent.addNode(PathTranslator.toRepositoryPath(trimmed),
-                                    NT_FOLDER);
-        return node;
+        return parent.addNode(PathTranslator.toRepositoryPath(trimmed),
+                              nodeType);
     }
 
     public Node addFolderNode(String path,
                               String name)
         throws RepositoryException {
+        return addFolderNode(path, name, null);
+    }
+
+    public Node addFolderNode(String path,
+                              String name,
+                              String nodeType)
+        throws RepositoryException {
         Node parent =
             (Node) session.getItem(PathTranslator.toRepositoryPath(path));
-        return addFolderNode(parent, name);
+        return addFolderNode(parent, name, nodeType);
     }
 
     /**
@@ -167,9 +186,25 @@ public class JcrTestHelper extends TestHelper
                             String charset,
                             String name)
         throws RepositoryException {
+        return addFileNode(parent, data, mimetype, charset, name, null);
+    }
+
+    /**
+     */
+    public Node addFileNode(Node parent,
+                            InputStream data,
+                            String mimetype,
+                            String charset,
+                            String name,
+                            String nodeType)
+        throws RepositoryException {
+        if (nodeType == null) {
+            nodeType = NT_FILE;
+        }
+
         String trimmed = name.indexOf("/") >= 0 ? Text.getName(name) : name;
         Node node = parent.addNode(PathTranslator.toRepositoryPath(trimmed),
-                                   NT_FILE);
+                                   nodeType);
 
         Node content = node.addNode(NN_JCR_CONTENT, NT_RESOURCE);
         content.setProperty(NP_JCR_DATA, data);
@@ -198,13 +233,11 @@ public class JcrTestHelper extends TestHelper
             l1.getNode(n2) :
             l1.addNode(n2, NT_UNSTRUCTURED);
 
-        Node node = l2.addNode(user.getUsername(), NT_FOLDER);
+        Node node = l2.addNode(user.getUsername(), NT_HOME_COLLECTION);
         node.addMixin(NT_USER);
         UserMapper.userToNode(user, node);
 
         node.addMixin(NT_TICKETABLE);
-        node.addMixin(NT_HOME_COLLECTION);
-        node.addMixin(NT_DAV_COLLECTION);
         node.setProperty(NP_DAV_DISPLAYNAME, user.getUsername());
 
         session.save();
@@ -291,8 +324,7 @@ public class JcrTestHelper extends TestHelper
     public Node addDavCollectionNode(Node parent,
                                      String name)
         throws RepositoryException {
-        Node node = addFolderNode(parent, name);
-        node.addMixin(NT_DAV_COLLECTION);
+        Node node = addFolderNode(parent, name, NT_DAV_COLLECTION);
         node.addMixin(NT_TICKETABLE);
         String trimmed = name.indexOf("/") >= 0 ? Text.getName(name) : name;
         node.setProperty(NP_DAV_DISPLAYNAME,
@@ -357,9 +389,9 @@ public class JcrTestHelper extends TestHelper
                                    String charset,
                                    String name)
         throws RepositoryException {
-        Node node = addFileNode(parent, data, mimetype, charset, name);
+        Node node = addFileNode(parent, data, mimetype, charset, name,
+                                NT_DAV_RESOURCE);
 
-        node.addMixin(NT_DAV_RESOURCE);
         node.addMixin(NT_TICKETABLE);
         node.setProperty(NP_DAV_DISPLAYNAME, node.getName());
         node.setProperty(NP_DAV_CONTENTLANGUAGE,

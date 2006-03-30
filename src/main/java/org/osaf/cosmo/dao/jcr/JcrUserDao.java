@@ -174,27 +174,30 @@ public class JcrUserDao extends JcrDaoSupport
                     }
 
                     // create intermediary structural nodes if necessary
-                    String n1 = user.getUsername().substring(0, 1);
+                    String n1 = PathTranslator.
+                        toRepositoryPath(user.getUsername().substring(0, 1));
                     Node l1 = session.getRootNode().hasNode(n1) ?
                         session.getRootNode().getNode(n1) :
                         session.getRootNode().addNode(n1, NT_UNSTRUCTURED);
 
-                    String n2 = user.getUsername().substring(0, 2);
+                    String n2 = PathTranslator.
+                        toRepositoryPath(user.getUsername().substring(0, 2));
                     Node l2 = l1.hasNode(n2) ?
                         l1.getNode(n2) :
                         l1.addNode(n2, NT_UNSTRUCTURED);
 
                     // XXX: use ResourceMapper to make the node a home
                     // collection
-                    Node node = l2.addNode(user.getUsername(), NT_FOLDER);
+                    String nodeName =
+                        PathTranslator.toRepositoryPath(user.getUsername());
+                    Node node = l2.addNode(nodeName,
+                                           NT_HOME_COLLECTION);
                     node.addMixin(NT_USER);
                     user.setDateModified(new Date());
                     user.setDateCreated(user.getDateModified());
                     UserMapper.userToNode(user, node);
 
                     node.addMixin(NT_TICKETABLE);
-                    node.addMixin(NT_HOME_COLLECTION);
-                    node.addMixin(NT_DAV_COLLECTION);
                     node.setProperty(NP_DAV_DISPLAYNAME, user.getUsername());
 
                     session.save();

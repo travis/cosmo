@@ -106,7 +106,7 @@ public class ResourceMapper implements SchemaConstants {
             PathTranslator.toRepositoryPath(resource.getDisplayName());
         Node resourceNode = parentNode.hasNode(name) ?
             parentNode.getNode(name) :
-            parentNode.addNode(name);
+            parentNode.addNode(name, NT_DAV_RESOURCE);
 
         setCommonResourceProperties(resource, resourceNode);
 
@@ -167,9 +167,6 @@ public class ResourceMapper implements SchemaConstants {
     public static void collectionToNode(CollectionResource resource,
                                         Node node)
         throws RepositoryException {
-        if (! node.isNodeType(NT_DAV_COLLECTION)) {
-            node.addMixin(NT_DAV_COLLECTION);
-        }
         if (! node.isNodeType(NT_TICKETABLE)) {
             node.addMixin(NT_TICKETABLE);
         }

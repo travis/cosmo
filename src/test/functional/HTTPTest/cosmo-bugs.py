@@ -191,10 +191,8 @@ if __name__ == "__main__":
             debug = int(args[1])
         
     print "host %s port %s recurring %s path %s" % (host, port, counter, path)
-    
-    print 'Creating instance of XML_Test class'
+
     cosmobugs = CosmoBugs(host=host, port=port, path=path)
-    print 'instance created, start run begin'
     cosmobugs.debug = debug
     cosmobugs.startRun()
     cosmobugs.end()

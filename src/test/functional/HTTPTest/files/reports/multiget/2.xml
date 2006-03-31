@@ -8,8 +8,8 @@
       </C:comp>
     </C:calendar-data>
   </D:prop>
-  <D:href>/cosmo/home/test1/calendar/1.ics</D:href>
-  <D:href>/cosmo/home/test1/calendar/2.ics</D:href>
-  <D:href>/cosmo/home/test1/calendar/3.ics</D:href>
-  <D:href>/cosmo/home/test1/calendar/4.ics</D:href>
+  <D:href>/cosmo/home/cosmo-multigetTestAccount/calendar/1.ics</D:href>
+  <D:href>/cosmo/home/cosmo-multigetTestAccount/calendar/2.ics</D:href>
+  <D:href>/cosmo/home/cosmo-multigetTestAccount/calendar/3.ics</D:href>
+  <D:href>/cosmo/home/cosmo-multigetTestAccount/calendar/4.ics</D:href>
 </C:calendar-multiget>

@@ -59,13 +59,13 @@ class CosmoMultiget(HTTPTest):
         put2icspath = self.pathbuilder('/home/cosmo-multigetTestAccount/calendar/2.ics')
         put3icspath = self.pathbuilder('/home/cosmo-multigetTestAccount/calendar/3.ics')
         put4icspath = self.pathbuilder('/home/cosmo-multigetTestAccount/calendar/4.ics')        
-        f = open("files/put/1.ics")
+        f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
-        f = open("files/put/2.ics")
+        f = open("files/reports/put/2.ics")
         put2icsbody = f.read()
-        f = open("files/put/3.ics")
+        f = open("files/reports/put/3.ics")
         put3icsbody = f.read()
-        f = open("files/put/4.ics")
+        f = open("files/reports/put/4.ics")
         put4icsbody = f.read()
         
         #Send request and check status
@@ -81,7 +81,7 @@ class CosmoMultiget(HTTPTest):
         # ------- Test 1.xml : basic VEVENT, summary "event 1" (tzid=US/Eastern) ------- #
         
         #Setup request 
-        f = open('files/multiget/1.xml')
+        f = open('files/reports/multiget/1.xml')
         report1body = f.read()
         self.request('REPORT', calpath, body=report1body, headers=self.headers)
         
@@ -130,7 +130,7 @@ class CosmoMultiget(HTTPTest):
         # ------- Test 2.xml : basic VEVENT, summary "event 2" (tzid=US/Mountain), has description ------- #
         
         #Setup request 
-        f = open('files/multiget/2.xml')
+        f = open('files/reports/multiget/2.xml')
         report2body = f.read()
         self.request('REPORT', calpath, body=report2body, headers=self.headers)
         
@@ -182,7 +182,7 @@ class CosmoMultiget(HTTPTest):
         # ------- Test 3.xml : basic VEVENT, summary "event 3" (tzid=US/Pacific) ------- #
         
         #Setup request 
-        f = open('files/multiget/3.xml')
+        f = open('files/reports/multiget/3.xml')
         report3body = f.read()
         self.request('REPORT', calpath, body=report3body, headers=self.headers)
         
@@ -233,7 +233,7 @@ class CosmoMultiget(HTTPTest):
         # ------- Test 4.xml : basic VEVENT with VALARM, summary "event 4" ------- #
         
         #Setup request 
-        f = open('files/multiget/4.xml')
+        f = open('files/reports/multiget/4.xml')
         report4body = f.read()
         self.request('REPORT', calpath, body=report4body, headers=self.headers)
         
@@ -303,7 +303,7 @@ class CosmoMultiget(HTTPTest):
         
         # ------- Test 5.xml : recurring VEVENT (5 consecutive days), summary "event 5" ------- #
         
-        f = open('files/multiget/5.xml')
+        f = open('files/reports/multiget/5.xml')
         report5body = f.read()
         
         self.request('REPORT', calpath, body=report5body, headers=self.headers)

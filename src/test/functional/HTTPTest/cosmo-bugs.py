@@ -45,7 +45,7 @@ class CosmoBugs(HTTPTest):
         #Construct Headers & body for put of ics data for bug
         put5175icsheaders = self.headeradd({'Content-Type' : 'text/calendar', 'Content-Length' : '183'})
         put5175icspath = self.pathbuilder('/home/cosmo-bugsTestAccount/calendar/5175.ics')
-        f = open("files/bugs/5175.ics")
+        f = open("files/reports/bugs/5175.ics")
         put5175icsbody = f.read()
         #Send request and check status for put of ics file
         self.request('PUT', put5175icspath, body=put5175icsbody, headers=put5175icsheaders)
@@ -86,7 +86,7 @@ class CosmoBugs(HTTPTest):
         #Build headers and body for ics put 
         put5254icsheaders = self.headeradd({'Content-Type' : 'text/calendar', 'Content-Length' : '558'})
         put5254icspath = self.pathbuilder('/home/cosmo-bugsTestAccount/calendar/5254.ics')
-        f = open("files/bugs/5254.ics")
+        f = open("files/reports/bugs/5254.ics")
         put5254icsbody = f.read()
 
         #Send request and check status of put for ics
@@ -126,7 +126,7 @@ class CosmoBugs(HTTPTest):
         #Build headers and body for ics put 
         put5261icsheaders = self.headeradd({'Content-Type' : 'text/calendar', 'Content-Length' : '1002'})
         put5261icspath = self.pathbuilder('/home/cosmo-bugsTestAccount/calendar/5261.ics')
-        f = open("files/bugs/5261.ics")
+        f = open("files/reports/bugs/5261.ics")
         put5261icsbody = f.read()
         
         #Send request and check status of put for ics

@@ -1,25 +1,56 @@
-import base64, time, md5, random
-import sys, getopt, httplib, urlparse, socket, xml
+import base64, md5, copy
+import getopt, httplib, urlparse, socket, xml
+
+from elementtree import ElementTree
 
 class HTTPTest:
     
-    def __init__(self, headers, host, port, path, tls=False):
+    def __init__(self, host, port, path, debug=0, headers=None, tls=False):
+        
+        if headers == None:
+            self.headers = {'Host' : "localhost:8080",
+                             'User-Agent': "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.1) Gecko/20060111 Firefox/1.5.0.1 Foxmarks/0.56",
+                             'Accept' : "*/*"}
+        else:
+            self.headers = headers
         
         self.connection = {"host" : host, "port" : port, "path" : path, "tls" : tls}
-        
+        self.debug = debug
         self.results = []
-        self.test_response = self.request('OPTIONS', path, body=None, headers=headers)
+        self.resultnames = []
+        self.request('OPTIONS', path, body=None, headers=self.headers)
         
+    def headeradd(self, headers):
+        """
+        Method to return dict copy of self.headers with header added
+        """
+        headers_return = copy.copy(self.headers)
+        headers_return.update(headers)
+        return headers_return
+    
+    def headeraddauth(self, username, password, headers=None):
+        """
+        Method to return dict with 'Authorization' header added, if no headers are defined a copy of self.headers is used and returned
+        """
+        if headers == None:
+            headers = copy.copy(self.headers)
+        auth = 'Basic %s' % base64.encodestring('%s:%s' % (username, password)).strip()
+
+        headers["Authorization"] = auth
+        return headers
+        
+    def pathbuilder(self, path):
+        
+        return '%s%s' % (self.connection["path"], path)
+    
     def checkStatus(self, status):
         
         out = self.test_response.status
-        
         if out == status:
-            self.results.append(True)
+            self.report(True, test='Status Code Check on %s' % status, comment=None)
             return True
         else:
-            self.results.append(False)
-            print "Failure on Status Code Check :: expected %s :: received %s" % (status, out)
+            self.report(False, test='Status Code Check on %s' % status, comment='expected %s ; received %s' % (status, out))
             return False
         
     def end(self):
@@ -39,7 +70,24 @@ class HTTPTest:
         print "Passes :: %s" % passes 
         print "Total tests run :: %s" % count
             
-    
+    def xmlparse(self):
+        """
+        Get xml in body
+        """
+        
+        self.xml_doc = ElementTree.XML(self.test_response.read())
+   
+    def report(self, result, test=None, comment=None):
+        
+        self.results.append(result)
+        self.resultnames.append(test)
+        if result == True:
+            if self.debug > 0:
+                print "Passed :: Test %s :: %s" % (test, comment)
+        if result == False:
+            print "Failure :: Test %s :: %s" % (test, comment)
+                                        
+                                        
     def request(self, method, url, body=None, headers={}, 
                 autoheaders=('Content-Length', 'Content-Type', 'User-Agent',
                               'Host'),
@@ -56,17 +104,18 @@ class HTTPTest:
         else:
             c = httplib.HTTPSConnection(self.connection["host"], self.connection["port"])
         h = headers.copy()
-        for header in autoheaders:
-            if header == 'Content-Length' and body is not None:
-                h[header] = '%d' % len(body)
-            if header == 'Content-Type' and body is not None:
-                h[header] = 'text/xml'
-            if header == 'User-Agent':
-                h[header] = 'silmut'
-            if header == 'Host':
-                h[header] = '%s:%s' % (self.connection["host"], self.connection["port"])
+        #for header in autoheaders:
+        #    if header == 'Content-Length' and body is not None:
+        #        h[header] = '%d' % len(body)
+        #    if header == 'Content-Type' and body is not None:
+        #        h[header] = 'text/xml'
+        #    if header == 'User-Agent':
+        #        h[header] = 'silmut'
+        #    if header == 'Host':
+        #        h[header] = '%s:%s' % (self.connection["host"], self.connection["port"])
         c.request(method, url, body, h)
         r = c.getresponse()
+        
         
         # Automatically follow 302 GET (same host only)
         if method == 'GET' and r.status == 302:
@@ -85,6 +134,7 @@ class HTTPTest:
         r.body = r.read()
         r.read = lambda: r.body
         
+        self.test_response = r
         return r
     
     

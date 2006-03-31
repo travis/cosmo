@@ -19,7 +19,7 @@ class FoxCloud(HTTPTest):
            'Content-Length' : "255",
            'Content-Type' : "text/xml; charset=UTF-8"}
            
-        cmp = '%s/cmp/mikeal' % self.connection["path"]
+        self.cmp = '%s/api/signup' % self.connection["path"]
                 
         self.rMikealAccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo"> \
@@ -38,7 +38,7 @@ class FoxCloud(HTTPTest):
     
     def recurringRun(self, counter):
         
-        cmp = '%s/cmp/mikeal' % self.connection["path"]
+        
         self.test_response = self.request('PUT', self.cmp, body=self.rMikealAccount, headers=self.foxHeaders)
         self.checkStatus(431) #username in use
         
@@ -81,14 +81,14 @@ class FoxCloud(HTTPTest):
                              
         putfox = "%s/home/testAccount%s/files/foxmarks.xml" % (self.connection["path"], counter)
         
-        cmp = '%s/cmp/testAccount%s' % (self.connection["path"], counter)
+    
         #print self.results[0]
         self.test_response = self.request('PUT', self.cmp, body=rCMPNewCurreEmail, headers=self.foxHeaders)
         self.checkStatus(201)
         
         #print self.results[1]
         
-        self.test_response = self.request('PUT', putfox, body=self.rPutFox, headers=putFoxHeaders)
+        self.test_response = self.request('MKCALENDAR', putfox, body=self.rPutFox, headers=putFoxHeaders)
         self.checkStatus(201)
         #print self.results[2]
         

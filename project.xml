@@ -383,8 +383,6 @@
           <directory>src/test/unit/resources/dav/caldav</directory>
           <includes>
             <include>*.ics</include>
-            <include>**/reports/**/*.ics</include>
-            <include>**/reports/**/*.xml</include>
           </includes>
         </resource>
       </resources>

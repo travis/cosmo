@@ -116,7 +116,7 @@ class CosmoMultiget(HTTPTest):
         else:
             self.report(False, test='multiget/1.xml REPORT return 4 elements & 4 etags & 1,2,3,4.ics', comment='Returned %s elements & %s etags %s ics matches' % (elementcount, etagcount, icscount))
         
-        # ------- Test 2.xml : basic VEVENT, summary "event 2" (tzid=US/Mountain), has description ------- #
+        # ------- Test 2.xml : basic multiget of 4 resources returning etag and only VCALENDAR property data (no embedded components) ------- #
         
         #Setup request 
         f = open('files/reports/multiget/2.xml')
@@ -168,7 +168,7 @@ class CosmoMultiget(HTTPTest):
         else:
             self.report(False, test='multiget/2.xml REPORT return 4 caldata elements with just VCAL info', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
         
-        # ------- Test 3.xml : basic VEVENT, summary "event 3" (tzid=US/Pacific) ------- #
+        # ------- Test 3.xml : basic multiget of 4 resources returning etag and only VTIMEZONE components ------- #
         
         #Setup request 
         f = open('files/reports/multiget/3.xml')
@@ -206,10 +206,10 @@ class CosmoMultiget(HTTPTest):
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        icscount = icscount - 1
+                        icscount = icscount - 100
                 for x in vcalnegative:
                     if ctest.text.find(x) != -1:
-                        icscount = icscount - 1                   
+                        icscount = icscount - 100                   
                 
                 
         
@@ -219,7 +219,7 @@ class CosmoMultiget(HTTPTest):
         else:
             self.report(False, test='multiget/3.xml REPORT return 4 caldata elements with just VTIMEZONE info', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
         
-        # ------- Test 4.xml : basic VEVENT with VALARM, summary "event 4" ------- #
+        # ------- Test 4.xml : basic multiget of 4 resources returning etag and only SUMMARY/UID properties inside VEVENT components and VALARMs ------- #
         
         #Setup request 
         f = open('files/reports/multiget/4.xml')
@@ -277,10 +277,10 @@ class CosmoMultiget(HTTPTest):
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        icscount = icscount - 1
+                        icscount = icscount - 100
                 for x in vcalnegative:
                     if ctest.text.find(x) != -1:
-                        icscount = icscount - 1
+                        icscount = icscount - 100
                 
                 
         #Run through all the elemenet and etag counts and make sure they match
@@ -290,7 +290,7 @@ class CosmoMultiget(HTTPTest):
             self.report(False, test='multiget/4.xml REPORT return 4 caldata elements with just VEVENT & SUMMARY/UID info', comment='Returned %s elements & %s ics matches & %s summarycount' % (elementcount, icscount, summarycount))
         
         
-        # ------- Test 5.xml : recurring VEVENT (5 consecutive days), summary "event 5" ------- #
+        # ------- Test 5.xml : has 4.txt except that the SUMMARY property value is not returned ------- #
         
         f = open('files/reports/multiget/5.xml')
         report5body = f.read()
@@ -329,10 +329,10 @@ class CosmoMultiget(HTTPTest):
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        icscount = icscount - 1
+                        icscount = icscount - 100
                 for x in vcalnegative:
                     if ctest.text.find(x) != -1:
-                        icscount = icscount - 1
+                        icscount = icscount - 100
                 
                 
         #Run through all the elemenet and etag counts and make sure they match

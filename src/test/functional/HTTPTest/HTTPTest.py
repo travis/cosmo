@@ -9,7 +9,7 @@ class HTTPTest:
         
         if headers == None:
             self.headers = {'Host' : "localhost:8080",
-                             'User-Agent': "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.1) Gecko/20060111 Firefox/1.5.0.1 Foxmarks/0.56",
+                             'User-Agent': "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.1) Gecko/20060111 Firefox/1.5.0.1",
                              'Accept' : "*/*"}
         else:
             self.headers = headers

@@ -38,6 +38,14 @@ import javax.jcr.Session;
 public abstract class CopyBasedMigration {
 
     /**
+     * Allows the migration to initialize resources before the
+     * conversion process starts.
+     */
+    public abstract void init()
+        throws MigrationException;
+    
+
+    /**
      * Copies data from the source session to the target session,
      * transforming as necessary to migrate from the previous
      * version's schema to this version's.
@@ -53,6 +61,15 @@ public abstract class CopyBasedMigration {
      */
     public abstract void down(Session current,
                               Session previous)
+        throws MigrationException;
+
+    /**
+     * Allows the migration to release resources once the conversion
+     * process has finished. Will be called even if a
+     * <code>MigrationException</code> is thrown during the
+     * conversion.
+     */
+    public abstract void release()
         throws MigrationException;
 
     /**

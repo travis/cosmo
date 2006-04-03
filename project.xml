@@ -219,7 +219,7 @@
       </properties>
     </dependency>
     <dependency>
-      <groupId>org.osaf</groupId>
+      <groupId>org.osaf.cosmo</groupId>
       <artifactId>cosmo-migrate</artifactId>
       <version>0.1-SNAPSHOT</version>
     </dependency>

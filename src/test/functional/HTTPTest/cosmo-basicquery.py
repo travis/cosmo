@@ -226,7 +226,7 @@ class CosmoBasicQuery(HTTPTest):
         #Setup request 
         f = open('files/reports/basicquery/4.xml')
         report4body = f.read()
-        #self.request('REPORT', calpath, body=report4body, headers=self.headers)
+        self.request('REPORT', calpath, body=report4body, headers=self.headers)
         
         ### Blocked by bug 5551
         
@@ -235,7 +235,7 @@ class CosmoBasicQuery(HTTPTest):
         #Setup request 
         f = open('files/reports/basicquery/5.xml')
         report5body = f.read()
-        #self.request('REPORT', calpath, body=report5body, headers=self.headers)
+        self.request('REPORT', calpath, body=report5body, headers=self.headers)
         
         ### Blocked by bug 5551
         
@@ -244,7 +244,7 @@ class CosmoBasicQuery(HTTPTest):
         #Setup request 
         f = open('files/reports/basicquery/6.xml')
         report6body = f.read()
-        #self.request('REPORT', calpath, body=report6body, headers=self.headers)
+        self.request('REPORT', calpath, body=report6body, headers=self.headers)
         
         ### Blocked by bug 5551
         

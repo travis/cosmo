@@ -201,7 +201,7 @@ class CosmoBasicQuery(HTTPTest):
                       'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
                       'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                       'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
-                      'BEGIN:VEVENT', 'SUMMARY', 'END:VEVENT', 'DESCRIPTION']
+                      'BEGIN:VEVENT', 'SUMMARY', 'END:VEVENT', 'DESCRIPTION:']
                       
         
         #Check response elements for each response and verify the calendar-data element has the proper info

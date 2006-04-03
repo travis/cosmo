@@ -81,7 +81,7 @@ class CosmoTimeRangeQuery(HTTPTest):
         self.request('PUT', put7icspath, body=put7icsbody, headers=puticsheaders)
         self.checkStatus(201)
         
-        # --------- Test 1.xml
+        # --------- Test 1.xml query for VEVENTs within time range
         
         #Setup request 
         f = open('files/reports/timerangequery/1.xml')
@@ -129,11 +129,11 @@ class CosmoTimeRangeQuery(HTTPTest):
                         
         #Run through all the elemenet and etag counts and make sure they match
         if elementcount == 3 & icscount == 3 & etagcount == 3:
-            self.report(True, test='report/basicquery/1.xml REPORT return 3 caldata elements query for VEVENTs within time range', comment=None)
+            self.report(True, test='report/timerangequery/1.xml REPORT return 3 caldata elements query for VEVENTs within time range', comment=None)
         else:
-            self.report(False, test='report/basicquery/1.xml REPORT return 3 caldata elements query for VEVENTs within time range', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
+            self.report(False, test='report/timerangequery/1.xml REPORT return 3 caldata elements query for VEVENTs within time range', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
         
-        # --------- Test 2.xml
+        # --------- Test 2.xml query for VEVENTs that have a DTSTART within time range
         
         #Setup request 
         f = open('files/reports/timerangequery/2.xml')
@@ -181,12 +181,12 @@ class CosmoTimeRangeQuery(HTTPTest):
                         
         #Run through all the elemenet and etag counts and make sure they match
         if elementcount == 4 & icscount == 4 & etagcount == 4:
-            self.report(True, test='report/basicquery/2.xml REPORT return 4 caldata elements query for VEVENTs that have a DTSTART within time range', comment=None)
+            self.report(True, test='report/timerangequery/2.xml REPORT return 4 caldata elements query for VEVENTs that have a DTSTART within time range', comment=None)
         else:
-            self.report(False, test='report/basicquery/2.xml REPORT return 4 caldata elements query for VEVENTs that have a DTSTART within time range', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
+            self.report(False, test='report/timerangequery/2.xml REPORT return 4 caldata elements query for VEVENTs that have a DTSTART within time range', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
  
         
-        # --------- Test 3.xml
+        # --------- Test 3.xml query for VALARMS within time range
         
         #Setup request 
         f = open('files/reports/timerangequery/3.xml')
@@ -228,9 +228,9 @@ class CosmoTimeRangeQuery(HTTPTest):
                         
         #Run through all the elemenet and etag counts and make sure they match
         if elementcount == 1 & icscount == 1 & etagcount == 1:
-            self.report(True, test='report/basicquery/3.xml REPORT return 1 caldata elements query for VALARMS within time range', comment=None)
+            self.report(True, test='report/timerangequery/3.xml REPORT return 1 caldata elements query for VALARMS within time range', comment=None)
         else:
-            self.report(False, test='report/basicquery/3.xml REPORT return 1 caldata elements query for VALARMS within time range', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
+            self.report(False, test='report/timerangequery/3.xml REPORT return 1 caldata elements query for VALARMS within time range', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
         
         # --------- Test 4.xml
         

@@ -79,6 +79,7 @@ public class MigratorClient {
         }
         session.logout();
         closeRepository(session.getRepository());
+        session = null;
         started = false;
     }
 
@@ -132,7 +133,7 @@ public class MigratorClient {
 
     /**
      */
-    public void setCredentials(final String username,
+    public void setCredentials(String username,
                                String password) {
         credentials = new SimpleCredentials(username, password.toCharArray());
     }
@@ -149,7 +150,7 @@ public class MigratorClient {
         return RepositoryImpl.create(rc);
     }
 
-    protected void closeRepository(Repository repository)
+    private void closeRepository(Repository repository)
         throws RepositoryException {
         ((RepositoryImpl) repository).shutdown();
     }

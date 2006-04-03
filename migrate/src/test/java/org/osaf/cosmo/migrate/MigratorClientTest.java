@@ -86,6 +86,8 @@ public class MigratorClientTest extends TestCase {
             fail("Started already started client");
         } catch (IllegalStateException e) {
             // expected
+        } finally {
+            client.stop();
         }
     }
 

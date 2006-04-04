@@ -3,7 +3,7 @@
   <D:prop>
     <D:getetag/>
     <C:calendar-data>
-      <C:expand-recurrence-set start="20060102T000000Z" end="20060105T000000Z"/>
+      <C:expand start="20060102T000000Z" end="20060105T000000Z"/>
     </C:calendar-data>
   </D:prop>
   <C:filter>

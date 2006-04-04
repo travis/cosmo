@@ -26,6 +26,7 @@ import javax.jcr.NodeIterator;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,24 +103,84 @@ public class ResourceMapper implements SchemaConstants {
     public static Node resourceToNode(Resource resource,
                                       Node parentNode)
         throws RepositoryException {
+        String nodeType = null;
+        if (resource instanceof HomeCollectionResource) {
+            nodeType = NT_HOME_COLLECTION;
+        }
+        else if (resource instanceof CollectionResource) {
+            nodeType = NT_DAV_COLLECTION;
+        }
+        else {
+            nodeType = NT_DAV_RESOURCE;
+        }
+
         String name =
             PathTranslator.toRepositoryPath(resource.getDisplayName());
         Node resourceNode = parentNode.hasNode(name) ?
-            parentNode.getNode(name) :
-            parentNode.addNode(name, NT_DAV_RESOURCE);
+            parentNode.getNode(name) : parentNode.addNode(name, nodeType);
 
         setCommonResourceProperties(resource, resourceNode);
 
         if (resource instanceof CollectionResource) {
             collectionToNode(((CollectionResource)resource), resourceNode);
         }
-        if (resource instanceof CalendarCollectionResource) {
+
+        if (resource instanceof HomeCollectionResource) {
+            homeCollectionToNode(((HomeCollectionResource)resource),
+                                 resourceNode);
+        }
+        else if (resource instanceof CalendarCollectionResource) {
             calendarCollectionToNode(((CalendarCollectionResource)resource),
                                      resourceNode);
         }
-        // XXX: other resource types
 
         return resourceNode;
+    }
+
+    /**
+     * Creates the named home collection in the repository
+     * representing the given <code>HomeCollectionResource</code>,
+     * returning the resulting node and setting the path on the
+     * resource.
+     *
+     * In the client view of the schema, all home collections are
+     * created in the root of the workspace. Thus, the client path of
+     * a home collection (the one returned by {@link
+     * Resource.getPath()} becomes <code>/&lgt;name&gt;</code> once
+     * the collection is created. Any path set on the collection
+     * before its creation is ignored.
+     *
+     * In the repository view, the home collection is created beneath
+     * two layers of structural nodes. The 'grandparent' node is named
+     * for the first character of the resource's name, and the parent
+     * node is named for the first two characters of the name. For
+     * this reason, home collection names must be at least 3
+     * characters long. This layering creates buckets into which
+     * individual home collections are allocated.
+     */
+    public static Node createHomeCollection(HomeCollectionResource resource,
+                                            String name,
+                                            Session session)
+        throws RepositoryException {
+        if (name == null || name.length() < 3) {
+            throw new IllegalArgumentException("home collection name must be least 3 characters");
+        }
+
+        // create bucket nodes if necessary
+        String n1 = PathTranslator.toRepositoryPath(name.substring(0, 1));
+        Node l1 = session.getRootNode().hasNode(n1) ?
+            session.getRootNode().getNode(n1) :
+            session.getRootNode().addNode(n1, NT_UNSTRUCTURED);
+
+        String n2 = PathTranslator.toRepositoryPath(name.substring(0, 2));
+        Node l2 = l1.hasNode(n2) ?
+            l1.getNode(n2) :
+            l1.addNode(n2, NT_UNSTRUCTURED);
+
+        Node hc = resourceToNode(resource, l2);
+        resource.setPath(PathTranslator.toClientPath(hc.getPath()));
+
+        return hc;
     }
 
     private static void setCommonResourceProperties(Resource resource,
@@ -159,6 +220,16 @@ public class ResourceMapper implements SchemaConstants {
                 comps[pos++] = i.next().toString();
 
             node.setProperty(NP_CALENDAR_SUPPORTED_COMPONENT_SET, comps);
+        }
+    }
+
+    /**
+     */
+    public static void homeCollectionToNode(HomeCollectionResource resource,
+                                            Node node)
+        throws RepositoryException {
+        if (! node.isNodeType(NT_HOME_COLLECTION)) {
+            node.addMixin(NT_HOME_COLLECTION);
         }
     }
 

@@ -86,10 +86,10 @@ class HTTPTest:
         self.resultcomments.append(comment)
         if result == True:
             if self.debug > 0:
-                if self.mask < 0:
+                if self.mask == 0:
                     print "Passed :: Test %s :: %s" % (test, comment)
         if result == False:
-            if self.mask < 0:
+            if self.mask == 0:
                 print "Failure :: Test %s :: %s" % (test, comment)
                                         
                                         

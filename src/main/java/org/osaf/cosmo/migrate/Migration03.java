@@ -21,14 +21,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.HomeCollectionResource;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.ResourceMapper;
+import org.osaf.cosmo.repository.UserMapper;
 
 /**
  * Migrates the 0.2 schema to 0.3 and vice versa.
@@ -94,6 +100,40 @@ public class Migration03 extends CopyBasedMigration {
         User overlord = loadOverlord();
         Map users = loadUsers();
 
+        for (Iterator i=users.values().iterator(); i.hasNext();) {
+            User user = (User) i.next();
+            try {
+                HomeCollectionResource currentHome =
+                    createCurrentHome(user, current);
+            } catch (MigrationException e) {
+                log.error("SKIPPING " + user.getUsername(), e);
+                continue;
+            }
+        }
+    }
+
+    HomeCollectionResource createCurrentHome(User user,
+                                             Session current)
+        throws MigrationException {
+
+        // because username and email were unique in the 0.2
+        // repository, we don't have to check for uniqueness
+
+        // create home node in current repo
+        HomeCollectionResource home = new HomeCollectionResource();
+        home.setDisplayName(user.getUsername());
+
+        try {
+            Node homeNode =
+                ResourceMapper.createHomeCollection(home,
+                                                    user.getUsername(),
+                                                    current);
+            UserMapper.userToNode(user, homeNode);
+        } catch (RepositoryException e) {
+            throw new MigrationException("Failed to create home collection", e);
+        }
+
+        return home;
     }
 
     /**

@@ -115,14 +115,14 @@ class CosmoTimeRangeQuery(HTTPTest):
         for t in test:
             if t[0].text.find('.ics') != -1:
                 if t[0].text.find('5.ics') != -1 & t[0].text.find('6.ics') != -1 & t[0].text.find('7.ics') != -1:
-                    print 'FAILED - element is not 5,6, or 7.ics'
+                    self.printout('FAILED - element is not 5,6, or 7.ics')
                     icscount = icscount -1
                     break
                 ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
                         
                 
@@ -167,14 +167,14 @@ class CosmoTimeRangeQuery(HTTPTest):
         for t in test:
             if t[0].text.find('.ics') != -1:
                 if t[0].text.find('1.ics') != -1 & t[0].text.find('2.ics') != -1 & t[0].text.find('3.ics') != -1 & t[0].text.find('4.ics'):
-                    print 'FAILED - element is not 1,2,3 or 4.ics'
+                    self.printout('FAILED - element is not 1,2,3 or 4.ics')
                     icscount = icscount -1
                     break
                 ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
                         
                 
@@ -223,7 +223,7 @@ class CosmoTimeRangeQuery(HTTPTest):
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
                         
         #Run through all the elemenet and etag counts and make sure they match

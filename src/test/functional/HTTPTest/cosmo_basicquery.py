@@ -118,7 +118,7 @@ class CosmoBasicQuery(HTTPTest):
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
                         
         #Run through all the elemenet and etag counts and make sure they match
@@ -165,7 +165,7 @@ class CosmoBasicQuery(HTTPTest):
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
                         
         #Run through all the elemenet and etag counts and make sure they match
@@ -212,7 +212,7 @@ class CosmoBasicQuery(HTTPTest):
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
         
         if elementcount == 3 & icscount == 3 & etagcount == 3:

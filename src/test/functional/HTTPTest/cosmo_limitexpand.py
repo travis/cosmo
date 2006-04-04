@@ -118,21 +118,21 @@ class CosmoLimitExpand(HTTPTest):
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
             elif t[0].text.find('6.ics') != -1:
                 ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
             elif t[0].text.find('7.ics') != -1:
                 ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
 
         #Run through all the elemenet and etag counts and make sure they match 
@@ -178,30 +178,30 @@ class CosmoLimitExpand(HTTPTest):
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
                 if ctest.text.find('RECURRENCE-ID;') != -1:
-                    print 'FAILED got %s in %s' % ('RECURRENCE-ID;', t[0].text)
+                    self.printout('FAILED got %s in %s' % ('RECURRENCE-ID;', t[0].text))
                     icscount = icscount - 100
             elif t[0].text.find('6.ics') != -1:
                 ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
                 if ctest.text.find('RECURRENCE-ID;TZID=US/Eastern:20060104T140000') == -1:
-                    print 'FAILED to get %s in %s' % ('RECURRENCE-ID;TZID=US/Eastern:20060104T140000', t[0].text)
+                    self.printout('FAILED to get %s in %s' % ('RECURRENCE-ID;TZID=US/Eastern:20060104T140000', t[0].text))
                     icscount = icscount - 100
             elif t[0].text.find('7.ics') != -1:
                 ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
                 icscount = icscount + 1
                 for x in vcalitems:
                     if ctest.text.find(x) == -1:
-                        print 'FAILED to get %s in %s' % (x, t[0].text)
+                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
                         icscount = icscount - 100
                 if ctest.text.find('RECURRENCE-ID;RANGE=THISANDFUTURE;TZID=US/Eastern:20060104T180000') == -1:
-                    print 'FAILED to get %s in %s' % ('RECURRENCE-ID;RANGE=THISANDFUTURE;TZID=US/Eastern:20060104T180000', t[0].text)
+                    self.printout('FAILED to get %s in %s' % ('RECURRENCE-ID;RANGE=THISANDFUTURE;TZID=US/Eastern:20060104T180000', t[0].text))
                     icscount = icscount - 100
 
         #Run through all the elemenet and etag counts and make sure they match 

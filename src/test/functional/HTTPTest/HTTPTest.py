@@ -54,6 +54,11 @@ class HTTPTest:
         else:
             self.report(False, test='Status Code Check on %s' % status, comment='expected %s ; received %s' % (status, out))
             return False
+    
+    def printout(self, string):
+        
+        if self.mask == 0:
+            print string
         
     def end(self):
         
@@ -68,9 +73,9 @@ class HTTPTest:
             
             count = count + 1
         
-        print "Failures :: %s" % failures
-        print "Passes :: %s" % passes 
-        print "Total tests run :: %s" % count
+        self.printout("Failures :: %s" % failures)
+        self.printout("Passes :: %s" % passes)
+        self.printout("Total tests run :: %s" % count)
             
     def xmlparse(self):
         """
@@ -86,11 +91,9 @@ class HTTPTest:
         self.resultcomments.append(comment)
         if result == True:
             if self.debug > 0:
-                if self.mask == 0:
-                    print "Passed :: Test %s :: %s" % (test, comment)
+                self.printout("Passed :: Test %s :: %s" % (test, comment))
         if result == False:
-            if self.mask == 0:
-                print "Failure :: Test %s :: %s" % (test, comment)
+            self.printout("Failure :: Test %s :: %s" % (test, comment))
                                         
                                         
     def request(self, method, url, body=None, headers={}, 

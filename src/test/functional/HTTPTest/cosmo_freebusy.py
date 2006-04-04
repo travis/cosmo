@@ -120,7 +120,7 @@ class CosmoFreeBusy(HTTPTest):
             ctest.text = ctest.text.replace('\n ', '')
             for x in vcalitems:
                 if ctest.text.find(x) == -1:
-                    print 'FAILED to get %s in %s' % (x, t[0].text)
+                    self.printout('FAILED to get %s in %s' % (x, t[0].text))
                     icscount = icscount - 100
                         
         #Run through all the elemenet and etag counts and make sure they match

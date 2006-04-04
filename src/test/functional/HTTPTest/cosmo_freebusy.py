@@ -1,6 +1,6 @@
 from HTTPTest import HTTPTest    
 
-class cosmoFreeBusy(HTTPTest):
+class CosmoFreeBusy(HTTPTest):
     
     def startRun(self):
         
@@ -159,7 +159,7 @@ if __name__ == "__main__":
         
     print "host %s port %s recurring %s path %s" % (host, port, counter, path)
     
-    cosmofreebusy = cosmoFreeBusy(host=host, port=port, path=path)
+    cosmofreebusy = CosmoFreeBusy(host=host, port=port, path=path)
     cosmofreebusy.debug = debug
     cosmofreebusy.startRun()
     cosmofreebusy.end()

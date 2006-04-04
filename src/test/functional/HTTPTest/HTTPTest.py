@@ -5,7 +5,7 @@ from elementtree import ElementTree
 
 class HTTPTest:
     
-    def __init__(self, host, port, path, debug=0, headers=None, tls=False):
+    def __init__(self, host, port, path, debug=0, headers=None, tls=False, mask=0):
         
         if headers == None:
             self.headers = {'Host' : "localhost:8080",
@@ -18,7 +18,9 @@ class HTTPTest:
         self.debug = debug
         self.results = []
         self.resultnames = []
+        self.resultcomments = []
         self.request('OPTIONS', path, body=None, headers=self.headers)
+        self.mask = mask
         
     def headeradd(self, headers):
         """
@@ -81,11 +83,14 @@ class HTTPTest:
         
         self.results.append(result)
         self.resultnames.append(test)
+        self.resultcomments.append(comment)
         if result == True:
             if self.debug > 0:
-                print "Passed :: Test %s :: %s" % (test, comment)
+                if self.mask < 0:
+                    print "Passed :: Test %s :: %s" % (test, comment)
         if result == False:
-            print "Failure :: Test %s :: %s" % (test, comment)
+            if self.mask < 0:
+                print "Failure :: Test %s :: %s" % (test, comment)
                                         
                                         
     def request(self, method, url, body=None, headers={}, 

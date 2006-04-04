@@ -62,6 +62,9 @@ public class UserMapper implements SchemaConstants {
      */
     public static void userToNode(User user, Node node)
         throws RepositoryException {
+        if (! node.isNodeType(NT_USER)) {
+            node.addMixin(NT_USER);
+        }
         node.setProperty(NP_USER_USERNAME, user.getUsername());
         node.setProperty(NP_USER_PASSWORD, user.getPassword());
         node.setProperty(NP_USER_FIRSTNAME, user.getFirstName());

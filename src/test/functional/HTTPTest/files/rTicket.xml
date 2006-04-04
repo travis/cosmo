@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<X:ticketinfo xmlns:D="DAV:" 
+              xmlns:X="http://www.xythos.com/namespaces/StorageServer">
+<D:privilege><D:read/></D:privilege>
+<X:timeout>Second-60</X:timeout>
+</X:ticketinfo>

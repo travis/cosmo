@@ -54,8 +54,8 @@ public abstract class AbstractCalendarQueryReport
         throws RepositoryException {
 
         // Create the XPath expression
-        String statement = "/jcr:root" + resource.getLocator().getJcrPath();
-        statement += filter.toXPath();
+        String statement = "/jcr:root" + resource.getLocator().getJcrPath() +
+                           filter.toXPath();
 
         if (log.isDebugEnabled()) {
             log.debug("executing JCR query " + statement);

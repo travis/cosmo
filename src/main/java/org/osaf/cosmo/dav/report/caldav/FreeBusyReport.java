@@ -273,7 +273,7 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
         MultiStatus ms = new MultiStatus();
         CalDAVMultiStatusResponse response = new CalDAVMultiStatusResponse(
                 resource, propfindProps, propfindType);
-        response.setCalendarData(calendarData, false);
+        response.setCalendarData(calendarData);
         ms.addResponse(response);
 
         return ms.toXml(doc);

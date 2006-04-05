@@ -41,13 +41,6 @@ public class CalDAVMultiStatusResponse extends MultiStatusResponse {
      */
     private String calendarData;
 
-    /**
-     * Indicates whether to use the old-style calendar-data element placement
-     * 
-     * TODO Remove once old-style clients are updated
-     */
-    private boolean oldStyle;
-
     public CalDAVMultiStatusResponse(DavResource resource,
                                      DavPropertyNameSet propNameSet,
                                      int propFindType) {
@@ -58,9 +51,8 @@ public class CalDAVMultiStatusResponse extends MultiStatusResponse {
      * @param calendarData
      *            The calendarData to set.
      */
-    public void setCalendarData(String calendarData, boolean oldStyle) {
+    public void setCalendarData(String calendarData) {
         this.calendarData = calendarData;
-        this.oldStyle = oldStyle;
     }
 
     /*
@@ -76,12 +68,7 @@ public class CalDAVMultiStatusResponse extends MultiStatusResponse {
             DomUtil.setText(cdata, calendarData);
         }
 
-        // TODO We currently support the old-style and new-style of
-        // calendar-data placement. Eventually we should remove the old-style
-        // when clients are updated.
-
-        if ((cdata != null) && !oldStyle) {
-
+        if (cdata != null) {
             // Create DavProperty for this data
             CalendarDataProperty prop = new CalendarDataProperty(cdata);
             add(prop);
@@ -89,11 +76,6 @@ public class CalDAVMultiStatusResponse extends MultiStatusResponse {
 
         // Get standard multistatus response from superclass
         Element response = super.toXml(doc);
-
-        // Now add the calendar-data element if required
-        if ((cdata != null) && oldStyle) {
-            response.appendChild(cdata);
-        }
 
         return response;
     }

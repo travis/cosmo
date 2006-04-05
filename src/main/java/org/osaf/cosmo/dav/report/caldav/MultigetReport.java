@@ -85,7 +85,6 @@ public class MultigetReport extends AbstractCalendarDataReport {
 
         propfindProps = new DavPropertyNameSet();
         hrefs = new Vector();
-        hasOldStyleCalendarData = false;
         boolean gotPropType = false;
 
         ElementIterator i = DomUtil.getChildren(info.getReportElement());
@@ -103,12 +102,12 @@ public class MultigetReport extends AbstractCalendarDataReport {
 
                 // Look for CALDAV:calendar-data element as a property
                 Iterator iter = propfindProps.iterator();
+
                 while (iter.hasNext()) {
                     DavPropertyName name = (DavPropertyName) iter.next();
+
+                    //CALDAV:calendar-data
                     if (CosmoDavConstants.CALENDARDATA.equals(name)) {
-                        // Remove it from the property list that the report will
-                        // return as we will handle this one ourselves
-                        propfindProps.remove(name);
 
                         // Now find the calendar-data element inside the prop
                         // element and cache that
@@ -118,30 +117,29 @@ public class MultigetReport extends AbstractCalendarDataReport {
                                 CosmoDavConstants.NAMESPACE_CALDAV);
                     }
                 }
+                //If a CALDAV:calendar-data found remove value
+                //from the propfindProps since it is managed explicitly.
+                if (calendarDataElement != null)
+                    propfindProps.remove(CosmoDavConstants.CALENDARDATA);
+
             } else if (XML_PROPNAME.equals(nodeName)) {
                 if (gotPropType) {
                     throw new IllegalArgumentException(
-                            "CALDAV:calendar-multiget must contain only one prop/propname/allprop element.");
+                            "CALDAV:calendar-multiget must contain only " +
+                            "one prop/propname/allprop element.");
                 }
                 propfindType = PROPFIND_PROPERTY_NAMES;
                 gotPropType = true;
             } else if (XML_ALLPROP.equals(nodeName)) {
                 if (gotPropType) {
                     throw new IllegalArgumentException(
-                            "CALDAV:calendar-multiget must contain only one prop/propname/allprop element.");
+                            "CALDAV:calendar-multiget must contain only one " +
+                            "prop/propname/allprop element.");
                 }
                 propfindType = PROPFIND_ALL_PROP;
                 gotPropType = true;
             } else if (XML_HREF.equals(nodeName)) {
                 hrefs.add(DomUtil.getTextTrim(child));
-
-            } else if (CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA
-                    .equals(nodeName)) {
-                // TODO this is the old-style calendar-data location. Eventually
-                // the option to handle this will go away as old-style clients
-                // are updated.
-                hasOldStyleCalendarData = true;
-                calendarDataElement = child;
             }
         }
 

@@ -165,14 +165,16 @@ public class QueryReport extends AbstractCalendarQueryReport {
             } else if (XML_PROPNAME.equals(nodeName)) {
                 if (gotPropType) {
                     throw new IllegalArgumentException(
-                            "CALDAV:calendar-query must contain only one prop/propname/allprop element.");
+                            "CALDAV:calendar-query must contain only " +
+                            "one prop/propname/allprop element.");
                 }
                 propfindType = PROPFIND_PROPERTY_NAMES;
                 gotPropType = true;
             } else if (XML_ALLPROP.equals(nodeName)) {
                 if (gotPropType) {
                     throw new IllegalArgumentException(
-                            "CALDAV:calendar-query must contain only one prop/propname/allprop element.");
+                            "CALDAV:calendar-query must contain only " +
+                            "one prop/propname/allprop element.");
                 }
                 propfindType = PROPFIND_ALL_PROP;
                 gotPropType = true;
@@ -236,7 +238,6 @@ public class QueryReport extends AbstractCalendarQueryReport {
 
             // Convert the query results into hrefs for each result
             queryResultToHrefs(qR);
-
         } catch (RepositoryException e) {
             String msg = "Error while running CALDAV:" +
                 info.getReportElement().getLocalName() + " report";
@@ -244,6 +245,12 @@ public class QueryReport extends AbstractCalendarQueryReport {
             // XXX: refactor so that the query is executed in a
             // different method that throws a checked exception
             throw new RuntimeException(msg, e);
+        } catch (IllegalArgumentException e1) {
+            //XXX: this exception raised when an unsupported query filter found.
+            //     this is a temporary solution till expanded query filter support added.
+            if (log.isDebugEnabled())
+                log.debug(e1);
+
         }
 
         // Hand off to parent with list of matching hrefs now complete

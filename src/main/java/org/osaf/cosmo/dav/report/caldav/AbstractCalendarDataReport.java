@@ -73,7 +73,6 @@ public abstract class AbstractCalendarDataReport
     protected int propfindType = PROPFIND_ALL_PROP;
     protected DavPropertyNameSet propfindProps;
     protected List hrefs;
-    protected boolean hasOldStyleCalendarData;
     protected Element calendarDataElement;
     protected OutputFilter outputFilter;
 
@@ -163,61 +162,48 @@ public abstract class AbstractCalendarDataReport
         CalDAVMultiStatusResponse response = new CalDAVMultiStatusResponse(res,
                 propfindProps, propfindType);
 
-        // Add calendar data if required
         if (res.exists()) {
+            if (calendarDataElement != null) {
+                // Generate calendar data string from resource
+                String calendarData = readCalendarData(res);
 
-            // Generate calendar data string from resource
-            String calendarData = readCalendarData(res);
+                if (outputFilter != null) {
+                    try {
+                        // Parse the calendar data into an iCalendar object
+                        CalendarBuilder builder = new CalendarBuilder();
+                        Calendar calendar = builder.build(new StringReader(
+                                                    calendarData));
 
-            if (outputFilter != null) {
-                try {
-                    // Parse the calendar data into an iCalendar object
-                    CalendarBuilder builder = new CalendarBuilder();
-                    Calendar calendar = builder.build(new StringReader(
-                            calendarData));
+                        // Write the calendar object back using the filter
+                        StringWriter out = new StringWriter();
+                        CalendarOutputter outputer = new CalendarOutputter();
+                        outputer.output(calendar, out, outputFilter);
+                        calendarData = out.toString();
+                        out.close();
 
-                    // Write the calendar object back using the filter
-                    StringWriter out = new StringWriter();
-                    CalendarOutputter outputer = new CalendarOutputter();
-                    outputer.output(calendar, out, outputFilter);
-                    calendarData = out.toString();
-                    out.close();
+                        // NB ical4j's outputter generates \r\n line ends but we
+                        // need
+                        // only \n, so remove all \r's from the string
+                        calendarData = calendarData.replaceAll("\r", "");
 
-                    // NB ical4j's outputter generates \r\n line ends but we
-                    // need
-                    // only \n, so remove all \r's from the string
-                    calendarData = calendarData.replaceAll("\r", "");
-
-                } catch (IOException e) {
-                    String msg = "Error while running CALDAV:" +
-                        info.getReportElement().getNodeName() + " report";
-                    log.error(msg, e);
-                    throw new RuntimeException(msg, e);
-                } catch (ParserException e) {
-                    String msg = "Error while running CALDAV:" +
-                        info.getReportElement().getNodeName() + " report";
-                    log.error(msg, e);
-                    throw new RuntimeException(msg, e);
-                } catch (ValidationException e) {
-                    String msg = "Error while running CALDAV:" +
-                        info.getReportElement().getNodeName() + " report";
-                    log.error(msg, e);
-                    throw new RuntimeException(msg, e);
+                    } catch (IOException e) {
+                        String msg = "Error while running CALDAV:" +
+                                      info.getReportElement().getNodeName() + " report";
+                        log.error(msg, e);
+                        throw new RuntimeException(msg, e);
+                    } catch (ParserException e) {
+                        String msg = "Error while running CALDAV:" +
+                                       info.getReportElement().getNodeName() + " report";
+                        log.error(msg, e);
+                        throw new RuntimeException(msg, e);
+                    } catch (ValidationException e) {
+                        String msg = "Error while running CALDAV:" +
+                                      info.getReportElement().getNodeName() + " report";
+                        log.error(msg, e);
+                        throw new RuntimeException(msg, e);
+                    }
                 }
-            }
-
-            // TODO We handle the old-style calendar-data format where that
-            // element is placed outside the propstat element. Eventually this
-            // will go away when old-style clients are updated.
-
-            // Add the calendar data if we got any
-            if (calendarData != null) {
-                response.setCalendarData(calendarData, hasOldStyleCalendarData);
-            } else {
-                String msg = "no calendar data for CALDAV:" +
-                    info.getReportElement().getNodeName() + " report";
-                log.error(msg);
-                throw new RuntimeException(msg);
+                response.setCalendarData(calendarData);
             }
         }
 
@@ -277,7 +263,6 @@ public abstract class AbstractCalendarDataReport
     }
 
     private OutputFilter parseCalendarData(Element cdata) {
-
         OutputFilter result = null;
         Period expand = null;
         Period limit = null;
@@ -307,19 +292,19 @@ public abstract class AbstractCalendarDataReport
                 // Now parse filter item
                 result = parseCalendarDataComp(child);
 
-                // TODO expand-recurrence-set was removed in -08 draft, but is
-                // here for backwards compatability
-            } else if (CosmoDavConstants.ELEMENT_CALDAV_EXPAND_RECURRENCE_SET
-                    .equals(child.getLocalName())
-                    || CosmoDavConstants.ELEMENT_CALDAV_EXPAND.equals(child
+            } else if (CosmoDavConstants.ELEMENT_CALDAV_EXPAND.equals(child
                             .getLocalName())) {
-                expand = parsePeriod(child);
+                expand = parsePeriod(child, true);
             } else if (CosmoDavConstants.ELEMENT_CALDAV_LIMIT_RECURRENCE_SET
                     .equals(child.getLocalName())) {
-                limit = parsePeriod(child);
+                limit = parsePeriod(child, true);
             } else if (CosmoDavConstants.ELEMENT_CALDAV_LIMIT_FREEBUSY_SET
                     .equals(child.getLocalName())) {
-                limitfb = parsePeriod(child);
+                limitfb = parsePeriod(child, true);
+            } else {
+                throw new IllegalArgumentException("Invalid child element: "  +
+                                                   child.getLocalName() +
+                                                   " found in calendar-data element");
             }
         }
 
@@ -434,14 +419,26 @@ public abstract class AbstractCalendarDataReport
     }
 
     private Period parsePeriod(Element node) {
+        return parsePeriod(node, false);
+    }
+
+    private Period parsePeriod(Element node, boolean utc) {
         try {
             // Get start (must be present)
             String start =
                 DomUtil.getAttribute(node,
                                      CosmoDavConstants.ATTR_CALDAV_START, null);
+
             if (start == null)
                 return null;
+
             DateTime trstart = new DateTime(start);
+
+            if (utc && !trstart.isUtc()) {
+                throw new IllegalArgumentException("CALDAV:timerange error " +
+                                                   "start must be UTC");
+            }
+
 
             // Get end (must be present)
             String end =
@@ -449,9 +446,16 @@ public abstract class AbstractCalendarDataReport
                                      CosmoDavConstants.ATTR_CALDAV_END, null);
             if (end == null)
                 return null;
+
             DateTime trend = new DateTime(end);
 
+            if (utc && !trend.isUtc()) {
+                throw new IllegalArgumentException("CALDAV:timerange error " +
+                                                   "end must be UTC");
+            }
+
             return new Period(trstart, trend);
+
         } catch (ParseException e) {
             return null;
         }

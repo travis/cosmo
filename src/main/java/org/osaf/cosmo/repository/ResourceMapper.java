@@ -39,6 +39,7 @@ import org.osaf.cosmo.model.FileResource;
 import org.osaf.cosmo.model.HomeCollectionResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.model.ResourceProperty;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
 /**
@@ -265,9 +266,26 @@ public class ResourceMapper implements SchemaConstants {
             resource.getProperties().add(propToResourceProperty(p));
         }
 
+        HashSet timedOutTicketNodes = new HashSet();
         for (NodeIterator i=node.getNodes(NN_TICKET); i.hasNext();) {
             Node child = i.nextNode();
-            resource.getTickets().add(TicketMapper.nodeToTicket(child));
+            Ticket ticket = TicketMapper.nodeToTicket(child);
+            if (ticket.hasTimedOut()) {
+                timedOutTicketNodes.add(child);
+                continue;
+            }
+            resource.getTickets().add(ticket);
+        }
+        if (! timedOutTicketNodes.isEmpty()) {
+            for (Iterator i=timedOutTicketNodes.iterator(); i.hasNext();) {
+                Node child = (Node) i.next();
+                if (log.isDebugEnabled()) {
+                    log.debug("removing timed out ticket " +
+                              child.getProperty(NP_TICKET_ID).getString());
+                }
+                child.remove();
+            }
+            node.save();
         }
 
         resource.setOwner(findOwner(node));

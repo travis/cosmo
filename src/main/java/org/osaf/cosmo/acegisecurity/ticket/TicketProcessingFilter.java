@@ -90,6 +90,12 @@ public class TicketProcessingFilter implements Filter {
                     if (! path.equals("/") && path.endsWith("/")) {
                         path = path.substring(0, path.length()-1);
                     }
+                    // XXX: refactor so this path prefix is not
+                    // hardcoded .. or look at making security happen
+                    // after url-rewriting, not before
+                    if (path.startsWith("/atom/1.0")) {
+                        path = path.substring(9);
+                    }
 
                     Authentication token = createAuthentication(path, ids);
                     sc.setAuthentication(token);

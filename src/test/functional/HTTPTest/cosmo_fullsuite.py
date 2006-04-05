@@ -81,5 +81,5 @@ if __name__ == "__main__":
                 if debug > 0:
                     print "Failure :: Script %s :: Test %s :: %s" % (s.__class__.__name__, s.resultnames[i], s.resultcomments[i])
             count = count + 1
-    print "Scripts Run %s :: Script Passes :: %s; Script Failures :: %s; Tests Run :: %s; Test Passes :: %s; Test Failures :: %s" % (scriptcount, scriptcount - scriptfailures, scriptfailures, 
+    print "Scripts Run :: %s; Script Passes :: %s; Script Failures :: %s; Tests Run :: %s; Test Passes :: %s; Test Failures :: %s" % (scriptcount, scriptcount - scriptfailures, scriptfailures, 
                                                                                                                                    count, passes, failures)

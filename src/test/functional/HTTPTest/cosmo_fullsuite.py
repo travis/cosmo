@@ -52,6 +52,8 @@ if __name__ == "__main__":
     
     # Run Suite
     for x in suite:
+        if mask == 0:
+            print "Starting test script %s" % x.__class__.__name__
         x.startRun()
     
     # Calculate passes and failures

@@ -20,6 +20,17 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
 <tiles:importAttribute name="resource"/>
+<tiles:importAttribute name="isCollection" ignore="true"/>
+
+<c:if test="${empty isCollection}">
+  <c:set var="isCollection" value="false"/>
+</c:if>
+
+<c:set var="davPath" value="/home${resource.path}"/>
+<c:set var="feedPath" value="/feed/atom/1.0${resource.path}"/>
+<c:if test="${isCollection}">
+  <c:set var="davPath" value="${davPath}/"/>
+</c:if>
 
 <div class="hd" style="margin-top: 12px;">
   Tickets
@@ -41,6 +52,9 @@
         Id
       </td>
       <td class="smTableColHead">
+        Sharing Links
+      </td>
+      <td class="smTableColHead">
         Owner
       </td>
       <td class="smTableColHead">
@@ -58,10 +72,16 @@
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
         <html:link page="/console/home/ticket${resource.path}/revoke/${ticket.id}">
           [revoke]
-        </html:link>    
+        </html:link>
       </td>
       <td class="smTableData">
         ${ticket.id}
+      </td>
+      <td class="smTableData" style="text-align:center;">
+        <html:link page="${davPath}?ticket=${ticket.id}">[dav]</html:link>
+        <c:if test="${isCollection}">
+          <html:link page="${feedPath}?ticket=${ticket.id}">[feed]</html:link>
+        </c:if>
       </td>
       <td class="smTableData" style="text-align:center;">
         ${ticket.owner}

@@ -134,6 +134,7 @@
 
 <tiles:insert definition="home.inc.tickets">
   <tiles:put name="resource" beanName="Collection"/>
+  <tiles:put name="isCollection" value="true"/>
 </tiles:insert>
 
 <tiles:insert definition="home.inc.properties">

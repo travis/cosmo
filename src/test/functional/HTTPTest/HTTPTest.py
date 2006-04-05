@@ -73,9 +73,9 @@ class HTTPTest:
             
             count = count + 1
         
-        self.printout("Failures :: %s" % failures)
-        self.printout("Passes :: %s" % passes)
-        self.printout("Total tests run :: %s" % count)
+        print("Failures :: %s" % failures)
+        print("Passes :: %s" % passes)
+        print("Total tests run :: %s" % count)
             
     def xmlparse(self):
         """

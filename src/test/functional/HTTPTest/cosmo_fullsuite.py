@@ -7,6 +7,7 @@ if __name__ == "__main__":
     path = '/cosmo'
     debug = 0
     counter = 10
+    mask = 1
     
     for arg in sys.argv:
         args = arg.split("=")
@@ -20,12 +21,14 @@ if __name__ == "__main__":
             counter = int(args[1])
         elif args[0] == "debug":
             debug = int(args[1])
+        elif args[0] == "mask":
+            mask = int(args[1])
         
     # ----- Define list of test scripts to run ------ #
     
     from cosmo_basicquery import CosmoBasicQuery
     from cosmo_bugs import CosmoBugs
-    from cosmo_freebusy import CosmoFreeBusy
+    #from cosmo_freebusy import CosmoFreeBusy
     from cosmo_invalid import CosmoInvalid
     from cosmo_limitexpand import CosmoLimitExpand
     from cosmo_mkcalendar import CosmoMkcalendar
@@ -33,19 +36,19 @@ if __name__ == "__main__":
     from cosmo_ticket import CosmoTicket
     from cosmo_timerangequery import CosmoTimeRangeQuery
     
-    cosmobasicquery = CosmoBasicQuery(host=host, port=port, path=path, debug=debug, mask=1)
-    cosmobugs = CosmoBugs(host=host, port=port, path=path, debug=debug, mask=1)
-    cosmofreebusy = CosmoFreeBusy(host=host, port=port, path=path, debug=debug, mask=1)
-    cosmoinvalid = CosmoInvalid(host=host, port=port, path=path, debug=debug, mask=1)
-    cosmolimitexpand = CosmoLimitExpand(host=host, port=port, path=path, debug=debug, mask=1)
-    cosmomkcalendar = CosmoMkcalendar(host=host, port=port, path=path, debug=debug, mask=1)
-    cosmomultiget = CosmoMultiget(host=host, port=port, path=path, debug=debug, mask=1)
-    cosmoticket = CosmoTicket(host=host, port=port, path=path, debug=debug, mask=1)
-    cosmotimerangequery = CosmoTimeRangeQuery(host=host, port=port, path=path, debug=debug, mask=1)
+    cosmobasicquery = CosmoBasicQuery(host=host, port=port, path=path, debug=debug, mask=mask)
+    cosmobugs = CosmoBugs(host=host, port=port, path=path, debug=debug, mask=mask)
+    #cosmofreebusy = CosmoFreeBusy(host=host, port=port, path=path, debug=debug, mask=mask)
+    cosmoinvalid = CosmoInvalid(host=host, port=port, path=path, debug=debug, mask=mask)
+    cosmolimitexpand = CosmoLimitExpand(host=host, port=port, path=path, debug=debug, mask=mask)
+    cosmomkcalendar = CosmoMkcalendar(host=host, port=port, path=path, debug=debug, mask=mask)
+    cosmomultiget = CosmoMultiget(host=host, port=port, path=path, debug=debug, mask=mask)
+    cosmoticket = CosmoTicket(host=host, port=port, path=path, debug=debug, mask=mask)
+    cosmotimerangequery = CosmoTimeRangeQuery(host=host, port=port, path=path, debug=debug, mask=mask)
     
-    suite = [cosmobasicquery, cosmobugs, cosmofreebusy, cosmoinvalid, 
+    suite = [cosmobasicquery, cosmobugs, cosmoinvalid, 
               cosmolimitexpand, cosmomkcalendar, cosmomultiget, cosmoticket, 
-              cosmotimerangequery]
+              cosmotimerangequery] #cosmofreebusy is currently removed.
     
     # Run Suite
     for x in suite:
@@ -64,7 +67,7 @@ if __name__ == "__main__":
             elif s.results[i] == True:
                 passes = passes +1
                 if debug > 0:
-                    print "Failure :: Script %s :: Test %s :: %s" % (s.__class___.__name__, s.resultnames[i], s.resultcomments[i])
+                    print "Failure :: Script %s :: Test %s :: %s" % (s.__class__.__name__, s.resultnames[i], s.resultcomments[i])
             count = count + 1
         
     print "Failures :: %s" % failures

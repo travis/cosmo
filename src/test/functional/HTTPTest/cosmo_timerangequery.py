@@ -250,6 +250,43 @@ class CosmoTimeRangeQuery(HTTPTest):
         
         ##Blocked by bug 5551
         
+        # -------------- More time range tests
+        
+        # Put all float cals
+        putfloat1icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/float1.ics') 
+        putfloat2icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/float2.ics') 
+        putfloat3icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/float3.ics') 
+        
+        f = open("files/reports/put/float1.ics")
+        putfloat1icsbody = f.read()
+        f = open("files/reports/put/float2.ics")
+        putfloat2icsbody = f.read()
+        f = open("files/reports/put/float3.ics")
+        putfloat3icsbody = f.read()
+        
+        self.request('PUT', putfloat1icspath, body=putfloat1icsbody, headers=puticsheaders)
+        self.request('PUT', putfloat2icspath, body=putfloat2icsbody, headers=puticsheaders)
+        self.request('PUT', putfloat3icspath, body=putfloat3icsbody, headers=puticsheaders)
+        
+        # ---------------- oneInHonolulu.xml test
+        
+        #Build request
+        f = open('files/reports/timerangequery/oneInHonolulu.xml')
+        reportoneInHonolulubody = f.read()
+        self.request('REPORT', calpath, body=reportoneInHonolulubody, headers=self.headers)
+        
+        # ---------------- twoInMountain.xml test
+        
+        f = open('files/reports/timerangequery/twoInMountain.xml')
+        reporttwoInMountainbody = f.read()
+        self.request('REPORT', calpath, body=reporttwoInMountainbody, headers=self.headers)        
+        
+        # ----------------- threeInEastern.xml test
+
+        f = open('files/reports/timerangequery/threeInEastern.xml')
+        reportthreeInEasternbody = f.read()
+        self.request('REPORT', calpath, body=reportthreeInEasternbody, headers=self.headers)
+        
         
         
 if __name__ == "__main__":

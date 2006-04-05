@@ -185,7 +185,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         try {
             Node resource = getNode();
             ticket.setOwner(getLoggedInUser().getUsername());
-            ticketDao.createTicket(resource.getPath(), ticket);
+            ticketDao.createTicket(getResourcePath(), ticket);
         } catch (Exception e) {
             log.error("cannot save ticket for resource " + getResourcePath(),
                       e);

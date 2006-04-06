@@ -554,6 +554,13 @@ public class QueryFilter implements SchemaConstants {
                 result = generateOrList(paramFilters, myprefix, result);
             }
 
+            if (! (useTimeRange || useTextMatch || paramSize > 0)) {
+                //If a timerange or textmatch is not specified and there are
+                //no additional parameters to the filter query then
+                //check to see if the calendar resource contains this property
+                result = "@" + myprefix;
+            }
+
             return result;
         }
     }

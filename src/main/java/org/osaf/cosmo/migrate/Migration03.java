@@ -24,7 +24,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.jcr.NamespaceException;
+import javax.jcr.NamespaceRegistry;
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
@@ -32,8 +37,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.HomeCollectionResource;
+import org.osaf.cosmo.model.ResourceProperty;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.repository.HexEscaper;
 import org.osaf.cosmo.repository.ResourceMapper;
+import org.osaf.cosmo.repository.TicketMapper;
 import org.osaf.cosmo.repository.UserMapper;
 
 /**
@@ -97,6 +106,12 @@ public class Migration03 extends CopyBasedMigration {
     public void up(Session previous,
                    Session current)
         throws MigrationException {
+        try {
+            registerCurrentNamespaces(previous, current);
+        } catch (RepositoryException e) {
+            throw new MigrationException("unable to register namespaces into current repository", e);
+        }
+
         User overlord = loadOverlord();
         Map users = loadUsers();
 
@@ -104,36 +119,12 @@ public class Migration03 extends CopyBasedMigration {
             User user = (User) i.next();
             try {
                 HomeCollectionResource currentHome =
-                    createCurrentHome(user, current);
+                    createCurrentHome(user, previous, current);
             } catch (MigrationException e) {
                 log.error("SKIPPING " + user.getUsername(), e);
                 continue;
             }
         }
-    }
-
-    HomeCollectionResource createCurrentHome(User user,
-                                             Session current)
-        throws MigrationException {
-
-        // because username and email were unique in the 0.2
-        // repository, we don't have to check for uniqueness
-
-        // create home node in current repo
-        HomeCollectionResource home = new HomeCollectionResource();
-        home.setDisplayName(user.getUsername());
-
-        try {
-            Node homeNode =
-                ResourceMapper.createHomeCollection(home,
-                                                    user.getUsername(),
-                                                    current);
-            UserMapper.userToNode(user, homeNode);
-        } catch (RepositoryException e) {
-            throw new MigrationException("Failed to create home collection", e);
-        }
-
-        return home;
     }
 
     /**
@@ -179,6 +170,27 @@ public class Migration03 extends CopyBasedMigration {
     }
 
     // package protected methods, for individuable testability
+
+    void registerCurrentNamespaces(Session previous,
+                                   Session current)
+        throws RepositoryException {
+        NamespaceRegistry prevNsReg =
+            previous.getWorkspace().getNamespaceRegistry();
+        NamespaceRegistry curNsReg =
+            current.getWorkspace().getNamespaceRegistry();
+
+        String[] prevPrefixes = prevNsReg.getPrefixes();
+        for (int i=0; i<prevPrefixes.length; i++) {
+            String prefix = prevPrefixes[i];
+            try {
+                curNsReg.getURI(prefix);
+            } catch (NamespaceException e) {
+                // namespace prefix is not registered in the current
+                // repository, so register it
+                curNsReg.registerNamespace(prefix, prevNsReg.getURI(prefix));
+            }
+        }
+    }
 
     User loadOverlord()
         throws MigrationException {
@@ -240,6 +252,29 @@ public class Migration03 extends CopyBasedMigration {
         return users;
     }
 
+    HomeCollectionResource createCurrentHome(User user,
+                                             Session previous,
+                                             Session current)
+        throws MigrationException {
+        try {
+            // find old home node
+            String oldHomePath = "/" + HexEscaper.escape(user.getUsername());
+            Node oldHomeNode = (Node) previous.getItem(oldHomePath);
+
+            // create new home node
+            HomeCollectionResource newHome = oldNodeToHome(oldHomeNode);
+            Node newHomeNode =
+                ResourceMapper.createHomeCollection(newHome,
+                                                    user.getUsername(),
+                                                    current);
+            UserMapper.userToNode(user, newHomeNode);
+
+            return newHome;
+        } catch (RepositoryException e) {
+            throw new MigrationException("Failed to create home collection", e);
+        }
+    }
+
     private User resultSetToUser(ResultSet rs)
         throws SQLException {
         User user = new User();
@@ -254,5 +289,47 @@ public class Migration03 extends CopyBasedMigration {
         user.setDateModified(rs.getDate("dateModified"));
 
         return user;
+    }
+
+    private HomeCollectionResource oldNodeToHome(Node node) 
+        throws RepositoryException {
+        HomeCollectionResource home = new HomeCollectionResource();
+
+        // set cosmo properties
+        home.setDisplayName(HexEscaper.unescape(node.getName()));
+        home.setDateCreated(node.getProperty("jcr:created").getDate().
+                            getTime());
+
+        // find old home custom properties
+        for (PropertyIterator i=node.getProperties(); i.hasNext();) {
+            Property p = i.nextProperty();
+            if (p.getName().startsWith("cosmo:") ||
+                p.getName().startsWith("jcr:") ||
+                p.getName().startsWith("dav:") ||
+                p.getName().startsWith("caldav:") ||
+                p.getName().startsWith("icalendar:") ||
+                p.getName().startsWith("xml")) {
+                continue;
+            }
+            ResourceProperty rp = new ResourceProperty();
+            rp.setName(p.getName());
+            rp.setValue(p.getString());
+            home.getProperties().add(rp);
+        }
+
+        // set old home tickets
+        for (NodeIterator i=node.getNodes("ticket:ticket"); i.hasNext();) {
+            Node child = i.nextNode();
+            // we can use TicketMapper since the ticket node type did
+            // not change between versions
+            Ticket ticket = TicketMapper.nodeToTicket(child);
+            // ignore timed out tickets
+            if (ticket.hasTimedOut()) {
+                continue;
+            }
+            home.getTickets().add(ticket);
+        }
+
+        return home;
     }
 }

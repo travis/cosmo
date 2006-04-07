@@ -17,10 +17,17 @@ package org.osaf.cosmo.migrate;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Map;
 
+import javax.jcr.NamespaceException;
+import javax.jcr.NamespaceRegistry;
 import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
+import javax.jcr.Session;
 
 import junit.framework.TestCase;
 
@@ -44,10 +51,23 @@ public class Migration03Test extends TestCase implements SchemaConstants {
         "jdbc:hsqldb:file:src/test/unit/migrate/db/userdb";
     private static final String DB_USERNAME = "sa";
     private static final String DB_PASSWORD = "";
+    private static final String PREV_CONFIG =
+        "src/test/unit/migrate/repository.xml";
+    private static final String PREV_DATA =
+        "src/test/unit/migrate/repository";
+    private static final String PREV_USERNAME = "cosmo_repository";
+    private static final String PREV_PASSWORD = "";
+    private static final String CUR_CONFIG =
+        "src/test/unit/config/repository.xml";
+    private static final String CUR_DATA =
+        "target/test-repository";
+    private static final String CUR_USERNAME = "cosmo_repository";
+    private static final String CUR_PASSWORD = "";
 
     private Migration03 migration;
     private Connection connection;
-    private JackrabbitTestSessionManager sessionManager;
+    private JackrabbitTestSessionManager previousSessionManager;
+    private JackrabbitTestSessionManager currentSessionManager;
     private JcrTestHelper testHelper;
 
     /**
@@ -61,16 +81,41 @@ public class Migration03Test extends TestCase implements SchemaConstants {
                                                  DB_PASSWORD);
         migration.setConnection(connection);
 
-        sessionManager = new JackrabbitTestSessionManager();
-        sessionManager.setUp();
+        previousSessionManager = new JackrabbitTestSessionManager();
+        previousSessionManager.setConfig(PREV_CONFIG);
+        previousSessionManager.setData(PREV_DATA);
+        previousSessionManager.setUsername(PREV_USERNAME);
+        previousSessionManager.setPassword(PREV_PASSWORD);
+        previousSessionManager.setUp();
 
-        testHelper = new JcrTestHelper(sessionManager.getSession());
+        currentSessionManager = new JackrabbitTestSessionManager();
+        currentSessionManager.setConfig(CUR_CONFIG);
+        currentSessionManager.setData(CUR_DATA);
+        currentSessionManager.setUsername(CUR_USERNAME);
+        currentSessionManager.setPassword(CUR_PASSWORD);
+        currentSessionManager.setUp();
+
+        // add namespace for a custom property in the previous repo to
+        // the current repo - this only needs to happen the first time
+        // the test suite is set up
+        NamespaceRegistry curNsReg =
+            currentSessionManager.getSession().getWorkspace().
+            getNamespaceRegistry();
+        try {
+            curNsReg.getURI("_pre141");
+        } catch (NamespaceException e) {
+            curNsReg.registerNamespace("_pre141", "myapp:ns");
+        }
+
+        testHelper = new JcrTestHelper(currentSessionManager.getSession());
     }
 
     /**
      */
     protected void tearDown() throws Exception {
-        sessionManager.tearDown();
+        previousSessionManager.tearDown();
+
+        currentSessionManager.tearDown();
 
         Statement st = connection.createStatement();
         st.execute("SHUTDOWN");
@@ -103,6 +148,36 @@ public class Migration03Test extends TestCase implements SchemaConstants {
 
     /**
      */
+    public void testRegisterCurrentNamespaces() throws Exception {
+        Session previous = previousSessionManager.getSession();
+        Session current = currentSessionManager.getSession();
+
+        Long now = new Long(System.currentTimeMillis());
+        String prefix = "m03test" + now;
+        String uri = "cosmo:0.3:migration:test" + now;
+
+        // add a custom namespace to previous
+        NamespaceRegistry prevNsReg =
+            previous.getWorkspace().getNamespaceRegistry();
+        prevNsReg.registerNamespace(prefix, uri);
+
+        migration.registerCurrentNamespaces(previous, current);
+
+        // confim that the custom namespace is in current
+        NamespaceRegistry curNsReg =
+            current.getWorkspace().getNamespaceRegistry();
+        try {
+            curNsReg.getURI(prefix);
+        } catch (NamespaceException e) {
+            fail("m03test was not registered in previous repository");
+        }
+
+        // would like to unregister the namespace but jackrabbit does
+        // not support this feature
+    }
+
+    /**
+     */
     public void testLoadOverlord() throws Exception {
         User overlord = migration.loadOverlord();
         assertNotNull(overlord);
@@ -129,10 +204,13 @@ public class Migration03Test extends TestCase implements SchemaConstants {
     /**
      */
     public void testCreateCurrentHome() throws Exception {
-        User user = testHelper.makeDummyUser();
+        User user = loadOldUser(2);
+
+        Session previous = previousSessionManager.getSession();
+        Session current = currentSessionManager.getSession();
 
         HomeCollectionResource home =
-            migration.createCurrentHome(user, sessionManager.getSession());
+            migration.createCurrentHome(user, previous, current);
         assertNotNull(home);
         assertEquals("resource display name does not match username",
                      user.getUsername(), home.getDisplayName());
@@ -145,8 +223,8 @@ public class Migration03Test extends TestCase implements SchemaConstants {
         String repoPath =
             PathTranslator.toRepositoryPath("/" + user.getUsername());
         assertTrue("home node not found at " + repoPath,
-                   sessionManager.getSession().itemExists(repoPath));
-        Node homeNode = (Node) sessionManager.getSession().getItem(repoPath);
+                   current.itemExists(repoPath));
+        Node homeNode = (Node) current.getItem(repoPath);
         assertTrue("home node not home collection node type",
                    homeNode.isNodeType(NT_HOME_COLLECTION));
         assertEquals("displayname prop does not match resource display name",
@@ -159,5 +237,38 @@ public class Migration03Test extends TestCase implements SchemaConstants {
         assertEquals("username prop does not match username",
                      user.getUsername(),
                      homeNode.getProperty(NP_USER_USERNAME).getString());
+
+        // XXX: for some reason the custom property is not found
+        // through jcr even though i can see it using webdav with
+        // cosmo on top of the same repository data
+//         try {
+//             homeNode.getProperty("_pre141:test");
+//         } catch (PathNotFoundException e) {
+//             fail("_pre141:test property not found on home node");
+//         }
+//         assertNotNull("_pre141:test property not found on home collection",
+//                       home.getProperty("_pre141:test"));
+    }
+
+    private User loadOldUser(int id)
+        throws Exception {
+        User user = new User();
+
+        Statement st = connection.createStatement();
+        ResultSet rs = st.executeQuery("select username, password, firstName, lastName, email, dateCreated, dateModified from user where id = " + new Integer(id));
+        rs.next();
+
+        user.setUsername(rs.getString("username"));
+        user.setPassword(rs.getString("password"));
+        user.setFirstName(rs.getString("firstName"));
+        user.setLastName(rs.getString("lastName"));
+        user.setEmail(rs.getString("email"));
+        user.setAdmin(Boolean.FALSE); // XXX check to see if this is true
+        user.setDateCreated(rs.getDate("dateCreated"));
+        user.setDateModified(rs.getDate("dateModified"));
+
+        st.close();
+
+        return user;
     }
 }

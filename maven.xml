@@ -40,27 +40,6 @@
        descriptor="${basedir}/src/main/data/nodetypes.xml"/>
   </goal>
 
-  <preGoal name="test:test-resources">
-    <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
-      <filter token="REPOSITORY_USERNAME"
-              value="${cosmo.test.repository.username}"/>
-      <filter token="REPOSITORY_PASSWORD"
-              value="${cosmo.test.repository.password}"/>
-      <filter token="CONFIGFILEPATH"
-              value="src/test/unit/config/repository.xml"/>
-      <filter token="REPOSITORYHOMEDIRPATH"
-              value="target/test-repository"/>
-      <filter token="MAIL_TRANSPORT_PROTOCOL"
-              value="${cosmo.test.mail.transport.protocol}"/>
-      <filter token="MAIL_SMTP_HOST"
-              value="${cosmo.test.mail.smtp.host}"/>
-      <filter token="MAIL_SMTP_STARTTLS_ENABLE"
-              value="${cosmo.test.mail.smtp.starttls.enable}"/>
-      <filter token="MAIL_SMTPS_HOST"
-              value="${cosmo.test.mail.smtps.host}"/>
-    </j:if>
-  </preGoal>
-
   <preGoal name="java:jar-resources">
     <filter token="VERSION" value="${pom.currentVersion}"/>
   </preGoal>

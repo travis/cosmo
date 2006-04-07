@@ -378,10 +378,8 @@
       <resources>
         <resource>
           <directory>src/test/unit/resources</directory>
-          <filtering>true</filtering>
           <includes>
             <include>log4j.xml</include>
-            <include>test.properties</include>
           </includes>
         </resource>
         <resource>

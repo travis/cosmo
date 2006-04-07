@@ -115,8 +115,6 @@ public class QueryFilter implements SchemaConstants {
         }
 
         // Generate a list of terms to use in the XPath expression
-        //XXX: this could raise an illegalArgumentException if the 
-        //comp filter name is not supported
         String tests = filter.generateTests("");
 
         if (tests != null && ! tests.equals("")) {
@@ -242,8 +240,10 @@ public class QueryFilter implements SchemaConstants {
                         .equals(child.getLocalName())) {
 
                     // Can only have one time-range element in a comp-filter
-                    if (got_one)
-                        throw new IllegalArgumentException("CALDAV:comp-filter only one time-range element permitted");
+                    if (got_one) {
+                        throw new IllegalArgumentException("CALDAV:comp-filter only one " +
+                                                           "time-range element permitted");
+                    }
 
                     got_one = true;
 
@@ -333,18 +333,6 @@ public class QueryFilter implements SchemaConstants {
          * @return the XPath element
          */
         public String generateTests(String prefix) {
-
-            if (! ("VCALENDAR".equalsIgnoreCase(name) ||
-                 "VEVENT".equalsIgnoreCase(name))) {
-                //As of Cosmo .3, only VEVENT's are supported.
-                //A VTODO, VJOURNAL, VALARM etc comp filter will result in an
-                //IllegalArgumentException on a generateTests call
-                //to indicate that no jcr querying is required.
-
-                throw new IllegalArgumentException("Cosmo only supports VEVENT sub comp " +
-                                                   "filters at this time");
-            }
-
             String result = new String();
 
             // If this is the top-level item, then prepend the icalendar
@@ -372,6 +360,13 @@ public class QueryFilter implements SchemaConstants {
 
             if (propSize != 0) {
                 result = generateOrList(propFilters, myprefix, result);
+            }
+
+            if (! (useTimeRange || compSize > 0 || propSize > 0)) {
+                //If a timerange is not specified and there are
+                //no additional propfilters or compfilters then
+                //check to see if the calendar resource contains this component
+                result = "@" + myprefix;
             }
 
             return result;

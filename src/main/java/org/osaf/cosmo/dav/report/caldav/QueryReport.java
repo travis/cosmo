@@ -245,12 +245,6 @@ public class QueryReport extends AbstractCalendarQueryReport {
             // XXX: refactor so that the query is executed in a
             // different method that throws a checked exception
             throw new RuntimeException(msg, e);
-        } catch (IllegalArgumentException e1) {
-            //XXX: this exception raised when an unsupported query filter found.
-            //     this is a temporary solution till expanded query filter support added.
-            if (log.isDebugEnabled())
-                log.debug(e1);
-
         }
 
         // Hand off to parent with list of matching hrefs now complete

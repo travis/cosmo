@@ -45,17 +45,8 @@ public class JackrabbitTestSessionManager {
     private static final Log log =
         LogFactory.getLog(JackrabbitTestSessionManager.class);
 
-    public static final String PROP_CONFIG_FILE_PATH =
-        "jackrabbit.repository.config";
-    public static final String PROP_REP_HOME_DIR =
-        "jackrabbit.repository.homedir";
-    public static final String PROP_USERNAME =
-        "jackrabbit.repository.username";
-    public static final String PROP_PASSWORD =
-        "jackrabbit.repository.password";
-
-    private String configFilePath;
-    private String repositoryHomedirPath;
+    private String config;
+    private String data;
     private String username;
     private String password;
     private Repository repository;
@@ -63,36 +54,14 @@ public class JackrabbitTestSessionManager {
     private Session session;
 
     /**
-     * Loads the <code>test.properties</code> resource and reads
-     * repository properties from it.
-     */
-    public JackrabbitTestSessionManager() {
-        // load test properties
-        Properties testprops = new Properties();
-        try {
-            testprops.load(getClass().getClassLoader().
-                           getResourceAsStream("test.properties"));
-        } catch (Exception e) {
-            throw new RuntimeException("can't load test.properties", e);
-        }
-
-        // extract test props used by this class
-        configFilePath = testprops.getProperty(PROP_CONFIG_FILE_PATH);
-        repositoryHomedirPath = testprops.getProperty(PROP_REP_HOME_DIR);
-        username = testprops.getProperty(PROP_USERNAME);
-        password = testprops.getProperty(PROP_PASSWORD);
-    }
-    
-    /**
      * Opens the repository, sets up the session factory, and begins a
      * session.
      */
     public void setUp() throws Exception {
         // set up repository
         try {
-            RepositoryConfig config =
-                RepositoryConfig.create(configFilePath, repositoryHomedirPath);
-            repository = RepositoryImpl.create(config);
+            RepositoryConfig rc = RepositoryConfig.create(config, data);
+            repository = RepositoryImpl.create(rc);
         } catch (Exception e) {
             throw new RuntimeException("can't open repository", e);
         }
@@ -124,6 +93,54 @@ public class JackrabbitTestSessionManager {
         SessionFactoryUtils.releaseSession(session, sessionFactory);
 
         ((RepositoryImpl) repository).shutdown();
+    }
+
+    /**
+     */
+    public String getConfig() {
+        return config;
+    }
+
+    /**
+     */
+    public void setConfig(String config) {
+        this.config = config;
+    }
+
+    /**
+     */
+    public String getData() {
+        return data;
+    }
+
+    /**
+     */
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    /**
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     */
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     /**

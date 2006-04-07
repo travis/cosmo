@@ -32,6 +32,11 @@ import org.springmodules.jcr.JcrSessionFactory;
 public class BaseJcrDaoTestCase extends TestCase {
     private static final Log log = LogFactory.getLog(BaseJcrDaoTestCase.class);
 
+    private static final String CONFIG = "src/test/unit/config/repository.xml";
+    private static final String DATA = "target/test-repository";
+    private static final String USERNAME = "cosmo_repository";
+    private static final String PASSWORD = "";
+
     private JackrabbitTestSessionManager sessionManager;
     private JcrTestHelper testHelper;
 
@@ -39,6 +44,10 @@ public class BaseJcrDaoTestCase extends TestCase {
      */
     protected void setUp() throws Exception {
         sessionManager = new JackrabbitTestSessionManager();
+        sessionManager.setConfig(CONFIG);
+        sessionManager.setData(DATA);
+        sessionManager.setUsername(USERNAME);
+        sessionManager.setPassword(PASSWORD);
         sessionManager.setUp();
 
         testHelper = new JcrTestHelper(sessionManager.getSession());

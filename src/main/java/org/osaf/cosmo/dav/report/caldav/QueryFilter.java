@@ -489,7 +489,7 @@ public class QueryFilter implements SchemaConstants {
                     useTextMatch = true;
 
                     // Element data is string to match
-                    textMatch = DomUtil.getTextTrim(child);
+                    textMatch = DomUtil.getTextTrim(child).replaceAll("'", "''");
 
                     // Check attribute for caseless
                     String caseless =
@@ -541,8 +541,8 @@ public class QueryFilter implements SchemaConstants {
                 String value = generatePeriods(timeRange);
                 result = "jcr:timerange(@" + key + ", '" + value + "')";
             } else if (useTextMatch) {
-                result = "jcr:contains(@" + myprefix + ", '" + textMatch
-                        + "')";
+                result = "jcr:like(@" + myprefix + ", '%" + textMatch
+                        + "%')";
             }
 
             if (paramSize != 0) {
@@ -620,7 +620,7 @@ public class QueryFilter implements SchemaConstants {
                 useTextMatch = true;
 
                 // Element data is string to match
-                textMatch = DomUtil.getTextTrim(child);
+                textMatch = DomUtil.getTextTrim(child).replaceAll("'", "''");
 
                 // Check attribute for caseless
                 String caseless =
@@ -652,8 +652,8 @@ public class QueryFilter implements SchemaConstants {
 
             if (useTextMatch) {
                 // TODO Figure out how to do caseless matching
-                result = "jcr:contains(@" + myprefix + ", '" + textMatch
-                        + "')";
+                result = "jcr:like(@" + myprefix + ", '%" + textMatch
+                        + "%')";
             }
             return result;
         }

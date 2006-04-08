@@ -2,7 +2,7 @@ from HTTPTest import HTTPTest
 
 class DAVTest(HTTPTest):
     
-    def verifyitems(self, *args, **keyargs):
+    def verifyItems(self, args=None, positive=None, negative=None, test=None, comment=None, inelement=None, inelementexpectedcount=None):
         """
         Method to verify elements exist and, if specified, verify that all strings in dict are in inelement.
         
@@ -33,39 +33,21 @@ class DAVTest(HTTPTest):
         inelementcount = 0
         inelementexpectedcount = 0
         
-        try: 
-            test = keyargs['test']
-        except KeyError:
+        if test == None:
             test = self.test
             
         for arg in args:
             itemexpectedcount = itemexpectedcount+1    
             
-        try:
-            positive = keyargs['positive']
+        if positive != None:
             for p in positive:
                 positiveexpectedcount = positiveexpectedcount+1
             positiveexpectedcount = (positiveexpectedcount*itemexpectedcount)
-        except KeyError:
-            positive = None
-            
-        try:
-            negative = keyargs['negative']
+       
+        if negative != None:
             for p in negative:
                 negativeexpectedcount = negativeexpectedcount+1
             negativeexpectedcount = (negativeexpectedcount*itemexpectedcount)
-        except KeyError:
-            negative = None
-            
-        try:
-            comment = keyargs['comment']
-        except KeyError:
-            comment = None
-            
-        try:
-            inelement = keyargs['inelement']
-        except KeyError:
-            inelement = None
             
         # ------ Super magic logic to verify all counts and matches
         
@@ -94,12 +76,8 @@ class DAVTest(HTTPTest):
                                 else:
                                     self.printout('FAILED to get %s in %s' % (p, t[0].text))                        
                                     
-        try:
-            inelementexpectedcount = keyargs['inelementexpectedcount']
-        except KeyError:
+        if inelementexpectedcount != None:
             inelementexpectedcount = inelementcount
-        except:
-            inelementexpectedcount = 0
                     
         if responseelementcount == itemexpectedcount == itemreturnedcount \
                            and positiveexpectedcount == positivepasscount \
@@ -114,7 +92,7 @@ class DAVTest(HTTPTest):
                                                                               inelementexpectedcount, inelementcount))
                                                                               
                                                                               
-    def verifyinelement(self, response, inelement, positive, negative=None, test=None, comment=None):
+    def verifyInElement(self, response, inelement, positive, negative=None, test=None, comment=None):
         """
         Method to verify positive and negative string list exists in single response.element match
         """

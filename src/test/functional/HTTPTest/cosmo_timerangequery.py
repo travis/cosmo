@@ -103,7 +103,7 @@ class CosmoTimeRangeQuery(DAVTest):
                       'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
                       'BEGIN:VEVENT', 'SUMMARY:event', 'END:VEVENT']
                       
-        self.verifyitems('5.ics', '6.ics', '7.ics', inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
+        self.verifyItems(['5.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
         
         # --------- Test 2.xml query for VEVENTs that have a DTSTART within time range
         
@@ -114,7 +114,7 @@ class CosmoTimeRangeQuery(DAVTest):
         report2body = f.read()
         self.request('REPORT', calpath, body=report2body, headers=self.headers)
                         
-        self.verifyitems('1.ics', '2.ics', '3.ics', '4.ics', positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')        
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')        
                                 
         # --------- Test 3.xml query for VALARMS within time range
         
@@ -125,7 +125,7 @@ class CosmoTimeRangeQuery(DAVTest):
         report3body = f.read()
         self.request('REPORT', calpath, body=report3body, headers=self.headers)
             
-        self.verifyitems('4.ics', positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data') 
+        self.verifyItems(['4.ics'], positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data') 
                                
         # --------- Test 4.xml
         
@@ -136,7 +136,7 @@ class CosmoTimeRangeQuery(DAVTest):
         report4body = f.read()
         self.request('REPORT', calpath, body=report4body, headers=self.headers)
         
-        self.verifyitems('1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics', positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics'], positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
         
         # --------- Test 5.xml
         
@@ -147,7 +147,7 @@ class CosmoTimeRangeQuery(DAVTest):
         report5body = f.read()
         self.request('REPORT', calpath, body=report5body, headers=self.headers)
         
-        self.verifyitems('1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics', positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics'], positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
         
         ##Blocked by bug 5551
         
@@ -188,7 +188,7 @@ class CosmoTimeRangeQuery(DAVTest):
         negcalitems = ['LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT','RRULE:', 'TZNAME:', 
                         'TZOFFSETFROM:', 'TZOFFSETTO:']
                         
-        self.verifyitems('float1.ics', positive=vcalitems, negative=negcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
+        self.verifyItems(['float1.ics'], positive=vcalitems, negative=negcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
         
         # ---------------- twoInMountain.xml test
         
@@ -198,15 +198,15 @@ class CosmoTimeRangeQuery(DAVTest):
         reporttwoInMountainbody = f.read()
         self.request('REPORT', calpath, body=reporttwoInMountainbody, headers=self.headers)        
         
-        self.verifyitems('float1.ics','float2.ics', inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', inelementexpectedcount=2)
-        self.verifyinelement('float1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
+        self.verifyItems(['float1.ics','float2.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', inelementexpectedcount=2)
+        self.verifyInElement('float1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN',
                       'VERSION:2.0', 'BEGIN:VEVENT', 'DTSTART:20060330T150000', 'DTEND:20060330T160000', 'SUMMARY:Floating Event Two',
                       'DESCRIPTION: This event should appear in Honolulu and Mountain', 'UID:54E181BC7CCC373042B218842112@ninevah.local',
                       'END:VEVENT', 'END:VCALENDAR']
 
-        self.verifyinelement('float2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
+        self.verifyInElement('float2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
         
         # ----------------- threeInEastern.xml test
         
@@ -224,22 +224,22 @@ class CosmoTimeRangeQuery(DAVTest):
         negcalitems = ['LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT','RRULE:', 'TZNAME:', 
                         'TZOFFSETFROM:', 'TZOFFSETTO:']
                         
-        self.verifyitems('float1.ics','float2.ics', 'float3.ics', inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', inelementexpectedcount=3)
-        self.verifyinelement('float1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
+        self.verifyItems(['float1.ics','float2.ics', 'float3.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', inelementexpectedcount=3)
+        self.verifyInElement('float1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN',
                       'VERSION:2.0', 'BEGIN:VEVENT', 'DTSTART:20060330T150000', 'DTEND:20060330T160000', 'SUMMARY:Floating Event Two',
                       'DESCRIPTION: This event should appear in Honolulu and Mountain', 'UID:54E181BC7CCC373042B218842112@ninevah.local',
                       'END:VEVENT', 'END:VCALENDAR']
         
-        self.verifyinelement('float2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
+        self.verifyInElement('float2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN',
                       'VERSION:2.0', 'BEGIN:VEVENT', 'DTSTART:20060330T170000', 'DTEND:20060330T180000', 'SUMMARY:Floating Event Three',
                       'DESCRIPTION: This event should appear in Honolulu', 'UID:54E181BC7CCC373042B218842113@ninevah.local',
                       'END:VEVENT', 'END:VCALENDAR']        
                       
-        self.verifyinelement('float3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
+        self.verifyInElement('float3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
         
         # ----------------- invalid_nonUTC1 ---- specified by bkirsh via email on 4/5/2006
         

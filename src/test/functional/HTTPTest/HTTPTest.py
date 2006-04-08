@@ -3,9 +3,15 @@ import getopt, httplib, urlparse, socket, xml
 
 from elementtree import ElementTree
 
-class HTTPTest:
+from TestObject import TestObject
+
+class HTTPTest(TestObject):
     
     def __init__(self, host, port, path, debug=0, headers=None, tls=False, mask=0):
+        
+        self.debug = debug
+        self.mask = mask
+        TestObject.__init__(self, debug=debug, mask=mask)
         
         if headers == None:
             self.headers = {'Host' : "localhost:8080",
@@ -15,12 +21,9 @@ class HTTPTest:
             self.headers = headers
         
         self.connection = {"host" : host, "port" : port, "path" : path, "tls" : tls}
-        self.debug = debug
-        self.results = []
-        self.resultnames = []
-        self.resultcomments = []
+
         self.request('OPTIONS', path, body=None, headers=self.headers)
-        self.mask = mask
+        
         
     def headeradd(self, headers):
         """
@@ -54,28 +57,6 @@ class HTTPTest:
         else:
             self.report(False, test='Status Code Check on %s' % status, comment='expected %s ; received %s' % (status, out))
             return False
-    
-    def printout(self, string):
-        
-        if self.mask == 0:
-            print string
-        
-    def end(self):
-        
-        count = 0
-        failures = 0
-        passes = 0
-        for result in self.results:
-            if result == False:
-                failures = failures + 1
-            elif result == True:
-                passes = passes +1
-            
-            count = count + 1
-        
-        print("Failures :: %s" % failures)
-        print("Passes :: %s" % passes)
-        print("Total tests run :: %s" % count)
             
     def xmlparse(self):
         """
@@ -83,18 +64,6 @@ class HTTPTest:
         """
         
         self.xml_doc = ElementTree.XML(self.test_response.read())
-   
-    def report(self, result, test=None, comment=None):
-        
-        self.results.append(result)
-        self.resultnames.append(test)
-        self.resultcomments.append(comment)
-        if result == True:
-            if self.debug > 0:
-                self.printout("Passed :: Test %s :: %s" % (test, comment))
-        if result == False:
-            self.printout("Failure :: Test %s :: %s" % (test, comment))
-                                        
                                         
     def request(self, method, url, body=None, headers={}, 
                 autoheaders=('Content-Length', 'Content-Type', 'User-Agent',

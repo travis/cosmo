@@ -1,6 +1,7 @@
-from HTTPTest import HTTPTest    
+#from HTTPTest import HTTPTest    
+from DAVTest import DAVTest
 
-class CosmoTimeRangeQuery(HTTPTest):
+class CosmoTimeRangeQuery(DAVTest):
     
     def startRun(self):
         
@@ -9,6 +10,8 @@ class CosmoTimeRangeQuery(HTTPTest):
         #Create Headers for CMP
         
         # ------- Test Create Account ------- #
+        
+        self.teststart('Setup Account')
            
         cmpheaders = self.headeradd({'Content-Type' : "text/xml; charset=UTF-8"})
         cmpheaders = self.headeraddauth("root", "cosmo", headers=cmpheaders)
@@ -32,6 +35,8 @@ class CosmoTimeRangeQuery(HTTPTest):
         
         # ------- Test Create Calendar ------- #
         
+        self.teststart('Create Calendar')
+        
         #Add auth to global headers
         self.headers = self.headeraddauth("cosmo-timerangequeryTestAccount", "cosmo-timerange")
         
@@ -41,6 +46,8 @@ class CosmoTimeRangeQuery(HTTPTest):
         self.checkStatus(201)
         
         # ------- Test Creation of events view ICS ------- #
+        
+        self.teststart('Put 1-7.ics')
         
         #Construct headers & body
         puticsheaders = self.headeradd({'Content-Type' : 'text/calendar'})      
@@ -83,174 +90,70 @@ class CosmoTimeRangeQuery(HTTPTest):
         
         # --------- Test 1.xml query for VEVENTs within time range
         
+        self.teststart('Test 1.xml query for VEVENTs within time range')
+        
         #Setup request 
         f = open('files/reports/timerangequery/1.xml')
         report1body = f.read()
         self.request('REPORT', calpath, body=report1body, headers=self.headers)
-        
-        #Set all success counters
-        elementcount = 0
-        etagcount = 0
-        icscount = 0
-        
-        #Verify correct number of calendar-data elements
-        self.xmlparse()
-        test = self.xml_doc.findall('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-        for t in test:
-            elementcount = elementcount + 1
-        
-        #Verify correct number of etags
-        test = self.xml_doc.findall('.//{DAV:}getetag')
-        for t in test:
-            etagcount = etagcount + 1  
             
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
                       'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
                       'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                       'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
                       'BEGIN:VEVENT', 'SUMMARY:event', 'END:VEVENT']
-        
-        #Check response elements for each response and verify the calendar-data element has the proper info
-        test = self.xml_doc.findall('.//{DAV:}response')
-        for t in test:
-            if t[0].text.find('.ics') != -1:
-                if t[0].text.find('5.ics') != -1 & t[0].text.find('6.ics') != -1 & t[0].text.find('7.ics') != -1:
-                    self.printout('FAILED - element is not 5,6, or 7.ics')
-                    icscount = icscount -1
-                    break
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
-                        icscount = icscount - 100
-                        
-                
-                        
-        #Run through all the elemenet and etag counts and make sure they match
-        if elementcount == 3 & icscount == 3 & etagcount == 3:
-            self.report(True, test='report/timerangequery/1.xml REPORT return 3 caldata elements query for VEVENTs within time range', comment=None)
-        else:
-            self.report(False, test='report/timerangequery/1.xml REPORT return 3 caldata elements query for VEVENTs within time range', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
+                      
+        self.verifyitems('5.ics', '6.ics', '7.ics', inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
         
         # --------- Test 2.xml query for VEVENTs that have a DTSTART within time range
+        
+        self.teststart('Test 2.xml query for VEVENTs that have a DTSTART within time range')
         
         #Setup request 
         f = open('files/reports/timerangequery/2.xml')
         report2body = f.read()
         self.request('REPORT', calpath, body=report2body, headers=self.headers)
-        
-        #Set all success counters
-        elementcount = 0
-        etagcount = 0
-        icscount = 0
-        
-        #Verify correct number of calendar-data elements
-        self.xmlparse()
-        test = self.xml_doc.findall('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-        for t in test:
-            elementcount = elementcount + 1
-        
-        #Verify correct number of etags
-        test = self.xml_doc.findall('.//{DAV:}getetag')
-        for t in test:
-            etagcount = etagcount + 1  
-            
-        vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
-                      'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
-                      'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
-                      'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
-                      'BEGIN:VEVENT', 'SUMMARY:event', 'END:VEVENT']
-        
-        #Check response elements for each response and verify the calendar-data element has the proper info
-        test = self.xml_doc.findall('.//{DAV:}response')
-        for t in test:
-            if t[0].text.find('.ics') != -1:
-                if t[0].text.find('1.ics') != -1 & t[0].text.find('2.ics') != -1 & t[0].text.find('3.ics') != -1 & t[0].text.find('4.ics'):
-                    self.printout('FAILED - element is not 1,2,3 or 4.ics')
-                    icscount = icscount -1
-                    break
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
-                        icscount = icscount - 100
                         
-                
-                        
-        #Run through all the elemenet and etag counts and make sure they match
-        if elementcount == 4 & icscount == 4 & etagcount == 4:
-            self.report(True, test='report/timerangequery/2.xml REPORT return 4 caldata elements query for VEVENTs that have a DTSTART within time range', comment=None)
-        else:
-            self.report(False, test='report/timerangequery/2.xml REPORT return 4 caldata elements query for VEVENTs that have a DTSTART within time range', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
- 
-        
+        self.verifyitems('1.ics', '2.ics', '3.ics', '4.ics', positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')        
+                                
         # --------- Test 3.xml query for VALARMS within time range
+        
+        self.teststart('Test 3.xml query for VALARMS within time range')
         
         #Setup request 
         f = open('files/reports/timerangequery/3.xml')
         report3body = f.read()
         self.request('REPORT', calpath, body=report3body, headers=self.headers)
-        
-        #Set all success counters
-        elementcount = 0
-        etagcount = 0
-        icscount = 0
-        
-        #Verify correct number of calendar-data elements
-        self.xmlparse()
-        test = self.xml_doc.findall('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-        for t in test:
-            elementcount = elementcount + 1
-        
-        #Verify correct number of etags
-        test = self.xml_doc.findall('.//{DAV:}getetag')
-        for t in test:
-            etagcount = etagcount + 1  
             
-        vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
-                      'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
-                      'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
-                      'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
-                      'BEGIN:VEVENT', 'SUMMARY:event', 'END:VEVENT']
-        
-        #Check response elements for each response and verify the calendar-data element has the proper info
-        test = self.xml_doc.findall('.//{DAV:}response')
-        for t in test:
-            if t[0].text.find('4.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
-                        icscount = icscount - 100
-                        
-        #Run through all the elemenet and etag counts and make sure they match
-        if elementcount == 1 & icscount == 1 & etagcount == 1:
-            self.report(True, test='report/timerangequery/3.xml REPORT return 1 caldata elements query for VALARMS within time range', comment=None)
-        else:
-            self.report(False, test='report/timerangequery/3.xml REPORT return 1 caldata elements query for VALARMS within time range', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
-        
+        self.verifyitems('4.ics', positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data') 
+                               
         # --------- Test 4.xml
+        
+        self.teststart('Test 4.xml')
         
         #Setup request 
         f = open('files/reports/timerangequery/4.xml')
         report4body = f.read()
         self.request('REPORT', calpath, body=report4body, headers=self.headers)
         
-        ##Blocked by bug 5551
+        self.verifyitems('1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics', positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
         
         # --------- Test 5.xml
+        
+        self.teststart('Test 5.xml')
         
         #Setup request 
         f = open('files/reports/timerangequery/5.xml')
         report5body = f.read()
         self.request('REPORT', calpath, body=report5body, headers=self.headers)
         
+        self.verifyitems('1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics', positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
+        
         ##Blocked by bug 5551
         
         # -------------- More time range tests
+        
+        self.teststart('Uploading Float Events')
         
         # Put all float cals
         putfloat1icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/float1.ics') 
@@ -270,22 +173,183 @@ class CosmoTimeRangeQuery(HTTPTest):
         
         # ---------------- oneInHonolulu.xml test
         
+        self.teststart('oneInHonolulu.xml')
+        
         #Build request
         f = open('files/reports/timerangequery/oneInHonolulu.xml')
         reportoneInHonolulubody = f.read()
         self.request('REPORT', calpath, body=reportoneInHonolulubody, headers=self.headers)
         
+        vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN',
+                      'VERSION:2.0', 'BEGIN:VEVENT', 'DTSTART:20060330T120000', 'DTEND:20060330T130000', 'SUMMARY:Floating Event One',
+                      'DESCRIPTION: This event should appear in Honolulu, Mountain, and Eastern', 'UID:54E181BC7CCC373042B21884211@ninevah.local',
+                      'END:VEVENT', 'END:VCALENDAR']
+                      
+        negcalitems = ['LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT','RRULE:', 'TZNAME:', 
+                        'TZOFFSETFROM:', 'TZOFFSETTO:']
+                        
+        self.verifyitems('float1.ics', positive=vcalitems, negative=negcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
+        
         # ---------------- twoInMountain.xml test
+        
+        self.teststart('twoInMountain.xml')
         
         f = open('files/reports/timerangequery/twoInMountain.xml')
         reporttwoInMountainbody = f.read()
         self.request('REPORT', calpath, body=reporttwoInMountainbody, headers=self.headers)        
         
+        self.verifyitems('float1.ics','float2.ics', inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', inelementexpectedcount=2)
+        self.verifyinelement('float1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
+        
+        vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN',
+                      'VERSION:2.0', 'BEGIN:VEVENT', 'DTSTART:20060330T150000', 'DTEND:20060330T160000', 'SUMMARY:Floating Event Two',
+                      'DESCRIPTION: This event should appear in Honolulu and Mountain', 'UID:54E181BC7CCC373042B218842112@ninevah.local',
+                      'END:VEVENT', 'END:VCALENDAR']
+
+        self.verifyinelement('float2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
+        
         # ----------------- threeInEastern.xml test
+        
+        self.teststart('threeInEastern.xml')
 
         f = open('files/reports/timerangequery/threeInEastern.xml')
         reportthreeInEasternbody = f.read()
         self.request('REPORT', calpath, body=reportthreeInEasternbody, headers=self.headers)
+        
+        vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN',
+                      'VERSION:2.0', 'BEGIN:VEVENT', 'DTSTART:20060330T120000', 'DTEND:20060330T130000', 'SUMMARY:Floating Event One',
+                      'DESCRIPTION: This event should appear in Honolulu, Mountain, and Eastern', 'UID:54E181BC7CCC373042B21884211@ninevah.local',
+                      'END:VEVENT', 'END:VCALENDAR']
+                      
+        negcalitems = ['LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT','RRULE:', 'TZNAME:', 
+                        'TZOFFSETFROM:', 'TZOFFSETTO:']
+                        
+        self.verifyitems('float1.ics','float2.ics', 'float3.ics', inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', inelementexpectedcount=3)
+        self.verifyinelement('float1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
+        
+        vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN',
+                      'VERSION:2.0', 'BEGIN:VEVENT', 'DTSTART:20060330T150000', 'DTEND:20060330T160000', 'SUMMARY:Floating Event Two',
+                      'DESCRIPTION: This event should appear in Honolulu and Mountain', 'UID:54E181BC7CCC373042B218842112@ninevah.local',
+                      'END:VEVENT', 'END:VCALENDAR']
+        
+        self.verifyinelement('float2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
+        
+        vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN',
+                      'VERSION:2.0', 'BEGIN:VEVENT', 'DTSTART:20060330T170000', 'DTEND:20060330T180000', 'SUMMARY:Floating Event Three',
+                      'DESCRIPTION: This event should appear in Honolulu', 'UID:54E181BC7CCC373042B218842113@ninevah.local',
+                      'END:VEVENT', 'END:VCALENDAR']        
+                      
+        self.verifyinelement('float3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=negcalitems)
+        
+        # ----------------- invalid_nonUTC1 ---- specified by bkirsh via email on 4/5/2006
+        
+        self.teststart('invalid_nonUTC1')
+        
+        #Setup request 
+        f = open('files/reports/timerangequery/invalid_nonUTC1.xml')
+        report_invalid_nonUTC1body = f.read()
+        self.request('REPORT', calpath, body=report_invalid_nonUTC1body, headers=self.headers)
+        
+        #Check Status = 400
+        self.checkStatus(400)
+        
+        # ----------------- invalid_nonUTC2 ---- specified by bkirsh via email on 4/5/2006
+        
+        self.teststart('invalid_nonUTC2')
+        
+        #Setup request 
+        f = open('files/reports/timerangequery/invalid_nonUTC2.xml')
+        report_invalid_nonUTC2body = f.read()
+        self.request('REPORT', calpath, body=report_invalid_nonUTC2body, headers=self.headers)
+        
+        #Check Status = 400
+        self.checkStatus(400)
+        
+        # ----------------- invalid_nonUTC3 ---- specified by bkirsh via email on 4/5/2006
+        
+        self.teststart('invalid_nonUTC3')
+        
+        #Setup request 
+        f = open('files/reports/timerangequery/invalid_nonUTC3.xml')
+        report_invalid_nonUTC3body = f.read()
+        self.request('REPORT', calpath, body=report_invalid_nonUTC3body, headers=self.headers)
+        
+        #Check Status = 400
+        self.checkStatus(400)
+        
+        # ----------------- invalid_nonUTC4 ---- specified by bkirsh via email on 4/5/2006
+        
+        self.teststart('invalid_nonUTC4')
+        
+        #Setup request 
+        f = open('files/reports/timerangequery/invalid_nonUTC4.xml')
+        report_invalid_nonUTC4body = f.read()
+        self.request('REPORT', calpath, body=report_invalid_nonUTC4body, headers=self.headers)
+        
+        #Check Status = 400
+        self.checkStatus(400)
+        
+        # ----------------- invalid_nonUTC5 ---- specified by bkirsh via email on 4/5/2006
+        
+        self.teststart('invalid_nonUTC5')
+        
+        #Setup request 
+        f = open('files/reports/timerangequery/invalid_nonUTC5.xml')
+        report_invalid_nonUTC5body = f.read()
+        self.request('REPORT', calpath, body=report_invalid_nonUTC5body, headers=self.headers)
+        
+        #Check Status = 400
+        self.checkStatus(400)
+        
+        # ----------------- invalid_nonUTC6 ---- specified by bkirsh via email on 4/5/2006
+        
+        self.teststart('invalid_nonUTC6')
+        
+        #Setup request 
+        f = open('files/reports/timerangequery/invalid_nonUTC6.xml')
+        report_invalid_nonUTC6body = f.read()
+        self.request('REPORT', calpath, body=report_invalid_nonUTC6body, headers=self.headers)
+        
+        #Check Status = 400
+        self.checkStatus(400)
+        
+        # ----------------- timerange_01 ---- specified by bkirsh via email on 4/5/2006
+        
+        self.teststart('timerange_01')
+        
+        #Setup request 
+        f = open('files/reports/timerangequery/timerange_01.xml')
+        report_timerange_01body = f.read()
+        self.request('REPORT', calpath, body=report_timerange_01body, headers=self.headers)
+        
+        #Check Status = 207 Multistatus
+        self.checkStatus(207)        
+        
+        # ----------------- timerange_02 ---- specified by bkirsh via email on 4/5/2006
+        
+        self.teststart('timerange_02')
+        
+        #Setup request 
+        f = open('files/reports/timerangequery/timerange_02.xml')
+        report_timerange_02body = f.read()
+        self.request('REPORT', calpath, body=report_timerange_02body, headers=self.headers)
+        
+        #Check Status = 207 Multistatus
+        self.checkStatus(207)        
+        
+        # ----------------- timerange_03 ---- specified by bkirsh via email on 4/5/2006
+        
+        self.teststart('timerange_03')
+        
+        #Setup request 
+        f = open('files/reports/timerangequery/timerange_03.xml')
+        report_timerange_03body = f.read()
+        self.request('REPORT', calpath, body=report_timerange_03body, headers=self.headers)
+        
+        #Check Status = 207 Multistatus
+        self.checkStatus(207)           
+        
+        
         
         
         

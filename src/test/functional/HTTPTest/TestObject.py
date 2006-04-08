@@ -7,15 +7,15 @@ class TestObject:
         self.debug = debug
         self.mask = mask
         self.results = []
-        self.resultnames = []
-        self.resultcomments = []
+        self.resultNames = []
+        self.resultComments = []
 
-    def printout(self, string):
+    def printOut(self, string):
         
         if self.mask == 0:
             print string
             
-    def teststart(self, testname):
+    def testStart(self, testname):
         """
         Set test name
         """
@@ -26,14 +26,17 @@ class TestObject:
             
     def report(self, result, test=None, comment=None):
         
+        if test is None:
+            test = self.test
+        
         self.results.append(result)
-        self.resultnames.append(test)
-        self.resultcomments.append(comment)
+        self.resultNames.append(test)
+        self.resultComments.append(comment)
         if result == True:
             if self.debug > 0:
-                self.printout("Passed :: Test %s :: %s" % (test, comment))
+                self.printOut("Passed :: Test %s :: %s" % (test, comment))
         if result == False:
-            self.printout("Failure :: Test %s :: %s" % (test, comment))
+            self.printOut("Failure :: Test %s :: %s" % (test, comment))
             
     
             

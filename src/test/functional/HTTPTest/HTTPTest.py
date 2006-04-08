@@ -13,7 +13,7 @@ class HTTPTest(TestObject):
         self.mask = mask
         TestObject.__init__(self, debug=debug, mask=mask)
         
-        if headers == None:
+        if headers is None:
             self.headers = {'Host' : "localhost:8080",
                              'User-Agent': "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.1) Gecko/20060111 Firefox/1.5.0.1",
                              'Accept' : "*/*"}
@@ -25,7 +25,7 @@ class HTTPTest(TestObject):
         self.request('OPTIONS', path, body=None, headers=self.headers)
         
         
-    def headeradd(self, headers):
+    def headerAdd(self, headers):
         """
         Method to return dict copy of self.headers with header added
         """
@@ -33,18 +33,18 @@ class HTTPTest(TestObject):
         headers_return.update(headers)
         return headers_return
     
-    def headeraddauth(self, username, password, headers=None):
+    def headerAddAuth(self, username, password, headers=None):
         """
         Method to return dict with 'Authorization' header added, if no headers are defined a copy of self.headers is used and returned
         """
-        if headers == None:
+        if headers is None:
             headers = copy.copy(self.headers)
         auth = 'Basic %s' % base64.encodestring('%s:%s' % (username, password)).strip()
 
         headers["Authorization"] = auth
         return headers
         
-    def pathbuilder(self, path):
+    def pathBuilder(self, path):
         
         return '%s%s' % (self.connection["path"], path)
     
@@ -58,7 +58,7 @@ class HTTPTest(TestObject):
             self.report(False, test='Status Code Check on %s' % status, comment='expected %s ; received %s' % (status, out))
             return False
             
-    def xmlparse(self):
+    def xmlParse(self):
         """
         Get xml in body
         """

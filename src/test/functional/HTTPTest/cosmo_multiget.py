@@ -1,6 +1,6 @@
-from HTTPTest import HTTPTest    
+from DAVTest import DAVTest    
 
-class CosmoMultiget(HTTPTest):
+class CosmoMultiget(DAVTest):
     
     def startRun(self):
         
@@ -10,11 +10,11 @@ class CosmoMultiget(HTTPTest):
         
         # ------- Test Create Account ------- #
            
-        cmpheaders = self.headeradd({'Content-Type' : "text/xml; charset=UTF-8"})
-        cmpheaders = self.headeraddauth("root", "cosmo", headers=cmpheaders)
+        cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
+        cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathbuilder('/cmp/user/cosmo-multigetTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-multigetTestAccount')
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
@@ -33,21 +33,21 @@ class CosmoMultiget(HTTPTest):
         # ------- Test Create Calendar ------- #
         
         #Add auth to global headers
-        self.headers = self.headeraddauth("cosmo-multigetTestAccount", "cosmo-multiget")
+        self.headers = self.headerAddAuth("cosmo-multigetTestAccount", "cosmo-multiget")
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathbuilder('/home/cosmo-multigetTestAccount/calendar/')
+        calpath = self.pathBuilder('/home/cosmo-multigetTestAccount/calendar/')
         self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
         # ------- Test Creation of events view ICS ------- #
         
         #Construct headers & body
-        puticsheaders = self.headeradd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathbuilder('/home/cosmo-multigetTestAccount/calendar/1.ics')
-        put2icspath = self.pathbuilder('/home/cosmo-multigetTestAccount/calendar/2.ics')
-        put3icspath = self.pathbuilder('/home/cosmo-multigetTestAccount/calendar/3.ics')
-        put4icspath = self.pathbuilder('/home/cosmo-multigetTestAccount/calendar/4.ics')        
+        puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
+        put1icspath = self.pathBuilder('/home/cosmo-multigetTestAccount/calendar/1.ics')
+        put2icspath = self.pathBuilder('/home/cosmo-multigetTestAccount/calendar/2.ics')
+        put3icspath = self.pathBuilder('/home/cosmo-multigetTestAccount/calendar/3.ics')
+        put4icspath = self.pathBuilder('/home/cosmo-multigetTestAccount/calendar/4.ics')        
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")
@@ -69,127 +69,47 @@ class CosmoMultiget(HTTPTest):
         
         # ------- Test 1.xml : basic VEVENT, summary "event 1" (tzid=US/Eastern) ------- #
         
+        self.testStart('Test 1.xml : basic VEVENT, summary "event 1" (tzid=US/Eastern)')
+        
         #Setup request 
         f = open('files/reports/multiget/1.xml')
         report1body = f.read()
         self.request('REPORT', calpath, body=report1body, headers=self.headers)
+        self.checkStatus(207)
         
-        #Set all success counters
-        elementcount = 0
-        etagcount = 0
-        icscount = 0
+        #Verify correct items in response
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID'])
+        self.verifyInElement('1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:54E181BC7CCC373042B28842@ninevah.local'])
+        self.verifyInElement('2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:9A6519F71822CD45840C3440@ninevah.local'])
+        self.verifyInElement('3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:DB3F97EF10A051730E2F752E@ninevah.local'])
+        self.verifyInElement('4.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:A3217B429B4D2FF2DC2EEE66@ninevah.local'])
         
-        #Verify correct number of calendar-data elements
-        self.xmlparse()
-        test = self.xml_doc.findall('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-        for t in test:
-            elementcount = elementcount + 1
-        
-        #Verify correct number of etags
-        test = self.xml_doc.findall('.//{DAV:}getetag')
-        for t in test:
-            etagcount = etagcount + 1  
-        
-        #Check response elements for each response and verify the calendar-data element has the proper UID for each ics entry    
-        test = self.xml_doc.findall('.//{DAV:}response')
-        for t in test:
-            if t[0].text.find('1.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find('54E181BC7CCC373042B28842@ninevah.local') != -1:
-                    icscount = icscount + 1
-            elif t[0].text.find('2.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find('9A6519F71822CD45840C3440@ninevah.local') != -1:
-                    icscount = icscount + 1
-            elif t[0].text.find('3.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find('UID:DB3F97EF10A051730E2F752E@ninevah.local') != -1:
-                    icscount = icscount + 1
-            elif t[0].text.find('4.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find('UID:A3217B429B4D2FF2DC2EEE66@ninevah.local') != -1:
-                    icscount = icscount + 1
-        
-        #Run through all the elemenet and etag counts and make sure they match 
-        if elementcount == 4 & etagcount == 4 & icscount == 4:
-            self.report(True, test='multiget/1.xml REPORT return 4 elements & 4 etags & 1,2,3,4.ics', comment=None)
-        else:
-            self.report(False, test='multiget/1.xml REPORT return 4 elements & 4 etags & 1,2,3,4.ics', comment='Returned %s elements & %s etags %s ics matches' % (elementcount, etagcount, icscount))
-        
+          
         # ------- Test 2.xml : basic multiget of 4 resources returning etag and only VCALENDAR property data (no embedded components) ------- #
+        
+        self.testStart('Test 2.xml : basic multiget of 4 resources returning etag and only VCALENDAR property data (no embedded components)')
         
         #Setup request 
         f = open('files/reports/multiget/2.xml')
         report2body = f.read()
         self.request('REPORT', calpath, body=report2body, headers=self.headers)
+        self.checkStatus(207)
         
-        #Set all success counters
-        elementcount = 0
-        icscount = 0
-        etagcount = 0
-               
-        #Verify correct number of etags
-        test = self.xml_doc.findall('.//{DAV:}getetag')
-        for t in test:
-            etagcount = etagcount + 1         
-       
-        #Verify correct number of calendar-data elements
-        self.xmlparse()
-        test = self.xml_doc.findall('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-        for t in test:
-            elementcount = elementcount + 1
+        vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN', 'VERSION:2.0', 'END:VCALENDAR']
         
-        f = open('files/multiget-2.response')
-        vcalprop = f.read()
-
-        #Check response elements for each response and verify the calendar-data element has the proper info
-        test = self.xml_doc.findall('.//{DAV:}response')
-        for t in test:
-            if t[0].text.find('1.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find(vcalprop) != -1:
-                    icscount = icscount + 1
-            if t[0].text.find('2.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find(vcalprop) != -1:
-                    icscount = icscount + 1
-            if t[0].text.find('3.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find(vcalprop) != -1:
-                    icscount = icscount + 1
-            if t[0].text.find('4.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find(vcalprop) != -1:
-                    icscount = icscount + 1
-        
-        #Run through all the elemenet and etag counts and make sure they match 
-        if elementcount == 4 & icscount == 4 & etagcount == 4:
-            self.report(True, test='multiget/2.xml REPORT return 4 caldata elements with just VCAL info', comment=None)
-        else:
-            self.report(False, test='multiget/2.xml REPORT return 4 caldata elements with just VCAL info', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
         
         # ------- Test 3.xml : basic multiget of 4 resources returning etag and only VTIMEZONE components ------- #
+        
+        self.testStart('Test 3.xml : basic multiget of 4 resources returning etag and only VTIMEZONE components')
         
         #Setup request 
         f = open('files/reports/multiget/3.xml')
         report3body = f.read()
         self.request('REPORT', calpath, body=report3body, headers=self.headers)
-        
-        #Set all success counters
-        elementcount = 0
-        icscount = 0
-        etagcount = 0
-        
-        #Verify correct number of etags
-        test = self.xml_doc.findall('.//{DAV:}getetag')
-        for t in test:
-            etagcount = etagcount + 1  
-        
-        #Verify correct number of calendar-data elements
-        self.xmlparse()
-        test = self.xml_doc.findall('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-        for t in test:
-            elementcount = elementcount + 1
+        self.checkStatus(207)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
                       'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
@@ -198,50 +118,18 @@ class CosmoMultiget(HTTPTest):
                       
         vcalnegative = ['BEGIN:VEVENT', 'SUMMARY', 'END:VEVENT']
         
-        #Check response elements for each response and verify the calendar-data element has the proper info
-        test = self.xml_doc.findall('.//{DAV:}response')
-        for t in test:
-            if t[0].text.find('.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        icscount = icscount - 100
-                for x in vcalnegative:
-                    if ctest.text.find(x) != -1:
-                        icscount = icscount - 100                   
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=vcalnegative)
                 
-                
-        
-        #Run through all the elemenet and etag counts and make sure they match
-        if elementcount == 4 & icscount == 4 & etagcount == 4:
-            self.report(True, test='multiget/3.xml REPORT return 4 caldata elements with just VTIMEZONE info', comment=None)
-        else:
-            self.report(False, test='multiget/3.xml REPORT return 4 caldata elements with just VTIMEZONE info', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
-        
         # ------- Test 4.xml : basic multiget of 4 resources returning etag and only SUMMARY/UID properties inside VEVENT components and VALARMs ------- #
+        
+        self.testStart('Test 4.xml : basic multiget of 4 resources returning etag and only SUMMARY/UID properties inside VEVENT components and VALARMs')
         
         #Setup request 
         f = open('files/reports/multiget/4.xml')
         report4body = f.read()
         self.request('REPORT', calpath, body=report4body, headers=self.headers)
-        
-        #Set all success counters
-        elementcount = 0
-        icscount = 0
-        etagcount = 0
-        summarycount = 0
-        
-        #Verify correct number of etags
-        test = self.xml_doc.findall('.//{DAV:}getetag')
-        for t in test:
-            etagcount = etagcount + 1  
-        
-        #Verify correct number of calendar-data elements
-        self.xmlparse()
-        test = self.xml_doc.findall('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-        for t in test:
-            elementcount = elementcount + 1
+        self.checkStatus(207)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
                       'BEGIN:VEVENT', 'SUMMARY:', 'UID', 'END:VEVENT', 'END:VCALENDAR']
@@ -249,69 +137,22 @@ class CosmoMultiget(HTTPTest):
         vcalnegative = ['BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
                       'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 
                       'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE']
-        
-        #Check response elements for each response and verify the calendar-data element has the proper info
-        test = self.xml_doc.findall('.//{DAV:}response')
-        
-        for t in test:
-            if t[0].text.find('1.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find('SUMMARY:event 1') != -1:
-                    summarycount = summarycount + 1
-            if t[0].text.find('2.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find('SUMMARY:event 2') != -1:
-                    summarycount = summarycount + 1
-            if t[0].text.find('3.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find('SUMMARY:event 3') != -1:
-                    summarycount = summarycount + 1
-            if t[0].text.find('4.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                if ctest.text.find('SUMMARY:event 4') != -1:
-                    summarycount = summarycount + 1
-        
-        for t in test:
-            if t[0].text.find('.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        icscount = icscount - 100
-                for x in vcalnegative:
-                    if ctest.text.find(x) != -1:
-                        icscount = icscount - 100
-                
-                
-        #Run through all the elemenet and etag counts and make sure they match
-        if elementcount == 4 & icscount == 4 & etagcount == 4 & summarycount == 4:
-            self.report(True, test='multiget/4.xml REPORT return 4 caldata elements with just VEVENT & SUMMARY/UID info', comment=None)
-        else:
-            self.report(False, test='multiget/4.xml REPORT return 4 caldata elements with just VEVENT & SUMMARY/UID info', comment='Returned %s elements & %s ics matches & %s summarycount' % (elementcount, icscount, summarycount))
-        
-        
+                      
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=vcalnegative)
+        self.verifyInElement('1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 1'])
+        self.verifyInElement('2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 2'])
+        self.verifyInElement('3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 3'])
+        self.verifyInElement('4.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 4'])
+          
         # ------- Test 5.xml : has 4.txt except that the SUMMARY property value is not returned ------- #
+        
+        self.testStart('Test 5.xml : has 4.txt except that the SUMMARY property value is not returned')
         
         f = open('files/reports/multiget/5.xml')
         report5body = f.read()
-        
         self.request('REPORT', calpath, body=report5body, headers=self.headers)
-        
-        #Set all success counters
-        elementcount = 0
-        icscount = 0
-        etagcount = 0
-        
-        #Verify correct number of etags
-        test = self.xml_doc.findall('.//{DAV:}getetag')
-        for t in test:
-            etagcount = etagcount + 1  
-        
-        #Verify correct number of calendar-data elements
-        self.xmlparse()
-        test = self.xml_doc.findall('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-        for t in test:
-            elementcount = elementcount + 1
+        self.checkStatus(207)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
                       'BEGIN:VEVENT', 'SUMMARY:', 'UID', 'END:VEVENT', 'END:VCALENDAR']
@@ -319,28 +160,13 @@ class CosmoMultiget(HTTPTest):
         vcalnegative = ['BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
                       'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 
                       'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'SUMMARY:event']
-        
-        #Check response elements for each response and verify the calendar-data element has the proper info
-        test = self.xml_doc.findall('.//{DAV:}response')
-        
-        for t in test:
-            if t[0].text.find('.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        icscount = icscount - 100
-                for x in vcalnegative:
-                    if ctest.text.find(x) != -1:
-                        icscount = icscount - 100
-                
-                
-        #Run through all the elemenet and etag counts and make sure they match
-        if elementcount == 4 & icscount == 4 & etagcount == 4:
-            self.report(True, test='multiget/5.xml REPORT return 4 caldata elements with just VEVENT & SUMMARY-no event & UID info', comment=None)
-        else:
-            self.report(False, test='multiget/5.xml REPORT return 4 caldata elements with just VEVENT & SUMMARY-no event & UID info', comment='Returned %s elements & %s ics matches' % (elementcount, icscount))
-        
+                      
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=vcalnegative)
+        self.verifyInElement('1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 1'])
+        self.verifyInElement('2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 2'])
+        self.verifyInElement('3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 3'])
+        self.verifyInElement('4.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 4'])
         
         
 if __name__ == "__main__":

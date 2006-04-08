@@ -11,13 +11,13 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ------- Test Create Account ------- #
         
-        self.teststart('Setup Account')
+        self.testStart('Setup Account')
            
-        cmpheaders = self.headeradd({'Content-Type' : "text/xml; charset=UTF-8"})
-        cmpheaders = self.headeraddauth("root", "cosmo", headers=cmpheaders)
+        cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
+        cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathbuilder('/cmp/user/cosmo-timerangequeryTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-timerangequeryTestAccount')
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
@@ -35,29 +35,29 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ------- Test Create Calendar ------- #
         
-        self.teststart('Create Calendar')
+        self.testStart('Create Calendar')
         
         #Add auth to global headers
-        self.headers = self.headeraddauth("cosmo-timerangequeryTestAccount", "cosmo-timerange")
+        self.headers = self.headerAddAuth("cosmo-timerangequeryTestAccount", "cosmo-timerange")
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/')
+        calpath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/')
         self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
         # ------- Test Creation of events view ICS ------- #
         
-        self.teststart('Put 1-7.ics')
+        self.testStart('Put 1-7.ics')
         
         #Construct headers & body
-        puticsheaders = self.headeradd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/1.ics')
-        put2icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/2.ics')
-        put3icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/3.ics')
-        put4icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/4.ics')    
-        put5icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/5.ics')
-        put6icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/6.ics')
-        put7icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/7.ics') 
+        puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
+        put1icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/1.ics')
+        put2icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/2.ics')
+        put3icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/3.ics')
+        put4icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/4.ics')    
+        put5icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/5.ics')
+        put6icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/6.ics')
+        put7icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/7.ics') 
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")
@@ -90,7 +90,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # --------- Test 1.xml query for VEVENTs within time range
         
-        self.teststart('Test 1.xml query for VEVENTs within time range')
+        self.testStart('Test 1.xml query for VEVENTs within time range')
         
         #Setup request 
         f = open('files/reports/timerangequery/1.xml')
@@ -107,7 +107,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # --------- Test 2.xml query for VEVENTs that have a DTSTART within time range
         
-        self.teststart('Test 2.xml query for VEVENTs that have a DTSTART within time range')
+        self.testStart('Test 2.xml query for VEVENTs that have a DTSTART within time range')
         
         #Setup request 
         f = open('files/reports/timerangequery/2.xml')
@@ -118,7 +118,7 @@ class CosmoTimeRangeQuery(DAVTest):
                                 
         # --------- Test 3.xml query for VALARMS within time range
         
-        self.teststart('Test 3.xml query for VALARMS within time range')
+        self.testStart('Test 3.xml query for VALARMS within time range')
         
         #Setup request 
         f = open('files/reports/timerangequery/3.xml')
@@ -129,7 +129,7 @@ class CosmoTimeRangeQuery(DAVTest):
                                
         # --------- Test 4.xml
         
-        self.teststart('Test 4.xml')
+        self.testStart('Test 4.xml')
         
         #Setup request 
         f = open('files/reports/timerangequery/4.xml')
@@ -140,7 +140,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # --------- Test 5.xml
         
-        self.teststart('Test 5.xml')
+        self.testStart('Test 5.xml')
         
         #Setup request 
         f = open('files/reports/timerangequery/5.xml')
@@ -153,12 +153,12 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # -------------- More time range tests
         
-        self.teststart('Uploading Float Events')
+        self.testStart('Uploading Float Events')
         
         # Put all float cals
-        putfloat1icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/float1.ics') 
-        putfloat2icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/float2.ics') 
-        putfloat3icspath = self.pathbuilder('/home/cosmo-timerangequeryTestAccount/calendar/float3.ics') 
+        putfloat1icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/float1.ics') 
+        putfloat2icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/float2.ics') 
+        putfloat3icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/float3.ics') 
         
         f = open("files/reports/put/float1.ics")
         putfloat1icsbody = f.read()
@@ -173,7 +173,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ---------------- oneInHonolulu.xml test
         
-        self.teststart('oneInHonolulu.xml')
+        self.testStart('oneInHonolulu.xml')
         
         #Build request
         f = open('files/reports/timerangequery/oneInHonolulu.xml')
@@ -192,7 +192,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ---------------- twoInMountain.xml test
         
-        self.teststart('twoInMountain.xml')
+        self.testStart('twoInMountain.xml')
         
         f = open('files/reports/timerangequery/twoInMountain.xml')
         reporttwoInMountainbody = f.read()
@@ -210,7 +210,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ----------------- threeInEastern.xml test
         
-        self.teststart('threeInEastern.xml')
+        self.testStart('threeInEastern.xml')
 
         f = open('files/reports/timerangequery/threeInEastern.xml')
         reportthreeInEasternbody = f.read()
@@ -243,7 +243,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ----------------- invalid_nonUTC1 ---- specified by bkirsh via email on 4/5/2006
         
-        self.teststart('invalid_nonUTC1')
+        self.testStart('invalid_nonUTC1')
         
         #Setup request 
         f = open('files/reports/timerangequery/invalid_nonUTC1.xml')
@@ -255,7 +255,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ----------------- invalid_nonUTC2 ---- specified by bkirsh via email on 4/5/2006
         
-        self.teststart('invalid_nonUTC2')
+        self.testStart('invalid_nonUTC2')
         
         #Setup request 
         f = open('files/reports/timerangequery/invalid_nonUTC2.xml')
@@ -267,7 +267,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ----------------- invalid_nonUTC3 ---- specified by bkirsh via email on 4/5/2006
         
-        self.teststart('invalid_nonUTC3')
+        self.testStart('invalid_nonUTC3')
         
         #Setup request 
         f = open('files/reports/timerangequery/invalid_nonUTC3.xml')
@@ -279,7 +279,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ----------------- invalid_nonUTC4 ---- specified by bkirsh via email on 4/5/2006
         
-        self.teststart('invalid_nonUTC4')
+        self.testStart('invalid_nonUTC4')
         
         #Setup request 
         f = open('files/reports/timerangequery/invalid_nonUTC4.xml')
@@ -291,7 +291,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ----------------- invalid_nonUTC5 ---- specified by bkirsh via email on 4/5/2006
         
-        self.teststart('invalid_nonUTC5')
+        self.testStart('invalid_nonUTC5')
         
         #Setup request 
         f = open('files/reports/timerangequery/invalid_nonUTC5.xml')
@@ -303,7 +303,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ----------------- invalid_nonUTC6 ---- specified by bkirsh via email on 4/5/2006
         
-        self.teststart('invalid_nonUTC6')
+        self.testStart('invalid_nonUTC6')
         
         #Setup request 
         f = open('files/reports/timerangequery/invalid_nonUTC6.xml')
@@ -315,7 +315,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ----------------- timerange_01 ---- specified by bkirsh via email on 4/5/2006
         
-        self.teststart('timerange_01')
+        self.testStart('timerange_01')
         
         #Setup request 
         f = open('files/reports/timerangequery/timerange_01.xml')
@@ -327,7 +327,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ----------------- timerange_02 ---- specified by bkirsh via email on 4/5/2006
         
-        self.teststart('timerange_02')
+        self.testStart('timerange_02')
         
         #Setup request 
         f = open('files/reports/timerangequery/timerange_02.xml')
@@ -339,7 +339,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         # ----------------- timerange_03 ---- specified by bkirsh via email on 4/5/2006
         
-        self.teststart('timerange_03')
+        self.testStart('timerange_03')
         
         #Setup request 
         f = open('files/reports/timerangequery/timerange_03.xml')

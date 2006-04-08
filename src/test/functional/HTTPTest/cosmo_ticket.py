@@ -1,8 +1,8 @@
 import time, md5, random
 
-from HTTPTest import HTTPTest    
+from DAVTest import DAVTest    
 
-class CosmoTicket(HTTPTest):
+class CosmoTicket(DAVTest):
     
     def startRun(self):
         
@@ -12,12 +12,12 @@ class CosmoTicket(HTTPTest):
         
         # ------- Test Create Account ------- #
            
-        cmpheaders = self.headeradd({'Content-Type' : "text/xml; charset=UTF-8"})
-        cmpheaders = self.headeraddauth("root", "cosmo", headers=cmpheaders)
+        cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
+        cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathbuilder('/cmp/user/cosmo-ticketTestAccount')
-        cmppath2 = self.pathbuilder('/cmp/user/cosmo-ticketTestAccount2')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-ticketTestAccount')
+        cmppath2 = self.pathBuilder('/cmp/user/cosmo-ticketTestAccount2')
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
@@ -47,8 +47,8 @@ class CosmoTicket(HTTPTest):
         self.checkStatus(201) # 201 ACCOUNT CREATED    
     
         #Add auth to global headers
-        authheaders1 = self.headeraddauth("cosmo-ticketTestAccount", "cosmo-ticket")
-        authheaders2 = self.headeraddauth("cosmo-ticketTestAccount2", "cosmo-ticket")
+        authheaders1 = self.headerAddAuth("cosmo-ticketTestAccount", "cosmo-ticket")
+        authheaders2 = self.headerAddAuth("cosmo-ticketTestAccount2", "cosmo-ticket")
         
         f = open('files/rTicket.xml')
         rTicket = f.read()
@@ -60,56 +60,56 @@ class CosmoTicket(HTTPTest):
         badNSTicket = f.read() 
         
         #Create Calendar on CalDAV server   
-        home1 = self.pathbuilder('/home/cosmo-ticketTestAccount/')
-        home2 = self.pathbuilder('/home/cosmo-ticketTestAccount2/')
+        home1 = self.pathBuilder('/home/cosmo-ticketTestAccount/')
+        home2 = self.pathBuilder('/home/cosmo-ticketTestAccount2/')
     
         # -------- MKTICKET Test
 
-        # --- OK (read-only)
+        self.testStart('OK (read-only)')
 
         self.request('MKTICKET', home1, body=rTicket, headers=authheaders1)
         self.checkStatus(200) # MKTICKET OK (read-only ticket)
     
         ticket = self.test_response.getheader('Ticket')
 
-        # --- OK (read-write)
+        self.testStart('OK (read-write)')
 
         self.request('MKTICKET', home1, body=rwTicket, headers=authheaders1)
         self.checkStatus(200) # MKTICKET OK (read-write ticket)
 
         rwTicketId = self.test_response.getheader('Ticket')
 
-        # --- Bad XML
+        self.testStart('Bad XML')
 
         self.request('MKTICKET', home1, body=badNSTicket, headers=authheaders1)
         self.checkStatus(400) # MKTICKET bad XML
 
-        # --- No XML body
+        self.testStart('No XML body')
 
         self.request('MKTICKET', home1, headers=authheaders1)
         self.checkStatus(400) # MKTICKET no body
     
-        # --- No access privileges
+        self.testStart('No access privileges')
 
         self.request('MKTICKET', home2, body=rTicket, headers=authheaders1)
         self.checkStatus(403) # MKTICKET no access
 
-        # --- No access privileges, no body
+        self.testStart('No access privileges, no body')
     
         self.request('MKTICKET', home2, headers=authheaders1)
         self.checkStatus(403) # MKTICKET no access, no body
 
-        # --- No such resource, no body
+        self.testStart('No such resource, no body')
 
         self.request('MKTICKET', '%s%s' % (home1, 'doesnotexist'), headers=authheaders1)
         self.checkStatus(404) # MKTICKET no such resource, no body
 
-        # --- No such resource
+        self.testStart('No such resource')
 
         self.request('MKTICKET', '%s%s' % (home1, 'doesnotexist'), body=rTicket, headers=authheaders1)
         self.checkStatus(404) # MKTICKET no such resource
     
-        # --- No access, no such resource
+        self.testStart('No access, no such resource')
 
         self.request('MKTICKET', '%s%s' % (home2, 'doesnotexist'), headers=authheaders1)
         self.checkStatus(403) # MKTICKET no access, no such resource
@@ -117,57 +117,57 @@ class CosmoTicket(HTTPTest):
 
         # -------------  GET/PUT/DELETE Tests
 
-        # --- GET with OK ticket
+        self.testStart('GET with OK ticket')
     
         self.request('GET', '%s?ticket=%s' % (home1, ticket))
         self.checkStatus(200) # GET OK
 
-        # --- GET with read-write ticket
+        self.testStart('GET with read-write ticket')
 
         self.request('GET', '%s?ticket=%s' % (home1, rwTicketId))
         self.checkStatus(200) # GET OK (read-write)
 
-        # --- GET with nonexisting ticket
+        self.testStart('GET with nonexisting ticket')
     
         nosuchticket = 'nosuchticket5dfe45210787'
         self.request('GET', '%s?ticket=%s' % (home1, nosuchticket))
         self.checkStatus(401) # GET no such ticket
 
-        # ---  PUT with read-only ticket
+        self.testStart(' PUT with read-only ticket')
 
         uniqueFile = 'test%s.xml' % md5.md5(str(random.random())).hexdigest()
         doc = '<my><doc/></my>'
         self.request('PUT', '%s%s?ticket=%s' % (home1, uniqueFile, ticket), body=doc)
         self.checkStatus(403) # PUT no access with read-only ticket
 
-        # --- PUT with nonexisting ticket
+        self.testStart('PUT with nonexisting ticket')
     
         self.request('PUT', '%s%s?ticket=%s' % (home1, uniqueFile, nosuchticket))
         self.checkStatus(401) # PUT no such ticket
 
-        # --- PUT with read-write ticket
+        self.testStart('PUT with read-write ticket')
 
         self.request('PUT', '%s%s?ticket=%s' % (home1, uniqueFile, rwTicketId), body=doc)
         self.checkStatus(201) # PUT ok (created) with read-write ticket
         self.request('PUT', '%s%s?ticket=%s' % (home1, uniqueFile, rwTicketId), body=doc)
         self.checkStatus(204) # PUT ok (updated) with read-write ticket
 
-        # --- DELETE with read-only ticket
+        self.testStart('DELETE with read-only ticket')
 
         self.request('DELETE', '%s%s?ticket=%s' % (home1, uniqueFile, ticket))
         self.checkStatus(403) # DELETE no access with read-only ticket
 
-        # --- DELETE with nonexisting ticket
+        self.testStart('DELETE with nonexisting ticket')
     
         self.request('DELETE', '%s%s?ticket=%s' % (home1, uniqueFile, nosuchticket))
         self.checkStatus(401) # DELETE no such ticket
 
-        # --- DELETE with read-write ticket
+        self.testStart('DELETE with read-write ticket')
 
         self.request('DELETE', '%s%s?ticket=%s' % (home1, uniqueFile, rwTicketId))
         self.checkStatus(204) # DELETE ok with read-only ticket
 
-        # --- GET deleted file
+        self.testStart('GET deleted file')
 
         self.request('GET', '%s%s?ticket=%s' % (home1, uniqueFile, rwTicketId))
         self.checkStatus(404) # GET deleted file
@@ -175,14 +175,14 @@ class CosmoTicket(HTTPTest):
 
         # --------------- DELTICKET Tests
 
-        # --- No access
+        self.testStart('No access')
 
         t = authheaders2.copy()
         t['Ticket'] = ticket
         self.request('DELTICKET', '%s?ticket=%s' % (home1, ticket), headers=t)
         self.checkStatus(403) # DELTICKET no access
         
-        # --- OK (No Content)
+        self.testStart('OK (No Content)')
 
         t = authheaders1.copy()
         t['Ticket'] = ticket
@@ -193,7 +193,7 @@ class CosmoTicket(HTTPTest):
         self.request('DELTICKET', '%s?ticket=%s' % (home1, rwTicketId))
         self.checkStatus(204) # DELTICKET OK (No Content, read-write ticket auth)
 
-        # --- Ticket does not exist
+        self.testStart('Ticket does not exist')
 
         t = authheaders1.copy()
         nosuchticket = 'nosuchticket5dfe45210787'
@@ -201,21 +201,21 @@ class CosmoTicket(HTTPTest):
         self.request('DELTICKET', '%s?ticket=%s' % (home1, nosuchticket), headers=t)
         self.checkStatus(412) # DELTICKET no such ticket
     
-        # --- Ticket does not exist, body
+        self.testStart('Ticket does not exist, body')
 
         t = authheaders1.copy()
         t['Ticket'] = 'nosuchticket5dfe45210787'
         self.request('DELTICKET', '%s?ticket=%s' % (home1, nosuchticket), body=rTicket, headers=t)
         self.checkStatus(412) # DELTICKET no such ticket, body
     
-        # --- Ticket does not exist, resource does not exist
+        self.testStart('Ticket does not exist, resource does not exist')
 
         t = authheaders1.copy()
         t['Ticket'] = 'nosuchticket5dfe45210787'
         self.request('DELTICKET', '%sdoesnotexist?ticket=%s' % (home1, nosuchticket), headers=t)
         self.checkStatus(404) # DELTICKET no such ticket or resource
     
-        # --- Ticket does not exist, resource does not exist, body
+        self.testStart('Ticket does not exist, resource does not exist, body')
 
         t = authheaders1.copy()
         t['Ticket'] = 'nosuchticket5dfe45210787'
@@ -224,7 +224,7 @@ class CosmoTicket(HTTPTest):
         
         # -------------------    Miscellaneous Tests
 
-        # --- Try to delete an already deleted ticket
+        self.testStart('Try to delete an already deleted ticket')
 
         self.request('MKTICKET', home1, body=rTicket, headers=authheaders1)
         self.checkStatus(200) # MKTICKET OK
@@ -236,7 +236,7 @@ class CosmoTicket(HTTPTest):
         self.request('DELTICKET', '%s?ticket=%s' % (home1, ticket), headers=t)
         self.checkStatus(412) # DELTICKET ticket already deleted
     
-        # --- Mismatched ticket in URL and header
+        self.testStart('Mismatched ticket in URL and header')
 
         self.request('MKTICKET', home1, body=rTicket, headers=authheaders1)
         self.checkStatus(200) # MKTICKET OK
@@ -261,8 +261,8 @@ class CosmoTicket(HTTPTest):
     def timeoutRun(self):
         
         #Add auth to global headers
-        authheaders1 = self.headeraddauth("cosmo-ticketTestAccount", "cosmo-ticket")
-        authheaders2 = self.headeraddauth("cosmo-ticketTestAccount2", "cosmo-ticket")
+        authheaders1 = self.headerAddAuth("cosmo-ticketTestAccount", "cosmo-ticket")
+        authheaders2 = self.headerAddAuth("cosmo-ticketTestAccount2", "cosmo-ticket")
         
         rTicket = '<?xml version="1.0" encoding="UTF-8"?> \
                    <X:ticketinfo xmlns:D="DAV:" xmlns:X="http://www.xythos.com/namespaces/StorageServer"> \
@@ -282,12 +282,12 @@ class CosmoTicket(HTTPTest):
                     </X:ticketinfo>'     
         
         #Create Calendar on CalDAV server   
-        home1 = self.pathbuilder('/home/cosmo-ticketTestAccount/')
-        home2 = self.pathbuilder('/home/cosmo-ticketTestAccount2/')
+        home1 = self.pathBuilder('/home/cosmo-ticketTestAccount/')
+        home2 = self.pathBuilder('/home/cosmo-ticketTestAccount2/')
 
-        # --- Timeout test cases must be run last, startRun must be run first
+        self.testStart('Timeout test cases must be run last, startRun must be run first')
         
-        # --- GET a resource with ticket
+        self.testStart('GET a resource with ticket')
 
         shortTicket = '<?xml version="1.0" encoding="UTF-8"?> \
                        <X:ticketinfo xmlns:D="DAV:" xmlns:X="http://www.xythos.com/namespaces/StorageServer"> \
@@ -303,13 +303,13 @@ class CosmoTicket(HTTPTest):
         self.request('GET', '%s?ticket=%s' % (home1, ticket))
         self.checkStatus(200) # GET with ticket OK
     
-        # --- GET with timed out ticket
+        self.testStart('GET with timed out ticket')
 
         time.sleep(12)
         self.request('HEAD', '%s?ticket=%s' % (home1, ticket))
         self.checkStatus(401) # GET ticket timed out
     
-        # --- DELTICKET the timed out ticket
+        self.testStart('DELTICKET the timed out ticket)')
 
         self.request('DELTICKET', home1, headers=t)
         self.checkStatus(412) # DELTICKET ticket already timed out

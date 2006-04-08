@@ -1,6 +1,6 @@
-from HTTPTest import HTTPTest    
+from DAVTest import DAVTest    
 
-class CosmoLimitExpand(HTTPTest):
+class CosmoLimitExpand(DAVTest):
     
     def startRun(self):
         
@@ -10,11 +10,11 @@ class CosmoLimitExpand(HTTPTest):
         
         # ------- Test Create Account ------- #
            
-        cmpheaders = self.headeradd({'Content-Type' : "text/xml; charset=UTF-8"})
-        cmpheaders = self.headeraddauth("root", "cosmo", headers=cmpheaders)
+        cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
+        cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathbuilder('/cmp/user/cosmo-limitexpandTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-limitexpandTestAccount')
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
@@ -33,24 +33,24 @@ class CosmoLimitExpand(HTTPTest):
         # ------- Test Create Calendar ------- #
         
         #Add auth to global headers
-        self.headers = self.headeraddauth("cosmo-limitexpandTestAccount", "limitexpand")
+        self.headers = self.headerAddAuth("cosmo-limitexpandTestAccount", "limitexpand")
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathbuilder('/home/cosmo-limitexpandTestAccount/calendar/')
+        calpath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/')
         self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
         # ------- Test Creation of events view ICS ------- #
         
         #Construct headers & body
-        puticsheaders = self.headeradd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathbuilder('/home/cosmo-limitexpandTestAccount/calendar/1.ics')
-        put2icspath = self.pathbuilder('/home/cosmo-limitexpandTestAccount/calendar/2.ics')
-        put3icspath = self.pathbuilder('/home/cosmo-limitexpandTestAccount/calendar/3.ics')
-        put4icspath = self.pathbuilder('/home/cosmo-limitexpandTestAccount/calendar/4.ics')    
-        put5icspath = self.pathbuilder('/home/cosmo-limitexpandTestAccount/calendar/5.ics')
-        put6icspath = self.pathbuilder('/home/cosmo-limitexpandTestAccount/calendar/6.ics')
-        put7icspath = self.pathbuilder('/home/cosmo-limitexpandTestAccount/calendar/7.ics') 
+        puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
+        put1icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/1.ics')
+        put2icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/2.ics')
+        put3icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/3.ics')
+        put4icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/4.ics')    
+        put5icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/5.ics')
+        put6icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/6.ics')
+        put7icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/7.ics') 
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")
@@ -83,132 +83,46 @@ class CosmoLimitExpand(HTTPTest):
         
         # ------- Test 1.xml : time-range query with limit over same range ---------- #
         
+        self.testStart('Test 1.xml : time-range query with limit over same range')
+        
         #Setup request 
         f = open('files/reports/limitexpand/1.xml')
         report1body = f.read()
         self.request('REPORT', calpath, body=report1body, headers=self.headers)
+        self.checkStatus(207)
         
-        #Set all success counters
-        elementcount = 0
-        etagcount = 0
-        icscount = 0
-        
-        #Verify correct number of calendar-data elements
-        self.xmlparse()
-        test = self.xml_doc.findall('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-        for t in test:
-            elementcount = elementcount + 1
-        
-        #Verify correct number of etags
-        test = self.xml_doc.findall('.//{DAV:}getetag')
-        for t in test:
-            etagcount = etagcount + 1                    
-                      
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:', 'VERSION:2.0', 'BEGIN:VTIMEZONE',
                       'LAST-MODIFIED:','TZID:', 'BEGIN:DAYLIGHT', 'DTSTART:', 'RRULE:', 'TZNAME:EDT',
                       'TZOFFSETFROM', 'TZOFFSETTO', 'END:DAYLIGHT', 'BEGIN:STANDARD', 'DTSTART:', 'RRULE:',
                       'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 'END:STANDARD', 'END:VTIMEZONE', 'BEGIN:VEVENT',
-                      'DTSTAMP:', 'DTSTART;', 'DURATION:', 'RRULE:', 'SUMMARY:', 'UID:', 'END:VEVENT', 'END:VCALENDAR']                   
+                      'DTSTAMP:', 'DTSTART;', 'DURATION:', 'RRULE:', 'SUMMARY:', 'UID:', 'END:VEVENT', 'END:VCALENDAR']
         
-        #Check response elements for each response and verify the calendar-data element has the proper UID for each ics entry    
-        test = self.xml_doc.findall('.//{DAV:}response')
-        for t in test:
-            if t[0].text.find('5.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
-                        icscount = icscount - 100
-            elif t[0].text.find('6.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
-                        icscount = icscount - 100
-            elif t[0].text.find('7.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
-                        icscount = icscount - 100
-
-        #Run through all the elemenet and etag counts and make sure they match 
-        if elementcount == 3 & etagcount == 3 & icscount == 3:
-            self.report(True, test='limitexpand/1.xml REPORT return 3 elements & 3 etags & 5,6,7.ics', comment=None)
-        else:
-            self.report(False, test='limitexpand/1.xml REPORT return 3 elements & 3 etags & 5.6.7.ics', comment='Returned %s elements & %s etags %s ics matches' % (elementcount, etagcount, icscount))
+        self.verifyItems(['5.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyItems(['5.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
+        
         
         # ------- Test 2.xml : time-range query with limit over different range ---------- #
+        
+        self.testStart('Test 2.xml : time-range query with limit over different range')
         
         #Setup request 
         f = open('files/reports/limitexpand/2.xml')
         report2body = f.read()
         self.request('REPORT', calpath, body=report2body, headers=self.headers)
-        
-        #Set all success counters
-        elementcount = 0
-        etagcount = 0
-        icscount = 0
-        
-        #Verify correct number of calendar-data elements
-        self.xmlparse()
-        test = self.xml_doc.findall('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-        for t in test:
-            elementcount = elementcount + 1
-        
-        #Verify correct number of etags
-        test = self.xml_doc.findall('.//{DAV:}getetag')
-        for t in test:
-            etagcount = etagcount + 1                    
+        self.checkStatus(207)             
                       
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:', 'VERSION:2.0', 'BEGIN:VTIMEZONE',
                       'LAST-MODIFIED:','TZID:', 'BEGIN:DAYLIGHT', 'DTSTART:', 'RRULE:', 'TZNAME:EDT',
                       'TZOFFSETFROM', 'TZOFFSETTO', 'END:DAYLIGHT', 'BEGIN:STANDARD', 'DTSTART:', 'RRULE:',
                       'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 'END:STANDARD', 'END:VTIMEZONE', 'BEGIN:VEVENT',
-                      'DTSTAMP:', 'DTSTART;', 'DURATION:', 'RRULE:', 'SUMMARY:', 'UID:', 'END:VEVENT', 'END:VCALENDAR']                   
-        
+                      'DTSTAMP:', 'DTSTART;', 'DURATION:', 'RRULE:', 'SUMMARY:', 'UID:', 'END:VEVENT', 'END:VCALENDAR']         
+                      
         #Check response elements for each response and verify the calendar-data element has the proper UID for each ics entry    
-        test = self.xml_doc.findall('.//{DAV:}response')
-        for t in test:
-            if t[0].text.find('5.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
-                        icscount = icscount - 100
-                if ctest.text.find('RECURRENCE-ID;') != -1:
-                    self.printout('FAILED got %s in %s' % ('RECURRENCE-ID;', t[0].text))
-                    icscount = icscount - 100
-            elif t[0].text.find('6.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
-                        icscount = icscount - 100
-                if ctest.text.find('RECURRENCE-ID;TZID=US/Eastern:20060104T140000') == -1:
-                    self.printout('FAILED to get %s in %s' % ('RECURRENCE-ID;TZID=US/Eastern:20060104T140000', t[0].text))
-                    icscount = icscount - 100
-            elif t[0].text.find('7.ics') != -1:
-                ctest = t.find('.//{urn:ietf:params:xml:ns:caldav}calendar-data')
-                icscount = icscount + 1
-                for x in vcalitems:
-                    if ctest.text.find(x) == -1:
-                        self.printout('FAILED to get %s in %s' % (x, t[0].text))
-                        icscount = icscount - 100
-                if ctest.text.find('RECURRENCE-ID;RANGE=THISANDFUTURE;TZID=US/Eastern:20060104T180000') == -1:
-                    self.printout('FAILED to get %s in %s' % ('RECURRENCE-ID;RANGE=THISANDFUTURE;TZID=US/Eastern:20060104T180000', t[0].text))
-                    icscount = icscount - 100
-
-        #Run through all the elemenet and etag counts and make sure they match 
-        if elementcount == 3 & etagcount == 3 & icscount == 3:
-            self.report(True, test='limitexpand/2.xml REPORT return 3 elements & 3 etags & 5,6(full),7.ics(full)', comment=None)
-        else:
-            self.report(False, test='limitexpand/2.xml REPORT return 3 elements & 3 etags & 5,6(full),7,ics(full)', comment='Returned %s elements & %s etags %s ics matches' % (elementcount, etagcount, icscount))
+        self.verifyItems(['5.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyItems(['5.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
+        self.verifyInElement('5.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['RECURRENCE-ID;'])
+        self.verifyInElement('6.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['RECURRENCE-ID;TZID=US/Eastern:20060104T140000'])
+        self.verifyInElement('7.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['RECURRENCE-ID;RANGE=THISANDFUTURE;TZID=US/Eastern:20060104T180000']) 
         
         # ------- Test 3.xml : time-range query with expand over same range ---------- #
         

@@ -75,11 +75,11 @@ if __name__ == "__main__":
         for i in range(len(s.results)):
             if s.results[i] == False:
                 failures = failures + 1
-                print "Failure :: Script %s :: Test %s :: %s" % (s.__class__.__name__, s.resultnames[i], s.resultcomments[i])
+                print "Failure :: Script %s :: Test %s :: %s" % (s.__class__.__name__, s.resultNames[i], s.resultComments[i])
             elif s.results[i] == True:
                 passes = passes + 1
                 if debug > 0:
-                    print "Failure :: Script %s :: Test %s :: %s" % (s.__class__.__name__, s.resultnames[i], s.resultcomments[i])
+                    print "Failure :: Script %s :: Test %s :: %s" % (s.__class__.__name__, s.resultNames[i], s.resultComments[i])
             count = count + 1
     print "Scripts Run :: %s; Script Passes :: %s; Script Failures :: %s; Tests Run :: %s; Test Passes :: %s; Test Failures :: %s" % (scriptcount, scriptcount - scriptfailures, scriptfailures, 
                                                                                                                                    count, passes, failures)

@@ -10,11 +10,11 @@ class CosmoInvalid(HTTPTest):
         
         # ------- Test Create Account ------- #
            
-        cmpheaders = self.headeradd({'Content-Type' : "text/xml; charset=UTF-8"})
-        cmpheaders = self.headeraddauth("root", "cosmo", headers=cmpheaders)
+        cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
+        cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathbuilder('/cmp/user/cosmo-invalidTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-invalidTestAccount')
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
@@ -33,24 +33,24 @@ class CosmoInvalid(HTTPTest):
         # ------- Test Create Calendar ------- #
         
         #Add auth to global headers
-        self.headers = self.headeraddauth("cosmo-invalidTestAccount", "cosmo-invalid")
+        self.headers = self.headerAddAuth("cosmo-invalidTestAccount", "cosmo-invalid")
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathbuilder('/home/cosmo-invalidTestAccount/calendar/')
+        calpath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/')
         self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
         # ------- Test Creation of events view ICS ------- #
         
         #Construct headers & body
-        puticsheaders = self.headeradd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathbuilder('/home/cosmo-invalidTestAccount/calendar/1.ics')
-        put2icspath = self.pathbuilder('/home/cosmo-invalidTestAccount/calendar/2.ics')
-        put3icspath = self.pathbuilder('/home/cosmo-invalidTestAccount/calendar/3.ics')
-        put4icspath = self.pathbuilder('/home/cosmo-invalidTestAccount/calendar/4.ics')    
-        put5icspath = self.pathbuilder('/home/cosmo-invalidTestAccount/calendar/5.ics')
-        put6icspath = self.pathbuilder('/home/cosmo-invalidTestAccount/calendar/6.ics')
-        put7icspath = self.pathbuilder('/home/cosmo-invalidTestAccount/calendar/7.ics') 
+        puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
+        put1icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/1.ics')
+        put2icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/2.ics')
+        put3icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/3.ics')
+        put4icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/4.ics')    
+        put5icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/5.ics')
+        put6icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/6.ics')
+        put7icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/7.ics') 
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")
@@ -82,6 +82,8 @@ class CosmoInvalid(HTTPTest):
         self.checkStatus(201)
         
         # ------- Test 1.xml : noSubComp ---------- #
+        
+        self.testStart('Test 1.xml : noSubComp')
         
         #Setup request 
         f = open('files/reports/invalid/noSubComp.xml')

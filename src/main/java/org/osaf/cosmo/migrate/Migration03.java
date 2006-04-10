@@ -30,8 +30,12 @@ import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
+import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.jcr.Value;
+import javax.jcr.ValueFactory;
+import javax.jcr.nodetype.NodeType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -118,10 +122,15 @@ public class Migration03 extends CopyBasedMigration {
         for (Iterator i=users.values().iterator(); i.hasNext();) {
             User user = (User) i.next();
             try {
-                HomeCollectionResource currentHome =
-                    createCurrentHome(user, previous, current);
-            } catch (MigrationException e) {
+                copyHome(user, previous, current);
+                current.save();
+            } catch (RepositoryException e) {
                 log.error("SKIPPING " + user.getUsername(), e);
+                try {
+                    current.refresh(false);
+                } catch (RepositoryException re) {
+                    throw new MigrationException("cannot refresh current session", re);
+                }
                 continue;
             }
         }
@@ -132,6 +141,7 @@ public class Migration03 extends CopyBasedMigration {
     public void down(Session current,
                      Session previous)
         throws MigrationException {
+        throw new MigrationException("migrating down not supported");
     }
 
     /**
@@ -196,7 +206,9 @@ public class Migration03 extends CopyBasedMigration {
         throws MigrationException {
         User overlord = null;
 
-        log.info("Loading overlord");
+        if (log.isDebugEnabled()) {
+            log.debug("Loading overlord");
+        }
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(SQL_LOAD_OVERLORD);
@@ -215,15 +227,16 @@ public class Migration03 extends CopyBasedMigration {
     Map loadUsers()
         throws MigrationException {
         HashMap users = new HashMap();
-
-        log.info("Loading users");
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Loading users");
+        }
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(SQL_LOAD_USERS);
             for (; rs.next();) {
                 User user = resultSetToUser(rs);
                 Integer id = rs.getInt("id");
-                log.info(user.getUsername());
                 users.put(id, user);
             }
             st.close();
@@ -231,7 +244,9 @@ public class Migration03 extends CopyBasedMigration {
             throw new MigrationException("Cannot load users", e);
         }
 
-        log.info("Loading root roles");
+        if (log.isDebugEnabled()) {
+            log.debug("Loading root role associations");
+        }
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(SQL_LOAD_ROOT_IDS);
@@ -252,27 +267,26 @@ public class Migration03 extends CopyBasedMigration {
         return users;
     }
 
-    HomeCollectionResource createCurrentHome(User user,
-                                             Session previous,
-                                             Session current)
-        throws MigrationException {
-        try {
-            // find old home node
-            String oldHomePath = "/" + HexEscaper.escape(user.getUsername());
-            Node oldHomeNode = (Node) previous.getItem(oldHomePath);
+    void copyHome(User user,
+                  Session previous,
+                  Session current)
+        throws RepositoryException {
+        // find old home node
+        String oldHomePath = "/" + HexEscaper.escape(user.getUsername());
+        Node oldHomeNode = (Node) previous.getItem(oldHomePath);
 
-            // create new home node
-            HomeCollectionResource newHome = oldNodeToHome(oldHomeNode);
-            Node newHomeNode =
+        // create new home node
+        if (log.isDebugEnabled()) {
+            log.debug("Copying homedir for " + user.getUsername());
+        }
+        HomeCollectionResource newHome = oldNodeToHome(oldHomeNode);
+        Node newHomeNode =
                 ResourceMapper.createHomeCollection(newHome,
                                                     user.getUsername(),
                                                     current);
-            UserMapper.userToNode(user, newHomeNode);
+        UserMapper.userToNode(user, newHomeNode);
 
-            return newHome;
-        } catch (RepositoryException e) {
-            throw new MigrationException("Failed to create home collection", e);
-        }
+        copyChildNodes(oldHomeNode, newHomeNode);
     }
 
     private User resultSetToUser(ResultSet rs)
@@ -331,5 +345,180 @@ public class Migration03 extends CopyBasedMigration {
         }
 
         return home;
+    }
+
+    private void copyChildNodes(Node original,
+                                Node parent)
+        throws RepositoryException {
+        for (NodeIterator i=original.getNodes(); i.hasNext();) {
+            Node child = i.nextNode();
+            if (child.getDefinition().isProtected()) {
+                continue;
+            }
+            copyNode(child, parent);
+        }
+    }
+
+    private void copyNode(Node original,
+                          Node parent)
+        throws RepositoryException {
+        // copy the original node into a child of the parent node
+        String primaryType =
+            translateNodeType(original.getPrimaryNodeType().getName());
+        if (log.isDebugEnabled()) {
+            log.debug("copying node named " + original.getName() + " of type " +
+                      primaryType + " into " + parent.getPath());
+        }
+        Node copied = parent.addNode(original.getName(), primaryType);
+
+        // add mixin types
+        NodeType[] previousMixins = original.getMixinNodeTypes();
+        for (int j=0; j<previousMixins.length; j++) {
+            String mixinType = translateNodeType(previousMixins[j].getName());
+            if (log.isDebugEnabled()) {
+                log.debug("adding mixin type " + mixinType);
+            }
+            copied.addMixin(mixinType);
+        }
+
+        // 0.3 has a subtype of caldav:resource for events, so add it
+        // 0.to all nodes with that type (to distinguish from tasks
+        // 0.etc in the future)
+        if (original.isNodeType("caldav:resource")) {
+            if (log.isDebugEnabled()) {
+                log.debug("adding mixin type calendar:event");
+            }
+            copied.addMixin("calendar:event");
+        }
+
+        // copy properties
+        for (PropertyIterator k=original.getProperties(); k.hasNext();) {
+            Property prop = k.nextProperty();
+            if (prop.getDefinition().isProtected()) {
+                continue;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("setting property " +
+                          translatePropertyName(prop.getName()));
+            }
+            if (prop.getDefinition().isMultiple()) {
+                copyMultiValuedProperty(prop, copied);
+            }
+            else {
+                copyProperty(prop, copied);
+            }
+        }
+
+        // 0.3 expects the calendar:supportedComponentSet property on
+        // 0.calendar collections to be initialized
+        if (original.isNodeType("caldav:collection")) {
+            Value[] values = new Value[1];
+            values[0] =
+                copied.getSession().getValueFactory().createValue("VEVENT");
+            if (log.isDebugEnabled()) {
+                log.debug("setting property calendar:supportedComponentSet");
+            }
+            copied.setProperty("calendar:supportedComponentSet",
+                               values);
+        }
+
+        copyChildNodes(original, copied);
+    }
+
+    private void copyProperty(Property original,
+                              Node current)
+        throws RepositoryException {
+        String name = translatePropertyName(original.getName());
+        Value value = original.getValue();
+        int type = original.getType();
+        switch (type) {
+        case PropertyType.BINARY:
+            current.setProperty(name, value.getStream());
+            break;
+        case PropertyType.BOOLEAN:
+            current.setProperty(name, value.getBoolean());
+            break;
+        case PropertyType.DATE:
+            current.setProperty(name, value.getDate());
+            break;
+        case PropertyType.DOUBLE:
+            current.setProperty(name, value.getDouble());
+            break;
+        case PropertyType.LONG:
+            current.setProperty(name, value.getLong());
+            break;
+        case PropertyType.STRING:
+            current.setProperty(name, value.getString());
+            break;
+        }
+    }
+    
+    private void copyMultiValuedProperty(Property original,
+                                         Node current)
+        throws RepositoryException {
+        String name = translatePropertyName(original.getName());
+        ValueFactory valueFactory = current.getSession().getValueFactory();
+        Value[] values = original.getValues();
+        Value[] newValues = new Value[values.length];
+        int type = original.getType();
+        switch (type) {
+        case PropertyType.BINARY:
+            for (int i=0; i<values.length; i++) {
+                newValues[i] = valueFactory.createValue(values[i].getStream());
+            }
+            break;
+        case PropertyType.BOOLEAN:
+            for (int i=0; i<values.length; i++) {
+                newValues[i] = valueFactory.createValue(values[i].getBoolean());
+            }
+            break;
+        case PropertyType.DATE:
+            for (int i=0; i<values.length; i++) {
+                newValues[i] = valueFactory.createValue(values[i].getDate());
+            }
+            break;
+        case PropertyType.DOUBLE:
+            for (int i=0; i<values.length; i++) {
+                newValues[i] = valueFactory.createValue(values[i].getDouble());
+            }
+            break;
+        case PropertyType.LONG:
+            for (int i=0; i<values.length; i++) {
+                newValues[i] = valueFactory.createValue(values[i].getLong());
+            }
+            break;
+        case PropertyType.STRING:
+            for (int i=0; i<values.length; i++) {
+                newValues[i] = valueFactory.createValue(values[i].getString());
+            }
+            break;
+        }
+        current.setProperty(name, newValues);
+    }
+
+    private String translateNodeType(String original) {
+        if ("mix:ticketable".equals(original)) {
+            return "ticket:ticketable";
+        }
+        if ("caldav:collection".equals(original)) {
+            return "calendar:collection";
+        }
+        if ("caldav:resource".equals(original)) {
+            return "calendar:resource";
+        }
+        if ("caldav:home".equals(original)) {
+            return "cosmo:homecollection";
+        }
+        return original;
+    }
+
+    private String translatePropertyName(String original) {
+        if ("caldav:calendar-description".equals(original)) {
+            return "calendar:description";
+        }
+        if ("caldav:uid".equals(original)) {
+            return "calendar:uid";
+        }
+        return original;
     }
 }

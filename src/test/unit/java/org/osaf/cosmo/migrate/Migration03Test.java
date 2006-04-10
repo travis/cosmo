@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.jcr.NamespaceException;
 import javax.jcr.NamespaceRegistry;
 import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
 import javax.jcr.Session;
@@ -203,52 +202,111 @@ public class Migration03Test extends TestCase implements SchemaConstants {
 
     /**
      */
-    public void testCreateCurrentHome() throws Exception {
-        User user = loadOldUser(2);
+    public void testCopyHome() throws Exception {
+        User user = loadOldUser(3);
 
         Session previous = previousSessionManager.getSession();
         Session current = currentSessionManager.getSession();
 
-        HomeCollectionResource home =
-            migration.createCurrentHome(user, previous, current);
-        assertNotNull(home);
-        assertEquals("resource display name does not match username",
-                     user.getUsername(), home.getDisplayName());
-        assertEquals("resource client path does not match '/' + username",
-                     "/" + user.getUsername(), home.getPath());
+        migration.copyHome(user, previous, current);
 
-        // to some extent these are testing RepositoryMapper as well
-        // as Migration03, but since we lack unit tests for
-        // RepositoryMapper, that's ok
         String repoPath =
             PathTranslator.toRepositoryPath("/" + user.getUsername());
         assertTrue("home node not found at " + repoPath,
                    current.itemExists(repoPath));
+
         Node homeNode = (Node) current.getItem(repoPath);
+        assertTrue("home node not ticketable node type",
+                   homeNode.isNodeType(NT_TICKETABLE));
         assertTrue("home node not home collection node type",
                    homeNode.isNodeType(NT_HOME_COLLECTION));
-        assertEquals("displayname prop does not match resource display name",
-                     home.getDisplayName(),
+        assertEquals("display name prop does not match username",
+                     user.getUsername(),
                      homeNode.getProperty(NP_DAV_DISPLAYNAME).getString());
-
-        // same for UserMapper
         assertTrue("home node not user node type",
                    homeNode.isNodeType(NT_USER));
         assertEquals("username prop does not match username",
                      user.getUsername(),
                      homeNode.getProperty(NP_USER_USERNAME).getString());
+        assertTrue("home node does not have custom property _pre141:test",
+                   homeNode.hasProperty("_pre141:test"));
 
-        // XXX: for some reason the custom property is not found
-        // through jcr even though i can see it using webdav with
-        // cosmo on top of the same repository data
-//         try {
-//             homeNode.getProperty("_pre141:test");
-//         } catch (PathNotFoundException e) {
-//             fail("_pre141:test property not found on home node");
-//         }
-//         assertNotNull("_pre141:test property not found on home collection",
-//                       home.getProperty("_pre141:test"));
-    }
+        assertTrue("home node does not have calendar child node",
+                   homeNode.hasNode("calendar"));
+        Node calendarNode = homeNode.getNode("calendar");
+        assertTrue("calendar node not dav collection node type",
+                  calendarNode.isNodeType(NT_DAV_COLLECTION));
+        assertTrue("calendar node not calendar collection node type",
+                   calendarNode.isNodeType(NT_CALENDAR_COLLECTION));
+        assertTrue("calendar node not ticketable node type",
+                   calendarNode.isNodeType(NT_TICKETABLE));
+        assertTrue("calendar node does not have property dav:displayname",
+                   calendarNode.hasProperty("dav:displayname"));
+        assertTrue("calendar node does not have property calendar:description",
+                   calendarNode.hasProperty("calendar:description"));
+        assertTrue("calendar node does not have property xml:lang",
+                   calendarNode.hasProperty("xml:lang"));
+        assertTrue("calendar node does not have property calendar:supportedComponentSet",
+                   calendarNode.hasProperty("calendar:supportedComponentSet"));
+
+        assertTrue("calendar node does not have ticket child node",
+                   calendarNode.hasNode("ticket:ticket"));
+        Node calendarTicketNode = calendarNode.getNode("ticket:ticket");
+        assertTrue("calendar ticket node not ticket node type",
+                   calendarTicketNode.isNodeType(NT_TICKET));
+
+        assertTrue("calendar node does not have event1.ics child node",
+                   calendarNode.hasNode("event1.ics"));
+        Node eventNode = calendarNode.getNode("event1.ics");
+        assertTrue("event node not dav resource node type",
+                   eventNode.isNodeType(NT_DAV_RESOURCE));
+        assertTrue("event node not calendar resource node type",
+                   eventNode.isNodeType(NT_CALENDAR_RESOURCE));
+        assertTrue("event node not event resource node type",
+                   eventNode.isNodeType(NT_EVENT_RESOURCE));
+        assertTrue("event node not ticketable node type",
+                   eventNode.isNodeType(NT_TICKETABLE));
+        assertTrue("event node does not have property dav:displayname",
+                   eventNode.hasProperty("dav:displayname"));
+        assertTrue("event node does not have property calendar:uid",
+                   eventNode.hasProperty("calendar:uid"));
+
+        assertTrue("event node does not have jcr:content child node",
+                   eventNode.hasNode("jcr:content"));
+        Node eventContentNode = eventNode.getNode("jcr:content");
+        assertTrue("content node does not have property jcr:data",
+                   eventContentNode.hasProperty("jcr:data"));
+        assertTrue("content node does not have property jcr:mimeType",
+                   eventContentNode.hasProperty("jcr:mimeType"));
+        assertTrue("content node does not have property jcr:lastModified",
+                   eventContentNode.hasProperty("jcr:lastModified"));
+
+        assertTrue("home node does not have README.txt child node",
+                   homeNode.hasNode("README.txt"));
+        Node readmeNode = homeNode.getNode("README.txt");
+        assertTrue("readme node not dav resource node type",
+                   readmeNode.isNodeType(NT_DAV_RESOURCE));
+        assertTrue("readme node not ticketable node type",
+                   readmeNode.isNodeType(NT_TICKETABLE));
+        assertTrue("readme node does not have property dav:displayname",
+                   readmeNode.hasProperty("dav:displayname"));
+
+        assertTrue("readme node does not have ticket child node",
+                   readmeNode.hasNode("ticket:ticket"));
+        Node readmeTicketNode = readmeNode.getNode("ticket:ticket");
+        assertTrue("readme ticket node not ticket node type",
+                   readmeTicketNode.isNodeType(NT_TICKET));
+
+        assertTrue("readme node does not have jcr:content child node",
+                   readmeNode.hasNode("jcr:content"));
+        Node readmeContentNode = readmeNode.getNode("jcr:content");
+        assertTrue("content node does not have property jcr:data",
+                   readmeContentNode.hasProperty("jcr:data"));
+        assertTrue("content node does not have property jcr:mimeType",
+                   readmeContentNode.hasProperty("jcr:mimeType"));
+        assertTrue("content node does not have property jcr:lastModified",
+                   readmeContentNode.hasProperty("jcr:lastModified"));
+   }
 
     private User loadOldUser(int id)
         throws Exception {

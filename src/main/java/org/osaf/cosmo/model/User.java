@@ -15,16 +15,13 @@
  */
 package org.osaf.cosmo.model;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  */
@@ -42,7 +39,7 @@ public class User extends BaseModelObject {
     /**
      */
     public static final Pattern USERNAME_PATTERN =
-        Pattern.compile("^[\\S ]+$");
+        Pattern.compile("^[^\\f\\n\\r\\v/]+$");
     /**
      */
     public static final int PASSWORD_LEN_MIN = 5;

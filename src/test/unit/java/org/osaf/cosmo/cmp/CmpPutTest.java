@@ -131,6 +131,25 @@ public class CmpPutTest extends BaseCmpServletTestCase {
     }
 
     /**
+     * Tests to make sure that usernames with / (slash) character fail when
+     * the user signs up.
+     */
+    public void testSignupInvalidUserSlashCase() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        // set an invalid username
+        u1.setUsername("aaa/bbb/c");
+
+        MockHttpServletRequest request = createMockRequest("PUT", "/signup");
+        sendXmlRequest(request, new UserContent(u1));
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals("incorrect status", MockHttpServletResponse.SC_BAD_REQUEST,
+                     response.getStatus());
+    }
+
+    /**
      */
     public void testAccountUpdate() throws Exception {
         User u1 = testHelper.makeDummyUser();

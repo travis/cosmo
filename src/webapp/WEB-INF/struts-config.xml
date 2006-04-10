@@ -160,7 +160,7 @@
             input="/console/user/root"
             parameter="updateRoot">
       <forward name="cancel" path="/console/users" redirect="true"/>
-      <forward name="failure" path="/console/user"/>
+      <forward name="failure" path="/console/user/root"/>
       <forward name="success" path="/console/users" redirect="true"/>
     </action>
 

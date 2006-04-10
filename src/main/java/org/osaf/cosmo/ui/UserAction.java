@@ -15,28 +15,22 @@
  */
 package org.osaf.cosmo.ui;
 
-import org.osaf.cosmo.model.DuplicateEmailException;
-import org.osaf.cosmo.model.DuplicateUsernameException;
-import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.CosmoSecurityManager;
-import org.osaf.cosmo.service.UserService;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.osaf.cosmo.model.DuplicateEmailException;
+import org.osaf.cosmo.model.DuplicateUsernameException;
+import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.service.UserService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Action for managing users.
@@ -97,17 +91,21 @@ public class UserAction extends CosmoAction {
         // time.
         User user = (User) request.getAttribute(ATTR_USER);
         if (user == null) {
-            if (userForm.getId() != null &&
-                ! userForm.getUsername().equals("")) {
+            if (userForm.getId() != null) {
+                String badEmail = userForm.getEmail();
                 user = userService.getUser(userForm.getId());
-            }
-            else {
+                populateUpdateForm(userForm, user);
+                userForm.setEmail(badEmail);
+             } else {
                 String username = request.getParameter(PARAM_USERNAME);
                 if (log.isDebugEnabled()) {
                     log.debug("viewing user " + username);
                 }
-                user = userService.getUser(username);
-                populateUpdateForm(userForm, user);
+
+                if(username != null) {
+                    user = userService.getUser(username);
+                    populateUpdateForm(userForm, user);
+                }
             }
         }
 
@@ -241,6 +239,7 @@ public class UserAction extends CosmoAction {
             String badEmail = userForm.getEmail();
             populateUpdateForm(userForm, formUser);
             userForm.setEmail(badEmail);
+
             saveErrorMessage(request, MSG_ERROR_EMAIL_EXISTS, PARAM_EMAIL);
             return mapping.findForward(UIConstants.FWD_FAILURE);
         }

@@ -23,7 +23,7 @@
    <global>
       <constant>
         <constant-name>username</constant-name>
-        <constant-value>^[\S ]+$</constant-value>
+        <constant-value>^[^\f\n\r\v/]+$</constant-value>
       </constant>
    </global>
    <formset>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<t:ticketinfo xmlns:t="http://www.xythos.com/namespaces/StorageServer" xmlns="DAV:">
+  <privilege><read/><write/></privilege>
+  <t:timeout>Infinite</t:timeout>
+  <t:visits>infinity</t:visits>
+</t:ticketinfo>

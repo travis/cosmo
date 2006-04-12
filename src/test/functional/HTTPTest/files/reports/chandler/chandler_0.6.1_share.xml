@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Share version='2' class='osaf.sharing.Sharing.Share' uuid='4ee98d02-c6bd-11da-c95e-001124e4b0d2'>
+   <contents>
+      <InclusionExclusionCollection class='osaf.pim.collections.InclusionExclusionCollection' uuid='40a22bdc-c6bd-11da-c95e-001124e4b0d2'>
+         <createdOn>2006-04-07 22:5:9.637578</createdOn>
+      </InclusionExclusionCollection>
+   </contents>
+   <sharer>
+      <Contact class='osaf.pim.contacts.Contact' uuid='409aaa38-c6bd-11da-c95e-001124e4b0d2'>
+         <emailAddress></emailAddress>
+         <contactName>
+            <ContactName class='osaf.pim.contacts.ContactName' uuid='409a36de-c6bd-11da-c95e-001124e4b0d2'>
+               <firstName>Chandler</firstName>
+               <lastName>User</lastName>
+               <createdOn>2006-04-07 22:5:9.584564</createdOn>
+            </ContactName>
+         </contactName>
+         <displayName>Me</displayName>
+         <createdOn>2006-04-07 22:5:9.587835</createdOn>
+      </Contact>
+   </sharer>
+   <sharees>
+   </sharees>
+   <filterClasses>
+      <value>osaf.pim.calendar.Calendar.CalendarEventMixin</value>
+   </filterClasses>
+   <filterAttributes>
+      <value>reminders</value>
+      <value>expiredReminders</value>
+      <value>transparency</value>
+      <value>allDay</value>
+      <value>anyTime</value>
+      <value>duration</value>
+      <value>expiredReminders</value>
+      <value>isGenerated</value>
+      <value>location</value>
+      <value>modifications</value>
+      <value>modifies</value>
+      <value>occurrenceFor</value>
+      <value>recurrenceID</value>
+      <value>reminders</value>
+      <value>rruleset</value>
+      <value>startTime</value>
+      <value>transparency</value>
+   </filterAttributes>
+   <displayName>test's calendar</displayName>
+   <createdOn>2006-04-07 22:5:33.590967</createdOn>
+</Share>

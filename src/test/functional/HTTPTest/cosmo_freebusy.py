@@ -95,8 +95,8 @@ class CosmoFreeBusy(DAVTest):
                       '20060103T190000Z/20060103T200000Z', '20060103T230000Z/20060104T000000Z', '20060104T150000Z/20060104T160000Z',
                       '20060104T210000Z/20060104T220000Z', '20060105T010000Z/20060105T000000Z']
                       
-        self.verifyItems([''], inelement='{DAV:}getetag', positive=[''])              
-        self.verifyItems([''], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, )
+        self.verifyDAVResponseItems([''], inelement='{DAV:}getetag', positive=[''])              
+        self.verifyDAVResponseItems([''], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, )
   
   
   

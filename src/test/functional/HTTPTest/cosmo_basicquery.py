@@ -97,8 +97,8 @@ class CosmoBasicQuery(DAVTest):
                       'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
                       'BEGIN:VEVENT', 'SUMMARY:event', 'END:VEVENT']
         
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
           
         # ------- Test 2.xml : query for resources where the SUMMARY in a VEVENT contains the character '1' -------- #
         
@@ -116,8 +116,8 @@ class CosmoBasicQuery(DAVTest):
                       'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
                       'BEGIN:VEVENT', 'SUMMARY:event 1', 'END:VEVENT']
                       
-        self.verifyItems(['1.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['1.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
+        self.verifyDAVResponseItems(['1.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['1.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
                               
         # ------- Test 3.xml : query for resources where the DESCRIPTION property exists in a VEVENT ---------- #
         
@@ -135,8 +135,8 @@ class CosmoBasicQuery(DAVTest):
                       'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
                       'BEGIN:VEVENT', 'SUMMARY', 'END:VEVENT', 'DESCRIPTION:']
                       
-        self.verifyItems(['2.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['2.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)      
+        self.verifyDAVResponseItems(['2.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['2.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)      
         
         # ------- Test 4.xml : query for resources that have a DTSTART in a VEVENT that contains a TZID parameter containing the text 'Paci' --- #
         
@@ -178,8 +178,8 @@ class CosmoBasicQuery(DAVTest):
                       'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
                       'BEGIN:VEVENT', 'SUMMARY', 'END:VEVENT', 'DESCRIPTION:']
         
-        self.verifyItems(['2.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['2.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
+        self.verifyDAVResponseItems(['2.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['2.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
 
         
         

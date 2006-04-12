@@ -61,7 +61,7 @@ class CosmoBugs(DAVTest):
         self.checkStatus(207) # check for multi-status
         
         # Verify that report for 5175.ics returns with proper url and UID:NEW_UID
-        self.verifyItems(['5175.ics'], positive=['UID:NEW_UID'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
+        self.verifyDAVResponseItems(['5175.ics'], positive=['UID:NEW_UID'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
         
         # -------------- Test for Bug 5254 -------------- #
         
@@ -87,7 +87,7 @@ class CosmoBugs(DAVTest):
         
         
         # Verify that report for 5254.ics returns with proper url and UID:0F94FE7B-8E01-4B27-835E-CD1431FD6475
-        self.verifyItems(['5254.ics'], positive=['UID:0F94FE7B-8E01-4B27-835E-CD1431FD6475'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
+        self.verifyDAVResponseItems(['5254.ics'], positive=['UID:0F94FE7B-8E01-4B27-835E-CD1431FD6475'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
         
       
         # -------------- Test for Bug 5261 -------------- #
@@ -112,7 +112,7 @@ class CosmoBugs(DAVTest):
         self.checkStatus(207) # check for multi-status
         
         # Verify that report for 5254.ics returns with proper url and UID:20060223T151702Z-2256-500-23960-0@grenouille
-        self.verifyItems(['5261.ics'], positive=['UID:20060223T151702Z-2256-500-23960-0@grenouille'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
+        self.verifyDAVResponseItems(['5261.ics'], positive=['UID:20060223T151702Z-2256-500-23960-0@grenouille'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
         
         
         

@@ -15,7 +15,6 @@ class HTTPTest(TestObject):
         
         if headers is None:
             self.headers = {'Host' : "localhost:8080",
-                             'User-Agent': "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.1) Gecko/20060111 Firefox/1.5.0.1",
                              'Accept' : "*/*"}
         else:
             self.headers = headers
@@ -56,6 +55,8 @@ class HTTPTest(TestObject):
             return True
         else:
             self.report(False, test='Status Code Check on %s' % status, comment='expected %s ; received %s' % (status, out))
+            if self.debug > 1:
+                self.printOut(self.test_response.read())
             return False
             
     def xmlParse(self):

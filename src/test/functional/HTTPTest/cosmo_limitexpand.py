@@ -97,8 +97,8 @@ class CosmoLimitExpand(DAVTest):
                       'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 'END:STANDARD', 'END:VTIMEZONE', 'BEGIN:VEVENT',
                       'DTSTAMP:', 'DTSTART;', 'DURATION:', 'RRULE:', 'SUMMARY:', 'UID:', 'END:VEVENT', 'END:VCALENDAR']
         
-        self.verifyItems(['5.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['5.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
+        self.verifyDAVResponseItems(['5.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['5.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
         
         
         # ------- Test 2.xml : time-range query with limit over different range ---------- #
@@ -118,11 +118,11 @@ class CosmoLimitExpand(DAVTest):
                       'DTSTAMP:', 'DTSTART;', 'DURATION:', 'RRULE:', 'SUMMARY:', 'UID:', 'END:VEVENT', 'END:VCALENDAR']         
                       
         #Check response elements for each response and verify the calendar-data element has the proper UID for each ics entry    
-        self.verifyItems(['5.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['5.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
-        self.verifyInElement('5.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['RECURRENCE-ID;'])
-        self.verifyInElement('6.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['RECURRENCE-ID;TZID=US/Eastern:20060104T140000'])
-        self.verifyInElement('7.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['RECURRENCE-ID;RANGE=THISANDFUTURE;TZID=US/Eastern:20060104T180000']) 
+        self.verifyDAVResponseItems(['5.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['5.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
+        self.verifyDAVResponseInElement('5.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['RECURRENCE-ID;'])
+        self.verifyDAVResponseInElement('6.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['RECURRENCE-ID;TZID=US/Eastern:20060104T140000'])
+        self.verifyDAVResponseInElement('7.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['RECURRENCE-ID;RANGE=THISANDFUTURE;TZID=US/Eastern:20060104T180000']) 
         
         # ------- Test 3.xml : time-range query with expand over same range ---------- #
         

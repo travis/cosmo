@@ -78,12 +78,12 @@ class CosmoMultiget(DAVTest):
         self.checkStatus(207)
         
         #Verify correct items in response
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID'])
-        self.verifyInElement('1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:54E181BC7CCC373042B28842@ninevah.local'])
-        self.verifyInElement('2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:9A6519F71822CD45840C3440@ninevah.local'])
-        self.verifyInElement('3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:DB3F97EF10A051730E2F752E@ninevah.local'])
-        self.verifyInElement('4.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:A3217B429B4D2FF2DC2EEE66@ninevah.local'])
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID'])
+        self.verifyDAVResponseInElement('1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:54E181BC7CCC373042B28842@ninevah.local'])
+        self.verifyDAVResponseInElement('2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:9A6519F71822CD45840C3440@ninevah.local'])
+        self.verifyDAVResponseInElement('3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:DB3F97EF10A051730E2F752E@ninevah.local'])
+        self.verifyDAVResponseInElement('4.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['UID:A3217B429B4D2FF2DC2EEE66@ninevah.local'])
         
           
         # ------- Test 2.xml : basic multiget of 4 resources returning etag and only VCALENDAR property data (no embedded components) ------- #
@@ -98,8 +98,8 @@ class CosmoMultiget(DAVTest):
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN', 'VERSION:2.0', 'END:VCALENDAR']
         
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
         
         # ------- Test 3.xml : basic multiget of 4 resources returning etag and only VTIMEZONE components ------- #
         
@@ -118,8 +118,8 @@ class CosmoMultiget(DAVTest):
                       
         vcalnegative = ['BEGIN:VEVENT', 'SUMMARY', 'END:VEVENT']
         
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=vcalnegative)
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=vcalnegative)
                 
         # ------- Test 4.xml : basic multiget of 4 resources returning etag and only SUMMARY/UID properties inside VEVENT components and VALARMs ------- #
         
@@ -138,12 +138,12 @@ class CosmoMultiget(DAVTest):
                       'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 
                       'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE']
                       
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=vcalnegative)
-        self.verifyInElement('1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 1'])
-        self.verifyInElement('2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 2'])
-        self.verifyInElement('3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 3'])
-        self.verifyInElement('4.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 4'])
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=vcalnegative)
+        self.verifyDAVResponseInElement('1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 1'])
+        self.verifyDAVResponseInElement('2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 2'])
+        self.verifyDAVResponseInElement('3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 3'])
+        self.verifyDAVResponseInElement('4.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', positive=['SUMMARY:event 4'])
           
         # ------- Test 5.xml : has 4.txt except that the SUMMARY property value is not returned ------- #
         
@@ -161,12 +161,12 @@ class CosmoMultiget(DAVTest):
                       'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 
                       'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'SUMMARY:event']
                       
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=vcalnegative)
-        self.verifyInElement('1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 1'])
-        self.verifyInElement('2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 2'])
-        self.verifyInElement('3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 3'])
-        self.verifyInElement('4.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 4'])
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, negative=vcalnegative)
+        self.verifyDAVResponseInElement('1.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 1'])
+        self.verifyDAVResponseInElement('2.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 2'])
+        self.verifyDAVResponseInElement('3.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 3'])
+        self.verifyDAVResponseInElement('4.ics', '{urn:ietf:params:xml:ns:caldav}calendar-data', negative=['SUMMARY:event 4'])
         
         
 if __name__ == "__main__":

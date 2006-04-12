@@ -35,6 +35,7 @@ if __name__ == "__main__":
     from cosmo_multiget import CosmoMultiget
     from cosmo_ticket import CosmoTicket
     from cosmo_timerangequery import CosmoTimeRangeQuery
+    from cosmo_chandler061 import CosmoChandlerZeroPointSixPointOne
     
     cosmobasicquery = CosmoBasicQuery(host=host, port=port, path=path, debug=debug, mask=mask)
     cosmobugs = CosmoBugs(host=host, port=port, path=path, debug=debug, mask=mask)
@@ -45,10 +46,11 @@ if __name__ == "__main__":
     cosmomultiget = CosmoMultiget(host=host, port=port, path=path, debug=debug, mask=mask)
     cosmoticket = CosmoTicket(host=host, port=port, path=path, debug=debug, mask=mask)
     cosmotimerangequery = CosmoTimeRangeQuery(host=host, port=port, path=path, debug=debug, mask=mask)
+    cosmochandler061 = CosmoChandlerZeroPointSixPointOne(host=host, port=port, path=path, debug=debug, mask=mask)
     
     suite = [cosmobasicquery, cosmobugs, cosmoinvalid, cosmofreebusy,
               cosmolimitexpand, cosmomkcalendar, cosmomultiget, cosmoticket, 
-              cosmotimerangequery] 
+              cosmotimerangequery, cosmochandler061] 
     
     count = 0
     failures = 0

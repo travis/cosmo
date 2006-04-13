@@ -15,10 +15,7 @@
 -->
 
 <project xmlns:j="jelly:core"
-         xmlns:ant="jelly:ant"
-         xmlns:maven="jelly:maven"
-         xmlns:scm="scm"
-         xmlns:jackrabbit="jackrabbit">
+         xmlns:scm="scm">
 
   <postGoal name="clean:clean">
     <delete file="${basedir}/derby.log"/>

@@ -187,17 +187,17 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060307</version>
+      <version>1.0-SNAPSHOT-osaf-20060412</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-commons</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060307</version>
+      <version>1.0-SNAPSHOT-osaf-20060412</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-server</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060321</version>
+      <version>1.0-SNAPSHOT-osaf-20060412</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -205,7 +205,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-server</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060321</version>
+      <version>1.0-SNAPSHOT-osaf-20060412</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -213,15 +213,10 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-webdav</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060321</version>
+      <version>1.0-SNAPSHOT-osaf-20060412</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
-    </dependency>
-    <dependency>
-      <groupId>org.osaf.cosmo</groupId>
-      <artifactId>cosmo-migrate</artifactId>
-      <version>0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>oro</groupId>

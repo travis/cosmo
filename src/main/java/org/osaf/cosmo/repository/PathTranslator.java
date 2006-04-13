@@ -18,6 +18,7 @@ package org.osaf.cosmo.repository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.jackrabbit.util.HexEscaper;
 import org.apache.jackrabbit.util.ISO9075;
 
 /**

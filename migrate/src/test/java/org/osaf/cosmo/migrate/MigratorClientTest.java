@@ -27,44 +27,25 @@ import org.apache.log4j.Logger;
 public class MigratorClientTest extends TestCase {
     private static Logger log = Logger.getLogger(MigratorClientTest.class);
 
-    public static final String PROP_CONFIG = "cosmo.migrate.test.config";
-    public static final String PROP_DATA = "cosmo.migrate.test.data";
-    public static final String PROP_USERNAME = "cosmo.migrate.test.username";
-    public static final String PROP_PASSWORD = "cosmo.migrate.test.password";
-
-    private String testConfig;
-    private String testData;
-    private String testUsername;
-    private String testPassword;
+    private static final String CONFIG = "src/test/config/repository.xml";
+    private static final String DATA = "target/test-repository";
+    private static final String USERNAME = "cosmo_repository";
+    private static final String PASSWORD = "";
 
     private MigratorClient client;
 
     /**
      */
     public MigratorClientTest() {
-        // load test properties
-        Properties testprops = new Properties();
-        try {
-            testprops.load(MigratorClientTest.class.getClassLoader().
-                           getResourceAsStream("test.properties"));
-        } catch (Exception e) {
-            throw new RuntimeException("can't load test.properties", e);
-        }
-
-        // extract test props used by this class
-        testConfig = testprops.getProperty(PROP_CONFIG);
-        testData = testprops.getProperty(PROP_DATA);
-        testUsername = testprops.getProperty(PROP_USERNAME);
-        testPassword = testprops.getProperty(PROP_PASSWORD);
     }
 
     /**
      */
     protected void setUp() throws Exception {
         client = new MigratorClient();
-        client.setConfig(testConfig);
-        client.setData(testData);
-        client.setCredentials(testUsername, testPassword);
+        client.setConfig(CONFIG);
+        client.setData(DATA);
+        client.setCredentials(USERNAME, PASSWORD);
     }
 
     /**

@@ -15,11 +15,13 @@
  */
 package org.osaf.cosmo.migrate;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -37,29 +39,29 @@ import javax.jcr.Value;
 import javax.jcr.ValueFactory;
 import javax.jcr.nodetype.NodeType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.jackrabbit.core.nodetype.NodeTypeManagerImpl;
+import org.apache.jackrabbit.util.HexEscaper;
 
-import org.osaf.cosmo.model.HomeCollectionResource;
-import org.osaf.cosmo.model.ResourceProperty;
-import org.osaf.cosmo.model.Ticket;
-import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.repository.HexEscaper;
-import org.osaf.cosmo.repository.ResourceMapper;
-import org.osaf.cosmo.repository.TicketMapper;
-import org.osaf.cosmo.repository.UserMapper;
+import org.apache.log4j.Logger;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Migrates the 0.2 schema to 0.3 and vice versa.
  */
 public class Migration03 extends CopyBasedMigration {
-    private static final Log log = LogFactory.getLog(Migration03.class);
+    private static Logger log = Logger.getLogger(Migration03.class);
 
     /**
      * <code>cosmo.migrate.03.userdb.url</code>
      */
     public static final String SYSPROP_USERDB_URL =
         "cosmo.migrate.03.userdb.url";
+    /**
+     * <code>nodetypes.xml</code>
+     */
+    public static final String RESOURCE_NODETYPES = "nodetypes.xml";
 
     private static final String VERSION = "0.3";
     private static final String DB_DRIVER = "org.hsqldb.jdbcDriver";
@@ -76,6 +78,85 @@ public class Migration03 extends CopyBasedMigration {
     private Connection connection;
 
     // CopyBasedMigration methods
+
+    /**
+     * Registers namespaces into the current repository, including
+     * namespaces used by Cosmo as well as custom namespaces
+     * registered into the previous repository.
+     *
+     * Builtin Cosmo namespaces include:
+     *
+     * <dl>
+     * <dt>dav</dt>
+     * <dd>DAV:</dd>
+     * <dt>calendar</dt>
+     * <dd>http://osafoundation.org/calendar</dd>
+     * <dt>ticket</dt>
+     * <dd>http://www.xythos.com/namespaces/StorageServer</dd>
+     * <dt>cosmo</dt>
+     * <dd>http://osafoundation.org/cosmo</dd>
+     * </dl>
+     *
+     * This method is not bound to the lifecycle of the
+     * <code>Migration</code>. It should only be called once during
+     * the lifetime of a particular repository. Subsequent calls will
+     * cause <code>MigrationException<code> to be thrown.
+     */
+    public static void registerNamespaces(Session previous,
+                                          Session current)
+        throws MigrationException {
+        try {
+            NamespaceRegistry prevRegistry =
+                previous.getWorkspace().getNamespaceRegistry();
+            NamespaceRegistry curRegistry =
+                current.getWorkspace().getNamespaceRegistry();
+
+            // namespaces used by our code
+            registerNamespace(curRegistry, "dav", "DAV:");
+            registerNamespace(curRegistry, "calendar",
+                              "http://osafoundation.org/calendar");
+            registerNamespace(curRegistry, "ticket",
+                              "http://www.xythos.com/namespaces/StorageServer");
+            registerNamespace(curRegistry, "cosmo",
+                              "http://osafoundation.org/cosmo");
+
+            // custom namespaces
+            String[] prevPrefixes = prevRegistry.getPrefixes();
+            for (int i=0; i<prevPrefixes.length; i++) {
+                registerNamespace(prevRegistry, curRegistry, prevPrefixes[i]);
+            }
+        } catch (RepositoryException e) {
+            throw new MigrationException("unable to register namespaces", e);
+        }
+    }
+
+    /**
+     * Registers node types into the current repository.
+     *
+     * Node types are loaded from a classpath resource named by
+     * {@link #RESOURCE_NODETYPES}.
+     *
+     * This method is not bound to the lifecycle of the
+     * <code>Migration</code>. It should only be called once during
+     * the lifetime of a particular repository. Subsequent calls will
+     * cause <code>MigrationException<code> to be thrown.
+     */
+    public static void registerNodeTypes(Session current)
+        throws MigrationException {
+        InputStream in = null;
+        in = Migration03.class.getClassLoader().
+            getResourceAsStream(RESOURCE_NODETYPES);
+        if (in == null) {
+            throw new MigrationException("nodetype resource " + RESOURCE_NODETYPES + " not found");
+        }
+        try {
+            NodeTypeManagerImpl mgr = (NodeTypeManagerImpl)
+                current.getWorkspace().getNodeTypeManager();
+            mgr.registerNodeTypes(new InputSource(in));
+        } catch (Exception e) {
+            throw new MigrationException("cannot register node types", e);
+        }
+    }
 
     /**
      * Connects to the 0.2 user database using the JDBC URL supplied
@@ -110,22 +191,32 @@ public class Migration03 extends CopyBasedMigration {
     public void up(Session previous,
                    Session current)
         throws MigrationException {
-        try {
-            registerCurrentNamespaces(previous, current);
-        } catch (RepositoryException e) {
-            throw new MigrationException("unable to register namespaces into current repository", e);
-        }
+        // XXX check for schema version.
+        // if it exists and is 0.3, don't register namespaces and node
+        // types
+        // if it exists and is not 0.3, throw an error (there was no
+        // schema version in the repo prior to 0.3)
 
-        User overlord = loadOverlord();
+        registerNamespaces(previous, current);
+        registerNodeTypes(current);
+
+        // XXX write schema version
+
+        Map overlord = loadOverlord();
         Map users = loadUsers();
 
         for (Iterator i=users.values().iterator(); i.hasNext();) {
-            User user = (User) i.next();
+            Map user = (Map) i.next();
+            String username = (String) user.get("username");
             try {
+                // XXX if the home directory already exists in the
+                // current repo, assume it was copied on a previous
+                // run
+
                 copyHome(user, previous, current);
                 current.save();
             } catch (RepositoryException e) {
-                log.error("SKIPPING " + user.getUsername(), e);
+                log.error("SKIPPING " + username, e);
                 try {
                     current.refresh(false);
                 } catch (RepositoryException re) {
@@ -134,6 +225,7 @@ public class Migration03 extends CopyBasedMigration {
                 continue;
             }
         }
+
     }
 
     /**
@@ -181,40 +273,17 @@ public class Migration03 extends CopyBasedMigration {
 
     // package protected methods, for individuable testability
 
-    void registerCurrentNamespaces(Session previous,
-                                   Session current)
-        throws RepositoryException {
-        NamespaceRegistry prevNsReg =
-            previous.getWorkspace().getNamespaceRegistry();
-        NamespaceRegistry curNsReg =
-            current.getWorkspace().getNamespaceRegistry();
-
-        String[] prevPrefixes = prevNsReg.getPrefixes();
-        for (int i=0; i<prevPrefixes.length; i++) {
-            String prefix = prevPrefixes[i];
-            try {
-                curNsReg.getURI(prefix);
-            } catch (NamespaceException e) {
-                // namespace prefix is not registered in the current
-                // repository, so register it
-                curNsReg.registerNamespace(prefix, prevNsReg.getURI(prefix));
-            }
-        }
-    }
-
-    User loadOverlord()
+    Map loadOverlord()
         throws MigrationException {
-        User overlord = null;
+        Map overlord = null;
 
-        if (log.isDebugEnabled()) {
-            log.debug("Loading overlord");
-        }
+        System.out.println("Loading overlord");
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(SQL_LOAD_OVERLORD);
             for (; rs.next();) {
                 overlord = resultSetToUser(rs);
-                overlord.setAdmin(Boolean.TRUE);
+                overlord.put("admin", Boolean.TRUE);
             }
             st.close();
         } catch (Exception e) {
@@ -228,36 +297,30 @@ public class Migration03 extends CopyBasedMigration {
         throws MigrationException {
         HashMap users = new HashMap();
         
-        if (log.isDebugEnabled()) {
-            log.debug("Loading users");
-        }
+        System.out.println("Loading users");
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(SQL_LOAD_USERS);
             for (; rs.next();) {
-                User user = resultSetToUser(rs);
-                Integer id = rs.getInt("id");
-                users.put(id, user);
+                users.put(rs.getInt("id"), resultSetToUser(rs));
             }
             st.close();
         } catch (Exception e) {
             throw new MigrationException("Cannot load users", e);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Loading root role associations");
-        }
+        System.out.println("Loading root role associations");
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(SQL_LOAD_ROOT_IDS);
             for (; rs.next();) {
-                Integer id = rs.getInt("userid");
-                User user = (User) users.get(id);
+                Integer id = (Integer) rs.getInt("userid");
+                Map user = (Map) users.get(id);
                 if (user == null) {
                     log.warn("Nonexistent user with id " + id + " marked as having root role in userdb... skipping:");
                     continue;
                 }
-                user.setAdmin(Boolean.TRUE);
+                user.put("admin", Boolean.TRUE);
             }
             st.close();
         } catch (Exception e) {
@@ -267,104 +330,103 @@ public class Migration03 extends CopyBasedMigration {
         return users;
     }
 
-    void copyHome(User user,
+    Node copyHome(Map user,
                   Session previous,
                   Session current)
         throws RepositoryException {
+        String username = (String) user.get("username");
+        System.out.println("Copying homedir for " + username);
+
         // find old home node
-        String oldHomePath = "/" + HexEscaper.escape(user.getUsername());
+        String oldHomePath = "/" + HexEscaper.escape(username);
         Node oldHomeNode = (Node) previous.getItem(oldHomePath);
 
-        // create new home node
-        if (log.isDebugEnabled()) {
-            log.debug("Copying homedir for " + user.getUsername());
-        }
-        HomeCollectionResource newHome = oldNodeToHome(oldHomeNode);
-        Node newHomeNode =
-                ResourceMapper.createHomeCollection(newHome,
-                                                    user.getUsername(),
-                                                    current);
-        UserMapper.userToNode(user, newHomeNode);
+        // create structural nodes
+        String n1 = HexEscaper.escape(username.substring(0, 1));
+        Node l1 = current.getRootNode().addNode(n1, "nt:unstructured");
 
-        copyChildNodes(oldHomeNode, newHomeNode);
-    }
+        String n2 = HexEscaper.escape(username.substring(0, 2));
+        Node l2 = l1.addNode(n2, "nt:unstructured");
 
-    private User resultSetToUser(ResultSet rs)
-        throws SQLException {
-        User user = new User();
+        // copy home node
+        Node home = copyNode(oldHomeNode, l2, "cosmo:homecollection");
 
-        user.setUsername(rs.getString("username"));
-        user.setPassword(rs.getString("password"));
-        user.setFirstName(rs.getString("firstName"));
-        user.setLastName(rs.getString("lastName"));
-        user.setEmail(rs.getString("email"));
-        user.setAdmin(Boolean.FALSE);
-        user.setDateCreated(rs.getDate("dateCreated"));
-        user.setDateModified(rs.getDate("dateModified"));
-
-        return user;
-    }
-
-    private HomeCollectionResource oldNodeToHome(Node node) 
-        throws RepositoryException {
-        HomeCollectionResource home = new HomeCollectionResource();
-
-        // set cosmo properties
-        home.setDisplayName(HexEscaper.unescape(node.getName()));
-        home.setDateCreated(node.getProperty("jcr:created").getDate().
-                            getTime());
-
-        // find old home custom properties
-        for (PropertyIterator i=node.getProperties(); i.hasNext();) {
-            Property p = i.nextProperty();
-            if (p.getName().startsWith("cosmo:") ||
-                p.getName().startsWith("jcr:") ||
-                p.getName().startsWith("dav:") ||
-                p.getName().startsWith("caldav:") ||
-                p.getName().startsWith("icalendar:") ||
-                p.getName().startsWith("xml")) {
-                continue;
-            }
-            ResourceProperty rp = new ResourceProperty();
-            rp.setName(p.getName());
-            rp.setValue(p.getString());
-            home.getProperties().add(rp);
-        }
-
-        // set old home tickets
-        for (NodeIterator i=node.getNodes("ticket:ticket"); i.hasNext();) {
-            Node child = i.nextNode();
-            // we can use TicketMapper since the ticket node type did
-            // not change between versions
-            Ticket ticket = TicketMapper.nodeToTicket(child);
-            // ignore timed out tickets
-            if (ticket.hasTimedOut()) {
-                continue;
-            }
-            home.getTickets().add(ticket);
-        }
+        // copy user details
+        home.addMixin("cosmo:user");
+        home.setProperty("cosmo:username", (String) user.get("username"));
+        home.setProperty("cosmo:password", (String) user.get("password"));
+        home.setProperty("cosmo:firstName", (String) user.get("firstName"));
+        home.setProperty("cosmo:lastName", (String) user.get("lastName"));
+        home.setProperty("cosmo:email", (String) user.get("email"));
+        home.setProperty("cosmo:admin",
+                         ((Boolean) user.get("admin")).booleanValue());
+        home.setProperty("cosmo:dateCreated",
+                         (Calendar) user.get("dateCreated"));
+        home.setProperty("cosmo:dateModified",
+                         (Calendar) user.get("dateModified"));
 
         return home;
     }
 
-    private void copyChildNodes(Node original,
-                                Node parent)
+    // private methods
+
+    private static void registerNamespace(NamespaceRegistry curRegistry,
+                                          String prefix,
+                                          String uri)
         throws RepositoryException {
-        for (NodeIterator i=original.getNodes(); i.hasNext();) {
-            Node child = i.nextNode();
-            if (child.getDefinition().isProtected()) {
-                continue;
-            }
-            copyNode(child, parent);
+        System.out.println("Registering namespace " + prefix + ": " + uri);
+        curRegistry.registerNamespace(prefix, uri);
+    }
+
+    private static void registerNamespace(NamespaceRegistry prevRegistry,
+                                          NamespaceRegistry curRegistry,
+                                          String prefix)
+        throws RepositoryException {
+        try {
+            curRegistry.getURI(prefix);
+        } catch (NamespaceException e) {
+            // namespace prefix is not registered in the current
+            // repository, so register it
+            String uri = prevRegistry.getURI(prefix);
+            System.out.println("Registering prefix " + prefix + ": " + uri);
+            curRegistry.registerNamespace(prefix, uri);
         }
     }
 
-    private void copyNode(Node original,
+    private Map resultSetToUser(ResultSet rs)
+        throws SQLException {
+        HashMap user = new HashMap();
+        user.put("username", rs.getString("username"));
+        user.put("password", rs.getString("password"));
+        user.put("firstname", rs.getString("firstName"));
+        user.put("lastname", rs.getString("lastName"));
+        user.put("email", rs.getString("email"));
+        user.put("admin", Boolean.FALSE);
+        Calendar created = Calendar.getInstance();
+        created.setTime(rs.getDate("dateCreated"));
+        user.put("dateCreated", created);
+        Calendar modified = Calendar.getInstance();
+        modified.setTime(rs.getDate("dateModified"));
+        user.put("dateModified", modified);
+        return user;
+    }
+
+    private Node copyNode(Node original,
                           Node parent)
         throws RepositoryException {
+        return copyNode(original, parent, null);
+    }
+
+    private Node copyNode(Node original,
+                          Node parent,
+                          String primaryType)
+        throws RepositoryException {
+        if (primaryType == null) {
+            primaryType =
+                translateNodeType(original.getPrimaryNodeType().getName());
+        }
+
         // copy the original node into a child of the parent node
-        String primaryType =
-            translateNodeType(original.getPrimaryNodeType().getName());
         if (log.isDebugEnabled()) {
             log.debug("copying node named " + original.getName() + " of type " +
                       primaryType + " into " + parent.getPath());
@@ -375,6 +437,11 @@ public class Migration03 extends CopyBasedMigration {
         NodeType[] previousMixins = original.getMixinNodeTypes();
         for (int j=0; j<previousMixins.length; j++) {
             String mixinType = translateNodeType(previousMixins[j].getName());
+            if ("cosmo:homecollection".equals(mixinType)) {
+                // home collection nodes are created explicitly by the
+                // copyHome method - ignore them here
+                continue;
+            }
             if (log.isDebugEnabled()) {
                 log.debug("adding mixin type " + mixinType);
             }
@@ -394,6 +461,7 @@ public class Migration03 extends CopyBasedMigration {
         // copy properties
         for (PropertyIterator k=original.getProperties(); k.hasNext();) {
             Property prop = k.nextProperty();
+            // XXX skips jcr:created, which we cannot set manuall
             if (prop.getDefinition().isProtected()) {
                 continue;
             }
@@ -423,6 +491,8 @@ public class Migration03 extends CopyBasedMigration {
         }
 
         copyChildNodes(original, copied);
+
+        return copied;
     }
 
     private void copyProperty(Property original,
@@ -494,6 +564,18 @@ public class Migration03 extends CopyBasedMigration {
             break;
         }
         current.setProperty(name, newValues);
+    }
+
+    private void copyChildNodes(Node original,
+                                Node parent)
+        throws RepositoryException {
+        for (NodeIterator i=original.getNodes(); i.hasNext();) {
+            Node child = i.nextNode();
+            if (child.getDefinition().isProtected()) {
+                continue;
+            }
+            copyNode(child, parent);
+        }
     }
 
     private String translateNodeType(String original) {

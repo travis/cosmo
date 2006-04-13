@@ -43,9 +43,15 @@ public class Migrator {
     /** */
     public static final int RC_ERR_START_TARGET = 4;
     /** */
-    public static final int RC_ERR_STOP_SOURCE = 5;
+    public static final int RC_ERR_MIGRATION_INIT = 5;
     /** */
-    public static final int RC_ERR_STOP_TARGET = 6;
+    public static final int RC_ERR_MIGRATION_UP = 6;
+    /** */
+    public static final int RC_ERR_MIGRATION_DOWN = 7;
+    /** */
+    public static final int RC_ERR_STOP_SOURCE = 8;
+    /** */
+    public static final int RC_ERR_STOP_TARGET = 9;
 
     /** */
     public static final String SOURCE_USERNAME = "cosmo_repository";
@@ -222,7 +228,24 @@ public class Migrator {
             System.exit(RC_ERR_START_TARGET);
         }
 
-        // XXX: find migration classes and run through them
+        Migration03 migration = new Migration03();
+
+        try {
+            migration.init();
+        } catch (MigrationException e) {
+            log.fatal("Could not initialize migration", e);
+            System.exit(RC_ERR_MIGRATION_INIT);
+        }
+
+        // down migration not supported by Migration03
+
+        try {
+            migration.up(migrator.getSourceClient().getSession(),
+                         migrator.getTargetClient().getSession());
+        } catch (MigrationException e) {
+            log.fatal("Could not perform up migration", e);
+            System.exit(RC_ERR_MIGRATION_UP);
+        }
 
         try {
             migrator.getTargetClient().stop();

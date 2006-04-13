@@ -38,6 +38,14 @@ public class Migrator {
     public static final int RC_ERR_USAGE = 1;
     /** */
     public static final int RC_ERR_CLI = 2;
+    /** */
+    public static final int RC_ERR_START_SOURCE = 3;
+    /** */
+    public static final int RC_ERR_START_TARGET = 4;
+    /** */
+    public static final int RC_ERR_STOP_SOURCE = 5;
+    /** */
+    public static final int RC_ERR_STOP_TARGET = 6;
 
     /** */
     public static final String SOURCE_USERNAME = "cosmo_repository";
@@ -200,8 +208,32 @@ public class Migrator {
 
         Migrator migrator = createMigrator(cl);
 
-        // XXX: start clients
+        try {
+            migrator.getSourceClient().start();
+        } catch (MigrationException e) {
+            log.fatal("Could not start source repository", e);
+            System.exit(RC_ERR_START_SOURCE);
+        }
+
+        try {
+            migrator.getTargetClient().start();
+        } catch (MigrationException e) {
+            log.fatal("Could not start target repository", e);
+            System.exit(RC_ERR_START_TARGET);
+        }
+
         // XXX: find migration classes and run through them
-        // XXX: stop clients
-   }
+
+        try {
+            migrator.getTargetClient().stop();
+        } catch (MigrationException e) {
+            log.warn("Could not stop target repository");
+        }
+
+        try {
+            migrator.getSourceClient().stop();
+        } catch (MigrationException e) {
+            log.warn("Could not stop source repository");
+        }
+    }
 }

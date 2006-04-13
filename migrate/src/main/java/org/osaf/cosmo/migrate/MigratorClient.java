@@ -59,12 +59,12 @@ public class MigratorClient {
      * session established, no additional sessions may be opened.
      */
     public Session start()
-        throws RepositoryException {
+        throws MigrationException {
         if (started) {
             throw new IllegalStateException("migrator client already started");
         }
         Repository repository = openRepository();
-        session = repository.login(credentials, workspace);
+        login(repository);
         started = true;
         return session;
     }
@@ -73,11 +73,11 @@ public class MigratorClient {
      * Finishes the migration session and closes the repository.
      */
     public void stop()
-        throws RepositoryException {
+        throws MigrationException {
         if (! started) {
             throw new IllegalStateException("migrator client not started");
         }
-        session.logout();
+        logout();
         closeRepository(session.getRepository());
         session = null;
         started = false;
@@ -144,14 +144,33 @@ public class MigratorClient {
         return session;
     }
 
+    private void login(Repository repository)
+        throws MigrationException {
+        try {
+            session = repository.login(credentials, workspace);
+        } catch (RepositoryException e) {
+            throw new MigrationException("could not log into " + workspace +
+                                         " workspace");
+        }
+    }
+
+    private void logout()
+        throws MigrationException {
+        session.logout();
+    }
+
     private Repository openRepository()
-        throws RepositoryException {
-        RepositoryConfig rc = RepositoryConfig.create(config, data);
-        return RepositoryImpl.create(rc);
+        throws MigrationException {
+        try {
+            RepositoryConfig rc = RepositoryConfig.create(config, data);
+            return RepositoryImpl.create(rc);
+        } catch (RepositoryException e) {
+            throw new MigrationException("could not open repository", e);
+        }
     }
 
     private void closeRepository(Repository repository)
-        throws RepositoryException {
+        throws MigrationException {
         ((RepositoryImpl) repository).shutdown();
     }
 }

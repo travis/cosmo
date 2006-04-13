@@ -18,7 +18,7 @@
   <name>Cosmo Migration Tool</name>
   <groupId>org.osaf.cosmo</groupId>
   <artifactId>cosmo-migrate</artifactId>
-  <currentVersion>0.1-SNAPSHOT</currentVersion>
+  <currentVersion>0.3-SNAPSHOT</currentVersion>
   <dependencies>
     <!-- framework dependencies -->
     <dependency>

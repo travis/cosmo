@@ -17,17 +17,17 @@ class CosmoTimeRangeQuery(DAVTest):
         cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathBuilder('/cmp/user/cosmo-timerangequeryTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-timerangequeryTestAccount%s' % self.appendVar) 
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
-                                 <username>cosmo-timerangequeryTestAccount</username> \
+                                 <username>cosmo-timerangequeryTestAccount%s</username> \
                                  <password>cosmo-timerange</password> \
-                                 <firstName>cosmo-timerangequery</firstName> \
+                                 <firstName>cosmo-timerangequery%s</firstName> \
                                  <lastName>TestAccount</lastName> \
-                                 <email>cosmo-timerangequeryTestAccount@osafoundation.org</email> \
-                                 </user>'
+                                 <email>cosmo-timerangequeryTestAccount%s@osafoundation.org</email> \
+                                 </user>' % (self.appendVar, self.appendVar, self.appendVar)
                                  
         #Create account and check status
         self.request('PUT', cmppath, body=bodycreateaccount, headers=cmpheaders)
@@ -38,10 +38,10 @@ class CosmoTimeRangeQuery(DAVTest):
         self.testStart('Create Calendar')
         
         #Add auth to global headers
-        self.headers = self.headerAddAuth("cosmo-timerangequeryTestAccount", "cosmo-timerange")
+        self.headers = self.headerAddAuth("cosmo-timerangequeryTestAccount%s" % self.appendVar, "cosmo-timerange") 
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/')
+        calpath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/' % self.appendVar) 
         self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
@@ -51,13 +51,13 @@ class CosmoTimeRangeQuery(DAVTest):
         
         #Construct headers & body
         puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/1.ics')
-        put2icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/2.ics')
-        put3icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/3.ics')
-        put4icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/4.ics')    
-        put5icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/5.ics')
-        put6icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/6.ics')
-        put7icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/7.ics') 
+        put1icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/1.ics'% self.appendVar) 
+        put2icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/2.ics'% self.appendVar) 
+        put3icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/3.ics'% self.appendVar) 
+        put4icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/4.ics'% self.appendVar)  
+        put5icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/5.ics'% self.appendVar) 
+        put6icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/6.ics'% self.appendVar) 
+        put7icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/7.ics'% self.appendVar) 
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")
@@ -88,8 +88,29 @@ class CosmoTimeRangeQuery(DAVTest):
         self.request('PUT', put7icspath, body=put7icsbody, headers=puticsheaders)
         self.checkStatus(201)
         
-        # --------- Test 1.xml query for VEVENTs within time range
+                
+        self.testStart('Uploading Float Events')
         
+        # Put all float cals
+        putfloat1icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/float1.ics' % self.appendVar) 
+        putfloat2icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/float2.ics' % self.appendVar) 
+        putfloat3icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/float3.ics' % self.appendVar) 
+        
+        f = open("files/reports/put/float1.ics")
+        putfloat1icsbody = f.read()
+        f = open("files/reports/put/float2.ics")
+        putfloat2icsbody = f.read()
+        f = open("files/reports/put/float3.ics")
+        putfloat3icsbody = f.read()
+        
+        self.request('PUT', putfloat1icspath, body=putfloat1icsbody, headers=puticsheaders)
+        self.request('PUT', putfloat2icspath, body=putfloat2icsbody, headers=puticsheaders)
+        self.request('PUT', putfloat3icspath, body=putfloat3icsbody, headers=puticsheaders)
+        
+    def recurringRun(self):
+            
+        calpath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount%s/calendar/' % self.appendVar) 
+    
         self.testStart('Test 1.xml query for VEVENTs within time range')
         
         #Setup request 
@@ -152,24 +173,7 @@ class CosmoTimeRangeQuery(DAVTest):
         ##Blocked by bug 5551
         
         # -------------- More time range tests
-        
-        self.testStart('Uploading Float Events')
-        
-        # Put all float cals
-        putfloat1icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/float1.ics') 
-        putfloat2icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/float2.ics') 
-        putfloat3icspath = self.pathBuilder('/home/cosmo-timerangequeryTestAccount/calendar/float3.ics') 
-        
-        f = open("files/reports/put/float1.ics")
-        putfloat1icsbody = f.read()
-        f = open("files/reports/put/float2.ics")
-        putfloat2icsbody = f.read()
-        f = open("files/reports/put/float3.ics")
-        putfloat3icsbody = f.read()
-        
-        self.request('PUT', putfloat1icspath, body=putfloat1icsbody, headers=puticsheaders)
-        self.request('PUT', putfloat2icspath, body=putfloat2icsbody, headers=puticsheaders)
-        self.request('PUT', putfloat3icspath, body=putfloat3icsbody, headers=puticsheaders)
+
         
         # ---------------- oneInHonolulu.xml test
         
@@ -348,7 +352,7 @@ class CosmoTimeRangeQuery(DAVTest):
         
         #Check Status = 207 Multistatus
         self.checkStatus(207)           
-        
+    
         
         
         
@@ -361,7 +365,7 @@ if __name__ == "__main__":
     port = '8080'
     path = '/cosmo'
     debug = 0
-    counter = 10
+    recurrence = 1
     
     for arg in sys.argv:
         args = arg.split("=")
@@ -371,14 +375,14 @@ if __name__ == "__main__":
             port = int(args[1])
         elif args[0] == "path":
             path = args[1]
-        elif args[0] == "recurring":
-            counter = int(args[1])
+        elif args[0] == "recurrence":
+            recurrence = int(args[1])
         elif args[0] == "debug":
             debug = int(args[1])
         
-    print "host %s port %s recurring %s path %s" % (host, port, counter, path)
+    print "host %s port %s recurring %s path %s" % (host, port, recurrence, path)
     
-    cosmotimerangequery = CosmoTimeRangeQuery(host=host, port=port, path=path)
-    cosmotimerangequery.debug = debug
-    cosmotimerangequery.startRun()
-    cosmotimerangequery.end()
+    cosmotimerangequery = CosmoTimeRangeQuery(host=host, port=port, path=path, recurrence=recurrence, debug=debug)
+    cosmotimerangequery.fullRun()
+    
+    

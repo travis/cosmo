@@ -7,11 +7,11 @@ from TestObject import TestObject
 
 class HTTPTest(TestObject):
     
-    def __init__(self, host, port, path, debug=0, headers=None, tls=False, mask=0):
+    def __init__(self, host, port, path, debug=0, headers=None, tls=False, mask=0, recurrence=1, appendVar='', printAppend='', threadNum=None):
         
         self.debug = debug
         self.mask = mask
-        TestObject.__init__(self, debug=debug, mask=mask)
+        TestObject.__init__(self, debug=debug, mask=mask, recurrence=recurrence, appendVar=appendVar, printAppend=printAppend, threadNum=threadNum)
         
         if headers is None:
             self.headers = {'Host' : "localhost:8080",
@@ -55,8 +55,6 @@ class HTTPTest(TestObject):
             return True
         else:
             self.report(False, test='Status Code Check on %s' % status, comment='expected %s ; received %s' % (status, out))
-            if self.debug > 1:
-                self.printOut(self.test_response.read())
             return False
             
     def xmlParse(self):
@@ -114,5 +112,11 @@ class HTTPTest(TestObject):
         
         self.test_response = r
         return r
+    
+
+
+            
+            
+            
     
     

@@ -82,7 +82,7 @@ class DAVTest(HTTPTest):
         if test is None:
             try:
                 test = self.test
-            except Error:
+            except:
                 test = None
             
         for arg in args:

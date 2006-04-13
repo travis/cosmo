@@ -9,22 +9,24 @@ class CosmoBasicQuery(DAVTest):
         #Create Headers for CMP
         
         # ------- Test Create Account ------- #
+        
+        self.testStart('Setup Accounts')
            
         cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
         cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathBuilder('/cmp/user/cosmo-basicqueryTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-basicqueryTestAccount%s' % self.appendVar)
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
-                                 <username>cosmo-basicqueryTestAccount</username> \
+                                 <username>cosmo-basicqueryTestAccount%s</username> \
                                  <password>cosmo-basicquery</password> \
-                                 <firstName>cosmo-basicquery</firstName> \
+                                 <firstName>cosmo-basicquery%s</firstName> \
                                  <lastName>TestAccount</lastName> \
-                                 <email>cosmo-basicqueryTestAccount@osafoundation.org</email> \
-                                 </user>'
+                                 <email>cosmo-basicqueryTestAccount%s@osafoundation.org</email> \
+                                 </user>' % (self.appendVar, self.appendVar, self.appendVar)
                                  
         #Create account and check status
         self.request('PUT', cmppath, body=bodycreateaccount, headers=cmpheaders)
@@ -33,24 +35,24 @@ class CosmoBasicQuery(DAVTest):
         # ------- Test Create Calendar ------- #
         
         #Add auth to global headers
-        self.headers = self.headerAddAuth("cosmo-basicqueryTestAccount", "cosmo-basicquery")
+        self.headers = self.headerAddAuth("cosmo-basicqueryTestAccount%s" % self.appendVar, "cosmo-basicquery")
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathBuilder('/home/cosmo-basicqueryTestAccount/calendar/')
-        self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
+        self.calpath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/' % self.appendVar)
+        self.request('MKCALENDAR', self.calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
         # ------- Test Creation of events view ICS ------- #
         
         #Construct headers & body
         puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount/calendar/1.ics')
-        put2icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount/calendar/2.ics')
-        put3icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount/calendar/3.ics')
-        put4icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount/calendar/4.ics')    
-        put5icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount/calendar/5.ics')
-        put6icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount/calendar/6.ics')
-        put7icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount/calendar/7.ics') 
+        put1icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/1.ics' % self.appendVar)
+        put2icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/2.ics' % self.appendVar)
+        put3icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/3.ics' % self.appendVar)
+        put4icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/4.ics' % self.appendVar)    
+        put5icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/5.ics' % self.appendVar)
+        put6icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/6.ics' % self.appendVar)
+        put7icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/7.ics' % self.appendVar) 
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")
@@ -81,6 +83,9 @@ class CosmoBasicQuery(DAVTest):
         self.request('PUT', put7icspath, body=put7icsbody, headers=puticsheaders)
         self.checkStatus(201)
         
+        
+    def recurringRun(self):
+        
         # ------- Test 1.xml : query for resources with VCALENDAR & VEVENT defined ---------- #
         
         self.testStart('Test 1.xml : query for resources with VCALENDAR & VEVENT defined')
@@ -88,7 +93,7 @@ class CosmoBasicQuery(DAVTest):
         #Setup request 
         f = open('files/reports/basicquery/1.xml')
         report1body = f.read()
-        self.request('REPORT', calpath, body=report1body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report1body, headers=self.headers)
         self.checkStatus(207) # Verify multi-status
             
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -107,7 +112,7 @@ class CosmoBasicQuery(DAVTest):
         #Setup request 
         f = open('files/reports/basicquery/2.xml')
         report2body = f.read()
-        self.request('REPORT', calpath, body=report2body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report2body, headers=self.headers)
         self.checkStatus(207) # Verify multi-status
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -126,7 +131,7 @@ class CosmoBasicQuery(DAVTest):
         #Setup request 
         f = open('files/reports/basicquery/3.xml')
         report3body = f.read()
-        self.request('REPORT', calpath, body=report3body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report3body, headers=self.headers)
         self.checkStatus(207) # Verify multi-status
             
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -145,7 +150,7 @@ class CosmoBasicQuery(DAVTest):
         #Setup request 
         f = open('files/reports/basicquery/4.xml')
         report4body = f.read()
-        self.request('REPORT', calpath, body=report4body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report4body, headers=self.headers)
         self.checkStatus(207) # Verify multi-status
         
         ### Blocked by bug 5551
@@ -157,7 +162,7 @@ class CosmoBasicQuery(DAVTest):
         #Setup request 
         f = open('files/reports/basicquery/5.xml')
         report5body = f.read()
-        self.request('REPORT', calpath, body=report5body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report5body, headers=self.headers)
         self.checkStatus(207) # Verify multi-status
         
         ### Blocked by bug 5551
@@ -169,7 +174,7 @@ class CosmoBasicQuery(DAVTest):
         #Setup request 
         f = open('files/reports/basicquery/6.xml')
         report6body = f.read()
-        self.request('REPORT', calpath, body=report6body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report6body, headers=self.headers)
         self.checkStatus(207) # Verify multi-status
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -191,7 +196,7 @@ if __name__ == "__main__":
     port = '8080'
     path = '/cosmo'
     debug = 0
-    counter = 10
+    recurrence = 1
     
     for arg in sys.argv:
         args = arg.split("=")
@@ -201,15 +206,13 @@ if __name__ == "__main__":
             port = int(args[1])
         elif args[0] == "path":
             path = args[1]
-        elif args[0] == "recurring":
-            counter = int(args[1])
+        elif args[0] == "recurrence":
+            recurrence = int(args[1])
         elif args[0] == "debug":
             debug = int(args[1])
         
-    print "host %s port %s recurring %s path %s" % (host, port, counter, path)
+    print "host %s port %s recurring %s path %s" % (host, port, recurrence, path)
     
-    cosmobasicquery = CosmoBasicQuery(host=host, port=port, path=path)
-    cosmobasicquery.debug = debug
-    cosmobasicquery.startRun()
-    cosmobasicquery.end()
+    cosmobasicquery = CosmoBasicQuery(host=host, port=port, path=path, recurrence=recurrence, debug=debug)
+    cosmobasicquery.fullRun()
     

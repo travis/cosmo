@@ -14,17 +14,17 @@ class CosmoBugs(DAVTest):
         cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathBuilder('/cmp/user/cosmo-bugsTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-bugsTestAccount%s' % self.appendVar)
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
-                                 <username>cosmo-bugsTestAccount</username> \
+                                 <username>cosmo-bugsTestAccount%s</username> \
                                  <password>cosmo-bugs</password> \
                                  <firstName>cosmo-bugs</firstName> \
                                  <lastName>TestAccount</lastName> \
                                  <email>cosmo-bugsTestAccount@osafoundation.org</email> \
-                                 </user>'
+                                 </user>' % self.appendVar
                                  
         #Create account and check status
         self.request('PUT', cmppath, body=bodycreateaccount, headers=cmpheaders)
@@ -33,10 +33,10 @@ class CosmoBugs(DAVTest):
         # ------- Test Create Calendar ------- #
         
         #Add auth to global headers
-        self.headers = self.headerAddAuth("cosmo-bugsTestAccount", "cosmo-bugs")
+        self.headers = self.headerAddAuth("cosmo-bugsTestAccount%s" % self.appendVar, "cosmo-bugs")
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathBuilder('/home/cosmo-bugsTestAccount/calendar/')
+        calpath = self.pathBuilder('/home/cosmo-bugsTestAccount%s/calendar/' % self.appendVar)
         self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
@@ -46,7 +46,7 @@ class CosmoBugs(DAVTest):
         
         #Construct Headers & body for put of ics data for bug
         put5175icsheaders = self.headerAdd({'Content-Type' : 'text/calendar', 'Content-Length' : '183'})
-        put5175icspath = self.pathBuilder('/home/cosmo-bugsTestAccount/calendar/5175.ics')
+        put5175icspath = self.pathBuilder('/home/cosmo-bugsTestAccount%s/calendar/5175.ics' % self.appendVar)
         f = open("files/reports/bugs/5175.ics")
         put5175icsbody = f.read()
         #Send request and check status for put of ics file
@@ -69,7 +69,7 @@ class CosmoBugs(DAVTest):
         
         #Build headers and body for ics put 
         put5254icsheaders = self.headerAdd({'Content-Type' : 'text/calendar', 'Content-Length' : '558'})
-        put5254icspath = self.pathBuilder('/home/cosmo-bugsTestAccount/calendar/5254.ics')
+        put5254icspath = self.pathBuilder('/home/cosmo-bugsTestAccount%s/calendar/5254.ics' % self.appendVar)
         f = open("files/reports/bugs/5254.ics")
         put5254icsbody = f.read()
 
@@ -96,7 +96,7 @@ class CosmoBugs(DAVTest):
         
         #Build headers and body for ics put 
         put5261icsheaders = self.headerAdd({'Content-Type' : 'text/calendar', 'Content-Length' : '1002'})
-        put5261icspath = self.pathBuilder('/home/cosmo-bugsTestAccount/calendar/5261.ics')
+        put5261icspath = self.pathBuilder('/home/cosmo-bugsTestAccount%s/calendar/5261.ics' % self.appendVar)
         f = open("files/reports/bugs/5261.ics")
         put5261icsbody = f.read()
         
@@ -124,7 +124,6 @@ if __name__ == "__main__":
     port = '8080'
     path = '/cosmo'
     debug = 0
-    counter = 10
     
     for arg in sys.argv:
         args = arg.split("=")
@@ -134,17 +133,13 @@ if __name__ == "__main__":
             port = int(args[1])
         elif args[0] == "path":
             path = args[1]
-        elif args[0] == "recurring":
-            counter = int(args[1])
         elif args[0] == "debug":
             debug = int(args[1])
         
-    print "host %s port %s recurring %s path %s" % (host, port, counter, path)
+    print "host %s port %s path %s" % (host, port, path)
 
-    cosmobugs = CosmoBugs(host=host, port=port, path=path)
-    cosmobugs.debug = debug
-    cosmobugs.startRun()
-    cosmobugs.end()
+    cosmobugs = CosmoBugs(host=host, port=port, path=path, debug=debug)
+    cosmobugs.fullRun()
 
 
 

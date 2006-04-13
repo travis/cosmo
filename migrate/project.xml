@@ -79,21 +79,6 @@
       <artifactId>hsqldb</artifactId>
       <version>1.7.3.3</version>
     </dependency>
-    <dependency>
-      <groupId>org.osaf</groupId>
-      <artifactId>cosmo</artifactId>
-      <version>0.3-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>1.2.6</version>
-    </dependency>
-    <dependency>
-      <groupId>springframework</groupId>
-      <artifactId>spring-dao</artifactId>
-      <version>1.2.6</version>
-    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>

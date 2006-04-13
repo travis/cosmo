@@ -16,7 +16,7 @@
 
 <project>
   <name>Cosmo</name>
-  <groupId>org.osaf</groupId>
+  <groupId>org.osaf.cosmo</groupId>
   <artifactId>cosmo</artifactId>
   <currentVersion>0.3-SNAPSHOT</currentVersion>
   <dependencies>
@@ -191,11 +191,6 @@
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit-commons</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060412</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-server</artifactId>
       <version>1.0-SNAPSHOT-osaf-20060412</version>
       <properties>
@@ -227,9 +222,9 @@
       </properties>
     </dependency>
     <dependency>
-      <groupId>osaf-commons</groupId>
+      <groupId>org.osaf.commons</groupId>
       <artifactId>osaf-commons-jackrabbit-maven-plugin</artifactId>
-      <version>0.4</version>
+      <version>0.5</version>
       <type>plugin</type>
     </dependency>
     <dependency>

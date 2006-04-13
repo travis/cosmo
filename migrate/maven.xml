@@ -1,0 +1,52 @@
+<!--
+   Copyright 2005 Open Source Applications Foundation
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<project xmlns:j="jelly:core"
+         xmlns:ant="jelly:ant"
+         xmlns:maven="jelly:maven"
+         xmlns:scm="scm"
+         xmlns:jackrabbit="jackrabbit">
+
+  <postGoal name="clean:clean">
+    <delete file="${basedir}/derby.log"/>
+  </postGoal>
+
+  <preGoal name="java:jar-resources">
+    <scm:checkout var="checkoutBean"
+                  url="${cosmo.scm.url}/src/main/data"
+                  workingDirectory="${maven.build.dir}/repository-data"
+                  username="${cosmo.scm.username}"
+                  password="${cosmo.scm.password}"/>
+  </preGoal>
+
+  <preGoal name="test:test">
+    <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
+      <attainGoal name="test:reposetup"/>
+    </j:if>
+  </preGoal>
+
+  <preGoal name="test:single">
+    <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
+      <attainGoal name="test:reposetup"/>
+    </j:if>
+  </preGoal>
+
+  <goal name="test:reposetup">
+    <delete dir="${maven.build.dir}/test-repository"/> 
+    <delete dir="${maven.build.dir}/test-migration03-repository"/>
+  </goal>
+
+</project>

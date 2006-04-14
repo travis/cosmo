@@ -191,6 +191,14 @@
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-commons</artifactId>
+      <version>1.0-SNAPSHOT-osaf-20060412</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jcr-server</artifactId>
       <version>1.0-SNAPSHOT-osaf-20060412</version>
       <properties>

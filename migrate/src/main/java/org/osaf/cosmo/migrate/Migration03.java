@@ -175,7 +175,7 @@ public class Migration03 extends CopyBasedMigration {
             throw new MigrationException("System property " + SYSPROP_USERDB_URL + " not found");
         }
 
-        log.info("Connecting to " + url);
+        System.out.println("Connecting to " + url);
         try {
             Class.forName(DB_DRIVER);
             connection = DriverManager.getConnection(url, DB_USERNAME,
@@ -216,18 +216,19 @@ public class Migration03 extends CopyBasedMigration {
         Map overlord = loadOverlord();
         Map users = loadUsers();
 
+        int skipped = 0;
         for (Iterator i=users.values().iterator(); i.hasNext();) {
             Map user = (Map) i.next();
             String username = (String) user.get("username");
             try {
-                // XXX if the home directory already exists in the
-                // current repo, assume it was copied on a previous
-                // run
-
-                copyHome(user, previous, current);
-                current.save();
+                // only save if the home directory was actually copied
+                if (copyHome(user, previous, current) != null) {
+                    current.save();
+                }
             } catch (RepositoryException e) {
-                log.error("SKIPPING " + username, e);
+                skipped++;
+                System.out.println("SKIPPING " + username);
+                e.printStackTrace();
                 try {
                     current.refresh(false);
                 } catch (RepositoryException re) {
@@ -237,6 +238,9 @@ public class Migration03 extends CopyBasedMigration {
             }
         }
 
+        if (skipped > 0) {
+            System.out.println(skipped + " users skipped - see stderr for details");
+        }
     }
 
     /**
@@ -359,7 +363,7 @@ public class Migration03 extends CopyBasedMigration {
                 Integer id = (Integer) rs.getInt("userid");
                 Map user = (Map) users.get(id);
                 if (user == null) {
-                    log.warn("Nonexistent user with id " + id + " marked as having root role in userdb... skipping:");
+                    System.err.println("Nonexistent user with id " + id + " marked as having root role in userdb... skipping:");
                     continue;
                 }
                 user.put("admin", Boolean.TRUE);
@@ -377,17 +381,25 @@ public class Migration03 extends CopyBasedMigration {
                   Session current)
         throws RepositoryException {
         String username = (String) user.get("username");
+        String oldHomePath = "/" + HexEscaper.escape(username);
+
+        String n1 = HexEscaper.escape(username.substring(0, 1));
+        String n2 = HexEscaper.escape(username.substring(0, 2));
+        String newHomePath = "/" + n1 + "/" + n2 + oldHomePath;
+
+        if (current.itemExists(newHomePath)) {
+            // looks like a previous migration run already copied this
+            // user's home.
+            return null;
+        }
+
         System.out.println("Copying homedir for " + username);
 
         // find old home node
-        String oldHomePath = "/" + HexEscaper.escape(username);
         Node oldHomeNode = (Node) previous.getItem(oldHomePath);
 
         // create structural nodes
-        String n1 = HexEscaper.escape(username.substring(0, 1));
         Node l1 = current.getRootNode().addNode(n1, "nt:unstructured");
-
-        String n2 = HexEscaper.escape(username.substring(0, 2));
         Node l2 = l1.addNode(n2, "nt:unstructured");
 
         // copy home node

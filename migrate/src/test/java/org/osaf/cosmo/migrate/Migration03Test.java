@@ -127,6 +127,9 @@ public class Migration03Test extends TestCase {
         st.execute("SHUTDOWN");
         connection.close();
 
+        previous.refresh(false);
+        current.refresh(false);
+
         super.tearDown();
     }
 
@@ -173,8 +176,6 @@ public class Migration03Test extends TestCase {
         String version = migration.readSchemaVersion(current);
         assertNotNull("no schema version found", version);
         assertEquals("schema version not 0.3", "0.3", version);
-
-        current.refresh(false);
     }
 
     /**
@@ -187,8 +188,6 @@ public class Migration03Test extends TestCase {
         Property version = (Property)
             current.getItem("/cosmo:system/cosmo:schema/cosmo:schemaVersion");
         assertEquals("schema version not 0.3", "0.3", version.getString());
-
-        current.refresh(false);
     }
 
     /**
@@ -218,6 +217,23 @@ public class Migration03Test extends TestCase {
                      (String) user3.get("username"));
         assertEquals("user 3 not admin", Boolean.FALSE,
                      (Boolean) user3.get("admin"));
+    }
+
+    /**
+     */
+    public void testAlreadyCopiedHome() throws Exception {
+        Map user = loadOldUser(3);
+        String username = (String) user.get("username");
+
+        String n1 = HexEscaper.escape(username.substring(0, 1));
+        Node l1 = current.getRootNode().addNode(n1, "nt:unstructured");
+        String n2 = HexEscaper.escape(username.substring(0, 2));
+        Node l2 = l1.addNode(n2, "nt:unstructured");
+        String n3 = HexEscaper.escape(username);
+        Node copied = l2.addNode(n3, "cosmo:homecollection");
+
+        Node home = migration.copyHome(user, previous, current);
+        assertNull("non-null home node found for previously copied user", home);
     }
 
     /**
@@ -324,8 +340,6 @@ public class Migration03Test extends TestCase {
                    readmeContent.hasProperty("jcr:mimeType"));
         assertTrue("content node does not have property jcr:lastModified",
                    readmeContent.hasProperty("jcr:lastModified"));
-
-        current.refresh(false);
    }
 
     private Map loadOldUser(int id)

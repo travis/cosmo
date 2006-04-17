@@ -4,9 +4,13 @@ class CosmoLimitExpand(DAVTest):
     
     def startRun(self):
         
-        #Set Headers and paths
         
-        #Create Headers for CMP
+        self.testStart('Setup Accounts')
+        
+        try:
+            self.appendUser = self.appendDict['username']
+        except KeyError:
+            self.appendUser = ''
         
         # ------- Test Create Account ------- #
            
@@ -14,17 +18,17 @@ class CosmoLimitExpand(DAVTest):
         cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathBuilder('/cmp/user/cosmo-limitexpandTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-limitexpandTestAccount%s' % self.appendUser)
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
-                                 <username>cosmo-limitexpandTestAccount</username> \
+                                 <username>cosmo-limitexpandTestAccount%s</username> \
                                  <password>limitexpand</password> \
                                  <firstName>cosmo-limitexpand</firstName> \
                                  <lastName>TestAccount</lastName> \
-                                 <email>cosmo-limitexpandTestAccount@osafoundation.org</email> \
-                                 </user>'
+                                 <email>cosmo-limitexpandTestAccount%s@osafoundation.org</email> \
+                                 </user>' % (self.appendUser, self.appendUser)
                                  
         #Create account and check status
         self.request('PUT', cmppath, body=bodycreateaccount, headers=cmpheaders)
@@ -33,24 +37,24 @@ class CosmoLimitExpand(DAVTest):
         # ------- Test Create Calendar ------- #
         
         #Add auth to global headers
-        self.headers = self.headerAddAuth("cosmo-limitexpandTestAccount", "limitexpand")
+        self.headers = self.headerAddAuth("cosmo-limitexpandTestAccount%s" % self.appendUser, "limitexpand")
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/')
-        self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
+        self.calpath = self.pathBuilder('/home/cosmo-limitexpandTestAccount%s/calendar/' % self.appendUser)
+        self.request('MKCALENDAR', self.calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
         # ------- Test Creation of events view ICS ------- #
         
         #Construct headers & body
         puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/1.ics')
-        put2icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/2.ics')
-        put3icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/3.ics')
-        put4icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/4.ics')    
-        put5icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/5.ics')
-        put6icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/6.ics')
-        put7icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount/calendar/7.ics') 
+        put1icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount%s/calendar/1.ics' % self.appendUser)
+        put2icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount%s/calendar/2.ics' % self.appendUser)
+        put3icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount%s/calendar/3.ics' % self.appendUser)
+        put4icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount%s/calendar/4.ics' % self.appendUser)    
+        put5icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount%s/calendar/5.ics' % self.appendUser)
+        put6icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount%s/calendar/6.ics' % self.appendUser)
+        put7icspath = self.pathBuilder('/home/cosmo-limitexpandTestAccount%s/calendar/7.ics' % self.appendUser) 
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")
@@ -81,6 +85,8 @@ class CosmoLimitExpand(DAVTest):
         self.request('PUT', put7icspath, body=put7icsbody, headers=puticsheaders)
         self.checkStatus(201)
         
+    def recurringRun(self):
+        
         # ------- Test 1.xml : time-range query with limit over same range ---------- #
         
         self.testStart('Test 1.xml : time-range query with limit over same range')
@@ -88,7 +94,7 @@ class CosmoLimitExpand(DAVTest):
         #Setup request 
         f = open('files/reports/limitexpand/1.xml')
         report1body = f.read()
-        self.request('REPORT', calpath, body=report1body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report1body, headers=self.headers)
         self.checkStatus(207)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:', 'VERSION:2.0', 'BEGIN:VTIMEZONE',
@@ -108,7 +114,7 @@ class CosmoLimitExpand(DAVTest):
         #Setup request 
         f = open('files/reports/limitexpand/2.xml')
         report2body = f.read()
-        self.request('REPORT', calpath, body=report2body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report2body, headers=self.headers)
         self.checkStatus(207)             
                       
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:', 'VERSION:2.0', 'BEGIN:VTIMEZONE',
@@ -132,7 +138,7 @@ class CosmoLimitExpand(DAVTest):
         #Setup request 
         #f = open('files/reports/limitexpand/3.xml')
         #report3body = f.read()
-        #self.request('REPORT', calpath, body=report3body, headers=self.headers)
+        #self.request('REPORT', self.calpath, body=report3body, headers=self.headers)
         
         
         
@@ -141,7 +147,7 @@ class CosmoLimitExpand(DAVTest):
         #Setup request 
         #f = open('files/reports/limitexpand/4.xml')
         #report4body = f.read()
-        #self.request('REPORT', calpath, body=report4body, headers=self.headers)
+        #self.request('REPORT', self.calpath, body=report4body, headers=self.headers)
         
         
         

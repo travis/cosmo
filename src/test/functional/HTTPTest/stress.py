@@ -78,7 +78,7 @@ def runThreaded(importDict, threads, debug, optsDict={}):
     for r in range(threads):
         print r
         
-        optsDict.update({'appendVar':r, 'threadNum':r})
+        optsDict.update({'self.appendDict[\'username\']':r, 'threadNum':r})
         test = TestExecutionThread(importDict=importDict, optsDict=optsDict, threadNum=r)
         test.start()
         threadList.append(test)

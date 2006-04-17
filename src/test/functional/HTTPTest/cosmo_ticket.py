@@ -6,49 +6,54 @@ class CosmoTicket(DAVTest):
     
     def startRun(self):
         
-        #Set Headers and paths
+        self.testStart('Setup Accounts')
         
-        #Create Headers for CMP
+        try:
+            self.appendUser = self.appendDict['username']
+        except KeyError:
+            self.appendUser = ''
         
         # ------- Test Create Account ------- #
            
-        cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
-        cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
+        self.cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
+        self.cmpheaders = self.headerAddAuth("root", "cosmo", headers=self.cmpheaders)
            
         #CMP path
-        cmppath = self.pathBuilder('/cmp/user/cosmo-ticketTestAccount')
-        cmppath2 = self.pathBuilder('/cmp/user/cosmo-ticketTestAccount2')
+        self.cmppath = self.pathBuilder('/cmp/user/cosmo-ticketTestAccount%s' % self.appendUser)
+        self.cmppath2 = self.pathBuilder('/cmp/user/cosmo-ticketTestAccount%s2' % self.appendUser)
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
-                                 <username>cosmo-ticketTestAccount</username> \
+                                 <username>cosmo-ticketTestAccount%s</username> \
                                  <password>cosmo-ticket</password> \
                                  <firstName>cosmo-ticket</firstName> \
                                  <lastName>TestAccount</lastName> \
-                                 <email>cosmo-ticketTestAccount@osafoundation.org</email> \
-                                 </user>'
+                                 <email>cosmo-ticketTestAccount%s@osafoundation.org</email> \
+                                 </user>'  % (self.appendUser, self.appendUser)
                                  
         bodycreateaccount2 = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
-                                 <username>cosmo-ticketTestAccount2</username> \
+                                 <username>cosmo-ticketTestAccount%s2</username> \
                                  <password>cosmo-ticket</password> \
                                  <firstName>cosmo-ticket2</firstName> \
                                  <lastName>TestAccount</lastName> \
-                                 <email>cosmo-ticketTestAccount2@osafoundation.org</email> \
-                                 </user>'                                 
+                                 <email>cosmo-ticketTestAccount%s2@osafoundation.org</email> \
+                                 </user>' % (self.appendUser, self.appendUser)                               
                                  
         #Create account and check status
-        self.request('PUT', cmppath, body=bodycreateaccount, headers=cmpheaders)
+        self.request('PUT', self.cmppath, body=bodycreateaccount, headers=self.cmpheaders)
         self.checkStatus(201) # 201 ACCOUNT CREATED
     
         #Create account and check status
-        self.request('PUT', cmppath2, body=bodycreateaccount2, headers=cmpheaders)
+        self.request('PUT', self.cmppath2, body=bodycreateaccount2, headers=self.cmpheaders)
         self.checkStatus(201) # 201 ACCOUNT CREATED    
+        
+    def recurringRun(self):
     
         #Add auth to global headers
-        authheaders1 = self.headerAddAuth("cosmo-ticketTestAccount", "cosmo-ticket")
-        authheaders2 = self.headerAddAuth("cosmo-ticketTestAccount2", "cosmo-ticket")
+        authheaders1 = self.headerAddAuth("cosmo-ticketTestAccount%s" % self.appendUser, "cosmo-ticket")
+        authheaders2 = self.headerAddAuth("cosmo-ticketTestAccount%s2" % self.appendUser, "cosmo-ticket")
         
         f = open('files/rTicket.xml')
         rTicket = f.read()
@@ -60,8 +65,8 @@ class CosmoTicket(DAVTest):
         badNSTicket = f.read() 
         
         #Create Calendar on CalDAV server   
-        home1 = self.pathBuilder('/home/cosmo-ticketTestAccount/')
-        home2 = self.pathBuilder('/home/cosmo-ticketTestAccount2/')
+        home1 = self.pathBuilder('/home/cosmo-ticketTestAccount%s/' % self.appendUser)
+        home2 = self.pathBuilder('/home/cosmo-ticketTestAccount%s2/' % self.appendUser)
     
         # -------- MKTICKET Test
 
@@ -261,8 +266,8 @@ class CosmoTicket(DAVTest):
     def timeoutRun(self):
         
         #Add auth to global headers
-        authheaders1 = self.headerAddAuth("cosmo-ticketTestAccount", "cosmo-ticket")
-        authheaders2 = self.headerAddAuth("cosmo-ticketTestAccount2", "cosmo-ticket")
+        authheaders1 = self.headerAddAuth("cosmo-ticketTestAccount%s" % self.appendUser, "cosmo-ticket")
+        authheaders2 = self.headerAddAuth("cosmo-ticketTestAccount%s2" % self.appendUser, "cosmo-ticket")
         
         rTicket = '<?xml version="1.0" encoding="UTF-8"?> \
                    <X:ticketinfo xmlns:D="DAV:" xmlns:X="http://www.xythos.com/namespaces/StorageServer"> \
@@ -282,8 +287,8 @@ class CosmoTicket(DAVTest):
                     </X:ticketinfo>'     
         
         #Create Calendar on CalDAV server   
-        home1 = self.pathBuilder('/home/cosmo-ticketTestAccount/')
-        home2 = self.pathBuilder('/home/cosmo-ticketTestAccount2/')
+        home1 = self.pathBuilder('/home/cosmo-ticketTestAccount%s/' % self.appendUser)
+        home2 = self.pathBuilder('/home/cosmo-ticketTestAccount%s2/' % self.appendUser)
 
         self.testStart('Timeout test cases must be run last, startRun must be run first')
         

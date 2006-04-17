@@ -2,7 +2,7 @@
 
 class TestObject:
     
-    def __init__(self, debug=0, mask=0, recurrence=1, appendVar='', printAppend='', threadNum=None):
+    def __init__(self, debug=0, mask=0, recurrence=1, appendVar='', printAppend='', appendDict={}, appendList=[], threadNum=None):
         
         self.debug = debug
         self.mask = mask
@@ -13,6 +13,9 @@ class TestObject:
         self.appendVar = str(appendVar)
         self.printAppend = printAppend
         self.threadNum = threadNum
+        self.appendDict = appendDict
+        self.appendList = appendList
+        # ctype=xml
 
     def printOut(self, string):
         
@@ -56,8 +59,10 @@ class TestObject:
     def fullRun(self):
         
         self.startRun()
-        if self.recurringRun:
+        try:
             self.runRecurring()
+        except AttributeError:
+            pass
         self.end()
             
     

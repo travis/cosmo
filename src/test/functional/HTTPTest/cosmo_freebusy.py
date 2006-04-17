@@ -9,22 +9,27 @@ class CosmoFreeBusy(DAVTest):
         #Create Headers for CMP
         
         # ------- Test Create Account ------- #
+        
+        try:
+            self.appendUser = self.appendDict['username']
+        except KeyError:
+            self.appendUser = ''
            
         cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
         cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathBuilder('/cmp/user/cosmo-freebusyTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-freebusyTestAccount%s' % self.appendUser)
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
-                                 <username>cosmo-freebusyTestAccount</username> \
+                                 <username>cosmo-freebusyTestAccount%s</username> \
                                  <password>cosmo-freebusy</password> \
                                  <firstName>cosmo-freebusy</firstName> \
                                  <lastName>TestAccount</lastName> \
-                                 <email>cosmo-freebusyTestAccount@osafoundation.org</email> \
-                                 </user>'
+                                 <email>cosmo-freebusyTestAccount%s@osafoundation.org</email> \
+                                 </user>' % (self.appendUser, self.appendUser)
                                  
         #Create account and check status
         self.request('PUT', cmppath, body=bodycreateaccount, headers=cmpheaders)
@@ -33,24 +38,24 @@ class CosmoFreeBusy(DAVTest):
         # ------- Test Create Calendar ------- #
         
         #Add auth to global headers
-        self.headers = self.headerAddAuth("cosmo-freebusyTestAccount", "cosmo-freebusy")
+        self.headers = self.headerAddAuth("cosmo-freebusyTestAccount%s" % self.appendUser, "cosmo-freebusy")
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathBuilder('/home/cosmo-freebusyTestAccount/calendar/')
-        self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
+        self.calpath = self.pathBuilder('/home/cosmo-freebusyTestAccount%s/calendar/' % self.appendUser)
+        self.request('MKCALENDAR', self.calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
         # ------- Test Creation of events view ICS ------- #
         
         #Construct headers & body
         puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount/calendar/1.ics')
-        put2icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount/calendar/2.ics')
-        put3icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount/calendar/3.ics')
-        put4icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount/calendar/4.ics')    
-        put5icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount/calendar/5.ics')
-        put6icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount/calendar/6.ics')
-        put7icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount/calendar/7.ics') 
+        put1icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount%s/calendar/1.ics' % self.appendUser)
+        put2icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount%s/calendar/2.ics' % self.appendUser)
+        put3icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount%s/calendar/3.ics' % self.appendUser)
+        put4icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount%s/calendar/4.ics' % self.appendUser)    
+        put5icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount%s/calendar/5.ics' % self.appendUser)
+        put6icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount%s/calendar/6.ics' % self.appendUser)
+        put7icspath = self.pathBuilder('/home/cosmo-freebusyTestAccount%s/calendar/7.ics' % self.appendUser) 
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")
@@ -81,12 +86,14 @@ class CosmoFreeBusy(DAVTest):
         self.request('PUT', put7icspath, body=put7icsbody, headers=puticsheaders)
         self.checkStatus(201)
         
+    def recurringRun(self):
+        
         # ------- Test 1.xml : REPORT query freebusy time-range start="20060101T000000Z" end="20060105T000000Z" ---------- #
         
         #Setup request 
         f = open('files/reports/freebusy/1.xml')
         report1body = f.read()
-        self.request('REPORT', calpath, body=report1body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report1body, headers=self.headers)
         self.checkStatus(207)
             
         vcalitems = ['FREEBUSY:', '20060101T150000Z/20060101T160000Z', '20060101T180000Z/20060101T190000Z',

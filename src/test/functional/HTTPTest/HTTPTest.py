@@ -7,11 +7,11 @@ from TestObject import TestObject
 
 class HTTPTest(TestObject):
     
-    def __init__(self, host, port, path, debug=0, headers=None, tls=False, mask=0, recurrence=1, appendVar='', printAppend='', threadNum=None):
+    def __init__(self, host, port, path, debug=0, headers=None, tls=False, mask=0, recurrence=1, appendDict={}, appendList=[], appendVar='', printAppend='', threadNum=None):
         
         self.debug = debug
         self.mask = mask
-        TestObject.__init__(self, debug=debug, mask=mask, recurrence=recurrence, appendVar=appendVar, printAppend=printAppend, threadNum=threadNum)
+        TestObject.__init__(self, debug=debug, mask=mask, recurrence=recurrence, appendVar=appendVar, printAppend=printAppend, threadNum=threadNum, appendDict=appendDict, appendList=appendList)
         
         if headers is None:
             self.headers = {'Host' : "localhost:8080",

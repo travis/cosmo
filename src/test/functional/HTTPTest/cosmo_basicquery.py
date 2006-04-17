@@ -4,29 +4,30 @@ class CosmoBasicQuery(DAVTest):
     
     def startRun(self):
         
-        #Set Headers and paths
-        
-        #Create Headers for CMP
-        
         # ------- Test Create Account ------- #
         
         self.testStart('Setup Accounts')
+        
+        try:
+            self.appendUser = self.appendDict['username']
+        except KeyError:
+            self.appendUser = ''
            
         cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
         cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathBuilder('/cmp/user/cosmo-basicqueryTestAccount%s' % self.appendVar)
+        cmppath = self.pathBuilder('/cmp/user/cosmo-basicqueryTestAccount%s' % self.appendUser)
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
                                  <username>cosmo-basicqueryTestAccount%s</username> \
                                  <password>cosmo-basicquery</password> \
-                                 <firstName>cosmo-basicquery%s</firstName> \
+                                 <firstName>cosmo-basicquery</firstName> \
                                  <lastName>TestAccount</lastName> \
                                  <email>cosmo-basicqueryTestAccount%s@osafoundation.org</email> \
-                                 </user>' % (self.appendVar, self.appendVar, self.appendVar)
+                                 </user>' % (self.appendUser, self.appendUser)
                                  
         #Create account and check status
         self.request('PUT', cmppath, body=bodycreateaccount, headers=cmpheaders)
@@ -35,10 +36,10 @@ class CosmoBasicQuery(DAVTest):
         # ------- Test Create Calendar ------- #
         
         #Add auth to global headers
-        self.headers = self.headerAddAuth("cosmo-basicqueryTestAccount%s" % self.appendVar, "cosmo-basicquery")
+        self.headers = self.headerAddAuth("cosmo-basicqueryTestAccount%s" % self.appendUser, "cosmo-basicquery")
         
         #Create Calendar on CalDAV server   
-        self.calpath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/' % self.appendVar)
+        self.calpath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/' % self.appendUser)
         self.request('MKCALENDAR', self.calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
@@ -46,13 +47,13 @@ class CosmoBasicQuery(DAVTest):
         
         #Construct headers & body
         puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/1.ics' % self.appendVar)
-        put2icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/2.ics' % self.appendVar)
-        put3icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/3.ics' % self.appendVar)
-        put4icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/4.ics' % self.appendVar)    
-        put5icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/5.ics' % self.appendVar)
-        put6icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/6.ics' % self.appendVar)
-        put7icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/7.ics' % self.appendVar) 
+        put1icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/1.ics' % self.appendUser)
+        put2icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/2.ics' % self.appendUser)
+        put3icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/3.ics' % self.appendUser)
+        put4icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/4.ics' % self.appendUser)    
+        put5icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/5.ics' % self.appendUser)
+        put6icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/6.ics' % self.appendUser)
+        put7icspath = self.pathBuilder('/home/cosmo-basicqueryTestAccount%s/calendar/7.ics' % self.appendUser) 
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")

@@ -8,23 +8,28 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         
         #Create Headers for CMP
         
+        try:
+            self.appendUser = self.appendDict['username']
+        except KeyErro:
+            self.appendUser = ''
+        
         # ------- Test Create Account ------- #
            
         cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
         cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathBuilder('/cmp/user/cosmo-chandler061TestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-chandler061TestAccount%s' % self.appendUser)
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
-                                 <username>cosmo-chandler061TestAccount</username> \
+                                 <username>cosmo-chandler061TestAccount%s</username> \
                                  <password>chandler061</password> \
                                  <firstName>cosmo-chandler061</firstName> \
                                  <lastName>TestAccount</lastName> \
-                                 <email>cosmo-chandler061TestAccount@osafoundation.org</email> \
-                                 </user>'
+                                 <email>cosmo-chandler061TestAccount%s@osafoundation.org</email> \
+                                 </user>' % (self.appendUser, self.appendUser)
                                  
         #Create account and check status
         self.request('PUT', cmppath, body=bodycreateaccount, headers=cmpheaders)
@@ -32,9 +37,9 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         print self.test_response.read()
 
         #Add auth to global headers
-        self.headers = self.headerAddAuth("cosmo-chandler061TestAccount", "chandler061")
+        self.headers = self.headerAddAuth("cosmo-chandler061TestAccount%s" % self.appendUser, "chandler061")
         
-        homepath = self.pathBuilder('/home/cosmo-chandler061TestAccount/')
+        homepath = self.pathBuilder('/home/cosmo-chandler061TestAccount%s/' % self.appendUser)
         
         # ------- Begin Emulation of TestSharing.py
         
@@ -57,7 +62,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         self.checkStatus(207)
 
         self.testStart(' OPTIONS Request for /cosmo/home/test/test_s_calendar')
-        calpath = self.pathBuilder('/home/cosmo-chandler061TestAccount/test_s_calendar/')
+        calpath = self.pathBuilder('/home/cosmo-chandler061TestAccount%s/test_s_calendar/' % self.appendUser)
         self.request('OPTIONS', calpath, None, self.headers)
         self.checkStatus(200)
         
@@ -97,7 +102,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         #print self.test_response.read()
         
         self.testStart('OPTIONS Request for /cosmo/home/test/test_s_calendar/.chandler/')
-        dotchandlerpath = self.pathBuilder('/home/cosmo-chandler061TestAccount/test_s_calendar/.chandler')
+        dotchandlerpath = self.pathBuilder('/home/cosmo-chandler061TestAccount%s/test_s_calendar/.chandler' % self.appendUser)
         self.request('OPTIONS', dotchandlerpath, None, self.headers)
         self.checkStatus(200)
         
@@ -121,14 +126,14 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         f = open('files/chandler/412ad108-c6bd-11da-c95e-001124e4b0d2.xml')
         putheaders = self.headerAdd({'Content-Type' : 'text/plain'})        
         putxmlbody = f.read()
-        putxmlpath = self.pathBuilder('/home/cosmo-chandler061TestAccount/test_s_calendar/.chandler/412ad108-c6bd-11da-c95e-001124e4b0d2.xml')
+        putxmlpath = self.pathBuilder('/home/cosmo-chandler061TestAccount%s/test_s_calendar/.chandler/412ad108-c6bd-11da-c95e-001124e4b0d2.xml' % self.appendUser)
         self.request('PUT', putxmlpath, putxmlbody, putheaders)
         self.checkStatus(201)
         
         self.testStart('PUT Request for /cosmo/home/test/test_s_calendar/.chandler/share.xml')
         f = open('files/chandler/chandler_0.6.1_share.xml')
         putxmlbody = f.read()
-        putxmlpath = self.pathBuilder('/home/cosmo-chandler061TestAccount/test_s_calendar/.chandler/share.xml')
+        putxmlpath = self.pathBuilder('/home/cosmo-chandler061TestAccount%s/test_s_calendar/.chandler/share.xml' % self.appendUser)
         self.request('PUT', putxmlpath, putxmlbody, putheaders)
         self.checkStatus(201)
         
@@ -140,7 +145,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         f = open('files/chandler/412ad108-c6bd-11da-c95e-001124e4b0d2.ics')
         puticsbody = f.read()
         putheaders = self.headerAdd({'Content-Type': 'text/calendar'})
-        puticspath = self.pathBuilder('/home/cosmo-chandler061TestAccount/test_s_calendar/412ad108-c6bd-11da-c95e-001124e4b0d2.ics')
+        puticspath = self.pathBuilder('/home/cosmo-chandler061TestAccount%s/test_s_calendar/412ad108-c6bd-11da-c95e-001124e4b0d2.ics' % self.appendUser)
         self.request('PUT', puticspath, puticsbody, putheaders)
         self.checkStatus(201)
         

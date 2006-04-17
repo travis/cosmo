@@ -4,9 +4,12 @@ class CosmoInvalid(HTTPTest):
     
     def startRun(self):
         
-        #Set Headers and paths
+        self.testStart('Setup Accounts')
         
-        #Create Headers for CMP
+        try:
+            self.appendUser = self.appendDict['username']
+        except KeyError:
+            self.appendUser = ''
         
         # ------- Test Create Account ------- #
            
@@ -14,17 +17,17 @@ class CosmoInvalid(HTTPTest):
         cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathBuilder('/cmp/user/cosmo-invalidTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-invalidTestAccount%s' % self.appendUser)
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
-                                 <username>cosmo-invalidTestAccount</username> \
+                                 <username>cosmo-invalidTestAccount%s</username> \
                                  <password>cosmo-invalid</password> \
                                  <firstName>cosmo-invalid</firstName> \
                                  <lastName>TestAccount</lastName> \
-                                 <email>cosmo-invalidTestAccount@osafoundation.org</email> \
-                                 </user>'
+                                 <email>cosmo-invalidTestAccount%s@osafoundation.org</email> \
+                                 </user>' % (self.appendUser, self.appendUser)
                                  
         #Create account and check status
         self.request('PUT', cmppath, body=bodycreateaccount, headers=cmpheaders)
@@ -33,10 +36,10 @@ class CosmoInvalid(HTTPTest):
         # ------- Test Create Calendar ------- #
         
         #Add auth to global headers
-        self.headers = self.headerAddAuth("cosmo-invalidTestAccount", "cosmo-invalid")
+        self.headers = self.headerAddAuth("cosmo-invalidTestAccount%s" % self.appendUser, "cosmo-invalid")
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/')
+        calpath = self.pathBuilder('/home/cosmo-invalidTestAccount%s/calendar/' % self.appendUser)
         self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
@@ -44,13 +47,13 @@ class CosmoInvalid(HTTPTest):
         
         #Construct headers & body
         puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/1.ics')
-        put2icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/2.ics')
-        put3icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/3.ics')
-        put4icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/4.ics')    
-        put5icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/5.ics')
-        put6icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/6.ics')
-        put7icspath = self.pathBuilder('/home/cosmo-invalidTestAccount/calendar/7.ics') 
+        put1icspath = self.pathBuilder('/home/cosmo-invalidTestAccount%s/calendar/1.ics' % self.appendUser)
+        put2icspath = self.pathBuilder('/home/cosmo-invalidTestAccount%s/calendar/2.ics' % self.appendUser)
+        put3icspath = self.pathBuilder('/home/cosmo-invalidTestAccount%s/calendar/3.ics' % self.appendUser)
+        put4icspath = self.pathBuilder('/home/cosmo-invalidTestAccount%s/calendar/4.ics' % self.appendUser)    
+        put5icspath = self.pathBuilder('/home/cosmo-invalidTestAccount%s/calendar/5.ics' % self.appendUser)
+        put6icspath = self.pathBuilder('/home/cosmo-invalidTestAccount%s/calendar/6.ics' % self.appendUser)
+        put7icspath = self.pathBuilder('/home/cosmo-invalidTestAccount%s/calendar/7.ics' % self.appendUser) 
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")

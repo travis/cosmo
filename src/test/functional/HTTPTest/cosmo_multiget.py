@@ -4,27 +4,30 @@ class CosmoMultiget(DAVTest):
     
     def startRun(self):
         
-        #Set Headers and paths
+        self.testStart('Setup Accounts')
         
-        #Create Headers for CMP
-        
+        try:
+            self.appendUser = self.appendDict['username']
+        except KeyError:
+            self.appendUser = ''
+            
         # ------- Test Create Account ------- #
            
         cmpheaders = self.headerAdd({'Content-Type' : "text/xml; charset=UTF-8"})
         cmpheaders = self.headerAddAuth("root", "cosmo", headers=cmpheaders)
            
         #CMP path
-        cmppath = self.pathBuilder('/cmp/user/cosmo-multigetTestAccount')
+        cmppath = self.pathBuilder('/cmp/user/cosmo-multigetTestAccount%s' % self.appendUser)
         
         #Create testing account        
         bodycreateaccount = '<?xml version="1.0" encoding="utf-8" ?> \
                                  <user xmlns="http://osafoundation.org/cosmo/CMP"> \
-                                 <username>cosmo-multigetTestAccount</username> \
+                                 <username>cosmo-multigetTestAccount%s</username> \
                                  <password>cosmo-multiget</password> \
                                  <firstName>cosmo-multiget</firstName> \
                                  <lastName>TestAccount</lastName> \
-                                 <email>cosmo-multigetTestAccount@osafoundation.org</email> \
-                                 </user>'
+                                 <email>cosmo-multigetTestAccount%s@osafoundation.org</email> \
+                                 </user>' % (self.appendUser, self.appendUser)
                                  
         #Create account and check status
         self.request('PUT', cmppath, body=bodycreateaccount, headers=cmpheaders)
@@ -33,21 +36,21 @@ class CosmoMultiget(DAVTest):
         # ------- Test Create Calendar ------- #
         
         #Add auth to global headers
-        self.headers = self.headerAddAuth("cosmo-multigetTestAccount", "cosmo-multiget")
+        self.headers = self.headerAddAuth("cosmo-multigetTestAccount%s" % self.appendUser, "cosmo-multiget")
         
         #Create Calendar on CalDAV server   
-        calpath = self.pathBuilder('/home/cosmo-multigetTestAccount/calendar/')
-        self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
+        self.calpath = self.pathBuilder('/home/cosmo-multigetTestAccount%s/calendar/' % self.appendUser)
+        self.request('MKCALENDAR', self.calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
         # ------- Test Creation of events view ICS ------- #
         
         #Construct headers & body
         puticsheaders = self.headerAdd({'Content-Type' : 'text/calendar'})      
-        put1icspath = self.pathBuilder('/home/cosmo-multigetTestAccount/calendar/1.ics')
-        put2icspath = self.pathBuilder('/home/cosmo-multigetTestAccount/calendar/2.ics')
-        put3icspath = self.pathBuilder('/home/cosmo-multigetTestAccount/calendar/3.ics')
-        put4icspath = self.pathBuilder('/home/cosmo-multigetTestAccount/calendar/4.ics')        
+        put1icspath = self.pathBuilder('/home/cosmo-multigetTestAccount%s/calendar/1.ics' % self.appendUser)
+        put2icspath = self.pathBuilder('/home/cosmo-multigetTestAccount%s/calendar/2.ics' % self.appendUser)
+        put3icspath = self.pathBuilder('/home/cosmo-multigetTestAccount%s/calendar/3.ics' % self.appendUser)
+        put4icspath = self.pathBuilder('/home/cosmo-multigetTestAccount%s/calendar/4.ics' % self.appendUser)        
         f = open("files/reports/put/1.ics")
         put1icsbody = f.read()
         f = open("files/reports/put/2.ics")
@@ -67,6 +70,8 @@ class CosmoMultiget(DAVTest):
         self.request('PUT', put4icspath, body=put4icsbody, headers=puticsheaders)
         self.checkStatus(201)
         
+    def recurringRun(self):
+        
         # ------- Test 1.xml : basic VEVENT, summary "event 1" (tzid=US/Eastern) ------- #
         
         self.testStart('Test 1.xml : basic VEVENT, summary "event 1" (tzid=US/Eastern)')
@@ -74,7 +79,7 @@ class CosmoMultiget(DAVTest):
         #Setup request 
         f = open('files/reports/multiget/1.xml')
         report1body = f.read()
-        self.request('REPORT', calpath, body=report1body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report1body, headers=self.headers)
         self.checkStatus(207)
         
         #Verify correct items in response
@@ -93,7 +98,7 @@ class CosmoMultiget(DAVTest):
         #Setup request 
         f = open('files/reports/multiget/2.xml')
         report2body = f.read()
-        self.request('REPORT', calpath, body=report2body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report2body, headers=self.headers)
         self.checkStatus(207)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN', 'VERSION:2.0', 'END:VCALENDAR']
@@ -108,7 +113,7 @@ class CosmoMultiget(DAVTest):
         #Setup request 
         f = open('files/reports/multiget/3.xml')
         report3body = f.read()
-        self.request('REPORT', calpath, body=report3body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report3body, headers=self.headers)
         self.checkStatus(207)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -128,7 +133,7 @@ class CosmoMultiget(DAVTest):
         #Setup request 
         f = open('files/reports/multiget/4.xml')
         report4body = f.read()
-        self.request('REPORT', calpath, body=report4body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report4body, headers=self.headers)
         self.checkStatus(207)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -151,7 +156,7 @@ class CosmoMultiget(DAVTest):
         
         f = open('files/reports/multiget/5.xml')
         report5body = f.read()
-        self.request('REPORT', calpath, body=report5body, headers=self.headers)
+        self.request('REPORT', self.calpath, body=report5body, headers=self.headers)
         self.checkStatus(207)
         
         vcalitems = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',

@@ -85,6 +85,12 @@ public class MigratorClient {
 
     /**
      */
+    public boolean isStarted() {
+        return started;
+    }
+
+    /**
+     */
     public String getConfig() {
         return config;
     }

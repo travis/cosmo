@@ -187,6 +187,73 @@ public class Migrator {
         return migrator;
     }
 
+    int doMigration() {
+        int rc = RC_OK;
+
+        try {
+            sourceClient.start();
+        } catch (MigrationException e) {
+            System.err.println("Could not start source repository: ");
+            e.printStackTrace();
+            rc = RC_ERR_START_SOURCE;
+        }
+
+        if (rc == RC_OK) {
+            try {
+                targetClient.start();
+            } catch (MigrationException e) {
+                System.err.println("Could not start target repository: ");
+                e.printStackTrace();
+                rc = RC_ERR_START_TARGET;
+            }
+        }
+
+        if (rc == RC_OK) {
+            Migration03 migration = new Migration03();
+
+            try {
+                migration.init();
+            } catch (MigrationException e) {
+                System.err.println("Could not initialize migration:");
+                e.printStackTrace();
+                rc = RC_ERR_MIGRATION_INIT;
+            }
+
+            // down migration not supported by Migration03
+
+            if (rc == RC_OK) {
+                try {
+                    migration.up(sourceClient.getSession(),
+                                 targetClient.getSession());
+                } catch (MigrationException e) {
+                    System.err.println("Could not perform up migration:");
+                    e.printStackTrace();
+                    rc = RC_ERR_MIGRATION_UP;
+                }
+            }
+        }
+
+        if (targetClient.isStarted()) {
+            try {
+                targetClient.stop();
+            } catch (MigrationException e) {
+                System.err.println("Could not stop target repository:");
+                e.printStackTrace();
+            }
+        }
+
+        if (sourceClient.isStarted()) {
+            try {
+                sourceClient.stop();
+            } catch (MigrationException e) {
+                System.err.println("Could not stop source repository:");
+                e.printStackTrace();
+            }
+        }
+
+        return rc;
+    }
+
     /**
      * Processes command line args, access the source and target
      * repositories, finds all migrations and executes them.
@@ -205,7 +272,8 @@ public class Migrator {
         try {
             cl = processCommandLine(args);
         } catch (ParseException e) {
-            log.fatal("Failure parsing command line: " + e.getMessage());
+            System.err.println("Failure parsing command line: ");
+            e.printStackTrace();
             System.exit(RC_ERR_CLI);
         }
         if (cl == null) {
@@ -213,50 +281,8 @@ public class Migrator {
         }
 
         Migrator migrator = createMigrator(cl);
+        int rc = migrator.doMigration();
 
-        try {
-            migrator.getSourceClient().start();
-        } catch (MigrationException e) {
-            log.fatal("Could not start source repository", e);
-            System.exit(RC_ERR_START_SOURCE);
-        }
-
-        try {
-            migrator.getTargetClient().start();
-        } catch (MigrationException e) {
-            log.fatal("Could not start target repository", e);
-            System.exit(RC_ERR_START_TARGET);
-        }
-
-        Migration03 migration = new Migration03();
-
-        try {
-            migration.init();
-        } catch (MigrationException e) {
-            log.fatal("Could not initialize migration", e);
-            System.exit(RC_ERR_MIGRATION_INIT);
-        }
-
-        // down migration not supported by Migration03
-
-        try {
-            migration.up(migrator.getSourceClient().getSession(),
-                         migrator.getTargetClient().getSession());
-        } catch (MigrationException e) {
-            log.fatal("Could not perform up migration", e);
-            System.exit(RC_ERR_MIGRATION_UP);
-        }
-
-        try {
-            migrator.getTargetClient().stop();
-        } catch (MigrationException e) {
-            log.warn("Could not stop target repository");
-        }
-
-        try {
-            migrator.getSourceClient().stop();
-        } catch (MigrationException e) {
-            log.warn("Could not stop source repository");
-        }
+        System.exit(rc);
     }
 }

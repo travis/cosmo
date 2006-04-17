@@ -174,6 +174,7 @@ public class Migration03 extends CopyBasedMigration {
         if (url == null) {
             throw new MigrationException("System property " + SYSPROP_USERDB_URL + " not found");
         }
+        url = "jdbc:hsqldb:file:" + url;
 
         System.out.println("Connecting to " + url);
         try {

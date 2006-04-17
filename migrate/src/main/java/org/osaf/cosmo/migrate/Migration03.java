@@ -191,16 +191,27 @@ public class Migration03 extends CopyBasedMigration {
     public void up(Session previous,
                    Session current)
         throws MigrationException {
-        // XXX check for schema version.
-        // if it exists and is 0.3, don't register namespaces and node
-        // types
-        // if it exists and is not 0.3, throw an error (there was no
-        // schema version in the repo prior to 0.3)
+        String schemaVersion = readSchemaVersion(current);
+        if (schemaVersion != null) {
+            // the schema version has previously been written into the
+            // current repository, which implies that the tool has
+            // been run on it at least once already.
 
-        registerNamespaces(previous, current);
-        registerNodeTypes(current);
-
-        // XXX write schema version
+            // doublecheck the written schema version. we can only run
+            // against our own version
+            if (! getVersion().equals(schemaVersion)) {
+                throw new MigrationException("target repository is of unsupported version " + schemaVersion);
+            }
+        }
+        else {
+            // initialize the repository metadata. register all
+            // namespaces and node types before writing the schema
+            // version so that subsequent runs know to skip
+            // registration of the schema version is set.
+            registerNamespaces(previous, current);
+            registerNodeTypes(current);
+            writeSchemaVersion(current);
+        }
 
         Map overlord = loadOverlord();
         Map users = loadUsers();
@@ -272,6 +283,37 @@ public class Migration03 extends CopyBasedMigration {
     }
 
     // package protected methods, for individuable testability
+
+    String readSchemaVersion(Session current)
+        throws MigrationException {
+        try {
+            if (current.itemExists("/cosmo:system/cosmo:schema/cosmo:schemaVersion")) {
+                Property schemaVersion =
+                    (Property) current.getItem("/cosmo:system/cosmo:schema/cosmo:schemaVersion");
+                return schemaVersion.getString();
+            }
+            return null;
+        } catch (RepositoryException e) {
+            throw new MigrationException("Cannot read schema version", e);
+        }
+    }
+
+    void writeSchemaVersion(Session current)
+        throws MigrationException {
+        try {
+            Node rootNode = current.getRootNode();
+            Node cosmoSystemNode = rootNode.hasNode("cosmo:system") ?
+                rootNode.getNode("cosmo:system") :
+                rootNode.addNode("cosmo:system", "nt:unstructured");
+            Node schemaNode = cosmoSystemNode.hasNode("cosmo:schema") ?
+                cosmoSystemNode.getNode("cosmo:schema") :
+                cosmoSystemNode.addNode("cosmo:schema", "nt:unstructured");
+            schemaNode.setProperty("cosmo:schemaVersion", getVersion());
+            current.save();
+        } catch (RepositoryException e) {
+            throw new MigrationException("Cannot write schema version", e);
+        }
+    }
 
     Map loadOverlord()
         throws MigrationException {

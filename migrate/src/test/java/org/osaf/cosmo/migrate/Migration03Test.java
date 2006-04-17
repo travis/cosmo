@@ -155,6 +155,44 @@ public class Migration03Test extends TestCase {
 
     /**
      */
+    public void testReadNoSchemaVersion() throws Exception {
+        String version = migration.readSchemaVersion(current);
+        assertNull("found schema version" + version +
+                   " where none was expected", version);
+    }
+
+    /**
+     */
+    public void testReadSchemaVersion() throws Exception {
+        Node cosmoSystemNode = current.getRootNode().
+            addNode("cosmo:system", "nt:unstructured");
+        Node schemaNode = cosmoSystemNode.
+            addNode("cosmo:schema", "nt:unstructured");
+        schemaNode.setProperty("cosmo:schemaVersion", "0.3");
+
+        String version = migration.readSchemaVersion(current);
+        assertNotNull("no schema version found", version);
+        assertEquals("schema version not 0.3", "0.3", version);
+
+        current.refresh(false);
+    }
+
+    /**
+     */
+    public void testWriteSchemaVersion() throws Exception {
+        migration.writeSchemaVersion(current);
+
+        assertTrue("no schema version property found",
+                   current.itemExists("/cosmo:system/cosmo:schema/cosmo:schemaVersion"));
+        Property version = (Property)
+            current.getItem("/cosmo:system/cosmo:schema/cosmo:schemaVersion");
+        assertEquals("schema version not 0.3", "0.3", version.getString());
+
+        current.refresh(false);
+    }
+
+    /**
+     */
     public void testLoadOverlord() throws Exception {
         Map overlord = migration.loadOverlord();
         assertNotNull(overlord);
@@ -286,6 +324,8 @@ public class Migration03Test extends TestCase {
                    readmeContent.hasProperty("jcr:mimeType"));
         assertTrue("content node does not have property jcr:lastModified",
                    readmeContent.hasProperty("jcr:lastModified"));
+
+        current.refresh(false);
    }
 
     private Map loadOldUser(int id)
@@ -294,7 +334,7 @@ public class Migration03Test extends TestCase {
         ResultSet rs = st.executeQuery("select username, password, firstName, lastName, email, dateCreated, dateModified from user where id = " + new Integer(id));
         rs.next();
  
-       HashMap user = new HashMap();
+        HashMap user = new HashMap();
         user.put("username", rs.getString("username"));
         user.put("password", rs.getString("password"));
         user.put("firstname", rs.getString("firstName"));

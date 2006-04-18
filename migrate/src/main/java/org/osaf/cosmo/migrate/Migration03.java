@@ -38,6 +38,7 @@ import javax.jcr.Session;
 import javax.jcr.Value;
 import javax.jcr.ValueFactory;
 import javax.jcr.nodetype.NodeType;
+import javax.jcr.nodetype.NoSuchNodeTypeException;
 
 import org.apache.jackrabbit.core.nodetype.NodeTypeManagerImpl;
 import org.apache.jackrabbit.util.HexEscaper;
@@ -123,6 +124,9 @@ public class Migration03 extends CopyBasedMigration {
             // custom namespaces
             String[] prevPrefixes = prevRegistry.getPrefixes();
             for (int i=0; i<prevPrefixes.length; i++) {
+                if ("caldav".equals(prevPrefixes[i])) {
+                    continue;
+                }
                 registerNamespace(prevRegistry, curRegistry, prevPrefixes[i]);
             }
         } catch (RepositoryException e) {
@@ -143,15 +147,27 @@ public class Migration03 extends CopyBasedMigration {
      */
     public static void registerNodeTypes(Session current)
         throws MigrationException {
+        NodeTypeManagerImpl mgr = null;
+        try {
+            mgr = (NodeTypeManagerImpl)
+                current.getWorkspace().getNodeTypeManager();
+            NodeType test = mgr.getNodeType("cosmo:user");
+            // custom node types are already registered, so bail out
+            return;
+        } catch (NoSuchNodeTypeException e) {
+            // expected when custom node types have not yet been registered
+        } catch (RepositoryException e) {
+            throw new MigrationException("unable to check for custom node type", e);
+        }
+
         InputStream in = null;
         in = Migration03.class.getClassLoader().
             getResourceAsStream(RESOURCE_NODETYPES);
         if (in == null) {
             throw new MigrationException("nodetype resource " + RESOURCE_NODETYPES + " not found");
         }
+
         try {
-            NodeTypeManagerImpl mgr = (NodeTypeManagerImpl)
-                current.getWorkspace().getNodeTypeManager();
             mgr.registerNodeTypes(new InputSource(in));
         } catch (Exception e) {
             throw new MigrationException("cannot register node types", e);
@@ -192,12 +208,11 @@ public class Migration03 extends CopyBasedMigration {
     public void up(Session previous,
                    Session current)
         throws MigrationException {
+        registerNamespaces(previous, current);
+        registerNodeTypes(current);
+
         String schemaVersion = readSchemaVersion(current);
         if (schemaVersion != null) {
-            // the schema version has previously been written into the
-            // current repository, which implies that the tool has
-            // been run on it at least once already.
-
             // doublecheck the written schema version. we can only run
             // against our own version
             if (! getVersion().equals(schemaVersion)) {
@@ -205,12 +220,6 @@ public class Migration03 extends CopyBasedMigration {
             }
         }
         else {
-            // initialize the repository metadata. register all
-            // namespaces and node types before writing the schema
-            // version so that subsequent runs know to skip
-            // registration of the schema version is set.
-            registerNamespaces(previous, current);
-            registerNodeTypes(current);
             writeSchemaVersion(current);
         }
 
@@ -429,23 +438,21 @@ public class Migration03 extends CopyBasedMigration {
                                           String prefix,
                                           String uri)
         throws RepositoryException {
-        System.out.println("Registering namespace " + prefix + ": " + uri);
-        curRegistry.registerNamespace(prefix, uri);
+        try {
+            curRegistry.getURI(prefix);
+        } catch (NamespaceException e) {
+            // namespace prefix is not registered in the current
+            // repository, so register it
+            System.out.println("Registering prefix " + prefix + ": " + uri);
+            curRegistry.registerNamespace(prefix, uri);
+        }
     }
 
     private static void registerNamespace(NamespaceRegistry prevRegistry,
                                           NamespaceRegistry curRegistry,
                                           String prefix)
         throws RepositoryException {
-        try {
-            curRegistry.getURI(prefix);
-        } catch (NamespaceException e) {
-            // namespace prefix is not registered in the current
-            // repository, so register it
-            String uri = prevRegistry.getURI(prefix);
-            System.out.println("Registering prefix " + prefix + ": " + uri);
-            curRegistry.registerNamespace(prefix, uri);
-        }
+        registerNamespace(curRegistry, prefix, prevRegistry.getURI(prefix));
     }
 
     private Map resultSetToUser(ResultSet rs)
@@ -453,8 +460,8 @@ public class Migration03 extends CopyBasedMigration {
         HashMap user = new HashMap();
         user.put("username", rs.getString("username"));
         user.put("password", rs.getString("password"));
-        user.put("firstname", rs.getString("firstName"));
-        user.put("lastname", rs.getString("lastName"));
+        user.put("firstName", rs.getString("firstName"));
+        user.put("lastName", rs.getString("lastName"));
         user.put("email", rs.getString("email"));
         user.put("admin", Boolean.FALSE);
         Calendar created = Calendar.getInstance();
@@ -655,6 +662,9 @@ public class Migration03 extends CopyBasedMigration {
         }
         if ("caldav:uid".equals(original)) {
             return "calendar:uid";
+        }
+        if ("xml:lang".equals(original)) {
+            return "calendar:language";
         }
         return original;
     }

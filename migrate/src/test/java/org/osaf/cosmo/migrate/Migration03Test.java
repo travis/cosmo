@@ -47,7 +47,7 @@ public class Migration03Test extends TestCase {
 
     private static final String DB_DRIVER = "org.hsqldb.jdbcDriver";
     private static final String DB_DIR =
-        "src/test/previous/db";
+        "src/test/previous/db/";
     private static final String DB_URL= "jdbc:hsqldb:file:" + DB_DIR+ "userdb";
     private static final String DB_USERNAME = "sa";
     private static final String DB_PASSWORD = "";

@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.migrate;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.jcr.SimpleCredentials;
 
 import junit.framework.TestCase;
@@ -38,17 +41,19 @@ public class MigratorTest extends TestCase {
     public void testWithRequiredArgs() throws Exception {
         // cl is not null and contains values for all options
         String[] args = {
+            "-db", "sourcedb/",
             "-sourceconfig", "sourcerepo.xml",
             "-sourcedata", "sourcerepo/",
             "-targetconfig", "targetrepo.xml",
             "-targetdata", "targetrepo/",
         };
-        CommandLine cl = Migrator.processCommandLine(args);
-        assertNotNull(cl);
-        assertEquals(cl.getOptionValue("sourceconfig"), "sourcerepo.xml");
-        assertEquals(cl.getOptionValue("sourcedata"), "sourcerepo/");
-        assertEquals(cl.getOptionValue("targetconfig"), "targetrepo.xml");
-        assertEquals(cl.getOptionValue("targetdata"), "targetrepo/");
+        Map params = Migrator.processCommandLine(args);
+        assertNotNull(params);
+        assertEquals((String) params.get("db"), "sourcedb/");
+        assertEquals((String) params.get("sourceconfig"), "sourcerepo.xml");
+        assertEquals((String) params.get("sourcedata"), "sourcerepo/");
+        assertEquals((String) params.get("targetconfig"), "targetrepo.xml");
+        assertEquals((String) params.get("targetdata"), "targetrepo/");
     }
 
     /**
@@ -56,8 +61,8 @@ public class MigratorTest extends TestCase {
     public void testWithoutRequiredArgs() throws Exception {
         // prints usage to stdout
         String[] args = {};
-        CommandLine cl = Migrator.processCommandLine(args);
-        assertNull(cl);
+        Map params = Migrator.processCommandLine(args);
+        assertNull(params);
     }
 
     /**
@@ -65,8 +70,8 @@ public class MigratorTest extends TestCase {
     public void testWithHelpArg() throws Exception {
         // prints usage to stdout
         String[] args = { "-help" };
-        CommandLine cl = Migrator.processCommandLine(args);
-        assertNull(cl);
+        Map params = Migrator.processCommandLine(args);
+        assertNull(params);
     }
 
     /**
@@ -75,40 +80,22 @@ public class MigratorTest extends TestCase {
         // unrecognized args are ignored - since we haven't passed
         // required args, cl will be null
         String[] args = { "deadbeef" };
-        CommandLine cl = Migrator.processCommandLine(args);
-        assertNull(cl);
+        Map params = Migrator.processCommandLine(args);
+        assertNull(params);
     }
 
     /**
      */
     public void testCreateMigrator() throws Exception {
-        // set up a CommandLine
-        Option sourceConfig = OptionBuilder.withArgName("file").hasArg().
-            create("sourceconfig");
-        Option sourceData = OptionBuilder.withArgName("dir").hasArg().
-            create("sourcedata");
-        Option targetConfig = OptionBuilder.withArgName("file").hasArg().
-            create("targetconfig");
-        Option targetData = OptionBuilder.withArgName("dir").hasArg().
-            create("targetdata");
-
-        Options options = new Options();
-        options.addOption(sourceConfig);
-        options.addOption(sourceData);
-        options.addOption(targetConfig);
-        options.addOption(targetData);
-
-        String[] args = {
-            "-sourceconfig", "sourcerepo.xml",
-            "-sourcedata", "sourcerepo/",
-            "-targetconfig", "targetrepo.xml",
-            "-targetdata", "targetrepo/",
-        };
-        CommandLineParser parser = new BasicParser();
-        CommandLine cl = parser.parse(options, args);
+        Map params = new HashMap();
+        params.put("db", "sourcedb/");
+        params.put("sourceconfig", "sourcerepo.xml");
+        params.put("sourcedata", "sourcerepo/");
+        params.put("targetconfig", "targetrepo.xml");
+        params.put("targetdata", "targetrepo/");
 
         // create the migrator and test its clients
-        Migrator migrator = Migrator.createMigrator(cl);
+        Migrator migrator = Migrator.createMigrator(params);
 
         assertNotNull("source client null", migrator.getSourceClient());
         assertEquals(migrator.getSourceClient().getConfig(), "sourcerepo.xml");

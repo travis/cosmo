@@ -298,8 +298,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
                         String text = getNode().
                             getProperty(NP_CALENDAR_DESCRIPTION).
                             getString();
-                        String lang = getNode().getProperty(NP_XML_LANG).
-                            getString();
+                        String lang = getNode().
+                            getProperty(NP_CALENDAR_LANGUAGE).getString();
 
                         if (lang != null)
                             properties.add(new CalendarDescription(text, lang));
@@ -595,7 +595,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             CalendarDescription c = (CalendarDescription) property;
 
             getNode().setProperty(NP_CALENDAR_DESCRIPTION, value);
-            getNode().setProperty(NP_XML_LANG, c.getLanguage());
+            getNode().setProperty(NP_CALENDAR_LANGUAGE, c.getLanguage());
         }
         else if (property instanceof SupportedCalendarComponentSet) {
             Object[] compTypes = ((Set) property.getValue()).toArray();

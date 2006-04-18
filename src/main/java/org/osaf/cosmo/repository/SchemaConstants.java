@@ -63,14 +63,13 @@ public interface SchemaConstants {
     public static final String NP_JCR_ENCODING = "jcr:encoding";
     public static final String NP_JCR_LASTMODIFIED = "jcr:lastModified";
 
-    public static final String NP_XML_LANG = "xml:lang";
-
     public static final String NP_DAV_DISPLAYNAME = "dav:displayname";
     public static final String NP_DAV_CONTENTLANGUAGE =
         "dav:contentlanguage";
 
     public static final String NP_CALENDAR_UID = "calendar:uid";
     public static final String NP_CALENDAR_DESCRIPTION = "calendar:description";
+    public static final String NP_CALENDAR_LANGUAGE = "calendar:language";
     public static final String NP_CALENDAR_TIMEZONE = "calendar:timezone";
     public static final String NP_CALENDAR_SUPPORTED_COMPONENT_SET = "calendar:supportedComponentSet";  
 

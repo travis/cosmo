@@ -205,7 +205,7 @@ public class ResourceMapper implements SchemaConstants {
             node.addMixin(NT_CALENDAR_COLLECTION);
         }
         node.setProperty(NP_CALENDAR_DESCRIPTION, resource.getDescription());
-        node.setProperty(NP_XML_LANG, resource.getLanguage());
+        node.setProperty(NP_CALENDAR_LANGUAGE, resource.getLanguage());
 
         if (resource.hasTimezone())
             node.setProperty(NP_CALENDAR_TIMEZONE, resource.getTimezone().toString());
@@ -425,8 +425,8 @@ public class ResourceMapper implements SchemaConstants {
                                       getProperty(NP_CALENDAR_DESCRIPTION).
                                       getString());
         }
-        if (node.hasProperty(NP_XML_LANG)) {
-            collection.setLanguage(node.getProperty(NP_XML_LANG).getString());
+        if (node.hasProperty(NP_CALENDAR_LANGUAGE)) {
+            collection.setLanguage(node.getProperty(NP_CALENDAR_LANGUAGE).getString());
         }
         if (node.hasProperty(NP_CALENDAR_TIMEZONE)) {
             try {

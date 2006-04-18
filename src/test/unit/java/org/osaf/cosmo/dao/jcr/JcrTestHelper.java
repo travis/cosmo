@@ -355,7 +355,7 @@ public class JcrTestHelper extends TestHelper
 
         node.addMixin(NT_CALENDAR_COLLECTION);
         node.setProperty(NP_CALENDAR_DESCRIPTION, node.getName());
-        node.setProperty(NP_XML_LANG, Locale.getDefault().toString());
+        node.setProperty(NP_CALENDAR_LANGUAGE, Locale.getDefault().toString());
 
         return node;
     }

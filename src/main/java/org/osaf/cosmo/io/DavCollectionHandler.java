@@ -135,7 +135,7 @@ public class DavCollectionHandler implements IOHandler, SchemaConstants {
                 collectionNode.addMixin(NT_CALENDAR_COLLECTION);
                 collectionNode.setProperty(NP_CALENDAR_DESCRIPTION,
                                            displayName);
-                collectionNode.setProperty(NP_XML_LANG,
+                collectionNode.setProperty(NP_CALENDAR_LANGUAGE,
                                            Locale.getDefault().toString());
             }
             return true;

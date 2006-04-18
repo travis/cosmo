@@ -181,7 +181,7 @@ PropertyDef
   Protected false
   Multiple false
 PropertyDef
-  Name xml:lang
+  Name calendar:language
   RequiredType STRING
   DefaultValues null
   AutoCreate false

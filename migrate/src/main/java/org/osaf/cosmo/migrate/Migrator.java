@@ -180,7 +180,8 @@ public class Migrator {
             cl.getOptionValue("sourcedata") == null ||
             cl.getOptionValue("targetconfig") == null ||
             cl.getOptionValue("targetdata") == null) {
-            new HelpFormatter().printHelp("migrator", options, true);
+            new HelpFormatter().printHelp("java -jar cosmo-migrate-x.x.jar",
+                                          options, true);
             return null;
         }
 

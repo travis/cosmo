@@ -46,8 +46,9 @@ public class Migration03Test extends TestCase {
     private static Logger log = Logger.getLogger(Migration03Test.class);
 
     private static final String DB_DRIVER = "org.hsqldb.jdbcDriver";
-    private static final String DB_URL =
-        "jdbc:hsqldb:file:src/test/previous/db/userdb";
+    private static final String DB_DIR =
+        "src/test/previous/db";
+    private static final String DB_URL= "jdbc:hsqldb:file:" + DB_DIR+ "userdb";
     private static final String DB_USERNAME = "sa";
     private static final String DB_PASSWORD = "";
     private static final String PREV_CONFIG =
@@ -136,23 +137,10 @@ public class Migration03Test extends TestCase {
 
     /**
      */
-    public void testInitNoUrlSystemProperty() throws Exception {
-        // use our own migration rather than the one set up for us
-        Migration03 m = new Migration03();
-        try {
-            m.init();
-            fail("Migration initialized without url system property");
-        } catch (MigrationException e) {
-            // expected
-        }
-    }
-
-    /**
-     */
     public void testInit() throws Exception {
         // use our own migration rather than the one set up for us
         Migration03 m = new Migration03();
-        System.setProperty(Migration03.SYSPROP_USERDB_URL, DB_URL);
+        m.setDb(DB_DIR);
         m.init();
     }
 

@@ -55,11 +55,6 @@ public class Migration03 extends CopyBasedMigration {
     private static Logger log = Logger.getLogger(Migration03.class);
 
     /**
-     * <code>cosmo.migrate.03.userdb.url</code>
-     */
-    public static final String SYSPROP_USERDB_URL =
-        "cosmo.migrate.03.userdb.url";
-    /**
      * <code>nodetypes.xml</code>
      */
     public static final String RESOURCE_NODETYPES = "nodetypes.xml";
@@ -77,6 +72,7 @@ public class Migration03 extends CopyBasedMigration {
     private static final String SQL_SHUTDOWN = "SHUTDOWN";
 
     private Connection connection;
+    private String db;
 
     // CopyBasedMigration methods
 
@@ -175,8 +171,8 @@ public class Migration03 extends CopyBasedMigration {
     }
 
     /**
-     * Connects to the 0.2 user database using the JDBC URL supplied
-     * by the {@link #SYSPROP_USERDB_URL} system property, unless a
+     * Connects to the 0.2 user database located at the filesystem
+     * location given by {@link #getDb()}, unless a
      * connection has previously been set with
      * {@link #setConnection(Connection)}.
      */
@@ -186,11 +182,7 @@ public class Migration03 extends CopyBasedMigration {
             return;
         }
 
-        String url = System.getProperty(SYSPROP_USERDB_URL);
-        if (url == null) {
-            throw new MigrationException("System property " + SYSPROP_USERDB_URL + " not found");
-        }
-        url = "jdbc:hsqldb:file:" + url;
+        String url = "jdbc:hsqldb:file:" + db + "userdb";
 
         System.out.println("Connecting to " + url);
         try {
@@ -294,6 +286,18 @@ public class Migration03 extends CopyBasedMigration {
      */
     public Connection getConnection() {
         return connection;
+    }
+
+    /**
+     */
+    public String getDb() {
+        return db;
+    }
+
+    /**
+     */
+    public void setDb(String db) {
+        this.db = db;
     }
 
     // package protected methods, for individuable testability

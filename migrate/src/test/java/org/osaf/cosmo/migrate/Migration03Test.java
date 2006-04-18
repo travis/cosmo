@@ -278,8 +278,8 @@ public class Migration03Test extends TestCase {
                    calendar.hasProperty("dav:displayname"));
         assertTrue("calendar node does not have property calendar:description",
                    calendar.hasProperty("calendar:description"));
-        assertTrue("calendar node does not have property xml:lang",
-                   calendar.hasProperty("xml:lang"));
+        assertTrue("calendar node does not have property calendar:language",
+                   calendar.hasProperty("calendar:language"));
         assertTrue("calendar node does not have property calendar:supportedComponentSet",
                    calendar.hasProperty("calendar:supportedComponentSet"));
         

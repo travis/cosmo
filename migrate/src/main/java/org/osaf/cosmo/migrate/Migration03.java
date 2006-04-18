@@ -66,7 +66,7 @@ public class Migration03 extends CopyBasedMigration {
     private static final String SQL_LOAD_OVERLORD =
         "SELECT username, password, firstName, lastName, email, dateCreated, dateModified FROM user WHERE username = 'root'";
     private static final String SQL_LOAD_USERS =
-        "SELECT LIMIT 0 0 username, password, firstName, lastName, email, dateCreated, dateModified, id FROM user WHERE username != 'root'";
+        "SELECT LIMIT 0 0 username, password, firstName, lastName, email, dateCreated, dateModified, id FROM user WHERE username != 'root' ORDER BY username";
     private static final String SQL_LOAD_ROOT_IDS =
         "SELECT userid FROM userrole WHERE roleid = 1 AND userid != 1";
     private static final String SQL_SHUTDOWN = "SHUTDOWN";

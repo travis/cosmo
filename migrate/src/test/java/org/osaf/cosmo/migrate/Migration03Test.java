@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.jcr.NamespaceException;
 import javax.jcr.NamespaceRegistry;
@@ -181,25 +180,25 @@ public class Migration03Test extends TestCase {
     /**
      */
     public void testLoadOverlord() throws Exception {
-        Map overlord = migration.loadOverlord();
+        HashMap overlord = migration.loadOverlord();
         assertNotNull(overlord);
     }
 
     /**
      */
     public void testLoadUsers() throws Exception {
-        Map users = migration.loadUsers();
+        HashMap users = migration.loadUsers();
         assertNotNull(users);
         assertEquals(2, users.keySet().size());
 
-        Map user2 = (Map) users.get(new Integer(2));
+        HashMap user2 = (HashMap) users.get(new Integer(2));
         assertNotNull("user 2 not found", user2);
         assertEquals("user 2 wrong username", "bcm",
                      (String) user2.get("username"));
         assertEquals("user 2 not admin", Boolean.TRUE,
                      (Boolean) user2.get("admin"));
 
-        Map user3 = (Map) users.get(new Integer(3));
+        HashMap user3 = (HashMap) users.get(new Integer(3));
         assertNotNull("user 3 not found", user3);
         assertEquals("user 3 wrong username", "ixjonez",
                      (String) user3.get("username"));
@@ -210,7 +209,7 @@ public class Migration03Test extends TestCase {
     /**
      */
     public void testAlreadyCopiedHome() throws Exception {
-        Map user = loadOldUser(3);
+        HashMap user = loadOldUser(3);
         String username = (String) user.get("username");
 
         String n1 = HexEscaper.escape(username.substring(0, 1));
@@ -227,7 +226,7 @@ public class Migration03Test extends TestCase {
     /**
      */
     public void testCopyHomeAndUser() throws Exception {
-        Map user = loadOldUser(3);
+        HashMap user = loadOldUser(3);
         String username = (String) user.get("username");
 
         Node home = migration.copyHome(user, previous, current);
@@ -330,7 +329,7 @@ public class Migration03Test extends TestCase {
                    readmeContent.hasProperty("jcr:lastModified"));
    }
 
-    private Map loadOldUser(int id)
+    private HashMap loadOldUser(int id)
         throws Exception {
         Statement st = connection.createStatement();
         ResultSet rs = st.executeQuery("select username, password, firstName, lastName, email, dateCreated, dateModified from user where id = " + new Integer(id));

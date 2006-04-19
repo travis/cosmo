@@ -21,10 +21,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.jcr.NamespaceException;
 import javax.jcr.NamespaceRegistry;
@@ -66,7 +67,7 @@ public class Migration03 extends CopyBasedMigration {
     private static final String SQL_LOAD_OVERLORD =
         "SELECT username, password, firstName, lastName, email, dateCreated, dateModified FROM user WHERE username = 'root'";
     private static final String SQL_LOAD_USERS =
-        "SELECT LIMIT 0 0 username, password, firstName, lastName, email, dateCreated, dateModified, id FROM user WHERE username != 'root' ORDER BY username";
+        "SELECT LIMIT 0 0 username, password, firstName, lastName, email, dateCreated, dateModified, id FROM user WHERE username != 'root'";
     private static final String SQL_LOAD_ROOT_IDS =
         "SELECT userid FROM userrole WHERE roleid = 1 AND userid != 1";
     private static final String SQL_SHUTDOWN = "SHUTDOWN";
@@ -215,17 +216,24 @@ public class Migration03 extends CopyBasedMigration {
             writeSchemaVersion(current);
         }
 
-        Map overlord = loadOverlord();
-        Map users = loadUsers();
+        HashMap overlord = loadOverlord();
+        HashMap usersById = loadUsers();
+        HashMap[] users = sortUsers(usersById);
 
         int skipped = 0;
-        for (Iterator i=users.values().iterator(); i.hasNext();) {
-            Map user = (Map) i.next();
+        int copied = 0;
+        long startTime = System.currentTimeMillis();
+        for (int i=0; i<users.length; i++) {
+            HashMap user = users[i];
             String username = (String) user.get("username");
             try {
                 // only save if the home directory was actually copied
+                long copyStartTime = System.currentTimeMillis();
                 if (copyHome(user, previous, current) != null) {
                     current.save();
+                    long copyStopTime = System.currentTimeMillis();
+                    System.out.println("Copied " + username + " in " + formatElapsedSeconds(copyStopTime - copyStartTime));
+                    copied++;
                 }
             } catch (RepositoryException e) {
                 skipped++;
@@ -239,7 +247,9 @@ public class Migration03 extends CopyBasedMigration {
                 continue;
             }
         }
+        long stopTime = System.currentTimeMillis();
 
+        System.out.println(copied + " users copied in " + formatElapsedHours(stopTime - startTime));
         if (skipped > 0) {
             System.out.println(skipped + " users skipped - see stderr for details");
         }
@@ -333,9 +343,9 @@ public class Migration03 extends CopyBasedMigration {
         }
     }
 
-    Map loadOverlord()
+    HashMap loadOverlord()
         throws MigrationException {
-        Map overlord = null;
+        HashMap overlord = null;
 
         System.out.println("Loading overlord");
         try {
@@ -353,7 +363,7 @@ public class Migration03 extends CopyBasedMigration {
         return overlord;
     }
 
-    Map loadUsers()
+    HashMap loadUsers()
         throws MigrationException {
         HashMap users = new HashMap();
         
@@ -375,7 +385,7 @@ public class Migration03 extends CopyBasedMigration {
             ResultSet rs = st.executeQuery(SQL_LOAD_ROOT_IDS);
             for (; rs.next();) {
                 Integer id = (Integer) rs.getInt("userid");
-                Map user = (Map) users.get(id);
+                HashMap user = (HashMap) users.get(id);
                 if (user == null) {
                     System.err.println("Nonexistent user with id " + id + " marked as having root role in userdb... skipping:");
                     continue;
@@ -390,7 +400,7 @@ public class Migration03 extends CopyBasedMigration {
         return users;
     }
 
-    Node copyHome(Map user,
+    Node copyHome(HashMap user,
                   Session previous,
                   Session current)
         throws RepositoryException {
@@ -406,8 +416,6 @@ public class Migration03 extends CopyBasedMigration {
             // user's home.
             return null;
         }
-
-        System.out.println("Copying homedir for " + username);
 
         // find old home node
         Node oldHomeNode = (Node) previous.getItem(oldHomePath);
@@ -459,7 +467,7 @@ public class Migration03 extends CopyBasedMigration {
         registerNamespace(curRegistry, prefix, prevRegistry.getURI(prefix));
     }
 
-    private Map resultSetToUser(ResultSet rs)
+    private HashMap resultSetToUser(ResultSet rs)
         throws SQLException {
         HashMap user = new HashMap();
         user.put("username", rs.getString("username"));
@@ -671,5 +679,35 @@ public class Migration03 extends CopyBasedMigration {
             return "calendar:language";
         }
         return original;
+    }
+
+    private HashMap[] sortUsers(HashMap usersById) {
+        HashMap[] users = (HashMap[])
+            usersById.values().toArray(new HashMap[0]);
+        Arrays.sort(users, new Comparator<HashMap>() {
+                        public int compare(HashMap o1, HashMap o2) {
+                            String u1 = (String) o1.get("username");
+                            String u2 = (String) o2.get("username");
+                            return u1.compareToIgnoreCase(u2);
+                        }
+                    });
+        return users;
+    }
+
+    private String formatElapsedHours(long elapsedTime) {
+        long seconds = elapsedTime / 1000;
+        long hours = seconds / 3600;
+        seconds = seconds - (hours * 3600);
+        long minutes = seconds / 60;
+        seconds = seconds - (minutes * 60);
+        return hours + " hour(s), " +
+            minutes + " minute(s), " +
+            seconds + " second(s)";
+    }
+
+    private String formatElapsedSeconds(long elapsedTime) {
+        long seconds = elapsedTime / 1000;
+        long milliseconds = elapsedTime - (seconds * 1000);
+        return seconds + "." + milliseconds + " seconds";
     }
 }

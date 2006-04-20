@@ -230,9 +230,12 @@ public class Migration03 extends CopyBasedMigration {
                 // only save if the home directory was actually copied
                 long copyStartTime = System.currentTimeMillis();
                 if (copyHome(user, previous, current) != null) {
-                    current.save();
                     long copyStopTime = System.currentTimeMillis();
                     System.out.println("Copied " + username + " in " + formatElapsedSeconds(copyStopTime - copyStartTime));
+                    long saveStartTime = System.currentTimeMillis();
+                    current.save();
+                    long saveStopTime = System.currentTimeMillis();
+                    System.out.println("Saved " + username + " in " + formatElapsedSeconds(saveStopTime - saveStartTime));
                     copied++;
                 }
             } catch (RepositoryException e) {
@@ -421,8 +424,11 @@ public class Migration03 extends CopyBasedMigration {
         Node oldHomeNode = (Node) previous.getItem(oldHomePath);
 
         // create structural nodes
-        Node l1 = current.getRootNode().addNode(n1, "nt:unstructured");
-        Node l2 = l1.addNode(n2, "nt:unstructured");
+        Node root = current.getRootNode();
+        Node l1 = root.hasNode(n1) ?
+            root.getNode(n1) : root.addNode(n1, "nt:unstructured");
+        Node l2 = l1.hasNode(n2) ?
+            l1.getNode(n2) : l1.addNode(n2, "nt:unstructured");
 
         // copy home node
         Node home = copyNode(oldHomeNode, l2, "cosmo:homecollection");
@@ -495,6 +501,8 @@ public class Migration03 extends CopyBasedMigration {
                           Node parent,
                           String primaryType)
         throws RepositoryException {
+        long startTime = System.currentTimeMillis();
+
         if (primaryType == null) {
             primaryType =
                 translateNodeType(original.getPrimaryNodeType().getName());
@@ -530,6 +538,7 @@ public class Migration03 extends CopyBasedMigration {
                 log.debug("adding mixin type calendar:event");
             }
             copied.addMixin("calendar:event");
+
         }
 
         // copy properties
@@ -552,8 +561,8 @@ public class Migration03 extends CopyBasedMigration {
 
         // 0.3 adds dav:created and dav:lastModified which are
         // initialized from corresponding 0.2 jcr builtin properties
-        if ("dav:collection".equals(primaryType) ||
-            "dav:resource".equals(primaryType)) {
+        if (copied.isNodeType("dav:collection") ||
+            copied.isNodeType("dav:resource")) {
             if (log.isDebugEnabled()) {
                 log.debug("setting property dav:created");
             }
@@ -580,6 +589,9 @@ public class Migration03 extends CopyBasedMigration {
             copied.setProperty("calendar:supportedComponentSet",
                                values);
         }
+
+        long stopTime = System.currentTimeMillis();
+        System.out.println("copied " + copied.getPath() + " in " + formatElapsedSeconds(stopTime - startTime));
 
         copyChildNodes(original, copied);
 
@@ -717,14 +729,24 @@ public class Migration03 extends CopyBasedMigration {
         seconds = seconds - (hours * 3600);
         long minutes = seconds / 60;
         seconds = seconds - (minutes * 60);
-        return hours + " hour(s), " +
-            minutes + " minute(s), " +
-            seconds + " second(s)";
+        return hours + "h " +
+            minutes + "m " +
+            seconds + "s";
     }
 
     private String formatElapsedSeconds(long elapsedTime) {
         long seconds = elapsedTime / 1000;
         long milliseconds = elapsedTime - (seconds * 1000);
-        return seconds + "." + milliseconds + " seconds";
+        String fraction = "";
+        if (milliseconds < 10) {
+            fraction = "00" + milliseconds;
+        }
+        else if (milliseconds < 100) {
+            fraction = "0" + milliseconds;
+        }
+        else {
+            fraction = "" + milliseconds;
+        }
+        return seconds + "." + fraction + "s";
     }
 }

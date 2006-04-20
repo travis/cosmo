@@ -64,6 +64,8 @@ public interface SchemaConstants {
     public static final String NP_JCR_LASTMODIFIED = "jcr:lastModified";
 
     public static final String NP_DAV_DISPLAYNAME = "dav:displayname";
+    public static final String NP_DAV_CREATED = "dav:created";
+    public static final String NP_DAV_LASTMODIFIED = "dav:lastModified";
     public static final String NP_DAV_CONTENTLANGUAGE =
         "dav:contentlanguage";
 

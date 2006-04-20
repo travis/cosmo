@@ -36,6 +36,7 @@ public abstract class Resource extends BaseModelObject {
     private HashSet tickets;
     private User owner;
     private Date dateCreated;
+    private Date dateModified;
 
     /**
      */
@@ -126,6 +127,18 @@ public abstract class Resource extends BaseModelObject {
      */
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
+    }
+
+    /**
+     */
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    /**
+     */
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
     }
 
     /**

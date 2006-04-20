@@ -40,12 +40,14 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
+import org.osaf.cosmo.model.HomeCollectionResource;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.repository.CalendarFlattener;
 import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.SchemaConstants;
 import org.osaf.cosmo.repository.TicketMapper;
+import org.osaf.cosmo.repository.ResourceMapper;
 import org.osaf.cosmo.repository.UserMapper;
 
 /**
@@ -222,23 +224,14 @@ public class JcrTestHelper extends TestHelper
         throws RepositoryException {
         User user = makeDummyUser();
 
-        // create intermediary structural nodes if necessary
-        String n1 = user.getUsername().substring(0, 1);
-        Node l1 = session.getRootNode().hasNode(n1) ?
-            session.getRootNode().getNode(n1) :
-            session.getRootNode().addNode(n1, NT_UNSTRUCTURED);
+        HomeCollectionResource home = new HomeCollectionResource();
+        home.setDisplayName(user.getUsername());
+        Node homeNode =
+            ResourceMapper.createHomeCollection(home, user.getUsername(),
+                                                session);
 
-        String n2 = user.getUsername().substring(0, 2);
-        Node l2 = l1.hasNode(n2) ?
-            l1.getNode(n2) :
-            l1.addNode(n2, NT_UNSTRUCTURED);
-
-        Node node = l2.addNode(user.getUsername(), NT_HOME_COLLECTION);
-        node.addMixin(NT_USER);
-        UserMapper.userToNode(user, node);
-
-        node.addMixin(NT_TICKETABLE);
-        node.setProperty(NP_DAV_DISPLAYNAME, user.getUsername());
+        homeNode.addMixin(NT_USER);
+        UserMapper.userToNode(user, homeNode);
 
         session.save();
 

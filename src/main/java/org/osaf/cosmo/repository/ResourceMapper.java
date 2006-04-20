@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.repository;
 
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.HashSet;
 import java.util.Set;
@@ -117,8 +118,15 @@ public class ResourceMapper implements SchemaConstants {
 
         String name =
             PathTranslator.toRepositoryPath(resource.getDisplayName());
-        Node resourceNode = parentNode.hasNode(name) ?
-            parentNode.getNode(name) : parentNode.addNode(name, nodeType);
+        Node resourceNode = null;
+        if (parentNode.hasNode(name)) {
+            resourceNode = parentNode.getNode(name);
+        } else {
+            resourceNode = parentNode.addNode(name, nodeType);
+            Calendar now = Calendar.getInstance();
+            resourceNode.setProperty(NP_DAV_CREATED, now);
+            resource.setDateModified(now.getTime());
+        }
 
         setCommonResourceProperties(resource, resourceNode);
 
@@ -188,6 +196,9 @@ public class ResourceMapper implements SchemaConstants {
                                                     Node node)
         throws RepositoryException {
         node.setProperty(NP_DAV_DISPLAYNAME, resource.getDisplayName());
+        Calendar now = Calendar.getInstance();
+        node.setProperty(NP_DAV_LASTMODIFIED, now);
+        resource.setDateModified(now.getTime());
 
         for (Iterator i=resource.getProperties().iterator(); i.hasNext();) {
             ResourceProperty rp = (ResourceProperty) i.next();
@@ -250,8 +261,10 @@ public class ResourceMapper implements SchemaConstants {
         resource.setPath(PathTranslator.toClientPath(node.getPath()));
         resource.setDisplayName(node.getProperty(NP_DAV_DISPLAYNAME).
                                 getString());
-        resource.setDateCreated(node.getProperty(NP_JCR_CREATED).getDate().
-                                getTime());
+        resource.setDateCreated(node.getProperty(NP_DAV_CREATED).
+                                getDate().getTime());
+        resource.setDateModified(node.getProperty(NP_DAV_LASTMODIFIED).
+                                 getDate().getTime());
 
         for (PropertyIterator i=node.getProperties(); i.hasNext();) {
             Property p = i.nextProperty();

@@ -21,6 +21,7 @@
       <prefix>ticket</prefix>
       <prefix>xml</prefix>
       <prefix>cosmo</prefix>
+      <prefix>dav</prefix>
     </namespaces>
   </filter>
 </config>

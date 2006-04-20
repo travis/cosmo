@@ -183,6 +183,18 @@ public class DavResourceHandler extends DefaultHandler
             resourceNode.setProperty(NP_DAV_DISPLAYNAME, displayName);
             resourceNode.setProperty(NP_DAV_CONTENTLANGUAGE,
                                      context.getContentLanguage());
+            java.util.Calendar now = java.util.Calendar.getInstance();
+            if (! resourceNode.hasProperty(NP_DAV_CREATED)) {
+                resourceNode.setProperty(NP_DAV_CREATED, now);
+            }
+            java.util.Calendar lastMod = java.util.Calendar.getInstance();
+            if (context.getModificationTime() != IOUtil.UNDEFINED_TIME) {
+                lastMod.setTimeInMillis(context.getModificationTime());
+            }
+            else {
+                lastMod.setTime(new java.util.Date());
+            }
+            resourceNode.setProperty(NP_DAV_LASTMODIFIED, lastMod);
 
             if (resourceNode.isNodeType(NT_CALENDAR_RESOURCE)) {
                 // set calendar:uid
@@ -293,6 +305,14 @@ public class DavResourceHandler extends DefaultHandler
         try {
             Node resourceNode = isCollection ?
                 contentNode : contentNode.getParent();
+            // get created
+            long createTime =
+                resourceNode.getProperty(NP_DAV_CREATED).getLong();
+            context.setCreationTime(createTime);
+            // get last modified
+            long modTime =
+                resourceNode.getProperty(NP_DAV_LASTMODIFIED).getLong();
+            context.setModificationTime(modTime);
             // get content language
             if (resourceNode.hasProperty(NP_DAV_CONTENTLANGUAGE)) {
                 String contentLanguage =

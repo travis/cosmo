@@ -130,6 +130,9 @@ public class DavCollectionHandler implements IOHandler, SchemaConstants {
             Node collectionNode = parentNode.addNode(name, NT_DAV_COLLECTION);
             collectionNode.addMixin(NT_TICKETABLE);
             collectionNode.setProperty(NP_DAV_DISPLAYNAME, displayName);
+            java.util.Calendar now = java.util.Calendar.getInstance();
+            collectionNode.setProperty(NP_DAV_CREATED, now);
+            collectionNode.setProperty(NP_DAV_LASTMODIFIED, now);
             if (context.getMimeType().
                 equals(CosmoDavConstants.CONTENT_TYPE_CALENDAR_COLLECTION)) {
                 collectionNode.addMixin(NT_CALENDAR_COLLECTION);

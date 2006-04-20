@@ -114,6 +114,24 @@ PropertyDef
   Protected false
   Multiple false
 PropertyDef
+  Name dav:created
+  RequiredType DATE
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name dav:lastModified
+  RequiredType DATE
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
   Name *
   RequiredType UNDEFINED
   DefaultValues null
@@ -148,6 +166,24 @@ PropertyDef
   DefaultValues null
   AutoCreate false
   Mandatory false
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name dav:created
+  RequiredType DATE
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
+  OnParentVersion COPY
+  Protected false
+  Multiple false
+PropertyDef
+  Name dav:lastModified
+  RequiredType DATE
+  DefaultValues null
+  AutoCreate false
+  Mandatory true
   OnParentVersion COPY
   Protected false
   Multiple false

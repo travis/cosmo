@@ -535,7 +535,6 @@ public class Migration03 extends CopyBasedMigration {
         // copy properties
         for (PropertyIterator k=original.getProperties(); k.hasNext();) {
             Property prop = k.nextProperty();
-            // XXX skips jcr:created, which we cannot set manuall
             if (prop.getDefinition().isProtected()) {
                 continue;
             }
@@ -549,6 +548,24 @@ public class Migration03 extends CopyBasedMigration {
             else {
                 copyProperty(prop, copied);
             }
+        }
+
+        // 0.3 adds dav:created and dav:lastModified which are
+        // initialized from corresponding 0.2 jcr builtin properties
+        if ("dav:collection".equals(primaryType) ||
+            "dav:resource".equals(primaryType)) {
+            if (log.isDebugEnabled()) {
+                log.debug("setting property dav:created");
+            }
+            Calendar created = original.getProperty("jcr:created").getDate();
+            copied.setProperty("dav:created", created);
+            if (log.isDebugEnabled()) {
+                log.debug("setting property dav:lastModified");
+            }
+            Calendar lastMod = original.hasProperty("jcr:lastModified") ?
+                original.getProperty("jcr:lastModified").getDate() :
+                created;
+            copied.setProperty("dav:lastModified", lastMod);
         }
 
         // 0.3 expects the calendar:supportedComponentSet property on

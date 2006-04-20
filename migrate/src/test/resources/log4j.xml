@@ -33,11 +33,9 @@
     <level value="WARN"/>
   </logger>
 
-<!--
   <logger name="org.osaf.cosmo.migrate">
     <level value="DEBUG"/>
   </logger>
--->
 
   <root>
     <level value="WARN"/>

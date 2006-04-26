@@ -214,9 +214,27 @@ public class Migration03 extends CopyBasedMigration {
         }
         else {
             writeSchemaVersion(current);
+
+            // no way to detect if overlord has been imported on a
+            // previous run, so ensure that it is only copied on the
+            // first run
+            HashMap overlord = loadOverlord();
+            try {
+                long startTime = System.currentTimeMillis();
+                copyOverlord(overlord, current);
+                long stopTime = System.currentTimeMillis();
+                System.out.println("Copied overlord in " + formatElapsedSeconds(stopTime - startTime));
+                current.save();
+            } catch (RepositoryException e) {
+                try {
+                    current.refresh(false);
+                } catch (RepositoryException re) {
+                    throw new MigrationException("cannot refresh current session", re);                
+                }
+                throw new MigrationException("cannot copy overlord", e);
+            }
         }
 
-        HashMap overlord = loadOverlord();
         HashMap usersById = loadUsers();
         HashMap[] users = sortUsers(usersById);
 
@@ -401,6 +419,39 @@ public class Migration03 extends CopyBasedMigration {
         }
 
         return users;
+    }
+
+    Node copyOverlord(HashMap overlord,
+                      Session current)
+        throws RepositoryException {
+        Node home = null;
+        if (current.itemExists("/r/ro/root")) {
+            home = (Node) current.getItem("/r/ro/root");
+        }
+        else {
+            System.out.println("Autocreating overlord");
+            Node root = current.getRootNode();
+            Node l1 = root.hasNode("r") ?
+                root.getNode("r") : root.addNode("r", "nt:unstructured");
+            Node l2 = l1.hasNode("ro") ?
+                l1.getNode("ro") : l1.addNode("ro", "nt:unstructured");
+            home = l2.addNode("root", "nt:base");
+            home.addMixin("cosmo:user");
+            home.setProperty("cosmo:username", "root");
+            home.setProperty("cosmo:admin", Boolean.TRUE);
+        }
+
+        // username, admin are not modifiable
+        home.setProperty("cosmo:password", (String) overlord.get("password"));
+        home.setProperty("cosmo:firstName", (String) overlord.get("firstName"));
+        home.setProperty("cosmo:lastName", (String) overlord.get("lastName"));
+        home.setProperty("cosmo:email", (String) overlord.get("email"));
+        home.setProperty("cosmo:dateCreated",
+                         (Calendar) overlord.get("dateCreated"));
+        home.setProperty("cosmo:dateModified",
+                         (Calendar) overlord.get("dateModified"));
+
+        return home;
     }
 
     Node copyHome(HashMap user,

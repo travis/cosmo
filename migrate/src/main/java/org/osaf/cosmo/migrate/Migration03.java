@@ -185,7 +185,9 @@ public class Migration03 extends CopyBasedMigration {
 
         String url = "jdbc:hsqldb:file:" + db + "userdb";
 
-        System.out.println("Connecting to " + url);
+        if (log.isDebugEnabled()) {
+            log.debug("Connecting to user database at " + url);
+        }
         try {
             Class.forName(DB_DRIVER);
             connection = DriverManager.getConnection(url, DB_USERNAME,
@@ -220,11 +222,14 @@ public class Migration03 extends CopyBasedMigration {
             // first run
             HashMap overlord = loadOverlord();
             try {
-                long startTime = System.currentTimeMillis();
+                long copyStartTime = System.currentTimeMillis();
                 copyOverlord(overlord, current);
-                long stopTime = System.currentTimeMillis();
-                System.out.println("Copied overlord in " + formatElapsedSeconds(stopTime - startTime));
+                long copyStopTime = System.currentTimeMillis();
+                System.out.println("Copied overlord in " + formatElapsedSeconds(copyStopTime - copyStartTime));
+                long saveStartTime = System.currentTimeMillis();
                 current.save();
+                long saveStopTime = System.currentTimeMillis();
+                System.out.println("Saved overlord in " + formatElapsedSeconds(saveStopTime - saveStartTime));
             } catch (RepositoryException e) {
                 try {
                     current.refresh(false);
@@ -258,7 +263,7 @@ public class Migration03 extends CopyBasedMigration {
                 }
             } catch (RepositoryException e) {
                 skipped++;
-                System.out.println("SKIPPING " + username);
+                System.out.println("SKIPPED " + username);
                 e.printStackTrace();
                 try {
                     current.refresh(false);
@@ -368,7 +373,9 @@ public class Migration03 extends CopyBasedMigration {
         throws MigrationException {
         HashMap overlord = null;
 
-        System.out.println("Loading overlord");
+        if (log.isDebugEnabled()) {
+            log.debug("Loading overlord");
+        }
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(SQL_LOAD_OVERLORD);
@@ -387,8 +394,10 @@ public class Migration03 extends CopyBasedMigration {
     HashMap loadUsers()
         throws MigrationException {
         HashMap users = new HashMap();
-        
-        System.out.println("Loading users");
+
+        if (log.isDebugEnabled()) {
+            log.debug("Loading users");
+        }
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(SQL_LOAD_USERS);
@@ -400,7 +409,9 @@ public class Migration03 extends CopyBasedMigration {
             throw new MigrationException("Cannot load users", e);
         }
 
-        System.out.println("Loading root role associations");
+        if (log.isDebugEnabled()) {
+            log.debug("Loading administrator associations");
+        }
         try {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(SQL_LOAD_ROOT_IDS);
@@ -429,7 +440,6 @@ public class Migration03 extends CopyBasedMigration {
             home = (Node) current.getItem("/r/ro/root");
         }
         else {
-            System.out.println("Autocreating overlord");
             Node root = current.getRootNode();
             Node l1 = root.hasNode("r") ?
                 root.getNode("r") : root.addNode("r", "nt:unstructured");
@@ -512,8 +522,8 @@ public class Migration03 extends CopyBasedMigration {
         } catch (NamespaceException e) {
             // namespace prefix is not registered in the current
             // repository, so register it
-            System.out.println("Registering prefix " + prefix + ": " + uri);
             curRegistry.registerNamespace(prefix, uri);
+            System.out.println("Registered namespace " + prefix + ": " + uri);
         }
     }
 
@@ -642,7 +652,9 @@ public class Migration03 extends CopyBasedMigration {
         }
 
         long stopTime = System.currentTimeMillis();
-        System.out.println("copied " + copied.getPath() + " in " + formatElapsedSeconds(stopTime - startTime));
+        if (log.isDebugEnabled()) {
+            log.debug("copied " + copied.getPath() + " in " + formatElapsedSeconds(stopTime - startTime));
+        }
 
         copyChildNodes(original, copied);
 

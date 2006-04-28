@@ -66,7 +66,7 @@ public class CalendarFlattener implements SchemaConstants {
     static final public String TIME_RANGE_FIELD_SUFFIX_LOWERCASE =
         TIME_RANGE_FIELD_SUFFIX.toLowerCase();
 
-    static final private String MAX_TIME_RANGE = "20500101T000000Z";
+    static final private String MAX_TIME_RANGE = "20080101T000000Z";  // @FIX@: Hack to limit date expansions. Need to revisit later.
 
     /**
      * Returns a <code>Map</code> of data items, one for each

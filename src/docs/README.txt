@@ -32,11 +32,14 @@ applications to publish and subscribe to a content repository.
 MORE INFO
 =========
 
-Cosmo's project page is at
-<http://wiki.osafoundation.org/bin/view/Projects/CosmoHome>.
+Cosmo's home page is at
+<http://cosmo-dev.osafoundation.org/>.
+
+Release notes can be found at
+<http://cosmo-dev.osafoundation.org/release_notes.php>.
 
 Instructions for installing and running Cosmo are found at
-<http://wiki.osafoundation.org/bin/view/Documentation/CosmoAdministrator>.
+<http://cosmo-dev.osafoundation.org/configuration.php>.
 
 Legal information is found in LICENSE.txt, NOTICE.txt and in the
 license/ subdirectory.

@@ -49,9 +49,16 @@ if __name__ == "__main__":
     cosmotimerangequery = CosmoTimeRangeQuery(host=host, port=port, path=path, debug=debug, mask=mask, recurrence=recurrence)
     cosmochandler061 = CosmoChandlerZeroPointSixPointOne(host=host, port=port, path=path, debug=debug, mask=mask, recurrence=recurrence)
     
-    suite = [cosmobasicquery, cosmobugs, cosmoinvalid, cosmofreebusy,
-              cosmolimitexpand, cosmomkcalendar, cosmomultiget, cosmoticket, 
-              cosmotimerangequery, cosmochandler061] 
+    suite = [cosmobasicquery, 
+              cosmobugs, 
+              cosmoinvalid, 
+              #cosmofreebusy,
+              cosmolimitexpand, 
+              cosmomkcalendar, 
+              cosmomultiget, 
+              cosmoticket, 
+              cosmotimerangequery, 
+              cosmochandler061] 
     
     count = 0
     failures = 0

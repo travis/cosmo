@@ -182,10 +182,10 @@ class CosmoBasicQuery(DAVTest):
                       'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
                       'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                       'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
-                      'BEGIN:VEVENT', 'SUMMARY', 'END:VEVENT', 'DESCRIPTION:']
+                      'BEGIN:VEVENT', 'SUMMARY', 'END:VEVENT']
         
-        self.verifyDAVResponseItems(['2.ics'], inelement='{DAV:}getetag', positive=[''])
-        self.verifyDAVResponseItems(['2.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '4.ics', '5.ics', '6.ics', '7.ics'], inelement='{DAV:}getetag', positive=[''])
+        self.verifyDAVResponseItems(['1.ics', '2.ics', '4.ics', '5.ics', '6.ics', '7.ics'], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems)
 
         
         

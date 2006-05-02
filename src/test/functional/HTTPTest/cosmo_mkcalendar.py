@@ -37,7 +37,7 @@ class CosmoMkcalendar(HTTPTest):
         self.headers = self.headerAddAuth("cosmo-mkcalendarTestAccount%s" % self.appendUser, "cosmo-mkcalendar")
         
         # ------- Test 1 - Invalid - Bad XML ------- #        
-        
+        self.testStart('Test 1 - Invalid - Bad XML')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/invalidBadXML/' % self.appendUser)
         f = open('files/mkcalendar/invalidBadXML.xml')
@@ -46,7 +46,7 @@ class CosmoMkcalendar(HTTPTest):
         
     
         # ------- Test 2 - Invalid - Caldav Property missing ------- #        
-        
+        self.testStart('Test 2 - Invalid - Caldav Property missing')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/invalidCaldavProperty/' % self.appendUser)
         f = open('files/mkcalendar/invalidCaldavProperty.xml')
@@ -54,7 +54,7 @@ class CosmoMkcalendar(HTTPTest):
         self.checkStatus(400)
         
         # ------- Test 3 - Invalid - Dav Property ------- #        
-        
+        self.testStart('Test 3 - Invalid - Dav Property')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/invalidDavProperty/' % self.appendUser)
         f = open('files/mkcalendar/invalidDavProperty.xml')
@@ -62,7 +62,7 @@ class CosmoMkcalendar(HTTPTest):
         self.checkStatus(400)
         
         # ------- Test 4 - Invalid - Supported Calendar Component ------- #        
-        
+        self.testStart('Test 4 - Invalid - Supported Calendar Component')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/invalidSupportedCalendarComponent/' % self.appendUser)
         f = open('files/mkcalendar/invalidSupportedCalendarComponent.xml')
@@ -70,7 +70,7 @@ class CosmoMkcalendar(HTTPTest):
         self.checkStatus(400)
         
         # ------- Test 5 - Invalid - Supported Calendar Data ------- #        
-        
+        self.testStart('Test 5 - Invalid - Supported Calendar Data')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/invalidSupportedCalendarData/' % self.appendUser)
         f = open('files/mkcalendar/invalidSupportedCalendarData.xml')
@@ -78,7 +78,7 @@ class CosmoMkcalendar(HTTPTest):
         self.checkStatus(400)
         
         # ------- Test 6 - Invalid - Timezone ------- #        
-        
+        self.testStart('Test 6 - Invalid - Timezone')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/invalidTimezone/' % self.appendUser)
         f = open('files/mkcalendar/invalidTimezone.xml')
@@ -86,14 +86,14 @@ class CosmoMkcalendar(HTTPTest):
         self.checkStatus(400)
         
         # ------- Test 7 - Valid - No Body ------- #        
-        
+        self.testStart('Test 7 - Valid - No Body')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/invalidNoBody/' % self.appendUser)
         self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
         # ------- Test 8 - Valid - Description No Lang ------- #        
-        
+        self.testStart('Test 8 - Valid - Description No Lang')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/validDescriptionNoLang/' % self.appendUser)
         f = open('files/mkcalendar/validDescriptionNoLang.xml')
@@ -101,7 +101,7 @@ class CosmoMkcalendar(HTTPTest):
         self.checkStatus(201)
         
         # ------- Test 9 - Valid - Full Body ------- #        
-        
+        self.testStart('Test 9 - Valid - Full Body')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/validFullBody/' % self.appendUser)
         f = open('files/mkcalendar/validFullBody.xml')
@@ -109,7 +109,7 @@ class CosmoMkcalendar(HTTPTest):
         self.checkStatus(201)
         
         # ------- Test 10 - Valid - No Desciption ------- #        
-        
+        self.testStart('Test 10 - Valid - No Desciption')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/validNoDescription/' % self.appendUser)
         f = open('files/mkcalendar/validNoDescription.xml')
@@ -117,7 +117,7 @@ class CosmoMkcalendar(HTTPTest):
         self.checkStatus(201)
         
         # ------- Test 11 - Invalid - No Display Name ------- #        
-        
+        self.testStart('Test 11 - Invalid - No Display Name')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/validNoDisplayname/' % self.appendUser)
         f = open('files/mkcalendar/validNoDisplayname.xml')
@@ -125,7 +125,7 @@ class CosmoMkcalendar(HTTPTest):
         self.checkStatus(201)
         
         # ------- Test 12 - Invalid - No Supported Calendar Component ------- #        
-        
+        self.testStart('Test 12 - Invalid - No Supported Calendar Component')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/validNoSupportedCalendarComponent/' % self.appendUser)
         f = open('files/mkcalendar/validNoSupportedCalendarComponent.xml')
@@ -133,7 +133,7 @@ class CosmoMkcalendar(HTTPTest):
         self.checkStatus(201)
         
         # ------- Test 13 - Invalid - No Timezone ------- #        
-        
+        self.testStart('Test 13 - Invalid - No Timezone')
         #Create Calendar on CalDAV server   
         calpath = self.pathBuilder('/home/cosmo-mkcalendarTestAccount%s/validNoTimezone/' % self.appendUser)
         f = open('files/mkcalendar/validNoTimezone.xml')
@@ -165,8 +165,6 @@ if __name__ == "__main__":
         
     print "host %s port %s recurring %s path %s" % (host, port, counter, path)
     
-    cosmomkcalendar = CosmoMkcalendar(host=host, port=port, path=path)
-    cosmomkcalendar.debug = debug
-    cosmomkcalendar.startRun()
-    cosmomkcalendar.end()
+    cosmomkcalendar = CosmoMkcalendar(host=host, port=port, path=path, debug=debug)
+    cosmomkcalendar.fullRun()
     

@@ -198,9 +198,7 @@ if __name__ == "__main__":
             debug = int(args[1])
         
     print "host %s port %s recurring %s path %s" % (host, port, counter, path)
-    cosmomultiget = CosmoMultiget(host=host, port=port, path=path)
-    cosmomultiget.debug = debug
-    cosmomultiget.startRun()
-    cosmomultiget.end()
+    cosmomultiget = CosmoMultiget(host=host, port=port, path=path, debug=debug)
+    cosmomultiget.fullRun()
     
     

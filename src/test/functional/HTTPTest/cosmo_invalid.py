@@ -93,7 +93,7 @@ class CosmoInvalid(HTTPTest):
         report1body = f.read()
         self.request('REPORT', calpath, body=report1body, headers=self.headers)
         
-        self.checkStatus(501)
+        self.checkStatus(400)
         
 
                 

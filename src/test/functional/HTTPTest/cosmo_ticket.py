@@ -370,8 +370,6 @@ if __name__ == "__main__":
         
     print "host %s port %s recurring %s path %s" % (host, port, counter, path)
     
-    cosmoticket = CosmoTicket(host=host, port=port, path=path)
-    cosmoticket.debug = debug
-    cosmoticket.startRun()
-    cosmoticket.end()
+    cosmoticket = CosmoTicket(host=host, port=port, path=path, debug=debug)
+    cosmoticket.fullRun()
     

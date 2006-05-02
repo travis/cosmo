@@ -160,7 +160,7 @@ class CosmoTimeRangeQuery(DAVTest):
         report4body = f.read()
         self.request('REPORT', calpath, body=report4body, headers=self.headers)
         
-        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics'], positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
+        self.verifyDAVResponseItems(['3.ics'], positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
         
         # --------- Test 5.xml
         
@@ -171,7 +171,7 @@ class CosmoTimeRangeQuery(DAVTest):
         report5body = f.read()
         self.request('REPORT', calpath, body=report5body, headers=self.headers)
         
-        self.verifyDAVResponseItems(['1.ics', '2.ics', '3.ics', '4.ics', '5.ics', '6.ics', '7.ics'], positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
+        self.verifyDAVResponseItems(['2.ics', '3.ics'], positive=vcalitems, inelement='{urn:ietf:params:xml:ns:caldav}calendar-data')
         
         ##Blocked by bug 5551
         

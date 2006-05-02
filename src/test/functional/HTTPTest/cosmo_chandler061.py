@@ -10,7 +10,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         
         try:
             self.appendUser = self.appendDict['username']
-        except KeyErro:
+        except KeyError:
             self.appendUser = ''
         
         # ------- Test Create Account ------- #

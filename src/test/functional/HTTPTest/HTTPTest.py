@@ -9,8 +9,6 @@ class HTTPTest(TestObject):
     
     def __init__(self, host, port, path, debug=0, headers=None, tls=False, mask=0, recurrence=1, appendDict={}, appendList=[], appendVar='', printAppend='', threadNum=None):
         
-        self.debug = debug
-        self.mask = mask
         TestObject.__init__(self, debug=debug, mask=mask, recurrence=recurrence, appendVar=appendVar, printAppend=printAppend, threadNum=threadNum, appendDict=appendDict, appendList=appendList)
         
         if headers is None:
@@ -20,7 +18,6 @@ class HTTPTest(TestObject):
             self.headers = headers
         
         self.connection = {"host" : host, "port" : port, "path" : path, "tls" : tls}
-
         self.request('OPTIONS', path, body=None, headers=self.headers)
         
         

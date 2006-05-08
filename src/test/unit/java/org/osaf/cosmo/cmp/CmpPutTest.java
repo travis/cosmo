@@ -113,41 +113,51 @@ public class CmpPutTest extends BaseCmpServletTestCase {
                      response.getStatus());
     }
 
-    /**
-     */
-    public void testSignupInvalidUser() throws Exception {
-        User u1 = testHelper.makeDummyUser();
-        // set an invalid username
-        u1.setUsername("a");
+    public void testSignupInvalidUsersCase() throws Exception {
 
-        MockHttpServletRequest request = createMockRequest("PUT", "/signup");
-        sendXmlRequest(request, new UserContent(u1));
+        String[] testStrings = { "a", "aaa/bbb/c", "j/b/c", "vvv/v/v" };
 
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        servlet.service(request, response);
+        for(int i=0; i < testStrings.length; i++) {
+            User u1 = testHelper.makeDummyUser();
+            u1.setUsername(testStrings[i]);
 
-        assertEquals("incorrect status", MockHttpServletResponse.SC_BAD_REQUEST,
-                     response.getStatus());
+            MockHttpServletRequest request = createMockRequest("PUT", "/signup");
+            sendXmlRequest(request, new UserContent(u1));
+
+            MockHttpServletResponse response = new MockHttpServletResponse();
+            servlet.service(request, response);
+
+            assertEquals("incorrect status for " + testStrings[i],
+                        MockHttpServletResponse.SC_BAD_REQUEST, response.getStatus());
+        }
     }
 
-    /**
-     * Tests to make sure that usernames with / (slash) character fail when
-     * the user signs up.
-     */
-    public void testSignupInvalidUserSlashCase() throws Exception {
-        User u1 = testHelper.makeDummyUser();
-        // set an invalid username
-        u1.setUsername("aaa/bbb/c");
+    public void testSignupValidUsersCase() throws Exception {
 
-        MockHttpServletRequest request = createMockRequest("PUT", "/signup");
-        sendXmlRequest(request, new UserContent(u1));
+        // Test all of the various characters that should work.
+        String[] testStrings = { "abcdefghijklmnopqrstuvwxyz",
+                                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                                 "1234567890", "!@#$%^&*(){}:\"?><",
+                                 ",.\\;'[]=-",
+        };
 
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        servlet.service(request, response);
 
-        assertEquals("incorrect status", MockHttpServletResponse.SC_BAD_REQUEST,
-                     response.getStatus());
+        for(int i=0; i < testStrings.length; i++) {
+            User u1 = testHelper.makeDummyUser();
+
+            u1.setUsername(testStrings[i]);
+
+            MockHttpServletRequest request = createMockRequest("PUT", "/signup");
+            sendXmlRequest(request, new UserContent(u1));
+
+            MockHttpServletResponse response = new MockHttpServletResponse();
+            servlet.service(request, response);
+
+            assertEquals("incorrect status for " + testStrings[i],
+                        MockHttpServletResponse.SC_CREATED, response.getStatus());
+        }
     }
+
 
     /**
      */

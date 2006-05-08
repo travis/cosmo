@@ -35,7 +35,7 @@ public class CosmoDavLocatorImpl implements DavResourceLocator {
         Logger.getLogger(CosmoDavLocatorImpl.class);
 
     private DavResourceLocator wrapped;
-    private String jcrPath;
+    private String repositoryPath;
 
     /**
      */
@@ -46,10 +46,10 @@ public class CosmoDavLocatorImpl implements DavResourceLocator {
     /**
      */
     public CosmoDavLocatorImpl(DavResourceLocator locator,
-                               String jcrPath) {
+                               String repositoryPath) {
         this.wrapped = locator;
-        this.jcrPath = jcrPath != null ?
-            jcrPath :
+        this.repositoryPath = repositoryPath != null ?
+            repositoryPath :
             PathTranslator.toRepositoryPath(locator.getResourcePath());
     }
 
@@ -109,9 +109,9 @@ public class CosmoDavLocatorImpl implements DavResourceLocator {
 
     /**
      */
-    public String getJcrPath() {
-        if (jcrPath != null) {
-            return jcrPath;
+    public String getRepositoryPath() {
+        if (repositoryPath != null) {
+            return repositoryPath;
         }
 
         return getResourcePath();

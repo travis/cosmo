@@ -16,6 +16,7 @@
 package org.osaf.cosmo.dav.report.caldav;
 
 import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
@@ -26,7 +27,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.JcrConstants;
+import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
+import org.apache.jackrabbit.webdav.jcr.JcrDavSession;
 
 import org.osaf.cosmo.jackrabbit.query.XPathTimeRangeQueryBuilder;
 
@@ -51,19 +54,20 @@ public abstract class AbstractCalendarQueryReport
      * @throws RepositoryException
      */
     protected Query getQuery()
-        throws RepositoryException {
+        throws DavException, RepositoryException {
 
         // Create the XPath expression
-        String statement = "/jcr:root" + resource.getLocator().getJcrPath() +
-                           filter.toXPath();
+        String statement = "/jcr:root" +
+            resource.getLocator().getRepositoryPath() + filter.toXPath();
 
         if (log.isDebugEnabled()) {
             log.debug("executing JCR query " + statement);
         }
 
         // Now create an XPath query
-        QueryManager qMgr = info.getSession().getRepositorySession()
-                .getWorkspace().getQueryManager();
+        Session repSession =
+            JcrDavSession.getRepositorySession(info.getSession());
+        QueryManager qMgr = repSession.getWorkspace().getQueryManager();
         Query result = qMgr.createQuery(statement,
                 XPathTimeRangeQueryBuilder.XPATH_TIMERANGE);
 
@@ -89,7 +93,7 @@ public abstract class AbstractCalendarQueryReport
 
         // Get the JCR path segment of the root. We will use this to help
         // truncate the results up to the .ics resources.
-        String root = resource.getLocator().getJcrPath();
+        String root = resource.getLocator().getRepositoryPath();
         int rootLength = root.length();
 
         RowIterator rowIter = qResult.getRows();

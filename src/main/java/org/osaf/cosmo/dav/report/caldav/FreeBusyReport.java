@@ -254,7 +254,7 @@ public class FreeBusyReport extends AbstractCalendarQueryReport {
             // Convert the query results into hrefs for each result
             queryResultToHrefs(qR);
 
-        } catch (RepositoryException e) {
+        } catch (Exception e) {
             String msg = "Error while running CALDAV:" +
                 info.getReportElement().getLocalName() + " report";
             log.error(msg, e);

@@ -186,18 +186,18 @@
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060412</version>
+      <artifactId>jackrabbit-core</artifactId>
+      <version>1.0-osaf-20060508</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit-commons</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060412</version>
+      <artifactId>jackrabbit-jcr-commons</artifactId>
+      <version>1.0-osaf-20060508</version>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jcr-server</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060412</version>
+      <artifactId>jackrabbit-jcr-server</artifactId>
+      <version>1.0-osaf-20060508</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -205,15 +205,15 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-server</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060412</version>
+      <version>1.0-osaf-20060508</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jcr-webdav</artifactId>
-      <version>1.0-SNAPSHOT-osaf-20060412</version>
+      <artifactId>jackrabbit-jcr-webdav</artifactId>
+      <version>1.0-osaf-20060508</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -239,6 +239,16 @@
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.0</version>
+<!--
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+-->
     </dependency>
     <dependency>
       <groupId>springframework</groupId>

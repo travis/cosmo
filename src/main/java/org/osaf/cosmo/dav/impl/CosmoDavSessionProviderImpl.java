@@ -23,6 +23,7 @@ import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.WebdavRequest;
+import org.apache.jackrabbit.webdav.jcr.JcrDavSession;
 import org.apache.jackrabbit.webdav.simple.DavSessionImpl;
 
 import org.apache.log4j.Logger;
@@ -73,7 +74,12 @@ public class CosmoDavSessionProviderImpl implements DavSessionProvider {
      * @param request
      */
     public void releaseSession(WebdavRequest request) {
-        request.getDavSession().getRepositorySession().logout();
+        try {
+            JcrDavSession.getRepositorySession(request.getDavSession()).
+                logout();
+        } catch (DavException e) {
+            log.warn("Cannot log out of repository session", e);
+        }
         request.setDavSession(null);
     }
 

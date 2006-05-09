@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.cmp;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -188,6 +190,31 @@ public class CmpGetTest extends BaseCmpServletTestCase {
 
         assertTrue(response.getStatus() ==
                    MockHttpServletResponse.SC_NOT_FOUND);
+    }
+
+    /**
+     */
+    public void testGetServerStatus() throws Exception {
+        MockHttpServletRequest request =
+            createMockRequest("GET", "/server/status");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals(MockHttpServletResponse.SC_OK, response.getStatus());
+        assertEquals("text/plain", response.getContentType());
+        assertEquals("UTF-8", response.getCharacterEncoding());
+
+        BufferedReader content = new BufferedReader(new StringReader(response.getContentAsString()));
+        String line = content.readLine();
+        boolean found = false;
+        while (line != null) {
+            if (line.startsWith("jvm.memory.max=")) {
+                found = true;
+                break;
+            }
+            line = content.readLine();
+        }
+        assertTrue("did not find jvm.memory.max in status output", found);
     }
 
     /**

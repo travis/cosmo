@@ -15,9 +15,6 @@
  */
 package org.osaf.cosmo.ui.status;
 
-import org.osaf.cosmo.ui.CosmoAction;
-import org.osaf.cosmo.ui.UIConstants;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,6 +24,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+
+import org.osaf.cosmo.status.StatusSnapshot;
+import org.osaf.cosmo.ui.CosmoAction;
+import org.osaf.cosmo.ui.UIConstants;
 
 /**
  * Action that provides a snapshot of the server status via

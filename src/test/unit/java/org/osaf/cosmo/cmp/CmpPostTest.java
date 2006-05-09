@@ -34,11 +34,24 @@ import org.w3c.dom.Element;
  * Test Case for CMP <code>POST</code> operations.
  *
  * As <code>POST</code> is treated exactly the same as
- * <code>PUT</code> in CMP, we only test a few cases here, to avoid
- * redundancy with {@link CmpPutTest}.
+ * <code>PUT</code> for most CMP ops, we only test a few cases here,
+ * to avoid redundancy with {@link CmpPutTest}.
  */
 public class CmpPostTest extends BaseCmpServletTestCase {
     private static final Log log = LogFactory.getLog(CmpPostTest.class);
+
+    /**
+     */
+    public void testServerGc() throws Exception {
+        MockHttpServletRequest request =
+            createMockRequest("POST", "/server/gc");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals("incorrect status", MockHttpServletResponse.SC_NO_CONTENT,
+                     response.getStatus());
+    }
 
     /**
      */

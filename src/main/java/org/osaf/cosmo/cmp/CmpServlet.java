@@ -35,12 +35,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 
-import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.status.StatusSnapshot;
 
 import org.springframework.beans.BeansException;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -75,6 +76,10 @@ import org.xml.sax.SAXException;
  * <dd>Includes an XML representation of a user as per {@link UserResource}, creating or modifying the user's properties within Cosmo, with all associated side effects including home directory creation.</dd>
  * <dt><code>DELETE /user/&lgt;username&gt;</code></dt>
  * <dd>Causes a user to be removed, with all associated side effects including home directory removal.</dd>
+ * <dt><code>GET /server/status</code></dt>
+ * <dd>Returns server status data in a plaintext name/value format</dd>
+ * <dt><code>POST /server/gc</code></dt>
+ * <dd>Advises the JVM to begin a garbage collection run at the next opportunity.</dd>
  * </dl>
  *
  * CMP defines the following authenticated operations:
@@ -174,6 +179,10 @@ public class CmpServlet extends HttpServlet {
             processUserGet(req, resp);
             return;
         }
+        if (req.getPathInfo().equals("/server/status")) {
+            processServerStatus(req, resp);
+            return;
+        }
         resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
@@ -184,6 +193,10 @@ public class CmpServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req,
                           HttpServletResponse resp)
         throws ServletException, IOException {
+        if (req.getPathInfo().equals("/server/gc")) {
+            processServerGc(req, resp);
+            return;
+        }
         doPut(req, resp);
     }
 
@@ -357,6 +370,33 @@ public class CmpServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
+    }
+
+    /**
+     * Delegated to by {@link #doGet} to handle server status GET
+     * requests, taking a status snapshot, setting the response
+     * status and headers, and writing the response content.
+     */
+    private void processServerStatus(HttpServletRequest req,
+                                     HttpServletResponse resp)
+        throws ServletException, IOException {
+        byte[] snap = new StatusSnapshot().toBytes();
+        resp.setContentType("text/plain");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentLength(snap.length);
+        resp.getOutputStream().write(snap);
+    }
+
+    /**
+     * Delegated to by {@link #doPost} to handle server gc POST
+     * requests, initiating garbage collection, and setting the
+     * response status.
+     */
+    private void processServerGc(HttpServletRequest req,
+                                 HttpServletResponse resp)
+        throws ServletException, IOException {
+        System.gc();
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     /**

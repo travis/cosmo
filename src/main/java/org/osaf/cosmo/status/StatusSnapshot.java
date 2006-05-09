@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.ui.status;
+package org.osaf.cosmo.status;
 
 /**
  * Encapsulates a view in time of the server status.
@@ -34,6 +34,29 @@ public class StatusSnapshot {
         freeMemory = (long) (runtime.freeMemory() / 1024);
         usedMemory = (long) totalMemory - freeMemory;
         maxMemory = (long) (runtime.maxMemory() / 1024);
+    }
+
+    /**
+     */
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+
+        buf.append("jvm.memory.max=").append(maxMemory).append("\n");
+        buf.append("jvm.memory.total=").append(totalMemory).append("\n");
+        buf.append("jvm.memory.used=").append(usedMemory).append("\n");
+        buf.append("jvm.memory.free=").append(freeMemory).append("\n");
+
+        return buf.toString();
+    }
+
+    /**
+     */
+    public byte[] toBytes() {
+        try {
+            return toString().getBytes("UTF-8");
+        } catch (Exception e) {
+            throw new RuntimeException("UTF-8 not supported?");
+        }
     }
 
     /**

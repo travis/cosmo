@@ -244,11 +244,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.0</version>
-<!--
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
--->
     </dependency>
     <dependency>
       <groupId>springframework</groupId>

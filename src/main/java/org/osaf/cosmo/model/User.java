@@ -39,7 +39,7 @@ public class User extends BaseModelObject {
     /**
      */
     public static final Pattern USERNAME_PATTERN =
-        Pattern.compile("^[^\\f\\n\\r\\v/]+$");
+        Pattern.compile("^[^\\t\\n\\r\\f\\a\\e\\p{Cntrl}/]+$");
     /**
      */
     public static final int PASSWORD_LEN_MIN = 5;

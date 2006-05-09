@@ -69,11 +69,11 @@
 
 <!-- controls -->
 <div class="md" style="margin-top:24px; text-align: left;">
-  <a href="/console/status/gc">
+  <html:link page="/console/status/gc">
     <fmt:message key="Status.Controls.RunGC"/>
-  </a>
+  </html:link>
   |
-  <a href="/console/status/dump">
+  <html:link page="/console/status/dump">
     <fmt:message key="Status.Controls.DumpRaw"/>
-  </a>
+  </html:link>
 </div>

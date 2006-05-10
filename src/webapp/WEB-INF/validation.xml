@@ -23,7 +23,7 @@
    <global>
       <constant>
         <constant-name>username</constant-name>
-        <constant-value>^[^\t\n\r\f\a\e\p{Cntrl}/]+$</constant-value>
+        <constant-value>^[^/\t\n\r\f\a\e]+$</constant-value>
       </constant>
    </global>
    <formset>

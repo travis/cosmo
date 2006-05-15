@@ -60,6 +60,7 @@ public class CosmoDavConstants {
     public static final String ELEMENT_PRIVILEGE = "privilege";
     public static final String ELEMENT_READ = "read";
     public static final String ELEMENT_WRITE = "write";
+    public static final String ELEMENT_FREEBUSY = "freebusy";
 
     public static final String ELEMENT_CALDAV_MKCALENDAR = "mkcalendar";
     public static final String ELEMENT_CALDAV_CALENDAR = "calendar";

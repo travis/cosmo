@@ -493,7 +493,7 @@
            <var-value>999999999</var-value>
          </var>
        </field>
-       <field property="readWrite" depends="required">
+       <field property="privileges" depends="required">
          <msg name="required" key="Form.FieldRequired"/>
        </field>
      </form>

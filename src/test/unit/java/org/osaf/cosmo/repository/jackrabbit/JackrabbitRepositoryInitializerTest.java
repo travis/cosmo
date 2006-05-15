@@ -101,6 +101,8 @@ public class JackrabbitRepositoryInitializerTest extends TestCase
             session.getWorkspace().getNamespaceRegistry();
         assertEquals(PREFIX_DAV, registry.getPrefix(NS_DAV));
         assertEquals(NS_DAV, registry.getURI(PREFIX_DAV));
+        assertEquals(PREFIX_ICALENDAR, registry.getPrefix(NS_ICALENDAR));
+        assertEquals(NS_ICALENDAR, registry.getURI(PREFIX_ICALENDAR));
         assertEquals(PREFIX_CALENDAR, registry.getPrefix(NS_CALENDAR));
         assertEquals(NS_CALENDAR, registry.getURI(PREFIX_CALENDAR));
         assertEquals(PREFIX_TICKET, registry.getPrefix(NS_TICKET));

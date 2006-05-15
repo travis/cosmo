@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<ticket:ticketinfo xmlns:D="DAV:"
+                   xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">
+  <D:privilege><D:freebusy/></D:privilege> 
+</ticket:ticketinfo>

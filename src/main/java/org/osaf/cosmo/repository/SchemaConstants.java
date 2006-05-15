@@ -23,12 +23,15 @@ public interface SchemaConstants {
 
     // namespace prefixes
     public static final String PREFIX_DAV = "dav";
+    public static final String PREFIX_ICALENDAR = "icalendar";
     public static final String PREFIX_CALENDAR = "calendar";
     public static final String PREFIX_TICKET = "ticket";
     public static final String PREFIX_COSMO = "cosmo";
 
     // namespace URIs
     public static final String NS_DAV = "DAV:";
+    public static final String NS_ICALENDAR =
+        "http://osafoundation.org/icalendar";
     public static final String NS_CALENDAR =
         "http://osafoundation.org/calendar";
     public static final String NS_TICKET =

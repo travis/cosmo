@@ -128,6 +128,13 @@ public class TicketDiscovery extends AbstractDavProperty {
                                           DavConstants.NAMESPACE);
                 privilege.appendChild(write);
             }
+            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_FREEBUSY)) {
+                Element freebusy =
+                    DomUtil.createElement(document,
+                                          CosmoDavConstants.ELEMENT_FREEBUSY,
+                                          DavConstants.NAMESPACE);
+                privilege.appendChild(freebusy);
+            }
             ticketInfo.appendChild(privilege);
  
             return ticketInfo;

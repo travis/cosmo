@@ -49,10 +49,11 @@
         Privileges
       </td>
       <td class="mdData">
-        <div class="smData"><cosmo:errmsg property="readWrite"/></div>
+        <div class="smData"><cosmo:errmsg property="privileges"/></div>
         <div>
-          <html:radio property="readWrite" value="false"/> Read
-          <html:radio property="readWrite" value="true"/> Read/Write
+          <html:radio property="privileges" value="ro"/> Read
+          <html:radio property="privileges" value="rw"/> Read/Write
+          <html:radio property="privileges" value="fb"/> Free-Busy
         </div>
       </td>
     </tr>

@@ -43,6 +43,8 @@ public class Ticket {
     public static final String PRIVILEGE_READ = "read";
     /** */
     public static final String PRIVILEGE_WRITE = "write";
+    /** */
+    public static final String PRIVILEGE_FREEBUSY = "freebusy";
 
     private String id;
     private String owner;

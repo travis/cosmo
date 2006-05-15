@@ -35,7 +35,7 @@ public class TicketForm extends ValidatorForm {
 
     private String path;
     private Integer timeout;
-    private boolean readWrite;
+    private String privileges;
 
     /**
      */
@@ -69,14 +69,14 @@ public class TicketForm extends ValidatorForm {
 
     /**
      */
-    public boolean isReadWrite() {
-        return readWrite;
+    public String getPrivileges() {
+        return privileges;
     }
 
     /**
      */
-    public void setReadWrite(boolean readWrite) {
-        this.readWrite = readWrite;
+    public void setPrivileges(String privileges) {
+        this.privileges = privileges;
     }
 
     /**
@@ -89,9 +89,14 @@ public class TicketForm extends ValidatorForm {
         else {
             ticket.setTimeout(Ticket.TIMEOUT_INFINITE);
         }
-        ticket.getPrivileges().add(Ticket.PRIVILEGE_READ);
-        if (readWrite) {
-            ticket.getPrivileges().add(Ticket.PRIVILEGE_WRITE);
+        if (privileges.equals("fb")) {
+            ticket.getPrivileges().add(Ticket.PRIVILEGE_FREEBUSY);
+        }
+        else {
+            ticket.getPrivileges().add(Ticket.PRIVILEGE_READ);
+            if (privileges.equals("rw")) {
+                ticket.getPrivileges().add(Ticket.PRIVILEGE_WRITE);
+            }
         }
         return ticket;
     }
@@ -110,7 +115,7 @@ public class TicketForm extends ValidatorForm {
         return new ToStringBuilder(this).
             append("path", path).
             append("timeout", timeout).
-            append("readWrite", readWrite).
+            append("privileges", privileges).
             toString();
     }
 
@@ -119,6 +124,5 @@ public class TicketForm extends ValidatorForm {
     private void initialize() {
         path = null;
         timeout = null;
-        readWrite = true;
     }
 }

@@ -70,6 +70,7 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.dav.property.CalendarTimezone;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.SupportedCalendarComponentSet;
+import org.osaf.cosmo.dav.report.ReportType;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
@@ -347,11 +348,47 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
+        Ticket authTicket = securityManager.getSecurityContext().getTicket();
+
+        if (ReportType.CALDAV_FREEBUSY.isRequestedReportType(info)) {
+            // check resource type
+            if (! (resource.isCollection() ||
+                   resource.isCalendarCollection())) {
+                response.sendError(DavServletResponse.SC_FORBIDDEN,
+                                   "CALDAV:free-busy-query REPORT can only be run against a collection");
+                return;
+            }
+
+            // check permissions
+            if (authTicket != null) {
+                if (! (authTicket.getPrivileges().
+                       contains(Ticket.PRIVILEGE_READ) ||
+                       authTicket.getPrivileges().
+                       contains(Ticket.PRIVILEGE_FREEBUSY))) {
+                    // see "Marshalling" section of
+                    // "CALDAV:free-busy-query Report" for why we
+                    // return NOT_FOUND
+                    response.sendError(DavServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+            }
+        }
+        else {
+            // check permissions
+            if (authTicket != null) {
+                if (! authTicket.getPrivileges().
+                    contains(Ticket.PRIVILEGE_READ)) {
+                    response.sendError(DavServletResponse.SC_FORBIDDEN);
+                    return;
+                }
+            }
+        }
+
         try {
             Report report = ((CosmoDavResourceImpl) resource).getReport(info);
             response.sendXmlResponse(report,
                                      DavServletResponse.SC_MULTI_STATUS);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             log.warn("error in REPORT module ", e);
             response.sendError(DavServletResponse.SC_BAD_REQUEST, e.getMessage());
         }

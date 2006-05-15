@@ -111,6 +111,7 @@ public class JackrabbitRepositoryInitializer
             NamespaceRegistry registry =
                 session.getWorkspace().getNamespaceRegistry();
             registry.registerNamespace(PREFIX_DAV, NS_DAV);
+            registry.registerNamespace(PREFIX_ICALENDAR, NS_ICALENDAR);
             registry.registerNamespace(PREFIX_CALENDAR, NS_CALENDAR);
             registry.registerNamespace(PREFIX_TICKET, NS_TICKET);
             registry.registerNamespace(PREFIX_COSMO, NS_COSMO);

@@ -34,7 +34,7 @@
   - ticket:id (string) primary mandatory copy
   - ticket:owner (string) mandatory copy
   - ticket:timeout (string) mandatory copy < 'Infinite', 'Second-\d+'
-  - ticket:privileges (string) mandatory multiple copy < 'read', 'write'
+  - ticket:privileges (string) mandatory multiple copy < 'read', 'write', 'freebusy'
   - ticket:created (date) mandatory copy
 
 [ticket:ticketable] mixin

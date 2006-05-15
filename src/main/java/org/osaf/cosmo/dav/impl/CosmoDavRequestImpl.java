@@ -342,7 +342,11 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
         Element write =
             DomUtil.getChildElement(privilege, CosmoDavConstants.ELEMENT_WRITE,
                                     DavConstants.NAMESPACE);
-        if (read == null && write == null) {
+        Element freebusy =
+            DomUtil.getChildElement(privilege,
+                                    CosmoDavConstants.ELEMENT_FREEBUSY,
+                                    DavConstants.NAMESPACE);
+        if (read == null && write == null && freebusy == null) {
             throw new IllegalArgumentException("ticket request contains empty or invalid DAV:privileges");
         }
 
@@ -353,6 +357,9 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
         }
         if (write != null) {
             ticket.getPrivileges().add(Ticket.PRIVILEGE_WRITE);
+        }
+        if (freebusy != null) {
+            ticket.getPrivileges().add(Ticket.PRIVILEGE_FREEBUSY);
         }
 
         return ticket;

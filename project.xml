@@ -227,12 +227,6 @@
       </properties>
     </dependency>
     <dependency>
-      <groupId>org.osaf.commons</groupId>
-      <artifactId>osaf-commons-jackrabbit-maven-plugin</artifactId>
-      <version>0.5</version>
-      <type>plugin</type>
-    </dependency>
-    <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
       <version>0.8</version>
@@ -380,6 +374,12 @@
           <directory>src/test/unit/resources</directory>
           <includes>
             <include>log4j.xml</include>
+          </includes>
+        </resource>
+        <resource>
+          <directory>src/main/resources</directory>
+          <includes>
+            <include>cosmo-schema.cnd</include>
           </includes>
         </resource>
         <resource>

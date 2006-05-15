@@ -16,30 +16,7 @@
 
 <project xmlns:j="jelly:core"
          xmlns:ant="jelly:ant"
-         xmlns:maven="jelly:maven"
-         xmlns:jackrabbit="jackrabbit">
-  <tstamp>
-    <format property="NOW" timezone="GMT"
-            pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"/>
-  </tstamp>
-
-  <goal name="build">
-    <attainGoal name="war:webapp"/>
-  </goal>
-
-  <!-- not used in the standard build, but only for manually
-       regenerating node type -->
-  <goal name="build:nodetypes">
-    <delete>
-      <fileset dir="${basedir}/src/main/data">
-        <include name="nodetypes.xml"/>
-      </fileset>
-    </delete>
-    <jackrabbit:generate
-       catalog="${basedir}/src/main/data/nodetypes.txt"
-       descriptor="${basedir}/src/main/data/nodetypes.xml"/>
-  </goal>
-
+         xmlns:maven="jelly:maven">
   <preGoal name="java:jar-resources">
     <filter token="VERSION" value="${pom.currentVersion}"/>
   </preGoal>
@@ -50,41 +27,6 @@
     <delete dir="${maven.src.dir}/webapp/WEB-INF/lib"/>
     <delete dir="${maven.src.dir}/webapp/WEB-INF/tld"/>
   </postGoal>
-
-  <preGoal name="test:test">
-    <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
-      <attainGoal name="test:reposetup"/>
-    </j:if>
-  </preGoal>
-
-  <preGoal name="test:single">
-    <j:if test="${unitTestSourcesPresent == 'true' and context.getVariable('maven.test.skip') != 'true'}">
-      <attainGoal name="test:reposetup"/>
-    </j:if>
-  </preGoal>
-
-  <goal name="test:reposetup">
-    <delete dir="${maven.build.dir}/test-repository"/> 
-    <echo>Setting up test repository</echo>
-    <jackrabbit:importschema
-       configFilePath="${basedir}/src/test/unit/config/repository.xml"
-       repositoryHomedirPath="${maven.build.dir}/test-repository"
-       username="${cosmo.test.repository.username}"
-       password="${cosmo.test.repository.password}"
-       descriptor="${basedir}/src/main/data/nodetypes.xml"/>
-    <copy todir="${maven.build.dir}" overwrite="true"
-          file="${basedir}/src/main/data/import-overlord.xml">
-      <filterset>
-        <filter token="NOW" value="${NOW}"/>
-      </filterset>
-    </copy>
-    <jackrabbit:importcontent
-       configFilePath="${basedir}/src/test/unit/config/repository.xml"
-       repositoryHomedirPath="${maven.build.dir}/test-repository"
-       username="${cosmo.test.repository.username}"
-       password="${cosmo.test.repository.password}"
-       content="${maven.build.dir}/import-overlord.xml"/>
-  </goal>
 
   <goal name="dist">
     <attainGoal name="war:war"/>

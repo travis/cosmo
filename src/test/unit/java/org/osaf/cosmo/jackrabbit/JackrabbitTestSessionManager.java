@@ -27,6 +27,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.core.RepositoryImpl;
 import org.apache.jackrabbit.core.config.RepositoryConfig;
 
+import org.osaf.cosmo.repository.jackrabbit.JackrabbitRepositoryInitializer;
+
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import org.springmodules.jcr.JcrSessionFactory;
@@ -66,10 +68,17 @@ public class JackrabbitTestSessionManager {
             throw new RuntimeException("can't open repository", e);
         }
 
-        // set up template
         SimpleCredentials credentials =
             new SimpleCredentials(username, password.toCharArray());
 
+        // initialize the repository
+        JackrabbitRepositoryInitializer initializer =
+            new JackrabbitRepositoryInitializer();
+        initializer.setRepository(repository);
+        initializer.setCredentials(credentials);
+        initializer.initialize();
+        
+        // set up template
         sessionFactory = new JcrSessionFactory();
         sessionFactory.setRepository(repository);
         sessionFactory.setCredentials(credentials);
@@ -80,6 +89,7 @@ public class JackrabbitTestSessionManager {
             new DefaultSessionHolderProvider().createSessionHolder(session);
         TransactionSynchronizationManager.bindResource(sessionFactory,
                                                        sessionHolder);
+
     }
 
     /**

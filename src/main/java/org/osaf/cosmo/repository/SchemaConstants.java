@@ -21,18 +21,28 @@ package org.osaf.cosmo.repository;
  */
 public interface SchemaConstants {
 
-    // prefixes
+    // namespace prefixes
     public static final String PREFIX_DAV = "dav";
-    public static final String PREFIX_ICALENDAR = "icalendar";
     public static final String PREFIX_CALENDAR = "calendar";
     public static final String PREFIX_TICKET = "ticket";
     public static final String PREFIX_COSMO = "cosmo";
+
+    // namespace URIs
+    public static final String NS_DAV = "DAV:";
+    public static final String NS_CALENDAR =
+        "http://osafoundation.org/calendar";
+    public static final String NS_TICKET =
+        "http://www.xythos.com/namespaces/StorageServer";
+    public static final String NS_COSMO = "http://osafoundation.org/cosmo";
 
     // node names
     public static final String NN_JCR_CONTENT = "jcr:content";
     public static final String NN_JCR_DATA = "jcr:data";
 
     public static final String NN_TICKET = "ticket:ticket";
+
+    public static final String NN_COSMO_SYSTEM = "cosmo:system";
+    public static final String NN_COSMO_SCHEMA = "cosmo:schema";
 
     // node types
 
@@ -89,4 +99,6 @@ public interface SchemaConstants {
     public static final String NP_USER_ADMIN = "cosmo:admin";
     public static final String NP_USER_DATECREATED = "cosmo:dateCreated";
     public static final String NP_USER_DATEMODIFIED = "cosmo:dateModified";
+
+    public static final String NP_COSMO_SCHEMA_VERSION = "cosmo:schemaVersion";
 }

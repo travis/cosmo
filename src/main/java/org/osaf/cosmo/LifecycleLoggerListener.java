@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.ui;
+package org.osaf.cosmo;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.log4j.LogManager;
+
+import org.osaf.cosmo.CosmoConstants;
 
 /**
  * A {@link javax.servlet.ServletContextListener} that logs
@@ -35,7 +37,8 @@ public class LifecycleLoggerListener implements ServletContextListener {
      * Logs an info message when the servlet context is starting.
      */
     public void contextInitialized(ServletContextEvent sce) {
-        log.info("Cosmo webapp starting");
+        log.info(CosmoConstants.PRODUCT_NAME + " " +
+                 CosmoConstants.PRODUCT_VERSION + " starting");
     }
 
     /**
@@ -43,7 +46,8 @@ public class LifecycleLoggerListener implements ServletContextListener {
      * down.
      */
     public void contextDestroyed(ServletContextEvent sce) {
-        log.info("Cosmo webapp stopping");
+        log.info(CosmoConstants.PRODUCT_NAME + " " +
+                 CosmoConstants.PRODUCT_VERSION + " stopping");
         LogManager.shutdown();
         java.beans.Introspector.flushCaches();
         LogFactory.releaseAll();

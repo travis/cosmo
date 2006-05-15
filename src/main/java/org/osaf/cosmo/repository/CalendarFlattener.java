@@ -109,7 +109,7 @@ public class CalendarFlattener implements SchemaConstants {
                 continue;
             }
 
-            String key = PREFIX_ICALENDAR + ":" + rawKey;
+            String key = "icalendar:" + rawKey;
             String value = (colon + 1 < line.length()) ?
                 line.substring(colon + 1) :
                 new String();
@@ -135,7 +135,7 @@ public class CalendarFlattener implements SchemaConstants {
 
         InstanceList instances = new InstanceList();
 
-        String flatPrefix = PREFIX_ICALENDAR + ":" + "vcalendar-";
+        String flatPrefix = "icalendar:" + "vcalendar-";
         String key = null;
         String propKey = null;
 

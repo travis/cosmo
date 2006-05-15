@@ -73,8 +73,23 @@
     </constructor-arg>
   </bean>
 
+  <!-- used at runtime to access a transactional session -->
   <bean id="homedirSessionFactory"
         class="org.springmodules.jcr.JcrSessionFactory">
+    <property name="credentials">
+      <ref bean="homedirCredentials"/>
+    </property>
+    <property name="repository">
+      <ref bean="jcrRepository"/>
+    </property>
+    <property name="workspaceName">
+      <value>homedir</value>
+    </property>
+  </bean>
+
+  <!-- used at startup time to initialize the repository -->
+  <bean id="repositoryInitializer"
+        class="org.osaf.cosmo.repository.jackrabbit.JackrabbitRepositoryInitializer">
     <property name="credentials">
       <ref bean="homedirCredentials"/>
     </property>

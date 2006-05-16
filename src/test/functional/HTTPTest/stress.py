@@ -4,6 +4,8 @@ stress.py defines functions for executing stress test class definitions inherite
 """
 
 import threading
+#import code
+#import string
 
 class TestExecutionThread(threading.Thread):
 
@@ -23,8 +25,7 @@ class TestExecutionThread(threading.Thread):
                joinlist.append('%s=%s' % (o, v))
                
        self.opts = ', '.join(joinlist)
-           
-       
+                  
 
    def run (self):
        
@@ -32,18 +33,20 @@ class TestExecutionThread(threading.Thread):
        classList = []
        
        for l, c in self.importDict.items():
+           
            importExec = 'from %s import %s' % (l, c)
-           exec(importExec)
+           exec '%s' % (importExec)
            classList.append(c)
        
        for c in classList:
            
            cl = c.lower()
            instanceExec = '%s = %s(%s)' % (cl, c, self.opts)     
-           exec(instanceExec)
+           exec(compile(instanceExec, '', 'exec'))
+          
            listExec = 'instanceList.append(%s)' % cl
            print listExec
-           exec(listExec)
+           exec '%s' % (listExec)
            
        for i in instanceList:
            
@@ -78,7 +81,7 @@ def runThreaded(importDict, threads, debug, optsDict={}):
     for r in range(threads):
         print r
         
-        optsDict.update({'self.appendDict[\'username\']':r, 'threadNum':r})
+        optsDict.update({'appendDict':'{"username":%s}' % r, 'threadNum':r})
         test = TestExecutionThread(importDict=importDict, optsDict=optsDict, threadNum=r)
         test.start()
         threadList.append(test)
@@ -142,6 +145,7 @@ if __name__ == "__main__":
         elif args[0] == "threads":
             threads = int(args[1])  
     
+    #optsDict = {'host':'\'%s\'' % host, 'port':'%s' % port, 'path':'\'%s\'' % path, 'mask':'0', 'recurrence':recurrence}
     optsDict = {'host':'\'%s\'' % host, 'port':'%s' % port, 'path':'\'%s\'' % path, 'mask':'0', 'recurrence':recurrence}
     
     runThreaded({'cosmo_basicquery':'CosmoBasicQuery', 'cosmo_timerangequery':'CosmoTimeRangeQuery'}, threads=threads, optsDict=optsDict, debug=debug)

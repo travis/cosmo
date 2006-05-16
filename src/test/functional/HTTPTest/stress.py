@@ -145,7 +145,6 @@ if __name__ == "__main__":
         elif args[0] == "threads":
             threads = int(args[1])  
     
-    #optsDict = {'host':'\'%s\'' % host, 'port':'%s' % port, 'path':'\'%s\'' % path, 'mask':'0', 'recurrence':recurrence}
     optsDict = {'host':'\'%s\'' % host, 'port':'%s' % port, 'path':'\'%s\'' % path, 'mask':'0', 'recurrence':recurrence}
     
     runThreaded({'cosmo_basicquery':'CosmoBasicQuery', 'cosmo_timerangequery':'CosmoTimeRangeQuery'}, threads=threads, optsDict=optsDict, debug=debug)

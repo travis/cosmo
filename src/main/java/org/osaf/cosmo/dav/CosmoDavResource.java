@@ -24,7 +24,11 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
+import org.apache.jackrabbit.webdav.version.report.Report;
+import org.apache.jackrabbit.webdav.version.report.ReportInfo;
+import org.apache.jackrabbit.webdav.version.report.ReportType;
 
+import org.osaf.cosmo.dav.report.CosmoReportType;
 import org.osaf.cosmo.dav.ticket.TicketDavRequest;
 import org.osaf.cosmo.model.Ticket;
 
@@ -48,6 +52,15 @@ public interface CosmoDavResource extends DavResource {
      */
     // see bug 5137 for why we don't include LOCK and UNLOCK
     public String METHODS = "OPTIONS, GET, HEAD, POST, TRACE, PROPFIND, PROPPATCH, MKCOL, COPY, PUT, DELETE, MOVE, MKTICKET, DELTICKET";
+
+    /**
+     * Constants representing the DAV reports supported by Cosmo.
+     */
+    public ReportType[] REPORTS = {
+        CosmoReportType.CALDAV_QUERY,
+        CosmoReportType.CALDAV_MULTIGET,
+        CosmoReportType.CALDAV_FREEBUSY
+    };
 
     /**
      * Returns true if this resource represents a ticketable dav
@@ -107,7 +120,21 @@ public interface CosmoDavResource extends DavResource {
     /**
      * Adds a new member to this resource and set the member properties.
      */
-    public  MultiStatusResponse addMember(DavResource member, InputContext inputContext,
-                                          DavPropertySet setProperties) throws DavException;
+    public MultiStatusResponse addMember(DavResource member,
+                                         InputContext inputContext,
+                                         DavPropertySet setProperties)
+        throws DavException;
 
+    /**
+     * Returns the member resource at the given absolute href.
+     */
+    public DavResource getMember(String href)
+        throws DavException;
+
+    /**
+     * Return the report that matches the given report info if it is
+     * supported by this resource.
+     */
+    public Report getReport(ReportInfo info)
+        throws DavException;
 }

@@ -36,6 +36,7 @@ import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
+import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.jcr.JcrDavException;
 import org.apache.jackrabbit.webdav.property.DavProperty;
@@ -45,7 +46,10 @@ import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.simple.DavResourceImpl;
 import org.apache.jackrabbit.webdav.simple.ResourceConfig;
-import org.apache.jackrabbit.webdav.MultiStatusResponse;
+import org.apache.jackrabbit.webdav.version.report.Report;
+import org.apache.jackrabbit.webdav.version.report.ReportInfo;
+import org.apache.jackrabbit.webdav.version.report.ReportType;
+import org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty;
 
 import org.apache.log4j.Logger;
 
@@ -62,10 +66,7 @@ import org.osaf.cosmo.dav.property.CosmoResourceType;
 import org.osaf.cosmo.dav.property.SupportedCalendarComponentSet;
 import org.osaf.cosmo.dav.property.SupportedCalendarData;
 import org.osaf.cosmo.dav.property.TicketDiscovery;
-import org.osaf.cosmo.dav.report.Report;
-import org.osaf.cosmo.dav.report.ReportInfo;
-import org.osaf.cosmo.dav.report.ReportType;
-import org.osaf.cosmo.dav.report.SupportedReportSetProperty;
+import org.osaf.cosmo.dav.report.CosmoReportType;
 import org.osaf.cosmo.io.CosmoImportContext;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -92,6 +93,7 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         new SupportedReportSetProperty();
     private boolean isCalendarCollection;
     private boolean isHomeCollection;
+    private DavSession session;
 
     /**
      */
@@ -102,8 +104,9 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         throws RepositoryException, DavException {
         super(locator, factory, session, config);
 
-        // Initialise the supported reports here. We have to do this now because
-        // they are needed when processing the REPORT method.
+        // Initialise the supported reports here. We have to do this
+        // now because they are needed when processing the REPORT
+        // method.
         initSupportedReports();
 
         initializing = false;
@@ -111,6 +114,8 @@ public class CosmoDavResourceImpl extends DavResourceImpl
             getNode().isNodeType(NT_CALENDAR_COLLECTION);
         isHomeCollection = exists() &&
             getNode().isNodeType(NT_HOME_COLLECTION);
+
+        this.session = session;
     }
 
     // DavResource methods
@@ -425,15 +430,10 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     /**
-     * Define the set of reports supported by this resource.
-     * 
-     * @see org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty
-     * @see AbstractResource#initSupportedReports()
      */
     protected void initSupportedReports() {
         if (exists()) {
-            supportedReports = new SupportedReportSetProperty(new ReportType[] {
-                    ReportType.CALDAV_QUERY, ReportType.CALDAV_MULTIGET, ReportType.CALDAV_FREEBUSY});
+            supportedReports = new SupportedReportSetProperty(REPORTS);
         }
     }
 
@@ -464,16 +464,13 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     /**
-     * Return a DavResource for the specified href.
-     * 
-     * @param href
-     *            MUST be an absolute href to the resource which itself MUST be
-     *            a child of this resource
-     * @param session
-     *            DavSession needed when creating child resource object
-     * @return DavResource for child or null if one could not be created.
+     * Returns the member resource at the given absolute href.
      */
-    public DavResource getChildHref(String href, DavSession session) {
+    public DavResource getMember(String href)
+        throws DavException {
+        if (! exists()) {
+            return null;
+        }
         DavResource child = null;
         if (getResourcePath() != null && !getResourcePath().equals("/")) {
             String childPath = href;
@@ -494,37 +491,29 @@ public class CosmoDavResourceImpl extends DavResourceImpl
     }
 
     /**
-     * Get the report that matches the reportinfo that is supported by this
-     * resource.
-     * 
-     * TODO Eventually this will be punted up into jackrabbit.
-     * 
-     * @param reportInfo
-     * @return the requested report
-     * @throws DavException
-     * @see DeltaVResource#getReport(org.apache.jackrabbit.webdav.version.report.ReportInfo)
+     * Return the report that matches the given report info if it is
+     * supported by this resource.
      */
-    public Report getReport(ReportInfo reportInfo)
+    public Report getReport(ReportInfo info)
         throws DavException {
         if (!exists()) {
             throw new DavException(DavServletResponse.SC_NOT_FOUND);
         }
-        if (supportedReports.isSupportedReport(reportInfo)) {
-            Report report = ReportType.getType(reportInfo).createReport();
-            report.setResource(this);
-            report.setInfo(reportInfo);
-            return report;
+        if (supportedReports.isSupportedReport(info)) {
+            return ReportType.getType(info).createReport(this, info);
         } else {
             throw new DavException(DavServletResponse.SC_UNPROCESSABLE_ENTITY,
-                    "Unkown report " + reportInfo.getReportElement().getTagName() + "requested.");
+                    "Unknown report " + info.getReportName() + "requested.");
         }
     }
 
     /**
      * Adds a new member to this resource and set the member properties.
      */
-    public MultiStatusResponse addMember(DavResource member, InputContext inputContext,
-                                         DavPropertySet setProperties) throws DavException {
+    public MultiStatusResponse addMember(DavResource member,
+                                         InputContext inputContext,
+                                         DavPropertySet setProperties)
+        throws DavException {
         MultiStatusResponse msr = null;
         DavResource savedMember = null;
 
@@ -535,7 +524,19 @@ public class CosmoDavResourceImpl extends DavResourceImpl
 
         try {
             addMember(member, inputContext);
-            savedMember = getMember(member.getResourcePath());
+
+            //This is not the most efficient way to do this but since
+            //the DavResourceImpl jackrabbit class keeps its member
+            //variables private it is the only way to get the
+            //Resource.
+            DavResourceIterator i = getMembers();
+            while (i.hasNext()) {
+                DavResource r = i.nextResource();
+                if (r.getResourcePath().equals(member.getResourcePath())) {
+                    savedMember = r;
+                    break;
+                }
+            }
 
             if (savedMember == null) {
                 throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -609,22 +610,6 @@ public class CosmoDavResourceImpl extends DavResourceImpl
         else {
             getNode().setProperty(getJcrName(property.getName()), value);
         }
-    }
-
-    protected DavResource getMember(String resourcePath) {
-        DavResourceIterator it = getMembers();
-
-        //This is not the most efficient way to do this but since
-        //the DavResourceImpl jackrabbit class keeps its member variables private
-        //it is the only way to get the Resource.
-        while (it.hasNext()) {
-            DavResource r = it.nextResource();
-
-            if (r.getResourcePath().equals(resourcePath))
-                return r;
-        }
-
-        return null;
     }
 }
 

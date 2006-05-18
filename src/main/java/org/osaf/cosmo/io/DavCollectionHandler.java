@@ -237,7 +237,7 @@ public class DavCollectionHandler implements IOHandler, SchemaConstants {
                 return true;
             }
 
-            context.setContentType("text/icalendar", "UTF-8");
+            context.setContentType("text/calendar", "UTF-8");
             CalendarOutputter outputter = new CalendarOutputter();
             // since the content was validated when the event resource
             // was imported, there's no need to do it here

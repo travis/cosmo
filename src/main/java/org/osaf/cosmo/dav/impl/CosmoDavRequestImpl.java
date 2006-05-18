@@ -21,10 +21,13 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.jackrabbit.webdav.DavConstants;
+import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
+import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.WebdavRequestImpl;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
+import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
@@ -32,7 +35,6 @@ import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavRequest;
-import org.osaf.cosmo.dav.report.ReportInfo;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.dav.property.CalendarTimezone;
 import org.osaf.cosmo.dav.property.CalendarDescription;
@@ -54,6 +56,7 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
 
     private DavPropertySet mkcalendarSet;
     private Ticket ticket;
+    private ReportInfo reportInfo;
 
     /**
      */
@@ -128,6 +131,21 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
             ticketId = getHeader(CosmoDavConstants.HEADER_TICKET);
         }
         return ticketId;
+    }
+
+    /**
+     * Return the report information, if any, included in the
+     * request.
+     *
+     * @throws DavException if there is no report information in the
+     * request or if the report information is invalid
+     */
+    public ReportInfo getReportInfo()
+        throws DavException {
+        if (reportInfo == null) {
+            reportInfo = parseReportRequest();
+        }
+        return reportInfo;
     }
 
     // private methods
@@ -365,20 +383,14 @@ public class CosmoDavRequestImpl extends WebdavRequestImpl
         return ticket;
     }
 
-
-    /**
-     * This is the Cosmo specific report handling.
-     *
-     * TODO Eventually this will be punted up into jackrabbit.
-     */
-    public ReportInfo getCosmoReportInfo() {
+    private ReportInfo parseReportRequest()
+        throws DavException {
         Document requestDocument = getRequestDocument();
         if (requestDocument == null) {
-            return null;
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST,
+                                   "Report content must not be empty");
         }
         return new ReportInfo(requestDocument.getDocumentElement(),
-                              getDepth(DEPTH_0),
-                              getDavSession());
+                              getDepth(DEPTH_0));
     }
 }
-

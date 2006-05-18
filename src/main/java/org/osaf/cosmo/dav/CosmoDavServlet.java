@@ -42,6 +42,8 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
+import org.apache.jackrabbit.webdav.version.report.Report;
+import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 
 import org.apache.log4j.Logger;
 
@@ -49,14 +51,19 @@ import org.osaf.cosmo.util.CosmoUtil;
 import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavConstants;
+import org.osaf.cosmo.dav.caldav.CaldavReport;
+import org.osaf.cosmo.dav.caldav.CaldavMultiStatusReport;
+import org.osaf.cosmo.dav.caldav.CaldavSingleResourceReport;
 import org.osaf.cosmo.dav.impl.CosmoDavLocatorFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResponseImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavSessionProviderImpl;
-import org.osaf.cosmo.dav.report.Report;
-import org.osaf.cosmo.dav.report.ReportInfo;
+import org.osaf.cosmo.dav.property.CalendarTimezone;
+import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
+import org.osaf.cosmo.dav.property.SupportedCalendarComponentSet;
+import org.osaf.cosmo.dav.report.CosmoReportType;
 import org.osaf.cosmo.io.CosmoInputContext;
 import org.osaf.cosmo.io.InvalidCalendarObjectException;
 import org.osaf.cosmo.io.InvalidDataException;
@@ -67,10 +74,6 @@ import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
-import org.osaf.cosmo.dav.property.CalendarTimezone;
-import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
-import org.osaf.cosmo.dav.property.SupportedCalendarComponentSet;
-import org.osaf.cosmo.dav.report.ReportType;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
@@ -332,25 +335,11 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             return;
         }
 
-        ReportInfo info = null;
-        try {
-            info = ((CosmoDavRequestImpl) request).getCosmoReportInfo();
-        } catch (IllegalArgumentException e) {
-            log.warn("error reading or parsing REPORT request content", e);
-            response.sendError(DavServletResponse.SC_BAD_REQUEST,
-                               e.getMessage());
-            return;
-        }
-        if (info == null) {
-            log.warn("REPORT request missing report info");
-            response.sendError(DavServletResponse.SC_BAD_REQUEST,
-                               "REPORT request missing report info");
-            return;
-        }
+        ReportInfo info = request.getReportInfo();
 
         Ticket authTicket = securityManager.getSecurityContext().getTicket();
 
-        if (ReportType.CALDAV_FREEBUSY.isRequestedReportType(info)) {
+        if (CosmoReportType.CALDAV_FREEBUSY.isRequestedReportType(info)) {
             // check resource type
             if (! (resource.isCollection() ||
                    resource.isCalendarCollection())) {
@@ -383,15 +372,8 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                 }
             }
         }
-
-        try {
-            Report report = ((CosmoDavResourceImpl) resource).getReport(info);
-            response.sendXmlResponse(report,
-                                     DavServletResponse.SC_MULTI_STATUS);
-        } catch (Exception e) {
-            log.warn("error in REPORT module ", e);
-            response.sendError(DavServletResponse.SC_BAD_REQUEST, e.getMessage());
-        }
+        
+        resource.getReport(info).run(response);
     }
 
     /**

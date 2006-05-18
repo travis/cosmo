@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dav.report.caldav;
+package org.osaf.cosmo.dav.caldav;
 
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
@@ -28,56 +28,45 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * @author cyrusdaboo
- * 
- * This class extends the jackrabbit MultiStatusResponse by adding the ability
- * to return a calendar-data elements as needed by some CalDAV reports.
+ * Subclass of
+ * {@link org.apache.jackrabbit.webdav.MultiStatusResponse} that adds
+ * the ability to return the <code>&lt;C:calendar-data&gt;</code> XML
+ * element needed by some CalDAV reports.
+ *
+ * Based on code originally written by Cyrus Daboo.
  */
+public class CaldavMultiStatusResponse extends MultiStatusResponse {
 
-public class CalDAVMultiStatusResponse extends MultiStatusResponse {
-
-    /**
-     * The calendar data as text.
-     */
     private String calendarData;
 
-    public CalDAVMultiStatusResponse(DavResource resource,
+    /** */
+    public CaldavMultiStatusResponse(DavResource resource,
                                      DavPropertyNameSet propNameSet,
                                      int propFindType) {
         super(resource, propNameSet, propFindType);
     }
 
-    /**
-     * @param calendarData
-     *            The calendarData to set.
-     */
+    // our methods
+
+    /** */
     public void setCalendarData(String calendarData) {
         this.calendarData = calendarData;
     }
 
-    /*
-     */
+    /** */
     public Element toXml(Document doc) {
-        // Generate calendar-data element if required
-        Element cdata = null;
         if (calendarData != null) {
-            cdata =
-                DomUtil.createElement(doc,
-                                      CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
-                                      CosmoDavConstants.NAMESPACE_CALDAV);
+            Element cdata = DomUtil.
+                createElement(doc,
+                              CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_DATA,
+                              CosmoDavConstants.NAMESPACE_CALDAV);
             DomUtil.setText(cdata, calendarData);
-        }
 
-        if (cdata != null) {
-            // Create DavProperty for this data
             CalendarDataProperty prop = new CalendarDataProperty(cdata);
             add(prop);
         }
 
-        // Get standard multistatus response from superclass
-        Element response = super.toXml(doc);
-
-        return response;
+        return super.toXml(doc);
     }
 
     private class CalendarDataProperty extends AbstractDavProperty {
@@ -95,8 +84,6 @@ public class CalDAVMultiStatusResponse extends MultiStatusResponse {
             return null;
         }
 
-        /*
-         */
         public Element toXml(Document doc) {
             return calendarData;
         }

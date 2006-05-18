@@ -79,6 +79,7 @@ class CosmoMultiget(DAVTest):
         #Setup request 
         f = open('files/reports/multiget/1.xml')
         report1body = f.read()
+        report1body = report1body.replace('multigetTestAccount','multigetTestAccount%s'%self.appendUser)
         self.request('REPORT', self.calpath, body=report1body, headers=self.headers)
         self.checkStatus(207)
         
@@ -98,6 +99,7 @@ class CosmoMultiget(DAVTest):
         #Setup request 
         f = open('files/reports/multiget/2.xml')
         report2body = f.read()
+        report2body = report2body.replace('multigetTestAccount','multigetTestAccount%s'%self.appendUser)
         self.request('REPORT', self.calpath, body=report2body, headers=self.headers)
         self.checkStatus(207)
         
@@ -113,6 +115,7 @@ class CosmoMultiget(DAVTest):
         #Setup request 
         f = open('files/reports/multiget/3.xml')
         report3body = f.read()
+        report3body = report3body.replace('multigetTestAccount','multigetTestAccount%s'%self.appendUser)
         self.request('REPORT', self.calpath, body=report3body, headers=self.headers)
         self.checkStatus(207)
         
@@ -133,6 +136,7 @@ class CosmoMultiget(DAVTest):
         #Setup request 
         f = open('files/reports/multiget/4.xml')
         report4body = f.read()
+        report4body = report4body.replace('multigetTestAccount','multigetTestAccount%s'%self.appendUser)
         self.request('REPORT', self.calpath, body=report4body, headers=self.headers)
         self.checkStatus(207)
         
@@ -156,6 +160,7 @@ class CosmoMultiget(DAVTest):
         
         f = open('files/reports/multiget/5.xml')
         report5body = f.read()
+        report5body = report5body.replace('multigetTestAccount','multigetTestAccount%s'%self.appendUser)
         self.request('REPORT', self.calpath, body=report5body, headers=self.headers)
         self.checkStatus(207)
         

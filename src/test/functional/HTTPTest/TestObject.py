@@ -15,7 +15,7 @@ class TestObject:
         self.threadNum = threadNum
         self.appendDict = appendDict
         self.appendList = appendList
-        # ctype=xml
+        print 'Testing ----- %s' % threadNum
 
     def printOut(self, string):
         
@@ -25,6 +25,8 @@ class TestObject:
             if self.threadNum is not None:
                 print 'Thread %s :: %s%s' % (self.threadNum, self.printAppend, string)
             
+        print 'Test Printout --- %s' % string    
+            
     def testStart(self, testname):
         """
         Set test name
@@ -33,6 +35,8 @@ class TestObject:
         self.test = testname
         if self.debug > 0:
                 self.printOut('Starting New Test :: %s' % self.test)
+                
+        print 'startingTest %s' % self.test
             
     def report(self, result, test=None, comment=None):
         
@@ -47,6 +51,8 @@ class TestObject:
                 self.printOut("Passed :: Test %s :: %s" % (test, comment))
         if result == False:
             self.printOut("Failure :: Test %s :: %s" % (test, comment))
+            
+        print '%s :: Test %s :: %s' % (result, test, comment)
             
             
     def runRecurring(self):

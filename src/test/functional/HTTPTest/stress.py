@@ -130,6 +130,29 @@ if __name__ == "__main__":
     threads = 2
     wait = 60
     
+    testsDict = {'cosmo_500events':'Cosmo500Events',
+                  #'cosmo_basicquery':'CosmoBasicQuery',
+                  #'cosmo_bugs':'CosmoBugs',
+                  #'cosmo_chandler061':'CosmoChandlerZeroPointSixPointOne',
+                  #'cosmo_freebusy':'CosmoFreeBusy',
+                  #'cosmo_invalid':'CosmoInvalid',
+                  #'cosmo_limitexpand':'CosmoLimitExpand',
+                  #'cosmo_mkcalendar':'CosmoMkcalendar',
+                  #'cosmo_multiget':'CosmoMultiget',
+                  #'cosmo_ticket':'CosmoTicket',
+                  #'cosmo_timerangequery':'CosmoTimeRangeQuery'
+                  }
+    
+    def parseTests(string):
+        
+        l = ','.split(string)
+        tests = {}
+        for test in l:
+            t = ':'.split(string)
+            tests.add['%s'%t[0]] = '%s' % t[1]
+            
+        return tests 
+    
     for arg in sys.argv:
         args = arg.split("=")
         if args[0] == "host":
@@ -144,10 +167,12 @@ if __name__ == "__main__":
             debug = int(args[1])   
         elif args[0] == "threads":
             threads = int(args[1])  
+        elif args[0] == "tests":
+            testsDict = parseTests(args[1])
     
     optsDict = {'host':'\'%s\'' % host, 'port':'%s' % port, 'path':'\'%s\'' % path, 'mask':'0', 'recurrence':recurrence}
     
-    runThreaded({'cosmo_basicquery':'CosmoBasicQuery', 'cosmo_timerangequery':'CosmoTimeRangeQuery'}, threads=threads, optsDict=optsDict, debug=debug)
+    runThreaded(testsDict, threads=threads, optsDict=optsDict, debug=debug)
 
     
     

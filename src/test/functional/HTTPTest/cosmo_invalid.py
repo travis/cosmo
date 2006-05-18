@@ -91,6 +91,7 @@ class CosmoInvalid(HTTPTest):
         #Setup request 
         f = open('files/reports/invalid/noSubComp.xml')
         report1body = f.read()
+        report1body = report1body.replace('invalidTestAccount','invalidTestAccount%s'%self.appendUser)
         self.request('REPORT', calpath, body=report1body, headers=self.headers)
         
         self.checkStatus(400)

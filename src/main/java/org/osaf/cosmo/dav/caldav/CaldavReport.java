@@ -96,9 +96,9 @@ public abstract class CaldavReport implements Report, DavConstants {
     public void init(DavResource resource,
                      ReportInfo info)
         throws DavException {
-        parseReport(info);
         this.resource = (CosmoDavResource) resource;
         this.info = info;
+        parseReport(info);
     }
 
     /** */

@@ -121,15 +121,10 @@ public class QueryReport extends CaldavMultiStatusReport
 
     private QueryFilter findQueryFilter(ReportInfo info)
         throws DavException {
-        Element propdata = DomUtil.getChildElement(info.getReportElement(),
-                                                   XML_PROP, NAMESPACE);
-        if (propdata == null) {
-            return null;
-        }
-        Element filterdata = DomUtil.
-            getChildElement(propdata,
-                            CosmoDavConstants.ELEMENT_CALDAV_FILTER,
-                            CosmoDavConstants.NAMESPACE_CALDAV);
+        Element filterdata =
+            DomUtil.getChildElement(info.getReportElement(),
+                                    CosmoDavConstants.ELEMENT_CALDAV_FILTER,
+                                    CosmoDavConstants.NAMESPACE_CALDAV);
         if (filterdata == null) {
             return null;
         }

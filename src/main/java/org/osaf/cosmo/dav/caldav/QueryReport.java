@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dav.caldav;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -150,7 +151,13 @@ public class QueryReport extends CaldavMultiStatusReport
         }
 
         qf.setTimezone(tz);
-        qf.parseElement(filterdata);
+
+        try {
+            qf.createFromXml(filterdata);
+        } catch (ParseException e) {
+            log.error("error parsing CALDAV:calendar-data", e);
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "error parsing CALDAV:calendar-data: " + e.getMessage());
+        }
 
         return qf;
     }

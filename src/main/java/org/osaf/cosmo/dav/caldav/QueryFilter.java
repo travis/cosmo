@@ -44,61 +44,49 @@ import net.fortuna.ical4j.model.Calendar;
 import org.w3c.dom.Element;
 
 /**
- * @author cyrusdaboo
- * 
- * This class represents an object model for the calendar-query report's
- * <filter> element. It parses the element out and then provides methods to
- * generate XPATH queries as needed for JCR.
+ * This class represents an object model for the calendar-query
+ * report's <filter> element. It parses the element out and then
+ * provides methods to generate XPATH queries as needed for JCR.
+ *
+ * Based on code written by Cyrus Daboo.
  */
 
 public class QueryFilter implements SchemaConstants {
-    private static final Logger log =
-        Logger.getLogger(QueryFilter.class);
+    private static final Logger log = Logger.getLogger(QueryFilter.class);
 
-    /**
-     * The parsed top-level filter object.
-     */
     protected compfilter filter;
     protected VTimeZone timezone;
 
     public QueryFilter() {
     }
 
-    /**
-     * @param tz
-     *            The tz to set.
-     */
+    /** */
     public void setTimezone(VTimeZone timezone) {
         this.timezone = timezone;
     }
 
-    /**
-     * Parse the <filter> XML element.
-     * 
-     * @param element
-     */
-    public void parseElement(Element element) {
-
+    /** */
+    public void createFromXml(Element element)
+        throws ParseException {
         // Can only have a single comp-filter element
         ElementIterator i =
             DomUtil.getChildren(element,
                                 CosmoDavConstants.ELEMENT_CALDAV_COMP_FILTER,
                                 CosmoDavConstants.NAMESPACE_CALDAV);
         if (! i.hasNext()) {
-            throw new IllegalArgumentException("CALDAV:filter must contain a comp-filter");
+            throw new ParseException("CALDAV:filter must contain a comp-filter", -1);
         }
 
         Element child = i.nextElement();
 
         if (i.hasNext()) {
-            throw new IllegalArgumentException("CALDAV:filter can contain only one comp-filter");
+            throw new ParseException("CALDAV:filter can contain only one comp-filter", -1);
         }
 
         // Create new component filter and have it parse the element
         filter = new compfilter();
 
-        //raises an IllegalArgumentException if parsing fails
-        filter.parseElement(child);
+        filter.createFromXml(child);
     }
 
     /**
@@ -127,17 +115,11 @@ public class QueryFilter implements SchemaConstants {
     }
 
     /**
-     * Generate fixed and floating time periods as a string.
-     * 
-     * @param period
-     *            UTC period to convert
-     * @return string representing both sets of periods
      */
     protected String generatePeriods(Period period) {
         // Get fixed start/end time
         DateTime dstart = period.getStart();
         DateTime dend = period.getEnd();
-
 
         // Get float start/end
         DateTime fstart = (DateTime) Dates.getInstance(dstart, dstart);
@@ -150,15 +132,16 @@ public class QueryFilter implements SchemaConstants {
         fend.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
 
         return dstart.toString() + '/' + dend.toString() + ','
-                + fstart.toString() + '/' + fend.toString();
+            + fstart.toString() + '/' + fend.toString();
     }
 
     private abstract class filter {
 
         abstract protected String generateTests(String prefix);
 
-        protected String generateOrList(List items, String prefix, String result) {
-
+        protected String generateOrList(List items,
+                                        String prefix,
+                                        String result) {
             if (items.size() != 0) {
                 boolean andExpression = (result.length() != 0);
                 if (andExpression) {
@@ -186,10 +169,6 @@ public class QueryFilter implements SchemaConstants {
     }
 
     /**
-     * @author cyrusdaboo
-     * 
-     * Object that models the <comp-filter> element.
-     * 
      */
     private class compfilter extends filter {
 
@@ -197,36 +176,23 @@ public class QueryFilter implements SchemaConstants {
         protected boolean useTimeRange;
         protected Period timeRange;
 
-        /**
-         * List of embedded <comp-filter> elements. NULL if none are present.
-         */
         protected List compFilters;
-
-        /**
-         * List of embedded <prop-filter> elements. NULL if none are present.
-         */
         protected List propFilters;
 
         public compfilter() {
             useTimeRange = false;
         }
 
-        /**
-         * Parse the <comp-filter> XML element.
-         * 
-         * @param element
-         *            <comp-filter> element to parse
-         *
-         */
-        public void parseElement(Element element) {
+        /** */
+        public void createFromXml(Element element)
+        throws ParseException {
             // Name must be present
             name =
                 DomUtil.getAttribute(element,
                                      CosmoDavConstants.ATTR_CALDAV_NAME, null);
 
             if (name == null) {
-                throw new IllegalArgumentException("CALDAV:comp-filter a calendar component " +
-                                                   "name  (e.g., \"VEVENT\") is required");
+                throw new ParseException("CALDAV:comp-filter a calendar component name  (e.g., \"VEVENT\") is required", -1);
             }
 
             // Look at each child component
@@ -241,8 +207,7 @@ public class QueryFilter implements SchemaConstants {
 
                     // Can only have one time-range element in a comp-filter
                     if (got_one) {
-                        throw new IllegalArgumentException("CALDAV:comp-filter only one " +
-                                                           "time-range element permitted");
+                        throw new ParseException("CALDAV:comp-filter only one time-range element permitted", -1);
                     }
 
                     got_one = true;
@@ -250,46 +215,34 @@ public class QueryFilter implements SchemaConstants {
                     // Mark the value
                     useTimeRange = true;
 
-                    try {
-                        // Get start (must be present)
-                        String start =
-                            DomUtil.getAttribute(child,
-                                CosmoDavConstants.ATTR_CALDAV_START, null);
-                        if (start == null) {
-                            throw new IllegalArgumentException("CALDAV:comp-filter " +
-                                                   "time-range requires a start time");
-                        }
-
-                        DateTime trstart = new DateTime(start);
-
-                        if (! trstart.isUtc()) {
-                            throw new IllegalArgumentException("CALDAV:param-filter error " +
-                                              "timerange start must be UTC");
-                        }
-
-
-                        // Get end (must be present)
-                        String end =
-                            DomUtil.getAttribute(child,
-                                CosmoDavConstants.ATTR_CALDAV_END, null);
-                        if (end == null) {
-                            throw new IllegalArgumentException("CALDAV:comp-filter " +
-                                                   "time-range requires an end time"); 
-                        }
-
-                        DateTime trend = new DateTime(end);
-
-                        if (! trend.isUtc()) {
-                            throw new IllegalArgumentException("CALDAV:param-filter error " +
-                                              "timerange end must be UTC");
-                        }
-
-                        timeRange = new Period(trstart, trend);
-
-                    } catch (ParseException e) {
-                        throw new IllegalArgumentException("CALDAV:comp-filter error while parsing XML", e);
+                    // Get start (must be present)
+                    String start =
+                        DomUtil.getAttribute(child,
+                                             CosmoDavConstants.ATTR_CALDAV_START, null);
+                    if (start == null) {
+                        throw new ParseException("CALDAV:comp-filter time-range requires a start time", -1);
                     }
 
+                    DateTime trstart = new DateTime(start);
+                    if (! trstart.isUtc()) {
+                        throw new ParseException("CALDAV:param-filter timerange start must be UTC", -1);
+                    }
+
+                    
+                    // Get end (must be present)
+                    String end =
+                        DomUtil.getAttribute(child,
+                                             CosmoDavConstants.ATTR_CALDAV_END, null);
+                    if (end == null) {
+                        throw new ParseException("CALDAV:comp-filter time-range requires an end time", -1); 
+                    }
+
+                    DateTime trend = new DateTime(end);
+                    if (! trend.isUtc()) {
+                        throw new ParseException("CALDAV:param-filter timerange end must be UTC", -1);
+                    }
+
+                    timeRange = new Period(trstart, trend);
                 } else if (CosmoDavConstants.ELEMENT_CALDAV_COMP_FILTER
                         .equals(child.getLocalName())) {
 
@@ -300,8 +253,7 @@ public class QueryFilter implements SchemaConstants {
                     // Create new component filter
                     compfilter cfilter = new compfilter();
 
-                    //throws an IllegalArgumentException if an error occurs during parsing
-                    cfilter.parseElement(child);
+                    cfilter.createFromXml(child);
 
                     // Add to list
                     compFilters.add(cfilter);
@@ -316,8 +268,7 @@ public class QueryFilter implements SchemaConstants {
                     // Create new prop filter
                     propfilter pfilter = new propfilter();
 
-                    //throws an IllegalArgumentException if an error occurs during parsing
-                    pfilter.parseElement(child);
+                    pfilter.createFromXml(child);
 
                     // Add to list
                     propFilters.add(pfilter);
@@ -325,13 +276,7 @@ public class QueryFilter implements SchemaConstants {
             }
         }
 
-        /**
-         * Generate an XPath element for testing components.
-         * 
-         * @param prefix
-         *            the prefix string used for the flat iCal namespace
-         * @return the XPath element
-         */
+        /** */
         public String generateTests(String prefix) {
             String result = new String();
 
@@ -374,10 +319,6 @@ public class QueryFilter implements SchemaConstants {
     }
 
     /**
-     * @author cyrusdaboo
-     * 
-     * Object that models the <prop-filter> element.
-     * 
      */
     private class propfilter extends filter {
 
@@ -388,9 +329,6 @@ public class QueryFilter implements SchemaConstants {
         protected String textMatch;
         protected boolean isCaseless;
 
-        /**
-         * List of embedded <param-filter> elements. NULL if none are present.
-         */
         protected List paramFilters;
 
         public propfilter() {
@@ -398,20 +336,16 @@ public class QueryFilter implements SchemaConstants {
             useTextMatch = false;
         }
 
-        /**
-         * Parse the <param-filter> XML element.
-         * 
-         * @param element
-         */
-        public void parseElement(Element element) {
+        /** */
+        public void createFromXml(Element element)
+            throws ParseException {
 
             // Name must be present
             name =
                 DomUtil.getAttribute(element,
                                      CosmoDavConstants.ATTR_CALDAV_NAME, null);
             if (name == null) {
-                throw new IllegalArgumentException("CALDAV:prop-filter a calendar " +
-                                    "property name (e.g., \"ATTENDEE\") is required");
+                throw new ParseException("CALDAV:prop-filter a calendar property name (e.g., \"ATTENDEE\") is required", -1);
             }
 
             // Look at each child component
@@ -426,61 +360,46 @@ public class QueryFilter implements SchemaConstants {
 
                     // Can only have one time-range or text-match
                     if (got_one)
-                        throw new IllegalArgumentException("CALDAV:prop-filter only one time-range or " +
-                                                           "text-match element permitted");
+                        throw new ParseException("CALDAV:prop-filter only one time-range or text-match element permitted", -1);
 
                     got_one = true;
 
                     // Get value
                     useTimeRange = true;
 
-                    try {
-                        // Get start (must be present)
-                        String start =
-                            DomUtil.getAttribute(child,
-                                CosmoDavConstants.ATTR_CALDAV_START, null);
-                        if (start == null) {
-                            throw new IllegalArgumentException("CALDAV:prop-filter " +
-                                                     "time-range requires a start time");
-                        }
-
-                        DateTime trstart = new DateTime(start);
-
-                        if (! trstart.isUtc()) {
-                            throw new IllegalArgumentException("CALDAV:param-filter error " +
-                                              "timerange start must be UTC");
-                        }
-
-                        // Get end (must be present)
-                        String end =
-                            DomUtil.getAttribute(child,
-                                CosmoDavConstants.ATTR_CALDAV_END, null);
-                        if (end == null) {
-                            throw new IllegalArgumentException("CALDAV:prop-filter " +
-                                              "time-range requires an end time");
-                        }
-
-                        DateTime trend = new DateTime(end);
-
-                        if (! trend.isUtc()) {
-                            throw new IllegalArgumentException("CALDAV:param-filter error " +
-                                              "timerange end must be UTC");
-                        }
-
-                        timeRange = new Period(trstart, trend);
-
-                    } catch (ParseException e) {
-                        throw new IllegalArgumentException("CALDAV:param-filter error " +
-                                                         "while parsing XML", e);
+                    // Get start (must be present)
+                    String start =
+                        DomUtil.getAttribute(child,
+                                             CosmoDavConstants.ATTR_CALDAV_START, null);
+                    if (start == null) {
+                        throw new ParseException("CALDAV:prop-filter time-range requires a start time", -1);
                     }
 
+                    DateTime trstart = new DateTime(start);
+                    if (! trstart.isUtc()) {
+                        throw new ParseException("CALDAV:param-filter timerange start must be UTC", -1);
+                    }
+
+                    // Get end (must be present)
+                    String end =
+                        DomUtil.getAttribute(child,
+                                             CosmoDavConstants.ATTR_CALDAV_END, null);
+                    if (end == null) {
+                        throw new ParseException("CALDAV:prop-filter time-range requires an end time", -1);
+                    }
+
+                    DateTime trend = new DateTime(end);
+                    if (! trend.isUtc()) {
+                        throw new ParseException("CALDAV:param-filter timerange end must be UTC", -1);
+                    }
+
+                    timeRange = new Period(trstart, trend);
                 } else if (CosmoDavConstants.ELEMENT_CALDAV_TEXT_MATCH
-                        .equals(child.getLocalName())) {
+                           .equals(child.getLocalName())) {
 
                     // Can only have one time-range or text-match
                     if (got_one) {
-                        throw new IllegalArgumentException("CALDAV:prop-filter only " +
-                                            "one time-range or text-match element permitted");
+                        throw new ParseException("CALDAV:prop-filter only one time-range or text-match element permitted", -1);
                     }
 
                     got_one = true;
@@ -511,8 +430,7 @@ public class QueryFilter implements SchemaConstants {
                     // Create new param filter
                     paramfilter pfilter = new paramfilter();
 
-                    //throws an IllegalArgumentException if an error occurs during parsing
-                    pfilter.parseElement(child);
+                    pfilter.createFromXml(child);
 
                     // Add to list
                     paramFilters.add(pfilter);
@@ -520,13 +438,7 @@ public class QueryFilter implements SchemaConstants {
             }
         }
 
-        /**
-         * Generate an XPath element for testing components.
-         * 
-         * @param prefix
-         *            the prefix string used for the flat iCal namespace
-         * @return the XPath element
-         */
+        /** */
         public String generateTests(String prefix) {
 
             String result = new String();
@@ -560,14 +472,7 @@ public class QueryFilter implements SchemaConstants {
         }
     }
 
-    /**
-     * @author cyrusdaboo
-     * 
-     * Object that models the <param-filter> element.
-     * 
-     */
-
-     //This class is raising errors
+    /** */
     private class paramfilter extends filter {
 
         protected String name;
@@ -575,43 +480,32 @@ public class QueryFilter implements SchemaConstants {
         protected String textMatch;
         protected boolean isCaseless;
 
-        /**
-         * 
-         */
+        /** */
         public paramfilter() {
-
             useTextMatch = false;
         }
 
-        /**
-         * Parse the <param-filter> XML element.
-         *
-         * @param element
-         */
-        public void parseElement(Element element) {
-
+        /** */
+        public void createFromXml(Element element)
+            throws ParseException {
             // Get name which must be present
             name = DomUtil.getAttribute(element,
-                                     CosmoDavConstants.ATTR_CALDAV_NAME, null);
+                                        CosmoDavConstants.ATTR_CALDAV_NAME, null);
 
             if (name == null) {
-                throw new IllegalArgumentException("CALDAV:param-filter a property " + 
-                                                   "parameter name " +
-                                                   "(e.g., \"PARTSTAT\") is required");
+                throw new ParseException("CALDAV:param-filter a property parameter name (e.g., \"PARTSTAT\") is required", -1);
             }
 
             // Can only have a single ext-match element
             ElementIterator i = DomUtil.getChildren(element);
             if (! i.hasNext()) {
-                throw new IllegalArgumentException("CALDAV:param-filter only a " +
-                                                   "single text-match element is allowed");
+                throw new ParseException("CALDAV:param-filter only a single text-match element is allowed", -1);
             }
 
             Element child = i.nextElement();
 
             if (i.hasNext()) {
-                throw new IllegalArgumentException("CALDAV:param-filter only a single " +
-                                                   "text-match element is allowed");
+                throw new ParseException("CALDAV:param-filter only a single text-match element is allowed", -1);
             }
 
             if (CosmoDavConstants.ELEMENT_CALDAV_TEXT_MATCH.equals(child
@@ -633,17 +527,10 @@ public class QueryFilter implements SchemaConstants {
                 else
                     isCaseless = true;
             } else
-                throw new IllegalArgumentException("CALDAV:prop-filter an invalid " +
-                                                   "element name found");
+                throw new ParseException("CALDAV:prop-filter an invalid element name found", -1);
         }
 
-        /**
-         * Generate an XPath element for testing parameters.
-         * 
-         * @param prefix
-         *            the prefix string used for the flat iCal namespace
-         * @return the XPath element
-         */
+        /** */
         public String generateTests(String prefix) {
 
             String result = new String();

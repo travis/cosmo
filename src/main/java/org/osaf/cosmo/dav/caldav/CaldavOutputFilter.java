@@ -92,9 +92,7 @@ public class CaldavOutputFilter extends OutputFilter {
                     .equals(child.getLocalName())) {
                 limitfb = parsePeriod(child, true);
             } else {
-                throw new IllegalArgumentException("Invalid child element: "  +
-                                                   child.getLocalName() +
-                                                   " found in calendar-data element");
+                throw new ParseException("Invalid child element " + child.getLocalName() + " found in calendar-data element", -1);
             }
         }
 
@@ -210,46 +208,35 @@ public class CaldavOutputFilter extends OutputFilter {
         return result;
     }
 
-    private static Period parsePeriod(Element node) {
+    private static Period parsePeriod(Element node)
+        throws ParseException {
         return parsePeriod(node, false);
     }
 
-    private static Period parsePeriod(Element node, boolean utc) {
-        try {
-            // Get start (must be present)
-            String start =
-                DomUtil.getAttribute(node,
-                                     CosmoDavConstants.ATTR_CALDAV_START, null);
-
-            if (start == null)
-                return null;
-
-            DateTime trstart = new DateTime(start);
-
-            if (utc && !trstart.isUtc()) {
-                throw new IllegalArgumentException("CALDAV:timerange error " +
-                                                   "start must be UTC");
-            }
-
-
-            // Get end (must be present)
-            String end =
-                DomUtil.getAttribute(node,
-                                     CosmoDavConstants.ATTR_CALDAV_END, null);
-            if (end == null)
-                return null;
-
-            DateTime trend = new DateTime(end);
-
-            if (utc && !trend.isUtc()) {
-                throw new IllegalArgumentException("CALDAV:timerange error " +
-                                                   "end must be UTC");
-            }
-
-            return new Period(trstart, trend);
-
-        } catch (ParseException e) {
-            return null;
+    private static Period parsePeriod(Element node, boolean utc)
+        throws ParseException {
+        String start =
+            DomUtil.getAttribute(node,
+                                 CosmoDavConstants.ATTR_CALDAV_START, null);
+        if (start == null) {
+            throw new ParseException("CALDAV:timerange start must be present", -1);
         }
+        DateTime trstart = new DateTime(start);
+        if (utc && !trstart.isUtc()) {
+            throw new ParseException("CALDAV:timerange start must be UTC", -1);
+        }
+
+        String end =
+            DomUtil.getAttribute(node,
+                                 CosmoDavConstants.ATTR_CALDAV_END, null);
+        if (end == null) {
+            throw new ParseException("CALDAV:timerange end must be present", -1);
+        }
+        DateTime trend = new DateTime(end);
+        if (utc && !trend.isUtc()) {
+            throw new ParseException("CALDAV:timerange end must be UTC", -1);
+        }
+
+        return new Period(trstart, trend);
     }
 }

@@ -64,7 +64,6 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
-import org.osaf.cosmo.dav.report.CosmoReportType;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -88,7 +87,7 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
 
     /** */
     public ReportType getType() {
-        return CosmoReportType.CALDAV_FREEBUSY;
+        return CALDAV_FREEBUSY;
     }
 
     // CaldavReport methods
@@ -100,9 +99,8 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
      */
     protected void parseReport(ReportInfo info)
         throws DavException {
-        if (! CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_FREEBUSY.
-            equals(info.getReportName())) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "CALDAV:free-busy-query element expected.");
+        if (! getType().isRequestedReportType(info)) {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "report not of type " + getType());
         }
 
         Element tre =

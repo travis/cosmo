@@ -30,9 +30,7 @@ import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
-import org.osaf.cosmo.dav.report.CosmoReportType;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,7 +56,7 @@ public class MultigetReport extends CaldavMultiStatusReport
 
     /** */
     public ReportType getType() {
-        return CosmoReportType.CALDAV_MULTIGET;
+        return CALDAV_MULTIGET;
     }
 
     // CaldavReport methods
@@ -70,9 +68,8 @@ public class MultigetReport extends CaldavMultiStatusReport
      */
     protected void parseReport(ReportInfo info)
         throws DavException {
-        if (! CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_MULTIGET.
-            equals(info.getReportName())) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "CALDAV:calendar-multiget element expected.");
+        if (! getType().isRequestedReportType(info)) {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "report not of type " + getType());
         }
 
         setPropFindProps(info.getPropertyNameSet());

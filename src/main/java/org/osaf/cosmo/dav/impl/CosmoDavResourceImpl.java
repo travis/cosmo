@@ -66,7 +66,6 @@ import org.osaf.cosmo.dav.property.CosmoResourceType;
 import org.osaf.cosmo.dav.property.SupportedCalendarComponentSet;
 import org.osaf.cosmo.dav.property.SupportedCalendarData;
 import org.osaf.cosmo.dav.property.TicketDiscovery;
-import org.osaf.cosmo.dav.report.CosmoReportType;
 import org.osaf.cosmo.io.CosmoImportContext;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;

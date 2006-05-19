@@ -27,6 +27,13 @@ public class CosmoDavPropertyName {
 
     /**
      */
+    public static final DavPropertyName CALENDARDATA =
+        DavPropertyName.create(CosmoDavConstants.
+                               PROPERTY_CALDAV_CALENDAR_DATA,
+                               CosmoDavConstants.NAMESPACE_CALDAV);
+
+    /**
+     */
     public static final DavPropertyName CALENDARDESCRIPTION =
         DavPropertyName.create(CosmoDavConstants.
                                PROPERTY_CALDAV_CALENDAR_DESCRIPTION,

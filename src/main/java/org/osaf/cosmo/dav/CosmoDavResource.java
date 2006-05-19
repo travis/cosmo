@@ -28,7 +28,7 @@ import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 
-import org.osaf.cosmo.dav.report.CosmoReportType;
+import org.osaf.cosmo.dav.caldav.CaldavReport;
 import org.osaf.cosmo.dav.ticket.TicketDavRequest;
 import org.osaf.cosmo.model.Ticket;
 
@@ -57,9 +57,9 @@ public interface CosmoDavResource extends DavResource {
      * Constants representing the DAV reports supported by Cosmo.
      */
     public ReportType[] REPORTS = {
-        CosmoReportType.CALDAV_QUERY,
-        CosmoReportType.CALDAV_MULTIGET,
-        CosmoReportType.CALDAV_FREEBUSY
+        CaldavReport.CALDAV_QUERY,
+        CaldavReport.CALDAV_MULTIGET,
+        CaldavReport.CALDAV_FREEBUSY
     };
 
     /**

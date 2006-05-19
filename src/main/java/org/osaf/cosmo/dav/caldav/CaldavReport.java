@@ -18,6 +18,8 @@ package org.osaf.cosmo.dav.caldav;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,11 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryResult;
 import javax.jcr.query.QueryManager;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.CalendarOutputter;
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.filter.OutputFilter;
 
 import org.apache.jackrabbit.webdav.DavConstants;
@@ -41,6 +48,7 @@ import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.jcr.JcrDavSession;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
+import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 
 import org.apache.commons.logging.Log;
@@ -59,6 +67,22 @@ import org.w3c.dom.Element;
  */
 public abstract class CaldavReport implements Report, DavConstants {
     private static final Log log = LogFactory.getLog(CaldavReport.class);
+
+    /** */
+    public static final ReportType CALDAV_QUERY =
+        ReportType.register(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_QUERY,
+                            CosmoDavConstants.NAMESPACE_CALDAV,
+                            QueryReport.class);
+    /** */
+    public static final ReportType CALDAV_MULTIGET =
+        ReportType.register(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_MULTIGET,
+                            CosmoDavConstants.NAMESPACE_CALDAV,
+                            MultigetReport.class);
+    /** */
+    public static final ReportType CALDAV_FREEBUSY =
+        ReportType.register(CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_FREEBUSY,
+                            CosmoDavConstants.NAMESPACE_CALDAV,
+                            FreeBusyReport.class);
 
     private CosmoDavResource resource;
     private ReportInfo info;
@@ -203,10 +227,10 @@ public abstract class CaldavReport implements Report, DavConstants {
     }
 
     /**
-     * Read the calendar data from the given dav resource. No attempt
-     * is made to validate the data.
+     * Read the calendar data from the given dav resource, filtering
+     * it if an output filter has been set.
      */
-    protected String readCalendarData(CosmoDavResource res)
+    protected String readCalendarData(CosmoDavResource resource)
         throws DavException {
         OutputContext ctx = new OutputContext() {
                 // simple output context that ignores all setters,
@@ -242,12 +266,43 @@ public abstract class CaldavReport implements Report, DavConstants {
                 }
             };
         try {
-            res.spool(ctx);
+            resource.spool(ctx);
         } catch (IOException e) {
             log.error("cannot read calendar data from resource " + resource.getResourcePath(), e);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot read calendar data: " + e.getMessage());
         }
-        return ctx.getOutputStream().toString();
+
+        String calendarData = ctx.getOutputStream().toString();
+
+        if (outputFilter != null) {
+            try {
+                CalendarBuilder builder = new CalendarBuilder();
+                Calendar calendar =
+                    builder.build(new StringReader(calendarData));
+
+                // filter the output
+                StringWriter out = new StringWriter();
+                CalendarOutputter outputter = new CalendarOutputter();
+                outputter.output(calendar, out, outputFilter);
+                calendarData = out.toString();
+                out.close();
+
+                // NB ical4j's outputter may generate \r\n line
+                // ends but we need \n only
+                calendarData = calendarData.replaceAll("\r", "");
+            } catch (IOException e) {
+                log.error("cannot read or filter calendar data for resource " + resource.getResourcePath(), e);
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot read or filter calendar data: " + e.getMessage());
+            } catch (ParserException e) {
+                log.error("cannot parse calendar data for resource " + resource.getResourcePath(), e);
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot parse calendar data: " + e.getMessage());
+            } catch (ValidationException e) {
+                log.error("invalid calendar data for resource " + resource.getResourcePath(), e);
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "invalid calendar data: " + e.getMessage());
+            }
+        }
+
+        return calendarData;
     }
 
     // private methods

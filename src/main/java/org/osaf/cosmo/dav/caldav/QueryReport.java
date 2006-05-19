@@ -37,7 +37,6 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
-import org.osaf.cosmo.dav.report.CosmoReportType;
 import org.osaf.cosmo.util.CosmoUtil;
 
 import org.w3c.dom.Document;
@@ -65,7 +64,7 @@ public class QueryReport extends CaldavMultiStatusReport
 
     /** */
     public ReportType getType() {
-        return CosmoReportType.CALDAV_QUERY;
+        return CALDAV_QUERY;
     }
 
     // CaldavReport methods
@@ -77,9 +76,8 @@ public class QueryReport extends CaldavMultiStatusReport
      */
     protected void parseReport(ReportInfo info)
         throws DavException {
-        if (! CosmoDavConstants.ELEMENT_CALDAV_CALENDAR_QUERY.
-            equals(info.getReportName())) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "CALDAV:calendar-query element expected.");
+        if (! getType().isRequestedReportType(info)) {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "report not of type " + getType());
         }
 
         setPropFindProps(info.getPropertyNameSet());

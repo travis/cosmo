@@ -16,21 +16,14 @@
 package org.osaf.cosmo.dav.caldav;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
-
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.ValidationException;
 
 import org.apache.jackrabbit.util.Text;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
+import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 
@@ -39,6 +32,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
+import org.osaf.cosmo.dav.property.CalendarData;
+import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -139,47 +134,24 @@ public abstract class CaldavMultiStatusReport extends CaldavReport {
 
     // private methods
 
-    private CaldavMultiStatusResponse
+    private MultiStatusResponse
         buildMultiStatusResponse(CosmoDavResource resource)
         throws DavException {
-        CaldavMultiStatusResponse response =
-            new CaldavMultiStatusResponse(resource, propfindProps,
-                                          propfindType);
+        // clone the incoming property name set and remove
+        // calendar-data since we generate it manually
+        DavPropertyNameSet resourceProps =
+            new DavPropertyNameSet(propfindProps);
+        resourceProps.remove(CosmoDavPropertyName.CALENDARDATA);
 
-        if (resource.exists()) {
-            if (getInfo().getPropertyNameSet().
-                contains(CosmoDavConstants.CALENDARDATA)) {
-                String calendarData = readCalendarData(resource);
+        MultiStatusResponse response =
+            new MultiStatusResponse(resource, resourceProps, propfindType);
 
-                if (getOutputFilter() != null) {
-                    try {
-                        CalendarBuilder builder = new CalendarBuilder();
-                        Calendar calendar =
-                            builder.build(new StringReader(calendarData));
-
-                        // filter the output
-                        StringWriter out = new StringWriter();
-                        CalendarOutputter outputter = new CalendarOutputter();
-                        outputter.output(calendar, out, getOutputFilter());
-                        calendarData = out.toString();
-                        out.close();
-
-                        // NB ical4j's outputter may generate \r\n line
-                        // ends but we need \n only
-                        calendarData = calendarData.replaceAll("\r", "");
-                    } catch (IOException e) {
-                        log.error("cannot read or filter calendar data for resource " + resource.getResourcePath(), e);
-                        throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot read or filter calendar data: " + e.getMessage());
-                    } catch (ParserException e) {
-                        log.error("cannot parse calendar data for resource " + resource.getResourcePath(), e);
-                        throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot parse calendar data: " + e.getMessage());
-                    } catch (ValidationException e) {
-                        log.error("invalid calendar data for resource " + resource.getResourcePath(), e);
-                        throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "invalid calendar data: " + e.getMessage());
-                    }
-                }
-                response.setCalendarData(calendarData);
+        if (propfindProps.contains(CosmoDavConstants.CALENDARDATA)) {
+            String calendarData = null;
+            if (resource.exists()) {
+                calendarData = readCalendarData(resource);
             }
+            response.add(new CalendarData(calendarData));
         }
 
         return response;

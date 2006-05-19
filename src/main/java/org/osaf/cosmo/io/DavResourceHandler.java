@@ -212,7 +212,7 @@ public class DavResourceHandler extends DefaultHandler
 
                 if (! CosmoConstants.INDEX_VIRTUAL_PROPERTIES) {
                     if (log.isDebugEnabled()) {
-                        log.debug("storing flattened properties");
+//                        log.debug("storing flattened properties");
                     }
                     // set flattened properties
                     // XXX: if the node is being updated, find the
@@ -224,9 +224,9 @@ public class DavResourceHandler extends DefaultHandler
                          i.hasNext();) {
                         Map.Entry entry = (Map.Entry) i.next();
                         if (log.isDebugEnabled()) {
-                            log.debug("setting flattened property " +
-                                      entry.getKey() +
-                                      " = " + entry.getValue());
+//                            log.debug("setting flattened property " +
+//                                      entry.getKey() +
+//                                      " = " + entry.getValue());
                         }
                         resourceNode.setProperty(entry.getKey().toString(),
                                                  entry.getValue().toString());

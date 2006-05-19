@@ -102,8 +102,8 @@ public final class TimeRangeTermEnum extends FilteredTermEnum {
                 boolean fixed = (testStart.indexOf('Z') != -1);
 
                 if (log.isDebugEnabled()) {
-                    log.debug("testing " + token + " using " +
-                              (fixed ? "fixed" : "floating") + " test");
+//                    log.debug("testing " + token + " using " +
+//                              (fixed ? "fixed" : "floating") + " test");
                 }
 
                 // Period range compare

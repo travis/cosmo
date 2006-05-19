@@ -104,6 +104,8 @@ public class CosmoDavConstants {
 
     // caldav properties
 
+    public static final String PROPERTY_CALDAV_CALENDAR_DATA =
+        "calendar-data";
     public static final String PROPERTY_CALDAV_CALENDAR_DESCRIPTION =
         "calendar-description";
     public static final String PROPERTY_CALDAV_CALENDAR_TIMEZONE =

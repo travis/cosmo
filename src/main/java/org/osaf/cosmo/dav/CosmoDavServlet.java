@@ -63,7 +63,6 @@ import org.osaf.cosmo.dav.impl.CosmoDavSessionProviderImpl;
 import org.osaf.cosmo.dav.property.CalendarTimezone;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
 import org.osaf.cosmo.dav.property.SupportedCalendarComponentSet;
-import org.osaf.cosmo.dav.report.CosmoReportType;
 import org.osaf.cosmo.io.CosmoInputContext;
 import org.osaf.cosmo.io.InvalidCalendarObjectException;
 import org.osaf.cosmo.io.InvalidDataException;
@@ -339,7 +338,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
 
         Ticket authTicket = securityManager.getSecurityContext().getTicket();
 
-        if (CosmoReportType.CALDAV_FREEBUSY.isRequestedReportType(info)) {
+        if (CaldavReport.CALDAV_FREEBUSY.isRequestedReportType(info)) {
             // check resource type
             if (! (resource.isCollection() ||
                    resource.isCalendarCollection())) {

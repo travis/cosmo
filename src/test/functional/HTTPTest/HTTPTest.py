@@ -108,6 +108,10 @@ class HTTPTest(TestObject):
         r.read = lambda: r.body
         
         self.test_response = r
+        
+        if self.debug > 2:
+            print r
+        
         return r
     
 

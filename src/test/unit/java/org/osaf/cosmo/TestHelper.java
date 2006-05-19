@@ -119,12 +119,24 @@ public class TestHelper {
 
     /**
      */
-    public Ticket makeDummyTicket() {
+    public Ticket makeDummyTicket(String timeout) {
         Ticket ticket = new Ticket();
-        ticket.setTimeout(Ticket.TIMEOUT_INFINITE);
+        ticket.setTimeout(timeout);
         ticket.setPrivileges(new HashSet());
         ticket.getPrivileges().add(Ticket.PRIVILEGE_READ);
         return ticket;
+    }
+
+    /**
+     */
+    public Ticket makeDummyTicket(int timeout) {
+        return makeDummyTicket("Second-" + timeout);
+    }
+
+    /**
+     */
+    public Ticket makeDummyTicket() {
+        return makeDummyTicket(Ticket.TIMEOUT_INFINITE);
     }
 
     /**

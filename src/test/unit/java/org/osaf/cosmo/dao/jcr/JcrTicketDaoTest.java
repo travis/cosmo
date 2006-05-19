@@ -71,10 +71,26 @@ public class JcrTicketDaoTest extends BaseJcrDaoTestCase {
 
     /**
      */
-    public void testCreateTicket() throws Exception {
+    public void testCreateInfiniteTicket() throws Exception {
         User u1 = getTestHelper().makeAndStoreDummyUser();
 
         Ticket t1 = getTestHelper().makeDummyTicket();
+        t1.setOwner(u1.getUsername());
+
+        dao.createTicket("/" + u1.getUsername(), t1);
+        Ticket ticket = getTestHelper().
+            findDummyTicket("/" + u1.getUsername(), t1.getId());
+        assertNotNull("Ticket not stored", ticket);
+
+        getTestHelper().removeDummyUser(u1);
+    }
+
+    /**
+     */
+    public void testCreateExpiringTicket() throws Exception {
+        User u1 = getTestHelper().makeAndStoreDummyUser();
+
+        Ticket t1 = getTestHelper().makeDummyTicket(60);
         t1.setOwner(u1.getUsername());
 
         dao.createTicket("/" + u1.getUsername(), t1);

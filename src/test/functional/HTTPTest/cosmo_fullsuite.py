@@ -52,7 +52,7 @@ if __name__ == "__main__":
     suite = [cosmobasicquery, 
               cosmobugs, 
               cosmoinvalid, 
-              #cosmofreebusy,
+              cosmofreebusy,
               cosmolimitexpand, 
               cosmomkcalendar, 
               cosmomultiget, 

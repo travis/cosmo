@@ -231,7 +231,8 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
 
     QueryFilter createQueryFilter(Document doc,
                                   String start,
-                                  String end) {
+                                  String end)
+        throws DavException {
         // Create a fake calendar-filter element designed to match
         // VEVENTs/VFREEBUSYs within the specified time range.
         //
@@ -295,7 +296,12 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
 
         // Parse out fake filter element
         QueryFilter filter = new QueryFilter();
-        filter.parseElement(calendarFilter);
+        try {
+            filter.createFromXml(calendarFilter);
+        } catch (ParseException e) {
+            log.error("error parsing pseudo freebusy filter", e);
+            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "error parsing pseudo freebusy filter");
+        }
         
         return filter;
     }

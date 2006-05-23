@@ -42,6 +42,7 @@ import net.fortuna.ical4j.model.filter.OutputFilter;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
+import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.io.OutputContext;
@@ -129,6 +130,11 @@ public abstract class CaldavReport implements Report, DavConstants {
         this.hrefs = hrefs;
     }
 
+    /** */
+    public void addHrefs(List hrefs) {
+        this.hrefs.addAll(hrefs);
+    }
+
     // our methods
 
     /**
@@ -147,13 +153,19 @@ public abstract class CaldavReport implements Report, DavConstants {
      */
     protected void runQuery()
         throws DavException {
-        try {
-            Query q = getQuery();
-            QueryResult qr = q.execute();
-            setHrefs(queryResultToHrefs(qr));
-        } catch (RepositoryException e) {
-            log.error("cannot run report query", e);
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot run report query: " + e.getMessage());
+        if (info.getDepth() == DEPTH_1) {
+            // iterate through this this resource's child calendar
+            // collections and run the query for each one
+            for (DavResourceIterator i = resource.getMembers(); i.hasNext();) {
+                CosmoDavResource child = (CosmoDavResource) i.nextResource();
+                if (child.isCalendarCollection()) {
+                    doQuery(child);
+                }
+            }
+        }
+        else {
+            // run the query on this resource itself
+            doQuery(resource);
         }
     }
 
@@ -307,7 +319,19 @@ public abstract class CaldavReport implements Report, DavConstants {
 
     // private methods
 
-    private Query getQuery()
+    private void doQuery(DavResource resource)
+        throws DavException {
+        try {
+            Query q = getQuery(resource);
+            QueryResult qr = q.execute();
+            addHrefs(queryResultToHrefs(qr));
+        } catch (RepositoryException e) {
+            log.error("cannot run report query", e);
+            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot run report query: " + e.getMessage());
+        }
+    }
+
+    private Query getQuery(DavResource resource)
         throws DavException, RepositoryException {
         String statement = "/jcr:root" +
             resource.getLocator().getRepositoryPath();

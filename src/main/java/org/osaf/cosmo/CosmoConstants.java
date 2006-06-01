@@ -25,6 +25,11 @@ import java.nio.charset.Charset;
  * Defines server-wide constant attributes.
  */
 public class CosmoConstants {
+
+    // cannot be instantiated
+    private CosmoConstants() {
+    }
+
     /**
      * The "friendly" name of the product used for casual identification.
      */

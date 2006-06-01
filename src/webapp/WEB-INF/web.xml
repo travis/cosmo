@@ -36,7 +36,7 @@
   </context-param>
   <listener>
     <listener-class>
-      org.osaf.cosmo.LifecycleLoggerListener
+      org.osaf.cosmo.util.LifecycleLoggerListener
     </listener-class>
   </listener>
   <listener>

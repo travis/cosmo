@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * Constant definitions for Cosmo
+ * Defines server-wide constant attributes.
  */
 public class CosmoConstants {
     /**
@@ -32,7 +32,7 @@ public class CosmoConstants {
 
     /**
      * A string identifier for Cosmo used to distinguish it from other
-     * software producs.
+     * software products.
      */
     public static final String PRODUCT_ID =
         "-//Open Source Applications Foundation//NONSGML Cosmo Sharing Server//EN";
@@ -47,6 +47,7 @@ public class CosmoConstants {
      * The Cosmo release version number.
      */
     public static final String PRODUCT_VERSION;
+    // XXX: add build timestamp for snapshots
 
     /**
      * The servlet context attribute which contains the Cosmo server
@@ -54,7 +55,17 @@ public class CosmoConstants {
      */
     public static final String SC_ATTR_SERVER_ADMIN = "cosmo.server.admin";
 
-    public static final boolean INDEX_VIRTUAL_PROPERTIES = false;
+    /**
+     * A feature toggle that determines whether Cosmo stores the
+     * calendar properties of a calendar resource in the repository or
+     * whether it simply indexes them ("virtual storage").
+     *
+     * @deprecated The virtual storage feature will be removed in
+     * release 0.5
+     */
+    @Deprecated public static final boolean INDEX_VIRTUAL_PROPERTIES = false;
+
+    // read the product version from VERSION_FILE
 
     private static String VERSION_FILE = "cosmo.version.txt";
 

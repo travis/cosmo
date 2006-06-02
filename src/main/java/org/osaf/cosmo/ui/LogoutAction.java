@@ -12,18 +12,18 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 /**
- * An {@link OSAFAction} that logs the current user out of the
- * application.
+ * Logs the current user out of the application.
+ *
+ * @see CosmoAction
  */
 public class LogoutAction extends CosmoAction {
     private static final Log log = LogFactory.getLog(LogoutAction.class);
 
     /**
      * Logs the user out of the application by invalidating his
-     * {@link javax.servlet.http.HttpSession} and then returns the
-     * <code>OK</code> forward.
+     * session. Returns {@link UIConstants#FWD_OK}.
      *
-     * @see UIConstants#FWD_OK
+     * @see HttpSession#invalidate()
      */
     public ActionForward execute(ActionMapping mapping,
                                  ActionForm form,

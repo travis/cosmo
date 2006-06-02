@@ -18,23 +18,19 @@ package org.osaf.cosmo.io;
 import org.apache.jackrabbit.server.io.DefaultIOManager;
 
 /**
- * Extends {@link org.apache.jackrabbit.server.io.DefaultIOManager}
- * to provide a set of custom IO handlers:
+ * Provides custom IO handlers for DAV collections and resources.
  *
- * <ol>
- * <li> {@link DavCollectionHandler} </li>
- * <li> {@link DavResourceHandler} </li>
- * </ol>
+ * @see DefaultIOManager
+ * @see IOHandler
  */
 public class CosmoIOManager extends DefaultIOManager {
 
     /**
-     * Overwrites the handler list to include the following handlers:
+     * Overwrites the superclass's handler list to include handlers
+     * for DAV collections and resources.
      *
-     * <ol>
-     * <li> {@link DavCollectionHandler}</li>
-     * <li> {@link CosmoHandler}</li>
-     * </ol>
+     * @see DavCollectionHandler
+     * @see DavResourceHandler
      */
     protected void init() {
         addIOHandler(new DavCollectionHandler(this));

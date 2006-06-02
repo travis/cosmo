@@ -119,7 +119,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
 
     /**
      * Removes the resource or collection specified by the
-     * {@link PARAM_PATH} parameter.
+     * {@link #PARAM_PATH} parameter.
      */
     public ActionForward remove(ActionMapping mapping,
                                 ActionForm form,
@@ -238,7 +238,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
     }
 
     /**
-     * Revokes the ticket specified by the {@link PARAM_TICKET}
+     * Revokes the ticket specified by the {@link #PARAM_TICKET}
      * parameter from the resource specified by the
      * {@link #PARAM_PATH} parameter.
      */

@@ -53,51 +53,12 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 /**
- * A servlet which implements a RESTful HTTP-based protocol for Cosmo
- * management operations.
+ * Implements RESTful HTTP-based protocol for Cosmo management
+ * operations.
  *
- * CMP defines the following resources:
- *
- * <dl>
- * <dt><code>Users</code></dt>
- * <dd>A resource representing a collection of user resources</dd>
- * <dt><code>User</code></dt>
- * <dd>A resource representing an individual user</dd>
- * </dl>
- *
- * CMP defines the following admin-only operations:
- *
- * <dl>
- * <dt><code>GET /users</code></dt>
- * <dd>Returns an XML representation of the <code>Users</code> resource collecting all Cosmo users as per {@link UsersResource}.</dd>
- * <dt><code>GET /user/&lgt;username&gt;</code></dt>
- * <dd>Returns an XML representation of a user as per {@link UserResource}.</dd>
- * <dt><code>PUT /user/&lgt;username&gt;</code></dt>
- * <dd>Includes an XML representation of a user as per {@link UserResource}, creating or modifying the user's properties within Cosmo, with all associated side effects including home directory creation.</dd>
- * <dt><code>DELETE /user/&lgt;username&gt;</code></dt>
- * <dd>Causes a user to be removed, with all associated side effects including home directory removal.</dd>
- * <dt><code>GET /server/status</code></dt>
- * <dd>Returns server status data in a plaintext name/value format</dd>
- * <dt><code>POST /server/gc</code></dt>
- * <dd>Advises the JVM to begin a garbage collection run at the next opportunity.</dd>
- * </dl>
- *
- * CMP defines the following authenticated operations:
- *
- * <dl>
- * <dt><code>GET /account</code></td>
- * <dd>Returns an XML representation of the authenticated user as per {@link UserResource}.</dd>
- * <dt><code>PUT /account</code></dt>
- * <dd>Includes an XML representation of the authenticated user as per {@link UserResource}, modifying the user's properties within Cosmo.</dd>
- * </dl>
- *
- * CMP defines the following anonymous (unauthenticated) operations:
- *
- * <dl>
- * <dt><code>PUT /signup</code></dt>
- * <dd>Includes an XML representation of a user, creating a user
- * account and home directory within Cosmo.
- * </dl>
+ * See
+ * http://wiki.osafoundation.org/bin/view/Projects/CosmoManagementProtocol
+ * for the protocol specification.
  */
 public class CmpServlet extends HttpServlet {
     private static final Log log = LogFactory.getLog(CmpServlet.class);
@@ -114,9 +75,10 @@ public class CmpServlet extends HttpServlet {
     private CosmoSecurityManager securityManager;
 
     /**
-     * Load the servlet context's
-     * {@link org.springframework.web.context.WebApplicationContext}
-     * and look up support objects.
+     * Loads the servlet context's <code>WebApplicationContext</code>
+     * and wires up dependencies. If no
+     * <code>WebApplicationContext</code> is found, dependencies must
+     * be set manually (useful for testing).
      *
      * @throws ServletException
      */
@@ -187,8 +149,14 @@ public class CmpServlet extends HttpServlet {
     }
 
     /**
-     * Simply delegates to
-     {@link doPut(HttpServletRequest, HttpServletResponse)
+     * Responds to the following operations:
+     *
+     * <ul>
+     * <li><code>POST /server/gc</li>
+     * </ul>
+     *
+     * Delegates all other operations to
+     * {@link #doPut(HttpServletRequest, HttpServletResponse)}.
      */
     protected void doPost(HttpServletRequest req,
                           HttpServletResponse resp)
@@ -270,8 +238,7 @@ public class CmpServlet extends HttpServlet {
 
     // private methods
 
-    /**
-     * Enforces preconditions on all PUT requests, including content
+    /* Enforces preconditions on all PUT requests, including content
      * length and content type checks. Returns <code>true</code> if
      * all preconditions are met, otherwise sets the appropriate
      * error response code and returns <code>false</code>.
@@ -298,7 +265,8 @@ public class CmpServlet extends HttpServlet {
         }
         return true;
     }
-    /**
+
+    /*
      * Delegated to by {@link #doDelete} to handle user DELETE
      * requests, removing the user and setting the response status and
      * headers.
@@ -319,7 +287,7 @@ public class CmpServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
-    /**
+    /*
      * Delegated to by {@link #doGet} to handle account GET
      * requests, retrieving the account for the currently logged in
      * user, setting the response status and headers, and writing the
@@ -335,7 +303,7 @@ public class CmpServlet extends HttpServlet {
         sendXmlResponse(resp, resource);
     }
 
-    /**
+    /*
      * Delegated to by {@link #doGet} to handle users GET
      * requests, retrieving all user accounts, setting the response
      * status and headers, and writing the response content.
@@ -348,7 +316,7 @@ public class CmpServlet extends HttpServlet {
         sendXmlResponse(resp, new UsersResource(users, getUrlBase(req)));
     }
 
-    /**
+    /*
      * Delegated to by {@link #doGet} to handle user GET
      * requests, retrieving the user account, setting the response
      * status and headers, and writing the response content.
@@ -372,7 +340,7 @@ public class CmpServlet extends HttpServlet {
         }
     }
 
-    /**
+    /*
      * Delegated to by {@link #doGet} to handle server status GET
      * requests, taking a status snapshot, setting the response
      * status and headers, and writing the response content.
@@ -387,7 +355,7 @@ public class CmpServlet extends HttpServlet {
         resp.getOutputStream().write(snap);
     }
 
-    /**
+    /*
      * Delegated to by {@link #doPost} to handle server gc POST
      * requests, initiating garbage collection, and setting the
      * response status.
@@ -399,7 +367,7 @@ public class CmpServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
-    /**
+    /*
      * Delegated to by {@link #doPut} to handle signup
      * requests, creating the user account and setting the response
      * status and headers.
@@ -428,7 +396,7 @@ public class CmpServlet extends HttpServlet {
         }
     }
 
-    /**
+    /*
      * Delegated to by {@link #doPut} to handle account update
      * requests for the currently logged in user, saving the modified
      * account and setting the response status and headers.
@@ -469,7 +437,7 @@ public class CmpServlet extends HttpServlet {
         }
     }
 
-    /**
+    /*
      * Delegated to by {@link #doPut} to handle account creation
      * requests, creating the user account and setting the response
      * status and headers.
@@ -507,7 +475,7 @@ public class CmpServlet extends HttpServlet {
         }
     }
 
-    /**
+    /*
      * Delegated to by {@link #doPut} to handle account update
      * requests, saving the modified account and setting the response
      * status and headers.
@@ -541,8 +509,6 @@ public class CmpServlet extends HttpServlet {
         }
     }
 
-    /**
-     */
     private void handleModelValidationError(HttpServletResponse resp,
                                             ModelValidationException e)
         throws IOException {
@@ -559,21 +525,12 @@ public class CmpServlet extends HttpServlet {
                        e.getMessage());
     }
 
-    /**
-     */
     private void sendApiError(HttpServletResponse resp,
                               int errorCode)
         throws IOException {
         resp.sendError(errorCode, CmpConstants.getReasonPhrase(errorCode));
     }
 
-    /**
-     * Looks up the bean with given name and class in the web
-     * application context.
-     *
-     * @param name the bean's name
-     * @param clazz the bean's class
-     */
     private Object getBean(String name, Class clazz)
         throws ServletException {
         try {
@@ -585,14 +542,10 @@ public class CmpServlet extends HttpServlet {
         }
     }
 
-    /**
-     */
     private User getLoggedInUser() {
         return securityManager.getSecurityContext().getUser();
     }
 
-    /**
-     */
     private String usernameFromPathInfo(String pathInfo) {
         if (pathInfo.startsWith("/user/")) {
             String username = pathInfo.substring(6);
@@ -604,8 +557,6 @@ public class CmpServlet extends HttpServlet {
         return null;
     }
 
-    /**
-     */
     private Document readXmlRequest(HttpServletRequest req)
         throws SAXException, IOException {
         if (req.getContentLength() == 0) {
@@ -635,8 +586,6 @@ public class CmpServlet extends HttpServlet {
         }
     }
 
-    /**
-     */
     private void sendXmlResponse(HttpServletResponse resp,
                                  CmpResource resource)
         throws ServletException, IOException {
@@ -661,8 +610,6 @@ public class CmpServlet extends HttpServlet {
         resp.getOutputStream().write(bytes);
     }
 
-    /**
-     */
     private String getUrlBase(HttpServletRequest req) {
         // like response.encodeUrl() except does not include servlet
         // path or session id

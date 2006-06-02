@@ -94,9 +94,8 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
         Logger.getLogger(CosmoDavServlet.class);
 
     /**
-     * The name of the Spring bean identifying the
-     * {@link org.osaf.commons.spring.jcr.JCRSessionFactory} that
-     * produces JCR sessions for this servlet.
+     * The name of the Spring bean identifying the session factory
+     * that produces JCR sessions for this servlet.
      */
     public static final String BEAN_DAV_SESSION_FACTORY =
         "homedirSessionFactory";

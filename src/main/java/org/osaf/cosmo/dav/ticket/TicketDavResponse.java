@@ -22,10 +22,7 @@ import org.apache.jackrabbit.webdav.DavException;
 import org.osaf.cosmo.dav.CosmoDavResource;
 
 /**
- * Provides response functionality related to "Ticket-Based Access
- * Control Extension to WebDAV".
- *
- * @see http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt
+ * Provides response functionality required by ticket extensions to WebDAV.
  */
 public interface TicketDavResponse {
 

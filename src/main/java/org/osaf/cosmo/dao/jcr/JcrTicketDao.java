@@ -115,8 +115,8 @@ public class JcrTicketDao extends JcrDaoSupport
      * an empty * <code>Set</code> if the resource does not have any
      * tickets.
      *
-     * @param String path the client path of the ticketed node
-     *
+     * @param path the client path of the ticketed node
+     * 
      * @throws DataRetrievalFailureException if the item at the given
      * path is not found
      * @throws InvalidDataResourceUsageException if the item at the

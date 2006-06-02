@@ -23,7 +23,7 @@ public class LogoutAction extends CosmoAction {
      * Logs the user out of the application by invalidating his
      * session. Returns {@link UIConstants#FWD_OK}.
      *
-     * @see HttpSession#invalidate()
+     * @see javax.servlet.http.HttpSession#invalidate()
      */
     public ActionForward execute(ActionMapping mapping,
                                  ActionForm form,

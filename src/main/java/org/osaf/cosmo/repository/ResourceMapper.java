@@ -155,7 +155,7 @@ public class ResourceMapper implements SchemaConstants {
      * In the client view of the schema, all home collections are
      * created in the root of the workspace. Thus, the client path of
      * a home collection (the one returned by {@link
-     * Resource.getPath()} becomes <code>/&lgt;name&gt;</code> once
+     * Resource#getPath()} becomes <code>/&lgt;name&gt;</code> once
      * the collection is created. Any path set on the collection
      * before its creation is ignored.
      *

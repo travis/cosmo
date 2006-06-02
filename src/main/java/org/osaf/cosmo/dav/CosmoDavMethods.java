@@ -25,8 +25,10 @@ import org.apache.jackrabbit.webdav.DavServletRequest;
  * constants for dav methods not already covered by jcr-server (those
  * defined in the CalDAV and ticket specs).
  *
- * @see http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt
- * @see http://ietf.webdav.org/caldav/draft-dusseault-caldav.txt
+ * See
+ * http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt
+ * and http://ietf.webdav.org/caldav/draft-dusseault-caldav.txt for
+ * more information on these methods.
  */
 public class CosmoDavMethods extends DavMethods {
 

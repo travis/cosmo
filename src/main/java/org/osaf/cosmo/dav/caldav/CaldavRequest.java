@@ -18,10 +18,7 @@ package org.osaf.cosmo.dav.caldav;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 
 /**
- * Provides request functionality related to "Calendaring Extensions
- * to Webdav (CalDAv)
- *
- * @see http://ietf.webdav.org/caldav/draft-dusseault-caldav.txt
+ * Provides request functionality required by CalDAV.
  */
 public interface CaldavRequest {
 

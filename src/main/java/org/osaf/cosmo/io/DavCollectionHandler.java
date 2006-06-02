@@ -100,7 +100,7 @@ public class DavCollectionHandler implements IOHandler, SchemaConstants {
     }
 
     /**
-     * As {@link #canImport(context, isCollection)}
+     * As {@link #canImport(ImportContext, boolean)}
      */
     public boolean canImport(ImportContext context,
                              DavResource resource) {
@@ -150,7 +150,7 @@ public class DavCollectionHandler implements IOHandler, SchemaConstants {
     }
 
     /**
-     * As {@link #importContent(context, isCollection)}
+     * As {@link #importContent(ImportContext, boolean)}
      */
     public boolean importContent(ImportContext context,
                                  DavResource resource)
@@ -188,7 +188,7 @@ public class DavCollectionHandler implements IOHandler, SchemaConstants {
     }
 
     /**
-     * As {@link #canExport(context, isCollection)}
+     * As {@link #canExport(ExportContext, boolean)}
      */
     public boolean canExport(ExportContext context,
                              DavResource resource) {

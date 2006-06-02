@@ -39,8 +39,6 @@ import org.apache.commons.logging.LogFactory;
  * Servlet filter that populates the
  * {@link org.acegisecurity.ContextHolder} with a
  * {@link TicketAuthenticationToken} if needed.
- *
- * @see http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt
  */
 public class TicketProcessingFilter implements Filter {
     private static final Log log =

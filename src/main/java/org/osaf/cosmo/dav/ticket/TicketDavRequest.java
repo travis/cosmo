@@ -18,10 +18,8 @@ package org.osaf.cosmo.dav.ticket;
 import org.osaf.cosmo.model.Ticket;
 
 /**
- * Provides request functionality related to "Ticket-Based Access
- * Control Extension to WebDAV".
- *
- * @see http://www.sharemation.com/%7Emilele/public/dav/draft-ito-dav-ticket-00.txt
+ * Provides request functionality required for ticket extensions to
+ * WebDAV.
  */
 public interface TicketDavRequest {
 

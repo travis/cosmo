@@ -21,7 +21,7 @@ import org.apache.jackrabbit.server.io.DefaultIOManager;
  * Provides custom IO handlers for DAV collections and resources.
  *
  * @see DefaultIOManager
- * @see IOHandler
+ * @see org.apache.jackrabbit.server.io.IOHandler
  */
 public class CosmoIOManager extends DefaultIOManager {
 

@@ -37,8 +37,6 @@ import org.apache.commons.logging.LogFactory;
  * If the associated user is not an administrator, contains an
  * authority named <code>ROLE_USER</code>.
  *
- * @see User
- * @see Ticket
  * @see UserDetails
  * @see GrantedAuthority
  */
@@ -77,7 +75,7 @@ public class CosmoUserDetails implements UserDetails {
      * Note: since account expiration has not been implemented in
      * Cosmo, this method always returns <code>true</code>.
      *
-     * @returns <code>true</code> if the user's account is valid (ie
+     * @return <code>true</code> if the user's account is valid (ie
      * non-expired), <code>false</code> if no longer valid (ie
      * expired)
      */
@@ -92,7 +90,7 @@ public class CosmoUserDetails implements UserDetails {
      * Note: since user locking has not been implemented in
      * Cosmo, this method always returns <code>true</code>.
      *
-     * @returns <code>true</code> if the user is not locked,
+     * @return <code>true</code> if the user is not locked,
      * <code>false</code> otherwise
      */
     public boolean isAccountNonLocked() {
@@ -103,7 +101,7 @@ public class CosmoUserDetails implements UserDetails {
      * Returns the authorities granted to the user. Cannot return
      * <code>null</code>.
      *
-     * @returns the authorities (never <code>null</code>)
+     * @return the authorities (never <code>null</code>)
      */
     public GrantedAuthority[] getAuthorities() {
         return authorities;
@@ -116,7 +114,7 @@ public class CosmoUserDetails implements UserDetails {
      * Note: since credential expiration has not been implemented in
      * Cosmo, this method always returns <code>true</code>.
      *
-     * @returns <code>true</code> if the user's credentials are
+     * @return <code>true</code> if the user's credentials are
      * valid (ie non-expired), <code>false</code> if no longer
      * valid (ie expired)
      */
@@ -131,7 +129,7 @@ public class CosmoUserDetails implements UserDetails {
      * Note: since user disablement has not been implemented in
      * Cosmo, this method always returns <code>true</code>.
      *
-     * @returns <code>true</code> if the user is enabled,
+     * @return <code>true</code> if the user is enabled,
      * <code>false</code> otherwise
      */
     public boolean isEnabled() {
@@ -142,7 +140,7 @@ public class CosmoUserDetails implements UserDetails {
      * Returns the password used to authenticate the user. Cannot
      * return <code>null</code>.
      *
-     * @returns the password (never <code>null</code>)
+     * @return the password (never <code>null</code>)
      */
     public String getPassword() {
         return user.getPassword();
@@ -152,7 +150,7 @@ public class CosmoUserDetails implements UserDetails {
      * Returns the username used to authenticate the user. Cannot
      * return <code>null</code>.
      *
-     * @returns the username (never <code>null</code>)
+     * @return the username (never <code>null</code>)
      */
     public String getUsername() {
         return user.getUsername();
@@ -163,7 +161,7 @@ public class CosmoUserDetails implements UserDetails {
     /**
      * Returns the underlying <code>User</code>.
      *
-     * @returns the user
+     * @return the user
      */
     public User getUser() {
         return user;

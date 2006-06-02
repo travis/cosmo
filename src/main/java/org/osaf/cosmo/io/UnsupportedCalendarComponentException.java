@@ -22,7 +22,7 @@ import org.osaf.cosmo.icalendar.ComponentTypes;
  * import did not contain at least one type of calendar component
  * supported by Cosmo.
  *
- * @see org.osaf.cosmo.icalendar.ComponentTypes;
+ * @see org.osaf.cosmo.icalendar.ComponentTypes
  */
 public class UnsupportedCalendarComponentException extends RuntimeException {
 

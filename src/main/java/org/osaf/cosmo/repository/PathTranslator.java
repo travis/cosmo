@@ -46,7 +46,7 @@ public class PathTranslator {
      * XPath queries are executed against the logical XML document
      * view of the repository.
      *
-     * @see {@link org.apache.jackrabbit.util.ISO9075}
+     * @see ISO9075#encode(String)
      */
     public static String toQueryableRepositoryPath(String repositoryPath) {
         if (repositoryPath.equals("/")) {
@@ -80,7 +80,7 @@ public class PathTranslator {
      * If the path does not start with '/', it is assumed to be a
      * simple name, and the '/' character is escaped.
      *
-     * @see {@link HexEscaper}
+     * @see HexEscaper#escape(String)
      */
     public static String toRepositoryPath(String clientPath) {
         if (clientPath.equals("/")) {
@@ -128,7 +128,7 @@ public class PathTranslator {
      * path, and any segments representing internal storage nodes are
      * removed.
      *
-     * @see {@link HexEscaper}
+     * @see HexEscaper#unescape(String)
      */
     public static String toClientPath(String repositoryPath) {
         if (repositoryPath.equals("/")) {

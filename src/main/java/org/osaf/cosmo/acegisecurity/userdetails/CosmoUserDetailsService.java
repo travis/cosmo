@@ -46,9 +46,8 @@ public class CosmoUserDetailsService implements UserDetailsService {
      * with this service's <code>UserDao</code> and returns a
      * <code>UserDetails</code> representing the user.
      *
-     * @param username the username presented to the 
-     * {@link DaoAuthenticationProvider}
-     * @return a fully populated {@link UserDetails} (never
+     * @param username the username to look up
+     * @return a fully populated <code>UserDetails</code> (never
      * <code>null</code>)
      * @throws UsernameNotFoundException if the user could not be
      * found

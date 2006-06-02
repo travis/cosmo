@@ -16,24 +16,24 @@
 package org.osaf.cosmo.security;
 
 /**
- * An interface that represents a server-wide security controller for
- * Cosmo. It provides a simple mechanism for external environments
- * (Jackrabbit, a WebDAV server, a web application) to access a
- * {@link CosmoSecurityContext} and to find information about Cosmo
- * users (as described by {@link CosmoUserDetails}).
+ * Rrepresents a server-wide security controller for Cosmo. It
+ * provides entry points for obtaining information about the
+ * authentication state of the currently executing thread or for
+ * initiating authentication (or overwriting the current state).
+ *
+ * @see CosmoSecurityContext
  */
 public interface CosmoSecurityManager {
 
     /**
-     * Provide a <code>CosmoSecurityContext</code> representing a
-     * Cosmo user previously authenticated by the Cosmo security
-     * system.
+     * Provides a <code>CosmoSecurityContext</code> representing a
+     * previously authenticated principal.
      */
     public CosmoSecurityContext getSecurityContext()
         throws CosmoSecurityException;
 
     /**
-     * Authenticate the given Cosmo credentials and register a
+     * Authenticates the given Cosmo credentials and registers a
      * <code>CosmoSecurityContext</code> for them. This method is used
      * when Cosmo components need to programatically log in a user
      * rather than relying on a security context already being in

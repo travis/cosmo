@@ -28,16 +28,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A class that decorates the Cosmo core {@link User} to provide an
- * implementation of {@link CosmoUserDetails} suitable for use by Acegi
- * Security's {@link AuthenticationProvider}.
- *
- *
+ * Wraps a Cosmo <code>User</code> to provide Acegi Security with
+ * access to user account information.
+ * <p>
  * If the associated user is an administrator, contains an authority
- * named "ROLE_ROOT".
+ * named <code>ROLE_ROOT</code>.
+ * <p>
+ * If the associated user is not an administrator, contains an
+ * authority named <code>ROLE_USER</code>.
  *
- * If the associated user is not the overlord, contains an authority
- * named "ROLE_USER".
+ * @see User
+ * @see Ticket
+ * @see UserDetails
+ * @see GrantedAuthority
  */
 public class CosmoUserDetails implements UserDetails {
     private static final Log log =
@@ -47,7 +50,8 @@ public class CosmoUserDetails implements UserDetails {
     private GrantedAuthority[] authorities;
 
     /**
-     * @param user the wrapped @{link User}
+     * @param user the wrapped <code>User</code>
+     * @see User
      */
     public CosmoUserDetails(User user) {
         this.user = user;
@@ -64,7 +68,7 @@ public class CosmoUserDetails implements UserDetails {
             authorities.toArray(new GrantedAuthority[0]);
     }
 
-    /* ----- UserDetails methods ----- */
+    // UserDetails methods
 
     /**
      * Indicates whether the user's account has expired. An expired
@@ -154,10 +158,10 @@ public class CosmoUserDetails implements UserDetails {
         return user.getUsername();
     }
 
-    /* ----- CosmoUserDetails methods ----- */
+    // oru methods
 
     /**
-     * Returns the underlying @{link User}.
+     * Returns the underlying <code>User</code>.
      *
      * @returns the user
      */

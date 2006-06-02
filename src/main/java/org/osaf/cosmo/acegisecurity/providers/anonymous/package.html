@@ -19,42 +19,12 @@
 </head>
 <body bgcolor="white">
 
-Provides utilities and implementation classes for integrating the
-Acegi Security System for Spring into Cosmo.
-
-<h2>Package Specification</h2>
-
-<p>
-Acegi Security integration classes are roughly broken down into three
-categories:
-</p>
-
-<p>
-The <code>providers.ticket</code> and <code>providers.homedir</code>
-subpackages contain classes that implement Cosmo's custom
-authentication and authorization schemes.
-</p>
-
-<p>
-The <code>userdetails</code> package contains implementations of Acegi
-Security's <code>UserDetails</code> and
-<code>UserDetailsService</code> interfaces which give the security
-framework access to Cosmo user data.
-</p>
-
-<p>
-The <code>context</code> and <code>providers.anonymous</code> packages
-contain classes that extend Acegi Security framework classes for
-HTTP-based protocols such as WebDAV and CMP which are not
-session-aware.
-</p>
+Extends the functionality of the Acegi Security classes that implement
+anonymous authentication.
 
 <h2>Related Documentation</h2>
 
 <ul>
-<li><a
-href="http://wiki.osafoundation.org/bin/view/Projects/CosmoSecurityModel">Cosmo
-Security Model</a></li>
 <li><a href="http://acegisecurity.org/">Acegi Security web
     site</a></li>
 <li><a

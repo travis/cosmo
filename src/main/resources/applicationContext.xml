@@ -214,7 +214,7 @@
   </bean>
 
   <bean id="ticketAuthenticationProvider"
-        class="org.osaf.cosmo.acegisecurity.ticket.TicketAuthenticationProvider">
+        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationProvider">
     <property name="ticketDao">
       <ref bean="ticketDao"/>
     </property>
@@ -234,8 +234,8 @@
   <!-- authorization resources -->
 
   <bean id="ticketVoter"
-        class="org.osaf.cosmo.acegisecurity.ticket.TicketVoter"/>
-  <bean id="homedirVoter" class="org.osaf.cosmo.acegisecurity.homedir.HomedirVoter"/>
+        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketVoter"/>
+  <bean id="homedirVoter" class="org.osaf.cosmo.acegisecurity.providers.homedir.HomedirVoter"/>
   <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
 
   <bean id="accessDecisionManager"

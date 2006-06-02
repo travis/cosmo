@@ -35,7 +35,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * Associates a fresh <code>SecurityContext</code> with an HTTP
+ * Ensures that the security context for an HTTP request is not
+ * retained for subsequent requests.
+ * <p>
+ * Associates a fresh <code>SecurityContext</code> with the HTTP
  * request and clears it when the response has been sent. This is
  * useful for stateless protocols like WebDAV that do not understand
  * HTTP sessions.

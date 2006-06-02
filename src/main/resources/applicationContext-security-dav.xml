@@ -62,7 +62,7 @@
   <!-- filter that performs ticket authentication -->
 
   <bean id="davTicketProcessingFilter"
-        class="org.osaf.cosmo.acegisecurity.ticket.TicketProcessingFilter"/>
+        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketProcessingFilter"/>
 
   <!-- filter that performs Basic authentication -->
 

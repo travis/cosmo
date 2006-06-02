@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.security.impl;
 
-import org.osaf.cosmo.acegisecurity.ticket.TicketAuthenticationToken;
+import org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationToken;
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -38,6 +38,11 @@ import org.apache.commons.logging.LogFactory;
  * The default implementation of {@link CosmoSecurityContext}. Wraps
  * an instance of Acegi Security's
  * {@link org.acegisecurity.Authentication}.
+ *
+ * XXX: consider removing the direct dependency on Acegi Security,
+ * instead possibly having separate implementations of
+ * CosmoSecurityContext for users and tickets that don't use an
+ * Authentication at all
  */
 public class CosmoSecurityContextImpl implements CosmoSecurityContext {
     private static final Log log =

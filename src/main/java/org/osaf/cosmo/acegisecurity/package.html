@@ -25,7 +25,7 @@ Acegi Security System for Spring into Cosmo.
 <h2>Package Specification</h2>
 
 <p>
-This package provides three types of classes:
+This package provides two types of classes:
 </p>
 
 <ul>
@@ -33,21 +33,30 @@ This package provides three types of classes:
   various Acegi Security framework components</li>
 <li>Services that use Cosmo data access objects to adapt the Cosmo
   model to the Acegi Security model</li>
-<li>Access control components (&quot;voters&quot;) that implement
-  specific Cosmo access control policies</li>
 </ul>
 
 <p>
-The <code>ticket</code> subpackage contains a similar set of classes
-that together implement Cosmo's ticket-based authentication and
-authorization scheme.
+The <code>ticket</code> and <code>homedir</code> subpackages contain
+classes that together implement Cosmo's custom authentication and
+authorization schemes.
+</p>
+
+<p>
+Cosmo defers to Acegi Security's role-based security implementation
+for access control for administrators.
 </p>
 
 <h2>Related Documentation</h2>
 
 <ul>
-<li><a href="http://acegisecurity.org/">Acegi Security web site</a></li>
+<li><a href="http://acegisecurity.org/">Acegi Security web
+    site</a></li>
 </ul>
+
+<p>
+<b>XXX:</b> link to Wiki describing security model (tickets, homedir,
+admin)
+</p>
 
 </body>
 </html>

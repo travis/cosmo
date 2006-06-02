@@ -36,19 +36,23 @@ import org.springmodules.jcr.JcrCallback;
 import org.springmodules.jcr.support.JcrDaoSupport;
 
 /**
- * Implementation of {@link HomeDirectoryDao} that operates against a
- * JCR repository.
+ * Implementation of <code>HomeDirectoryDao</code> that operates
+ * against a JCR repository.
  *
- * This implementation extends
- * {@link org.springmodules.jcr.JcrDaoSupport} to gain access to
- * a {@link org.springmodules.jcr.JcrTemplate}, which it uses to
- * obtain repository sessions. See the Spring Modules documentation
+ * This implementation extends <code>JcrDaoSupport</code> to gain
+ * access to a <code>JcrTemplate</code>, which it uses to  obtain
+ * repository sessions. See the Spring Modules documentation
  * for more information on how to configure the template with
  * credentials, a repository reference and a workspace name.
  *
- * It uses {@link ResourceMapper} to convert JCR nodes and
- * properties to and from instances of
- * {@link Resource}.
+ * The DAO uses <code>ResourceMapper</code> to convert JCR nodes and
+ * properties to and from instances of <code>Resource</code>.
+ *
+ * @see HomeDirectoryDao
+ * @see JcrDaoSupport
+ * @see org.springmodules.jcr.JcrTemplate
+ * @see ResourceMapper
+ * @see Resource
  */
 public class JcrHomeDirectoryDao extends JcrDaoSupport
     implements SchemaConstants, HomeDirectoryDao {

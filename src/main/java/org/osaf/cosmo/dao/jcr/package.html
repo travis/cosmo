@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+  Copyright 2006 Open Source Applications Foundation
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+      http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+</head>
+<body bgcolor="white">
+
+Provides implementations of DAO interfaces that persist data to a
+JCR-accessible content repository.
+
+<h2>Package Specification</h2>
+
+<p>
+These data access objects operate against a content repository via the
+JCR 1.0 API. Integration is facilitated by Spring Modules' JCR support
+- primarily the <code>JcrDaoSupport</code> and <code>JcrTemplate</code>
+classes, which take care of authenticating to the repository, opening
+JCR sessions and managing JCR transactions. Dependencies are
+configured and wired by the Spring Framework.
+</p>
+
+<p>
+By virtue of extending <code>JcrDaoSupport</code>, a DAO has access to
+an instance of <code>JcrTemplate</code>. The DAO method calls
+<code>execute()</code> on the template, passing it an instance of
+<code>JcrCallback</code>. The callback has one method,
+<code>doInJcr</code>, which is given a live JCR session the DAO can
+use to access the repository.
+</p>
+
+<p>
+DAOs convert between repository nodes and instances of
+the <code>Resource</code> model with the <code>ResourceMapper</code>
+helper from the <code>repository</code> package. That class, and
+<code>PathTranslator</code>, help DAOs locate the repository items
+that correspond to DAV-accessible Cosmo resources.
+</p>
+
+<p>
+DAOs are responsible for saving any changes they make to the session
+but not for committing or rolling back transactions. Any
+<code>RepositoryException</code>s thrown by a repository operation are
+caught by <code>JcrDaoSupport</code> and translated to an equivalent
+unchecked Spring exception.
+</p>
+
+<p>
+The JCR repository instance is obtained from JNDI by Spring when the
+Cosmo web application starts up (this may be a local instance or a
+proxy or stub for a remote repository, depending on what is provided
+by the servlet container). The location of the repository instance in
+JNDI, as well as the credentials used to access the repository and the
+name of the workspace in which to store Cosmo data, are configured in
+Spring's <code>applicationContext.xml</code> file (found in the packed
+webapp in <code>WEB-INF/classes</code>).
+</p>
+
+<h2>Related Documentation</h2>
+
+<ul>
+<li><a href="http://jcp.org/en/jsr/detail?id=170">JSR 170</a></li>
+<li><a href="http://www.day.com/maven/jsr170/javadocs/jcr-1.0/">JCR 1.0 API docs</a></li>
+<li><a href="http://www.springframework.org/">Spring
+Framework</a></li>
+<li><a href="https://springmodules.dev.java.net/">Spring
+Modules</a></li>
+</ul>
+
+</body>
+</html>

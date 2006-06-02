@@ -25,7 +25,7 @@ import org.acegisecurity.vote.AccessDecisionVoter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.security.CosmoUserDetails;
+import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 
 /**
  * Makes access control decisions based on whether or not a user is

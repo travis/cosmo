@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.security.impl;
+package org.osaf.cosmo.acegisecurity.userdetails;
 
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.CosmoUserDetails;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.GrantedAuthorityImpl;
+import org.acegisecurity.userdetails.UserDetails;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,9 +39,9 @@ import org.apache.commons.logging.LogFactory;
  * If the associated user is not the overlord, contains an authority
  * named "ROLE_USER".
  */
-public class CosmoUserDetailsImpl implements CosmoUserDetails {
+public class CosmoUserDetails implements UserDetails {
     private static final Log log =
-        LogFactory.getLog(CosmoUserDetailsImpl.class);
+        LogFactory.getLog(CosmoUserDetails.class);
 
     private User user;
     private GrantedAuthority[] authorities;
@@ -49,7 +49,7 @@ public class CosmoUserDetailsImpl implements CosmoUserDetails {
     /**
      * @param user the wrapped @{link User}
      */
-    public CosmoUserDetailsImpl(User user) {
+    public CosmoUserDetails(User user) {
         this.user = user;
 
         ArrayList authorities = new ArrayList();

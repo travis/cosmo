@@ -57,7 +57,7 @@
   <!-- filter that integrates SecurityContext into HTTP request -->
 
   <bean id="davHttpRequestContextIntegrationFilter"
-        class="org.osaf.cosmo.acegisecurity.HttpRequestContextIntegrationFilter"/>
+        class="org.osaf.cosmo.acegisecurity.context.HttpRequestContextIntegrationFilter"/>
 
   <!-- filter that performs ticket authentication -->
 

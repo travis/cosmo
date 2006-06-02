@@ -187,7 +187,7 @@
   <!-- authentication resources -->
 
   <bean id="userDetailsService"
-        class="org.osaf.cosmo.acegisecurity.CosmoUserDetailsService">
+        class="org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetailsService">
      <property name="userDao">
        <ref bean="userDao"/>
      </property>
@@ -235,7 +235,7 @@
 
   <bean id="ticketVoter"
         class="org.osaf.cosmo.acegisecurity.ticket.TicketVoter"/>
-  <bean id="homedirVoter" class="org.osaf.cosmo.acegisecurity.HomedirVoter"/>
+  <bean id="homedirVoter" class="org.osaf.cosmo.acegisecurity.homedir.HomedirVoter"/>
   <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
 
   <bean id="accessDecisionManager"

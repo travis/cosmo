@@ -16,11 +16,11 @@
 package org.osaf.cosmo.security.impl;
 
 import org.osaf.cosmo.acegisecurity.ticket.TicketAuthenticationToken;
+import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
-import org.osaf.cosmo.security.CosmoUserDetails;
 
 import java.util.Iterator;
 

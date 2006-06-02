@@ -61,7 +61,7 @@
   <!-- filter that integrates SecurityContext into HTTP request -->
 
   <bean id="cmpHttpRequestContextIntegrationFilter"
-        class="org.osaf.cosmo.acegisecurity.HttpRequestContextIntegrationFilter"/>
+        class="org.osaf.cosmo.acegisecurity.context.HttpRequestContextIntegrationFilter"/>
 
   <!-- filter that performs Basic authentication -->
 
@@ -85,7 +85,7 @@
   <!-- filter that performs anonymous authentication -->
 
   <bean id="cmpAnonymousProcessingFilter"
-        class="org.osaf.cosmo.acegisecurity.NoSessionAnonymousProcessingFilter">
+        class="org.osaf.cosmo.acegisecurity.providers.anonymous.NoSessionAnonymousProcessingFilter">
     <property name="key">
       <value>badgerbadgerbadger</value>
     </property>

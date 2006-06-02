@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.acegisecurity;
+package org.osaf.cosmo.acegisecurity.userdetails;
 
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.security.CosmoSecurityManager;
-import org.osaf.cosmo.security.impl.CosmoUserDetailsImpl;
 
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UserDetailsService;
@@ -58,8 +57,7 @@ public class CosmoUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username)
         throws UsernameNotFoundException, DataAccessException {
         try {
-            return new
-                CosmoUserDetailsImpl(userDao.getUser(username));
+            return new CosmoUserDetails(userDao.getUser(username));
         } catch (DataRetrievalFailureException e) {
             throw new UsernameNotFoundException("user " + username +
                                                 " not found", e);

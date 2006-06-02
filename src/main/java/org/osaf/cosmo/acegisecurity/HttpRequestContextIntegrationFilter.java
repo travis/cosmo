@@ -39,19 +39,22 @@ import org.springframework.beans.factory.InitializingBean;
  * request and clears it when the response has been sent. This is
  * useful for stateless protocols like WebDAV that do not understand
  * HTTP sessions.
- *
+ * <p>
  * The created <code>SecurityContext</code> is an instance of the
  * class defined by the {@link #setContext(Class)} method (which
- * defaults to {@link
- * org.acegisecurity.context.SecurityContextImpl}.
- *
+ * defaults to SecurityContextImpl).
+ * <p>
  * This filter will only execute once per request, to resolve servlet
  * container (specifically Weblogic) incompatibilities.
- *
+ * <p>
  * This filter MUST be executed BEFORE any authentication processing
  * mechanisms (eg BASIC, CAS processing filters etc), which expect the
  * <code>SecurityContextHolder</code> to contain a valid
  * <code>SecurityContext</code> by the time they execute.
+ *
+ * @see SecurityContext
+ * @see SecurityContextImpl
+ * @see  SecurityContextHolder
  */
 public class HttpRequestContextIntegrationFilter
     implements InitializingBean, Filter {
@@ -62,10 +65,12 @@ public class HttpRequestContextIntegrationFilter
 
     private Class context = SecurityContextImpl.class;
 
+    /** */
     public void setContext(Class secureContext) {
         this.context = secureContext;
     }
 
+    /** */
     public Class getContext() {
         return context;
     }
@@ -81,13 +86,18 @@ public class HttpRequestContextIntegrationFilter
 
     // Filter methods
 
-    /**
-     * Does nothing. We use IoC container lifecycle services instead.
-     */
     public void destroy() {
     }
 
     /**
+     * Generates a new security context, continues the filter chain,
+     * then clears the context by generating another new one.
+     *
+     * @param request the servlet request
+     * @param response the servlet response
+     * @param chain the filter chain
+     * @throws IOException if an I/O error occurs
+     * @throws ServletException if any other error occurs
      */
     public void doFilter(ServletRequest request,
                          ServletResponse response,
@@ -121,9 +131,6 @@ public class HttpRequestContextIntegrationFilter
         }
     }
 
-    /**
-     * Does nothing. We use IoC container lifecycle services instead.
-     */
     public void init(FilterConfig filterConfig)
         throws ServletException {
     }
@@ -131,6 +138,11 @@ public class HttpRequestContextIntegrationFilter
     // our methods
 
     /**
+     * Returns a new instance of <code>SecurityContext</code> as
+     * specified by this class's context class.
+     *
+     * @return the new context instance
+     * @throws ServletException if an error occurs
      */
     public SecurityContext generateNewContext() throws ServletException {
         try {

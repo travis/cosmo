@@ -29,21 +29,32 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 
 /**
- * Extends
- * {@link org.acegisecurity.providers.anonymous.AnonymousProcessingFilter}
- * to never cause an {@link javax.servlet.http.HttpSession} to be created.
- *
+ * An <code>AnonymousProcessingFilter</code>
+ * that does not begin an <code>HttpSession</code>.
+ * <p>
  * The usual behavior of <code>AnonymousProcessingFilter</code> is to add
- * an instance of {@link WebAuthenticationDetails} to the
- * authentication token it creates. By default,
- * <code>WebAuthenticationDetails</code> causes an
- * <code>HttpSession</code> to be created.
+ * a <code>WebAuthenticationDetails</code> to the authentication token
+ * it creates which, by default, begins an <code>HttpSession</code>.
+ *
+ * @see AnonymousProcessingFilter
+ * @see WebAuthenticationDetails
+ * @see javax.servlet.http.HttpSession
  */
 public class NoSessionAnonymousProcessingFilter
     extends AnonymousProcessingFilter {
     private static final Log log =
         LogFactory.getLog(NoSessionAnonymousProcessingFilter.class);
 
+    /**
+     * Overrides the superclass method to create an
+     * <code>AnonymousAuthenticationToken</code> and set a
+     * <code>WebAuthenticationDetails</code> on it without beginning
+     * an <code>HttpSession</code>.
+     *
+     * @param request the servlet request
+     * @return the newly created <code>Authentication</code>
+     * @see AnonymousAuthenticationToken
+     */
     protected Authentication createAuthentication(ServletRequest request) {
         Assert.isInstanceOf(HttpServletRequest.class, request,
             "ServletRequest must be an instance of HttpServletRequest");

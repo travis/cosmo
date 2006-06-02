@@ -30,9 +30,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
 
 /**
- * A class that implements Acegi Security's
- * {@link org.acegisecurity.userdetails.UserDetailsService}
- * interface using the Cosmo {@link UserDao}.
+ * Implements Acegi Security's <code>UserDetailsService</code>
+ * interface by retrieving user details with a <code>UserDao</code>.
+ * 
+ * @see UserDetailsService
+ * @see UserDao
  */
 public class CosmoUserDetailsService implements UserDetailsService {
     private static final Log log =
@@ -41,15 +43,17 @@ public class CosmoUserDetailsService implements UserDetailsService {
     private UserDao userDao;
 
     /**
-     * Locates the user based on the username.
+     * Locates the user with the given username by retrieving it
+     * with this service's <code>UserDao</code> and returns a
+     * <code>UserDetails</code> representing the user.
      *
-     * @param username the username presented to the @{link
-     * DaoAuthenticationProvider}
-     * @returns a fully populated @{link UserDetails} (never
+     * @param username the username presented to the 
+     * {@link DaoAuthenticationProvider}
+     * @return a fully populated {@link UserDetails} (never
      * <code>null</code>)
      * @throws UsernameNotFoundException if the user could not be
-     * found or the user has no @{link GrantedAuthority}
-     * @throws DataAccessException if a system error occurred
+     * found
+     * @see UserDetails
      */
     public UserDetails loadUserByUsername(String username)
         throws UsernameNotFoundException, DataAccessException {
@@ -62,14 +66,12 @@ public class CosmoUserDetailsService implements UserDetailsService {
         }
     }
 
-    /**
-     */
+    /** */
     public UserDao getUserDao() {
         return userDao;
     }
 
-    /**
-     */
+    /** */
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }

@@ -138,6 +138,7 @@ public class FeedServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
+        // XXX: return atom item for individual resource
         if (! (resource instanceof CollectionResource)) {
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
                            "Feeds not supported for non-collection resource");

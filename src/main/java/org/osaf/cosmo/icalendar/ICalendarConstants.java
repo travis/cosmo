@@ -16,20 +16,26 @@
 package org.osaf.cosmo.icalendar;
 
 /**
- * Provides constants for ICalendar entities that are not otherwise
- * defined by ical4j.
+ * Provides constants for values specified by iCalendar that are not
+ * otherwise defined by iCal4J.
  */
 public interface ICalendarConstants {
 
     /**
+     * The highest version number of the iCalendar specification that
+     * is implemented by Cosmo.
      */
     public static final String VERSION = "2.0";
 
     /**
+     * The MIME media type identifying a content item containing
+     * data formatted with iCalendar.
      */
     public static final String CONTENT_TYPE = "text/calendar";
 
     /**
+     * The file extension commonly used to designate a file containing
+     * data formatted with iCalendar.
      */
     public static final String FILE_EXTENSION = "ics";
 }

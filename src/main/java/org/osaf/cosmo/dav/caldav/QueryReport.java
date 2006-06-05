@@ -38,7 +38,6 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dav.CosmoDavConstants;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.property.CosmoDavPropertyName;
-import org.osaf.cosmo.util.CosmoUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -111,12 +110,11 @@ public class QueryReport extends CaldavMultiStatusReport
         }
         String icaltz = DomUtil.getTextTrim(tzdata);
 
-        //(CALDAV:valid-calendar-data)
         try {
-            return CosmoUtil.validateVtimezone(icaltz);
-        } catch (ValidationException e) {
-            log.error("invalid CALDAV:timezone", e);
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "invalid CALDAV:timezone: " + e.getMessage());
+            return CaldavRequestHelper.extractTimeZone(icaltz);
+        } catch (Exception e) {
+            log.error("unable to extract CALDAV:timezone", e);
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "unable to extract CALDAV:timezone: " + e.getMessage());
         }
     }
 
@@ -132,21 +130,18 @@ public class QueryReport extends CaldavMultiStatusReport
 
         QueryFilter qf = new QueryFilter();
         if (tz == null) {
-            // If no CALDAV:timezone was specified with the REPORT
-            // query then try and get the timezone of the calendar
-            // collection
-            DavProperty ptz = getResource().
-                getProperty(CosmoDavPropertyName.CALENDARTIMEZONE);
-            if (ptz != null) {
-                try {
-                    tz = CosmoUtil.validateVtimezone((String) ptz.getValue());
-                } catch (ValidationException e) {
-                    //This exception should never be raised since the
-                    //timezone was validated when it was added as a property of
-                    //the calendar collection
+            // if no timezone was specified in the report info, fall
+            // back to one stored with the calendar collection, if any
+            try {
+                DavProperty prop = getResource().
+                    getProperty(CosmoDavPropertyName.CALENDARTIMEZONE);
+                tz = CaldavRequestHelper.extractTimeZone(prop);
+            } catch (Exception e) {
+                    // this exception should never be raised since the
+                    // timezone was validated when it was added as a
+                    // property of the calendar collection
                     log.error("invalid CALDAV:timezone property on resource " + getResource().getResourcePath(), e);
                     throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "invalid CALDAV:timezone property: " + e.getMessage());
-                }
             }
         }
 

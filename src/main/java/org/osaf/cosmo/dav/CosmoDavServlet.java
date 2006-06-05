@@ -47,13 +47,11 @@ import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 
 import org.apache.log4j.Logger;
 
-import org.osaf.cosmo.util.CosmoUtil;
 import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.dav.CosmoDavResource;
 import org.osaf.cosmo.dav.CosmoDavConstants;
+import org.osaf.cosmo.dav.caldav.CaldavRequestHelper;
 import org.osaf.cosmo.dav.caldav.CaldavReport;
-import org.osaf.cosmo.dav.caldav.CaldavMultiStatusReport;
-import org.osaf.cosmo.dav.caldav.CaldavSingleResourceReport;
 import org.osaf.cosmo.dav.impl.CosmoDavLocatorFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
@@ -427,27 +425,27 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             properties = request.getMkCalendarSetProperties();
 
             // {CALDAV:valid-calendar-data}
-            try {
-                DavProperty ct = properties.get(CosmoDavPropertyName.CALENDARTIMEZONE);
-
-                if (ct != null) 
-                    CosmoUtil.validateVtimezone((String) ct.getValue());
-            } catch (ValidationException e) {
-                log.warn("error parsing MKCALENDAR properties invalid timezone", e);
-                response.sendError(DavServletResponse.SC_BAD_REQUEST, e.getMessage());
-                return;
+            DavProperty prop =
+                properties.get(CosmoDavPropertyName.CALENDARTIMEZONE);
+            if (prop != null) {
+                try {
+                    String ical = (String) prop.getValue();
+                    CaldavRequestHelper.extractTimeZone(ical);
+                } catch (Exception e) {
+                    log.warn("MKCALENDAR properties include invalid timezone", e);
+                    response.sendError(DavServletResponse.SC_BAD_REQUEST, "MKCALENDAR properties include invalid timezone: " + e.getMessage());
+                    return;
+                }
             }
 
-            //if no supported calendar component set specified with the MKCALENDAR request
-            //then add the default values for the new jcr calendar collection
-            DavProperty supComp = properties.get(
-                                        CosmoDavPropertyName.SUPPORTEDCALENDARCOMPONENTSET);
-
-            if (supComp == null)
+            //if no supported calendar component set specified with
+            //the MKCALENDAR request, set the default values
+            if (properties.get(CosmoDavPropertyName.
+                               SUPPORTEDCALENDARCOMPONENTSET) == null) {
                 properties.add(new SupportedCalendarComponentSet());
+            }
 
             ctx.setCalendarCollectionProperties(properties);
-
         } catch (IllegalArgumentException e) {
             log.warn("error parsing MKCALENDAR properties", e);
             response.sendError(DavServletResponse.SC_BAD_REQUEST, e.getMessage());
@@ -459,14 +457,16 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
                       resource.getResourcePath());
         }
 
-        //If no properties passed then just create the new Calendar Collection node
+        // if no properties were included, then simply create the
+        // collection and return a single response
         if (properties.isEmpty()) {
             parentResource.addMember(resource, ctx);
             response.setStatus(DavServletResponse.SC_CREATED);
             return;
         }
 
-        MultiStatusResponse msr = parentResource.addMember(resource, ctx, properties);
+        MultiStatusResponse msr =
+            parentResource.addMember(resource, ctx, properties);
 
         if (msr.hasStatusKey(DavServletResponse.SC_OK)) {
             response.setStatus(DavServletResponse.SC_CREATED);

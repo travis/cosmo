@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.io;
+package org.osaf.cosmo.dav.io;
 
 import java.io.InputStream;
 

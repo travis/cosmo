@@ -13,27 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.io;
+package org.osaf.cosmo.dav.io;
 
 /**
- * An exception indicating that a resource submitted for import was
- * not of a media type supported by the server in the specified
- * location.
+ * An exception indicating that a calendar resource submitted for
+ * import did not obey all restrictions specified in by section 4.1 of
+ * CalDAV (MUST NOT contain more than one type of calendar component,
+ * MUST not specify the iCalendar METHOD property, etc).
  */
-public class UnsupportedMediaTypeException extends RuntimeException {
-
-    private String mediaType;
+public class InvalidCalendarObjectException extends RuntimeException {
 
     /**
      */
-    public UnsupportedMediaTypeException(String mediaType) {
-        super(mediaType);
-        this.mediaType = mediaType;
-    }
-
-    /**
-     */
-    public String getMediaType() {
-        return mediaType;
+    public InvalidCalendarObjectException(String message) {
+        super(message);
     }
 }

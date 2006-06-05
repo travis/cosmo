@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
   <iomanager>
-    <class name="org.osaf.cosmo.io.CosmoIOManager"/>
+    <class name="org.osaf.cosmo.dav.io.CosmoIOManager"/>
   </iomanager>
   <collection>
     <nodetypes>

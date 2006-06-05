@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.io;
+package org.osaf.cosmo.dav.io;
 
-import org.apache.jackrabbit.server.io.DefaultIOManager;
+import org.osaf.cosmo.icalendar.ComponentTypes;
 
 /**
- * Provides custom IO handlers for DAV collections and resources.
+ * An exception indicating that a calendar resource submitted for
+ * import did not contain at least one type of calendar component
+ * supported by Cosmo.
  *
- * @see DefaultIOManager
- * @see org.apache.jackrabbit.server.io.IOHandler
+ * @see org.osaf.cosmo.icalendar.ComponentTypes
  */
-public class CosmoIOManager extends DefaultIOManager {
+public class UnsupportedCalendarComponentException extends RuntimeException {
 
     /**
-     * Overwrites the superclass's handler list to include handlers
-     * for DAV collections and resources.
-     *
-     * @see DavCollectionHandler
-     * @see DavResourceHandler
      */
-    protected void init() {
-        addIOHandler(new DavCollectionHandler(this));
-        addIOHandler(new DavResourceHandler(this));
+    public UnsupportedCalendarComponentException() {
+        super(ComponentTypes.getAllSupportedComponentTypeNamesAsString());
+    }
+
+    /**
+     */
+    public UnsupportedCalendarComponentException(String message) {
+        super(message);
     }
 }

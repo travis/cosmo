@@ -13,28 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.io;
+package org.osaf.cosmo.dav.io;
 
 /**
- * An exception indicating that a calendar resource submitted for
- * import specified a uid that is already in use by another calendar
- * resource within the same calendar collection or a subcollection
- * thereof.
+ * An exception indicating that a resource submitted for import was
+ * incorrectly formatted or otherwise invalid.
  */
-public class UidConflictException extends RuntimeException {
-
-    private String uid;
+public class InvalidDataException extends RuntimeException {
 
     /**
      */
-    public UidConflictException(String uid) {
-        super(uid);
-        this.uid = uid;
+    public InvalidDataException(String message) {
+        super(message);
     }
 
     /**
      */
-    public String getUid() {
-        return uid;
+    public InvalidDataException(String message, Exception e) {
+        super(message, e);
     }
 }

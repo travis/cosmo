@@ -27,6 +27,9 @@ import net.fortuna.ical4j.model.Component;
  */
 public class ComponentTypes {
 
+    /** */
+    public static final int VEVENT = 0;
+
     private static int[] SUPPORTED_COMPONENT_TYPES = {
         VEVENT
     };
@@ -34,9 +37,6 @@ public class ComponentTypes {
     private static String[] SUPPORTED_COMPONENT_TYPE_NAMES = {
         Component.VEVENT
     };
-
-    /** */
-    public static final int VEVENT = 0;
 
     /**
      * Returns an array of codes representing all supported

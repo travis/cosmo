@@ -51,7 +51,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         
         self.testStart('PROPFIND for /cosmo/home/test/')
         #Build request body
-        f = open('files/chandler/chandler_0.6.1_testAccount.xml')
+        f = open('files/reports/chandler/chandler_0.6.1_testAccount.xml')
         propfindbody = f.read()
         propheaders = self.headerAdd({'Content-Type' : 'text/xml; charset="utf-8"'})
         self.request('PROPFIND', homepath, propfindbody, propheaders)
@@ -68,7 +68,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         
         self.testStart(' PROPFIND Request for /cosmo/home/test/test_s_calendar')
         #Build request body
-        f = open('files/chandler/chandler_0.6.1_testAccount.xml')
+        f = open('files/reports/chandler/chandler_0.6.1_testAccount.xml')
         propfindbody = f.read()
         self.request('PROPFIND', calpath, propfindbody, propheaders)
         self.checkStatus(501)
@@ -83,19 +83,19 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         
         self.testStart('PROPPATCH request')
         #Build request body
-        f = open('files/chandler/chandler_0.6.1_proppatch.xml')
+        f = open('files/reports/chandler/chandler_0.6.1_proppatch.xml')
         proppatchbody = f.read()
         self.request('PROPPATCH', calpath, proppatchbody, propheaders)
         self.checkStatus(207)
 
         self.testStart('MKTICKET request read only')
-        f = open('files/chandler/chandler_0.6.1_mkticket.xml')
+        f = open('files/reports/chandler/chandler_0.6.1_mkticket.xml')
         mkticketbody = f.read()
         self.request('MKTICKET', calpath, mkticketbody, propheaders)
         self.checkStatus(200)
         
         self.testStart('MKTICKET request read/write')
-        f = open('files/chandler/chandler_0.6.1_mkticket_rw.xml')
+        f = open('files/reports/chandler/chandler_0.6.1_mkticket_rw.xml')
         mkticketrwbody = f.read()
         self.request('MKTICKET', calpath, mkticketrwbody, propheaders)
         self.checkStatus(200)
@@ -123,7 +123,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         self.checkStatus(207)
         
         self.testStart('PUT Request for /cosmo/home/test/test_s_calendar/.chandler/412ad108-c6bd-11da-c95e-001124e4b0d2.xml')
-        f = open('files/chandler/412ad108-c6bd-11da-c95e-001124e4b0d2.xml')
+        f = open('files/reports/chandler/412ad108-c6bd-11da-c95e-001124e4b0d2.xml')
         putheaders = self.headerAdd({'Content-Type' : 'text/plain'})        
         putxmlbody = f.read()
         putxmlpath = self.pathBuilder('/home/cosmo-chandler061TestAccount%s/test_s_calendar/.chandler/412ad108-c6bd-11da-c95e-001124e4b0d2.xml' % self.appendUser)
@@ -131,7 +131,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         self.checkStatus(201)
         
         self.testStart('PUT Request for /cosmo/home/test/test_s_calendar/.chandler/share.xml')
-        f = open('files/chandler/chandler_0.6.1_share.xml')
+        f = open('files/reports/chandler/chandler_0.6.1_share.xml')
         putxmlbody = f.read()
         putxmlpath = self.pathBuilder('/home/cosmo-chandler061TestAccount%s/test_s_calendar/.chandler/share.xml' % self.appendUser)
         self.request('PUT', putxmlpath, putxmlbody, putheaders)
@@ -142,7 +142,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         self.checkStatus(207)
         
         self.testStart('PUT Request for /cosmo/home/test/test_s_calendar/412ad108-c6bd-11da-c95e-001124e4b0d2.ics')
-        f = open('files/chandler/412ad108-c6bd-11da-c95e-001124e4b0d2.ics')
+        f = open('files/reports/chandler/412ad108-c6bd-11da-c95e-001124e4b0d2.ics')
         puticsbody = f.read()
         putheaders = self.headerAdd({'Content-Type': 'text/calendar'})
         puticspath = self.pathBuilder('/home/cosmo-chandler061TestAccount%s/test_s_calendar/412ad108-c6bd-11da-c95e-001124e4b0d2.ics' % self.appendUser)
@@ -150,7 +150,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         self.checkStatus(201)
         
         self.testStart('PROPPATCH Request for /cosmo/home/test/test_s_calendar/412ad108-c6bd-11da-c95e-001124e4b0d2.ics')
-        f = open('files/chandler/chandler_0.6.1_proppatch_ics.xml')
+        f = open('files/reports/chandler/chandler_0.6.1_proppatch_ics.xml')
         proppatchicsbody = f.read()
         self.request('PROPPATCH', puticspath, proppatchicsbody, propheaders)
         self.checkStatus(207)

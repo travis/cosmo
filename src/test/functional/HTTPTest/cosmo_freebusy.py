@@ -94,7 +94,7 @@ class CosmoFreeBusy(DAVTest):
         f = open('files/reports/freebusy/1.xml')
         report1body = f.read()
         self.request('REPORT', self.calpath, body=report1body, headers=self.headers)
-        self.checkStatus(207)
+        self.checkStatus(200)
             
         vcalitems = ['FREEBUSY:', '20060101T150000Z/20060101T160000Z', '20060101T180000Z/20060101T190000Z',
                       '20060101T210000Z/20060101T220000Z', '20060101T230000Z/20060102T000000Z', '20060102T150000Z/20060102T160000Z',

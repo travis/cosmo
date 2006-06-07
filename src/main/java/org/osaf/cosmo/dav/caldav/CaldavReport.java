@@ -363,7 +363,6 @@ public abstract class CaldavReport implements Report, DavConstants {
         if (statement.endsWith("/")) {
             statement = statement.substring(0, statement.length()-1);
         }
-        log.debug("statement root: "+ statement);
         if (queryFilter != null) {
             statement += queryFilter.toXPath();
         }

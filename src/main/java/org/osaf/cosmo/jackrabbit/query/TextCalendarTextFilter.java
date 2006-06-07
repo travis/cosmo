@@ -68,8 +68,10 @@ import org.apache.jackrabbit.core.value.InternalValue;
  * 
  * For this to work the iCalendar data is coverted into a special 'flat' format,
  * and then split into key/value pairs, and the key becomes the indexer field.
+ *
+ * @deprecated This class will be removed in Cosmo 0.5.
  */
-public class TextCalendarTextFilter implements TextFilter {
+@Deprecated public class TextCalendarTextFilter implements TextFilter {
     private static final Log log =
         LogFactory.getLog(TextCalendarTextFilter.class);
 

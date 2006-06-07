@@ -38,13 +38,13 @@ import org.springmodules.jcr.support.JcrDaoSupport;
 /**
  * Implementation of <code>HomeDirectoryDao</code> that operates
  * against a JCR repository.
- *
+ * <p>
  * This implementation extends <code>JcrDaoSupport</code> to gain
  * access to a <code>JcrTemplate</code>, which it uses to  obtain
  * repository sessions. See the Spring Modules documentation
  * for more information on how to configure the template with
  * credentials, a repository reference and a workspace name.
- *
+ * <p>
  * The DAO uses <code>ResourceMapper</code> to convert JCR nodes and
  * properties to and from instances of <code>Resource</code>.
  *

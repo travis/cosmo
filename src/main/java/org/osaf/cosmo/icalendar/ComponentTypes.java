@@ -42,7 +42,7 @@ public class ComponentTypes {
      * Returns an array of codes representing all supported
      * component types (see specific type constants).
      *
-     * @returns array of component type codes
+     * @return array of component type codes
      */
     public static int[] getAllSupportedComponentTypes() {
         return SUPPORTED_COMPONENT_TYPES;
@@ -52,7 +52,7 @@ public class ComponentTypes {
      * Returns an array of the names of all supported component types
      * in no particular order.
      *
-     * @returns array of component type names
+     * @return array of component type names
      */
     public static String[] getAllSupportedComponentTypeNames() {
         return SUPPORTED_COMPONENT_TYPE_NAMES;
@@ -62,7 +62,7 @@ public class ComponentTypes {
      * Returns a string containing the names of all supported
      * component types delimited by the <code>|</code> character.
      *
-     * @returns string of component type names
+     * @return string of component type names
      */
     public static String getAllSupportedComponentTypeNamesAsString() {
         StringBuffer buf = new StringBuffer();
@@ -80,7 +80,7 @@ public class ComponentTypes {
      * type code.
      *
      * @param code a type code
-     * @returns the name of the corresponding component type
+     * @return the name of the corresponding component type
      * @throws IllegalArgumentException if the type code does not
      * represent a supported component type
      */
@@ -98,7 +98,7 @@ public class ComponentTypes {
      * name.
      *
      * @param name a component type name
-     * @returns the corresponding type code
+     * @return the corresponding type code
      * @throws IllegalArgumentException if the name does not
      * represent a supported component type
      */
@@ -115,7 +115,7 @@ public class ComponentTypes {
      * a supported component type.
      *
      * @param code a type code
-     * @returns <code>true</code> if the code represents a supported
+     * @return <code>true</code> if the code represents a supported
      * component type, <code>false</code> otherwise
      */
     public static boolean isValidComponentType(int code) {
@@ -127,7 +127,7 @@ public class ComponentTypes {
      * a supported component type.
      *
      * @param name a type name
-     * @returns <code>true</code> if the name represents a supported
+     * @return <code>true</code> if the name represents a supported
      * component type, <code>false</code> otherwise
      */
     public static boolean isValidComponentTypeName(String name) {

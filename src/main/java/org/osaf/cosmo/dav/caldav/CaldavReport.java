@@ -147,25 +147,34 @@ public abstract class CaldavReport implements Report, DavConstants {
         throws DavException;
 
     /**
-     * Use the resource and report info to execute whatever query is
-     * required by the report and set the member resource hrefs used
-     * to extract properties and calendar data for the response.
+     * Executes the report query and sets the member resource hrefs
+     * used to calculate the report response.
+     *
+     * If the report is specified with depth 0, no queries are run,
+     * since collections themselves do not have associated calendar
+     * data.
+     *
+     * If the report is specified with depth 1, only the calendar
+     * resources within the collection are considered.
+     *
+     * If the report is specified with depth infinity, all descendent
+     * calendar collections are considered as well as the requested
+     * collection.
+     *
+     * @throws DavException if an error occurs while running the
+     * report query
      */
     protected void runQuery()
         throws DavException {
-        if (info.getDepth() == DEPTH_1) {
-            // iterate through this this resource's child calendar
-            // collections and run the query for each one
-            for (DavResourceIterator i = resource.getMembers(); i.hasNext();) {
-                CosmoDavResource child = (CosmoDavResource) i.nextResource();
-                if (child.isCalendarCollection()) {
-                    doQuery(child);
-                }
-            }
+        if (info.getDepth() == DEPTH_0) {
+            return;
         }
-        else {
-            // run the query on this resource itself
-            doQuery(resource);
+
+        // run the query on this resource itself
+        doQuery(resource);
+
+        if (info.getDepth() == DEPTH_INFINITY) {
+            doQueryForChildren(resource);
         }
     }
 
@@ -331,10 +340,30 @@ public abstract class CaldavReport implements Report, DavConstants {
         }
     }
 
+    private void doQueryForChildren(DavResource resource)
+        throws DavException {
+        // iterate through this this resource's child calendar
+        // collections and run the query for each one
+        for (DavResourceIterator i = resource.getMembers(); i.hasNext();) {
+            CosmoDavResource child = (CosmoDavResource) i.nextResource();
+            if (child.isCalendarCollection()) {
+                doQuery(child);
+                doQueryForChildren(child);
+            }
+        }
+    }
+
     private Query getQuery(DavResource resource)
         throws DavException, RepositoryException {
         String statement = "/jcr:root" +
             resource.getLocator().getRepositoryPath();
+        // ensure the repository path doesn't end with a "/", which
+        // would cause the query statement to mean something totally
+        // different
+        if (statement.endsWith("/")) {
+            statement = statement.substring(0, statement.length()-1);
+        }
+        log.debug("statement root: "+ statement);
         if (queryFilter != null) {
             statement += queryFilter.toXPath();
         }

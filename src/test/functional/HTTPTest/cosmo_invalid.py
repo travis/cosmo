@@ -84,6 +84,8 @@ class CosmoInvalid(HTTPTest):
         self.request('PUT', put7icspath, body=put7icsbody, headers=puticsheaders)
         self.checkStatus(201)
         
+        self.headers = self.headerAdd({'Depth':'1'}, self.headers)
+        
         # ------- Test 1.xml : noSubComp ---------- #
         
         self.testStart('Test 1.xml : noSubComp')

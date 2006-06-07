@@ -42,6 +42,8 @@ class Cosmo500Events(DAVTest):
         self.calpath = self.pathBuilder('/home/cosmo-500eventsTestAccount%s/calendar/' % self.appendUser)
         self.request('MKCALENDAR', self.calpath, body=None, headers=self.headers)
         self.checkStatus(201)
+        
+        self.headers = self.headerAdd({'Depth':'1'}, self.headers)
       
     def recurringRun(self):
         

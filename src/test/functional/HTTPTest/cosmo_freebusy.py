@@ -86,6 +86,8 @@ class CosmoFreeBusy(DAVTest):
         self.request('PUT', put7icspath, body=put7icsbody, headers=puticsheaders)
         self.checkStatus(201)
         
+        self.headers = self.headerAdd({'Depth':'1'}, self.headers)
+        
     def recurringRun(self):
         
         # ------- Test 1.xml : REPORT query freebusy time-range start="20060101T000000Z" end="20060105T000000Z" ---------- #

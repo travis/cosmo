@@ -84,6 +84,8 @@ class CosmoBasicQuery(DAVTest):
         self.request('PUT', put7icspath, body=put7icsbody, headers=puticsheaders)
         self.checkStatus(201)
         
+        self.headers = self.headerAdd({'Depth':'1'}, self.headers)
+        
         
     def recurringRun(self):
         

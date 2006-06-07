@@ -47,37 +47,59 @@ import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.SchemaConstants;
 
 /**
- * Extends {@link org.apache.jackrabbit.server.io.DefaultHandler}
- * to provide custom logic for importing and exporting Cosmo
- * resources.
+ * Imports and exports WebDAV non-collection resources.
+ *
+ * Expects that the content nodes provided to import and export
+ * methods are of type <code>nt:resource</code> with parents of type
+ * <code>dav:resource</code>.
+ *
+ * All import and export methods do nothing if the provided resource
+ * is a collection.
  */
 public class DavResourceHandler extends DefaultHandler
     implements SchemaConstants {
     private static final Log log = LogFactory.getLog(DavResourceHandler.class);
 
-    /**
-     */
+    /** */
     public DavResourceHandler(IOManager ioManager) {
         super(ioManager, NT_DAV_COLLECTION, NT_DAV_RESOURCE, NT_RESOURCE);
     }
 
+    /** */
+    public boolean canImport(ImportContext context, boolean isCollection) {
+        if (! super.canImport(context, isCollection)) {
+            return false;
+        }
+        return ! isCollection;
+    }
+
     /**
-     * Extends the superclass method with the following logic:
+     * Imports the data stream from the <code>ImportContext</code> and
+     * makes the dav resource ticketable.
+     * 
+     * If the parent node is a <code>calendar:collection</code>,
+     * verifies that the imported content is a calendar object
+     * containing at least one calendar component of supported type
+     * and validates the uniqueness of the component's UID.
      *
-     * <ol>
-     * <li> Adds the <code>dav:resource</code> and
-     * <code>mix:ticketable</code> mixin type to the resource node if
-     * it does not already have them.</li>
-     * <li> If importing a calendar resource into a calendar collection:
-     * <ol>
-     * <li> Ensures that the calendar object contains at least one
-     * event.</li>
-     * <li> Ensures that uid of the calendar object is unique within
-     * the calendar collection.</li>
-     * <li> Adds the <code>calendar:resource</code> mixin type to the
-     * resource node if it does not already have that type.</li>
-     * </ol>
-     * </ol>
+     * @param context the import context
+     * @param isCollection whether or not the resource being imported
+     * is a collection
+     * @param contentNode the data node where the imported resource
+     * content is stored
+     * @return <code>false</code> if the content node represents a
+     * collection
+     * <code>true</code> otherwise.
+     * @throws IOException if the import stream cannot be read
+     * @throws RepositoryException if the import stream cannot be
+     * stored
+     * @throws UnsupportedMediaTypeException if import of a
+     * non-calendar resource is attempted within a calendar collection
+     * @throws UnsupportedCalendarComponentException if a calendar
+     * resource does not contain at least one supported component type
+     * @throws UidConflictException if a calendar component's UID
+     * conflicts with that of another calendar resource already stored
+     * within the calendar collection
      */
     public boolean importData(ImportContext context,
                               boolean isCollection,
@@ -150,44 +172,36 @@ public class DavResourceHandler extends DefaultHandler
     }
 
     /**
-     * Extends the superclass method with the following logic:
+     * Sets the properties of the given <code>nt:resource</code> and
+     * its parent <code>dav:resource</code> node based on the
+     * attributes of the <code>ImportContext</code>.
      *
-     * <ol>
-     * <li> The (JCR-escaped) system id is used to set the resource
-     * node's <code>dav:displayname</code> property.</li>
-     * <li> The resource node's <code>dav:contentlanguage</code>
-     * property is set from the import context.</li>
-     * <li> If importing a calendar resource into a calendar collection,
-     * set the resource node's <code>calendar:uid</code> property.</li>
-     *</ol>
+     * @param context the import context
+     * @param isCollection whether or not the resource being imported
+     * is a collection
+     * @param contentNode the data node where the imported resource
+     * content is stored
+     * @return <code>false</code> if the content node represents a
+     * collection or if an error occurs importing properties,
+     * <code>true</code> otherwise.
      */
     protected boolean importProperties(ImportContext context,
                                        boolean isCollection,
                                        Node contentNode) {
-        if (! super.importProperties(context, isCollection, contentNode)) {
-            return false;
-        }
-
-        CosmoImportContext cosmoContext = (CosmoImportContext) context;
-        Node resourceNode = contentNode;
-
         try {
-            if (! isCollection) {
-                resourceNode = contentNode.getParent();
-            }
+            Node resourceNode = contentNode.getParent();
 
             // XXX: move into JcrResourceMapper!!@#$!@!@
 
             String displayName =
                 PathTranslator.toClientPath(context.getSystemId());
             resourceNode.setProperty(NP_DAV_DISPLAYNAME, displayName);
-            resourceNode.setProperty(NP_DAV_CONTENTLANGUAGE,
-                                     context.getContentLanguage());
-            java.util.Calendar now = java.util.Calendar.getInstance();
+            java.util.Calendar lastMod = java.util.Calendar.getInstance();
+            // only set created if the node is brand new
             if (! resourceNode.hasProperty(NP_DAV_CREATED)) {
+                java.util.Calendar now = java.util.Calendar.getInstance();
                 resourceNode.setProperty(NP_DAV_CREATED, now);
             }
-            java.util.Calendar lastMod = java.util.Calendar.getInstance();
             if (context.getModificationTime() != IOUtil.UNDEFINED_TIME) {
                 lastMod.setTimeInMillis(context.getModificationTime());
             }
@@ -195,6 +209,21 @@ public class DavResourceHandler extends DefaultHandler
                 lastMod.setTime(new java.util.Date());
             }
             resourceNode.setProperty(NP_DAV_LASTMODIFIED, lastMod);
+            // the request might have used chunked encoding, which
+            // means that context.getContentLength() would be -1, so
+            // we can't rely on that but have to look at the size of
+            // the data property of the content node
+            long length = contentNode.getProperty(NP_JCR_DATA).getLength();
+            resourceNode.setProperty(NP_DAV_CONTENTLENGTH, length);
+            String etag =
+                "\"" + length + "-" + lastMod.getTimeInMillis() + "\"";
+            resourceNode.setProperty(NP_DAV_ETAG, etag);
+            resourceNode.setProperty(NP_DAV_CONTENTLANGUAGE,
+                                     context.getContentLanguage());
+
+            contentNode.setProperty(NP_JCR_MIMETYPE, context.getMimeType());
+            contentNode.setProperty(NP_JCR_ENCODING, context.getEncoding());
+            contentNode.setProperty(NP_JCR_LASTMODIFIED, lastMod);
 
             if (resourceNode.isNodeType(NT_CALENDAR_RESOURCE)) {
                 // set calendar:uid
@@ -202,6 +231,7 @@ public class DavResourceHandler extends DefaultHandler
                 // no need to store this property - the calendar
                 // collection uid uniqueness check can look directly
                 // at the icalendar uid property
+                CosmoImportContext cosmoContext = (CosmoImportContext) context;
                 Calendar calendar = cosmoContext.getCalendar();
                 Component event = (Component) calendar.getComponents().
                     getComponents(Component.VEVENT).
@@ -247,9 +277,17 @@ public class DavResourceHandler extends DefaultHandler
     }
 
     /**
-     * Returns true if the given uid value is not already in use by
-     * any calendar resource node within the parent calendar
-     * collection node of the given resource node.
+     * Determines whether or not he given UID is unique within the the
+     * parent calendar collection of the given resource node.
+     *
+     * @param resourceNode the node representing a calendar resource
+     * being imported into a calendar collection
+     * @param uid the UID of the calendar resource being imported
+     * @return <code>false</code> if the UID is already in use by
+     * another calendar resource within the calendar collection,
+     * <code>true</code> otherwise
+     * @throws RepositoryException if an error occurs while searching
+     * the repository
      */
     protected boolean isUidUnique(Node resourceNode, String uid)
         throws RepositoryException {
@@ -287,39 +325,60 @@ public class DavResourceHandler extends DefaultHandler
         return true;
     }
 
+    /** */
+    public boolean canExport(ExportContext context, boolean isCollection) {
+        if (! super.canExport(context, isCollection)) {
+            return false;
+        }
+        return ! isCollection;
+    }
+
     /**
-     * Extends the superclass method with the following logic:
+     * Sets the attributes of the <code>ExportContext</code> based on
+     * the properties of the given <code>nt:resource</code> and
+     * its parent <code>dav:resource</code> node.
      *
-     * <ol>
-     * <li> If the resource node is a <code>dav:resource</code>, its
-     * <code>dav:contentlanguage</code> property is used to set the
-     * export context's content language.
-     *</ol>
+     * @param context the export context
+     * @param isCollection whether or not the resource being exported
+     * is a collection
+     * @param contentNode the data node where the exported resource
+     * content is stored
+     * @throws IOException if an error occurs
      */
     protected void exportProperties(ExportContext context,
                                     boolean isCollection,
                                     Node contentNode)
         throws IOException {
-        super.exportProperties(context, isCollection, contentNode);
-
         try {
-            Node resourceNode = isCollection ?
-                contentNode : contentNode.getParent();
-            // get created
+            Node resourceNode = contentNode.getParent();
+
             long createTime =
                 resourceNode.getProperty(NP_DAV_CREATED).getLong();
             context.setCreationTime(createTime);
-            // get last modified
             long modTime =
                 resourceNode.getProperty(NP_DAV_LASTMODIFIED).getLong();
             context.setModificationTime(modTime);
-            // get content language
+            long length =
+                resourceNode.getProperty(NP_DAV_CONTENTLENGTH).getLong();
+            context.setContentLength(length);
+            String etag =
+                resourceNode.getProperty(NP_DAV_ETAG).getString();
+            context.setETag(etag);
             if (resourceNode.hasProperty(NP_DAV_CONTENTLANGUAGE)) {
                 String contentLanguage =
                     resourceNode.getProperty(NP_DAV_CONTENTLANGUAGE).
                     getString();
                 context.setContentLanguage(contentLanguage);
             }
+
+            String mimeType =
+                contentNode.getProperty(NP_JCR_MIMETYPE).getString();
+            String encoding = null;
+            if (contentNode.hasProperty(NP_JCR_ENCODING)) {
+                encoding =
+                    contentNode.getProperty(NP_JCR_ENCODING).getString();
+            }
+            context.setContentType(mimeType, encoding);
         } catch (RepositoryException e) {
             log.error("error exporting dav properties", e);
             throw new IOException(e.getMessage());

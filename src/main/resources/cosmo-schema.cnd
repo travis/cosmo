@@ -41,16 +41,18 @@
   + ticket:ticket (ticket:ticket) = ticket:ticket multiple version
 
 [dav:collection] > nt:folder
-  - dav:displayname (string) mandatory copy
+  - dav:displayName (string) mandatory copy
   - dav:created (date) mandatory copy
   - dav:lastModified (date) mandatory copy
   - * (undefined) copy
 
 [dav:resource] > nt:file
-  - dav:displayname (string) mandatory copy
-  - dav:contentlanguage (string) copy
+  - dav:displayName (string) mandatory copy
+  - dav:contentLength (long) mandatory copy
+  - dav:contentLanguage (string) copy
   - dav:created (date) mandatory copy
   - dav:lastModified (date) mandatory copy
+  - dav:etag (string) mandatory copy
   - * (undefined) copy
 
 [calendar:collection] mixin

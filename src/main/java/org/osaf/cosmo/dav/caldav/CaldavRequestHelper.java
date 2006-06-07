@@ -44,7 +44,7 @@ public class CaldavRequestHelper {
      *
      * @param prop the <code>DavProperty</code> containing the
      * timezone
-     * @returns a <code>VTimeZone</code> representing the submitted
+     * @return a <code>VTimeZone</code> representing the submitted
      * timezone, or <code>null</code> if the property or its value is
      * <code>null</code>
      * @throws IOException if an error occurs reading the iCalendar
@@ -72,7 +72,7 @@ public class CaldavRequestHelper {
      * properties and parameters are validated according to RFC 2445.
      *
      * @param ical the iCalendar string to parse
-     * @returns a <code>VTimeZone</code> representing the submitted
+     * @return a <code>VTimeZone</code> representing the submitted
      * timezone, or <code>null</code> if the iCalendar string is
      * <code>null</code>
      * @throws IOException if an error occurs reading the iCalendar

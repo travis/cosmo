@@ -81,7 +81,7 @@ public interface SchemaConstants {
     public static final String NP_DAV_LASTMODIFIED = "dav:lastModified";
     public static final String NP_DAV_CONTENTLENGTH = "dav:contentLength";
     public static final String NP_DAV_CONTENTLANGUAGE =
-        "dav:contentlanguage";
+        "dav:contentLanguage";
     public static final String NP_DAV_ETAG = "dav:etag";
 
     public static final String NP_CALENDAR_UID = "calendar:uid";

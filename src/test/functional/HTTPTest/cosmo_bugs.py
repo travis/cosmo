@@ -37,7 +37,7 @@ class CosmoBugs(DAVTest):
         
         # ------- Test Create Calendar ------- #
         
-        self.headers = self.headerAdd({'Depth':'1'}, self.headers)
+        self.headers = self.headerAdd({'Depth':'1'})
         
         #Add auth to global headers
         self.headers = self.headerAddAuth("cosmo-bugsTestAccount%s" % self.appendUser, "cosmo-bugs")

@@ -131,16 +131,16 @@ if __name__ == "__main__":
     wait = 60
     
     testsDict = {'cosmo_500events':'Cosmo500Events',
-                  #'cosmo_basicquery':'CosmoBasicQuery',
-                  #'cosmo_bugs':'CosmoBugs',
-                  #'cosmo_chandler061':'CosmoChandlerZeroPointSixPointOne',
-                  #'cosmo_freebusy':'CosmoFreeBusy',
-                  #'cosmo_invalid':'CosmoInvalid',
-                  #'cosmo_limitexpand':'CosmoLimitExpand',
-                  #'cosmo_mkcalendar':'CosmoMkcalendar',
-                  #'cosmo_multiget':'CosmoMultiget',
-                  #'cosmo_ticket':'CosmoTicket',
-                  #'cosmo_timerangequery':'CosmoTimeRangeQuery'
+                  'cosmo_basicquery':'CosmoBasicQuery',
+                  'cosmo_bugs':'CosmoBugs',
+                  'cosmo_chandler061':'CosmoChandlerZeroPointSixPointOne',
+                  'cosmo_freebusy':'CosmoFreeBusy',
+                  'cosmo_invalid':'CosmoInvalid',
+                  'cosmo_limitexpand':'CosmoLimitExpand',
+                  'cosmo_mkcalendar':'CosmoMkcalendar',
+                  'cosmo_multiget':'CosmoMultiget',
+                  'cosmo_ticket':'CosmoTicket',
+                  'cosmo_timerangequery':'CosmoTimeRangeQuery'
                   }
     
     def parseTests(string):

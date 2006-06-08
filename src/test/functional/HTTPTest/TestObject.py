@@ -55,12 +55,16 @@ class TestObject:
             for p in positive:
                 if comp_string.find(p) == -1:
                     self.report(False, test=test, comment=comment)
+                    if self.debug > 2:
+                        print "Failure on finding %s in string" % p
                     return
 
         if negative is not None:
-            for p in positive:
-                if comp_string.find(p) != -1:
+            for n in negative:
+                if comp_string.find(n) != -1:
                     self.report(False, test=test, comment=comment)
+                    if self.debug > 2:
+                        print "Failure found %s in string" % n
                     return    
                     
         self.report(True, test=test, comment=comment)

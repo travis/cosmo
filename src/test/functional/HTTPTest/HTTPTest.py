@@ -56,7 +56,7 @@ class HTTPTest(TestObject):
             
     def verifyListInResponse(self, positive=None, negative=None, comment=None):
         
-        self.listComparison(self.test_response.read(), test='verifyListInResponse', positive=positive, negative=positive, comment='%s,%s' % (positive, negative))  
+        self.listComparison(self.test_response.read().replace('\n ', ''), test='verifyListInResponse', positive=positive, negative=negative, comment='%s,%s' % (positive, negative))  
             
     def xmlParse(self):
         """

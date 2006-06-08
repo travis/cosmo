@@ -43,7 +43,7 @@ class Cosmo500Events(DAVTest):
         self.request('MKCALENDAR', self.calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
-        self.headers = self.headerAdd({'Depth':'1'}, self.headers)
+        self.headers = self.headerAdd({'Depth':'1'})
       
     def recurringRun(self):
         

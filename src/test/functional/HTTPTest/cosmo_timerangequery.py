@@ -48,7 +48,7 @@ class CosmoTimeRangeQuery(DAVTest):
         self.request('MKCALENDAR', calpath, body=None, headers=self.headers)
         self.checkStatus(201)
         
-        self.headers = self.headerAdd({'Depth':'1'}, self.headers)
+        self.headers = self.headerAdd({'Depth':'1'})
         
         # ------- Test Creation of events view ICS ------- #
         

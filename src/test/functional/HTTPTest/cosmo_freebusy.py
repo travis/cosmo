@@ -97,13 +97,13 @@ class CosmoFreeBusy(DAVTest):
         report1body = f.read()
         self.request('REPORT', self.calpath, body=report1body, headers=self.headers)
         self.checkStatus(200)
-            
+
         vcalitems = ['FREEBUSY:', '20060101T150000Z/20060101T160000Z', '20060101T180000Z/20060101T190000Z',
                       '20060101T210000Z/20060101T220000Z', '20060101T230000Z/20060102T000000Z', '20060102T150000Z/20060102T160000Z',
                       '20060102T190000Z/20060102T200000Z', '20060102T230000Z/20060103T000000Z', '20060103T150000Z/20060103T160000Z',
                       '20060103T190000Z/20060103T200000Z', '20060103T230000Z/20060104T000000Z', '20060104T150000Z/20060104T160000Z',
                       '20060104T210000Z/20060104T220000Z', '20060105T010000Z/20060105T000000Z']
-                      
+
         self.verifyListInResponse(positive=vcalitems)
         
         

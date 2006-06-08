@@ -15,7 +15,6 @@ class TestObject:
         self.threadNum = threadNum
         self.appendDict = appendDict
         self.appendList = appendList
-        print 'Testing ----- %s' % threadNum
 
     def printOut(self, string):
         
@@ -24,8 +23,6 @@ class TestObject:
                 print '%s%s' % (self.printAppend, string)
             if self.threadNum is not None:
                 print 'Thread %s :: %s%s' % (self.threadNum, self.printAppend, string)
-            
-        print 'Test Printout --- %s' % string    
             
     def testStart(self, testname):
         """
@@ -36,7 +33,7 @@ class TestObject:
         if self.debug > 0:
                 self.printOut('Starting New Test :: %s' % self.test)
                 
-        print 'startingTest %s' % self.test
+        self.printOut('startingTest %s' % self.test)
             
     def report(self, result, test=None, comment=None):
         
@@ -52,7 +49,21 @@ class TestObject:
         if result == False:
             self.printOut("Failure :: Test %s :: %s" % (test, comment))
             
-        print '%s :: Test %s :: %s' % (result, test, comment)
+    def listComparison(self, comp_string, test='ListComparison', positive=None, negative=None, comment=None):
+        
+        if positive is not None:
+            for p in positive:
+                if comp_string.find(p) == -1:
+                    self.report(False, test=test, comment=comment)
+                    return
+
+        if negative is not None:
+            for p in positive:
+                if comp_string.find(p) != -1:
+                    self.report(False, test=test, comment=comment)
+                    return    
+                    
+        self.report(True, test=test, comment=comment)
             
             
     def runRecurring(self):

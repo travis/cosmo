@@ -86,7 +86,7 @@ class CosmoFreeBusy(DAVTest):
         self.request('PUT', put7icspath, body=put7icsbody, headers=puticsheaders)
         self.checkStatus(201)
         
-        self.headers = self.headerAdd({'Depth':'1'}, self.headers)
+        self.headers = self.headerAdd({'Depth':'1'})
         
     def recurringRun(self):
         
@@ -104,8 +104,12 @@ class CosmoFreeBusy(DAVTest):
                       '20060103T190000Z/20060103T200000Z', '20060103T230000Z/20060104T000000Z', '20060104T150000Z/20060104T160000Z',
                       '20060104T210000Z/20060104T220000Z', '20060105T010000Z/20060105T000000Z']
                       
-        self.verifyDAVResponseItems([''], inelement='{DAV:}getetag', positive=[''])              
-        self.verifyDAVResponseItems([''], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, )
+        self.verifyListInResponse(positive=vcalitems)
+        
+        
+#                       
+#         self.verifyDAVResponseItems([''], inelement='{DAV:}getetag', positive=[''])              
+#         self.verifyDAVResponseItems([''], inelement='{urn:ietf:params:xml:ns:caldav}calendar-data', positive=vcalitems, )
   
   
   
@@ -137,6 +141,6 @@ if __name__ == "__main__":
     
     cosmofreebusy = CosmoFreeBusy(host=host, port=port, path=path)
     cosmofreebusy.debug = debug
-    cosmofreebusy.startRun()
+    cosmofreebusy.fullRun()
     cosmofreebusy.end()
     

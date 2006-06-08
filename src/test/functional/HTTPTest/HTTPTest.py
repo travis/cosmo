@@ -54,6 +54,10 @@ class HTTPTest(TestObject):
             self.report(False, test='Status Code Check on %s' % status, comment='expected %s ; received %s' % (status, out))
             return False
             
+    def verifyListInResponse(self, positive=None, negative=None, comment=None):
+        
+        self.listComparison(self.test_response.read(), test='verifyListInResponse', positive=positive, negative=positive, comment='%s,%s' % (positive, negative))  
+            
     def xmlParse(self):
         """
         Get xml in body
@@ -109,8 +113,12 @@ class HTTPTest(TestObject):
         
         self.test_response = r
         
-        if self.debug > 2:
-            print r
+        if self.debug > 3:
+            print 'Request::\n%s' % body
+            print 'RequestHeaders::\n%s' % headers
+            print 'Response::\n%s' % r.read()
+        elif self.debug > 2:
+            print r.read()
         
         return r
     

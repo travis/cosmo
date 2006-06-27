@@ -102,9 +102,7 @@ public class CosmoImportContext extends ImportContextImpl
         return calendar;
     }
 
-    /**
-     * @see ImportContext#informCompleted(boolean)
-     */
+    /** */
     public void informCompleted(boolean success) {
         super.informCompleted(success);
         calendar = null;

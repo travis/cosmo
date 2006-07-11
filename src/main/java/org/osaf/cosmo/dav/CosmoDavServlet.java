@@ -54,7 +54,6 @@ import org.osaf.cosmo.dav.caldav.CaldavRequestHelper;
 import org.osaf.cosmo.dav.caldav.CaldavReport;
 import org.osaf.cosmo.dav.impl.CosmoDavLocatorFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavRequestImpl;
-import org.osaf.cosmo.dav.impl.CosmoDavResourceImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResourceFactoryImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavResponseImpl;
 import org.osaf.cosmo.dav.impl.CosmoDavSessionProviderImpl;
@@ -177,7 +176,7 @@ public class CosmoDavServlet extends SimpleWebdavServlet {
             throws ServletException, IOException, DavException {
         CosmoDavRequest cosmoRequest = (CosmoDavRequest) request;
         CosmoDavResponse cosmoResponse = (CosmoDavResponse) response;
-        CosmoDavResourceImpl cosmoResource = (CosmoDavResourceImpl) resource;
+        CosmoDavResource cosmoResource = (CosmoDavResource) resource;
 
         // TODO We handle REPORT ourselves for now. Eventually this will be
         // punted up into jackrabbit

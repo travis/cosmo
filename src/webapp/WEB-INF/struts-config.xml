@@ -72,7 +72,7 @@
             scope="request"
             validate="true"
             input="/console/forgot"
-            type="org.osaf.cosmo.ui.CredentialsReminderAction">
+            type="org.osaf.cosmo.ui.account.CredentialsReminderAction">
       <forward name="ok" path="forgot"/>
       <forward name="failure" path="forgot"/>
     </action>
@@ -88,7 +88,7 @@
             forward="account.new"/>
 
     <action path="/account/signup"
-            type="org.osaf.cosmo.ui.AccountAction"
+            type="org.osaf.cosmo.ui.account.AccountAction"
             name="signupAccountForm"
             scope="request"
             validate="true"
@@ -99,7 +99,7 @@
     </action>
 
     <action path="/account"
-            type="org.osaf.cosmo.ui.AccountAction"
+            type="org.osaf.cosmo.ui.account.AccountAction"
             name="updateAccountForm"
             scope="request"
             validate="false"
@@ -108,7 +108,7 @@
     </action>
 
     <action path="/account/update"
-            type="org.osaf.cosmo.ui.AccountAction"
+            type="org.osaf.cosmo.ui.account.AccountAction"
             name="updateAccountForm"
             scope="request"
             validate="true"
@@ -121,7 +121,7 @@
     <!-- user admin actions -->
 
     <action path="/user"
-            type="org.osaf.cosmo.ui.UserAction"
+            type="org.osaf.cosmo.ui.admin.user.UserAction"
             name="updateUserForm"
             scope="request"
             validate="false"
@@ -130,7 +130,7 @@
     </action>
 
     <action path="/user/update"
-            type="org.osaf.cosmo.ui.UserAction"
+            type="org.osaf.cosmo.ui.admin.user.UserAction"
             name="updateUserForm"
             scope="request"
             validate="true"
@@ -144,7 +144,7 @@
     <!-- root user requires totally different form validation -->
 
     <action path="/user/root"
-            type="org.osaf.cosmo.ui.UserAction"
+            type="org.osaf.cosmo.ui.admin.user.UserAction"
             name="updateRootForm"
             scope="request"
             validate="false"
@@ -153,7 +153,7 @@
     </action>
 
     <action path="/user/root/update"
-            type="org.osaf.cosmo.ui.UserAction"
+            type="org.osaf.cosmo.ui.admin.user.UserAction"
             name="updateRootForm"
             scope="request"
             validate="true"
@@ -165,13 +165,13 @@
     </action>
 
     <action path="/user/remove"
-            type="org.osaf.cosmo.ui.UserAction"
+            type="org.osaf.cosmo.ui.admin.user.UserAction"
             parameter="remove">
       <forward name="success" path="/console/users" redirect="true"/>
     </action>
 
     <action path="/users"
-            type="org.osaf.cosmo.ui.UserAction"
+            type="org.osaf.cosmo.ui.admin.user.UserAction"
             name="createUserForm"
             scope="request"
             validate="false"
@@ -180,7 +180,7 @@
     </action>
 
     <action path="/user/create"
-            type="org.osaf.cosmo.ui.UserAction"
+            type="org.osaf.cosmo.ui.admin.user.UserAction"
             name="createUserForm"
             scope="request"
             validate="true"

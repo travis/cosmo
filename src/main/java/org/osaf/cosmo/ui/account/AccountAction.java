@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.ui;
+package org.osaf.cosmo.ui.account;
 
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
@@ -21,6 +21,12 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.UserService;
+// XXX: we really should have a separate AccountForm rather than
+// reusing UserForm, but since we're moving away from struts soon
+// anyway, it hardly matters
+import org.osaf.cosmo.ui.CosmoAction;
+import org.osaf.cosmo.ui.UIConstants;
+import org.osaf.cosmo.ui.admin.user.UserForm;
 
 import java.util.List;
 

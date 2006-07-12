@@ -1,4 +1,4 @@
-package org.osaf.cosmo.ui;
+package org.osaf.cosmo.ui.account;
 
 import java.util.Locale;
 import javax.mail.MessagingException;
@@ -20,6 +20,8 @@ import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.ui.CosmoAction;
+import org.osaf.cosmo.ui.UIConstants;
 
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.mail.javamail.JavaMailSender;

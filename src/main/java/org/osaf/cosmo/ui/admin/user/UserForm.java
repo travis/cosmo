@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.ui;
+package org.osaf.cosmo.ui.admin.user;
 
 import javax.servlet.http.HttpServletRequest;
 

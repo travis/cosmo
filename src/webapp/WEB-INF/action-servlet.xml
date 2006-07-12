@@ -23,7 +23,7 @@
   <!-- user admin actions -->
 
   <bean name="userAction" abstract="true" singleton="false"
-        class="org.osaf.cosmo.ui.UserAction" >
+        class="org.osaf.cosmo.ui.admin.user.UserAction" >
     <property name="configurer">
       <ref bean="servletContextConfigurer"/>
     </property>
@@ -46,7 +46,7 @@
   <!-- account self-management actions -->
 
   <bean name="accountAction" abstract="true" singleton="false"
-        class="org.osaf.cosmo.ui.AccountAction" >
+        class="org.osaf.cosmo.ui.account.AccountAction" >
     <property name="userService">
       <ref bean="userService"/>
     </property>
@@ -63,7 +63,7 @@
   <!-- credentials reminder actions -->
 
   <bean name="/remind" singleton="false"
-        class="org.osaf.cosmo.ui.CredentialsReminderAction" >
+        class="org.osaf.cosmo.ui.account.CredentialsReminderAction" >
     <property name="userService">
       <ref bean="userService"/>
     </property>

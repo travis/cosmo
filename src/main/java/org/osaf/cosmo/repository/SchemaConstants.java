@@ -39,6 +39,7 @@ public interface SchemaConstants {
     public static final String NS_COSMO = "http://osafoundation.org/cosmo";
 
     // node names
+    public static final String NN_JCR_SYSTEM = "jcr:system";
     public static final String NN_JCR_CONTENT = "jcr:content";
     public static final String NN_JCR_DATA = "jcr:data";
 

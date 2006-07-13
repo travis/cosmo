@@ -101,11 +101,11 @@ public class PathTranslator {
         String[] segments = clientPath.split("/");
         String username = segments[0];
         repositoryPath.
-            append(username.substring(0, 1)).
+            append(HexEscaper.escape(username.substring(0, 1))).
             append("/").
-            append(username.substring(0, 2)).
+            append(HexEscaper.escape(username.substring(0, 2))).
             append("/").
-            append(username).
+            append(HexEscaper.escape(username)).
             append("/");
 
         // add the rest of the segments to the repo path

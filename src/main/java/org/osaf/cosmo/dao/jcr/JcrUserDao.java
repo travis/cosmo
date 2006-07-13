@@ -81,10 +81,33 @@ public class JcrUserDao extends JcrDaoSupport
                 public Object doInJcr(Session session)
                     throws RepositoryException {
                     Set users = new HashSet();
-                    for (NodeIterator i=queryForUsers(session).getNodes();
-                         i.hasNext();) {
-                        Node node = i.nextNode();
-                        users.add(UserMapper.nodeToUser(node));
+
+                    NodeIterator i = null;
+                    NodeIterator j = null;
+                    NodeIterator k = null;
+                    Node l1 = null;
+                    Node l2 = null;
+                    Node home = null;
+                    for (i=session.getRootNode().getNodes(); i.hasNext();) {
+                        l1 = i.nextNode();
+                        if (l1.getName().equals(NN_JCR_SYSTEM) ||
+                            l1.getName().equals(NN_COSMO_SYSTEM) ||
+                            ! l1.isNodeType(NT_UNSTRUCTURED)) {
+                            continue;
+                        }
+                        for (j=l1.getNodes(); j.hasNext();) {
+                            l2 = j.nextNode();
+                            if (! l2.isNodeType(NT_UNSTRUCTURED)) {
+                                continue;
+                            }
+                            for (k=l2.getNodes(); k.hasNext();) {
+                                home = k.nextNode();
+                                if (! home.isNodeType(NT_USER)) {
+                                    continue;
+                                }
+                                users.add(UserMapper.nodeToUser(home));
+                            }
+                        }
                     }
 
                     return users;
@@ -326,20 +349,6 @@ public class JcrUserDao extends JcrDaoSupport
         QueryManager qm =
             session.getWorkspace().getQueryManager();
         return qm.createQuery(statement.toString(), Query.XPATH).execute();
-    }
-
-    /**
-     */
-    protected QueryResult queryForUsers(Session session)
-        throws RepositoryException {
-        StringBuffer stmt = new StringBuffer();
-        stmt.append("/jcr:root//element(*, ").
-            append(NT_USER).
-            append(")").
-            append("[@").
-            append(NP_USER_USERNAME).
-            append("]");
-        return executeXPathQuery(session, stmt.toString());
     }
 
     /**

@@ -35,6 +35,9 @@
     <param-value>MessageResources</param-value>
   </context-param>
   <listener>
+    <listener-class>org.hyperic.hq.product.servlet.filter.JMXSessionListener</listener-class>
+  </listener>
+  <listener>
     <listener-class>
       org.osaf.cosmo.util.LifecycleLoggerListener
     </listener-class>
@@ -59,6 +62,14 @@
       org.osaf.cosmo.jackrabbit.query.TextFilterListener
     </listener-class>
   </listener>
+  <filter>
+    <filter-name>hyperic-jmx</filter-name>
+    <filter-class>org.hyperic.hq.product.servlet.filter.JMXFilter</filter-class>
+    <init-param>
+      <param-name>responseTimeLogDir</param-name>
+      <param-value>/usr/local/hyperic/logs</param-value>
+    </init-param>
+  </filter>
   <filter>
     <filter-name>version-header</filter-name>
     <filter-class>org.osaf.cosmo.ui.VersionHeaderFilter</filter-class>
@@ -110,6 +121,10 @@
     </init-param>
   </filter>
   <filter-mapping>
+    <filter-name>hyperic-jmx</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
     <filter-name>version-header</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
@@ -142,6 +157,11 @@
     <filter-name>url-rewrite</filter-name>
     <url-pattern>/feed/*</url-pattern>
   </filter-mapping>
+  <servlet>
+    <servlet-name>JMXWebappMetricServlet</servlet-name>
+    <servlet-class>org.hyperic.hq.product.servlet.filter.JMXFilterInitServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
   <servlet>
     <servlet-name>webdav</servlet-name>
     <servlet-class>org.osaf.cosmo.dav.CosmoDavServlet</servlet-class>

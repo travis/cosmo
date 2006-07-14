@@ -24,11 +24,16 @@
   <form-beans>
     <form-bean name="forgotForm"
                type="org.apache.struts.validator.LazyValidatorForm"/>
-    <form-bean name="signupAccountForm" type="org.osaf.cosmo.ui.UserForm"/>
-    <form-bean name="updateAccountForm" type="org.osaf.cosmo.ui.UserForm"/>
-    <form-bean name="createUserForm" type="org.osaf.cosmo.ui.UserForm"/>
-    <form-bean name="updateUserForm" type="org.osaf.cosmo.ui.UserForm"/>
-    <form-bean name="updateRootForm" type="org.osaf.cosmo.ui.UserForm"/>
+    <form-bean name="signupAccountForm"
+               type="org.osaf.cosmo.ui.admin.user.UserForm"/>
+    <form-bean name="updateAccountForm"
+               type="org.osaf.cosmo.ui.admin.user.UserForm"/>
+    <form-bean name="createUserForm"
+               type="org.osaf.cosmo.ui.admin.user.UserForm"/>
+    <form-bean name="updateUserForm"
+               type="org.osaf.cosmo.ui.admin.user.UserForm"/>
+    <form-bean name="updateRootForm"
+               type="org.osaf.cosmo.ui.admin.user.UserForm"/>
     <form-bean name="ticketForm" type="org.osaf.cosmo.ui.home.TicketForm"/>
   </form-beans>
 

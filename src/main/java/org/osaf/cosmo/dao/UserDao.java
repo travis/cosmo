@@ -16,6 +16,8 @@
 package org.osaf.cosmo.dao;
 
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.util.PagedList;
+import org.osaf.cosmo.util.PageCriteria;
 
 import java.util.Set;
 
@@ -33,6 +35,15 @@ public interface UserDao extends Dao {
      */
     public Set getUsers();
 
+    /**
+     * Returns a paginated list of Users meeting the criteria set in
+     * <code>pageCriteria</code>
+     * 
+     * @param pageCriteria the pagination criteria
+     * @return paginated list of users
+     */
+    public PagedList getUsers(PageCriteria pageCriteria);
+    
     /**
      * Returns the user account identified by the given username.
      *

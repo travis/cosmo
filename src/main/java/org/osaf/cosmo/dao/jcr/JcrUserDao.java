@@ -15,9 +15,11 @@
  */
 package org.osaf.cosmo.dao.jcr;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.jcr.NodeIterator;
@@ -36,6 +38,7 @@ import org.springmodules.jcr.JcrCallback;
 import org.springmodules.jcr.JcrTemplate;
 import org.springmodules.jcr.support.JcrDaoSupport;
 
+import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
@@ -45,6 +48,9 @@ import org.osaf.cosmo.repository.PathTranslator;
 import org.osaf.cosmo.repository.ResourceMapper;
 import org.osaf.cosmo.repository.SchemaConstants;
 import org.osaf.cosmo.repository.UserMapper;
+import org.osaf.cosmo.util.PageCriteria;
+import org.osaf.cosmo.util.ArrayPagedList;
+import org.osaf.cosmo.util.PagedList;
 
 import org.springframework.dao.DataRetrievalFailureException;
 
@@ -113,6 +119,32 @@ public class JcrUserDao extends JcrDaoSupport
                     return users;
                 }
             });
+    }
+
+    /**
+     * Returns a paginated list of Users meeting the criteria set in
+     * <code>pageCriteria</code>
+     * 
+     * @param pageCriteria the pagination criteria
+     * @return paginated list of users
+     */
+    public PagedList getUsers(final PageCriteria pageCriteria) {
+        List<User> users = (List<User>)
+            getJcrTemplate().execute(new JcrCallback() {
+            public List<User> doInJcr(Session session)
+                throws RepositoryException {
+                List<User> userList = new ArrayList<User>();
+                QueryResult qr = queryForUsers(session, pageCriteria);
+                NodeIterator i = qr.getNodes();
+                while (i.hasNext()) {
+                    User user = UserMapper.nodeToUser(i.nextNode());
+                    userList.add(user);
+                }
+                return userList;
+            }
+        });
+        
+        return new ArrayPagedList(pageCriteria, users);
     }
 
     /**
@@ -367,6 +399,33 @@ public class JcrUserDao extends JcrDaoSupport
             append(" = '").
             append(email).
             append("']");
+        return executeXPathQuery(session, stmt.toString());
+    }
+
+    /**
+     * Executes a query to find all of the user account nodes.
+     */
+    protected QueryResult queryForUsers(Session session)
+        throws RepositoryException {
+        return queryForUsers(session, null);
+    }
+
+    /**
+     * Executes a query to find all of the user account nodes that meet the
+     * supplied page criteria
+     */
+    protected QueryResult queryForUsers(Session session,
+                                        PageCriteria pageCriteria)
+        throws RepositoryException {
+        StringBuffer stmt = new StringBuffer();
+        stmt.append("/jcr:root").append("/*/*/*[@").append(NT_USER)
+            .append("]");
+        if (pageCriteria != null) {
+            PageCriteria.SortType sortType = pageCriteria.getSortType();
+            if (sortType != null) {
+                stmt.append(JcrXpathQueryBuilder.buildOrderByQuery(pageCriteria));
+            }
+        }
         return executeXPathQuery(session, stmt.toString());
     }
 }

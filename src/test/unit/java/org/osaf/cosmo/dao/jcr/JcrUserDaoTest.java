@@ -16,7 +16,9 @@
 package org.osaf.cosmo.dao.jcr;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
@@ -27,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.util.PageCriteria;
+import org.osaf.cosmo.util.PagedList;
 
 import org.springframework.dao.DataRetrievalFailureException;
 
@@ -83,6 +87,115 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
         getTestHelper().removeDummyUser(u1);
         getTestHelper().removeDummyUser(u2);
         getTestHelper().removeDummyUser(u3);
+    }
+    
+    /**
+     */
+    public void testPaginatedAscendingQueryUsers() throws Exception {
+        User u1 = getTestHelper().makeAndStoreDummyUser();
+        User u2 = getTestHelper().makeAndStoreDummyUser();
+        User u3 = getTestHelper().makeAndStoreDummyUser();
+        User u4 = getTestHelper().makeAndStoreDummyUser();
+
+        PageCriteria pageCriteria = new PageCriteria();
+
+        pageCriteria.setPageNumber(1);
+        pageCriteria.setPageSize(2);
+
+        pageCriteria.setSortAscending(true);
+
+        PageCriteria.SortType nameSort = pageCriteria.new SortType();
+
+        nameSort.addAttribute(pageCriteria.new SortAttribute("cosmo:firstName",
+                true));
+        nameSort.addAttribute(pageCriteria.new SortAttribute("cosmo:lastName",
+                true));
+
+        pageCriteria.setSortType(nameSort);
+
+        PagedList pagedList = dao.getUsers(pageCriteria);
+        List<User> users = pagedList.getList();
+
+        // account for root user
+        assertTrue("PageList Size not 5", pagedList.getTotal() == 5);
+        assertTrue("Not 2 users", users.size() == 2);
+        assertTrue("User 1 not found in users", users.contains(u1));
+        assertFalse("User 2 found in users", users.contains(u2));
+
+        pageCriteria.setPageNumber(2);
+
+        pagedList = dao.getUsers(pageCriteria);
+        users = pagedList.getList();
+
+        assertTrue("PageList Size not 5", pagedList.getTotal() == 5);
+        assertTrue("Not 2 users", users.size() == 2);
+        assertTrue("User 2 not found in users", users.contains(u2));
+        assertTrue("User 3 not found in users", users.contains(u3));
+        assertFalse("User 4 found in users", users.contains(u4));
+
+        getTestHelper().removeDummyUser(u1);
+        getTestHelper().removeDummyUser(u2);
+        getTestHelper().removeDummyUser(u3);
+        getTestHelper().removeDummyUser(u4);
+    }
+
+    /**
+     */
+    public void testPaginatedDescendingQueryUsers() throws Exception {
+        User u1 = getTestHelper().makeAndStoreDummyUser();
+        User u2 = getTestHelper().makeAndStoreDummyUser();
+        User u3 = getTestHelper().makeAndStoreDummyUser();
+        User u4 = getTestHelper().makeAndStoreDummyUser();
+
+        PageCriteria pageCriteria = new PageCriteria();
+
+        PageCriteria.SortType nameSort = pageCriteria.new SortType();
+
+        nameSort.addAttribute(pageCriteria.new SortAttribute("cosmo:firstName",
+                true));
+        nameSort.addAttribute(pageCriteria.new SortAttribute("cosmo:lastName",
+                true));
+
+        pageCriteria.setSortType(nameSort);
+        pageCriteria.setSortAscending(false);
+        pageCriteria.setPageNumber(1);
+        pageCriteria.setPageSize(2);
+
+        PagedList pagedList = dao.getUsers(pageCriteria);
+        List<User> users = pagedList.getList();
+        
+        // account for root user
+        assertTrue("PageList Size not 5", pagedList.getTotal() == 5);
+        assertTrue("Not 2 users", users.size() == 2);
+        assertTrue("User 2 not found in users", users.contains(u2));
+        assertTrue("User 1 not found in users", users.contains(u1));
+        assertFalse("User 3 found in users", users.contains(u3));
+
+        pageCriteria.setPageNumber(2);
+
+        pagedList = dao.getUsers(pageCriteria);
+        users = pagedList.getList();
+
+        assertTrue("PageList Size not 5", pagedList.getTotal() == 5);
+        assertTrue("Not 2 users", users.size() == 2);
+        assertTrue("User 3 not found in users", users.contains(u3));
+        assertTrue("User 4 not found in users", users.contains(u4));
+
+        pageCriteria.setPageNumber(3);
+
+        pagedList = dao.getUsers(pageCriteria);
+        users = pagedList.getList();
+
+        // Should have only root in is
+        assertTrue("PageList Size not 5", pagedList.getTotal() == 5);
+        assertTrue("Not 1 user", users.size() == 1);
+        assertEquals("Root not found in users", users.get(0).getUsername(),
+                "root");
+
+        getTestHelper().removeDummyUser(u1);
+        getTestHelper().removeDummyUser(u2);
+        getTestHelper().removeDummyUser(u3);
+        getTestHelper().removeDummyUser(u4);
     }
 
     /**

@@ -20,11 +20,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.util.PageCriteria;
+import org.osaf.cosmo.util.PagedList;
+import org.osaf.cosmo.util.ArrayPagedList;
 
 import org.springframework.dao.DataRetrievalFailureException;
 
@@ -64,6 +69,17 @@ public class MockUserDao implements UserDao {
         for (Iterator i=usernameIdx.values().iterator(); i.hasNext();) {
             tmp.add(i.next());
         }
+        return tmp;
+    }
+    
+    /**
+     */
+    public PagedList getUsers(PageCriteria pageCriteria) {
+        List list = new ArrayList();
+        for (Iterator i=usernameIdx.values().iterator(); i.hasNext();) {
+            list.add(i.next());
+        }
+        PagedList tmp = new ArrayPagedList(pageCriteria, list);
         return tmp;
     }
 

@@ -15,8 +15,11 @@
  */
 package org.osaf.cosmo.service.impl;
 
+import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.util.PagedList;
+import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.model.User;
 
 import java.security.MessageDigest;
@@ -52,6 +55,14 @@ public class StandardUserService implements UserService {
      */
     public Set getUsers() {
         return userDao.getUsers();
+    }
+
+    /**
+     * Returns the sorted list of user accounts corresponding to the
+     * given * <code>PageCriteria</code>.
+     */
+    public PagedList getUsers(PageCriteria pageCriteria) {
+        return userDao.getUsers(pageCriteria);
     }
 
     /**

@@ -16,6 +16,8 @@
 package org.osaf.cosmo.service;
 
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.util.PagedList;
+import org.osaf.cosmo.util.PageCriteria;
 
 import java.util.Set;
 
@@ -29,6 +31,14 @@ public interface UserService extends Service {
      * Returns an unordered set of all user accounts in the repository.
      */
     public Set getUsers();
+
+    /**
+     * Returns the sorted list of user accounts corresponding to the
+     * given <code>PageCriteria</code>.
+     *
+     * @param pageCriteria the pagination criteria
+     */
+    public PagedList getUsers(PageCriteria pageCriteria);
 
     /**
      * Returns the user account identified by the given username.

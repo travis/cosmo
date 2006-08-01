@@ -122,11 +122,10 @@ public class JcrUserDao extends JcrDaoSupport
     }
 
     /**
-     * Returns a paginated list of Users meeting the criteria set in
-     * <code>pageCriteria</code>
-     * 
+     * Returns the sorted list of user accounts corresponding to the
+     * given <code>PageCriteria</code>.
+     *
      * @param pageCriteria the pagination criteria
-     * @return paginated list of users
      */
     public PagedList getUsers(final PageCriteria pageCriteria) {
         List<User> users = (List<User>)

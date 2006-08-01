@@ -36,14 +36,13 @@ public interface UserDao extends Dao {
     public Set getUsers();
 
     /**
-     * Returns a paginated list of Users meeting the criteria set in
-     * <code>pageCriteria</code>
-     * 
+     * Returns the sorted list of user accounts corresponding to the
+     * given <code>PageCriteria</code>.
+     *
      * @param pageCriteria the pagination criteria
-     * @return paginated list of users
      */
     public PagedList getUsers(PageCriteria pageCriteria);
-    
+
     /**
      * Returns the user account identified by the given username.
      *

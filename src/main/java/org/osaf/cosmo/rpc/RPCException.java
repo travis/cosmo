@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Open Source Applications Foundation
+ * Copyright 2006 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dao;
-
-import org.osaf.cosmo.model.Resource;
+package org.osaf.cosmo.rpc;
 
 /**
- * Interface for DAOs that manage access to user home directories.
+ * Base class for errors that occur during execution of RPC methods 
+ *  
  */
-public interface HomeDirectoryDao extends Dao {
+public class RPCException extends Exception {
 
     /**
-     * Returns the resource at the specified path within the
-     * repository.
-     *
-     * @throws NoSuchResourceException if a resource does not exist at
-     * the specified path
      */
-    public Resource getResource(String path);
+    public RPCException(String message) {
+        super(message);
+    }
 
     /**
-     * Removes the resource at the specified path within the
-     * repository.
      */
-    public void removeResource(String path);
-    
+    public RPCException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

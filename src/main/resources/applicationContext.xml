@@ -184,6 +184,47 @@
     </property>
   </bean>
 
+  <bean id="rpcService"
+     class="org.osaf.cosmo.rpc.RPCServiceImpl">
+    <property name="homeDirectoryService">
+      <ref bean="homeDirectoryService"/>
+    </property>
+    <property name="userService">
+      <ref bean="userService"/>
+    </property>
+    <property name="cosmoSecurityManager">
+      <ref bean="securityManager"/>
+    </property>
+  </bean>
+
+  <!-- these beans are used to initialize the JSON-RPC service -->
+  <bean id="JSONRPCBridge" 
+        class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    <property name="targetClass">
+      <value>com.metaparadigm.jsonrpc.JSONRPCBridge</value>
+    </property>
+    <property name="targetMethod">
+      <value>getGlobalBridge</value>
+    </property>
+  </bean>  	
+
+  <bean id="registerWithJSON" 
+        class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    <property name="targetObject">
+        <ref local="JSONRPCBridge"/>
+    </property>
+    <property name="targetMethod">
+      <value>registerObject</value>
+    </property>
+    <property name="arguments">
+      <list>
+          <value>scoobyService</value>
+          <ref local="rpcService"/>
+          <value>org.osaf.cosmo.rpc.RPCService</value>
+      </list>
+    </property>
+  </bean>
+  
   <!-- authentication resources -->
 
   <bean id="userDetailsService"

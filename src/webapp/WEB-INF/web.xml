@@ -186,6 +186,19 @@
       <param-value>/console/home/browse</param-value>
     </init-param>
   </servlet>
+  <servlet>
+      <servlet-name>springDispatcherServlet</servlet-name> 
+      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class> 
+      <load-on-startup>1</load-on-startup> 
+  </servlet> 
+  <servlet>
+    <servlet-name>JSON</servlet-name>
+    <servlet-class>com.metaparadigm.jsonrpc.JSONRPCServlet</servlet-class>
+    <init-param>
+      <param-name>auto-session-bridge</param-name>
+      <param-value>0</param-value>
+    </init-param>
+  </servlet>
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/console/*</url-pattern>
@@ -201,6 +214,18 @@
   <servlet-mapping>
     <servlet-name>feed</servlet-name>
     <url-pattern>/feed/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping> 
+    <servlet-name>springDispatcherServlet</servlet-name> 
+     <url-pattern>*.page</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping> 
+    <servlet-name>springDispatcherServlet</servlet-name> 
+     <url-pattern>/i18n.js</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>JSON</servlet-name>
+    <url-pattern>/JSON-RPC</url-pattern>
   </servlet-mapping>
   <error-page>
     <exception-type>java.lang.Throwable</exception-type>

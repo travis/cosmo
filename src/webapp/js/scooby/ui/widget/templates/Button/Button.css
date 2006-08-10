@@ -1,0 +1,10 @@
+.buttonSpan{
+    background: transparent none repeat scroll 0%; 
+    -moz-background-clip: -moz-initial; 
+    -moz-background-origin: -moz-initial; 
+    -moz-background-inline-policy: -moz-initial;
+}
+
+.buttonTable{
+    width: 84px;
+}

@@ -15,13 +15,11 @@
  */
 package org.osaf.cosmo.rpc.model;
 
+import static org.osaf.cosmo.icalendar.ICalendarConstants.PARAM_X_OSAF_ANYTIME;
+import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
+
 import java.net.URISyntaxException;
 import java.text.ParseException;
-
-import org.apache.commons.id.uuid.VersionFourGenerator;
-import org.apache.commons.lang.StringUtils;
-import org.osaf.cosmo.CosmoConstants;
-
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -35,7 +33,20 @@ import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
-import net.fortuna.ical4j.model.property.*;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.DateProperty;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.DtEnd;
+import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Status;
+import net.fortuna.ical4j.model.property.Summary;
+import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.model.property.Version;
+
+import org.apache.commons.id.uuid.VersionFourGenerator;
+import org.apache.commons.lang.StringUtils;
+import org.osaf.cosmo.CosmoConstants;
 
 /**
  * An instance of this class is used to convert Scooby Events into ical4j
@@ -182,8 +193,8 @@ public class CosmoToICalendarConverter {
             Parameter anyTimeParam = null;
             try {
                 anyTimeParam = ParameterFactoryImpl.getInstance()
-                        .createParameter(CosmoConstants.PARAM_X_OSAF_ANYTIME,
-                                CosmoConstants.VALUE_TRUE);
+                        .createParameter(PARAM_X_OSAF_ANYTIME,
+                                VALUE_TRUE);
             } catch (URISyntaxException urise) {
                 throw new RuntimeException(urise);
             }

@@ -73,7 +73,7 @@ public class RPCServiceImpl implements RPCService {
         CosmoDate start = new CosmoDate();
         start.setUtc(true);
         start.setDate(1);
-        start.setMonth(1);
+        start.setMonth(8);
         start.setYear(1);
         event.setStart(start);
         event.setId("123456");
@@ -89,8 +89,8 @@ public class RPCServiceImpl implements RPCService {
         CosmoDate start = new CosmoDate();
         start.setUtc(true);
         start.setDate(1);
-        start.setMonth(1);
-        start.setYear(1);
+        start.setMonth(9);
+        start.setYear(2006);
         event.setStart(start);
         event.setId("123456");
         return new Event[]{event};

@@ -29,7 +29,7 @@ public class InternationalizationController extends AbstractController {
     public ModelAndView handleRequestInternal(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         ModelAndView mav = new ModelAndView("i18n");
-        ResourceBundle bundle = ResourceBundle.getBundle("MessageResources",
+        ResourceBundle bundle = ResourceBundle.getBundle("PimMessageResources",
                 request.getLocale());
         Enumeration messages = bundle.getKeys();
         mav.addObject("messages", messages);

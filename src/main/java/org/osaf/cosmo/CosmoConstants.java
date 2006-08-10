@@ -59,18 +59,6 @@ public class CosmoConstants {
      * administrator's email address.
      */
     public static final String SC_ATTR_SERVER_ADMIN = "cosmo.server.admin";
-    
-    /**
-     * The icalender parameter used on a DTSTART to indicate that the event
-     * which contains the DTSTART is an "anytime" event. This is a OSAF custom 
-     * parameter.
-     */
-    public static final String PARAM_X_OSAF_ANYTIME = "X-OSAF-ANYTIME";
-
-    /**
-     * iCalendar value for "TRUE"
-     */
-    public static final String VALUE_TRUE = "TRUE";
 
     /**
      * A feature toggle that determines whether Cosmo stores the

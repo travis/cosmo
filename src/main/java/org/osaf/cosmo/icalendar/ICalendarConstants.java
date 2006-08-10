@@ -38,4 +38,16 @@ public interface ICalendarConstants {
      * data formatted with iCalendar.
      */
     public static final String FILE_EXTENSION = "ics";
+
+    /**
+     * The icalender parameter used on a DTSTART to indicate that the event
+     * which contains the DTSTART is an "anytime" event. This is a OSAF custom 
+     * parameter.
+     */
+    public static final String PARAM_X_OSAF_ANYTIME = "X-OSAF-ANYTIME";
+
+    /**
+     * iCalendar value for "TRUE"
+     */
+    public static final String VALUE_TRUE = "TRUE";
 }

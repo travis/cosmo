@@ -15,8 +15,8 @@
  */
 package org.osaf.cosmo.rpc.model;
 
-import static org.osaf.cosmo.CosmoConstants.VALUE_TRUE;
-import static org.osaf.cosmo.CosmoConstants.PARAM_X_OSAF_ANYTIME;
+import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
+import static org.osaf.cosmo.icalendar.ICalendarConstants.PARAM_X_OSAF_ANYTIME;
 
 import java.util.ArrayList;
 import java.util.Calendar;

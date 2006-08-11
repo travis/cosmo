@@ -19,13 +19,13 @@ JSON_SERVICE_OBJECT_NAME = "scoobyService";
 JAVA_JSON_MAPPING = {"java.util.Date":Date,
                      "net.fortuna.ical4j.model.Date":Date,
                      "net.fortuna.ical4j.model.DateTime":Date,
-                     "org.osaf.scooby.model.Event":CalEventData,
-                     "org.osaf.scooby.model.ScoobyDate":ScoobyDate,
-                     "org.osaf.scooby.model.ScoobyTimeZone":ScoobyTimezone, 
-                     "org.osaf.scooby.model.RecurrenceRule":RecurrenceRule};
+                     "org.osaf.cosmo.rpc.model.Event":CalEventData,
+                     "org.osaf.cosmo.rpc.model.CosmoDate":ScoobyDate,
+                     "org.osaf.cosmo.rpc.model.CosmoTimeZone":ScoobyTimezone, 
+                     "org.osaf.cosmo.rpc.model.RecurrenceRule":RecurrenceRule};
 
-JAVA_EXCEPTION_MAPPING = {"org.osaf.scooby.rpc.service.ScoobyServiceException":ScoobyServiceRemoteException,
-                          "org.osaf.scooby.rpc.service.NotAuthenticatedException":NotAuthenticatedException};
+JAVA_EXCEPTION_MAPPING = {"org.osaf.scooby.rpc.RPCException":ScoobyServiceRemoteException,
+                          "org.osaf.scooby.rpc.NotAuthenticatedException":NotAuthenticatedException};
 
 function createSetterMethodName(propName){
     var setterMethodName = "set";
@@ -138,7 +138,7 @@ ScoobyService.prototype.resetServiceAccessTime = function() {
 
 ScoobyService.prototype.refreshServerSession = function() {
     var req = JSONRpcClient.poolGetHTTPRequest();
-    req.open('GET', '/scooby/keepalive.jsp', true);
+    req.open('GET', '/cosmo/keepalive.jsp', true);
     req.onreadystatechange = function() {
         if (req.readyState == 4) {
             // Do nothing -- it means we successfully got
@@ -150,7 +150,7 @@ ScoobyService.prototype.refreshServerSession = function() {
 
 ScoobyService.prototype.init = function() {
     //get a handle on the json object
-    var jsonrpc = new JSONRpcClient("/scooby/JSON-RPC");
+    var jsonrpc = new JSONRpcClient("/cosmo/JSON-RPC");
     var proto = ScoobyService.prototype;
     var jsonRemoteObject = jsonrpc[JSON_SERVICE_OBJECT_NAME];
 
@@ -236,5 +236,3 @@ wrapGetEvents = function(getEventsFunction){
 
     return newFunction;
 }
-
-

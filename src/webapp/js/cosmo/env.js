@@ -87,7 +87,7 @@ scooby.env.getScoobyBase = scooby.env._getCachePropGetterPopulator("scoobyBase",
  */
 scooby.env.getTemplateBase = scooby.env._getCachePropGetterPopulator("templateBase", function(){
 //FIXME maybe this should go in our base widget (once we make one ;-) )
-    var uri = scooby.env.getScoobyBase() + "scooby/ui/widget/templates/";
+    var uri = scooby.env.getScoobyBase() + "cosmo/ui/widget/templates/";
     return uri;
 });
 

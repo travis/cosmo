@@ -29,8 +29,8 @@ function CalEventData(id, title, description, start, end, allDay,
     this.status = status ? status : null;
     this.masterEvent = masterEvent ? masterEvent : false;
     this.instance = instance ? instance : false;
-    this.javaClass = 'org.osaf.scooby.model.Event';
 };
+
 CalEventData.prototype = {
     toString: genericToString
 }

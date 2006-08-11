@@ -35,8 +35,8 @@ dojo.widget.defineWidget("scooby.ui.widget.Button", dojo.widget.HtmlWidget, {
 
     //FIXME - deal with skins
     buttonDirectory : scooby.env.getTemplateBase() + "Button/",
-    templatePath : dojo.uri.dojoUri( "../../scooby/ui/widget/templates/Button/Button.html"),
-    templateCssPath : dojo.uri.dojoUri("../../scooby/ui/widget/templates/Button/Button.css"),
+    templatePath : dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/Button/Button.html"),
+    templateCssPath : dojo.uri.dojoUri("../../cosmo/ui/widget/templates/Button/Button.css"),
 
     //attach points
     leftContainer: null,

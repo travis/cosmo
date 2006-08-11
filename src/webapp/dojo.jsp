@@ -5,7 +5,7 @@
 <script type="text/javascript" src="js/lib/dojo-event_and_io/dojo.js.uncompressed.js"></script>
 <script type="text/javascript">
 
-    dojo.setModulePrefix("scooby", "../../scooby"); // path is relative to dojo root
+    dojo.setModulePrefix("scooby", "../../cosmo"); // path is relative to dojo root
 
     dojo.require("dojo.widget.*");
     dojo.require("scooby.ui.widget.Debug");

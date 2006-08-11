@@ -5,8 +5,8 @@ dojo.provide("scooby.ui.widget.Debug");
 
 dojo.widget.defineWidget("scooby.ui.widget.Debug", dojo.widget.HtmlWidget, {
 
-    templatePath : dojo.uri.dojoUri("../../scooby/ui/widget/templates/Debug.html"),
-    templateCssPath : dojo.uri.dojoUri("../../scooby/ui/widget/templates/Debug.css"),
+    templatePath : dojo.uri.dojoUri("../../cosmo/ui/widget/templates/Debug.html"),
+    templateCssPath : dojo.uri.dojoUri("../../cosmo/ui/widget/templates/Debug.css"),
     time : "",
     debugDiv : null,
     contentContainer : null,

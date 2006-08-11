@@ -19,6 +19,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<fmt:setBundle basename="PimMessageResources"/>
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -31,35 +32,35 @@
 
 <%@ include file="dojo.jsp" %>
 <script type="text/javascript" src="i18n.js"></script>
-<script type="text/javascript" src="js/scooby/util/log.js"></script>
-<script type="text/javascript" src="js/scooby/util/ajax.js"></script>
-<script type="text/javascript" src="js/scooby/util/date.js"></script>
-<script type="text/javascript" src="js/scooby/util/hash.js"></script>
-<script type="text/javascript" src="js/scooby/util/debug.js"></script>
-<script type="text/javascript" src="js/scooby/util/validate.js"></script>
-<script type="text/javascript" src="js/scooby/util/cookie.js"></script>
-<script type="text/javascript" src="js/scooby/util/text.js"></script>
-<script type="text/javascript" src="js/scooby/util/popup.js"></script>
-<script type="text/javascript" src="js/scooby/model/scoobydate.js"></script>
-<script type="text/javascript" src="js/scooby/model/model.js"></script>
-<script type="text/javascript" src="js/scooby/ui/ui.conf.js"></script>
-<script type="text/javascript" src="js/scooby/ui/block.js"></script>
-<script type="text/javascript" src="js/scooby/ui/dialog.js"></script>
-<script type="text/javascript" src="js/scooby/ui/cal_main.js"></script>
-<script type="text/javascript" src="js/scooby/ui/draggable.js"></script>
-<script type="text/javascript" src="js/scooby/ui/resize_area.js"></script>
-<script type="text/javascript" src="js/scooby/ui/cal_form.js"></script>
-<script type="text/javascript" src="js/scooby/ui/event/handlers.js"></script>
-<script type="text/javascript" src="js/scooby/ui/styler.js"></script>
-<script type="text/javascript" src="js/scooby/ui/contentcontainer.js"></script>
-<script type="text/javascript" src="js/scooby/ui/button.js"></script>
-<script type="text/javascript" src="js/scooby/ui/minical.js"></script>
-<script type="text/javascript" src="js/scooby/ui/widget/Layout.js"></script>
-<script type="text/javascript" src="js/scooby/facade/pref.js"></script>
-<script type="text/javascript" src="js/scooby/service/service_stub.js"></script>
-<script type="text/javascript" src="js/scooby/service/json_service_impl.js"></script>
-<script type="text/javascript" src="js/scooby/legacy/cal_event.js"></script>
-<script type="text/javascript" src="js/scooby/legacy/async.js"></script>
+<script type="text/javascript" src="js/cosmo/util/log.js"></script>
+<script type="text/javascript" src="js/cosmo/util/ajax.js"></script>
+<script type="text/javascript" src="js/cosmo/util/date.js"></script>
+<script type="text/javascript" src="js/cosmo/util/hash.js"></script>
+<script type="text/javascript" src="js/cosmo/util/debug.js"></script>
+<script type="text/javascript" src="js/cosmo/util/validate.js"></script>
+<script type="text/javascript" src="js/cosmo/util/cookie.js"></script>
+<script type="text/javascript" src="js/cosmo/util/text.js"></script>
+<script type="text/javascript" src="js/cosmo/util/popup.js"></script>
+<script type="text/javascript" src="js/cosmo/model/scoobydate.js"></script>
+<script type="text/javascript" src="js/cosmo/model/model.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/ui.conf.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/block.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/dialog.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/cal_main.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/draggable.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/resize_area.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/cal_form.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/event/handlers.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/styler.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/contentcontainer.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/button.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/minical.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/widget/Layout.js"></script>
+<script type="text/javascript" src="js/cosmo/facade/pref.js"></script>
+<script type="text/javascript" src="js/cosmo/service/service_stub.js"></script>
+<script type="text/javascript" src="js/cosmo/service/json_service_impl.js"></script>
+<script type="text/javascript" src="js/cosmo/legacy/cal_event.js"></script>
+<script type="text/javascript" src="js/cosmo/legacy/async.js"></script>
 <script type="text/javascript" src="js/lib/jsonrpc-java-js/jsonrpc.js"></script>
 
 <script type="text/javascript">
@@ -71,8 +72,8 @@ function init() {
 }
 </script>
 
-<script type="text/javascript" src="js/scooby/ui/event/listeners.js"></script>
-<script type="text/javascript" src="js/scooby/ui/global.css.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/event/listeners.js"></script>
+<script type="text/javascript" src="js/cosmo/ui/global.css.js"></script>
 
 
 </head>

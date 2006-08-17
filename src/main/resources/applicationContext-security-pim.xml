@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+    Copyright 2005 Open Source Applications Foundation
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<!-- Security configuration for the Web Console -->
+
+<beans>
+
+  <!-- interceptor which performs authorization for web requests -->
+
+   <bean id="pimFilterInvocationInterceptor"
+         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
+     <property name="authenticationManager">
+       <ref bean="authenticationManager"/>
+     </property>
+     <property name="accessDecisionManager">
+       <ref bean="accessDecisionManager"/>
+     </property>
+     <property name="objectDefinitionSource">
+       <value>
+	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+	 PATTERN_TYPE_APACHE_ANT
+	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+	 PATTERN_TYPE_APACHE_ANT
+         /**/*.css*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /**/*.js=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /**/*.js?*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /**/*.html*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /**/*.prefs*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /*.ico=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /**/*.gif=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /**/*.jpg=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /**/*.png=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /login.page*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /lang.page*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /logout.page*=ROLE_ROOT,ROLE_USER
+         /main.page*=ROLE_ROOT,ROLE_USER
+         /json-rpc=ROLE_ROOT,ROLE_USER
+         /keepalive.jsp=ROLE_ROOT,ROLE_USER
+         /test.page*=ROLE_ROOT,ROLE_USER
+         /=ROLE_ROOT, ROLE_USER
+         /**=ROLE_ROOT
+       </value>
+     </property>
+   </bean>
+
+  <!-- filter chain that kicks off request-time processing -->
+
+  <bean id="pimFilterChainProxy"
+        class="org.acegisecurity.util.FilterChainProxy">
+    <property name="filterInvocationDefinitionSource">
+      <value>
+        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+        PATTERN_TYPE_APACHE_ANT
+        /**=pimHttpSessionContextIntegrationFilter,pimFormBasedProcessingFilter,pimAnonymousProcessingFilter,pimExceptionTranslationFilter,pimFilterInvocationInterceptor
+      </value>
+    </property>
+  </bean>
+
+  <!-- filter that integrates SecurityContext into HTTP Session -->
+
+  <bean id="pimHttpSessionContextIntegrationFilter"
+        class="org.acegisecurity.context.HttpSessionContextIntegrationFilter"/>
+
+   <!-- filter that performs form-based authentication -->
+
+  <bean id="pimFormBasedAuthenticationEntryPoint"
+        class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+    <property name="loginFormUrl">
+      <value>/login.page</value>
+    </property>
+    <property name="forceHttps">
+      <value>false</value>
+    </property>
+  </bean>
+
+  <bean id="pimFormBasedProcessingFilter"
+        class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter">
+    <property name="authenticationManager">
+      <ref bean="authenticationManager"/>
+    </property>
+      <property name="authenticationFailureUrl">
+        <value>/login.page</value>
+      </property>
+      <property name="defaultTargetUrl">
+        <value>/main.page</value>
+      </property>
+      <property name="alwaysUseDefaultTargetUrl">
+        <value>true</value>
+      </property>
+  </bean>
+
+  <!-- filter that performs anonymous authentication -->
+
+  <bean id="pimAnonymousProcessingFilter"
+        class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+    <property name="key">
+      <value>badgerbadgerbadger</value>
+    </property>
+    <property name="userAttribute">
+      <value>anonymous,ROLE_ANONYMOUS</value>
+    </property>
+  </bean>
+
+  <!-- filter that converts authen/authz exceptions to web pages -->
+
+  <bean id="pimExceptionTranslationFilter"
+        class="org.acegisecurity.ui.ExceptionTranslationFilter">
+    <property name="authenticationEntryPoint">
+      <ref local="pimFormBasedAuthenticationEntryPoint"/>
+    </property>
+  </bean>
+
+</beans>

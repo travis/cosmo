@@ -1,4 +1,4 @@
-
+dojo.require(scooby.env);
 var uiPrefReq = new Ajax();
 var uiStyles = '';
 var uiPref = []; 
@@ -7,7 +7,7 @@ var repl = null;
 var dynRules = [];
 
 uiPrefReq.async = false;
-uiStyles = uiPrefReq.doGet('templates/' + TEMPLATE_DIRECTORY + '/ui.css');
+uiStyles = uiPrefReq.doGet(scooby.env.getBaseUrl() + '/templates/' + TEMPLATE_DIRECTORY + '/ui.css');
 if (uiStyles.status != 200) {
     alert('Could not load stylesheet.');
 }

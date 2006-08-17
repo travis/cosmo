@@ -15,6 +15,9 @@
 */
 
 /**
+ * To use this file, you must first provide it with the base URL for your application
+ * by calling "setBaseUrl"
+ * 
  * @fileoverview provides information about the scooby environment.
  * @author Bobby Rullo br@osafoundation.org
  * @license Apache License 2.0
@@ -91,6 +94,21 @@ scooby.env.getTemplateBase = scooby.env._getCachePropGetterPopulator("templateBa
     return uri;
 });
 
+/**
+ * Returns the baseURI of the application.
+ */
+scooby.env.getBaseUrl = function(){
+    var result = scooby.env._scoobyConfig["baseUrl"];
+    if (typeof(result) == "undefined"){
+        throw new Error("You must setBaseUrl before calling this function");
+    }
+	return result;
+}
 
-
-
+/**
+ * Sets the base url of the application. Provided by the server somehow.
+ * @param {String} baseUrl
+ */
+scooby.env.setBaseUrl = function(baseUrl){
+    scooby.env._scoobyConfig["baseUrl"] = baseUrl;
+}

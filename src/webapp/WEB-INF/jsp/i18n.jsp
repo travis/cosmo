@@ -18,7 +18,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core"        prefix="c"      %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"         prefix="fmt"    %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"   prefix="fn"     %>
-<fmt:setBundle basename="PimMessageResources"/>
  
 var localText = [];
 
@@ -26,9 +25,6 @@ function getText(str) {
     return localText[str];
 }
 
-<fmt:bundle basename="PimMessageResources">
-	<c:forEach var="key" items="${messages}">
-	    localText["${key}"] = "<fmt:message bundle="PimMessageResources" key="${key}"/>";
-	</c:forEach>
-</fmt:bundle>
-<fmt:message  key="App.Sunday"/>
+<c:forEach var="key" items="${messages}">
+    localText["${key}"] = "<fmt:message key="${key}"/>";
+</c:forEach>

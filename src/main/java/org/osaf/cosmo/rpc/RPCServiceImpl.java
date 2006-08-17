@@ -55,7 +55,6 @@ public class RPCServiceImpl implements RPCService {
     public void createCalendar(String displayName, String path)
             throws RPCException {
         // TODO Auto-generated method stub
-
     }
 
     public Calendar[] getCalendars() throws RPCException {
@@ -132,7 +131,7 @@ public class RPCServiceImpl implements RPCService {
 
     public void setPreference(String preferenceName, String value)
             throws RPCException {
-
     }
+    
 
 }

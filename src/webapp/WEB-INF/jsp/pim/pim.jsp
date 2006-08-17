@@ -15,11 +15,12 @@
  * limitations under the License.
 */
 --%>
+<%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
+<%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
+<cosmo:staticbaseurl var="staticBaseUrl"/>
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <fmt:setBundle basename="PimMessageResources"/>
+
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -29,39 +30,39 @@
 <head>
 
 <title><fmt:message key="App.Welcome"/></title>
-
 <%@ include file="dojo.jsp" %>
-<script type="text/javascript" src="i18n.js"></script>
-<script type="text/javascript" src="js/cosmo/util/log.js"></script>
-<script type="text/javascript" src="js/cosmo/util/ajax.js"></script>
-<script type="text/javascript" src="js/cosmo/util/date.js"></script>
-<script type="text/javascript" src="js/cosmo/util/hash.js"></script>
-<script type="text/javascript" src="js/cosmo/util/debug.js"></script>
-<script type="text/javascript" src="js/cosmo/util/validate.js"></script>
-<script type="text/javascript" src="js/cosmo/util/cookie.js"></script>
-<script type="text/javascript" src="js/cosmo/util/text.js"></script>
-<script type="text/javascript" src="js/cosmo/util/popup.js"></script>
-<script type="text/javascript" src="js/cosmo/model/scoobydate.js"></script>
-<script type="text/javascript" src="js/cosmo/model/model.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/ui.conf.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/block.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/dialog.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/cal_main.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/draggable.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/resize_area.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/cal_form.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/event/handlers.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/styler.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/contentcontainer.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/button.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/minical.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/widget/Layout.js"></script>
-<script type="text/javascript" src="js/cosmo/facade/pref.js"></script>
-<script type="text/javascript" src="js/cosmo/service/service_stub.js"></script>
-<script type="text/javascript" src="js/cosmo/service/json_service_impl.js"></script>
-<script type="text/javascript" src="js/cosmo/legacy/cal_event.js"></script>
-<script type="text/javascript" src="js/cosmo/legacy/async.js"></script>
-<script type="text/javascript" src="js/lib/jsonrpc-java-js/jsonrpc.js"></script>
+
+<script type="text/javascript" src="${staticBaseUrl}/i18n.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/log.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/ajax.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/date.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/hash.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/debug.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/validate.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/cookie.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/text.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/popup.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/model/scoobydate.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/model/model.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/ui.conf.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/block.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/dialog.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/cal_main.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/draggable.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/resize_area.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/cal_form.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/event/handlers.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/styler.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/contentcontainer.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/button.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/minical.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/widget/Layout.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/facade/pref.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/service/service_stub.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/service/json_service_impl.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/legacy/cal_event.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/legacy/async.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/lib/jsonrpc-java-js/jsonrpc.js"></script>
 
 <script type="text/javascript">
 // FIXME: Need to get timeout value from server
@@ -72,8 +73,8 @@ function init() {
 }
 </script>
 
-<script type="text/javascript" src="js/cosmo/ui/event/listeners.js"></script>
-<script type="text/javascript" src="js/cosmo/ui/global.css.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/event/listeners.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/global.css.js"></script>
 
 
 </head>

@@ -42,7 +42,6 @@
     </property> 
 </bean> 
 
-
 <bean id="handlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping"> 
     <property name="interceptors">
         <list> 
@@ -60,12 +59,15 @@
 <!-- TODO set cache settings here.... -->
 <bean id="i18nController" class="org.osaf.cosmo.spring.mvc.InternationalizationController" />
 
-<bean id="jspViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController"> 
-
+<bean id="jspViewController" class="org.osaf.cosmo.spring.mvc.CosmoUrlFilenameViewController"> 
+	<property name="alwaysUseFullPath">
+		<value>true</value>
+    </property>
 </bean> 
+
 <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
-    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/> 
-    <property name="prefix" value=""/> 
+    <property name="viewClass" value="org.osaf.cosmo.spring.mvc.CosmoJstlView"/> 
+    <property name="prefix" value="WEB-INF/jsp/"/> 
     <property name="suffix" value=".jsp"/> 
 </bean> 
 

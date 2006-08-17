@@ -28,6 +28,7 @@
       classpath:applicationContext-security-console.xml
       classpath:applicationContext-security-dav.xml
       classpath:applicationContext-security-cmp.xml
+      classpath:applicationContext-security-pim.xml
     </param-value>
   </context-param>
   <context-param>
@@ -96,6 +97,14 @@
     </init-param>
   </filter>
   <filter>
+    <filter-name>pim-security</filter-name>
+    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <init-param>
+      <param-name>targetBean</param-name>
+      <param-value>pimFilterChainProxy</param-value>
+    </init-param>
+  </filter>
+  <filter>
     <filter-name>url-rewrite</filter-name>
     <filter-class>
       org.tuckey.web.filters.urlrewrite.UrlRewriteFilter
@@ -132,6 +141,10 @@
   <filter-mapping>
     <filter-name>cmp-security</filter-name>
     <url-pattern>/cmp/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>pim-security</filter-name>
+    <url-pattern>/pim/*</url-pattern>
   </filter-mapping>
   <!-- url rewriting has to happen after security -->
   <filter-mapping>
@@ -217,7 +230,7 @@
   </servlet-mapping>
   <servlet-mapping> 
     <servlet-name>springDispatcherServlet</servlet-name> 
-     <url-pattern>*.page</url-pattern>
+     <url-pattern>/pim/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping> 
     <servlet-name>springDispatcherServlet</servlet-name> 

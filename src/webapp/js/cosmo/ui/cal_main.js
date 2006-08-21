@@ -369,7 +369,7 @@ var Cal = new function() {
         var rightClick = null;
         
         handleImg = document.createElement('img');
-        handleImg.src = skinImagesDir + 'resize_handle_image.gif';
+        handleImg.src = scooby.env.getImagesUrl() + 'resize_handle_image.gif';
        
         leftClick = function() { Cal.uiMask.show(); setTimeout('Cal.goView("back");', 100); }
         rightClick = function() { Cal.uiMask.show(); setTimeout('Cal.goView("next");', 100); }
@@ -379,7 +379,7 @@ var Cal = new function() {
         document.getElementById('allDayResizeHandleDiv').appendChild(handleImg);
         document.getElementById('viewNavButtons').appendChild(navButtons.domNode);
         document.getElementById('smallLogoDiv').style.background =
-            'url(' + skinImagesDir + LOGO_GRAPHIC_SM + ')';
+            'url(' + scooby.env.getImagesUrl() + LOGO_GRAPHIC_SM + ')';
     };
     /**
      * Loads localized Date information into the arrays in date.js
@@ -447,7 +447,7 @@ var Cal = new function() {
                 '" style="left:' + start + 'px; width:' + (this.dayUnitWidth-1) +
                 'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
             if (i == currDay) {
-                str += ' background-image:url(' + skinImagesDir + 
+                str += ' background-image:url(' + scooby.env.getImagesUrl() + 
                     'day_col_header_background.gif); background-repeat:' +
                     ' repeat-x; background-position:0px 0px;'
             }

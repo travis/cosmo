@@ -18,6 +18,7 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
+<cosmo:staticbaseurl var="staticBaseUrl"/>
 
 <u:bind var="PRODUCT_VERSION"
         type="org.osaf.cosmo.CosmoConstants"
@@ -28,23 +29,23 @@
   <div style="width:300px; margin-top:18px;">
 
     <div>
-    <html:link page="http://wiki.osafoundation.org/bin/view/Projects/CosmoHome" 
+    <html:link href="http://wiki.osafoundation.org/bin/view/Projects/CosmoHome" 
                onclick="goURLMainWin('http://wiki.osafoundation.org/bin/view/Projects/CosmoHome'); 
-               return false;"><img src="/cosmo_logo_large.jpg" alt="<fmt:message 
+               return false;"><img src="${staticBaseUrl}/cosmo_logo_large.jpg" alt="<fmt:message 
                key="About.LogoAltText"/>"/></html:link>    
     </div>
     <div class="smLabel" style="margin-top:2px;"><fmt:message 
          key="About.VersionString"/>${PRODUCT_VERSION}
     </div>
     <div style="margin-top:28px;"><fmt:message key="About.LicenseOpen"/>
-    <html:link page="http://www.apache.org/licenses/LICENSE-2.0" 
+    <html:link href="http://www.apache.org/licenses/LICENSE-2.0" 
                onclick="goURLMainWin('http://www.apache.org/licenses/LICENSE-2.0'); 
                return false;">
     <fmt:message key="About.LicenseLinkText"/></html:link><fmt:message 
                  key="About.LicenseClose"/>
     </div>
     <div style="margin-top:8px;"><fmt:message key="About.InfoOpen"/>
-    <html:link page="http://wiki.osafoundation.org/bin/view/Projects/CosmoHome" 
+    <html:link href="http://wiki.osafoundation.org/bin/view/Projects/CosmoHome" 
                onclick="goURLMainWin('http://wiki.osafoundation.org/bin/view/Projects/CosmoHome'); 
                return false;">
     <fmt:message key="About.InfoLinkText"/></html:link><fmt:message 

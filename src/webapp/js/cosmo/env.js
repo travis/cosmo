@@ -112,3 +112,7 @@ scooby.env.getBaseUrl = function(){
 scooby.env.setBaseUrl = function(baseUrl){
     scooby.env._scoobyConfig["baseUrl"] = baseUrl;
 }
+
+scooby.env.getImagesUrl = function(){
+	return scooby.env.getBaseUrl() + '/templates/default/images/';
+}

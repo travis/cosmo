@@ -15,6 +15,8 @@
  * limitations under the License.
 */
 --%>
+
+
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:staticbaseurl var="staticBaseUrl"/>

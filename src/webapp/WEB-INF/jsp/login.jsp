@@ -23,7 +23,6 @@
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
-<fmt:setBundle basename="PimMessageResources"/>
 
 <%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
 
@@ -36,10 +35,11 @@
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/cookie.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/log.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/popup.js"></script>
+<fmt:setBundle basename="PimMessageResources"/>
 
 
 <script type="text/javascript">
-var AUTH_PROC = 'j_acegi_security_check';
+var AUTH_PROC = '${staticBaseUrl}/console/j_acegi_security_check';
 </script>
 
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/global.css.js"></script>
@@ -54,7 +54,7 @@ var AUTH_PROC = 'j_acegi_security_check';
       <div class="baseWidget">
         <div style="padding:12px;">
           <form id="loginForm" name="loginForm" method="post" 
-            action="${staticBaseUrl}/j_acegi_security_check" onsubmit="return false;">
+            action="${staticBaseUrl}/console/j_acegi_security_check" onsubmit="return false;">
             <table>
               <tr>
                 <td class="formTitleHoriz">
@@ -80,8 +80,16 @@ var AUTH_PROC = 'j_acegi_security_check';
           </form>
         </div>
       </div>
+      <div style="padding-top:36px; text-align:center">
+              <fmt:message key="Login.NoAccount"/>
+      </div>
+      <div style="padding-top:36px; text-align:center">
+          <a href="${staticBaseUrl}/console/account/new">
+              <fmt:message key="Login.CreateAccount"/>
+          </a>
+      </div>
       <div style="padding-top:36px; text-align:center;">
-        <a href="javascript:Popup.open('about.html', 380, 280);">
+        <a href="javascript:Popup.open('${staticBaseUrl}/console/about', 340, 280);">
           <fmt:message key="Login.About"/>
         </a>
       </div>

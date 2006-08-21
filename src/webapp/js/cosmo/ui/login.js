@@ -23,6 +23,7 @@
 /**
  * @object Login -- singleton for doing user auth
  */
+dojo.require("scooby.env");
 var Login = new function () {
 
     this.loginFocus = false;
@@ -40,8 +41,7 @@ var Login = new function () {
         self.loginForm.j_username.focus();
         // Add logo and button
         document.getElementById('logoDiv').innerHTML = 
-            '<img src="templates/'+ TEMPLATE_DIRECTORY + 
-            '/images/' + LOGO_GRAPHIC + '" alt="">';
+            '<img src=' +scooby.env.getImagesUrl() + LOGO_GRAPHIC + '" alt="">';
         document.getElementById('submitButtonDiv').appendChild(but.domNode);
     }
     this.handleLoginResp = function(str) {
@@ -52,7 +52,13 @@ var Login = new function () {
         }
         else {
             self.showPrompt('normal', 'Logging you on. Please wait ...');
-            location = 'main.page';
+            var username  = self.loginForm.j_username.value;
+            alert (username);
+            if (username == "root") {
+                location = scooby.env.getBaseUrl() + "/console/account";
+            } else {
+                location = scooby.env.getBaseUrl() + "/pim/pim.page";
+            }
         }
     }
     this.doLogin = function() {
@@ -64,12 +70,6 @@ var Login = new function () {
 
         if (!un || !pw) {
             err = getText('Login.Error.RequiredFields');
-        }
-        else {
-            if (un == 'root') {
-                err = getText(
-                    'Login.Error.NoLoginWithRootAccount');
-            }
         }
         if (err) {
             self.showErr(err);

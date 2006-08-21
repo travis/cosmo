@@ -47,13 +47,12 @@
          /**/*.gif=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /**/*.jpg=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /**/*.png=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
-         /login.page*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
-         /lang.page*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
-         /logout.page*=ROLE_ROOT,ROLE_USER
-         /main.page*=ROLE_ROOT,ROLE_USER
-         /json-rpc=ROLE_ROOT,ROLE_USER
-         /keepalive.jsp=ROLE_ROOT,ROLE_USER
-         /test.page*=ROLE_ROOT,ROLE_USER
+         /pim/login.page*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /pim/lang.page*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /pim/logout.page*=ROLE_ROOT,ROLE_USER
+         /pim/pim.page*=ROLE_ROOT,ROLE_USER
+         /pim/json-rpc=ROLE_ROOT,ROLE_USER
+         /pim/keepalive.jsp=ROLE_ROOT,ROLE_USER
          /=ROLE_ROOT, ROLE_USER
          /**=ROLE_ROOT
        </value>
@@ -99,7 +98,7 @@
         <value>/console/login</value>
       </property>
       <property name="defaultTargetUrl">
-        <value>/main.page</value>
+        <value>/index.jsp</value>
       </property>
       <property name="alwaysUseDefaultTargetUrl">
         <value>true</value>

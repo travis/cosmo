@@ -83,7 +83,7 @@
   <bean id="pimFormBasedAuthenticationEntryPoint"
         class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
     <property name="loginFormUrl">
-      <value>/login.page</value>
+      <value>/console/login</value>
     </property>
     <property name="forceHttps">
       <value>false</value>
@@ -96,7 +96,7 @@
       <ref bean="authenticationManager"/>
     </property>
       <property name="authenticationFailureUrl">
-        <value>/login.page</value>
+        <value>/console/login</value>
       </property>
       <property name="defaultTargetUrl">
         <value>/main.page</value>
@@ -119,7 +119,6 @@
   </bean>
 
   <!-- filter that converts authen/authz exceptions to web pages -->
-
   <bean id="pimExceptionTranslationFilter"
         class="org.acegisecurity.ui.ExceptionTranslationFilter">
     <property name="authenticationEntryPoint">

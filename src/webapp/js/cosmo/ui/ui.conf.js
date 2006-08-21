@@ -14,8 +14,12 @@
  * limitations under the License.
 */
 
+dojo.require("scooby.env");
+
 // Configurable UI options
-var TEMPLATE_DIRECTORY = 'default'; // Template directory to use
+
+
+var TEMPLATE_DIRECTORY = '/default'; // Template directory to use
 var DISPLAY_WIDTH_PERCENT = 1.0; // Percent of window width to draw entire display
 var DISPLAY_HEIGHT_PERCENT = 1.0; // Percent of window height to draw entire display
 var TOP_MENU_HEIGHT = 48; // Height for top navigation area -- Month name and nav arrows
@@ -39,5 +43,5 @@ var DIALOG_BOX_WIDTH = 380;
 var DIALOG_BOX_HEIGHT = 280;
 var LOGO_GRAPHIC = 'logo_main.gif';
 var LOGO_GRAPHIC_SM = 'logo_sm.gif';
-var BUTTON_DIR_PATH = 'templates/' + TEMPLATE_DIRECTORY + '/images/';
+var BUTTON_DIR_PATH = scooby.env.getBaseUrl() + '/templates/' + TEMPLATE_DIRECTORY + '/images/';
 

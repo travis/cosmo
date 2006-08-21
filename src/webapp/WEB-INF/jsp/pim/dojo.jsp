@@ -17,7 +17,6 @@
     dojo.require("scooby.env");
     scooby.env.setBaseUrl("${staticBaseUrl}");
     dojo.widget.manager.registerWidgetPackage("scooby.ui.widget");
-    
 }
     
 </script>

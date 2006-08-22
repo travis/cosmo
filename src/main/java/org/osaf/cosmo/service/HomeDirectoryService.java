@@ -15,6 +15,10 @@
  */
 package org.osaf.cosmo.service;
 
+import java.util.Set;
+
+import org.osaf.cosmo.model.CalendarCollectionResource;
+import org.osaf.cosmo.model.CalendarResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.model.Ticket;
 
@@ -53,4 +57,24 @@ public interface HomeDirectoryService extends Service {
      * the specified path
      */
     public void revokeTicket(String path, String id);
+
+    /**
+     * Creates a calendar collection resource at the given path
+     * 
+     * @param displayName the human readable name
+     * @param path the path where the collection should be created
+     */
+    public void createCalendarCollection(String displayName, String path);
+    
+    /**
+     * Returns all the calendar collection resources within a given collection. 
+     * 
+     * @param path path to the collection
+     * @param recurse will search recursively if is true, otherwise
+     *        just returns the calendar collections directly within the given 
+     *        collection
+     * @return
+     */
+    public Set<CalendarCollectionResource> getCalendarCollectionResources(
+            String path, boolean recurse);
 }

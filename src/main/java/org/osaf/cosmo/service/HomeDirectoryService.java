@@ -16,7 +16,9 @@
 package org.osaf.cosmo.service;
 
 import java.util.Set;
+import java.util.TimeZone;
 
+import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.model.CalendarCollectionResource;
 import org.osaf.cosmo.model.CalendarResource;
 import org.osaf.cosmo.model.Resource;
@@ -77,4 +79,29 @@ public interface HomeDirectoryService extends Service {
      */
     public Set<CalendarCollectionResource> getCalendarCollectionResources(
             String path, boolean recurse);
+
+    /**
+     * Returns the CalendarResource which has the event with the given id within a particular
+     * calendar collection 
+     * 
+     * @param pathToCalendarCollection the path to the calendar collection in which the desired 
+     *                                 event is located
+     * @param id
+     * @return
+     */
+    public CalendarResource getCalendarResourceByEventId(String pathToCalendarCollection, String id);
+
+    /**
+     * Returns all the CalendarResources which contain events that fall within the specified date range.
+     * 
+     * @param pathToCalendarCollection the path to the calendar collection in which the desired 
+     *                                 events are located
+     * @param utcStartTime             The start time, in UTC
+     * @param utcEndTime               The end time,   in UTC
+     * @param timezone                 The timezone to use when resolving the UTC of timezone-less events
+     * @return                       
+     */
+    public Set<CalendarResource> getCalendarResourcesInDateRange(
+            String pathToCalendarCollection, long utcStartTime,
+            long utcEndTime, TimeZone timezone);
 }

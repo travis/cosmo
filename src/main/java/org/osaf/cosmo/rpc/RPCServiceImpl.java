@@ -15,24 +15,35 @@
  */
 package org.osaf.cosmo.rpc;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.component.VEvent;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.model.CalendarCollectionResource;
 import org.osaf.cosmo.model.CalendarResource;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.rpc.model.Calendar;
-import org.osaf.cosmo.rpc.model.CosmoDate;
 import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.HomeDirectoryService;
 import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.util.ICalendarUtils;
 
 public class RPCServiceImpl implements RPCService {
+    private static final Log log =
+        LogFactory.getLog(RPCServiceImpl.class);
+
     private UserService userService = null;
     private HomeDirectoryService homeDirectoryService = null;
     private CosmoSecurityManager cosmoSecurityManager = null;
@@ -78,36 +89,57 @@ public class RPCServiceImpl implements RPCService {
             calendar.setPath(c.getPath());
             cals.add(calendar);
         }
+        //TODO sort these
         return (Calendar[]) cals.toArray(new Calendar[cals.size()]);
     }
 
     public Event getEvent(String calendarPath, String id) throws RPCException {
-        CalendarResource calResource = getCalendarResourceByEventId(
+        CalendarResource calResource = homeDirectoryService.getCalendarResourceByEventId(
                 getAbsolutePath(calendarPath), id);
-        net.fortuna.ical4j.model.Calendar ical = calendarBuilder
-                .build(calResource.getContent());
-        icalendarToCosmoConverter.createEvent(vevent, calendar)
-        
+        try {
+            net.fortuna.ical4j.model.Calendar ical = extractCalendar(calResource);
+            VEvent vevent = ICalendarUtils.getMasterEvent(ical, id);
+            return icalendarToCosmoConverter.createEvent(vevent, ical);
+        } catch (Exception e) {
+            log.error("Problem getting event: userName: " + getUsername() 
+                    + " calendarName: " + calendarPath 
+                    + " id: " +id, e);
+            throw new RPCException("Problem getting event", e);
+        }   
     }
 
     public Event[] getEvents(String calendarPath, long utcStartTime,
             long utcEndTime) throws RPCException {
-        Event event = new Event();
-        event.setDescription("TESTEVENT");
-        event.setTitle("TESTEVENT");
         
-        CosmoDate start = new CosmoDate();
-        start.setUtc(true);
-        start.setDate(1);
-        start.setMonth(9);
-        start.setYear(2006);
-        event.setStart(start);
-        event.setId("123456");
-        return new Event[]{event};
+        
+        Set<CalendarResource> calendarResources = homeDirectoryService
+                .getCalendarResourcesInDateRange(getAbsolutePath(calendarPath),
+                        utcStartTime, utcStartTime, null);
+        Event[] events = null;
+        try {
+        Set<net.fortuna.ical4j.model.Calendar> calendars 
+            = createCalendarSetFromCalendarResourceSet(calendarResources);
+        DateTime beginDate = new DateTime();
+        beginDate.setUtc(true);
+        beginDate.setTime(utcStartTime);
+        DateTime endDate = new DateTime();
+        endDate.setUtc(true);
+        endDate.setTime(utcEndTime);
+
+        events = icalendarToCosmoConverter.createEventsFromCalendars(calendars,
+                beginDate, endDate);
+        } catch (Exception e) {
+            log.error("Problem getting events: userName: " + getUsername() 
+                    + " calendarName: " + calendarPath 
+                    + " beginDate: " + utcStartTime
+                    + " endDate: " + utcStartTime, e);
+            throw new RPCException("Problem getting events", e);
+        }
+        return events;
     }
 
     public String getPreference(String preferenceName) throws RPCException {
-        return "TEST_PREF";
+       return userService.getPreference(getUsername(), preferenceName);
     }
 
     public String getTestString() {
@@ -124,24 +156,28 @@ public class RPCServiceImpl implements RPCService {
     }
 
     public void removeCalendar(String calendarPath) throws RPCException {
-
+        String absolutePath = getAbsolutePath(calendarPath);
+        homeDirectoryService.removeResource(absolutePath);
     }
 
     public void removeEvent(String calendarPath, String id) throws RPCException {
-
+        CalendarResource calendarResource = homeDirectoryService
+                .getCalendarResourceByEventId(getAbsolutePath(calendarPath), id);
+        homeDirectoryService.removeResource(calendarResource.getPath());
     }
 
     public void removePreference(String preferenceName) throws RPCException {
-
+        userService.removePreference(getUsername(), preferenceName);
     }
 
     public String saveEvent(String calendarPath, Event event)
             throws RPCException {
-        return "123455556";
+        return "!@#%$";
     }
 
     public void setPreference(String preferenceName, String value)
             throws RPCException {
+        userService.setPreference(getUsername(),preferenceName);
     }
     
     /**
@@ -165,5 +201,38 @@ public class RPCServiceImpl implements RPCService {
         }       
     }
     
+    private String getUsername() {
+        try {
+            return getUser().getUsername();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private User getUser() {
+        try {
+            return cosmoSecurityManager.getSecurityContext().getUser();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private net.fortuna.ical4j.model.Calendar extractCalendar(
+            CalendarResource calendarResource) throws IOException,
+            ParserException {
+        net.fortuna.ical4j.model.Calendar ical = calendarBuilder
+                .build(calendarResource.getContent());
+
+        return ical;
+    }
+    
+    private Set<net.fortuna.ical4j.model.Calendar> createCalendarSetFromCalendarResourceSet(
+            Set<CalendarResource> calendarResources) throws IOException, ParserException {
+        Set<net.fortuna.ical4j.model.Calendar> calendars = new HashSet<net.fortuna.ical4j.model.Calendar>();
+        for (CalendarResource calendarResource : calendarResources){
+            calendars.add(extractCalendar(calendarResource));
+        }
+        return calendars;
+    }
 
 }

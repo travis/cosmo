@@ -15,9 +15,14 @@
  */
 package org.osaf.cosmo.service.impl;
 
+import java.util.Set;
+import java.util.TimeZone;
+
 import org.osaf.cosmo.dao.HomeDirectoryDao;
 import org.osaf.cosmo.dao.TicketDao;
 import org.osaf.cosmo.service.HomeDirectoryService;
+import org.osaf.cosmo.model.CalendarCollectionResource;
+import org.osaf.cosmo.model.CalendarResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.model.Ticket;
 
@@ -117,5 +122,25 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
      */
     public void setTicketDao(TicketDao ticketDao) {
         this.ticketDao = ticketDao;
+    }
+
+    public void createCalendarCollection(String displayName, String path) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public Set<CalendarCollectionResource> getCalendarCollectionResources(String path, boolean recurse) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public CalendarResource getCalendarResourceByEventId(String pathToCalendarCollection, String id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Set<CalendarResource> getCalendarResourcesInDateRange(String pathToCalendarCollection, long utcStartTime, long utcEndTime, TimeZone timezone) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -245,4 +245,19 @@ public class StandardUserService implements UserService {
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }
+
+    public String getPreference(String username, String preferenceName) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void removePreference(String username, String preferenceName) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setPreference(String username, String preferenceName) {
+        // TODO Auto-generated method stub
+        
+    }
 }

@@ -100,4 +100,25 @@ public interface UserService extends Service {
      * presentation as an authentication credential.
      */
     public String generatePassword();
+
+    /**
+     * Returns the named preference for a given user.
+     * @param username the user whose preferences you are fetching
+     * @param preferenceName the name of the preference to retrieve
+     */
+    public String getPreference(String username, String preferenceName);
+
+    /**
+     * Removes a user's preference
+     * @param username the user whose preferences you are removing
+     * @param preferenceName the name of the preference to obliterate
+     */
+    public void removePreference(String username, String preferenceName);
+
+    /**
+     * Removes a user's preference
+     * @param username the user whose preferences you are setting
+     * @param preferenceName the name of the preference to set
+     */
+    public void setPreference(String username, String preferenceName);
 }

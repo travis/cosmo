@@ -15,19 +15,20 @@
  */
 package org.osaf.cosmo.service.impl;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.HomeDirectoryDao;
+import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.dao.TicketDao;
-import org.osaf.cosmo.service.HomeDirectoryService;
 import org.osaf.cosmo.model.CalendarCollectionResource;
 import org.osaf.cosmo.model.CalendarResource;
 import org.osaf.cosmo.model.Resource;
 import org.osaf.cosmo.model.Ticket;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.service.HomeDirectoryService;
 
 /**
  * Standard implementation of {@link HomeDirectoryService}.
@@ -131,7 +132,7 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
 
     public Set<CalendarCollectionResource> getCalendarCollectionResources(String path, boolean recurse) {
         // TODO Auto-generated method stub
-        return null;
+        return new HashSet<CalendarCollectionResource>();
     }
 
     public CalendarResource getCalendarResourceByEventId(String pathToCalendarCollection, String id) {
@@ -141,6 +142,6 @@ public class StandardHomeDirectoryService implements HomeDirectoryService {
 
     public Set<CalendarResource> getCalendarResourcesInDateRange(String pathToCalendarCollection, long utcStartTime, long utcEndTime, TimeZone timezone) {
         // TODO Auto-generated method stub
-        return null;
+        return new HashSet<CalendarResource>();
     }
 }

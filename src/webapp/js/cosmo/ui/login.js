@@ -53,7 +53,6 @@ var Login = new function () {
         else {
             self.showPrompt('normal', 'Logging you on. Please wait ...');
             var username  = self.loginForm.j_username.value;
-            alert (username);
             if (username == "root") {
                 location = scooby.env.getBaseUrl() + "/console/account";
             } else {

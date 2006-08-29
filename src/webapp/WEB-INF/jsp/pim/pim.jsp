@@ -90,7 +90,7 @@ function init() {
               <fmt:message key="Main.About"/> 
             </a>
             <span class="menuBarDivider">|</span>
-            <a href="redirect_login.html"> 
+            <a href="${staticBaseUrl}/console/logout"> 
                <fmt:message key="Main.LogOut"/>
             </a>&nbsp;&nbsp;
         </div>

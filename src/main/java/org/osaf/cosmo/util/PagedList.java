@@ -13,6 +13,23 @@ import java.util.List;
 public interface PagedList {
     
     /**
+     * The request attribute in which this action places a List of
+     * Users: <code>Users</code>
+     */
+    public static final String ATTR_USERS = "Users";
+    
+    /**
+     * The request attribute in which this action places the total number of
+     * pages
+     */
+    public static final String ATTR_NUM_PAGES = "NumPages";
+    
+    /**
+     * The request attribute in which this action places the current page number
+     */
+    public static final String ATTR_CURRENT_PAGE = "CurrentPage";
+    
+    /**
      * Returns the Pagination criteria for the list.
      */
     public PageCriteria getPageCriteria();

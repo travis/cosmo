@@ -26,6 +26,10 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.ui.CosmoAction;
 import org.osaf.cosmo.ui.UIConstants;
+import org.osaf.cosmo.util.PagedList;
+import org.osaf.cosmo.util.PageCriteria;
+
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,7 +52,7 @@ public class UserAction extends CosmoAction {
     private static final String MSG_CONFIRM_UPDATE = "User.Form.Updated";
     private static final String MSG_CONFIRM_REMOVE = "User.Form.Removed";
     private static final Log log = LogFactory.getLog(UserAction.class);
-
+    
     /**
      * The request parameter that contains the username identifying a
      * user.
@@ -59,15 +63,19 @@ public class UserAction extends CosmoAction {
      */
     public static final String PARAM_EMAIL = "email";
     /**
+     * The request parameter that contains the email address of a user
+     */
+    public static final String PARAM_SORT_TYPE = "sort";
+    /**
+     * The request parameter that contains the email address of a user
+     */
+    public static final String PARAM_ASCENDING = "asc";
+    /**
      * The request attribute in which this action places an
      * identified User: <code>User</code>
      */
     public static final String ATTR_USER = "User";
-    /**
-     * The request attribute in which this action places a List of
-     * Users: <code>Users</code>
-     */
-    public static final String ATTR_USERS = "Users";
+    
 
     private UserService userService;
 
@@ -127,6 +135,12 @@ public class UserAction extends CosmoAction {
                                 HttpServletResponse response)
         throws Exception {
         UserForm userForm = (UserForm) form;
+        
+        if (isCancelled(request)) {
+            userForm.reset(mapping, request);
+            return mapping.findForward(UIConstants.FWD_CANCEL);
+        }
+        
         User formUser = new User();
         populateUser(formUser, userForm);
 
@@ -198,6 +212,7 @@ public class UserAction extends CosmoAction {
         throws Exception {
         UserForm userForm = (UserForm) form;
 
+        // Make sure the form wasn't Cancelled
         if (isCancelled(request)) {
             userForm.reset(mapping, request);
             return mapping.findForward(UIConstants.FWD_CANCEL);
@@ -279,10 +294,35 @@ public class UserAction extends CosmoAction {
                               HttpServletRequest request,
                               HttpServletResponse response)
         throws Exception {
-        UserForm userForm = (UserForm) form;
+        
+        PagedListForm pagedListForm = (PagedListForm) form;
+        
+        PageCriteria pageCriteria = pagedListForm.getPageCriteria();
+        
+        PagedList users = (PagedList) userService.getUsers(pageCriteria);
+        
+        // Update the page Criteria in case getUsers Changed It
+        pageCriteria = (PageCriteria) users.getPageCriteria();
+        
+        request.setAttribute(PagedList.ATTR_USERS, users.getList());
 
-        request.setAttribute(ATTR_USERS, getSortedUsers());
-
+        int pageSize = pageCriteria.getPageSize();
+        int total = users.getTotal();
+        int numPages;
+        if(pageSize == PageCriteria.VIEW_ALL || pageSize >= total) {
+            numPages = 1;
+        } else {
+            // Account for off by 0
+            numPages = total / pageSize + (total % pageSize == 0 ? 0 : 1);
+        }
+        
+        request.setAttribute(PagedList.ATTR_NUM_PAGES, numPages);
+        int pageNumber = pageCriteria.getPageNumber();
+        if(pageNumber > numPages){
+            pageNumber = numPages;
+        }
+        request.setAttribute(PagedList.ATTR_CURRENT_PAGE, pageNumber);
+        
         return mapping.findForward(UIConstants.FWD_OK);
     }
 
@@ -334,4 +374,5 @@ public class UserAction extends CosmoAction {
         // never set password in the form
         form.setAdmin(user.getAdmin().booleanValue());
     }
+
 }

@@ -35,6 +35,7 @@
     <form-bean name="updateRootForm"
                type="org.osaf.cosmo.ui.admin.user.UserForm"/>
     <form-bean name="ticketForm" type="org.osaf.cosmo.ui.home.TicketForm"/>
+    <form-bean name="pagedListForm" type="org.osaf.cosmo.ui.admin.user.PagedListForm"/>
   </form-beans>
 
   <global-exceptions>
@@ -177,7 +178,7 @@
 
     <action path="/users"
             type="org.osaf.cosmo.ui.admin.user.UserAction"
-            name="createUserForm"
+            name="pagedListForm"
             scope="request"
             validate="false"
             parameter="list">
@@ -189,11 +190,18 @@
             name="createUserForm"
             scope="request"
             validate="true"
-            input="/console/users"
+            input="/console/user/new"
             parameter="create">
-      <forward name="failure" path="/console/users"/>
+      <forward name="cancel" path="/console/users" redirect="true"/>
+      <forward name="failure" path="/console/user/new"/>
       <forward name="success" path="/console/users" redirect="true"/>
     </action>
+    
+    <action path="/user/new"
+            name="createUserForm"
+            scope="request"
+            validate="false"
+            forward="user.new"/>
 
     <!-- home directory browser actions -->
     <action path="/home/browse"

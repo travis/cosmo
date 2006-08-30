@@ -19,33 +19,186 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<script language="JavaScript">
+
+function goToPage(pageOffset){
+   
+   var pageNumberElement = getUserPageNumberElement();
+   var currentPage = parseInt(pageNumberElement.value);
+   pageNumberElement.value = currentPage + pageOffset; 
+   getPagedListForm().submit();
+}
+
+function getPagedListForm(){
+	return document.forms["pagedListForm"];
+}
+
+function getPagedListFormElement(elementName){
+    var form = getPagedListForm();
+    return form.elements[elementName];
+}
+
+function getUserPageNumberElement(){
+    return getPagedListFormElement("pageCriteria.pageNumber");
+}
+</script>
+
 <cosmo:cnfmsg/>
 
 <c:choose>
   <c:when test="${not empty Users}">
-    <div style="margin-top:24px;">
+	<html:form method="GET" action="/users.do">
+      <html:hidden property="pageCriteria.sortTypeString"/>
+      <html:hidden property="pageCriteria.sortAscending"/>
+      <div style="margin-top:12px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td align="left" valign="top">
+              <fmt:message key="User.List.PageSize"/>
+              <html:select property="pageCriteria.pageSize" onchange="goToPage(0);">
+                <html:option value="10">10</html:option>
+                <html:option value="25">25</html:option>
+                <html:option value="50">50</html:option>
+                <html:option value="-1">All</html:option>
+              </html:select>
+          </td>
+        
+          <td align="right" valign="top">
+            <html:link href="javascript: goToPage(-${CurrentPage - 1});">&lt;&lt;</html:link>  
+  		    <html:link href="javascript: goToPage(-1);">&lt;</html:link>
+  		    <fmt:message key="User.List.Page"/>
+  		    <html:select property="pageCriteria.pageNumber" onchange="goToPage(0);">
+    		  <c:forEach var="i" begin="1" end="${NumPages}">
+      		    <html:option value="${i}">${i}</html:option>
+              </c:forEach>
+  		    </html:select>
+  	 	    <fmt:message key="User.List.Of"/>
+		    ${NumPages}
+		    <html:link href="javascript: goToPage(1);">&gt;</html:link>
+		    <html:link href="javascript: goToPage(${NumPages - CurrentPage});">&gt;&gt;</html:link>
+          </td>
+
+        
+        </tr>
+      </table>
+      </div>
+
+
+  </html:form>
+
+    <div style="margin-top:12px;">
     <table cellpadding="4" cellspacing="1" border="0" width="100%">
       <tr>
         <td class="smTableColHead" style="width:1%;">
           &nbsp;
         </td>
         <td class="smTableColHead">
-          <fmt:message key="User.List.TH.FullName"/>
+          <c:choose>
+            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Name"}'>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Name&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.FullName"/></html:link> 
+              <c:choose>
+                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
+   	               &nbsp;&nbsp;&#8595;
+   	   		    </c:when>
+   	            <c:otherwise>
+   	               &nbsp;&nbsp;&#8593;
+   	            </c:otherwise>
+   	          </c:choose>
+            </c:when>
+            <c:otherwise>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Name&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.FullName"/></html:link> 
+            </c:otherwise>
+          </c:choose>
         </td>
         <td class="smTableColHead">
-          <fmt:message key="User.List.TH.Username"/>
+          <c:choose>
+            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Username"}'>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Username&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.Username"/></html:link> 
+              <c:choose>
+                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
+   	               &nbsp;&nbsp;&#8595;
+   	   		    </c:when>
+   	            <c:otherwise>
+   	               &nbsp;&nbsp;&#8593;
+   	            </c:otherwise>
+   	          </c:choose>
+            </c:when>
+            <c:otherwise>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Username&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.Username"/></html:link> 
+            </c:otherwise>
+          </c:choose>
         </td>
         <td class="smTableColHead">
-          <fmt:message key="User.List.TH.IsAdmin"/>
+          <c:choose>
+            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Administrator"}'>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Administrator&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.IsAdmin"/></html:link> 
+              <c:choose>
+                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
+   	               &nbsp;&nbsp;&#8595;
+   	   		    </c:when>
+   	            <c:otherwise>
+   	               &nbsp;&nbsp;&#8593;
+   	            </c:otherwise>
+   	          </c:choose>
+            </c:when>
+            <c:otherwise>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Administrator&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.IsAdmin"/></html:link> 
+            </c:otherwise>
+          </c:choose>
+        </td>
+        <td class="smTableColHead"">
+          <c:choose>
+            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Email"}'>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Email&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.Email"/></html:link> 
+              <c:choose>
+                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
+   	               &nbsp;&nbsp;&#8595;
+   	   		    </c:when>
+   	            <c:otherwise>
+   	               &nbsp;&nbsp;&#8593;
+   	            </c:otherwise>
+   	          </c:choose>
+            </c:when>
+            <c:otherwise>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Email&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.Email"/></html:link> 
+            </c:otherwise>
+          </c:choose>
         </td>
         <td class="smTableColHead">
-          <fmt:message key="User.List.TH.Email"/>
+          <c:choose>
+            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Created"}'>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Created&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.DateCreated"/></html:link> 
+              <c:choose>
+                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
+   	               &nbsp;&nbsp;&#8595;
+   	   		    </c:when>
+   	            <c:otherwise>
+   	               &nbsp;&nbsp;&#8593;
+   	            </c:otherwise>
+   	          </c:choose>
+            </c:when>
+            <c:otherwise>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Created&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.DateCreated"/></html:link> 
+            </c:otherwise>
+          </c:choose>
         </td>
         <td class="smTableColHead">
-          <fmt:message key="User.List.TH.DateCreated"/>
-        </td>
-        <td class="smTableColHead">
-          <fmt:message key="User.List.TH.DateLastModified"/>
+          <c:choose>
+            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Last Modified"}'>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Last%20Modified&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.DateLastModified"/></html:link> 
+              <c:choose>
+                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
+   	               &nbsp;&nbsp;&#8595;
+   	   		    </c:when>
+   	            <c:otherwise>
+   	               &nbsp;&nbsp;&#8593;
+   	            </c:otherwise>
+   	          </c:choose>
+            </c:when>
+            <c:otherwise>
+              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Last%20Modified&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.DateLastModified"/></html:link> 
+            </c:otherwise>
+          </c:choose>
         </td>
       </tr>
       <c:forEach var="user" items="${Users}">
@@ -104,89 +257,11 @@
   </c:otherwise>
 </c:choose>
 
-<div class="widgetBorder" style="width:460px; margin-top:24px;">
-<div class="widgetContent" style="padding:8px;">
-
-<cosmo:errmsg/>
-
-<html:form action="/user/create">
-
-<div class="hd" style="margin-bottom:4px;"><fmt:message key="User.List.NewUser"/></div>
-
-  <table cellpadding="3" cellspacing="1" border="0">
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="User.Form.Username"/>
-      </td>
-      <td>
-        <div class="smData"><cosmo:errmsg property="username"/></div>
-        <div><html:text property="username" size="32" maxlength="32" styleClass="textInput"/></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="User.Form.FirstName"/>
-      </td>
-      <td>
-        <div class="smData"><cosmo:errmsg property="firstName"/></div>
-        <div><html:text property="firstName" size="32" maxlength="128" styleClass="textInput"/></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="User.Form.LastName"/>
-      </td>
-      <td>
-        <div class="smData"><cosmo:errmsg property="lastName"/></div>
-        <div><html:text property="lastName" size="32" maxlength="128" styleClass="textInput"/></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="User.Form.Email"/>
-      </td>
-      <td>
-        <div class="smData"><cosmo:errmsg property="email"/></div>
-        <div><html:text property="email" size="32" maxlength="128" styleClass="textInput"/></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="User.Form.Password"/>
-      </td>
-      <td>
-        <div class="smData"><cosmo:errmsg property="password"/></div>
-        <div><html:password property="password" size="16" maxlength="16" styleClass="textInput"/></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="User.Form.Confirm"/>
-      </td>
-      <td>
-        <div class="smData"><cosmo:errmsg property="confirm"/></div>
-        <div><html:password property="confirm" size="16" maxlength="16" styleClass="textInput"/></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right; vertical-align:top;">&nbsp;</td>
-      <td>
-        <div style="margin-top:8px;">
-          <html:checkbox property="admin" value="true"/>
-          <fmt:message key="User.Form.MakeAdministrator"/>
-        </div>
-      </td>
-    </tr>
-  </table>
- 
-  <div style="margin-top:12px; text-align:right;">
-    <html:submit property="create" styleClass="md">
-      <fmt:message key="User.Form.Button.Create"/>
-    </html:submit>
-  </div> 
- 
-</html:form> 
- 
-</div> 
+<div style="margin-top:12px;">
+<html:link page="/console/user/new">
+  Create New User
+</html:link>
 </div>
+
+
 

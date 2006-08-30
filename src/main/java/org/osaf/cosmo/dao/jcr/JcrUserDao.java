@@ -75,8 +75,17 @@ import org.springframework.dao.DataRetrievalFailureException;
  */
 public class JcrUserDao extends JcrDaoSupport
     implements SchemaConstants, UserDao {
+    
+    private JcrXpathQueryBuilder jcrXpathQueryBuilder = null;
     private static final Log log = LogFactory.getLog(JcrUserDao.class);
 
+    public JcrXpathQueryBuilder getJcrXpathQueryBuilder() {
+        return jcrXpathQueryBuilder;
+    }
+
+    public void setJcrXpathQueryBuilder(JcrXpathQueryBuilder jcrXpathQueryBuilder) {
+        this.jcrXpathQueryBuilder = jcrXpathQueryBuilder;
+    }
     // UserDao methods
 
     /**
@@ -388,16 +397,7 @@ public class JcrUserDao extends JcrDaoSupport
      */
     protected QueryResult queryForUserByEmail(Session session, String email)
         throws RepositoryException {
-        StringBuffer stmt = new StringBuffer();
-        stmt.append("/jcr:root").
-            append("//element(*, ").
-            append(NT_USER).
-            append(")").
-            append("[@").
-            append(NP_USER_EMAIL).
-            append(" = '").
-            append(email).
-            append("']");
+        StringBuffer stmt = jcrXpathQueryBuilder.buildUserQueryByEmail(email);
         return executeXPathQuery(session, stmt.toString());
     }
 
@@ -406,7 +406,8 @@ public class JcrUserDao extends JcrDaoSupport
      */
     protected QueryResult queryForUsers(Session session)
         throws RepositoryException {
-        return queryForUsers(session, null);
+        StringBuffer stmt = jcrXpathQueryBuilder.buildUserQuery();
+        return executeXPathQuery(session, stmt.toString());
     }
 
     /**
@@ -414,17 +415,9 @@ public class JcrUserDao extends JcrDaoSupport
      * supplied page criteria
      */
     protected QueryResult queryForUsers(Session session,
-                                        PageCriteria pageCriteria)
-        throws RepositoryException {
-        StringBuffer stmt = new StringBuffer();
-        stmt.append("/jcr:root").append("/*/*/*[@").append(NT_USER)
-            .append("]");
-        if (pageCriteria != null) {
-            PageCriteria.SortType sortType = pageCriteria.getSortType();
-            if (sortType != null) {
-                stmt.append(JcrXpathQueryBuilder.buildOrderByQuery(pageCriteria));
-            }
-        }
+            PageCriteria pageCriteria) throws RepositoryException {
+        StringBuffer stmt = jcrXpathQueryBuilder.buildUserQuery(pageCriteria);
         return executeXPathQuery(session, stmt.toString());
+        
     }
 }

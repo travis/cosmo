@@ -42,6 +42,7 @@
   <bean name="/user/update"      parent="userAction"/>
   <bean name="/user/root/update" parent="userAction"/>
   <bean name="/user/remove"      parent="userAction"/>
+  <bean name="/user/new"         parent="userAction"/>
 
   <!-- account self-management actions -->
 

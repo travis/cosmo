@@ -22,6 +22,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.struts.validator.ValidatorForm;
 import org.apache.struts.action.ActionMapping;
 
+import org.osaf.cosmo.util.PageCriteria;
+
 /**
  * Action for managing users.
  */

@@ -1,7 +1,5 @@
 package org.osaf.cosmo.dao.jcr;
 
-import org.osaf.cosmo.util.PageCriteria;
-import org.osaf.cosmo.util.PageCriteria.SortType;
 import org.osaf.cosmo.dao.jcr.JcrXpathQueryBuilder;
 
 import org.apache.commons.logging.Log;
@@ -15,31 +13,30 @@ public class JcrXpathQueryBuilderTest extends TestCase{
     
     public void testQueryBuilder(){
         
-        PageCriteria pageCriteria = new PageCriteria();
+        JcrXpathQueryBuilder jcrXpathQueryBuilder = new JcrXpathQueryBuilder();
         
-        SortType nameSort = pageCriteria.new SortType();
+        
+        JcrSortType nameSort = new JcrSortType();
     
         nameSort.addAttribute("cosmo:firstName", true);
         nameSort.addAttribute("cosmo:lastName" , true);
+        nameSort.setAscending(true);
         
-        pageCriteria.setSortType(nameSort);
-        pageCriteria.setSortAscending(true);
-        
-        String query = JcrXpathQueryBuilder.buildOrderByQuery(pageCriteria);
+        String query = jcrXpathQueryBuilder.buildOrderByQuery(nameSort);
         
         //Try the ascending query
         assertEquals("Ascending Query Test", query , "order by @cosmo:firstName ascending, @cosmo:lastName ascending");
         
-        pageCriteria.setSortAscending(false);
+        nameSort.setAscending(false);
         
-        query = JcrXpathQueryBuilder.buildOrderByQuery(pageCriteria);
+        query = jcrXpathQueryBuilder.buildOrderByQuery(nameSort);
         
         //Try the descending query
         assertEquals("Descending Query Test", query , "order by @cosmo:firstName descending, @cosmo:lastName descending");
         
-        pageCriteria.setSortAscending(true);
+        nameSort.setAscending(true);
         
-        query = JcrXpathQueryBuilder.buildOrderByQuery(pageCriteria);
+        query = jcrXpathQueryBuilder.buildOrderByQuery(nameSort);
         
         //Make sure ascending query still works
         assertEquals("Ascending Query Test after descending", query , "order by @cosmo:firstName ascending, @cosmo:lastName ascending");

@@ -110,6 +110,11 @@
     <put name="body"         value="/WEB-INF/jsp/user/list.jsp"/>
     <put name="prefix"       value="User.List."/>
   </definition>
+  
+  <definition name="user.new" extends="layout.dialog">
+    <put name="body"         value="/WEB-INF/jsp/user/new.jsp"/>
+    <put name="prefix"       value="User.Form."/>
+  </definition>
 
   <!-- home directory browser defs -->
 

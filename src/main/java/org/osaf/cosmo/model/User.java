@@ -64,6 +64,38 @@ public class User extends BaseModelObject {
     /**
      */
     public static final int EMAIL_LEN_MAX = 128;
+    
+    // Sort Strings
+    
+    /**
+     * A String indicating the results should be sorted by Last Name then First Name
+     */
+    public static final String NAME_SORT_STRING = "Name";
+    /**
+     * A String indicating the results should be sorted by Username
+     */
+    public static final String USERNAME_SORT_STRING = "Username";
+    /**
+     * A String indicating the results should be sorted by Administrator
+     */
+    public static final String ADMIN_SORT_STRING = "Administrator";
+    /**
+     * A String indicating the results should be sorted by Email
+     */
+    public static final String EMAIL_SORT_STRING = "Email";
+    /**
+     * A String indicating the results should be sorted by Date Created
+     */
+    public static final String CREATED_SORT_STRING = "Created";
+    /**
+     * A String indicating the results should be sorted by Date last Modified
+     */
+    public static final String LAST_MODIFIED_SORT_STRING = "Last Modified";
+    
+    /**
+     * The Default Sort Type
+     */
+    public static final String DEFAULT_SORT_STRING = NAME_SORT_STRING;
 
     private String username;
     private String oldUsername;

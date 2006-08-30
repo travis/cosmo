@@ -15,11 +15,13 @@
  */
 package org.osaf.cosmo.service;
 
-import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.util.PagedList;
-import org.osaf.cosmo.util.PageCriteria;
-
 import java.util.Set;
+
+import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.util.PageCriteria;
+import org.osaf.cosmo.util.PagedList;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataRetrievalFailureException;
 
 /**
  * Interface for services that manage user accounts.
@@ -32,13 +34,6 @@ public interface UserService extends Service {
      */
     public Set getUsers();
 
-    /**
-     * Returns the sorted list of user accounts corresponding to the
-     * given <code>PageCriteria</code>.
-     *
-     * @param pageCriteria the pagination criteria
-     */
-    public PagedList getUsers(PageCriteria pageCriteria);
 
     /**
      * Returns the user account identified by the given username.
@@ -49,6 +44,16 @@ public interface UserService extends Service {
      * exist
      */
     public User getUser(String username);
+    
+    /**
+     * Returns the all user accounts meeting the supplied
+     * <code>PageCriteria</code>'s requirements
+     * 
+     * @param pageCriteria the Pagination Criteria for the PagedList
+     * 
+     * @throws IllegalArgumentException if an invalid pageNumber is supplied in the <code>PageCriteria</code>
+     */
+    public PagedList getUsers(PageCriteria pageCriteria);
 
     /**
      * Returns the user account identified by the given email address.

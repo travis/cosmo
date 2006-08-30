@@ -49,7 +49,7 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
 
         dao = new JcrUserDao();
         dao.setSessionFactory(getSessionFactory());
-
+        dao.setJcrXpathQueryBuilder(new JcrXpathQueryBuilder());
         try {
             dao.init();
         } catch (Exception e) {
@@ -104,14 +104,9 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
 
         pageCriteria.setSortAscending(true);
 
-        PageCriteria.SortType nameSort = pageCriteria.new SortType();
+        String nameSort = User.NAME_SORT_STRING;
 
-        nameSort.addAttribute(pageCriteria.new SortAttribute("cosmo:firstName",
-                true));
-        nameSort.addAttribute(pageCriteria.new SortAttribute("cosmo:lastName",
-                true));
-
-        pageCriteria.setSortType(nameSort);
+        pageCriteria.setSortTypeString(nameSort);
 
         PagedList pagedList = dao.getUsers(pageCriteria);
         List<User> users = pagedList.getList();
@@ -132,6 +127,14 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
         assertTrue("User 2 not found in users", users.contains(u2));
         assertTrue("User 3 not found in users", users.contains(u3));
         assertFalse("User 4 found in users", users.contains(u4));
+        
+        pageCriteria.setPageNumber(1);
+        pageCriteria.setPageSize(PageCriteria.VIEW_ALL);
+
+        pagedList = dao.getUsers(pageCriteria);
+        users = pagedList.getList();
+        assertTrue("PageList Size not 5", pagedList.getTotal() == 5);
+        assertTrue("Not 5 users", users.size() == 5);
 
         getTestHelper().removeDummyUser(u1);
         getTestHelper().removeDummyUser(u2);
@@ -149,14 +152,9 @@ public class JcrUserDaoTest extends BaseJcrDaoTestCase {
 
         PageCriteria pageCriteria = new PageCriteria();
 
-        PageCriteria.SortType nameSort = pageCriteria.new SortType();
+        String nameSort = User.NAME_SORT_STRING;
 
-        nameSort.addAttribute(pageCriteria.new SortAttribute("cosmo:firstName",
-                true));
-        nameSort.addAttribute(pageCriteria.new SortAttribute("cosmo:lastName",
-                true));
-
-        pageCriteria.setSortType(nameSort);
+        pageCriteria.setSortTypeString(nameSort);
         pageCriteria.setSortAscending(false);
         pageCriteria.setPageNumber(1);
         pageCriteria.setPageSize(2);

@@ -40,6 +40,10 @@
     <to>/console/user/update</to>
   </rule>
   <rule>
+    <from>^/console/user/new$</from>
+    <to>/console/user/new</to>
+  </rule>
+  <rule>
     <from>^/console/user/root$</from>
     <to>/console/user/root?username=root</to>
   </rule>

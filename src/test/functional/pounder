@@ -67,7 +67,7 @@ remove_user($cmp, $user);
 
 exit;
 
-sub cmp_connect() {
+sub cmp_connect {
     my $cmp = Cosmo::CMP->new($server_url, $admin_username, $admin_password,
                               $opt_debug);
     $cmp->agent(PROGRAM . "/" . VERSION);
@@ -76,7 +76,7 @@ sub cmp_connect() {
     return $cmp;
 }
 
-sub create_user() {
+sub create_user {
     my $cmp = shift;
 
     my $username = PROGRAM . "-" . VERSION;
@@ -93,7 +93,7 @@ sub create_user() {
     return $user;
 }
 
-sub dav_connect() {
+sub dav_connect {
     my $user = shift;
 
     my $dav = Cosmo::DAV->new($server_url, $user->username(),

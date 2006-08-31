@@ -1,5 +1,5 @@
 // Base font for all text
-$fontFamily = lucida-grande,verdana,arial,sans-serif
+$fontFamily = "Lucida Grande", "Verdana", "Arial", sans-serif
 // Base color for all text
 $fontColor = #000000
 // Base font sizes

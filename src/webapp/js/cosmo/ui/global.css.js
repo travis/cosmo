@@ -22,7 +22,7 @@ function doStyles(str) {
     // Remove comments
     uiStyles = uiStyles.replace(/\/\/.*/g, '');
 
-    pat = /(\$\S+)(\s*=\s*)(\S+)(\s*)\n/g;
+    pat = /(\$\S+)(\s*=\s*)(.+)\n/g;
     while (arr = pat.exec(uiStyles)) {
         repl = new Object();
         repl.rule = arr[0];

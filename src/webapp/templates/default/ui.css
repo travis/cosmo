@@ -275,7 +275,7 @@ $smButtonHeight = 18px
     z-index:5; 
     visibility:hidden; 
     border:1px solid $blockBorderColor; 
-    background-image:url(templates/default/images/block_gradient_unsel.gif); 
+    background-image:url(../templates/default/images/block_gradient_unsel.gif); 
     background-repeat: repeat-y;
     background-position:0px 0px;
 }
@@ -290,7 +290,7 @@ $smButtonHeight = 18px
     z-index:5; 
     visibility:hidden; 
     border:1px solid $blockBorderColor; 
-    background-image:url(templates/default/images/block_gradient_sel.gif); 
+    background-image:url(../templates/default/images/block_gradient_sel.gif); 
     background-repeat: repeat-y;
     background-position:0px 0px;
 }

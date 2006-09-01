@@ -80,10 +80,10 @@ var AUTH_PROC = '${staticBaseUrl}/console/j_acegi_security_check';
           </form>
         </div>
       </div>
-      <div style="padding-top:36px; text-align:center">
+      <div style="padding-top:24px; text-align:center">
               <fmt:message key="Login.NoAccount"/>
       </div>
-      <div style="padding-top:36px; text-align:center">
+      <div style="padding-top:4px; text-align:center">
           <a href="${staticBaseUrl}/console/account/new">
               <fmt:message key="Login.CreateAccount"/>
           </a>

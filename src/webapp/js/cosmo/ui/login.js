@@ -40,8 +40,8 @@ var Login = new function () {
         self.authProc = AUTH_PROC;
         self.loginForm.j_username.focus();
         // Add logo and button
-        document.getElementById('logoDiv').innerHTML = 
-            '<img src="' + scooby.env.getImagesUrl() + LOGO_GRAPHIC + '" alt="">';
+        //document.getElementById('logoDiv').innerHTML = 
+        //    '<img src="' + scooby.env.getImagesUrl() + LOGO_GRAPHIC + '" alt="">';
         document.getElementById('submitButtonDiv').appendChild(but.domNode);
     }
     this.handleLoginResp = function(str) {

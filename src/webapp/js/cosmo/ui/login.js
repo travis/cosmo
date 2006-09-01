@@ -41,7 +41,7 @@ var Login = new function () {
         self.loginForm.j_username.focus();
         // Add logo and button
         document.getElementById('logoDiv').innerHTML = 
-            '<img src=' +scooby.env.getImagesUrl() + LOGO_GRAPHIC + '" alt="">';
+            '<img src="' + scooby.env.getImagesUrl() + LOGO_GRAPHIC + '" alt="">';
         document.getElementById('submitButtonDiv').appendChild(but.domNode);
     }
     this.handleLoginResp = function(str) {

@@ -175,7 +175,7 @@ sub propfind{
     $useragent->request($request);
     my $end = time();
     my $elapsed = $end - $start;
-    print "Time Elapsed: " . $elapsed;
+    print "Time Elapsed: " . $elapsed . "\n";
     
 }
 

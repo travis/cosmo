@@ -171,7 +171,11 @@ sub propfind{
     my $useragent = $dav->dav->get_user_agent();
     my $request = HTTP::Request->new( "PROPFIND", $path_to_collection );
     $request->content(REQ_PROPFIND_ALLPROP);
+    my $start = time();
     $useragent->request($request);
+    my $end = time();
+    my $elapsed = $end - $start;
+    print "Time Elapsed: " . $elapsed;
     
 }
 

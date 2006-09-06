@@ -37,6 +37,13 @@ Options:
 Report bugs to $0-cosmo\@osafoundation.org
 EOT
 
+use constant REQ_PROPFIND_ALLPROP => <<EOT;
+<?xml version="1.0" encoding="utf-8" ?>
+<D:propfind xmlns:D="DAV:">
+<D:allprop/>
+</D:propfind>
+EOT
+
 use constant DEFAULT_SERVER_URL => 'http://localhost:8080';
 use constant DEFAULT_ADMIN_USERNAME => 'root';
 use constant DEFAULT_ADMIN_PASSWORD => 'cosmo';
@@ -156,6 +163,19 @@ sub populate {
 }
 
 sub propfind{
+    my $dav = shift;
+    my $user = shift;
+    my $collection = shift;
+    my $path_to_collection = path_to_collection($dav->server_url(), $user, $collection);
+
+    my $useragent = $dav->dav->get_user_agent();
+    my $request = HTTP::Request->new( "PROPFIND", $path_to_collection );
+    $request->content(REQ_PROPFIND_ALLPROP);
+    $useragent->request($request);
+    
+}
+
+sub propfind_slow{
     my $dav = shift;
     my $user = shift;
     my $collection = shift;

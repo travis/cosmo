@@ -81,13 +81,12 @@ $user_username ||= DEFAULT_USER_USERNAME;
 $user_password ||= DEFAULT_USER_PASSWORD;
 $user_collection ||= DEFAULT_COLLECTION;
 
-# make a test user, run a publish cycle, then remove the test user
 
 my $cmp = cmp_connect();
-#my $user = create_user($cmp);
 my $command = $ARGV[0];
 
 if ($command eq 'createuser'){
+    print "create user";
     my $user = create_user($cmp, $user_username, $user_password);
 }
 
@@ -107,10 +106,6 @@ if ($command eq 'propfind'){
    propfind($dav, $user, $user_collection);
    
 }
-
-#//publish($dav);
-#//unpublish($dav);
-#//remove_user($cmp, $user);
 
 exit;
 
@@ -146,6 +141,7 @@ sub populate {
     my $user = shift;
     my $num_resources = shift;
     my $path_to_collection = path_to_collection($dav->server_url(), $user, $user_collection);
+    my $useragent = $dav->dav->get_user_agent();
 
     print "\n";
     print "user: " . $user->username() . "\n";
@@ -155,10 +151,11 @@ sub populate {
     $dav->dav->mkcol($path_to_collection);
     
         my $content = "content!";
-        $dav->dav->open($path_to_collection);
     for (my $count = 0; $count < $num_resources; $count++) {
         print "count:  " . $count . "\n";
-        $dav->dav->put(\$content, $count); 
+        my $request = HTTP::Request->new( "PUT", $path_to_collection . "/" . $count);
+        $request->content($content);
+        $useragent->request($request);
     }
 }
 

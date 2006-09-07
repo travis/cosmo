@@ -9,9 +9,9 @@ $fontSizeL = 12px
 // Color for base areas of UI
 $mainUIColor = #ffffff 
 // Selected event block color
-$selectedBlockColor = #005ac8
+$selectedBlockColor = #0064cb
 // Unselected event block color
-$unselectedBlockColor = #007efe
+$unselectedBlockColor = #3398ff
 // Processing event block color
 $processingBlockColor = #9fd1fc
 // Block outline color
@@ -264,46 +264,35 @@ $smButtonHeight = 18px
 
 /* Event blocks 
  * --------------------- */
-/* Normal, unselected */
-.eventDiv { 
+/* All blocks */
+.eventBlock {
     position:absolute; 
     width:1px;
     left:0px;
-    color:$unselectedTextColor;
-    background:$unselectedBlockColor; 
     opacity:1.0;
     z-index:5; 
     visibility:hidden; 
+}
+/* Normal, unselected */
+.eventDiv { 
+    color:$unselectedTextColor;
+    background-color:$unselectedBlockColor;
     border:1px solid $blockBorderColor; 
-    background-image:url(../templates/default/images/block_gradient_unsel.gif); 
     background-repeat: repeat-y;
     background-position:0px 0px;
 }
 /* Selected block */
 .eventDivSel { 
-    position:absolute; 
-    width:1px;
-    left:0px;
     color:$selectedTextColor;
-    background:$selectedBlockColor; 
-    opacity:1.0;;
-    z-index:5; 
-    visibility:hidden; 
+    background-color:$selectedBlockColor; 
     border:1px solid $blockBorderColor; 
-    background-image:url(../templates/default/images/block_gradient_sel.gif); 
     background-repeat: repeat-y;
     background-position:0px 0px;
 }
 /* Processing block */
 .eventDivProc { 
-    position:absolute; 
-    width:1px;
-    left:0px; 
     color:$processingTextColor;
-    background:$processingBlockColor; 
-    opacity:1.0; 
-    z-index:5; 
-    visibility:hidden; 
+    background-color:$processingBlockColor; 
     border:1px solid $blockBorderColor; 
 }
 /* Resize handle at the top of timed event blocks */

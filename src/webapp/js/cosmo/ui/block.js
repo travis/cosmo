@@ -168,29 +168,58 @@ function Block() {
      */
     this.mainAreaColorChange = function(stateId) {
         var className = '';
+        var imgPath = '';
         var mainDiv = document.getElementById(this.divId + Cal.ID_SEPARATOR +
             this.id);
         // If this block is processing, change to 'processing' color
         switch (stateId) {
             case 1:
-                className = 'eventDivSel';
+                className = 'eventBlock eventDivSel';
+                imgPath = scooby.env.getImagesUrl() + 'block_gradient_dark.png';
                 break;
             case 2:
-                className = 'eventDiv';
+                className = 'eventBlock eventDiv';
+                imgPath = scooby.env.getImagesUrl() + 'block_gradient_light.png';
                 break;
             case 3:
-                className = 'eventDivProc';
+                className = 'eventBlock eventDivProc';
+                imgPath = '';
                 break;
             default:
                 // Do nothing
                 break;
         }
+        
+        // Main div for block
+        // ------------
         mainDiv.className = className;
-        // Update color on all associated aux divs for multi-day events
+        // Using the AlphaImageLoader hack b0rks normal z-indexing
+        // No pretty transparent PNGs for IE6
+        if (!document.all) {
+            if (imgPath) {
+                mainDiv.style.backgroundImage = 'url(' + imgPath + ')';
+            }
+            else {
+                mainDiv.style.backgroundImage = null;
+                
+            }
+        }
+        // Aux divs for multi-day events
+        // ------------
         if (this.auxDivList.length) {
             for (var i = 0; i < this.auxDivList.length; i++) {
                 auxDiv = this.auxDivList[i];
                 auxDiv.className = className
+                // Use transparent PNG background in non-IE6 browsers
+                if (!document.all) {
+                    if (imgPath) {
+                        auxDiv.style.backgroundImage = 'url(' + imgPath + ')';
+                    }
+                    else {
+                        auxDiv.style.backgroundImage = null;
+                        
+                    }
+                }
             }
         }
     }

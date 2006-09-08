@@ -168,9 +168,11 @@ function Block() {
      */
     this.mainAreaColorChange = function(stateId) {
         
+        var ev = Cal.eventRegistry.getItem(this.id); 
         var imgPath = '';
         var textColor = '';
         var borderColor = '';
+        var borderStyle = 'solid';
         var blockColor = '';
         
         var mainDiv = document.getElementById(this.divId + Cal.ID_SEPARATOR +
@@ -179,17 +181,33 @@ function Block() {
         switch (stateId) {
             // Selected
             case 1:
-                textColor = '#ffffff';
-                borderColor = '#ffffff';
-                blockColor = '#0064cb';
-                imgPath = scooby.env.getImagesUrl() + 'block_gradient_dark.png';
+                if (ev.data.status && ev.data.status.indexOf('CANCELLED') > -1) {
+                    textColor = '#0064cb';
+                    borderColor = '#3398ff';
+                    blockColor = '#bedeff';
+                    imgPath = '';
+                }
+                else {
+                    textColor = '#ffffff';
+                    borderColor = '#ffffff';
+                    blockColor = '#0064cb';
+                    imgPath = scooby.env.getImagesUrl() + 'block_gradient_dark.png';
+                }
                 break;
             // Unselected
             case 2:
-                textColor = '#ffffff';
-                borderColor = '#ffffff';
-                blockColor = '#3398ff';
-                imgPath = scooby.env.getImagesUrl() + 'block_gradient_light.png';
+                if (ev.data.status && ev.data.status.indexOf('CANCELLED') > -1) {
+                    textColor = '#0064cb';
+                    borderColor = '#3398ff';
+                    blockColor = '#e6f2ff';
+                    imgPath = '';
+                }
+                else {
+                    textColor = '#ffffff';
+                    borderColor = '#ffffff';
+                    blockColor = '#3398ff';
+                    imgPath = scooby.env.getImagesUrl() + 'block_gradient_light.png';
+                }
                 break;
             // Processing
             case 3:
@@ -203,11 +221,16 @@ function Block() {
                 break;
         }
         
+        if (ev.data.status && ev.data.status.indexOf('TENTATIVE') > -1) {
+            borderStyle = 'dashed';
+        }
+        
         // Main div for block
         // ------------
         mainDiv.style.color = textColor;
         mainDiv.style.borderColor = borderColor;
         mainDiv.style.backgroundColor = blockColor;
+        mainDiv.style.borderStyle = borderStyle;
         // Using the AlphaImageLoader hack b0rks normal z-indexing
         // No pretty transparent PNGs for IE6
         if (!document.all) {
@@ -227,6 +250,7 @@ function Block() {
                 auxDiv.style.color = textColor;
                 auxDiv.style.borderColor = borderColor;
                 auxDiv.style.backgroundColor = blockColor;
+                auxDiv.style.borderStyle = borderStyle;
                 // Use transparent PNG background in non-IE6 browsers
                 if (!document.all) {
                     if (imgPath) {

@@ -44,6 +44,46 @@ use constant REQ_PROPFIND_ALLPROP => <<EOT;
 </D:propfind>
 EOT
 
+use constant REQ_MKCALENDAR => <<EOT;
+<?xml version="1.0" encoding="utf-8" ?>
+   <C:mkcalendar xmlns:D="DAV:"
+                 xmlns:C="urn:ietf:params:xml:ns:caldav">
+     <D:set>
+       <D:prop>
+         <D:displayname>Test Events</D:displayname>
+         <C:calendar-description xml:lang="en"
+   >Calendar restricted to events.</C:calendar-description>
+         <C:supported-calendar-component-set>
+           <C:comp name="VEVENT"/>
+         </C:supported-calendar-component-set>
+         <C:calendar-timezone><![CDATA[BEGIN:VCALENDAR
+PRODID:-//Example Corp.//CalDAV Client//EN
+VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:US-Eastern
+LAST-MODIFIED:19870101T000000Z
+BEGIN:STANDARD
+DTSTART:19671029T020000
+RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:Eastern Standard Time (US & Canada)
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:19870405T020000
+RRULE:FREQ=YEARLY;BYDAY=1SU;BYMONTH=4
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:Eastern Daylight Time (US & Canada)
+END:DAYLIGHT
+END:VTIMEZONE
+END:VCALENDAR
+]]></C:calendar-timezone>
+</D:prop>
+</D:set>
+</C:mkcalendar>
+EOT
+
 use constant DEFAULT_SERVER_URL => 'http://localhost:8080';
 use constant DEFAULT_ADMIN_USERNAME => 'root';
 use constant DEFAULT_ADMIN_PASSWORD => 'cosmo';
@@ -107,6 +147,15 @@ if ($command eq 'propfind'){
    
 }
 
+if ($command eq 'populate_caldata'){
+   my $user = $cmp->get_user($user_username);
+   $user->password($user_password);
+   my $data_directory = $ARGV[1];
+   my $dav = dav_connect($user);
+   
+   populate_caldata($dav, $user, $data_directory);
+}
+
 exit;
 
 sub cmp_connect {
@@ -157,6 +206,38 @@ sub populate {
         $request->content($content);
         $useragent->request($request);
     }
+}
+
+sub populate_caldata {
+    my $dav = shift;
+    my $user = shift;
+    my $data_directory = shift;
+    
+    my $path_to_collection = path_to_collection($dav->server_url(), $user, $user_collection);
+    my $useragent = $dav->dav->get_user_agent();
+
+    $dav->dav->delete($path_to_collection);
+    my $request = HTTP::Request->new( "MKCALENDAR", $path_to_collection );
+    $request->content(REQ_MKCALENDAR);
+    $useragent->request($request);
+
+    opendir(DIR, $data_directory);
+    my @files = readdir(DIR);
+    foreach my $file (@files) {
+        open(FILE, $data_directory . "/" . $file);
+        my $content ="";
+        binmode FILE;
+        while(<FILE>) { $content .= $_; }
+        close FILE;
+        
+        my $request = HTTP::Request->new( "PUT", $path_to_collection . "/" . $file);
+        $request->content($content);
+        $request->header("Content-Type" => "text/calendar");
+        $useragent->request($request);
+        
+        #print $content;
+    }    
+    
 }
 
 sub propfind{

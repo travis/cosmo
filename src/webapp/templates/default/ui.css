@@ -272,28 +272,10 @@ $smButtonHeight = 18px
     opacity:1.0;
     z-index:5; 
     visibility:hidden; 
-}
-/* Normal, unselected */
-.eventDiv { 
-    color:$unselectedTextColor;
-    background-color:$unselectedBlockColor;
-    border:1px solid $blockBorderColor; 
     background-repeat: repeat-y;
     background-position:0px 0px;
-}
-/* Selected block */
-.eventDivSel { 
-    color:$selectedTextColor;
-    background-color:$selectedBlockColor; 
-    border:1px solid $blockBorderColor; 
-    background-repeat: repeat-y;
-    background-position:0px 0px;
-}
-/* Processing block */
-.eventDivProc { 
-    color:$processingTextColor;
-    background-color:$processingBlockColor; 
-    border:1px solid $blockBorderColor; 
+    border-style:solid;
+    border-width:1px;
 }
 /* Resize handle at the top of timed event blocks */
 .eventResizeTop { 

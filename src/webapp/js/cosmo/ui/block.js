@@ -167,22 +167,35 @@ function Block() {
      * or (3) normal, unselected
      */
     this.mainAreaColorChange = function(stateId) {
-        var className = '';
+        
         var imgPath = '';
+        var textColor = '';
+        var borderColor = '';
+        var blockColor = '';
+        
         var mainDiv = document.getElementById(this.divId + Cal.ID_SEPARATOR +
             this.id);
         // If this block is processing, change to 'processing' color
         switch (stateId) {
+            // Selected
             case 1:
-                className = 'eventBlock eventDivSel';
+                textColor = '#ffffff';
+                borderColor = '#ffffff';
+                blockColor = '#0064cb';
                 imgPath = scooby.env.getImagesUrl() + 'block_gradient_dark.png';
                 break;
+            // Unselected
             case 2:
-                className = 'eventBlock eventDiv';
+                textColor = '#ffffff';
+                borderColor = '#ffffff';
+                blockColor = '#3398ff';
                 imgPath = scooby.env.getImagesUrl() + 'block_gradient_light.png';
                 break;
+            // Processing
             case 3:
-                className = 'eventBlock eventDivProc';
+                textColor = '#ffffff';
+                borderColor = '#ffffff';
+                blockColor = '#9fd1fc';
                 imgPath = '';
                 break;
             default:
@@ -192,7 +205,9 @@ function Block() {
         
         // Main div for block
         // ------------
-        mainDiv.className = className;
+        mainDiv.style.color = textColor;
+        mainDiv.style.borderColor = borderColor;
+        mainDiv.style.backgroundColor = blockColor;
         // Using the AlphaImageLoader hack b0rks normal z-indexing
         // No pretty transparent PNGs for IE6
         if (!document.all) {
@@ -209,7 +224,9 @@ function Block() {
         if (this.auxDivList.length) {
             for (var i = 0; i < this.auxDivList.length; i++) {
                 auxDiv = this.auxDivList[i];
-                auxDiv.className = className
+                auxDiv.style.color = textColor;
+                auxDiv.style.borderColor = borderColor;
+                auxDiv.style.backgroundColor = blockColor;
                 // Use transparent PNG background in non-IE6 browsers
                 if (!document.all) {
                     if (imgPath) {
@@ -454,14 +471,16 @@ HasTimeBlock.prototype.insert = function(id) {
     // -----------------------
     // Main lozenge div
     blockDiv.id = this.divId + this.idPrefix;
-    blockDiv.className = 'eventDiv';
+    blockDiv.className = 'eventBlock';
     blockDiv.style.width = this.width + 'px';
 
+    /*
     // Just a small little bit of fun to change the border style of a block
     // depending on the status of the event.
     if (ev.data.status && ev.data.status.indexOf('TENTATIVE') > -1) {
         blockDiv.style.borderStyle = 'dashed';
     }
+    */
 
     // Resize-up handle
     blockDivSub.id = this.divId + 'Top' + this.idPrefix;
@@ -506,7 +525,7 @@ HasTimeBlock.prototype.insert = function(id) {
             var blockDiv = document.createElement('div');
             blockDiv.id = this.divId + Cal.ID_SEPARATOR +  +
                 'aux' + (i+1) + this.idPrefix;
-            blockDiv.className = 'eventDiv';
+            blockDiv.className = 'eventBlock';
             blockDiv.style.width = this.width + 'px';
 
             // Central content area
@@ -858,7 +877,7 @@ NoTimeBlock.prototype.insert = function(id) {
     // -----------------------
     // Main lozenge div
     blockDiv.id = this.divId + this.idPrefix;
-    blockDiv.className = 'eventDiv';
+    blockDiv.className = 'eventBlock';
     // Set other style props separately because setAttribute() is broken in IE
     blockDiv.style.width = this.width + 'px';
 

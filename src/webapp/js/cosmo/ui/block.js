@@ -160,15 +160,16 @@ function Block() {
             stateId = (Cal.currSelObj && this.id == Cal.currSelObj.id) ?
                 1 : 2;
         }
-        this.mainAreaColorChange(stateId);
+        this.setLozengeAppearance(stateId);
     }
     /**
      * Change color of block to indicate (1) selected (2) processing
      * or (3) normal, unselected
      */
-    this.mainAreaColorChange = function(stateId) {
+    this.setLozengeAppearance = function(stateId) {
         
-        var ev = Cal.eventRegistry.getItem(this.id); 
+        var ev = Cal.eventRegistry.getItem(this.id);
+        var useLightColor = this.useLightColor(ev);
         var imgPath = '';
         var textColor = '';
         var borderColor = '';
@@ -181,7 +182,7 @@ function Block() {
         switch (stateId) {
             // Selected
             case 1:
-                if (ev.data.status && ev.data.status.indexOf('CANCELLED') > -1) {
+                if (useLightColor) {
                     textColor = '#0064cb';
                     borderColor = '#3398ff';
                     blockColor = '#bedeff';
@@ -196,7 +197,7 @@ function Block() {
                 break;
             // Unselected
             case 2:
-                if (ev.data.status && ev.data.status.indexOf('CANCELLED') > -1) {
+                if (useLightColor) {
                     textColor = '#0064cb';
                     borderColor = '#3398ff';
                     blockColor = '#e6f2ff';
@@ -265,13 +266,29 @@ function Block() {
         }
     }
     /**
+     * Use light or dark pallette colors
+     */
+    this.useLightColor = function(ev) {
+        var ret = false;
+        switch(true) {
+            case (ev.data.status && ev.data.status.indexOf('CANCELLED') > -1):
+            case (ev.data.start.getTime() == ev.data.end.getTime()):
+                ret = true;
+                break;
+            default:
+                // Do nothing
+                break;
+        }
+        return ret;
+    };
+    /**
      * Make the block look selected -- change color and
      * move forward to z-index of 25
      */
     this.setSelected = function() {
         var auxDiv = null;
 
-        this.mainAreaColorChange(1);
+        this.setLozengeAppearance(1);
        
         // Set the z-index to the front
         this.div.style.zIndex = 25;
@@ -290,7 +307,7 @@ function Block() {
     this.setDeselected = function() {
         var auxDiv = null;
         
-        this.mainAreaColorChange(2);
+        this.setLozengeAppearance(2);
         
         // Set the z-index to the back
         this.div.style.zIndex = 1;

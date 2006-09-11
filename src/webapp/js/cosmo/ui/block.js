@@ -175,9 +175,13 @@ function Block() {
         var borderColor = '';
         var borderStyle = 'solid';
         var blockColor = '';
-        
         var mainDiv = document.getElementById(this.divId + Cal.ID_SEPARATOR +
             this.id);
+        var timeDiv = document.getElementById(this.divId + 'Start' +
+            Cal.ID_SEPARATOR + ev.id);
+        var titleDiv = document.getElementById(this.divId + 'Title' +
+            Cal.ID_SEPARATOR + ev.id);
+        
         // If this block is processing, change to 'processing' color
         switch (stateId) {
             // Selected
@@ -243,6 +247,12 @@ function Block() {
                 
             }
         }
+        
+        // Text colors
+        // ------------
+        timeDiv.style.color = textColor;
+        titleDiv.style.color = textColor;
+        
         // Aux divs for multi-day events
         // ------------
         if (this.auxDivList.length) {

@@ -21,7 +21,7 @@ A script that is useful for testing how long it takes to do propfinds
 Commands:
    createuser                            creates a new user
    populate [number of resources]        populates the collection with given number of resources
-   propfind                              executes the propfind on the collection
+   propfind [depth]                      executes the propfind on the collection
     
 Options:
   -s               server root URL (defaults to http://localhost:8080)
@@ -92,6 +92,7 @@ use constant DEFAULT_USER_PASSWORD => 'password';
 use constant DEFAULT_COLLECTION => 'collection';
 
 use constant DEFAULT_NUM_RESOURCES => 3000;
+use constant DEFAULT_DEPTH => 0;
 
 $SIG{__DIE__} = sub { die sprintf("%s: %s", PROGRAM, $_[0]) };
 
@@ -143,7 +144,8 @@ if ($command eq 'propfind'){
    my $user = $cmp->get_user($user_username);
    $user->password($user_password);
    my $dav = dav_connect($user);
-   propfind($dav, $user, $user_collection);
+   my $depth = $ARGV[1] ||= DEFAULT_DEPTH;
+   propfind($dav, $user, $user_collection, $depth);
    
 }
 
@@ -245,11 +247,12 @@ sub propfind{
     my $user = shift;
     my $collection = shift;
     my $path_to_collection = path_to_collection($dav->server_url(), $user, $collection);
-
+    my $depth = shift;
+    
     my $useragent = $dav->dav->get_user_agent();
     my $request = HTTP::Request->new( "PROPFIND", $path_to_collection );
     $request->content(REQ_PROPFIND_ALLPROP);
-    $request->header("Depth" => "1");
+    $request->header("Depth" => $depthw);
     my $start = time();
     $useragent->request($request);
     my $end = time();

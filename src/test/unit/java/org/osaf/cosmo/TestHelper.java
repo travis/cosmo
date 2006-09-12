@@ -29,6 +29,8 @@ import net.fortuna.ical4j.model.parameter.*;
 import net.fortuna.ical4j.model.property.*;
 
 import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -212,5 +214,30 @@ public class TestHelper {
         BUILDER_FACTORY.setNamespaceAware(true);
         DocumentBuilder docBuilder = BUILDER_FACTORY.newDocumentBuilder();
         return docBuilder.parse(in);
+    }
+
+    /** */
+    public ContentItem makeDummyContent(User user) {
+        ContentItem content = new ContentItem();
+
+        content.setName("test item");
+        content.setOwner(user);
+        content.setContent("test!".getBytes());
+        content.setContentEncoding("UTF-8");
+        content.setContentLanguage("en_US");
+        content.setContentType("text/plain");
+        content.setContentLength(new Long(5));
+
+        return content;
+    }
+
+    /** */
+    public CollectionItem makeDummyCollection(User user) {
+        CollectionItem collection = new CollectionItem();
+
+        collection.setName("test collection");
+        collection.setOwner(user);
+
+        return collection;
     }
 }

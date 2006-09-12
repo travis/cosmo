@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.Item;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -28,6 +29,12 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * Test case for <code>DELETE</code> requests on
  * <code>DavServlet</code>.
+ * <p>
+ * Unsupported from spec:
+ * <ul>
+ * <li>Returning multistatus response when a collection member or
+ * descendent cannot be deleted</li>
+ * </ul>
  */
 public class DavDeleteTest extends BaseDavServletTestCase {
     private static final Log log = LogFactory.getLog(DavDeleteTest.class);
@@ -46,9 +53,9 @@ public class DavDeleteTest extends BaseDavServletTestCase {
         assertEquals("DELETE content did not return No Content",
                      MockHttpServletResponse.SC_NO_CONTENT,
                      response.getStatus());
-
         assertNull("DELETEd content still exists in storage",
                    contentService.findItemByUid(content.getUid()));
+        assertChildNotReferencedByParent(home, content);
     }
 
     /** */
@@ -65,9 +72,50 @@ public class DavDeleteTest extends BaseDavServletTestCase {
         assertEquals("DELETE collection did not return No Content",
                      MockHttpServletResponse.SC_NO_CONTENT,
                      response.getStatus());
-
         assertNull("DELETEd collection still exists in storage",
                    contentService.findItemByUid(collection.getUid()));
+        assertChildNotReferencedByParent(home, collection);
+    }
+
+    /** */
+    public void testDeleteCollectionDepthInfinity() throws Exception {
+        // should behave exactly the same as testDeleteCollection()
+
+        HomeCollectionItem home = contentService.getRootItem(user);
+        CollectionItem collection = testHelper.makeDummyCollection(user);
+        contentService.createCollection(home, collection);
+
+        MockHttpServletRequest request =
+            createMockRequest("DELETE", toCanonicalPath(collection.getName()));
+        request.addHeader("Depth", "infinity");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals("DELETE collection did not return No Content",
+                     MockHttpServletResponse.SC_NO_CONTENT,
+                     response.getStatus());
+        assertNull("DELETEd collection still exists in storage",
+                   contentService.findItemByUid(collection.getUid()));
+        assertChildNotReferencedByParent(home, collection);
+    }
+
+    /** */
+    public void testDeleteCollectionDepth0() throws Exception {
+        // should fail with unknown status
+
+        HomeCollectionItem home = contentService.getRootItem(user);
+        CollectionItem collection = testHelper.makeDummyCollection(user);
+        contentService.createCollection(home, collection);
+
+        MockHttpServletRequest request =
+            createMockRequest("DELETE", toCanonicalPath(collection.getName()));
+        request.addHeader("Depth", "0");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals("DELETE collection did not return Bad Request",
+                     MockHttpServletResponse.SC_BAD_REQUEST,
+                     response.getStatus());
     }
 
     /** */
@@ -80,5 +128,14 @@ public class DavDeleteTest extends BaseDavServletTestCase {
         assertEquals("DELETE home collection did not return Forbidden",
                      MockHttpServletResponse.SC_FORBIDDEN,
                      response.getStatus());
+    }
+
+    private void assertChildNotReferencedByParent(CollectionItem parent,
+                                                  Item item) {
+        for (Item child : parent.getChildren()) {
+            if (child.getUid().equals(item.getUid()))
+                fail("DELETEd item still referenced by parent collection");
+        }
+        assertTrue(true);
     }
 }

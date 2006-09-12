@@ -33,13 +33,13 @@ MORE INFO
 =========
 
 Cosmo's home page is at
-<http://cosmo-dev.osafoundation.org/>.
+<http://cosmo.osafoundation.org/>.
 
 Release notes can be found at
-<http://cosmo-dev.osafoundation.org/release_notes.php>.
+<http://cosmo.osafoundation.org/release_notes.php>.
 
 Instructions for installing and running Cosmo are found at
-<http://cosmo-dev.osafoundation.org/configuration.php>.
+<http://cosmo.osafoundation.org/configuration.php>.
 
 Legal information is found in LICENSE.txt, NOTICE.txt and in the
 license/ subdirectory.
@@ -53,7 +53,7 @@ cosmo@osafoundation.org. Sign up at
 
 
 
-Copyright 2005 Open Source Applications Foundation
+Copyright 2005-2006 Open Source Applications Foundation
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -1,5 +1,4 @@
 /*
-    alert(typeof ret.id);
  * Copyright 2006 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

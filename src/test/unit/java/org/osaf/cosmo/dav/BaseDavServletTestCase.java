@@ -23,13 +23,14 @@ import org.apache.commons.id.random.SessionIdGenerator;
 
 import org.osaf.cosmo.BaseMockServletTestCase;
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
+import org.osaf.cosmo.dao.mock.MockCalendarDao;
+import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.dav.DavServlet;
-import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.mock.MockSecurityManager;
-import org.osaf.cosmo.security.mock.MockUserPrincipal;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -45,12 +46,16 @@ public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
 
     protected TestHelper testHelper;
     protected DavServlet servlet;
+    protected ContentService contentService;
     protected UserService userService;
 
     /**
      */
     protected void setUp() throws Exception {
         super.setUp();
+
+        contentService = createMockContentService();
+        contentService.init();
 
         userService = createMockUserService();
         userService.init();
@@ -64,17 +69,11 @@ public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
 
     protected void tearDown() throws Exception {
         servlet.destroy();
-        super.tearDown();
-    }
 
-    /**
-     */
-    protected void sendXmlRequest(MockHttpServletRequest request,
-                                  byte[] xml)
-        throws Exception {
-        request.setContentType("text/xml");
-        request.setCharacterEncoding("UTF-8");
-        request.setContent(xml);
+        userService.destroy();
+        contentService.destroy();
+
+        super.tearDown();
     }
 
     /**
@@ -89,6 +88,15 @@ public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
      */
     public String getServletPath() {
         return SERVLET_PATH;
+    }
+
+    /**
+     */
+    private ContentService createMockContentService() {
+        StandardContentService svc = new StandardContentService();
+        svc.setCalendarDao(new MockCalendarDao());
+        svc.setContentDao(new MockContentDao());
+        return svc;
     }
 
     /**

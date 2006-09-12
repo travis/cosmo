@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dao.ItemDao;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
@@ -184,6 +185,8 @@ public class MockItemDao implements ItemDao {
      *            item to remove
      */
     public void removeItem(Item item) {
+        item.getParent().getChildren().remove(item);
+
         itemsByUid.remove(item.getUid());
         itemsByPath.remove(getItemPath(item));
         if (rootUids.get(item.getOwner().getId()).equals(item.getUid())) {
@@ -313,6 +316,13 @@ public class MockItemDao implements ItemDao {
         item.setCreationDate(new Date());
         item.setModifiedDate(item.getCreationDate());
 
+        for (Item sibling : item.getParent().getChildren()) {
+            if (sibling.getName().equals(item.getName()))
+                throw new DuplicateItemNameException();
+        }
+
+        item.getParent().getChildren().add(item);
+
         itemsByUid.put(item.getUid(), item);
         itemsByPath.put(getItemPath(parentItem) + "/" + item.getName(), item);
     }
@@ -323,10 +333,18 @@ public class MockItemDao implements ItemDao {
             throw new IllegalArgumentException("item to be updated does not match stored item");
         if (item.getName() == null)
             throw new IllegalArgumentException("name cannot be null");
-        Item parentItem = item.getParent();
-        
         if (item.getOwner() == null)
             throw new IllegalArgumentException("owner cannot be null");
+
+        CollectionItem parentItem = item.getParent();
+
+        if (parentItem != null) {
+            for (Item sibling : parentItem.getChildren()) {
+                if (sibling.getName().equals(item.getName()) &&
+                    ! (sibling.getUid().equals(item.getUid())))
+                    throw new DuplicateItemNameException();
+            }
+        }
 
         item.setModifiedDate(item.getCreationDate());
 

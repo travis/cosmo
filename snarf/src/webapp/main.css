@@ -1,0 +1,112 @@
+/*
+ * Copyright 2005 Open Source Applications Foundation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+* { 
+    padding:0px; 
+    margin:0px;  }
+body { 
+    font-family:verdana,arial,sans-serif;
+    font-size:12px; 
+    color:#222222; 
+    height:100%;  
+    padding-top:36px; 
+    padding-right:12px; 
+    padding-left:12px; }
+div, p, td, ul { 
+    font-family:verdana,arial,sans-serif; 
+    line-height:18px;
+    font-size:12px; 
+    color:#222222; }
+p, ul { 
+    margin-bottom:14px; 
+    margin-top:0px; }
+img { 
+    border:0px; }
+form { 
+    margin:0px; 
+    padding:0px; }
+a { 
+    color: #3366aa; }
+a:hover { 
+    color: #99bbcc; }
+h1, h2, h3, h4 {
+    font-weight:bold; 
+    margin-top:0px; 
+    margin-bottom:10px; 
+    color:#444444; }
+h1 { 
+    font-size:18px; }
+h2 { 
+    font-size:14px; }
+h3 { 
+    font-size:12px; }
+h4 { 
+    font-size:11px; }
+
+hr { 
+    height:1px; 
+    border:0px; 
+    background:#aaaaaa; 
+    margin-bottom:12px; }
+li { 
+    margin-left:24px; }
+.gutterCol { 
+    width:24px; }
+.navBox { 
+    padding:10px; 
+    border:1px solid #aaaaaa; 
+    background:#efeee3; }
+.navLink { 
+    margin-bottom:2px; 
+    font-weight:bold; }
+.navText { 
+    margin-bottom:8px; 
+    padding-left:12px; 
+    font-size:11px; }
+.outerCol {
+    float:left;
+    width:170px; 
+    vertical-align:top; }
+.floatPad {
+    float:left;
+    width:24px; }
+.clearBoth {
+  clear:both; }
+#contentDiv { 
+    margin:auto;
+    width:760px; 
+    text-align:left; 
+    padding-bottom:36px; }
+#osafLogoDiv {
+    text-align:center;
+    margin:auto;
+    margin-bottom:8px; }
+#centerCol { 
+    float:left;
+    width:370px;
+    vertical-align:top; }
+#floatImageDiv { 
+    float:right; 
+    margin-left:12px; }
+#changeLog p { 
+    font-size:11px; 
+    margin-bottom:8px; }
+#changeLog h2 { 
+    font-size:12px; 
+    margin-bottom:8px; }
+#changeLog h3 { 
+    font-size:11px; 
+    margin-bottom:8px; }

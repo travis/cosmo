@@ -1,0 +1,57 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+    <head>
+        <title>OSAF Server Bundle</title>
+        <script type="text/javascript" src="ajax.js"></script>
+        <script type="text/javascript" src="simpledialog.js"></script>
+        <script type="text/javascript" src="signup.js"></script>
+        <link rel="stylesheet" type="text/css" href="main.css"/>
+        <link rel="stylesheet" type="text/css" href="simpledialog.css"/>
+    </head>
+    <body>
+        <div id="alignDiv">
+            <div id="contentDiv">
+                <div class="outerCol">
+                    <div id="osafLogoDiv"><a href="http://www.osafoundation.org"><img src="/osaf_logo_sm.gif" width="125" height="34" alt="OSAF"/></a></div>
+                    <div class="navBox">
+                        <div class="navLink"><a href="http://cosmo.osafoundation.org/">Cosmo project page</a></div>
+                        <div class="navText">Get more information about the Cosmo Sharing Server.</div>
+                        <div class="navLink"><a href="http://scooby.osafoundation.org/">Scooby project page</a></div>
+                        <div class="navText">Get more information about the Scooby Web Calendar.</div>
+                        <div class="navLink"><a href="http://www.osafoundation.org">OSAF home</a></div>
+                        <div class="navText">Web site for the Open Source Applications Foundation.</div>
+                    </div>
+                </div>
+                <div class="floatPad">&nbsp;</div>
+                <div id="centerCol">
+                    <h1>OSAF Server Bundle</h1> 
+                    <p>The OSAF server bundle integrates several best-of-breed components into one easy-to-run calendar server package.</p>
+                    <p>It pulls together Cosmo, Scooby, the <a href="http://tomcat.apache.org/">Tomcat</a> servlet container, and the <a href="http://incubator.apache.org/jackrabbit/">Jackrabbit</a> content repository into a single application server.</p>
+                    <div id="floatImageDiv"><a href="http://cosmo.osafoundation.org"><img src="/cosmo_logo.gif" width="179" height="48" alt="Cosmo Sharing Server"/></a></div>
+                    <h2>What is Cosmo?</h2>
+                    <p>Cosmo is a calendar server.</p>
+                    <p>With your favorite calendar program (Chandler, Apple iCal, Mozilla Sunbird, or any other WebDAV or CalDAV enabled client), you can share your calendar with other people by publishing it to Cosmo. Once your calendar is stored on the server, you can give permission for others to subscribe to it, and even modify it if their calendar client allows.</p>
+                    <div class="clearBoth"></div>
+                    <h2>What is Scooby?</h2>
+                    <p>Scooby is a next generation Web calendar application.</p>
+                    <p>It provides an XHTML+CSS face for CalDAV servers (primarily Cosmo but eventually others as well).</p>
+                    <h2>License</h2>
+                    <p>The OSAF server bundle is available under the terms of the <a href="http://apache.org/licenses/LICENSE-2.0">Apache Software License, Version 2.0</a>.</p>
+                </div>
+                <div class="floatPad">&nbsp;</div>
+                <div class="outerCol">
+                    <div class="navBox">
+                        <div class="navLink"><a onclick="Signup.showDialog(); return false;" href="/cosmo/console/account/new">Create an Account</a></div>
+                        <div class="navText">Click here to create an account to use with Chandler, iCal, Evolution, Sunbird, or the bundled Scooby Web cal.</div>
+                        <div class="navLink"><a href="/cosmo/">Log in to Cosmo</a></div>
+                        <div class="navText">Click here to log in to Cosmo. The built-in system user has username <code>root</code>, password <code>cosmo</code>.</div>
+                        <div class="navLink"><a href="/scooby/">Log in to Scooby</a></div>
+                        <div class="navText">Click here to log in to Scooby. Use the username and password of your Cosmo account. You cannot log in to Scooby as the Cosmo user <code>root</code>.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

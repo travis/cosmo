@@ -1,0 +1,67 @@
+<!--
+    Copyright 2005-2006 Open Source Applications Foundation
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<Server port="8005" shutdown="SHUTDOWN">
+  <GlobalNamingResources>
+    <Resource name="osafsrv/db"
+              type="javax.sql.DataSource"
+              maxActive="100"
+              maxIdle="30"
+              maxWait="10000"
+              username="sa"
+              password=""
+              driverClassName="org.apache.derby.jdbc.EmbeddedDriver"
+              url="jdbc:derby:db;create=true"/>
+    <Resource name="osafsrv/mail"
+              type="javax.mail.Session"
+              mail.transport.protocol="smtp"
+              mail.smtp.host="localhost"
+              mail.smtps.host="localhost"
+              mail.smtp.starttls.enable="false"/>
+  </GlobalNamingResources>
+  <Service name="Catalina">
+    <Connector port="8080" enableLookups="false"
+               minSpareThreads="4" maxSpareThreads="50"
+               maxThreads="200"/>
+<!--
+    <Connector port="8443" enableLookups="false" secure="true"
+               minSpareThreads="4" maxSpareThreads="50"
+               maxThreads="200"
+               scheme="https" clientAuth="want"
+               keystorePass="osafcosmo" sslProtocol="TLS"/>
+-->
+    <Engine name="Catalina" defaultHost="localhost">
+      <Host name="localhost" appBase="webapps" autoDeploy="false"
+            deployOnStartup="false">
+        <Valve className="org.apache.catalina.valves.AccessLogValve"
+               directory="../logs" prefix="access." suffix=".log"
+               pattern="combined" resolveHosts="false"/>
+        <Context path="" docBase="ROOT" reloadable="false"/>
+        <Context path="/cosmo" docBase="cosmo-0.5-hibernate-SNAPSHOT.war"
+                 reloadable="false">
+          <Environment name="cosmo/config" value="file:etc/cosmo.properties"
+                       type="java.lang.String" override="false"/>
+          <ResourceLink name="jdbc/cosmo"
+                        global="osafsrv/db"
+                        type="javax.sql.DataSource"/>
+          <ResourceLink name="mail/cosmo"
+                        global="osafsrv/mail"
+                        type="javax.mail.Session"/>
+        </Context>
+      </Host>
+    </Engine>
+  </Service>
+</Server>

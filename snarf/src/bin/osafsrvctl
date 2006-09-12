@@ -1,0 +1,107 @@
+#!/bin/sh
+# -----------------------------------------------------------------------------
+# Copyright 2005 Open Source Applications Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Wrapper script for Tomcat's catalina.sh that sets up the environment
+# and changes the directory to run in the server bundle installation
+# directory.
+#
+# Ripped off from Tomcat's shutdown.sh
+# -----------------------------------------------------------------------------
+
+function check_feature() {
+    if [ -z "$1" ] ; then
+        return 1;
+    elif [ "$1" == "false" ] || [ "$1" == "0" ] ; then
+        return 2;
+    fi
+    return 0;
+}
+
+# resolve links - $0 may be a softlink
+PRG="$0"
+
+while [ -h "$PRG" ] ; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '.*/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+
+# move into server bundle installation directory
+OSAFSRV_HOME=`dirname "$PRG"`/..
+cd $OSAFSRV_HOME
+export OSAFSRV_HOME=`pwd`
+OSAFSRV_BINDIR="$OSAFSRV_HOME"/bin
+
+# tomcat is found one level above this directory
+export CATALINA_HOME="$OSAFSRV_HOME"/tomcat
+CATALINA_BINDIR="$CATALINA_HOME"/bin
+TOMCAT_SCRIPT=catalina.sh
+
+# check that the tomcat control script exists
+if [ ! -x "$CATALINA_BINDIR"/"$TOMCAT_SCRIPT" ]; then
+  echo "Cannot find $CATALINA_BINDIR/$TOMCAT_SCRIPT"
+  echo "This file is needed to run this program"
+  exit 1
+fi
+
+# source the config script if it exists
+CFGSCRIPT=osafsrvcfg
+if [ -f "$OSAFSRV_BINDIR"/"$CFGSCRIPT" ]; then
+    . "$OSAFSRV_BINDIR"/"$CFGSCRIPT"
+fi
+
+# enable/disable features
+OSAFSRV_OPTS="-server"
+check_feature $OSAFSRV_JMX_LOCAL
+if [ $? -lt 2 ]; then
+    OSAFSRV_OPTS="$OSAFSRV_OPTS -Dcom.sun.management.jmxremote"
+else
+    echo "Disabling JMX"
+fi
+check_feature $OSAFSRV_ICAL4J_UNFOLDING_RELAXED
+if [ $? -lt 2 ]; then
+    OSAFSRV_OPTS="$OSAFSRV_OPTS -Dical4j.unfolding.relaxed=true"
+else
+    OSAFSRV_OPTS="$OSAFSRV_OPTS -Dical4j.unfolding.relaxed=false"
+    echo "Disabling ical4j relaxed unfolding"
+fi
+if [ -n "$OSAFSRV_DERBY_ERROR_LOG" ]; then
+    OSAFSRV_OPTS="$OSAFSRV_OPTS -Dderby.stream.error.file=$OSAFSRV_DERBY_ERROR_LOG";
+    echo "Logging derby output to $OSAFSRV_DERBY_ERROR_LOG"
+else
+    OSAFSRV_OPTS="$OSAFSRV_OPTS -Dderby.stream.error.file=logs/derby.log"
+fi
+check_feature $OSAFSRV_DERBY_ERROR_LOG_APPEND
+if [ $? -lt 2 ]; then
+    OSAFSRV_OPTS="$OSAFSRV_OPTS -Dderby.infolog.append=true"
+else
+    OSAFSRV_OPTS="$OSAFSRV_OPTS -Dderby.infolog.append=false"
+    echo "Disabling appending for derby log"
+fi
+
+# move into the server bundle install dir so that paths relative to
+# the current working directory resolve correctly
+cd $OSAFSRV_HOME
+
+export JAVA_OPTS="$JAVA_OPTS $OSAFSRV_OPTS"
+
+echo "Using OSAFSRV_HOME:      $OSAFSRV_HOME"
+
+exec "$CATALINA_BINDIR"/"$TOMCAT_SCRIPT" "$@"

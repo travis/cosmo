@@ -25,17 +25,17 @@
  */
 dojo.require("scooby.env");
 var Login = new function () {
-
+    
+    var self = this;
+    
     this.loginFocus = false;
     this.loginReq = null;
     this.loginForm = null; 
     this.authProc = '';
 
     this.init = function() {
-        var self = Login;
         var but = new Button('submitButton', 74, Login.doLogin, 
             getText('App.Button.Submit'));
-        self.loginReq = new Ajax();
         self.loginForm = document.getElementById('loginForm');
         self.authProc = AUTH_PROC;
         self.loginForm.j_username.focus();
@@ -45,7 +45,6 @@ var Login = new function () {
         document.getElementById('submitButtonDiv').appendChild(but.domNode);
     }
     this.handleLoginResp = function(str) {
-        var self = Login;
         if (str.indexOf('login.js') > -1) {
             self.showErr(getText('Login.Error.AuthFailed'));
             self.loginForm.j_password.value = ''; 
@@ -61,10 +60,9 @@ var Login = new function () {
         }
     }
     this.doLogin = function() {
-        var self = Login;
         var un = self.loginForm.j_username.value;
         var pw = self.loginForm.j_password.value;
-        var postData = '';
+        var postData = {};
         var err = '';
 
         if (!un || !pw) {
@@ -75,9 +73,14 @@ var Login = new function () {
         }
         else {
             Cookie.set('username', un);
-            postData = 'j_username=' + un + '&j_password=' + pw;
-            self.loginReq.doPost(self.authProc, postData, 
-                Login.handleLoginResp);
+            postData = { 'j_username': un, 'j_password': pw };
+            dojo.io.bind({
+                url: self.authProc,
+                method: 'POST',
+                content: postData,
+                load: function(type, data, evt) { Login.handleLoginResp(data); },
+                error: function(type, error) { alert(error.message); }
+            });
         }
     }
 

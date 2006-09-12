@@ -15,25 +15,23 @@
 */
 
 dojo.require(scooby.env);
-var uiPrefReq = new Ajax();
 var uiStyles = '';
 var uiPref = []; 
 var arr = [];
 var repl = null;
 var dynRules = [];
 
-uiPrefReq.async = false;
-uiStyles = uiPrefReq.doGet(scooby.env.getBaseUrl() + '/templates/' + TEMPLATE_DIRECTORY + '/ui.css');
-if (uiStyles.status != 200) {
-    alert('Could not load stylesheet.');
-}
-else {
-    doStyles(uiStyles.responseText);
-}
+dojo.io.bind({
+    url: scooby.env.getBaseUrl() + '/templates' + TEMPLATE_DIRECTORY + '/ui.css',
+    sync: true,
+    load: function(type, data, evt) { doStyles(type, data, evt); },
+    error: function(type, error) { alert(error.message); },
+    mimetype: "text/plain"
+});
 
 // FiXME: Refactor with objects
-function doStyles(str) {
-    var uiStyles = str;
+function doStyles(type, data, evt) {
+    var uiStyles = data;
 
     // Remove comments
     uiStyles = uiStyles.replace(/\/\/.*/g, '');

@@ -36,7 +36,6 @@
 
 <script type="text/javascript" src="${staticBaseUrl}/i18n.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/log.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/ajax.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/date.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/hash.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/debug.js"></script>

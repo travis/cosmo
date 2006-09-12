@@ -18,7 +18,7 @@
   <name>Cosmo</name>
   <groupId>org.osaf.cosmo</groupId>
   <artifactId>cosmo</artifactId>
-  <currentVersion>0.5-hibernate-SNAPSHOT</currentVersion>
+  <currentVersion>0.5-SNAPSHOT</currentVersion>
   <dependencies>
     <!--
         dependencies with the war.bundle property are included in the

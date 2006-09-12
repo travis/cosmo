@@ -21,9 +21,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.service.UserService;
 
 /**
  * Gathers information from Spring configuration and the user database
@@ -35,7 +35,7 @@ public class ServletContextConfigurer {
         LogFactory.getLog(ServletContextConfigurer.class);
 
     private ServletContext servletContext;
-    private UserDao userDao;
+    private UserService userService;
 
     /**
      * An entry point for configuration of the servlet context.
@@ -55,20 +55,22 @@ public class ServletContextConfigurer {
      * attribute by looking up the root user's email address.
      */
     public void setServerAdmin() {
-        User rootUser = userDao.getUser(User.USERNAME_OVERLORD);
+        User overlord = userService.getUser(User.USERNAME_OVERLORD);
+        if (overlord == null)
+            throw new IllegalStateException("overlord not in database");
         servletContext.setAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN,
-                                    rootUser.getEmail());
+                                    overlord.getEmail());
     }
 
     /**
      */
-    public UserDao getUserDao() {
-        return userDao;
+    public UserService getUserService() {
+        return userService;
     }
 
     /**
      */
-    public void setUserDao(UserDao userDao) {
-        this.userDao = userDao;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

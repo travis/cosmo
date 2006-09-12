@@ -16,8 +16,8 @@
 package org.osaf.cosmo.dao;
 
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.util.PagedList;
 import org.osaf.cosmo.util.PageCriteria;
+import org.osaf.cosmo.util.PagedList;
 
 import java.util.Set;
 
@@ -33,7 +33,7 @@ public interface UserDao extends Dao {
     /**
      * Returns an unordered set of all user accounts in the repository.
      */
-    public Set getUsers();
+    public Set<User> getUsers();
 
     /**
      * Returns the sorted list of user accounts corresponding to the
@@ -42,7 +42,7 @@ public interface UserDao extends Dao {
      * @param pageCriteria the pagination criteria
      */
     public PagedList getUsers(PageCriteria pageCriteria);
-
+    
     /**
      * Returns the user account identified by the given username.
      *

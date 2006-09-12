@@ -35,16 +35,15 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 
-import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.status.StatusSnapshot;
 
 import org.springframework.beans.BeansException;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -198,14 +197,12 @@ public class CmpServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            try {
-                User user = userService.getUser(urlUsername);
+            User user = userService.getUser(urlUsername);
+            if (user != null)
                 processUserUpdate(req, resp, user);
-                return;
-            } catch (DataRetrievalFailureException e) {
+            else
                 processUserCreate(req, resp);
-                return;
-            }
+            return;
         }
         resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
@@ -329,15 +326,14 @@ public class CmpServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        try {
-            User user = userService.getUser(username);
-            UserResource resource = new UserResource(user, getUrlBase(req));
-            resp.setHeader("ETag", resource.getEntityTag());
-            sendXmlResponse(resp, resource);
-        } catch (DataRetrievalFailureException e) {
+        User user = userService.getUser(username);
+        if (user == null) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
+        UserResource resource = new UserResource(user, getUrlBase(req));
+        resp.setHeader("ETag", resource.getEntityTag());
+        sendXmlResponse(resp, resource);
     }
 
     /*

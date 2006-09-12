@@ -208,7 +208,7 @@
             type="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction"
             parameter="browse">
       <forward name="collection" path="home.collection"/>
-      <forward name="resource" path="home.resource"/>
+      <forward name="item" path="home.item"/>
     </action>
 
     <action path="/home/remove"

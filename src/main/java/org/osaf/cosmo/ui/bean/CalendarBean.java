@@ -22,9 +22,9 @@ import java.util.Set;
 
 import net.fortuna.ical4j.data.ParserException;
 
-import org.osaf.cosmo.model.Resource;
-import org.osaf.cosmo.model.EventResource;
-import org.osaf.cosmo.model.CalendarCollectionResource;
+import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.CalendarEventItem;
+import org.osaf.cosmo.model.CalendarCollectionItem;
 
 /**
  * A simple bean that translates the information about a set of
@@ -33,28 +33,29 @@ import org.osaf.cosmo.model.CalendarCollectionResource;
  */
 public class CalendarBean {
 
-    private CalendarCollectionResource resource;
-    private HashSet events;
+    private CalendarCollectionItem item;
+    private HashSet<EventBean> events;
 
     /**
      */
-    public CalendarBean(CalendarCollectionResource resource)
+    public CalendarBean(CalendarCollectionItem item)
         throws IOException, ParserException {
-        this.resource = resource;
-        events = new HashSet();
+        this.item = item;
+        events = new HashSet<EventBean>();
 
-        for (Iterator i=resource.getResources().iterator(); i.hasNext();) {
-            Resource child = (Resource) i.next();
-            if (child instanceof EventResource) {
-                events.add(new EventBean((EventResource) child));
-            }
-        }
+        // XXX no way to get child items
+//         for (Iterator<EventBean> i=item.getItems().iterator(); i.hasNext();) {
+//             Item child = (Item) i.next();
+//             if (child instanceof CalendarEventItem) {
+//                 events.add(new EventBean((CalendarEventItem) child));
+//             }
+//        }
     }
 
     /**
      */
-    public CalendarCollectionResource getResource() {
-        return resource;
+    public CalendarCollectionItem getItem() {
+        return item;
     }
 
     /**
@@ -67,8 +68,8 @@ public class CalendarBean {
      */
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        for (Iterator i=events.iterator(); i.hasNext();) {
-            EventResource event = (EventResource) i.next();
+        for (Iterator<EventBean> i=events.iterator(); i.hasNext();) {
+            EventBean event = i.next();
             buf.append(event.toString());
             if (i.hasNext()) {
                 buf.append("\n");

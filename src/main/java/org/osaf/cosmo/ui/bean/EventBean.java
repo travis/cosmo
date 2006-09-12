@@ -28,7 +28,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.Duration;
 
-import org.osaf.cosmo.model.EventResource;
+import org.osaf.cosmo.model.CalendarEventItem;
 
 /**
  * A simple bean that translates the information about an event from
@@ -38,21 +38,21 @@ import org.osaf.cosmo.model.EventResource;
 public class EventBean {
 
     private VEvent vevent;
-    private EventResource resource;
+    private CalendarEventItem item;
 
     /**
      */
-    public EventBean(EventResource resource)
+    public EventBean(CalendarEventItem item)
         throws IOException, ParserException {
-        this.resource = resource;
-        this.vevent = (VEvent) resource.getCalendar().getComponents().
+        this.item = item;
+        this.vevent = (VEvent) item.getCalendar().getComponents().
             getComponents(Component.VEVENT).get(0);
     }
 
     /**
      */
-    public EventResource getResource() {
-        return resource;
+    public CalendarEventItem getItem() {
+        return item;
     }
 
     /**

@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.BaseMockServletTestCase;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.cmp.CmpServlet;
+import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.impl.StandardUserService;
@@ -58,6 +59,7 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
 
     private UserService createMockUserService() {
         StandardUserService svc = new StandardUserService();
+        svc.setContentDao(new MockContentDao());
         svc.setUserDao(new MockUserDao());
         svc.setPasswordGenerator(new SessionIdGenerator());
         return svc;

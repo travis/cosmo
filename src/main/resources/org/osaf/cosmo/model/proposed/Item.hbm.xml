@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.osaf.cosmo.model">
+    <class name="Item" table="item" abstract="true" lazy="false">
+        
+        <id name="id" column="id" unsaved-value="-1">
+            <generator class="native" />
+        </id>
+        
+        <discriminator column="itemtype" length="16" type="string"/>
+        
+        <version name="version" column="version"/>
+        
+        <many-to-one name="owner" class="User">
+            <column name="ownerid"/>
+        </many-to-one>
+        
+        <many-to-one name="parent" class="CollectionItem">
+            <column name="parentid"/>
+        </many-to-one>
+       
+        <property name="uid" type="string" length="255" unique="true" not-null="true" index="idx_itemuid">
+            <column name="uid"/>
+        </property>
+        
+        <property name="name" type="string" length="255" not-null="true" index="idx_itemname">
+            <column name="itemname"/>
+        </property>
+        
+        <property name="creationDate" type="timestamp">
+            <column name="datecreated"/>
+        </property>
+        
+        <property name="modifiedDate" type="timestamp">
+            <column name="datemodified"/>
+        </property>
+        
+		<map name="attributes" table="attribute" fetch="subselect" lazy="true" inverse="true" cascade="all-delete-orphan">
+			<key column="itemid"/>
+			<map-key column="attributename" type="string"/>
+			<one-to-many class="Attribute"/>
+		</map>
+		
+		<set name="tickets" table="tickets" inverse="true" lazy="true" cascade="all-delete-orphan">
+			<key column="itemid"/>
+			<one-to-many class="Ticket"/>
+		</set>
+		
+    </class>
+    
+    <query name="item.by.parentId">from Item where parent.id=:parentid</query>
+    <query name="homeCollection.by.ownerId">from HomeCollectionItem where owner.id=:ownerid</query>
+    <query name="item.by.ownerId.parentId.name">from Item where owner.id=:ownerid and parent.id=:parentid and name=:name</query>
+    <query name="item.by.ownerId.nullParent.name">from Item where owner.id=:ownerid and parent.id is null and name=:name</query>
+    <query name="item.by.ownerId.nullParent.name.minusItem">from Item where id!=:itemid and owner.id=:ownerid and parent.id is null and name=:name</query>
+    <query name="item.by.ownerId.parentId.name.minusItem">from Item where id!=:itemid and owner.id=:ownerid and parent.id=:parentid and name=:name</query>
+    
+    <query name="item.by.uid">from Item i where i.uid=:uid</query>
+    <query name="collectionItem.by.uid">from CollectionItem i where i.uid=:uid</query>
+    <query name="contentItem.by.uid">from ContentItem i where i.uid=:uid</query>
+    <query name="calendarCollectionItem.by.uid">from CalendarCollectionItem i where i.uid=:uid</query>
+    <query name="calendarEventItem.by.uid">from CalendarEventItem i where i.uid=:uid</query>
+    <query name="item.by.parent.name">from Item where parent=:parent and name=:name</query>
+    <query name="item.by.ownerName.name.nullParent">select i from Item i, User u where i.owner=u and u.username=:username and i.name=:name and i.parent is null</query>
+    <query name="item.by.ownerId.and.nullParent">select i from Item i where i.owner.id=:ownerid and i.parent is null</query>
+    
+</hibernate-mapping>

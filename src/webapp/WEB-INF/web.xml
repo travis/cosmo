@@ -48,7 +48,7 @@
   </listener>
   <listener>
     <listener-class>
-      org.osaf.cosmo.repository.RepositoryListener
+      org.osaf.cosmo.db.DbListener
     </listener-class>
   </listener>
   <listener>
@@ -56,21 +56,16 @@
       org.osaf.cosmo.ui.config.ConfigurationListener
     </listener-class>
   </listener>
-  <listener>
-    <listener-class>
-      org.osaf.cosmo.jackrabbit.query.TextFilterListener
-    </listener-class>
-  </listener>
   <filter>
     <filter-name>version-header</filter-name>
     <filter-class>org.osaf.cosmo.ui.VersionHeaderFilter</filter-class>
   </filter>
   <filter>
-    <filter-name>jcr-session</filter-name>
-    <filter-class>org.springmodules.jcr.support.OpenSessionInViewFilter</filter-class>
+    <filter-name>hibernate-session</filter-name>
+    <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
     <init-param>
       <param-name>sessionFactoryBeanName</param-name>
-      <param-value>homedirSessionFactory</param-value>
+      <param-value>sessionFactory</param-value>
     </init-param>
   </filter>
   <filter>
@@ -132,7 +127,7 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>jcr-session</filter-name>
+    <filter-name>hibernate-session</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
@@ -169,17 +164,9 @@
     <url-pattern>/feed/*</url-pattern>
   </filter-mapping>
   <servlet>
-    <servlet-name>webdav</servlet-name>
-    <servlet-class>org.osaf.cosmo.dav.CosmoDavServlet</servlet-class>
+    <servlet-name>dav</servlet-name>
+    <servlet-class>org.osaf.cosmo.dav.DavServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
-    <init-param>
-      <param-name>resource-path-prefix</param-name>
-      <param-value>/home</param-value>
-    </init-param>
-    <init-param>
-      <param-name>resource-config</param-name>
-      <param-value>/WEB-INF/resource-config.xml</param-value>
-    </init-param>
   </servlet>
   <servlet>
     <servlet-name>action</servlet-name>
@@ -230,7 +217,7 @@
     <url-pattern>/console/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>webdav</servlet-name>
+    <servlet-name>dav</servlet-name>
     <url-pattern>/home/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
@@ -266,8 +253,8 @@
     <location>/console/error</location>
   </error-page>
   <resource-env-ref>
-    <resource-env-ref-name>jcr/cosmo</resource-env-ref-name>
-    <resource-env-ref-type>javax.jcr.Repository</resource-env-ref-type>
+    <resource-env-ref-name>jdbc/cosmo</resource-env-ref-name>
+    <resource-env-ref-type>javax.sql.DataSouurce</resource-env-ref-type>
   </resource-env-ref>
   <resource-env-ref>
     <resource-env-ref-name>mail/cosmo</resource-env-ref-name>

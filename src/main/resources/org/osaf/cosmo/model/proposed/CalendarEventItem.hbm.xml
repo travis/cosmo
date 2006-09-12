@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.osaf.cosmo.model">
+    <subclass name="CalendarEventItem" extends="CalendarItem" discriminator-value="event" lazy="false">
+      
+    </subclass>
+	
+	<query name="event.by.calendar.icaluid">select i from CalendarEventItem i, CalendarPropertyIndex pi where pi.item.id=i.id and i.parent=:calendar and pi.name='icalendar:vcalendar-vevent_uid' and pi.value=:uid</query>
+</hibernate-mapping>

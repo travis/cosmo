@@ -20,6 +20,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +29,10 @@ import java.util.regex.Pattern;
  */
 public class User extends BaseModelObject {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5401963358519490736L;
     /**
      */
     public static final String USERNAME_OVERLORD = "root";
@@ -107,8 +113,9 @@ public class User extends BaseModelObject {
     private Boolean admin;
     private Date dateCreated;
     private Date dateModified;
+    private Set items = new HashSet(0);
 
-    /**
+	/**
      */
     public User() {
         admin = Boolean.FALSE;
@@ -241,7 +248,7 @@ public class User extends BaseModelObject {
     public boolean isOverlord() {
         return username != null && username.equals(USERNAME_OVERLORD);
     }
-
+    
     /**
      */
     public boolean equals(Object o) {
@@ -374,5 +381,13 @@ public class User extends BaseModelObject {
                                                EMAIL_LEN_MAX +
                                                " characters in length");
         }
+    }
+
+    public Set getItems() {
+        return items;
+    }
+
+    public void setItems(Set items) {
+        this.items = items;
     }
 }

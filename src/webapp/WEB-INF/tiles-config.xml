@@ -123,9 +123,9 @@
     <put name="prefix"       value="HomeDirectory.Collection."/>
   </definition>
 
-  <definition name="home.resource" extends="layout.standard">
-    <put name="body"         value="/WEB-INF/jsp/home/resource.jsp"/>
-    <put name="prefix"       value="HomeDirectory.Resource."/>
+  <definition name="home.item" extends="layout.standard">
+    <put name="body"         value="/WEB-INF/jsp/home/item.jsp"/>
+    <put name="prefix"       value="HomeDirectory.Item."/>
   </definition>
 
   <definition name="home.inc.tickets"

@@ -25,19 +25,19 @@ public interface ICalendarConstants {
      * The highest version number of the iCalendar specification that
      * is implemented by Cosmo.
      */
-    public static final String VERSION = "2.0";
+    public static final String ICALENDAR_VERSION = "2.0";
 
     /**
      * The MIME media type identifying a content item containing
      * data formatted with iCalendar.
      */
-    public static final String CONTENT_TYPE = "text/calendar";
+    public static final String ICALENDAR_MEDIA_TYPE = "text/calendar";
 
     /**
      * The file extension commonly used to designate a file containing
      * data formatted with iCalendar.
      */
-    public static final String FILE_EXTENSION = "ics";
+    public static final String ICALENDAR_FILE_EXTENSION = "ics";
 
     /**
      * The icalender parameter used on a DTSTART to indicate that the event

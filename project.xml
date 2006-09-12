@@ -18,7 +18,7 @@
   <name>Cosmo</name>
   <groupId>org.osaf.cosmo</groupId>
   <artifactId>cosmo</artifactId>
-  <currentVersion>0.5-SNAPSHOT</currentVersion>
+  <currentVersion>0.5-hibernate-SNAPSHOT</currentVersion>
   <dependencies>
     <!--
         dependencies with the war.bundle property are included in the
@@ -52,11 +52,6 @@
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
-    </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>3.1</version>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
@@ -107,14 +102,19 @@
       </properties>
     </dependency>
     <dependency>
-      <groupId>concurrent</groupId>
-      <artifactId>concurrent</artifactId>
-      <version>1.3.4</version>
-    </dependency>
-    <dependency>
       <groupId>ical4j</groupId>
       <artifactId>ical4j-osaf</artifactId>
       <version>0.9.18-20060124</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <!-- required by jcr-server -->
+    <!-- XXX: should be 1.0 release version -->
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-jcr-commons</artifactId>
+      <version>1.0-osaf-20060508</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -138,11 +138,6 @@
       </properties>
     </dependency>
     <dependency>
-      <groupId>jsr170</groupId>
-      <artifactId>jcr</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <dependency>
       <groupId>javamail</groupId>
       <artifactId>mailapi</artifactId>
       <version>1.3.2</version>
@@ -152,6 +147,7 @@
       <artifactId>smtp</artifactId>
       <version>1.3.2</version>
     </dependency>
+    <!-- jdom required by rome -->
     <dependency>
       <groupId>jdom</groupId>
       <artifactId>jdom</artifactId>
@@ -168,17 +164,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-    <dependency>
-      <groupId>lucene</groupId>
-      <artifactId>lucene</artifactId>
-      <version>1.4.3</version>
-    </dependency>
-    <dependency>
-      <groupId>maven-plugins</groupId>
-      <artifactId>maven-javaapp-plugin</artifactId>
-      <version>1.3.1</version>
-      <type>plugin</type>
-    </dependency>
+    <!-- derby used for integration testing -->
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
@@ -186,18 +172,8 @@
     </dependency>
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit-core</artifactId>
-      <version>1.0-osaf-20060508</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit-jcr-commons</artifactId>
-      <version>1.0-osaf-20060508</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-jcr-server</artifactId>
-      <version>1.0-osaf-20060519</version>
+      <version>1.0-osaf-20060906</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -205,7 +181,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-server</artifactId>
-      <version>1.0-osaf-20060519</version>
+      <version>1.0-osaf-20060906</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -213,7 +189,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-jcr-webdav</artifactId>
-      <version>1.0-osaf-20060519</version>
+      <version>1.0-osaf-20060906</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -233,11 +209,6 @@
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>springframework</groupId>
@@ -315,14 +286,6 @@
       <type>jsar</type>
     </dependency>
     <dependency>
-      <groupId>springmodules</groupId>
-      <artifactId>springmodules-sandbox-jcr</artifactId>
-      <version>dev-20051020</version>
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <dependency>
       <groupId>struts</groupId>
       <artifactId>struts</artifactId>
       <version>1.2.8</version>
@@ -396,6 +359,133 @@
       <version>0.3.0</version>
       <type>jsar</type>
     </dependency>
+    <!-- Hibernate dependencies -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate</artifactId>
+      <version>3.1.3</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.1</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>springframework</groupId>
+      <artifactId>spring-hibernate</artifactId>
+      <version>1.2.6</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>1.2.6</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+      <version>1.2.6</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>springframework</groupId>
+      <artifactId>spring-aop</artifactId>
+      <version>1.2.6</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>1.5.3</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm-attrs</artifactId>
+      <version>1.5.3</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib</artifactId>
+      <version>2.1_3</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>ehcache</groupId>
+      <artifactId>ehcache</artifactId>
+      <version>1.1</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>c3p0</groupId>
+      <artifactId>c3p0</artifactId>
+      <version>0.9.0</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.2</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>1.6.1</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
+    <dependency>
+      <groupId>jta</groupId>
+      <artifactId>jta</artifactId>
+      <version>1.0.1B</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+
   </dependencies>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
@@ -415,6 +505,8 @@
           <directory>src/test/unit/resources</directory>
           <includes>
             <include>log4j.xml</include>
+            <include>cosmo.properties</include>
+            <include>applicationContext-test.xml</include>
           </includes>
         </resource>
         <resource>

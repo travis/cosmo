@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.osaf.cosmo.model">
+    <subclass name="CalendarItem" extends="ContentItem" discriminator-value="calendaritem" lazy="false">
+        <set name="timeRangeIndexes" table="cal_timerange_index" inverse="true" lazy="true" cascade="all-delete-orphan">
+            <key column="itemid"/>
+            <one-to-many class="CalendarTimeRangeIndex"/>
+        </set>
+        
+        <set name="propertyIndexes" table="cal_property_index" inverse="true" lazy="true" cascade="all-delete-orphan">
+            <key column="itemid"/>
+            <one-to-many class="CalendarPropertyIndex"/>
+        </set>
+    </subclass>
+</hibernate-mapping>

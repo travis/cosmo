@@ -15,6 +15,10 @@
  */
 package org.osaf.cosmo.icalendar;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import net.fortuna.ical4j.model.Component;
 
 /**
@@ -27,110 +31,52 @@ import net.fortuna.ical4j.model.Component;
  */
 public class ComponentTypes {
 
-    /** */
-    public static final int VEVENT = 0;
+    private static Set<String> SUPPORTED_COMPONENT_TYPES = new HashSet();
 
-    private static int[] SUPPORTED_COMPONENT_TYPES = {
-        VEVENT
-    };
-
-    private static String[] SUPPORTED_COMPONENT_TYPE_NAMES = {
-        Component.VEVENT
+    static {
+        SUPPORTED_COMPONENT_TYPES.add(Component.VEVENT);
     };
 
     /**
-     * Returns an array of codes representing all supported
-     * component types (see specific type constants).
+     * Returns an array of all supported component types
      *
-     * @return array of component type codes
+     * @return array of component types
      */
-    public static int[] getAllSupportedComponentTypes() {
+    public static Set<String> getAllSupportedComponentTypes() {
         return SUPPORTED_COMPONENT_TYPES;
-    }
-
-    /**
-     * Returns an array of the names of all supported component types
-     * in no particular order.
-     *
-     * @return array of component type names
-     */
-    public static String[] getAllSupportedComponentTypeNames() {
-        return SUPPORTED_COMPONENT_TYPE_NAMES;
     }
 
     /**
      * Returns a string containing the names of all supported
      * component types delimited by the <code>|</code> character.
      *
-     * @return string of component type names
+     * @return string of component types
      */
-    public static String getAllSupportedComponentTypeNamesAsString() {
+    public static String getAllSupportedComponentTypesAsString() {
         StringBuffer buf = new StringBuffer();
-        for (int i=0; i<SUPPORTED_COMPONENT_TYPE_NAMES.length; i++) {
-            buf.append(SUPPORTED_COMPONENT_TYPE_NAMES[i]);
-            if (i<SUPPORTED_COMPONENT_TYPE_NAMES.length-1) {
+        for (Iterator<String> i=SUPPORTED_COMPONENT_TYPES.iterator();
+             i.hasNext();) {
+            buf.append(i.next());
+            if (i.hasNext())
                 buf.append("|");
-            }
         }
         return buf.toString();
-    }
-
-    /**
-     * Returns the name of the component type represented by the given
-     * type code.
-     *
-     * @param code a type code
-     * @return the name of the corresponding component type
-     * @throws IllegalArgumentException if the type code does not
-     * represent a supported component type
-     */
-    public static String getComponentTypeName(int code) {
-        switch (code) {
-        case VEVENT:
-            return Component.VEVENT;
-        }
-        throw new IllegalArgumentException("Invalid component type code '" +
-                                           code + "'.");
-    }
-
-    /**
-     * Returns the code of the component type represented by the given
-     * name.
-     *
-     * @param name a component type name
-     * @return the corresponding type code
-     * @throws IllegalArgumentException if the name does not
-     * represent a supported component type
-     */
-    public static int getComponentType(String name) {
-        if (name.equalsIgnoreCase(Component.VEVENT)) {
-            return VEVENT;
-        }
-        throw new IllegalArgumentException("Invalid component type name '" +
-                                           name + "'.");
     }
 
     /**
      * Returns whether or not the given component type code represents
      * a supported component type.
      *
-     * @param code a type code
-     * @return <code>true</code> if the code represents a supported
+     * @param code a type string
+     * @return <code>true</code> if the string represents a supported
      * component type, <code>false</code> otherwise
      */
-    public static boolean isValidComponentType(int code) {
-        return code == VEVENT;
-    }
-
-    /**
-     * Returns whether or not the given component type name represents
-     * a supported component type.
-     *
-     * @param name a type name
-     * @return <code>true</code> if the name represents a supported
-     * component type, <code>false</code> otherwise
-     */
-    public static boolean isValidComponentTypeName(String name) {
-        return name.equalsIgnoreCase(Component.VEVENT);
+    public static boolean isValidComponentType(String type) {
+        for (Iterator<String> i=SUPPORTED_COMPONENT_TYPES.iterator();
+             i.hasNext();) {
+            if (type.equalsIgnoreCase(i.next()))
+                return true;
+        }
+        return false;
     }
 }

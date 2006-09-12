@@ -19,7 +19,8 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<tiles:importAttribute name="resource"/>
+<tiles:importAttribute name="item"/>
+<tiles:importAttribute name="path"/>
 
 <div class="hd" style="margin-top: 12px;">
   Properties
@@ -35,13 +36,13 @@
         Value
       </td>
     </tr>
-    <c:forEach var="property" items="${resource.properties}">
+    <c:forEach var="entry" items="${item.attributes}">
     <tr>
       <td class="smTableData" width="50%">
-        ${property.name}
+        ${entry.value.name}
       </td>
       <td class="smTableData" width="50%">
-        ${property.value}
+        ${entry.value.value}
       </td>
     </tr>
     </c:forEach>

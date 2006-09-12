@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import org.apache.jackrabbit.webdav.DavException;
 
-import org.osaf.cosmo.dav.CosmoDavResource;
+import org.osaf.cosmo.dav.ExtendedDavResource;
 
 /**
  * Provides response functionality required by ticket extensions to WebDAV.
@@ -33,7 +33,7 @@ public interface TicketDavResponse {
      * @param resource the resource on which the ticket was created
      * @param ticketId the id of the newly created ticket
      */
-    public void sendMkTicketResponse(CosmoDavResource resource,
+    public void sendMkTicketResponse(ExtendedDavResource resource,
                                      String ticketId)
         throws DavException, IOException;
 
@@ -43,7 +43,7 @@ public interface TicketDavResponse {
      * @param resource the resource on which the ticket was deleted
      * @param ticketId the id of the deleted ticket
      */
-    public void sendDelTicketResponse(CosmoDavResource resource,
+    public void sendDelTicketResponse(ExtendedDavResource resource,
                                       String ticketId)
         throws DavException, IOException;
 }

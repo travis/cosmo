@@ -15,14 +15,12 @@
  */
 package org.osaf.cosmo.feed;
 
-import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
-import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedOutput;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.Collection;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,10 +30,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.dao.NoSuchResourceException;
-import org.osaf.cosmo.model.CollectionResource;
-import org.osaf.cosmo.model.Resource;
-import org.osaf.cosmo.service.HomeDirectoryService;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 import org.springframework.beans.BeansException;
@@ -45,13 +42,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * A servlet which generates syndication feeds describing Cosmo
- * resources.
+ * items.
  */
 public class FeedServlet extends HttpServlet {
     private static final Log log = LogFactory.getLog(FeedServlet.class);
 
     private static final String BEAN_HOME_DIRECTORY_SERVICE =
-        "homeDirectoryService";
+        "contentService";
     private static final String BEAN_SECURITY_MANAGER =
         "securityManager";
 
@@ -67,7 +64,7 @@ public class FeedServlet extends HttpServlet {
     public static final String FEED_ATOM10_URI = "/atom/1.0";
 
     private WebApplicationContext wac;
-    private HomeDirectoryService homeDirectoryService;
+    private ContentService contentService;
     private CosmoSecurityManager securityManager;
     private String homePath;
     private String browsePath;
@@ -100,12 +97,11 @@ public class FeedServlet extends HttpServlet {
         if (log.isDebugEnabled()) {
             log.debug("browse path: " + browsePath);
         }
-
         wac = WebApplicationContextUtils.
             getRequiredWebApplicationContext(getServletContext());
 
-        homeDirectoryService = (HomeDirectoryService)
-            getBean(BEAN_HOME_DIRECTORY_SERVICE, HomeDirectoryService.class);
+        contentService = (ContentService)
+            getBean(BEAN_HOME_DIRECTORY_SERVICE, ContentService.class);
         securityManager = (CosmoSecurityManager)
             getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
     }
@@ -124,28 +120,22 @@ public class FeedServlet extends HttpServlet {
             return;
         }
 
-        Resource resource = null;
-        try {
-            resource = homeDirectoryService.getResource(path);
-        } catch (NoSuchResourceException e) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        } catch (InvalidDataAccessResourceUsageException e) {
-            // this happens when an item exists in the repository at
-            // that path, but it does not represent a dav resource or
-            // collection, so pretend that there's no resource there
-            // at all
+        Item item = contentService.findItemByPath(path);
+        if (item == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        // XXX: return atom item for individual resource
-        if (! (resource instanceof CollectionResource)) {
+        // XXX: return atom item for individual item
+        if (! (item instanceof CollectionItem)) {
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
-                           "Feeds not supported for non-collection resource");
+                           "Feeds not supported for non-collection item");
             return;
         }
 
-        spoolAtom10Feed((CollectionResource) resource, req, resp);
+        CollectionItem collection = (CollectionItem) item;
+        Collection children = contentService.findChildren(collection);
+
+        spoolAtom10Feed(collection, children, path, req, resp);
     }
 
     // our methods
@@ -156,10 +146,18 @@ public class FeedServlet extends HttpServlet {
         return wac;
     }
 
-    private void spoolAtom10Feed(CollectionResource collection,
+    private void spoolAtom10Feed(CollectionItem collection,
+                                 Collection children,
+                                 String path,
                                  HttpServletRequest req,
                                  HttpServletResponse resp)
         throws IOException {
+        FeedGenerator generator =
+            new FeedGenerator(encodeURL(req, FEED_ATOM10_URI),
+                              encodeURL(req, homePath, false),
+                              encodeURL(req, browsePath, false));
+        Feed feed = generator.generateFeed(collection, children, path);
+
         // set headers
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/atom+xml");
@@ -167,46 +165,17 @@ public class FeedServlet extends HttpServlet {
         // XXX we can't know content length unless we write to a temp
         // file and then spool that
 
-        Feed feed = collection.getAtomFeed();
-
-        // make ids and link hrefs absolute
-        feed.setId(encodeURL(req, homePath + feed.getId(), false));
-        for (Iterator i=feed.getAlternateLinks().iterator(); i.hasNext();) {
-            Link link = (Link) i.next();
-            if (link.getRel().equals("self")) {
-                link.setHref(encodeURL(req, FEED_ATOM10_URI + link.getHref()));
-            }
-            else if (link.getRel().equals("alternate")) {
-                link.setHref(encodeURL(req, browsePath + link.getHref(),
-                                       false));
-            }
-        }
-        for (Iterator i=feed.getEntries().iterator(); i.hasNext();) {
-            Entry entry = (Entry) i.next();
-            entry.setId(encodeURL(req, homePath + entry.getId(), false));
-            for (Iterator j=entry.getAlternateLinks().iterator();
-                 j.hasNext();) {
-                Link link = (Link) j.next();
-                if (link.getRel().equals("alternate")) {
-                    link.setHref(encodeURL(req, browsePath + link.getHref(),
-                                           false));
-                }
-            }
-        }
-
         // spool data
         try {
             WireFeedOutput outputter = new WireFeedOutput();
             outputter.output(feed, resp.getWriter());
+            resp.flushBuffer();
         } catch (FeedException e) {
-            log.error("can't get Atom feed for collection " +
-                      collection.getPath(), e);
+            log.error("can't spool feed for collection " + path, e);
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                            e.getMessage());
             return;
         }
-
-        resp.flushBuffer();
     }
 
     private Object getBean(String name, Class clazz)

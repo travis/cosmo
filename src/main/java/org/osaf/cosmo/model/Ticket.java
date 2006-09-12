@@ -35,8 +35,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Similarly, the class does not know how to convert itself to or from
  * XML.
  */
-public class Ticket {
+public class Ticket extends BaseModelObject {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3333589463226954251L;
     /** */
     public static final String TIMEOUT_INFINITE = "Infinite";
     /** */
@@ -46,41 +50,27 @@ public class Ticket {
     /** */
     public static final String PRIVILEGE_FREEBUSY = "freebusy";
 
-    private String id;
-    private String owner;
+    private Long dbId;
+    private String key;
     private String timeout;
     private Set privileges;
     private Date created;
-
+    private User owner;
+    private Item item;
+    
     /**
      */
     public Ticket() {
         privileges = new HashSet();
     }
 
-    /**
-     */
-    public String getId() {
-        return id;
-    }
+    public String getKey() {
+		return key;
+	}
 
-    /**
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     */
-    public String getOwner() {
-        return owner;
-    }
-
-    /**
-     */
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
+	public void setKey(String key) {
+		this.key = key;
+	}
 
     /**
      */
@@ -124,6 +114,22 @@ public class Ticket {
         this.created = created;
     }
 
+    public Long getDbId() {
+		return dbId;
+	}
+
+	public void setDbId(Long dbId) {
+		this.dbId = dbId;
+	}
+    
+	public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
     /**
      */
     public boolean hasTimedOut() {
@@ -148,8 +154,7 @@ public class Ticket {
         }
         Ticket it = (Ticket) o;
         return new EqualsBuilder().
-            append(id, it.id).
-            append(owner, it.owner).
+            append(key, it.key).
             append(timeout, it.timeout).
             append(privileges, it.privileges).
             isEquals();
@@ -159,8 +164,7 @@ public class Ticket {
      */
     public int hashCode() {
         return new HashCodeBuilder(3, 5).
-            append(id).
-            append(owner).
+            append(key).
             append(timeout).
             append(privileges).
             toHashCode();
@@ -170,11 +174,18 @@ public class Ticket {
      */
     public String toString() {
         return new ToStringBuilder(this).
-            append("id", id).
-            append("owner", owner).
+            append("key", key).
             append("timeout", timeout).
             append("privileges", privileges).
             append("created", created).
             toString();
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
     }
 }

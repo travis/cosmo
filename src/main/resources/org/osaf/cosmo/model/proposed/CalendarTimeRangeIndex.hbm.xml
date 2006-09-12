@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jul 17, 2006 11:59:26 AM by Hibernate Tools 3.1.0.beta5 -->
+<hibernate-mapping package="org.osaf.cosmo.model">
+    <class name="CalendarTimeRangeIndex" table="cal_timerange_index">
+        
+        <id name="id" column="id" unsaved-value="-1">
+            <generator class="native" />
+        </id>
+        <property name="startDate" type="string" length="16">
+            <column name="startdate" index="idx_startdt"/>
+        </property>
+        <property name="endDate" type="string" length="16">
+            <column name="enddate" index="idx_enddt"/>
+        </property>
+        <property name="type" type="string" not-null="true" length="255">
+            <column name="componenttype" index="idx_comptype"/>
+        </property>
+        <property name="isRecurring" type="boolean">
+            <column name="isrecurring"/>
+        </property>
+        <property name="isFloating" type="boolean">
+            <column name="isFloating"/>
+        </property>
+        
+        <many-to-one name="item" class="Item">
+            <column name="itemid"/>
+        </many-to-one>
+        
+    </class>
+    
+    
+</hibernate-mapping>

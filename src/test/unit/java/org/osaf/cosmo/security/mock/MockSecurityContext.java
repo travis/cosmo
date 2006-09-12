@@ -64,7 +64,7 @@ public class MockSecurityContext implements CosmoSecurityContext {
             return "anonymous";
         }
         if (ticket != null) {
-            return ticket.getId();
+            return ticket.getKey();
         }
         return user.getUsername();
     }

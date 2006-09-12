@@ -19,15 +19,16 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<tiles:importAttribute name="resource"/>
+<tiles:importAttribute name="item"/>
+<tiles:importAttribute name="path"/>
 <tiles:importAttribute name="isCollection" ignore="true"/>
 
 <c:if test="${empty isCollection}">
   <c:set var="isCollection" value="false"/>
 </c:if>
 
-<c:set var="davPath" value="/home${resource.path}"/>
-<c:set var="feedPath" value="/feed/atom/1.0${resource.path}"/>
+<c:set var="davPath" value="/home${path}"/>
+<c:set var="feedPath" value="/feed/atom/1.0${path}"/>
 <c:if test="${isCollection}">
   <c:set var="davPath" value="${davPath}/"/>
 </c:if>
@@ -37,7 +38,7 @@
 </div>
 
 <div style="margin-top:12px;">
-<html:link page="/console/home/ticket${resource.path}/new">
+<html:link page="/console/home/ticket${path}/new">
   [new ticket]
 </html:link>
 </div>
@@ -67,24 +68,24 @@
         Created
       </td>
     </tr>
-    <c:forEach var="ticket" items="${resource.tickets}">
+    <c:forEach var="ticket" items="${item.tickets}">
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        <html:link page="/console/home/ticket${resource.path}/revoke/${ticket.id}">
+        <html:link page="/console/home/ticket${path}/revoke/${ticket.key}">
           [revoke]
         </html:link>
       </td>
       <td class="smTableData">
-        ${ticket.id}
+        ${ticket.key}
       </td>
       <td class="smTableData" style="text-align:center;">
-        <html:link page="${davPath}?ticket=${ticket.id}">[dav]</html:link>
+        <html:link page="${davPath}?ticket=${ticket.key}">[dav]</html:link>
         <c:if test="${isCollection}">
-          <html:link page="${feedPath}?ticket=${ticket.id}">[feed]</html:link>
+          <html:link page="${feedPath}?ticket=${ticket.key}">[feed]</html:link>
         </c:if>
       </td>
       <td class="smTableData" style="text-align:center;">
-        ${ticket.owner}
+        ${ticket.owner.username}
       </td>
       <td class="smTableData" style="text-align:center;">
         ${ticket.timeout}

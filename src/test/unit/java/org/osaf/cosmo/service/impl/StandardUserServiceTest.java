@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.model.User;
 
@@ -38,6 +39,7 @@ public class StandardUserServiceTest extends TestCase {
         LogFactory.getLog(StandardUserServiceTest.class);
 
     private StandardUserService service;
+    private MockContentDao contentDao;
     private MockUserDao userDao;
     private TestHelper testHelper;
 
@@ -45,8 +47,10 @@ public class StandardUserServiceTest extends TestCase {
      */
     protected void setUp() throws Exception {
         testHelper = new TestHelper();
+        contentDao = new MockContentDao();
         userDao = new MockUserDao();
         service = new StandardUserService();
+        service.setContentDao(contentDao);
         service.setUserDao(userDao);
         service.setPasswordGenerator(new SessionIdGenerator());
         service.init();

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    /*
+    * Copyright (c) 2006 SimDesk Technologies, Inc.  All Rights Reserved.
+    *
+    * This software is the confidential and proprietary information of
+    * SimDesk Technologies, Inc. ("Confidential Information").  You shall
+    * not disclose such Confidential Information and shall use it only in
+    * accordance with the terms of the license agreement you entered into
+    * with SimDesk Technologies.
+    *
+    * SIMDESK TECHNOLOGIES MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT
+    * THE SUITABILITY OF THE SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING
+    * BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+    * FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.  SIMDESK TECHNOLOGIES
+    * SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT
+    * OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES.
+    */
+-->
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+  <bean id="cosmoConfigPath"
+        class="java.lang.String">
+    <constructor-arg>
+      <value>classpath:cosmo.properties</value>
+    </constructor-arg>
+  </bean>
+
+  <!-- we don't need this, but we have to override the bean definition
+       from applicationContext.xml -->
+  <bean id="mailSession"
+        class="java.lang.String"/>
+
+  <bean id="mailSender"
+        class="org.springframework.mail.javamail.JavaMailSenderImpl">
+    <property name="protocol">
+      <value>smtp</value>
+    </property>
+    <property name="host">
+      <value>localhost</value>
+    </property>
+  </bean>
+
+  <bean id="sessionFactory"
+        class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+    <property name="lobHandler" ref="defaultLobHandler" />
+    <property name="mappingResources">
+      <list>
+        <value>org/osaf/cosmo/model/proposed/User.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/Attribute.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/Item.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CollectionItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/HomeCollectionItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/ContentItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CalendarCollectionItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CalendarItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CalendarEventItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CalendarPropertyIndex.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CalendarTimeRangeIndex.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/ServerProperty.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/Ticket.hbm.xml</value>
+      </list>
+    </property>
+    <property name="hibernateProperties">
+      <props>
+        <prop key="hibernate.generate_statistics">false</prop>
+        <prop key="hibernate.cache.use_query_cache">false</prop>
+        <prop key="hibernate.cache.use_second_level_cache">true</prop>
+        <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+        <prop key="hibernate.show_sql">false</prop>
+         
+        <prop key="hibernate.hbm2ddl.auto">update</prop>
+        
+        <prop key="hibernate.dialect">org.hibernate.dialect.DerbyDialect</prop>
+      </props>
+    </property>
+    <property name="dataSource">
+      <ref bean="jdbcDataSource"/>
+    </property>
+  </bean>
+  
+  
+  <bean id="jdbcDataSource"
+        class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName">
+      <value>org.apache.derby.jdbc.EmbeddedDriver</value>
+    </property>
+        <property name="url">
+          <value>jdbc:derby:target/test-db;create=true</value>
+        </property>
+  </bean>
+
+</beans>

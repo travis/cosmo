@@ -31,8 +31,6 @@ import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
 import org.osaf.cosmo.util.ArrayPagedList;
 
-import org.springframework.dao.DataRetrievalFailureException;
-
 /**
  * Mock implementation of {@link UserDao} useful for testing.
  */
@@ -89,10 +87,7 @@ public class MockUserDao implements UserDao {
         if (username == null) {
             throw new IllegalArgumentException("null username");
         }
-        if (usernameIdx.containsKey(username)) {
-            return (User) usernameIdx.get(username);
-        }
-        throw new DataRetrievalFailureException(username + " not found");
+        return (User) usernameIdx.get(username);
     }
 
     /**
@@ -101,10 +96,7 @@ public class MockUserDao implements UserDao {
         if (email == null) {
             throw new IllegalArgumentException("null email");
         }
-        if (emailIdx.containsKey(email)) {
-            return (User) emailIdx.get(email);
-        }
-        throw new DataRetrievalFailureException(email + " not found");
+        return (User) emailIdx.get(email);
     }
 
     /**
@@ -135,7 +127,7 @@ public class MockUserDao implements UserDao {
             user.getOldUsername() :
             user.getUsername();
         if (! usernameIdx.containsKey(key)) {
-            throw new DataRetrievalFailureException("not found");
+            throw new IllegalArgumentException("user not found");
         }
         if (user.isUsernameChanged() &&
             usernameIdx.containsKey(user.getUsername())) {

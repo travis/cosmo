@@ -226,13 +226,9 @@ public class CmpPutTest extends BaseCmpServletTestCase {
      */
     public void testUserCreate() throws Exception {
         User cmpUser = testHelper.makeDummyUser();
-        try {
-            // ensure that the user doesn't already exist
-            userService.getUser(cmpUser.getUsername());
-            fail("user " + cmpUser.getUsername() + " already exists");
-        } catch (Exception e) {
-            // expected
-        }
+        // ensure that the user doesn't already exist
+        User test = userService.getUser(cmpUser.getUsername());
+        assertNull(test);
 
         MockHttpServletRequest request =
             createMockRequest("PUT", "/user/" + cmpUser.getUsername());
@@ -341,12 +337,8 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         assertEquals("updated email doesn't match", storedUser.getEmail(),
                      cmpUser.getEmail());
 
-        try {
-            userService.getUser(originalUsername);
-            fail("user with original username exists");
-        } catch (Exception e) {
-            // expected
-        }
+        User test = userService.getUser(originalUsername);
+        assertNull(test);
     }
 
     /**

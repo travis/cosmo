@@ -143,21 +143,18 @@ public class TestHelper {
      */
     public Ticket makeDummyTicket(User user) {
         Ticket ticket = makeDummyTicket();
-        ticket.setOwner(user.getUsername());
-        ticket.setId(new Integer(++tseq).toString());
+        ticket.setOwner(user);
+        ticket.setKey(new Integer(++tseq).toString());
         return ticket;
     }
 
-    /**
-     */
+    /** */
     public User makeDummyUser(String username,
                               String password) {
-        if (username == null) {
+        if (username == null)
             throw new IllegalArgumentException("username required");
-        }
-        if (password == null) {
+        if (password == null)
             throw new IllegalArgumentException("password required");
-        }
 
         User user = new User();
         user.setUsername(username);
@@ -169,8 +166,7 @@ public class TestHelper {
         return user;
     }
 
-    /**
-     */
+    /** */
     public User makeDummyUser() {
         String serial = new Integer(++useq).toString();
         String username = "dummy" + serial;

@@ -32,10 +32,10 @@ public class ArrayPagedList implements PagedList {
 	
     /**
      */
-	public ArrayPagedList(){
-		this.list = new ArrayList();
-	}
-	
+    public ArrayPagedList(){
+        this.list = new ArrayList();
+    }
+
     /**
      * Creates an ArrayPaged list that adheres to the supplied PageCriteria. If
      * an invalid page number is supplied, the list will be filled with a
@@ -70,6 +70,26 @@ public class ArrayPagedList implements PagedList {
             }
             this.list = list.subList(first, last);
         }
+    }
+
+    /**
+     * Creates an <code>ArrayPagedList</code> based on the supplied
+     * sublist. The sublist is assumed to have already been paged, and
+     * the supplied page criteria is not used.
+     * 
+     * @param pageCriteria - criteria for pagination of the list
+     * @param sublist - the elements of the original list that have
+     *            been deemed by some external code to be part of the
+     *            page indicated by the page criteria
+     * @param total the total number of elements in the original list
+     * 
+     */
+	public ArrayPagedList(PageCriteria pageCriteria,
+                              List sublist,
+                              int total) {
+        this.pageCriteria = pageCriteria;
+        this.list = sublist;
+        this.total = total;
     }
 
     /**

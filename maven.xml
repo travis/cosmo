@@ -60,4 +60,5 @@
   <goal name="dist:clean">
     <delete dir="${cosmo.dist}"/>
   </goal>
+  
 </project>

@@ -1,0 +1,145 @@
+/*
+ * Copyright (c) 2006 SimDesk Technologies, Inc.  All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of
+ * SimDesk Technologies, Inc. ("Confidential Information").  You shall
+ * not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with SimDesk Technologies.
+ *
+ * SIMDESK TECHNOLOGIES MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT
+ * THE SUITABILITY OF THE SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.  SIMDESK TECHNOLOGIES
+ * SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT
+ * OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES.
+ */
+package org.osaf.cosmo.calendar.query;
+
+import java.text.ParseException;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.jackrabbit.webdav.DavConstants;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.ElementIterator;
+import org.osaf.cosmo.dav.caldav.CaldavConstants;
+import org.w3c.dom.Element;
+
+/**
+ * Represents the CALDAV:param-filter element. From sec 9.6.3:
+ * 
+ * Name: param-filter
+ * 
+ * Namespace: urn:ietf:params:xml:ns:caldav
+ * 
+ * Purpose: Limits the search to specific parameter values.
+ * 
+ * Description: The CALDAV:param-filter XML element specifies a search criteria
+ * on a specific calendar property parameter (e.g., PARTSTAT) in the scope of a
+ * given CALDAV:prop-filter. A calendar property is said to match a
+ * CALDAV:param-filter if:
+ * 
+ * A parameter of the type specified by the "name" attribute exists, and the
+ * CALDAV:param-filter is empty, or it matches the CALDAV:text-match conditions
+ * if specified.
+ * 
+ * or: A parameter of the type specified by the "name" attribute does not exist,
+ * and the CALDAV:is-not-defined element is specified.
+ * 
+ * Definition:
+ * 
+ * <!ELEMENT param-filter (is-not-defined | text-match)?>
+ * 
+ * <!ATTLIST param-filter name CDATA #REQUIRED>
+ * 
+ * name value: a property parameter name (e.g., "PARTSTAT")
+ * 
+ */
+public class ParamFilter implements DavConstants, CaldavConstants {
+
+    private IsNotDefinedFilter isNotDefinedFilter = null;
+
+    private TextMatchFilter textMatchFilter = null;
+
+    private String name = null;
+
+    public ParamFilter(String name) {
+        this.name = name;
+    }
+
+    public ParamFilter() {
+    }
+
+    /**
+     * Construct a ParamFilter object from a DOM Element
+     * @param element
+     * @throws ParseException
+     */
+    public ParamFilter(Element element) throws ParseException {
+        // Get name which must be present
+        name = DomUtil.getAttribute(element, ATTR_CALDAV_NAME, null);
+
+        if (name == null) {
+            throw new ParseException(
+                    "CALDAV:param-filter a property parameter name (e.g., \"PARTSTAT\") is required",
+                    -1);
+        }
+
+        // Can only have a single ext-match element
+        ElementIterator i = DomUtil.getChildren(element);
+        
+        if(i.hasNext()) {
+            
+            Element child = i.nextElement();
+
+            if (i.hasNext()) {
+                throw new ParseException(
+                        "CALDAV:param-filter only a single text-match or is-not-defined element is allowed",
+                        -1);
+            }
+
+            if (ELEMENT_CALDAV_TEXT_MATCH.equals(child.getLocalName())) {
+                textMatchFilter = new TextMatchFilter(child);
+
+            } else if (ELEMENT_CALDAV_IS_NOT_DEFINED.equals(child.getLocalName())) {
+
+                isNotDefinedFilter = new IsNotDefinedFilter();
+            } else
+                throw new ParseException(
+                        "CALDAV:param-filter an invalid element name found", -1);
+        }
+    }
+
+    public IsNotDefinedFilter getIsNotDefinedFilter() {
+        return isNotDefinedFilter;
+    }
+
+    public void setIsNotDefinedFilter(IsNotDefinedFilter isNotDefinedFilter) {
+        this.isNotDefinedFilter = isNotDefinedFilter;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public TextMatchFilter getTextMatchFilter() {
+        return textMatchFilter;
+    }
+
+    public void setTextMatchFilter(TextMatchFilter textMatchFilter) {
+        this.textMatchFilter = textMatchFilter;
+    }
+
+    /** */
+    public String toString() {
+        return new ToStringBuilder(this).
+            append("name", name).
+            append("textMatchFilter", textMatchFilter).
+            append("isNotDefinedFilter", isNotDefinedFilter).
+            toString();
+    }
+}

@@ -25,8 +25,9 @@ import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.User;
+
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataRetrievalFailureException;
 
 /**
  * Implements Acegi Security's <code>UserDetailsService</code>
@@ -55,12 +56,11 @@ public class CosmoUserDetailsService implements UserDetailsService {
      */
     public UserDetails loadUserByUsername(String username)
         throws UsernameNotFoundException, DataAccessException {
-        try {
-            return new CosmoUserDetails(userDao.getUser(username));
-        } catch (DataRetrievalFailureException e) {
+        User user = userDao.getUser(username);
+        if (user == null)
             throw new UsernameNotFoundException("user " + username +
-                                                " not found", e);
-        }
+                                                " not found");
+        return new CosmoUserDetails(userDao.getUser(username));
     }
 
     /** */

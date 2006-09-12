@@ -101,7 +101,7 @@ public class CaldavRequestHelper {
         if (vtz == null) {
             throw new ValidationException("CALDAV:timezone must contain exactly one VTIMEZONE component - enclosed component not VTIMEZONE");
         }
-
-        return vtz;
+ 
+       return vtz;
     }
 }

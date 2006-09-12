@@ -15,13 +15,6 @@
  */
 package org.osaf.cosmo.service.impl;
 
-import org.osaf.cosmo.dao.NoSuchResourceException;
-import org.osaf.cosmo.dao.UserDao;
-import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.service.UserService;
-import org.osaf.cosmo.util.PagedList;
-import org.osaf.cosmo.util.PageCriteria;
-
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.Set;
@@ -31,6 +24,14 @@ import org.apache.commons.id.StringIdentifierGenerator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.dao.ContentDao;
+import org.osaf.cosmo.dao.UserDao;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.util.PagedList;
+import org.osaf.cosmo.util.PageCriteria;
 
 /**
  * Standard implementation of {@link UserService}.
@@ -46,6 +47,7 @@ public class StandardUserService implements UserService {
     private MessageDigest digest;
     private String digestAlgorithm;
     private StringIdentifierGenerator passwordGenerator;
+    private ContentDao contentDao;
     private UserDao userDao;
 
     // UserService methods
@@ -54,6 +56,8 @@ public class StandardUserService implements UserService {
      * Returns an unordered set of all user accounts in the repository.
      */
     public Set getUsers() {
+        if (log.isDebugEnabled())
+            log.debug("getting all users");
         return userDao.getUsers();
     }
 
@@ -64,6 +68,8 @@ public class StandardUserService implements UserService {
      * @param pageCriteria the pagination criteria
      */
     public PagedList getUsers(PageCriteria pageCriteria) {
+        if (log.isDebugEnabled())
+            log.debug("getting users for criteria " + pageCriteria);
         return userDao.getUsers(pageCriteria);
     }
 
@@ -76,6 +82,8 @@ public class StandardUserService implements UserService {
      * exist
      */
     public User getUser(String username) {
+        if (log.isDebugEnabled())
+            log.debug("getting user " + username);
         return userDao.getUser(username);
     }
 
@@ -88,6 +96,8 @@ public class StandardUserService implements UserService {
      * exist
      */
     public User getUserByEmail(String email) {
+        if (log.isDebugEnabled())
+            log.debug("getting user with email address " + email);
         return userDao.getUserByEmail(email);
     }
 
@@ -103,14 +113,22 @@ public class StandardUserService implements UserService {
      * email address is already in use
      */
     public User createUser(User user) {
+        if (log.isDebugEnabled())
+            log.debug("creating user " + user.getUsername());
+
         user.validateRawPassword();
+
         user.setPassword(digestPassword(user.getPassword()));
         user.setDateCreated(new Date());
         user.setDateModified(user.getDateCreated());
 
         userDao.createUser(user);
 
-        return userDao.getUser(user.getUsername());
+        User newUser = userDao.getUser(user.getUsername());
+
+        contentDao.createRootItem(newUser);
+
+        return newUser;
     }
 
     /**
@@ -127,6 +145,13 @@ public class StandardUserService implements UserService {
      * email address is already in use
      */
     public User updateUser(User user) {
+        boolean isUsernameChanged = user.isUsernameChanged();
+        if (log.isDebugEnabled()) {
+            log.debug("updating user " + user.getOldUsername());
+            if (isUsernameChanged)
+                log.debug("... changing username to " + user.getUsername());
+        }
+
         if (user.getPassword().length() < 32) {
             user.validateRawPassword();
             user.setPassword(digestPassword(user.getPassword()));
@@ -135,7 +160,18 @@ public class StandardUserService implements UserService {
 
         userDao.updateUser(user);
 
-        return userDao.getUser(user.getUsername());
+        User newUser = userDao.getUser(user.getUsername());
+
+        if (isUsernameChanged) {
+            if (log.isDebugEnabled())
+                log.debug("renaming root item for user " +
+                          newUser.getUsername());
+            CollectionItem rootCollection = contentDao.getRootItem(newUser);
+            rootCollection.setName(newUser.getUsername());
+            contentDao.updateCollection(rootCollection);
+        }
+
+        return newUser;
     }
 
     /**
@@ -145,6 +181,9 @@ public class StandardUserService implements UserService {
      * @param username the username of the account to return
      */
     public void removeUser(String username) {
+        if (log.isDebugEnabled())
+            log.debug("removing user " + username);
+        // seems to automatically remove the user's root item
         userDao.removeUser(username);
     }
 
@@ -166,6 +205,9 @@ public class StandardUserService implements UserService {
      * and defaulting optional properties.
      */
     public void init() {
+        if (contentDao == null) {
+            throw new IllegalStateException("contentDao is required");
+        }
         if (userDao == null) {
             throw new IllegalStateException("userDao is required");
         }
@@ -232,6 +274,18 @@ public class StandardUserService implements UserService {
      */
     public void setPasswordGenerator(StringIdentifierGenerator generator) {
         this.passwordGenerator = generator;
+    }
+
+    /**
+     */
+    public ContentDao getContentDao() {
+        return this.contentDao;
+    }
+
+    /**
+     */
+    public void setContentDao(ContentDao contentDao) {
+        this.contentDao = contentDao;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-          "http://www.springframework.org/dtd/spring-beans.dtd"> 
+          "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
     Copyright 2005 Open Source Applications Foundation
@@ -42,70 +42,6 @@
     </property>
   </bean>
 
-  <!-- resources needed to connect to the JCR repository -->
-
-  <bean id="jcrRepository"
-        class="org.springframework.jndi.JndiObjectFactoryBean">
-    <property name="jndiName">
-      <value>jcr/cosmo</value>
-    </property>
-    <property name="resourceRef">
-      <value>true</value>
-    </property>
-  </bean>
-
-  <bean id="homedirPassword"
-        class="java.lang.String">
-    <constructor-arg>
-      <value>${cosmo.repository.password}</value>
-    </constructor-arg>
-  </bean>
-
-  <bean id="homedirCredentials"
-        class="javax.jcr.SimpleCredentials">
-    <constructor-arg>
-      <value>${cosmo.repository.username}</value>
-    </constructor-arg>
-    <constructor-arg>
-      <bean id="homedirPasswordChars"
-            factory-bean="homedirPassword"
-            factory-method="toCharArray"/>
-    </constructor-arg>
-  </bean>
-  
-  <!-- Used to create XPath queries from PageCriteria -->
-  <bean id="jcrXpathQueryBuilder"
-        class="org.osaf.cosmo.dao.jcr.JcrXpathQueryBuilder">
-  </bean>
-  
-  <!-- used at runtime to access a transactional session -->
-  <bean id="homedirSessionFactory"
-        class="org.springmodules.jcr.JcrSessionFactory">
-    <property name="credentials">
-      <ref bean="homedirCredentials"/>
-    </property>
-    <property name="repository">
-      <ref bean="jcrRepository"/>
-    </property>
-    <property name="workspaceName">
-      <value>homedir</value>
-    </property>
-  </bean>
-
-  <!-- used at startup time to initialize the repository -->
-  <bean id="repositoryInitializer"
-        class="org.osaf.cosmo.repository.jackrabbit.JackrabbitRepositoryInitializer">
-    <property name="credentials">
-      <ref bean="homedirCredentials"/>
-    </property>
-    <property name="repository">
-      <ref bean="jcrRepository"/>
-    </property>
-    <property name="workspaceName">
-      <value>homedir</value>
-    </property>
-  </bean>
-
   <!-- resources needed to send mail -->
 
   <bean id="mailSession"
@@ -125,41 +61,226 @@
     </property>
   </bean>
 
-  <!-- data access objects (DAOs) -->
+  <!-- resources needed for database access -->
 
-  <bean id="userDao"
-        class="org.osaf.cosmo.dao.jcr.JcrUserDao"
-        init-method="init"
-        destroy-method="destroy">
-    <property name="sessionFactory">
-      <ref bean="homedirSessionFactory"/>
+  <bean id="jdbcDataSource"
+        class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName" value="java:comp/env/jdbc/cosmo"/>
+  </bean>
+  
+  <bean id="defaultLobHandler"
+        class="org.springframework.jdbc.support.lob.DefaultLobHandler">
+  </bean>
+
+  <bean id="sessionFactory"
+        class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+    <property name="lobHandler" ref="defaultLobHandler" />
+    <property name="mappingResources">
+      <list>
+        <value>org/osaf/cosmo/model/proposed/User.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/Attribute.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/Item.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CollectionItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/HomeCollectionItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/ContentItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CalendarCollectionItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CalendarItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CalendarEventItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CalendarPropertyIndex.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/CalendarTimeRangeIndex.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/ServerProperty.hbm.xml</value>
+        <value>org/osaf/cosmo/model/proposed/Ticket.hbm.xml</value>
+      </list>
     </property>
-    <property name="jcrXpathQueryBuilder">
-      <ref bean="jcrXpathQueryBuilder"/>
+    <property name="hibernateProperties">
+      <props>
+        <prop key="hibernate.generate_statistics">false</prop>
+        <prop key="hibernate.cache.use_query_cache">false</prop>
+        <prop key="hibernate.cache.use_second_level_cache">true</prop>
+        <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+        <prop key="hibernate.show_sql">false</prop>
+
+        <!-- XXX: this needs to be configurable by the deployer,
+             presumably in cosmo.properties -->
+        <prop key="hibernate.dialect">org.hibernate.dialect.DerbyDialect</prop>
+      </props>
+    </property>
+    <property name="dataSource">
+      <ref bean="jdbcDataSource"/>
+    </property>
+  </bean>
+  
+  <!-- Transaction manager for a single Hibernate SessionFactory
+       (alternative to JTA) -->
+  <bean id="transactionManager"
+        class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+    <property name="sessionFactory">
+      <ref local="sessionFactory" />
     </property>
   </bean>
 
-  <bean id="homeDirectoryDao"
-        class="org.osaf.cosmo.dao.jcr.JcrHomeDirectoryDao"
-        init-method="init"
-        destroy-method="destroy">
-    <property name="sessionFactory">
-      <ref bean="homedirSessionFactory"/>
+  <!--  Interceptor for measuring performance of dao methods -->
+  <bean id="performanceInterceptor"
+        class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
+    <property name="loggerName" value="org.osaf.cosmo.perf" />
+  </bean>
+
+  <!-- This is the base transaction proxy factory bean, all
+       transactional managers use this bean definition. -->
+  <bean id="txProxyTemplate" abstract="true"
+        class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <property name="transactionManager">
+      <ref bean="transactionManager" />
+    </property>
+    <property name="transactionAttributes">
+      <props>
+        <prop key="save*">PROPAGATION_REQUIRED</prop>
+        <prop key="store*">PROPAGATION_REQUIRED</prop>
+        <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+        <prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+        <prop key="load*">PROPAGATION_REQUIRED,readOnly</prop>
+        <prop key="*">PROPAGATION_REQUIRED</prop>
+      </props>
+    </property>
+    <property name="preInterceptors">
+      <list>
+        <ref local="performanceInterceptor" />
+      </list>
+    </property>
+    <property name="postInterceptors">
+      <list></list>
+    </property>
+  </bean>
+  
+  <!-- data access objects -->
+  
+  <bean id="hibernateTemplate"
+        class="org.springframework.orm.hibernate3.HibernateTemplate">
+    <constructor-arg><ref bean="sessionFactory"/></constructor-arg>
+  </bean>
+
+  <bean id="itemPathTranslator"
+        class="org.osaf.cosmo.dao.hibernate.DefaultItemPathTranslator">
+    <constructor-arg><ref bean="hibernateTemplate"/></constructor-arg>
+  </bean>
+
+  <bean id="idGenerator"
+        class="org.apache.commons.id.random.SessionIdGenerator" />
+
+  <bean id="txItemDao" parent="txProxyTemplate">
+    <property name="proxyInterfaces">
+      <value>org.osaf.cosmo.dao.ItemDao</value>
+    </property>
+    <property name="target">
+      <ref local="itemDao" />
     </property>
   </bean>
 
-  <bean id="ticketIdGenerator"
-        class="org.apache.commons.id.random.SessionIdGenerator"/>
-
-  <bean id="ticketDao"
-        class="org.osaf.cosmo.dao.jcr.JcrTicketDao"
+  <bean id="itemDao"
+        class="org.osaf.cosmo.dao.hibernate.ItemDaoImpl" 
         init-method="init"
         destroy-method="destroy">
     <property name="sessionFactory">
-      <ref bean="homedirSessionFactory"/>
+      <ref bean="sessionFactory" />
+    </property>
+    <property name="itemPathTranslator">
+      <ref bean="itemPathTranslator" />
     </property>
     <property name="idGenerator">
-      <ref local="ticketIdGenerator"/>
+      <ref local="idGenerator" />
+    </property>
+  </bean>
+  
+  <bean id="txServerPropertyDao" parent="txProxyTemplate">
+    <property name="proxyInterfaces">
+      <value>org.osaf.cosmo.dao.ServerPropertyDao</value>
+    </property>
+    <property name="target">
+      <ref local="serverPropertyDao" />
+    </property>
+  </bean>
+  
+  <bean id="serverPropertyDao"
+        class="org.osaf.cosmo.dao.hibernate.ServerPropertyDaoImpl"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="sessionFactory">
+      <ref bean="sessionFactory" />
+    </property>
+  </bean>
+  
+  <bean id="txContentDao" parent="txProxyTemplate">
+    <property name="proxyInterfaces">
+      <value>org.osaf.cosmo.dao.ContentDao</value>
+    </property>
+    <property name="target">
+      <ref local="contentDao" />
+    </property>
+  </bean>
+
+  <bean id="contentDao"
+        class="org.osaf.cosmo.dao.hibernate.ContentDaoImpl"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="sessionFactory">
+      <ref bean="sessionFactory" />
+    </property>
+    <property name="itemPathTranslator">
+      <ref bean="itemPathTranslator" />
+    </property>
+    <property name="idGenerator">
+      <ref local="idGenerator" />
+    </property>
+  </bean>
+  
+  <bean id="txUserDao" parent="txProxyTemplate">
+    <property name="proxyInterfaces">
+      <value>org.osaf.cosmo.dao.UserDao</value>
+    </property>
+    <property name="target">
+      <ref local="userDao" />
+    </property>
+  </bean>
+  
+  <bean id="userDao"
+        class="org.osaf.cosmo.dao.hibernate.UserDaoImpl"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="sessionFactory">
+      <ref bean="sessionFactory" />
+    </property>
+  </bean>
+
+  <bean id="txCalendarDao" parent="txProxyTemplate">
+    <property name="proxyInterfaces">
+      <value>org.osaf.cosmo.dao.CalendarDao</value>
+    </property>
+    <property name="target">
+      <ref local="calendarDao" />
+    </property>
+  </bean>
+
+  <bean id="calendarIndexer"
+        class="org.osaf.cosmo.dao.hibernate.DefaultCalendarIndexer" />
+
+  <bean id="calendarDao"
+        class="org.osaf.cosmo.dao.hibernate.CalendarDaoImpl"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="sessionFactory">
+      <ref bean="sessionFactory" />
+    </property>
+    <property name="calendarIndexer">
+      <ref bean="calendarIndexer" />
+    </property>
+    <property name="calendarFilterTranslatorClass">
+      <value>org.osaf.cosmo.dao.hibernate.SQLCalendarFilterTranslator</value>
+    </property>
+    <property name="itemPathTranslator">
+      <ref bean="itemPathTranslator" />
+    </property>
+    <property name="idGenerator">
+      <ref local="idGenerator" />
     </property>
   </bean>
 
@@ -168,10 +289,22 @@
   <bean id="passwordGenerator"
         class="org.apache.commons.id.random.SessionIdGenerator"/>
 
-  <bean id="userService"
+  <bean id="userService" parent="txProxyTemplate">
+    <property name="proxyInterfaces">
+      <value>org.osaf.cosmo.service.UserService</value>
+    </property>
+    <property name="target">
+      <ref local="userServiceTarget" />
+    </property>
+  </bean>
+
+  <bean id="userServiceTarget"
         class="org.osaf.cosmo.service.impl.StandardUserService"
         init-method="init"
         destroy-method="destroy">
+    <property name="contentDao">
+      <ref bean="contentDao"/>
+    </property>
     <property name="userDao">
       <ref bean="userDao"/>
     </property>
@@ -180,22 +313,51 @@
     </property>
   </bean>
 
-  <bean id="homeDirectoryService"
-        class="org.osaf.cosmo.service.impl.StandardHomeDirectoryService"
-        init-method="init"
-        destroy-method="destroy">
-    <property name="homeDirectoryDao">
-      <ref bean="homeDirectoryDao"/>
+  <bean id="contentService" parent="txProxyTemplate">
+    <property name="proxyInterfaces">
+      <value>org.osaf.cosmo.service.ContentService</value>
     </property>
-    <property name="ticketDao">
-      <ref bean="ticketDao"/>
+    <property name="target">
+      <ref local="contentServiceTarget" />
     </property>
   </bean>
 
+  <bean id="contentServiceTarget"
+        class="org.osaf.cosmo.service.impl.StandardContentService"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="calendarDao">
+      <ref bean="calendarDao"/>
+    </property>
+    <property name="contentDao">
+      <ref bean="contentDao"/>
+    </property>
+  </bean>
+  
+  <bean id="serverPropertyService" parent="txProxyTemplate">
+    <property name="proxyInterfaces">
+      <value>org.osaf.cosmo.service.ServerPropertyService</value>
+    </property>
+    <property name="target">
+      <ref local="serverPropertyServiceTarget" />
+    </property>
+  </bean>
+  
+  <bean id="serverPropertyServiceTarget"
+        class="org.osaf.cosmo.service.impl.StandardServerPropertyService"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="serverPropertyDao">
+      <ref bean="serverPropertyDao"/>
+    </property>
+  </bean>
+
+  <!-- really a facade to the service layer -->
+
   <bean id="rpcService"
-     class="org.osaf.cosmo.rpc.RPCServiceImpl">
-    <property name="homeDirectoryService">
-      <ref bean="homeDirectoryService"/>
+        class="org.osaf.cosmo.rpc.RPCServiceImpl">
+    <property name="contentService">
+      <ref bean="contentService"/>
     </property>
     <property name="userService">
       <ref bean="userService"/>
@@ -206,6 +368,7 @@
   </bean>
 
   <!-- these beans are used to initialize the JSON-RPC service -->
+
   <bean id="JSONRPCBridge" 
         class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
     <property name="targetClass">
@@ -264,8 +427,8 @@
 
   <bean id="ticketAuthenticationProvider"
         class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationProvider">
-    <property name="ticketDao">
-      <ref bean="ticketDao"/>
+    <property name="contentService">
+      <ref bean="contentService"/>
     </property>
   </bean>
 
@@ -310,14 +473,55 @@
     </property>
   </bean>
 
+  <!-- dav protocol resources -->
+
+  <bean id="davLockManager"
+        class="org.apache.jackrabbit.webdav.lock.SimpleLockManager"/>
+
+  <bean id="davResourceFactory"
+        class="org.osaf.cosmo.dav.impl.StandardDavResourceFactory">
+    <property name="contentService">
+      <ref local="contentService"/>
+    </property>
+    <property name="securityManager">
+      <ref local="securityManager"/>
+    </property>
+  </bean>
+
+  <bean id="davLocatorFactory"
+        class="org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl">
+    <constructor-arg>
+      <value>/home</value>
+    </constructor-arg>
+  </bean>
+
+  <bean id="davSessionProvider"
+        class="org.osaf.cosmo.dav.impl.NoOpDavSessionProvider"/>
+
+  <!-- a helper for setting up the database schema and loading seed
+       data -->
+
+  <bean id="dbInitializer"
+        class="org.osaf.cosmo.db.DbInitializer">
+    <property name="userService">
+      <ref bean="userService"/>
+    </property>
+    <property name="serverPropertyService">
+      <ref bean="serverPropertyService"/>
+    </property>
+    <property name="localSessionFactory">
+      <ref bean="&amp;sessionFactory"/>
+    </property>
+  </bean>
+
   <!-- the servlet context configurer, which is used instead of
        spring's servlet context export mechanism because config
-       information needs to be loaded from the repository -->
+       information needs to be loaded from the database -->
 
   <bean id="servletContextConfigurer"
-        class="org.osaf.cosmo.ui.config.jcr.JcrServletContextConfigurer">
-    <property name="userDao">
-      <ref bean="userDao"/>
+        class="org.osaf.cosmo.ui.config.ServletContextConfigurer">
+    <property name="userService">
+      <ref bean="userService"/>
     </property>
   </bean>
 

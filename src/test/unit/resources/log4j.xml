@@ -33,7 +33,7 @@
     <level value="WARN"/>
   </logger>
 
-  <logger name="net.sf.hibernate.util.JDBCExceptionReporter">
+  <logger name="org.hibernate.util.JDBCExceptionReporter">
     <level value="OFF"/>
   </logger>
 

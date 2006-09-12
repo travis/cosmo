@@ -23,3 +23,4 @@
     <c:set var="result" value="${user.firstName} ${user.lastName}"/>
   </c:otherwise>
 </c:choose>
+

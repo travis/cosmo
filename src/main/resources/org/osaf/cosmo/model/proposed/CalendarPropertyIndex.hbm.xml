@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jul 17, 2006 11:59:26 AM by Hibernate Tools 3.1.0.beta5 -->
+<hibernate-mapping package="org.osaf.cosmo.model">
+    <class name="CalendarPropertyIndex" table="cal_property_index">
+        
+        <id name="id" column="id" unsaved-value="-1">
+            <generator class="native" />
+        </id>
+       
+        <property name="name" type="string" not-null="true" length="255">
+            <column name="propertyname" index="idx_calpropname"/>
+        </property>
+        
+        <property name="value" type="string" length="2048">
+            <column name="propertyvalue" index="idx_calpropvalue"/>
+        </property>
+        
+        <many-to-one name="item" class="Item">
+            <column name="itemid"/>
+        </many-to-one>
+        
+    </class>
+    
+    
+</hibernate-mapping>

@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.User;
 
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -43,12 +42,8 @@ public class CmpDeleteTest extends BaseCmpServletTestCase {
 
         assertTrue(response.getStatus() ==
                    MockHttpServletResponse.SC_NO_CONTENT);
-        try {
-            userService.getUser(u1.getUsername());
-            fail("user " + u1.getUsername() + " not deleted");
-        } catch (DataRetrievalFailureException e) {
-            // expected
-        }
+        User test = userService.getUser(u1.getUsername());
+        assertNull(test);
     }
 
     /**

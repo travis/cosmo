@@ -28,9 +28,9 @@ import org.acegisecurity.providers.AuthenticationProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.dao.TicketDao;
-import org.osaf.cosmo.dav.CosmoDavConstants;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.service.ContentService;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -42,7 +42,7 @@ public class TicketAuthenticationProvider
     private static final Log log =
         LogFactory.getLog(TicketAuthenticationProvider.class);
 
-    private TicketDao ticketDao;
+    private ContentService contentService;
 
     // AuthenticationProvider methods
 
@@ -56,10 +56,10 @@ public class TicketAuthenticationProvider
 
         TicketAuthenticationToken token =
             (TicketAuthenticationToken) authentication;
-        String repositoryPath = tokenPathToRepositoryPath(token.getPath());
+        String clientPath = tokenPathToRepositoryPath(token.getPath());
         for (Iterator i=token.getIds().iterator(); i.hasNext();) {
             String id = (String) i.next();
-            Ticket ticket = findTicket(repositoryPath, id);
+            Ticket ticket = findTicket(clientPath, id);
             if (ticket != null) {
                 token.setTicket(ticket);
                 token.setAuthenticated(true);
@@ -67,7 +67,7 @@ public class TicketAuthenticationProvider
             }
         }
         throw new BadCredentialsException("No valid tickets found for" +
-                                          " resource at " + repositoryPath);
+                                          " resource at " + clientPath);
     }
 
     /**
@@ -81,43 +81,46 @@ public class TicketAuthenticationProvider
 
     /**
      */
-    public TicketDao getTicketDao() {
-        return ticketDao;
+    public ContentService getContentService() {
+        return contentService;
     }
 
     /**
      */
-    public void setTicketDao(TicketDao ticketDao) {
-        this.ticketDao = ticketDao;
+    public void setContentService(ContentService contentService) {
+        this.contentService = contentService;
     }
 
     /**
      */
-    protected Ticket findTicket(String repositoryPath,
+    protected Ticket findTicket(String path,
                                 String id) {
         try {
             if (log.isDebugEnabled()) {
                 log.debug("authenticating ticket " + id +
-                          " for resource at path " + repositoryPath);
+                          " for resource at path " + path);
             }
-            Ticket ticket = ticketDao.getTicket(repositoryPath, id);
+            Item item = contentService.findItemByPath(path);
+            if (item == null) {
+                // XXX: ContentService does not currently throw DRFE
+                throw new TicketedItemNotFoundException("Resource at " +
+                                                        path + " not found");
+            }
+
+            Ticket ticket = contentService.getTicket(item, id);
             if (ticket == null) {
                 return null;
             }
 
             if (ticket.hasTimedOut()) {
                 if (log.isDebugEnabled()) {
-                    log.debug("removing timed out ticket " + ticket.getId());
+                    log.debug("removing timed out ticket " + ticket.getKey());
                 }
-                ticketDao.removeTicket(repositoryPath, ticket);
+                contentService.removeTicket(item, ticket);
                 return null;
             }
 
             return ticket;
-        } catch (DataRetrievalFailureException e) {
-            throw new TicketedItemNotFoundException("Resource at " +
-                                                    repositoryPath + 
-                                                    " not found");
         } catch (DataAccessException e) {
             throw new AuthenticationServiceException(e.getMessage(), e);
         }

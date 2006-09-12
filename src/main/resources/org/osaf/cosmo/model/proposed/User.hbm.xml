@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jul 17, 2006 11:59:26 AM by Hibernate Tools 3.1.0.beta5 -->
+<hibernate-mapping package="org.osaf.cosmo.model">
+    
+    <class name="User" table="users">
+        
+        <id name="id" column="id" unsaved-value="-1">
+            <generator class="native" />
+        </id>
+        <property name="username" type="string" index="idx_username">
+            <column name="username"/>
+        </property>
+        <property name="password" type="string">
+            <column name="password"/>
+        </property>
+        <property name="firstName" type="string">
+            <column name="firstname"/>
+        </property>
+        <property name="lastName" type="string">
+            <column name="lastname"/>
+        </property>
+        <property name="email" type="string" index="idx_useremail">
+            <column name="email"/>
+        </property>
+        <property name="admin" type="boolean">
+            <column name="admin"/>
+        </property>
+        <property name="dateCreated" type="timestamp">
+            <column name="datecreated"/>
+        </property>
+        <property name="dateModified" type="timestamp">
+            <column name="datemodified"/>
+        </property>
+        
+        <set name="items" table="items" inverse="true" lazy="true" cascade="delete">
+			<key column="ownerid" />
+			<one-to-many class="Item" />
+		</set>
+        
+    </class>
+    
+    <query name="user.byUsername">from User where username=:username</query>
+    <query name="user.byEmail">from User where email=:email</query>
+    
+</hibernate-mapping>

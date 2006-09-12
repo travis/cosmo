@@ -80,8 +80,8 @@
 
   <bean name="homeDirectoryBrowserAction" abstract="true" singleton="false"
         class="org.osaf.cosmo.ui.home.HomeDirectoryBrowserAction" >
-    <property name="homeDirectoryService">
-      <ref bean="homeDirectoryService"/>
+    <property name="contentService">
+      <ref bean="contentService"/>
     </property>
     <property name="securityManager">
       <ref bean="securityManager"/>

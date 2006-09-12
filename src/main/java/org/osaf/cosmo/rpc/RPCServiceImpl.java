@@ -18,34 +18,45 @@ package org.osaf.cosmo.rpc;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.model.CalendarCollectionResource;
-import org.osaf.cosmo.model.CalendarResource;
+import org.osaf.cosmo.calendar.query.CalendarFilter;
+import org.osaf.cosmo.calendar.query.ComponentFilter;
+import org.osaf.cosmo.calendar.query.TimeRangeFilter;
+import org.osaf.cosmo.model.CalendarCollectionItem;
+import org.osaf.cosmo.model.CalendarItem;
+import org.osaf.cosmo.model.CalendarEventItem;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.DuplicateItemNameException;
+import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.rpc.model.Calendar;
 import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter;
 import org.osaf.cosmo.security.CosmoSecurityManager;
-import org.osaf.cosmo.service.HomeDirectoryService;
+import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.util.ICalendarUtils;
+import org.osaf.cosmo.util.PathUtil;
 
 public class RPCServiceImpl implements RPCService {
     private static final Log log =
         LogFactory.getLog(RPCServiceImpl.class);
 
     private UserService userService = null;
-    private HomeDirectoryService homeDirectoryService = null;
+    private ContentService contentService = null;
     private CosmoSecurityManager cosmoSecurityManager = null;
     private CalendarBuilder calendarBuilder = new CalendarBuilder();
     private ICalendarToCosmoConverter icalendarToCosmoConverter = new ICalendarToCosmoConverter();
@@ -58,12 +69,12 @@ public class RPCServiceImpl implements RPCService {
         this.cosmoSecurityManager = cosmoSecurityManager;
     }
 
-    public HomeDirectoryService getHomeDirectoryService() {
-        return homeDirectoryService;
+    public ContentService getContentService() {
+        return contentService;
     }
 
-    public void setHomeDirectoryService(HomeDirectoryService homeDirectoryService) {
-        this.homeDirectoryService = homeDirectoryService;
+    public void setContentService(ContentService contentService) {
+        this.contentService = contentService;
     }
 
     public UserService getUserService() {
@@ -75,18 +86,45 @@ public class RPCServiceImpl implements RPCService {
     }
 
     public void createCalendar(String displayName, String path)
-            throws RPCException {
-        homeDirectoryService.createCalendarCollection(displayName, getAbsolutePath(path));
+        throws RPCException {
+        String absolutePath = getAbsolutePath(path);
+        if (log.isDebugEnabled())
+            log.debug("Creating calendar at " + absolutePath);
+
+        String parentPath = PathUtil.getParentPath(absolutePath);
+        CollectionItem collection = (CollectionItem)
+            contentService.findItemByPath(parentPath);
+        if (collection == null)
+            throw new RPCException("No collection at " + parentPath);
+
+        CalendarCollectionItem calendar = new CalendarCollectionItem();
+        calendar.setName(PathUtil.getBasename(absolutePath));
+        calendar.setOwner(getUser());
+        // XXX: no Item.displayName yet
+
+        try {
+            contentService.createCalendar(collection, calendar);
+        } catch (DuplicateItemNameException e) {
+            throw new RPCException("Calendar at " + absolutePath + " already exists", e);
+        } catch (Exception e) {
+            throw new RPCException("Cannot create calendar: " + e.getMessage(), e);
+        }
     }
 
     public Calendar[] getCalendars() throws RPCException {
-        Set<CalendarCollectionResource> cols =
-            homeDirectoryService.getCalendarCollectionResources(getAbsolutePath(null), true);
+        if (log.isDebugEnabled())
+            log.debug("Getting calendars in home collection of " +
+                      getUser().getUsername());
+        // XXX no ContentService.findCalendars yet
+        HomeCollectionItem home = contentService.getRootItem(getUser());
         List<Calendar> cals = new ArrayList<Calendar>();
-        for (CalendarCollectionResource c : cols){
+        for (Iterator<Item> i=home.getChildren().iterator(); i.hasNext();) {
+            Item child = i.next();
+            if (! (child instanceof CalendarCollectionItem))
+                continue;
             Calendar calendar = new Calendar();
-            calendar.setName(c.getDisplayName());
-            calendar.setPath(c.getPath());
+            calendar.setName(child.getName()); // XXX no Item.displayName yet
+            calendar.setPath("/" + child.getName());
             cals.add(calendar);
         }
         //TODO sort these
@@ -94,51 +132,94 @@ public class RPCServiceImpl implements RPCService {
     }
 
     public Event getEvent(String calendarPath, String id) throws RPCException {
-        CalendarResource calResource = homeDirectoryService.getCalendarResourceByEventId(
-                getAbsolutePath(calendarPath), id);
+        String absolutePath = getAbsolutePath(calendarPath);
+        if (log.isDebugEnabled())
+            log.debug("Getting event " + id + " in calendar at " +
+                      absolutePath);
+        // XXX: assumes that the given id is the event uid, which the
+        // content service assumes to be globally unique, but which
+        // should probably only be assumed to be unique within the
+        // collection
+        CalendarEventItem calItem = contentService.findEventByUid(id);
         try {
-            net.fortuna.ical4j.model.Calendar ical = extractCalendar(calResource);
-            VEvent vevent = ICalendarUtils.getMasterEvent(ical, id);
+            net.fortuna.ical4j.model.Calendar ical = calItem.getCalendar();
+            VEvent vevent = calItem.getMasterEvent();
             return icalendarToCosmoConverter.createEvent(vevent, ical);
         } catch (Exception e) {
             log.error("Problem getting event: userName: " + getUsername() 
-                    + " calendarName: " + calendarPath 
+                    + " calendarName: " + absolutePath
                     + " id: " +id, e);
             throw new RPCException("Problem getting event", e);
         }   
     }
 
     public Event[] getEvents(String calendarPath, long utcStartTime,
-            long utcEndTime) throws RPCException {
-        
-        
-        Set<CalendarResource> calendarResources = homeDirectoryService
-                .getCalendarResourcesInDateRange(getAbsolutePath(calendarPath),
-                        utcStartTime, utcStartTime, null);
+                             long utcEndTime) throws RPCException {
+        DateTime start = new DateTime(utcStartTime);
+        start.setUtc(true);
+
+        DateTime end = new DateTime(utcEndTime);
+        end.setUtc(true);
+
+        ComponentFilter eventFilter = new ComponentFilter(Component.VEVENT);
+        eventFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
+
+        ComponentFilter calFilter =
+            new ComponentFilter(net.fortuna.ical4j.model.Calendar.VCALENDAR);
+        calFilter.getComponentFilters().add(eventFilter);
+
+        CalendarFilter filter = new CalendarFilter();
+        filter.setFilter(calFilter);
+
+        String absolutePath = getAbsolutePath(calendarPath);
+        if (log.isDebugEnabled())
+            log.debug("Getting events between " + start + " and " + end +
+                      " in calendar " + absolutePath);
+
+        // XXX: need ContentService.findEvents(path, filter)
+        CalendarCollectionItem collection = (CalendarCollectionItem)
+            contentService.findCalendarByPath(absolutePath);
+        if (collection == null)
+            throw new RPCException("Collection " + absolutePath + " does not exist");
+
+        Set<CalendarEventItem> calendarItems = null;
+        try {
+            calendarItems = contentService.findEvents(collection, filter);
+        } catch (Exception e) {
+            log.error("cannot find events for calendar " + absolutePath, e);
+            throw new RPCException("Cannot find events for calendar " + absolutePath + ": " + e.getMessage(), e);
+        }
+
         Event[] events = null;
         try {
-        Set<net.fortuna.ical4j.model.Calendar> calendars 
-            = createCalendarSetFromCalendarResourceSet(calendarResources);
-        DateTime beginDate = new DateTime();
-        beginDate.setUtc(true);
-        beginDate.setTime(utcStartTime);
-        DateTime endDate = new DateTime();
-        endDate.setUtc(true);
-        endDate.setTime(utcEndTime);
+            Set<net.fortuna.ical4j.model.Calendar> calendars =
+                new HashSet<net.fortuna.ical4j.model.Calendar>();
+            for (CalendarEventItem calendarItem : calendarItems){
+                calendars.add(calendarItem.getCalendar());
+            }
 
-        events = icalendarToCosmoConverter.createEventsFromCalendars(calendars,
-                beginDate, endDate);
+            DateTime beginDate = new DateTime();
+            beginDate.setUtc(true);
+            beginDate.setTime(utcStartTime);
+            DateTime endDate = new DateTime();
+            endDate.setUtc(true);
+            endDate.setTime(utcEndTime);
+
+            events = icalendarToCosmoConverter.
+                createEventsFromCalendars(calendars, beginDate, endDate);
         } catch (Exception e) {
             log.error("Problem getting events: userName: " + getUsername() 
-                    + " calendarName: " + calendarPath 
-                    + " beginDate: " + utcStartTime
-                    + " endDate: " + utcStartTime, e);
+                      + " calendarName: " + absolutePath 
+                      + " beginDate: " + utcStartTime
+                      + " endDate: " + utcStartTime, e);
             throw new RPCException("Problem getting events", e);
         }
         return events;
     }
 
     public String getPreference(String preferenceName) throws RPCException {
+        if (log.isDebugEnabled())
+            log.debug("Getting preference " + preferenceName);
        return userService.getPreference(getUsername(), preferenceName);
     }
 
@@ -157,16 +238,28 @@ public class RPCServiceImpl implements RPCService {
 
     public void removeCalendar(String calendarPath) throws RPCException {
         String absolutePath = getAbsolutePath(calendarPath);
-        homeDirectoryService.removeResource(absolutePath);
+        if (log.isDebugEnabled())
+            log.debug("Removing calendar " + absolutePath);
+        contentService.removeItem(absolutePath);
     }
 
-    public void removeEvent(String calendarPath, String id) throws RPCException {
-        CalendarResource calendarResource = homeDirectoryService
-                .getCalendarResourceByEventId(getAbsolutePath(calendarPath), id);
-        homeDirectoryService.removeResource(calendarResource.getPath());
+    public void removeEvent(String calendarPath, String id)
+        throws RPCException {
+        String absolutePath = getAbsolutePath(calendarPath);
+        if (log.isDebugEnabled())
+            log.debug("Removing event " + id + " from calendar " +
+                      absolutePath);
+        // XXX: assumes that the given id is the event uid, which the
+        // content service assumes to be globally unique, but which
+        // should probably only be assumed to be unique within the
+        // collection
+        CalendarEventItem calItem = contentService.findEventByUid(id);
+        contentService.removeEvent(calItem);
     }
 
     public void removePreference(String preferenceName) throws RPCException {
+        if (log.isDebugEnabled())
+            log.debug("Removing preference " + preferenceName);
         userService.removePreference(getUsername(), preferenceName);
     }
 
@@ -177,9 +270,11 @@ public class RPCServiceImpl implements RPCService {
 
     public void setPreference(String preferenceName, String value)
             throws RPCException {
+        if (log.isDebugEnabled())
+            log.debug("Setting preference " + preferenceName + " to " + value);
         userService.setPreference(getUsername(),preferenceName);
     }
-    
+
     /**
      * Given a path relative to the current user's home directory, returns the 
      * absolute path
@@ -188,11 +283,11 @@ public class RPCServiceImpl implements RPCService {
      */
     private String getAbsolutePath(String relativePath) {
         try {
-            StringBuffer s = new StringBuffer('/');
-            s.append(cosmoSecurityManager.getSecurityContext()
-                                    .getUser().getUsername());
-            s.append('/');
-            if (s != null){
+            StringBuffer s = new StringBuffer("/");
+            s.append(getUser().getUsername());
+            if (relativePath != null){
+                if (! relativePath.startsWith("/"))
+                    s.append("/");
                 s.append(relativePath);
             }
             return s.toString();
@@ -216,23 +311,4 @@ public class RPCServiceImpl implements RPCService {
             throw new RuntimeException(e);
         }
     }
-    
-    private net.fortuna.ical4j.model.Calendar extractCalendar(
-            CalendarResource calendarResource) throws IOException,
-            ParserException {
-        net.fortuna.ical4j.model.Calendar ical = calendarBuilder
-                .build(calendarResource.getContent());
-
-        return ical;
-    }
-    
-    private Set<net.fortuna.ical4j.model.Calendar> createCalendarSetFromCalendarResourceSet(
-            Set<CalendarResource> calendarResources) throws IOException, ParserException {
-        Set<net.fortuna.ical4j.model.Calendar> calendars = new HashSet<net.fortuna.ical4j.model.Calendar>();
-        for (CalendarResource calendarResource : calendarResources){
-            calendars.add(extractCalendar(calendarResource));
-        }
-        return calendars;
-    }
-
 }

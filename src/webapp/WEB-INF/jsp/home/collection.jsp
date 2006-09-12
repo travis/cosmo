@@ -21,25 +21,25 @@
 
 <div class="hd" style="margin-top: 12px;">
   <fmt:message key="HomeDirectory.Collection.Title">
-    <fmt:param value="${Collection.path}"/>
+    <fmt:param value="${Path}"/>
   </fmt:message>
 </div>
 
 <div style="margin-top:12px;">
-<c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionResource'}">
-<html:link page="/console/home/download${Collection.path}">
+<c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionItem'}">
+<html:link page="/console/home/download${Path}">
   [download as iCalendar]
 </html:link>
-<html:link page="/console/home/view${Collection.path}">
+<html:link page="/console/home/view${Path}">
   [view as HTML]
 </html:link>
 </c:if>
-<html:link page="/feed/atom/1.0${Collection.path}">
+<html:link page="/feed/atom/1.0${Path}">
   [subscribe to feed]
 </html:link>
 </div>
 
-<c:if test="${Collection.path != '/'}">
+<c:if test="${Path != '/'}">
 <div style="margin-top:12px;">
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>
@@ -47,10 +47,10 @@
         Display Name
       </td>
       <td class="mdData">
-        ${Collection.displayName}
+        ${Collection.name}
       </td>
     </tr>
-    <c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionResource'}">
+    <c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionItem'}">
     <tr>
       <td class="mdLabel" style="text-align:right;">
         Description
@@ -73,7 +73,7 @@
         Created
       </td>
       <td class="mdData">
-        <fmt:formatDate value="${Collection.dateCreated}" type="both"/>
+        <fmt:formatDate value="${Collection.creationDate}" type="both"/>
       </td>
     </tr>
   </table>
@@ -106,26 +106,26 @@
         Size
       </td>
     </tr>
-    <c:forEach var="resource" items="${Collection.resources}">
+    <c:forEach var="item" items="${Collection.children}">
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-      <html:link page="/console/home/browse${resource.path}">[browse]</html:link>
-        <c:if test="${resource.class.name != 'org.osaf.cosmo.model.HomeCollectionResource'}"><html:link page="/console/home/remove${resource.path}">[remove]</html:link></c:if>
+      <html:link page="/console/home/browse${Path}/${item.name}">[browse]</html:link>
+        <c:if test="${item.parent != null}"><html:link page="/console/home/remove${Path}/${item.name}">[remove]</html:link></c:if>
       </td>
       <td class="smTableData">
-        ${resource.displayName}
+        ${item.name}
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.HomeCollectionResource'}">Home</c:when><c:when test="${resource.class.name == 'org.osaf.cosmo.model.CollectionResource'}">Folder</c:when><c:when test="${resource.class.name == 'org.osaf.cosmo.model.CalendarCollectionResource'}">Calendar</c:when><c:when test="${resource.class.name == 'org.osaf.cosmo.model.EventResource'}">Event</c:when><c:otherwise>File</c:otherwise></c:choose>
+        <c:choose><c:when test="${item.parent == null}">Home</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CollectionItem'}">Folder</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CalendarCollectionItem'}">Calendar</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.EventCalendarItem'}">Event</c:when><c:otherwise>File</c:otherwise></c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">         
-        <fmt:formatDate value="${resource.dateCreated}" type="both"/>
+        <fmt:formatDate value="${item.creationDate}" type="both"/>
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.FileResource' || resource.class.name == 'org.osaf.cosmo.model.EventResource'}"><fmt:formatDate value="${resource.dateModified}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.ContentItem' || item.class.name == 'org.osaf.cosmo.model.EventCalendarItem'}"><fmt:formatDate value="${item.modifiedDate}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${resource.class.name == 'org.osaf.cosmo.model.FileResource' || resource.class.name == 'org.osaf.cosmo.model.EventResource'}"><fmt:formatNumber value="${resource.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.ContentItem' || item.class.name == 'org.osaf.cosmo.model.EventCalendarItem'}"><fmt:formatNumber value="${item.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     </c:forEach>
@@ -133,10 +133,12 @@
 </div>
 
 <tiles:insert definition="home.inc.tickets">
-  <tiles:put name="resource" beanName="Collection"/>
+  <tiles:put name="item" beanName="Collection"/>
+  <tiles:put name="path" beanName="Path"/>
   <tiles:put name="isCollection" value="true"/>
 </tiles:insert>
 
 <tiles:insert definition="home.inc.properties">
-  <tiles:put name="resource" beanName="Collection"/>
+  <tiles:put name="item" beanName="Collection"/>
+  <tiles:put name="path" beanName="Path"/>
 </tiles:insert>

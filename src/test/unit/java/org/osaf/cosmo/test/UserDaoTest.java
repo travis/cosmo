@@ -174,6 +174,24 @@ public class UserDaoTest extends HibernateDaoTestCase {
         userDao.createUser(user1);
         User queryUser1 = userDao.getUser("user1");
         Assert.assertNotNull(queryUser1);
+        userDao.removeUser(user1);
+        queryUser1 = userDao.getUser("user1");
+        Assert.assertNull(queryUser1);
+    }
+	
+    public void testDeleteUserByUsername() throws Exception
+    {
+        User user1 = new User();
+        user1.setUsername("user1");
+        user1.setFirstName("User");
+        user1.setLastName("1");
+        user1.setEmail("user1@user1.com");
+        user1.setPassword("user1password");
+        user1.setAdmin(Boolean.TRUE);
+        
+        userDao.createUser(user1);
+        User queryUser1 = userDao.getUser("user1");
+        Assert.assertNotNull(queryUser1);
         userDao.removeUser(user1.getUsername());
         queryUser1 = userDao.getUser("user1");
         Assert.assertNull(queryUser1);

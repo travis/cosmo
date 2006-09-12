@@ -93,6 +93,13 @@ public interface UserService extends Service {
     public User updateUser(User user);
 
     /**
+     * Removes a user account from the repository.
+     *
+     * @param user the account to remove
+     */
+    public void removeUser(User user);
+
+    /**
      * Removes the user account identified by the given username from
      * the repository.
      *

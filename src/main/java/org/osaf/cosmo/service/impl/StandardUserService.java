@@ -188,6 +188,18 @@ public class StandardUserService implements UserService {
     }
 
     /**
+     * Removes a user account from the repository.
+     *
+     * @param user the account to remove
+     */
+    public void removeUser(User user) {
+        if (log.isDebugEnabled())
+            log.debug("removing user " + user.getUsername());
+        // seems to automatically remove the user's root item
+        userDao.removeUser(user);
+    }
+
+    /**
      * Generates a random password in a format suitable for
      * presentation as an authentication credential.
      */

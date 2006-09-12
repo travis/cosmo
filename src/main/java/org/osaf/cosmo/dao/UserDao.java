@@ -99,4 +99,11 @@ public interface UserDao extends Dao {
      * @param username the username of the account to return
      */
     public void removeUser(String username);
+
+    /**
+     * Removes a user account from the repository.
+     *
+     * @param user the user to remove
+     */
+    public void removeUser(User user);
 }

@@ -154,6 +154,17 @@ public class StandardUserServiceTest extends TestCase {
         User u1 = testHelper.makeDummyUser();
         userDao.createUser(u1);
 
+        service.removeUser(u1);
+
+        assertFalse("User not removed", userDao.getUsers().contains(u1));
+    }
+
+    /**
+     */
+    public void testRemoveUserByUsername() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        userDao.createUser(u1);
+
         service.removeUser(u1.getUsername());
 
         assertFalse("User not removed", userDao.getUsers().contains(u1));

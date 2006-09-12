@@ -125,6 +125,14 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         } 
     }
 
+    public void removeUser(User user) {
+        try {
+            getSession().delete(user);
+        } catch (HibernateException e) {
+            throw SessionFactoryUtils.convertHibernateAccessException(e);
+        } 
+    }
+
     public void updateUser(User user) {
         try {
             getSession().save(user);

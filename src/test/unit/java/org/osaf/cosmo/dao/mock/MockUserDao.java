@@ -159,6 +159,15 @@ public class MockUserDao implements UserDao {
         }
     }
 
+    /**
+     */
+    public void removeUser(User user) {
+        if (user == null)
+            return;
+        usernameIdx.remove(user.getUsername());
+        emailIdx.remove(user.getEmail());
+    }
+
     // Dao methods
 
     /**

@@ -66,12 +66,12 @@ public abstract class BaseMockServletTestCase extends TestCase {
     /**
      */
     protected MockHttpServletRequest createMockRequest(String method,
-                                                       String cmpPath) {
+                                                       String pathInfo) {
         MockHttpServletRequest request =
             new MockHttpServletRequest(servletContext, method,
-                                       getServletPath() + cmpPath);
+                                       getServletPath() + pathInfo);
         request.setServletPath(getServletPath());
-        request.setPathInfo(cmpPath);
+        request.setPathInfo(pathInfo);
         return request;
     }
 

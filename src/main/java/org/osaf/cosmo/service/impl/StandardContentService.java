@@ -63,6 +63,21 @@ public class StandardContentService implements ContentService {
     }
 
     /**
+     * Find an item with the specified uid. The return type will be one of
+     * ContentItem, CollectionItem, CalendarCollectionItem, CalendarItem.
+     *
+     * @param uid
+     *            uid of item to find
+     * @return item represented by uid
+     */
+    public Item findItemByUid(String uid) {
+        if (log.isDebugEnabled()) {
+            log.debug("finding item with uid " + uid);
+        }
+        return contentDao.findItemByUid(uid);
+    }
+
+    /**
      * Find content item by path. Path is of the format:
      * /username/parent1/parent2/itemname.
      */

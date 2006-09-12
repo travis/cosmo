@@ -43,6 +43,16 @@ public interface ContentService extends Service {
     public HomeCollectionItem getRootItem(User user);
 
     /**
+     * Find an item with the specified uid. The return type will be one of
+     * ContentItem, CollectionItem, CalendarCollectionItem, CalendarItem.
+     *
+     * @param uid
+     *            uid of item to find
+     * @return item represented by uid
+     */
+    public Item findItemByUid(String uid);
+
+    /**
      * Find content item by path. Path is of the format:
      * /username/parent1/parent2/itemname.
      *

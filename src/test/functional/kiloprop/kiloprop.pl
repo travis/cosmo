@@ -8,6 +8,10 @@ use Cosmo::DAV ();
 use Cosmo::User ();
 use File::Basename ();
 use Getopt::Long ();
+use Time::HiRes qw(time);
+use File::Slurp qw(read_dir read_file);
+
+$| = 1;
 
 BEGIN { $0 = File::Basename::basename($0) }
 
@@ -21,7 +25,9 @@ A script that is useful for testing how long it takes to do propfinds
 Commands:
    createuser                            creates a new user
    populate [number of resources]        populates the collection with given number of resources
+   populate_caldata [dir of ics files]   populates the collection with ICS files in the specified directory
    propfind [depth]                      executes the propfind on the collection
+   delete_coll                           delete the user's collection
     
 Options:
   -s               server root URL (defaults to http://localhost:8080)
@@ -30,6 +36,7 @@ Options:
   -u               username (defaults to test)
   -p               password (defaults to password)
   -c               collection within users's account.
+  -n               number of iterations to perform operation
   -d               print debugging information to STDOUT
   -h               list available command line options (this page)
   -v               print version information and exit
@@ -93,10 +100,11 @@ use constant DEFAULT_COLLECTION => 'collection';
 
 use constant DEFAULT_NUM_RESOURCES => 3000;
 use constant DEFAULT_DEPTH => 0;
+use constant DEFAULT_ITERATIONS => 1;
 
 $SIG{__DIE__} = sub { die sprintf("%s: %s", PROGRAM, $_[0]) };
 
-my ($server_url, $admin_username, $admin_password,
+my ($server_url, $admin_username, $admin_password, $iterations,
     $opt_debug, $opt_help, $opt_version, $user_collection, $user_username, $user_password);
 
 # process command line options
@@ -106,6 +114,7 @@ Getopt::Long::GetOptions(
     "p=s" => \$user_password,
     "a=s" => \$admin_username,
     "w=s" => \$admin_password,
+    "i=i" => \$iterations,
     "d"   => \$opt_debug,
     "h"   => \$opt_help,
     "v"   => \$opt_version,
@@ -121,7 +130,7 @@ $admin_password ||= DEFAULT_ADMIN_PASSWORD;
 $user_username ||= DEFAULT_USER_USERNAME;
 $user_password ||= DEFAULT_USER_PASSWORD;
 $user_collection ||= DEFAULT_COLLECTION;
-
+$iterations ||= DEFAULT_ITERATIONS;
 
 my $cmp = cmp_connect();
 my $command = $ARGV[0];
@@ -147,6 +156,14 @@ if ($command eq 'propfind'){
    my $depth = $ARGV[1] ||= DEFAULT_DEPTH;
    propfind($dav, $user, $user_collection, $depth);
    
+}
+
+if ($command eq 'delete_coll'){
+   my $user = $cmp->get_user($user_username);
+   $user->password($user_password);
+   my $dav = dav_connect($user);
+   
+   delete_coll($dav, $user);
 }
 
 if ($command eq 'populate_caldata'){
@@ -201,13 +218,22 @@ sub populate {
     $dav->dav->delete($path_to_collection);
     $dav->dav->mkcol($path_to_collection);
     
-        my $content = "content!";
-    for (my $count = 0; $count < $num_resources; $count++) {
-        print "count:  " . $count . "\n";
+    my $content = "content!";
+    for my $count (1..$num_resources) {
+        print "count:  $count\n";
         my $request = HTTP::Request->new( "PUT", $path_to_collection . "/" . $count);
         $request->content($content);
         $useragent->request($request);
     }
+}
+
+sub delete_coll {
+    my ($dav, $user) = @_;
+    
+    my $path_to_collection = path_to_collection($dav->server_url(), $user, $user_collection);
+    my $useragent = $dav->dav->get_user_agent();
+
+    $dav->dav->delete($path_to_collection);
 }
 
 sub populate_caldata {
@@ -218,31 +244,27 @@ sub populate_caldata {
     my $path_to_collection = path_to_collection($dav->server_url(), $user, $user_collection);
     my $useragent = $dav->dav->get_user_agent();
 
-    $dav->dav->delete($path_to_collection);
     my $request = HTTP::Request->new( "MKCALENDAR", $path_to_collection );
     $request->content(REQ_MKCALENDAR);
     $useragent->request($request);
 
-    opendir(DIR, $data_directory);
-    my @files = readdir(DIR);
+    my @files = read_dir($data_directory);
+    my $count = 1;
     foreach my $file (@files) {
-        open(FILE, $data_directory . "/" . $file);
-        my $content ="";
-        binmode FILE;
-        while(<FILE>) { $content .= $_; }
-        close FILE;
-        
-        my $request = HTTP::Request->new( "PUT", $path_to_collection . "/" . $file);
+        my $content = read_file("$data_directory/$file");
+        $count++;
+
+        my $resource = "$path_to_collection/$file";
+        print "$count PUT $resource\n";
+        my $request = HTTP::Request->new( "PUT", $resource);
         $request->content($content);
         $request->header("Content-Type" => "text/calendar");
         $useragent->request($request);
-        
-        #print $content;
+        last if $iterations > 1 and $iterations <= $count;
     }    
-    
 }
 
-sub propfind{
+sub propfind {
     my $dav = shift;
     my $user = shift;
     my $collection = shift;
@@ -252,16 +274,16 @@ sub propfind{
     my $useragent = $dav->dav->get_user_agent();
     my $request = HTTP::Request->new( "PROPFIND", $path_to_collection );
     $request->content(REQ_PROPFIND_ALLPROP);
-    $request->header("Depth" => $depthw);
+    $request->header("Depth" => $depth);
     my $start = time();
-    $useragent->request($request);
+    for my $i (1..$iterations) {
+        $useragent->request($request);
+    }
     my $end = time();
-    my $elapsed = $end - $start;
-    print "Time Elapsed: " . $elapsed . "\n";
-    
+    printf "Time Elapsed for %d iterations: %0.6f\n", $iterations, $end-$start;
 }
 
-sub propfind_slow{
+sub propfind_slow {
     my $dav = shift;
     my $user = shift;
     my $collection = shift;
@@ -270,8 +292,7 @@ sub propfind_slow{
     my $start = time();
     $dav->dav->propfind($path_to_collection,1);
     my $end = time();
-    my $elapsed = $end - $start;
-    print "Time Elapsed: " . $elapsed;
+    printf "Time Elapsed: %0.6f\n", $end-$start;
 }
 
 sub dav_connect {

@@ -20,17 +20,20 @@ import javax.servlet.ServletContextEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.id.random.SessionIdGenerator;
+import org.apache.jackrabbit.webdav.lock.SimpleLockManager;
+import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 
 import org.osaf.cosmo.BaseMockServletTestCase;
 import org.osaf.cosmo.TestHelper;
-import org.osaf.cosmo.service.ContentService;
-import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.dav.DavServlet;
+import org.osaf.cosmo.dav.impl.NoOpDavSessionProvider;
+import org.osaf.cosmo.dav.impl.StandardDavResourceFactory;
+import org.osaf.cosmo.model.User;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -46,28 +49,58 @@ public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
 
     protected TestHelper testHelper;
     protected DavServlet servlet;
-    protected ContentService contentService;
-    protected UserService userService;
+    protected StandardContentService contentService;
+    protected StandardUserService userService;
+    protected User user;
 
     /**
      */
     protected void setUp() throws Exception {
         super.setUp();
 
-        contentService = createMockContentService();
+        MockCalendarDao calendarDao = new MockCalendarDao();
+        MockContentDao contentDao = new MockContentDao();
+        MockUserDao userDao = new MockUserDao();
+
+        contentService = new StandardContentService();
+        contentService.setCalendarDao(calendarDao);
+        contentService.setContentDao(contentDao);
         contentService.init();
 
-        userService = createMockUserService();
+        userService = new StandardUserService();
+        userService.setContentDao(contentDao);
+        userService.setUserDao(userDao);
+        userService.setPasswordGenerator(new SessionIdGenerator());
         userService.init();
 
         testHelper = new TestHelper();
 
+        StandardDavResourceFactory resourceFactory =
+            new StandardDavResourceFactory();
+        resourceFactory.setContentService(contentService);
+        resourceFactory.setSecurityManager(getSecurityManager());
+
+        LocatorFactoryImpl locatorFactory =
+            new LocatorFactoryImpl(getServletPath());
+
+        NoOpDavSessionProvider sessionProvider = new NoOpDavSessionProvider();
+
         servlet = new DavServlet();
         servlet.setSecurityManager(getSecurityManager());
+        servlet.setLockManager(new SimpleLockManager());
+        servlet.setResourceFactory(resourceFactory);
+        servlet.setLocatorFactory(locatorFactory);
+        servlet.setDavSessionProvider(sessionProvider);
         servlet.init(getServletConfig());
+
+        user = testHelper.makeDummyUser();
+        userService.createUser(user);
     }
 
+    /** */
     protected void tearDown() throws Exception {
+        userService.removeUser(user);
+
         servlet.destroy();
 
         userService.destroy();
@@ -76,35 +109,25 @@ public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
         super.tearDown();
     }
 
-    /**
-     */
+    /** */
     protected MultiStatus
         readMultiStatusResponse(MockHttpServletResponse response)
         throws Exception {
         return MultiStatus.createFromXml(readXmlResponse(response));
     }
 
-    /**
-     */
+    /** */
     public String getServletPath() {
         return SERVLET_PATH;
     }
 
-    /**
-     */
-    private ContentService createMockContentService() {
-        StandardContentService svc = new StandardContentService();
-        svc.setCalendarDao(new MockCalendarDao());
-        svc.setContentDao(new MockContentDao());
-        return svc;
-    }
-
-    /**
-     */
-    private UserService createMockUserService() {
-        StandardUserService svc = new StandardUserService();
-        svc.setUserDao(new MockUserDao());
-        svc.setPasswordGenerator(new SessionIdGenerator());
-        return svc;
+    /** */
+    public String toCanonicalPath(String relativePath) {
+        StringBuffer buf = new StringBuffer("/");
+        buf.append(user.getUsername());
+        if (! relativePath.startsWith("/"))
+            buf.append("/");
+        buf.append(relativePath);
+        return buf.toString();
     }
 }

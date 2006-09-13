@@ -72,6 +72,8 @@ public abstract class BaseMockServletTestCase extends TestCase {
                                        getServletPath() + pathInfo);
         request.setServletPath(getServletPath());
         request.setPathInfo(pathInfo);
+        request.addHeader("Host", request.getServerName() + ":" +
+                          request.getServerPort());
         return request;
     }
 
@@ -114,6 +116,16 @@ public abstract class BaseMockServletTestCase extends TestCase {
             new ByteArrayInputStream(response.getContentAsByteArray());
         BUILDER_FACTORY.setNamespaceAware(true);
         return BUILDER_FACTORY.newDocumentBuilder().parse(in);
+    }
+
+    /** */
+    protected String toAbsoluteUrl(MockHttpServletRequest request,
+                                   String path) {
+        StringBuffer url = new StringBuffer(request.getScheme());
+        url.append("://").append(request.getServerName()).
+            append(":").append(request.getServerPort()).
+            append(path);
+        return url.toString();
     }
 
     /**

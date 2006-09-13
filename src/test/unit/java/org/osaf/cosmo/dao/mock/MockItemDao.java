@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.id.random.SessionIdGenerator;
@@ -29,12 +30,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dao.ItemDao;
+import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.util.PathUtil;
 
 /**
  * Mock implementation of <code>ItemDao</code> useful for testing.
@@ -179,6 +183,84 @@ public class MockItemDao implements ItemDao {
     }
 
     /**
+     * Copy an item to the given path
+     * @param item item to copy
+     * @param path path to copy item to
+     * @param deepCopy true for deep copy, else shallow copy will
+     *                 be performed
+     * @throws org.osaf.cosmo.model.ItemNotFoundException
+     *         if parent item specified by path does not exist
+     * @throws org.osaf.cosmo.model.DuplicateItemNameException
+     *         if path points to an item with the same path
+     */
+    public void copyItem(Item item,
+                         String path,
+                         boolean deepCopy) {
+        if (item == null)
+            throw new IllegalArgumentException("item cannot be null");
+        if (path == null)
+            throw new IllegalArgumentException("path cannot be null");
+
+        String parentPath = PathUtil.getParentPath(path);
+        CollectionItem parent = (CollectionItem)
+            itemsByPath.get(PathUtil.getParentPath(path));
+        if (parent == null)
+            throw new ItemNotFoundException("parent collection not found");
+
+        Item copy =
+            copyItem(item, PathUtil.getBasename(path), parent, deepCopy);
+    }
+
+    private Item copyItem(Item item,
+                          String copyName,
+                          CollectionItem parent,
+                          boolean deepCopy) {
+        Item copy = null;
+        try {
+            copy = item.getClass().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("unable to construct new instance of " + item.getClass());
+        }
+
+        if (copyName == null)
+            copyName = item.getName();
+        copy.setName(copyName);
+        copy.setParent(parent);
+        copy.setOwner(item.getOwner());
+
+        for(Map.Entry<String, Attribute> entry :
+                item.getAttributes().entrySet())
+            copy.addAttribute(entry.getValue().copy());
+
+        // XXX: ignoring calendar indexes
+
+        storeItem(copy);
+
+        if (deepCopy && (item instanceof CollectionItem)) {
+            CollectionItem collection = (CollectionItem) item;
+            for (Item child: collection.getChildren())
+                copyItem(child, null, (CollectionItem) copy, true);
+        }
+
+        return copy;
+    }
+    
+  
+    /**
+     * Move item to the given path
+     * @param item item to move
+     * @param path path to move item to
+     * @throws org.osaf.cosmo.model.ItemNotFoundException
+     *         if parent item specified by path does not exist
+     * @throws org.osaf.cosmo.model.DuplicateItemNameException
+     *         if path points to an item with the same path
+     */
+    public void moveItem(Item item,
+                         String path) {
+        throw new UnsupportedOperationException();
+    }
+    
+    /**
      * Remove an item.
      * 
      * @param item
@@ -273,16 +355,6 @@ public class MockItemDao implements ItemDao {
     }
     
     // Dao methods
-
-    public void copyItem(Item item, String path, boolean deepCopy) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void moveItem(Item item, String path) {
-        // TODO Auto-generated method stub
-        
-    }
 
     /**
      * Initializes the DAO, sanity checking required properties

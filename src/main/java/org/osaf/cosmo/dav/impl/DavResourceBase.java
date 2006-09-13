@@ -341,9 +341,11 @@ public abstract class DavResourceBase implements ExtendedDavResource {
             getContentService().copyItem(item, destination.getResourcePath(),
                                          ! shallow);
         } catch (ItemNotFoundException e) {
-            throw new DavException(DavServletResponse.SC_CONFLICT);
+            throw new DavException(DavServletResponse.SC_CONFLICT,
+                                   "Parent collection not found");
         } catch (DuplicateItemNameException e) {
-            throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED);
+            throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED,
+                                   "Item with that name already exists");
         }
     }
 

@@ -15,8 +15,8 @@
  */
 package org.osaf.cosmo.rpc.model;
 
-import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.PARAM_X_OSAF_ANYTIME;
+import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,10 +24,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.osaf.cosmo.model.CalendarCollectionItem;
-import org.osaf.cosmo.model.CalendarEventItem;
-
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.DateList;
@@ -47,6 +43,8 @@ import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.RRule;
+
+import org.osaf.cosmo.model.CalendarEventItem;
 
 /**
  * An instance of this class is used to convert ICalendar 

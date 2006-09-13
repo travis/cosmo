@@ -15,20 +15,19 @@
  */
 package org.osaf.cosmo.rpc;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +38,6 @@ import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
 import org.osaf.cosmo.model.CalendarCollectionItem;
-import org.osaf.cosmo.model.CalendarItem;
 import org.osaf.cosmo.model.CalendarEventItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.DuplicateItemNameException;
@@ -53,7 +51,6 @@ import org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
-import org.osaf.cosmo.util.ICalendarUtils;
 import org.osaf.cosmo.util.PathUtil;
 
 public class RPCServiceImpl implements RPCService {
@@ -281,13 +278,23 @@ public class RPCServiceImpl implements RPCService {
             calendar.getComponents().add(vevent);
             calendarEventItem.setContent(calendar.toString().getBytes());
 
-            String name = findAvailableName(calendarPath, vevent);
-
-            calendarEventItem.setName(name);
+            Iterator<String> availableNameIterator = availableNameIterator(vevent);
+            
             calendarEventItem.setOwner(getUser());
-
-            calendarEventItem = contentService.addEvent(calendarItem,
-                    calendarEventItem);
+            
+            boolean added = false;
+            do {
+                String name = availableNameIterator.next();
+                calendarEventItem.setName(name);
+                try{ 
+                    added = true;
+                    calendarEventItem = contentService.addEvent(calendarItem,
+                                calendarEventItem);
+                } catch (DuplicateItemNameException dupe){
+                    added = false;
+                }
+            } while (!added && availableNameIterator.hasNext());
+            
         } else {
             calendarEventItem = contentService.findEventByUid(event.getId());
             net.fortuna.ical4j.model.Calendar calendar = calendarEventItem.getCalendar();
@@ -299,34 +306,48 @@ public class RPCServiceImpl implements RPCService {
         return calendarEventItem.getUid();
     }
 
-    private String findAvailableName(String calendarPath, VEvent vevent) throws RPCException{
-        char[] chars = {'0', '1', '2', '3', '4', '5', '6', '6', '8', '9'};
-        StringBuffer baseName = new StringBuffer(vevent.getUid().getValue())
-                .append(".ics");
+    private Iterator<String> availableNameIterator(VEvent vevent) {
+        String  baseName = new StringBuffer(vevent.getUid()
+                .getValue()).append(".ics").toString();
         int index = baseName.length() - 4;
-        int count = 0;
-        boolean foundAGoodName = false;
-        
-        while (!foundAGoodName && count < 10) {
-            if (count == 1){
-                baseName.insert(index, '0');
-            } else if (count > 1){
-                baseName.setCharAt(index, chars[count]);
-            }
-            if (contentService.findItemByPath(getAbsolutePath(calendarPath
-                    + "/" + baseName.toString())) == null) {
-                foundAGoodName = true;
-            }
-            count++;
-        }
-        
-        if (!foundAGoodName){
-            throw new RPCException("Could not find a suitable name for event!");
-        }
-        
-        return baseName.toString();
+        return availableNameIterator(baseName, index);
     }
+    
+    private Iterator<String> availableNameIterator(String baseName,
+            final int appendIndex) {
+        final char[] chars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        final StringBuffer baseNameBuffer = new StringBuffer(baseName);
 
+        return new Iterator<String>() {
+            int count = 0;
+
+            public boolean hasNext() {
+                return count < 10;
+            }
+
+            public String next() {
+                String next = null;
+                if (count == 0) {
+                    next = baseNameBuffer.toString();
+                } else if (count == 1) {
+                    next =  baseNameBuffer.insert(appendIndex, '0').toString();
+                } else if (hasNext()) {
+                    baseNameBuffer.setCharAt(appendIndex, chars[count-1]);
+                    next =  baseNameBuffer.toString();
+                } else {
+                    throw new NoSuchElementException();
+                }
+                count++;
+                return next;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+        };
+    }
+    
     public void setPreference(String preferenceName, String value)
             throws RPCException {
         if (log.isDebugEnabled())
@@ -374,6 +395,17 @@ public class RPCServiceImpl implements RPCService {
     private CalendarCollectionItem getCalendarCollectionItem(String calendarPath) {
         return (CalendarCollectionItem) contentService
                 .findItemByPath(getAbsolutePath(calendarPath));
+    }
+    
+    public static void main(String[] args){
+
+        RPCServiceImpl rpc = new RPCServiceImpl();
+        VEvent vEvent = new VEvent();
+        vEvent.getProperties().add(new Uid("1231230-112312312-3123123"));
+        Iterator i = rpc.availableNameIterator(vEvent);
+        while (i.hasNext()){
+            System.out.println(i.next());
+        }
     }
 
 }

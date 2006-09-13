@@ -716,4 +716,37 @@ function CalForm() {
 
         descrTxt = null; // Set DOM-node-ref to null to avoid IE memleak
     };
+    this.addJumpToDate = function(dc) {
+        var top = parseInt(MiniCal.displayContext.style.top);
+        var d = null;
+        
+        // place the div just above minical
+        top -= 28;
+        dc.style.top = top + 'px';
+        
+        d = document.createElement('div');
+        d.className = 'formElem floatLeft';
+        dc.appendChild(d);
+        this.createInput('text', 'jumpto', 'jumpto',
+            10, 10, null, 'inputText', d);
+        this.setTextInput(this.form.jumpto, 'mm/dd/yyyy', true, false);
+        this.form.jumpto.onclick = Cal.calForm.emptyTextInput;
+        
+        d = document.createElement('div');
+        d.className = 'floatLeft';
+        this.createNbsp(d);
+        this.createNbsp(d);
+        dc.appendChild(d);
+        
+        d = document.createElement('div');
+        d.className = 'floatLeft';
+        dc.appendChild(d);
+        butJump = new Button('jumpToButton', 38, function() { alert('This does nothing yet.') },
+                getText('App.Button.Go'), true);
+        d.appendChild(butJump.domNode);
+        
+        d = document.createElement('div');
+        d.className = 'clearAll';
+        dc.appendChild(d);
+    };
 }

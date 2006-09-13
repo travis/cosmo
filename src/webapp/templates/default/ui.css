@@ -385,6 +385,12 @@ $smButtonHeight = 18px
     position:absolute;
     top:8px;
 }
+/* Jump-to date box */
+#jumpToDateDiv { 
+    padding-left:8px;
+    padding-right:8px;
+    position:absolute;
+}
 /* Right sidebar
  * --------------------- */
 /* Right sidebar main */

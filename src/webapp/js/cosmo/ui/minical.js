@@ -74,6 +74,7 @@ var MiniCal = new function() {
         self.hide();
         self.render();
         self.show();
+        return true;
     };
     
     /**

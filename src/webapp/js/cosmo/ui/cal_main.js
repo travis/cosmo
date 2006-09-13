@@ -216,10 +216,14 @@ var Cal = new function() {
             var dummyElem = document.createElement('div');
             allDayDiv.appendChild(dummyElem);
         }
-
-        var mcDiv = document.getElementById('miniCalDiv');
-        MiniCal.init(Cal, mcDiv);
         
+        // Load minical and jump-to date
+        var mcDiv = document.getElementById('miniCalDiv');
+        var jpDiv = document.getElementById('jumpToDateDiv');
+        // Place jump-to date based on mini-cal pos
+        if (MiniCal.init(Cal, mcDiv)) {
+           this.calForm.addJumpToDate(jpDiv);
+        }
     };
 
     // ==========================

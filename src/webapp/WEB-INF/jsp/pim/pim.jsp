@@ -97,6 +97,7 @@ function init() {
             <form method="post" id="calForm" name="calForm" action="">
                 <div id="leftSidebarDiv">
                     <div id="calSelectNav"></div>
+                    <div id="jumpToDateDiv"></div>
                     <div id="miniCalDiv"></div>
                 </div>
                 <div id="calTopNavDiv">

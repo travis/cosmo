@@ -27,7 +27,6 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.lang.StringUtils;
@@ -396,16 +395,4 @@ public class RPCServiceImpl implements RPCService {
         return (CalendarCollectionItem) contentService
                 .findItemByPath(getAbsolutePath(calendarPath));
     }
-    
-    public static void main(String[] args){
-
-        RPCServiceImpl rpc = new RPCServiceImpl();
-        VEvent vEvent = new VEvent();
-        vEvent.getProperties().add(new Uid("1231230-112312312-3123123"));
-        Iterator i = rpc.availableNameIterator(vEvent);
-        while (i.hasNext()){
-            System.out.println(i.next());
-        }
-    }
-
 }

@@ -27,7 +27,11 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Version;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.CosmoConstants;
@@ -43,6 +47,7 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.rpc.model.Calendar;
+import org.osaf.cosmo.rpc.model.CosmoToICalendarConverter;
 import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -60,6 +65,7 @@ public class RPCServiceImpl implements RPCService {
     private CosmoSecurityManager cosmoSecurityManager = null;
     private CalendarBuilder calendarBuilder = new CalendarBuilder();
     private ICalendarToCosmoConverter icalendarToCosmoConverter = new ICalendarToCosmoConverter();
+    private CosmoToICalendarConverter cosmoToICalendarConverter = new CosmoToICalendarConverter();
     
     public CosmoSecurityManager getCosmoSecurityManager() {
         return cosmoSecurityManager;
@@ -142,9 +148,8 @@ public class RPCServiceImpl implements RPCService {
         // collection
         CalendarEventItem calItem = contentService.findEventByUid(id);
         try {
-            net.fortuna.ical4j.model.Calendar ical = calItem.getCalendar();
-            VEvent vevent = calItem.getMasterEvent();
-            return icalendarToCosmoConverter.createEvent(vevent, ical);
+            return icalendarToCosmoConverter.createEvent(calItem.getUid(),
+                    calItem.getMasterEvent(), calItem.getCalendar());
         } catch (Exception e) {
             log.error("Problem getting event: userName: " + getUsername() 
                     + " calendarName: " + absolutePath
@@ -192,12 +197,6 @@ public class RPCServiceImpl implements RPCService {
 
         Event[] events = null;
         try {
-            Set<net.fortuna.ical4j.model.Calendar> calendars =
-                new HashSet<net.fortuna.ical4j.model.Calendar>();
-            for (CalendarEventItem calendarItem : calendarItems){
-                calendars.add(calendarItem.getCalendar());
-            }
-
             DateTime beginDate = new DateTime();
             beginDate.setUtc(true);
             beginDate.setTime(utcStartTime);
@@ -206,7 +205,7 @@ public class RPCServiceImpl implements RPCService {
             endDate.setTime(utcEndTime);
 
             events = icalendarToCosmoConverter.
-                createEventsFromCalendars(calendars, beginDate, endDate);
+                createEventsFromCalendars(calendarItems, beginDate, endDate);
         } catch (Exception e) {
             log.error("Problem getting events: userName: " + getUsername() 
                       + " calendarName: " + absolutePath 
@@ -265,7 +264,67 @@ public class RPCServiceImpl implements RPCService {
 
     public String saveEvent(String calendarPath, Event event)
             throws RPCException {
-        return "!@#%$";
+
+        CalendarEventItem calendarEventItem = null;
+        CalendarCollectionItem calendarItem = getCalendarCollectionItem(calendarPath);
+        
+        //Check to see if this is a new event
+        if (StringUtils.isEmpty(event.getId())) {
+            //make an empty iCalendar
+            net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
+            calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+            calendar.getProperties().add(Version.VERSION_2_0);
+            calendar.getProperties().add(CalScale.GREGORIAN);
+            
+            calendarEventItem = new CalendarEventItem();
+            VEvent vevent = cosmoToICalendarConverter.createVEvent(event);
+            calendar.getComponents().add(vevent);
+            calendarEventItem.setContent(calendar.toString().getBytes());
+
+            String name = findAvailableName(calendarPath, vevent);
+
+            calendarEventItem.setName(name);
+            calendarEventItem.setOwner(getUser());
+
+            calendarEventItem = contentService.addEvent(calendarItem,
+                    calendarEventItem);
+        } else {
+            calendarEventItem = contentService.findEventByUid(event.getId());
+            net.fortuna.ical4j.model.Calendar calendar = calendarEventItem.getCalendar();
+            cosmoToICalendarConverter.updateEvent(event, calendar);
+            calendarEventItem.setContent(calendar.toString().getBytes());
+            contentService.updateEvent(calendarEventItem);
+        }
+
+        return calendarEventItem.getUid();
+    }
+
+    private String findAvailableName(String calendarPath, VEvent vevent) throws RPCException{
+        char[] chars = {'0', '1', '2', '3', '4', '5', '6', '6', '8', '9'};
+        StringBuffer baseName = new StringBuffer(vevent.getUid().getValue())
+                .append(".ics");
+        int index = baseName.length() - 4;
+        int count = 0;
+        boolean foundAGoodName = false;
+        
+        while (!foundAGoodName && count < 10) {
+            if (count == 1){
+                baseName.insert(index, '0');
+            } else if (count > 1){
+                baseName.setCharAt(index, chars[count]);
+            }
+            if (contentService.findItemByPath(getAbsolutePath(calendarPath
+                    + "/" + baseName.toString())) == null) {
+                foundAGoodName = true;
+            }
+            count++;
+        }
+        
+        if (!foundAGoodName){
+            throw new RPCException("Could not find a suitable name for event!");
+        }
+        
+        return baseName.toString();
     }
 
     public void setPreference(String preferenceName, String value)
@@ -311,4 +370,10 @@ public class RPCServiceImpl implements RPCService {
             throw new RuntimeException(e);
         }
     }
+    
+    private CalendarCollectionItem getCalendarCollectionItem(String calendarPath) {
+        return (CalendarCollectionItem) contentService
+                .findItemByPath(getAbsolutePath(calendarPath));
+    }
+
 }

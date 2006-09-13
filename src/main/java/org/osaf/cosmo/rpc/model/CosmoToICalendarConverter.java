@@ -115,8 +115,7 @@ public class CosmoToICalendarConverter {
      * @return
      */
     public void updateEvent(Event event, Calendar calendar){
-        String uid = event.getId();
-        VEvent vevent = getMasterVEvent(uid, calendar);
+        VEvent vevent = getMasterVEvent(calendar);
         copyProperties(event, vevent);
     }
 
@@ -339,25 +338,18 @@ public class CosmoToICalendarConverter {
         }
     }
 
-    protected VEvent getMasterVEvent(String uid, Calendar calendar){
+    protected VEvent getMasterVEvent(Calendar calendar){
         ComponentList list = calendar.getComponents().getComponents(Component.VEVENT);
         for (Object obj: list){
             VEvent vevent = (VEvent) obj;
-            if (uid.equals(getUID(vevent))){
                 if (!hasProperty(vevent, Property.RECURRENCE_ID) &&
                     !hasProperty(vevent, Property.EXRULE) &&
                     !hasProperty(vevent, Property.EXDATE)){
                     return vevent;
                 }
-            }
         }
 
         return null;
-    }
-
-    private String getUID(VEvent vevent){
-        Uid uid = (Uid) vevent.getProperties().getProperty(Property.UID);
-        return uid == null ? null : uid.getValue();
     }
 
     private boolean hasProperty(Component c, String propName){

@@ -24,6 +24,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.osaf.cosmo.model.CalendarCollectionItem;
+import org.osaf.cosmo.model.CalendarEventItem;
+
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.DateList;
@@ -64,9 +68,9 @@ public class ICalendarToCosmoConverter {
      * @param vevent
      * @return
      */
-    public Event createEvent(VEvent vevent, net.fortuna.ical4j.model.Calendar calendar){
+    public Event createEvent(String itemId, VEvent vevent, net.fortuna.ical4j.model.Calendar calendar){
         Event event = new Event();
-        event.setId(getPropertyValue(vevent, Property.UID));
+        event.setId(itemId);
         event.setDescription(getPropertyValue(vevent, Property.DESCRIPTION));
         event.setTitle(getPropertyValue(vevent, Property.SUMMARY));
         event.setStatus(getPropertyValue(vevent, Property.STATUS));
@@ -149,21 +153,27 @@ public class ICalendarToCosmoConverter {
      * Returns a single array of Events for every VEVENT in every Calendar. If there
      * are any recurring events, the expanded instances will be returned for the given date
      * range
-     * @param calendars the calendars from which to get the VEVENTS
+     * @param calendarCollectionItems the calendars from which to get the VEVENTS
      * @param startDate the start date to be used when expanding recurring events
      * @param endDate  the end date to be used when expanding recurring events
      * @return
      */
     public Event[] createEventsFromCalendars(
-            Collection<net.fortuna.ical4j.model.Calendar> calendars,
+            Collection<CalendarEventItem> calendarEventItems,
             DateTime startDate, DateTime endDate) {
         List<Event> events = new ArrayList<Event>();
-        for (net.fortuna.ical4j.model.Calendar calendar : calendars) {
+        for (CalendarEventItem calendarEventItem : calendarEventItems) {
+            net.fortuna.ical4j.model.Calendar calendar = null;
+            try {
+            calendar = calendarEventItem.getCalendar();
+            } catch (Exception pe){
+                throw new RuntimeException(pe);
+            }
             ComponentList vevents = calendar.getComponents().getComponents(
                     Component.VEVENT);
             for (Object o : vevents) {
                 VEvent vevent = (VEvent) o;
-                Event e = createEvent(vevent, calendar);
+                Event e = createEvent(calendarEventItem.getUid(), vevent, calendar);
                 if (hasProperty(vevent, Property.RRULE) ){
                     List<Event> expandedEvents = expandEvent(e, vevent, calendar,
                             startDate, endDate);

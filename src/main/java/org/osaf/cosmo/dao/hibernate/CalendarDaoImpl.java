@@ -18,7 +18,6 @@ package org.osaf.cosmo.dao.hibernate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +32,6 @@ import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CalendarEventItem;
-import org.osaf.cosmo.model.CalendarItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DuplicateEventUidException;
@@ -447,6 +445,29 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
                 events.add(i.next());
             }
             return events;
+        } catch (HibernateException e) {
+            throw SessionFactoryUtils.convertHibernateAccessException(e);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.osaf.cosmo.dao.CalendarDao#findEventByIcalUid(java.lang.String,
+     *      org.osaf.cosmo.model.CalendarCollectionItem)
+     */
+    public CalendarEventItem findEventByIcalUid(String uid,
+            CalendarCollectionItem calendar) {
+        try {
+            Query hibQuery = getSession().getNamedQuery(
+                    "event.by.calendar.icaluid");
+            hibQuery.setParameter("calendar", calendar);
+            hibQuery.setParameter("uid", uid);
+            List results = hibQuery.list();
+            if (results.size() > 0)
+                return (CalendarEventItem) results.get(0);
+            else
+                return null;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }

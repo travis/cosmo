@@ -15,17 +15,17 @@
  */
 package org.osaf.cosmo.dao;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CalendarEventItem;
-import org.osaf.cosmo.model.CalendarItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DuplicateEventUidException;
+import org.osaf.cosmo.model.DuplicateItemNameException;
+import org.osaf.cosmo.model.ModelValidationException;
 
 /**
  * Interface for DAO that provides base functionality for calendaring items.
@@ -141,6 +141,19 @@ public interface CalendarDao extends ItemDao {
      */
     public CalendarEventItem findEventByUid(String uid);
 
+    /**
+     * Find calendar event with a specified icalendar uid. The icalendar format
+     * requires that an event's uid is unique within a calendar.
+     * 
+     * @param uid
+     *            icalendar uid of calendar event
+     * @param calendar
+     *            calendar collection to search
+     * @return calendar event represented by uid and calendar
+     */
+    public CalendarEventItem findEventByIcalUid(String uid,
+            CalendarCollectionItem calendar);
+    
     /**
      * Find calendar events by criteria. Events can be searched based on a set
      * of item attribute criteria. Only events that contain attributes with

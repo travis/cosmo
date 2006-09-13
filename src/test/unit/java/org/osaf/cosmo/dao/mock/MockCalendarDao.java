@@ -253,4 +253,10 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
     public void removeEvent(CalendarEventItem event) {
         removeItem(event);
     }
+
+    public CalendarEventItem findEventByIcalUid(String uid, CalendarCollectionItem calendar) {
+        // TODO implement
+        return null;
+    }
+    
 }

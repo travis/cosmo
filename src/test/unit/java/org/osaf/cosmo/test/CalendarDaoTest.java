@@ -17,9 +17,7 @@ package org.osaf.cosmo.test;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -203,6 +201,34 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
             event2 = calendarDao.addEvent(calendar, event2);
             Assert.fail("able to create event with duplicat uid");
         } catch(DuplicateEventUidException e) {}
+    }
+    
+    public void testFindByEventIcalUid() throws Exception
+    {
+        CalendarCollectionItem calendar = new CalendarCollectionItem();
+        calendar.setName("test");
+        calendar.setOwner(getUser(userDao, "testuser"));
+        calendar.setDescription("test description");
+        calendar.setLanguage("en");
+        calendar = calendarDao.createCalendar(calendar);
+        
+        CalendarEventItem event = new CalendarEventItem();
+        event.setName("test.ics");
+        event.setOwner(getUser(userDao, "testuser"));
+        event.setContent(getBytes(baseDir + "/cal1.ics"));
+        event.setContentEncoding("UTF8");
+        event.setContentType("text/calendar");
+        event.setContentLanguage("en");
+        
+        event = calendarDao.addEvent(calendar, event);
+        
+        clearSession();
+        
+        calendar = calendarDao.findCalendarByUid(calendar.getUid());
+        String uid = "68ADA955-67FF-4D49-BBAC-AF182C620CF6";
+        CalendarEventItem queryEvent = calendarDao.findEventByIcalUid(uid, calendar);
+        Assert.assertNotNull(queryEvent);
+        Assert.assertEquals(event.getUid(), queryEvent.getUid());
     }
     
 	public void testCalendarDaoAdvanced() throws Exception

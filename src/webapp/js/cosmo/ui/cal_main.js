@@ -435,7 +435,9 @@ var Cal = new function() {
         var startdate = this.viewStart.getDate();
         var startmon = this.viewStart.getMonth();
         var daymax = this.daysInMonth(startmon+1);
-        var currDay = this.currDate.getDay();
+        var calcDay = null;
+        var cd = this.currDate;
+        var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
 
         str += '<div id="dayListSpacer" class="dayListDayDiv"' +
             ' style="left:0px; width:' +
@@ -445,12 +447,13 @@ var Cal = new function() {
 
         // Do a week's worth of day cols with day name and date
         for (var i = 0; i < 7; i++) {
+            calcDay = Date.add('d', i, this.viewStart);
             startdate = startdate > daymax ? 1 : startdate;
             // Subtract one pixel of height for 1px border per retarded CSS spec
             str += '<div class="dayListDayDiv" id="dayListDiv' + i +
                 '" style="left:' + start + 'px; width:' + (this.dayUnitWidth-1) +
                 'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
-            if (i == currDay) {
+            if (calcDay.getTime() == currDay.getTime()) {
                 str += ' background-image:url(' + scooby.env.getImagesUrl() + 
                     'day_col_header_background.gif); background-repeat:' +
                     ' repeat-x; background-position:0px 0px;'
@@ -472,11 +475,14 @@ var Cal = new function() {
         var str = '';
         var start = 0;
         var idstr = ''
-        var currDay = this.currDate.getDay();
+        var calcDay = null;
+        var cd = this.currDate;
+        var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
 
         for (var i = 0; i < 7; i++) {
+            calcDay = Date.add('d', i, this.viewStart);
             str += '<div class="allDayListDayDiv';
-            if (i == currDay) {
+            if (calcDay.getTime() == currDay.getTime()) {
                 str +=  ' currentDayDay'
             }
             str +='" id="allDayListDiv' + i +
@@ -499,7 +505,9 @@ var Cal = new function() {
         var idstr = '';
         var hour = 0;
         var meridian = '';
-        var currDay = this.currDate.getDay();
+        var calcDay = null;
+        var cd = this.currDate;
+        var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
         var viewDiv = null;
         // Subtract one px for border per asinine CSS spec
         var halfHourHeight = (HOUR_UNIT_HEIGHT/2) - 1;
@@ -540,7 +548,8 @@ var Cal = new function() {
 
         // Do a week's worth of day cols with hours
         for (var i = 0; i < 7; i++) {
-           str += '<div class="dayDiv" id="dayDiv' + i +
+            calcDay = Date.add('d', i, this.viewStart);
+            str += '<div class="dayDiv" id="dayDiv' + i +
                 '" style="left:' + start + 'px; width:' +
                 (this.dayUnitWidth-1) +
                 'px;"';
@@ -549,14 +558,14 @@ var Cal = new function() {
                 idstr = i + '-' + j + '00';
                 row = '';
                 row += '<div id="hourDiv' + idstr + '" class="hourDivTop';
-                if (i == currDay) {
+                if (calcDay.getTime() == currDay.getTime()) {
                     row +=  ' currentDayDay'
                 }
                 row += '" style="height:' + halfHourHeight + 'px;">';
                 row += '</div>\n';
                 idstr = i + '-' + j + '30';
                 row += '<div id="hourDiv' + idstr + '" class="hourDivBottom';
-                if (i == currDay) {
+                if (calcDay.getTime() == currDay.getTime()) {
                     row +=  ' currentDayDay'
                 }
                 row += '" style="';
@@ -1212,6 +1221,8 @@ var Cal = new function() {
         Cal.getQuerySpan(new Date(queryDate)); // Get the new query span week
         Cal.showMonthHeader();
         Cal.showDayList();
+        Cal.showAllDayList();
+        Cal.showHours();
 
         // Load and display events
         Cal.loadDisplayEvents();

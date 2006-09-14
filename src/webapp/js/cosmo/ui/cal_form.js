@@ -28,6 +28,9 @@
  * @object The form for all UI-form-elements on the page
  */
 function CalForm() {
+    
+    var self = this;
+    
     // The actual form DOM elem -- form.form is redundant, so
     // changing this to formElem would be a Good Thing
     this.form = document.getElementById('calForm');
@@ -741,12 +744,35 @@ function CalForm() {
         d = document.createElement('div');
         d.className = 'floatLeft';
         dc.appendChild(d);
-        butJump = new Button('jumpToButton', 38, function() { alert('This does nothing yet.') },
+        butJump = new Button('jumpToButton', 38, Cal.calForm.goJumpToDate,
                 getText('App.Button.Go'), true);
         d.appendChild(butJump.domNode);
         
         d = document.createElement('div');
         d.className = 'clearAll';
         dc.appendChild(d);
+    };
+    this.goJumpToDate = function() {
+        var e = null;
+        var err = '';
+        var val = self.form.jumpto.value;
+        err = Validate.dateFormat(val);
+        if (err) {
+            err += '\n';
+        }
+        // Display error or update form and submit
+        // =======================
+        // Err condition
+        if (err) {
+            err = err.replace(/\n/g, '<br/>');
+            e = new ScoobyServiceClientException();
+            e.message = err;
+            Cal.showErr('Error in jump-to date', e);
+            return false;
+        }
+        // All okey-dokey -- submit
+        else {
+           Cal.goViewQueryDate(val); 
+        }
     };
 }

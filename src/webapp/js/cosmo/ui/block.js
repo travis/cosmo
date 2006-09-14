@@ -250,7 +250,9 @@ function Block() {
         
         // Text colors
         // ------------
-        timeDiv.style.color = textColor;
+        if (timeDiv) {
+            timeDiv.style.color = textColor;
+        }
         titleDiv.style.color = textColor;
         
         // Aux divs for multi-day events
@@ -282,7 +284,7 @@ function Block() {
         var ret = false;
         switch(true) {
             case (ev.data.status && ev.data.status.indexOf('CANCELLED') > -1):
-            case (ev.data.start.getTime() == ev.data.end.getTime()):
+            case (!ev.data.allDay && (ev.data.start.getTime() == ev.data.end.getTime())):
                 ret = true;
                 break;
             default:

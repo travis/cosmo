@@ -32,7 +32,7 @@ var MiniCal = new function() {
     function getElementOfAttribute(attr, elem) {
         if (elem.tagName == "BODY") return null
         return (elem.getAttribute(attr) != null ? 
-            elem : getElementofAttribute(attr, elem.parentNode));
+            elem : getElementOfAttribute(attr, elem.parentNode));
     }
     
     this.controller = null;

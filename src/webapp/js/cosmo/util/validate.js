@@ -28,7 +28,7 @@ var Validate = new function() {
         // Check format
         var matchArray = str.match(pat);
         if (!matchArray) {
-            errMsg += 'Date is not in a valid format.\n';
+            errMsg += getText('App.Error.InvalidDateFormat') + '\n';
         }
         else {
             // Parse date parts into vars
@@ -37,22 +37,22 @@ var Validate = new function() {
             year = matchArray[4];
             // Month range
             if (month < 1 || month > 12) {
-                errMsg += 'Month must be between 1 and 12.\n';
+                errMsg += getText('App.Error.InvalidMonthRange') + '\n';
             }
             // Day range
             if (day < 1 || day > 31) {
-                errMsg += 'Day must be between 1 and 31.\n';
+                errMsg += getText('App.Error.InvalidDayRange') + '\n';
             }
             // Day 31 for correct months
             if ((month == 4 || month == 6 || month == 9 || month == 11) 
                 && day == 31) {
-                errMsg += 'Month ' + month + ' does not have 31 days.\n';
+                errMsg += Date.fullMonth[month-1] + ' does not have 31 days.\n';
             }
             // Leap year stuff
             if (month == 2) {
                 var isLeap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
                 if (day > 29 || (day == 29 && !isLeap)) {
-                    errMsg += 'February ' + year + ' does not have ' + day + ' days.\n';
+                    errMsg += getText('App.Error.FebruaryDays') + '\n';
                 }
             }
         }

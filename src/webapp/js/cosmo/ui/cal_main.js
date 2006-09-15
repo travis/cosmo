@@ -508,29 +508,41 @@ var Cal = new function() {
         var calcDay = null;
         var cd = this.currDate;
         var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
+        var isCurrentDay = false;
         var viewDiv = null;
         // Subtract one px for border per asinine CSS spec
         var halfHourHeight = (HOUR_UNIT_HEIGHT/2) - 1;
+        var nonWorkingShade = '#f3f3f3';
         
         str = '';
         viewDiv = document.getElementById('timedHourListDiv');
-
+        
+        // Timeline of hours on left
         for (var j = 0; j < 24; j++) {
-            idstr = i + '-' + j + '00';
             hour = j == 12 ? getText('App.Noon') : hrMil2Std(j);
             meridian = j > 11 ? ' PM' : ' AM';
             meridian = j == 12 ? '' : '<span>' + meridian + '</span>';
             row = '';
-            row += '<div class="hourDivTop" style="height:' + 
-                halfHourHeight + 'px;">';
-            row += '<div id="hourDivTime' + idstr +
-                '" class="hourDivSubLeft">' + hour
+            row += '<div class="hourDivTop';
+            // Non-working hours are gray
+            if (j < 8 || j > 18) {
+                row += ' nonWorkingHours';
+            }
+            row += '" style="height:' + 
+                halfHourHeight + 'px;';
+            row += '">';
+            row += '<div class="hourDivSubLeft">' + hour
             row += meridian;
             row += '</div>';
             row += '</div>\n';
             idstr = i + '-' + j + '30';
-            row += '<div id="hourDiv' + idstr +
-                '" class="hourDivBottom"';
+            row += '<div class="hourDivBottom';
+            // Non-working hours are gray
+            if (j < 8 || j > 18) {
+                row += ' nonWorkingHours';
+            }
+            row += '"';
+            // Make the noon border thicker
             if (j == 11) { 
                 row += ' style="height:' + (halfHourHeight-1) + 
                     'px; border-width:2px;';
@@ -555,18 +567,31 @@ var Cal = new function() {
                 'px;"';
             str += '>';
             for (var j = 0; j < 24; j++) {
+                
+                isCurrentDay = (calcDay.getTime() == currDay.getTime());
+                
                 idstr = i + '-' + j + '00';
                 row = '';
                 row += '<div id="hourDiv' + idstr + '" class="hourDivTop';
-                if (calcDay.getTime() == currDay.getTime()) {
+                // Highlight the current day
+                if (isCurrentDay) {
                     row +=  ' currentDayDay'
+                }
+                // Non-working hours are gray
+                else if (j < 8 || j > 18) {
+                    row += ' nonWorkingHours';
                 }
                 row += '" style="height:' + halfHourHeight + 'px;">';
                 row += '</div>\n';
                 idstr = i + '-' + j + '30';
                 row += '<div id="hourDiv' + idstr + '" class="hourDivBottom';
-                if (calcDay.getTime() == currDay.getTime()) {
+                // Highlight the current day
+                if (isCurrentDay) {
                     row +=  ' currentDayDay'
+                }
+                // Non-working hours are gray
+                else if (j < 8 || j > 18) {
+                    row += ' nonWorkingHours';
                 }
                 row += '" style="';
                 if (j == 11) { 

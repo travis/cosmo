@@ -239,7 +239,8 @@ function CalForm() {
                 formElem.size = size;
             }
             if (maxlength) {
-                formElem.maxlength = maxlength;
+                //formElem.maxlength = maxlength; // Setting the prop directly is broken in FF
+                formElem.setAttribute('maxlength', maxlength);
             }
             if (value) {
                 formElem.value = value;
@@ -728,10 +729,21 @@ function CalForm() {
         dc.style.top = top + 'px';
         
         d = document.createElement('div');
+        d.className = 'floatLeft';
+        d.style.paddingTop = '3px';
+        d.appendChild(document.createTextNode(getText('Main.GoTo')));
+        dc.appendChild(d);
+        
+        d = document.createElement('div');
+        d.className = 'floatLeft';
+        this.createNbsp(d);
+        dc.appendChild(d);
+        
+        d = document.createElement('div');
         d.className = 'formElem floatLeft';
         dc.appendChild(d);
         this.createInput('text', 'jumpto', 'jumpto',
-            10, 10, null, 'inputText', d);
+            8, 10, null, 'inputText', d);
         this.setTextInput(this.form.jumpto, 'mm/dd/yyyy', true, false);
         this.form.jumpto.onclick = Cal.calForm.emptyTextInput;
         
@@ -744,7 +756,7 @@ function CalForm() {
         d = document.createElement('div');
         d.className = 'floatLeft';
         dc.appendChild(d);
-        butJump = new Button('jumpToButton', 38, Cal.calForm.goJumpToDate,
+        butJump = new Button('jumpToButton', 32, Cal.calForm.goJumpToDate,
                 getText('App.Button.Go'), true);
         d.appendChild(butJump.domNode);
         
@@ -767,7 +779,7 @@ function CalForm() {
             err = err.replace(/\n/g, '<br/>');
             e = new ScoobyServiceClientException();
             e.message = err;
-            Cal.showErr('Error in jump-to date', e);
+            Cal.showErr(getText('Main.Error.GoToDate'), e);
             return false;
         }
         // All okey-dokey -- submit

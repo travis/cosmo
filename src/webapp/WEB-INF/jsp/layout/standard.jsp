@@ -57,6 +57,19 @@
           <td align="right" valign="top">
             <!-- main navbar -->
             <div class="mdData">
+              <fmt:message key="Layout.Nav.Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
+              <authz:authorize ifAnyGranted="ROLE_USER">
+                |
+                <c:url var="homeUrl" value="/console/home/browse/${user.username}"/>
+                <a href="${homeUrl}"><fmt:message key="Layout.Nav.Main.Home"/></a>
+                |
+                <c:url var="accountUrl" value="/console/account"/>
+                <a href="${accountUrl}"><fmt:message key="Layout.Nav.Main.Account"/></a>
+                |
+                <c:url var="calendarUrl" value="/pim/pim.page"/>
+                <a href="${calendarUrl}"><fmt:message key="Layout.Nav.Main.Calendar"/></a>
+              </authz:authorize>
+              |
               <c:choose><c:when test="${fn:endsWith(body, '/help.jsp')}"><strong><fmt:message key="Layout.Nav.Main.Help"/></strong></c:when><c:otherwise><html:link page="/console/help"><fmt:message key="Layout.Nav.Main.Help"/></html:link></c:otherwise></c:choose>
               |
               <c:url var="aboutUrl" value="/console/about"/>
@@ -65,11 +78,6 @@
               <html:link page="/console/logout">
                 <fmt:message key="Layout.Nav.Main.LogOut"/>
               </html:link>
-            </div>
-            <div class="mdData" style="margin-top:8px;">
-              <fmt:message key="Layout.Nav.Main.LoggedInAs">
-                <fmt:param value="${user.username}"/>
-              </fmt:message>
             </div>
             <!-- end main navbar -->
           </td>

@@ -85,9 +85,26 @@ function init() {
 <body id="body">
         <div id="menuBarDiv">
             <div id="smallLogoDiv"></div>
-            <fmt:message key="Main.Welcome"/> ${user.username}
+            <fmt:message key="Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
+            <authz:authorize ifAnyGranted="ROLE_USER">
+              <span class="menuBarDivider">|</span>
+              <c:url var="homeUrl" value="/console/home/browse/${user.username}"/>
+              <a href="${homeUrl}"><fmt:message key="Main.Home"/></a>
+              <span class="menuBarDivider">|</span>
+              <c:url var="accountUrl" value="/console/account"/>
+              <a href="${accountUrl}"><fmt:message key="Main.Account"/></a>
+            </authz:authorize>
+            <authz:authorize ifAllGranted="ROLE_ROOT">
+              <span class="menuBarDivider">|</span>
+              <c:url var="consoleUrl" value="/console/users"/>
+              <a href="${consoleUrl}"><fmt:message key="Main.Console"/></a>
+            </authz:authorize>
             <span class="menuBarDivider">|</span>
-            <a href="javascript:Popup.open('${baseUrl}/console/about', 380, 280);">
+            <c:url var="helpUrl" value="/console/help"/>
+            <a href="${helpUrl}"><fmt:message key="Main.Help"/></a>
+            <span class="menuBarDivider">|</span>
+            <c:url var="aboutUrl" value="/console/about"/>
+            <a href="javascript:Popup.open('${aboutUrl}', 380, 280);">
               <fmt:message key="Main.About"/> 
             </a>
             <span class="menuBarDivider">|</span>

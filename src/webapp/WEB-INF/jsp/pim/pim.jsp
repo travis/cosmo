@@ -19,6 +19,7 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
+<cosmo:baseurl var="baseUrl"/>
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
 <fmt:setBundle basename="PimMessageResources"/>
@@ -85,7 +86,7 @@ function init() {
             <div id="smallLogoDiv"></div>
             <fmt:message key="Main.Welcome"/> ${user.username}
             <span class="menuBarDivider">|</span>
-            <a href="javascript:Popup.open('about.html', 380, 280);">
+            <a href="javascript:Popup.open('${baseUrl}/console/about', 380, 280);">
               <fmt:message key="Main.About"/> 
             </a>
             <span class="menuBarDivider">|</span>

@@ -435,7 +435,7 @@ var Signup = new function() {
     /**
      * The table of config settings for setting up a sharing acount
      * and the links to create another new account or to log into
-     * Scooby
+     * Cosmo
      * @returns A div containing the table of config settings
      */
     this.getResultTable = function() {
@@ -485,10 +485,10 @@ var Signup = new function() {
         p = document.createElement('div');
         p.style.marginTop = '20px';
         a = document.createElement('a');
-        a.href = '/scooby/';
+        a.href = '/cosmo/';
         a.appendChild(document.createTextNode('Click here'));
         p.appendChild(a);
-        p.appendChild(document.createTextNode(' to begin using your new account in Scooby.'));
+        p.appendChild(document.createTextNode(' to begin using your new account.'));
         dI.appendChild(p);
         
         p = document.createElement('div');

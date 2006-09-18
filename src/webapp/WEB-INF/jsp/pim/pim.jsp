@@ -21,6 +21,7 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:baseurl var="baseUrl"/>
 <cosmo:staticbaseurl var="staticBaseUrl"/>
+<cosmoui:user var="user"/>
 
 <fmt:setBundle basename="PimMessageResources"/>
 

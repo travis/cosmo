@@ -483,7 +483,7 @@ var Cal = new function() {
             calcDay = Date.add('d', i, this.viewStart);
             str += '<div class="allDayListDayDiv';
             if (calcDay.getTime() == currDay.getTime()) {
-                str +=  ' currentDayDay'
+                str += ' currentDayDay'
             }
             str +='" id="allDayListDiv' + i +
             '" style="left:' + start + 'px; width:' +
@@ -526,7 +526,7 @@ var Cal = new function() {
             row += '<div class="hourDivTop';
             // Non-working hours are gray
             if (j < 8 || j > 18) {
-                row += ' nonWorkingHours';
+                //row += ' nonWorkingHours';
             }
             row += '" style="height:' + 
                 halfHourHeight + 'px;';
@@ -539,7 +539,7 @@ var Cal = new function() {
             row += '<div class="hourDivBottom';
             // Non-working hours are gray
             if (j < 8 || j > 18) {
-                row += ' nonWorkingHours';
+                //row += ' nonWorkingHours';
             }
             row += '"';
             // Make the noon border thicker
@@ -575,11 +575,11 @@ var Cal = new function() {
                 row += '<div id="hourDiv' + idstr + '" class="hourDivTop';
                 // Highlight the current day
                 if (isCurrentDay) {
-                    row +=  ' currentDayDay'
+                    row += ' currentDayDay'
                 }
                 // Non-working hours are gray
                 else if (j < 8 || j > 18) {
-                    row += ' nonWorkingHours';
+                    //row += ' nonWorkingHours';
                 }
                 row += '" style="height:' + halfHourHeight + 'px;">';
                 row += '</div>\n';
@@ -587,11 +587,11 @@ var Cal = new function() {
                 row += '<div id="hourDiv' + idstr + '" class="hourDivBottom';
                 // Highlight the current day
                 if (isCurrentDay) {
-                    row +=  ' currentDayDay'
+                    row += ' currentDayDay'
                 }
                 // Non-working hours are gray
                 else if (j < 8 || j > 18) {
-                    row += ' nonWorkingHours';
+                    //row += ' nonWorkingHours';
                 }
                 row += '" style="';
                 if (j == 11) { 

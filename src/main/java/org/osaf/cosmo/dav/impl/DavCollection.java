@@ -45,9 +45,11 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
+import org.apache.jackrabbit.webdav.version.DeltaVConstants;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
+import org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty;
 
 import org.apache.log4j.Logger;
 
@@ -66,7 +68,11 @@ import org.osaf.cosmo.util.PathUtil;
  * Extends <code>DavResourceBase</code> to adapt the Cosmo
  * <code>CollectionItem</code> to the DAV resource model.
  *
- * This class does not define any live properties.
+ * This class defines the following live properties:
+ *
+ * <ul>
+ * <li><code>DAV:supported-report-set</code></li>
+ * </ul>
  *
  * @see DavResourceBase
  * @see CollectionItem
@@ -80,6 +86,8 @@ public class DavCollection extends DavResourceBase {
     private ArrayList members;
 
     static {
+        registerLiveProperty(DeltaVConstants.SUPPORTED_REPORT_SET);
+
         RESOURCE_TYPES = new int[] { ResourceType.COLLECTION };
 
         REPORT_TYPES.add(QueryReport.REPORT_TYPE_CALDAV_QUERY);
@@ -230,17 +238,35 @@ public class DavCollection extends DavResourceBase {
 
     /** */
     protected void loadLiveProperties() {
-        // no additional live properties
+        CollectionItem cc = (CollectionItem) getItem();
+        if (cc == null)
+            return;
+
+        DavPropertySet properties = getProperties();
+
+        properties.add(new SupportedReportSetProperty((ReportType[])REPORT_TYPES.toArray(new ReportType[0])));
     }
 
     /** */
     protected void setLiveProperty(DavProperty property) {
-        // no additional live properties
+        CollectionItem cc = (CollectionItem) getItem();
+        if (cc == null)
+            return;
+
+        DavPropertyName name = property.getName();
+
+        if (name.equals(DeltaVConstants.SUPPORTED_REPORT_SET))
+            throw new ModelValidationException("cannot set protected property " + name);
     }
 
     /** */
     protected void removeLiveProperty(DavPropertyName name) {
-        // no additional live properties
+        CollectionItem cc = (CollectionItem) getItem();
+        if (cc == null)
+            return;
+
+        if (name.equals(DeltaVConstants.SUPPORTED_REPORT_SET))
+            throw new ModelValidationException("cannot remove protected property " + name);
     }
 
     /** */

@@ -361,10 +361,10 @@ $smButtonHeight = 18px
 /* Scooby logo up on menubar */
 #smallLogoDiv {
     position:absolute;
-    top:4px;
-    left:4px;
-    width:135px;
-    height:40px;
+    top:8px;
+    left:8px;
+    width:129px;
+    height:28px;
 }
 
 /* Main content area under menubar -- contains both

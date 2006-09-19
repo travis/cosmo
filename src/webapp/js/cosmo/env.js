@@ -116,3 +116,7 @@ scooby.env.setBaseUrl = function(baseUrl){
 scooby.env.getImagesUrl = function(){
 	return scooby.env.getBaseUrl() + '/templates/default/images/';
 }
+
+scooby.env.getRedirectUrl = function(){
+	return scooby.env.getBaseUrl() + '/redirect_login.jsp';}
+

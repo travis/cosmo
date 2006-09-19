@@ -1702,7 +1702,7 @@ var Cal = new function() {
         }
     };
     this.redirectTimeout = function() {
-        location = 'redirect_login.html';
+        location = scooby.env.getRedirectUrl();
     },
 
     // ==========================

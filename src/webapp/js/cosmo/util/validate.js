@@ -65,16 +65,16 @@ var Validate = new function() {
         // Check format
         var matchArray = str.match(pat);
         if (!matchArray) {
-            errMsg += 'Time is not in a valid format.\n';
+            errMsg += getText('App.Error.InvalidTimeFormat') + '\n';
         }
         else {
             hours = matchArray[1];
             minutes = matchArray[3];
             if (hours < 1 || hours > 12) {
-                errMsg += 'Hour must between 1 and 12.';
+                errMsg += getText('App.Error.InvalidHourRange') + '\n';
             }
             if (minutes < 0 || minutes > 59) {
-                errMsg += 'Minutes must between 00 and 59.';
+                errMsg += getText('App.Error.InvalidMinutesRange') + '\n';
             }
         }
         return errMsg;

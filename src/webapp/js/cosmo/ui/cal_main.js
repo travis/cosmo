@@ -438,7 +438,9 @@ var Cal = new function() {
         var calcDay = null;
         var cd = this.currDate;
         var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
-
+        
+        // Spacer to align with the timeline that displays hours below
+        // for the timed event canvas
         str += '<div id="dayListSpacer" class="dayListDayDiv"' +
             ' style="left:0px; width:' +
             (HOUR_LISTING_WIDTH - 1) + 'px; height:' +
@@ -496,7 +498,7 @@ var Cal = new function() {
     };
     /**
      * Draws the 12 AM to 11 PM hour-range in each day column
-     * TO-DO: Change from using innerHTML to DOM methods to insert the hour divs
+     * innerHTML is faster than DOM, leave for now
      */
     this.showHours = function() {
         var str = '';
@@ -510,12 +512,28 @@ var Cal = new function() {
         var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
         var isCurrentDay = false;
         var viewDiv = null;
+        var timeLineWidth = 0;
+        var workingHoursBarWidth = 3;
+        
         // Subtract one px for border per asinine CSS spec
         var halfHourHeight = (HOUR_UNIT_HEIGHT/2) - 1;
-        var nonWorkingShade = '#f3f3f3';
+        
+        function workingHoursLine() {
+            var r = '';
+            // Working/non-working hours line
+            r += '<div class="';
+            r += (j < 8 || j > 17) ? 'nonWorkingHours' : 'workingHours';
+            r += '" style="width:' + workingHoursBarWidth + 
+                'px; height:' + (halfHourHeight+1) + 
+                'px; float:left; font-size:1px;">&nbsp;</div>';
+            return r;
+        }
         
         str = '';
         viewDiv = document.getElementById('timedHourListDiv');
+        timeLineWidth = parseInt(viewDiv.offsetWidth);
+        // Subtract 1 for 1px border
+        timeLineWidth = timeLineWidth - workingHoursBarWidth - 1;
         
         // Timeline of hours on left
         for (var j = 0; j < 24; j++) {
@@ -523,25 +541,25 @@ var Cal = new function() {
             meridian = j > 11 ? ' PM' : ' AM';
             meridian = j == 12 ? '' : '<span>' + meridian + '</span>';
             row = '';
+            
+            // Upper half hour
+            // ==================
             row += '<div class="hourDivTop';
-            // Non-working hours are gray
-            if (j < 8 || j > 18) {
-                //row += ' nonWorkingHours';
-            }
             row += '" style="height:' + 
-                halfHourHeight + 'px;';
-            row += '">';
-            row += '<div class="hourDivSubLeft">' + hour
-            row += meridian;
-            row += '</div>';
+                halfHourHeight + 'px; width:' + 
+                timeLineWidth + 'px; float:left;">';
+            // Hour plus AM/PM
+            row += '<div class="hourDivSubLeft">' + hour + 
+                meridian + '</div>';
             row += '</div>\n';
+            row += workingHoursLine();
+            row += '<br class="clearAll"/>'
+            
             idstr = i + '-' + j + '30';
-            row += '<div class="hourDivBottom';
-            // Non-working hours are gray
-            if (j < 8 || j > 18) {
-                //row += ' nonWorkingHours';
-            }
-            row += '"';
+            
+            // Lower half hour
+            // ==================
+            row += '<div class="hourDivBottom"';
             // Make the noon border thicker
             if (j == 11) { 
                 row += ' style="height:' + (halfHourHeight-1) + 
@@ -550,7 +568,11 @@ var Cal = new function() {
             else {
                 row += ' style="height:' + halfHourHeight + 'px;';
             }
-            row += '">&nbsp;</div>';
+            row += ' width:' + timeLineWidth + 
+                'px; float:left;">&nbsp;</div>\n';
+            row += workingHoursLine();
+            row += '<br class="clearAll"/>'
+            
             str += row;
         }
         viewDiv.innerHTML = str;

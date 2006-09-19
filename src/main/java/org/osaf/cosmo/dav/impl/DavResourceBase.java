@@ -52,6 +52,8 @@ import org.apache.jackrabbit.webdav.xml.Namespace;
 import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dav.ExtendedDavResource;
+import org.osaf.cosmo.dav.ticket.TicketConstants;
+import org.osaf.cosmo.dav.ticket.property.TicketDiscovery;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CollectionItem;
@@ -74,10 +76,11 @@ import org.osaf.cosmo.util.PathUtil;
  * This class defines the following live properties:
  *
  * <ul>
- * <li><code>DAV:getcreationdate</code></li>
- * <li><code>DAV:displayname</code></li>
- * <li><code>DAV:iscollection</code></li>
- * <li><code>DAV:resourcetype</code></li>
+ * <li><code>DAV:getcreationdate</code> (protected)</li>
+ * <li><code>DAV:displayname</code> (protected)</li>
+ * <li><code>DAV:iscollection</code> (protected)</li>
+ * <li><code>DAV:resourcetype</code> (protected)</li>
+ * <li><code>ticket:ticketdiscovery</code> (protected)</li>
  * </ul>
  *
  * Note that all of these properties are protected and cannot be
@@ -88,7 +91,8 @@ import org.osaf.cosmo.util.PathUtil;
  * @see org.apache.jackrabbit.webdav.DavResource
  * @see ExtendedDavResource
  */
-public abstract class DavResourceBase implements ExtendedDavResource {
+public abstract class DavResourceBase
+    implements ExtendedDavResource, TicketConstants {
     private static final Logger log =
         Logger.getLogger(DavResourceBase.class);
 
@@ -107,6 +111,7 @@ public abstract class DavResourceBase implements ExtendedDavResource {
         registerLiveProperty(DavPropertyName.DISPLAYNAME);
         registerLiveProperty(DavPropertyName.ISCOLLECTION);
         registerLiveProperty(DavPropertyName.RESOURCETYPE);
+        registerLiveProperty(TICKETDISCOVERY);
     }
 
     /** */
@@ -615,7 +620,27 @@ public abstract class DavResourceBase implements ExtendedDavResource {
     /**
      * Loads the live DAV properties for the resource.
      */
-    protected abstract void loadLiveProperties();
+    protected void loadLiveProperties() {
+        if (item == null)
+            return;
+
+        long creationTime = item.getCreationDate() != null ?
+            item.getCreationDate().getTime() :
+            new Date().getTime();
+        properties.add(new DefaultDavProperty(DavPropertyName.CREATIONDATE,
+                                              IOUtil.getCreated(creationTime)));
+
+        properties.add(new DefaultDavProperty(DavPropertyName.DISPLAYNAME,
+                                              item.getName()));
+
+        properties.add(new ResourceType(getResourceTypes()));
+
+        // Windows XP support
+        properties.add(new DefaultDavProperty(DavPropertyName.ISCOLLECTION,
+                                              isCollection() ? "1" : "0"));
+
+        properties.add(new TicketDiscovery(this));
+    }
 
     /**
      * Sets a live DAV property on the resource.
@@ -632,7 +657,18 @@ public abstract class DavResourceBase implements ExtendedDavResource {
      * or if a null value is specified for a property that does not
      * accept them
      */
-    protected abstract void setLiveProperty(DavProperty property);
+    protected void setLiveProperty(DavProperty property) {
+        if (item == null)
+            return;
+
+        DavPropertyName name = property.getName();
+        if (property.getValue() == null)
+            throw new ModelValidationException("null value for property " + name);
+        String value = property.getValue().toString();
+
+        if (name.equals(TICKETDISCOVERY))
+            throw new ModelValidationException("cannot set protected property " + name);
+    }
 
     /**
      * Removes a live DAV property from the resource.
@@ -647,7 +683,13 @@ public abstract class DavResourceBase implements ExtendedDavResource {
      *
      * @throws ModelValidationException if the property is protected
      */
-    protected abstract void removeLiveProperty(DavPropertyName name);
+    protected void removeLiveProperty(DavPropertyName name) {
+        if (item == null)
+            return;
+
+        if (name.equals(TICKETDISCOVERY))
+            throw new ModelValidationException("cannot remove protected property " + name);
+    }
 
     /**
      * Returns a list of names of <code>Attribute</code>s that should
@@ -661,22 +703,6 @@ public abstract class DavResourceBase implements ExtendedDavResource {
 
         if (log.isDebugEnabled())
             log.debug("loading properties for " + getResourcePath());
-
-        // load base live properties
-        long creationTime = item.getCreationDate() != null ?
-            item.getCreationDate().getTime() :
-            new Date().getTime();
-        properties.add(new DefaultDavProperty(DavPropertyName.CREATIONDATE,
-                                              IOUtil.getCreated(creationTime)));
-
-        properties.add(new DefaultDavProperty(DavPropertyName.DISPLAYNAME,
-                                              item.getName()));
-
-        properties.add(new ResourceType(getResourceTypes()));
-
-        // Windows XP support
-        properties.add(new DefaultDavProperty(DavPropertyName.ISCOLLECTION,
-                                              isCollection() ? "1" : "0"));
 
         // load subclass live properties
         loadLiveProperties();

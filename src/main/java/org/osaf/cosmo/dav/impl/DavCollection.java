@@ -71,7 +71,7 @@ import org.osaf.cosmo.util.PathUtil;
  * This class defines the following live properties:
  *
  * <ul>
- * <li><code>DAV:supported-report-set</code></li>
+ * <li><code>DAV:supported-report-set</code> (protected)</li>
  * </ul>
  *
  * @see DavResourceBase
@@ -238,6 +238,8 @@ public class DavCollection extends DavResourceBase {
 
     /** */
     protected void loadLiveProperties() {
+        super.loadLiveProperties();
+
         CollectionItem cc = (CollectionItem) getItem();
         if (cc == null)
             return;
@@ -249,6 +251,8 @@ public class DavCollection extends DavResourceBase {
 
     /** */
     protected void setLiveProperty(DavProperty property) {
+        super.setLiveProperty(property);
+
         CollectionItem cc = (CollectionItem) getItem();
         if (cc == null)
             return;
@@ -261,6 +265,8 @@ public class DavCollection extends DavResourceBase {
 
     /** */
     protected void removeLiveProperty(DavPropertyName name) {
+        super.removeLiveProperty(name);
+
         CollectionItem cc = (CollectionItem) getItem();
         if (cc == null)
             return;

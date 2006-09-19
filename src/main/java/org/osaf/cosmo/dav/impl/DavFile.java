@@ -186,9 +186,9 @@ public class DavFile extends DavResourceBase {
     }
 
     /** */
-    public DavResource getMember(String href)
+    public DavResource findMember(String href)
         throws DavException {
-        throw new DavException(DavServletResponse.SC_NOT_FOUND);
+        throw new DavException(DavServletResponse.SC_BAD_REQUEST);
     }
 
     /** */
@@ -245,6 +245,8 @@ public class DavFile extends DavResourceBase {
 
     /** */
     protected void loadLiveProperties() {
+        super.loadLiveProperties();
+
         ContentItem content = (ContentItem) getItem();
         if (content == null)
             return;
@@ -275,13 +277,13 @@ public class DavFile extends DavResourceBase {
 
     /** */
     protected void setLiveProperty(DavProperty property) {
+        super.setLiveProperty(property);
+
         ContentItem content = (ContentItem) getItem();
         if (content == null)
             return;
 
         DavPropertyName name = property.getName();
-        if (property.getValue() == null)
-            throw new ModelValidationException("null value for property " + name);
         String value = property.getValue().toString();
 
         if (name.equals(DavPropertyName.GETCONTENTLENGTH) ||
@@ -306,6 +308,8 @@ public class DavFile extends DavResourceBase {
 
     /** */
     protected void removeLiveProperty(DavPropertyName name) {
+        super.removeLiveProperty(name);
+
         ContentItem content = (ContentItem) getItem();
         if (content == null)
             return;

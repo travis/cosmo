@@ -21,10 +21,10 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -51,7 +51,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dav.ExtendedDavResource;
-import org.osaf.cosmo.dav.impl.DavResourceBase;
+import org.osaf.cosmo.dav.impl.DavCalendarCollection;
+import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CalendarEventItem;
@@ -67,24 +68,12 @@ public abstract class CaldavReport
     implements Report, DavConstants, CaldavConstants {
     private static final Log log = LogFactory.getLog(CaldavReport.class);
 
-    /** */
-    public static final ReportType CALDAV_QUERY =
-        ReportType.register(ELEMENT_CALDAV_CALENDAR_QUERY,
-                            NAMESPACE_CALDAV, QueryReport.class);
-    /** */
-    public static final ReportType CALDAV_MULTIGET =
-        ReportType.register(ELEMENT_CALDAV_CALENDAR_MULTIGET,
-                            NAMESPACE_CALDAV, MultigetReport.class);
-    /** */
-    public static final ReportType CALDAV_FREEBUSY =
-        ReportType.register(ELEMENT_CALDAV_CALENDAR_FREEBUSY,
-                            NAMESPACE_CALDAV, FreeBusyReport.class);
-
     private ExtendedDavResource resource;
     private ReportInfo info;
     private CalendarFilter queryFilter;
     private OutputFilter outputFilter;
-    private List hrefs = new ArrayList();
+    private Set<DavCalendarResource> results =
+        new HashSet<DavCalendarResource>();
 
     // Report methods
 
@@ -100,8 +89,10 @@ public abstract class CaldavReport
     /** */
     public void run(DavServletResponse response)
         throws IOException, DavException {
+        if (log.isDebugEnabled())
+            log.debug("running report " + getType().getReportName());
+
         runQuery();
-        buildResponse();
         output(response);
     }
 
@@ -116,18 +107,13 @@ public abstract class CaldavReport
     }
 
     /** */
-    public List getHrefs() {
-        return hrefs;
+    public Set<DavCalendarResource> getResults() {
+        return results;
     }
 
     /** */
-    public void setHrefs(List hrefs) {
-        this.hrefs = hrefs;
-    }
-
-    /** */
-    public void addHrefs(List hrefs) {
-        this.hrefs.addAll(hrefs);
+    public void addResults(Set<DavCalendarResource> results) {
+        this.results.addAll(results);
     }
 
     // our methods
@@ -142,8 +128,10 @@ public abstract class CaldavReport
         throws DavException;
 
     /**
-     * Executes the report query and sets the member resource hrefs
-     * used to calculate the report response.
+     * Executes the report query and stores the result, creating
+     * whatever objects are needed to generate the response output
+     * (filtering with the <code>OutputFilter</code> if one is
+     * provided with the report info).
      *
      * If the report is specified with depth 0, no queries are run,
      * since collections themselves do not have associated calendar
@@ -172,15 +160,6 @@ public abstract class CaldavReport
             doQueryForChildren(resource);
         }
     }
-
-    /**
-     * Process the list of calendar resource hrefs found by the report
-     * query, creating whatever objects are needed to generate the
-     * response output (filtering with the <code>OutputFilter</code>
-     * if one is provided with the report info).
-     */
-    protected abstract void buildResponse()
-        throws DavException;
 
     /**
      * Write output to the response.
@@ -325,11 +304,8 @@ public abstract class CaldavReport
     private void doQuery(DavResource resource)
         throws DavException {
         try {
-            // XXX
-            //            DavCalendarCollection dcc = (DavCalendarCollection) resource;
-            //            Collection events = dcc.findEvents(queryFilter);
-            Collection events = new ArrayList();
-            addHrefs(queryResultToHrefs(events));
+            DavCalendarCollection collection = (DavCalendarCollection) resource;
+            addResults(collection.findMembers(queryFilter));
         } catch (Exception e) {
             log.error("cannot run report query", e);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot run report query: " + e.getMessage());
@@ -347,23 +323,5 @@ public abstract class CaldavReport
                 doQueryForChildren(child);
             }
         }
-    }
-
-    private List queryResultToHrefs(Collection events) {
-        DavResourceLocator parentLocator = resource.getLocator();
-
-        List hrefs = new ArrayList();
-        for (Iterator i=events.iterator(); i.hasNext();) {
-            CalendarEventItem event = (CalendarEventItem) i.next();
-            String eventPath = parentLocator.getResourcePath() + "/" +
-                event.getName();
-            DavResourceLocator eventLocator = parentLocator.getFactory()
-                .createResourceLocator(parentLocator.getPrefix(),
-                                       parentLocator.getWorkspacePath(),
-                                       eventPath, false);
-            hrefs.add(eventLocator.getHref(true));
-        }
-
-        return hrefs;
     }
 }

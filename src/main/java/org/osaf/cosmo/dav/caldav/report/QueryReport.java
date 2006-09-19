@@ -36,6 +36,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dav.caldav.CaldavRequestHelper;
+import org.osaf.cosmo.dav.impl.DavCalendarCollection;
+import org.osaf.cosmo.dav.impl.DavResourceBase;
+import org.osaf.cosmo.model.CalendarCollectionItem;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,13 +58,18 @@ import org.w3c.dom.Element;
 public class QueryReport extends CaldavMultiStatusReport {
     private static final Log log = LogFactory.getLog(QueryReport.class);
 
-    // Report methods
-
     private VTimeZone tz;
 
     /** */
+    public static final ReportType REPORT_TYPE_CALDAV_QUERY =
+        ReportType.register(ELEMENT_CALDAV_CALENDAR_QUERY,
+                            NAMESPACE_CALDAV, QueryReport.class);
+
+    // Report methods
+
+    /** */
     public ReportType getType() {
-        return CALDAV_QUERY;
+        return REPORT_TYPE_CALDAV_QUERY;
     }
 
     // CaldavReport methods
@@ -116,41 +124,27 @@ public class QueryReport extends CaldavMultiStatusReport {
 
     private CalendarFilter findQueryFilter(ReportInfo info)
         throws DavException {
-        // XXX
-        return new CalendarFilter();
+        Element filterdata =
+            DomUtil.getChildElement(info.getReportElement(),
+                                    ELEMENT_CALDAV_FILTER, NAMESPACE_CALDAV);
+        if (filterdata == null) {
+            return null;
+        }
 
-//         Element filterdata =
-//             DomUtil.getChildElement(info.getReportElement(),
-//                                     ELEMENT_CALDAV_FILTER, NAMESPACE_CALDAV);
-//         if (filterdata == null) {
-//             return null;
-//         }
+        if (tz == null) {
+            if (getResource() instanceof DavCalendarCollection) {
+                // if no timezone was specified in the report info,
+                // fall back to one stored with the calendar
+                // collection, if any
+                tz = ((DavCalendarCollection) getResource()).getTimeZone();
+            }
+        }
 
-//         CaldavQueryFilter qf = new CaldavQueryFilter();
-//         if (tz == null) {
-//             // if no timezone was specified in the report info, fall
-//             // back to one stored with the calendar collection, if any
-//             try {
-//                 DavProperty prop = getResource().getProperty(CALENDARTIMEZONE);
-//                 tz = CaldavRequestHelper.extractTimeZone(prop);
-//             } catch (Exception e) {
-//                     // this exception should never be raised since the
-//                     // timezone was validated when it was added as a
-//                     // property of the calendar collection
-//                     log.error("invalid CALDAV:timezone property on resource " + getResource().getResourcePath(), e);
-//                     throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "invalid CALDAV:timezone property: " + e.getMessage());
-//             }
-//         }
-
-//         qf.setTimezone(tz);
-
-//         try {
-//             qf.createFromXml(filterdata);
-//         } catch (ParseException e) {
-//             log.error("error parsing CALDAV:calendar-data", e);
-//             throw new DavException(DavServletResponse.SC_BAD_REQUEST, "error parsing CALDAV:calendar-data: " + e.getMessage());
-//         }
-
-//         return qf;
+        try {
+            return new CalendarFilter(filterdata, tz);
+        } catch (ParseException e) {
+            log.error("Unable to parse calendar filter",e );
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Unable to parse calendar filter: " + e.getMessage());
+        }
     }
 }

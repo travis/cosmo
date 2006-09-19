@@ -42,6 +42,8 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
+import org.apache.jackrabbit.webdav.version.report.Report;
+import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 
 import org.apache.log4j.Logger;
 
@@ -191,6 +193,12 @@ public class DavFile extends DavResourceBase {
 
     /** */
     public void removeMember(DavResource member)
+        throws DavException {
+        throw new UnsupportedOperationException();
+    }
+
+    /** */
+    public Report getReport(ReportInfo reportInfo)
         throws DavException {
         throw new UnsupportedOperationException();
     }

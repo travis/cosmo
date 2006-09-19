@@ -46,15 +46,6 @@ public interface ExtendedDavResource extends DavResource {
     public String COMPLIANCE_CLASS = "1, calendar-access, ticket";
 
     /**
-     * Constants representing the DAV reports supported by Cosmo.
-     */
-    public ReportType[] REPORTS = {
-        CaldavReport.CALDAV_QUERY,
-        CaldavReport.CALDAV_MULTIGET,
-        CaldavReport.CALDAV_FREEBUSY
-    };
-
-    /**
      * Returns true if this resource represents a calendar
      * collection.
      */
@@ -100,7 +91,7 @@ public interface ExtendedDavResource extends DavResource {
     /**
      * Returns the member resource at the given absolute href.
      */
-    public DavResource getMember(String href)
+    public DavResource findMember(String href)
         throws DavException;
 
     /**

@@ -49,6 +49,7 @@ import org.apache.jackrabbit.webdav.property.ResourceType;
 
 import org.apache.log4j.Logger;
 
+import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.util.CalendarBuilderDispenser;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.property.CalendarDescription;
@@ -57,6 +58,7 @@ import org.osaf.cosmo.dav.caldav.property.SupportedCalendarComponentSet;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarData;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.CalendarItem;
 import org.osaf.cosmo.model.CalendarEventItem;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.DuplicateEventUidException;
@@ -134,6 +136,48 @@ public class DavCalendarCollection extends DavCollection
     }
 
     // our methods
+
+    /**
+     * Returns the member resources in this calendar collection matching
+     * the given filter.
+     */
+    public Set<DavCalendarResource> findMembers(CalendarFilter filter)
+        throws DavException {
+        // XXX what exceptions do we need to catch?
+
+        Set<DavCalendarResource> members =
+            new HashSet<DavCalendarResource>();
+        CalendarCollectionItem calendar = (CalendarCollectionItem) getItem();
+        for (CalendarItem memberItem :
+                 getContentService().findEvents(calendar, filter)) {
+            String memberPath = getResourcePath() + "/" + memberItem.getName();
+            DavResourceLocator memberLocator =
+                getLocator().getFactory().
+                createResourceLocator(getLocator().getPrefix(),
+                                      getLocator().getWorkspacePath(),
+                                      memberPath, false);
+            DavCalendarResource member = (DavCalendarResource)
+                ((StandardDavResourceFactory)getFactory()).
+                createResource(memberLocator, getSession(), memberItem);
+            members.add(member);
+        }
+
+        return members;
+    }
+
+    /**
+     * Returns the default timezone for this calendar collection, if
+     * one has been set.
+     */
+    public VTimeZone getTimeZone() {
+        CalendarCollectionItem collection = (CalendarCollectionItem)
+            getItem();
+        Calendar obj = collection.getTimezone();
+        if (obj == null)
+            return null;
+        return (VTimeZone)
+            obj.getComponents().getComponent(Component.VTIMEZONE);
+    }
 
     /** */
     protected int[] getResourceTypes() {

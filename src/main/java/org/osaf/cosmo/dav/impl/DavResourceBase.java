@@ -47,7 +47,6 @@ import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.version.report.Report;
-import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.xml.Namespace;
 
 import org.apache.log4j.Logger;
@@ -415,13 +414,6 @@ public abstract class DavResourceBase implements ExtendedDavResource {
     /** */
     public DavSession getSession() {
         return session;
-    }
-
-    /** */
-    public Report getReport(ReportInfo reportInfo)
-        throws DavException {
-        // XXX
-        throw new UnsupportedOperationException();
     }
 
     // ExtendedDavResource methods

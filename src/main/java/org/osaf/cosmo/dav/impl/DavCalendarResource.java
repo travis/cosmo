@@ -15,38 +15,42 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import net.fortuna.ical4j.model.Calendar;
+
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
 
 import org.apache.log4j.Logger;
 
-import org.osaf.cosmo.model.CalendarEventItem;
+import org.osaf.cosmo.model.CalendarItem;
 
 /**
- * Extends <code>DavCalendarResource</code> to adapt the Cosmo
- * <code>CalendarEventItem</code> to the DAV resource model.
+ * Base class for extensions of <code>DavFile</code> that adapt the
+ * Cosmo <code>CalendarItem</code> subclasses to the DAV resource
+ * model.
  *
  * This class does not define any live properties.
  *
  * @see DavFile
- * @see CalendarEventItem
+ * @see CalendarItem
  */
-public class DavEvent extends DavCalendarResource {
-    private static final Logger log = Logger.getLogger(DavEvent.class);
+public class DavCalendarResource extends DavFile {
+    private static final Logger log =
+        Logger.getLogger(DavCalendarResource.class);
 
     /** */
-    public DavEvent(CalendarEventItem event,
+    public DavCalendarResource(CalendarItem item,
                     DavResourceLocator locator,
                     DavResourceFactory factory,
                     DavSession session) {
-        super(event, locator, factory, session);
+        super(item, locator, factory, session);
     }
 
-    /** */
-    public DavEvent(DavResourceLocator locator,
-                    DavResourceFactory factory,
-                    DavSession session) {
-        this(new CalendarEventItem(), locator, factory, session);
+    /**
+     * Returns the calendar object associated with this resource.
+     */
+    public Calendar getCalendar() {
+        return ((CalendarItem) getItem()).getCalendar();
     }
 }

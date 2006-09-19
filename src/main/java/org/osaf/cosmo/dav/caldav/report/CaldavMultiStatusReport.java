@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.jackrabbit.webdav.DavException;
+import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
@@ -29,7 +30,7 @@ import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.dav.ExtendedDavResource;
+import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.dav.caldav.property.CalendarData;
 
 import org.w3c.dom.Document;
@@ -45,7 +46,7 @@ public abstract class CaldavMultiStatusReport extends CaldavReport {
     private static final Log log =
         LogFactory.getLog(CaldavMultiStatusReport.class);
 
-    private MultiStatus multistatus;
+    private MultiStatus multistatus = new MultiStatus();
     private int propfindType = PROPFIND_ALL_PROP;
     private DavPropertyNameSet propfindProps;
 
@@ -61,43 +62,20 @@ public abstract class CaldavMultiStatusReport extends CaldavReport {
     // our methods
 
     /**
-     * Process the list of calendar resource hrefs found by the report
-     * query and create a multistatus response.
+     * Runs the query and builds a multistatus response.
      */
-    protected void buildResponse()
+    protected void runQuery()
         throws DavException {
-        // Get parent's href as we use this a bit
-        String parentHref = getResource().getHref();
+        super.runQuery();
 
-        // Get the host portion of the href as we need to check for relative
-        // hrefs.
-        String host = parentHref.substring(0, parentHref.indexOf("/", 8));
-
-        // Iterate over each href (making sure it is a child of the root)
-        // and return a response for each
-        multistatus = new MultiStatus();
-        for (Iterator i=getHrefs().iterator(); i.hasNext();) {
-            // Note that the href sent by the client may be relative, so
-            // we need to convert to absolute for subsequent comprisons
-            String href = (String) i.next();
-            if (! href.startsWith("http")) {
-                href = host + href;
-            }
-
-            // Check it is a child or the same
-            if (! isDescendantOrEqual(parentHref, href)) {
-                throw new DavException(DavServletResponse.SC_BAD_REQUEST, "CALDAV:" + getInfo().getReportName() + " href element " + href + " is not a child or equal to request href.");
-            }
-
-            // Get resource for this href
-            ExtendedDavResource child = (ExtendedDavResource)
-                getResource().getMember(href);
-            if (child == null) {
-                throw new DavException(DavServletResponse.SC_BAD_REQUEST, "CALDAV:" + getInfo().getReportName() + " href element " + href + " could not be resolved.");
-            }
-
-            multistatus.addResponse(buildMultiStatusResponse(child));
+        for (DavCalendarResource member : getResults()) {
+            multistatus.addResponse(buildMultiStatusResponse(member));
         }
+    }
+
+    /** */
+    protected MultiStatus getMultiStatus() {
+        return multistatus;
     }
 
     /**
@@ -129,10 +107,9 @@ public abstract class CaldavMultiStatusReport extends CaldavReport {
         this.propfindProps = props;
     }
 
-    // private methods
-
-    private MultiStatusResponse
-        buildMultiStatusResponse(ExtendedDavResource resource)
+    /** */
+    protected MultiStatusResponse
+        buildMultiStatusResponse(DavCalendarResource resource)
         throws DavException {
         // clone the incoming property name set and remove
         // calendar-data since we generate it manually
@@ -152,14 +129,5 @@ public abstract class CaldavMultiStatusReport extends CaldavReport {
         }
 
         return response;
-    }
-
-    private boolean isDescendantOrEqual(String path, String descendant) {
-        if (path.equals(descendant)) {
-            return true;
-        } else {
-            String pattern = path.endsWith("/") ? path : path + "/";
-            return descendant.startsWith(pattern);
-        }
     }
 }

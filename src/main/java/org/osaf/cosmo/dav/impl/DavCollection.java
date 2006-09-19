@@ -45,10 +45,16 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
+import org.apache.jackrabbit.webdav.version.report.Report;
+import org.apache.jackrabbit.webdav.version.report.ReportInfo;
+import org.apache.jackrabbit.webdav.version.report.ReportType;
 
 import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dav.CosmoDavMethods;
+import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
+import org.osaf.cosmo.dav.caldav.report.MultigetReport;
+import org.osaf.cosmo.dav.caldav.report.QueryReport;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
@@ -69,11 +75,16 @@ public class DavCollection extends DavResourceBase {
     private static final Logger log = Logger.getLogger(DavCollection.class);
     private static final int[] RESOURCE_TYPES;
     private static final Set DEAD_PROPERTY_FILTER = new HashSet();
+    private static final Set REPORT_TYPES = new HashSet();
 
     private ArrayList members;
 
     static {
         RESOURCE_TYPES = new int[] { ResourceType.COLLECTION };
+
+        REPORT_TYPES.add(QueryReport.REPORT_TYPE_CALDAV_QUERY);
+        REPORT_TYPES.add(MultigetReport.REPORT_TYPE_CALDAV_MULTIGET);
+        REPORT_TYPES.add(FreeBusyReport.REPORT_TYPE_CALDAV_FREEBUSY);
     }
 
     /** */
@@ -164,10 +175,20 @@ public class DavCollection extends DavResourceBase {
     }
 
     /** */
-    public DavResource getMember(String href)
+    public DavResource findMember(String href)
         throws DavException {
-        // XXX
-        throw new UnsupportedOperationException();
+        if (href.startsWith(getLocator().getPrefix())) {
+            // convert absolute href to relative
+            href = href.substring(getLocator().getPrefix().length());
+        }
+
+        DavResourceLocator memberLocator =
+            getLocator().getFactory().
+            createResourceLocator(getLocator().getPrefix(),
+                                  getLocator().getWorkspacePath(),
+                                  href, false);
+        return ((StandardDavResourceFactory)getFactory()).
+            createResource(memberLocator, getSession());
     }
 
     /**
@@ -186,6 +207,18 @@ public class DavCollection extends DavResourceBase {
         }
 
         members.remove(member);
+    }
+
+    /** */
+    public Report getReport(ReportInfo reportInfo)
+        throws DavException {
+        if (! exists())
+            throw new DavException(DavServletResponse.SC_NOT_FOUND);
+
+        if (! isSupportedReport(reportInfo))
+            throw new DavException(DavServletResponse.SC_UNPROCESSABLE_ENTITY, "Unknown report " + reportInfo.getReportName());
+
+        return ReportType.getType(reportInfo).createReport(this, reportInfo);
     }
 
     // our methods
@@ -316,6 +349,18 @@ public class DavCollection extends DavResourceBase {
                       " from " + collection.getName());
 
         getContentService().removeContent(content);
+    }
+
+    /**
+     * Determines whether or not the report indicated by the given
+     * report info is supported by this collection.
+     */
+    protected boolean isSupportedReport(ReportInfo info) {
+        for (Iterator<ReportType> i=REPORT_TYPES.iterator(); i.hasNext();) {
+            if (i.next().isRequestedReportType(info))
+                return true;
+        }
+        return false;
     }
 
     private void loadMembers() {

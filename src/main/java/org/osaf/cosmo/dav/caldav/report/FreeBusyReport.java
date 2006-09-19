@@ -27,7 +27,6 @@ import java.util.TreeSet;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
@@ -63,7 +62,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
-import org.osaf.cosmo.dav.ExtendedDavResource;
+import org.osaf.cosmo.calendar.query.ComponentFilter;
+import org.osaf.cosmo.calendar.query.TimeRangeFilter;
+import org.osaf.cosmo.dav.impl.DavCalendarResource;
+import org.osaf.cosmo.model.ModelConversionException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -83,11 +85,16 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
 
     Period freeBusyRange;
 
+    /** */
+    public static final ReportType REPORT_TYPE_CALDAV_FREEBUSY =
+        ReportType.register(ELEMENT_CALDAV_CALENDAR_FREEBUSY,
+                            NAMESPACE_CALDAV, FreeBusyReport.class);
+
     // Report methods
 
     /** */
     public ReportType getType() {
-        return CALDAV_FREEBUSY;
+        return REPORT_TYPE_CALDAV_FREEBUSY;
     }
 
     // CaldavReport methods
@@ -112,10 +119,11 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
 
         String start = DomUtil.getAttribute(tre, ATTR_CALDAV_START, null);
         String end = DomUtil.getAttribute(tre, ATTR_CALDAV_END, null);
-        setQueryFilter(createQueryFilter(tre.getOwnerDocument(), start, end));
-
         try {
-            freeBusyRange = new Period(new DateTime(start), new DateTime(end));
+            DateTime sdt = new DateTime(start);
+            DateTime edt = new DateTime(end);
+            setQueryFilter(createQueryFilter(tre.getOwnerDocument(), sdt, edt));
+            freeBusyRange = new Period(sdt, edt);
         } catch (ParseException e) {
             log.error("cannot parse CALDAV:time-range", e);
             throw new DavException(DavServletResponse.SC_BAD_REQUEST, "cannot parse CALDAV:time-range: " + e.getMessage());
@@ -125,44 +133,28 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
     // CaldavSingleResourceReport
 
     /**
-     * Iterate over each calendar resource found by the report query,
-     * extract the set of periods for busy time for each instance,
-     * then create a VFREEBUSY component with those periods, and set
-     * the report's stream, content type and character set.
+     * Runs the query, extracts the set of periods for busy time for
+     * each occurrence of each found calendar item, creates a
+     * VFREEBUSY component, and sets the report's stream, content type
+     * and character set.
      */
-    protected void buildResponse()
+    protected void runQuery()
         throws DavException {
+        super.runQuery();
+
         PeriodList busyPeriods = new PeriodList();
         PeriodList busyTentativePeriods = new PeriodList();
         PeriodList busyUnavailablePeriods = new PeriodList();
 
         // Create recurrence instances within the time-range
-        for (Iterator i = getHrefs().iterator(); i.hasNext();) {
-            String href = (String) i.next();
-
-            // Get resource for this href
-            DavResource child = getResource().getMember(href);
-            if (child == null) {
-                throw new DavException(DavServletResponse.SC_BAD_REQUEST, "href " + href + " could not be resolved.");
-            }
-
-            // Read in calendar data
-            String calendarData =
-                readCalendarData((ExtendedDavResource) child);
-
+        for (DavCalendarResource child : getResults()) {
             try {
-                // Parse the calendar data into an iCalendar object
-                CalendarBuilder builder = new CalendarBuilder();
-                Calendar calendar =
-                    builder.build(new StringReader(calendarData));
+                Calendar calendar = child.getCalendar();
 
                 // Add busy details from the calendar data
                 addBusyPeriods(calendar, busyPeriods, busyTentativePeriods,
                                busyUnavailablePeriods);
-            } catch (IOException e) {
-                log.error("cannot read calendar for resource " + child.getResourcePath(), e);
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,  "cannot read calendar data: " + e.getMessage());
-            } catch (ParserException e) {
+            } catch (ModelConversionException e) {
                 log.error("cannot parse calendar for resource " + child.getResourcePath(), e);
                 throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,  "cannot parse calendar data: " + e.getMessage());
             }
@@ -227,8 +219,8 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
     // private methods
 
     CalendarFilter createQueryFilter(Document doc,
-                                     String start,
-                                     String end)
+                                     DateTime start,
+                                     DateTime end)
         throws DavException {
         // Create a fake calendar-filter element designed to match
         // VEVENTs/VFREEBUSYs within the specified time range.
@@ -246,56 +238,22 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
         // </C:comp-filter>
         // </C:filter>
 
-        // XXX
+        ComponentFilter eventFilter = new ComponentFilter(Component.VEVENT);
+        eventFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
 
-        return new CalendarFilter();
+        ComponentFilter freebusyFilter =
+            new ComponentFilter(Component.VFREEBUSY);
+        freebusyFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
 
-//         Element calendarFilter =
-//             DomUtil.createElement(doc, ELEMENT_CALDAV_FILTER,
-//                                   NAMESPACE_CALDAV);
+        ComponentFilter calFilter =
+            new ComponentFilter(net.fortuna.ical4j.model.Calendar.VCALENDAR);
+        calFilter.getComponentFilters().add(eventFilter);
+        calFilter.getComponentFilters().add(freebusyFilter);
 
-//         Element compFilterVCalendar =
-//             DomUtil.createElement(doc, ELEMENT_CALDAV_COMP_FILTER,
-//                                   NAMESPACE_CALDAV);
-//         compFilterVCalendar.setAttribute(ATTR_CALDAV_NAME, "VCALENDAR");
-//         calendarFilter.appendChild(compFilterVCalendar);
+        CalendarFilter filter = new CalendarFilter();
+        filter.setFilter(calFilter);
 
-//         Element compFilterVEvent =
-//             DomUtil.createElement(doc, ELEMENT_CALDAV_COMP_FILTER,
-//                                   NAMESPACE_CALDAV);
-//         compFilterVEvent.setAttribute(ATTR_CALDAV_NAME, "VEVENT");
-//         compFilterVCalendar.appendChild(compFilterVEvent);
-
-//         Element timeRange =
-//             DomUtil.createElement(doc, ELEMENT_CALDAV_TIME_RANGE,
-//                                   NAMESPACE_CALDAV);
-//         timeRange.setAttribute(ATTR_CALDAV_START, start);
-//         timeRange.setAttribute(ATTR_CALDAV_END, end);
-//         compFilterVEvent.appendChild(timeRange);
-
-//         Element compFilterVFreeBusy =
-//             DomUtil.createElement(doc, ELEMENT_CALDAV_COMP_FILTER,
-//                                   NAMESPACE_CALDAV);
-//         compFilterVFreeBusy.setAttribute(ATTR_CALDAV_NAME, "VFREEBUSY");
-//         compFilterVCalendar.appendChild(compFilterVFreeBusy);
-
-//         timeRange =
-//             DomUtil.createElement(doc, ELEMENT_CALDAV_TIME_RANGE,
-//                                   NAMESPACE_CALDAV);
-//         timeRange.setAttribute(ATTR_CALDAV_START, start);
-//         timeRange.setAttribute(ATTR_CALDAV_END, end);
-//         compFilterVFreeBusy.appendChild(timeRange);
-
-//         // Parse out fake filter element
-//         CaldavQueryFilter filter = new CaldavQueryFilter();
-//         try {
-//             filter.createFromXml(calendarFilter);
-//         } catch (ParseException e) {
-//             log.error("error parsing pseudo freebusy filter", e);
-//             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "error parsing pseudo freebusy filter");
-//         }
-        
-//         return filter;
+        return filter;
     }
 
     private void addBusyPeriods(Calendar calendar,

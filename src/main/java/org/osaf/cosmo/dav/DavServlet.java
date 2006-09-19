@@ -54,7 +54,7 @@ import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.CaldavRequest;
 import org.osaf.cosmo.dav.caldav.property.CalendarTimezone;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarComponentSet;
-import org.osaf.cosmo.dav.caldav.report.CaldavReport;
+import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
 import org.osaf.cosmo.dav.impl.StandardDavRequest;
 import org.osaf.cosmo.dav.impl.StandardDavResponse;
 import org.osaf.cosmo.dav.io.DavInputContext;
@@ -326,7 +326,11 @@ public class DavServlet extends AbstractWebdavServlet
 
         Ticket authTicket = securityManager.getSecurityContext().getTicket();
 
-        if (CaldavReport.CALDAV_FREEBUSY.isRequestedReportType(info)) {
+        // XXX move these checks into DavCollection or even into the
+        // report run method
+
+        if (FreeBusyReport.REPORT_TYPE_CALDAV_FREEBUSY.
+            isRequestedReportType(info)) {
             // check resource type
             if (! (resource.isCollection() ||
                    eresource.isCalendarCollection())) {

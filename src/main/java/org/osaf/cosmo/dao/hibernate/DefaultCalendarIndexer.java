@@ -64,8 +64,8 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
             index.setName((String) nextEntry.getKey());
             index.setValue((String) nextEntry.getValue());
             item.addPropertyIndex(index);
-            if (log.isDebugEnabled())
-                log.debug("creating calendar property index: " + index.toString());
+//             if (log.isDebugEnabled())
+//                 log.debug("creating calendar property index: " + index.toString());
         }
         
         for (Iterator it = timeRangeMap.entrySet().iterator(); it.hasNext();) {
@@ -77,8 +77,8 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
         for (Iterator it = indices.iterator(); it.hasNext();) {
             CalendarTimeRangeIndex index = (CalendarTimeRangeIndex) it.next();
             item.addTimeRangeIndex(index);
-            if (log.isDebugEnabled())
-                log.debug("creating calendar timerange index: " + index.toString());
+//             if (log.isDebugEnabled())
+//                 log.debug("creating calendar timerange index: " + index.toString());
         }
         
         session.update(item);

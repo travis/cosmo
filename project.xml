@@ -527,6 +527,12 @@
             <include>*.ics</include>
           </includes>
         </resource>
+        <resource>
+          <directory>src/test/unit/resources/icalendar</directory>
+          <includes>
+            <include>*.ics</include>
+          </includes>
+        </resource>
       </resources>
     </unitTest>
   </build>

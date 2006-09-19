@@ -16,16 +16,21 @@
 
 package org.osaf.cosmo.util;
 
+import java.net.URISyntaxException;
 import java.util.Calendar;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Parameter;
+import net.fortuna.ical4j.model.ParameterFactoryImpl;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.DateProperty;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -158,5 +163,47 @@ public class ICalendarUtils {
         
         component.getProperties().add(property);
     }
+    
+    /**
+     * Sets a DateProperty with the given Date. Also sets the VALUE param to DATE to 
+     * indicate that this is a DATE not a DATETIME
+     * @param dateProperty
+     * @param date
+     */
+    public static void setDate(DateProperty dateProperty,
+            net.fortuna.ical4j.model.Date date) {
+        Parameter valueParam = dateProperty.getParameters().getParameter(
+                Parameter.VALUE);
+        ParameterFactoryImpl paramFactory = ParameterFactoryImpl.getInstance();
 
+        try {
+            valueParam = paramFactory.createParameter(Parameter.VALUE,
+                    Value.DATE.getValue());
+        } catch (URISyntaxException urise) {
+            throw new RuntimeException(urise);
+        }
+
+        dateProperty.getParameters().add(valueParam);
+        dateProperty.setDate(date);
+    }
+    
+    /**
+     * Sets a DateProperty with the given DateTime.
+     * @param dateProperty
+     * @param dateTime
+     */
+    public static void setDateTime(DateProperty dateProperty, DateTime dateTime) {
+        Parameter valueParam = dateProperty.getParameters().getParameter(
+                Parameter.VALUE);
+        if (valueParam != null) {
+            dateProperty.getParameters().remove(valueParam);
+        }
+
+        dateProperty.setDate(dateTime);
+    }
+    
+    public static String getTZId(DateProperty dateProperty){
+        Parameter tzid = dateProperty.getParameters().getParameter(Parameter.TZID);
+        return tzid.getValue();
+    }
 }

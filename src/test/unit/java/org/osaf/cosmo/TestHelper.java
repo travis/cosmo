@@ -23,20 +23,29 @@ import java.util.TimeZone;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.fortuna.ical4j.model.*;
-import net.fortuna.ical4j.model.component.*;
-import net.fortuna.ical4j.model.parameter.*;
-import net.fortuna.ical4j.model.property.*;
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
+import net.fortuna.ical4j.model.component.VAlarm;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.parameter.XParameter;
+import net.fortuna.ical4j.model.property.Action;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.model.property.Version;
+import net.fortuna.ical4j.model.property.XProperty;
 
-import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.mock.MockAnonymousPrincipal;
 import org.osaf.cosmo.security.mock.MockUserPrincipal;
-
 import org.w3c.dom.Document;
 
 /**
@@ -44,6 +53,8 @@ import org.w3c.dom.Document;
 public class TestHelper {
     protected static final DocumentBuilderFactory BUILDER_FACTORY =
         DocumentBuilderFactory.newInstance();
+
+    protected static CalendarBuilder calendarBuilder = new CalendarBuilder();
 
     static int apseq = 0;
     static int eseq = 0;
@@ -207,13 +218,15 @@ public class TestHelper {
      */
     public Document loadXml(String name)
         throws Exception {
-        InputStream in = getClass().getClassLoader().getResourceAsStream(name);
-        if (in == null) {
-            throw new IllegalStateException("resource " + name + " not found");
-        }
+        InputStream in = getInputStream(name);
         BUILDER_FACTORY.setNamespaceAware(true);
         DocumentBuilder docBuilder = BUILDER_FACTORY.newDocumentBuilder();
         return docBuilder.parse(in);
+    }
+    
+    public Calendar loadIcs(String name) throws Exception{
+        InputStream in = getInputStream(name);
+        return calendarBuilder.build(in);
     }
 
     /** */
@@ -239,5 +252,13 @@ public class TestHelper {
         collection.setOwner(user);
 
         return collection;
+    }
+    
+    private InputStream getInputStream(String name){
+        InputStream in = getClass().getClassLoader().getResourceAsStream(name);
+        if (in == null) {
+            throw new IllegalStateException("resource " + name + " not found");
+        }
+        return in;
     }
 }

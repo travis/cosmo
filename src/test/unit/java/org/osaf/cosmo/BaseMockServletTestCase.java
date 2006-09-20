@@ -105,6 +105,7 @@ public abstract class BaseMockServletTestCase extends TestCase {
         serializer.asDOMSerializer().serialize(doc);
         request.setContentType("text/xml");
         request.setCharacterEncoding("UTF-8");
+        //        log.debug("content: " + new String(out.toByteArray()));
         request.setContent(out.toByteArray());;
     }
 

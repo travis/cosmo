@@ -95,6 +95,7 @@ public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
 
         user = testHelper.makeDummyUser();
         userService.createUser(user);
+        logInUser(user);
     }
 
     /** */

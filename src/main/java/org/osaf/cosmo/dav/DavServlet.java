@@ -518,7 +518,7 @@ public class DavServlet extends AbstractWebdavServlet
 
         User user = securityManager.getSecurityContext().getUser();
         if (user != null) {
-            if (! (ticket.getOwner().equals(user.getUsername()) ||
+            if (! (ticket.getOwner().equals(user) ||
                    securityManager.getSecurityContext().isAdmin())) {
                 response.sendError(DavServletResponse.SC_FORBIDDEN);
                 return;

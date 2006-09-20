@@ -455,8 +455,7 @@ public abstract class DavResourceBase
         if (log.isDebugEnabled())
             log.debug("adding ticket for " + item.getName());
 
-        item.getTickets().add(ticket);
-        //        contentService.createTicket(item, ticket);
+        getContentService().createTicket(item, ticket);
     }
 
     /**
@@ -473,8 +472,7 @@ public abstract class DavResourceBase
             log.debug("removing ticket " + ticket.getKey() + " on " +
                       item.getName());
 
-        item.getTickets().remove(ticket);
-        //        contentService.removeTicket(item, ticket);
+        getContentService().removeTicket(item, ticket);
     }
 
     /**

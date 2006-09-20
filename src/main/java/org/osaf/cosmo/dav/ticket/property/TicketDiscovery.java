@@ -85,7 +85,8 @@ public class TicketDiscovery extends AbstractDavProperty
             String url =
                 resource.getLocator().getFactory().
                 createResourceLocator(resource.getLocator().getPrefix(),
-                                      "/" + ticket.getOwner()).
+                                      resource.getLocator().getWorkspacePath(),
+                                      "/" + ticket.getOwner().getUsername()).
                 getHref(true);
             DomUtil.setText(href, url);
             owner.appendChild(href);

@@ -284,6 +284,8 @@ public class MockItemDao implements ItemDao {
      */
     public void createTicket(Item item,
                              Ticket ticket) {
+        ticket.setKey(calculateTicketKey());
+        item.getTickets().add(ticket);
         findItemTickets(item).add(ticket);
     }
 
@@ -332,6 +334,7 @@ public class MockItemDao implements ItemDao {
                              Ticket ticket) {
         Set itemTickets = findItemTickets(item);
         if (itemTickets.contains(ticket)) {
+            item.getTickets().remove(ticket);
             itemTickets.remove(ticket);
             return;
         }
@@ -451,6 +454,10 @@ public class MockItemDao implements ItemDao {
     }
 
     private String calculateUid() {
+        return idGenerator.nextStringIdentifier();
+    }
+
+    private String calculateTicketKey() {
         return idGenerator.nextStringIdentifier();
     }
 

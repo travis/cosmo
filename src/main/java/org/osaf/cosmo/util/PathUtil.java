@@ -50,4 +50,22 @@ public class PathUtil {
         }
         return (idx == 0) ? "/" : path.substring(0, idx);
     }
+
+    /**
+     * Returns the initial segment of the given path. If the path is
+     * simply "/", returns null;
+     */
+    public static String getInitialSegment(String path) {
+        if (path == null)
+            throw new IllegalArgumentException("null path");
+        String segment = path;
+        if (segment.equals("/"))
+            return null;
+        if (segment.startsWith("/"))
+            segment = segment.substring(1);
+        int slash = segment.indexOf("/");
+        if (slash > 0)
+            segment = segment.substring(0, slash);
+        return segment;
+    }
 }

@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
+import org.osaf.cosmo.util.PathUtil;
 
 /**
  * Makes access control decisions based on whether or not a user is
@@ -128,7 +129,13 @@ public class HomedirVoter implements AccessDecisionVoter {
             return ACCESS_DENIED;
         }
 
-        return path.startsWith(username) ? ACCESS_GRANTED : ACCESS_DENIED;
+        // path is given to us in a form like /bcm/foo/bar - we only
+        // grant access if the first path segment exactly matches the
+        // given username
+
+        return PathUtil.getInitialSegment(path).equals(username) ?
+            ACCESS_GRANTED :
+            ACCESS_DENIED;
     }
 
     // XXX for read ops, look for client path in PARAM_CLIENT_PATH
@@ -162,7 +169,8 @@ public class HomedirVoter implements AccessDecisionVoter {
             // probably a dav path
             resourcePath = path;
         }
-        return resourcePath.substring(1);
+
+        return resourcePath;
     }
 
     /**

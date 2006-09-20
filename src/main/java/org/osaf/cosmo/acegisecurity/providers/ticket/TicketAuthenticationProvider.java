@@ -102,7 +102,6 @@ public class TicketAuthenticationProvider
             }
             Item item = contentService.findItemByPath(path);
             if (item == null) {
-                // XXX: ContentService does not currently throw DRFE
                 throw new TicketedItemNotFoundException("Resource at " +
                                                         path + " not found");
             }

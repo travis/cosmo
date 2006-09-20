@@ -237,13 +237,14 @@ function Block() {
         mainDiv.style.backgroundColor = blockColor;
         mainDiv.style.borderStyle = borderStyle;
         // Using the AlphaImageLoader hack b0rks normal z-indexing
-        // No pretty transparent PNGs for IE6
-        if (!document.all) {
+        // No pretty transparent PNGs for IE6 -- works nicely in IE7
+        //if (!(dojo.render.html.ie && !dojo.render.html.ie7)) { // Wait for 0.4
+        if (!(document.all && navigator.appVersion.indexOf('MSIE 7') == -1)) {
             if (imgPath) {
                 mainDiv.style.backgroundImage = 'url(' + imgPath + ')';
             }
             else {
-                mainDiv.style.backgroundImage = null;
+                mainDiv.style.backgroundImage = '';
                 
             }
         }
@@ -265,12 +266,13 @@ function Block() {
                 auxDiv.style.backgroundColor = blockColor;
                 auxDiv.style.borderStyle = borderStyle;
                 // Use transparent PNG background in non-IE6 browsers
-                if (!document.all) {
+                //if (!(dojo.render.html.ie && !dojo.render.html.ie7)) { // Wait for 0.4
+                if (!(document.all && navigator.appVersion.indexOf('MSIE 7') == -1)) {
                     if (imgPath) {
                         auxDiv.style.backgroundImage = 'url(' + imgPath + ')';
                     }
                     else {
-                        auxDiv.style.backgroundImage = null;
+                        auxDiv.style.backgroundImage = '';
                         
                     }
                 }

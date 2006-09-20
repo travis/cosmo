@@ -78,7 +78,7 @@ function CalEvent(id, block) {
         // BANDAID: Keep people from shooting themselves in the foot
         // with reurring events
         if (ev.data.masterEvent || ev.data.instance) {
-            msg = 'This is a recurring event. Editing recurring events is not supported in Scooby,' +
+            msg = 'This is a recurring event. Editing recurring events is not supported in Cosmo,' +
                 ' and will probably have effects you do not intend.<br/>&nbsp;<br/>Save this change?';
             Cal.showSaveConfirm(msg);
         }
@@ -88,7 +88,7 @@ function CalEvent(id, block) {
     };
     /**
      * Main function for saving changes to events.
-     * Call to the Scooby service happens on a short timeout to
+     * Call to the Cosmo service happens on a short timeout to
      * give time for the processing state to display. This avoids
      * horrible, Pokemon-seizure-inducing flashes on screen
      * Does the visual stuff first, then hands off to remoteSaveDelay
@@ -171,7 +171,7 @@ function CalEvent(id, block) {
     };
     /**
      * Called from remoteSave -- this method actually calls the
-     * Scooby service to save the changes
+     * Cosmo service to save the changes
      * Since the handler for the XHR request will have no idea
      * what event is just saved, we save all that info in the
      * asyncRegistry referenced by the requestId. The info about the
@@ -179,7 +179,7 @@ function CalEvent(id, block) {
      * The handler for the XHR response is handleRemoteSaveResult
      */
     this.remoteSaveDelay = function() {
-        var requestId = Cal.scoob.saveEvent(
+        var requestId = Cal.serv.saveEvent(
             this.handleRemoteSaveResult, Cal.currentCalendar.path, this.data);
         // New Async obj to track this request
         var saveAsync = new Async(requestId, this, 'saveEvent');
@@ -195,7 +195,7 @@ function CalEvent(id, block) {
      * The handler for the XHR response is handleRemoveResult
      */
     this.remove = function() {
-        var requestId = Cal.scoob.removeEvent(
+        var requestId = Cal.serv.removeEvent(
             this.handleRemoveResult, Cal.currentCalendar.path, this.data.id);
         // New Async obj to track this request
         var removeAsync = new Async(requestId, this, 'removeEvent');
@@ -280,7 +280,7 @@ function CalEvent(id, block) {
         // ********************
         // BANDAID: need to move this into the actual Service call
         // ********************
-        Cal.scoob.resetServiceAccessTime();
+        Cal.serv.resetServiceAccessTime();
     };
     /**
      * Handler for XHR request from 'remove' method. Looks up info
@@ -315,7 +315,7 @@ function CalEvent(id, block) {
         // ********************
         // BANDAID: need to move this into the actual Service call
         // ********************
-        Cal.scoob.resetServiceAccessTime();
+        Cal.serv.resetServiceAccessTime();
     };
     /**
      * Makes a clone backup of the CalEventData for the event to 

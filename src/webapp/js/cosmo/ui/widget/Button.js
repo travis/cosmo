@@ -25,16 +25,16 @@
 dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
 dojo.require("dojo.dom");
-dojo.require("scooby.env");
+dojo.require("cosmo.env");
 
-dojo.provide("scooby.ui.widget.Button");
+dojo.provide("cosmo.ui.widget.Button");
 
-dojo.widget.defineWidget("scooby.ui.widget.Button", dojo.widget.HtmlWidget, {
+dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     //Constants
     DISABLED_TABLE_OPACITY : 0.6,
 
     //FIXME - deal with skins
-    buttonDirectory : scooby.env.getTemplateBase() + "Button/",
+    buttonDirectory : cosmo.env.getTemplateBase() + "Button/",
     templatePath : dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/Button/Button.html"),
     templateCssPath : dojo.uri.dojoUri("../../cosmo/ui/widget/templates/Button/Button.css"),
 

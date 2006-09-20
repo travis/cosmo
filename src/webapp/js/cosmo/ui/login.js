@@ -23,7 +23,7 @@
 /**
  * @object Login -- singleton for doing user auth
  */
-dojo.require("scooby.env");
+dojo.require("cosmo.env");
 var Login = new function () {
     
     var self = this;
@@ -41,7 +41,7 @@ var Login = new function () {
         self.loginForm.j_username.focus();
         // Add logo and button
         //document.getElementById('logoDiv').innerHTML = 
-        //    '<img src="' + scooby.env.getImagesUrl() + LOGO_GRAPHIC + '" alt="">';
+        //    '<img src="' + cosmo.env.getImagesUrl() + LOGO_GRAPHIC + '" alt="">';
         document.getElementById('submitButtonDiv').appendChild(but.domNode);
     }
     this.handleLoginResp = function(str) {
@@ -53,9 +53,9 @@ var Login = new function () {
             self.showPrompt('normal', 'Logging you on. Please wait ...');
             var username  = self.loginForm.j_username.value;
             if (username == "root") {
-                location = scooby.env.getBaseUrl() + "/console/account";
+                location = cosmo.env.getBaseUrl() + "/console/account";
             } else {
-                location = scooby.env.getBaseUrl() + "/pim/pim.page";
+                location = cosmo.env.getBaseUrl() + "/pim/pim.page";
             }
         }
     }

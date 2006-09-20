@@ -26,8 +26,8 @@ var Cal = new function() {
     // Constants
     this.ID_SEPARATOR = '__';
     
-    // The Scooby service -- used to talk to the backend
-    this.scoob = null;
+    // The Cosmo service -- used to talk to the backend
+    this.serv = null;
     // For calculating UI element positions
     this.top = 0;
     this.left = 0;
@@ -95,7 +95,7 @@ var Cal = new function() {
     this.inputDisabled = false;
 
     // Used with the local UI timeout calculations
-    // A related property is Cal.scoob.serviceAccessTime in the Scooby service
+    // A related property is Cal.serv.serviceAccessTime in the Cosmo service
     this.inputTimestamp = null;
 
     // The path to the currently selected calendar
@@ -119,10 +119,10 @@ var Cal = new function() {
         this.currDate = new Date();
         this.calendars = [];
 
-        // Create and init the Scooby service
+        // Create and init the Cosmo service
         // --------------
-        this.scoob = new ScoobyService();
-        this.scoob.init();
+        this.serv = new ScoobyService();
+        this.serv.init();
 
         // Load user prefs
         // --------------
@@ -167,14 +167,14 @@ var Cal = new function() {
         // Load/create calendar to view
         // --------------
         // Get stored cals for this user
-        this.calendars = this.scoob.getCalendars();
+        this.calendars = this.serv.getCalendars();
         //TODO need to sort
         this.calendars.sort(); // Sort by alpha
         // No cals for this user
         if (!this.calendars.length){
             // Create initial cal
             try {
-                this.scoob.createCalendar('Scooby', 'Scooby');
+                this.serv.createCalendar('Cosmo', 'Cosmo');
             }
             catch(e) {
                 Cal.showErr(getText('Main.Error.InitCalCreateFailed'), e);
@@ -182,10 +182,10 @@ var Cal = new function() {
             }
             // Set it as the default
             this.currentCalendar = new CalendarMetadata();
-            this.currentCalendar.name = 'Scooby';
-            this.currentCalendar.path = 'Scooby';
+            this.currentCalendar.name = 'Cosmo';
+            this.currentCalendar.path = 'Cosmo';
 
-            // Add 'Welcome to Scooby' Event
+            // Add 'Welcome to Cosmo' Event
             this.insertCalEventNew('hourDiv3-900', true);
         }
         // Cals exist for this user
@@ -373,7 +373,7 @@ var Cal = new function() {
         var rightClick = null;
         
         handleImg = document.createElement('img');
-        handleImg.src = scooby.env.getImagesUrl() + 'resize_handle_image.gif';
+        handleImg.src = cosmo.env.getImagesUrl() + 'resize_handle_image.gif';
        
         leftClick = function() { Cal.uiMask.show(); setTimeout('Cal.goView("back");', 100); }
         rightClick = function() { Cal.uiMask.show(); setTimeout('Cal.goView("next");', 100); }
@@ -383,7 +383,7 @@ var Cal = new function() {
         document.getElementById('allDayResizeHandleDiv').appendChild(handleImg);
         document.getElementById('viewNavButtons').appendChild(navButtons.domNode);
         document.getElementById('smallLogoDiv').style.background =
-            'url(' + scooby.env.getImagesUrl() + LOGO_GRAPHIC_SM + ')';
+            'url(' + cosmo.env.getImagesUrl() + LOGO_GRAPHIC_SM + ')';
     };
     /**
      * Loads localized Date information into the arrays in date.js
@@ -456,7 +456,7 @@ var Cal = new function() {
                 '" style="left:' + start + 'px; width:' + (this.dayUnitWidth-1) +
                 'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
             if (calcDay.getTime() == currDay.getTime()) {
-                str += ' background-image:url(' + scooby.env.getImagesUrl() + 
+                str += ' background-image:url(' + cosmo.env.getImagesUrl() + 
                     'day_col_header_background.gif); background-repeat:' +
                     ' repeat-x; background-position:0px 0px;'
             }
@@ -743,7 +743,7 @@ var Cal = new function() {
         // Load the array of events
         // ======================
         try {
-            eventLoadList = this.scoob.getEvents(this.currentCalendar.path,
+            eventLoadList = this.serv.getEvents(this.currentCalendar.path,
                 this.viewStart.getTime(), this.viewEnd.getTime());
         }
         catch(e) {
@@ -1034,8 +1034,8 @@ var Cal = new function() {
     /**
      * Insert a new calendar event -- can be called two ways:
      * (1) Double-clicking on the cal canvas
-     * (2) When the user has no calendar, Scooby creates a new calendar
-     *     and adds the 'Welcome to Scooby' event with this method
+     * (2) When the user has no calendar, Cosmo creates a new calendar
+     *     and adds the 'Welcome to Cosmo' event with this method
      * @param id A string, the id of the div on the cal canvas double-clicked
      * @param newCal Boolean, whether or not this is a 'Welcome' event
      * for a newly created calendar
@@ -1101,8 +1101,8 @@ var Cal = new function() {
 
         // Set CalEventData start and end calculated from click position
         // --------
-        evTitle = newCal ? 'Welcome to Scooby!' : getText('Main.NewEvent');
-        evDesc = newCal ? 'Welcome to Scooby!' : '';
+        evTitle = newCal ? 'Welcome to Cosmo!' : getText('Main.NewEvent');
+        evDesc = newCal ? 'Welcome to Cosmo!' : '';
         ev.data = new CalEventData(null, evTitle, evDesc,
             start, end, allDay);
 
@@ -1352,7 +1352,7 @@ var Cal = new function() {
 
         // BANDAID: Warning specifically for recurring events
         if (Cal.currSelObj.data.masterEvent || Cal.currSelObj.data.instance) {
-            msg = 'This is a recurring event. Removing recurring events is not supported in Scooby,' +
+            msg = 'This is a recurring event. Removing recurring events is not supported in Cosmo,' +
                 ' and will probably have effects you do not intend.<br/>&nbsp;<br/>Remove this event?';
         }
         else {
@@ -1678,7 +1678,7 @@ var Cal = new function() {
         /*
          * =========================
          * FIXME: Unify the Cal.inputTimestamp
-         * and Cal.scoob.serviceAccessTime properties
+         * and Cal.serv.serviceAccessTime properties
          * They represent the same thing, so right now it's redundant
          * We have to set them both for this stuff to work
          * =========================
@@ -1687,7 +1687,7 @@ var Cal = new function() {
         ts = ts.getTime();
         this.inputTimestamp = ts;
         Cookie.set('inputTimestamp', ts);
-        this.scoob.resetServiceAccessTime();
+        this.serv.resetServiceAccessTime();
     };
     this.isTimedOut = function() {
         var ts = new Date();
@@ -1705,7 +1705,7 @@ var Cal = new function() {
         var ts = new Date();
         var diff = 0;
         ts = ts.getTime();
-        diff = ts - this.scoob.getServiceAccessTime();
+        diff = ts - this.serv.getServiceAccessTime();
         return (diff > (60000*(TIMEOUT_MIN-2))) ? true : false
     };
     this.checkTimeout = function() {
@@ -1717,14 +1717,14 @@ var Cal = new function() {
         // Otherwise check for imminent server timeout and refresh local timing cookie
         else if (this.isServerTimeoutSoon()) {
             // If server-side session is about to time out, refresh it by hitting JSP page
-            this.scoob.refreshServerSession();
+            this.serv.refreshServerSession();
             // Reset local session timing cookie
             this.setInputTimestamp();
             return false;
         }
     };
     this.redirectTimeout = function() {
-        location = scooby.env.getRedirectUrl();
+        location = cosmo.env.getRedirectUrl();
     },
 
     // ==========================

@@ -196,7 +196,7 @@ function Block() {
                     textColor = '#ffffff';
                     borderColor = '#ffffff';
                     blockColor = '#0064cb';
-                    imgPath = scooby.env.getImagesUrl() + 'block_gradient_dark.png';
+                    imgPath = cosmo.env.getImagesUrl() + 'block_gradient_dark.png';
                 }
                 break;
             // Unselected
@@ -211,7 +211,7 @@ function Block() {
                     textColor = '#ffffff';
                     borderColor = '#ffffff';
                     blockColor = '#3398ff';
-                    imgPath = scooby.env.getImagesUrl() + 'block_gradient_light.png';
+                    imgPath = cosmo.env.getImagesUrl() + 'block_gradient_light.png';
                 }
                 break;
             // Processing

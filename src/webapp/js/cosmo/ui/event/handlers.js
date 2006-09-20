@@ -15,12 +15,12 @@
  */
 
 /**
- * @fileoverview Event handlers for Scooby. Most all UI input is handled here.
+ * @fileoverview Event handlers for Cosmo. Most all UI input is handled here.
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  *
  * Rather than putting event listeners directly on the DOM elements
- * themselves, Scooby uses meaningful IDs for all clickable elements.
+ * themselves, Cosmo uses meaningful IDs for all clickable elements.
  * All UI input goes through these global listeners and dispatches 
  * events to the appropriate handler based on the ID of the element 
  * being manipulated.

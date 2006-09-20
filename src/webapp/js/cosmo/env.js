@@ -18,34 +18,34 @@
  * To use this file, you must first provide it with the base URL for your application
  * by calling "setBaseUrl"
  * 
- * @fileoverview provides information about the scooby environment.
+ * @fileoverview provides information about the Cosmo environment.
  * @author Bobby Rullo br@osafoundation.org
  * @license Apache License 2.0
  */
  
-dojo.provide("scooby.env");
+dojo.provide("cosmo.env");
 
 //private variable for storing environment information. Do not access directly, 
 //use methods below.
-scooby.env._scoobyConfig = {};
+cosmo.env._cosmoConfig = {};
 
-scooby.env._NULL = {};
-scooby.env._FALSE_OR_ZERO = {};
-scooby.env._getCachePropGetterPopulator = function(propName, calculatorFunction ){
+cosmo.env._NULL = {};
+cosmo.env._FALSE_OR_ZERO = {};
+cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction ){
    var _calcy = calculatorFunction;
    
    return  function(){
-   var prop = scooby.env._scoobyConfig[propName];
+   var prop = cosmo.env._cosmoConfig[propName];
    
    if (prop){
        dojo.debug("got a cache hit: " + prop);       
        //if we don't use these placeholders, then the preceding if statement will return 
        //false, and we'll have to recalculate.
-       if (prop == scooby.env._NULL) {
+       if (prop == cosmo.env._NULL) {
            return null; 
        }
        
-       if (prop == scooby.env._FALSE_OR_ZERO) {
+       if (prop == cosmo.env._FALSE_OR_ZERO) {
            return false; 
        }
               
@@ -58,12 +58,12 @@ scooby.env._getCachePropGetterPopulator = function(propName, calculatorFunction 
 
    if (!prop){
        if (prop == false) {
-           scooby.env._scoobyConfig[propName] = scooby.env._FALSE_OR_ZERO;
+           cosmo.env._cosmoConfig[propName] = cosmo.env._FALSE_OR_ZERO;
        } else if (prop == null) {
-           scooby.env._scoobyConfig[propName] = scooby.env._NULL;
+           cosmo.env._cosmoConfig[propName] = cosmo.env._NULL;
        }     
    } else {
-       scooby.env._scoobyConfig[propName] = prop;
+       cosmo.env._cosmoConfig[propName] = prop;
    } 
    
    return prop;
@@ -71,12 +71,12 @@ scooby.env._getCachePropGetterPopulator = function(propName, calculatorFunction 
 }
 
 /**
- * Returns the path to the scooby script base, relative to the document NOT dojo
+ * Returns the path to the cosmo script base, relative to the document NOT dojo
  */
-scooby.env.getScoobyBase = scooby.env._getCachePropGetterPopulator("scoobyBase", function(){
+cosmo.env.getCosmoBase = cosmo.env._getCachePropGetterPopulator("cosmoBase", function(){
     // "../.." is ugly but it works. 
     var uri = dojo.hostenv.getBaseScriptUri() + "../../";
-    scooby.env._scoobyConfig["baseScoobyUri"] = uri;
+    cosmo.env._cosmoConfig["baseCosmoUri"] = uri;
     return uri;
 });
 
@@ -88,17 +88,17 @@ scooby.env.getScoobyBase = scooby.env._getCachePropGetterPopulator("scoobyBase",
  *
  * TODO - add an option for getting dojo-relative URI's
  */
-scooby.env.getTemplateBase = scooby.env._getCachePropGetterPopulator("templateBase", function(){
+cosmo.env.getTemplateBase = cosmo.env._getCachePropGetterPopulator("templateBase", function(){
 //FIXME maybe this should go in our base widget (once we make one ;-) )
-    var uri = scooby.env.getScoobyBase() + "cosmo/ui/widget/templates/";
+    var uri = cosmo.env.getCosomoBase() + "cosmo/ui/widget/templates/";
     return uri;
 });
 
 /**
  * Returns the baseURI of the application.
  */
-scooby.env.getBaseUrl = function(){
-    var result = scooby.env._scoobyConfig["baseUrl"];
+cosmo.env.getBaseUrl = function(){
+    var result = cosmo.env._cosmoConfig["baseUrl"];
     if (typeof(result) == "undefined"){
         throw new Error("You must setBaseUrl before calling this function");
     }
@@ -109,14 +109,14 @@ scooby.env.getBaseUrl = function(){
  * Sets the base url of the application. Provided by the server somehow.
  * @param {String} baseUrl
  */
-scooby.env.setBaseUrl = function(baseUrl){
-    scooby.env._scoobyConfig["baseUrl"] = baseUrl;
+cosmo.env.setBaseUrl = function(baseUrl){
+    cosmo.env._cosmoConfig["baseUrl"] = baseUrl;
 }
 
-scooby.env.getImagesUrl = function(){
-	return scooby.env.getBaseUrl() + '/templates/default/images/';
+cosmo.env.getImagesUrl = function(){
+	return cosmo.env.getBaseUrl() + '/templates/default/images/';
 }
 
-scooby.env.getRedirectUrl = function(){
-	return scooby.env.getBaseUrl() + '/redirect_login.jsp';}
+cosmo.env.getRedirectUrl = function(){
+	return cosmo.env.getBaseUrl() + '/redirect_login.jsp';}
 

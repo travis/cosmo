@@ -15,7 +15,7 @@
 */
 
 /**
- * A scooby date is how we represent date-times in Scooby's events
+ * A ScoobyDate is how we represent date-times in Cosmo's events
  *
  * The absence of a timezone together with the utc property being false indicates
  * a floating date-time.

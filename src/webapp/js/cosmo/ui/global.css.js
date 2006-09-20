@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-dojo.require(scooby.env);
+dojo.require(cosmo.env);
 var uiStyles = '';
 var uiPref = []; 
 var arr = [];
@@ -22,7 +22,7 @@ var repl = null;
 var dynRules = [];
 
 dojo.io.bind({
-    url: scooby.env.getBaseUrl() + '/templates' + TEMPLATE_DIRECTORY + '/ui.css',
+    url: cosmo.env.getBaseUrl() + '/templates' + TEMPLATE_DIRECTORY + '/ui.css',
     sync: true,
     load: function(type, data, evt) { doStyles(type, data, evt); },
     error: function(type, error) { alert(error.message); },

@@ -27,13 +27,13 @@
 <script type="text/javascript">
 {
     var staticBaseUrl = "${staticBaseUrl}";
-    dojo.setModulePrefix("scooby", "../../cosmo"); // path is relative to dojo root
+    dojo.setModulePrefix("cosmo", "../../cosmo"); // path is relative to dojo root
 
     dojo.require("dojo.widget.*");
-    dojo.require("scooby.ui.widget.Debug");
-    dojo.require("scooby.env");
-    scooby.env.setBaseUrl("${staticBaseUrl}");
-    dojo.widget.manager.registerWidgetPackage("scooby.ui.widget");
+    dojo.require("cosmo.ui.widget.Debug");
+    dojo.require("cosmo.env");
+    cosmo.env.setBaseUrl("${staticBaseUrl}");
+    dojo.widget.manager.registerWidgetPackage("cosmo.ui.widget");
 }
     
 </script>

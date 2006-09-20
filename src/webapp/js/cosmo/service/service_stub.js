@@ -24,7 +24,7 @@
  * All methods here can be called two ways - synchronously or asynchronously. For synchcronous
  * calls just call them method as declared below. For example:
  *
- *    <code> var events = scoobyService.getEvents("Scooby", beginDate, endDate);</code>
+ *    <code> var events = scoobyService.getEvents("Cosmo", beginDate, endDate);</code>
  *
  * For asynchronous calls you simply pass a callback as the first argument to any of the methods.
  * The callback is of the form

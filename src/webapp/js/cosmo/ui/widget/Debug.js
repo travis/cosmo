@@ -17,9 +17,9 @@
 dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
 
-dojo.provide("scooby.ui.widget.Debug");
+dojo.provide("cosmo.ui.widget.Debug");
 
-dojo.widget.defineWidget("scooby.ui.widget.Debug", dojo.widget.HtmlWidget, {
+dojo.widget.defineWidget("cosmo.ui.widget.Debug", dojo.widget.HtmlWidget, {
 
     templatePath : dojo.uri.dojoUri("../../cosmo/ui/widget/templates/Debug.html"),
     templateCssPath : dojo.uri.dojoUri("../../cosmo/ui/widget/templates/Debug.css"),

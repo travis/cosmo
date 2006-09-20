@@ -79,7 +79,7 @@ function RecurrenceRule(){
     this.endDate = null;
 
     /**
-     * For events not created in Scooby that have more complex rules than scooby
+     * For events not created in Cosmo that have more complex rules than Cosmo 
      * allows, a text representation of the rule appears here but is not editable.
      */
     this.customRule = null;

@@ -15,5 +15,5 @@
 */
 
 alert("HI!");
-dojo.require("scooby.ui.widget.Hour");
-dojo.hostenv.moduleLoaded("scooby.ui.widget.*");
+dojo.require("cosmo.ui.widget.Hour");
+dojo.hostenv.moduleLoaded("cosmo.ui.widget.*");

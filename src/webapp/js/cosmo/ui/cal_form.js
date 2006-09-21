@@ -36,10 +36,11 @@ function CalForm() {
     this.form = document.getElementById('calForm');
     // If a text input currently has focus -- should disable 
     // listener for Delete button
-    this.textInputHasFocus = false,
+    this.detailTextInputHasFocus = false;
     // If a textare currently has focus -- should disable
     // listner for Delete and Enter buttons
-    this.textAreaHasFocus = false,
+    this.detailTextAreaHasFocus = false;
+    this.jumpToTextInputHasFocus = false;
     
     /**
      * Holdover from when we used object-literal notation
@@ -696,8 +697,8 @@ function CalForm() {
         // All text inputs
         for (var i=0; i < inputs.length; i++) {
             if (inputs[i].className == 'inputText') {
-                inputs[i].onfocus = function() { Cal.calForm.textInputHasFocus = true };
-                inputs[i].onblur = function() { Cal.calForm.textInputHasFocus = false };
+                inputs[i].onfocus = function() { Cal.calForm.detailTextInputHasFocus = true; };
+                inputs[i].onblur = function() { Cal.calForm.detailTextInputHasFocus = false; };
             }
         }
         
@@ -707,11 +708,11 @@ function CalForm() {
         
         // Description textarea
         descrTxt.onfocus = function() {
-            Cal.calForm.textInputHasFocus = true;
+            Cal.calForm.detailTextInputHasFocus = true;
             Cal.calForm.textAreaHasFocus = true;
         };
         descrTxt.onblur = function() {
-            Cal.calForm.textInputHasFocus = false;
+            Cal.calForm.detailTextInputHasFocus = false;
             Cal.calForm.textAreaHasFocus = false;
         };
 
@@ -736,21 +737,23 @@ function CalForm() {
         
         d = document.createElement('div');
         d.className = 'floatLeft';
-        this.createNbsp(d);
+        self.createNbsp(d);
         dc.appendChild(d);
         
         d = document.createElement('div');
         d.className = 'formElem floatLeft';
         dc.appendChild(d);
-        this.createInput('text', 'jumpto', 'jumpto',
+        self.createInput('text', 'jumpto', 'jumpto',
             8, 10, null, 'inputText', d);
-        this.setTextInput(this.form.jumpto, 'mm/dd/yyyy', true, false);
-        this.form.jumpto.onclick = Cal.calForm.emptyTextInput;
+        self.setTextInput(self.form.jumpto, 'mm/dd/yyyy', true, false);
+        self.form.jumpto.onclick = Cal.calForm.emptyTextInput;
+        self.form.jumpto.onfocus = function() { Cal.calForm.jumpToTextInputHasFocus = true; };
+        self.form.jumpto.onblur = function() { Cal.calForm.jumpToTextInputHasFocus = false; };
         
         d = document.createElement('div');
         d.className = 'floatLeft';
-        this.createNbsp(d);
-        this.createNbsp(d);
+        self.createNbsp(d);
+        self.createNbsp(d);
         dc.appendChild(d);
         
         d = document.createElement('div');

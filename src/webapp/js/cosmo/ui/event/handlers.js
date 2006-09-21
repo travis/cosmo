@@ -267,16 +267,19 @@ function keyUpHandler(e) {
             case 13:
                 if (Cal.currSelObj && 
                     !Cal.currSelObj.getInputDisabled() && 
-                    !Cal.calForm.textAreaHasFocus) {
+                    Cal.calForm.detailTextInputHasFocus) {
                     
                     Cal.saveCalEvent();
+                }
+                else if (Cal.calForm.jumpToTextInputHasFocus) {
+                    Cal.calForm.goJumpToDate();
                 }
                 break;
             // Delete key
             case 46:
                 if (Cal.currSelObj && 
                     !Cal.currSelObj.getInputDisabled() && 
-                    !Cal.calForm.textInputHasFocus) {
+                    !Cal.calForm.detailTextInputHasFocus) {
                     
                     Cal.showRemoveConfirm();
                 }

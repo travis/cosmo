@@ -105,13 +105,13 @@ function Block() {
     this.getPlatonicLeft = function() {
         var ev = Cal.eventRegistry.getItem(this.id);
         var diff = (Date.diff('d', Cal.viewStart.getTime(), ev.data.start.getTime()));
-        return (diff * Cal.dayUnitWidth);
+        return (diff * cosmo.view.cal.canvas.dayUnitWidth);
             
     };
     this.getPlatonicWidth = function() {
         var ev = Cal.eventRegistry.getItem(this.id);
         var diff = (ScoobyDate.diff('d', ev.data.start, ev.data.end))+3;
-        return (diff * Cal.dayUnitWidth);
+        return (diff * cosmo.view.cal.canvas.dayUnitWidth);
     }
     /**
      * Cross-browser wrapper for setting CSS opacity
@@ -425,14 +425,14 @@ HasTimeBlock.prototype.updateFromEvent = function(ev) {
         else {
             startPos = Cal.calcPosFromTime(Date.strftime('%H:%M',
             ev.data.start.getTime()));
-            left = (ev.data.start.getLocalDay())*Cal.dayUnitWidth;
+            left = (ev.data.start.getLocalDay())*cosmo.view.cal.canvas.dayUnitWidth;
         }
         endPos = Cal.calcPosFromTime(Date.strftime('%H:%M',
             ev.data.end.getTime()));
         height = endPos - startPos;
         left += (ev.conflictDepth * 10);
 
-        width = Cal.dayUnitWidth - (ev.maxDepth * 10);
+        width = cosmo.view.cal.canvas.dayUnitWidth - (ev.maxDepth * 10);
         
         // BANDAID: set min height if not multi-day event
         if (!this.auxDivList.length && (height < unit)) {
@@ -658,7 +658,7 @@ HasTimeBlock.prototype.setLeft = function(pos) {
     this.div.style.left = leftPos + 'px';
     if (this.auxDivList.length) {
         for (var i = 0; i < this.auxDivList.length; i++) {
-            leftPos += Cal.dayUnitWidth;
+            leftPos += cosmo.view.cal.canvas.dayUnitWidth;
             auxDiv = this.auxDivList[i];
             auxDiv.style.left = leftPos + 'px';
         }
@@ -861,7 +861,7 @@ NoTimeBlock.prototype.updateFromEvent = function(ev, temp) {
     var diff = ScoobyDate.diff('d', ev.data.start, ev.data.end) + 1;
 
     this.left = this.getPlatonicLeft();
-    this.width = (diff*Cal.dayUnitWidth)-3;
+    this.width = (diff*cosmo.view.cal.canvas.dayUnitWidth)-3;
     if (!temp) {
         this.top = ev.allDayRow*19;
     }
@@ -903,7 +903,7 @@ NoTimeBlock.prototype.calcWidth = function(startDay, ev) {
     diff = (ScoobyDate.diff('d', ev.data.start, ev.data.end))+1;
 
     diff = (diff > maxDiff) ? maxDiff : diff;
-    width = (diff*Cal.dayUnitWidth)-1;
+    width = (diff*cosmo.view.cal.canvas.dayUnitWidth)-1;
 
     return width;
 }

@@ -79,7 +79,7 @@ function Draggable(id) {
         this.min = this.bottom-(HOUR_UNIT_HEIGHT/2)+2;
         this.clickOffsetX = xPos - this.origDivLeft;
         this.clickOffsetY = yPos - div.offsetTop;
-        this.rLimit = (Cal.midColWidth - Cal.dayUnitWidth - 
+        this.rLimit = (Cal.midColWidth - cosmo.view.cal.canvas.dayUnitWidth - 
             SCROLLBAR_SPACER_WIDTH - 2); 
         
         // FIXME: This causes a really irritating CSS bug in Mozilla/Firefox
@@ -341,10 +341,10 @@ HasTimeDraggable.prototype.drop = function() {
     
     // Snap-to for lateral position
     if (this.dragMode == 'drag') {
-        deltaX = left % Cal.dayUnitWidth;
+        deltaX = left % cosmo.view.cal.canvas.dayUnitWidth;
         // Drag is just right of day-width size -- snap left
-        if (deltaX > (Cal.dayUnitWidth/2)) {
-            left = left+(Cal.dayUnitWidth-deltaX);
+        if (deltaX > (cosmo.view.cal.canvas.dayUnitWidth/2)) {
+            left = left+(cosmo.view.cal.canvas.dayUnitWidth-deltaX);
         }
         // Drag is just left of day-width size -- snap right
         else {
@@ -398,10 +398,10 @@ NoTimeDraggable.prototype.drop = function() {
     
     // Side-to-side snap
     if (this.dragMode == 'drag') {
-        deltaX = left % Cal.dayUnitWidth;
+        deltaX = left % cosmo.view.cal.canvas.dayUnitWidth;
         // Drag is just right of day-width size -- snap left
-        if (deltaX > (Cal.dayUnitWidth/2)) {
-            left = left+(Cal.dayUnitWidth-deltaX);
+        if (deltaX > (cosmo.view.cal.canvas.dayUnitWidth/2)) {
+            left = left+(cosmo.view.cal.canvas.dayUnitWidth-deltaX);
         }
         // Drag is just left of day-width size -- snap right
         else {

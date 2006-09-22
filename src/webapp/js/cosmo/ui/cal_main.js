@@ -47,9 +47,6 @@ var Cal = new function() {
     // All-day resizable area, scrolling area for normal events, detail form
     // Calculated based on client window size
     this.midColWidth = 0;
-    // Width of day col in week view, width of event blocks --
-    // calculated based on client window size
-    this.dayUnitWidth = 0;
     // The form on the page -- a CalForm obj
     this.calForm = null;
     // What view we're using -- currently only week view exists
@@ -138,10 +135,7 @@ var Cal = new function() {
         // Load and display date info for UI elements
         // --------------
         if (this.loadLocaleDateInfo() && this.getQuerySpan(this.currDate)) {
-            this.showHours();
-            this.showMonthHeader();
-            this.showDayList();
-            this.showAllDayList();
+            cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
         }
 
         // Create the calendar form obj -- clear on page reload
@@ -344,7 +338,7 @@ var Cal = new function() {
         eventInfo.setPosition(4, 8);
 
         // Set cal day column width
-        this.dayUnitWidth = parseInt(
+        cosmo.view.cal.canvas.dayUnitWidth = parseInt(
             (this.midColWidth - HOUR_LISTING_WIDTH - SCROLLBAR_SPACER_WIDTH)/7 );
 
         // Kill and DOM-elem references to avoid IE memleak issues --
@@ -419,248 +413,6 @@ var Cal = new function() {
         newArr['PM'] = getText('App.PM');
         Date.meridian = newArr;
         return true;
-    };
-    /**
-     * Shows list of days at the head of each column in the week view
-     * Uses the Date.abbrWeekday array of names in date.js
-     * TO-DO: Change from using innerHTML to DOM methods
-     */
-    this.showDayList = function() {
-        var skinImagesDir = 'templates/' + TEMPLATE_DIRECTORY + '/images/';
-        var str = '';
-        var start = HOUR_LISTING_WIDTH + 1;
-        var idstr = '';
-        var startdate = this.viewStart.getDate();
-        var startmon = this.viewStart.getMonth();
-        var daymax = this.daysInMonth(startmon+1);
-        var calcDay = null;
-        var cd = this.currDate;
-        var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
-        
-        // Spacer to align with the timeline that displays hours below
-        // for the timed event canvas
-        str += '<div id="dayListSpacer" class="dayListDayDiv"' +
-            ' style="left:0px; width:' +
-            (HOUR_LISTING_WIDTH - 1) + 'px; height:' +
-            (DAY_LIST_DIV_HEIGHT-1) +
-            'px;">&nbsp;</div>';
-
-        // Do a week's worth of day cols with day name and date
-        for (var i = 0; i < 7; i++) {
-            calcDay = Date.add('d', i, this.viewStart);
-            startdate = startdate > daymax ? 1 : startdate;
-            // Subtract one pixel of height for 1px border per retarded CSS spec
-            str += '<div class="dayListDayDiv" id="dayListDiv' + i +
-                '" style="left:' + start + 'px; width:' + (this.dayUnitWidth-1) +
-                'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
-            if (calcDay.getTime() == currDay.getTime()) {
-                str += ' background-image:url(' + cosmo.env.getImagesUrl() + 
-                    'day_col_header_background.gif); background-repeat:' +
-                    ' repeat-x; background-position:0px 0px;'
-            }
-            str += '">';
-            str += Date.abbrWeekday[i] + '&nbsp;' + startdate;
-            str += '</div>\n';
-            start += this.dayUnitWidth;
-            startdate++;
-        }
-        document.getElementById('dayListDiv').innerHTML = str;
-        return true;
-    };
-    /**
-     * Draws the day columns in the resizeable all-day area
-     * TO-DO: Change from using innerHTML to DOM methods
-     */
-    this.showAllDayList = function() {
-        var str = '';
-        var start = 0;
-        var idstr = ''
-        var calcDay = null;
-        var cd = this.currDate;
-        var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
-
-        for (var i = 0; i < 7; i++) {
-            calcDay = Date.add('d', i, this.viewStart);
-            str += '<div class="allDayListDayDiv';
-            if (calcDay.getTime() == currDay.getTime()) {
-                str += ' currentDayDay'
-            }
-            str +='" id="allDayListDiv' + i +
-            '" style="left:' + start + 'px; width:' +
-            (this.dayUnitWidth-1) + 'px;">&nbsp;</div>';
-            start += this.dayUnitWidth;
-        }
-        str += '<br style="clear:both;"/>';
-        document.getElementById('allDayContentDiv').innerHTML = str;
-        return true;
-    };
-    /**
-     * Draws the 12 AM to 11 PM hour-range in each day column
-     * innerHTML is faster than DOM, leave for now
-     */
-    this.showHours = function() {
-        var str = '';
-        var row = '';
-        var start = 0;
-        var idstr = '';
-        var hour = 0;
-        var meridian = '';
-        var calcDay = null;
-        var cd = this.currDate;
-        var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
-        var isCurrentDay = false;
-        var viewDiv = null;
-        var timeLineWidth = 0;
-        var workingHoursBarWidth = 3;
-        
-        // Subtract one px for border per asinine CSS spec
-        var halfHourHeight = (HOUR_UNIT_HEIGHT/2) - 1;
-        
-        function workingHoursLine() {
-            var r = '';
-            // Working/non-working hours line
-            r += '<div class="';
-            r += (j < 8 || j > 17) ? 'nonWorkingHours' : 'workingHours';
-            r += '" style="width:' + workingHoursBarWidth + 
-                'px; height:' + (halfHourHeight+1) + 
-                'px; float:left; font-size:1px;">&nbsp;</div>';
-            return r;
-        }
-        
-        str = '';
-        viewDiv = document.getElementById('timedHourListDiv');
-        timeLineWidth = parseInt(viewDiv.offsetWidth);
-        // Subtract 1 for 1px border
-        timeLineWidth = timeLineWidth - workingHoursBarWidth - 1;
-        
-        // Timeline of hours on left
-        for (var j = 0; j < 24; j++) {
-            hour = j == 12 ? getText('App.Noon') : hrMil2Std(j);
-            meridian = j > 11 ? ' PM' : ' AM';
-            meridian = j == 12 ? '' : '<span>' + meridian + '</span>';
-            row = '';
-            
-            // Upper half hour
-            // ==================
-            row += '<div class="hourDivTop';
-            row += '" style="height:' + 
-                halfHourHeight + 'px; width:' + 
-                timeLineWidth + 'px; float:left;">';
-            // Hour plus AM/PM
-            row += '<div class="hourDivSubLeft">' + hour + 
-                meridian + '</div>';
-            row += '</div>\n';
-            row += workingHoursLine();
-            row += '<br class="clearAll"/>'
-            
-            idstr = i + '-' + j + '30';
-            
-            // Lower half hour
-            // ==================
-            row += '<div class="hourDivBottom"';
-            // Make the noon border thicker
-            if (j == 11) { 
-                row += ' style="height:' + (halfHourHeight-1) + 
-                    'px; border-width:2px;';
-            }
-            else {
-                row += ' style="height:' + halfHourHeight + 'px;';
-            }
-            row += ' width:' + timeLineWidth + 
-                'px; float:left;">&nbsp;</div>\n';
-            row += workingHoursLine();
-            row += '<br class="clearAll"/>'
-            
-            str += row;
-        }
-        viewDiv.innerHTML = str;
-
-        str = '';
-        viewDiv = document.getElementById('timedContentDiv');
-
-        // Do a week's worth of day cols with hours
-        for (var i = 0; i < 7; i++) {
-            calcDay = Date.add('d', i, this.viewStart);
-            str += '<div class="dayDiv" id="dayDiv' + i +
-                '" style="left:' + start + 'px; width:' +
-                (this.dayUnitWidth-1) +
-                'px;"';
-            str += '>';
-            for (var j = 0; j < 24; j++) {
-                
-                isCurrentDay = (calcDay.getTime() == currDay.getTime());
-                
-                idstr = i + '-' + j + '00';
-                row = '';
-                row += '<div id="hourDiv' + idstr + '" class="hourDivTop';
-                // Highlight the current day
-                if (isCurrentDay) {
-                    row += ' currentDayDay'
-                }
-                // Non-working hours are gray
-                else if (j < 8 || j > 18) {
-                    //row += ' nonWorkingHours';
-                }
-                row += '" style="height:' + halfHourHeight + 'px;">';
-                row += '</div>\n';
-                idstr = i + '-' + j + '30';
-                row += '<div id="hourDiv' + idstr + '" class="hourDivBottom';
-                // Highlight the current day
-                if (isCurrentDay) {
-                    row += ' currentDayDay'
-                }
-                // Non-working hours are gray
-                else if (j < 8 || j > 18) {
-                    //row += ' nonWorkingHours';
-                }
-                row += '" style="';
-                if (j == 11) { 
-                    row += 'height:' + (halfHourHeight-1) + 
-                        'px; border-width:2px;';
-                }
-                else {
-                    row += 'height:' + halfHourHeight + 'px;';
-                }
-                row += '">&nbsp;</div>';
-                str += row;
-            }
-            str += '</div>\n';
-            start += this.dayUnitWidth;
-        }
-
-        viewDiv.innerHTML = str;
-        return true;
-    };
-    /**
-     * Displays the month name at the top
-     * TO-DO: Change from using innerHTML to DOM methods
-     */
-    this.showMonthHeader = function() {
-        var vS = this.viewStart;
-        var vE = this.viewEnd;
-        var mS = vS.getMonth();
-        var mE = vE.getMonth();
-        var headerDiv = document.getElementById('monthHeaderDiv');
-        var str = '';
-
-        // Format like 'March-April, 2006'
-        if (mS < mE) {
-            str += vS.strftime('%B-');
-            str += vE.strftime('%B %Y');
-        }
-        // Format like 'December 2006-January 2007'
-        else if (mS > mE) {
-            str += vS.strftime('%B %Y-');
-            str += vE.strftime('%B %Y');
-        }
-        // Format like 'April 2-8, 2006'
-        else {
-            str += vS.strftime('%B %Y');
-        }
-        if (headerDiv.firstChild) {
-            headerDiv.removeChild(headerDiv.firstChild);
-        }
-        headerDiv.appendChild(document.createTextNode(str));
     };
     /**
      * Get the scroll offset for the scrollable view area ('timedScrollingMainDiv')
@@ -1009,11 +761,8 @@ var Cal = new function() {
         Cal.eventRegistry = new Hash();
         Cal.asyncRegistry = new Hash();
         Cal.getQuerySpan(new Date(queryDate)); // Get the new query span week
-        Cal.showMonthHeader();
-        Cal.showDayList();
-        Cal.showAllDayList();
-        Cal.showHours();
-
+        // Draw the calendar canvas
+        cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
         // Load and display events
         Cal.loadDisplayEvents();
         Cal.uiMask.hide();
@@ -1192,7 +941,7 @@ var Cal = new function() {
      * @return A Date object
      */
     this.calcDateFromPos = function(point) {
-        var col = parseInt(point/this.dayUnitWidth); // Number 0-6 -- day in the week
+        var col = parseInt(point/cosmo.view.cal.canvas.dayUnitWidth); // Number 0-6 -- day in the week
         var posdate = this.calcDateFromIndex(col);
         return posdate;
     };
@@ -1335,36 +1084,6 @@ var Cal = new function() {
     // ==========================
     // Cal-specific time manip functions
     // ==========================
-    /**
-     * Returns the number of days in a specific month of a specific year --
-     * the year is necessary to handle leap years' Feb. 29
-     * @param month Integer, numbers 1-12
-     * @param year Integer, if divisible by four indicates a leap year
-     * @return Integer number of days in the indicated month
-     */
-    this.daysInMonth = function(month, year){
-        var days = 0;
-        switch (month) {
-            case 4:
-            case 6:
-            case 9:
-            case 11:
-                days = 30;
-                break;
-            case 2:
-                if (year % 4 == 0){
-                       days = 29;
-                   }
-                   else{
-                       days = 28;
-                  }
-                  break;
-              default:
-                  days = 31;
-                  break;
-        }
-        return days;
-    };
     /**
      * Get the start and end for the span of time to view in the cal
      * Eventually this will change depending on what type of view is selected

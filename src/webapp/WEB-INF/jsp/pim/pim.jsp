@@ -69,6 +69,7 @@
 
 <script type="text/javascript">
 // Dojo requires
+dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.view.cal.conflict');
 
 // FIXME: Need to get timeout value from server

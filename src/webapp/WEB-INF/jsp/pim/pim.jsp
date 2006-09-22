@@ -68,6 +68,9 @@
 <script type="text/javascript" src="${staticBaseUrl}/js/lib/jsonrpc-java-js/jsonrpc.js"></script>
 
 <script type="text/javascript">
+// Dojo requires
+dojo.require('cosmo.view.cal.conflict');
+
 // FIXME: Need to get timeout value from server
 var TIMEOUT_MIN = 30;
 

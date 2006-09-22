@@ -16,7 +16,7 @@
 
 package org.osaf.cosmo.rpc.model;
 
-public class CosmoDate {
+public class CosmoDate implements Cloneable{
     
     public static final int MONTH_JANUARY = 0;
     public static final int MONTH_FEBRUARY = 1;
@@ -106,6 +106,14 @@ public class CosmoDate {
 
     public void setHours(int hours) {
         this.hours = hours;
+    }
+    
+    public CosmoDate clone(){
+        try {
+            return (CosmoDate) super.clone();
+        } catch (CloneNotSupportedException cnse){
+            throw new RuntimeException(cnse);
+        }
     }
     
     public boolean equals (Object o){

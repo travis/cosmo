@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.rpc.model;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.PARAM_X_OSAF_ANYTIME;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
 
@@ -30,15 +31,19 @@ import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.ParameterFactoryImpl;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.DateListProperty;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Uid;
@@ -49,28 +54,28 @@ import org.apache.commons.lang.StringUtils;
 import org.osaf.cosmo.CosmoConstants;
 
 /**
- * An instance of this class is used to convert Scooby Events into ical4j
- * events or ical4j events wrapped in ical4j Calendars.
- *
- *
+ * An instance of this class is used to convert Scooby Events into ical4j events
+ * or ical4j events wrapped in ical4j Calendars.
+ * 
+ * 
  * @author bobbyrullo
- *
+ * 
  */
 public class CosmoToICalendarConverter {
 
-    //TODO Have spring manage UUID generator
+    // TODO Have spring manage UUID generator
     public static VersionFourGenerator uidGenerator = new VersionFourGenerator();
 
     /**
      * Creates a Calendar object which wraps an ical4j VEvent
-     *
+     * 
      * All timezone information is ignored at this point, so all dates are
      * "floating" dates
-     *
+     * 
      * @param event
      * @return
      */
-    public Calendar createWrappedVEvent(Event event){
+    public Calendar createWrappedVEvent(Event event) {
         Calendar calendar = new Calendar();
         calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
         calendar.getProperties().add(Version.VERSION_2_0);
@@ -82,14 +87,14 @@ public class CosmoToICalendarConverter {
 
     /**
      * Creates a VEvent from a scooby Event.
-     *
-     * All timezone information is
-     * ignored at this point, so all dates are "floating" dates
-     *
+     * 
+     * All timezone information is ignored at this point, so all dates are
+     * "floating" dates
+     * 
      * @param event
      * @return
      */
-    public VEvent createVEvent(Event event){
+    public VEvent createVEvent(Event event) {
         VEvent vevent = new VEvent();
 
         copyProperties(event, vevent);
@@ -99,33 +104,35 @@ public class CosmoToICalendarConverter {
         uid.setValue(event.getId() != null ? event.getId() : getNextUID());
         vevent.getProperties().add(uid);
 
-
         return vevent;
     }
 
     /**
-     * Updates an existing event within an ical4j calendar by finding the
-     * VEvent within the calendar with the same UID and copying its properties
-     * to that event. Any properties that Scooby doesn't support are preserved.
-     *
+     * Updates an existing event within an ical4j calendar by finding the VEvent
+     * within the calendar with the same UID and copying its properties to that
+     * event. Any properties that Scooby doesn't support are preserved.
+     * 
      * Timezones of all dates will remain as they were originally.
-     *
-     * @param event the scooby event
-     * @param calendar the calendar containing the VEvent to update
+     * 
+     * @param event
+     *            the scooby event
+     * @param calendar
+     *            the calendar containing the VEvent to update
      * @return
      */
-    public void updateEvent(Event event, Calendar calendar){
+    public void updateEvent(Event event, Calendar calendar) {
         VEvent vevent = getMasterVEvent(calendar);
         copyProperties(event, vevent);
     }
 
     /**
-     * Sets a DateProperty with the Date (no time)  represented by the ScoobyDate.
-     *
+     * Sets a DateProperty with the Date (no time) represented by the
+     * ScoobyDate.
+     * 
      * @param dateProp
      * @param scoobyDate
      */
-    protected void setDate(DateProperty dateProp, CosmoDate scoobyDate){
+    protected void setDate(DateProperty dateProp, CosmoDate scoobyDate) {
         String dateString = getDateTimeString(scoobyDate, false, false);
         Date date = null;
         try {
@@ -139,12 +146,13 @@ public class CosmoToICalendarConverter {
 
     /**
      * Sets a DateProperty with the DateTime represented by the ScoobyDate.
-     *
+     * 
      * @param dateProp
      * @param scoobyDate
      */
-    protected void setDateTime(DateProperty dateProp, CosmoDate scoobyDate){
-        String dateString = getDateTimeString(scoobyDate, true, scoobyDate.isUtc());
+    protected void setDateTime(DateProperty dateProp, CosmoDate scoobyDate) {
+        String dateString = getDateTimeString(scoobyDate, true, scoobyDate
+                .isUtc());
         DateTime dateTime = null;
         try {
             dateTime = new DateTime(dateString);
@@ -154,8 +162,8 @@ public class CosmoToICalendarConverter {
         dateProp.setDate(dateTime);
     }
 
-    protected void copyProperties(Event event, VEvent vevent){
-        //if dtStart and end are dates with times, this is true
+    protected void copyProperties(Event event, VEvent vevent) {
+        // if dtStart and end are dates with times, this is true
         boolean dateTime = true;
         DtStart dtStart = null;
         DtEnd dtEnd = null;
@@ -164,8 +172,7 @@ public class CosmoToICalendarConverter {
         DtEnd dtEndOld = null;
 
         boolean dtEndHasDuration = hasProperty(vevent, Property.DURATION);
-        if (hasProperty(vevent, Property.DTEND)
-                || dtEndHasDuration ) {
+        if (hasProperty(vevent, Property.DTEND) || dtEndHasDuration) {
             dtEndOld = vevent.getEndDate();
         }
 
@@ -173,15 +180,16 @@ public class CosmoToICalendarConverter {
             dateTime = false;
             dtStart = new DtStart();
             setDate(dtStart, event.getStart());
-            if (event.getEnd() != null){
+            if (event.getEnd() != null) {
                 dtEnd = new DtEnd();
                 java.util.Calendar endCalendar = createCalendar(event.getEnd());
                 endCalendar.add(java.util.Calendar.DATE, 1);
                 Date endDate = null;
                 try {
-                    endDate = new Date(getDateTimeString(endCalendar, false, false));
-                } catch (ParseException pe){
-                   throw new RuntimeException(pe);
+                    endDate = new Date(getDateTimeString(endCalendar, false,
+                            false));
+                } catch (ParseException pe) {
+                    throw new RuntimeException(pe);
                 }
                 dtEnd.setDate(endDate);
                 dtEnd.getParameters().add(Value.DATE);
@@ -192,8 +200,7 @@ public class CosmoToICalendarConverter {
             Parameter anyTimeParam = null;
             try {
                 anyTimeParam = ParameterFactoryImpl.getInstance()
-                        .createParameter(PARAM_X_OSAF_ANYTIME,
-                                VALUE_TRUE);
+                        .createParameter(PARAM_X_OSAF_ANYTIME, VALUE_TRUE);
             } catch (URISyntaxException urise) {
                 throw new RuntimeException(urise);
             }
@@ -220,37 +227,99 @@ public class CosmoToICalendarConverter {
         description.setValue(event.getDescription());
 
         Status status = null;
-        if(!StringUtils.isEmpty(event.getStatus())) {
+        if (!StringUtils.isEmpty(event.getStatus())) {
             status = new Status();
             status.setValue(event.getStatus());
         }
 
         if (dateTime) {
-            if (dtStartOld != null && dtStart != null){
-                copyTimeZone(dtStartOld,  dtStart);
+            if (dtStartOld != null && dtStart != null) {
+                copyTimeZone(dtStartOld, dtStart);
             }
-            if (dtEndOld != null && dtEnd!= null){
+            if (dtEndOld != null && dtEnd != null) {
                 copyTimeZone(dtEndHasDuration ? dtStartOld : dtEndOld, dtEnd);
             }
         }
 
         addOrReplaceProperty(vevent, description);
         addOrReplaceProperty(vevent, summary);
-        if(status != null) {
+        if (status != null) {
             addOrReplaceProperty(vevent, status);
         } else {
             removeProperty(vevent, Property.STATUS);
         }
         addOrReplaceProperty(vevent, dtStart);
-        if (dtEnd != null){
+        if (dtEnd != null) {
             addOrReplaceProperty(vevent, dtEnd);
         }
         removeProperty(vevent, Property.DURATION);
 
+        RecurrenceRule recurrenceRule = event.getRecurrenceRule();
+        if (recurrenceRule != null && isEmpty(recurrenceRule.getCustomRule())) {
+            String rule = getFrequency(recurrenceRule.getFrequency())
+                    + ";";
+            if (recurrenceRule.getEndDate() != null) {
+                rule += "UNTIL="
+                        + getDateTimeString(recurrenceRule.getEndDate(), true,
+                                true);
+            }
+            try {
+                RRule rrule = new RRule(new Recur(rule));
+                vevent.getProperties().add(rrule);
+            } catch (ParseException pe) {
+                throw new RuntimeException(pe);
+            }
+            
+            CosmoDate[] exceptionDates = recurrenceRule.getExceptionDates();
+            if (exceptionDates != null && exceptionDates.length > 0){
+                ExDate exDate = new ExDate();
+
+                //just use the timezone of the DTSTART for now (maybe forever)
+                boolean utc = false;
+                if (dateTime){
+                    utc = dtStartOld.isUtc();
+                    if (utc){
+                        exDate.setUtc(true);
+                    } else {
+                        copyTimeZone(dtStartOld, exDate);
+                    }
+                }
+               
+                for (int x = 0; x < exceptionDates.length; x++) {
+                    try {
+                        exDate.getDates().add(
+                                new Date(getDateTimeString(exceptionDates[x],
+                                        dateTime, utc)));
+                    } catch (ParseException pe) {
+                        throw new RuntimeException(pe);
+                    }
+                }
+                
+                vevent.getProperties().add(exDate);
+                
+            }
+        }
+    }
+
+    private String getFrequency(String frequency) {
+        String freq = "FREQ=";
+        if (frequency.equals(RecurrenceRule.FREQUENCY_DAILY)){
+            return freq + Recur.DAILY;
+        } else if (frequency.equals(RecurrenceRule.FREQUENCY_WEEKLY)){
+            return freq + Recur.WEEKLY;
+        } else if (frequency.equals(RecurrenceRule.FREQUENCY_BIWEEKLY)){
+            return freq + Recur.WEEKLY + ";INTERVAL=2";
+        } else if (frequency.equals(RecurrenceRule.FREQUENCY_MONTHLY)){
+            return freq + Recur.MONTHLY;
+        } else if (frequency.equals(RecurrenceRule.FREQUENCY_YEARLY)){
+            return freq + Recur.YEARLY;
+        } else {
+            return null;
+        }
     }
 
     protected static void addOrReplaceProperty(VEvent destination,
-                                               Property property) {
+            Property property) {
 
         Property oldProp = destination.getProperties().getProperty(
                 property.getName());
@@ -267,11 +336,12 @@ public class CosmoToICalendarConverter {
     }
 
     protected static String getDateTimeString(CosmoDate scoobyDate,
-                                              boolean includeTime, boolean utc) {
+            boolean includeTime, boolean utc) {
         StringBuffer buf = new StringBuffer();
-        buf.append(StringUtils.leftPad(""+scoobyDate.getYear(),  4, "0"));
-        buf.append(StringUtils.leftPad(""+(scoobyDate.getMonth()+1), 2, "0"));
-        buf.append(StringUtils.leftPad(""+scoobyDate.getDate(), 2, "0"));
+        buf.append(StringUtils.leftPad("" + scoobyDate.getYear(), 4, "0"));
+        buf.append(StringUtils
+                .leftPad("" + (scoobyDate.getMonth() + 1), 2, "0"));
+        buf.append(StringUtils.leftPad("" + scoobyDate.getDate(), 2, "0"));
         if (includeTime) {
             buf.append("T");
             buf.append(StringUtils.leftPad("" + scoobyDate.getHours(), 2, "0"));
@@ -279,7 +349,7 @@ public class CosmoToICalendarConverter {
                     .leftPad("" + scoobyDate.getMinutes(), 2, "0"));
             buf.append(StringUtils
                     .leftPad("" + scoobyDate.getSeconds(), 2, "0"));
-            if (utc){
+            if (utc) {
                 buf.append("Z");
             }
         }
@@ -287,7 +357,7 @@ public class CosmoToICalendarConverter {
     }
 
     protected static String getDateTimeString(java.util.Calendar calendar,
-                                              boolean includeTime, boolean utc) {
+            boolean includeTime, boolean utc) {
         StringBuffer buf = new StringBuffer();
         buf.append(StringUtils.leftPad(""
                 + calendar.get(java.util.Calendar.YEAR), 4, "0"));
@@ -297,19 +367,20 @@ public class CosmoToICalendarConverter {
                 + calendar.get(java.util.Calendar.DAY_OF_MONTH), 2, "0"));
         if (includeTime) {
             buf.append("T");
-            buf.append(StringUtils.leftPad("" + calendar.get(java.util.Calendar.HOUR_OF_DAY), 2, "0"));
-            buf.append(StringUtils
-                    .leftPad("" + calendar.get(java.util.Calendar.MINUTE), 2, "0"));
-            buf.append(StringUtils
-                    .leftPad("" + calendar.get(java.util.Calendar.SECOND), 2, "0"));
-            if (utc){
+            buf.append(StringUtils.leftPad(""
+                    + calendar.get(java.util.Calendar.HOUR_OF_DAY), 2, "0"));
+            buf.append(StringUtils.leftPad(""
+                    + calendar.get(java.util.Calendar.MINUTE), 2, "0"));
+            buf.append(StringUtils.leftPad(""
+                    + calendar.get(java.util.Calendar.SECOND), 2, "0"));
+            if (utc) {
                 buf.append("Z");
             }
         }
         return buf.toString();
     }
 
-    protected static java.util.Calendar createCalendar(CosmoDate scoobyDate){
+    protected static java.util.Calendar createCalendar(CosmoDate scoobyDate) {
         java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.clear();
         calendar.set(java.util.Calendar.YEAR, scoobyDate.getYear());
@@ -319,7 +390,7 @@ public class CosmoToICalendarConverter {
         calendar.set(java.util.Calendar.MINUTE, scoobyDate.getMinutes());
         calendar.set(java.util.Calendar.SECOND, scoobyDate.getDate());
         return calendar;
-     }
+    }
 
     protected static String getNextUID() {
         return uidGenerator.nextIdentifier().toString();
@@ -327,6 +398,7 @@ public class CosmoToICalendarConverter {
 
     /**
      * Copies the TZID from the source to the dest
+     * 
      * @param source
      * @param dest
      */
@@ -338,21 +410,31 @@ public class CosmoToICalendarConverter {
         }
     }
 
-    protected VEvent getMasterVEvent(Calendar calendar){
-        ComponentList list = calendar.getComponents().getComponents(Component.VEVENT);
-        for (Object obj: list){
+    protected void copyTimeZone(DateProperty source, DateListProperty dest){
+        TzId sourceTz = (TzId) source.getParameters().getParameter(
+                Parameter.TZID);
+        if (sourceTz != null) {
+            dest.getParameters().add(sourceTz);
+        }
+    }
+    
+    //TODO this is wrong. How do we REALLY determine the master event?
+    protected VEvent getMasterVEvent(Calendar calendar) {
+        ComponentList list = calendar.getComponents().getComponents(
+                Component.VEVENT);
+        for (Object obj : list) {
             VEvent vevent = (VEvent) obj;
-                if (!hasProperty(vevent, Property.RECURRENCE_ID) &&
-                    !hasProperty(vevent, Property.EXRULE) &&
-                    !hasProperty(vevent, Property.EXDATE)){
-                    return vevent;
-                }
+            if (!hasProperty(vevent, Property.RECURRENCE_ID)
+                    && !hasProperty(vevent, Property.EXRULE)
+                    && !hasProperty(vevent, Property.EXDATE)) {
+                return vevent;
+            }
         }
 
         return null;
     }
 
-    private boolean hasProperty(Component c, String propName){
+    private boolean hasProperty(Component c, String propName) {
         PropertyList l = c.getProperties().getProperties(propName);
         return l != null && l.size() > 0;
     }

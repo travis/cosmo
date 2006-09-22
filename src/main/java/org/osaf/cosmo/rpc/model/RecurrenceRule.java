@@ -28,13 +28,14 @@ public class RecurrenceRule {
     public static final String FREQUENCY_DAILY   = "daily";
     public static final String FREQUENCY_MONTHLY = "monthly";
     public static final String FREQUENCY_YEARLY  = "yearly";
-    public static final String FREQUENCY_BIWEEKLY  = "yearly";
+    public static final String FREQUENCY_BIWEEKLY  = "biweekly";
 
     
     private String frequency = null;
     private CosmoDate endDate = null;
     private String customRule = null;
-    
+    private CosmoDate[] exceptionDates = null; 
+                      
     /**
      * Returns how often this event should be repeated
      * 
@@ -77,6 +78,14 @@ public class RecurrenceRule {
     
     public void setCustomRule(String customRule) {
         this.customRule = customRule;
+    }
+    
+    public CosmoDate[] getExceptionDates() {
+        return exceptionDates;
+    }
+
+    public void setExceptionDates(CosmoDate[] exceptionDates) {
+        this.exceptionDates = exceptionDates;
     }
 
 	@Override

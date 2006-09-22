@@ -17,6 +17,7 @@ package org.osaf.cosmo.rpc.model;
 
 import static org.osaf.cosmo.icalendar.ICalendarConstants.PARAM_X_OSAF_ANYTIME;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
+import static org.osaf.cosmo.util.ICalendarUtils.getVTimeZone;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -480,18 +481,6 @@ public class ICalendarToCosmoConverter {
             net.fortuna.ical4j.model.Calendar calendar){
         String tzid = getParameterValue(dateProperty, Parameter.TZID);
         return createScoobyDate(dateProperty.getDate(), calendar, tzid);
-    }
-    
-    private VTimeZone getVTimeZone(String tzid, net.fortuna.ical4j.model.Calendar calendar){
-        ComponentList list = calendar.getComponents().getComponents(Component.VTIMEZONE);
-        for (Object component : list){
-            VTimeZone vtimezone = (VTimeZone) component;
-            String curTzid = getPropertyValue(vtimezone, Property.TZID);
-            if (tzid.equals(curTzid)){
-                return vtimezone;
-            }
-        }
-        return null;
     }
     
     private boolean isUtc(net.fortuna.ical4j.model.Date date){

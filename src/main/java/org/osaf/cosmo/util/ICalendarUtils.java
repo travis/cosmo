@@ -29,6 +29,7 @@ import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DateProperty;
 
@@ -205,5 +206,17 @@ public class ICalendarUtils {
     public static String getTZId(DateProperty dateProperty){
         Parameter tzid = dateProperty.getParameters().getParameter(Parameter.TZID);
         return tzid.getValue();
+    }
+    
+   public static VTimeZone getVTimeZone(String tzid, net.fortuna.ical4j.model.Calendar calendar){
+        ComponentList list = calendar.getComponents().getComponents(Component.VTIMEZONE);
+        for (Object component : list){
+            VTimeZone vtimezone = (VTimeZone) component;
+            String curTzid = getPropertyValue(vtimezone, Property.TZID);
+            if (tzid.equals(curTzid)){
+                return vtimezone;
+            }
+        }
+        return null;
     }
 }

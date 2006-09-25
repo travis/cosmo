@@ -33,7 +33,7 @@ Usage: $0 [OPTIONS...]
 A simple tool for bulk loading test accounts into a Cosmo server.
 
 Options:
-  -s               server root URL (defaults to http://localhost:8080)
+  -s               server root URL (defaults to http://localhost:8080/cosmo)
   -u               admin username (defaults to root)
   -p               admin password (defaults to cosmo)
   -n               number of test accounts to create (defaults to 20)
@@ -42,7 +42,7 @@ Options:
   -v               print version information and exit
 EOT
 
-use constant DEFAULT_SERVER_URL => 'http://localhost:8080';
+use constant DEFAULT_SERVER_URL => 'http://localhost:8080/cosmo';
 use constant DEFAULT_ADMIN_USERNAME => 'root';
 use constant DEFAULT_ADMIN_PASSWORD => 'cosmo';
 use constant DEFAULT_NUM_ACCOUNTS => 20;

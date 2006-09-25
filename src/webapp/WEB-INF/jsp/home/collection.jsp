@@ -50,13 +50,21 @@
         ${Collection.name}
       </td>
     </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        UID
+      </td>
+      <td class="mdData">
+        ${Collection.uid}
+      </td>
+    </tr>
     <c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionItem'}">
     <tr>
       <td class="mdLabel" style="text-align:right;">
         Description
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Collection.description}">${Collection.description}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${Collection.description != null}">${Collection.description}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -64,7 +72,17 @@
         Language
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Collection.language}">${Collection.language}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${Collection.language != null}">${Collection.language}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        <fmt:message key="HomeDirectory.Collection.Attributes.SupportedCalendarItems"/>
+      </td>
+      <td class="mdData">
+        <c:forEach var="type" items="${Collection.supportedComponents}">
+          <fmt:message key="HomeDirectory.Collection.Attributes.SupportedCalendarItem.${type}"/>
+        </c:forEach>
       </td>
     </tr>
     </c:if>

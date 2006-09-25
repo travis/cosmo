@@ -134,6 +134,9 @@
   <definition name="home.inc.properties"
               page="/WEB-INF/jsp/home/inc-properties.jsp"/>
 
+  <definition name="home.inc.indexes"
+              page="/WEB-INF/jsp/home/inc-indexes.jsp"/>
+
   <definition name="home.calendar" extends="layout.standard">
     <put name="body"         value="/WEB-INF/jsp/home/calendar.jsp"/>
     <put name="prefix"       value="HomeDirectory.Calendar."/>

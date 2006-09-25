@@ -55,6 +55,14 @@
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
+        UID
+      </td>
+      <td class="mdData">
+        ${Item.uid}
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
         Size
       </td>
       <td class="mdData">
@@ -74,7 +82,7 @@
         Encoding
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Item.contentEncoding}">${Item.contentEncoding}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${Item.contentEncoding != null}">${Item.contentEncoding}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -82,7 +90,7 @@
         Language
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Item.contentLanguage}">${Item.contentLanguage}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${Item.contentLanguage != null}">${Item.contentLanguage}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -111,6 +119,11 @@
 </tiles:insert>
 
 <tiles:insert definition="home.inc.properties">
+  <tiles:put name="item" beanName="Item"/>
+  <tiles:put name="path" beanName="Path"/>
+</tiles:insert>
+
+<tiles:insert definition="home.inc.indexes">
   <tiles:put name="item" beanName="Item"/>
   <tiles:put name="path" beanName="Path"/>
 </tiles:insert>

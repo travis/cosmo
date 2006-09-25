@@ -15,16 +15,11 @@
  * limitations under the License.
 */
 --%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
+<%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
-
-
-<%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
 
 <script type="text/javascript" src="${staticBaseUrl}/i18n.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/ui.conf.js"></script>

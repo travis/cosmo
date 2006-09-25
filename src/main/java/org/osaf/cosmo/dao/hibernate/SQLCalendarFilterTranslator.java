@@ -226,6 +226,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
                     textMatch);
         }
 
+        // Deepest we can go is a param filter
         if (hasParamFilters) {
             for (Iterator it = propFilter.getParamFilters().iterator(); it
                     .hasNext();) {
@@ -234,9 +235,10 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
                         attributeWhere, attributeJoins, timeRangeWhere,
                         timeRangeJoins);
             }
+            return;
         }
-
-        // else we return
+        
+        // else we generate the query and return
         if (sqlBuf.length() > 0)
             sqlBuf.append(" union ");
 
@@ -300,14 +302,14 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         buf.append("(ctri" + index + ".componenttype = :param" + paramCount);
         params.put("param" + paramCount, myprefix);
         paramCount++;
-        buf.append(" and ((ctri" + index + ".startdate <= case when ctri" + index
+        buf.append(" and ((ctri" + index + ".startdate < case when ctri" + index
                 + ".isfloating=1 then '" + timeRangeFilter.getFloatEnd() + "'");
         // params.put("param" + paramCount, timeRangeFilter.getFloatEnd());
         // paramCount++;
         buf.append(" else :param" + paramCount + " end");
         params.put("param" + paramCount, timeRangeFilter.getUTCEnd());
         paramCount++;
-        buf.append(" and ctri" + index + ".enddate >= case when ctri" + index
+        buf.append(" and ctri" + index + ".enddate > case when ctri" + index
                 + ".isfloating=1 then '" + timeRangeFilter.getFloatStart()
                 + "'");
         // params.put("param" + paramCount, timeRangeFilter.getFloatStart());

@@ -124,11 +124,8 @@ public class TimeRangeFilter implements CaldavConstants {
         fstart = (DateTime) Dates.getInstance(dstart, dstart);
         fend = (DateTime) Dates.getInstance(dend, dend);
 
-        // if the timezone is null then default system timezone is used
-        fstart.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
-
-        // if the timezone is null then default system timezone is used
-        fend.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
+        // set timezone on floating times
+        updateFloatingTimes();
     }
 
     public String getUTCStart() {
@@ -153,6 +150,8 @@ public class TimeRangeFilter implements CaldavConstants {
 
     public void setTimezone(VTimeZone timezone) {
         this.timezone = timezone;
+        // update timezone on floating times
+        updateFloatingTimes();
     }
 
     /** */
@@ -163,5 +162,18 @@ public class TimeRangeFilter implements CaldavConstants {
             append("fstart", fstart).
             append("fend", fend).
             toString();
+    }
+    
+    private void updateFloatingTimes() {
+        
+        if(fstart!=null) {
+            // if the timezone is null then default system timezone is used
+            fstart.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
+        }
+
+        if(fend!=null) {
+            // if the timezone is null then default system timezone is used
+            fend.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
+        }
     }
 }

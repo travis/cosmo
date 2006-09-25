@@ -68,6 +68,20 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
     }
+    
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.dao.ItemDao#findItemParentByPath(java.lang.String)
+     */
+    public Item findItemParentByPath(String path) {
+        try {
+            Item dbItem = itemPathTranslator.findItemParent(path);
+            return dbItem;
+        } catch (HibernateException e) {
+            throw SessionFactoryUtils.convertHibernateAccessException(e);
+        }
+    }
+
 
     /*
      * (non-Javadoc)

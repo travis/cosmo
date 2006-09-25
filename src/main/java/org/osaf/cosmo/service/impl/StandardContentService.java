@@ -87,6 +87,18 @@ public class StandardContentService implements ContentService {
         }
         return contentDao.findItemByPath(path);
     }
+    
+    /**
+     * Find content item's parent by path. Path is of the format:
+     * /username/parent1/parent2/itemname.  In this example,
+     * the item at /username/parent1/parent2 would be returned.
+     */
+    public Item findItemParentByPath(String path) {
+        if (log.isDebugEnabled()) {
+            log.debug("finding item's parent at path " + path);
+        }
+        return contentDao.findItemParentByPath(path);
+    }
 
     /**
      * Update an existing item.

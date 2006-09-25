@@ -228,6 +228,12 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         queryItem = itemDao.findItemByPath("/testuser2/a/test");
         Assert.assertNotNull(queryItem);
         Assert.assertTrue(queryItem instanceof ContentItem);
+        
+        clearSession();
+        
+        queryItem = itemDao.findItemParentByPath("/testuser2/a/test");
+        Assert.assertNotNull(queryItem);
+        Assert.assertEquals(a.getUid(), queryItem.getUid());
     }
 
     public void testContentDaoUpdateContent() throws Exception

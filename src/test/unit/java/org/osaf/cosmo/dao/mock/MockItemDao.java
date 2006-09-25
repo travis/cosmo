@@ -90,6 +90,18 @@ public class MockItemDao implements ItemDao {
     public Item findItemByPath(String path) {
         return itemsByPath.get(path);
     }
+    
+    /**
+     * Find the parent item of the item with the specified path. 
+     * The return type will be one of CollectionItem, CalendarCollectionItem.
+     *
+     * @param path
+     *            path of item
+     * @return parent item of item represented by path
+     */
+    public Item findItemParentByPath(String path) {
+        return itemsByPath.get(path).getParent();
+    }
 
     /**
      * Return the path to an item. The path has the format:

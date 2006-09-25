@@ -24,16 +24,12 @@ import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.AuthenticationServiceException;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.providers.AuthenticationProvider;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.service.ContentService;
-
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataRetrievalFailureException;
 
 /**
  */
@@ -100,16 +96,32 @@ public class TicketAuthenticationProvider
                 log.debug("authenticating ticket " + id +
                           " for resource at path " + path);
             }
+            
+            // If the item exists, get it
             Item item = contentService.findItemByPath(path);
+            
+            // If the item doesn't exist (PUT request), then
+            // get the parent
             if (item == null) {
-                throw new TicketedItemNotFoundException("Resource at " +
-                                                        path + " not found");
+                item = contentService.findItemParentByPath(path);
+                // Parent must exist
+                if(item==null)
+                    throw new TicketedItemNotFoundException("Resource at " +
+                            path + " not found");
             }
 
+            // First look for ticket on item
             Ticket ticket = contentService.getTicket(item, id);
-            if (ticket == null) {
-                return null;
+            
+            // Look for ticket on each parent
+            while (ticket == null && (item.getParent()!=null)) {
+                item = item.getParent();
+                ticket = contentService.getTicket(item, id);
             }
+            
+            // If we didn't find a ticket, then its not there
+            if(ticket==null)
+                return null;
 
             if (ticket.hasTimedOut()) {
                 if (log.isDebugEnabled()) {

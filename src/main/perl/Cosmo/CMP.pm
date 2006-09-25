@@ -71,7 +71,8 @@ sub get_basic_credentials {
 sub check_server_availability {
     my $self = shift;
     my $res = $self->get($self->server_url);
-    $res->is_success or
+    # GET / returns redirect to login page
+    $res->is_redirect or
         die $res->status_line . "\n";
 }
 

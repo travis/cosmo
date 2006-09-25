@@ -27,8 +27,8 @@
         <id name="id" column="id" unsaved-value="-1">
             <generator class="native" />
         </id>
-        <property name="username" type="string" index="idx_username">
-            <column name="username"/>
+        <property name="username" type="string">
+            <column name="username" index="idx_username"/>
         </property>
         <property name="password" type="string">
             <column name="password"/>
@@ -39,8 +39,8 @@
         <property name="lastName" type="string">
             <column name="lastname"/>
         </property>
-        <property name="email" type="string" index="idx_useremail">
-            <column name="email"/>
+        <property name="email" type="string">
+            <column name="email" index="idx_useremail"/>
         </property>
         <property name="admin" type="boolean">
             <column name="admin"/>

@@ -38,12 +38,12 @@
             <column name="parentid"/>
         </many-to-one>
        
-        <property name="uid" type="string" length="255" unique="true" not-null="true" index="idx_itemuid">
-            <column name="uid"/>
+        <property name="uid" type="string">
+            <column name="uid" length="255" unique="true" not-null="true" index="idx_itemuid"/>
         </property>
         
-        <property name="name" type="string" length="255" not-null="true" index="idx_itemname">
-            <column name="itemname"/>
+        <property name="name" type="string">
+            <column name="itemname" length="255" not-null="true" index="idx_itemname"/>
         </property>
         
         <property name="creationDate" type="timestamp">

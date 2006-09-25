@@ -28,8 +28,8 @@
         
         <discriminator column="attributetype" type="string" length="16" not-null="true"/>
         
-        <property name="name" type="string" length="255" not-null="true">
-            <column name="attributename" index="attrname_idx"/>
+        <property name="name" type="string">
+            <column name="attributename" length="255" not-null="true" index="attrname_idx"/>
         </property>
         
         <many-to-one name="item" class="Item">

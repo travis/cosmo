@@ -25,8 +25,8 @@
             <generator class="native" />
         </id>
        
-        <property name="name" type="string" unique="true" not-null="true" index="idx_svrpropname" length="255">
-            <column name="propertyname"/>
+        <property name="name" type="string">
+            <column name="propertyname" unique="true" not-null="true" index="idx_svrpropname" length="255"/>
         </property>
         
         <property name="value" type="string" length="2048">

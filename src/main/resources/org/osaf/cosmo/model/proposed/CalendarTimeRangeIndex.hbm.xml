@@ -25,14 +25,14 @@
         <id name="id" column="id" unsaved-value="-1">
             <generator class="native" />
         </id>
-        <property name="startDate" type="string" length="16">
-            <column name="startdate" index="idx_startdt"/>
+        <property name="startDate" type="string">
+            <column name="startdate" length="16" index="idx_startdt"/>
         </property>
-        <property name="endDate" type="string" length="16">
-            <column name="enddate" index="idx_enddt"/>
+        <property name="endDate" type="string">
+            <column name="enddate" length="16" index="idx_enddt"/>
         </property>
-        <property name="type" type="string" not-null="true" length="255">
-            <column name="componenttype" index="idx_comptype"/>
+        <property name="type" type="string">
+            <column name="componenttype" not-null="true" length="255" index="idx_comptype"/>
         </property>
         <property name="isRecurring" type="boolean">
             <column name="isrecurring"/>

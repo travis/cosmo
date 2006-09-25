@@ -34,8 +34,8 @@
             <column name="ownerid"/>
         </many-to-one>
         
-        <property name="key" type="string" unique="true" not-null="true" index="idx_ticketkey" length="255">
-            <column name="ticketkey"/>
+        <property name="key" type="string">
+            <column name="ticketkey" unique="true" not-null="true" index="idx_ticketkey" length="255"/>
         </property>
         
         <property name="timeout" type="string" length="255">

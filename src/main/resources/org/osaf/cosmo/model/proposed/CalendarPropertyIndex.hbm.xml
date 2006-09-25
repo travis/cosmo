@@ -26,12 +26,12 @@
             <generator class="native" />
         </id>
        
-        <property name="name" type="string" not-null="true" length="255">
-            <column name="propertyname" index="idx_calpropname"/>
+        <property name="name" type="string">
+            <column name="propertyname" not-null="true" length="255" index="idx_calpropname"/>
         </property>
         
-        <property name="value" type="string" length="2048">
-            <column name="propertyvalue" index="idx_calpropvalue"/>
+        <property name="value" type="string">
+            <column name="propertyvalue" length="4096"/>
         </property>
         
         <many-to-one name="item" class="Item">

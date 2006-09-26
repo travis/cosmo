@@ -277,11 +277,11 @@ public class CosmoToICalendarConverter {
                 //just use the timezone of the DTSTART for now (maybe forever)
                 boolean utc = false;
                 if (dateTime){
-                    utc = dtStartOld.isUtc();
+                    utc = dtStart.isUtc();
                     if (utc){
                         exDate.setUtc(true);
                     } else {
-                        copyTimeZone(dtStartOld, exDate);
+                        copyTimeZone(dtStart, exDate);
                     }
                 }
                

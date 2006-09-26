@@ -22,13 +22,16 @@ import junit.framework.TestCase;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.logging.Log;
@@ -260,7 +263,7 @@ public class CosmoToICalendarConverterTest extends TestCase {
         assertNull(recur.getUntil());
     }
 
-    public void testCreateRecurringYearlyEndDate(){
+    public void testCreateRecurringYearlyOneEndDate(){
         Event event = createBaseEvent();
         RecurrenceRule rr = new RecurrenceRule();
         rr.setFrequency(RecurrenceRule.FREQUENCY_YEARLY);
@@ -283,6 +286,32 @@ public class CosmoToICalendarConverterTest extends TestCase {
         assertNotNull(untilDate);
         java.util.Calendar calendar = getGMTCalendar(untilDate);
         assertEquals(2010, calendar.get(java.util.Calendar.YEAR));
+    }
+    
+    public void testCreateRecurringDailyOneExceptionDate(){
+        Event event = createBaseEvent();
+        RecurrenceRule rr = new RecurrenceRule();
+        rr.setFrequency(RecurrenceRule.FREQUENCY_DAILY);
+        
+        CosmoDate exceptionDate = event.getStart().clone();
+        exceptionDate.setDate(3);
+        rr.setExceptionDates(new CosmoDate[]{exceptionDate});
+        event.setRecurrenceRule(rr);
+
+        VEvent vevent = converter.createVEvent(event);
+        RRule rrule = (RRule) vevent.getProperties().getProperty(Property.RRULE);
+        assertNotNull(rrule);
+
+        PropertyList exdates = vevent.getProperties().getProperties(
+                Property.EXDATE);
+        assertEquals(1, exdates.size());
+        ExDate exdate = (ExDate) exdates.get(0);
+        DateList dates = exdate.getDates();
+        assertEquals(1, dates.size());
+        Date date = (Date) dates.get(0);
+        java.util.Calendar calendar = getCalendar(date);
+        int day = calendar.get(java.util.Calendar.DAY_OF_MONTH);
+        assertEquals(3, day);
     }
     
     /**
@@ -342,6 +371,19 @@ public class CosmoToICalendarConverterTest extends TestCase {
     protected java.util.Calendar getGMTCalendar(Date date){
         java.util.Calendar calendar = java.util.Calendar.getInstance(TimeZone
                 .getTimeZone("GMT"));
+        calendar.setTime(date);
+        return calendar;
+    }
+    
+    /**
+     * Returns the java.util.Calendar for the specified Date using the default
+     * timezone of the system. Good for when you nee to get day, month, year, etc. 
+     * of a "Floating" date.
+     * @param date
+     * @return
+     */
+    protected java.util.Calendar getCalendar(Date date){
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.setTime(date);
         return calendar;
     }

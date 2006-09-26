@@ -425,7 +425,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         servlet.service(request, response);
 
         assertEquals("incorrect status",
-                     MockHttpServletResponse.SC_METHOD_NOT_ALLOWED,
+                     MockHttpServletResponse.SC_NOT_FOUND,
                      response.getStatus());
     }
 }

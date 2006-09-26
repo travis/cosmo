@@ -226,7 +226,7 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         servlet.service(request, response);
 
         assertTrue(response.getStatus() ==
-                   MockHttpServletResponse.SC_METHOD_NOT_ALLOWED);
+                   MockHttpServletResponse.SC_NOT_FOUND);
     }
 
     private Set createUsersFromXml(Document doc)

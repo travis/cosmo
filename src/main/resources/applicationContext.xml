@@ -489,9 +489,18 @@
   </bean>
 
   <bean id="davLocatorFactory"
-        class="org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl">
+        class="org.osaf.cosmo.dav.impl.StandardLocatorFactory">
     <constructor-arg>
       <value>/home</value>
+    </constructor-arg>
+    <constructor-arg>
+      <value>/feed/atom/1.0</value>
+    </constructor-arg>
+    <constructor-arg>
+      <value>/cmp</value>
+    </constructor-arg>
+    <constructor-arg>
+      <value>/console/home/browse</value>
     </constructor-arg>
   </bean>
 

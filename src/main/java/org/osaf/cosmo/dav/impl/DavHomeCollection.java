@@ -26,6 +26,7 @@ import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dav.acl.AclConstants;
+import org.osaf.cosmo.dav.acl.property.AlternateUriSet;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.property.CalendarHomeSet;
 import org.osaf.cosmo.model.HomeCollectionItem;
@@ -39,6 +40,7 @@ import org.osaf.cosmo.model.ModelValidationException;
  *
  * <ul>
  * <li><code>DAV:calendar-home-set</code> (protected)</li>
+ * <li><code>DAV:alternate-URI-set</code> (protected)</li>
  * </ul>
  *
  * @see DavCollection
@@ -52,6 +54,7 @@ public class DavHomeCollection extends DavCollection
 
     static {
         registerLiveProperty(CALENDARHOMESET);
+        registerLiveProperty(ALTERNATEURISET);
 
         int p = ResourceType.registerResourceType(ELEMENT_ACL_PRINCIPAL,
                                                   NAMESPACE);
@@ -91,6 +94,7 @@ public class DavHomeCollection extends DavCollection
         DavPropertySet properties = getProperties();
 
         properties.add(new CalendarHomeSet(this));
+        properties.add(new AlternateUriSet(this));
     }
 
     /** */
@@ -103,7 +107,8 @@ public class DavHomeCollection extends DavCollection
 
         DavPropertyName name = property.getName();
 
-        if (name.equals(CALENDARHOMESET))
+        if (name.equals(CALENDARHOMESET) ||
+            name.equals(ALTERNATEURISET))
             throw new ModelValidationException("cannot set protected property " + name);
     }
 
@@ -115,7 +120,40 @@ public class DavHomeCollection extends DavCollection
         if (hc == null)
             return;
 
-        if (name.equals(CALENDARHOMESET))
+        if (name.equals(CALENDARHOMESET) ||
+            name.equals(ALTERNATEURISET))
             throw new ModelValidationException("cannot remove protected property " + name);
+    }
+
+    // our methods
+
+    /**
+     * Returns a locator that provides the Atom URL for the home
+     * collection.
+     */
+    public DavResourceLocator getAtomLocator() {
+        return ((StandardLocatorFactory)getLocator().getFactory()).
+            createAtomLocator(getLocator().getPrefix(),
+                              getLocator().getResourcePath());
+    }
+
+    /**
+     * Returns a locator that provides the CMP URL for the home
+     * collection.
+     */
+    public DavResourceLocator getCmpLocator() {
+        return ((StandardLocatorFactory)getLocator().getFactory()).
+            createCmpLocator(getLocator().getPrefix(),
+                             getLocator().getResourcePath());
+    }
+
+    /**
+     * Returns a locator that provides the web URL for the home
+     * collection.
+     */
+    public DavResourceLocator getWebLocator() {
+        return ((StandardLocatorFactory)getLocator().getFactory()).
+            createWebLocator(getLocator().getPrefix(),
+                             getLocator().getResourcePath());
     }
 }

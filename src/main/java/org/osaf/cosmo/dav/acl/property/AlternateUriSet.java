@@ -61,15 +61,25 @@ public class AlternateUriSet extends AbstractDavProperty
         /**
          */
         public Element toXml(Document document) {
-            Element href =
+            Element atom =
                 DomUtil.createElement(document, XML_HREF, NAMESPACE);
-            DomUtil.setText(href, home.getLocator().getHref(true));
+            DomUtil.setText(atom, home.getAtomLocator().getHref(false));
+
+            Element cmp =
+                DomUtil.createElement(document, XML_HREF, NAMESPACE);
+            DomUtil.setText(cmp, home.getCmpLocator().getHref(false));
+
+            Element web =
+                DomUtil.createElement(document, XML_HREF, NAMESPACE);
+            DomUtil.setText(web, home.getWebLocator().getHref(false));
 
             Element set =
                 DomUtil.createElement(document,
                                       ELEMENT_ACL_ALTERNATE_URI_SET,
                                       NAMESPACE);
-            set.appendChild(href);
+            set.appendChild(atom);
+            set.appendChild(cmp);
+            set.appendChild(web);
 
             return set;
         }

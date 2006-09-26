@@ -61,6 +61,7 @@ import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.dav.ticket.TicketDavRequest;
 import org.osaf.cosmo.dav.ticket.TicketDavResponse;
 import org.osaf.cosmo.model.ModelConversionException;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -428,15 +429,9 @@ public class DavServlet extends AbstractWebdavServlet
             log.warn("error parsing MKCALENDAR properties", e);
             response.sendError(DavServletResponse.SC_BAD_REQUEST, e.getMessage());
             return;
-            // XXX: addMember should throw a DavException in this case
-//         } catch (InvalidCalendarObjectException e) {
-//             log.warn("invalid timezone for MKCALENDAR", e);
-//             response.sendError(DavServletResponse.SC_BAD_REQUEST, "invalid timezone for MKCALENDAR: " + e.getMessage());
-//             return;
         }
 
-        if (properties.isEmpty() ||
-            msr.hasStatusKey(DavServletResponse.SC_OK)) {
+        if (properties.isEmpty() || ! msr.hasNonOk()) {
             response.setStatus(DavServletResponse.SC_CREATED);
             return;
         }

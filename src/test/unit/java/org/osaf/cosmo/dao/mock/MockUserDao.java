@@ -101,7 +101,7 @@ public class MockUserDao implements UserDao {
 
     /**
      */
-    public void createUser(User user) {
+    public User createUser(User user) {
         if (user == null) {
             throw new IllegalArgumentException("null user");
         }
@@ -114,11 +114,12 @@ public class MockUserDao implements UserDao {
         }
         usernameIdx.put(user.getUsername(), user);
         emailIdx.put(user.getEmail(), user);
+        return user;
     }
 
     /**
      */
-    public void updateUser(User user) {
+    public User updateUser(User user) {
         if (user == null) {
             throw new IllegalArgumentException("null user");
         }
@@ -144,6 +145,7 @@ public class MockUserDao implements UserDao {
         if (user.isEmailChanged()) {
             emailIdx.remove(user.getOldEmail());
         }
+        return user;
     }
 
     /**

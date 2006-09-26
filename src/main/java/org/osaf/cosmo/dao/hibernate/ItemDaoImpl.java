@@ -26,7 +26,10 @@ import org.apache.commons.id.StringIdentifierGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
+import org.hibernate.ObjectDeletedException;
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
+import org.hibernate.UnresolvableObjectException;
 import org.osaf.cosmo.dao.ItemDao;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CalendarPropertyIndex;
@@ -110,6 +113,9 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     public void removeItem(Item item) {
         try {
 
+            if(item==null)
+                throw new IllegalArgumentException("item cannot be null");
+            
             if(item instanceof HomeCollectionItem)
                 throw new IllegalArgumentException("cannot remove root item");
 
@@ -117,6 +123,12 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             getSession().delete(item);
             getSession().flush();
             
+        } catch(ObjectNotFoundException onfe) {
+            throw new ItemNotFoundException("item not found");
+        } catch(ObjectDeletedException ode) {
+            throw new ItemNotFoundException("item not found");
+        } catch(UnresolvableObjectException uoe) {
+            throw new ItemNotFoundException("item not found");
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -363,10 +375,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     public void removeItemByPath(String path) {
         try {
             Item item = itemPathTranslator.findItemByPath(path);
-            if(item instanceof HomeCollectionItem)
-                throw new IllegalArgumentException("cannot remove root item");
-
-            getSession().delete(item);
+            removeItem(item);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -379,10 +388,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     public void removeItemByUid(String uid) {
         try {
             Item item = findItemByUid(uid);
-            if(item instanceof HomeCollectionItem)
-                throw new IllegalArgumentException("cannot remove root item");
-
-            getSession().delete(item);
+            removeItem(item);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }

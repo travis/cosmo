@@ -83,6 +83,9 @@ public interface CaldavConstants {
     /** The CalDAV XML element name <CALDAV:free-busy-query> */
     public static final String ELEMENT_CALDAV_CALENDAR_FREEBUSY =
         "free-busy-query";
+    /** The CalDAV XML element name <CALDAV:calendar-home-set> */
+    public static final String ELEMENT_CALDAV_CALENDAR_HOME_SET =
+        "calendar-home-set";
 
     /** The CalDAV XML attribute name CALDAV:name */
     public static final String ATTR_CALDAV_NAME = "name";
@@ -111,8 +114,10 @@ public interface CaldavConstants {
     public static final String PROPERTY_CALDAV_CALENDAR_TIMEZONE =
         "calendar-timezone";
     /** The CalDAV property name CALDAV:supported-calendar-component-set */
-    public static final String PROPERTY_CALDAV_SUPPORTED_CALENDAR_COMPONENT_SET =
-        "supported-calendar-component-set";
+    public static final String PROPERTY_CALDAV_SUPPORTED_CALENDAR_COMPONENT_SET = "supported-calendar-component-set";
+    /** The CalDAV property name CALDAV:calendar-home-set */
+    public static final String PROPERTY_CALDAV_CALENDAR_HOME_SET =
+        "calendar-home-set";
     /** The CalDAV property name CALDAV:supported-calendar-data */
     public static final String PROPERTY_CALDAV_SUPPORTED_CALENDAR_DATA =
         "supported-calendar-data";
@@ -136,5 +141,9 @@ public interface CaldavConstants {
     /** The CalDAV property CALDAV:supported-calendar-data */
     public static final DavPropertyName SUPPORTEDCALENDARDATA =
         DavPropertyName.create(PROPERTY_CALDAV_SUPPORTED_CALENDAR_DATA,
+                               NAMESPACE_CALDAV);
+    /** The CalDAV property CALDAV:calendar-home-set */
+    public static final DavPropertyName CALENDARHOMESET =
+        DavPropertyName.create(PROPERTY_CALDAV_CALENDAR_HOME_SET,
                                NAMESPACE_CALDAV);
 }

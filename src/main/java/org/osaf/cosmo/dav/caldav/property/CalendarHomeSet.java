@@ -32,7 +32,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 
 /**
- * Represents the CalDAV calendar-home-set property.
+ * Represents the CalDAV:calendar-home-set property.
+ *
+ * The property is protected. The value is a single DAV:href element
+ * containing the URL of the home collection.
  */
 public class CalendarHomeSet extends AbstractDavProperty
     implements CaldavConstants {
@@ -48,7 +51,7 @@ public class CalendarHomeSet extends AbstractDavProperty
 
     /**
      * Returns a
-     * <code>SupportedCalendarData.SupportedCalendarDataInfo</code>
+     * <code>CalendarHomeSet.SupportedCalendarDataInfo</code>
      * for this property.
      */
     public Object getValue() {

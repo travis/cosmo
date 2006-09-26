@@ -115,12 +115,12 @@ public interface CaldavConstants {
         "calendar-timezone";
     /** The CalDAV property name CALDAV:supported-calendar-component-set */
     public static final String PROPERTY_CALDAV_SUPPORTED_CALENDAR_COMPONENT_SET = "supported-calendar-component-set";
-    /** The CalDAV property name CALDAV:calendar-home-set */
-    public static final String PROPERTY_CALDAV_CALENDAR_HOME_SET =
-        "calendar-home-set";
     /** The CalDAV property name CALDAV:supported-calendar-data */
     public static final String PROPERTY_CALDAV_SUPPORTED_CALENDAR_DATA =
         "supported-calendar-data";
+    /** The CalDAV property name CALDAV:calendar-home-set */
+    public static final String PROPERTY_CALDAV_CALENDAR_HOME_SET =
+        "calendar-home-set";
 
     /** The CalDAV property CALDAV:calendar-data */
     public static final DavPropertyName CALENDARDATA =

@@ -77,19 +77,19 @@
     <property name="lobHandler" ref="defaultLobHandler" />
     <property name="mappingResources">
       <list>
-        <value>org/osaf/cosmo/model/proposed/User.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/Attribute.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/Item.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/CollectionItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/HomeCollectionItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/ContentItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/CalendarCollectionItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/CalendarItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/CalendarEventItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/CalendarPropertyIndex.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/CalendarTimeRangeIndex.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/ServerProperty.hbm.xml</value>
-        <value>org/osaf/cosmo/model/proposed/Ticket.hbm.xml</value>
+        <value>org/osaf/cosmo/model/User.hbm.xml</value>
+        <value>org/osaf/cosmo/model/Attribute.hbm.xml</value>
+        <value>org/osaf/cosmo/model/Item.hbm.xml</value>
+        <value>org/osaf/cosmo/model/CollectionItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/HomeCollectionItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/ContentItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/CalendarCollectionItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/CalendarItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/CalendarEventItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/CalendarPropertyIndex.hbm.xml</value>
+        <value>org/osaf/cosmo/model/CalendarTimeRangeIndex.hbm.xml</value>
+        <value>org/osaf/cosmo/model/ServerProperty.hbm.xml</value>
+        <value>org/osaf/cosmo/model/Ticket.hbm.xml</value>
       </list>
     </property>
     <property name="hibernateProperties">

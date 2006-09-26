@@ -27,7 +27,8 @@ document.onselectstart = function () { return false; };
 
 
 dojo.event.browser.addListener(window, "onload", init, false);
-window.onunload = cleanup;
+dojo.event.browser.addListener(window, "onunload", cleanup, false);
+// FIXME -- Just resize/re-render, don't need to reload
 window.onresize = function() {
     location = location.href;
 };

@@ -60,9 +60,6 @@ var Cal = new function() {
     // The dialog box used to display
     // warnings / confirmations -- a Dialog obj
     this.dialog = new Dialog();
-    // Resizeable area for all-day and any-time events --
-    // a ResizeArea obj
-    this.allDayArea = null;
     // Dummy recurrence rule for getting recurrence options
     this.recurTemplate = new RecurrenceRule();
     this.recurTemplate.options = ['FREQUENCY_DAILY','FREQUENCY_WEEKLY', 
@@ -103,8 +100,7 @@ var Cal = new function() {
     // Init
     // ==========================
     /**
-     * Main function -- place absolute-positioned UI elements, wipe canvas clean,
-     * load the current week, and show the hours in each day col
+     * Main function
      */
     this.init = function() {
 
@@ -132,28 +128,26 @@ var Cal = new function() {
             this.setImagesForSkin();
         }
 
-        // Load and display date info for UI elements
+        // Load and display date info, render cal canvas
         // --------------
         if (this.loadLocaleDateInfo() && this.getQuerySpan(this.currDate)) {
             cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
         }
 
-        // Create the calendar form obj -- clear on page reload
-        // --------------
+        // Calendar event detail form 
         this.calForm = new CalForm();
         this.calForm.init();
-
-        // Create the resizable all-day event area
-        // --------------
-        this.allDayArea = new ResizeArea('allDayResizeMainDiv', 'allDayResizeHandleDiv');
-        this.allDayArea.init('down');
-        this.allDayArea.addAdjacent('timedScrollingMainDiv');
-        this.allDayArea.setDragLimit();
+        this.calForm.setEventListeners();
         
-        // Display day grid on all-day event area
-        //this.showAllDayList();
-
-        // Set the initial timestamp for client-side timeout/keepalive fu
+        // Load minical and jump-to date
+        var mcDiv = document.getElementById('miniCalDiv');
+        var jpDiv = document.getElementById('jumpToDateDiv');
+        // Place jump-to date based on mini-cal pos
+        if (MiniCal.init(Cal, mcDiv)) {
+           this.calForm.addJumpToDate(jpDiv);
+        }
+        
+        // Client-side keepalive
         this.setInputTimestamp();
 
         // Load/create calendar to view
@@ -190,9 +184,6 @@ var Cal = new function() {
             this.currentCalendar = this.calendars[0];
         }
 
-        // Add event listeners to the form elements
-        this.calForm.setEventListeners();
-
         // Load and display events
         // --------------
         this.loadDisplayEvents();
@@ -209,13 +200,6 @@ var Cal = new function() {
             allDayDiv.appendChild(dummyElem);
         }
         
-        // Load minical and jump-to date
-        var mcDiv = document.getElementById('miniCalDiv');
-        var jpDiv = document.getElementById('jumpToDateDiv');
-        // Place jump-to date based on mini-cal pos
-        if (MiniCal.init(Cal, mcDiv)) {
-           this.calForm.addJumpToDate(jpDiv);
-        }
     };
 
     // ==========================
@@ -414,19 +398,6 @@ var Cal = new function() {
         Date.meridian = newArr;
         return true;
     };
-    /**
-     * Get the scroll offset for the scrollable view area ('timedScrollingMainDiv')
-     * @return An integer representing the scroll offset for the scrollable view area.
-     */
-    this.getMainViewScrollTop = function() {
-        // Has to be looked up every time, as value may change
-        // either when user scrolls or resizes all-day event area
-        var top = document.getElementById('timedScrollingMainDiv').scrollTop;
-        top -= this.viewOffset;
-        top -= (this.allDayArea.dragSize-this.allDayArea.origSize); // Subtract change in resized all-day event area
-        return top;
-
-    };
     this.getWinHeight = function() {
         // IE
         // *** Note: IE requires the body style to include'height:100%;'
@@ -459,11 +430,7 @@ var Cal = new function() {
      */
     this.loadDisplayEvents = function() {
         // Load saved events
-        if (Cal.loadEvents() &&
-            cosmo.view.cal.conflict.sortAndClearEvents(Cal.eventRegistry) &&
-            cosmo.view.cal.conflict.checkConflicts(Cal.eventRegistry) &&
-            cosmo.view.cal.conflict.stackUntimed(Cal.eventRegistry) &&
-            Cal.placeBlocks()) {
+        if (Cal.loadEvents() && Cal.updateEventsDisplay()) {
             // Give the final event the selection and display in form
             if (Cal.eventRegistry.length) {
                Cal.setSelected(Cal.eventRegistry.getLast());
@@ -474,10 +441,9 @@ var Cal = new function() {
             }
         }
     };
-    this.updateAllEventsDisplayed = function() {
-        return (cosmo.view.cal.conflict.sortAndClearEvents(Cal.eventRegistry) &&
-            cosmo.view.cal.conflict.checkConflicts(Cal.eventRegistry) && 
-            cosmo.view.cal.conflict.stackUntimed(Cal.eventRegistry) && Cal.placeBlocks());
+    this.updateEventsDisplay = function() {
+        return (cosmo.view.cal.conflict.calc(Cal.eventRegistry) && 
+            Cal.placeBlocks());
     }
     /**
      * Load the events from the backend

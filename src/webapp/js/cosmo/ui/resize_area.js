@@ -21,6 +21,9 @@ function ResizeAreaAdjacent(div, origPos, origSize) {
 }
 
 function ResizeArea(id, handleId) {
+    
+    var self = this;
+    
     this.id = id;
     this.handleId = handleId;
     this.contentDiv = null;
@@ -33,12 +36,14 @@ function ResizeArea(id, handleId) {
     this.adjacentArea = [];
 
     this.init = function(dir, off) {
-        this.contentDiv = document.getElementById(this.id);
-        this.handleDiv = document.getElementById(this.handleId);
-        this.direction = dir ? dir : this.direction;
-        this.origSize = this.getHeight(this.contentDiv) + 
-            this.getHeight(this.handleDiv);
-        this.dragSize = this.origSize;
+        self.contentDiv = document.getElementById(this.id);
+        self.handleDiv = document.getElementById(this.handleId);
+        self.handleDiv.onmousedown = function() { Cal.dragElem = self };
+        self.direction = dir ? dir : this.direction;
+        self.origSize = this.getHeight(this.contentDiv) + 
+            self.getHeight(this.handleDiv);
+        self.dragSize = self.origSize;
+        
     };
     this.addAdjacent = function(id) {
         var div = document.getElementById(id);
@@ -81,10 +86,11 @@ function ResizeArea(id, handleId) {
         return div.offsetHeight;
     };
     this.cleanup = function() {
-        this.contentDiv = null;
-        this.handleDiv = null;
-        for (var i = 0; i < this.adjacentArea.length; i++) {
-            this.adjacentArea[i].div = null;
+        self.contentDiv = null;
+        self.handleDiv.onmousedown = null;
+        self.handleDiv = null;
+        for (var i = 0; i < self.adjacentArea.length; i++) {
+            self.adjacentArea[i].div = null;
         }
     };
 }

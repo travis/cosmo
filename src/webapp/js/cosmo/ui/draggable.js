@@ -240,14 +240,14 @@ HasTimeDraggable.prototype.resizeTop = function(y) {
     // Where the top edge of the block should go, given any offset for the
     // top of the calendar, and any scrolling in the scrollable area
     // Used when resizing up
-    var t = (y-Cal.top)+Cal.getMainViewScrollTop();
+    var t = (y-Cal.top)+cosmo.view.cal.canvas.getTimedCanvasScrollTop();
     var size = 0;
     
     t = t > this.min ? this.min : t;
     t = t < 0 ? 0 : t;
     selObj.block.setTop(t);
     //if (!selObj.block.auxDivList.length) {
-        size = this.getSize((this.absTop-yPos-Cal.getMainViewScrollTop())
+        size = this.getSize((this.absTop-yPos-cosmo.view.cal.canvas.getTimedCanvasScrollTop())
             + this.height);
         
         selObj.block.setHeight(size, true);
@@ -263,7 +263,7 @@ HasTimeDraggable.prototype.resizeBottom = function(y) {
     var selObj = Cal.currSelObj;
     // Where the bottom edge of the block should go -- this is a
     // relative measurement based on pos on the scrollable area
-    var b = (y-this.absTop)+Cal.getMainViewScrollTop();
+    var b = (y-this.absTop)+cosmo.view.cal.canvas.getTimedCanvasScrollTop();
     var max = (VIEW_DIV_HEIGHT - this.absTop);
     b = b > max ? max : b;
     size = this.getSize(b);
@@ -420,7 +420,8 @@ NoTimeDraggable.prototype.drop = function() {
  * Get the bottom constraint for moving/resizing a block
  */
 NoTimeDraggable.prototype.getBLimit = function(moveblock) {
-    return (Cal.allDayArea.dragSize - moveblock.height - 8);
+    // This area resizes vertically -- imposing a drag limit makes no sense here
+    return 10000000;
 
 }
 

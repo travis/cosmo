@@ -168,11 +168,6 @@ function mouseDownHandler(e) {
             Cal.calForm.setButtons(true, true);
 
             break;
-        
-        case (strId.indexOf('allDayResizeHandleDiv') > -1):
-            // Set the Cal draggable to the resize area's resize handle
-            Cal.dragElem = Cal.allDayArea;
-            break;
     }
 }
 

@@ -18,14 +18,24 @@ dojo.provide('cosmo.view.cal.canvas');
 
 cosmo.view.cal.canvas = new function() {
     
-    var self = this; // Need some closure for scope
-
+    // Need some closure for scope
+    var self = this;
+    // Rendering the first time
+    var initRender = true; 
+    // Resizeable area for all-day events -- a ResizeArea obj
+    var allDayArea = null; 
+    
+    function $(id) {
+        return document.getElementById(id);
+    }
+        
     // Width of day col in week view, width of event blocks --
     // Calc'd based on client window size
     // Other pieces of the app use this, so make it public
     this.dayUnitWidth = 0;
-   
+    
     // Public methods
+    // ****************
     this.render = function(vS, vE, cD) {
         
         // Bounding dates, current date -- passed in on render
@@ -38,10 +48,6 @@ cosmo.view.cal.canvas = new function() {
         var hoursNode = null;
         var dayNameHeadersNode = null;
         var allDayColsNode = null;
-        
-        function $(id) {
-            return document.getElementById(id);
-        }
         
         /**
          * Set up key container elements 
@@ -325,13 +331,44 @@ cosmo.view.cal.canvas = new function() {
         
         // Do it!
         // -----------
+        if (initRender) {
+            // Make the all-day event area resizeable
+            // --------------
+            allDayArea = new ResizeArea('allDayResizeMainDiv', 'allDayResizeHandleDiv');
+            allDayArea.init('down');
+            allDayArea.addAdjacent('timedScrollingMainDiv');
+            allDayArea.setDragLimit();
+            initRender = false;
+        }
+        
         init();
         showMonthHeader();
         showDayNameHeaders();
         showAllDayCols();
         showHours();
     };
+    /**
+     * Get the scroll offset for the timed canvas
+     */
+    this.getTimedCanvasScrollTop = function() {
+        // Has to be looked up every time, as value may change
+        // either when user scrolls or resizes all-day event area
+        var top = $('timedScrollingMainDiv').scrollTop;
+        // FIXME -- viewOffset is the vertical offset of the UI
+        // with the top menubar added in. This should be a property
+        // of render context that the canvas can look up
+        top -= Cal.viewOffset;
+        // Subtract change in resized all-day event area
+        top -= (allDayArea.dragSize - allDayArea.origSize);
+        return top;
+   };
+    this.cleanup = function() {
+        allDayArea.cleanup();
+    };
 }
 cosmo.view.cal.canvas.constructor = null;
+
+// Cleanup
+dojo.event.browser.addListener(window, "onunload", cosmo.view.cal.canvas.cleanup, false);
 
 

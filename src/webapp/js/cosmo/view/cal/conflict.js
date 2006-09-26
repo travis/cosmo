@@ -18,8 +18,9 @@ dojo.provide('cosmo.view.cal.conflict');
 
 cosmo.view.cal.conflict = new function() {
     
-    // Public methods
-    // ****************
+    var self = this; // Closure
+    var evReg = null; // Event registry
+    
     // Clearing conflict info, sorting
     /**
      * Sorts events by start and then end, and clears the collision
@@ -27,7 +28,7 @@ cosmo.view.cal.conflict = new function() {
      * FIXME: Separate out sort and clearing collision props
      * Sort should go somewhere generic like cosmo.view.cal.canvas
      */
-    this.sortAndClearEvents = function(evReg) {
+    function sortAndClearEvents() {
         
         var ev = null;
         // Sorting events by start
@@ -79,7 +80,7 @@ cosmo.view.cal.conflict = new function() {
      * we find an event with a start after the end of the event
      * in question
      */
-    this.checkConflicts = function(evReg) {
+    function checkConflicts() {
         
         // Check conflicts at a specific position in the list --
         // jump out as soon as we find a start after the end of
@@ -191,7 +192,7 @@ cosmo.view.cal.conflict = new function() {
     /**
      * Set matrix position for each untimed event
      */
-    this.stackUntimed = function(evReg) {
+    function stackUntimed() {
     
         // 'Sparse matrix' for untimed events
         var allDayMatrix = [[], [], [], [], [], [], []];
@@ -262,8 +263,16 @@ cosmo.view.cal.conflict = new function() {
         
         evReg.each(setMatrixPos);
         return true;
-    }
+    };
+    
+    // Public methods
+    // *******************
+    this.calc = function(eR) {
+        evReg = eR;
+        return sortAndClearEvents() &&
+            checkConflicts() &&
+            stackUntimed();
+    };
 }
 cosmo.view.cal.conflict.constructor = null;
-
 

@@ -273,7 +273,7 @@ function CalEvent(id, block) {
             }
 
             // Update entire display of events
-            Cal.updateAllEventsDisplayed();
+            Cal.updateEventsDisplay();
         }
         // Resets local timer for timeout -- we know server-side
         // session has been refreshed
@@ -308,7 +308,7 @@ function CalEvent(id, block) {
         }
         
         // Update entire display of events
-        Cal.updateAllEventsDisplayed();
+        Cal.updateEventsDisplay();
         
         // Resets local timer for timeout -- we know server-side
         // session has been refreshed

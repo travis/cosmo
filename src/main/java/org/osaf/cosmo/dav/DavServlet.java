@@ -228,6 +228,11 @@ public class DavServlet extends AbstractWebdavServlet
             return;
         }
 
+        if (! resource.exists()) {
+            response.sendError(DavServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
         super.doDelete(request, response, resource);
     }
 

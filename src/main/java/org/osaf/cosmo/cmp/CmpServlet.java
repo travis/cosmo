@@ -113,7 +113,7 @@ public class CmpServlet extends HttpServlet {
             processUserDelete(req, resp);
             return;
         }
-        resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
 
     /**
@@ -144,7 +144,7 @@ public class CmpServlet extends HttpServlet {
             processServerStatus(req, resp);
             return;
         }
-        resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
 
     /**
@@ -204,7 +204,7 @@ public class CmpServlet extends HttpServlet {
                 processUserCreate(req, resp);
             return;
         }
-        resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
 
     // our methods

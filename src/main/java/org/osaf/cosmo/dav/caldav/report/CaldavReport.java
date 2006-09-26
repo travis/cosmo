@@ -90,7 +90,8 @@ public abstract class CaldavReport
     public void run(DavServletResponse response)
         throws IOException, DavException {
         if (log.isDebugEnabled())
-            log.debug("running report " + getType().getReportName());
+            log.debug("running report " + getType().getReportName() +
+                      " against " + resource.getResourcePath());
 
         runQuery();
         output(response);
@@ -303,6 +304,9 @@ public abstract class CaldavReport
 
     private void doQuery(DavResource resource)
         throws DavException {
+        if (! ((ExtendedDavResource)resource).isCalendarCollection())
+            return;
+
         try {
             DavCalendarCollection collection = (DavCalendarCollection) resource;
             addResults(collection.findMembers(queryFilter));

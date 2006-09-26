@@ -71,7 +71,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         f = open('files/reports/chandler/chandler_0.6.1_testAccount.xml')
         propfindbody = f.read()
         self.request('PROPFIND', calpath, propfindbody, propheaders)
-        self.checkStatus(501)
+        self.checkStatus(404)
         
         self.testStart('HEAD request which also fails')
         self.request('HEAD', calpath, None, self.headers)
@@ -108,7 +108,7 @@ class CosmoChandlerZeroPointSixPointOne(DAVTest):
         
         self.testStart('PROPFIND Request for /cosmo/home/test/test_s_calendar/.chandler/')
         self.request('PROPFIND', dotchandlerpath, propfindbody, propheaders)
-        self.checkStatus(501)
+        self.checkStatus(404)
         
         self.testStart(' HEAD Request for /cosmo/home/test/test_s_calendar/.chandler/')
         self.request('HEAD', dotchandlerpath, None, self.headers)

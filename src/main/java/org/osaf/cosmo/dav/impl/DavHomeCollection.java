@@ -15,12 +15,14 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
+import org.apache.jackrabbit.webdav.property.ResourceType;
 
 import org.apache.log4j.Logger;
 
@@ -43,12 +45,17 @@ import org.osaf.cosmo.model.ModelValidationException;
  * @see CollectionItem
  */
 public class DavHomeCollection extends DavCollection
-    implements CaldavConstants {
+    implements DavConstants, CaldavConstants {
     private static final Logger log =
         Logger.getLogger(DavHomeCollection.class);
+    private static final int[] RESOURCE_TYPES;
 
     static {
         registerLiveProperty(CALENDARHOMESET);
+
+        int p = ResourceType.registerResourceType(XML_PRINCIPAL,
+                                                  NAMESPACE);
+        RESOURCE_TYPES = new int[] { ResourceType.COLLECTION, p };
     }
 
     /** */
@@ -67,6 +74,11 @@ public class DavHomeCollection extends DavCollection
     }
 
     // DavResourceBase
+
+    /** */
+    protected int[] getResourceTypes() {
+        return RESOURCE_TYPES;
+    }
 
     /** */
     protected void loadLiveProperties() {

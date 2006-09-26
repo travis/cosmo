@@ -48,7 +48,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     private static final QueryCriteriaBuilder queryCriteriaBuilder =
         new UserQueryCriteriaBuilder();
 
-    public void createUser(User user) {
+    public User createUser(User user) {
 
         try {
             if (getUser(user.getUsername()) != null)
@@ -62,6 +62,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             user.setDateModified(new Date());
             
             getSession().save(user);
+            return user;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         } 
@@ -133,9 +134,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         } 
     }
 
-    public void updateUser(User user) {
+    public User updateUser(User user) {
         try {
             getSession().save(user);
+            return user;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }

@@ -74,7 +74,7 @@ public interface UserDao extends Dao {
      * @throws DuplicateEmailException if the email address is already
      * in use
      */
-    public void createUser(User user);
+    public User createUser(User user);
 
     /**
      * Updates a user account that exists in the repository. Returns a
@@ -90,7 +90,7 @@ public interface UserDao extends Dao {
      * @throws DuplicateEmailException if the email address is already
      * in use
      */
-    public void updateUser(User user);
+    public User updateUser(User user);
 
     /**
      * Removes the user account identified by the given username from

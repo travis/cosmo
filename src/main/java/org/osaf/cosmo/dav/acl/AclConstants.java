@@ -35,6 +35,9 @@ public interface AclConstants extends DavConstants {
     /** The ACL XML element name <DAV:principal-URL> */
     public static final String ELEMENT_ACL_PRINCIPAL_URL =
         "principal-URL";
+    /** The ACL XML element name <DAV:group-membership> */
+    public static final String ELEMENT_ACL_GROUP_MEMBERSHIP =
+        "group-membership";
 
     /** The ACL property name DAV:alternate-URI-set */
     public static final String PROPERTY_ACL_ALTERNATE_URI_SET =
@@ -42,6 +45,9 @@ public interface AclConstants extends DavConstants {
     /** The ACL property name DAV:principal-URL-set */
     public static final String PROPERTY_ACL_PRINCIPAL_URL =
         "principal-URL";
+    /** The ACL property name DAV:group-membership */
+    public static final String PROPERTY_ACL_GROUP_MEMBERSHIP =
+        "group-membership";
 
     /** The ACL property DAV:alternate-URI-set */
     public static final DavPropertyName ALTERNATEURISET =
@@ -49,4 +55,7 @@ public interface AclConstants extends DavConstants {
     /** The ACL property DAV:principal-URL */
     public static final DavPropertyName PRINCIPALURL =
         DavPropertyName.create(PROPERTY_ACL_PRINCIPAL_URL, NAMESPACE);
+    /** The ACL property DAV:group-membership */
+    public static final DavPropertyName GROUPMEMBERSHIP =
+        DavPropertyName.create(PROPERTY_ACL_GROUP_MEMBERSHIP, NAMESPACE);
 }

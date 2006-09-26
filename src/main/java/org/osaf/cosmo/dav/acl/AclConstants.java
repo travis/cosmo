@@ -32,13 +32,21 @@ public interface AclConstants extends DavConstants {
     /** The ACL XML element name <DAV:alternate-URI-set> */
     public static final String ELEMENT_ACL_ALTERNATE_URI_SET =
         "alternate-URI-set";
+    /** The ACL XML element name <DAV:principal-URL> */
+    public static final String ELEMENT_ACL_PRINCIPAL_URL =
+        "principal-URL";
 
     /** The ACL property name DAV:alternate-URI-set */
     public static final String PROPERTY_ACL_ALTERNATE_URI_SET =
         "alternate-URI-set";
+    /** The ACL property name DAV:principal-URL-set */
+    public static final String PROPERTY_ACL_PRINCIPAL_URL =
+        "principal-URL";
 
     /** The ACL property DAV:alternate-URI-set */
     public static final DavPropertyName ALTERNATEURISET =
-        DavPropertyName.create(PROPERTY_ACL_ALTERNATE_URI_SET,
-                               NAMESPACE);
+        DavPropertyName.create(PROPERTY_ACL_ALTERNATE_URI_SET, NAMESPACE);
+    /** The ACL property DAV:principal-URL */
+    public static final DavPropertyName PRINCIPALURL =
+        DavPropertyName.create(PROPERTY_ACL_PRINCIPAL_URL, NAMESPACE);
 }

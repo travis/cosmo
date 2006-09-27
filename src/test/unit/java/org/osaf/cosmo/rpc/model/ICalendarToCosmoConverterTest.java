@@ -20,13 +20,19 @@ import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
 import static org.osaf.cosmo.util.ICalendarUtils.getFirstEvent;
 import static org.osaf.cosmo.util.ICalendarUtils.setDate;
 import static org.osaf.cosmo.util.ICalendarUtils.setDateTime;
+
+import java.util.List;
+
 import junit.framework.TestCase;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.ParameterFactoryImpl;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.DtStart;
 
 import org.apache.commons.logging.Log;
@@ -207,6 +213,30 @@ public class ICalendarToCosmoConverterTest extends TestCase {
         assertEquals("Month not zero", endDate.getMonth(), 0);
         assertEquals("Year not 2006", endDate.getYear(), 2006);
         assertEquals("Date not 31", endDate.getDate(), 31);
+    }
+    
+    public void testOneExcetpionDate() throws Exception {
+        Calendar c  = testHelper.loadIcs("ical_one_exdate.ics");
+        VEvent vevent = getFirstEvent(c);
+        Event e = converter.createEvent("1234556", vevent, c);
+            
+        RecurrenceRule rrule = e.getRecurrenceRule();
+        CosmoDate[] exceptionDates = rrule.getExceptionDates();
+        assertNotNull(exceptionDates);
+        assertEquals(1, exceptionDates.length);
+        CosmoDate exceptionDate  = exceptionDates[0];
+        assertEquals(CosmoDate.MONTH_SEPTEMBER, exceptionDate.getMonth());
+        assertEquals(20, exceptionDate.getDate());
+        assertEquals(2006, exceptionDate.getYear());
+
+        //let's make sure the date really gets skipped when we expand.
+        VTimeZone vTimeZone = (VTimeZone) c.getComponents().getComponent(Component.VTIMEZONE);
+        TimeZone timezone = new TimeZone (vTimeZone);
+        DateTime rangeStart = new DateTime("20060917T060000", timezone);
+        DateTime rangeEnd   = new DateTime("20060925T070000", timezone);
+        List<Event> events = converter.expandEvent(e, vevent, c, rangeStart, rangeEnd);
+        assertNotNull(events);
+        assertEquals(8, events.size());
     }
     
     protected Event loadEventIcs(String name, String id) throws Exception {

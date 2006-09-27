@@ -22,8 +22,11 @@ import static org.osaf.cosmo.util.ICalendarUtils.getVTimeZone;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
@@ -43,6 +46,7 @@ import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
+import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.osaf.cosmo.model.CalendarEventItem;
@@ -84,7 +88,8 @@ public class ICalendarToCosmoConverter {
         RRule rrule = (RRule) vevent.getProperties()
             .getProperty(Property.RRULE);
         if (rrule != null){
-            RecurrenceRule recurrenceRule = createRecurrenceRule(rrule, vevent.getStartDate(), calendar);
+            RecurrenceRule recurrenceRule = createRecurrenceRule(rrule, vevent
+                    .getStartDate(), vevent, calendar);
             event.setRecurrenceRule(recurrenceRule);
             event.setMasterEvent(true);
         }
@@ -185,7 +190,7 @@ public class ICalendarToCosmoConverter {
         return (Event[]) events.toArray(new Event[events.size()]);
     }
     
-    private List<Event> expandEvent(Event event, VEvent vevent,
+    public List<Event> expandEvent(Event event, VEvent vevent,
             net.fortuna.ical4j.model.Calendar calendar, DateTime rangeStart,
             DateTime rangeEnd) {
         Date masterStartDate = vevent.getStartDate().getDate();
@@ -209,9 +214,10 @@ public class ICalendarToCosmoConverter {
             dateOrDateTime = Value.DATE_TIME;
         }
 
-        DateList startDateList = recur.getDates(
-                vevent.getStartDate().getDate(), rangeStart, rangeEnd,
-                dateOrDateTime);
+        ExDate exDate =  (ExDate)vevent.getProperties().getProperty(Property.EXDATE);
+        DateList exDates = exDate != null ? exDate.getDates() : null;
+        DateList startDateList = getExpandedDates(recur, exDates, vevent
+                .getStartDate().getDate(), rangeStart, rangeEnd, dateOrDateTime);
 
         long duration = -1;
         if (event.isPointInTime()){
@@ -282,7 +288,7 @@ public class ICalendarToCosmoConverter {
         return events;
     }
 
-    private RecurrenceRule createRecurrenceRule(RRule rrule, DtStart dtStart,
+    private RecurrenceRule createRecurrenceRule(RRule rrule, DtStart dtStart, VEvent vevent,
             net.fortuna.ical4j.model.Calendar calendar) {
         RecurrenceRule recurrenceRule = new RecurrenceRule();
         Recur recur = rrule.getRecur();
@@ -303,7 +309,7 @@ public class ICalendarToCosmoConverter {
 
         net.fortuna.ical4j.model.Date until = recur.getUntil();
         TzId tzId = null;
-
+        String tzIdValue = null;
         // If this is a datetime, we must convert from UTC to the appropriate
         // timezone
         if (until != null) {
@@ -324,7 +330,7 @@ public class ICalendarToCosmoConverter {
                     }
                 }
             }
-            String tzIdValue = null;
+            
             if (tzId != null) {
                 tzIdValue = tzId.getValue();
             }
@@ -335,6 +341,25 @@ public class ICalendarToCosmoConverter {
         } else {
             recurrenceRule.setEndDate(null);
         }
+        
+        //now deal with EXDATE's
+        ExDate exdate = (ExDate) vevent.getProperties().getProperty(
+                Property.EXDATE);
+        if (exdate != null) {
+            DateList dates = exdate.getDates();
+            if (dates != null && dates.size() > 0) {
+                CosmoDate[] cosmoExceptionDates = new CosmoDate[dates.size()];
+                for (int x = 0; x < dates.size(); x++) {
+                    net.fortuna.ical4j.model.Date date = (net.fortuna.ical4j.model.Date) dates
+                            .get(x);
+                    CosmoDate cosmoDate = createScoobyDate(date, calendar,
+                            tzIdValue);
+                    cosmoExceptionDates[x] = cosmoDate;
+                }
+                recurrenceRule.setExceptionDates(cosmoExceptionDates);
+            }
+        }
+        
         return recurrenceRule;
     }   
 
@@ -449,11 +474,14 @@ public class ICalendarToCosmoConverter {
             VTimeZone vtimeZone = getVTimeZone(tzid, calendar);
             jCalendar = Calendar.getInstance(new TimeZone(vtimeZone));
             jCalendar.setTime(dateTime);
-            int minutesOffset = (jCalendar.get(Calendar.ZONE_OFFSET) + jCalendar.get(Calendar.DST_OFFSET))  / (60 * 1000);
+            int minutesOffset = (jCalendar.get(Calendar.ZONE_OFFSET) + jCalendar
+                    .get(Calendar.DST_OFFSET))
+                    / (60 * 1000);
             scoobyTimeZone.setMinutesOffset(minutesOffset);
             Observance ob = vtimeZone.getApplicableObservance(dateTime);
             Property timezoneName = ob.getProperties().getProperty(Property.TZNAME);
-            scoobyTimeZone.setName(timezoneName != null ? timezoneName.getValue() : ob.getName());
+            scoobyTimeZone.setName(timezoneName != null ? timezoneName
+                    .getValue() : ob.getName());
             scoobyDate.setTimezone(scoobyTimeZone);
         } else if (isUtc(date)) {
             hasTime = true;
@@ -517,5 +545,16 @@ public class ICalendarToCosmoConverter {
     
     private boolean isEmpty(Collection coll){
         return coll == null || coll.isEmpty();
+    }
+    
+    @SuppressWarnings("unchecked")
+    private DateList getExpandedDates(Recur recur, DateList exDates,
+            net.fortuna.ical4j.model.Date masterEventStartDate,
+            net.fortuna.ical4j.model.Date rangeStart,
+            net.fortuna.ical4j.model.Date rangeEnd, Value dateOrDateTime) {
+        DateList dates = recur.getDates(masterEventStartDate, rangeStart,
+                rangeEnd, dateOrDateTime);
+        dates.removeAll(exDates);
+        return dates;
     }
 }

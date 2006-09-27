@@ -296,6 +296,31 @@ public class CmpPutTest extends BaseCmpServletTestCase {
 
     /**
      */
+    public void testUserCreateInvalidAttribute() throws Exception {
+        Document doc = BUILDER_FACTORY.newDocumentBuilder().newDocument();
+
+        Element user = DomUtil.createElement(doc, UserResource.EL_USER,
+                                             UserResource.NS_CMP);
+        doc.appendChild(user);
+
+        Element foobar = DomUtil.createElement(doc, "foo",
+                                               UserResource.NS_CMP);
+        user.appendChild(foobar);
+
+        MockHttpServletRequest request =
+            createMockRequest("PUT", "/user/foobar");
+        sendXmlRequest(request, doc);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals("User create with invalid attribute did not return Bad Request",
+                     MockHttpServletResponse.SC_BAD_REQUEST,
+                     response.getStatus());
+    }
+
+    /**
+     */
     public void testUserUpdate() throws Exception {
         User u1 = testHelper.makeDummyUser();
         u1 = userService.createUser(u1);

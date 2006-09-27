@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -204,44 +205,43 @@ public class UserResource implements CmpResource {
             throw new CmpException("root element not user");
         }
 
-        Element e = DomUtil.getChildElement(root, EL_USERNAME, NS_CMP);
-        if (e != null) {
-            if (user.getUsername() != null &&
-                user.getUsername().equals(User.USERNAME_OVERLORD)) {
-                throw new CmpException("root user's username may not " +
-                                       "be changed");
+        for (ElementIterator i=DomUtil.getChildren(root); i.hasNext();) {
+            Element e = i.nextElement();
+
+            if (DomUtil.matches(e, EL_USERNAME, NS_CMP)) {
+                if (user.getUsername() != null &&
+                    user.getUsername().equals(User.USERNAME_OVERLORD)) {
+                    throw new CmpException("root user's username may not " +
+                                           "be changed");
+                }
+                user.setUsername(DomUtil.getTextTrim(e));
             }
-            user.setUsername(DomUtil.getTextTrim(e));
-        }
-
-        e = DomUtil.getChildElement(root, EL_PASSWORD, NS_CMP);
-        if (e != null) {
-            user.setPassword(DomUtil.getTextTrim(e));
-        }
-
-        e = DomUtil.getChildElement(root, EL_FIRSTNAME, NS_CMP);
-        if (e != null) {
-            if (user.getUsername() != null &&
-                user.getUsername().equals(User.USERNAME_OVERLORD)) {
-                throw new CmpException("root user's first name may not " +
-                                       "be changed");
+            else if (DomUtil.matches(e, EL_PASSWORD, NS_CMP)) {
+                user.setPassword(DomUtil.getTextTrim(e));
             }
-            user.setFirstName(DomUtil.getTextTrim(e));
-        }
-
-        e = DomUtil.getChildElement(root, EL_LASTNAME, NS_CMP);
-        if (e != null) {
-            if (user.getUsername() != null &&
-                user.getUsername().equals(User.USERNAME_OVERLORD)) {
-                throw new CmpException("root user's last name may not " +
-                                       "be changed");
+            else if (DomUtil.matches(e, EL_FIRSTNAME, NS_CMP)) {
+                if (user.getUsername() != null &&
+                    user.getUsername().equals(User.USERNAME_OVERLORD)) {
+                    throw new CmpException("root user's first name may not " +
+                                           "be changed");
+                }
+                user.setFirstName(DomUtil.getTextTrim(e));
             }
-            user.setLastName(DomUtil.getTextTrim(e));
-        }
-
-        e = DomUtil.getChildElement(root, EL_EMAIL, NS_CMP);
-        if (e != null) {
-            user.setEmail(DomUtil.getTextTrim(e));
+            else if (DomUtil.matches(e, EL_LASTNAME, NS_CMP)) {
+                if (user.getUsername() != null &&
+                    user.getUsername().equals(User.USERNAME_OVERLORD)) {
+                    throw new CmpException("root user's last name may not " +
+                                           "be changed");
+                }
+                user.setLastName(DomUtil.getTextTrim(e));
+            }
+            else if (DomUtil.matches(e, EL_EMAIL, NS_CMP)) {
+                user.setEmail(DomUtil.getTextTrim(e));
+            }
+            else {
+                throw new CmpException("unknown user attribute element " +
+                                       e.getTagName());
+            }
         }
     }
 

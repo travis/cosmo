@@ -32,6 +32,12 @@ public class DavMkTicketTest extends BaseDavServletTestCase {
     private static final Log log = LogFactory.getLog(DavMkTicketTest.class);
 
     /** */
+    protected void setUp() throws Exception {
+        super.setUp();
+        logInUser(user);
+    }
+
+    /** */
     public void testMkTicket() throws Exception {
         HomeCollectionItem home = contentService.getRootItem(user);
 

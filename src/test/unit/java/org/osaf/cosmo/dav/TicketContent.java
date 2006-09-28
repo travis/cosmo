@@ -31,22 +31,58 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Simple wrapper bean that converts a {@link Ticket} to an XML
- * fragment suitable for sending as DAV request content.
+ * Simple wrapper bean for a <code>Ticket</code> that can convert it
+ * to and from XML request and response content.
  */
 public class TicketContent
     implements XmlSerializable, DavConstants, TicketConstants {
     private static final Log log = LogFactory.getLog(TicketContent.class);
 
     private Ticket ticket;
+    private String ownerHref;
 
     /**
+     * Constructs an instance suitable for use as request content
      */
     public TicketContent(Ticket ticket) {
+        this(ticket, null);
+    }
+
+    private TicketContent(Ticket ticket,
+                            String ownerHref) {
         this.ticket = ticket;
+        this.ownerHref = ownerHref;
     }
 
     /**
+     * Returns the underlying ticket.
+     *
+     * If this object represents a ticket included in request
+     * content, the underlying ticket does not have an owner, a key or
+     * a created date.
+     *
+     * If this object represents a ticket included in response
+     * content, the underlying ticket does not have an owner but
+     * rather an owner href.
+     */
+    public Ticket getTicket() {
+        return ticket;
+    }
+
+    /**
+     * Returns the href representing the ticket's owner.
+     *
+     * Only returns something useful when this object represents a
+     * ticket included in response content.
+     */
+    public String getOwnerHref() {
+        return ownerHref;
+    }
+
+    /**
+     * Converts the underlying ticket to an XML fragment suitable
+     * for use as request content (ignores any key, owner, created
+     * date).
      */
     public Element toXml(Document doc) {
         Element e = DomUtil.createElement(doc, ELEMENT_TICKET_TICKETINFO,
@@ -80,5 +116,57 @@ public class TicketContent
         e.appendChild(privilege);
 
         return e;
+    }
+
+    /**
+     * Returns a <code>TicketContent> populated with information from
+     * the given XML fragment which is assumed to be response content
+     * (containing an owner href rather than a <code>User</code>).
+     *
+     * The root element of the fragment must be a
+     * <code>ticket:ticketinfo</code> element.
+     */
+    public static TicketContent createFromXml(Element root)
+        throws Exception {
+        if (! DomUtil.matches(root, ELEMENT_TICKET_TICKETINFO,
+                              NAMESPACE_TICKET)) {
+            throw new Exception("root element not ticketinfo");
+        }
+
+        Ticket ticket = new Ticket();
+
+        String id = DomUtil.getChildTextTrim(root, ELEMENT_TICKET_ID,
+                                             NAMESPACE_TICKET);
+        ticket.setKey(id);
+
+        String timeout =
+            DomUtil.getChildTextTrim(root, ELEMENT_TICKET_TIMEOUT,
+                                     NAMESPACE_TICKET);
+        ticket.setTimeout(timeout);
+
+        Element privilege =
+            DomUtil.getChildElement(root, XML_PRIVILEGE, NAMESPACE);
+        Element read =
+            DomUtil.getChildElement(privilege, XML_READ, NAMESPACE);
+        Element write =
+            DomUtil.getChildElement(privilege, XML_WRITE, NAMESPACE);
+        Element freebusy =
+            DomUtil.getChildElement(privilege, ELEMENT_TICKET_FREEBUSY,
+                                    NAMESPACE);
+        if (read != null) {
+            ticket.getPrivileges().add(Ticket.PRIVILEGE_READ);
+        }
+        if (write != null) {
+            ticket.getPrivileges().add(Ticket.PRIVILEGE_WRITE);
+        }
+        if (freebusy != null) {
+            ticket.getPrivileges().add(Ticket.PRIVILEGE_FREEBUSY);
+        }
+
+        Element owner = DomUtil.getChildElement(root, XML_OWNER, NAMESPACE);
+        String ownerHref =
+            DomUtil.getChildTextTrim(owner, XML_HREF, NAMESPACE);
+
+        return new TicketContent(ticket, ownerHref);
     }
 }

@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.jackrabbit.webdav.lock.SimpleLockManager;
 import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
+import org.apache.jackrabbit.webdav.xml.Namespace;
 
 import org.osaf.cosmo.BaseMockServletTestCase;
 import org.osaf.cosmo.TestHelper;
@@ -37,6 +38,8 @@ import org.osaf.cosmo.model.User;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import org.w3c.dom.Element;
 
 /**
  * Base class for WebDAV+extensions servlet test cases.
@@ -95,7 +98,6 @@ public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
 
         user = testHelper.makeDummyUser();
         userService.createUser(user);
-        logInUser(user);
     }
 
     /** */
@@ -115,6 +117,33 @@ public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
         readMultiStatusResponse(MockHttpServletResponse response)
         throws Exception {
         return MultiStatus.createFromXml(readXmlResponse(response));
+    }
+
+    /** */
+    protected Element findProp(MultiStatus ms,
+                               String href,
+                               int code,
+                               String name,
+                               Namespace ns)
+        throws Exception {
+        MultiStatus.MultiStatusResponse msr = ms.findResponse(href);
+        if (msr == null)
+            throw new Exception("no response for href " + href);
+
+        MultiStatus.PropStat ps = msr.findPropStat(code);
+        if (ps == null)
+            throw new Exception("no " + code + " propstat");
+
+        return ps.findProp(name, ns);
+    }
+
+    /** */
+    protected Element findProp(MultiStatus ms,
+                               String href,
+                               String name,
+                               Namespace ns)
+        throws Exception {
+        return findProp(ms, href, MockHttpServletResponse.SC_OK, name, ns);
     }
 
     /** */

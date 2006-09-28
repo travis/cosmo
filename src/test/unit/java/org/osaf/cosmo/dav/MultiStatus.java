@@ -38,19 +38,29 @@ public class MultiStatus {
     private static final Log log = LogFactory.getLog(MultiStatus.class);
     private static final Namespace NS = Namespace.getNamespace("D", "DAV:");
 
-    private Set responses;
+    private HashSet<MultiStatusResponse> responses;
     private String responseDescription;
 
     /**
      */
     public MultiStatus() {
-        responses = new HashSet();
+        responses = new HashSet<MultiStatusResponse>();
     }
 
     /**
      */
-    public Set getResponses() {
+    public Set<MultiStatusResponse> getResponses() {
         return responses;
+    }
+
+    /**
+     */
+    public MultiStatusResponse findResponse(String href) {
+        for (MultiStatusResponse msr : responses) {
+            if (msr.getHref().equals(href))
+                return msr;
+        }
+        return null;
     }
 
     /**
@@ -105,13 +115,13 @@ public class MultiStatus {
     public static class MultiStatusResponse {
         private String href;
         private Status status;
-        private Set propstats;
+        private HashSet<PropStat> propstats;
         private String responseDescription;
 
         /**
          */
         public MultiStatusResponse() {
-            this.propstats = new HashSet();
+            propstats = new HashSet<PropStat>();
         }
 
         /**
@@ -140,8 +150,18 @@ public class MultiStatus {
 
         /**
          */
-        public Set getPropStats() {
+        public Set<PropStat> getPropStats() {
             return propstats;
+        }
+
+        /**
+         */
+        public PropStat findPropStat(int code) {
+            for (PropStat ps : propstats) {
+                if (ps.getStatus().getCode() == code)
+                    return ps;
+            }
+            return null;
         }
 
         /**
@@ -203,20 +223,31 @@ public class MultiStatus {
     /**
      */
     public static class PropStat {
-        private Set props;
+        private HashSet<Element> props;
         private Status status;
         private String responseDescription;
 
         /**
          */
         public PropStat() {
-            props = new HashSet();
+            props = new HashSet<Element>();
         }
 
         /**
          */
-        public Set getProps() {
+        public Set<Element> getProps() {
             return props;
+        }
+
+        /**
+         */
+        public Element findProp(String name,
+                                Namespace ns) {
+            for (Element prop : props) {
+                if (DomUtil.matches(prop, name, ns))
+                    return prop;
+            }
+            return null;
         }
 
         /**
@@ -259,7 +290,7 @@ public class MultiStatus {
 
             ElementIterator i = DomUtil.getChildren(pe);
             while (i.hasNext()) {
-                ps.getProps().add(i.next());
+                ps.getProps().add(i.nextElement());
             }
 
             String statusLine = DomUtil.getChildTextTrim(e, "status", NS);

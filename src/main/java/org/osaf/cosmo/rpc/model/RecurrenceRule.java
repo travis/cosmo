@@ -35,7 +35,8 @@ public class RecurrenceRule {
     private CosmoDate endDate = null;
     private String customRule = null;
     private CosmoDate[] exceptionDates = null; 
-                      
+    private Modification[] modifications = null;
+    
     /**
      * Returns how often this event should be repeated
      * 
@@ -87,7 +88,15 @@ public class RecurrenceRule {
     public void setExceptionDates(CosmoDate[] exceptionDates) {
         this.exceptionDates = exceptionDates;
     }
+    
+    public Modification[] getModifications() {
+        return modifications;
+    }
 
+    public void setModifications(Modification[] modifications) {
+        this.modifications = modifications;
+    }
+    
 	@Override
 	public int hashCode() {
 		final int PRIME = 31;
@@ -124,6 +133,8 @@ public class RecurrenceRule {
 			return false;
 		return true;
 	}
+
+
 
     
 }

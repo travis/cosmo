@@ -46,6 +46,7 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.rpc.model.Calendar;
+import org.osaf.cosmo.rpc.model.CosmoDate;
 import org.osaf.cosmo.rpc.model.CosmoToICalendarConverter;
 import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter;
@@ -261,33 +262,7 @@ public class RPCServiceImpl implements RPCService {
         
         //Check to see if this is a new event
         if (StringUtils.isEmpty(event.getId())) {
-            //make an empty iCalendar
-            net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
-            calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
-            calendar.getProperties().add(Version.VERSION_2_0);
-            calendar.getProperties().add(CalScale.GREGORIAN);
-            
-            calendarEventItem = new CalendarEventItem();
-            VEvent vevent = cosmoToICalendarConverter.createVEvent(event);
-            calendar.getComponents().add(vevent);
-            calendarEventItem.setContent(calendar.toString().getBytes());
-
-            Iterator<String> availableNameIterator = availableNameIterator(vevent);
-            
-            calendarEventItem.setOwner(getUser());
-            
-            boolean added = false;
-            do {
-                String name = availableNameIterator.next();
-                calendarEventItem.setName(name);
-                try{ 
-                    added = true;
-                    calendarEventItem = contentService.addEvent(calendarItem,
-                                calendarEventItem);
-                } catch (DuplicateItemNameException dupe){
-                    added = false;
-                }
-            } while (!added && availableNameIterator.hasNext());
+            calendarEventItem = saveNewEvent(event, calendarItem);
             
         } else {
             calendarEventItem = contentService.findEventByUid(event.getId());
@@ -300,47 +275,39 @@ public class RPCServiceImpl implements RPCService {
         return calendarEventItem.getUid();
     }
 
-    private Iterator<String> availableNameIterator(VEvent vevent) {
-        String  baseName = new StringBuffer(vevent.getUid()
-                .getValue()).append(".ics").toString();
-        int index = baseName.length() - 4;
-        return availableNameIterator(baseName, index);
+    private CalendarEventItem saveNewEvent(Event event, CalendarCollectionItem calendarItem) {
+        CalendarEventItem calendarEventItem;
+        //make an empty iCalendar
+        net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
+        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+        calendar.getProperties().add(Version.VERSION_2_0);
+        calendar.getProperties().add(CalScale.GREGORIAN);
+        
+        calendarEventItem = new CalendarEventItem();
+        VEvent vevent = cosmoToICalendarConverter.createVEvent(event);
+        calendar.getComponents().add(vevent);
+        calendarEventItem.setContent(calendar.toString().getBytes());
+
+        Iterator<String> availableNameIterator = availableNameIterator(vevent);
+        
+        calendarEventItem.setOwner(getUser());
+        
+        boolean added = false;
+        do {
+            String name = availableNameIterator.next();
+            calendarEventItem.setName(name);
+            try{ 
+                added = true;
+                calendarEventItem = contentService.addEvent(calendarItem,
+                            calendarEventItem);
+            } catch (DuplicateItemNameException dupe){
+                added = false;
+            }
+        } while (!added && availableNameIterator.hasNext());
+        return calendarEventItem;
     }
-    
-    private Iterator<String> availableNameIterator(String baseName,
-            final int appendIndex) {
-        final char[] chars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-        final StringBuffer baseNameBuffer = new StringBuffer(baseName);
 
-        return new Iterator<String>() {
-            int count = 0;
 
-            public boolean hasNext() {
-                return count < 10;
-            }
-
-            public String next() {
-                String next = null;
-                if (count == 0) {
-                    next = baseNameBuffer.toString();
-                } else if (count == 1) {
-                    next =  baseNameBuffer.insert(appendIndex, '0').toString();
-                } else if (hasNext()) {
-                    baseNameBuffer.setCharAt(appendIndex, chars[count-1]);
-                    next =  baseNameBuffer.toString();
-                } else {
-                    throw new NoSuchElementException();
-                }
-                count++;
-                return next;
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-
-        };
-    }
     
     public void setPreference(String preferenceName, String value)
             throws RPCException {
@@ -395,6 +362,23 @@ public class RPCServiceImpl implements RPCService {
 
     }
     
+    public String saveNewEventBreakRecurrence(String calendarPath, Event event,
+            String originalEventId, CosmoDate originalEventEndDate) throws RPCException {
+        CalendarCollectionItem calendarItem = getCalendarCollectionItem(calendarPath);
+        
+        //first save the new event
+        CalendarEventItem calendarEventItem = saveNewEvent(event, calendarItem);
+
+        //get the old event's recurrence rule
+        RecurrenceRule recurrenceRule = getRecurrenceRules(calendarPath,
+                new String[] { originalEventId }).get(originalEventId);
+        
+        recurrenceRule.setEndDate(originalEventEndDate);
+        saveRecurrenceRule(calendarPath, originalEventId, recurrenceRule);
+        
+        return calendarEventItem.getUid();
+    }
+    
     /**
      * Given a path relative to the current user's home directory, returns the
      * absolute path
@@ -437,4 +421,47 @@ public class RPCServiceImpl implements RPCService {
         return (CalendarCollectionItem) contentService
                 .findItemByPath(getAbsolutePath(calendarPath));
     }
+    private Iterator<String> availableNameIterator(VEvent vevent) {
+        String  baseName = new StringBuffer(vevent.getUid()
+                .getValue()).append(".ics").toString();
+        int index = baseName.length() - 4;
+        return availableNameIterator(baseName, index);
+    }
+    
+    private Iterator<String> availableNameIterator(String baseName,
+            final int appendIndex) {
+        final char[] chars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        final StringBuffer baseNameBuffer = new StringBuffer(baseName);
+
+        return new Iterator<String>() {
+            int count = 0;
+
+            public boolean hasNext() {
+                return count < 10;
+            }
+
+            public String next() {
+                String next = null;
+                if (count == 0) {
+                    next = baseNameBuffer.toString();
+                } else if (count == 1) {
+                    next =  baseNameBuffer.insert(appendIndex, '0').toString();
+                } else if (hasNext()) {
+                    baseNameBuffer.setCharAt(appendIndex, chars[count-1]);
+                    next =  baseNameBuffer.toString();
+                } else {
+                    throw new NoSuchElementException();
+                }
+                count++;
+                return next;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+        };
+    }
+
+
 }

@@ -18,6 +18,7 @@ package org.osaf.cosmo.rpc;
 import java.util.Map;
 
 import org.osaf.cosmo.rpc.model.Calendar;
+import org.osaf.cosmo.rpc.model.CosmoDate;
 import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.rpc.model.RecurrenceRule;
 
@@ -179,4 +180,16 @@ public interface RPCService {
      * @return
      */
     public String getTestString();
+    
+    /**
+     * Saves the specified new event and updates the event with the specified id
+     * with the new recurrence end date
+     * @param calendarPath
+     * @param event
+     * @param originalEventId
+     * @param originalEventEndDate
+     * @return the id of the new event
+     */
+    public String saveNewEventBreakRecurrence(String calendarPath, Event event,
+            String originalEventId, CosmoDate originalEventEndDate) throws RPCException;
 }

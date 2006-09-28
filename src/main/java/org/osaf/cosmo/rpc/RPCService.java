@@ -15,8 +15,11 @@
  */
 package org.osaf.cosmo.rpc;
 
+import java.util.Map;
+
 import org.osaf.cosmo.rpc.model.Calendar;
 import org.osaf.cosmo.rpc.model.Event;
+import org.osaf.cosmo.rpc.model.RecurrenceRule;
 
 /**
  * This is the interface that is exposed to web-clients via json-rpc or other 
@@ -137,6 +140,39 @@ public interface RPCService {
      * @param preferenceName the name of the preference to remove
      */
     public void removePreference(String preferenceName) throws RPCException;
+    
+    /**
+     * Returns the RecurrenceRule for a particular event
+     * 
+     * @param calendarPath
+     * @param eventId
+     * @return
+     */
+    public Map<String, RecurrenceRule> getRecurrenceRules(String calendarPath,
+            String[] eventIds) throws RPCException;
+    
+    /**
+     * Saves the RecurrenceRule for a particular event
+     * 
+     * @param calendarPath
+     * @param eventId
+     * @param recurrenceRule
+     * @throws RPCException
+     */
+    public void saveRecurrenceRule(String calendarPath, String eventId,
+            RecurrenceRule recurrenceRule) throws RPCException;
+
+    /**
+     * Returns the expanded instances of this event for the given
+     * tiem range.
+     * @param calendarPath
+     * @param eventId
+     * @param utcStartTime
+     * @param utcEndTime
+     * @return
+     */
+    public Event[] expandEvent(String calendarPath, String eventId,
+            long utcStartTime, long utcEndTime) throws RPCException;
     
     /**
      * Method useful for testing remote connection. Should return "Scooby"

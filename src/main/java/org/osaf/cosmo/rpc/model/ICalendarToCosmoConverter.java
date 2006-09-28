@@ -554,7 +554,9 @@ public class ICalendarToCosmoConverter {
             net.fortuna.ical4j.model.Date rangeEnd, Value dateOrDateTime) {
         DateList dates = recur.getDates(masterEventStartDate, rangeStart,
                 rangeEnd, dateOrDateTime);
-        dates.removeAll(exDates);
+        if (exDates != null) {
+            dates.removeAll(exDates);
+        }
         return dates;
     }
 }

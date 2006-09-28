@@ -83,6 +83,13 @@ function RecurrenceRule(){
      * allows, a text representation of the rule appears here but is not editable.
      */
     this.customRule = null;
+    
+    /**
+     * This is an array of CosmoDates, each one representing a date on which the
+     * event will NOT occur
+     * 
+     */
+    this.exceptionDates = null;
 }
 
 RecurrenceRule.prototype = {

@@ -16,8 +16,10 @@
 package org.osaf.cosmo.rpc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -47,6 +49,7 @@ import org.osaf.cosmo.rpc.model.Calendar;
 import org.osaf.cosmo.rpc.model.CosmoToICalendarConverter;
 import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter;
+import org.osaf.cosmo.rpc.model.RecurrenceRule;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
@@ -138,10 +141,6 @@ public class RPCServiceImpl implements RPCService {
         if (log.isDebugEnabled())
             log.debug("Getting event " + id + " in calendar at " +
                       absolutePath);
-        // XXX: assumes that the given id is the event uid, which the
-        // content service assumes to be globally unique, but which
-        // should probably only be assumed to be unique within the
-        // collection
         CalendarEventItem calItem = contentService.findEventByUid(id);
         try {
             return icalendarToCosmoConverter.createEvent(calItem.getUid(),
@@ -244,10 +243,6 @@ public class RPCServiceImpl implements RPCService {
         if (log.isDebugEnabled())
             log.debug("Removing event " + id + " from calendar " +
                       absolutePath);
-        // XXX: assumes that the given id is the event uid, which the
-        // content service assumes to be globally unique, but which
-        // should probably only be assumed to be unique within the
-        // collection
         CalendarEventItem calItem = contentService.findEventByUid(id);
         contentService.removeEvent(calItem);
     }
@@ -353,10 +348,57 @@ public class RPCServiceImpl implements RPCService {
             log.debug("Setting preference " + preferenceName + " to " + value);
         userService.setPreference(getUsername(),preferenceName);
     }
+    
+    public Map<String, RecurrenceRule> getRecurrenceRules(String calendarPath,
+            String[] eventIds) throws RPCException {
+        Map<String, RecurrenceRule> map = new HashMap<String, RecurrenceRule>();
+        for (int x = 0; x < eventIds.length; x++) {
+            String eventId = eventIds[x];
+            CalendarEventItem calItem = contentService.findEventByUid(eventId);
+            Event e = icalendarToCosmoConverter.createEvent(calItem.getUid(),
+                    calItem.getMasterEvent(), calItem.getCalendar());
+            map.put(eventId, e.getRecurrenceRule());
+        }
+        return map;
+    }
 
+    public void saveRecurrenceRule(String calendarPath, String eventId,
+            RecurrenceRule recurrenceRule) throws RPCException {
+
+        CalendarEventItem calendarEventItem = contentService
+                .findEventByUid(eventId);
+        net.fortuna.ical4j.model.Calendar calendar = calendarEventItem.getCalendar();
+        
+        Event event = icalendarToCosmoConverter.createEvent(eventId, calendarEventItem
+                .getMasterEvent(), calendar);
+        event.setRecurrenceRule(recurrenceRule);
+        cosmoToICalendarConverter.updateEvent(event, calendar);
+        calendarEventItem.setContent(calendar.toString().getBytes());
+        contentService.updateEvent(calendarEventItem);
+    }
+
+    public Event[] expandEvent(String calendarPath, String eventId,
+            long utcStartTime, long utcEndTime) throws RPCException{
+
+        CalendarEventItem calItem = contentService.findEventByUid(eventId);
+
+        DateTime start = new DateTime(utcStartTime);
+        start.setUtc(true);
+
+        DateTime end = new DateTime(utcEndTime);
+        end.setUtc(true);
+
+        List<CalendarEventItem> items = new ArrayList<CalendarEventItem>();
+        items.add(calItem);
+        return icalendarToCosmoConverter.createEventsFromCalendars(items,
+                start, end);
+
+    }
+    
     /**
-     * Given a path relative to the current user's home directory, returns the 
+     * Given a path relative to the current user's home directory, returns the
      * absolute path
+     * 
      * @param relativePath
      * @return
      */

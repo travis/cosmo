@@ -37,6 +37,9 @@ function createSetterMethodName(propName){
 }
 
 function convertObject(object){
+    if (object.javaClass == "java.util.HashMap"){
+        return convertMap(object);
+    }
     var constructor = JAVA_JSON_MAPPING[object.javaClass];
     if (constructor){
        var newObject = new constructor();
@@ -49,6 +52,7 @@ function convertObject(object){
            if (prop && typeof prop == "object" && prop.javaClass){
                prop = convertObject(prop);
            }
+           
            //see if there is a "setter" method - important especially for Date type
            var setterMethodName = createSetterMethodName(propName);
            if (newObject[setterMethodName]){
@@ -60,6 +64,15 @@ function convertObject(object){
        return newObject
     }
     return object;
+}
+
+function convertMap(map){
+    map = map.map;
+    var newmap = {};
+    for (var propName in map){
+        newmap[propName] = convertObject(map[propName]);
+    }
+    return newmap;
 }
 
 function wrapMethod(jsonRemoteObject, jsonRemoteMethod){

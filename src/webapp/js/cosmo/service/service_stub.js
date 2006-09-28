@@ -128,6 +128,37 @@ ScoobyService.prototype = {
     setPreference: function(preferenceName, value){},
     
     /**
+     * Returns the RecurrenceRules for a bunch of events
+     * 
+     * @param calendarPath the calendar containing the events
+     * @param eventIds an array of the id's of the events
+     *                 for which you want the RecurrenceRules of
+     * @return a map of ids --> RecurrenceRules
+     */
+     getRecurrenceRules: function(calendarPath, eventIds){},
+     
+         
+    /**
+     * Saves the RecurrenceRule for a particular event
+     * 
+     * @param calendarPath
+     * @param eventId
+     * @param recurrenceRule
+     */
+     saveRecurrenceRule: function(calendarPath, eventId, recurrenceRule){},
+
+    /**
+     * Returns the expanded instances of this event for the given
+     * tiem range.
+     * @param calendarPath
+     * @param eventId
+     * @param utcStartTime
+     * @param utcEndTime
+     * @return
+     */
+    expandEvent: function(calendarPath, eventId, utcStartTime, utcEndTime){},
+
+    /**
      * Returns the version of Scooby
      */
     getVersion: function(){}

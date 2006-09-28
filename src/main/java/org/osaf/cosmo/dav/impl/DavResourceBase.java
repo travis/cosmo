@@ -65,6 +65,7 @@ import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.util.PathUtil;
@@ -497,9 +498,35 @@ public abstract class DavResourceBase
      * authenticated user) on this resource, or an empty
      * <code>Set</code> if there are no visible tickets.
      */
-    public Set getTickets() {
-        // XXX: filter out visible tickets
-        return item.getTickets();
+    public Set<Ticket> getTickets() {
+        HashSet<Ticket> visible = new HashSet<Ticket>();
+
+        CosmoSecurityContext sctx = getSecurityManager().getSecurityContext();
+
+        // Admin context has access to all tickets
+        if (sctx.isAdmin()) {
+            visible.addAll(item.getTickets());
+        }
+
+        // Ticket context can only see itself
+        else if (sctx.getTicket() != null) {
+            for (Ticket t : (Set<Ticket>) item.getTickets()) {
+                if (sctx.getTicket().equals(t))
+                    visible.add(t);
+            }
+        }
+
+        // User context can only see the tickets he owns
+        else if (sctx.getUser() != null) {
+            for (Ticket t : (Set<Ticket>) item.getTickets()) {
+                if (sctx.getUser().equals(t.getOwner()))
+                    visible.add(t);
+            }
+        }
+
+        // Anonymous context can't see any tickets
+
+        return visible;
     }
 
     // our methods

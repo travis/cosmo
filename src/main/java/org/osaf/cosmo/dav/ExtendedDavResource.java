@@ -78,7 +78,7 @@ public interface ExtendedDavResource extends DavResource {
      * authenticated user) on this resource, or an empty
      * <code>Set</code> if there are no visible tickets.
      */
-    public Set getTickets();
+    public Set<Ticket> getTickets();
 
     /**
      * Adds a new member to this resource and set the member properties.

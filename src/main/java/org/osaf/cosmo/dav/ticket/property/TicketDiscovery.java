@@ -53,10 +53,8 @@ public class TicketDiscovery extends AbstractDavProperty
      */
     public Object getValue() {
         Set elements = new HashSet();
-        for (Iterator i=resource.getTickets().iterator();
-             i.hasNext();) {
-            elements.add(new TicketInfo((Ticket) i.next()));
-        }
+        for (Ticket t : resource.getTickets())
+            elements.add(new TicketInfo(t));
         return elements;
     }
 

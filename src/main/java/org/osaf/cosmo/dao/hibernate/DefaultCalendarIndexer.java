@@ -68,8 +68,12 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
             
             // Only index properties that fit within the
             // maximimum index length
-            if(name.length() > maxPropertyNameLength)
+            if(name.length() > maxPropertyNameLength) {
+                log.warn("calendar property name '" + name + "'"
+                        + " too long to index, skipping...");
                 continue;
+            }
+                
             
             index.setName(name);
             index.setValue(getSearchablePropetyValue((String) nextEntry

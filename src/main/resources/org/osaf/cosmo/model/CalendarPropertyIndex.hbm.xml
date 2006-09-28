@@ -31,7 +31,7 @@
         </property>
         
         <property name="value" type="string">
-            <column name="propertyvalue" length="4096"/>
+            <column name="propertyvalue" length="20000"/>
         </property>
         
         <many-to-one name="item" class="Item">

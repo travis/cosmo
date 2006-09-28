@@ -37,6 +37,9 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
 
     private static final Log log = LogFactory
             .getLog(DefaultCalendarIndexer.class);
+    
+    private int maxPropertyNameLength = 255;
+    private int maxPropertyValueLength = 20000;
 
     /*
      * (non-Javadoc)
@@ -61,8 +64,16 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
         for (Iterator it = propertyMap.entrySet().iterator(); it.hasNext();) {
             Entry nextEntry = (Entry) it.next();
             CalendarPropertyIndex index = new CalendarPropertyIndex();
-            index.setName((String) nextEntry.getKey());
-            index.setValue((String) nextEntry.getValue());
+            String name = (String) nextEntry.getKey();
+            
+            // Only index properties that fit within the
+            // maximimum index length
+            if(name.length() > maxPropertyNameLength)
+                continue;
+            
+            index.setName(name);
+            index.setValue(getSearchablePropetyValue((String) nextEntry
+                    .getValue()));
             item.addPropertyIndex(index);
 //             if (log.isDebugEnabled())
 //                 log.debug("creating calendar property index: " + index.toString());
@@ -84,6 +95,61 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
         session.update(item);
     }
 
+   
+    /**
+     * Return the maximum length of a propety value
+     * that will be indexed.  All characters after this
+     * maximum length will be truncated in the index and
+     * will not be searchable.
+     * @return
+     */
+    public int getMaxPropertyValueLength() {
+        return maxPropertyValueLength;
+    }
+
+    /**
+     * Set the maximum length of a propety value
+     * that will be indexed.  All characters after this
+     * maximum length will be truncated in the index and
+     * will not be searchable.
+     * @param maxPropertyValueLength
+     */
+    public void setMaxPropertyValueLength(int maxPropertyValueLength) {
+        this.maxPropertyValueLength = maxPropertyValueLength;
+    }
+
+    
+    /**
+     * Return the maximum length of a propety name
+     * that will be indexed.  A property name that
+     * is longer than this maximum length will
+     * not be indexed.
+     * @return
+     */
+    public int getMaxPropertyNameLength() {
+        return maxPropertyNameLength;
+    }
+
+
+    /**
+     * Set the maximum length of a propety name
+     * that will be indexed.  A property name that
+     * is longer than this maximum length will
+     * not be indexed.
+     * @param maxPropertyNameLength
+     */
+    public void setMaxPropertyNameLength(int maxPropertyNameLength) {
+        this.maxPropertyNameLength = maxPropertyNameLength;
+    }
+
+
+    private String getSearchablePropetyValue(String value) {
+        if(value.length() > maxPropertyValueLength)
+            return value.substring(0, maxPropertyValueLength);
+        else
+            return value;
+    }
+    
     private void addIndicesForTerm(Collection indices, String key, String value) {
         StringTokenizer periodTokens = new StringTokenizer(value, ",");
         boolean recurring = value.indexOf(',') > 0;

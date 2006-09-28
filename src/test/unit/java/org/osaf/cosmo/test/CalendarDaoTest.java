@@ -169,6 +169,31 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
 		queryItem = calendarDao.findCalendarByUid(queryItem.getUid());
 		Assert.assertNull(queryItem);
 	}
+    
+    public void testLongPropertyValue() throws Exception
+    {
+        CalendarCollectionItem calendar = new CalendarCollectionItem();
+        calendar.setName("test");
+        calendar.setOwner(getUser(userDao, "testuser"));
+        calendar.setDescription("test description");
+        calendar.setLanguage("en");
+        calendar = calendarDao.createCalendar(calendar);
+        
+        CalendarEventItem event = new CalendarEventItem();
+        event.setName("big.ics");
+        event.setOwner(getUser(userDao, "testuser"));
+        event.setContent(getBytes(baseDir + "/big.ics"));
+        event.setContentEncoding("UTF8");
+        event.setContentType("text/calendar");
+        event.setContentLanguage("en");
+        
+        event = calendarDao.addEvent(calendar, event);
+        
+        clearSession();
+        
+        CalendarEventItem queryEvent = calendarDao.findEventByUid(event.getUid());
+        verifyInputStream(new FileInputStream(baseDir + "/big.ics"), queryEvent.getContent());
+    }
 	
     public void testDuplicateEventUid() throws Exception
     {

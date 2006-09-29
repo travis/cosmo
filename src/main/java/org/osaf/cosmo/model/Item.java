@@ -28,6 +28,7 @@ public abstract class Item extends BaseModelObject {
 
     private String uid;
     private String name;
+    private String displayName;
     private Date creationDate;
     private Date modifiedDate;
     private Integer version;
@@ -152,6 +153,20 @@ public abstract class Item extends BaseModelObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    /**
+     * @return Item's human readable name
+     */
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    /**
+     * @param displayName Item's human readable name
+     */
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public User getOwner() {

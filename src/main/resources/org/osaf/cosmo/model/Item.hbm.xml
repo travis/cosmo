@@ -45,6 +45,10 @@
         <property name="name" type="string">
             <column name="itemname" length="255" not-null="true" index="idx_itemname"/>
         </property>
+		
+		<property name="displayName" type="string">
+            <column name="displayname" length="255"/>
+        </property>
         
         <property name="creationDate" type="timestamp">
             <column name="datecreated"/>
@@ -54,17 +58,17 @@
             <column name="datemodified"/>
         </property>
         
-		<map name="attributes" table="attribute" fetch="subselect" lazy="true" inverse="true" cascade="all-delete-orphan">
-			<key column="itemid"/>
-			<map-key column="attributename" type="string"/>
-			<one-to-many class="Attribute"/>
-		</map>
+        <map name="attributes" table="attribute" fetch="subselect" lazy="true" inverse="true" cascade="all-delete-orphan">
+            <key column="itemid"/>
+            <map-key column="attributename" type="string"/>
+            <one-to-many class="Attribute"/>
+        </map>
 		
-		<set name="tickets" table="tickets" inverse="true" lazy="true" cascade="all-delete-orphan">
-			<key column="itemid"/>
-			<one-to-many class="Ticket"/>
-		</set>
-		
+        <set name="tickets" table="tickets" inverse="true" lazy="true" cascade="all-delete-orphan">
+            <key column="itemid"/>
+            <one-to-many class="Ticket"/>
+        </set>
+
     </class>
     
     <query name="item.by.parentId">from Item where parent.id=:parentid</query>

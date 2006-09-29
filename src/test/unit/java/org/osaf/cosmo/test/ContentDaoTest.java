@@ -77,6 +77,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
 
         ContentItem item = new ContentItem();
         item.setName("test");
+        item.setDisplayName("this is a test item");
         item.setOwner(user);
         item.setContent(getBytes(baseDir + "/testdata1.txt"));
         item.setContentEncoding("UTF8");
@@ -243,6 +244,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
 
         ContentItem item = new ContentItem();
         item.setName("test");
+        item.setDisplayName("this is a test item");
         item.setOwner(user);
         item.setContent(getBytes(baseDir + "/testdata1.txt"));
         item.setContentEncoding("UTF8");
@@ -257,6 +259,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         Assert.assertEquals(0, newItem.getVersion().intValue());
 
         queryItem.setName("test2");
+        queryItem.setDisplayName("this is a test item2");
         queryItem.getAttributes().remove("customattribute");
         queryItem.setContentLanguage("es");
         queryItem.setContent(getBytes(baseDir + "/testdata2.txt"));

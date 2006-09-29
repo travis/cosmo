@@ -157,7 +157,8 @@ function Block() {
         // 'selected' color if this block is the most recently
         // clicked one
         else {
-            stateId = (Cal.currSelObj && this.id == Cal.currSelObj.id) ?
+            var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+            stateId = (selEv && (this.id == selEv.id)) ?
                 1 : 2;
         }
         this.setLozengeAppearance(stateId);

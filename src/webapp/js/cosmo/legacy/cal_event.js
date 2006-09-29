@@ -72,8 +72,8 @@ function CalEvent(id, block) {
      * remoteSave method.
      */
     this.remoteSaveMain = function() {
-        // Deal with loss of scope from callback
-        var ev = Cal.currSelObj;
+        // FIXME: Use topics
+        var ev = cosmo.view.cal.canvas.getSelectedEvent();
 
         // BANDAID: Keep people from shooting themselves in the foot
         // with reurring events
@@ -92,9 +92,8 @@ function CalEvent(id, block) {
      * Does the visual stuff first, then hands off to remoteSaveDelay
      */
     this.remoteSave = function() {
-        // Deal with loss of scope from callback
-        var ev = Cal.currSelObj;
-
+        // FIXME: Use topics
+        var ev = cosmo.view.cal.canvas.getSelectedEvent();
         // Block stuff
         // =====================
         // Reset the block because we may be changing to the new type --
@@ -129,7 +128,9 @@ function CalEvent(id, block) {
      */
     this.cancelSave = function() {
         // Put the block back where it was
-        Cal.currSelObj.restoreEvent();
+        // FIXME: Use topics
+        var ev = cosmo.view.cal.canvas.getSelectedEvent();
+        ev.restoreEvent();
         // Hide the confirmation dialog
         if (Cal.dialog) {
             Cal.hideDialog();
@@ -163,7 +164,9 @@ function CalEvent(id, block) {
         if (this.restoreFromSnapshot()) {
             this.block.updateFromEvent(this);
             // Update block and event detail form display
-            Cal.currSelObj.block.updateDisplayMain();
+            // FIXME: Use topics
+            var ev = cosmo.view.cal.canvas.getSelectedEvent();
+            ev.block.updateDisplayMain();
             this.setInputDisabled(false);
         }
     };

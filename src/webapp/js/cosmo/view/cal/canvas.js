@@ -31,10 +31,10 @@ cosmo.view.cal.canvas = new function() {
     
     function setSelectedEvent(ev) {
         // Deselect previously selected event if any
-        if (this.selectedEvent) {
-            this.selectedEvent.block.setDeselected();
+        if (self.selectedEvent) {
+            self.selectedEvent.block.setDeselected();
         }
-        this.selectedEvent = ev; // Pointer to the currently selected event
+        self.selectedEvent = ev; // Pointer to the currently selected event
         ev.block.setSelected(); // Show the associated block as selected
     };
     
@@ -44,11 +44,11 @@ cosmo.view.cal.canvas = new function() {
         var act = cmd.action;
         switch (act) {
             case 'setSelected':
-                //setSelectedEvent(cmd.data);
+                setSelectedEvent(cmd.data);
                 break;
         }
     };
-       
+    
     // Width of day col in week view, width of event blocks --
     // Calc'd based on client window size
     // Other pieces of the app use this, so make it public
@@ -383,6 +383,9 @@ cosmo.view.cal.canvas = new function() {
         top -= (allDayArea.dragSize - allDayArea.origSize);
         return top;
    };
+    this.getSelectedEvent = function() {
+        return self.selectedEvent;
+    };
     this.cleanup = function() {
         allDayArea.cleanup();
     };

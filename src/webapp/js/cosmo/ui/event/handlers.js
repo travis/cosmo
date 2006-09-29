@@ -130,7 +130,6 @@ function mouseDownHandler(e) {
                 return false;
             }
             
-            Cal.setSelected(selObj);
             dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': selObj });
             // Set up Draggable and save dragMode -- user may be dragging
             if (strId.indexOf('AllDay') > -1) {
@@ -258,13 +257,13 @@ function keyUpHandler(e) {
     // ---------------
     // TO-DO: Move redundant conditionals up a level
     else {
+        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
         switch (e.keyCode) {
             // Enter key
             case 13:
-                if (Cal.currSelObj && 
-                    !Cal.currSelObj.getInputDisabled() && 
+                if (selEv && 
+                    !selEv.getInputDisabled() && 
                     Cal.calForm.detailTextInputHasFocus) {
-                    
                     Cal.saveCalEvent();
                 }
                 else if (Cal.calForm.jumpToTextInputHasFocus) {
@@ -273,10 +272,11 @@ function keyUpHandler(e) {
                 break;
             // Delete key
             case 46:
-                if (Cal.currSelObj && 
-                    !Cal.currSelObj.getInputDisabled() && 
+                if (selEv && 
+                    !selEv.getInputDisabled() && 
                     !Cal.calForm.detailTextInputHasFocus) {
-                    Cal.showDialog(cosmo.view.cal.dialog.getProps('removeConfirm'));
+                    Cal.showDialog(
+                        cosmo.view.cal.dialog.getProps('removeConfirm'));
                 }
                 break;
         }

@@ -44,8 +44,10 @@ cosmo.view.cal.dialog = new function() {
     };
     
     // Call a method on the currently selected event
+    // FIXME: Use topics
     function doEvMethod(key) {
-        Cal.currSelObj[key]();
+        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        selEv[key]();
     }
     
     // Public methods

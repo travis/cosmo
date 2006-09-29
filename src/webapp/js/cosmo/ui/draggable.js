@@ -64,7 +64,8 @@ function Draggable(id) {
      */
     this.init = function(dragMode) {
         // Reference to the main block and div for this Draggable
-        var block = Cal.currSelObj.block;
+        var ev = cosmo.view.cal.canvas.getSelectedEvent();
+        var block = ev.block;
         var div = block.div;
         
         this.dragMode = dragMode;
@@ -85,7 +86,7 @@ function Draggable(id) {
         // FIXME: This causes a really irritating CSS bug in Mozilla/Firefox
         // Set opacity if moving
         //if (this.dragMode == 'drag') {
-        //    Cal.currSelObj.block.setOpacity(60);
+        //    cosmo.view.cal.canvas.getSelectedEvent().block.setOpacity(60);
         //}
     };
     /**
@@ -97,7 +98,7 @@ function Draggable(id) {
     this.move = function() {
         // Compensate for crack-fiend clicking -- make sure there's
         // a selected block
-        if (!Cal.currSelObj) {
+        if (!cosmo.view.cal.canvas.getSelectedEvent()) {
             return false;
         }
         
@@ -105,7 +106,7 @@ function Draggable(id) {
         this.dragged = true;
         
         // Block associated with this Draggable
-        var moveBlock = Cal.currSelObj.block;
+        var moveBlock = cosmo.view.cal.canvas.getSelectedEvent().block;
         // Subtract the offset to get where the left/top
         // of the block should be
         var moveX = (xPos - this.clickOffsetX);
@@ -137,7 +138,7 @@ function Draggable(id) {
         ret = parseInt(size);
         // Single-day events only
         // Min size is 30 minutes -- two 15-min. chunks
-        if (!Cal.currSelObj.block.auxDivList.length) {
+        if (!cosmo.view.cal.canvas.getSelectedEvent().block.auxDivList.length) {
             ret = ret < this.unit ? this.unit : ret;
         }
         return ret;
@@ -151,7 +152,7 @@ function Draggable(id) {
      * changes to the event to the backend
      */
     this.doUpdate = function() {
-        var selObj = Cal.currSelObj;
+        var selObj = cosmo.view.cal.canvas.getSelectedEvent();
         // Make backup snapshot of event data in case save/remove
         // operation fails
         selObj.makeSnapshot();
@@ -178,8 +179,8 @@ function Draggable(id) {
      * or doesn't have a valid dragMode
      */
     this.paranoia = function() {
-        if (!Cal.currSelObj || !Cal.dragElem.dragMode || 
-            Cal.currSelObj.getInputDisabled()) {
+        if (!cosmo.view.cal.canvas.getSelectedEvent() || !Cal.dragElem.dragMode || 
+            cosmo.view.cal.canvas.getSelectedEvent().getInputDisabled()) {
             return false;
         }
         else {
@@ -236,7 +237,7 @@ HasTimeDraggable.prototype.resize = function() {
  */
 HasTimeDraggable.prototype.resizeTop = function(y) {
     // The selected event
-    var selObj = Cal.currSelObj;
+    var selObj = cosmo.view.cal.canvas.getSelectedEvent();
     // Where the top edge of the block should go, given any offset for the
     // top of the calendar, and any scrolling in the scrollable area
     // Used when resizing up
@@ -260,7 +261,7 @@ HasTimeDraggable.prototype.resizeTop = function(y) {
  */
 HasTimeDraggable.prototype.resizeBottom = function(y) {
    // The selected event
-    var selObj = Cal.currSelObj;
+    var selObj = cosmo.view.cal.canvas.getSelectedEvent();
     // Where the bottom edge of the block should go -- this is a
     // relative measurement based on pos on the scrollable area
     var b = (y-this.absTop)+cosmo.view.cal.canvas.getTimedCanvasScrollTop();
@@ -286,7 +287,7 @@ HasTimeDraggable.prototype.drop = function() {
         return false;
     }
     
-    var selObj = Cal.currSelObj;
+    var selObj = cosmo.view.cal.canvas.getSelectedEvent();
     var unit = HOUR_UNIT_HEIGHT/4; // 15-min. increments
     var top = 0;
     var size = 0;
@@ -392,7 +393,7 @@ NoTimeDraggable.prototype.drop = function() {
     var left = 0;
     var deltaX = 0;
     var deltaY = 0;
-    var selObj = Cal.currSelObj;
+    var selObj = cosmo.view.cal.canvas.getSelectedEvent();
     top = selObj.block.getTop();
     left = selObj.block.getLeft();
     

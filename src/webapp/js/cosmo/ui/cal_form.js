@@ -31,6 +31,17 @@ function CalForm() {
     
     var self = this;
     
+    dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
+    
+    this.handlePub = function(cmd) {
+        var act = cmd.action;
+        switch (act) {
+            case 'setSelected':
+                self.setButtons(true, true);
+                break;
+        }
+    };
+    
     // The actual form DOM elem -- form.form is redundant, so
     // changing this to formElem would be a Good Thing
     this.form = document.getElementById('calForm');

@@ -37,10 +37,6 @@ var Cal = new function() {
     // Used to cal positions for draggable elems
     // Changes when resizing all-day event area
     this.viewOffset = 0;
-    // The currently selected event -- a CalEvent obj
-    // Because of problems with loss of scope from callbacks, this
-    // gets used a lot in CalEvent methods called on the selected event
-    this.currSelObj = null;
     // The element currently being dragged -- a Draggable obj
     this.dragElem = null;
     // Width of the middle column of UI elements
@@ -433,11 +429,12 @@ var Cal = new function() {
         if (Cal.loadEvents() && Cal.updateEventsDisplay()) {
             // Give the final event the selection and display in form
             if (Cal.eventRegistry.length) {
-               Cal.setSelected(Cal.eventRegistry.getLast());
+                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': Cal.eventRegistry.getLast() });
             }
-            if (Cal.currSelObj) {
+            selEv = cosmo.view.cal.canvas.getSelectedEvent();
+            if (selEv) {
                 // Show the last event -- the selected one, in the info form
-                Cal.calForm.updateFromEvent(Cal.currSelObj);
+                Cal.calForm.updateFromEvent(selEv);
             }
         }
     };
@@ -574,7 +571,7 @@ var Cal = new function() {
         // Update the block
         // ================================
         if (block.insert(id)) { // Insert the block on the view
-            this.setSelected(ev);
+            cosmo.view.cal.canvas.selectedEvent = ev;
             // Save on the backend if it's a new event
             ev.remoteSaveMain();
         }
@@ -622,7 +619,7 @@ var Cal = new function() {
      * the block pos/size when the save successfully completes
      */
     this.saveCalEvent = function() {
-        var selEvent = Cal.currSelObj;
+        var selEvent = cosmo.view.cal.canvas.getSelectedEvent();
         var startpos = 0;
         var endpos = 0;
         var height = 0;
@@ -644,15 +641,16 @@ var Cal = new function() {
     /**
      * Called when the user clicks the 'Remove' button from the confirmation
      * dialog box for removal -- calls removeCalEventFromCanvas which removes the event
+     * FIXME: Use topics
      */
     this.removeCalEvent = function() {
         // Use asolute references to Cal instead of 'this'
         // because this method is called from Button context
-        Cal.currSelObj.remove();
+        cosmo.view.cal.canvas.getSelectedEvent().remove();
         // Clear out the data in the event detail form
         Cal.calForm.clear();
         // No currently selected event
-        Cal.currSelObj = null;
+        cosmo.view.cal.canvas.selectedEvent = null;
         // Dissapear the dialog
         Cal.hideDialog();
     };
@@ -665,32 +663,20 @@ var Cal = new function() {
      * (3) Removing the placeholder event when initial event
      *     creation fails
      * @param ev CalEvent obj, the event to be removed
+     * FIXME: Use topics and move to cosmo.view.cal.canvas
      */
     this.removeCalEventFromCanvas = function(ev) {
         // Remove from list of visible events
         Cal.eventRegistry.removeItem(ev.id);
         // Remove the block
         ev.block.remove();
-        // If this was the selected event, set currSelObj to null
-        if (Cal.currSelObj && (Cal.currSelObj.id = ev.id)) {
-            Cal.currSelObj = null;
+        // FIXME: Use topics
+        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        if (selEv && (selEv.id = ev.id)) {
+            cosmo.view.cal.canvas.selectedEvent = null;
         }
         // Bye-bye, event
         ev = null;
-    };
-    /**
-     * Set a particular calendar event as the currently selected one
-     * @param ev The CalEvent obj for the element clicked on
-     */
-    this.setSelected = function(ev) {
-        // Deselect previously selected event if any
-        if (this.currSelObj) {
-            this.currSelObj.block.setDeselected();
-        }
-        this.currSelObj = ev; // Pointer to the currently selected event
-        ev.block.setSelected(); // Show the associated block as selected
-        // Enable the Remove and Save buttons
-        Cal.calForm.setButtons(true, true);
     };
 
     // ==========================
@@ -704,7 +690,7 @@ var Cal = new function() {
     this.wipeView = function() {
         var events = this.eventRegistry;
         var ev = null;
-        this.currSelObj = null; // Kill selected event
+        cosmo.view.cal.canvas.selectedEvent = null; // Kill selected event
         // Pull the last event off the eventRegistry list and remove it
         // Don't use 'pop' -- removeCalEventFromCanvas takes the item off the eventRegistry
         while (ev = events.getLast()) {

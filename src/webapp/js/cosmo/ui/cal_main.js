@@ -613,32 +613,6 @@ var Cal = new function() {
     // Saving and removing events
     // ==========================
     /**
-     * Called when user clicks the Save button on the event info form
-     * Updates the properties of the selected event and saves the
-     * changes to the backend. Handler for the save process will update
-     * the block pos/size when the save successfully completes
-     */
-    this.saveCalEvent = function() {
-        var selEvent = cosmo.view.cal.canvas.getSelectedEvent();
-        var startpos = 0;
-        var endpos = 0;
-        var height = 0;
-        var errMsg = '';
-
-        // Give timeout check in onclick handler a chance to work
-        if (Cal.isTimedOut()) {
-            return false;
-        }
-        // Make backup snapshot
-        selEvent.makeSnapshot();
-        // Update CalEvent obj
-        if (Cal.calForm.updateEvent(selEvent)) {
-            // Save the changes to the backend -- handler for remote save
-            // process will update block position and size
-            selEvent.remoteSaveMain();
-        }
-    };
-    /**
      * Called when the user clicks the 'Remove' button from the confirmation
      * dialog box for removal -- calls removeCalEventFromCanvas which removes the event
      * FIXME: Use topics

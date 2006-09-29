@@ -152,25 +152,25 @@ function Draggable(id) {
      * changes to the event to the backend
      */
     this.doUpdate = function() {
-        var selObj = cosmo.view.cal.canvas.getSelectedEvent();
+        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
         // Make backup snapshot of event data in case save/remove
         // operation fails
-        selObj.makeSnapshot();
+        selEv.makeSnapshot();
         // Update the event properties based on the block pos/size
-        if (selObj.block.updateEvent(selObj, this.dragMode)) {
+        if (selEv.block.updateEvent(selEv, this.dragMode)) {
             // Check against the backup to make sure the event has
             // actually been edited
-            if (selObj.hasChanged()) {
-                selObj.setInputDisabled(true); // Disable input while processing
+            if (selEv.hasChanged()) {
+                selEv.setInputDisabled(true); // Disable input while processing
                 // Save the changes
                 // ==========================
-                selObj.remoteSaveMain();
+                dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'data': selEv });
             }
             // If no real edit, then just reposition the block
             // With conflict calculations and snap-to
             else {
-                selObj.block.updateFromEvent(selObj);
-                selObj.block.updateElements();
+                selEv.block.updateFromEvent(selEv);
+                selEv.block.updateElements();
             }
         }
     };
@@ -237,7 +237,7 @@ HasTimeDraggable.prototype.resize = function() {
  */
 HasTimeDraggable.prototype.resizeTop = function(y) {
     // The selected event
-    var selObj = cosmo.view.cal.canvas.getSelectedEvent();
+    var selEv = cosmo.view.cal.canvas.getSelectedEvent();
     // Where the top edge of the block should go, given any offset for the
     // top of the calendar, and any scrolling in the scrollable area
     // Used when resizing up
@@ -246,12 +246,12 @@ HasTimeDraggable.prototype.resizeTop = function(y) {
     
     t = t > this.min ? this.min : t;
     t = t < 0 ? 0 : t;
-    selObj.block.setTop(t);
-    //if (!selObj.block.auxDivList.length) {
+    selEv.block.setTop(t);
+    //if (!selEv.block.auxDivList.length) {
         size = this.getSize((this.absTop-yPos-cosmo.view.cal.canvas.getTimedCanvasScrollTop())
             + this.height);
         
-        selObj.block.setHeight(size, true);
+        selEv.block.setHeight(size, true);
    // }
 }
 
@@ -261,14 +261,14 @@ HasTimeDraggable.prototype.resizeTop = function(y) {
  */
 HasTimeDraggable.prototype.resizeBottom = function(y) {
    // The selected event
-    var selObj = cosmo.view.cal.canvas.getSelectedEvent();
+    var selEv = cosmo.view.cal.canvas.getSelectedEvent();
     // Where the bottom edge of the block should go -- this is a
     // relative measurement based on pos on the scrollable area
     var b = (y-this.absTop)+cosmo.view.cal.canvas.getTimedCanvasScrollTop();
     var max = (VIEW_DIV_HEIGHT - this.absTop);
     b = b > max ? max : b;
     size = this.getSize(b);
-    selObj.block.setHeight(size);
+    selEv.block.setHeight(size);
 
 }
 
@@ -287,7 +287,7 @@ HasTimeDraggable.prototype.drop = function() {
         return false;
     }
     
-    var selObj = cosmo.view.cal.canvas.getSelectedEvent();
+    var selEv = cosmo.view.cal.canvas.getSelectedEvent();
     var unit = HOUR_UNIT_HEIGHT/4; // 15-min. increments
     var top = 0;
     var size = 0;
@@ -302,9 +302,9 @@ HasTimeDraggable.prototype.drop = function() {
     
     // Abstract away getting top and bottom -- multi-day events
     // have multiple divs, treat as a composite here
-    top = selObj.block.getTop();
-    left = selObj.block.getLeft();
-    size = selObj.block.getBottom()-top;
+    top = selEv.block.getTop();
+    left = selEv.block.getLeft();
+    size = selEv.block.getBottom()-top;
     
     // Snap-to for top position: both simple move and resize up
     if (this.dragMode == 'drag' || this.dragMode == 'resizetop') {
@@ -317,7 +317,7 @@ HasTimeDraggable.prototype.drop = function() {
         else {
             top = top-deltaY;
         }
-        selObj.block.top = top;
+        selEv.block.top = top;
     }
     // Snap-to for size: both resize up and resize down
     if (this.dragMode.indexOf('resize') > -1) {
@@ -333,7 +333,7 @@ HasTimeDraggable.prototype.drop = function() {
         else {
             size = size-deltaY;
         }
-        selObj.block.height = size;
+        selEv.block.height = size;
     }
     // 1px border -- add the 1px taken out for the 1px border 
     // back to the size
@@ -351,7 +351,7 @@ HasTimeDraggable.prototype.drop = function() {
         else {
             left = left-deltaX;
         }
-        selObj.block.left = left;
+        selEv.block.left = left;
     }
     // Do the actual update
     // =================
@@ -393,9 +393,9 @@ NoTimeDraggable.prototype.drop = function() {
     var left = 0;
     var deltaX = 0;
     var deltaY = 0;
-    var selObj = cosmo.view.cal.canvas.getSelectedEvent();
-    top = selObj.block.getTop();
-    left = selObj.block.getLeft();
+    var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+    top = selEv.block.getTop();
+    left = selEv.block.getLeft();
     
     // Side-to-side snap
     if (this.dragMode == 'drag') {
@@ -408,9 +408,9 @@ NoTimeDraggable.prototype.drop = function() {
         else {
             left = left-deltaX;
         }
-        selObj.block.left = left;
+        selEv.block.left = left;
     }
-    selObj.block.top = top;
+    selEv.block.top = top;
     
     // Do the actual update
     // =================

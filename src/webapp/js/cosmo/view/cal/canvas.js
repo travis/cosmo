@@ -39,7 +39,6 @@ cosmo.view.cal.canvas = new function() {
     };
     
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
-
     this.handlePub = function(cmd) {
         var act = cmd.action;
         switch (act) {

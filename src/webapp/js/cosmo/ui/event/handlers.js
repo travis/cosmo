@@ -264,7 +264,8 @@ function keyUpHandler(e) {
                 if (selEv && 
                     !selEv.getInputDisabled() && 
                     Cal.calForm.detailTextInputHasFocus) {
-                    Cal.saveCalEvent();
+                    //Cal.calForm.saveCalEvent();
+                    dojo.event.topic.publish('/calEvent', { 'action': 'saveFromForm' });
                 }
                 else if (Cal.calForm.jumpToTextInputHasFocus) {
                     Cal.calForm.goJumpToDate();

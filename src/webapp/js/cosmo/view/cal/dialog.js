@@ -36,9 +36,9 @@ cosmo.view.cal.dialog = new function() {
             function() { doEvMethod('cancelSave') },
             getText('App.Button.Cancel'), true)],
         'btnsRight': [new Button('saveButtonDialog', 74, 
-            function() { doEvMethod('remoteSave'); },
+            function() { doPublish('save'); },
             getText('App.Button.Save'), true)],
-        'defaultAction': function() { doEvMethod('remoteSave'); },
+        'defaultAction': function() { doPublish('save'); },
         'msg': 'This is a recurring event. Editing recurring events is not supported in Cosmo,' +
             ' and will probably have effects you do not intend.<br/>&nbsp;<br/>Save this change?'
     };
@@ -48,6 +48,10 @@ cosmo.view.cal.dialog = new function() {
     function doEvMethod(key) {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
         selEv[key]();
+    }
+    function doPublish(act) {
+        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        dojo.event.topic.publish('/calEvent', { 'action': act, 'data': selEv });
     }
     
     // Public methods

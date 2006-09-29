@@ -69,6 +69,7 @@
 
 <script type="text/javascript">
 // Dojo requires
+dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.view.cal.conflict');
 dojo.require('cosmo.view.cal.dialog');

@@ -33,11 +33,49 @@ function CalForm() {
     
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     
+    function saveCalEvent(evParam) {
+        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        // Give timeout check in onclick handler a chance to work
+        if (Cal.isTimedOut()) {
+            return false;
+        }
+        // Make backup snapshot
+        selEv.makeSnapshot();
+        // Update CalEvent obj
+        if (self.updateEvent(selEv)) {
+            // Save the changes to the backend -- handler for remote save
+            // process will update block position and size
+            //selEvent.remoteSaveMain();
+            // ==========================
+            dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'data': selEv });
+        }
+    };
+
+    
     this.handlePub = function(cmd) {
         var act = cmd.action;
+        var ev = cmd.data;
         switch (act) {
+            case 'saveFromForm':
+                saveCalEvent(ev);
+                break;
             case 'setSelected':
                 self.setButtons(true, true);
+                break;
+            case 'saveSuccess':
+                if (cmd.qualifier == 'onCanvas') {
+                    self.setButtons(true, true);
+                }
+                else {
+                    self.setButtons(false, false);
+                    self.clear();
+                }
+                break;
+            case 'saveFailed':
+                self.setButtons(true, true);
+                break;
+            default:
+                // Do nothing
                 break;
         }
     };
@@ -379,7 +417,7 @@ function CalForm() {
         }
         else {
             butSave = new Button('savebutton', 74,
-                Cal.saveCalEvent, getText('App.Button.Save'));
+                saveCalEvent, getText('App.Button.Save'));
         }
 
         checkElem = document.getElementById('removeButton');

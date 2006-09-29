@@ -28,11 +28,32 @@ cosmo.view.cal.canvas = new function() {
     function $(id) {
         return document.getElementById(id);
     }
-        
+    
+    function setSelectedEvent(ev) {
+        // Deselect previously selected event if any
+        if (this.selectedEvent) {
+            this.selectedEvent.block.setDeselected();
+        }
+        this.selectedEvent = ev; // Pointer to the currently selected event
+        ev.block.setSelected(); // Show the associated block as selected
+    };
+    
+    dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
+
+    this.handlePub = function(cmd) {
+        var act = cmd.action;
+        switch (act) {
+            case 'setSelected':
+                //setSelectedEvent(cmd.data);
+                break;
+        }
+    };
+       
     // Width of day col in week view, width of event blocks --
     // Calc'd based on client window size
     // Other pieces of the app use this, so make it public
     this.dayUnitWidth = 0;
+    this.selectedEvent = null;
     
     // Public methods
     // ****************

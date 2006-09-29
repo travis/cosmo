@@ -643,9 +643,9 @@ var Cal = new function() {
     };
     /**
      * Called when the user clicks the 'Remove' button from the confirmation
-     * dialog box for removal -- calls removeCalEvent which removes the event
+     * dialog box for removal -- calls removeCalEventFromCanvas which removes the event
      */
-    this.removeCalEventConfirmed = function() {
+    this.removeCalEvent = function() {
         // Use asolute references to Cal instead of 'this'
         // because this method is called from Button context
         Cal.currSelObj.remove();
@@ -666,7 +666,7 @@ var Cal = new function() {
      *     creation fails
      * @param ev CalEvent obj, the event to be removed
      */
-    this.removeCalEvent = function(ev) {
+    this.removeCalEventFromCanvas = function(ev) {
         // Remove from list of visible events
         Cal.eventRegistry.removeItem(ev.id);
         // Remove the block
@@ -706,9 +706,9 @@ var Cal = new function() {
         var ev = null;
         this.currSelObj = null; // Kill selected event
         // Pull the last event off the eventRegistry list and remove it
-        // Don't use 'pop' -- removeCalEvent takes the item off the eventRegistry
+        // Don't use 'pop' -- removeCalEventFromCanvas takes the item off the eventRegistry
         while (ev = events.getLast()) {
-            this.removeCalEvent(ev, false);
+            this.removeCalEventFromCanvas(ev);
         }
     };
     /**
@@ -798,66 +798,13 @@ var Cal = new function() {
         }
     };
     /**
-     * Display confirmation dialog when user clicks Remove button
-     * or uses Delete button on keyboard to remove an event
-     * When the dialog box is displayed, hitting Enter will call
-     * whatever method is attached to the defaultAction property
-     * of the dialog box
-     */
-    this.showRemoveConfirm = function() {
-        var but = null;
-        var msg = '';
-
-        // BANDAID: Warning specifically for recurring events
-        if (Cal.currSelObj.data.masterEvent || Cal.currSelObj.data.instance) {
-            msg = 'This is a recurring event. Removing recurring events is not supported in Cosmo,' +
-                ' and will probably have effects you do not intend.<br/>&nbsp;<br/>Remove this event?';
-        }
-        else {
-            msg = getText('Main.Prompt.EventRemoveConfirm');
-        }
-
-        // Use asolute references to Cal instead of 'this'
-        // because this method is called from Button context
-        Cal.dialog.type = Cal.dialog.CONFIRM;
-        but = new Button('cancelButtonDialog', 74, Cal.hideDialog,
-            getText('App.Button.Cancel'), true);
-        Cal.dialog.btnsLeft[0] = but;
-        but = new Button('removeButtonDialog', 74, Cal.removeCalEventConfirmed,
-            getText('App.Button.Remove'), true);
-        Cal.dialog.btnsRight[0] = but;
-        Cal.dialog.defaultAction = Cal.removeCalEventConfirmed;
-        Cal.dialog.msg = msg;
-        Cal.showDialog();
-    };
-    /**
-     * Display confirmation dialog when user attempts to edit a
-     * recurring event -- not currently a supported action
-     * When the dialog box is displayed, hitting Enter will call
-     * whatever method is attached to the defaultAction property
-     * of the dialog box
-     */
-    this.showSaveConfirm = function(str) {
-        var but = null;
-        var msg = str;
-        // Use asolute references to Cal instead of 'this'
-        // because this method is called from Button context
-        Cal.dialog.type = Cal.dialog.CONFIRM;
-        but = new Button('saveButtonDialog', 74, Cal.currSelObj.cancelSave,
-            getText('App.Button.Cancel'), true);
-        Cal.dialog.btnsLeft[0] = but;
-        but = new Button('saveButtonDialog', 74, Cal.currSelObj.remoteSave,
-            getText('App.Button.Save'), true);
-        Cal.dialog.btnsRight[0] = but;
-        Cal.dialog.defaultAction = Cal.currSelObj.remoteSave;
-        Cal.dialog.msg = msg;
-        Cal.showDialog();
-    };
-    /**
      * Display the current dialog box and throw up the transparent
      * full-screen div that blocks all user input to the UI
      */
-    this.showDialog = function() {
+    this.showDialog = function(props) {
+        for (var p in props) {
+            Cal.dialog[p] = props[p];
+        }
         Cal.setInputDisabled(true);
         Cal.dialog.show();
     };

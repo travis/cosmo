@@ -78,9 +78,7 @@ function CalEvent(id, block) {
         // BANDAID: Keep people from shooting themselves in the foot
         // with reurring events
         if (ev.data.masterEvent || ev.data.instance) {
-            msg = 'This is a recurring event. Editing recurring events is not supported in Cosmo,' +
-                ' and will probably have effects you do not intend.<br/>&nbsp;<br/>Save this change?';
-            Cal.showSaveConfirm(msg);
+            Cal.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm'));
         }
         else {
             ev.remoteSave();
@@ -234,7 +232,7 @@ function CalEvent(id, block) {
             // Failed create -- remove fake placeholder event and block
             else {
                 // Remove all the client-side stuff associated with this event
-                Cal.removeCalEvent(saveObj);
+                Cal.removeCalEventFromCanvas(saveObj);
                 errMsg = getText('Main.Error.EventNewSaveFailed');
             }
             // Enable the remove button if it was previously disabled
@@ -255,7 +253,7 @@ function CalEvent(id, block) {
             // If new dates are out of range, remove the event from display
             if (saveObj.isOutOfViewRange()) {
                 // Remove all the client-side stuff associated with this event
-                Cal.removeCalEvent(saveObj);
+                Cal.removeCalEventFromCanvas(saveObj);
                 // Disable the Remove and Save buttons
                 Cal.calForm.setButtons(false, false);
                 // Clear out form values
@@ -302,7 +300,7 @@ function CalEvent(id, block) {
         }
         else {
             // Remove all the client-side stuff associated with this event
-            Cal.removeCalEvent(removeObj);
+            Cal.removeCalEventFromCanvas(removeObj);
             // Disable the Remove and Save buttons
             Cal.calForm.setButtons(false, false);
         }

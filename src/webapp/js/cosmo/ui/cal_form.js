@@ -359,7 +359,8 @@ function CalForm() {
         }
         else {
             butRemove = new Button('removeButton', 74,
-                Cal.showRemoveConfirm, getText('App.Button.Remove'));
+                function() { Cal.showDialog(cosmo.view.cal.dialog.getProps('removeConfirm')); }, 
+                getText('App.Button.Remove'));
         }
         if (!enableSave) {
             butSave = new Button('savebutton', 74, null,

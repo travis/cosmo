@@ -131,6 +131,7 @@ function mouseDownHandler(e) {
             }
             
             Cal.setSelected(selObj);
+            dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': selObj });
             // Set up Draggable and save dragMode -- user may be dragging
             if (strId.indexOf('AllDay') > -1) {
                 dragElem = new NoTimeDraggable(id);
@@ -275,8 +276,7 @@ function keyUpHandler(e) {
                 if (Cal.currSelObj && 
                     !Cal.currSelObj.getInputDisabled() && 
                     !Cal.calForm.detailTextInputHasFocus) {
-                    
-                    Cal.showRemoveConfirm();
+                    Cal.showDialog(cosmo.view.cal.dialog.getProps('removeConfirm'));
                 }
                 break;
         }

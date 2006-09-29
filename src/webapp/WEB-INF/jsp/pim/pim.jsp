@@ -98,6 +98,9 @@ function init() {
               <span class="menuBarDivider">|</span>
               <c:url var="accountUrl" value="/console/account"/>
               <a href="${accountUrl}"><fmt:message key="Main.Account"/></a>
+              <span class="menuBarDivider">|</span>
+              <c:url var="calendarUrl" value="/pim/pim.page"/>
+              <a href="${calendarUrl}"><fmt:message key="Main.Calendar"/></a>
             </authz:authorize>
             <authz:authorize ifAllGranted="ROLE_ROOT">
               <span class="menuBarDivider">|</span>

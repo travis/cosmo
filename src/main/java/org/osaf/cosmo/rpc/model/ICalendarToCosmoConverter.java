@@ -45,6 +45,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.RecurrenceId;
 
 import org.osaf.cosmo.model.CalendarEventItem;
 
@@ -166,8 +167,8 @@ public class ICalendarToCosmoConverter {
         for (CalendarEventItem calendarEventItem : calendarEventItems) {
             net.fortuna.ical4j.model.Calendar calendar = null;
             try {
-            calendar = calendarEventItem.getCalendar();
-            } catch (Exception pe){
+                calendar = calendarEventItem.getCalendar();
+            } catch (Exception pe) {
                 throw new RuntimeException(pe);
             }
             ComponentList vevents = calendar.getComponents().getComponents(
@@ -354,6 +355,23 @@ public class ICalendarToCosmoConverter {
                     cosmoExceptionDates[x] = cosmoDate;
                 }
                 recurrenceRule.setExceptionDates(cosmoExceptionDates);
+            }
+        }
+        
+        //now deal with modifications
+        ComponentList vevents = calendar.getComponents().getComponents(
+                Component.VEVENT);
+        List<Modification> mods = new ArrayList<Modification>();
+        if (vevents != null){
+            for (int x = 0; x < vevents.size();x++){
+                VEvent curVEvent = (VEvent) vevents.get(x);
+                RecurrenceId recurrenceId = curVEvent.getReccurrenceId();
+                if (recurrenceId != null){
+                    Modification modification = new Modification();
+                    CosmoDate instanceDate = createScoobyDate(recurrenceId,  calendar);
+                    modification.setInstanceDate(instanceDate);
+                    mods.add(modification);
+                }
             }
         }
         

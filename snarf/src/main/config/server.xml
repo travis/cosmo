@@ -16,6 +16,9 @@
 
 <Server port="8005" shutdown="SHUTDOWN">
   <GlobalNamingResources>
+    <!-- Derby configuration 
+         The default configuration has Cosmo running against
+         and embedded Derby database -->
     <Resource name="osafsrv/db"
               type="javax.sql.DataSource"
               maxActive="100"
@@ -25,6 +28,21 @@
               password=""
               driverClassName="org.apache.derby.jdbc.EmbeddedDriver"
               url="jdbc:derby:db;create=true"/>
+    
+    <!-- MySQL configuration 
+         Comment the above Resource and uncomment the following
+         Resource to configure Cosmo to run against a MySQL DB   -->
+    <!-- 
+	<Resource name="osafsrv/db"
+             type="javax.sql.DataSource"
+             maxActive="100"
+             maxIdle="30"
+             maxWait="10000"
+             username="[user]"
+             password="[pass]"
+             driverClassName="com.mysql.jdbc.Driver"
+             url="jdbc:mysql://[server]:3306/[db]"/>
+    -->
     <Resource name="osafsrv/mail"
               type="javax.mail.Session"
               mail.transport.protocol="smtp"

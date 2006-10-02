@@ -126,6 +126,11 @@ public class MockSecurityContext implements CosmoSecurityContext {
             user = ((MockUserPrincipal) principal).getUser();
             admin = user.getAdmin().booleanValue();
         }
-        
+        else if (principal instanceof MockTicketPrincipal) {
+            ticket = ((MockTicketPrincipal) principal).getTicket();
+        }
+        else {
+            throw new RuntimeException("unknown principal type " + principal.getClass().getName());
+        }
     }
 }

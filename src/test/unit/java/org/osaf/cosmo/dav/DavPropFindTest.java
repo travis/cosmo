@@ -78,34 +78,42 @@ public class DavPropFindTest extends BaseDavServletTestCase
 
     /** */
     public void testPropFindTicketDiscoveryByTicket() throws Exception {
-//         HomeCollectionItem home = contentService.getRootItem(user);
+        // put 2 tickets on the resource, then log in with one of
+        // those tickets and make sure that only that ticket is
+        // returned 
 
-//         Ticket ticket = testHelper.makeDummyTicket();
-//         ticket.setOwner(user);
-//         contentService.createTicket(home, ticket);
+        HomeCollectionItem home = contentService.getRootItem(user);
 
-//         // XXX log in ticket
+        Ticket ticket1 = testHelper.makeDummyTicket();
+        ticket1.setOwner(user);
+        contentService.createTicket(home, ticket1);
 
-//         PropFindContent content = new PropFindContent();
-//         content.addPropertyName(TICKETDISCOVERY);
+        Ticket ticket2 = testHelper.makeDummyTicket();
+        ticket2.setOwner(user);
+        contentService.createTicket(home, ticket2);
 
-//         String path = toCanonicalPath("/");
-//         MockHttpServletRequest request = createMockRequest("PROPFIND", path);
-//         sendXmlRequest(request, content);
-//         MockHttpServletResponse response = new MockHttpServletResponse();
-//         servlet.service(request, response);
+        logInTicket(ticket1);
 
-//         assertEquals("PROPFIND did not return MultiStatus",
-//                      DavServletResponse.SC_MULTI_STATUS,
-//                      response.getStatus());
+        PropFindContent content = new PropFindContent();
+        content.addPropertyName(TICKETDISCOVERY);
 
-//         Set<TicketContent> contents =
-//             createTicketContents(readMultiStatusResponse(response),
-//                                  request.getRequestURL().toString());
-//         assertTrue("No tickets in response", ! contents.isEmpty());
-//         assertEquals("More than one ticket in response", contents.size(), 1);
-//         assertTicketEquality(ticket, contents.iterator().next(),
-//                              request.getRequestURL().toString());
+        String path = toCanonicalPath("/");
+        MockHttpServletRequest request = createMockRequest("PROPFIND", path);
+        sendXmlRequest(request, content);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals("PROPFIND did not return MultiStatus",
+                     DavServletResponse.SC_MULTI_STATUS,
+                     response.getStatus());
+
+        Set<TicketContent> contents =
+            createTicketContents(readMultiStatusResponse(response),
+                                 request.getRequestURL().toString());
+        assertTrue("No tickets in response", ! contents.isEmpty());
+        assertEquals("More than one ticket in response", contents.size(), 1);
+        assertTicketEquality(ticket1, contents.iterator().next(),
+                             request.getRequestURL().toString());
     }
 
     private void assertTicketEquality(Ticket ticket,

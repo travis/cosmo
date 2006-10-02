@@ -31,8 +31,10 @@ import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.mock.MockSecurityManager;
+import org.osaf.cosmo.security.mock.MockTicketPrincipal;
 import org.osaf.cosmo.security.mock.MockUserPrincipal;
 
 import org.springframework.mock.web.MockServletConfig;
@@ -81,6 +83,12 @@ public abstract class BaseMockServletTestCase extends TestCase {
      */
     protected void logInUser(User user) {
         securityManager.setUpMockSecurityContext(new MockUserPrincipal(user));
+    }
+
+    /**
+     */
+    protected void logInTicket(Ticket ticket) {
+        securityManager.setUpMockSecurityContext(new MockTicketPrincipal(ticket));
     }
 
     /**

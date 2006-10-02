@@ -18,6 +18,8 @@ package org.osaf.cosmo.rpc.model;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.PARAM_X_OSAF_ANYTIME;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
 import static org.osaf.cosmo.util.ICalendarUtils.getVTimeZone;
+import static org.osaf.cosmo.util.ICalendarUtils.getMasterEvent;
+import static org.osaf.cosmo.util.ICalendarUtils.hasProperty;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -56,7 +58,12 @@ import org.osaf.cosmo.model.CalendarEventItem;
  *
  */
 public class ICalendarToCosmoConverter {
-
+    public static final String EVENT_DESCRIPTION = "description";
+    public static final String EVENT_START = "start";
+    public static final String EVENT_END = "end";
+    public static final String EVENT_TITLE = "title";
+    public static final String EVENT_STATUS = "status";
+    
     /**
      * Garden variety no-arg contructor
      */
@@ -68,7 +75,7 @@ public class ICalendarToCosmoConverter {
      * Creates an Event from an iCalendar VEvent
      * @param vevent
      * @return
-     */
+     */ 
     public Event createEvent(String itemId, VEvent vevent, net.fortuna.ical4j.model.Calendar calendar){
         Event event = new Event();
         event.setId(itemId);
@@ -164,6 +171,8 @@ public class ICalendarToCosmoConverter {
             Collection<CalendarEventItem> calendarEventItems,
             DateTime startDate, DateTime endDate) {
         List<Event> events = new ArrayList<Event>();
+        
+        //iterate through all the CalendarEventItem's....
         for (CalendarEventItem calendarEventItem : calendarEventItems) {
             net.fortuna.ical4j.model.Calendar calendar = null;
             try {
@@ -171,14 +180,14 @@ public class ICalendarToCosmoConverter {
             } catch (Exception pe) {
                 throw new RuntimeException(pe);
             }
-            ComponentList vevents = calendar.getComponents().getComponents(
-                    Component.VEVENT);
-            for (Object o : vevents) {
-                VEvent vevent = (VEvent) o;
-                Event e = createEvent(calendarEventItem.getUid(), vevent, calendar);
-                if (hasProperty(vevent, Property.RRULE) ){
-                    List<Event> expandedEvents = expandEvent(e, vevent, calendar,
-                            startDate, endDate);
+            VEvent vevent = getMasterEvent(calendar);
+
+            if (vevent != null) {
+                Event e = createEvent(calendarEventItem.getUid(), vevent,
+                        calendar);
+                if (hasProperty(vevent, Property.RRULE)) {
+                    List<Event> expandedEvents = expandEvent(e, vevent,
+                            calendar, startDate, endDate);
                     events.addAll(expandedEvents);
                 } else {
                     events.add(e);
@@ -370,13 +379,48 @@ public class ICalendarToCosmoConverter {
                     Modification modification = new Modification();
                     CosmoDate instanceDate = createScoobyDate(recurrenceId,  calendar);
                     modification.setInstanceDate(instanceDate);
+                    Event modEvent = createEvent("", curVEvent, calendar);
+                    String[] modifiedProperties = getModifiedProprties(curVEvent, vevent);
+                    modification.setModifiedProperties(modifiedProperties);
+                    modification.setEvent(modEvent);
                     mods.add(modification);
                 }
             }
         }
         
+        recurrenceRule.setModifications(mods.toArray(new Modification[0]));
+        
         return recurrenceRule;
     }   
+   
+    private String[] getModifiedProprties(VEvent modifiedEvent, VEvent originalEvent) {
+        List<String> props = new ArrayList<String>();
+        addIfHasProperty(modifiedEvent, props, Property.DESCRIPTION, EVENT_DESCRIPTION);
+        addIfHasProperty(modifiedEvent, props, Property.SUMMARY, EVENT_TITLE);
+        addIfHasProperty(modifiedEvent, props, Property.STATUS, EVENT_STATUS);
+        
+        RecurrenceId recurrenceId = modifiedEvent.getReccurrenceId();
+        Date origStartDate = recurrenceId.getDate();
+        net.fortuna.ical4j.model.Date modStartDate = modifiedEvent.getStartDate().getDate();
+        if (!origStartDate.equals(modStartDate)){
+            props.add(EVENT_START);
+        }
+
+        net.fortuna.ical4j.model.Date origEndDate = originalEvent.getEndDate().getDate();
+        net.fortuna.ical4j.model.Date modEndDate = modifiedEvent.getEndDate().getDate();
+        if (!origEndDate.equals(modEndDate)){
+            props.add(EVENT_END);
+        }
+        
+        return props.toArray(new String[0]);
+    }
+    
+    private void addIfHasProperty(VEvent vEvent, List<String> propList, String iCalPropName,
+            String cosmoPropName) {
+        if (hasProperty(vEvent, iCalPropName)){
+            propList.add(cosmoPropName);
+        }
+    }
 
     /**
      * Returns true if the recurrence rule is not one that is able to be
@@ -450,10 +494,6 @@ public class ICalendarToCosmoConverter {
         return false;
     }
 
-    private boolean hasProperty(Component c, String propName){
-        PropertyList l = c.getProperties().getProperties(propName);
-        return l != null && l.size() > 0;
-    }
     
     private String getPropertyValue(Component component, String propertyName){
         Property property = component.getProperties().getProperty(propertyName);

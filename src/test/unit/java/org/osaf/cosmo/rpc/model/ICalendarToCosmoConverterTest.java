@@ -34,6 +34,7 @@ import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.Uid;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -237,6 +238,43 @@ public class ICalendarToCosmoConverterTest extends TestCase {
         List<Event> events = converter.expandEvent(e, vevent, c, rangeStart, rangeEnd);
         assertNotNull(events);
         assertEquals(8, events.size());
+    }
+    
+    public void testCreateVEventWithMinimalProperties(){
+        Calendar calendar = new Calendar();
+        VEvent vEvent = new VEvent();
+        DtStart dtStart = new DtStart(new Date());
+        Uid uid = new Uid("12345");
+        
+        calendar.getComponents().add(vEvent);
+        vEvent.getProperties().add(dtStart);
+        vEvent.getProperties().add(uid);
+
+        try {
+            converter.createEvent("xxx", vEvent, calendar);
+        } catch (Exception e){
+            fail(e.getLocalizedMessage());
+        }
+        
+    }
+    
+    public void testRecurringEventsWithModifiedInstances() throws Exception{
+        Event e = loadEventIcs("ical_instance_mods.ics", "123");
+        RecurrenceRule rr = e.getRecurrenceRule();
+        assertNotNull(rr);
+        assertEquals(2, rr.getModifications().length);
+        for (Modification modification : rr.getModifications()){
+            CosmoDate instanceDate = modification.getInstanceDate();
+            String[] modifiedProps  = modification.getModifiedProperties();
+            if (instanceDate.getDate() == 20){
+                assertEquals(1, modifiedProps.length);
+            } else {
+                assertEquals(21, instanceDate.getDate());
+                assertEquals(3, modifiedProps.length);
+            }
+        
+        
+        }
     }
     
     protected Event loadEventIcs(String name, String id) throws Exception {

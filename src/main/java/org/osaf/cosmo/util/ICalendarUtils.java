@@ -18,6 +18,7 @@ package org.osaf.cosmo.util;
 
 import java.net.URISyntaxException;
 import java.util.Calendar;
+import java.util.Iterator;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
@@ -137,7 +138,24 @@ public class ICalendarUtils {
         PropertyList l = c.getProperties().getProperties(propName);
         return l != null && l.size() > 0;
     }
-        
+       
+    
+    /**
+     * Returns the first master in the calendar - that is, one without a RECURRENCE-ID
+     * @param calendar
+     * @return
+     */
+    public static VEvent getMasterEvent(net.fortuna.ical4j.model.Calendar calendar){
+        ComponentList events = calendar.getComponents().getComponents(Component.VEVENT);
+        for (Iterator i = events.iterator();i.hasNext(); ){
+            VEvent vEvent = (VEvent) i.next();
+            if (!hasProperty(vEvent, Property.RECURRENCE_ID)){
+                return vEvent;
+            }
+        }
+        return null;
+    }
+    
     /**
      * Returns the "master" VEvent - one that does not have a RECURRENCE-ID
      * 

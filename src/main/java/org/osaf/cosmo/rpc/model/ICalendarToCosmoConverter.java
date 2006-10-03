@@ -17,11 +17,11 @@ package org.osaf.cosmo.rpc.model;
 
 import static org.osaf.cosmo.icalendar.ICalendarConstants.PARAM_X_OSAF_ANYTIME;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
+import static org.osaf.cosmo.util.ICalendarUtils.VEVENT_START_DATE_COMPARATOR;
 import static org.osaf.cosmo.util.ICalendarUtils.getDuration;
 import static org.osaf.cosmo.util.ICalendarUtils.getMasterEvent;
 import static org.osaf.cosmo.util.ICalendarUtils.getVTimeZone;
 import static org.osaf.cosmo.util.ICalendarUtils.hasProperty;
-import static org.osaf.cosmo.util.ICalendarUtils.VEVENT_START_DATE_COMPARATOR;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
@@ -112,17 +111,17 @@ public class ICalendarToCosmoConverter {
             // let's check for the X-OSAF-ANYTIME param first
             if (VALUE_TRUE.equals(getParameterValue(dtStart, PARAM_X_OSAF_ANYTIME))) {
                 event.setAnyTime(true);
-                event.setStart(createScoobyDate(dtStart, calendar));
+                event.setStart(createCosmoDate(dtStart, calendar));
             } else if (!startDateHasTime ) {
                 // the start is a DATE (not a DATE_TIME) so this must be an All
                 // Day event
                 event.setAllDay(true);
-                event.setStart(createScoobyDate(dtStart, calendar));   
+                event.setStart(createCosmoDate(dtStart, calendar));   
             } else {
              // the start is a DATE_TIME (not a DATE) so this must be a
                 // "point in time"
                 event.setPointInTime(true);
-                CosmoDate startAndEnd = createScoobyDate(dtStart, calendar); 
+                CosmoDate startAndEnd = createCosmoDate(dtStart, calendar); 
                 event.setStart(startAndEnd);
                 event.setEnd(startAndEnd);
             }
@@ -142,8 +141,8 @@ public class ICalendarToCosmoConverter {
                 endCalendar.setTime(vevent.getEndDate().getDate());
                 endCalendar.add(Calendar.DATE, -1);
                 endDate = new net.fortuna.ical4j.model.Date(endCalendar.getTimeInMillis());
-                event.setStart(createScoobyDate(dtStart, calendar));
-                event.setEnd(createScoobyDate((net.fortuna.ical4j.model.Date)endDate, calendar, null));
+                event.setStart(createCosmoDate(dtStart, calendar));
+                event.setEnd(createCosmoDate((net.fortuna.ical4j.model.Date)endDate, calendar, null));
                 
             } else {
                 startDate = new DateTime(dtStart.getDate());
@@ -158,8 +157,8 @@ public class ICalendarToCosmoConverter {
                     }
                 }
                 endDate = new DateTime(dtEnd.getDate());
-                event.setStart(createScoobyDate(dtStart, calendar));
-                event.setEnd(createScoobyDate(dtEnd, calendar));
+                event.setStart(createCosmoDate(dtStart, calendar));
+                event.setEnd(createCosmoDate(dtEnd, calendar));
             }
         }
         return event;
@@ -268,7 +267,7 @@ public class ICalendarToCosmoConverter {
                 instance.setAnyTime(event.isAnyTime());
                 instance.setInstance(true);
                 instance.setRecurrenceRule(event.getRecurrenceRule());
-                instance.setStart(createScoobyDate(instanceStartDate, calendar,
+                instance.setStart(createCosmoDate(instanceStartDate, calendar,
                         tzid));
                 if (event.getEnd() != null) {
                     if (event.isAllDay()) {
@@ -279,7 +278,7 @@ public class ICalendarToCosmoConverter {
                         endCalendar.add(Calendar.DATE, -1);
                         net.fortuna.ical4j.model.Date instanceEndDate = new net.fortuna.ical4j.model.Date(
                                 endCalendar.getTimeInMillis());
-                        event.setEnd(createScoobyDate(instanceEndDate,
+                        event.setEnd(createCosmoDate(instanceEndDate,
                                 calendar, null));
 
                     } else {
@@ -291,20 +290,53 @@ public class ICalendarToCosmoConverter {
                             if (masterTimezone != null) {
                                 endTime.setTimeZone(masterTimezone);
                             }
-                            instance.setEnd(createScoobyDate(endTime, calendar,
+                            instance.setEnd(createCosmoDate(endTime, calendar,
                                     tzid));
                         }
                     }
                 }
-
+                
+                //let's add any individual instance modifications that may exist
+                VEvent modificationVEvent = fetcher.getInstance(instanceStartDate);
+                if (modificationVEvent != null) {
+                    copyModifiedProperties(modificationVEvent, instance,
+                            calendar);
+                }
                 events.add(instance);
             }
         }
         return events;
     }
     
+    private void copyModifiedProperties(VEvent modificationVEvent,
+            Event instance, net.fortuna.ical4j.model.Calendar calendar) {
+        
+        //have to do DTSTART first, since others depend on it.
+        DtStart dtStart = (DtStart) modificationVEvent.getProperties().getProperty(Property.DTSTART);
+        if (dtStart != null){
+            instance.setStart(createCosmoDate(dtStart, calendar));
+        }
+        for (Object o : modificationVEvent.getProperties()) {
+            Property property = (Property) o;
+            if (property.getName().equals(Property.DTSTART)) {
+                continue;
+            } else if (property.getName().equals(Property.DTEND)) {
+                instance.setEnd(createCosmoDate((DtEnd) property, calendar));
+            } else if (property.getName().equals(Property.SUMMARY)) {
+                instance.setTitle(getPropertyValue(modificationVEvent,
+                        Property.SUMMARY));
+            } else if (property.getName().equals(Property.STATUS)){
+                instance.setStatus(getPropertyValue(modificationVEvent, Property.STATUS));
+            } else if (property.getName().equals(Property.DESCRIPTION)){
+                instance.setStatus(getPropertyValue(modificationVEvent, Property.DESCRIPTION));
+            } else if (property.getName().equals(Property.DURATION)){
+                
+            }
+        }
+    }
+
     private static class OverridingInstanceFetcher {
-//        private VEvent masterEvent = null;
+        private VEvent masterEvent = null;
         
         private Map<Long, VEvent> overrideMap = new HashMap<Long, VEvent>();
 
@@ -332,6 +364,8 @@ public class ICalendarToCosmoConverter {
                         overrideMap.put(recurrenceId.getDate().getTime(),
                                 vEvent);
                     }
+                } else {
+                    masterEvent = vEvent;
                 }
             }
             Collections.sort(thisAndFutures,VEVENT_START_DATE_COMPARATOR );
@@ -346,12 +380,12 @@ public class ICalendarToCosmoConverter {
                 net.fortuna.ical4j.model.Date insDate = curInstance.getReccurrenceId().getDate();
                 
                 if (insDate.equals(date)){
-                    copyComponents(curInstance, instance, date);
+                    copyProperties(curInstance, instance, date);
                     break;
                 }
                 
                 if (insDate.after(date)){
-                    copyComponents(curInstance, instance, date);
+                    copyProperties(curInstance, instance, date);
                     continue;
                 }
                 
@@ -363,12 +397,12 @@ public class ICalendarToCosmoConverter {
                 net.fortuna.ical4j.model.Date insDate = curInstance.getReccurrenceId().getDate();
                 
                 if (insDate.equals(date)){
-                    copyComponents(curInstance, instance, date);
+                    copyProperties(curInstance, instance, date);
                     break;
                 }
                 
                 if (insDate.before(date)){
-                    copyComponents(curInstance, instance, date);
+                    copyProperties(curInstance, instance, date);
                     continue;
                 }
                 
@@ -378,7 +412,7 @@ public class ICalendarToCosmoConverter {
             VEvent curInstance = overrideMap.get(date.getTime());
 
             if (curInstance != null){
-                copyComponents(curInstance, instance, date);
+                copyProperties(curInstance, instance, date);
             }
             
             if (instance.getProperties().size() == 0){
@@ -388,47 +422,48 @@ public class ICalendarToCosmoConverter {
             return instance;
         }
         
-        public void copyComponents(VEvent source, VEvent dest,
+        public void copyProperties(VEvent source, VEvent dest,
                 net.fortuna.ical4j.model.Date d) {
+            
+            //we must do DT_START, DT_END first, since DTEND relies on value of DTSTART.
+            DtStart dtStart = (DtStart) source.getProperties().getProperty(Property.DTSTART);
+            if (dtStart != null) {
+                if (!dtStart.getDate().equals(
+                        source.getReccurrenceId().getDate())) {
+                    net.fortuna.ical4j.model.Date newDate = ICalendarUtils.clone(d);
+                    long delta = dtStart.getDate().getTime()
+                            - source.getReccurrenceId().getDate().getTime();
+                    newDate.setTime(newDate.getTime() + delta);
+                    DtStart newDtStart = new DtStart(newDate);
+                    ICalendarUtils.addOrReplaceProperty(dest, newDtStart);
+                }
+            }
+
+            DtEnd sourceDtEnd= (DtEnd) source.getProperties().getProperty(Property.DTEND);
+            if (sourceDtEnd != null) {
+                DtStart sourceDtStart = (DtStart) source.getProperties()
+                        .getProperty(Property.DTSTART);
+                net.fortuna.ical4j.model.Date sourceStartDate = sourceDtStart
+                        .getDate();
+                net.fortuna.ical4j.model.Date sourceEndDate = sourceDtEnd
+                        .getDate();
+                long delta = sourceEndDate.getTime()
+                        - sourceStartDate.getTime();
+                    net.fortuna.ical4j.model.Date newEndDate = ICalendarUtils
+                            .clone(dest.getStartDate()  == null ? d : dest.getStartDate().getDate());
+                    newEndDate.setTime(newEndDate.getTime() + delta);
+                    DtEnd newDtEnd = new DtEnd(newEndDate);
+                    ICalendarUtils.addOrReplaceProperty(dest, newDtEnd);
+            }
+            
             for (Object o : source.getProperties()) {
                 Property p = (Property) o;
 
                 if (p.getName().equals(Property.RECURRENCE_ID)
                         || p.getName().equals(Property.UID)
-                        || p.getName().equals(Property.SEQUENCE)) {
-                    continue;
-                }
-
-                if (p.getName().equals(Property.DTSTART)) {
-                    DtStart dtStart = (DtStart) p;
-                    if (!dtStart.getDate().equals(
-                            source.getReccurrenceId().getDate())) {
-                        net.fortuna.ical4j.model.Date newDate = (net.fortuna.ical4j.model.Date) d
-                                .clone();
-                        long delta = dtStart.getDate().getTime()
-                                - source.getReccurrenceId().getDate().getTime();
-                        newDate.setTime(newDate.getTime() + delta);
-                        DtStart newDtStart = new DtStart(newDate);
-                        ICalendarUtils.addOrReplaceProperty(dest, newDtStart);
-                    }
-                    continue;
-                }
-
-                if (p.getName().equals(Property.DTEND)) {
-                    DtStart sourceDtStart = (DtStart) source.getProperties()
-                            .getProperty(Property.DTSTART);
-                    net.fortuna.ical4j.model.Date sourceStartDate = sourceDtStart
-                            .getDate();
-                    DtEnd sourceDtEnd = (DtEnd) p;
-                    net.fortuna.ical4j.model.Date sourceEndDate = sourceDtEnd
-                            .getDate();
-                    long delta = sourceEndDate.getTime()
-                            - sourceStartDate.getTime();
-                    net.fortuna.ical4j.model.Date newEndDate = (net.fortuna.ical4j.model.Date) d
-                            .clone();
-                    newEndDate.setTime(newEndDate.getTime() + delta);
-                    DtEnd newDtEnd = new DtEnd(newEndDate);
-                    ICalendarUtils.addOrReplaceProperty(dest, newDtEnd);
+                        || p.getName().equals(Property.SEQUENCE)
+                        || p.getName().equals(Property.DTSTART)
+                        || p.getName().equals(Property.DTEND)) {
                     continue;
                 }
                 
@@ -485,7 +520,7 @@ public class ICalendarToCosmoConverter {
                 tzIdValue = tzId.getValue();
             }
 
-            CosmoDate scoobyDate = createScoobyDate(until, calendar, tzIdValue);
+            CosmoDate scoobyDate = createCosmoDate(until, calendar, tzIdValue);
             recurrenceRule.setEndDate(scoobyDate);
 
         } else {
@@ -502,7 +537,7 @@ public class ICalendarToCosmoConverter {
                 for (int x = 0; x < dates.size(); x++) {
                     net.fortuna.ical4j.model.Date date = (net.fortuna.ical4j.model.Date) dates
                             .get(x);
-                    CosmoDate cosmoDate = createScoobyDate(date, calendar,
+                    CosmoDate cosmoDate = createCosmoDate(date, calendar,
                             tzIdValue);
                     cosmoExceptionDates[x] = cosmoDate;
                 }
@@ -520,7 +555,7 @@ public class ICalendarToCosmoConverter {
                 RecurrenceId recurrenceId = curVEvent.getReccurrenceId();
                 if (recurrenceId != null){
                     Modification modification = new Modification();
-                    CosmoDate instanceDate = createScoobyDate(recurrenceId,  calendar);
+                    CosmoDate instanceDate = createCosmoDate(recurrenceId,  calendar);
                     modification.setInstanceDate(instanceDate);
                     Event modEvent = createEvent("", curVEvent, calendar);
                     String[] modifiedProperties = getModifiedProprties(curVEvent, vevent);
@@ -544,16 +579,19 @@ public class ICalendarToCosmoConverter {
         
         RecurrenceId recurrenceId = modifiedEvent.getReccurrenceId();
         net.fortuna.ical4j.model.Date origStartDate = recurrenceId.getDate();
-        net.fortuna.ical4j.model.Date modStartDate = modifiedEvent.getStartDate().getDate();
-        if (!origStartDate.equals(modStartDate)){
+        net.fortuna.ical4j.model.Date modStartDate = modifiedEvent
+                .getStartDate().getDate();
+        if (!origStartDate.equals(modStartDate)) {
             props.add(EVENT_START);
         }
         
         long duration = getDuration(originalEvent);
-        net.fortuna.ical4j.model.Date origEndDate = (net.fortuna.ical4j.model.Date) origStartDate.clone();
+        net.fortuna.ical4j.model.Date origEndDate = (net.fortuna.ical4j.model.Date) ICalendarUtils
+                .clone(origStartDate);
         origEndDate.setTime(origEndDate.getTime() + duration);
-        net.fortuna.ical4j.model.Date modEndDate = modifiedEvent.getEndDate().getDate();
-        if (!origEndDate.equals(modEndDate)){
+        net.fortuna.ical4j.model.Date modEndDate = modifiedEvent.getEndDate()
+                .getDate();
+        if (!origEndDate.equals(modEndDate)) {
             props.add(EVENT_END);
         }
         
@@ -659,7 +697,7 @@ public class ICalendarToCosmoConverter {
     }
     
     
-    private CosmoDate createScoobyDate(net.fortuna.ical4j.model.Date date,
+    private CosmoDate createCosmoDate(net.fortuna.ical4j.model.Date date,
             net.fortuna.ical4j.model.Calendar calendar, String tzid) {
 
         CosmoDate scoobyDate = new CosmoDate();
@@ -705,10 +743,10 @@ public class ICalendarToCosmoConverter {
         return scoobyDate;
     }
     
-    private CosmoDate createScoobyDate(DateProperty dateProperty, 
+    private CosmoDate createCosmoDate(DateProperty dateProperty, 
             net.fortuna.ical4j.model.Calendar calendar){
         String tzid = getParameterValue(dateProperty, Parameter.TZID);
-        return createScoobyDate(dateProperty.getDate(), calendar, tzid);
+        return createCosmoDate(dateProperty.getDate(), calendar, tzid);
     }
     
     private boolean isUtc(net.fortuna.ical4j.model.Date date){

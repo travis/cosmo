@@ -294,13 +294,13 @@ public class ICalendarToCosmoConverterTest extends TestCase {
         List<Event> events = converter.expandEvent(e, vevent, c, rangeStart, rangeEnd);
         assertEquals(7, events.size());
 
-        /*Event titleChangeEvent = events.get(3);
+        Event titleChangeEvent = events.get(3);
         assertEquals("TitleChange",  titleChangeEvent.getTitle());
 
         Event titleChangeStartChangeEndChangeEvent = events.get(4);
         assertEquals("TitleChangeStartChangeEndChange",  titleChangeStartChangeEndChangeEvent.getTitle());
         assertEquals(30, titleChangeStartChangeEndChangeEvent.getStart().getMinutes());
-        assertEquals(30, titleChangeStartChangeEndChangeEvent.getEnd().getMinutes());*/
+        assertEquals(30, titleChangeStartChangeEndChangeEvent.getEnd().getMinutes());
     }
     
     protected Event loadEventIcs(String name, String id) throws Exception {

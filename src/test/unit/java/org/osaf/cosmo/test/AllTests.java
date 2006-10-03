@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.test;
 
+import org.osaf.cosmo.calendar.CalendarQueryFilterTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 

@@ -51,6 +51,11 @@
       <version>10.1.2.1</version>
     </dependency>
     <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.0.3</version>
+    </dependency>
+    <dependency>
       <groupId>org.osaf.cosmo</groupId>
       <artifactId>cosmo</artifactId>
       <!-- when you update this version, you must also update it in

@@ -6,9 +6,11 @@ WHAT IS THE SERVER BUNDLE?
 ==========================
 
 The OSAF Sever Bundle integrates the Cosmo and Scooby calendar
-application and server with the Tomcat servlet container and
-Jackrabbit content repository to provide an integrated, easy-to-run
-calendar server.
+application and server with the Tomcat servlet container and the
+Derby embedded database to provide an integrated, easy-to-run
+calendar server.  The server bundle also includes configuration
+options and the MySQL Connector/J JDBC driver to run Cosmo
+against a MySQL 5 database server.
 
 
 MORE INFO

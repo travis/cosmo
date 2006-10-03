@@ -255,6 +255,25 @@ public class ICalendarUtils {
        }
        else return 0;
    }
+
+   
+   /**
+    * This is here because the clone that comes with ical4j is broken - if you setTime() on
+    * the new object, the old object will be changed!
+    * 
+    * @param date
+    * @return
+    */
+   public static Date clone(Date date){
+       if (date instanceof DateTime){
+           DateTime dateTime = (DateTime) date;
+           DateTime newDateTime = new DateTime(dateTime.getTime());
+           newDateTime.setTimeZone(dateTime.getTimeZone());
+           return newDateTime;
+       }
+       Date newDate = new Date(date.getTime());
+       return newDate;
+   }
    
    public static Comparator<VEvent> VEVENT_START_DATE_COMPARATOR = new Comparator<VEvent>(){
 

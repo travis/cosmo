@@ -18,12 +18,14 @@ package org.osaf.cosmo.util;
 
 import java.net.URISyntaxException;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Iterator;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.ParameterFactoryImpl;
 import net.fortuna.ical4j.model.Property;
@@ -33,6 +35,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DateProperty;
+import net.fortuna.ical4j.model.property.Duration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -237,4 +240,40 @@ public class ICalendarUtils {
         }
         return null;
     }
+   
+   public static long getDuration(VEvent vevent){
+       Date startDate = vevent.getStartDate().getDate();
+       Duration d = (Duration) vevent.getProperties().getProperty(Property.DURATION);
+       if (d != null){
+           Dur dur = d.getDuration();
+           long endTime = dur.getTime(startDate).getTime();
+           return endTime - startDate.getTime();
+       }
+       Date endDate = vevent.getEndDate().getDate();
+       if (endDate != null){
+           return endDate.getTime() - startDate.getTime();
+       }
+       else return 0;
+   }
+   
+   public static Comparator<VEvent> VEVENT_START_DATE_COMPARATOR = new Comparator<VEvent>(){
+
+    public int compare(VEvent v1, VEvent v2) {
+        Date d1 = v1.getStartDate().getDate();
+        Date d2 = v2.getStartDate().getDate();
+        long t1 = d1.getTime();
+        long t2 = d2.getTime();
+        
+        if (t1 == t2){
+            return 0;
+        }
+        
+        if (t1 < t2){
+            return -1;
+        }
+        
+        return 1;
+    }
+       
+   };
 }

@@ -17,15 +17,21 @@ package org.osaf.cosmo.rpc.model;
 
 import static org.osaf.cosmo.icalendar.ICalendarConstants.PARAM_X_OSAF_ANYTIME;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
-import static org.osaf.cosmo.util.ICalendarUtils.getVTimeZone;
+import static org.osaf.cosmo.util.ICalendarUtils.getDuration;
 import static org.osaf.cosmo.util.ICalendarUtils.getMasterEvent;
+import static org.osaf.cosmo.util.ICalendarUtils.getVTimeZone;
 import static org.osaf.cosmo.util.ICalendarUtils.hasProperty;
+import static org.osaf.cosmo.util.ICalendarUtils.VEVENT_START_DATE_COMPARATOR;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
@@ -33,12 +39,12 @@ import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.Observance;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.parameter.Range;
 import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DateProperty;
@@ -50,6 +56,7 @@ import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 
 import org.osaf.cosmo.model.CalendarEventItem;
+import org.osaf.cosmo.util.ICalendarUtils;
 
 /**
  * An instance of this class is used to convert ICalendar 
@@ -200,6 +207,7 @@ public class ICalendarToCosmoConverter {
     public List<Event> expandEvent(Event event, VEvent vevent,
             net.fortuna.ical4j.model.Calendar calendar, DateTime rangeStart,
             DateTime rangeEnd) {
+        OverridingInstanceFetcher fetcher = new OverridingInstanceFetcher(calendar);
         Date masterStartDate = vevent.getStartDate().getDate();
 
         List<Event> events = new ArrayList<Event>();
@@ -293,6 +301,141 @@ public class ICalendarToCosmoConverter {
             }
         }
         return events;
+    }
+    
+    private static class OverridingInstanceFetcher {
+//        private VEvent masterEvent = null;
+        
+        private Map<Long, VEvent> overrideMap = new HashMap<Long, VEvent>();
+
+        private List<VEvent> thisAndFutures = new ArrayList<VEvent>();
+
+        private List<VEvent> thisAndPriors = new ArrayList<VEvent>();
+
+        public OverridingInstanceFetcher(
+                net.fortuna.ical4j.model.Calendar calendar) {
+            ComponentList vevents = calendar.getComponents().getComponents(
+                    Component.VEVENT);
+            for (Object o : vevents) {
+                VEvent vEvent = (VEvent) o;
+                RecurrenceId recurrenceId = vEvent.getReccurrenceId();
+                if (recurrenceId != null) {
+                    Range range = (Range) recurrenceId.getParameters()
+                            .getParameter(Parameter.RANGE);
+                    if (range != null) {
+                        if (range.getValue().equals(Range.THISANDFUTURE)) {
+                            thisAndFutures.add(vEvent);
+                        } else if (range.getValue().equals(Range.THISANDPRIOR)) {
+                            thisAndPriors.add(vEvent);
+                        }
+                    } else {
+                        overrideMap.put(recurrenceId.getDate().getTime(),
+                                vEvent);
+                    }
+                }
+            }
+            Collections.sort(thisAndFutures,VEVENT_START_DATE_COMPARATOR );
+            Collections.sort(thisAndPriors, VEVENT_START_DATE_COMPARATOR);
+        }
+        
+        public VEvent getInstance(net.fortuna.ical4j.model.Date date){
+            VEvent instance = new VEvent();
+            
+            for (int x = thisAndPriors.size() - 1; x >=0; x--){
+                VEvent curInstance = thisAndPriors.get(x);
+                net.fortuna.ical4j.model.Date insDate = curInstance.getReccurrenceId().getDate();
+                
+                if (insDate.equals(date)){
+                    copyComponents(curInstance, instance, date);
+                    break;
+                }
+                
+                if (insDate.after(date)){
+                    copyComponents(curInstance, instance, date);
+                    continue;
+                }
+                
+                break;
+            }
+            
+            for (int x = 0; x < thisAndFutures.size();x++){
+                VEvent curInstance = thisAndPriors.get(x);
+                net.fortuna.ical4j.model.Date insDate = curInstance.getReccurrenceId().getDate();
+                
+                if (insDate.equals(date)){
+                    copyComponents(curInstance, instance, date);
+                    break;
+                }
+                
+                if (insDate.before(date)){
+                    copyComponents(curInstance, instance, date);
+                    continue;
+                }
+                
+                break;
+            }
+            
+            VEvent curInstance = overrideMap.get(date.getTime());
+
+            if (curInstance != null){
+                copyComponents(curInstance, instance, date);
+            }
+            
+            if (instance.getProperties().size() == 0){
+                instance = null;
+            }
+            
+            return instance;
+        }
+        
+        public void copyComponents(VEvent source, VEvent dest,
+                net.fortuna.ical4j.model.Date d) {
+            for (Object o : source.getProperties()) {
+                Property p = (Property) o;
+
+                if (p.getName().equals(Property.RECURRENCE_ID)
+                        || p.getName().equals(Property.UID)
+                        || p.getName().equals(Property.SEQUENCE)) {
+                    continue;
+                }
+
+                if (p.getName().equals(Property.DTSTART)) {
+                    DtStart dtStart = (DtStart) p;
+                    if (!dtStart.getDate().equals(
+                            source.getReccurrenceId().getDate())) {
+                        net.fortuna.ical4j.model.Date newDate = (net.fortuna.ical4j.model.Date) d
+                                .clone();
+                        long delta = dtStart.getDate().getTime()
+                                - source.getReccurrenceId().getDate().getTime();
+                        newDate.setTime(newDate.getTime() + delta);
+                        DtStart newDtStart = new DtStart(newDate);
+                        ICalendarUtils.addOrReplaceProperty(dest, newDtStart);
+                    }
+                    continue;
+                }
+
+                if (p.getName().equals(Property.DTEND)) {
+                    DtStart sourceDtStart = (DtStart) source.getProperties()
+                            .getProperty(Property.DTSTART);
+                    net.fortuna.ical4j.model.Date sourceStartDate = sourceDtStart
+                            .getDate();
+                    DtEnd sourceDtEnd = (DtEnd) p;
+                    net.fortuna.ical4j.model.Date sourceEndDate = sourceDtEnd
+                            .getDate();
+                    long delta = sourceEndDate.getTime()
+                            - sourceStartDate.getTime();
+                    net.fortuna.ical4j.model.Date newEndDate = (net.fortuna.ical4j.model.Date) d
+                            .clone();
+                    newEndDate.setTime(newEndDate.getTime() + delta);
+                    DtEnd newDtEnd = new DtEnd(newEndDate);
+                    ICalendarUtils.addOrReplaceProperty(dest, newDtEnd);
+                    continue;
+                }
+                
+                ICalendarUtils.addOrReplaceProperty(dest, p);
+            }
+        }
+
     }
 
     private RecurrenceRule createRecurrenceRule(RRule rrule, DtStart dtStart, VEvent vevent,
@@ -400,13 +543,15 @@ public class ICalendarToCosmoConverter {
         addIfHasProperty(modifiedEvent, props, Property.STATUS, EVENT_STATUS);
         
         RecurrenceId recurrenceId = modifiedEvent.getReccurrenceId();
-        Date origStartDate = recurrenceId.getDate();
+        net.fortuna.ical4j.model.Date origStartDate = recurrenceId.getDate();
         net.fortuna.ical4j.model.Date modStartDate = modifiedEvent.getStartDate().getDate();
         if (!origStartDate.equals(modStartDate)){
             props.add(EVENT_START);
         }
-
-        net.fortuna.ical4j.model.Date origEndDate = originalEvent.getEndDate().getDate();
+        
+        long duration = getDuration(originalEvent);
+        net.fortuna.ical4j.model.Date origEndDate = (net.fortuna.ical4j.model.Date) origStartDate.clone();
+        origEndDate.setTime(origEndDate.getTime() + duration);
         net.fortuna.ical4j.model.Date modEndDate = modifiedEvent.getEndDate().getDate();
         if (!origEndDate.equals(modEndDate)){
             props.add(EVENT_END);

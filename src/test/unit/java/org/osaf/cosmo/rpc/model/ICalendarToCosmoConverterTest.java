@@ -21,7 +21,10 @@ import static org.osaf.cosmo.util.ICalendarUtils.getFirstEvent;
 import static org.osaf.cosmo.util.ICalendarUtils.setDate;
 import static org.osaf.cosmo.util.ICalendarUtils.setDateTime;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 import net.fortuna.ical4j.model.Calendar;
@@ -39,6 +42,7 @@ import net.fortuna.ical4j.model.property.Uid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.util.ICalendarUtils;
 
 
 public class ICalendarToCosmoConverterTest extends TestCase {
@@ -255,11 +259,13 @@ public class ICalendarToCosmoConverterTest extends TestCase {
         } catch (Exception e){
             fail(e.getLocalizedMessage());
         }
-        
     }
     
     public void testRecurringEventsWithModifiedInstances() throws Exception{
-        Event e = loadEventIcs("ical_instance_mods.ics", "123");
+        Calendar c = testHelper.loadIcs("ical_instance_mods.ics");
+        VEvent vevent = ICalendarUtils.getMasterEvent(c);
+        Event e = converter.createEvent("1234556", vevent, c);
+        
         RecurrenceRule rr = e.getRecurrenceRule();
         assertNotNull(rr);
         assertEquals(2, rr.getModifications().length);
@@ -267,14 +273,34 @@ public class ICalendarToCosmoConverterTest extends TestCase {
             CosmoDate instanceDate = modification.getInstanceDate();
             String[] modifiedProps  = modification.getModifiedProperties();
             if (instanceDate.getDate() == 20){
+                //for this event, only the title was changed, so we should see "1" modified property.
                 assertEquals(1, modifiedProps.length);
             } else {
+                //for this event the title was modified, and we changed the start time and end time
                 assertEquals(21, instanceDate.getDate());
                 assertEquals(3, modifiedProps.length);
+                Set<String> s = new HashSet<String>(Arrays.asList(modifiedProps));
+                assertTrue(s.contains("start"));
+                assertTrue(s.contains("end"));
+                assertTrue(s.contains("title"));
             }
-        
-        
         }
+        
+        //let's see if this event expands out properly
+        VTimeZone vTimeZone = (VTimeZone) c.getComponents().getComponent(Component.VTIMEZONE);
+        TimeZone timezone = new TimeZone (vTimeZone);
+        DateTime rangeStart = new DateTime("20060917T000000", timezone);
+        DateTime rangeEnd   = new DateTime("20060924T000000", timezone);
+        List<Event> events = converter.expandEvent(e, vevent, c, rangeStart, rangeEnd);
+        assertEquals(7, events.size());
+
+        /*Event titleChangeEvent = events.get(3);
+        assertEquals("TitleChange",  titleChangeEvent.getTitle());
+
+        Event titleChangeStartChangeEndChangeEvent = events.get(4);
+        assertEquals("TitleChangeStartChangeEndChange",  titleChangeStartChangeEndChangeEvent.getTitle());
+        assertEquals(30, titleChangeStartChangeEndChangeEvent.getStart().getMinutes());
+        assertEquals(30, titleChangeStartChangeEndChangeEvent.getEnd().getMinutes());*/
     }
     
     protected Event loadEventIcs(String name, String id) throws Exception {

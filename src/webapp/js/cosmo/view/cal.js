@@ -20,6 +20,8 @@ cosmo.view.cal = new function() {
     
     var self = this;
     
+    // Saving changes
+    // =========================
     function saveEventChangesConfirm(ev) {
         // Recurrence
         if (ev.data.masterEvent || ev.data.instance) {
@@ -108,9 +110,6 @@ cosmo.view.cal = new function() {
             }
             // Otherwise update display
             else {
-                // Update the detail form
-                Cal.calForm.updateFromEvent(saveEv);
-                
                 // Re-enable user input on this event
                 saveEv.setInputDisabled(false);
                 
@@ -130,16 +129,131 @@ cosmo.view.cal = new function() {
         Cal.serv.resetServiceAccessTime();
     };
     
+    // Remove
+    // =========================
+    function removeEventConfirm(ev) {
+        var str = '';
+        // Recurrence
+        if (ev.data.masterEvent || ev.data.instance) {
+            str = 'removeRecurConfirm';
+        }
+        else {
+            str = 'removeConfirm';
+        }
+        Cal.showDialog(cosmo.view.cal.dialog.getProps(str));
+    };
+    function removeEvent(ev) {
+        doRemove(ev);
+        
+        // No currently selected event
+        cosmo.view.cal.canvas.selectedEvent = null;
+        
+        // Kill any confirmation dialog that might be showing
+        if (Cal.dialog.isDisplayed) {
+            Cal.hideDialog();
+        }
+    };
+    function doRemove(ev) {
+        var f = function(newEvId, err, reqId) { 
+            handleRemoveResult(ev, newEvId, err, reqId); };
+        var requestId = Cal.serv.removeEvent(
+            f, Cal.currentCalendar.path, ev.data.id);
+    };
+    function handleRemoveResult(ev, newEvId, err, reqId) {
+        var removeEv = ev;
+        // Simple error message to go along with details from Error obj
+        var errMsg = getText('Main.Error.EventRemoveFailed');
+        if (err) {
+            Cal.showErr(errMsg, err);
+        }
+        else {
+            // Remove all the client-side stuff associated with this event
+            Cal.removeCalEventFromCanvas(removeEv);
+        }
+        
+        // Update entire display of events
+        Cal.updateEventsDisplay();
+        
+        // Broadcast success
+        dojo.event.topic.publish('/calEvent', { 'action': 'removeSuccess', 
+            'data': removeEv });
+        
+        // Resets local timer for timeout -- we know server-side
+        // session has been refreshed
+        // ********************
+        // BANDAID: need to move this into the actual Service call
+        // ********************
+        Cal.serv.resetServiceAccessTime();
+    };
+    
+    // Public attributes
+    // ********************
+    // List of currently displayed events
+    this.eventRegistry = new Hash();
+    // Options for saving/removing recurring events
+    this.recurringEventOptions = {
+        ALL_EVENTS: 'allEvents',
+        ALL_FUTURE_EVENTS: 'allFuture',
+        ONLY_THIS_EVENT: 'onlyThis'
+    };
+    
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function(cmd) {
+        var opts = self.recurringEventOptions;
         var act = cmd.action;
+        var qual = cmd.qualifier || null;
         var ev = cmd.data;
         switch (act) {
             case 'saveConfirm':
                 saveEventChangesConfirm(ev);
                 break;
             case 'save':
-                saveEventChanges(ev);
+                // Recurring event
+                if (qual) {
+                    switch(qual) {
+                        case opts.ALL_EVENTS:
+                            
+                            break;
+                        case opts.ALL_FUTURE_EVENTS:
+                            
+                            break;
+                        case opts.ONLY_THIS_EVENT:
+                            
+                            break;
+                        default:
+                            // Do nothing
+                            break;
+                    }
+                }
+                // Normal one-shot event
+                else {
+                    saveEventChanges(ev);
+                }
+                break;
+            case 'removeConfirm':
+                removeEventConfirm(ev);
+                break;
+            case 'remove':
+                if (qual) {
+                    switch(qual) {
+                        case opts.ALL_EVENTS:
+                            
+                            break;
+                        case opts.ALL_FUTURE_EVENTS:
+                            
+                            break;
+                        case opts.ONLY_THIS_EVENT:
+                            
+                            break;
+                        default:
+                            // Do nothing
+                            break;
+                    }
+                }
+                // Normal one-shot event
+                else {
+                    removeEvent(ev);
+                }
                 break;
         }
     };

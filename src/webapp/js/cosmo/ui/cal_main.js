@@ -571,9 +571,8 @@ var Cal = new function() {
         // Update the block
         // ================================
         if (block.insert(id)) { // Insert the block on the view
-            cosmo.view.cal.canvas.selectedEvent = ev;
-            // Save on the backend if it's a new event
-            ev.remoteSaveMain();
+            // Save new event
+            dojo.event.topic.publish('/calEvent', { 'action': 'save', 'data': ev })
         }
         return Cal.eventRegistry.getItem(id);
     };
@@ -612,22 +611,6 @@ var Cal = new function() {
     // ==========================
     // Saving and removing events
     // ==========================
-    /**
-     * Called when the user clicks the 'Remove' button from the confirmation
-     * dialog box for removal -- calls removeCalEventFromCanvas which removes the event
-     * FIXME: Use topics
-     */
-    this.removeCalEvent = function() {
-        // Use asolute references to Cal instead of 'this'
-        // because this method is called from Button context
-        cosmo.view.cal.canvas.getSelectedEvent().remove();
-        // Clear out the data in the event detail form
-        Cal.calForm.clear();
-        // No currently selected event
-        cosmo.view.cal.canvas.selectedEvent = null;
-        // Dissapear the dialog
-        Cal.hideDialog();
-    };
     /**
      * Removes a cal event from the canvas -- called in three cases:
      * (1) Actually removing an event from the calendar (this gets

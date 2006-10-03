@@ -41,6 +41,10 @@ function Dialog() {
     this.type = '',
     // Whether or not the dialog box is currently showing
     this.isDisplayed = false,
+    // Size of the box -- default to app's DIALOG_BOX_WIDTH and
+    // DIALOG_BOX_HEIGHT
+    this.width = null;
+    this.height = null;
     // Text of the message displayed in the dialog
     this.msg = '',
     // Arrays of Button objects -- left ones cluster on the 
@@ -66,6 +70,8 @@ function Dialog() {
         this.btnsCenter = btnsCenter ? btnsCenter : this.btnsCenter;
         this.btnsRight = btnsRight ? btnsRight : this.btnsRight;
         this.msg = display ? display : this.msg;
+        this.width = this.width || DIALOG_BOX_WIDTH;
+        this.height = this.height || DIALOG_BOX_HEIGHT;
         this.create();
     };
     /**
@@ -76,6 +82,8 @@ function Dialog() {
     this.hide = function() {
         this.destroy();
         this.clearButtons();
+        this.width = null;
+        this.height = null;
         this.defaultAction = null;
     };
     /**
@@ -99,8 +107,10 @@ function Dialog() {
         
         dia.id = 'fauxPopDiv';
         // Center the dialog in the window
-        dia.style.left = parseInt((winwidth-DIALOG_BOX_WIDTH)/2) + 'px';
-        dia.style.top = parseInt((winheight-DIALOG_BOX_HEIGHT)/2) + 'px';
+        dia.style.width = parseInt(this.width) + 'px';
+        dia.style.height = parseInt(this.height) + 'px';
+        dia.style.left = parseInt((winwidth - this.width)/2) + 'px';
+        dia.style.top = parseInt((winheight - this.height)/2) + 'px';
         dcontent.id = 'fauxPopContentDiv';
         dtext.id = 'fauxPopTextDiv';
         dtext.innerHTML = this.msg;

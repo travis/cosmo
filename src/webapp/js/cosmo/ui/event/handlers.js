@@ -276,8 +276,9 @@ function keyUpHandler(e) {
                 if (selEv && 
                     !selEv.getInputDisabled() && 
                     !Cal.calForm.detailTextInputHasFocus) {
-                    Cal.showDialog(
-                        cosmo.view.cal.dialog.getProps('removeConfirm'));
+                    dojo.event.topic.publish('/calEvent', { 'action': 'removeConfirm', 'data': selEv });
+                    //Cal.showDialog(
+                    //    cosmo.view.cal.dialog.getProps('removeConfirm'));
                 }
                 break;
         }

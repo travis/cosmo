@@ -516,8 +516,6 @@ $smButtonHeight = 18px
 /* Main box for fake popup */
 #fauxPopDiv { 
     position:absolute; 
-    width:360px;
-    height:280px;
     background:$mainUIColor; 
     border:1px solid $uiDetailBorderColor;
     z-index:2000; 

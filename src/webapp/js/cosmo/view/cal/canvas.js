@@ -41,9 +41,26 @@ cosmo.view.cal.canvas = new function() {
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function(cmd) {
         var act = cmd.action;
+        var ev = cmd.data;
         switch (act) {
             case 'setSelected':
-                setSelectedEvent(cmd.data);
+                setSelectedEvent(ev);
+                break;
+            case 'save':
+                setSelectedEvent(ev);
+                break; 
+            case 'saveSuccess':
+                // Changes have placed the saved event off-canvas
+                if (cmd.qualifier == 'offCanvas') {
+                    setSelectedEvent(null);
+                }
+                // Saved event is still in view
+                else {
+                    setSelectedEvent(ev);
+                }
+                break;
+            default:
+                // Do nothing
                 break;
         }
     };

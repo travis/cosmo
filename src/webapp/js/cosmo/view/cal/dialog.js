@@ -20,38 +20,65 @@ cosmo.view.cal.dialog = new function() {
     
     var self = this;
     var props = {}; // Props for each modal dialog
+    var opts = cosmo.view.cal.recurringEventOptions;
     
     props.removeConfirm = {
         'type': Cal.dialog.CONFIRM,
         'btnsLeft': [new Button('cancelButtonDialog', 74, Cal.hideDialog,
             getText('App.Button.Cancel'), true)],
-        'btnsRight': [new Button('removeButtonDialog', 74, Cal.removeCalEvent,
+        'btnsRight': [new Button('removeButtonDialog', 74, function() { doPublish('remove'); },
             getText('App.Button.Remove'), true)],
-        'defaultAction': Cal.removeCalEvent,
+        'defaultAction': function() { doPublish('remove'); },
         'msg': getText('Main.Prompt.EventRemoveConfirm')
+    };
+    props.removeRecurConfirm = {
+        'type': Cal.dialog.CONFIRM,
+        'btnsLeft': [new Button('cancelButtonDialog', 74, Cal.hideDialog,
+            getText('App.Button.Cancel'), true)],
+        'btnsRight': [
+            new Button('allButtonDialog', 84, 
+                function() { doPublish('remove', opts.ALL_EVENTS); }, 'All Events', true), 
+            new Button('allFutureButtonDialog', 120, 
+                function() { doPublish('remove', opts.ALL_FUTURE_EVENTS); }, 'All Future Events', true),
+            new Button('onlyThisButtonDialog', 120, 
+                function() { doPublish('remove', opts.ONLY_THIS_EVENT); }, 'Only This Event', true)
+            ],
+        'defaultAction': function() {},
+        'width': 480,
+        'msg': 'This is a recurring event. Which occurrences do you wish to delete?'
     };
     props.saveRecurConfirm = {
         'type': Cal.dialog.CONFIRM,
         'btnsLeft': [new Button('cancelButtonDialog', 74, 
             function() { doEvMethod('cancelSave') },
             getText('App.Button.Cancel'), true)],
-        'btnsRight': [new Button('saveButtonDialog', 74, 
-            function() { doPublish('save'); },
-            getText('App.Button.Save'), true)],
-        'defaultAction': function() { doPublish('save'); },
-        'msg': 'This is a recurring event. Editing recurring events is not supported in Cosmo,' +
-            ' and will probably have effects you do not intend.<br/>&nbsp;<br/>Save this change?'
+        'btnsRight': [
+            new Button('allButtonDialog', 84, 
+                function() { doPublish('save', opts.ALL_EVENTS); }, 'All Events', true), 
+            new Button('allFutureButtonDialog', 120, 
+                function() { doPublish('save', opts.ALL_FUTURE_EVENTS); }, 'All Future Events', true),
+            new Button('onlyThisButtonDialog', 120, 
+                function() { doPublish('save', opts.ONLY_THIS_EVENT); }, 'Only This Event', true)
+            ],
+        'defaultAction': function() {},
+        'width': 480,
+        'msg': 'This is a recurring event. Which occurrences do you wish to change?'
     };
     
+    // Publish via topics
+    function doPublish(act, qual) {
+        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        var obj = {};
+        obj.action = act; // Action to publish
+        obj.data = selEv || null; // Selected cal event to act on
+        if (qual) { obj.qualifier = qual; } // Action qualifier
+        dojo.event.topic.publish('/calEvent', obj);
+    }
     // Call a method on the currently selected event
     // FIXME: Use topics
     function doEvMethod(key) {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
         selEv[key]();
-    }
-    function doPublish(act) {
-        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
-        dojo.event.topic.publish('/calEvent', { 'action': act, 'data': selEv });
     }
     
     // Public methods

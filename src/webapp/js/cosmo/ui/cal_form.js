@@ -33,7 +33,7 @@ function CalForm() {
     
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     
-    function saveCalEvent(evParam) {
+    function saveCalEvent() {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
         // Give timeout check in onclick handler a chance to work
         if (Cal.isTimedOut()) {
@@ -45,12 +45,18 @@ function CalForm() {
         if (self.updateEvent(selEv)) {
             // Save the changes to the backend -- handler for remote save
             // process will update block position and size
-            //selEvent.remoteSaveMain();
             // ==========================
             dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'data': selEv });
         }
     };
-
+    
+    function removeCalEvent() {
+        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        if (Cal.isTimedOut()) {
+            return false;
+        }
+        dojo.event.topic.publish('/calEvent', { 'action': 'removeConfirm', 'data': selEv });
+    }
     
     this.handlePub = function(cmd) {
         var act = cmd.action;
@@ -63,12 +69,15 @@ function CalForm() {
                 self.setButtons(true, true);
                 break;
             case 'saveSuccess':
-                if (cmd.qualifier == 'onCanvas') {
-                    self.setButtons(true, true);
-                }
-                else {
+                // Changes have placed the saved event off-canvas
+                if (cmd.qualifier == 'offCanvas') {
                     self.setButtons(false, false);
                     self.clear();
+                }
+                // Saved event is still in view
+                else {
+                    self.updateFromEvent(ev);
+                    self.setButtons(true, true);
                 }
                 break;
             case 'saveFailed':
@@ -395,8 +404,6 @@ function CalForm() {
      * Set up the buttons for the form -- called initially on setup
      * Also called when editing/removing events to toggle button state
      * to enabled/disabled appropriately
-     * TO-DO: The two params should probably be for *enabling*
-     * so that (true, true) means the button are turned on
      */
     this.setButtons = function(enableRemove, enableSave) {
         var butRemove = null;
@@ -408,8 +415,7 @@ function CalForm() {
         }
         else {
             butRemove = new Button('removeButton', 74,
-                function() { Cal.showDialog(cosmo.view.cal.dialog.getProps('removeConfirm')); }, 
-                getText('App.Button.Remove'));
+                removeCalEvent, getText('App.Button.Remove'));
         }
         if (!enableSave) {
             butSave = new Button('savebutton', 74, null,

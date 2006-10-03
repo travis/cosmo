@@ -121,6 +121,9 @@ public interface CaldavConstants {
     /** The CalDAV property name CALDAV:calendar-home-set */
     public static final String PROPERTY_CALDAV_CALENDAR_HOME_SET =
         "calendar-home-set";
+    /** The CalDAV property name CALDAV:max-resource-size */
+    public static final String PROPERTY_CALDAV_MAX_RESOURCE_SIZE =
+        "max-resource-size";
 
     /** The CalDAV property CALDAV:calendar-data */
     public static final DavPropertyName CALENDARDATA =
@@ -145,5 +148,9 @@ public interface CaldavConstants {
     /** The CalDAV property CALDAV:calendar-home-set */
     public static final DavPropertyName CALENDARHOMESET =
         DavPropertyName.create(PROPERTY_CALDAV_CALENDAR_HOME_SET,
+                               NAMESPACE_CALDAV);
+    /** The CalDAV property CALDAV:max-resource-size */
+    public static final DavPropertyName MAXRESOURCESIZE =
+        DavPropertyName.create(PROPERTY_CALDAV_MAX_RESOURCE_SIZE,
                                NAMESPACE_CALDAV);
 }

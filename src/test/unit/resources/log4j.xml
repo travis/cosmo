@@ -42,10 +42,9 @@
   </logger>
 
   <logger name="org.osaf">
-    <level value="WARN"/>
-  </logger>
-
-  <logger name="org.osaf.cosmo.cmp.CmpServlet">
+<!--
+    <level value="DEBUG"/>
+-->
     <level value="ERROR"/>
   </logger>
 

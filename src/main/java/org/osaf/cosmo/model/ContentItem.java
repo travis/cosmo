@@ -40,6 +40,10 @@ public class ContentItem extends Item {
     public static final String ATTR_CONTENT_DATA = "content:data";
     public static final String ATTR_CONTENT_LENGTH = "content:length";
 
+    // max content size is smaller than binary attribute value max
+    // size
+    public static final long MAX_CONTENT_SIZE = 10 * 1024 * 1024;
+
     public ContentItem() {
     }
 
@@ -48,6 +52,8 @@ public class ContentItem extends Item {
     }
 
     public void setContent(byte[] content) {
+        if (content.length > MAX_CONTENT_SIZE)
+            throw new DataSizeException("Item content too large");
         setAttribute(ATTR_CONTENT_DATA, content);
     }
 

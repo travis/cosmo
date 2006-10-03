@@ -60,6 +60,7 @@ import org.osaf.cosmo.dav.caldav.report.QueryReport;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.util.PathUtil;
@@ -295,7 +296,6 @@ public class DavCollection extends DavResourceBase {
                 log.debug("creating calendar collection " +
                           member.getResourcePath());
 
-            // XXX: what exceptions need to be caught?
             subcollection = getContentService().
                 createCalendar(collection, subcollection);
             member.setItem(subcollection);
@@ -305,7 +305,6 @@ public class DavCollection extends DavResourceBase {
             if (log.isDebugEnabled())
                 log.debug("creating collection " + member.getResourcePath());
 
-            // XXX: what exceptions need to be caught?
             subcollection = getContentService().
                 createCollection(collection, subcollection);
             member.setItem(subcollection);
@@ -320,7 +319,6 @@ public class DavCollection extends DavResourceBase {
         CollectionItem collection = (CollectionItem) getItem();
         ContentItem content = (ContentItem) member.getItem();
 
-        // XXX: what exceptions need to be caught?
         if (content.getId() != -1) {
             if (log.isDebugEnabled())
                 log.debug("updating file " + member.getResourcePath());
@@ -329,7 +327,7 @@ public class DavCollection extends DavResourceBase {
         } else {
             if (log.isDebugEnabled())
                 log.debug("creating file " + member.getResourcePath());
-            
+
             content =
                 getContentService().createContent(collection, content);
         }
@@ -353,7 +351,6 @@ public class DavCollection extends DavResourceBase {
                           subcollection.getName() +
                           " from " + collection.getName());
 
-            // XXX: what exceptions need to be caught?
             getContentService().removeCalendar(subcollection);
         } else {
             CollectionItem subcollection = (CollectionItem) member.getItem();
@@ -362,7 +359,6 @@ public class DavCollection extends DavResourceBase {
                 log.debug("removing collection " + subcollection.getName() +
                           " from " + collection.getName());
 
-            // XXX: what exceptions need to be caught?
             getContentService().removeCollection(subcollection);
         }
     }
@@ -375,7 +371,6 @@ public class DavCollection extends DavResourceBase {
         CollectionItem collection = (CollectionItem) getItem();
         ContentItem content = (ContentItem) member.getItem();
 
-        // XXX: what exceptions need to be caught?
         if (log.isDebugEnabled())
             log.debug("removing content " + content.getName() +
                       " from " + collection.getName());
@@ -411,7 +406,7 @@ public class DavCollection extends DavResourceBase {
                     createResource(memberLocator, getSession(), memberItem);
                 members.add(member);
             } catch (DavException e) {
-                // XXX should never happen
+                // should never happen
                 log.error("error loading member resource for item " +
                           memberItem.getName() + " in collection " +
                           getResourcePath(), e);
@@ -438,7 +433,7 @@ public class DavCollection extends DavResourceBase {
 
             members.add(member);
         } catch (DavException e) {
-            // XXX should never happen
+            // should never happen
             log.error("error stashing member resource for item " +
                       memberItem.getName() + " in collection " +
                       getResourcePath(), e);

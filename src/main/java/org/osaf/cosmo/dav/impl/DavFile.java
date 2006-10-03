@@ -47,6 +47,7 @@ import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 
 import org.apache.log4j.Logger;
 
+import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.ModelValidationException;
@@ -211,36 +212,49 @@ public class DavFile extends DavResourceBase {
     }
 
     /** */
-    protected void populateItem(InputContext inputContext) {
+    protected void populateItem(InputContext inputContext)
+        throws DavException {
         super.populateItem(inputContext);
 
         ContentItem content = (ContentItem) getItem();
 
         if (inputContext.hasStream()) {
-            // XXX: need better exception handling
             try {
                 // XXX: read to tmp file, checking bytes read against
                 // content length
                 content.setContent(inputContext.getInputStream());
-                content.setContentLength(new Long(inputContext.getContentLength()));
             } catch (IOException e) {
                 throw new RuntimeException("cannot read input stream", e);
+            } catch (DataSizeException e) {
+                throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource content: " + e.getMessage());
+            }
+
+            try {
+                content.setContentLength(new Long(inputContext.getContentLength()));
+            } catch (ClassCastException e) {
+                throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Provided content length is not an integer");
+            } catch (DataSizeException e) {
+                throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource attribute: " + e.getMessage());
             }
         }
 
-        if (inputContext.getContentLanguage() != null)
-            content.setContentLanguage(inputContext.getContentLanguage());
+        try {
+            if (inputContext.getContentLanguage() != null)
+                content.setContentLanguage(inputContext.getContentLanguage());
 
-        String contentType = inputContext.getContentType();
-        if (contentType != null)
-            content.setContentType(IOUtil.getMimeType(contentType));
-        else
-            content.setContentType(IOUtil.MIME_RESOLVER.
-                                   getMimeType(content.getName()));
+            String contentType = inputContext.getContentType();
+            if (contentType != null)
+                content.setContentType(IOUtil.getMimeType(contentType));
+            else
+                content.setContentType(IOUtil.MIME_RESOLVER.
+                                       getMimeType(content.getName()));
 
-        String contentEncoding = IOUtil.getEncoding(contentType);
-        if (contentEncoding != null)
-            content.setContentEncoding(contentEncoding);
+            String contentEncoding = IOUtil.getEncoding(contentType);
+            if (contentEncoding != null)
+                content.setContentEncoding(contentEncoding);
+        } catch (DataSizeException e) {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource attribute: " + e.getMessage());
+        }
     }
 
     /** */

@@ -57,6 +57,7 @@ import org.osaf.cosmo.dav.ticket.property.TicketDiscovery;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
@@ -202,6 +203,8 @@ public abstract class DavResourceBase
             throw new DavException(DavServletResponse.SC_CONFLICT);
         } catch (ModelValidationException e) {
             throw new DavException(DavServletResponse.SC_CONFLICT);
+        } catch (DataSizeException e) {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN, "Property cannot be stored: " + e.getMessage());
         }
 
         getContentService().updateItem(item);
@@ -258,9 +261,14 @@ public abstract class DavResourceBase
                 setResourceProperty(property);
                 msr.add(property.getName(), DavServletResponse.SC_OK);
             } catch (ModelConversionException e) {
+                log.warn("Property " + property.getName() + " cannot be stored: " + e.getMessage());
                 msr.add(property.getName(), DavServletResponse.SC_CONFLICT);
             } catch (ModelValidationException e) {
+                log.warn("Property " + property.getName() + " cannot be stored: " + e.getMessage());
                 msr.add(property.getName(), DavServletResponse.SC_CONFLICT);
+            } catch (DataSizeException e) {
+                log.warn("Property " + property.getName() + " cannot be stored: " + e.getMessage());
+                msr.add(property.getName(), DavServletResponse.SC_FORBIDDEN);
             }
         }
 
@@ -272,8 +280,10 @@ public abstract class DavResourceBase
                 removeResourceProperty(name);
                 msr.add(name, DavServletResponse.SC_OK);
             } catch (ModelConversionException e) {
+                log.warn("Property " + name + " cannot be removed: " + e.getMessage());
                 msr.add(name, DavServletResponse.SC_CONFLICT);
             } catch (ModelValidationException e) {
+                log.warn("Property " + name + " cannot be removed: " + e.getMessage());
                 msr.add(name, DavServletResponse.SC_CONFLICT);
             }
         }
@@ -563,7 +573,8 @@ public abstract class DavResourceBase
      * Sets the properties of the item backing this resource from the
      * given input context. 
      */
-    protected void populateItem(InputContext inputContext) {
+    protected void populateItem(InputContext inputContext)
+        throws DavException {
         if (log.isDebugEnabled())
             log.debug("populating item for " + getResourcePath());
 
@@ -604,6 +615,9 @@ public abstract class DavResourceBase
                 msr.add(property.getName(), DavServletResponse.SC_CONFLICT);
             } catch (ModelValidationException e) {
                 msr.add(property.getName(), DavServletResponse.SC_CONFLICT);
+            } catch (DataSizeException e) {
+                log.warn("Property " + property.getName() + " cannot be stored: " + e.getMessage());
+                msr.add(property.getName(), DavServletResponse.SC_FORBIDDEN);
             }
         }
 

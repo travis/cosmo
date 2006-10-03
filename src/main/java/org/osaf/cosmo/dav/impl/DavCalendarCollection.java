@@ -54,6 +54,7 @@ import org.osaf.cosmo.calendar.util.CalendarBuilderDispenser;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.property.CalendarDescription;
 import org.osaf.cosmo.dav.caldav.property.CalendarTimezone;
+import org.osaf.cosmo.dav.caldav.property.MaxResourceSize;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarComponentSet;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarData;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
@@ -61,6 +62,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.CalendarItem;
 import org.osaf.cosmo.model.CalendarEventItem;
 import org.osaf.cosmo.model.CalendarCollectionItem;
+import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.DuplicateEventUidException;
 import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
@@ -77,6 +79,7 @@ import org.osaf.cosmo.model.ModelValidationException;
  * <li><code>CALDAV:calendar-supported-calendar-component-set</code>
  * (protected)</li>
  * <li><code>CALDAV:supported-calendar-data</code> (protected)</li>
+ * <li><code>CALDAV:max-resource-size</code> (protected)</li>
  * </ul>
  *
  * @see DavCollection
@@ -94,6 +97,7 @@ public class DavCalendarCollection extends DavCollection
         registerLiveProperty(CALENDARTIMEZONE);
         registerLiveProperty(SUPPORTEDCALENDARCOMPONENTSET);
         registerLiveProperty(SUPPORTEDCALENDARDATA);
+        registerLiveProperty(MAXRESOURCESIZE);
 
         int cc = ResourceType.registerResourceType(ELEMENT_CALDAV_CALENDAR,
                                               NAMESPACE_CALDAV);
@@ -185,13 +189,19 @@ public class DavCalendarCollection extends DavCollection
     }
 
     /** */
-    protected void populateItem(InputContext inputContext) {
+    protected void populateItem(InputContext inputContext)
+        throws DavException {
         super.populateItem(inputContext);
 
         CalendarCollectionItem cc = (CalendarCollectionItem) getItem();
 
-        cc.setDescription(cc.getName());
-        cc.setLanguage(Locale.getDefault().toString());
+        try {
+            cc.setDescription(cc.getName());
+            // XXX: language should come from the input context
+            cc.setLanguage(Locale.getDefault().toString());
+        } catch (DataSizeException e) {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store collection attribute: " + e.getMessage());
+        }
     }
 
     /** */
@@ -212,6 +222,7 @@ public class DavCalendarCollection extends DavCollection
 
         properties.add(new SupportedCalendarComponentSet(cc.getSupportedComponents()));
         properties.add(new SupportedCalendarData());
+        properties.add(new MaxResourceSize());
     }
 
     /** */
@@ -227,7 +238,8 @@ public class DavCalendarCollection extends DavCollection
             throw new ModelValidationException("null value for property " + name);
         String value = property.getValue().toString();
 
-        if (name.equals(SUPPORTEDCALENDARDATA))
+        if (name.equals(SUPPORTEDCALENDARDATA) ||
+            name.equals(MAXRESOURCESIZE))
             throw new ModelValidationException("cannot set protected property " + name);
 
         if (name.equals(SUPPORTEDCALENDARCOMPONENTSET)) {
@@ -283,7 +295,8 @@ public class DavCalendarCollection extends DavCollection
             return;
 
         if (name.equals(SUPPORTEDCALENDARCOMPONENTSET) ||
-            name.equals(SUPPORTEDCALENDARDATA)) {
+            name.equals(SUPPORTEDCALENDARDATA) ||
+            name.equals(MAXRESOURCESIZE)) {
             throw new ModelValidationException("cannot remove protected property " + name);
         }
 
@@ -349,7 +362,9 @@ public class DavCalendarCollection extends DavCollection
 
         // XXX CALDAV:calendar-collection-location-ok
 
-        // XXX CALDAV:max-resource-size
+        // CALDAV:max-resource-size was already taken care of when
+        // DavCollection.addMember called DavResourceBase.populateItem
+        // on the event, though it returned a 409 rather than a 412
 
         // XXX CALDAV:min-date-time
 
@@ -359,7 +374,6 @@ public class DavCalendarCollection extends DavCollection
 
         // XXX CALDAV:max-attendees-per-instance
 
-        // XXX: what exceptions need to be caught?
         if (event.getId() != -1) {
             if (log.isDebugEnabled())
                 log.debug("updating event " + member.getResourcePath());
@@ -372,7 +386,7 @@ public class DavCalendarCollection extends DavCollection
         } else {
             if (log.isDebugEnabled())
                 log.debug("creating event " + member.getResourcePath());
-            
+
             try {
                 event = getContentService().addEvent(collection, event);
             } catch (DuplicateEventUidException e) {

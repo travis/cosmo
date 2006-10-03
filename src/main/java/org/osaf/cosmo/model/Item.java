@@ -26,6 +26,9 @@ import java.util.Set;
  */
 public abstract class Item extends BaseModelObject {
 
+    public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
+    public static final long MAX_STRING_ATTR_SIZE = 1 * 1024;
+
     private String uid;
     private String name;
     private String displayName;
@@ -47,8 +50,9 @@ public abstract class Item extends BaseModelObject {
         ticket.setItem(this);
         tickets.add(ticket);
     }
-    
+
     public void addAttribute(Attribute attribute) {
+        validateAttribute(attribute);
         attribute.setItem(this);
         attributes.put(attribute.getName(), attribute);
     }
@@ -110,6 +114,7 @@ public abstract class Item extends BaseModelObject {
                 attr = new StringAttribute(key, value.toString());
             addAttribute(attr);
         } else {
+            validateAttribute(attr, value);
             if(value instanceof String)
                 ((StringAttribute) attr).setValue((String) value);
             else if(value instanceof byte[])
@@ -127,7 +132,31 @@ public abstract class Item extends BaseModelObject {
         }
     }
 
+    protected void validateAttribute(Attribute attribute,
+                                     Object value) {
+        if (value == null)
+            return;
+
+        if (attribute instanceof BinaryAttribute) {
+            byte[] v = (byte[]) value;
+            if (v.length > MAX_BINARY_ATTR_SIZE)
+                throw new DataSizeException("Binary attribute " + attribute.getName() + " too large");
+        }
+
+        if (attribute instanceof StringAttribute) {
+            String v = (String) value;
+            if (v.length() > MAX_STRING_ATTR_SIZE)
+                throw new DataSizeException("String attribute " + attribute.getName() + " too large");
+        }
+    }
+
+    protected void validateAttribute(Attribute attribute) {
+        validateAttribute(attribute, attribute.getValue());
+    }
+    
     private void setAttributes(Map<String, Attribute> attributes) {
+        // attributes not validated, as this method is only used by
+        // hibernate to set attributes loaded from the db
         this.attributes = attributes;
     }
 

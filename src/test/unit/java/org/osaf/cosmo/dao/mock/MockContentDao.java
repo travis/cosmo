@@ -15,17 +15,15 @@
  */
 package org.osaf.cosmo.dao.mock;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.User;
+import org.springframework.dao.ConcurrencyFailureException;
 
 /**
  * Mock implementation of <code>ContentDao</code> useful for testing.
@@ -36,6 +34,8 @@ import org.osaf.cosmo.model.User;
  */
 public class MockContentDao extends MockItemDao implements ContentDao {
 
+    public static boolean THROW_CONCURRENT_EXCEPTION = false;
+    
     /**
      */
     public MockContentDao() {
@@ -151,6 +151,9 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (content == null)
             throw new IllegalArgumentException("collection cannot be null");
 
+        if(THROW_CONCURRENT_EXCEPTION)
+            throw new ConcurrencyFailureException("fail!");
+        
         content.setParent(parent);
         storeItem((Item) content);
 
@@ -168,6 +171,9 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (content == null)
             throw new IllegalArgumentException("content cannot be null");
 
+        if(THROW_CONCURRENT_EXCEPTION)
+            throw new ConcurrencyFailureException("fail!");
+        
         updateItem((Item) content);
 
         return content;

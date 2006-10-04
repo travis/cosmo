@@ -308,7 +308,15 @@ public class DavServlet extends AbstractWebdavServlet
             return;
         }
 
-        super.doPut(request, response, resource);
+        // catch concurrency failure and return 500 with
+        // nice message instead of stack trace
+        try {
+            super.doPut(request, response, resource);
+        } catch (org.springframework.dao.ConcurrencyFailureException e) {
+            log.warn("Concurrency failure during PUT", e);
+            response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Concurrency failure.");
+        }
 
         response.setHeader("ETag", resource.getETag());
     }

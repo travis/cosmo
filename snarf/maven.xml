@@ -63,6 +63,9 @@
         <include name="*.txt"/>
       </fileset>
     </copy>
+    <copy todir="${bundle.dist.version}/license">
+      <fileset dir="${basedir}/src/docs/license"/>
+    </copy>
     <copy todir="${bundle.dist.version}/tomcat/conf"
           file="${basedir}/src/main/config/server.xml"/>
     <copy todir="${bundle.dist.version}/etc"

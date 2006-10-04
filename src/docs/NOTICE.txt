@@ -1,3 +1,4 @@
 This product includes software developed by the Open Source
-Applications Foundation (http://www.osafoundation.org/) and the Apache
-Software Foundation (http://www.apache.org/).
+Applications Foundation (http://www.osafoundation.org/), the Apache
+Software Foundation (http://www.apache.org/), and Hibernate 
+(http://www.hibernate.org/).

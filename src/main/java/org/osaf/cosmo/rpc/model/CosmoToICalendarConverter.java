@@ -44,6 +44,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Uid;
@@ -296,7 +297,18 @@ public class CosmoToICalendarConverter {
                 }
                 
                 vevent.getProperties().add(exDate);
-                
+            }
+            Modification[] modifications = recurrenceRule.getModifications();
+            if (modifications != null && modifications.length > 0){
+                for (Modification modification : modifications){
+                    VEvent modVEvent = new VEvent();
+                    RecurrenceId recurrenceId = new RecurrenceId();
+                    setDate(recurrenceId, modification.getInstanceDate());
+                    copyTimeZone(dtStart, recurrenceId);
+                    for (String property : modification.getModifiedProperties()){
+                    //    if (property.equals(ICalendarToCosmoConverter.))
+                    }
+                }
             }
         }
     }

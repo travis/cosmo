@@ -482,7 +482,11 @@ public class ICalendarToCosmoConverter {
             recurrenceRule.setCustomRule(rrule.getValue());
         } else {
             if (recur.getFrequency().equals(Recur.WEEKLY)) {
-                recurrenceRule.setFrequency(RecurrenceRule.FREQUENCY_WEEKLY);
+                if (recur.getInterval() == 1){
+                    recurrenceRule.setFrequency(RecurrenceRule.FREQUENCY_WEEKLY);
+                } else if (recur.getInterval() == 2){
+                    recurrenceRule.setFrequency(RecurrenceRule.FREQUENCY_BIWEEKLY);
+                }
             } else if (recur.getFrequency().equals(Recur.MONTHLY)) {
                 recurrenceRule.setFrequency(RecurrenceRule.FREQUENCY_MONTHLY);
             } else if (recur.getFrequency().equals(Recur.DAILY)) {

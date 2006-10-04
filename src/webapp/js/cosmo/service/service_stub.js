@@ -159,6 +159,18 @@ ScoobyService.prototype = {
     expandEvent: function(calendarPath, eventId, utcStartTime, utcEndTime){},
 
     /**
+     * Saves the specified new event and updates the event with the specified id
+     * with the new recurrence end date   
+     * @param calendarPath the calendar where the event is.
+     * @param event the new event to be saved
+     * @param originalEventId the id of the original event
+     * @param originalEventEndDate the new recurrence end date of the original event
+     * @return the id of the new event
+     */
+    saveNewEventBreakRecurrence: function(calendarPath, event,
+        originalEventId, originalEventEndDate){},
+    
+    /**
      * Returns the version of Scooby
      */
     getVersion: function(){}

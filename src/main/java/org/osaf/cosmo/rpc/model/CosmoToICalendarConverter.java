@@ -83,6 +83,7 @@ public class CosmoToICalendarConverter {
         calendar.getProperties().add(CalScale.GREGORIAN);
         VEvent vevent = createVEvent(event);
         calendar.getComponents().add(vevent);
+        addModificationsToCalendar(calendar, vevent, event);
         return calendar;
     }
 
@@ -143,6 +144,18 @@ public class CosmoToICalendarConverter {
         }
         dateProp.setDate(date);
         dateProp.getParameters().add(Value.DATE);
+    }
+
+    protected void setDateAndTimezone(DateProperty destDateProp,
+            CosmoDate sourceDate, DateProperty sourceForTimeZone,
+            boolean dateTime) {
+        if (dateTime){
+            setDateTime(destDateProp, sourceDate);
+            copyTimeZone(sourceForTimeZone, destDateProp);
+        } else {
+            setDate(destDateProp, sourceDate);
+        }
+
     }
 
     /**
@@ -298,18 +311,6 @@ public class CosmoToICalendarConverter {
                 
                 vevent.getProperties().add(exDate);
             }
-            Modification[] modifications = recurrenceRule.getModifications();
-            if (modifications != null && modifications.length > 0){
-                for (Modification modification : modifications){
-                    VEvent modVEvent = new VEvent();
-                    RecurrenceId recurrenceId = new RecurrenceId();
-                    setDate(recurrenceId, modification.getInstanceDate());
-                    copyTimeZone(dtStart, recurrenceId);
-                    for (String property : modification.getModifiedProperties()){
-                    //    if (property.equals(ICalendarToCosmoConverter.))
-                    }
-                }
-            }
         }
     }
 
@@ -429,7 +430,7 @@ public class CosmoToICalendarConverter {
             dest.getParameters().add(sourceTz);
         }
     }
-    
+   
     //TODO this is wrong. How do we REALLY determine the master event?
     protected VEvent getMasterVEvent(Calendar calendar) {
         ComponentList list = calendar.getComponents().getComponents(
@@ -449,5 +450,60 @@ public class CosmoToICalendarConverter {
     private boolean hasProperty(Component c, String propName) {
         PropertyList l = c.getProperties().getProperties(propName);
         return l != null && l.size() > 0;
+    }
+    private void addModificationsToCalendar(Calendar calendar,
+            VEvent masterVEvent, Event event) {
+        if (event.getRecurrenceRule() == null
+                || StringUtils.isNotBlank(event.getRecurrenceRule()
+                        .getCustomRule())) {
+            return;
+        }
+        DtStart dtStart = masterVEvent.getStartDate();
+        RecurrenceRule recurrenceRule = event.getRecurrenceRule();
+        Modification[] modifications = recurrenceRule.getModifications();
+        boolean dateTime = dtStart.getDate() instanceof DateTime;
+
+        if (modifications != null && modifications.length > 0) {
+            for (Modification modification : modifications) {
+                VEvent modVEvent = new VEvent();
+                RecurrenceId recurrenceId = new RecurrenceId();
+                setDateAndTimezone(recurrenceId,
+                        modification.getInstanceDate(), dtStart, dateTime);
+                modVEvent.getProperties().add(recurrenceId);
+                for (String property : modification.getModifiedProperties()) {
+                    if (property.equals(ICalendarToCosmoConverter.EVENT_START)) {
+                        DtStart modStart = new DtStart();
+                        setDateAndTimezone(modStart, modification.getEvent()
+                                .getStart(), dtStart, dateTime);
+                        modVEvent.getProperties().add(modStart);
+
+                    } else if (property
+                            .equals(ICalendarToCosmoConverter.EVENT_END)) {
+                        DtEnd modEnd = new DtEnd();
+                        setDateAndTimezone(modEnd, modification.getEvent()
+                                .getEnd(), dtStart, dateTime);
+                        modVEvent.getProperties().add(modEnd);
+
+                    } else if (property
+                            .equals(ICalendarToCosmoConverter.EVENT_DESCRIPTION)) {
+                        Description description = new Description();
+                        description.setValue(modification.getEvent()
+                                .getDescription());
+                        modVEvent.getProperties().add(description);
+                    } else if (property
+                            .equals(ICalendarToCosmoConverter.EVENT_TITLE)) {
+                        Summary summary = new Summary();
+                        summary.setValue(modification.getEvent().getTitle());
+                        modVEvent.getProperties().add(summary);
+                    } else if (property
+                            .equals(ICalendarToCosmoConverter.EVENT_STATUS)) {
+                        Status status = new Status();
+                        status.setValue(modification.getEvent().getStatus());
+                        modVEvent.getProperties().add(status);
+                    }
+                }
+                calendar.getComponents().add(modVEvent);
+            }
+        }
     }
 }

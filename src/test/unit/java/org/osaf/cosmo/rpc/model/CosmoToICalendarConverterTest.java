@@ -21,6 +21,7 @@ import static org.osaf.cosmo.util.ICalendarUtils.getUIDValue;
 import junit.framework.TestCase;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
@@ -33,10 +34,12 @@ import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.RecurrenceId;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.util.ICalendarUtils;
 
 public class CosmoToICalendarConverterTest extends TestCase {
     private static final Log log = LogFactory.getLog(CosmoToICalendarConverterTest.class);
@@ -312,6 +315,54 @@ public class CosmoToICalendarConverterTest extends TestCase {
         java.util.Calendar calendar = getCalendar(date);
         int day = calendar.get(java.util.Calendar.DAY_OF_MONTH);
         assertEquals(3, day);
+    }
+    
+    public void testCreateRecurringModInstance(){
+        Event event = createBaseEvent();
+        RecurrenceRule rr = new RecurrenceRule();
+        rr.setFrequency(RecurrenceRule.FREQUENCY_DAILY);
+        
+        Modification modification = new Modification();
+        
+        CosmoDate instanceDate = new CosmoDate();
+        instanceDate.setYear(2005);
+        instanceDate.setMonth(CosmoDate.MONTH_JANUARY);
+        instanceDate.setDate(3);
+        instanceDate.setHours(12);
+        instanceDate.setMinutes(0);
+        instanceDate.setSeconds(0);
+        instanceDate.setUtc(false);
+        modification.setInstanceDate(instanceDate);
+        
+        Event modEvent = new Event();
+        modEvent.setDescription("MOD");
+        modification.setEvent(modEvent);
+        modification
+                .setModifiedProperties(new String[] { ICalendarToCosmoConverter.EVENT_DESCRIPTION });
+        rr.setModifications(new Modification[] { modification });
+        event.setRecurrenceRule(rr);
+
+        Calendar calendar = converter.createWrappedVEvent(event);
+        ComponentList vevents = calendar.getComponents().getComponents(
+                Component.VEVENT);
+
+        //One master, one instance = 2 vevents
+        assertEquals(2, vevents.size());
+        
+        for (Object o : vevents) {
+            VEvent vEvent = (VEvent) o;
+            RecurrenceId recurrenceId = vEvent.getReccurrenceId();
+            if (recurrenceId != null) {
+                // this one is the instance
+                assertEquals("20050103T120000", recurrenceId.getDate()
+                        .toString());
+                //one for RECURRENCE-ID. one for DESCRIPTION
+                assertEquals(2, vEvent.getProperties().size());
+                assertEquals("MOD", ICalendarUtils.getPropertyValue(vEvent,
+                        Property.DESCRIPTION));
+            }
+        }
+      
     }
     
     /**

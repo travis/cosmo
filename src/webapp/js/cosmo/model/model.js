@@ -90,6 +90,13 @@ function RecurrenceRule(){
      * 
      */
     this.exceptionDates = null;
+    
+    /**
+     * An array of modifications, each one representing a modification to an event
+     * instance
+     *
+     */
+    this.modifications = null;
 }
 
 RecurrenceRule.prototype = {
@@ -105,6 +112,29 @@ RecurrenceRule.clone = function(rule) {
         ret.customRule = rule.customRule;
     }
     return ret;
+}
+
+function Modification(){
+    /**
+     * References the instance date which is being modified
+     *
+     */
+    this.instanceDate = null;
+    
+    /**
+     * The list of modified properties
+     *
+     */
+    this.modifiedProperties = null;
+    
+    /**
+     * The event with the modified properties. Note: only the modified properties need to be set
+     */
+    this.event;
+}
+
+Modification.prototype = {
+    toString: genericToString
 }
 
 function StatusTemplate() {

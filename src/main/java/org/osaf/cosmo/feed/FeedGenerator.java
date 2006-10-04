@@ -79,7 +79,7 @@ public class FeedGenerator {
                               String path) {
         Feed feed = new Feed("atom_1.0");
 
-        feed.setTitle(collection.getName());
+        feed.setTitle(collection.getDisplayName());
         feed.setUpdated(Calendar.getInstance().getTime());
         feed.setId(homeHref(path));
 
@@ -119,7 +119,7 @@ public class FeedGenerator {
         Entry entry = new Entry();
         entry.setId(homeHref(entryPath));
         entry.setPublished(item.getCreationDate());
-        entry.setTitle(item.getName());
+        entry.setTitle(item.getDisplayName());
         entry.setUpdated(item.getModifiedDate());
 
         Link browseLink = new Link();
@@ -127,6 +127,8 @@ public class FeedGenerator {
         browseLink.setType("text/html");
         browseLink.setHref(browseHref(entryPath));
         entry.getAlternateLinks().add(browseLink);
+
+        // XXX: if calendar item, include hcalendar content
 
         return entry;
     }

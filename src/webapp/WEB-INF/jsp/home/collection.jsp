@@ -19,10 +19,13 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<div class="hd" style="margin-top: 12px;">
-  <fmt:message key="HomeDirectory.Collection.Title">
-    <fmt:param value="${Path}"/>
-  </fmt:message>
+<div>
+  <span class="hd" style="margin-top: 12px;">
+    <fmt:message key="HomeDirectory.Collection.Title">
+      <fmt:param value="${Collection.displayName}"/>
+    </fmt:message>
+  </span>
+  - <span class="md">${Path}</span>
 </div>
 
 <div style="margin-top:12px;">
@@ -42,14 +45,6 @@
 <c:if test="${Path != '/'}">
 <div style="margin-top:12px;">
   <table cellpadding="3" cellspacing="1" border="0">
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        Display Name
-      </td>
-      <td class="mdData">
-        ${Collection.name}
-      </td>
-    </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
         UID
@@ -131,7 +126,7 @@
         <c:if test="${item.parent != null}"><html:link page="/console/home/remove${Path}/${item.name}">[remove]</html:link></c:if>
       </td>
       <td class="smTableData">
-        ${item.name}
+        ${item.displayName}
       </td>
       <td class="smTableData" style="text-align:center;">
         <c:choose><c:when test="${item.parent == null}">Home</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CollectionItem'}">Folder</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CalendarCollectionItem'}">Calendar</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.EventCalendarItem'}">Event</c:when><c:otherwise>File</c:otherwise></c:choose>

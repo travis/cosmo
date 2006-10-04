@@ -149,7 +149,7 @@ public abstract class DavResourceBase
 
     /** */
     public String getDisplayName() {
-        return item.getName();
+        return item.getDisplayName();
     }
 
     /** */
@@ -578,7 +578,10 @@ public abstract class DavResourceBase
         if (log.isDebugEnabled())
             log.debug("populating item for " + getResourcePath());
 
-        item.setName(PathUtil.getBasename(getResourcePath()));
+        if (item.getUid() == null) {
+            item.setName(PathUtil.getBasename(getResourcePath()));
+            item.setDisplayName(item.getName());
+        }
 
         // if we don't know specifically who the user is, then the
         // owner of the resource becomes the person who issued the
@@ -670,7 +673,7 @@ public abstract class DavResourceBase
                                               IOUtil.getCreated(creationTime)));
 
         properties.add(new DefaultDavProperty(DavPropertyName.DISPLAYNAME,
-                                              item.getName()));
+                                              item.getDisplayName()));
 
         properties.add(new ResourceType(getResourceTypes()));
 
@@ -707,6 +710,9 @@ public abstract class DavResourceBase
 
         if (name.equals(TICKETDISCOVERY))
             throw new ModelValidationException("cannot set protected property " + name);
+
+        if (name.equals(DavPropertyName.DISPLAYNAME))
+            item.setDisplayName(value);
     }
 
     /**
@@ -726,7 +732,8 @@ public abstract class DavResourceBase
         if (item == null)
             return;
 
-        if (name.equals(TICKETDISCOVERY))
+        if (name.equals(TICKETDISCOVERY) ||
+            name.equals(DavPropertyName.DISPLAYNAME))
             throw new ModelValidationException("cannot remove protected property " + name);
     }
 

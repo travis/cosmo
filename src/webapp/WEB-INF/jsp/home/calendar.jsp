@@ -19,10 +19,13 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<div class="hd" style="margin-top: 12px;">
-  <fmt:message key="HomeDirectory.Calendar.Title">
-    <fmt:param value="${Collection.path}"/>
-  </fmt:message>
+<div>
+  <span class="hd" style="margin-top: 12px;">
+    <fmt:message key="HomeDirectory.Calendar.Title">
+      <fmt:param value="${Calendar.item.displayName}"/>
+    </fmt:message>
+  </span>
+  - <span class="md">${Path}</span>
 </div>
 
 <div style="margin-top:12px;">
@@ -50,7 +53,7 @@
       </c:if>
     <tr class="vevent">
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        <html:link page="/console/home/view${event.resource.path}">
+        <html:link page="/console/home/view${Path}/${event.item.name}">
           [view]
         </html:link>
       </td>

@@ -473,7 +473,7 @@ public class DavCollection extends DavResourceBase {
             DavResourceBase child = (DavResourceBase) i.nextResource();
             String name =
                 PathUtil.getBasename(child.getLocator().getResourcePath()); 
-            String displayName = child.getItem().getName();
+            String displayName = child.getItem().getDisplayName();
             writer.write("<li><a href=\"");
             writer.write(name); // XXX URI escape
             if (child.isCollection()) {

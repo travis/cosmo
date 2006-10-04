@@ -41,15 +41,12 @@ public class CalendarBean {
     public CalendarBean(CalendarCollectionItem item)
         throws IOException, ParserException {
         this.item = item;
-        events = new HashSet<EventBean>();
-
-        // XXX no way to get child items
-//         for (Iterator<EventBean> i=item.getItems().iterator(); i.hasNext();) {
-//             Item child = (Item) i.next();
-//             if (child instanceof CalendarEventItem) {
-//                 events.add(new EventBean((CalendarEventItem) child));
-//             }
-//        }
+        this.events = new HashSet<EventBean>();
+        for (Item child : item.getChildren()) {
+            if (child instanceof CalendarEventItem) {
+                events.add(new EventBean((CalendarEventItem) child));
+            }
+        }
     }
 
     /**

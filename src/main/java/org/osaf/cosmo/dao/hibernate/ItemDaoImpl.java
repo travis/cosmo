@@ -192,6 +192,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             newItem.setOwner(user);
             newItem.setParent(null);
             newItem.setName(user.getUsername());
+            newItem.setDisplayName(newItem.getName());
             setBaseItemProps(newItem);
             getSession().save(newItem);
             return newItem;

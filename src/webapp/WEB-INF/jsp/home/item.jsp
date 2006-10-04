@@ -19,10 +19,13 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<div class="hd" style="margin-top: 12px;">
-  <fmt:message key="HomeDirectory.Item.Title">
-    <fmt:param value="${Path}"/>
-  </fmt:message>
+<div>
+  <span class="hd" style="margin-top: 12px;">
+    <fmt:message key="HomeDirectory.Item.Title">
+      <fmt:param value="${Item.displayName}"/>
+    </fmt:message>
+  </span>
+  - <span class="md">${Path}</span>
 </div>
 
 <div style="margin-top:12px;">
@@ -45,14 +48,6 @@
 
 <div style="margin-top:12px;">
   <table cellpadding="3" cellspacing="1" border="0">
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        Display Name
-      </td>
-      <td class="mdData">
-        ${Item.name}
-      </td>
-    </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
         UID

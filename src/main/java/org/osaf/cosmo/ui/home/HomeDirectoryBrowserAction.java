@@ -100,7 +100,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
 
         Item item = getItem(path);
 
-        addTitleParam(request, item.getName());
+        addTitleParam(request, item.getDisplayName());
         request.setAttribute(ATTR_PATH, path);
 
         if (item instanceof CollectionItem) {
@@ -152,7 +152,7 @@ public class HomeDirectoryBrowserAction extends CosmoAction {
         String path = request.getParameter(PARAM_PATH);
 
         Item item = getItem(path);
-        addTitleParam(request, item.getName());
+        addTitleParam(request, item.getDisplayName());
 
         request.setAttribute(ATTR_PATH, path);
 

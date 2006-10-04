@@ -19,10 +19,13 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<div class="hd" style="margin-top: 12px;">
-  <fmt:message key="HomeDirectory.Event.Title">
-    <fmt:param value="${Resource.path}"/>
-  </fmt:message>
+<div>
+  <span class="hd" style="margin-top: 12px;">
+    <fmt:message key="HomeDirectory.Event.Title">
+      <fmt:param value="${Event.item.displayName}"/>
+    </fmt:message>
+  </span>
+  - <span class="md">${Path}</span>
 </div>
 
 <c:if test="${not empty Event.timeZone}">

@@ -101,7 +101,7 @@
         <value>/index.jsp</value>
       </property>
       <property name="alwaysUseDefaultTargetUrl">
-        <value>true</value>
+        <value>false</value>
       </property>
   </bean>
 

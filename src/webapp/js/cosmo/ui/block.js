@@ -67,7 +67,7 @@ function Block() {
      * and description
      */
     this.updateText = function() {
-        var ev = Cal.eventRegistry.getItem(this.id);
+        var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
         var strtime = ev.data.start.strftime('%I:%M%p');
         // Trim leading zero if need be
         strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
@@ -103,13 +103,13 @@ function Block() {
             Cal.ID_SEPARATOR + this.id).style.cursor = cursorChange;
     };
     this.getPlatonicLeft = function() {
-        var ev = Cal.eventRegistry.getItem(this.id);
+        var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
         var diff = (Date.diff('d', Cal.viewStart.getTime(), ev.data.start.getTime()));
         return (diff * cosmo.view.cal.canvas.dayUnitWidth);
             
     };
     this.getPlatonicWidth = function() {
-        var ev = Cal.eventRegistry.getItem(this.id);
+        var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
         var diff = (ScoobyDate.diff('d', ev.data.start, ev.data.end))+3;
         return (diff * cosmo.view.cal.canvas.dayUnitWidth);
     }
@@ -169,7 +169,7 @@ function Block() {
      */
     this.setLozengeAppearance = function(stateId) {
         
-        var ev = Cal.eventRegistry.getItem(this.id);
+        var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
         var useLightColor = this.useLightColor(ev);
         var imgPath = '';
         var textColor = '';
@@ -488,7 +488,7 @@ HasTimeBlock.prototype.updateEvent = function(ev, dragMode) {
  */
 HasTimeBlock.prototype.insert = function(id) {
 
-    var ev = Cal.eventRegistry.getItem(id);
+    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(id);
     var startDay = 0;
     var endDay = 0;
     var auxDivCount = 0;
@@ -918,7 +918,7 @@ NoTimeBlock.prototype.calcWidth = function(startDay, ev) {
  * (2) Do sizing/positioning, and turn on visibility with updateDisplayMain
  */
 NoTimeBlock.prototype.insert = function(id) {
-    var ev = Cal.eventRegistry.getItem(id);
+    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(id);
     var blockDiv = document.createElement('div');
     var blockDivSub = document.createElement('div');
     var d = null;

@@ -64,11 +64,6 @@ var Cal = new function() {
     this.statusTemplate = new StatusTemplate();
     this.statusTemplate.options = ['CONFIRMED', 'TENTATIVE', 'CANCELLED'];
 
-    // The list of events currently displayed
-    // on the calendar -- key is the CalEvent obj's id prop,
-    // value is the CalEvent
-    this.eventRegistry = new Hash();
-
     // Remote calls for saving or removing --
     // tracking list used for callback reference
     this.asyncRegistry = new Hash();
@@ -182,7 +177,7 @@ var Cal = new function() {
 
         // Load and display events
         // --------------
-        this.loadDisplayEvents();
+        this.loadEvents();
         this.uiMask.hide();
 
         // Scroll to 8am for normal event
@@ -421,37 +416,17 @@ var Cal = new function() {
     // Loading and displaying events
     // ==========================
     /**
-     * Load and display the events for the selected calendar
-     * for the selected span of time
-     */
-    this.loadDisplayEvents = function() {
-        // Load saved events
-        if (Cal.loadEvents() && Cal.updateEventsDisplay()) {
-            // Give the final event the selection and display in form
-            if (Cal.eventRegistry.length) {
-                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': Cal.eventRegistry.getLast() });
-            }
-            selEv = cosmo.view.cal.canvas.getSelectedEvent();
-            if (selEv) {
-                // Show the last event -- the selected one, in the info form
-                Cal.calForm.updateFromEvent(selEv);
-            }
-        }
-    };
-    this.updateEventsDisplay = function() {
-        return (cosmo.view.cal.conflict.calc(Cal.eventRegistry) && 
-            Cal.placeBlocks());
-    }
-    /**
      * Load the events from the backend
      * Calls Cal.insertCalEventLoaded for each CalEventDate obj loaded
      * Returns true when finished
      */
     this.loadEvents = function() {
         var eventLoadList = null;
+        var eventLoadHash = new Hash();
         var isErr = false;
         var detail = '';
         var evData = null;
+        var id = '';
         var ev = null;
 
         // Load the array of events
@@ -465,8 +440,7 @@ var Cal = new function() {
             Log.print(e.javaStack);
             return false;
         }
-        // Create blocks for all the events
-        // ======================
+        
         for (var i = 0; i < eventLoadList.length; i++) {
             evData = eventLoadList[i];
             // Basic paranoia checks
@@ -483,8 +457,12 @@ var Cal = new function() {
                         ScoobyTimezone.clone(evData.end.timezone);
                 }
             }
-            Cal.insertCalEventLoaded(evData);
+            var id = Cal.generateTempId();
+            ev = new CalEvent(id, null);
+            ev.data = evData;
+            eventLoadHash.setItem(id, ev);
         }
+        dojo.event.topic.publish('/calEvent', { 'action': 'eventsLoadSuccess', 'data': eventLoadHash });
         return true;
 
     };
@@ -566,7 +544,7 @@ var Cal = new function() {
 
         // Register the new event in the event list
         // ================================
-        Cal.eventRegistry.setItem(id, ev);
+        cosmo.view.cal.canvas.eventRegistry.setItem(id, ev);
 
         // Update the block
         // ================================
@@ -574,86 +552,12 @@ var Cal = new function() {
             // Save new event
             dojo.event.topic.publish('/calEvent', { 'action': 'save', 'data': ev })
         }
-        return Cal.eventRegistry.getItem(id);
+        return cosmo.view.cal.canvas.eventRegistry.getItem(id);
     };
-    /**
-     * Main method for creating the CalEvent and Block obj for
-     * events loaded from the server
-     */
-    this.insertCalEventLoaded = function(evData) {
-            // ID for the block -- random strings, also used for div elem IDs
-            var id = Cal.generateTempId();
-            // Create a blank CalEvent obj to fill in with data from server
-            ev = new CalEvent(id, null);
-            ev.data = evData;
-
-            // Register the new event in the event list
-            // ================================
-            Cal.eventRegistry.setItem(id, ev);
-
-            // Create the block and link it to the event
-            ev.block = ev.data.allDay ? new NoTimeBlock(id) :
-                new HasTimeBlock(id);
-            ev.block.insert(id);
-    };
-    /**
-     * Update the display of all blocks on the canvas
-     */
-    this.placeBlocks = function() {
-        return Cal.eventRegistry.each(Cal.placeBlock);
-    };
-    this.placeBlock = function(key, val) {
-        ev = val;
-        ev.block.updateFromEvent(ev);
-        ev.block.updateDisplayMain();
-    }
-
-    // ==========================
-    // Saving and removing events
-    // ==========================
-    /**
-     * Removes a cal event from the canvas -- called in three cases:
-     * (1) Actually removing an event from the calendar (this gets
-     *     called after the backend successfully removes it)
-     * (2) Removing an event from view because it's been edited
-     *     to dates outside the viewable span
-     * (3) Removing the placeholder event when initial event
-     *     creation fails
-     * @param ev CalEvent obj, the event to be removed
-     * FIXME: Use topics and move to cosmo.view.cal.canvas
-     */
-    this.removeCalEventFromCanvas = function(ev) {
-        // Remove from list of visible events
-        Cal.eventRegistry.removeItem(ev.id);
-        // Remove the block
-        ev.block.remove();
-        // FIXME: Use topics
-        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
-        if (selEv && (selEv.id = ev.id)) {
-            cosmo.view.cal.canvas.selectedEvent = null;
-        }
-        // Bye-bye, event
-        ev = null;
-    };
-
+    
     // ==========================
     // Navigating and changing calendars
     // ==========================
-    /**
-     * Removes all events from the display
-     * Used when navigating through view spans, e.g., week-to-week,
-     * and when changing selected calendars
-     */
-    this.wipeView = function() {
-        var events = this.eventRegistry;
-        var ev = null;
-        cosmo.view.cal.canvas.selectedEvent = null; // Kill selected event
-        // Pull the last event off the eventRegistry list and remove it
-        // Don't use 'pop' -- removeCalEventFromCanvas takes the item off the eventRegistry
-        while (ev = events.getLast()) {
-            this.removeCalEventFromCanvas(ev);
-        }
-    };
     /**
      * Used to navigate from view span to view span, e.g., week-to-week
      */
@@ -665,15 +569,13 @@ var Cal = new function() {
     };
 
     this.goViewQueryDate = function(queryDate) {
-        Cal.wipeView();
         Cal.calForm.clear();
-        Cal.eventRegistry = new Hash();
         Cal.asyncRegistry = new Hash();
         Cal.getQuerySpan(new Date(queryDate)); // Get the new query span week
         // Draw the calendar canvas
         cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
         // Load and display events
-        Cal.loadDisplayEvents();
+        Cal.loadEvents();
         Cal.uiMask.hide();
     };
     /**
@@ -694,7 +596,7 @@ var Cal = new function() {
         Cal.currentCalendar = Cal.calendars[index];
         Cal.wipeView();
         // Load and display events
-        Cal.loadDisplayEvents();
+        Cal.loadEvents();
         Cal.uiMask.hide();
     };
 
@@ -1057,7 +959,6 @@ var Cal = new function() {
         }
         this.calForm = null;
         this.allDayArea = null;
-        this.eventRegistry = null;
         this.asyncRegistry = null;
     };
 }

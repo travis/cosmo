@@ -62,6 +62,10 @@ function CalForm() {
         var act = cmd.action;
         var ev = cmd.data;
         switch (act) {
+            case 'eventsDisplaySuccess':
+                self.updateFromEvent(ev);
+                self.setButtons(true, true);
+                break;
             case 'saveFromForm':
                 saveCalEvent(ev);
                 break;

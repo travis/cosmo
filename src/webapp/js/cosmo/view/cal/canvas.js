@@ -38,26 +38,98 @@ cosmo.view.cal.canvas = new function() {
         ev.block.setSelected(); // Show the associated block as selected
     };
     
+    /**
+     * Removes a cal event from the canvas -- called in three cases:
+     * (1) Actually removing an event from the calendar (this gets
+     *     called after the backend successfully removes it)
+     * (2) Removing an event from view because it's been edited
+     *     to dates outside the viewable span
+     * (3) Removing the placeholder event when initial event
+     *     creation fails
+     * @param ev CalEvent obj, the event to be removed
+     */
+    function removeEvent(key, val) {
+        var ev = val;
+        var selEv = self.getSelectedEvent();
+        // Remove the block
+        ev.block.remove();
+        if (selEv && (selEv.id = ev.id)) {
+            self.selectedEvent = null;
+        }
+        // Remove from list of visible events
+        self.eventRegistry.removeItem(ev.id);
+        // Bye-bye, event
+        ev = null;
+    }
+    function removeAllEvents() {
+        self.eventRegistry.each(removeEvent);
+        self.eventRegistry = new Hash();
+    };
+    function appendLozenge(key, val) {
+        var id = key;
+        var ev = val;
+        // Create the block and link it to the event
+        ev.block = ev.data.allDay ? new NoTimeBlock(id) :
+            new HasTimeBlock(id);
+        ev.block.insert(id);
+    }
+    function updateEventsDisplay() {
+        if (self.eventRegistry.length && 
+            cosmo.view.cal.conflict.calc(self.eventRegistry) && 
+                positionLozenges()) {
+            // If no currently selected event, put selection on
+            // the final one loaded
+            if (!self.selectedEvent) {
+                dojo.event.topic.publish('/calEvent', { 
+                    'action': 'setSelected', 
+                    'data': self.eventRegistry.getLast() });
+            }
+            dojo.event.topic.publish('/calEvent', { 'action': 
+                'eventsDisplaySuccess', 'data': self.selectedEvent });
+        }
+    }
+    function positionLozenges() {
+        return self.eventRegistry.each(positionLozenge);
+    };
+    function positionLozenge(key, val) {
+        ev = val;
+        ev.block.updateFromEvent(ev);
+        ev.block.updateDisplayMain();
+    }
+    
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function(cmd) {
         var act = cmd.action;
         var ev = cmd.data;
         switch (act) {
+            case 'eventsLoadSuccess':
+                self.eventRegistry = ev;
+                self.eventRegistry.each(appendLozenge);
+                updateEventsDisplay();
+                break;
             case 'setSelected':
                 setSelectedEvent(ev);
                 break;
             case 'save':
                 setSelectedEvent(ev);
                 break; 
+            case 'saveFailed':
+                removeEvent(ev.id, ev);
+                break;
             case 'saveSuccess':
                 // Changes have placed the saved event off-canvas
                 if (cmd.qualifier == 'offCanvas') {
-                    setSelectedEvent(null);
+                    removeEvent(ev.id, ev);
                 }
                 // Saved event is still in view
                 else {
-                    setSelectedEvent(ev);
+                    ev.setInputDisabled(false);
+                    ev.block.updateDisplayMain();
                 }
+                updateEventsDisplay();
+                break;
+            case 'removeSuccess':
+                removeEvent(ev.id, ev);
                 break;
             default:
                 // Do nothing
@@ -69,6 +141,11 @@ cosmo.view.cal.canvas = new function() {
     // Calc'd based on client window size
     // Other pieces of the app use this, so make it public
     this.dayUnitWidth = 0;
+    // The list currently displayed events
+    // on the calendar -- key is the CalEvent obj's id prop,
+    // value is the CalEvent
+    this.eventRegistry = new Hash();
+    // Currently selected event
     this.selectedEvent = null;
     
     // Public methods
@@ -377,6 +454,9 @@ cosmo.view.cal.canvas = new function() {
             allDayArea.setDragLimit();
             initRender = false;
         }
+        else {
+            removeAllEvents();
+        }
         
         init();
         showMonthHeader();
@@ -403,6 +483,8 @@ cosmo.view.cal.canvas = new function() {
         return self.selectedEvent;
     };
     this.cleanup = function() {
+        // Let's be tidy
+        self.eventRegistry = null;
         allDayArea.cleanup();
     };
 }

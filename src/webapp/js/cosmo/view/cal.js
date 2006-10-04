@@ -82,7 +82,6 @@ cosmo.view.cal = new function() {
             // Failed create -- remove fake placeholder event and block
             else {
                 // Remove all the client-side stuff associated with this event
-                Cal.removeCalEventFromCanvas(saveEv);
                 errMsg = getText('Main.Error.EventNewSaveFailed');
             }
             // Broadcast failure
@@ -101,25 +100,16 @@ cosmo.view.cal = new function() {
             
             // If new dates are out of range, remove the event from display
             if (saveEv.isOutOfViewRange()) {
-                // Remove all the client-side stuff associated with this event
-                Cal.removeCalEventFromCanvas(saveEv);
-                
                 // Broadcast success
                 dojo.event.topic.publish('/calEvent', { 'action': 'saveSuccess', 
                     'qualifier': 'offCanvas', 'data': saveEv });
             }
             // Otherwise update display
             else {
-                // Re-enable user input on this event
-                saveEv.setInputDisabled(false);
-                
                 // Broadcast success
                 dojo.event.topic.publish('/calEvent', { 'action': 'saveSuccess', 
                     'qualifier': 'onCanvas', 'data': saveEv });
             }
-
-            // Update entire display of events
-            Cal.updateEventsDisplay();
         }
         // Resets local timer for timeout -- we know server-side
         // session has been refreshed
@@ -167,16 +157,13 @@ cosmo.view.cal = new function() {
             Cal.showErr(errMsg, err);
         }
         else {
-            // Remove all the client-side stuff associated with this event
-            Cal.removeCalEventFromCanvas(removeEv);
+            // Broadcast success
+            dojo.event.topic.publish('/calEvent', { 'action': 'removeSuccess', 
+                'data': removeEv });
         }
         
         // Update entire display of events
-        Cal.updateEventsDisplay();
-        
-        // Broadcast success
-        dojo.event.topic.publish('/calEvent', { 'action': 'removeSuccess', 
-            'data': removeEv });
+        //Cal.updateEventsDisplay();
         
         // Resets local timer for timeout -- we know server-side
         // session has been refreshed
@@ -188,8 +175,6 @@ cosmo.view.cal = new function() {
     
     // Public attributes
     // ********************
-    // List of currently displayed events
-    this.eventRegistry = new Hash();
     // Options for saving/removing recurring events
     this.recurringEventOptions = {
         ALL_EVENTS: 'allEvents',

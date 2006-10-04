@@ -123,14 +123,16 @@ function mouseDownHandler(e) {
         case (strId.indexOf('eventDiv') > -1):
             // Get the clicked-on event
             id = Cal.getIndexEvent(strId);
-            selObj = Cal.eventRegistry.getItem(id);
+            selObj = cosmo.view.cal.canvas.eventRegistry.getItem(id);
 
             // If this object is currently in 'processing' state, ignore any input
             if (selObj.getInputDisabled()) {
                 return false;
             }
             
+            // Publish selection
             dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': selObj });
+            
             // Set up Draggable and save dragMode -- user may be dragging
             if (strId.indexOf('AllDay') > -1) {
                 dragElem = new NoTimeDraggable(id);
@@ -289,7 +291,7 @@ function keyUpHandler(e) {
  * Do cleanup of DOM-element refs to avoid memleak in IE
  */
 function cleanup() {
-    Cal.wipeView();
+    //Cal.wipeView();
     Cal.cleanup();
     Cal = null;
 }

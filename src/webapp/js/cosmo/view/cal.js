@@ -23,15 +23,51 @@ cosmo.view.cal = new function() {
     // Saving changes
     // =========================
     function saveEventChangesConfirm(ev) {
-        // Recurrence
-        if (ev.data.masterEvent || ev.data.instance) {
-            Cal.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm'));
+        var recur = ev.data.recurrenceRule;
+        // Recurrence is a ball-buster
+        if (recur) {
+            var freq = recur.frequency;
+            var opts = {};
+            opts.instanceOnly = false;
+            opts.masterEvent = false;
+
+            // Check to see if editing a recurrence instance to go
+            // beyond the recurrence interval -- in that case only
+            // mod is possible. No 'all,' no 'all future.'
+            function isOutOfIntervalRange() { 
+                var ret = false;
+                var dt = ev.data.start;
+                var dtOrig = ev.dataOrig.start;
+                var origDate = new Date(dtOrig.getFullYear(), dtOrig.getMonth(), dtOrig.getDate());
+                var newDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+                var ranges = {
+                    'daily': ['d', 1],
+                    'weekly': ['ww', 1],
+                    'biweekly': ['ww', 2],
+                    'monthly': ['m', 1],
+                    'yearly': ['yyyy', 1]
+                }
+                var unit = ranges[freq][0];
+                var bound = ranges[freq][1];
+                var diff = Date.diff(unit, origDate, newDate);
+                ret = (diff >= bound || diff <= (bound * -1)) ? true : false;
+                return ret;
+            }
+            if (ev.data.masterEvent) {
+                opts.masterEvent = true;
+            }
+            else {
+                opts.instanceOnly = isOutOfIntervalRange();
+            }
+            Cal.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', opts));
         }
         else {
             saveEventChanges(ev);
         }
     };
-    function saveEventChanges(ev) {
+    function saveEventChanges(ev, qual) {
+        var opts = self.recurringEventOptions;
+        
         // Lozenge stuff
         // ---------
         // Reset the block because we may be changing to the new type --
@@ -47,9 +83,72 @@ cosmo.view.cal = new function() {
         // Display processing animation
         ev.block.showProcessing();
 
-        // Service call to save changes
+        // Recurring event
+        var f = null;
+        if (qual) {
+            switch(qual) {
+                case opts.ALL_EVENTS:
+                    var saveEv = null;
+                    if (ev.data.masterEvent) {
+                        f = function() { doSaveSingleEvent(ev) }
+                    }
+                    else {
+                        h = function(eData) {
+                            // Master event's CalEventData is e
+                            // Current instance's CalEvent is ev
+                            var masterStart = eData.start;
+                            var origStart = ev.dataOrig.start;
+                            var newStart = ev.data.start;
+                            // Date parts for the edited instance start
+                            var mon = newStart.getMonth();
+                            var dat = newStart.getDate();
+                            var hou = newStart.getHours();
+                            var min = newStart.getMinutes();
+                            
+                            // Mod start based on edited instance
+                            switch ( ev.data.recurrenceRule.frequency) {
+                                case 'daily':
+                                    // Can't change anything but time
+                                    break;
+                                case 'weekly':
+                                case 'biweekly':
+                                    var diff = Date.diff('d', origStart, newStart);
+                                    masterStart.setDate(masterStart.getDate() + diff);
+                                    break;
+                                case 'monthly':
+                                    masterStart.setDate(dat);
+                                    break;
+                                case 'yearly':
+                                    masterStart.setMonth(mon);
+                                    masterStart.setDate(dat);
+                                    break;
+                            }
+                            // Always set time
+                            masterStart.setHours(min);
+                            masterStart.setMinutes(min);
+                            //doSaveSingleEvent(eData);
+                        };
+                        var saveEv = Cal.serv.getEvent(h, Cal.currentCalendar.path, ev.data.id);
+                    }
+                    break;
+                case opts.ALL_FUTURE_EVENTS:
+                    
+                    break;
+                case opts.ONLY_THIS_EVENT:
+                    
+                    break;
+                default:
+                    // Do nothing
+                    break;
+            }
+            return;
+        }
+        // Normal one-shot event
+        else {
+            f = function() { doSaveSingleEvent(ev) }
+        }
+        
         // Give a sec for the processing state to show
-        var f = function() { doSave(ev) }
         setTimeout(f, 500);
         
         // Kill any confirmation dialog that might be showing
@@ -57,11 +156,14 @@ cosmo.view.cal = new function() {
             Cal.hideDialog();
         }
     };
-    function doSave(ev) {
+    function doSaveSingleEvent(e) {
+        var d = e.data ? e.data : e; // Input is either a CalEvent or CalEventData
         var f = function(newEvId, err, reqId) { 
             handleSaveResult(ev, newEvId, err, reqId); };
-        var requestId = Cal.serv.saveEvent(
-            f, Cal.currentCalendar.path, ev.data);
+        var requestId = null;
+        
+        requestId = Cal.serv.saveEvent(
+            f, Cal.currentCalendar.path, d);
     };
     function handleSaveResult(ev, newEvId, err, reqId) {
         var saveEv = ev;
@@ -123,8 +225,8 @@ cosmo.view.cal = new function() {
     // =========================
     function removeEventConfirm(ev) {
         var str = '';
-        // Recurrence
-        if (ev.data.masterEvent || ev.data.instance) {
+        // Recurrence is a ball-buster
+        if (ev.data.recurrenceRule) {
             str = 'removeRecurConfirm';
         }
         else {
@@ -184,7 +286,6 @@ cosmo.view.cal = new function() {
     
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function(cmd) {
-        var opts = self.recurringEventOptions;
         var act = cmd.action;
         var qual = cmd.qualifier || null;
         var ev = cmd.data;
@@ -193,27 +294,7 @@ cosmo.view.cal = new function() {
                 saveEventChangesConfirm(ev);
                 break;
             case 'save':
-                // Recurring event
-                if (qual) {
-                    switch(qual) {
-                        case opts.ALL_EVENTS:
-                            
-                            break;
-                        case opts.ALL_FUTURE_EVENTS:
-                            
-                            break;
-                        case opts.ONLY_THIS_EVENT:
-                            
-                            break;
-                        default:
-                            // Do nothing
-                            break;
-                    }
-                }
-                // Normal one-shot event
-                else {
-                    saveEventChanges(ev);
-                }
+                saveEventChanges(ev, qual);
                 break;
             case 'removeConfirm':
                 removeEventConfirm(ev);

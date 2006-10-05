@@ -236,7 +236,7 @@ var MiniCal = new function() {
             var content = '';
             for (var i = 0; i < 7; i++)
             content += dayHeadHTML.replace(/%content%/, 
-                Date.abbrWeekday[i].substr(0, 2));
+                Date.abbrWeekday[i].substr(0, 1));
             monthHTML = monthHTML.replace(/%daynames%/, content);
             
             // Create days and weeks

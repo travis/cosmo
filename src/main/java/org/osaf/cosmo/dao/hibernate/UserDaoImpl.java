@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.osaf.cosmo.dao.UserDao;
@@ -155,8 +156,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
     private User findUserByUsername(String username) {
         Session session = getSession();
-        List users = session.getNamedQuery("user.byUsername").setParameter(
-                "username", username).list();
+        Query hibQuery = session.getNamedQuery("user.byUsername").setParameter(
+                "username", username);
+        hibQuery.setCacheable(true);
+        List users = hibQuery.list();
         if (users.size() > 0)
             return (User) users.get(0);
         else
@@ -165,8 +168,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
     private User findUserByEmail(String email) {
         Session session = getSession();
-        List users = session.getNamedQuery("user.byEmail").setParameter(
-                "email", email).list();
+        Query hibQuery = session.getNamedQuery("user.byEmail").setParameter(
+                "email", email);
+        hibQuery.setCacheable(true);
+        List users = hibQuery.list();
         if (users.size() > 0)
             return (User) users.get(0);
         else

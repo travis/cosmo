@@ -95,6 +95,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
         try {
             Query hibQuery = getSession().getNamedQuery("item.by.uid")
                     .setParameter("uid", uid);
+            hibQuery.setCacheable(true);
             List results = hibQuery.list();
             if (results.size() > 0)
                 return (Item) results.get(0);
@@ -666,6 +667,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
         Query hibQuery = getSession().getNamedQuery(
                 "homeCollection.by.ownerId").setParameter("ownerid",
                 dbUserId);
+        hibQuery.setCacheable(true);
         List results = hibQuery.list();
 
         if (results.size() > 0)

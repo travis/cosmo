@@ -21,7 +21,8 @@
 <!-- Generated Jul 17, 2006 11:59:26 AM by Hibernate Tools 3.1.0.beta5 -->
 <hibernate-mapping package="org.osaf.cosmo.model">
     <class name="Attribute" table="attribute" abstract="true">
-        
+        <cache usage="read-write"/>
+
         <id name="id" type="long" column="id" unsaved-value="-1">
             <generator class="native" />
         </id>
@@ -58,13 +59,15 @@
         
         <subclass name="MultiValueStringAttribute" discriminator-value="multistring">
             <set name="value" table="multistring_values" lazy="true">
-    		    <key column="attributeid"/>
-    		    <element column="stringvalue" type="string"/>
-		    </set>   
+                <cache usage="read-write"/>
+                <key column="attributeid"/>
+                <element column="stringvalue" type="string"/>
+            </set>   
         </subclass>
         
         <subclass name="DictionaryAttribute" discriminator-value="dictionary">
             <map name="value" table="dictionary_values" lazy="true">
+                <cache usage="read-write"/>
                 <key column="attributeid"/>
                 <map-key column="keyname" type="string"/>
                 <element column="stringvalue" type="string"/>

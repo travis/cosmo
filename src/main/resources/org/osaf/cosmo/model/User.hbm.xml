@@ -23,7 +23,7 @@
 <hibernate-mapping package="org.osaf.cosmo.model">
     
     <class name="User" table="users">
-        
+        <cache usage="read-write"/>
         <id name="id" column="id" unsaved-value="-1">
             <generator class="native" />
         </id>

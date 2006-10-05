@@ -393,8 +393,7 @@ $smButtonHeight = 18px
 }
 /* Jump-to date box */
 #jumpToDateDiv { 
-    padding-left:7px;
-    padding-right:3px;
+    padding:0px;
     position:absolute;
 }
 /* Right sidebar
@@ -440,7 +439,6 @@ $smButtonHeight = 18px
     font-weight:bold;
     color:#333333;
     color:$navBarTextColor;
-    letter-spacing:-1px; 
 }
 /* List of day/dates -- e.g., 'Sun 11 | Mon 12 | Tue 12' */
 #dayListDiv { 
@@ -539,7 +537,7 @@ $smButtonHeight = 18px
  * --------------------- */
 #miniCalDiv {
     border:0px; 
-    left:8px; 
+    left:15px; 
     width:140px;
     border:1px solid #cccccc;
     position:relative;
@@ -573,7 +571,7 @@ $smButtonHeight = 18px
 .miniDayName {
     color:rgb(100,100,100);
     text-align:center;
-    font-size:0.7em;
+    font-size:0.9em;
 }
 .miniBase {
     font-size:0px;

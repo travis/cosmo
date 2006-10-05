@@ -781,13 +781,15 @@ function CalForm() {
 
         descrTxt = null; // Set DOM-node-ref to null to avoid IE memleak
     };
-    this.addJumpToDate = function(dc) {
+    this.addJumpToDate = function(dMain) {
         var top = parseInt(MiniCal.displayContext.style.top);
         var d = null;
         
         // place the div just above minical
         top -= 28;
-        dc.style.top = top + 'px';
+        dMain.style.top = top + 'px';
+        var dc = document.createElement('div');
+        dMain.appendChild(dc);
         
         d = document.createElement('div');
         d.className = 'floatLeft';
@@ -804,7 +806,7 @@ function CalForm() {
         d.className = 'formElem floatLeft';
         dc.appendChild(d);
         self.createInput('text', 'jumpto', 'jumpto',
-            8, 10, null, 'inputText', d);
+            10, 10, null, 'inputText', d);
         self.setTextInput(self.form.jumpto, 'mm/dd/yyyy', true, false);
         self.form.jumpto.onclick = Cal.calForm.emptyTextInput;
         self.form.jumpto.onfocus = function() { Cal.calForm.jumpToTextInputHasFocus = true; };
@@ -826,6 +828,17 @@ function CalForm() {
         d = document.createElement('div');
         d.className = 'clearAll';
         dc.appendChild(d);
+        
+        // Do some hokey calculations and pixel positioning
+        // to center this stuff -- so CSS is better than
+        // tables HOW exactly?
+        var wInner = dc.offsetWidth;
+        var wOuter = LEFT_SIDEBAR_WIDTH;
+        var lOffset = Math.round((wOuter - wInner)/2);
+        dc.style.position = 'absolute';
+        dc.style.width = wInner + 'px';
+        dc.style.left = lOffset + 'px';
+        dMain.style.width = LEFT_SIDEBAR_WIDTH + 'px';
     };
     this.goJumpToDate = function() {
         var e = null;

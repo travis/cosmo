@@ -599,11 +599,21 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     }
 
 
-    // Set server generated item properties on new DbItem
+    // Set server generated item properties
     protected void setBaseItemProps(Item item) {
         item.setUid(idGenerator.nextStringIdentifier());
-        item.setCreationDate(new Date());
-        item.setModifiedDate(new Date());
+        
+        // make precision seconds because of MySQL datetime
+        long currTime = (System.currentTimeMillis() / 1000) * 1000;
+        item.setCreationDate(new Date(currTime));
+        item.setModifiedDate(new Date(currTime));
+    }
+    
+    //  Update server generated item properties
+    protected void updateBaseItemProps(Item item) {
+        // make precision seconds because of MySQL datetime
+        long currTime = (System.currentTimeMillis() / 1000) * 1000;
+        item.setModifiedDate(new Date(currTime));
     }
 
     protected Item findItemByParentAndName(Long userDbId, Long parentDbId,

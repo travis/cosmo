@@ -111,6 +111,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         item.setContentLanguage("en");
         item.addStringAttribute("customattribute", "customattributevalue");
         item.addIntegerAttribute("intattribute", new Long(22));
+        item.addBooleanAttribute("booleanattribute", Boolean.TRUE);
         // TODO: figure out db date type is handled because i'm seeing
         // issues with accuracy
         //item.addAttribute(new DateAttribute("dateattribute", new Date()));
@@ -253,10 +254,13 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         item.addAttribute(new StringAttribute("customattribute", "customattributevalue"));
 
         ContentItem newItem = contentDao.createContent(root, item);
+        
+        clearSession();
+        
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
 
         verifyItem(newItem, queryItem);
-        Assert.assertEquals(0, newItem.getVersion().intValue());
+        Assert.assertEquals(0, queryItem.getVersion().intValue());
 
         queryItem.setName("test2");
         queryItem.setDisplayName("this is a test item2");
@@ -264,13 +268,17 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         queryItem.setContentLanguage("es");
         queryItem.setContent(getBytes(baseDir + "/testdata2.txt"));
 
+        // Make sure modified date changes
+        Thread.sleep(1000);
         contentDao.updateContent(queryItem);
 
         clearSession();
         
         ContentItem queryItem2 = contentDao.findContentByUid(newItem.getUid());
-        Assert.assertEquals(1, queryItem2.getVersion().intValue());
+        Assert.assertTrue(queryItem2.getVersion().intValue()>0);
         verifyItem(queryItem, queryItem2);
+      
+        Assert.assertTrue(newItem.getModifiedDate().before(queryItem2.getModifiedDate()));
     }
     
     public void testContentDaoUpdateError() throws Exception

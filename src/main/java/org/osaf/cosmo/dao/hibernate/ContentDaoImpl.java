@@ -228,6 +228,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 checkForDuplicateItemNameMinusItem(collection.getOwner().getId(), 
                     collection.getParent().getId(), collection.getName(), collection.getId());
             
+            updateBaseItemProps(collection);
             getSession().update(collection);
             return collection;
         } catch (HibernateException e) {
@@ -257,6 +258,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             checkForDuplicateItemNameMinusItem(content.getOwner().getId(), 
                     content.getParent().getId(), content.getName(), content.getId());
             
+            updateBaseItemProps(content);
             getSession().update(content);
             return content;
         } catch (HibernateException e) {

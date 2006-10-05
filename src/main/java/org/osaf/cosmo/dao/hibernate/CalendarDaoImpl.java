@@ -362,6 +362,7 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
             checkForDuplicateItemNameMinusItem(calendar.getOwner().getId(), 
                     calendar.getParent().getId(), calendar.getName(), calendar.getId());
             
+            updateBaseItemProps(calendar);
             getSession().update(calendar);
             return calendar;
         } catch (HibernateException e) {
@@ -399,6 +400,7 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
             calendarIndexer.indexCalendarEvent(getSession(), event, event
                     .getCalendar());
 
+            updateBaseItemProps(event);
             getSession().update(event);
             return event;
         } catch (HibernateException e) {

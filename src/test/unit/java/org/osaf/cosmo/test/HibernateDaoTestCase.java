@@ -167,6 +167,8 @@ public class HibernateDaoTestCase extends SpringTestCase {
     protected void verifyItem(Item item1, Item item2) throws Exception
     {
         Assert.assertEquals(item1.getName(),item2.getName());
+        Assert.assertEquals(item1.getCreationDate(), item2.getCreationDate());
+        Assert.assertEquals(item1.getModifiedDate(), item2.getModifiedDate());
         Assert.assertEquals(item1.getDisplayName(), item2.getDisplayName());
         Assert.assertEquals(item1.getId(), item2.getId());
         Assert.assertEquals(item1.getUid(), item2.getUid());

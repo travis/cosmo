@@ -51,14 +51,17 @@ public class StandardQueryCriteriaBuilder implements QueryCriteriaBuilder {
                                        PageCriteria pageCriteria) {
         Criteria crit = session.createCriteria(clazz);
 
-        crit.setMaxResults(pageCriteria.getPageSize());
+        // If page size is -1, that means get all users
+        if(pageCriteria.getPageSize()>0) {
+            crit.setMaxResults(pageCriteria.getPageSize());
 
-        int firstResult = 0;
-        if (pageCriteria.getPageNumber() > 1)
-            firstResult = ((pageCriteria.getPageNumber() - 1) *
-                           pageCriteria.getPageSize());
-        crit.setFirstResult(firstResult);
-
+            int firstResult = 0;
+            if (pageCriteria.getPageNumber() > 1)
+                firstResult = ((pageCriteria.getPageNumber() - 1) *
+                               pageCriteria.getPageSize());
+            crit.setFirstResult(firstResult);
+        }
+        
         for (Order order : buildOrders(pageCriteria))
             crit.addOrder(order);
 

@@ -16,7 +16,6 @@
 package org.osaf.cosmo.model;
 
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Represents an attribute with a date value

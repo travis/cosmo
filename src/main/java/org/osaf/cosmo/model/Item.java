@@ -81,6 +81,10 @@ public abstract class Item extends BaseModelObject {
         addAttribute(new IntegerAttribute(key, value));
     }
     
+    public void addBooleanAttribute(String key, Boolean value) {
+        addAttribute(new BooleanAttribute(key, value));
+    }
+    
     public void addDateAttribute(String key, Date value) {
         addAttribute(new DateAttribute(key, value));
     }
@@ -104,6 +108,8 @@ public abstract class Item extends BaseModelObject {
                 attr = new BinaryAttribute(key, (byte[]) value);
             else if(value instanceof Long)
                 attr = new IntegerAttribute(key, (Long) value);
+            else if(value instanceof Boolean)
+                attr = new BooleanAttribute(key, (Boolean) value);
             else if(value instanceof Date)
                 attr = new DateAttribute(key, (Date) value);
             else if(value instanceof Set)
@@ -121,6 +127,8 @@ public abstract class Item extends BaseModelObject {
                 ((BinaryAttribute) attr).setValue((byte[]) value);
             else if(value instanceof Long)
                 ((IntegerAttribute) attr).setValue((Long) value);
+            else if(value instanceof Boolean)
+                ((BooleanAttribute) attr).setValue((Boolean) value);
             else if(value instanceof Date)
                 ((DateAttribute) attr).setValue((Date) value);
             else if(value instanceof Set)

@@ -18,51 +18,50 @@ package org.osaf.cosmo.model;
 
 
 /**
- * Represents attribute with an integer value.
+ * Represents attribute with an Boolean value.
  */
-public class IntegerAttribute extends Attribute
+public class BooleanAttribute extends Attribute
 		implements java.io.Serializable {
 	  
-	/**
+	
+    /**
      * 
      */
-    private static final long serialVersionUID = -7110319771835652090L;
+    private static final long serialVersionUID = -8393344132524216261L;
     
-    private Long value;
+    private Boolean value;
 
 	/** default constructor */
-	public IntegerAttribute() {
+	public BooleanAttribute() {
 	}
 	
-	public IntegerAttribute(String name, Long value)
+	public BooleanAttribute(String name, Boolean value)
 	{
 		setName(name);
 		this.value = value;
 	}
 
 	// Property accessors
-	public Long getValue() {
+	public Boolean getValue() {
 		return this.value;
 	}
     
     public Attribute copy() {
-        IntegerAttribute attr = new IntegerAttribute();
+        BooleanAttribute attr = new BooleanAttribute();
         attr.setName(getName());
         attr.setValue(getValue());
         return attr;
     }
 
-	public void setValue(Long value) {
+	public void setValue(Boolean value) {
 		this.value = value;
 	}
     
     public void setValue(Object value) {
-        if (value != null && !(value instanceof Long))
+        if (value != null && !(value instanceof Boolean))
             throw new ModelValidationException(
-                    "attempted to set non Long value on attribute");
-        setValue((Long) value);
+                    "attempted to set non Boolean value on attribute");
+        setValue((Boolean) value);
     }
     
-    
-
 }

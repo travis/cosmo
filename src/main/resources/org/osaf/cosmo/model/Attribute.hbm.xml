@@ -51,6 +51,10 @@
         <subclass name="IntegerAttribute" discriminator-value="integer">
         	<property name="value" column="intvalue" type="long"/>	
         </subclass>
+		
+		<subclass name="BooleanAttribute" discriminator-value="boolean">
+        	<property name="value" column="booleanvalue" type="boolean"/>	
+        </subclass>
         
         <subclass name="MultiValueStringAttribute" discriminator-value="multistring">
             <set name="value" table="multistring_values" lazy="true">

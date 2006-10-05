@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.model;
 
-import java.util.Set;
 
 /**
  * Represents an attribute with a string value.

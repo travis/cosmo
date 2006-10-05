@@ -25,6 +25,7 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZone;
@@ -62,7 +63,6 @@ public class CalendarExpandRecurringEventsTest extends TestCase {
         StringReader sr = new StringReader(calendar.toString(filter));
         
         Calendar filterCal = cb.build(sr);
-        System.out.println(filterCal.toString());
         
         // Should expand to 3 event components
         Assert.assertEquals(3, filterCal.getComponents().getComponents("VEVENT").size());
@@ -93,10 +93,39 @@ public class CalendarExpandRecurringEventsTest extends TestCase {
         StringReader sr = new StringReader(calendar.toString(filter));
         
         Calendar filterCal = cb.build(sr);
-        System.out.println(filterCal.toString());
         
         // Should expand to 3 event components
         Assert.assertEquals(3, filterCal.getComponents().getComponents("VEVENT").size());
+        
+        verifyExpandedCalendar(filterCal);
+    }
+    
+    public void testExpandNonRecurringEvent() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "expand_nonrecurr_test3.ics");
+        Calendar calendar = cb.build(fis);
+        
+        Assert.assertEquals(1, calendar.getComponents().getComponents("VEVENT").size());
+        
+        VTimeZone vtz = (VTimeZone) calendar.getComponents().getComponent("VTIMEZONE");
+        TimeZone tz = new TimeZone(vtz);
+        CaldavOutputFilter filter = new CaldavOutputFilter("test");
+        DateTime start = new DateTime("20060102T140000", tz);
+        DateTime end = new DateTime("20060105T140000", tz);
+        start.setUtc(true);
+        end.setUtc(true);
+        
+        Period period = new Period(start, end);
+        filter.setExpand(period);
+        filter.setAllSubComponents();
+        filter.setAllProperties();
+        
+        StringReader sr = new StringReader(calendar.toString(filter));
+        
+        Calendar filterCal = cb.build(sr);
+        
+        // Should be the same component
+        Assert.assertEquals(1, filterCal.getComponents().getComponents("VEVENT").size());
         
         verifyExpandedCalendar(filterCal);
     }
@@ -110,11 +139,11 @@ public class CalendarExpandRecurringEventsTest extends TestCase {
         for(Iterator<VEvent> it = comps.iterator();it.hasNext();) {
             VEvent event = it.next();
             DateTime dt = (DateTime) event.getStartDate().getDate();
+            
             // verify start dates are UTC
+            Assert.assertNull(event.getStartDate().getParameters().getParameter(Parameter.TZID));
             Assert.assertTrue(dt.isUtc());
             
-            // verify each component has recurrenceid
-            Assert.assertNotNull(event.getReccurrenceId());
             // verify no recurrence rules
             Assert.assertNull(event.getProperties().getProperty(Property.RRULE));
         }

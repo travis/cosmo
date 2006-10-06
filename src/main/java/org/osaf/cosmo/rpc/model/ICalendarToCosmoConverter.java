@@ -728,7 +728,8 @@ public class ICalendarToCosmoConverter {
         } else if (isUtc(date)) {
             hasTime = true;
             DateTime dateTime = (DateTime) date;
-            jCalendar = Calendar.getInstance(dateTime.getTimeZone());
+            scoobyDate.setUtc(true);
+            jCalendar = Calendar.getInstance();
             jCalendar.setTime(dateTime);
         } else {
             hasTime = date instanceof DateTime;

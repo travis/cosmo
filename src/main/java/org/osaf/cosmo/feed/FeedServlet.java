@@ -133,9 +133,8 @@ public class FeedServlet extends HttpServlet {
         }
 
         CollectionItem collection = (CollectionItem) item;
-        Collection children = contentService.findChildren(collection);
 
-        spoolAtom10Feed(collection, children, path, req, resp);
+        spoolAtom10Feed(collection, path, req, resp);
     }
 
     // our methods
@@ -147,7 +146,6 @@ public class FeedServlet extends HttpServlet {
     }
 
     private void spoolAtom10Feed(CollectionItem collection,
-                                 Collection children,
                                  String path,
                                  HttpServletRequest req,
                                  HttpServletResponse resp)
@@ -156,7 +154,7 @@ public class FeedServlet extends HttpServlet {
             new FeedGenerator(encodeURL(req, FEED_ATOM10_URI),
                               encodeURL(req, homePath, false),
                               encodeURL(req, browsePath, false));
-        Feed feed = generator.generateFeed(collection, children, path);
+        Feed feed = generator.generateFeed(collection, path);
 
         // set headers
         resp.setStatus(HttpServletResponse.SC_OK);

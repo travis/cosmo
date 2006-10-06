@@ -299,6 +299,9 @@ public abstract class DavResourceBase
             if (isHomeCollection())
                 return null;
 
+            // XXX: if we have an item, wrap its parent rather than
+            // doing a full lookup
+
             if (log.isDebugEnabled())
                 log.debug("getting parent collection for resource " +
                           getResourcePath());
@@ -741,7 +744,7 @@ public abstract class DavResourceBase
      * Returns a list of names of <code>Attribute</code>s that should
      * not be exposed through DAV as dead properties.
      */
-    protected abstract Set getDeadPropertyFilter();
+    protected abstract Set<String> getDeadPropertyFilter();
 
     private void loadProperties() {
         if (! exists())

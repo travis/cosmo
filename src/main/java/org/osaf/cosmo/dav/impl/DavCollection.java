@@ -54,14 +54,17 @@ import org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty;
 import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dav.CosmoDavMethods;
+import org.osaf.cosmo.dav.ExtendedDavConstants;
 import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
 import org.osaf.cosmo.dav.caldav.report.MultigetReport;
 import org.osaf.cosmo.dav.caldav.report.QueryReport;
+import org.osaf.cosmo.dav.property.ExcludeFreeBusyRollup;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.util.PathUtil;
 
@@ -73,27 +76,33 @@ import org.osaf.cosmo.util.PathUtil;
  *
  * <ul>
  * <li><code>DAV:supported-report-set</code> (protected)</li>
+ * <li><code>cosmo:exclude-free-busy-rollup</code></li>
  * </ul>
  *
  * @see DavResourceBase
  * @see CollectionItem
  */
-public class DavCollection extends DavResourceBase {
+public class DavCollection extends DavResourceBase
+    implements ExtendedDavConstants {
     private static final Logger log = Logger.getLogger(DavCollection.class);
     private static final int[] RESOURCE_TYPES;
-    private static final Set DEAD_PROPERTY_FILTER = new HashSet();
+    private static final Set<String> DEAD_PROPERTY_FILTER =
+        new HashSet<String>();
     private static final Set REPORT_TYPES = new HashSet();
 
     private ArrayList members;
 
     static {
         registerLiveProperty(DeltaVConstants.SUPPORTED_REPORT_SET);
+        registerLiveProperty(EXCLUDEFREEBUSYROLLUP);
 
         RESOURCE_TYPES = new int[] { ResourceType.COLLECTION };
 
         REPORT_TYPES.add(QueryReport.REPORT_TYPE_CALDAV_QUERY);
         REPORT_TYPES.add(MultigetReport.REPORT_TYPE_CALDAV_MULTIGET);
         REPORT_TYPES.add(FreeBusyReport.REPORT_TYPE_CALDAV_FREEBUSY);
+
+        DEAD_PROPERTY_FILTER.add(CollectionItem.ATTR_EXCLUDE_FREE_BUSY_ROLLUP);
     }
 
     /** */
@@ -233,6 +242,11 @@ public class DavCollection extends DavResourceBase {
     // our methods
 
     /** */
+    public boolean isExcludedFromFreeBusyRollups() {
+        return ((CollectionItem) getItem()).isExcludeFreeBusyRollup();
+    }
+
+    /** */
     protected int[] getResourceTypes() {
         return RESOURCE_TYPES;
     }
@@ -248,6 +262,7 @@ public class DavCollection extends DavResourceBase {
         DavPropertySet properties = getProperties();
 
         properties.add(new SupportedReportSetProperty((ReportType[])REPORT_TYPES.toArray(new ReportType[0])));
+        properties.add(new ExcludeFreeBusyRollup(cc.isExcludeFreeBusyRollup()));
     }
 
     /** */
@@ -259,9 +274,16 @@ public class DavCollection extends DavResourceBase {
             return;
 
         DavPropertyName name = property.getName();
+        if (property.getValue() == null)
+            throw new ModelValidationException("null value for property " + name);
+        String value = property.getValue().toString();
 
         if (name.equals(DeltaVConstants.SUPPORTED_REPORT_SET))
             throw new ModelValidationException("cannot set protected property " + name);
+
+        if (name.equals(EXCLUDEFREEBUSYROLLUP)) {
+            cc.setExcludeFreeBusyRollup(Boolean.valueOf(value));
+        }
     }
 
     /** */
@@ -274,10 +296,13 @@ public class DavCollection extends DavResourceBase {
 
         if (name.equals(DeltaVConstants.SUPPORTED_REPORT_SET))
             throw new ModelValidationException("cannot remove protected property " + name);
+
+        if (name.equals(EXCLUDEFREEBUSYROLLUP))
+            cc.setExcludeFreeBusyRollup(false);
     }
 
     /** */
-    protected Set getDeadPropertyFilter() {
+    protected Set<String> getDeadPropertyFilter() {
         return DEAD_PROPERTY_FILTER;
     }
 

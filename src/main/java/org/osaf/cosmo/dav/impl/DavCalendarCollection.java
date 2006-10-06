@@ -90,7 +90,8 @@ public class DavCalendarCollection extends DavCollection
     private static final Logger log =
         Logger.getLogger(DavCalendarCollection.class);
     private static final int[] RESOURCE_TYPES;
-    private static final Set DEAD_PROPERTY_FILTER = new HashSet();
+    private static final Set<String> DEAD_PROPERTY_FILTER =
+        new HashSet<String>();
 
     static {
         registerLiveProperty(CALENDARDESCRIPTION);
@@ -313,8 +314,8 @@ public class DavCalendarCollection extends DavCollection
     }
 
     /** */
-    protected Set getDeadPropertyFilter() {
-        Set copy = new HashSet();
+    protected Set<String> getDeadPropertyFilter() {
+        Set<String> copy = new HashSet<String>();
         copy.addAll(super.getDeadPropertyFilter());
         copy.addAll(DEAD_PROPERTY_FILTER);
         return copy;

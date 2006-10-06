@@ -28,6 +28,10 @@ public class CollectionItem extends Item {
      */
     private static final long serialVersionUID = 2873258323314048223L;
     
+    // CollectionItem specific attributes
+    public static final String ATTR_EXCLUDE_FREE_BUSY_ROLLUP =
+        "cosmo:excludeFreeBusyRollup";
+
     private Set<Item> children = new HashSet<Item>(0);
     
     public CollectionItem() {
@@ -39,5 +43,17 @@ public class CollectionItem extends Item {
 
     private void setChildren(Set<Item> children) {
         this.children = children;
+    }
+
+    public boolean isExcludeFreeBusyRollup() {
+        Boolean val =
+            (Boolean) getAttributeValue(ATTR_EXCLUDE_FREE_BUSY_ROLLUP);
+        if (val != null)
+            return val.booleanValue();
+        return false;
+    }
+
+    public void setExcludeFreeBusyRollup(boolean flag) {
+        setAttribute(ATTR_EXCLUDE_FREE_BUSY_ROLLUP, Boolean.valueOf(flag));
     }
 }

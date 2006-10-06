@@ -44,6 +44,11 @@ public class DavPropFindTest extends BaseDavServletTestCase
     implements DavConstants, TicketConstants {
     private static final Log log = LogFactory.getLog(DavPropFindTest.class);
 
+    // XXX: the ticket-discovery and exclude-free-busy-rollup property
+    // tests really should be integration tests against live
+    // data. this class should simply test that DavServlet's
+    // doPropFind method behaves as expected.
+
     /** */
     public void testPropFindTicketDiscoveryByUser() throws Exception {
         logInUser(user);

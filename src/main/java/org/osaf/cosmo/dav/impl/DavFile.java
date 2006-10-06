@@ -72,7 +72,8 @@ import org.osaf.cosmo.model.ModelValidationException;
 public class DavFile extends DavResourceBase {
     private static final Logger log = Logger.getLogger(DavFile.class);
     private static final int[] RESOURCE_TYPES;
-    private static final Set DEAD_PROPERTY_FILTER = new HashSet();
+    private static final Set<String> DEAD_PROPERTY_FILTER =
+        new HashSet<String>();
 
     private String etag;
 
@@ -344,7 +345,7 @@ public class DavFile extends DavResourceBase {
     }
 
     /** */
-    protected Set getDeadPropertyFilter() {
+    protected Set<String> getDeadPropertyFilter() {
         return DEAD_PROPERTY_FILTER;
     }
 

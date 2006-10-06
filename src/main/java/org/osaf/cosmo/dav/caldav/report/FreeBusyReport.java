@@ -65,6 +65,7 @@ import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
 import org.osaf.cosmo.dav.impl.DavCalendarResource;
+import org.osaf.cosmo.dav.impl.DavCollection;
 import org.osaf.cosmo.model.ModelConversionException;
 
 import org.w3c.dom.Document;
@@ -140,6 +141,15 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
      */
     protected void runQuery()
         throws DavException {
+        // if the collection or any of its parent is excluded from
+        // free busy rollups, deny the query
+        DavCollection dc = (DavCollection) getResource();
+        while (dc != null) {
+            if (dc.isExcludedFromFreeBusyRollups())
+                throw new DavException(DavServletResponse.SC_FORBIDDEN, "Targeted collection does not participate in freebusy rollups");
+            dc = (DavCollection) dc.getCollection();
+        }
+
         super.runQuery();
 
         PeriodList busyPeriods = new PeriodList();
@@ -214,6 +224,19 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
         setContentType("text/calendar");
         setEncoding("UTF-8"); 
         setStream(new ByteArrayInputStream(output.getBytes()));
+    }
+
+    /**
+     * Does nothing if the targeted resource is excluded from free
+     * busy rollups.
+     */
+    protected void doQuery(DavResource resource,
+                           boolean recurse)
+        throws DavException {
+        if (((DavCollection) resource).isExcludedFromFreeBusyRollups())
+            return;
+
+        super.doQuery(resource, recurse);
     }
 
     // private methods

@@ -150,16 +150,10 @@ public abstract class CaldavReport
      */
     protected void runQuery()
         throws DavException {
-        if (info.getDepth() == DEPTH_0) {
+        if (info.getDepth() == DEPTH_0)
             return;
-        }
 
-        // run the query on this resource itself
-        doQuery(resource);
-
-        if (info.getDepth() == DEPTH_INFINITY) {
-            doQueryForChildren(resource);
-        }
+        doQuery(resource, info.getDepth() == DEPTH_INFINITY);
     }
 
     /**
@@ -300,9 +294,18 @@ public abstract class CaldavReport
         return calendarData;
     }
 
-    // private methods
-
-    private void doQuery(DavResource resource)
+    /**
+     * Performs the report query on the targeted resource itself.
+     * Finds the set of members that match the query filter and
+     * adds them to the report results.
+     *
+     * If <code>recurse</code> is true, queries each of the
+     * subcollections as well.
+     *
+     * If the resource is not a calendar collection, does nothing.
+     */
+    protected void doQuery(DavResource resource,
+                           boolean recurse)
         throws DavException {
         if (! ((ExtendedDavResource)resource).isCalendarCollection())
             return;
@@ -314,17 +317,14 @@ public abstract class CaldavReport
             log.error("cannot run report query", e);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot run report query: " + e.getMessage());
         }
-    }
 
-    private void doQueryForChildren(DavResource resource)
-        throws DavException {
-        // iterate through this this resource's child calendar
-        // collections and run the query for each one
+        if (! recurse)
+            return;
+
         for (DavResourceIterator i = resource.getMembers(); i.hasNext();) {
             ExtendedDavResource child = (ExtendedDavResource) i.nextResource();
-            if (child.isCalendarCollection()) {
-                doQuery(child);
-                doQueryForChildren(child);
+            if (child.isCollection()) {
+                doQuery(child, true);
             }
         }
     }

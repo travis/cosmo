@@ -121,25 +121,7 @@ function wrapMethod(jsonRemoteObject, jsonRemoteMethod){
         } catch (exception) {
             throw wrapException(exception);
         }
-
-        if (returnVal){
-
-            //test if the returned value is an Array
-            if (typeof returnVal == "object" && returnVal[0]){
-                var newArray = new Array();
-                for (var x = 0; x < returnVal.length; x++){
-                    newArray[x] = convertObject(returnVal[x]);
-                }
-                return newArray;
-            }
-
-            //If it's javaclass, we might need to convert it
-            if (returnVal.javaClass){
-                return convertObject(returnVal);
-            }
-
-            return returnVal;
-        }
+        return convertObject(returnVal);
     }
     return f;
 }

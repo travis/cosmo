@@ -117,7 +117,7 @@ cosmo.view.cal.canvas = new function() {
                 setSelectedEvent(ev);
                 break;
             case 'save':
-                setSelectedEvent(ev);
+                //setSelectedEvent(ev);
                 break; 
             case 'saveFailed':
                 if (cmd.qualifier == 'initialSave') {

@@ -71,6 +71,7 @@ cosmo.view.cal = new function() {
         var opts = self.recurringEventOptions;
         
         // Lozenge stuff
+        // FIXME: Actually this stuff should be oWnZ0Rd by view.cal.canvas
         // ---------
         // Reset the block because we may be changing to the new type --
         // e.g., between all-day and normal, or between normal single
@@ -84,7 +85,7 @@ cosmo.view.cal = new function() {
         ev.block.updateElements();
         // Display processing animation
         ev.block.showProcessing();
-
+        
         // Kill any confirmation dialog that might be showing
         if (Cal.dialog.isDisplayed) {
             Cal.hideDialog();
@@ -96,11 +97,10 @@ cosmo.view.cal = new function() {
             switch(qual) {
                 case opts.ALL_EVENTS:
                     if (ev.data.masterEvent) {
-                        f = function() { doSaveSingleEvent(ev) }
+                        f = function() { doSaveEvent(ev, { 'saveType': 'recurrenceMaster' }) }
                     }
                     else {
-                        var asyncRegData = {};
-                        h = function(eData, err) {
+                        h = function(evData, err) {
                             if (err) {
                                 Cal.showErr('Could not retrieve master event for this recurrence.', err);
                                 // Broadcast failure
@@ -108,18 +108,17 @@ cosmo.view.cal = new function() {
                                     'qualifier': 'editExiting', 'data': ev });
                             }
                             else {
-                                // Master event's CalEventData is e
-                                // Current instance's CalEvent is ev
-                                
-                                // FIXME: CosmoDates returned are missing all their methods
-                                // Create a dummy CosmoDate and fill in props from the 
-                                // returned object
-                                var es = eData.start;
+                                // ******************************************
+                                var es = evData.start;
+                                for (var i in evData.start) {
+                                    Log.print(i + ': ' + evData.start[i]);
+                                }
                                 var masterStart = new ScoobyDate();
                                 var masterEnd = new ScoobyDate();
-                                for (var i in es) {
+                                for (var i in evData.start) {
                                     masterStart[i] = es[i];
                                 }
+                                // ******************************************
                                 
                                 var origStart = ev.dataOrig.start;
                                 var newStart = ev.data.start;
@@ -163,14 +162,15 @@ cosmo.view.cal = new function() {
                                 // Needed to do fallback if the update fails
                                 // FIXME: Didn't I just get rid of this 
                                 // asyncRegistry thing? This is a hack.
-                                asyncRegistry.setItem(eData.id, ev);
+                                asyncRegistry.setItem(evData.id, ev);
                                 
-                                doSaveRecurrenceMaster(eData);
+                                // doSaveEvent expects a CalEvent with attached CalEventData
+                                var saveEv = new CalEvent();
+                                saveEv.data = evData;
+                                doSaveEvent(saveEv, { 'saveType': 'recurrenceMaster' });
                             }
                         };
-                        
-                        var reqId = Cal.serv.getEvent(h, Cal.currentCalendar.path, ev.data.id);
-                        // var reqId = Cal.serv.getEvent(h, ev.data.id); // Produce an error
+                        f = function() { var reqId = Cal.serv.getEvent(h, Cal.currentCalendar.path, ev.data.id); };
                     }
                     break;
                 case opts.ALL_FUTURE_EVENTS:
@@ -183,34 +183,40 @@ cosmo.view.cal = new function() {
                     // Do nothing
                     break;
             }
-            return;
         }
         // Normal one-shot event
         else {
-            f = function() { doSaveSingleEvent(ev) }
+            f = function() { doSaveEvent(ev, { 'saveType': 'singleEvent' }) }
         }
         
         // Give a sec for the processing state to show
         setTimeout(f, 500);
         
     }
-    function doSaveSingleEvent(ev) {
+    function doSaveEvent(ev, opts) {
         var f = function(newEvId, err, reqId) { 
-            handleSaveSingleEvent(ev, newEvId, err, reqId); };
+            handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
         
         requestId = Cal.serv.saveEvent(
             f, Cal.currentCalendar.path, ev.data);
     }
-    function handleSaveSingleEvent(ev, newEvId, err, reqId) {
+    function handleSaveEvent(ev, newEvId, err, reqId, optsParam) {
         var saveEv = ev;
+        var opts = optsParam || {};
         // Simple error message to go along with details from Error obj
         var errMsg = '';
+        var act = '';
         var qual = '';
+        
+        if (opts.saveType == 'recurrenceMaster') {
+        
+        }
         
         // Failure -- display exception info
         // ============
         if (err) {
+            act = 'saveFailed';
             // Failed update -- fall back to original state
             if (saveEv.dataOrig) {
                 errMsg = getText('Main.Error.EventEditSaveFailed');
@@ -218,19 +224,15 @@ cosmo.view.cal = new function() {
             }
             // Failed create -- remove fake placeholder event and block
             else {
-                qual = 'initialSave';
-                // Remove all the client-side stuff associated with this event
                 errMsg = getText('Main.Error.EventNewSaveFailed');
+                qual = 'initialSave';
             }
-            // Broadcast failure
-            dojo.event.topic.publish('/calEvent', { 'action': 'saveFailed', 
-                'qualifier': qual, 'data': saveEv });
-            
             Cal.showErr(errMsg, err);
         }
         // Success
         // ============
         else {
+            act = 'saveSuccess';
             // Set the CalEventData ID from the value returned by server
             if (!saveEv.data.id) {
                 saveEv.data.id = newEvId;
@@ -238,17 +240,18 @@ cosmo.view.cal = new function() {
             
             // If new dates are out of range, remove the event from display
             if (saveEv.isOutOfViewRange()) {
-                // Broadcast success
-                dojo.event.topic.publish('/calEvent', { 'action': 'saveSuccess', 
-                    'qualifier': 'offCanvas', 'data': saveEv });
+                qual = 'offCanvas';
             }
             // Otherwise update display
             else {
-                // Broadcast success
-                dojo.event.topic.publish('/calEvent', { 'action': 'saveSuccess', 
-                    'qualifier': 'onCanvas', 'data': saveEv });
+                qual = 'onCanvas';
             }
         }
+        
+        // Broadcast success/failure
+        dojo.event.topic.publish('/calEvent', { 'action': act, 
+            'qualifier': qual, 'data': saveEv });
+        
         // Resets local timer for timeout -- we know server-side
         // session has been refreshed
         // ********************
@@ -306,9 +309,6 @@ cosmo.view.cal = new function() {
             dojo.event.topic.publish('/calEvent', { 'action': 'removeSuccess', 
                 'data': removeEv });
         }
-        
-        // Update entire display of events
-        //Cal.updateEventsDisplay();
         
         // Resets local timer for timeout -- we know server-side
         // session has been refreshed

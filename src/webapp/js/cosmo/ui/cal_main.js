@@ -64,9 +64,6 @@ var Cal = new function() {
     this.statusTemplate = new StatusTemplate();
     this.statusTemplate.options = ['CONFIRMED', 'TENTATIVE', 'CANCELLED'];
 
-    // Remote calls for saving or removing --
-    // tracking list used for callback reference
-    this.asyncRegistry = new Hash();
 
     // List of any queued-up error messages
     this.errorList = [];
@@ -570,7 +567,6 @@ var Cal = new function() {
 
     this.goViewQueryDate = function(queryDate) {
         Cal.calForm.clear();
-        Cal.asyncRegistry = new Hash();
         Cal.getQuerySpan(new Date(queryDate)); // Get the new query span week
         // Draw the calendar canvas
         cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
@@ -959,7 +955,6 @@ var Cal = new function() {
         }
         this.calForm = null;
         this.allDayArea = null;
-        this.asyncRegistry = null;
     };
 }
 

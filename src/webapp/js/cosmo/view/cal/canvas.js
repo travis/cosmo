@@ -96,6 +96,12 @@ cosmo.view.cal.canvas = new function() {
         ev.block.updateFromEvent(ev);
         ev.block.updateDisplayMain();
     }
+    function restoreEvent(ev) {
+        if (ev.restoreFromSnapshot()) {
+            ev.block.updateFromEvent(ev);
+            ev.block.updateDisplayMain();
+        }
+    }
     
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function(cmd) {
@@ -114,7 +120,13 @@ cosmo.view.cal.canvas = new function() {
                 setSelectedEvent(ev);
                 break; 
             case 'saveFailed':
-                removeEvent(ev.id, ev);
+                if (cmd.qualifier == 'initialSave') {
+                    removeEvent(ev.id, ev);
+                }
+                else {
+                    restoreEvent(ev);
+                    ev.setInputDisabled(false);
+                }
                 break;
             case 'saveSuccess':
                 // Changes have placed the saved event off-canvas
@@ -130,6 +142,7 @@ cosmo.view.cal.canvas = new function() {
                 break;
             case 'removeSuccess':
                 removeEvent(ev.id, ev);
+                updateEventsDisplay();
                 break;
             default:
                 // Do nothing

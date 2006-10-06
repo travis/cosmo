@@ -19,6 +19,8 @@ dojo.provide('cosmo.view.cal');
 cosmo.view.cal = new function() {
     
     var self = this;
+    // tracking list used for callback reference
+    asyncRegistry = new Hash();
     
     // Saving changes
     // =========================
@@ -64,7 +66,7 @@ cosmo.view.cal = new function() {
         else {
             saveEventChanges(ev);
         }
-    };
+    }
     function saveEventChanges(ev, qual) {
         var opts = self.recurringEventOptions;
         
@@ -83,52 +85,92 @@ cosmo.view.cal = new function() {
         // Display processing animation
         ev.block.showProcessing();
 
+        // Kill any confirmation dialog that might be showing
+        if (Cal.dialog.isDisplayed) {
+            Cal.hideDialog();
+        }
+        
         // Recurring event
         var f = null;
         if (qual) {
             switch(qual) {
                 case opts.ALL_EVENTS:
-                    var saveEv = null;
                     if (ev.data.masterEvent) {
                         f = function() { doSaveSingleEvent(ev) }
                     }
                     else {
-                        h = function(eData) {
-                            // Master event's CalEventData is e
-                            // Current instance's CalEvent is ev
-                            var masterStart = eData.start;
-                            var origStart = ev.dataOrig.start;
-                            var newStart = ev.data.start;
-                            // Date parts for the edited instance start
-                            var mon = newStart.getMonth();
-                            var dat = newStart.getDate();
-                            var hou = newStart.getHours();
-                            var min = newStart.getMinutes();
-                            
-                            // Mod start based on edited instance
-                            switch ( ev.data.recurrenceRule.frequency) {
-                                case 'daily':
-                                    // Can't change anything but time
-                                    break;
-                                case 'weekly':
-                                case 'biweekly':
-                                    var diff = Date.diff('d', origStart, newStart);
-                                    masterStart.setDate(masterStart.getDate() + diff);
-                                    break;
-                                case 'monthly':
-                                    masterStart.setDate(dat);
-                                    break;
-                                case 'yearly':
-                                    masterStart.setMonth(mon);
-                                    masterStart.setDate(dat);
-                                    break;
+                        var asyncRegData = {};
+                        h = function(eData, err) {
+                            if (err) {
+                                Cal.showErr('Could not retrieve master event for this recurrence.', err);
+                                // Broadcast failure
+                                dojo.event.topic.publish('/calEvent', { 'action': 'saveFailed',
+                                    'qualifier': 'editExiting', 'data': ev });
                             }
-                            // Always set time
-                            masterStart.setHours(min);
-                            masterStart.setMinutes(min);
-                            //doSaveSingleEvent(eData);
+                            else {
+                                // Master event's CalEventData is e
+                                // Current instance's CalEvent is ev
+                                
+                                // FIXME: CosmoDates returned are missing all their methods
+                                // Create a dummy CosmoDate and fill in props from the 
+                                // returned object
+                                var es = eData.start;
+                                var masterStart = new ScoobyDate();
+                                var masterEnd = new ScoobyDate();
+                                for (var i in es) {
+                                    masterStart[i] = es[i];
+                                }
+                                
+                                var origStart = ev.dataOrig.start;
+                                var newStart = ev.data.start;
+                                var minutesToEnd = ScoobyDate.diff('n', ev.data.start, ev.data.end);
+                                // Date parts for the edited instance start
+                                var mon = newStart.getMonth();
+                                var dat = newStart.getDate();
+                                var hou = newStart.getHours();
+                                var min = newStart.getMinutes();
+                                
+                                // Mod start based on edited instance
+                                switch (ev.data.recurrenceRule.frequency) {
+                                    case 'daily':
+                                        // Can't change anything but time
+                                        break;
+                                    case 'weekly':
+                                    case 'biweekly':
+                                        var diff = Date.diff('d', origStart, newStart);
+                                        masterStart.setDate(masterStart.getDate() + diff);
+                                        break;
+                                    case 'monthly':
+                                        masterStart.setDate(dat);
+                                        break;
+                                    case 'yearly':
+                                        masterStart.setMonth(mon);
+                                        masterStart.setDate(dat);
+                                        break;
+                                }
+                                // Always set time
+                                masterStart.setHours(hou);
+                                masterStart.setMinutes(min);
+                                
+                                masterEnd = ScoobyDate.clone(masterStart);
+                                masterEnd.add('n', minutesToEnd);
+                                
+                                //Log.print(masterStart.toString());
+                                //Log.print(masterEnd.toString());
+                                
+                                // Save the recurrence instance in a Hash
+                                // with the master's CalEventData id as the key
+                                // Needed to do fallback if the update fails
+                                // FIXME: Didn't I just get rid of this 
+                                // asyncRegistry thing? This is a hack.
+                                asyncRegistry.setItem(eData.id, ev);
+                                
+                                doSaveRecurrenceMaster(eData);
+                            }
                         };
-                        var saveEv = Cal.serv.getEvent(h, Cal.currentCalendar.path, ev.data.id);
+                        
+                        var reqId = Cal.serv.getEvent(h, Cal.currentCalendar.path, ev.data.id);
+                        // var reqId = Cal.serv.getEvent(h, ev.data.id); // Produce an error
                     }
                     break;
                 case opts.ALL_FUTURE_EVENTS:
@@ -151,44 +193,38 @@ cosmo.view.cal = new function() {
         // Give a sec for the processing state to show
         setTimeout(f, 500);
         
-        // Kill any confirmation dialog that might be showing
-        if (Cal.dialog.isDisplayed) {
-            Cal.hideDialog();
-        }
-    };
-    function doSaveSingleEvent(e) {
-        var d = e.data ? e.data : e; // Input is either a CalEvent or CalEventData
+    }
+    function doSaveSingleEvent(ev) {
         var f = function(newEvId, err, reqId) { 
-            handleSaveResult(ev, newEvId, err, reqId); };
+            handleSaveSingleEvent(ev, newEvId, err, reqId); };
         var requestId = null;
         
         requestId = Cal.serv.saveEvent(
-            f, Cal.currentCalendar.path, d);
-    };
-    function handleSaveResult(ev, newEvId, err, reqId) {
+            f, Cal.currentCalendar.path, ev.data);
+    }
+    function handleSaveSingleEvent(ev, newEvId, err, reqId) {
         var saveEv = ev;
         // Simple error message to go along with details from Error obj
         var errMsg = '';
+        var qual = '';
         
         // Failure -- display exception info
         // ============
         if (err) {
             // Failed update -- fall back to original state
             if (saveEv.dataOrig) {
-                // Restore from backup snapshot
-                saveEv.restoreEvent();
-                // Re-enable user input on this event
-                saveEv.setInputDisabled(false);
                 errMsg = getText('Main.Error.EventEditSaveFailed');
+                qual = 'editExisting';
             }
             // Failed create -- remove fake placeholder event and block
             else {
+                qual = 'initialSave';
                 // Remove all the client-side stuff associated with this event
                 errMsg = getText('Main.Error.EventNewSaveFailed');
             }
             // Broadcast failure
             dojo.event.topic.publish('/calEvent', { 'action': 'saveFailed', 
-                'data': saveEv });
+                'qualifier': qual, 'data': saveEv });
             
             Cal.showErr(errMsg, err);
         }
@@ -219,11 +255,18 @@ cosmo.view.cal = new function() {
         // BANDAID: need to move this into the actual Service call
         // ********************
         Cal.serv.resetServiceAccessTime();
-    };
+    }
+    function doSaveRecurrenceMaster(evData) {
+        alert('Success -- ' + evData);
+
+    }
+    function handleSaveRecurrenceMaster() {
+        
+    }
     
     // Remove
     // =========================
-    function removeEventConfirm(ev) {
+    function removeEventConfirm(ev, qual) {
         var str = '';
         // Recurrence is a ball-buster
         if (ev.data.recurrenceRule) {
@@ -233,7 +276,7 @@ cosmo.view.cal = new function() {
             str = 'removeConfirm';
         }
         Cal.showDialog(cosmo.view.cal.dialog.getProps(str));
-    };
+    }
     function removeEvent(ev) {
         doRemove(ev);
         
@@ -244,13 +287,13 @@ cosmo.view.cal = new function() {
         if (Cal.dialog.isDisplayed) {
             Cal.hideDialog();
         }
-    };
+    }
     function doRemove(ev) {
         var f = function(newEvId, err, reqId) { 
             handleRemoveResult(ev, newEvId, err, reqId); };
         var requestId = Cal.serv.removeEvent(
             f, Cal.currentCalendar.path, ev.data.id);
-    };
+    }
     function handleRemoveResult(ev, newEvId, err, reqId) {
         var removeEv = ev;
         // Simple error message to go along with details from Error obj
@@ -273,7 +316,7 @@ cosmo.view.cal = new function() {
         // BANDAID: need to move this into the actual Service call
         // ********************
         Cal.serv.resetServiceAccessTime();
-    };
+    }
     
     // Public attributes
     // ********************
@@ -300,26 +343,7 @@ cosmo.view.cal = new function() {
                 removeEventConfirm(ev);
                 break;
             case 'remove':
-                if (qual) {
-                    switch(qual) {
-                        case opts.ALL_EVENTS:
-                            
-                            break;
-                        case opts.ALL_FUTURE_EVENTS:
-                            
-                            break;
-                        case opts.ONLY_THIS_EVENT:
-                            
-                            break;
-                        default:
-                            // Do nothing
-                            break;
-                    }
-                }
-                // Normal one-shot event
-                else {
-                    removeEvent(ev);
-                }
+                removeEvent(ev, qual);
                 break;
         }
     };

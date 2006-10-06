@@ -207,7 +207,7 @@ cosmo.view.cal = new function() {
         // Simple error message to go along with details from Error obj
         var errMsg = '';
         var act = '';
-        var qual = '';
+        var qual = {};
         
         if (opts.saveType == 'recurrenceMaster') {
         
@@ -220,12 +220,12 @@ cosmo.view.cal = new function() {
             // Failed update -- fall back to original state
             if (saveEv.dataOrig) {
                 errMsg = getText('Main.Error.EventEditSaveFailed');
-                qual = 'editExisting';
+                qual.newEvent = false;
             }
             // Failed create -- remove fake placeholder event and block
             else {
                 errMsg = getText('Main.Error.EventNewSaveFailed');
-                qual = 'initialSave';
+                qual.newEvent = true;
             }
             Cal.showErr(errMsg, err);
         }
@@ -235,16 +235,20 @@ cosmo.view.cal = new function() {
             act = 'saveSuccess';
             // Set the CalEventData ID from the value returned by server
             if (!saveEv.data.id) {
+                qual.newEvent = true;
                 saveEv.data.id = newEvId;
+            }
+            else {
+                qual.newEvent = false;
             }
             
             // If new dates are out of range, remove the event from display
             if (saveEv.isOutOfViewRange()) {
-                qual = 'offCanvas';
+                qual.onCanvas = false;
             }
             // Otherwise update display
             else {
-                qual = 'onCanvas';
+                qual.onCanvas = true;
             }
         }
         

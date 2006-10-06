@@ -117,10 +117,10 @@ cosmo.view.cal.canvas = new function() {
                 setSelectedEvent(ev);
                 break;
             case 'save':
-                //setSelectedEvent(ev);
+                // Do nothing
                 break; 
             case 'saveFailed':
-                if (cmd.qualifier == 'initialSave') {
+                if (cmd.qualifier.newEvent) {
                     removeEvent(ev.id, ev);
                 }
                 else {
@@ -129,8 +129,11 @@ cosmo.view.cal.canvas = new function() {
                 }
                 break;
             case 'saveSuccess':
+                if (cmd.qualifier.newEvent) {
+                    setSelectedEvent(ev);
+                }
                 // Changes have placed the saved event off-canvas
-                if (cmd.qualifier == 'offCanvas') {
+                if (!cmd.qualifier.onCanvas) {
                     removeEvent(ev.id, ev);
                 }
                 // Saved event is still in view

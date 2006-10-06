@@ -74,7 +74,7 @@ function CalForm() {
                 break;
             case 'saveSuccess':
                 // Changes have placed the saved event off-canvas
-                if (cmd.qualifier == 'offCanvas') {
+                if (!cmd.qualifier.onCanvas) {
                     self.setButtons(false, false);
                     self.clear();
                 }

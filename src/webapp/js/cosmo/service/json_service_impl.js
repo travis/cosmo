@@ -37,10 +37,29 @@ function createSetterMethodName(propName){
     return setterMethodName;
 }
 
-function convertObject(object){
+function convertObject(object){        
+    if (!object){
+        return object;
+    }    
+
+    //test if the returned value is an Array
+    if (typeof object == "object" && object[0]){
+        var newArray = new Array();
+        for (var x = 0; x < object.length; x++){
+            newArray[x] = convertObject(object[x]);
+        }
+        return newArray;
+    }
+
+   //If it's javaclass, we might need to convert it
+    if (!object.javaClass){
+        return object;
+    }
+
     if (object.javaClass == "java.util.HashMap"){
         return convertMap(object);
     }
+    
     var constructor = JAVA_JSON_MAPPING[object.javaClass];
     if (constructor){
        var newObject = new constructor();
@@ -89,9 +108,11 @@ function wrapMethod(jsonRemoteObject, jsonRemoteMethod){
                 if(exception != null){
                     oldCallback(null, wrapException(exception), requestId);
                 } else {
-                    oldCallback(result, null, requestId);
+                    oldCallback(convertObject(result), null, requestId);
                 }
             }
+            
+            return jsonRemoteMethod.apply(jsonRemoteObject, arguments);
         }
 
         var returnVal = null;

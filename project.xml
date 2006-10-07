@@ -510,18 +510,6 @@
           </includes>
         </resource>
         <resource>
-          <directory>src/main/resources</directory>
-          <includes>
-            <include>cosmo-schema.cnd</include>
-          </includes>
-        </resource>
-        <resource>
-          <directory>src/webapp/WEB-INF</directory>
-          <includes>
-            <include>resource-config.xml</include>
-          </includes>
-        </resource>
-        <resource>
           <directory>src/test/unit/resources/dav/caldav</directory>
           <includes>
             <include>*.ics</include>
@@ -532,6 +520,9 @@
           <includes>
             <include>*.ics</include>
           </includes>
+        </resource>
+        <resource>
+          <directory>src/test/unit/resources/testdata</directory>
         </resource>
       </resources>
     </unitTest>

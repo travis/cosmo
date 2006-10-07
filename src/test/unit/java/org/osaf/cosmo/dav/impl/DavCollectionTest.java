@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 
+import org.osaf.cosmo.dav.BaseDavTestCase;
 import org.osaf.cosmo.dav.ExtendedDavConstants;
 import org.osaf.cosmo.dav.property.ExcludeFreeBusyRollup;
 import org.osaf.cosmo.model.CollectionItem;
@@ -28,15 +29,14 @@ import org.osaf.cosmo.model.CollectionItem;
 /**
  * Test case for <code>DavCollection</code>.
  */
-public class DavCollectionTest extends BaseDavResourceTestCase
+public class DavCollectionTest extends BaseDavTestCase
     implements ExtendedDavConstants {
     private static final Log log = LogFactory.getLog(DavCollectionTest.class);
 
     /** */
     public void testDeadFreeBusyRollupProperty() throws Exception {
-        home.setExcludeFreeBusyRollup(false);
-        DavCollection dc =
-            new DavCollection(home, homeLocator, resourceFactory, session);
+        testHelper.getHomeCollection().setExcludeFreeBusyRollup(false);
+        DavCollection dc = testHelper.initializeHomeResource();
 
         boolean found = false;
         for (String name : dc.getDeadPropertyFilter()) {
@@ -51,9 +51,8 @@ public class DavCollectionTest extends BaseDavResourceTestCase
 
     /** */
     public void testGetIncludeFreeBusyRollupProperty() throws Exception {
-        home.setExcludeFreeBusyRollup(false);
-        DavCollection dc =
-            new DavCollection(home, homeLocator, resourceFactory, session);
+        testHelper.getHomeCollection().setExcludeFreeBusyRollup(false);
+        DavCollection dc = testHelper.initializeHomeResource();
 
         DavProperty efbr = dc.getProperty(EXCLUDEFREEBUSYROLLUP);
         assertNotNull("exclude-free-busy-rollup property not found", efbr);
@@ -64,9 +63,8 @@ public class DavCollectionTest extends BaseDavResourceTestCase
 
     /** */
     public void testGetExcludeFreeBusyRollupProperty() throws Exception {
-        home.setExcludeFreeBusyRollup(true);
-        DavCollection dc =
-            new DavCollection(home, homeLocator, resourceFactory, session);
+        testHelper.getHomeCollection().setExcludeFreeBusyRollup(true);
+        DavCollection dc = testHelper.initializeHomeResource();
 
         DavProperty efbr = dc.getProperty(EXCLUDEFREEBUSYROLLUP);
         assertNotNull("exclude-free-busy-rollup property not found", efbr);
@@ -77,53 +75,49 @@ public class DavCollectionTest extends BaseDavResourceTestCase
 
     /** */
     public void testSetIncludeFreeBusyRollupProperty() throws Exception {
-        home.setExcludeFreeBusyRollup(true);
-        DavCollection dc =
-            new DavCollection(home, homeLocator, resourceFactory, session);
+        testHelper.getHomeCollection().setExcludeFreeBusyRollup(true);
+        DavCollection dc = testHelper.initializeHomeResource();
 
         DavProperty efbr = new ExcludeFreeBusyRollup(false);
         dc.setLiveProperty(efbr);
 
         assertTrue("set exclude-free-busy-rollup property is true",
-                   ! home.isExcludeFreeBusyRollup());
+                   ! testHelper.getHomeCollection().isExcludeFreeBusyRollup());
     }
 
     /** */
     public void testSetExcludeFreeBusyRollupProperty() throws Exception {
-        home.setExcludeFreeBusyRollup(false);
-        DavCollection dc =
-            new DavCollection(home, homeLocator, resourceFactory, session);
+        testHelper.getHomeCollection().setExcludeFreeBusyRollup(false);
+        DavCollection dc = testHelper.initializeHomeResource();
 
         DavProperty efbr = new ExcludeFreeBusyRollup(true);
         dc.setLiveProperty(efbr);
 
         assertTrue("set exclude-free-busy-rollup property is false",
-                   home.isExcludeFreeBusyRollup());
+                   testHelper.getHomeCollection().isExcludeFreeBusyRollup());
     }
 
     /** */
     public void testBadSetExcludeFreeBusyRollupProperty() throws Exception {
-        home.setExcludeFreeBusyRollup(true);
-        DavCollection dc =
-            new DavCollection(home, homeLocator, resourceFactory, session);
+        testHelper.getHomeCollection().setExcludeFreeBusyRollup(true);
+        DavCollection dc = testHelper.initializeHomeResource();
 
         // ugh should be interpreted as false
         DavProperty efbr = new DefaultDavProperty(EXCLUDEFREEBUSYROLLUP, "ugh");
         dc.setLiveProperty(efbr);
 
         assertTrue("failed to interpret String exclude-free-busy-rollup property value as false",
-                   ! home.isExcludeFreeBusyRollup());
+                   ! testHelper.getHomeCollection().isExcludeFreeBusyRollup());
     }
 
     /** */
     public void testRemoveExcludeFreeBusyRollupProperty() throws Exception {
-        home.setExcludeFreeBusyRollup(true);
-        DavCollection dc =
-            new DavCollection(home, homeLocator, resourceFactory, session);
+        testHelper.getHomeCollection().setExcludeFreeBusyRollup(true);
+        DavCollection dc = testHelper.initializeHomeResource();
 
         dc.removeLiveProperty(EXCLUDEFREEBUSYROLLUP);
 
         assertTrue("removed exclude-free-busy-rollup property is true",
-                   ! home.isExcludeFreeBusyRollup());
+                   ! testHelper.getHomeCollection().isExcludeFreeBusyRollup());
     }
 }

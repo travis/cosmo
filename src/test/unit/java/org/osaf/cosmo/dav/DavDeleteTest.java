@@ -41,9 +41,10 @@ public class DavDeleteTest extends BaseDavServletTestCase {
 
     /** */
     public void testDeleteContent() throws Exception {
-        HomeCollectionItem home = contentService.getRootItem(user);
-        ContentItem content = testHelper.makeDummyContent(user);
-        contentService.createContent(home, content);
+        HomeCollectionItem home = testHelper.getHomeCollection();
+        ContentItem content =
+            testHelper.makeDummyContent(testHelper.getUser());
+        testHelper.getContentService().createContent(home, content);
 
         MockHttpServletRequest request =
             createMockRequest("DELETE", toCanonicalPath(content.getName()));
@@ -54,15 +55,17 @@ public class DavDeleteTest extends BaseDavServletTestCase {
                      MockHttpServletResponse.SC_NO_CONTENT,
                      response.getStatus());
         assertNull("DELETEd content still exists in storage",
-                   contentService.findItemByUid(content.getUid()));
+                   testHelper.getContentService().
+                   findItemByUid(content.getUid()));
         assertChildNotReferencedByParent(home, content);
     }
 
     /** */
     public void testDeleteCollection() throws Exception {
-        HomeCollectionItem home = contentService.getRootItem(user);
-        CollectionItem collection = testHelper.makeDummyCollection(user);
-        contentService.createCollection(home, collection);
+        HomeCollectionItem home = testHelper.getHomeCollection();
+        CollectionItem collection =
+            testHelper.makeDummyCollection(testHelper.getUser());
+        testHelper.getContentService().createCollection(home, collection);
 
         MockHttpServletRequest request =
             createMockRequest("DELETE", toCanonicalPath(collection.getName()));
@@ -73,7 +76,8 @@ public class DavDeleteTest extends BaseDavServletTestCase {
                      MockHttpServletResponse.SC_NO_CONTENT,
                      response.getStatus());
         assertNull("DELETEd collection still exists in storage",
-                   contentService.findItemByUid(collection.getUid()));
+                   testHelper.getContentService().
+                   findItemByUid(collection.getUid()));
         assertChildNotReferencedByParent(home, collection);
     }
 
@@ -81,9 +85,10 @@ public class DavDeleteTest extends BaseDavServletTestCase {
     public void testDeleteCollectionDepthInfinity() throws Exception {
         // should behave exactly the same as testDeleteCollection()
 
-        HomeCollectionItem home = contentService.getRootItem(user);
-        CollectionItem collection = testHelper.makeDummyCollection(user);
-        contentService.createCollection(home, collection);
+        HomeCollectionItem home = testHelper.getHomeCollection();
+        CollectionItem collection =
+            testHelper.makeDummyCollection(testHelper.getUser());
+        testHelper.getContentService().createCollection(home, collection);
 
         MockHttpServletRequest request =
             createMockRequest("DELETE", toCanonicalPath(collection.getName()));
@@ -95,7 +100,8 @@ public class DavDeleteTest extends BaseDavServletTestCase {
                      MockHttpServletResponse.SC_NO_CONTENT,
                      response.getStatus());
         assertNull("DELETEd collection still exists in storage",
-                   contentService.findItemByUid(collection.getUid()));
+                   testHelper.getContentService().
+                   findItemByUid(collection.getUid()));
         assertChildNotReferencedByParent(home, collection);
     }
 
@@ -103,9 +109,10 @@ public class DavDeleteTest extends BaseDavServletTestCase {
     public void testDeleteCollectionDepth0() throws Exception {
         // should fail with unknown status
 
-        HomeCollectionItem home = contentService.getRootItem(user);
-        CollectionItem collection = testHelper.makeDummyCollection(user);
-        contentService.createCollection(home, collection);
+        HomeCollectionItem home = testHelper.getHomeCollection();
+        CollectionItem collection =
+            testHelper.makeDummyCollection(testHelper.getUser());
+        testHelper.getContentService().createCollection(home, collection);
 
         MockHttpServletRequest request =
             createMockRequest("DELETE", toCanonicalPath(collection.getName()));

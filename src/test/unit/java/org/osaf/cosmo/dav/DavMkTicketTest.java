@@ -34,12 +34,13 @@ public class DavMkTicketTest extends BaseDavServletTestCase {
     /** */
     protected void setUp() throws Exception {
         super.setUp();
-        logInUser(user);
+        // all MKTICKET requests require a security context
+        testHelper.logIn();
     }
 
     /** */
     public void testMkTicket() throws Exception {
-        HomeCollectionItem home = contentService.getRootItem(user);
+        HomeCollectionItem home = testHelper.getHomeCollection();
 
         Ticket ticket = testHelper.makeDummyTicket();
 
@@ -82,7 +83,7 @@ public class DavMkTicketTest extends BaseDavServletTestCase {
 
     /** */
     public void testBadRequest() throws Exception {
-        HomeCollectionItem home = contentService.getRootItem(user);
+        HomeCollectionItem home = testHelper.getHomeCollection();
 
         Ticket ticket = testHelper.makeDummyTicket();
 

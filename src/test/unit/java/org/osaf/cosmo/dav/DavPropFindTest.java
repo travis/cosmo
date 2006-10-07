@@ -51,13 +51,12 @@ public class DavPropFindTest extends BaseDavServletTestCase
 
     /** */
     public void testPropFindTicketDiscoveryByUser() throws Exception {
-        logInUser(user);
-
-        HomeCollectionItem home = contentService.getRootItem(user);
+        testHelper.logIn();
+        HomeCollectionItem home = testHelper.getHomeCollection();
 
         Ticket ticket = testHelper.makeDummyTicket();
-        ticket.setOwner(user);
-        contentService.createTicket(home, ticket);
+        ticket.setOwner(testHelper.getUser());
+        testHelper.getContentService().createTicket(home, ticket);
 
         PropFindContent content = new PropFindContent();
         content.addPropertyName(TICKETDISCOVERY);
@@ -87,15 +86,15 @@ public class DavPropFindTest extends BaseDavServletTestCase
         // those tickets and make sure that only that ticket is
         // returned 
 
-        HomeCollectionItem home = contentService.getRootItem(user);
+        HomeCollectionItem home = testHelper.getHomeCollection();
 
         Ticket ticket1 = testHelper.makeDummyTicket();
-        ticket1.setOwner(user);
-        contentService.createTicket(home, ticket1);
+        ticket1.setOwner(testHelper.getUser());
+        testHelper.getContentService().createTicket(home, ticket1);
 
         Ticket ticket2 = testHelper.makeDummyTicket();
-        ticket2.setOwner(user);
-        contentService.createTicket(home, ticket2);
+        ticket2.setOwner(testHelper.getUser());
+        testHelper.getContentService().createTicket(home, ticket2);
 
         logInTicket(ticket1);
 

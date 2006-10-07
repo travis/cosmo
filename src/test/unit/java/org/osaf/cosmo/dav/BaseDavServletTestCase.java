@@ -19,22 +19,11 @@ import javax.servlet.ServletContextEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.jackrabbit.webdav.lock.SimpleLockManager;
-import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 import org.apache.jackrabbit.webdav.xml.Namespace;
 
 import org.osaf.cosmo.BaseMockServletTestCase;
-import org.osaf.cosmo.TestHelper;
-import org.osaf.cosmo.service.impl.StandardContentService;
-import org.osaf.cosmo.service.impl.StandardUserService;
-import org.osaf.cosmo.dao.mock.MockCalendarDao;
-import org.osaf.cosmo.dao.mock.MockContentDao;
-import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.dav.DavServlet;
-import org.osaf.cosmo.dav.impl.NoOpDavSessionProvider;
-import org.osaf.cosmo.dav.impl.StandardDavResourceFactory;
-import org.osaf.cosmo.model.User;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -42,7 +31,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.w3c.dom.Element;
 
 /**
- * Base class for WebDAV+extensions servlet test cases.
+ * Base class for <code>DavServlet</code> test cases.
+ *
+ * This class extends from <code>BaseMockServletTestCase</code> rather
+ * than <code>BaseDavTestCase</code> and therefore duplicates a small
+ * amount of its functionality related to <code>DavTestHelper</code>.
  */
 public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
     private static final Log log =
@@ -50,64 +43,31 @@ public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
 
     private static final String SERVLET_PATH = "/home";
 
-    protected TestHelper testHelper;
+    protected DavTestHelper testHelper;
     protected DavServlet servlet;
-    protected StandardContentService contentService;
-    protected StandardUserService userService;
-    protected User user;
 
     /**
      */
     protected void setUp() throws Exception {
         super.setUp();
 
-        MockCalendarDao calendarDao = new MockCalendarDao();
-        MockContentDao contentDao = new MockContentDao();
-        MockUserDao userDao = new MockUserDao();
-
-        contentService = new StandardContentService();
-        contentService.setCalendarDao(calendarDao);
-        contentService.setContentDao(contentDao);
-        contentService.init();
-
-        userService = new StandardUserService();
-        userService.setContentDao(contentDao);
-        userService.setUserDao(userDao);
-        userService.setPasswordGenerator(new SessionIdGenerator());
-        userService.init();
-
-        testHelper = new TestHelper();
-
-        StandardDavResourceFactory resourceFactory =
-            new StandardDavResourceFactory();
-        resourceFactory.setContentService(contentService);
-        resourceFactory.setSecurityManager(getSecurityManager());
-
-        LocatorFactoryImpl locatorFactory =
-            new LocatorFactoryImpl(getServletPath());
-
-        NoOpDavSessionProvider sessionProvider = new NoOpDavSessionProvider();
+        testHelper = new DavTestHelper(getServletPath());
+        testHelper.setUp();
 
         servlet = new DavServlet();
-        servlet.setSecurityManager(getSecurityManager());
+        servlet.setSecurityManager(testHelper.getSecurityManager());
         servlet.setLockManager(new SimpleLockManager());
-        servlet.setResourceFactory(resourceFactory);
-        servlet.setLocatorFactory(locatorFactory);
-        servlet.setDavSessionProvider(sessionProvider);
+        servlet.setResourceFactory(testHelper.getResourceFactory());
+        servlet.setLocatorFactory(testHelper.getLocatorFactory());
+        servlet.setDavSessionProvider(testHelper.getSessionProvider());
         servlet.init(getServletConfig());
-
-        user = testHelper.makeDummyUser();
-        userService.createUser(user);
     }
 
     /** */
     protected void tearDown() throws Exception {
-        userService.removeUser(user);
-
         servlet.destroy();
 
-        userService.destroy();
-        contentService.destroy();
+        testHelper.tearDown();
 
         super.tearDown();
     }
@@ -154,7 +114,7 @@ public abstract class BaseDavServletTestCase extends BaseMockServletTestCase {
     /** */
     public String toCanonicalPath(String relativePath) {
         StringBuffer buf = new StringBuffer("/");
-        buf.append(user.getUsername());
+        buf.append(testHelper.getUser().getUsername());
         if (! relativePath.startsWith("/"))
             buf.append("/");
         buf.append(relativePath);

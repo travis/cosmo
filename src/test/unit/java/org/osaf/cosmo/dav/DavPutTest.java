@@ -33,8 +33,8 @@ public class DavPutTest extends BaseDavServletTestCase {
 
     /** */
     public void testPutContent() throws Exception {
-        logInUser(user);
-        HomeCollectionItem home = contentService.getRootItem(user);
+        testHelper.logIn();
+        HomeCollectionItem home = testHelper.getHomeCollection();
        
         MockHttpServletRequest request =
             createMockRequest("PUT", toCanonicalPath("testContent"));
@@ -46,8 +46,9 @@ public class DavPutTest extends BaseDavServletTestCase {
                      MockHttpServletResponse.SC_CREATED,
                      response.getStatus());
         
-        ContentItem content = 
-            (ContentItem) contentService.findItemByPath(toCanonicalPath("testContent"));
+        ContentItem content = (ContentItem)
+            testHelper.getContentService().
+            findItemByPath(toCanonicalPath("testContent"));
      
         assertNotNull("Content does not exist", content);
         assertEquals("Content name incorrect.","testContent", content.getName());
@@ -58,8 +59,8 @@ public class DavPutTest extends BaseDavServletTestCase {
     
     /** */
     public void testPutContentConcurrent() throws Exception {
-        logInUser(user);
-        HomeCollectionItem home = contentService.getRootItem(user);
+        testHelper.logIn();
+        HomeCollectionItem home = testHelper.getHomeCollection();
        
         // tell the mock dao to throw an exception
         MockContentDao.THROW_CONCURRENT_EXCEPTION = true;

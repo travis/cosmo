@@ -34,10 +34,11 @@ public class DavCopyTest extends BaseDavServletTestCase {
 
     /** */
     public void testCopyContent() throws Exception {
-        HomeCollectionItem home = contentService.getRootItem(user);
-        ContentItem content = testHelper.makeDummyContent(user);
+        HomeCollectionItem home = testHelper.getHomeCollection();
+        ContentItem content =
+            testHelper.makeDummyContent(testHelper.getUser());
         content.setAttribute("test:test", "test value");
-        contentService.createContent(home, content);
+        testHelper.getContentService().createContent(home, content);
 
         String oldPath = toCanonicalPath(content.getName());
         String newPath = toCanonicalPath("testcopy");
@@ -51,10 +52,10 @@ public class DavCopyTest extends BaseDavServletTestCase {
                      MockHttpServletResponse.SC_CREATED,
                      response.getStatus());
         assertNotNull("COPYd content does not exist at old location",
-                      contentService.findItemByPath(oldPath));
+                      testHelper.getContentService().findItemByPath(oldPath));
 
         ContentItem newContent = (ContentItem)
-            contentService.findItemByPath(newPath);
+            testHelper.getContentService().findItemByPath(newPath);
         assertNotNull("COPYd content does not exist at new location",
                       newContent);
         assertNotNull("COPYd content does not retain test property",

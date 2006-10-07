@@ -23,6 +23,8 @@ var yPos = 0;
  */
 var Cal = new function() {
     
+    var self = this;
+    
     // Constants
     this.ID_SEPARATOR = '__';
     
@@ -174,7 +176,7 @@ var Cal = new function() {
 
         // Load and display events
         // --------------
-        this.loadEvents();
+        cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
         this.uiMask.hide();
 
         // Scroll to 8am for normal event
@@ -412,57 +414,7 @@ var Cal = new function() {
     // ==========================
     // Loading and displaying events
     // ==========================
-    /**
-     * Load the events from the backend
-     * Calls Cal.insertCalEventLoaded for each CalEventDate obj loaded
-     * Returns true when finished
-     */
-    this.loadEvents = function() {
-        var eventLoadList = null;
-        var eventLoadHash = new Hash();
-        var isErr = false;
-        var detail = '';
-        var evData = null;
-        var id = '';
-        var ev = null;
-
-        // Load the array of events
-        // ======================
-        try {
-            eventLoadList = this.serv.getEvents(this.currentCalendar.path,
-                this.viewStart.getTime(), this.viewEnd.getTime());
-        }
-        catch(e) {
-            Cal.showErr(getText('Main.Error.LoadEventsFailed'), e);
-            Log.print(e.javaStack);
-            return false;
-        }
-        
-        for (var i = 0; i < eventLoadList.length; i++) {
-            evData = eventLoadList[i];
-            // Basic paranoia checks
-            if (!evData.end) {
-                evData.end = ScoobyDate.clone(evData.start);
-            }
-            if (evData.start.timezone || evData.end.timezone) {
-                if (!evData.end.timezone) {
-                    evData.end.timezone =
-                        ScoobyTimezone.clone(evData.start.timezone);
-                }
-                if (!evData.start.timezone) {
-                    evData.start.timezone =
-                        ScoobyTimezone.clone(evData.end.timezone);
-                }
-            }
-            var id = Cal.generateTempId();
-            ev = new CalEvent(id, null);
-            ev.data = evData;
-            eventLoadHash.setItem(id, ev);
-        }
-        dojo.event.topic.publish('/calEvent', { 'action': 'eventsLoadSuccess', 'data': eventLoadHash });
-        return true;
-
-    };
+    
     
     /**
      * Insert a new calendar event -- can be called two ways:
@@ -571,7 +523,7 @@ var Cal = new function() {
         // Draw the calendar canvas
         cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
         // Load and display events
-        Cal.loadEvents();
+        cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
         Cal.uiMask.hide();
     };
     /**
@@ -592,7 +544,7 @@ var Cal = new function() {
         Cal.currentCalendar = Cal.calendars[index];
         Cal.wipeView();
         // Load and display events
-        Cal.loadEvents();
+        cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
         Cal.uiMask.hide();
     };
 

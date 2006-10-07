@@ -15,6 +15,9 @@
 */
 
 function Hash() {
+    
+    var self = this;
+    
     this.length = 0;
     this.items = []; // Hash keys and their values
     this.order = []; // Array of the order of hash keys
@@ -104,7 +107,8 @@ function Hash() {
         return this.items[this.order[0]];
     };
     this.getLast = function() {
-        return this.items[this.order[this.length-1]];
+        var ret = this.items[this.order[this.length-1]];
+        return ret;
     };
     this.getCurrent = function() {
         return this.items[this.order[this.cursorPos]];
@@ -155,8 +159,25 @@ function Hash() {
         }
         return true;
     };
+    this.clone = function() {
+        var h = new Hash();
+        for (var i = 0; i < self.order.length; i++) {
+            var key = self.order[i];
+            var val = self.items[key];
+            h.setItem(key, val);
+        }
+        return h;
+    };
+    this.append = function(hNew) {
+        for (var i = 0; i < hNew.order.length; i++) {
+            var key = hNew.order[i];
+            var val = hNew.items[key];
+            self.setItem(key, val);
+        }
+        
+    };
     this.sort = function(specialSort, desc) {
-        var sortFunc = this.getSort(specialSort, desc);
+        var sortFunc = getSort(specialSort, desc);
         var valSort = [];
         var keySort = [];
         for (var i = 0; i < this.order.length; i++) {
@@ -178,36 +199,36 @@ function Hash() {
         }
     };
     this.sortByKey = function(specialSort, desc) {
-        var sortFunc = this.getSort(specialSort, desc);
+        var sortFunc = getSort(specialSort, desc);
         this.order.sort(sortFunc);
     };
-    // Sort methods
+    // Sorting and comparator functions
     // ==============
-    this.getSort = function(specialSort, desc) {
+    function getSort(specialSort, desc) {
         var sortFunc = null;
         if (typeof specialSort == 'function') {
             sortFunc = specialSort;
         }
         else {
             if (specialSort == true) {
-                sortFunc = desc ? this.simpleDescNoCase : this.simpleAscNoCase;
+                sortFunc = desc ? simpleDescNoCase : simpleAscNoCase;
             }
             else {
-                sortFunc = desc ? this.simpleDescCase : this.simpleAscCase;
+                sortFunc = desc ? simpleDescCase : simpleAscCase;
             }
         }
         return sortFunc;
     };
-    this.simpleAscCase = function(a, b) {
+    function simpleAscCase(a, b) {
         return (a >= b) ?  1 : -1;
     };
-    this.simpleDescCase = function(a, b) {
+    function simpleDescCase(a, b) {
         return (a < b) ?  1 : -1;
     };
-    this.simpleAscNoCase = function(a, b) {
+    function simpleAscNoCase(a, b) {
         return (a.toLowerCase() >= b.toLowerCase()) ? 1 : -1;
     };
-    this.simpleDescNoCase = function(a, b) {
+    function simpleDescNoCase(a, b) {
         return (a.toLowerCase() < b.toLowerCase()) ? 1 : -1;
     };
 }

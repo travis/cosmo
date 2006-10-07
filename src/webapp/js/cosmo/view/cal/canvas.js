@@ -48,22 +48,46 @@ cosmo.view.cal.canvas = new function() {
      *     creation fails
      * @param ev CalEvent obj, the event to be removed
      */
-    function removeEvent(key, val) {
-        var ev = val;
+    function removeEventFromDisplay(ev) {
         var selEv = self.getSelectedEvent();
         // Remove the block
         ev.block.remove();
+        // Remove selection if need be
         if (selEv && (selEv.id = ev.id)) {
             self.selectedEvent = null;
         }
-        // Remove from list of visible events
-        self.eventRegistry.removeItem(ev.id);
-        // Bye-bye, event
+        return true;
+    }
+    function removeEvent(ev) {
+        if (removeEventFromDisplay(ev)) {
+            self.eventRegistry.removeItem(ev.id);
+        }
         ev = null;
     }
-    function removeAllEvents() {
-        self.eventRegistry.each(removeEvent);
-        self.eventRegistry = new Hash();
+    function removeEventGroup(arr) {
+        if (arr) {
+            var str = ',' + arr.join() + ',';
+            var h = new Hash();
+            while (ev = self.eventRegistry.pop()) {
+                if (str.indexOf(',' + ev.data.id + ',') > -1) {
+                    removeEventFromDisplay(ev);
+                    ev = null;
+                }
+                else {
+                    h.setItem(ev.id, ev);
+                }
+            }
+            self.eventRegistry = h;
+        }
+        else {
+            // Pull the last event off the eventRegistry list and remove it
+            while (ev = self.eventRegistry.pop()) {
+                removeEventFromDisplay(ev);
+                ev = null;
+            } 
+            self.eventRegistry = new Hash();
+       }
+       return true;
     };
     function appendLozenge(key, val) {
         var id = key;
@@ -102,16 +126,27 @@ cosmo.view.cal.canvas = new function() {
             ev.block.updateDisplayMain();
         }
     }
-    
+   
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function(cmd) {
         var act = cmd.action;
         var ev = cmd.data;
         switch (act) {
             case 'eventsLoadSuccess':
+                removeEventGroup();
                 self.eventRegistry = ev;
                 self.eventRegistry.each(appendLozenge);
                 updateEventsDisplay();
+                break;
+            case 'eventsAddSuccess':
+                if (removeEventGroup([cmd.id])) {
+                    var h = self.eventRegistry.clone();
+                    h.append(ev);
+                    removeEventGroup();
+                    self.eventRegistry = h;
+                    self.eventRegistry.each(appendLozenge);
+                    updateEventsDisplay();
+                }
                 break;
             case 'setSelected':
                 setSelectedEvent(ev);
@@ -121,7 +156,7 @@ cosmo.view.cal.canvas = new function() {
                 break; 
             case 'saveFailed':
                 if (cmd.qualifier.newEvent) {
-                    removeEvent(ev.id, ev);
+                    removeEvent(ev);
                 }
                 else {
                     restoreEvent(ev);
@@ -134,7 +169,7 @@ cosmo.view.cal.canvas = new function() {
                 }
                 // Changes have placed the saved event off-canvas
                 if (!cmd.qualifier.onCanvas) {
-                    removeEvent(ev.id, ev);
+                    removeEvent(ev);
                 }
                 // Saved event is still in view
                 else {
@@ -144,7 +179,7 @@ cosmo.view.cal.canvas = new function() {
                 updateEventsDisplay();
                 break;
             case 'removeSuccess':
-                removeEvent(ev.id, ev);
+                removeEvent(ev);
                 updateEventsDisplay();
                 break;
             default:
@@ -471,7 +506,7 @@ cosmo.view.cal.canvas = new function() {
             initRender = false;
         }
         else {
-            removeAllEvents();
+            removeEventGroup();
         }
         
         init();

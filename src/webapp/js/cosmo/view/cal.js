@@ -19,8 +19,6 @@ dojo.provide('cosmo.view.cal');
 cosmo.view.cal = new function() {
     
     var self = this;
-    // tracking list used for callback reference
-    asyncRegistry = new Hash();
     
     // Saving changes
     // =========================
@@ -97,7 +95,7 @@ cosmo.view.cal = new function() {
             switch(qual) {
                 case opts.ALL_EVENTS:
                     if (ev.data.masterEvent) {
-                        f = function() { doSaveEvent(ev, { 'saveType': 'recurrenceMaster' }) }
+                        f = function() { doSaveEvent(ev, { 'saveType': 'recurrenceMaster', 'instanceEventId': null }) }
                     }
                     else {
                         h = function(evData, err) {
@@ -108,17 +106,8 @@ cosmo.view.cal = new function() {
                                     'qualifier': 'editExiting', 'data': ev });
                             }
                             else {
-                                // ******************************************
-                                var es = evData.start;
-                                for (var i in evData.start) {
-                                    Log.print(i + ': ' + evData.start[i]);
-                                }
-                                var masterStart = new ScoobyDate();
+                                var masterStart = evData.start;
                                 var masterEnd = new ScoobyDate();
-                                for (var i in evData.start) {
-                                    masterStart[i] = es[i];
-                                }
-                                // ******************************************
                                 
                                 var origStart = ev.dataOrig.start;
                                 var newStart = ev.data.start;
@@ -153,21 +142,21 @@ cosmo.view.cal = new function() {
                                 
                                 masterEnd = ScoobyDate.clone(masterStart);
                                 masterEnd.add('n', minutesToEnd);
+                                evData.end.setYear(masterEnd.getFullYear());
+                                evData.end.setMonth(masterEnd.getMonth());
+                                evData.end.setDate(masterEnd.getDate());
+                                evData.end.setHours(masterEnd.getHours());
+                                evData.end.setMinutes(masterEnd.getMinutes());
+                                masterEnd = evData.end;
                                 
+                                //Log.print(minutesToEnd);
                                 //Log.print(masterStart.toString());
                                 //Log.print(masterEnd.toString());
-                                
-                                // Save the recurrence instance in a Hash
-                                // with the master's CalEventData id as the key
-                                // Needed to do fallback if the update fails
-                                // FIXME: Didn't I just get rid of this 
-                                // asyncRegistry thing? This is a hack.
-                                asyncRegistry.setItem(evData.id, ev);
                                 
                                 // doSaveEvent expects a CalEvent with attached CalEventData
                                 var saveEv = new CalEvent();
                                 saveEv.data = evData;
-                                doSaveEvent(saveEv, { 'saveType': 'recurrenceMaster' });
+                                doSaveEvent(saveEv, { 'saveType': 'recurrenceMaster', 'instanceEventId': ev.data.id });
                             }
                         };
                         f = function() { var reqId = Cal.serv.getEvent(h, Cal.currentCalendar.path, ev.data.id); };
@@ -209,9 +198,7 @@ cosmo.view.cal = new function() {
         var act = '';
         var qual = {};
         
-        if (opts.saveType == 'recurrenceMaster') {
-        
-        }
+        qual.saveType = opts.saveType || 'singleEvent'; // Default to single event
         
         // Failure -- display exception info
         // ============
@@ -252,23 +239,21 @@ cosmo.view.cal = new function() {
             }
         }
         
-        // Broadcast success/failure
-        dojo.event.topic.publish('/calEvent', { 'action': act, 
-            'qualifier': qual, 'data': saveEv });
-        
         // Resets local timer for timeout -- we know server-side
         // session has been refreshed
         // ********************
         // BANDAID: need to move this into the actual Service call
         // ********************
         Cal.serv.resetServiceAccessTime();
-    }
-    function doSaveRecurrenceMaster(evData) {
-        alert('Success -- ' + evData);
-
-    }
-    function handleSaveRecurrenceMaster() {
         
+        if (opts.saveType == 'recurrenceMaster') {
+            loadRecurrenceExpansion(saveEv.data.id, Cal.viewStart, Cal.viewEnd);
+        }
+        else {
+            // Broadcast message for success/failure
+            dojo.event.topic.publish('/calEvent', { 'action': act, 
+                'qualifier': qual, 'data': saveEv });
+        }
     }
     
     // Remove
@@ -321,6 +306,42 @@ cosmo.view.cal = new function() {
         // ********************
         Cal.serv.resetServiceAccessTime();
     }
+    function loadRecurrenceExpansion(id, start, end) {
+        var s = start.getTime();
+        var e = end.getTime();
+        var f = function(arr) {
+            var expandEventHash = createEventRegistry(arr);
+            dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess', 
+                'id': id, 'data': expandEventHash });
+        }
+        Cal.serv.expandEvent(f, Cal.currentCalendar.path, id, s, e); 
+    }
+    
+    function createEventRegistry(arr) {
+        var h = new Hash();
+        for (var i = 0; i < arr.length; i++) {
+            evData = arr[i];
+            // Basic paranoia checks
+            if (!evData.end) {
+                evData.end = ScoobyDate.clone(evData.start);
+            }
+            if (evData.start.timezone || evData.end.timezone) {
+                if (!evData.end.timezone) {
+                    evData.end.timezone =
+                        ScoobyTimezone.clone(evData.start.timezone);
+                }
+                if (!evData.start.timezone) {
+                    evData.start.timezone =
+                        ScoobyTimezone.clone(evData.end.timezone);
+                }
+            }
+            var id = Cal.generateTempId();
+            ev = new CalEvent(id, null);
+            ev.data = evData;
+            h.setItem(id, ev);
+        }
+        return h;
+    }
     
     // Public attributes
     // ********************
@@ -350,6 +371,33 @@ cosmo.view.cal = new function() {
                 removeEvent(ev, qual);
                 break;
         }
+    };
+    
+    this.loadEvents = function(start, end) {
+        var s = start.getTime();
+        var e = end.getTime();
+        var eventLoadList = null;
+        var eventLoadHash = new Hash();
+        var isErr = false;
+        var detail = '';
+        var evData = null;
+        var id = '';
+        var ev = null;
+
+        // Load the array of events
+        // ======================
+        try {
+            eventLoadList = Cal.serv.getEvents(Cal.currentCalendar.path, s, e);
+        }
+        catch(e) {
+            Cal.showErr(getText('Main.Error.LoadEventsFailed'), e);
+            Log.print(e.javaStack);
+            return false;
+        }
+        var eventLoadHash = createEventRegistry(eventLoadList);
+        dojo.event.topic.publish('/calEvent', { 'action': 'eventsLoadSuccess', 
+            'data': eventLoadHash });
+        return true;
     };
 };
 

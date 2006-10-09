@@ -131,6 +131,13 @@ function Hash() {
             return this.items[this.order[this.cursorPos]];
         }
     };
+    this.getPos = function(key) {
+        for (var i = 0; i < this.order.length; i++) {
+            if (key == this.order[i]) {
+                return i;
+            }
+        }
+    };
     this.pop = function() {
         var pos = this.length-1;
         var ret = this.items[this.order[pos]];

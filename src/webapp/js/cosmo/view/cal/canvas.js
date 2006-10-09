@@ -58,36 +58,37 @@ cosmo.view.cal.canvas = new function() {
         }
         return true;
     }
-    function removeEvent(ev) {
-        if (removeEventFromDisplay(ev)) {
-            self.eventRegistry.removeItem(ev.id);
+    function removeEvent(ev, rem) {
+        // Default behavior is to remove the lozenge
+        var removeLozenge = rem != false ? true : false;
+        self.eventRegistry.removeItem(ev.id);
+        if (removeLozenge) {
+            removeEventFromDisplay(ev);
         }
         ev = null;
     }
-    function removeEventGroup(arr) {
-        if (arr) {
-            var str = ',' + arr.join() + ',';
-            var h = new Hash();
-            while (ev = self.eventRegistry.pop()) {
-                if (str.indexOf(',' + ev.data.id + ',') > -1) {
-                    removeEventFromDisplay(ev);
-                    ev = null;
-                }
-                else {
-                    h.setItem(ev.id, ev);
-                }
-            }
-            self.eventRegistry = h;
-        }
-        else {
-            // Pull the last event off the eventRegistry list and remove it
-            while (ev = self.eventRegistry.pop()) {
+    function removeAllEvents(rem) {
+        // Default behavior is to remove the lozenge
+        var removeLozenge = rem != false ? true : false;
+        // Pull the last event off the eventRegistry list and remove it
+        while (ev = self.eventRegistry.pop()) {
+            if (removeLozenge) {
                 removeEventFromDisplay(ev);
-                ev = null;
-            } 
-            self.eventRegistry = new Hash();
-       }
-       return true;
+            }
+            ev = null;
+        } 
+        self.eventRegistry = new Hash();
+    }
+    function removeEventRecurrenceGroup(reg, arr) {
+        // Default behavior is to remove the lozenge
+        var str = ',' + arr.join() + ',';
+        var h = new Hash();
+        while (ev = reg.pop()) {
+            if (str.indexOf(',' + ev.data.id + ',') == -1) {
+                h.setItem(ev.id, ev);
+            }
+        }
+        return h;
     };
     function appendLozenge(key, val) {
         var id = key;
@@ -133,20 +134,21 @@ cosmo.view.cal.canvas = new function() {
         var ev = cmd.data;
         switch (act) {
             case 'eventsLoadSuccess':
-                removeEventGroup();
+                removeAllEvents();
                 self.eventRegistry = ev;
                 self.eventRegistry.each(appendLozenge);
                 updateEventsDisplay();
                 break;
             case 'eventsAddSuccess':
-                if (removeEventGroup([cmd.id])) {
-                    var h = self.eventRegistry.clone();
-                    h.append(ev);
-                    removeEventGroup();
-                    self.eventRegistry = h;
-                    self.eventRegistry.each(appendLozenge);
-                    updateEventsDisplay();
-                }
+                var h = self.eventRegistry.clone();
+                h = removeEventRecurrenceGroup(h, [cmd.id]);
+                h.append(ev);
+                var currSel = self.eventRegistry.getPos(self.selectedEvent.id);
+                removeAllEvents();
+                self.eventRegistry = h;
+                self.eventRegistry.each(appendLozenge);
+                updateEventsDisplay();
+                setSelectedEvent(self.eventRegistry.getAtPos(currSel));
                 break;
             case 'setSelected':
                 setSelectedEvent(ev);
@@ -506,7 +508,7 @@ cosmo.view.cal.canvas = new function() {
             initRender = false;
         }
         else {
-            removeEventGroup();
+            removeAllEvents();
         }
         
         init();

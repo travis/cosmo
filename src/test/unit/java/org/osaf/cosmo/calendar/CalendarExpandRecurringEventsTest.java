@@ -64,8 +64,27 @@ public class CalendarExpandRecurringEventsTest extends TestCase {
         
         Calendar filterCal = cb.build(sr);
         
+        ComponentList comps = filterCal.getComponents().getComponents("VEVENT");
+        
         // Should expand to 3 event components
-        Assert.assertEquals(3, filterCal.getComponents().getComponents("VEVENT").size());
+        Assert.assertEquals(3, comps.size());
+        
+        Iterator<VEvent> it = comps.iterator();
+        VEvent event = it.next();
+        
+        Assert.assertEquals("event 6", event.getProperties().getProperty(Property.SUMMARY).getValue());
+        Assert.assertEquals("20060102T190000Z", event.getStartDate().getDate().toString());
+        Assert.assertEquals("20060102T190000Z", event.getReccurrenceId().getDate().toString());
+        
+        event = it.next();
+        Assert.assertEquals("event 6", event.getProperties().getProperty(Property.SUMMARY).getValue());
+        Assert.assertEquals("20060103T190000Z", event.getStartDate().getDate().toString());
+        Assert.assertEquals("20060103T190000Z", event.getReccurrenceId().getDate().toString());
+        
+        event = it.next();
+        Assert.assertEquals("event 6", event.getProperties().getProperty(Property.SUMMARY).getValue());
+        Assert.assertEquals("20060104T190000Z", event.getStartDate().getDate().toString());
+        Assert.assertEquals("20060104T190000Z", event.getReccurrenceId().getDate().toString());
         
         verifyExpandedCalendar(filterCal);
     }
@@ -75,7 +94,9 @@ public class CalendarExpandRecurringEventsTest extends TestCase {
         FileInputStream fis = new FileInputStream(baseDir + "expand_recurr_test2.ics");
         Calendar calendar = cb.build(fis);
         
-        Assert.assertEquals(5, calendar.getComponents().getComponents("VEVENT").size());
+        ComponentList comps = calendar.getComponents().getComponents("VEVENT");
+        
+        Assert.assertEquals(5, comps.size());
         
         VTimeZone vtz = (VTimeZone) calendar.getComponents().getComponent("VTIMEZONE");
         TimeZone tz = new TimeZone(vtz);
@@ -94,8 +115,27 @@ public class CalendarExpandRecurringEventsTest extends TestCase {
         
         Calendar filterCal = cb.build(sr);
         
+        comps = filterCal.getComponents().getComponents("VEVENT");
+        
         // Should expand to 3 event components
-        Assert.assertEquals(3, filterCal.getComponents().getComponents("VEVENT").size());
+        Assert.assertEquals(3, comps.size());
+        
+        Iterator<VEvent> it = comps.iterator();
+        VEvent event = it.next();
+        
+        Assert.assertEquals("event 6", event.getProperties().getProperty(Property.SUMMARY).getValue());
+        Assert.assertEquals("20060102T190000Z", event.getStartDate().getDate().toString());
+        Assert.assertEquals("20060102T190000Z", event.getReccurrenceId().getDate().toString());
+        
+        event = it.next();
+        Assert.assertEquals("event 6", event.getProperties().getProperty(Property.SUMMARY).getValue());
+        Assert.assertEquals("20060103T190000Z", event.getStartDate().getDate().toString());
+        Assert.assertEquals("20060103T190000Z", event.getReccurrenceId().getDate().toString());
+        
+        event = it.next();
+        Assert.assertEquals("event 6 changed", event.getProperties().getProperty(Property.SUMMARY).getValue());
+        Assert.assertEquals("20060104T210000Z", event.getStartDate().getDate().toString());
+        Assert.assertEquals("20060104T190000Z", event.getReccurrenceId().getDate().toString());
         
         verifyExpandedCalendar(filterCal);
     }
@@ -124,8 +164,17 @@ public class CalendarExpandRecurringEventsTest extends TestCase {
         
         Calendar filterCal = cb.build(sr);
         
+        ComponentList comps = filterCal.getComponents().getComponents("VEVENT");
+        
         // Should be the same component
-        Assert.assertEquals(1, filterCal.getComponents().getComponents("VEVENT").size());
+        Assert.assertEquals(1, comps.size());
+        
+        Iterator<VEvent> it = comps.iterator();
+        VEvent event = it.next();
+        
+        Assert.assertEquals("event 6", event.getProperties().getProperty(Property.SUMMARY).getValue());
+        Assert.assertEquals("20060102T190000Z", event.getStartDate().getDate().toString());
+        Assert.assertNull(event.getReccurrenceId());
         
         verifyExpandedCalendar(filterCal);
     }

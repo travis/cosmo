@@ -1,0 +1,85 @@
+<!--
+Copyright 2004 ThoughtWorks, Inc
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<html>
+<head>
+<meta content="text/html; charset=ISO-8859-1"
+http-equiv="content-type">
+<title>Test Suite</title>
+<link rel="stylesheet" type="text/css" href="../core/selenium.css" />
+<script language="JavaScript" type="text/javascript" src="../core/scripts/selenium-browserdetect.js"></script>
+<script language="JavaScript" type="text/javascript">
+    function filterTestsForBrowser() {
+        var suiteTable = document.getElementById("suiteTable");
+        var skippedTests = document.getElementById("skippedTests");
+
+        for(rowNum = suiteTable.rows.length - 1; rowNum >= 0; rowNum--)
+        {
+            var row = suiteTable.rows[rowNum];
+            var filterString = row.getAttribute("unless");
+            if (filterString && eval(filterString))
+            {
+              var cellHTML = row.cells[0].innerHTML;
+              suiteTable.deleteRow(rowNum);
+
+              var newRow = skippedTests.insertRow(1);
+              var newCell = newRow.insertCell(0)
+              newCell.innerHTML = cellHTML;
+            }
+        }
+    }
+</script>
+</head>
+
+<body onload="filterTestsForBrowser()">
+
+    <table id="suiteTable"    cellpadding="1"
+           cellspacing="1"
+           border="1"
+           class="selenium">
+        <tbody>
+		<tr><td><b>Cosmo Full Suite</b></td></tr>
+			
+			<tr><td><a href="./CosmoRegister.html">CosmoRegister</a></td></tr>
+			<tr><td><a href="./CosmoAuth.html">CosmoAuth</a></td></tr>
+			<tr><td><a href="./CosmoResizeEvent.html">CosmoResizeEvent</a></td></tr>
+			<tr><td><a href="./CosmoCreate.html">CosmoCreateEvents</a></td></tr>
+			<tr><td><a href="./CosmoCreateStacked.html">CosmoCreateStackedEvents</a></td></tr>
+			<tr><td><a href="./CosmoEventsMultipleDays.html">CosmoEventsMultipleDays</a></td></tr>
+			<tr><td><a href="./CosmoMove.html">CosmoMoveFirstEvent</a></td></tr>
+			<tr><td><a href="./CosmoCreateMoveMove.html">CosmoCreateMoveMove</a></td></tr>
+			<tr><td><a href="./CosmoEventProperties.html">CosmoEventProperties</a></td></tr>
+			<tr><td><a href="./CosmoRemoveEvents.html">CosmoRemoveEvents</a></td></tr>
+			<tr><td><a href="./CosmoEventPropertiesStatus.html">CosmoEventPropertiesStatus</a></td></tr>
+			<tr><td><a href="./CosmoEventPropertiesAllDayToggle.html">CosmoEventPropertiesAllDayToggle</a></td></tr>
+			<tr><td><a href="./CosmoLogout.html">CosmoLogout</a></td></tr>
+			<tr><td><a href="./CosmoRemTestAcct.html">CosmoRemTestAcct</a></td></tr>
+           
+        </tbody>
+    </table>
+
+    <br />
+    <em>Not supported in this browser</em>
+    <table id="skippedTests" cellpadding="1"
+           cellspacing="1"
+           border="1"
+           class="selenium">
+        <tbody>
+            <tr><td><b>Skipped Tests</b></td></tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

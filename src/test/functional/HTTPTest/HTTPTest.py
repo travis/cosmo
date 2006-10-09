@@ -17,9 +17,8 @@ class HTTPTest(TestObject):
         else:
             self.headers = headers
         
-        self.connection = {"host" : host, "port" : port, "path" : path, "tls" : tls}
+        self.connection = {'host':host, 'port':port, 'path':path, 'tls':tls, 'keep-alive':False}
         self.request('OPTIONS', path, body=None, headers=self.headers)
-        
         
     def headerAdd(self, headers):
         """
@@ -64,6 +63,14 @@ class HTTPTest(TestObject):
         """
         
         self.xml_doc = ElementTree.XML(self.test_response.read())
+    
+    def startKeepAlive(self):
+    
+        self.connection['keep-alive'] = True
+        
+    def endKeepAlive(self):
+        
+        self.connection['keep-alive'] = False
                                         
     def request(self, method, url, body=None, headers={}, 
                 autoheaders=('Content-Length', 'Content-Type', 'User-Agent',
@@ -76,11 +83,24 @@ class HTTPTest(TestObject):
                  full data that was received.
         """
         
-        if not self.connection["tls"]:
-            c = httplib.HTTPConnection(self.connection["host"], self.connection["port"])
-        else:
-            c = httplib.HTTPSConnection(self.connection["host"], self.connection["port"])
-        h = headers.copy()
+        if self.connection['keep-alive'] is False:
+        
+            if not self.connection["tls"]:
+                c = httplib.HTTPConnection(self.connection["host"], self.connection["port"])
+                h = headers.copy()
+                c.request(method, url, body, h)                
+            else:
+                c = httplib.HTTPSConnection(self.connection["host"], self.connection["port"])
+                h = headers.copy()
+                c.request(method, url, body, h)
+        
+        elif self.connection['keep-alive'] is True:
+            headers['Connection'] = "keep-alive"
+            h = headers.copy()
+            c.request(method, url, body, h)
+        
+        r = c.getresponse()
+            
         #for header in autoheaders:
         #    if header == 'Content-Length' and body is not None:
         #        h[header] = '%d' % len(body)
@@ -90,8 +110,8 @@ class HTTPTest(TestObject):
         #        h[header] = 'silmut'
         #    if header == 'Host':
         #        h[header] = '%s:%s' % (self.connection["host"], self.connection["port"])
-        c.request(method, url, body, h)
-        r = c.getresponse()
+        
+        
         
         
         # Automatically follow 302 GET (same host only)
@@ -112,6 +132,7 @@ class HTTPTest(TestObject):
         r.read = lambda: r.body
         
         self.test_response = r
+        self.test_connection = c
         
         if self.debug > 3:
             print 'Request::\n%s' % body

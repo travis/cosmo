@@ -130,7 +130,7 @@ if __name__ == "__main__":
     threads = 2
     wait = 60
     
-    testsDict = {'cosmo_500events':'Cosmo500Events',
+    testsDict = {#'cosmo_500events':'Cosmo500Events',
                   'cosmo_basicquery':'CosmoBasicQuery',
                   'cosmo_bugs':'CosmoBugs',
                   'cosmo_chandler061':'CosmoChandlerZeroPointSixPointOne',

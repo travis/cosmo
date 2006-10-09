@@ -119,11 +119,7 @@ public class TimeRangeFilter implements CaldavConstants {
         // Get fixed start/end time
         dstart = period.getStart();
         dend = period.getEnd();
-
-        // Get float start/end
-        fstart = (DateTime) Dates.getInstance(dstart, dstart);
-        fend = (DateTime) Dates.getInstance(dend, dend);
-
+        
         // set timezone on floating times
         updateFloatingTimes();
     }
@@ -165,13 +161,13 @@ public class TimeRangeFilter implements CaldavConstants {
     }
     
     private void updateFloatingTimes() {
-        
-        if(fstart!=null) {
+        if(dstart!=null) {
+            fstart = (DateTime) Dates.getInstance(dstart, dstart);
             // if the timezone is null then default system timezone is used
             fstart.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
         }
-
-        if(fend!=null) {
+        if(dend!=null) {
+            fend = (DateTime) Dates.getInstance(dend, dend);
             // if the timezone is null then default system timezone is used
             fend.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
         }

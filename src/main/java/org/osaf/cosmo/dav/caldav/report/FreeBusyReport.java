@@ -16,16 +16,12 @@
 package org.osaf.cosmo.dav.caldav.report;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.TreeSet;
 
-import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -38,9 +34,11 @@ import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.PeriodList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VFreeBusy;
+import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.parameter.FbType;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.FreeBusy;
@@ -50,24 +48,22 @@ import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.Dates;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
+import org.osaf.cosmo.dav.impl.DavCalendarCollection;
 import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.dav.impl.DavCollection;
 import org.osaf.cosmo.model.ModelConversionException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -84,6 +80,8 @@ import org.w3c.dom.Element;
 public class FreeBusyReport extends CaldavSingleResourceReport {
     private static final Log log = LogFactory.getLog(FreeBusyReport.class);
 
+    private VTimeZone tz = null;
+    
     Period freeBusyRange;
 
     /** */
@@ -162,7 +160,7 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
                 Calendar calendar = child.getCalendar();
 
                 // Add busy details from the calendar data
-                addBusyPeriods(calendar, busyPeriods, busyTentativePeriods,
+                addBusyPeriods(calendar, tz, busyPeriods, busyTentativePeriods,
                                busyUnavailablePeriods);
             } catch (ModelConversionException e) {
                 log.error("cannot parse calendar for resource " + child.getResourcePath(), e);
@@ -261,13 +259,21 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
         // </C:comp-filter>
         // </C:filter>
 
+        // If the calendar collection has a timezone attribute,
+        // then use that to convert floating date/times to UTC
+        if (getResource() instanceof DavCalendarCollection) {
+            tz = ((DavCalendarCollection) getResource()).getTimeZone();
+        }
+     
         ComponentFilter eventFilter = new ComponentFilter(Component.VEVENT);
         eventFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
-
+        eventFilter.getTimeRangeFilter().setTimezone(tz);
+        
         ComponentFilter freebusyFilter =
             new ComponentFilter(Component.VFREEBUSY);
         freebusyFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
-
+        freebusyFilter.getTimeRangeFilter().setTimezone(tz);
+        
         ComponentFilter calFilter =
             new ComponentFilter(net.fortuna.ical4j.model.Calendar.VCALENDAR);
         calFilter.getComponentFilters().add(eventFilter);
@@ -280,11 +286,17 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
     }
 
     private void addBusyPeriods(Calendar calendar,
+                                VTimeZone timezone,
                                 PeriodList busyPeriods,
                                 PeriodList busyTentativePeriods,
                                 PeriodList busyUnavailablePeriods) {
         // Create list of instances within the specified time-range
         InstanceList instances = new InstanceList();
+        instances.setUTC(true);
+        
+        if(timezone!=null)
+            instances.setTimezone(new TimeZone(timezone));
+        
 
         // Look at each VEVENT/VFREEBUSY component only
         ComponentList overrides = new ComponentList();

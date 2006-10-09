@@ -104,7 +104,7 @@
     <dependency>
       <groupId>ical4j</groupId>
       <artifactId>ical4j-osaf</artifactId>
-      <version>0.9.18-20061001</version>
+      <version>0.9.18-20061008</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -527,4 +527,5 @@
       </resources>
     </unitTest>
   </build>
+
 </project>

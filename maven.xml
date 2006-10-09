@@ -61,4 +61,11 @@
     <delete dir="${cosmo.dist}"/>
   </goal>
   
+  <!--  Deletes the (unused by us) dojo widget image files, which make the war file  large-ish  -->
+   <postGoal name="war:installScripts">
+      <maven:get var="webapp" plugin="maven-war-plugin" property="maven.war.webapp.dir" />
+      <j:set var="webappLibDir" value="${webapp}/${maven.war.jslib.dir}"/>
+      <delete dir="${webappLibDir}/dojo-event_and_io/src/widget/templates/images" />
+   </postGoal>
+  
 </project>

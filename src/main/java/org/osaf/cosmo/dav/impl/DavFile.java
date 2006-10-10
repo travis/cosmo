@@ -230,13 +230,6 @@ public class DavFile extends DavResourceBase {
                 throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource content: " + e.getMessage());
             }
 
-            try {
-                content.setContentLength(new Long(inputContext.getContentLength()));
-            } catch (ClassCastException e) {
-                throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Provided content length is not an integer");
-            } catch (DataSizeException e) {
-                throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource attribute: " + e.getMessage());
-            }
         }
 
         try {

@@ -239,7 +239,6 @@ public class TestHelper {
         content.setContentEncoding("UTF-8");
         content.setContentLanguage("en_US");
         content.setContentType("text/plain");
-        content.setContentLength(new Long(5));
 
         return content;
     }

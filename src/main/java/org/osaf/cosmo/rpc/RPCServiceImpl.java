@@ -64,7 +64,6 @@ public class RPCServiceImpl implements RPCService {
     private UserService userService = null;
     private ContentService contentService = null;
     private CosmoSecurityManager cosmoSecurityManager = null;
-    private CalendarBuilder calendarBuilder = new CalendarBuilder();
     private ICalendarToCosmoConverter icalendarToCosmoConverter = new ICalendarToCosmoConverter();
     private CosmoToICalendarConverter cosmoToICalendarConverter = new CosmoToICalendarConverter();
     
@@ -270,7 +269,6 @@ public class RPCServiceImpl implements RPCService {
             net.fortuna.ical4j.model.Calendar calendar = calendarEventItem.getCalendar();
             cosmoToICalendarConverter.updateEvent(event, calendar);
             calendarEventItem.setContent(calendar.toString().getBytes());
-            calendarEventItem.setContentLength(new Long(calendarEventItem.getContent().length));
             contentService.updateEvent(calendarEventItem);
         }
 
@@ -289,7 +287,6 @@ public class RPCServiceImpl implements RPCService {
         VEvent vevent = cosmoToICalendarConverter.createVEvent(event);
         calendar.getComponents().add(vevent);
         calendarEventItem.setContent(calendar.toString().getBytes());
-        calendarEventItem.setContentLength(new Long(calendarEventItem.getContent().length));
 
         Iterator<String> availableNameIterator = availableNameIterator(vevent);
         

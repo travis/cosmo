@@ -51,10 +51,16 @@ public class ContentItem extends Item {
         return (byte[]) getAttributeValue(ATTR_CONTENT_DATA);
     }
 
+    /**
+     * Sets the ATTR_CONTENT_DATA with the given content, and ATTR_CONTENT_LENGTH
+     * with the length of the content
+     * @param content
+     */
     public void setContent(byte[] content) {
         if (content.length > MAX_CONTENT_SIZE)
             throw new DataSizeException("Item content too large");
         setAttribute(ATTR_CONTENT_DATA, content);
+        setContentLength((long)content.length);
     }
 
     public void setContent(InputStream is) throws IOException {
@@ -97,13 +103,13 @@ public class ContentItem extends Item {
        return (Long) getAttributeValue(ATTR_CONTENT_LENGTH);
     }
 
-    public void setContentLength(Long contentLength) {
-        setAttribute(ATTR_CONTENT_LENGTH, contentLength);
-    }
-
     public void validate() {
         super.validate();
         validateContent();
+    }
+
+    protected void setContentLength(Long contentLength) {
+        setAttribute(ATTR_CONTENT_LENGTH, contentLength);
     }
     
     protected void validateContent() {

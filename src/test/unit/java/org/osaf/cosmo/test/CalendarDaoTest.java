@@ -124,7 +124,6 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
 		queryEvent.setContentLanguage("es");
 		queryEvent.setContentType("text/ical");
 		queryEvent.setContent(getBytes(baseDir + "/cal2.ics"));
-        queryEvent.setContentLength(new Long(queryEvent.getContent().length));
 		
 		queryEvent = calendarDao.updateEvent(queryEvent);
 		
@@ -413,7 +412,6 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
         event.setDisplayName(name);
         event.setOwner(getUser(userDao, owner));
         event.setContent(getBytes(baseDir + "/" + file));
-        event.setContentLength(new Long(event.getContent().length));
         event.setContentEncoding("UTF8");
         event.setContentType("text/calendar");
         event.setContentLanguage("en");

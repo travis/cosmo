@@ -98,27 +98,29 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         item.setContentLanguage("en");
         item.setContentEncoding("UTF8");
         item.setContentType("text/text");
+        item.removeAttribute(ContentItem.ATTR_CONTENT_LENGTH);
 
         try {
             contentDao.createContent(root, item);
             Assert.fail("able to create invalid content.");
         } catch (ModelValidationException e) {}
         
-        item.setContentLength(new Long(-1));
+        item.setAttribute(ContentItem.ATTR_CONTENT_LENGTH,(new Long(-1)));
         
         try {
             contentDao.createContent(root, item);
             Assert.fail("able to create invalid content.");
         } catch (ModelValidationException e) {}
         
-        item.setContentLength(new Long(1));
+        item.setAttribute(ContentItem.ATTR_CONTENT_LENGTH,(new Long(1)));
         
         try {
             contentDao.createContent(root, item);
             Assert.fail("able to create invalid content.");
         } catch (ModelValidationException e) {}
         
-        item.setContentLength(new Long(item.getContent().length));
+        //we do this so that content length is reset to what it should be
+        item.setContent(item.getContent());
         contentDao.createContent(root, item);
         
         item = generateTestContent();
@@ -303,7 +305,6 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         queryItem.getAttributes().remove("customattribute");
         queryItem.setContentLanguage("es");
         queryItem.setContent(getBytes(baseDir + "/testdata2.txt"));
-        queryItem.setContentLength(new Long(queryItem.getContent().length));
 
         // Make sure modified date changes
         Thread.sleep(1000);
@@ -964,7 +965,6 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         content.setName(name);
         content.setDisplayName(name);
         content.setContent(getBytes(baseDir + "/testdata1.txt"));
-        content.setContentLength(new Long(content.getContent().length));
         content.setContentLanguage("en");
         content.setContentEncoding("UTF8");
         content.setContentType("text/text");

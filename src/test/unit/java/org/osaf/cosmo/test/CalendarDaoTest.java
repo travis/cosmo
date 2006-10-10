@@ -274,42 +274,6 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
 		Assert.assertNull(queryEvent);
 	}
     
-    public void testCalendarEventStamping() throws Exception
-    {
-        User user = getUser(userDao, "testuser");
-        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
-        CalendarCollectionItem calendar = new CalendarCollectionItem();
-        calendar.setName("test");
-        calendar.setOwner(user);
-        calendar.setDescription("test description");
-        calendar.setLanguage("en");
-        
-        HashSet supportedComponents = new HashSet();
-        supportedComponents.add("VEVENT");
-        calendar.setSupportedComponents(supportedComponents);
-       
-        CalendarCollectionItem newCalendar = calendarDao.createCalendar(calendar);
-    
-        ContentItem item1 = generateEvent("test.ics","cal1.ics","testuser");
-        ContentItem item2 = generateEvent("test2.ics","cal2.ics","testuser");
-        
-        ContentItem newItem1 = contentDao.createContent(root, item1);
-        ContentItem newItem2 = contentDao.createContent(calendar, item2);
-        
-        try {
-            calendarDao.addEvent(item1);
-            Assert.fail("able to convert content that is not part of calendar");
-        } catch(IllegalArgumentException e) {}
-        
-        CalendarEventItem newEvent = calendarDao.addEvent(newItem2);
-        Assert.assertNotNull(newEvent);
-        
-        clearSession();
-        
-        CalendarEventItem queryEvent = calendarDao.findEventByUid(newEvent.getUid());
-        Assert.assertNotNull(queryEvent);
-    }
-	
 	public void testCalendarQuerying() throws Exception
 	{
 		CalendarCollectionItem calendar = generateCalendar("test","testuser");

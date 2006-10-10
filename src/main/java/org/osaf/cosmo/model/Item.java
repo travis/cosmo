@@ -245,4 +245,22 @@ public abstract class Item extends BaseModelObject {
     private void setTickets(Set<Ticket> tickets) {
         this.tickets = tickets;
     }
+    
+    /**
+     * Ensure Item contains valid data.
+     */
+    public void validate() {
+        validateName();
+        validateUid();
+    }
+    
+    protected void validateName() {
+        if(name==null || "".equals(name))
+            throw new ModelValidationException("Item must have name");
+    }
+    
+    protected void validateUid() {
+        if(uid==null || "".equals(uid))
+            throw new ModelValidationException("Item must have uid");
+    }
 }

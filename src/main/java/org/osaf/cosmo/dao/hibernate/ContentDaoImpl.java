@@ -55,8 +55,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         if (collection.getId()!=-1)
             throw new IllegalArgumentException("invalid collection id (expected -1)");
         
-        if (collection.getName() == null)
-            throw new IllegalArgumentException("collection must have name");
         
         try {
             if (collection.getOwner() == null)
@@ -72,8 +70,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             setBaseItemProps(collection);
             collection.setParent(parent);
+            
+            // validate item
+            collection.validate();
             getSession().save(collection);
-            getSession().flush();
             
             return collection;
         } catch (HibernateException e) {
@@ -98,29 +98,24 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         if (content.getId()!=-1)
             throw new IllegalArgumentException("invalid content id (expected -1)");
         
-        if (content.getName() == null)
-            throw new IllegalArgumentException("content must have name");
-
         try {
             User owner = content.getOwner();
 
             if (owner == null)
                 throw new IllegalArgumentException("content must have owner");
 
-            // validate content
-            content.validate();
-          
             // Enforce hiearchy for WebDAV support
             // In a hierarchy, can't have two items with same name with
             // same parent
             checkForDuplicateItemName(owner.getId(), parent.getId(), content.getName());
 
-            
             setBaseItemProps(content);
             content.setParent(parent);
-            getSession().save(content);
-            getSession().flush();
             
+            // validate content
+            content.validate();
+            
+            getSession().save(content);
             return content;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -221,9 +216,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             if (collection == null)
                 throw new IllegalArgumentException("collection cannot be null");
             
-            if (collection.getName() == null || "".equals(collection.getName()))
-                throw new IllegalArgumentException("collection must have name");
-            
             // In a hierarchy, can't have two items with same name with
             // same parent
             if (collection.getParent() != null)
@@ -231,6 +223,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                     collection.getParent().getId(), collection.getName(), collection.getId());
             
             updateBaseItemProps(collection);
+            
+            // validate item
+            collection.validate();
+            
             getSession().update(collection);
             return collection;
         } catch (HibernateException e) {
@@ -251,10 +247,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             if(content.getParent()==null)
                 throw new IllegalArgumentException("parent cannot be null");
-            
-            if (content.getName() == null || "".equals(content.getName()))
-                throw new IllegalArgumentException("content must have name");
-            
+                        
             // validate content
             content.validate();
             

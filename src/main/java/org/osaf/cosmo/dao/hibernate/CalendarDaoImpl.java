@@ -80,16 +80,11 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
 
         if (event.getId()!=-1)
             throw new IllegalArgumentException("invalid event id (expected -1)");
-        
-        if (event.getName() == null || "".equals(event.getName()))
-            throw new IllegalArgumentException("event must have name");
 
         if (event.getOwner() == null)
             throw new IllegalArgumentException("event must have owner");
 
         try {
-            // validate content
-            event.validate();
             
             User owner = event.getOwner();
 
@@ -104,6 +99,10 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
             
             setBaseItemProps(event);
             event.setParent(calendar);
+            
+            // validate content
+            event.validate();
+            
             getSession().save(event);
 
             // index event
@@ -118,49 +117,7 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.dao.CalendarDao#addEvent(org.osaf.cosmo.model.ContentItem)
-     */
-    public CalendarEventItem addEvent(ContentItem contentItem) {
-        
-        // NOTE: this is pretty much a big hack because Hibernate does
-        // not allow you to change the type of an item.  So we are bypassing
-        // hibernate and using straight JDBC.
-        try {
-            
-            // Can only convert content to calendar event if content is part
-            // of calendar collection
-            if(!(contentItem.getParent() instanceof CalendarCollectionItem))
-                throw new IllegalArgumentException("content must belong to calendar collection");
-            
-            Connection conn = getSession().connection();
-            PreparedStatement ps = conn.prepareStatement("update item set itemtype='event' where id=?");
-            ps.setLong(1, contentItem.getId());
-            ps.executeUpdate();
-            ps.close();
-  
-            getSession().evict(contentItem);
-            
-            CalendarEventItem event = 
-                (CalendarEventItem) getSession().load(CalendarEventItem.class, contentItem.getId());
-            
-            // A calendar can't have two events with the same ical uid property
-            verifyEventUidIsUnique((CalendarCollectionItem) event.getParent(), event);
-            
-            // index event
-            calendarIndexer.indexCalendarEvent(getSession(), event, event
-                    .getCalendar());
-            
-            getSession().update(event);
-            return event;
-        } catch (HibernateException e) {
-            throw SessionFactoryUtils.convertHibernateAccessException(e);
-        } catch (SQLException e) {
-            throw new SQLErrorCodeSQLExceptionTranslator().translate(null, null, e);
-        }
-    }
-
-
+    
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.CalendarDao#createCalendar(org.osaf.cosmo.model.CalendarCollectionItem)
      */
@@ -192,9 +149,6 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
         if (calendar.getId()!=-1)
             throw new IllegalArgumentException("invalid calendar id (expected -1)");
         
-        if (calendar.getName() == null || "".equals(calendar.getName()))
-            throw new IllegalArgumentException("calendar must have name");
-
         try {
             User owner = calendar.getOwner();
 
@@ -208,9 +162,10 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
             calendar.setParent(collection);
             setBaseItemProps(calendar);
 
+            // validate item
+            calendar.validate();
+            
             getSession().save(calendar);
-            getSession().flush();
-
             return calendar;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -357,15 +312,15 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
             if (calendar == null)
                 throw new IllegalArgumentException("calendar cannot be null");
 
-            if (calendar.getName() == null || "".equals(calendar.getName()))
-                throw new IllegalArgumentException("calendar must have name");
-            
             // In a hierarchy, can't have two items with same name with
             // same parent
             checkForDuplicateItemNameMinusItem(calendar.getOwner().getId(), 
                     calendar.getParent().getId(), calendar.getName(), calendar.getId());
             
             updateBaseItemProps(calendar);
+            
+            // validate item
+            calendar.validate();
             getSession().update(calendar);
             return calendar;
         } catch (HibernateException e) {
@@ -385,17 +340,11 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
             if (event == null)
                 throw new IllegalArgumentException("event cannot be null");
 
-            if (event.getName() == null || "".equals(event.getName()))
-                throw new IllegalArgumentException("event must have name");
-
             if (event.getOwner() == null)
                 throw new IllegalArgumentException("event must have owner");
             
             if (event.getParent() == null)
                 throw new IllegalArgumentException("event must have parent");
-            
-            // validate content
-            event.validate();
             
             // In a hierarchy, can't have two items with same name with
             // same parent
@@ -407,6 +356,10 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
                     .getCalendar());
 
             updateBaseItemProps(event);
+            
+            // validate content
+            event.validate();
+            
             getSession().update(event);
             return event;
         } catch (HibernateException e) {

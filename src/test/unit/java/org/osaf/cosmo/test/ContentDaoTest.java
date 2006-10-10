@@ -120,6 +120,39 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         
         item.setContentLength(new Long(item.getContent().length));
         contentDao.createContent(root, item);
+        
+        item = generateTestContent();
+        item.setName(null);
+        
+        try {
+            contentDao.createContent(root, item);
+            Assert.fail("able to create invalid content.");
+        } catch (ModelValidationException e) {}
+        
+        item.setName("");
+        
+        try {
+            contentDao.createContent(root, item);
+            Assert.fail("able to create invalid content.");
+        } catch (ModelValidationException e) {}
+        
+        item.setName("lsfkjlsf");
+        contentDao.createContent(root, item);
+        
+        item.setName(null);
+        try {
+            contentDao.updateContent(item);
+            Assert.fail("able to update invalid content.");
+        } catch (ModelValidationException e) {}
+        
+        item.setName("");
+        try {
+            contentDao.updateContent(item);
+            Assert.fail("able to update invalid content.");
+        } catch (ModelValidationException e) {}
+        
+        item.setName("lsfjlsslfkjlsfd");
+        contentDao.updateContent(item);
     }
     
     public void testContentAttributes() throws Exception

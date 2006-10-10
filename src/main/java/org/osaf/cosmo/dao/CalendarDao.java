@@ -84,14 +84,6 @@ public interface CalendarDao extends ItemDao {
     public CalendarEventItem addEvent(CalendarCollectionItem calendar,
             CalendarEventItem event);
 
-
-    /**
-     * Create a new calendar event item from an existing content item
-     * @param content
-     * @return newly created calendar event item
-     */
-    public CalendarEventItem addEvent(ContentItem content);
-
     /**
      * Update existing calendar event item.
      *

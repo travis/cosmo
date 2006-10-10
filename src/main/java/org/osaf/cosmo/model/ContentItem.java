@@ -102,6 +102,7 @@ public class ContentItem extends Item {
     }
 
     public void validate() {
+        super.validate();
         validateContent();
     }
     

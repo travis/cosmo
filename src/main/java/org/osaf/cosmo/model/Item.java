@@ -97,6 +97,7 @@ public abstract class Item extends BaseModelObject {
         addAttribute(new DictionaryAttribute(key, value));
     }
     
+    @SuppressWarnings("unchecked")
     public void setAttribute(String key, Object value) {
         Attribute attr = (Attribute) attributes.get(key);
         
@@ -121,22 +122,7 @@ public abstract class Item extends BaseModelObject {
             addAttribute(attr);
         } else {
             validateAttribute(attr, value);
-            if(value instanceof String)
-                ((StringAttribute) attr).setValue((String) value);
-            else if(value instanceof byte[])
-                ((BinaryAttribute) attr).setValue((byte[]) value);
-            else if(value instanceof Long)
-                ((IntegerAttribute) attr).setValue((Long) value);
-            else if(value instanceof Boolean)
-                ((BooleanAttribute) attr).setValue((Boolean) value);
-            else if(value instanceof Date)
-                ((DateAttribute) attr).setValue((Date) value);
-            else if(value instanceof Set)
-                ((MultiValueStringAttribute) attr).setValue((Set) value);
-            else if(value instanceof Map)
-                ((DictionaryAttribute) attr).setValue((Map) value);
-            else
-                ((StringAttribute) attr).setValue(value.toString());
+            attr.setValue(value);
         }
     }
 

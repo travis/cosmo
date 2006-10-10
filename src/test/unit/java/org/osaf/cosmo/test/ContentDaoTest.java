@@ -17,7 +17,6 @@ package org.osaf.cosmo.test;
 
 import java.io.FileInputStream;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,21 +25,18 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.dao.hibernate.ContentDaoImpl;
 import org.osaf.cosmo.dao.hibernate.ItemDaoImpl;
 import org.osaf.cosmo.dao.hibernate.UserDaoImpl;
-import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.DateAttribute;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
-import org.osaf.cosmo.model.IntegerAttribute;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ModelValidationException;
-import org.osaf.cosmo.model.MultiValueStringAttribute;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -75,16 +71,9 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         User user = getUser(userDao,"testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        ContentItem item = new ContentItem();
+        ContentItem item = generateTestContent();
         item.setName("test");
-        item.setDisplayName("this is a test item");
-        item.setOwner(user);
-        item.setContent(getBytes(baseDir + "/testdata1.txt"));
-        item.setContentEncoding("UTF8");
-        item.setContentType("text/text");
-        item.setContentLanguage("en");
-        item.addAttribute(new StringAttribute("customattribute", "customattributevalue"));
-
+        
         ContentItem newItem = contentDao.createContent(root, item);
 
         Assert.assertTrue(newItem.getId()>-1);
@@ -97,7 +86,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         verifyItem(newItem, queryItem);
     }
     
-    public void testContentAttributes() throws Exception
+    public void testContentDaoInvalidContent() throws Exception
     {
         User user = getUser(userDao,"testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
@@ -105,11 +94,40 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         ContentItem item = new ContentItem();
         item.setName("test");
         item.setOwner(user);
-        item.setContent(new FileInputStream(baseDir + "/testdata1.txt"));
+        item.setContent(getBytes(baseDir + "/testdata1.txt"));
+        item.setContentLanguage("en");
         item.setContentEncoding("UTF8");
         item.setContentType("text/text");
-        item.setContentLanguage("en");
-        item.addStringAttribute("customattribute", "customattributevalue");
+
+        try {
+            contentDao.createContent(root, item);
+            Assert.fail("able to create invalid content.");
+        } catch (ModelValidationException e) {}
+        
+        item.setContentLength(new Long(-1));
+        
+        try {
+            contentDao.createContent(root, item);
+            Assert.fail("able to create invalid content.");
+        } catch (ModelValidationException e) {}
+        
+        item.setContentLength(new Long(1));
+        
+        try {
+            contentDao.createContent(root, item);
+            Assert.fail("able to create invalid content.");
+        } catch (ModelValidationException e) {}
+        
+        item.setContentLength(new Long(item.getContent().length));
+        contentDao.createContent(root, item);
+    }
+    
+    public void testContentAttributes() throws Exception
+    {
+        User user = getUser(userDao,"testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        ContentItem item = generateTestContent();
         item.addIntegerAttribute("intattribute", new Long(22));
         item.addBooleanAttribute("booleanattribute", Boolean.TRUE);
         // TODO: figure out db date type is handled because i'm seeing
@@ -214,14 +232,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         Assert.assertNotNull(queryItem);
         Assert.assertTrue(queryItem instanceof CollectionItem);
 
-        ContentItem item = new ContentItem();
-        item.setName("test");
-        item.setOwner(getUser(userDao, "testuser"));
-        item.setContent(getBytes(baseDir + "/testdata1.txt"));
-        item.setContentEncoding("UTF8");
-        item.setContentType("text/text");
-        item.setContentLanguage("en");
-        item.addAttribute(new StringAttribute("customattribute", "customattributevalue"));
+        ContentItem item = generateTestContent();
 
         item = contentDao.createContent(a, item);
         
@@ -243,16 +254,8 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         User user = getUser(userDao,"testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        ContentItem item = new ContentItem();
-        item.setName("test");
-        item.setDisplayName("this is a test item");
-        item.setOwner(user);
-        item.setContent(getBytes(baseDir + "/testdata1.txt"));
-        item.setContentEncoding("UTF8");
-        item.setContentType("text/text");
-        item.setContentLanguage("en");
-        item.addAttribute(new StringAttribute("customattribute", "customattributevalue"));
-
+        ContentItem item = generateTestContent();
+        
         ContentItem newItem = contentDao.createContent(root, item);
         
         clearSession();
@@ -267,6 +270,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         queryItem.getAttributes().remove("customattribute");
         queryItem.setContentLanguage("es");
         queryItem.setContent(getBytes(baseDir + "/testdata2.txt"));
+        queryItem.setContentLength(new Long(queryItem.getContent().length));
 
         // Make sure modified date changes
         Thread.sleep(1000);
@@ -286,23 +290,9 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         User user = getUser(userDao,"testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        ContentItem item1 = new ContentItem();
-        item1.setName("test");
-        item1.setOwner(user);
-        item1.setContent(getBytes(baseDir + "/testdata1.txt"));
-        item1.setContentEncoding("UTF8");
-        item1.setContentType("text/text");
-        item1.setContentLanguage("en");
+        ContentItem item1 = generateTestContent("test","testuser");
+        ContentItem item2 = generateTestContent("test2","testuser");
        
-        ContentItem item2 = new ContentItem();
-        item2.setName("test2");
-        item2.setOwner(user);
-        item2.setContent(getBytes(baseDir + "/testdata1.txt"));
-        item2.setContentEncoding("UTF8");
-        item2.setContentType("text/text");
-        item2.setContentLanguage("en");
-        
-
         ContentItem newItem1 = contentDao.createContent(root, item1);
         ContentItem newItem2 = contentDao.createContent(root, item2);
         
@@ -323,15 +313,8 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         User user = getUser(userDao,"testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        ContentItem item = new ContentItem();
-        item.setName("test");
-        item.setOwner(user);
-        item.setContent(getBytes(baseDir + "/testdata1.txt"));
-        item.setContentEncoding("UTF8");
-        item.setContentType("text/text");
-        item.setContentLanguage("en");
-        item.addAttribute(new StringAttribute("customattribute", "customattributevalue"));
-
+        ContentItem item = generateTestContent();
+        
         ContentItem newItem = contentDao.createContent(root, item);
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         verifyItem(newItem, queryItem);
@@ -349,15 +332,8 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         User user = getUser(userDao,"testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        ContentItem item = new ContentItem();
-        item.setName("test");
-        item.setOwner(user);
-        item.setContent(getBytes(baseDir + "/testdata1.txt"));
-        item.setContentEncoding("UTF8");
-        item.setContentType("text/text");
-        item.setContentLanguage("en");
-        item.addAttribute(new StringAttribute("customattribute", "customattributevalue"));
-
+        ContentItem item = generateTestContent();
+        
         ContentItem newItem = contentDao.createContent(root, item);
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         verifyItem(newItem, queryItem);
@@ -375,15 +351,8 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         User user = getUser(userDao,"testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        ContentItem item = new ContentItem();
-        item.setName("test");
-        item.setOwner(user);
-        item.setContent(getBytes(baseDir + "/testdata1.txt"));
-        item.setContentEncoding("UTF8");
-        item.setContentType("text/text");
-        item.setContentLanguage("en");
-        item.addAttribute(new StringAttribute("customattribute", "customattributevalue"));
-
+        ContentItem item = generateTestContent();
+       
         ContentItem newItem = contentDao.createContent(root, item);
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         verifyItem(newItem, queryItem);
@@ -483,24 +452,12 @@ public class ContentDaoTest extends HibernateDaoTestCase {
 
         b = contentDao.createCollection(a, b);
 
-        ContentItem c = new ContentItem();
-        c.setName("c");
-        c.setOwner(getUser(userDao, "testuser2"));
-        c.setContent(getBytes(baseDir + "/testdata1.txt"));
-        c.setContentEncoding("UTF8");
-        c.setContentType("text/text");
-        c.setContentLanguage("en");
-
+        ContentItem c = generateTestContent("c","testuser2");
+        
         c = contentDao.createContent(b, c);
 
-        ContentItem d = new ContentItem();
-        d.setName("d");
-        d.setOwner(getUser(userDao, "testuser2"));
-        d.setContent(getBytes(baseDir + "/testdata1.txt"));
-        d.setContentEncoding("UTF8");
-        d.setContentType("text/text");
-        d.setContentLanguage("en");
-
+        ContentItem d = generateTestContent("d","testuser2");
+       
         d = contentDao.createContent(a, d);
 
         clearSession();
@@ -510,13 +467,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         a2.setName("a");
         a2.setOwner(getUser(userDao, "testuser2"));
         
-        ContentItem d2 = new ContentItem();
-        d2.setName("d");
-        d2.setOwner(getUser(userDao, "testuser2"));
-        d2.setContent(getBytes(baseDir + "/testdata1.txt"));
-        d2.setContentEncoding("UTF8");
-        d2.setContentType("text/text");
-        d2.setContentLanguage("en");
+        ContentItem d2 = generateTestContent("d","testuser2");
         
         try
         {
@@ -613,13 +564,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
 
         c = contentDao.createCollection(b, c);
 
-        ContentItem d = new ContentItem();
-        d.setName("d");
-        d.setOwner(getUser(userDao, "testuser2"));
-        d.setContent(getBytes(baseDir + "/testdata1.txt"));
-        d.setContentEncoding("UTF8");
-        d.setContentType("text/text");
-        d.setContentLanguage("en");
+        ContentItem d = generateTestContent("d","testuser2");
 
         d = contentDao.createContent(c, d);
 
@@ -700,13 +645,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
 
         c = contentDao.createCollection(b, c);
 
-        ContentItem d = new ContentItem();
-        d.setName("d");
-        d.setOwner(getUser(userDao, "testuser2"));
-        d.setContent(getBytes(baseDir + "/testdata1.txt"));
-        d.setContentEncoding("UTF8");
-        d.setContentType("text/text");
-        d.setContentLanguage("en");
+        ContentItem d = generateTestContent("d","testuser2");
 
         d = contentDao.createContent(c, d);
 
@@ -789,14 +728,8 @@ public class ContentDaoTest extends HibernateDaoTestCase {
 
         c = contentDao.createCollection(b, c);
 
-        ContentItem d = new ContentItem();
-        d.setName("d");
-        d.setOwner(getUser(userDao, "testuser2"));
-        d.setContent(getBytes(baseDir + "/testdata1.txt"));
-        d.setContentEncoding("UTF8");
-        d.setContentType("text/text");
-        d.setContentLanguage("en");
-
+        ContentItem d = generateTestContent("d","testuser2");
+        
         d = contentDao.createContent(c, d);
 
         CollectionItem e = new CollectionItem();
@@ -880,14 +813,8 @@ public class ContentDaoTest extends HibernateDaoTestCase {
     {
         User testuser = getUser(userDao, "testuser");
         String name = "ticketable:" + System.currentTimeMillis();
-        ContentItem item = new ContentItem();
-        item.setName(name);
-        item.setOwner(testuser);
-        item.setContent(getBytes(baseDir + "/testdata1.txt"));
-        item.setContentEncoding("UTF8");
-        item.setContentType("text/text");
-        item.setContentLanguage("en");
-
+        ContentItem item = generateTestContent(name,"testuser");
+        
         CollectionItem root = (CollectionItem) contentDao.getRootItem(testuser);
         ContentItem newItem = contentDao.createContent(root, item);
 
@@ -993,6 +920,24 @@ public class ContentDaoTest extends HibernateDaoTestCase {
     private User getUser(UserDao userDao, String username)
     {
         return getUser(userDao,contentDao,username);
+    }
+    
+    private ContentItem generateTestContent() throws Exception {
+        return generateTestContent("test","testuser");
+    }
+    
+    private ContentItem generateTestContent(String name,String owner) throws Exception {
+        ContentItem content = new ContentItem();
+        content.setName(name);
+        content.setDisplayName(name);
+        content.setContent(getBytes(baseDir + "/testdata1.txt"));
+        content.setContentLength(new Long(content.getContent().length));
+        content.setContentLanguage("en");
+        content.setContentEncoding("UTF8");
+        content.setContentType("text/text");
+        content.setOwner(getUser(userDao, owner));
+        content.addAttribute(new StringAttribute("customattribute", "customattributevalue"));
+        return content;
     }
 
 }

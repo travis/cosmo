@@ -107,6 +107,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             if (owner == null)
                 throw new IllegalArgumentException("content must have owner");
 
+            // validate content
+            content.validate();
           
             // Enforce hiearchy for WebDAV support
             // In a hierarchy, can't have two items with same name with
@@ -252,6 +254,9 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             if (content.getName() == null || "".equals(content.getName()))
                 throw new IllegalArgumentException("content must have name");
+            
+            // validate content
+            content.validate();
             
             // In a hierarchy, can't have two items with same name with
             // same parent

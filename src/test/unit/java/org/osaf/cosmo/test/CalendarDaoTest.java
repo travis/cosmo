@@ -69,17 +69,8 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
     
 	public void testCalendarDaoBasic() throws Exception
 	{
-		CalendarCollectionItem calendar = new CalendarCollectionItem();
-		calendar.setName("test");
-		calendar.setOwner(getUser(userDao, "testuser"));
-		calendar.setDescription("test description");
-		calendar.setLanguage("en");
+		CalendarCollectionItem calendar = generateCalendar("test","testuser");
 		
-		HashSet supportedComponents = new HashSet();
-		supportedComponents.add("VEVENT");
-		calendar.setSupportedComponents(supportedComponents);
-		
-
 		CalendarCollectionItem newItem = calendarDao.createCalendar(calendar);
 		
         clearSession();
@@ -96,7 +87,7 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
 		queryItem.setName("test2");
 		queryItem.setLanguage("es");
 		queryItem.setDescription("test description2");
-		supportedComponents = new HashSet();
+		HashSet<String> supportedComponents = new HashSet<String>();
 		supportedComponents.add("VTODO");
 		queryItem.setSupportedComponents(supportedComponents);
 		
@@ -112,13 +103,7 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
 		Assert.assertEquals("VTODO", (String) queryItem.getSupportedComponents().iterator().next());
 		
 		// test add event
-		CalendarEventItem event = new CalendarEventItem();
-		event.setName("test.ics");
-		event.setOwner(getUser(userDao, "testuser"));
-		event.setContent(getBytes(baseDir + "/cal1.ics"));
-		event.setContentEncoding("UTF8");
-		event.setContentType("text/calendar");
-		event.setContentLanguage("en");
+		CalendarEventItem event = generateEvent("test.ics","cal1.ics","testuser");
 		
 		CalendarEventItem newEvent = calendarDao.addEvent(calendar, event);
 		
@@ -139,6 +124,7 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
 		queryEvent.setContentLanguage("es");
 		queryEvent.setContentType("text/ical");
 		queryEvent.setContent(getBytes(baseDir + "/cal2.ics"));
+        queryEvent.setContentLength(new Long(queryEvent.getContent().length));
 		
 		queryEvent = calendarDao.updateEvent(queryEvent);
 		
@@ -172,20 +158,10 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
     
     public void testLongPropertyValue() throws Exception
     {
-        CalendarCollectionItem calendar = new CalendarCollectionItem();
-        calendar.setName("test");
-        calendar.setOwner(getUser(userDao, "testuser"));
-        calendar.setDescription("test description");
-        calendar.setLanguage("en");
+        CalendarCollectionItem calendar = generateCalendar("test","testuser");
         calendar = calendarDao.createCalendar(calendar);
         
-        CalendarEventItem event = new CalendarEventItem();
-        event.setName("big.ics");
-        event.setOwner(getUser(userDao, "testuser"));
-        event.setContent(getBytes(baseDir + "/big.ics"));
-        event.setContentEncoding("UTF8");
-        event.setContentType("text/calendar");
-        event.setContentLanguage("en");
+        CalendarEventItem event = generateEvent("big.ics","big.ics","testuser");
         
         event = calendarDao.addEvent(calendar, event);
         
@@ -197,30 +173,14 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
 	
     public void testDuplicateEventUid() throws Exception
     {
-        CalendarCollectionItem calendar = new CalendarCollectionItem();
-        calendar.setName("test");
-        calendar.setOwner(getUser(userDao, "testuser"));
-        calendar.setDescription("test description");
-        calendar.setLanguage("en");
+        CalendarCollectionItem calendar = generateCalendar("test","testuser");
         calendar = calendarDao.createCalendar(calendar);
         
-        CalendarEventItem event = new CalendarEventItem();
-        event.setName("test.ics");
-        event.setOwner(getUser(userDao, "testuser"));
-        event.setContent(getBytes(baseDir + "/cal1.ics"));
-        event.setContentEncoding("UTF8");
-        event.setContentType("text/calendar");
-        event.setContentLanguage("en");
+        CalendarEventItem event = generateEvent("test.ics","cal1.ics","testuser");
         
         event = calendarDao.addEvent(calendar, event);
         
-        CalendarEventItem event2 = new CalendarEventItem();
-        event2.setName("testduplicate.ics");
-        event2.setOwner(getUser(userDao, "testuser"));
-        event2.setContent(getBytes(baseDir + "/cal1.ics"));
-        event2.setContentEncoding("UTF8");
-        event2.setContentType("text/calendar");
-        event2.setContentLanguage("en");
+        CalendarEventItem event2 = generateEvent("testduplicate.ics","cal1.ics","testuser");
         
         try {
             event2 = calendarDao.addEvent(calendar, event2);
@@ -230,20 +190,10 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
     
     public void testFindByEventIcalUid() throws Exception
     {
-        CalendarCollectionItem calendar = new CalendarCollectionItem();
-        calendar.setName("test");
-        calendar.setOwner(getUser(userDao, "testuser"));
-        calendar.setDescription("test description");
-        calendar.setLanguage("en");
+        CalendarCollectionItem calendar = generateCalendar("test","testuser");
         calendar = calendarDao.createCalendar(calendar);
         
-        CalendarEventItem event = new CalendarEventItem();
-        event.setName("test.ics");
-        event.setOwner(getUser(userDao, "testuser"));
-        event.setContent(getBytes(baseDir + "/cal1.ics"));
-        event.setContentEncoding("UTF8");
-        event.setContentType("text/calendar");
-        event.setContentLanguage("en");
+        CalendarEventItem event = generateEvent("test.ics","cal1.ics","testuser");
         
         event = calendarDao.addEvent(calendar, event);
         
@@ -258,26 +208,10 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
     
 	public void testCalendarDaoAdvanced() throws Exception
 	{
-		CalendarCollectionItem calendar = new CalendarCollectionItem();
-		calendar.setName("test");
-		calendar.setOwner(getUser(userDao, "testuser"));
-		calendar.setDescription("test description");
-		calendar.setLanguage("en");
-		
-		HashSet supportedComponents = new HashSet();
-		supportedComponents.add("VEVENT");
-		
-		calendar.setSupportedComponents(supportedComponents);
-		
-		
+		CalendarCollectionItem calendar = generateCalendar("test","testuser");
 		calendar = calendarDao.createCalendar(calendar);
 		
-		CalendarCollectionItem calendar2 = new CalendarCollectionItem();
-		calendar2.setName("test");
-		calendar2.setOwner(getUser(userDao,"testuser"));
-		calendar2.setDescription("test description");
-		calendar2.setLanguage("en");
-		calendar2.setSupportedComponents(supportedComponents);
+		CalendarCollectionItem calendar2 = generateCalendar("test","testuser");
 		
 		try
 		{
@@ -292,24 +226,12 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
 		calendar2 = calendarDao.createCalendar(calendar2);
 		
 		// test add events
-		CalendarEventItem event = new CalendarEventItem();
-		event.setName("test.ics");
-		event.setOwner(getUser(userDao, "testuser"));
-		event.setContent(getBytes(baseDir + "/cal1.ics"));
-		event.setContentEncoding("UTF8");
-		event.setContentType("text/calendar");
-		event.setContentLanguage("en");
-		
+		CalendarEventItem event = generateEvent("test.ics","cal1.ics","testuser");
+      
 		CalendarEventItem newEvent = calendarDao.addEvent(calendar, event);
 		
-		CalendarEventItem event2 = new CalendarEventItem();
-		event2.setName("test2.ics");
-		event2.setOwner(getUser(userDao, "testuser"));
-		event2.setContent(getBytes(baseDir + "/cal2.ics"));
-		event2.setContentEncoding("UTF8");
-		event2.setContentType("text/calendar");
-		event2.setContentLanguage("en");
-		
+		CalendarEventItem event2 = generateEvent("test2.ics","cal2.ics","testuser");
+        
 		CalendarEventItem newEvent2 = calendarDao.addEvent(calendar, event2);
 		
         clearSession();
@@ -368,21 +290,8 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
        
         CalendarCollectionItem newCalendar = calendarDao.createCalendar(calendar);
     
-        ContentItem item1 = new ContentItem();
-        item1.setName("test.ics");
-        item1.setOwner(getUser(userDao, "testuser"));
-        item1.setContent(getBytes(baseDir + "/cal1.ics"));
-        item1.setContentEncoding("UTF8");
-        item1.setContentType("text/calendar");
-        item1.setContentLanguage("en");
-        
-        ContentItem item2 = new ContentItem();
-        item2.setName("test2.ics");
-        item2.setOwner(getUser(userDao, "testuser"));
-        item2.setContent(getBytes(baseDir + "/cal1.ics"));
-        item2.setContentEncoding("UTF8");
-        item2.setContentType("text/calendar");
-        item2.setContentLanguage("en");
+        ContentItem item1 = generateEvent("test.ics","cal1.ics","testuser");
+        ContentItem item2 = generateEvent("test2.ics","cal2.ics","testuser");
         
         ContentItem newItem1 = contentDao.createContent(root, item1);
         ContentItem newItem2 = contentDao.createContent(calendar, item2);
@@ -403,28 +312,12 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
 	
 	public void testCalendarQuerying() throws Exception
 	{
-		CalendarCollectionItem calendar = new CalendarCollectionItem();
-		calendar.setName("test");
-		calendar.setOwner(getUser(userDao, "testuser"));
-		calendar.setDescription("test description");
-		calendar.setLanguage("en");
-		
-		HashSet supportedComponents = new HashSet();
-		supportedComponents.add("VEVENT");
-		
-		calendar.setSupportedComponents(supportedComponents);
-		
+		CalendarCollectionItem calendar = generateCalendar("test","testuser");
 		calendar = calendarDao.createCalendar(calendar);
 	
 		for(int i=1;i<=5;i++)
 		{
-			CalendarEventItem event = new CalendarEventItem();
-			event.setName("test" + i +".ics");
-			event.setOwner(getUser(userDao, "testuser"));
-			event.setContent(getBytes(baseDir + "/cal" + i + ".ics"));
-			event.setContentEncoding("UTF8");
-			event.setContentType("text/calendar");
-			event.setContentLanguage("en");
+			CalendarEventItem event = generateEvent("test" + i +".ics","cal" + i + ".ics","testuser");
 			CalendarEventItem newEvent = calendarDao.addEvent(calendar, event);
 		}
 		
@@ -533,6 +426,34 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
     private User getUser(UserDao userDao, String username)
     {
         return getUser(userDao,contentDao,username);
+    }
+    
+    private CalendarCollectionItem generateCalendar(String name, String owner) 
+    {
+        CalendarCollectionItem calendar = new CalendarCollectionItem();
+        calendar.setName(name);
+        calendar.setOwner(getUser(userDao, owner));
+        calendar.setDescription("test description");
+        calendar.setLanguage("en");
+        
+        HashSet<String> supportedComponents = new HashSet<String>();
+        supportedComponents.add("VEVENT");
+        calendar.setSupportedComponents(supportedComponents);
+        return calendar;
+    }
+    
+    private CalendarEventItem generateEvent(String name, String file, String owner)
+        throws Exception {
+        CalendarEventItem event = new CalendarEventItem();
+        event.setName(name);
+        event.setDisplayName(name);
+        event.setOwner(getUser(userDao, owner));
+        event.setContent(getBytes(baseDir + "/" + file));
+        event.setContentLength(new Long(event.getContent().length));
+        event.setContentEncoding("UTF8");
+        event.setContentType("text/calendar");
+        event.setContentLanguage("en");
+        return event;
     }
 	
 }

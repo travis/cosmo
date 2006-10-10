@@ -88,6 +88,9 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
             throw new IllegalArgumentException("event must have owner");
 
         try {
+            // validate content
+            event.validate();
+            
             User owner = event.getOwner();
 
             Long parentDbId = calendar.getId();
@@ -390,6 +393,9 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
             
             if (event.getParent() == null)
                 throw new IllegalArgumentException("event must have parent");
+            
+            // validate content
+            event.validate();
             
             // In a hierarchy, can't have two items with same name with
             // same parent

@@ -101,6 +101,25 @@ public class ContentItem extends Item {
         setAttribute(ATTR_CONTENT_LENGTH, contentLength);
     }
 
+    public void validate() {
+        validateContent();
+    }
+    
+    protected void validateContent() {
+        if (getContentLength() == null)
+            throw new ModelValidationException("Content Length must be present");
+
+        if (getContentLength().longValue() < 0)
+            throw new ModelValidationException("Content Length must be >= 0");
+
+        if (getContent() == null)
+            throw new ModelValidationException("Content must be present");
+
+        if (getContent().length != getContentLength().longValue())
+            throw new ModelValidationException(
+                    "Content Length doesn't match Content");
+    }
+    
     /**
      */
     public String toString() {

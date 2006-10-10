@@ -93,8 +93,6 @@
             <fmt:message key="Layout.Nav.Console.Label"/>
             <c:choose><c:when test="${fn:endsWith(body, '/user/list.jsp')}"><strong><fmt:message key="Layout.Nav.Console.Users"/></strong></c:when><c:otherwise><html:link page="/console/users"><fmt:message key="Layout.Nav.Console.Users"/></html:link></c:otherwise></c:choose>
             |
-            <html:link page="/console/home/browse/"><fmt:message key="Layout.Nav.Console.HomeDirectories"/></html:link>
-            |
             <c:choose><c:when test="${fn:endsWith(body, '/status/view.jsp')}"><strong><fmt:message key="Layout.Nav.Console.ServerStatus"/></strong></c:when><c:otherwise><html:link page="/console/status"><fmt:message key="Layout.Nav.Console.ServerStatus"/></html:link></c:otherwise></c:choose>
             <!-- end admin console navbar -->
           </div>

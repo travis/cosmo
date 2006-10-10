@@ -133,9 +133,12 @@ public class HomedirVoter implements AccessDecisionVoter {
         // grant access if the first path segment exactly matches the
         // given username
 
-        return PathUtil.getInitialSegment(path).equals(username) ?
-            ACCESS_GRANTED :
-            ACCESS_DENIED;
+        String segment = PathUtil.getInitialSegment(path);
+        if (segment == null)
+            // path is /
+            return ACCESS_ABSTAIN;
+
+        return segment.equals(username) ? ACCESS_GRANTED : ACCESS_DENIED;
     }
 
     // XXX for read ops, look for client path in PARAM_CLIENT_PATH

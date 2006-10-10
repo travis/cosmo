@@ -94,31 +94,6 @@ public class CaldavQueryFilter
     }
 
     /**
-     * Convert filter into XPath string for use with JCR queries.
-     * 
-     * @return the XPath query as a string.
-     */
-    public String toXPath() {
-        // Look at only calendar resources
-        String path = "/element(*, calendar:resource)";
-
-        if (CosmoConstants.INDEX_VIRTUAL_PROPERTIES) {
-            path += "/jcr:content";
-        }
-
-        // Generate a list of terms to use in the XPath expression
-        String tests = filter.generateTests("");
-
-        if (tests != null && ! tests.equals("")) {
-            path += "[";
-            path += tests;
-            path += "]";
-        }
-
-        return path;
-    }
-
-    /**
      */
     protected String generatePeriods(Period period) {
         // Get fixed start/end time

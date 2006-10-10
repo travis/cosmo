@@ -60,16 +60,6 @@ public class CosmoConstants {
      */
     public static final String SC_ATTR_SERVER_ADMIN = "cosmo.server.admin";
 
-    /**
-     * A feature toggle that determines whether Cosmo stores the
-     * calendar properties of a calendar resource in the repository or
-     * whether it simply indexes them ("virtual storage").
-     *
-     * @deprecated The virtual storage feature will be removed in
-     * release 0.5
-     */
-    @Deprecated public static final boolean INDEX_VIRTUAL_PROPERTIES = false;
-
     // read the product version from VERSION_FILE
 
     private static String VERSION_FILE = "cosmo.version.txt";

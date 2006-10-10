@@ -19,6 +19,13 @@ dojo.provide('cosmo.view.cal');
 cosmo.view.cal = new function() {
     
     var self = this;
+    var ranges = {
+        'daily': ['d', 1],
+        'weekly': ['ww', 1],
+        'biweekly': ['ww', 2],
+        'monthly': ['m', 1],
+        'yearly': ['yyyy', 1]
+    }
     
     // Saving changes
     // =========================
@@ -40,13 +47,6 @@ cosmo.view.cal = new function() {
                 var dtOrig = ev.dataOrig.start;
                 var origDate = new Date(dtOrig.getFullYear(), dtOrig.getMonth(), dtOrig.getDate());
                 var newDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
-                var ranges = {
-                    'daily': ['d', 1],
-                    'weekly': ['ww', 1],
-                    'biweekly': ['ww', 2],
-                    'monthly': ['m', 1],
-                    'yearly': ['yyyy', 1]
-                }
                 var unit = ranges[freq][0];
                 var bound = ranges[freq][1];
                 var diff = Date.diff(unit, origDate, newDate);
@@ -88,7 +88,6 @@ cosmo.view.cal = new function() {
         if (Cal.dialog.isDisplayed) {
             Cal.hideDialog();
         }
-        
         // Recurring event
         var f = null;
         if (qual) {
@@ -163,7 +162,15 @@ cosmo.view.cal = new function() {
                     }
                     break;
                 case opts.ALL_FUTURE_EVENTS:
-                    
+                    var newEv = new CalEvent();
+                    var freq = ev.data.recurrenceRule.frequency;
+                    var start = ev.dataOrig.start;
+                    var recurEnd = new ScoobyDate(start.getFullYear(), start.getMonth(), start.getDate());
+                    var unit = ranges[freq][0];
+                    var incr = (ranges[freq][1] * -1);
+                    recurEnd = ScoobyDate.add(recurEnd, unit, incr);
+                    newEv.data = CalEventData.clone(ev.data);
+                    f = function() { doSaveEventBreakRecurrence(newEv, ev.data.id, recurEnd, { 'saveType': 'instanceAllFuture', 'originalEvent': ev }); };
                     break;
                 case opts.ONLY_THIS_EVENT:
                     
@@ -195,6 +202,16 @@ cosmo.view.cal = new function() {
         else {
             self.lastSent = ev;
         }
+    }
+    function doSaveEventBreakRecurrence(ev, origId, recurEnd, opts) {
+        var f = function(newEvId, err, reqId) {
+           handleSaveEvent(ev, newEvId, err, reqId, opts); };
+        var requestId = null;
+        Log.print(recurEnd);
+        requestId = Cal.serv.saveNewEventBreakRecurrence(
+            f, Cal.currentCalendar.path, ev.data, origId, recurEnd);
+        self.processingQueue.push(requestId);
+        self.lastSent = ev;
     }
     function handleSaveEvent(ev, newEvId, err, reqId, optsParam) {
         var saveEv = ev;
@@ -252,8 +269,16 @@ cosmo.view.cal = new function() {
         // ********************
         Cal.serv.resetServiceAccessTime();
         
-        if (opts.saveType == 'recurrenceMaster') {
-            loadRecurrenceExpansion(saveEv.data.id, Cal.viewStart, Cal.viewEnd);
+        if (opts.saveType == 'recurrenceMaster' || opts.saveType == 'instanceAllFuture') {
+            var idArr = [];
+            if (opts.saveType == 'instanceAllFuture') {
+                idArr = [opts.originalEvent.data.id]
+            }
+            else {
+                idArr = saveEv.data.id;
+            }
+            //idArr.push(saveEv.data.id);
+            loadRecurrenceExpansion(idArr, Cal.viewStart, Cal.viewEnd);
         }
         else {
             self.processingQueue.shift();
@@ -395,6 +420,7 @@ cosmo.view.cal = new function() {
         var id = '';
         var ev = null;
 
+        dojo.event.topic.publish('/calEvent', { 'action': 'eventsLoadStart' });
         // Load the array of events
         // ======================
         try {

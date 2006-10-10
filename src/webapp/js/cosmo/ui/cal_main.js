@@ -116,6 +116,7 @@ var Cal = new function() {
             allDayDiv = document.getElementById('allDayContentDiv');
             this.placeUI();
             this.setImagesForSkin();
+            this.setUpNavButtons();
         }
 
         // Load and display date info, render cal canvas
@@ -127,7 +128,6 @@ var Cal = new function() {
         // Calendar event detail form 
         this.calForm = new CalForm();
         this.calForm.init();
-        this.calForm.setEventListeners();
         
         // Load minical and jump-to date
         var mcDiv = document.getElementById('miniCalDiv');
@@ -190,6 +190,8 @@ var Cal = new function() {
             allDayDiv.appendChild(dummyElem);
         }
         
+        // Add event listeners for form-element behaviors
+        this.calForm.setEventListeners();
     };
 
     // ==========================
@@ -334,20 +336,12 @@ var Cal = new function() {
     this.setImagesForSkin =  function() {
         var skinImagesDir = 'templates/' + TEMPLATE_DIRECTORY + '/images/';
         var handleImg = null;
-        var navButtons = null;
-        var leftClick =  null;
-        var rightClick = null;
         
         handleImg = document.createElement('img');
         handleImg.src = cosmo.env.getImagesUrl() + 'resize_handle_image.gif';
        
-        leftClick = function() { Cal.uiMask.show(); setTimeout('Cal.goView("back");', 100); }
-        rightClick = function() { Cal.uiMask.show(); setTimeout('Cal.goView("next");', 100); }
-        navButtons = new NavButtonSet('viewNav', leftClick, rightClick);
-       
        
         document.getElementById('allDayResizeHandleDiv').appendChild(handleImg);
-        document.getElementById('viewNavButtons').appendChild(navButtons.domNode);
         document.getElementById('smallLogoDiv').style.background =
             'url(' + cosmo.env.getImagesUrl() + LOGO_GRAPHIC_SM + ')';
     };
@@ -507,6 +501,19 @@ var Cal = new function() {
     // ==========================
     // Navigating and changing calendars
     // ==========================
+    // *** FIXME: Unify mask-display/nav methods ***
+    /**
+     * Set up the week-to-week navigation button panel 
+     */
+    this.setUpNavButtons = function() {
+        var navButtons = null;
+        var leftClick =  null;
+        var rightClick = null;
+        leftClick = function() { Cal.uiMask.show(); setTimeout('Cal.goView("back");', 300); }
+        rightClick = function() { Cal.uiMask.show(); setTimeout('Cal.goView("next");', 300); }
+        navButtons = new NavButtonSet('viewNav', leftClick, rightClick);
+        document.getElementById('viewNavButtons').appendChild(navButtons.domNode);
+    };
     /**
      * Used to navigate from view span to view span, e.g., week-to-week
      */
@@ -529,20 +536,20 @@ var Cal = new function() {
     /**
      * Used to ensure the 'processing' text shows briefly
      * Prevent seizure-inducing flashes of the mask div
+     * Execute whatever function is passed after showing the mask
      */
-    this.goSelCalMask = function() {
-        Cal.uiMask.show();
-        setTimeout(Cal.goSelCal, 100);
-    };
+    this.showMaskDelayNav = function(f) {
+        self.uiMask.show();
+        setTimeout(f, 200);
+    }
     /**
-     * Change to a new selected calendar -- called on a 100 MS delay
+     * Change to a new selected calendar
      * from setTimeout, so use Cal object reference
      */
     this.goSelCal = function() {
         var selectElement = Cal.calForm.form.calSelectElem;
         var index = selectElement.options[selectElement.selectedIndex].value;
         Cal.currentCalendar = Cal.calendars[index];
-        Cal.wipeView();
         // Load and display events
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
         Cal.uiMask.hide();

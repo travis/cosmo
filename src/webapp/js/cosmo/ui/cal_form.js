@@ -751,7 +751,8 @@ function CalForm() {
         
         // Cal selector
         if (form.calSelectElem) {
-            form.calSelectElem.onchange = Cal.goSelCalMask;
+            form.calSelectElem.onchange = function() { 
+                f = Cal.goSelCal; Cal.showMaskDelayNav(f); };
         }
         
         // All text inputs
@@ -860,7 +861,8 @@ function CalForm() {
         }
         // All okey-dokey -- submit
         else {
-           Cal.goViewQueryDate(val); 
+            f = function() { Cal.goViewQueryDate(val); };
+            Cal.showMaskDelayNav(f);
         }
     };
 }

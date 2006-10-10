@@ -134,7 +134,10 @@ cosmo.view.cal.canvas = new function() {
             ev.block.updateDisplayMain();
         }
     }
-    
+    function wipe() {
+        removeAllEvents();
+        self.selectedEvent = null;
+    }
     function loadSuccess(ev) {
         removeAllEvents();
         self.eventRegistry = ev;
@@ -188,6 +191,9 @@ cosmo.view.cal.canvas = new function() {
         var act = cmd.action;
         var ev = cmd.data;
         switch (act) {
+            case 'eventsLoadStart':
+                wipe();
+                break;
             case 'eventsLoadSuccess':
                 loadSuccess(ev);
                 break;

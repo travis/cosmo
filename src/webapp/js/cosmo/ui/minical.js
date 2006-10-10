@@ -61,6 +61,22 @@ var MiniCal = new function() {
     // Height of the widget
     this.height = 0;
     
+    dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
+    this.handlePub = function(cmd) {
+        var act = cmd.action;
+        var qual = cmd.qualifier || null;
+        var ev = cmd.data;
+        switch (act) {
+            case 'eventsLoadSuccess':
+                // Set selection
+                self.renderSelection();
+                break;
+            default:
+                // Do nothing
+                break;
+        }
+    };
+    
     /**
      * Initialize minical state and render
      * Hide until rendering is completed because Firefox
@@ -505,8 +521,8 @@ var MiniCal = new function() {
      * topics and pub/sub
      */
     this.goToday = function() {
-        self.controller.goViewQueryDate(self.currDate);
-        self.render();
+        f = function() { self.controller.goViewQueryDate(self.currDate); };
+        self.controller.showMaskDelayNav(f);
     }
     /**
      * Handle clicks on normal dates within minical
@@ -523,10 +539,13 @@ var MiniCal = new function() {
         dt = elem.getAttribute('day');
         // Convert to int because FF saves attributes as strings
         dt = new Date(parseInt(dt));
+        
         // Main calendar view -- go to selected week
-        self.controller.goViewQueryDate(dt);
-        // Set selection
-        self.renderSelection();
+        // FIXME: Unify mask-display/nav methods
+        // ==================
+        f = function() { self.controller.goViewQueryDate(dt); };
+        self.controller.showMaskDelayNav(f);
+        
     };
     /**
      * Hide the minical until actually rendered

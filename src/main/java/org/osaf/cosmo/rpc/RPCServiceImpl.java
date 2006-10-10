@@ -100,13 +100,13 @@ public class RPCServiceImpl implements RPCService {
         String parentPath = PathUtil.getParentPath(absolutePath);
         CollectionItem collection = (CollectionItem)
             contentService.findItemByPath(parentPath);
-        if (collection == null)
+        if (collection == null){
             throw new RPCException("No collection at " + parentPath);
-
+        }
         CalendarCollectionItem calendar = new CalendarCollectionItem();
         calendar.setName(PathUtil.getBasename(absolutePath));
         calendar.setOwner(getUser());
-        // XXX: no Item.displayName yet
+        calendar.setDisplayName(displayName);
 
         try {
             contentService.createCalendar(collection, calendar);
@@ -129,7 +129,7 @@ public class RPCServiceImpl implements RPCService {
             if (! (child instanceof CalendarCollectionItem))
                 continue;
             Calendar calendar = new Calendar();
-            calendar.setName(child.getName()); // XXX no Item.displayName yet
+            calendar.setName(child.getDisplayName()); // XXX no Item.displayName yet
             calendar.setPath("/" + child.getName());
             cals.add(calendar);
         }
@@ -274,40 +274,6 @@ public class RPCServiceImpl implements RPCService {
 
         return calendarEventItem.getUid();
     }
-
-    private CalendarEventItem saveNewEvent(Event event, CalendarCollectionItem calendarItem) {
-        CalendarEventItem calendarEventItem;
-        //make an empty iCalendar
-        net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
-        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
-        calendar.getProperties().add(Version.VERSION_2_0);
-        calendar.getProperties().add(CalScale.GREGORIAN);
-        
-        calendarEventItem = new CalendarEventItem();
-        VEvent vevent = cosmoToICalendarConverter.createVEvent(event);
-        calendar.getComponents().add(vevent);
-        calendarEventItem.setContent(calendar.toString().getBytes());
-
-        Iterator<String> availableNameIterator = availableNameIterator(vevent);
-        
-        calendarEventItem.setOwner(getUser());
-        
-        boolean added = false;
-        do {
-            String name = availableNameIterator.next();
-            calendarEventItem.setName(name);
-            try{ 
-                added = true;
-                calendarEventItem = contentService.addEvent(calendarItem,
-                            calendarEventItem);
-            } catch (DuplicateItemNameException dupe){
-                added = false;
-            }
-        } while (!added && availableNameIterator.hasNext());
-        return calendarEventItem;
-    }
-
-
     
     public void setPreference(String preferenceName, String value)
             throws RPCException {
@@ -467,6 +433,36 @@ public class RPCServiceImpl implements RPCService {
 
         };
     }
+    private CalendarEventItem saveNewEvent(Event event, CalendarCollectionItem calendarItem) {
+        CalendarEventItem calendarEventItem;
+        //make an empty iCalendar
+        net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
+        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+        calendar.getProperties().add(Version.VERSION_2_0);
+        calendar.getProperties().add(CalScale.GREGORIAN);
+        
+        calendarEventItem = new CalendarEventItem();
+        VEvent vevent = cosmoToICalendarConverter.createVEvent(event);
+        calendar.getComponents().add(vevent);
+        calendarEventItem.setContent(calendar.toString().getBytes());
 
+        Iterator<String> availableNameIterator = availableNameIterator(vevent);
+        
+        calendarEventItem.setOwner(getUser());
+        
+        boolean added = false;
+        do {
+            String name = availableNameIterator.next();
+            calendarEventItem.setName(name);
+            try{ 
+                added = true;
+                calendarEventItem = contentService.addEvent(calendarItem,
+                            calendarEventItem);
+            } catch (DuplicateItemNameException dupe){
+                added = false;
+            }
+        } while (!added && availableNameIterator.hasNext());
+        return calendarEventItem;
+    }
 
 }

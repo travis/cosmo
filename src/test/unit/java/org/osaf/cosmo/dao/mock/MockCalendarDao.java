@@ -42,8 +42,8 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
 
     /**
      */
-    public MockCalendarDao() {
-        super();
+    public MockCalendarDao(MockDaoStorage storage) {
+        super(storage);
     }
 
     // CalendarDao methods
@@ -79,7 +79,7 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
             collection = getRootItem(calendar.getOwner());
         calendar.setParent(collection);
 
-        storeItem(calendar);
+        getStorage().storeItem(calendar);
 
         return calendar;
     }
@@ -96,7 +96,7 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
         if (calendar == null)
             throw new IllegalArgumentException("calendar cannot be null");
 
-        updateItem(calendar);
+        getStorage().updateItem(calendar);
 
         return calendar;
     }
@@ -121,7 +121,7 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
             throw new IllegalArgumentException("event cannot be null");
 
         event.setParent(calendar);
-        storeItem(event);
+        getStorage().storeItem(event);
 
         return event;
     }
@@ -149,7 +149,7 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
         if (event == null)
             throw new IllegalArgumentException("event cannot be null");
 
-        updateItem(event);
+        getStorage().updateItem(event);
 
         return event;
     }

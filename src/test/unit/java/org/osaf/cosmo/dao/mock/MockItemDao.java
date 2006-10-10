@@ -17,15 +17,9 @@ package org.osaf.cosmo.dao.mock;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,20 +43,12 @@ import org.osaf.cosmo.util.PathUtil;
 public class MockItemDao implements ItemDao {
     private static final Log log = LogFactory.getLog(MockItemDao.class);
 
-    private HashMap<String, Item> itemsByPath;
-    private HashMap<String, Item> itemsByUid;
-    private HashMap<Long, String> rootUids;
-    private HashMap<String, Set> tickets;
-    private SessionIdGenerator idGenerator;
+    private MockDaoStorage storage;
 
     /**
      */
-    public MockItemDao() {
-        itemsByPath = new HashMap<String, Item>();
-        itemsByUid = new HashMap<String, Item>();
-        rootUids = new HashMap<Long, String>();
-        tickets = new HashMap<String, Set>();
-        idGenerator = new SessionIdGenerator();
+    public MockItemDao(MockDaoStorage storage) {
+        this.storage = storage;
     }
 
     // ItemDao methods
@@ -76,7 +62,7 @@ public class MockItemDao implements ItemDao {
      * @return item represented by uid
      */
     public Item findItemByUid(String uid) {
-        return itemsByUid.get(uid);
+        return storage.getItemByUid(uid);
     }
 
     /**
@@ -88,7 +74,7 @@ public class MockItemDao implements ItemDao {
      * @return item represented by path
      */
     public Item findItemByPath(String path) {
-        return itemsByPath.get(path);
+        return storage.getItemByPath(path);
     }
     
     /**
@@ -100,7 +86,7 @@ public class MockItemDao implements ItemDao {
      * @return parent item of item represented by path
      */
     public Item findItemParentByPath(String path) {
-        return itemsByPath.get(path).getParent();
+        return storage.getItemByPath(path).getParent();
     }
 
     /**
@@ -112,21 +98,7 @@ public class MockItemDao implements ItemDao {
      * @return hierarchical path to item
      */
     public String getItemPath(Item item) {
-        StringBuffer path = new StringBuffer();
-        LinkedList<String> hierarchy = new LinkedList<String>();
-        hierarchy.addFirst(item.getName());
-
-        Item currentItem = item;
-        while (currentItem.getParent() != null) {
-            currentItem = itemsByUid.get(currentItem.getParent().getUid());
-            hierarchy.addFirst(currentItem.getName());
-        }
-
-        // hierarchy
-        for (String part : hierarchy)
-            path.append("/" + part);
-
-        return path.toString();
+        return storage.getItemPath(item);
     }
 
     /**
@@ -138,7 +110,7 @@ public class MockItemDao implements ItemDao {
      * @return hierarchical path to item
      */
     public String getItemPath(String uid) {
-        return getItemPath(itemsByUid.get(uid));
+        return storage.getItemPath(uid);
     }
 
     /**
@@ -155,12 +127,7 @@ public class MockItemDao implements ItemDao {
             log.debug("getting root item for user " + user.getUsername());
         }
 
-        String rootUid = rootUids.get(user.getId());
-        if (rootUid == null) {
-            throw new IllegalStateException("user does not have a root item");
-        }
-
-        return (HomeCollectionItem) itemsByUid.get(rootUid);
+        return getStorage().getRootItem(user.getId());
     }
 
     /**
@@ -176,16 +143,7 @@ public class MockItemDao implements ItemDao {
             log.debug("creating root item for user " + user.getUsername());
         }
 
-        HomeCollectionItem rootCollection = new HomeCollectionItem();
-        rootCollection.setName(user.getUsername());
-        rootCollection.setOwner(user);
-        rootCollection.setUid(calculateUid());
-        rootCollection.setCreationDate(new Date());
-        rootCollection.setModifiedDate(rootCollection.getCreationDate());
-
-        itemsByUid.put(rootCollection.getUid(), rootCollection);
-        itemsByPath.put("/" + rootCollection.getName(), rootCollection);
-        rootUids.put(user.getId(), rootCollection.getUid());
+        HomeCollectionItem rootCollection = storage.createRootItem(user);
 
         if (log.isDebugEnabled()) {
             log.debug("root item uid is " + rootCollection.getUid());
@@ -215,7 +173,7 @@ public class MockItemDao implements ItemDao {
 
         String parentPath = PathUtil.getParentPath(path);
         CollectionItem parent = (CollectionItem)
-            itemsByPath.get(PathUtil.getParentPath(path));
+            storage.getItemByPath(PathUtil.getParentPath(path));
         if (parent == null)
             throw new ItemNotFoundException("parent collection not found");
 
@@ -246,7 +204,7 @@ public class MockItemDao implements ItemDao {
 
         // XXX: ignoring calendar indexes
 
-        storeItem(copy);
+        storage.storeItem(copy);
 
         if (deepCopy && (item instanceof CollectionItem)) {
             CollectionItem collection = (CollectionItem) item;
@@ -281,10 +239,11 @@ public class MockItemDao implements ItemDao {
     public void removeItem(Item item) {
         item.getParent().getChildren().remove(item);
 
-        itemsByUid.remove(item.getUid());
-        itemsByPath.remove(getItemPath(item));
-        if (rootUids.get(item.getOwner().getId()).equals(item.getUid())) {
-            rootUids.remove(item.getOwner().getId());
+        storage.removeItemByUid(item.getUid());
+        storage.removeItemByPath(getItemPath(item));
+        if (storage.getRootUid(item.getOwner().getId()).
+            equals(item.getUid())) {
+            storage.removeRootUid(item.getOwner().getId());
         }
     }
 
@@ -296,9 +255,8 @@ public class MockItemDao implements ItemDao {
      */
     public void createTicket(Item item,
                              Ticket ticket) {
-        ticket.setKey(calculateTicketKey());
         item.getTickets().add(ticket);
-        findItemTickets(item).add(ticket);
+        storage.createTicket(item, ticket);
     }
 
     /**
@@ -307,7 +265,7 @@ public class MockItemDao implements ItemDao {
      * @param item the item to be ticketed
      */
     public Set getTickets(Item item) {
-        return findItemTickets(item);
+        return storage.findItemTickets(item);
     }
 
     /**
@@ -321,15 +279,14 @@ public class MockItemDao implements ItemDao {
      */
     public Ticket getTicket(Item item,
                             String key) {
-        for (Iterator i=findItemTickets(item).iterator(); i.hasNext();) {
-            Ticket t = (Ticket) i.next();
-            if (t.getKey().equals(key)) {
+        for(Ticket t : storage.findItemTickets(item)) {
+            if (t.getKey().equals(key))
                 return t;
-            }
         }
         // the ticket might be on an ancestor, so check the parent
         if (item.getParent() != null) {
-            return getTicket(itemsByUid.get(item.getParent().getUid()), key);
+            return getTicket(storage.getItemByUid(item.getParent().getUid()),
+                             key);
         }
         // this is the root item; the ticket simply doesn't exist
         // anywhere in the given path
@@ -344,15 +301,16 @@ public class MockItemDao implements ItemDao {
      */
     public void removeTicket(Item item,
                              Ticket ticket) {
-        Set itemTickets = findItemTickets(item);
+        Set itemTickets = storage.findItemTickets(item);
         if (itemTickets.contains(ticket)) {
             item.getTickets().remove(ticket);
-            itemTickets.remove(ticket);
+            storage.removeTicket(item, ticket);
             return;
         }
         // the ticket might be on an ancestor, so check the parent
         if (item.getParent() != null) {
-            removeTicket(itemsByUid.get(item.getParent().getUid()), ticket);
+            removeTicket(storage.getItemByUid(item.getParent().getUid()),
+                         ticket);
         }
         // this is the root item; the ticket simply doesn't exist
         // anywhere in the given path
@@ -360,13 +318,11 @@ public class MockItemDao implements ItemDao {
     }
 
     public void removeItemByPath(String path) {
-        Item item = findItemByPath(path);
-        removeItem(item);
+        removeItem(findItemByPath(path));
     }
 
     public void removeItemByUid(String uid) {
-        Item item = findItemByUid(uid);
-        removeItem(item);
+        removeItem(findItemByUid(uid));
     }
     
     // Dao methods
@@ -387,98 +343,13 @@ public class MockItemDao implements ItemDao {
 
     // our methods
 
-
     /** */
-    protected void storeItem(Item item) {
-        if (item.getName() == null)
-            throw new IllegalArgumentException("name cannot be null");
-        if (item.getParent() == null)
-            throw new IllegalArgumentException("parent cannot be null");
-        Item parentItem = item.getParent();
-        
-        if (item.getOwner() == null)
-            throw new IllegalArgumentException("owner cannot be null");
-
-        item.setUid(calculateUid());
-        item.setCreationDate(new Date());
-        item.setModifiedDate(item.getCreationDate());
-
-        for (Item sibling : item.getParent().getChildren()) {
-            if (sibling.getName().equals(item.getName()))
-                throw new DuplicateItemNameException();
-        }
-
-        item.getParent().getChildren().add(item);
-
-        itemsByUid.put(item.getUid(), item);
-        itemsByPath.put(getItemPath(parentItem) + "/" + item.getName(), item);
-    }
-
-    /** */
-    protected void updateItem(Item item) {
-        if (itemsByUid.get(item.getUid()) != item)
-            throw new IllegalArgumentException("item to be updated does not match stored item");
-        if (item.getName() == null)
-            throw new IllegalArgumentException("name cannot be null");
-        if (item.getOwner() == null)
-            throw new IllegalArgumentException("owner cannot be null");
-
-        CollectionItem parentItem = item.getParent();
-
-        if (parentItem != null) {
-            for (Item sibling : parentItem.getChildren()) {
-                if (sibling.getName().equals(item.getName()) &&
-                    ! (sibling.getUid().equals(item.getUid())))
-                    throw new DuplicateItemNameException();
-            }
-        }
-
-        item.setModifiedDate(item.getCreationDate());
-
-        String path = "";
-        if (parentItem != null)
-            path += getItemPath(parentItem);
-        path += "/" + item.getName();
-
-        // XXX if the item name changed during the update, then we
-        // leave a dangling map entry
-        itemsByPath.put(path, item);
-    }
-
-    /** */
-    protected Set findItemChildren(Item item) {
-        HashSet children = new HashSet();
-
-        for (Iterator<Item> i=itemsByUid.values().iterator(); i.hasNext();) {
-            Item child = i.next();
-            if (child.getParent().getUid().equals(item.getUid())) {
-                children.add(child);
-            }
-        }
-
-        return Collections.unmodifiableSet(children);
+    public MockDaoStorage getStorage() {
+        return storage;
     }
 
     /** */
     protected Set findRootChildren(User user) {
-        return
-            findItemChildren(itemsByUid.get(rootUids.get(user.getId())));
-    }
-
-    private String calculateUid() {
-        return idGenerator.nextStringIdentifier();
-    }
-
-    private String calculateTicketKey() {
-        return idGenerator.nextStringIdentifier();
-    }
-
-    private Set findItemTickets(Item item) {
-        Set itemTickets = (Set) tickets.get(item.getUid());
-        if (itemTickets == null) {
-            itemTickets = new HashSet();
-            tickets.put(item.getUid(), itemTickets);
-        }
-        return itemTickets;
+        return storage.findItemChildren(storage.getRootItem(user.getId()));
     }
 }

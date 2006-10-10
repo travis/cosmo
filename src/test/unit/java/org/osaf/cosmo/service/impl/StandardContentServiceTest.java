@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dao.mock.MockContentDao;
+import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
@@ -45,7 +46,7 @@ public class StandardContentServiceTest extends TestCase {
     /** */
     protected void setUp() throws Exception {
         testHelper = new TestHelper();
-        contentDao = new MockContentDao();
+        contentDao = new MockContentDao(new MockDaoStorage());
         service = new StandardContentService();
         service.setContentDao(contentDao);
         service.init();

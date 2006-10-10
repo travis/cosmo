@@ -38,8 +38,8 @@ public class MockContentDao extends MockItemDao implements ContentDao {
     
     /**
      */
-    public MockContentDao() {
-        super();
+    public MockContentDao(MockDaoStorage storage) {
+        super(storage);
     }
 
     // ContentDao methods
@@ -62,7 +62,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
 
         collection.setParent(parent);
 
-        storeItem(collection);
+        getStorage().storeItem((Item) collection);
 
         return collection;
     }
@@ -78,7 +78,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (collection == null)
             throw new IllegalArgumentException("collection cannot be null");
 
-        updateItem(collection);
+        getStorage().updateItem(collection);
 
         return collection;
     }
@@ -116,7 +116,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
      *         can be either CollectionItem or ContentItem.
      */
     public Set findChildren(CollectionItem collection) {
-        return findItemChildren(collection);
+        return getStorage().findItemChildren(collection);
     }
 
     /**
@@ -131,7 +131,6 @@ public class MockContentDao extends MockItemDao implements ContentDao {
     public Set findChildren(User user) {
         return findRootChildren(user);
     }
-
 
     /**
      * Create new content item. A content item represents a piece of content or
@@ -155,7 +154,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             throw new ConcurrencyFailureException("fail!");
         
         content.setParent(parent);
-        storeItem((Item) content);
+        getStorage().storeItem((Item)content);
 
         return content;
     }
@@ -174,7 +173,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if(THROW_CONCURRENT_EXCEPTION)
             throw new ConcurrencyFailureException("fail!");
         
-        updateItem((Item) content);
+        getStorage().updateItem((Item) content);
 
         return content;
     }
@@ -197,7 +196,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             throw new IllegalArgumentException("item cannot be null");
 
         item.setParent(parent);
-        updateItem(item);
+        getStorage().updateItem(item);
     }
 
     /**

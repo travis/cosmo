@@ -31,6 +31,7 @@ import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
+import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.dav.impl.DavCollection;
 import org.osaf.cosmo.dav.impl.DavHomeCollection;
@@ -79,8 +80,9 @@ public class DavTestHelper extends TestHelper {
 
         securityManager = new MockSecurityManager();
 
-        MockCalendarDao calendarDao = new MockCalendarDao();
-        MockContentDao contentDao = new MockContentDao();
+        MockDaoStorage storage = new MockDaoStorage();
+        MockCalendarDao calendarDao = new MockCalendarDao(storage);
+        MockContentDao contentDao = new MockContentDao(storage);
         MockUserDao userDao = new MockUserDao();
 
         contentService = new StandardContentService();

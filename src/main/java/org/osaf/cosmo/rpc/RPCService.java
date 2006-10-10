@@ -164,15 +164,16 @@ public interface RPCService {
             RecurrenceRule recurrenceRule) throws RPCException;
 
     /**
-     * Returns the expanded instances of this event for the given
-     * tiem range.
-     * @param calendarPath
-     * @param eventId
-     * @param utcStartTime
-     * @param utcEndTime
-     * @return
+     * Expands the events with the given eventIds for the specified time range. 
+     * @param calendarPath the calendar in which the events are located
+     * @param eventIds the id's of the events to be expanded
+     * @param utcStartTime the time range start  in UTC
+     * @param utcEndTime the time range end in UTC
+     * @return a map with the event id's as keys, and the array of expanded Events 
+     *         as values
+     * @throws RPCException
      */
-    public Event[] expandEvent(String calendarPath, String eventId,
+    public Map<String, Event[]> expandEvents(String calendarPath, String[] eventIds,
             long utcStartTime, long utcEndTime) throws RPCException;
     
     /**

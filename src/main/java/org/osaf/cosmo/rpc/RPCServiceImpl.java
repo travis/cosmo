@@ -17,6 +17,7 @@ package org.osaf.cosmo.rpc;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -346,21 +347,26 @@ public class RPCServiceImpl implements RPCService {
         contentService.updateEvent(calendarEventItem);
     }
 
-    public Event[] expandEvent(String calendarPath, String eventId,
+    public Map<String, Event[]> expandEvents(String calendarPath, String[] eventIds,
             long utcStartTime, long utcEndTime) throws RPCException{
 
-        CalendarEventItem calItem = contentService.findEventByUid(eventId);
+        Map<String, Event[]> map = new HashMap<String, Event[]>();
+        for (String eventId : eventIds) {
+            CalendarEventItem calItem = contentService.findEventByUid(eventId);
 
-        DateTime start = new DateTime(utcStartTime);
-        start.setUtc(true);
+            DateTime start = new DateTime(utcStartTime);
+            start.setUtc(true);
 
-        DateTime end = new DateTime(utcEndTime);
-        end.setUtc(true);
+            DateTime end = new DateTime(utcEndTime);
+            end.setUtc(true);
 
-        List<CalendarEventItem> items = new ArrayList<CalendarEventItem>();
-        items.add(calItem);
-        return icalendarToCosmoConverter.createEventsFromCalendars(items,
-                start, end);
+            List<CalendarEventItem> items = new ArrayList<CalendarEventItem>();
+            items.add(calItem);
+            map.put(eventId,icalendarToCosmoConverter.createEventsFromCalendars(items,
+                    start, end));
+            
+        }
+        return map;
 
     }
     

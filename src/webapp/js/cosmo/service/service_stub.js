@@ -148,15 +148,15 @@ ScoobyService.prototype = {
      saveRecurrenceRule: function(calendarPath, eventId, recurrenceRule){},
 
     /**
-     * Returns the expanded instances of this event for the given
-     * tiem range.
-     * @param calendarPath
-     * @param eventId
-     * @param utcStartTime
-     * @param utcEndTime
-     * @return
+     * Expands the events with the given eventIds for the specified time range. 
+     * @param calendarPath the calendar in which the events are located
+     * @param eventIds an array of the id of the events to be expanded
+     * @param utcStartTime the time range start  in UTC
+     * @param utcEndTime the time range end in UTC
+     * @return a map with the event id's as keys, and the array of expanded Events 
+     *         as values
      */
-    expandEvent: function(calendarPath, eventId, utcStartTime, utcEndTime){},
+    expandEvents: function(calendarPath, eventIds, utcStartTime, utcEndTime){},
 
     /**
      * Saves the specified new event and updates the event with the specified id
@@ -171,7 +171,7 @@ ScoobyService.prototype = {
         originalEventId, originalEventEndDate){},
     
     /**
-     * Returns the version of Scooby
+     * Returns the version of Cosmo
      */
     getVersion: function(){}
 }

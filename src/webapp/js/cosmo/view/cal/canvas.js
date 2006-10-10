@@ -48,12 +48,12 @@ cosmo.view.cal.canvas = new function() {
      *     creation fails
      * @param ev CalEvent obj, the event to be removed
      */
-    function removeEventFromDisplay(ev) {
+    function removeEventFromDisplay(id, ev) {
         var selEv = self.getSelectedEvent();
         // Remove the block
         ev.block.remove();
         // Remove selection if need be
-        if (selEv && (selEv.id = ev.id)) {
+        if (selEv && (selEv.id == ev.id)) {
             self.selectedEvent = null;
         }
         return true;
@@ -63,26 +63,26 @@ cosmo.view.cal.canvas = new function() {
         var removeLozenge = rem != false ? true : false;
         self.eventRegistry.removeItem(ev.id);
         if (removeLozenge) {
-            removeEventFromDisplay(ev);
+            removeEventFromDisplay(ev.id, ev);
         }
         ev = null;
     }
     function removeAllEvents(rem) {
         // Default behavior is to remove the lozenge
         var removeLozenge = rem != false ? true : false;
+        var ev = null;
         // Pull the last event off the eventRegistry list and remove it
-        while (ev = self.eventRegistry.pop()) {
-            if (removeLozenge) {
-                removeEventFromDisplay(ev);
-            }
-            ev = null;
+        if (removeLozenge) {
+            self.eventRegistry.each(removeEventFromDisplay);
         } 
         self.eventRegistry = new Hash();
+        return true;
     }
     function removeEventRecurrenceGroup(reg, arr) {
         // Default behavior is to remove the lozenge
         var str = ',' + arr.join() + ',';
         var h = new Hash();
+        var ev = null;
         while (ev = reg.pop()) {
             if (str.indexOf(',' + ev.data.id + ',') == -1) {
                 h.setItem(ev.id, ev);
@@ -98,6 +98,12 @@ cosmo.view.cal.canvas = new function() {
             new HasTimeBlock(id);
         ev.block.insert(id);
     }
+    function dumpEvData(key, val) {
+        Log.print(key);
+        Log.print(val.id)
+        Log.print(val.data.id);
+        Log.print(val.data.title);
+    }
     function updateEventsDisplay() {
         if (self.eventRegistry.length && 
             cosmo.view.cal.conflict.calc(self.eventRegistry) && 
@@ -112,6 +118,7 @@ cosmo.view.cal.canvas = new function() {
             dojo.event.topic.publish('/calEvent', { 'action': 
                 'eventsDisplaySuccess', 'data': self.selectedEvent });
         }
+        return true;
     }
     function positionLozenges() {
         return self.eventRegistry.each(positionLozenge);
@@ -127,28 +134,65 @@ cosmo.view.cal.canvas = new function() {
             ev.block.updateDisplayMain();
         }
     }
-   
+    
+    function loadSuccess(ev) {
+        removeAllEvents();
+        self.eventRegistry = ev;
+        self.eventRegistry.each(appendLozenge);
+        updateEventsDisplay();
+    }
+    function addSuccess(data) {
+        var id = data.id;
+        var ev = data.eventRegistry;
+        var h = self.eventRegistry.clone();
+        var currSel = self.eventRegistry.getPos(self.selectedEvent.id);
+        h = removeEventRecurrenceGroup(h, [id]);
+        h.append(ev);
+        removeAllEvents();
+        self.eventRegistry = h;
+        self.eventRegistry.each(appendLozenge);
+        if (!cosmo.view.cal.processingQueue.length) {
+            updateEventsDisplay();
+            if (!cosmo.view.cal.lastSent) {
+                setSelectedEvent(self.eventRegistry.getAtPos(currSel));
+            }
+            else {
+                setSelectedEvent(cosmo.view.cal.lastSent);
+            }
+        }
+        
+    }
+    function saveSuccess(cmd, ev) {
+        // Updating existing
+        if (!cmd.qualifier.newEvent) {
+            // Changes have placed the saved event off-canvas
+            if (!cmd.qualifier.onCanvas) {
+                removeEvent(ev);
+            }
+            // Saved event is still in view
+            else {
+                ev.setInputDisabled(false);
+                ev.block.updateDisplayMain();
+            }
+        }
+        // Don't re-render when requests are still processing
+        if (!cosmo.view.cal.processingQueue.length) {
+            if (cmd.qualifier.newEvent || cmd.qualifier.onCanvas) {
+                setSelectedEvent(cosmo.view.cal.lastSent);
+            }
+            updateEventsDisplay();
+        }
+    }
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function(cmd) {
         var act = cmd.action;
         var ev = cmd.data;
         switch (act) {
             case 'eventsLoadSuccess':
-                removeAllEvents();
-                self.eventRegistry = ev;
-                self.eventRegistry.each(appendLozenge);
-                updateEventsDisplay();
+                loadSuccess(ev);
                 break;
             case 'eventsAddSuccess':
-                var h = self.eventRegistry.clone();
-                h = removeEventRecurrenceGroup(h, [cmd.id]);
-                h.append(ev);
-                var currSel = self.eventRegistry.getPos(self.selectedEvent.id);
-                removeAllEvents();
-                self.eventRegistry = h;
-                self.eventRegistry.each(appendLozenge);
-                updateEventsDisplay();
-                setSelectedEvent(self.eventRegistry.getAtPos(currSel));
+                addSuccess(cmd.data);
                 break;
             case 'setSelected':
                 setSelectedEvent(ev);
@@ -166,19 +210,7 @@ cosmo.view.cal.canvas = new function() {
                 }
                 break;
             case 'saveSuccess':
-                if (cmd.qualifier.newEvent) {
-                    setSelectedEvent(ev);
-                }
-                // Changes have placed the saved event off-canvas
-                if (!cmd.qualifier.onCanvas) {
-                    removeEvent(ev);
-                }
-                // Saved event is still in view
-                else {
-                    ev.setInputDisabled(false);
-                    ev.block.updateDisplayMain();
-                }
-                updateEventsDisplay();
+                saveSuccess(cmd, ev);
                 break;
             case 'removeSuccess':
                 removeEvent(ev);

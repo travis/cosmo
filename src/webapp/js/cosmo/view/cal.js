@@ -186,9 +186,15 @@ cosmo.view.cal = new function() {
         var f = function(newEvId, err, reqId) { 
             handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
-        
         requestId = Cal.serv.saveEvent(
             f, Cal.currentCalendar.path, ev.data);
+        self.processingQueue.push(requestId);
+        if (opts.saveType == 'recurrenceMaster' && opts.instanceEventId) {
+            self.lastSent = null;
+        }
+        else {
+            self.lastSent = ev;
+        }
     }
     function handleSaveEvent(ev, newEvId, err, reqId, optsParam) {
         var saveEv = ev;
@@ -250,6 +256,7 @@ cosmo.view.cal = new function() {
             loadRecurrenceExpansion(saveEv.data.id, Cal.viewStart, Cal.viewEnd);
         }
         else {
+            self.processingQueue.shift();
             // Broadcast message for success/failure
             dojo.event.topic.publish('/calEvent', { 'action': act, 
                 'qualifier': qual, 'data': saveEv });
@@ -311,8 +318,9 @@ cosmo.view.cal = new function() {
         var e = end.getTime();
         var f = function(arr) {
             var expandEventHash = createEventRegistry(arr);
+            self.processingQueue.shift();
             dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess', 
-                'id': id, 'data': expandEventHash });
+               'data': { 'eventRegistry': expandEventHash, 'id': id } });
         }
         Cal.serv.expandEvent(f, Cal.currentCalendar.path, id, s, e); 
     }
@@ -351,6 +359,9 @@ cosmo.view.cal = new function() {
         ALL_FUTURE_EVENTS: 'allFuture',
         ONLY_THIS_EVENT: 'onlyThis'
     };
+    // How many updates/removals are in-flight
+    this.processingQueue = [];
+    this.lastSent = null;
     
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function(cmd) {

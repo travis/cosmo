@@ -210,7 +210,6 @@ cosmo.view.cal = new function() {
         var f = function(newEvId, err, reqId) {
            handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
-        Log.print(recurEnd);
         requestId = Cal.serv.saveNewEventBreakRecurrence(
             f, Cal.currentCalendar.path, ev.data, origId, recurEnd);
         self.processingQueue.push(requestId);
@@ -346,6 +345,31 @@ cosmo.view.cal = new function() {
                     }
                     break;
                 case opts.ALL_FUTURE_EVENTS:
+                        h = function(hashMap, err) {
+                            if (err) {
+                                Cal.showErr('Could not retrieve recurrence rule for this recurrence.', err);
+                                // Broadcast failure
+                                dojo.event.topic.publish('/calEvent', { 'action': 'removeFailed',
+                                    'data': ev });
+                            }
+                            else {
+                                for (var a in hashMap) {
+                                    var saveRule = hashMap[a];
+                                }
+                                var freq = ev.data.recurrenceRule.frequency;
+                                var start = ev.data.start;
+                                var recurEnd = new ScoobyDate(start.getFullYear(), 
+                                    start.getMonth(), start.getDate());
+                                var unit = ranges[freq][0];
+                                var incr = (ranges[freq][1] * -1);
+                                recurEnd = ScoobyDate.add(recurEnd, unit, incr);
+                                saveRule.endDate = recurEnd;
+                                doSaveRecurrenceRule(ev, saveRule, { 'saveAction': 'remove', 
+                                    'removeType': 'instanceAllFuture', 'recurEnd': recurEnd });
+                            }
+                        };
+                        f = function() { var reqId = Cal.serv.getRecurrenceRules(h, 
+                            Cal.currentCalendar.path, [ev.data.id]); };
                     break;
                 case opts.ONLY_THIS_EVENT:
                     
@@ -391,6 +415,37 @@ cosmo.view.cal = new function() {
         dojo.event.topic.publish('/calEvent', { 'action': act, 
             'data': removeEv, 'opts': opts });
     }
+    function doSaveRecurrenceRule(ev, rrule, opts) {
+        var f = function(err, reqId) { 
+            handleSaveRecurrenceRuleResult(ev, err, reqId, opts); };
+        var requestId = Cal.serv.saveRecurrenceRule(
+            f, Cal.currentCalendar.path, ev.data.id, rrule);
+    }
+    function handleSaveRecurrenceRuleResult(ev, err, reqId, opts) {
+        var rruleEv = ev;
+        var msgKey = opts.saveAction == 'remove' ? 'EventRemoveFailed' : 'EventEditSaveFailed';
+        // Simple error message to go along with details from Error obj
+        var errMsg = getText('Main.Error.' + msgKey);
+        if (err) {
+            act = opts.saveAction + 'Failed';
+            Cal.showErr(errMsg, err);
+        }
+        else {
+            act = opts.saveAction + 'Success';
+        }
+        
+        // Resets local timer for timeout -- we know server-side
+        // session has been refreshed
+        // ********************
+        // BANDAID: need to move this into the actual Service call
+        // ********************
+        Cal.serv.resetServiceAccessTime();
+            
+        // Broadcast success
+        dojo.event.topic.publish('/calEvent', { 'action': act, 
+            'data': rruleEv, 'opts': opts });
+    }
+    
     function loadRecurrenceExpansion(idArr, start, end, ev, opts) {
         var s = start.getTime();
         var e = end.getTime();

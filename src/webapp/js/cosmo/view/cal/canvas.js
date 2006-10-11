@@ -89,7 +89,7 @@ cosmo.view.cal.canvas = new function() {
         var h = new Hash();
         var ev = null;
         var compDt = dt ? new ScoobyDate(dt.getFullYear(), 
-            dt.getMonth(), dt.getDate(), 11, 59) : null;
+            dt.getMonth(), dt.getDate(), 23, 59) : null;
         while (ev = reg.pop()) {
             var removeForDate = true;
             // If also filtering by date, check the start date of
@@ -218,9 +218,13 @@ cosmo.view.cal.canvas = new function() {
         }
     }
     function removeSuccess(ev, opts) {
-        if (opts.removeType == 'recurrenceMaster') {
+        if (opts.removeType == 'recurrenceMaster' || opts.removeType == 'instanceAllFuture') {
             var h = self.eventRegistry.clone();
-            h = removeEventRecurrenceGroup(h, [ev.data.id]);
+            var dt = null;
+            if (opts.removeType == 'instanceAllFuture') {
+                dt = opts.recurEnd;
+            }
+            h = removeEventRecurrenceGroup(h, [ev.data.id], dt);
             removeAllEvents();
             self.eventRegistry = h;
             self.eventRegistry.each(appendLozenge);

@@ -75,6 +75,8 @@ function RecurrenceRule(){
 
     /**
      * The date to repeat this event until.
+     * This will only be a Date, not a DateTime -- should
+     * NOT include time info
      */
     this.endDate = null;
 

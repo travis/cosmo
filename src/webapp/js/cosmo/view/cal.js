@@ -150,10 +150,6 @@ cosmo.view.cal = new function() {
                                 evData.end.setMinutes(masterEnd.getMinutes());
                                 masterEnd = evData.end;
                                 
-                                //Log.print(minutesToEnd);
-                                //Log.print(masterStart.toString());
-                                //Log.print(masterEnd.toString());
-                                
                                 // doSaveEvent expects a CalEvent with attached CalEventData
                                 var saveEv = new CalEvent();
                                 saveEv.data = evData;
@@ -213,7 +209,7 @@ cosmo.view.cal = new function() {
         var f = function(newEvId, err, reqId) {
            handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
-        Log.print(recurEnd);
+        //Log.print(recurEnd);
         requestId = Cal.serv.saveNewEventBreakRecurrence(
             f, Cal.currentCalendar.path, ev.data, origId, recurEnd);
         self.processingQueue.push(requestId);
@@ -463,6 +459,9 @@ cosmo.view.cal = new function() {
                 break;
             case 'remove':
                 removeEvent(ev, qual);
+                break;
+            default:
+                // Do nothing
                 break;
         }
     };

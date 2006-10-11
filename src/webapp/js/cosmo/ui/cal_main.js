@@ -86,6 +86,9 @@ var Cal = new function() {
     //The list of calendars available to the current user
     this.calendars = [];
 
+    // Create the 'Welcome to Cosmo' event?
+    this.createWelcomeItem = false;
+
     // ==========================
     // Init
     // ==========================
@@ -162,7 +165,8 @@ var Cal = new function() {
             this.currentCalendar.path = 'Cosmo';
 
             // Add 'Welcome to Cosmo' Event
-            this.insertCalEventNew('hourDiv3-900', true);
+            //this.insertCalEventNew('hourDiv3-900', true);
+            this.createWelcomeItem = true;
         }
         // Cals exist for this user
         else {
@@ -404,7 +408,7 @@ var Cal = new function() {
             return window.innerWidth;
         }
     };
-
+    
     // ==========================
     // Loading and displaying events
     // ==========================
@@ -438,10 +442,10 @@ var Cal = new function() {
         var id = '';
         var evTitle = '';
         var evDesc = '';
-
+        
         // ID for the block -- random strings, also used for div elem IDs
         id = Cal.generateTempId();
-
+        
         // Create the CalEvent obj, attach the CalEventData obj, create the Block
         // ================================
         evType = (evParam.indexOf('allDayListDiv') > -1) ? 'allDayMain' : 'normal';
@@ -474,21 +478,21 @@ var Cal = new function() {
             end = new ScoobyDate(start.getFullYear(),
                 start.getMonth(), start.getDate());
         }
-
+        
         // Create the CalEvent, connect it to its block
         ev = new CalEvent(id, block);
-
+        
         // Set CalEventData start and end calculated from click position
         // --------
         evTitle = newCal ? 'Welcome to Cosmo!' : getText('Main.NewEvent');
         evDesc = newCal ? 'Welcome to Cosmo!' : '';
         ev.data = new CalEventData(null, evTitle, evDesc,
             start, end, allDay);
-
+        
         // Register the new event in the event list
         // ================================
         cosmo.view.cal.canvas.eventRegistry.setItem(id, ev);
-
+        
         // Update the block
         // ================================
         if (block.insert(id)) { // Insert the block on the view

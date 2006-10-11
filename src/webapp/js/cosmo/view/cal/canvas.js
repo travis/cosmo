@@ -98,12 +98,6 @@ cosmo.view.cal.canvas = new function() {
             new HasTimeBlock(id);
         ev.block.insert(id);
     }
-    function dumpEvData(key, val) {
-        Log.print(key);
-        Log.print(val.id)
-        Log.print(val.data.id);
-        Log.print(val.data.title);
-    }
     function updateEventsDisplay() {
         if (self.eventRegistry.length && 
             cosmo.view.cal.conflict.calc(self.eventRegistry) && 
@@ -141,10 +135,17 @@ cosmo.view.cal.canvas = new function() {
     function loadSuccess(ev) {
         removeAllEvents();
         self.eventRegistry = ev;
-        self.eventRegistry.each(appendLozenge);
+        if (Cal.createWelcomeItem) { 
+            Cal.insertCalEventNew('hourDiv3-900', true); 
+            Cal.createWelcomeItem = false;
+        }
+        else {
+            self.eventRegistry.each(appendLozenge);
+        }
         updateEventsDisplay();
     }
-    function saveSuccess(cmd, ev) {
+    function saveSuccess(cmd) {
+        var ev = cmd.data;
         // Updating existing
         if (!cmd.qualifier.newEvent) {
             // Changes have placed the saved event off-canvas
@@ -241,7 +242,7 @@ cosmo.view.cal.canvas = new function() {
                 }
                 break;
             case 'saveSuccess':
-                saveSuccess(cmd, ev);
+                saveSuccess(cmd);
                 break;
             case 'removeSuccess':
                 removeSuccess(ev, opts)

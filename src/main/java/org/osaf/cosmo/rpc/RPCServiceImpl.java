@@ -27,6 +27,7 @@ import java.util.Set;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.ProdId;
@@ -129,7 +130,7 @@ public class RPCServiceImpl implements RPCService {
             if (! (child instanceof CalendarCollectionItem))
                 continue;
             Calendar calendar = new Calendar();
-            calendar.setName(child.getDisplayName()); // XXX no Item.displayName yet
+            calendar.setName(child.getDisplayName());
             calendar.setPath("/" + child.getName());
             cals.add(calendar);
         }
@@ -446,6 +447,11 @@ public class RPCServiceImpl implements RPCService {
         calendar.getComponents().add(vevent);
         calendarEventItem.setContent(calendar.toString().getBytes());
 
+        Property summary = (Property)
+            vevent.getProperties().getProperty(Property.SUMMARY);
+        if (summary != null)
+            calendarEventItem.setDisplayName(summary.getValue());
+
         Iterator<String> availableNameIterator = availableNameIterator(vevent);
         
         calendarEventItem.setOwner(getUser());
@@ -454,6 +460,8 @@ public class RPCServiceImpl implements RPCService {
         do {
             String name = availableNameIterator.next();
             calendarEventItem.setName(name);
+            if (calendarEventItem.getDisplayName() == null)
+                calendarEventItem.setDisplayName(name);
             try{ 
                 added = true;
                 calendarEventItem = contentService.addEvent(calendarItem,

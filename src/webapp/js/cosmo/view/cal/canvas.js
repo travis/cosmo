@@ -28,7 +28,12 @@ cosmo.view.cal.canvas = new function() {
     function $(id) {
         return document.getElementById(id);
     }
-    
+    function dumpEvData(key, val) {
+        Log.print(key);
+        Log.print(val.id)
+        Log.print(val.data.id);
+        Log.print(val.data.title);
+    }    
     function setSelectedEvent(ev) {
         // Deselect previously selected event if any
         if (self.selectedEvent) {
@@ -78,13 +83,21 @@ cosmo.view.cal.canvas = new function() {
         self.eventRegistry = new Hash();
         return true;
     }
-    function removeEventRecurrenceGroup(reg, arr) {
+    function removeEventRecurrenceGroup(reg, arr, dt) {
         // Default behavior is to remove the lozenge
         var str = ',' + arr.join() + ',';
         var h = new Hash();
         var ev = null;
+        var compDt = dt ? new ScoobyDate(dt.getFullYear(), 
+            dt.getMonth(), dt.getDate(), 11, 59) : null;
         while (ev = reg.pop()) {
-            if (str.indexOf(',' + ev.data.id + ',') == -1) {
+            var removeForDate = true;
+            // If also filtering by date, check the start date of
+            // matching events as well
+            if (compDt && (ev.data.start.toUTC() < compDt.toUTC())) {
+                removeForDate = false;
+            }
+            if ((str.indexOf(',' + ev.data.id + ',') == -1) || !removeForDate) {
                 h.setItem(ev.id, ev);
             }
         }
@@ -167,12 +180,20 @@ cosmo.view.cal.canvas = new function() {
         }
     }
     function addSuccess(data) {
-        var id = data.id;
-        var ev = data.eventRegistry;
+        var idArr = data.idArr;
+        var evReg = data.eventRegistry;
+        var ev = null;
+        var opts = data.opts;
         var h = self.eventRegistry.clone();
-        var currSel = self.eventRegistry.getPos(self.selectedEvent.id);
-        h = removeEventRecurrenceGroup(h, [id]);
-        h.append(ev);
+        
+        if (opts.saveType == 'recurrenceMaster') {
+            var currSel = self.eventRegistry.getPos(self.selectedEvent.id);
+            h = removeEventRecurrenceGroup(h, idArr);
+        }
+        else if (opts.saveType == 'instanceAllFuture') {
+            h = removeEventRecurrenceGroup(h, idArr, opts.recurEnd);
+        }
+        h.append(evReg);
         removeAllEvents();
         self.eventRegistry = h;
         self.eventRegistry.each(appendLozenge);
@@ -183,19 +204,18 @@ cosmo.view.cal.canvas = new function() {
                 // multiple events, but can't move off of their day
                 // weekly and above can move off their day, but will only
                 // have a single instance visible on the canvas
-                var ev = ev.getAtPos(0);
-                if (ev.data.recurrenceRule.frequency == 'daily') {
-                    setSelectedEvent(self.eventRegistry.getAtPos(currSel));
+                // 'instanceAllFuture' creates a new recurring event
+                ev = evReg.getAtPos(0);
+                if (ev.data.recurrenceRule.frequency == 'daily' && 
+                    opts.saveType == 'recurrenceMaster') { 
+                    ev = self.eventRegistry.getAtPos(currSel);
                 }
-                else {
-                    setSelectedEvent(ev);
-                }
+                setSelectedEvent(ev);
             }
             else {
                 setSelectedEvent(cosmo.view.cal.lastSent);
             }
         }
-        
     }
     function removeSuccess(ev, opts) {
         if (opts.removeType == 'recurrenceMaster') {

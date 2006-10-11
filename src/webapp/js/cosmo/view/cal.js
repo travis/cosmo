@@ -172,7 +172,8 @@ cosmo.view.cal = new function() {
                     recurEnd = ScoobyDate.add(recurEnd, unit, incr);
                     newEv.data = CalEventData.clone(ev.data);
                     f = function() { doSaveEventBreakRecurrence(newEv, ev.data.id, 
-                        recurEnd, { 'saveType': 'instanceAllFuture', 'originalEvent': ev }); };
+                        recurEnd, { 'saveType': 'instanceAllFuture', 
+                        'originalEvent': ev, 'recurEnd': recurEnd }); };
                     break;
                 case opts.ONLY_THIS_EVENT:
                     
@@ -209,11 +210,11 @@ cosmo.view.cal = new function() {
         var f = function(newEvId, err, reqId) {
            handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
-        //Log.print(recurEnd);
+        Log.print(recurEnd);
         requestId = Cal.serv.saveNewEventBreakRecurrence(
             f, Cal.currentCalendar.path, ev.data, origId, recurEnd);
         self.processingQueue.push(requestId);
-        self.lastSent = ev;
+        self.lastSent = null;
     }
     function handleSaveEvent(ev, newEvId, err, reqId, optsParam) {
         var saveEv = ev;
@@ -246,7 +247,9 @@ cosmo.view.cal = new function() {
         else {
             act = 'saveSuccess';
             // Set the CalEventData ID from the value returned by server
-            if (!saveEv.data.id) {
+            // New event creation and new recurring events created by
+            // the 'All Future Events' option
+            if (!saveEv.data.id || opts.saveType == 'instanceAllFuture') {
                 qual.newEvent = true;
                 saveEv.data.id = newEvId;
             }
@@ -276,14 +279,10 @@ cosmo.view.cal = new function() {
             (opts.saveType == 'recurrenceMaster' || opts.saveType == 'instanceAllFuture')) {
             var idArr = [];
             if (opts.saveType == 'instanceAllFuture') {
-                //idArr = [opts.originalEvent.data.id]
-                idArr = opts.originalEvent.data.id;
+                idArr.push(opts.originalEvent.data.id);
             }
-            else {
-                idArr = saveEv.data.id;
-            }
-            //idArr.push(saveEv.data.id);
-            loadRecurrenceExpansion(idArr, Cal.viewStart, Cal.viewEnd);
+            idArr.push(saveEv.data.id);
+            loadRecurrenceExpansion(idArr, Cal.viewStart, Cal.viewEnd, saveEv, opts);
         }
         else {
             self.processingQueue.shift();
@@ -392,20 +391,43 @@ cosmo.view.cal = new function() {
         dojo.event.topic.publish('/calEvent', { 'action': act, 
             'data': removeEv, 'opts': opts });
     }
-    function loadRecurrenceExpansion(id, start, end) {
+    function loadRecurrenceExpansion(idArr, start, end, ev, opts) {
         var s = start.getTime();
         var e = end.getTime();
-        var f = function(arr) {
-            var expandEventHash = createEventRegistry(arr);
+        var id = opts.saveType == 'recurrenceMaster' ? idArr[0] : idArr[1];
+        var f = function(hashMap) {
+            var expandEventHash = createEventRegistry(hashMap);
             self.processingQueue.shift();
             dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess', 
-               'data': { 'eventRegistry': expandEventHash, 'id': id } });
+               'data': { 'saveEvent': ev, 'eventRegistry': expandEventHash, 
+               'idArr': idArr, 'opts': opts } });
         }
-        Cal.serv.expandEvent(f, Cal.currentCalendar.path, id, s, e); 
+
+        Cal.serv.expandEvents(f, Cal.currentCalendar.path, [id], s, e); 
     }
     
-    function createEventRegistry(arr) {
+    function createEventRegistry(arrParam) {
         var h = new Hash();
+        var arr = [];
+       
+        // Param may be a single array, or hashmap of arrays -- one
+        // for each recurring event sequence
+        // ---------------------------------
+        // If passed a simple array, use it as-is
+        if (arrParam.length) {
+            arr = arrParam;
+        }
+        // If passed a hashmap of arrays, suck all the array items
+        // into one array
+        else {
+            for (var j in arrParam) {
+                var a = arrParam[j];
+                for (var i = 0; i < a.length; i++) {
+                    arr.push(a[i]);
+                }
+            }
+        }
+        
         for (var i = 0; i < arr.length; i++) {
             evData = arr[i];
             // Basic paranoia checks

@@ -32,6 +32,7 @@ import net.fortuna.ical4j.model.ParameterFactoryImpl;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
@@ -176,6 +177,23 @@ public class CosmoToICalendarConverter {
         dateProp.setDate(dateTime);
     }
 
+    protected DateTime createDateTime(CosmoDate cosmoDate, DateProperty timeZoneSource){
+        String dateString = getDateTimeString(cosmoDate, true, cosmoDate
+                .isUtc());
+        DateTime dateTime = null;
+        try {
+            dateTime = new DateTime(dateString);
+        } catch (ParseException pe) {
+            throw new RuntimeException(pe);
+        }
+        DateTime timeZoneSourceDateTime = (DateTime) timeZoneSource.getDate();
+        TimeZone tz = timeZoneSourceDateTime.getTimeZone();
+        if (tz != null){
+            dateTime.setTimeZone(timeZoneSourceDateTime.getTimeZone());
+        }
+        return dateTime;
+    }
+    
     protected void copyProperties(Event event, VEvent vevent) {
         // if dtStart and end are dates with times, this is true
         boolean dateTime = true;
@@ -273,9 +291,9 @@ public class CosmoToICalendarConverter {
             String rule = getFrequency(recurrenceRule.getFrequency())
                     + ";";
             if (recurrenceRule.getEndDate() != null) {
+                String dateString = getDateTimeString(recurrenceRule.getEndDate(), false, false);
                 rule += "UNTIL="
-                        + getDateTimeString(recurrenceRule.getEndDate(), true,
-                                true);
+                        + dateString;
             }
             try {
                 RRule rrule = new RRule(new Recur(rule));

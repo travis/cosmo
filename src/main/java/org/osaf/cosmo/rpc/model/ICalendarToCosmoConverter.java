@@ -499,32 +499,21 @@ public class ICalendarToCosmoConverter {
         net.fortuna.ical4j.model.Date until = recur.getUntil();
         TzId tzId = null;
         String tzIdValue = null;
+        // let's make sure that the DtStart actually is a DateTime
+        Date startDate = dtStart.getDate();
+        if (startDate instanceof DateTime) {
+            DateTime dtStartDate = (DateTime) startDate;
+            TimeZone timezone = dtStartDate.getTimeZone();
+            if (timezone != null) {
+                tzId = (TzId) dtStart.getParameters().getParameter(
+                        Parameter.TZID);
+            }  
+        }
+     
         // If this is a datetime, we must convert from UTC to the appropriate
         // timezone
         if (until != null) {
-            if (until instanceof DateTime) {
-                DateTime dtUntil = (DateTime) until;
-
-                // let's make sure that the DtStart actually is a DateTime
-                Date startDate = dtStart.getDate();
-                if (startDate instanceof DateTime) {
-                    DateTime dtStartDate = (DateTime) startDate;
-                    TimeZone timezone = dtStartDate.getTimeZone();
-                    if (timezone != null) {
-                        tzId = (TzId) dtStart.getParameters().getParameter(
-                                Parameter.TZID);
-                        // this changes the timezone from utc
-                        dtUntil.setTimeZone(timezone);
-                        until = dtUntil;
-                    }
-                }
-            }
-            
-            if (tzId != null) {
-                tzIdValue = tzId.getValue();
-            }
-
-            CosmoDate scoobyDate = createCosmoDate(until, calendar, tzIdValue);
+            CosmoDate scoobyDate = createCosmoDate(until, calendar, null);
             recurrenceRule.setEndDate(scoobyDate);
 
         } else {
@@ -729,7 +718,7 @@ public class ICalendarToCosmoConverter {
             hasTime = true;
             DateTime dateTime = (DateTime) date;
             scoobyDate.setUtc(true);
-            jCalendar = Calendar.getInstance();
+            jCalendar = Calendar.getInstance(java.util.TimeZone.getTimeZone("GMT"));
             jCalendar.setTime(dateTime);
         } else {
             hasTime = date instanceof DateTime;

@@ -279,7 +279,7 @@ public class CosmoToICalendarConverter {
             }
             try {
                 RRule rrule = new RRule(new Recur(rule));
-                vevent.getProperties().add(rrule);
+                addOrReplaceProperty(vevent,rrule);
             } catch (ParseException pe) {
                 throw new RuntimeException(pe);
             }
@@ -334,10 +334,13 @@ public class CosmoToICalendarConverter {
     protected static void addOrReplaceProperty(VEvent destination,
             Property property) {
 
-        Property oldProp = destination.getProperties().getProperty(
+        PropertyList oldPropList = destination.getProperties().getProperties(
                 property.getName());
-        if (oldProp != null) {
-            destination.getProperties().remove(oldProp);
+        for (Object o : oldPropList) {
+            Property oldProp = (Property) o;
+            if (oldProp != null) {
+                destination.getProperties().remove(oldProp);
+            }
         }
         destination.getProperties().add(property);
 

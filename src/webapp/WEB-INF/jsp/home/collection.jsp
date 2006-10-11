@@ -129,16 +129,16 @@
         ${item.displayName}
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${item.parent == null}">Home</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CollectionItem'}">Folder</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CalendarCollectionItem'}">Calendar</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.EventCalendarItem'}">Event</c:when><c:otherwise>File</c:otherwise></c:choose>
+        <c:choose><c:when test="${item.parent == null}">Home</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CollectionItem'}">Folder</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CalendarCollectionItem'}">Calendar</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CalendarEventItem'}">Event</c:when><c:otherwise>File</c:otherwise></c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">         
         <fmt:formatDate value="${item.creationDate}" type="both"/>
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.ContentItem' || item.class.name == 'org.osaf.cosmo.model.EventCalendarItem'}"><fmt:formatDate value="${item.modifiedDate}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.ContentItem' || item.class.name == 'org.osaf.cosmo.model.CalendarEventItem'}"><fmt:formatDate value="${item.modifiedDate}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.ContentItem' || item.class.name == 'org.osaf.cosmo.model.EventCalendarItem'}"><fmt:formatNumber value="${item.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.ContentItem' || item.class.name == 'org.osaf.cosmo.model.CalendarEventItem'}"><fmt:formatNumber value="${item.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     </c:forEach>

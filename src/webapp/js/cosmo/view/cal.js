@@ -210,6 +210,7 @@ cosmo.view.cal = new function() {
         var f = function(newEvId, err, reqId) {
            handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
+        //Log.print(ev.data);
         requestId = Cal.serv.saveNewEventBreakRecurrence(
             f, Cal.currentCalendar.path, ev.data, origId, recurEnd);
         self.processingQueue.push(requestId);

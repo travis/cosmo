@@ -192,6 +192,9 @@ cosmo.view.cal.canvas = new function() {
         }
         else if (opts.saveType == 'instanceAllFuture') {
             h = removeEventRecurrenceGroup(h, idArr, opts.recurEnd);
+            // Remove the original dragged event lozenge -- the new master
+            // will be in the recurrence expansion from the server
+            h.removeItem(opts.originalEvent.id);
         }
         h.append(evReg);
         removeAllEvents();
@@ -218,7 +221,8 @@ cosmo.view.cal.canvas = new function() {
         }
     }
     function removeSuccess(ev, opts) {
-        if (opts.removeType == 'recurrenceMaster' || opts.removeType == 'instanceAllFuture') {
+        if (opts.removeType == 'recurrenceMaster' || 
+            opts.removeType == 'instanceAllFuture') {
             var h = self.eventRegistry.clone();
             var dt = null;
             if (opts.removeType == 'instanceAllFuture') {

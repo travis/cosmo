@@ -144,27 +144,6 @@ cosmo.view.cal.canvas = new function() {
         self.eventRegistry.each(appendLozenge);
         updateEventsDisplay();
     }
-    function addSuccess(data) {
-        var id = data.id;
-        var ev = data.eventRegistry;
-        var h = self.eventRegistry.clone();
-        var currSel = self.eventRegistry.getPos(self.selectedEvent.id);
-        h = removeEventRecurrenceGroup(h, [id]);
-        h.append(ev);
-        removeAllEvents();
-        self.eventRegistry = h;
-        self.eventRegistry.each(appendLozenge);
-        if (!cosmo.view.cal.processingQueue.length) {
-            updateEventsDisplay();
-            if (!cosmo.view.cal.lastSent) {
-                setSelectedEvent(self.eventRegistry.getAtPos(currSel));
-            }
-            else {
-                setSelectedEvent(cosmo.view.cal.lastSent);
-            }
-        }
-        
-    }
     function saveSuccess(cmd, ev) {
         // Updating existing
         if (!cmd.qualifier.newEvent) {
@@ -186,10 +165,56 @@ cosmo.view.cal.canvas = new function() {
             updateEventsDisplay();
         }
     }
+    function addSuccess(data) {
+        var id = data.id;
+        var ev = data.eventRegistry;
+        var h = self.eventRegistry.clone();
+        var currSel = self.eventRegistry.getPos(self.selectedEvent.id);
+        h = removeEventRecurrenceGroup(h, [id]);
+        h.append(ev);
+        removeAllEvents();
+        self.eventRegistry = h;
+        self.eventRegistry.each(appendLozenge);
+        if (!cosmo.view.cal.processingQueue.length) {
+            updateEventsDisplay();
+            if (!cosmo.view.cal.lastSent) {
+                // Nasty, tricksy selection fu -- daily recurrence can have 
+                // multiple events, but can't move off of their day
+                // weekly and above can move off their day, but will only
+                // have a single instance visible on the canvas
+                var ev = ev.getAtPos(0);
+                if (ev.data.recurrenceRule.frequency == 'daily') {
+                    setSelectedEvent(self.eventRegistry.getAtPos(currSel));
+                }
+                else {
+                    setSelectedEvent(ev);
+                }
+            }
+            else {
+                setSelectedEvent(cosmo.view.cal.lastSent);
+            }
+        }
+        
+    }
+    function removeSuccess(ev, opts) {
+        if (opts.removeType == 'recurrenceMaster') {
+            var h = self.eventRegistry.clone();
+            h = removeEventRecurrenceGroup(h, [ev.data.id]);
+            removeAllEvents();
+            self.eventRegistry = h;
+            self.eventRegistry.each(appendLozenge);
+        }
+        else {
+            removeEvent(ev);
+        }
+        updateEventsDisplay();
+    }
+    
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function(cmd) {
         var act = cmd.action;
         var ev = cmd.data;
+        var opts = cmd.opts;
         switch (act) {
             case 'eventsLoadStart':
                 wipe();
@@ -219,8 +244,7 @@ cosmo.view.cal.canvas = new function() {
                 saveSuccess(cmd, ev);
                 break;
             case 'removeSuccess':
-                removeEvent(ev);
-                updateEventsDisplay();
+                removeSuccess(ev, opts)
                 break;
             default:
                 // Do nothing

@@ -59,7 +59,7 @@ cosmo.view.cal.dialog = new function() {
         'type': Cal.dialog.CONFIRM,
         'btnsLeft': [new Button('cancelButtonDialog', 74, Cal.hideDialog,
             getText('App.Button.Cancel'), true)],
-        'btnsRight': [b.removeAllEvents, b.removeFutureEvents, b.removeOnlyThisEvent],
+        'btnsRight': [],
         'defaultAction': function() {},
         'width': 480,
         'msg': 'This is a recurring event. Which occurrences do you wish to remove?'
@@ -110,6 +110,15 @@ cosmo.view.cal.dialog = new function() {
                 }
             }
             p.btnsRight.push(b.saveOnlyThisEvent);
+        }
+        else if (key == 'removeRecurConfirm') {
+            p.btnsRight = [];
+            p.btnsRight.push(b.removeAllEvents);
+            if (!opts.masterEvent) {
+                p.btnsRight.push(b.removeFutureEvents);
+            }
+            p.btnsRight.push(b.removeOnlyThisEvent);
+            
         }
         return p;
     };

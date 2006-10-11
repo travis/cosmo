@@ -45,7 +45,8 @@ cosmo.view.cal = new function() {
                 var ret = false;
                 var dt = ev.data.start;
                 var dtOrig = ev.dataOrig.start;
-                var origDate = new Date(dtOrig.getFullYear(), dtOrig.getMonth(), dtOrig.getDate());
+                var origDate = new Date(dtOrig.getFullYear(), dtOrig.getMonth(), 
+                    dtOrig.getDate());
                 var newDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
                 var unit = ranges[freq][0];
                 var bound = ranges[freq][1];
@@ -94,7 +95,8 @@ cosmo.view.cal = new function() {
             switch(qual) {
                 case opts.ALL_EVENTS:
                     if (ev.data.masterEvent) {
-                        f = function() { doSaveEvent(ev, { 'saveType': 'recurrenceMaster', 'instanceEventId': null }) }
+                        f = function() { doSaveEvent(ev, { 
+                            'saveType': 'recurrenceMaster', 'instanceEventId': null }) }
                     }
                     else {
                         h = function(evData, err) {
@@ -102,7 +104,7 @@ cosmo.view.cal = new function() {
                                 Cal.showErr('Could not retrieve master event for this recurrence.', err);
                                 // Broadcast failure
                                 dojo.event.topic.publish('/calEvent', { 'action': 'saveFailed',
-                                    'qualifier': 'editExiting', 'data': ev });
+                                    'qualifier': 'editExisting', 'data': ev });
                             }
                             else {
                                 var masterStart = evData.start;
@@ -155,22 +157,26 @@ cosmo.view.cal = new function() {
                                 // doSaveEvent expects a CalEvent with attached CalEventData
                                 var saveEv = new CalEvent();
                                 saveEv.data = evData;
-                                doSaveEvent(saveEv, { 'saveType': 'recurrenceMaster', 'instanceEventId': ev.data.id });
+                                doSaveEvent(saveEv, { 'saveType': 'recurrenceMaster', 
+                                    'instanceEventId': ev.data.id });
                             }
                         };
-                        f = function() { var reqId = Cal.serv.getEvent(h, Cal.currentCalendar.path, ev.data.id); };
+                        f = function() { var reqId = Cal.serv.getEvent(h, 
+                            Cal.currentCalendar.path, ev.data.id); };
                     }
                     break;
                 case opts.ALL_FUTURE_EVENTS:
                     var newEv = new CalEvent();
                     var freq = ev.data.recurrenceRule.frequency;
                     var start = ev.dataOrig.start;
-                    var recurEnd = new ScoobyDate(start.getFullYear(), start.getMonth(), start.getDate());
+                    var recurEnd = new ScoobyDate(start.getFullYear(), 
+                        start.getMonth(), start.getDate());
                     var unit = ranges[freq][0];
                     var incr = (ranges[freq][1] * -1);
                     recurEnd = ScoobyDate.add(recurEnd, unit, incr);
                     newEv.data = CalEventData.clone(ev.data);
-                    f = function() { doSaveEventBreakRecurrence(newEv, ev.data.id, recurEnd, { 'saveType': 'instanceAllFuture', 'originalEvent': ev }); };
+                    f = function() { doSaveEventBreakRecurrence(newEv, ev.data.id, 
+                        recurEnd, { 'saveType': 'instanceAllFuture', 'originalEvent': ev }); };
                     break;
                 case opts.ONLY_THIS_EVENT:
                     
@@ -196,7 +202,7 @@ cosmo.view.cal = new function() {
         requestId = Cal.serv.saveEvent(
             f, Cal.currentCalendar.path, ev.data);
         self.processingQueue.push(requestId);
-        if (opts.saveType == 'recurrenceMaster' && opts.instanceEventId) {
+        if (opts.saveType == 'recurrenceMaster') {
             self.lastSent = null;
         }
         else {
@@ -269,10 +275,13 @@ cosmo.view.cal = new function() {
         // ********************
         Cal.serv.resetServiceAccessTime();
         
-        if (opts.saveType == 'recurrenceMaster' || opts.saveType == 'instanceAllFuture') {
+        // Only proceed to repaint recurrence if update succeeds
+        if (act == 'saveSuccess' && 
+            (opts.saveType == 'recurrenceMaster' || opts.saveType == 'instanceAllFuture')) {
             var idArr = [];
             if (opts.saveType == 'instanceAllFuture') {
-                idArr = [opts.originalEvent.data.id]
+                //idArr = [opts.originalEvent.data.id]
+                idArr = opts.originalEvent.data.id;
             }
             else {
                 idArr = saveEv.data.id;
@@ -290,45 +299,90 @@ cosmo.view.cal = new function() {
     
     // Remove
     // =========================
-    function removeEventConfirm(ev, qual) {
+    function removeEventConfirm(ev) {
         var str = '';
+        var opts = {};
+        opts.masterEvent = false;
         // Recurrence is a ball-buster
         if (ev.data.recurrenceRule) {
             str = 'removeRecurConfirm';
+            if (ev.data.masterEvent) {
+                opts.masterEvent = true;
+            }
         }
         else {
             str = 'removeConfirm';
         }
-        Cal.showDialog(cosmo.view.cal.dialog.getProps(str));
+        Cal.showDialog(cosmo.view.cal.dialog.getProps(str, opts));
     }
-    function removeEvent(ev) {
-        doRemove(ev);
-        
-        // No currently selected event
-        cosmo.view.cal.canvas.selectedEvent = null;
+    function removeEvent(ev, qual) {
+        var opts = self.recurringEventOptions;
         
         // Kill any confirmation dialog that might be showing
         if (Cal.dialog.isDisplayed) {
             Cal.hideDialog();
         }
+        // Recurring event
+        var f = null;
+        if (qual) {
+            switch(qual) {
+                case opts.ALL_EVENTS:
+                    if (ev.data.masterEvent) {
+                        f = function() { doRemoveEvent(ev, { 'removeType': 'recurrenceMaster' }) };
+                    }
+                    else {
+                        h = function(evData, err) {
+                            if (err) {
+                                Cal.showErr('Could not retrieve master event for this recurrence.', err);
+                                // Broadcast failure
+                                dojo.event.topic.publish('/calEvent', { 'action': 'removeFailed',
+                                    'data': ev });
+                            }
+                            else {
+                                // doRemoveEvent expects a CalEvent with attached CalEventData
+                                var removeEv = new CalEvent();
+                                removeEv.data = evData;
+                                doRemoveEvent(removeEv, { 'removeType': 'recurrenceMaster', 
+                                    'instanceEventId': ev.data.id });
+                            }
+                        };
+                        f = function() { var reqId = Cal.serv.getEvent(h, 
+                            Cal.currentCalendar.path, ev.data.id); };
+                    }
+                    break;
+                case opts.ALL_FUTURE_EVENTS:
+                    break;
+                case opts.ONLY_THIS_EVENT:
+                    
+                    break;
+                default:
+                    // Do nothing
+                    break;
+            }
+        }
+        // Normal one-shot event
+        else {
+            f = function() { doRemoveEvent(ev, { 'removeType': 'singleEvent' }) }
+        }
+        f();
+        
     }
-    function doRemove(ev) {
+    function doRemoveEvent(ev, opts) {
         var f = function(newEvId, err, reqId) { 
-            handleRemoveResult(ev, newEvId, err, reqId); };
+            handleRemoveResult(ev, newEvId, err, reqId, opts); };
         var requestId = Cal.serv.removeEvent(
             f, Cal.currentCalendar.path, ev.data.id);
     }
-    function handleRemoveResult(ev, newEvId, err, reqId) {
+    function handleRemoveResult(ev, newEvId, err, reqId, opts) {
         var removeEv = ev;
         // Simple error message to go along with details from Error obj
         var errMsg = getText('Main.Error.EventRemoveFailed');
         if (err) {
+            act = 'removeFailed';
             Cal.showErr(errMsg, err);
         }
         else {
-            // Broadcast success
-            dojo.event.topic.publish('/calEvent', { 'action': 'removeSuccess', 
-                'data': removeEv });
+            act = 'removeSuccess';
         }
         
         // Resets local timer for timeout -- we know server-side
@@ -337,6 +391,10 @@ cosmo.view.cal = new function() {
         // BANDAID: need to move this into the actual Service call
         // ********************
         Cal.serv.resetServiceAccessTime();
+            
+        // Broadcast success
+        dojo.event.topic.publish('/calEvent', { 'action': act, 
+            'data': removeEv, 'opts': opts });
     }
     function loadRecurrenceExpansion(id, start, end) {
         var s = start.getTime();

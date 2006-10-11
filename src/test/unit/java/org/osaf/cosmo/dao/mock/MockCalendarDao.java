@@ -40,6 +40,16 @@ import org.osaf.cosmo.model.User;
  */
 public class MockCalendarDao extends MockItemDao implements CalendarDao {
 
+    private CalendarFilter lastCalendarFilter;
+    
+    /**
+     * Useful for unit tests.
+     * @return
+     */
+    public CalendarFilter getLastCalendarFilter() {
+        return lastCalendarFilter;
+    }
+
     /**
      */
     public MockCalendarDao(MockDaoStorage storage) {
@@ -220,7 +230,8 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
 
     /**
      * Find calendar events by filter.
-     *
+     * NOTE: This impl always returns an empty set, but has the side effect 
+     * of setting the last 
      * @param calendar
      *            calendar collection to search
      * @param filter
@@ -230,8 +241,9 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
      */
     public Set<CalendarEventItem> findEvents(CalendarCollectionItem calendar,
                                              CalendarFilter filter) {
-        // XXX
-        throw new UnsupportedOperationException();
+        lastCalendarFilter = filter;
+        return new HashSet<CalendarEventItem>();
+
     }
 
     /**

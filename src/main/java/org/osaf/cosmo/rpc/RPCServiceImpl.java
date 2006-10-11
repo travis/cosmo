@@ -144,6 +144,9 @@ public class RPCServiceImpl implements RPCService {
             log.debug("Getting event " + id + " in calendar at " +
                       absolutePath);
         CalendarEventItem calItem = contentService.findEventByUid(id);
+        if (calItem == null){
+            return null;
+        }
         try {
             return icalendarToCosmoConverter.createEvent(calItem.getUid(),
                     calItem.getMasterEvent(), calItem.getCalendar());

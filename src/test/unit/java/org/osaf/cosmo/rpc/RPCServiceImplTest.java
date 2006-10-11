@@ -17,10 +17,15 @@ package org.osaf.cosmo.rpc;
 
 import junit.framework.TestCase;
 
+import net.fortuna.ical4j.model.DateTime;
+
 import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.calendar.query.CalendarFilter;
+import org.osaf.cosmo.calendar.query.ComponentFilter;
+import org.osaf.cosmo.calendar.query.TimeRangeFilter;
 import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
@@ -138,7 +143,18 @@ public class RPCServiceImplTest extends TestCase {
         long UTC_MAR_ONE = 1141200000000L;    // 3/1/2006 - 1141200000000
         long UTC_MAY_ONE = 1146466800000L;    // 5/1/2006 - 1146466800000
         Event events[] = rpcService.getEvents(TEST_CALENDAR_PATH, UTC_MAR_ONE, UTC_MAY_ONE);
-        assertEquals(events.length, 2);
+        
+        CalendarFilter calendarFilter = calendarDao.getLastCalendarFilter();
+        ComponentFilter filter = (ComponentFilter)calendarFilter.getFilter().getComponentFilters().get(0);
+
+        DateTime start = new DateTime(1141200000000L);
+        start.setUtc(true);
+        DateTime end   = new DateTime(1146466800000L);
+        end.setUtc(true);
+        
+        TimeRangeFilter timeRangeFilter = filter.getTimeRangeFilter();
+        assertEquals(start.toString(),timeRangeFilter.getUTCStart());
+        assertEquals(end.toString(), timeRangeFilter.getUTCEnd());
     }
 
     public void testSaveEvent() throws Exception {
@@ -184,7 +200,7 @@ public class RPCServiceImplTest extends TestCase {
         boolean found = false;
         for (Calendar c : calendars) {
             log.info(c.getPath());
-            if (c.getPath().equals("RemoteCosmoServiceTest")) {
+            if (c.getPath().equals("/RemoteCosmoServiceTest")) {
                 found = true;
             }
         }
@@ -202,7 +218,8 @@ public class RPCServiceImplTest extends TestCase {
         assertEquals(calendars.length, initialNumberOfCalendars - 1);
     }
 
-    public void testGetPreference() throws Exception {
+/* XXX Uncomment once we add preferences to the Cosmo data model
+ *     public void testGetPreference() throws Exception {
         rpcService.removePreference("testPreference");
         String result = rpcService.getPreference("testPreference");
         assertNull(result);
@@ -219,5 +236,6 @@ public class RPCServiceImplTest extends TestCase {
     
     public void testRemovePreference() throws Exception {
         rpcService.removePreference("testPreference");
-    }
+    }*/
+    
 }

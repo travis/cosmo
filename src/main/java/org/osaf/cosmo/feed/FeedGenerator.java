@@ -73,6 +73,9 @@ public class FeedGenerator {
      */
     public Feed generateFeed(CollectionItem collection,
                              String path) {
+        if (! path.equals("/") && path.endsWith("/"))
+            path = path.substring(0, path.length()-1);
+
         Feed feed = createFeed(collection, path);
 
         for (Item child : collection.getChildren()) {
@@ -136,8 +139,15 @@ public class FeedGenerator {
                                 String feedPath) {
         String entryPath = feedPath + "/" + item.getName();
 
+        // add the timestamp of the item's last modification to the id
+        // so that readers which are too smart for their own good will
+        // count an item as unread if it has changed since the reader
+        // last saw it
+        String id = davHref(entryPath);
+        id = id + "#" + item.getModifiedDate().getTime();
+
         Entry entry = new Entry();
-        entry.setId(davHref(entryPath));
+        entry.setId(id);
         entry.setPublished(item.getCreationDate());
         entry.setTitle(item.getDisplayName());
         entry.setUpdated(item.getModifiedDate());
@@ -149,9 +159,10 @@ public class FeedGenerator {
         entry.getAlternateLinks().add(webLink);
 
         if (item instanceof CalendarItem) {
+            CalendarItem ci = (CalendarItem) item;
             Content content = new Content();
             content.setType(Content.HTML);
-            content.setValue(HCalendarFormatter.toHCal((CalendarItem)item));
+            content.setValue(HCalendarFormatter.toHCal(ci));
             entry.getContents().add(content);
         }
 

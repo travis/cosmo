@@ -21,6 +21,7 @@ import com.sun.syndication.io.WireFeedOutput;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -51,6 +52,10 @@ public class FeedServlet extends HttpServlet {
         "contentService";
     private static final String BEAN_SECURITY_MANAGER =
         "securityManager";
+
+    // used to store the feed item between calls to getLastModified
+    // and doGet
+    private static ThreadLocal<Item> feedItem = new ThreadLocal<Item>();
 
     /** */
     public static final String INIT_HOME_PATH = "home-path";
@@ -110,6 +115,36 @@ public class FeedServlet extends HttpServlet {
 
     /**
      */
+    protected long getLastModified(HttpServletRequest req) {
+        String path = req.getParameter(PARAM_PATH);
+        if (path == null)
+            return -1;
+
+        Item item = contentService.findItemByPath(path);
+        if (item == null)
+            return -1;
+
+        // set the item in a ThreadLocal so we don't have to look it
+        // up again
+        feedItem.set(item);
+
+        if (! (item instanceof CollectionItem))
+            return item.getModifiedDate().getTime();
+
+        CollectionItem collection = (CollectionItem) item;
+
+        Date lastMod = null;
+        for (Item child : collection.getChildren()) {
+            if (lastMod == null ||
+                child.getModifiedDate().after(lastMod))
+                lastMod = child.getModifiedDate();
+        }
+
+        return lastMod != null ? lastMod.getTime() : -1;
+    }
+
+    /**
+     */
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp)
         throws ServletException, IOException {
@@ -120,7 +155,15 @@ public class FeedServlet extends HttpServlet {
             return;
         }
 
-        Item item = contentService.findItemByPath(path);
+        // if we already found the item when calculating the last
+        // modified timestamp, it's in the ThreadLocal, and we can
+        // remove it since nothing else will use it
+        Item item = feedItem.get();
+        if (item != null) {
+            feedItem.remove();
+        } else {
+            item = contentService.findItemByPath(path);
+        }
         if (item == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;

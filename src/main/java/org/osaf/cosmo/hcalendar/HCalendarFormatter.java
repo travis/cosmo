@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.hcalendar;
 
-import java.text.SimpleDateFormat;
-
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Property;
@@ -31,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CalendarEventItem;
 import org.osaf.cosmo.model.CalendarItem;
+import org.osaf.cosmo.util.DateUtil;
 
 /**
  * A class that formats Cosmo calendar model objects according to the
@@ -90,9 +89,9 @@ public class HCalendarFormatter {
         if (dtstart != null) {
             buf.append(": " ).
                 append("<abbr class=\"dtstart\" title=\"").
-                append(formatMachineReadableDate(dtstart.getDate())).
+                append(toRfc3339Date(dtstart.getDate())).
                 append("\">").
-                append(formatHumanReadableDate(dtstart.getDate())).
+                append(toHumanReadableDate(dtstart.getDate())).
                 append("</abbr>");
         }
 
@@ -101,9 +100,9 @@ public class HCalendarFormatter {
         if (dtend != null) {
             buf.append(" to ").
                 append("<abbr class=\"dtend\" title=\"").
-                append(formatMachineReadableDate(dtend.getDate())).
+                append(toRfc3339Date(dtend.getDate())).
                 append("\">").
-                append(formatHumanReadableDate(dtend.getDate())).
+                append(toHumanReadableDate(dtend.getDate())).
                 append("</abbr>");
         }
 
@@ -114,8 +113,8 @@ public class HCalendarFormatter {
                 append("<abbr class=\"duration\" title=\"").
                 append(duration.getValue()).
                 append("\">").
-                append(formatHumanReadableDate(duration.getDuration().
-                                               getTime(dtstart.getDate()))).
+                append(toHumanReadableDate(duration.getDuration().
+                                           getTime(dtstart.getDate()))).
                 append("</abbr>");
         }
 
@@ -142,24 +141,16 @@ public class HCalendarFormatter {
         return buf.toString();
     }
 
-    private static String formatMachineReadableDate(java.util.Date date) {
-        // the hcalendar spec recommends the RFC 3339 format
-        String pattern = "yyyy-MM-dd'T'HH:mm:ssZ";
+    private static String toRfc3339Date(java.util.Date date) {
         TimeZone tz = date instanceof DateTime ?
             ((DateTime) date).getTimeZone() : null;
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        if (tz != null)
-            formatter.setTimeZone(tz);
-        return formatter.format(date);
+        return DateUtil.formatRfc3339Date(date, tz);
     }
 
-    private static String formatHumanReadableDate(java.util.Date date) {
+    private static String toHumanReadableDate(java.util.Date date) {
         String pattern = "MMM d, yyyy h:mm a zzz";
         TimeZone tz = date instanceof DateTime ?
             ((DateTime) date).getTimeZone() : null;
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        if (tz != null)
-            formatter.setTimeZone(tz);
-        return formatter.format(date);
+        return DateUtil.formatDate(pattern, date, tz);
     }
 }

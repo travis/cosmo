@@ -269,6 +269,7 @@ public class ICalendarToCosmoConverter {
                 instance.setRecurrenceRule(event.getRecurrenceRule());
                 instance.setStart(createCosmoDate(instanceStartDate, calendar,
                         tzid));
+                instance.setInstanceDate(instance.getStart());
                 if (event.getEnd() != null) {
                     if (event.isAllDay()) {
                         Calendar endCalendar = Calendar.getInstance();

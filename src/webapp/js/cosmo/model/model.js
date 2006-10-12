@@ -15,7 +15,7 @@
 */
 
 function CalEventData(id, title, description, start, end, allDay,
-    pointInTime, anyTime, recurrenceRule, status, masterEvent, instance) {
+    pointInTime, anyTime, recurrenceRule, status, masterEvent, instance, instanceDate) {
 
     this.id = id;
     this.title = title;
@@ -29,6 +29,7 @@ function CalEventData(id, title, description, start, end, allDay,
     this.status = status ? status : null;
     this.masterEvent = masterEvent ? masterEvent : false;
     this.instance = instance ? instance : false;
+    this.instanceDate = instanceDate ? instanceDate : null;
 };
 
 CalEventData.prototype = {

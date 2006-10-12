@@ -34,7 +34,8 @@ public class Event {
     private boolean isAnyTime = false;
     private boolean masterEvent = false;
     private boolean instance = false;
-
+    private CosmoDate instanceDate = null;
+    
 	public String getTitle() {
 		return title;
 	}
@@ -140,6 +141,20 @@ public class Event {
     public void setStatus(String status) {
         this.status = status;
     }
+    
+    /**
+     * The instance date is the date/dateTime that this instance would start if 
+     * there were no modifications to it. Analogous to the RECURRENCE-ID in icalendar.
+     * @return
+     */
+    public CosmoDate getInstanceDate() {
+        return instanceDate;
+    }
+
+    public void setInstanceDate(CosmoDate instanceDate) {
+        this.instanceDate = instanceDate;
+    }
+
 
 	@Override
 	public int hashCode() {

@@ -278,7 +278,7 @@ public class ICalendarToCosmoConverter {
                         endCalendar.add(Calendar.DATE, -1);
                         net.fortuna.ical4j.model.Date instanceEndDate = new net.fortuna.ical4j.model.Date(
                                 endCalendar.getTimeInMillis());
-                        event.setEnd(createCosmoDate(instanceEndDate,
+                        instance.setEnd(createCosmoDate(instanceEndDate,
                                 calendar, null));
 
                     } else {

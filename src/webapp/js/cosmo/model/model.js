@@ -89,16 +89,17 @@ function RecurrenceRule(){
     /**
      * This is an array of CosmoDates, each one representing a date on which the
      * event will NOT occur
+     * This must be a DateTime, not just a Date
      * 
      */
-    this.exceptionDates = null;
+    this.exceptionDates = [];
     
     /**
      * An array of modifications, each one representing a modification to an event
      * instance
      *
      */
-    this.modifications = null;
+    this.modifications = [];
 }
 
 RecurrenceRule.prototype = {

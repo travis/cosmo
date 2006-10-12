@@ -265,6 +265,7 @@ public class ICalendarToCosmoConverter {
                 instance.setDescription(event.getDescription());
                 instance.setAllDay(event.isAllDay());
                 instance.setAnyTime(event.isAnyTime());
+                instance.setStatus(event.getStatus());
                 instance.setInstance(true);
                 instance.setRecurrenceRule(event.getRecurrenceRule());
                 instance.setStart(createCosmoDate(instanceStartDate, calendar,

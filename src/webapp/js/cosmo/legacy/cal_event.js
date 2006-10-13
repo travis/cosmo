@@ -67,17 +67,25 @@ function CalEvent(id, block) {
             }
         }
         var compareRecurrence = function(curr, orig) {
-            if (!curr && orig || curr && !orig) {
-                return true;
-            }
-            else {
-                if ((curr.frequency != orig.frequency) ||
-                    (curr.endDate != orig.endDate)) {
-                    return true;
-                }
-                else {
+            switch (true) {
+                // No recurrence
+                case (!curr && !orig):
                     return false;
-                }
+                    break;
+                // Either adding or removing recurrence
+                case (!curr && orig || curr && !orig):
+                    return true;
+                    break;
+                // Changing recurrence
+                default:
+                    if ((curr.frequency != orig.frequency) ||
+                        (curr.endDate != orig.endDate)) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                    break;
             }
         }
         var compareList = {

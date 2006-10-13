@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
+
 <%--
 /*
  * Copyright 2006 Open Source Applications Foundation

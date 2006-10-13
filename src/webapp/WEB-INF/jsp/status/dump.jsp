@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/plain; charset=UTF-8" %>
+
 <%--
 /*
  * Copyright 2005-2006 Open Source Applications Foundation
@@ -15,5 +17,4 @@
  * limitations under the License.
 */
 --%>
-<%@ page contentType="text/plain" %>
 <%= request.getAttribute("Status") %>

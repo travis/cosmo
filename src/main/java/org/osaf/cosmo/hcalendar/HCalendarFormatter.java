@@ -24,6 +24,7 @@ import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -80,7 +81,7 @@ public class HCalendarFormatter {
             master.getProperties().getProperty(Property.SUMMARY);
         if (summary != null) {
             buf.append("<span class=\"summary\">").
-                append(summary.getValue()). // XXX HTML escape
+                append(StringEscapeUtils.escapeHtml(summary.getValue())).
                 append("</span>");
         }
 
@@ -133,7 +134,7 @@ public class HCalendarFormatter {
         if (location != null) {
             buf.append(" at " ).
                 append("<span class=\"location\">").
-                append(location.getValue()). // XXX HTML escape
+                append(StringEscapeUtils.escapeHtml(location.getValue())).
                 append("</span>");
         }
 

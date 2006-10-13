@@ -18,6 +18,8 @@ package org.osaf.cosmo.dav.impl;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -50,6 +52,8 @@ import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 import org.apache.log4j.Logger;
 
@@ -484,11 +488,11 @@ public class DavCollection extends DavResourceBase
                                                    "utf8"));
         String title = getLocator().getResourcePath();
         writer.write("<html><head><title>");
-        writer.write(title); // XXX: html escape
+        writer.write(StringEscapeUtils.escapeHtml(title));
         writer.write("</title></head>");
         writer.write("<body>");
         writer.write("<h1>");
-        writer.write(title); // XXX: html escape
+        writer.write(StringEscapeUtils.escapeHtml(title));
         writer.write("</h1>");
         writer.write("<ul>");
         if (! getLocator().getResourcePath().equals("/")) {
@@ -500,12 +504,16 @@ public class DavCollection extends DavResourceBase
                 PathUtil.getBasename(child.getLocator().getResourcePath()); 
             String displayName = child.getItem().getDisplayName();
             writer.write("<li><a href=\"");
-            writer.write(name); // XXX URI escape
+            try {
+                writer.write(URLEncoder.encode(name, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException("UTF-8 not supported", e);
+            }
             if (child.isCollection()) {
                 writer.write("/");
             }
             writer.write("\">");
-            writer.write(displayName); // XXX: html escape
+            writer.write(StringEscapeUtils.escapeHtml(displayName));
             writer.write("</a></li>");
         }
         writer.write("</ul>");

@@ -28,5 +28,3 @@ Log = new function() {
     }
 }
 
-Log.print('Howdy');
-

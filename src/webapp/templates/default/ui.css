@@ -368,6 +368,7 @@ $smButtonHeight = 18px
     left:8px;
     width:129px;
     height:28px;
+    background-repeat: no-repeat;
 }
 
 /* Main content area under menubar -- contains both

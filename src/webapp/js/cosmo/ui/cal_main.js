@@ -338,6 +338,7 @@ var Cal = new function() {
      * Set skin-specific images
      */
     this.setImagesForSkin =  function() {
+        var logoDiv = document.getElementById('smallLogoDiv');
         var skinImagesDir = 'templates/' + TEMPLATE_DIRECTORY + '/images/';
         var handleImg = null;
         
@@ -346,8 +347,14 @@ var Cal = new function() {
        
        
         document.getElementById('allDayResizeHandleDiv').appendChild(handleImg);
-        document.getElementById('smallLogoDiv').style.background =
+        logoDiv.style.background =
             'url(' + cosmo.env.getImagesUrl() + LOGO_GRAPHIC_SM + ')';
+
+        // Wheeeee, IE6 resets background tiling when you set an image background
+        //if (!(dojo.render.html.ie && !dojo.render.html.ie7)) { // Wait for 0.4
+        if (!(document.all && navigator.appVersion.indexOf('MSIE 7') == -1)) {
+            logoDiv.style.backgroundRepeat = 'no-repeat';
+        }
     };
     /**
      * Loads localized Date information into the arrays in date.js

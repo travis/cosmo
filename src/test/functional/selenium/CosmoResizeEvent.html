@@ -14,7 +14,6 @@ Copyright 2006, Open Source Applications Foundation
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -26,8 +25,23 @@ Copyright 2006, Open Source Applications Foundation
 <tr><td rowspan="1" colspan="3">Cosmo Test</td></tr>
 <tr>
 	<td>open</td>
-	<td>/scooby/main.page</td>
+	<td>/cosmo/pim/pim.page</td>
 	<td></td>
+</tr>
+<tr>
+      <td>pause</td>
+      <td>2000</td>
+      <td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/cosmo/pim/pim.page</td>
+	<td></td>
+</tr>
+<tr>
+      <td>pause</td>
+      <td>2000</td>
+      <td></td>
 </tr>
 <tr>
 	<td>click</td>
@@ -75,44 +89,13 @@ Copyright 2006, Open Source Applications Foundation
       <td></td>
 </tr>
 <tr>
-      <td>dblclick</td>
-      <td>id=hourDiv2-1100</td>
-      <td></td>
-</tr>
-<tr>
-      <td>dblclick</td>
-      <td>id=hourDiv1-1100</td>
-      <td></td>
-</tr>
-<tr>
-	<td>store</td>
-	<td>javascript{this.browserbot.getCurrentWindow().Cal.eventRegistry.getNext().id}</td>
-	<td>did</td>
-</tr>
-<tr>
-	<td>dragdropDivCosmo</td>
-	<td>id=eventDivTop__${did}</td>
-	<td>id=hourDiv3-1000</td>
-</tr>
-<tr>
       <td>pause</td>
       <td>2000</td>
       <td></td>
 </tr>
 <tr>
-	<td>dragdropDivCosmo</td>
-	<td>id=eventDivBottom__${did}</td>
-	<td>id=hourDiv3-1300</td>
-</tr>
-<tr>
-      <td>pause</td>
-      <td>2000</td>
-      <td></td>
-</tr>
-
-<tr>
-	<td>store</td>
-	<td>javascript{this.browserbot.getCurrentWindow().Cal.eventRegistry.getNext().id}</td>
+	<td>storeId</td>
+	<td>first</td>
 	<td>did</td>
 </tr>
 <tr>
@@ -128,22 +111,19 @@ Copyright 2006, Open Source Applications Foundation
 <tr>
 	<td>dragdropDivCosmo</td>
 	<td>id=eventDivBottom__${did}</td>
-	<td>id=hourDiv2-1200</td>
+	<td>id=hourDiv2-1300</td>
 </tr>
+
 <tr>
       <td>pause</td>
       <td>2000</td>
       <td></td>
 </tr>
-<tr>
-	<td>store</td>
-	<td>javascript{this.browserbot.getCurrentWindow().Cal.eventRegistry.getFirst().id}</td>
-	<td>did</td>
-</tr>
+
 <tr>
 	<td>dragdropDivCosmo</td>
 	<td>id=eventDivTop__${did}</td>
-	<td>id=hourDiv1-1100</td>
+	<td>id=hourDiv2-1000</td>
 </tr>
 <tr>
       <td>pause</td>
@@ -153,13 +133,9 @@ Copyright 2006, Open Source Applications Foundation
 <tr>
 	<td>dragdropDivCosmo</td>
 	<td>id=eventDivBottom__${did}</td>
-	<td>id=hourDiv1-1300</td>
+	<td>id=hourDiv2-1200</td>
 </tr>
-<tr>
-      <td>pause</td>
-      <td>2000</td>
-      <td></td>
-</tr>
+
 </tbody></table>
 </body>
 </html>

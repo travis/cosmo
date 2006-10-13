@@ -15,9 +15,18 @@
 */
 
 Log = new function() {
-    this.print = function(msg) {
-        if ((navigator.userAgent.indexOf('Safari') == -1) && (!document.all)) {
-          console.log(msg);
+    // No-console browsers
+    if (typeof console == 'undefined') {
+         this.print = function() {
+            alert(arguments[0]);
+         }
+    }
+    else {
+        this.print = function() {
+            console.log(arguments);
         }
     }
 }
+
+Log.print('Howdy');
+

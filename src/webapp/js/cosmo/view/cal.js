@@ -34,44 +34,73 @@ cosmo.view.cal = new function() {
         // Don't bother going through the edit process if nothing 
         // has actually changed
         var changedProps = ev.hasChanged();
+        var changedRecur = false;
+        
         if (!changedProps) {
             return false;
         }
         
-        var recur = ev.data.recurrenceRule;
-        // Recurrence is a ball-buster
-        if (recur) {
-            var freq = recur.frequency;
-            var opts = {};
-            opts.instanceOnly = false;
-            opts.masterEvent = false;
-
-            // Check to see if editing a recurrence instance to go
-            // beyond the recurrence interval -- in that case only
-            // mod is possible. No 'all,' no 'all future.'
-            function isOutOfIntervalRange() { 
-                var ret = false;
-                var dt = ev.data.start;
-                var dtOrig = ev.dataOrig.start;
-                var origDate = new Date(dtOrig.getFullYear(), dtOrig.getMonth(), 
-                    dtOrig.getDate());
-                var newDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
-                var unit = ranges[freq][0];
-                var bound = ranges[freq][1];
-                var diff = Date.diff(unit, origDate, newDate);
-                ret = (diff >= bound || diff <= (bound * -1)) ? true : false;
-                return ret;
+        for (var i = 0; i < changedProps.length; i++) {
+            //Log.print(i + ': ' + changedProps[i]);
+            if (changedProps[i][0] == 'recurrenceRule') {
+                changedRecur = true;
             }
-            if (ev.data.masterEvent) {
-                opts.masterEvent = true;
-            }
-            else {
-                opts.instanceOnly = isOutOfIntervalRange();
-            }
-            Cal.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', opts));
         }
+        // Changing recurrence rule
+        // --------------
+        if (changedRecur) {
+            // NOT IMPLEMENTED YET
+            alert('Not yet implemented');
+            return;
+            // This means 'All Future Events'
+            var opts = self.recurringEventOptions;
+            dojo.event.topic.publish('/calEvent', { 'action': 'save', 
+                'qualifier': opts.ALL_FUTURE_EVENTS, data: ev });
+        }
+        // Changing event, not recurrence rule
+        // --------------
         else {
-            saveEventChanges(ev);
+            var recur = ev.data.recurrenceRule;
+            // Recurring event
+            // -------
+            if (recur) {
+                var freq = recur.frequency;
+                var opts = {};
+                opts.instanceOnly = false;
+                opts.masterEvent = false;
+
+                // Check to see if editing a recurrence instance to go
+                // beyond the recurrence interval -- in that case only
+                // mod is possible. No 'all,' no 'all future.'
+                function isOutOfIntervalRange() { 
+                    var ret = false;
+                    var dt = ev.data.start;
+                    var dtOrig = ev.dataOrig.start;
+                    var origDate = new Date(dtOrig.getFullYear(), dtOrig.getMonth(), 
+                        dtOrig.getDate());
+                    var newDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+                    var unit = ranges[freq][0];
+                    var bound = ranges[freq][1];
+                    var diff = Date.diff(unit, origDate, newDate);
+                    ret = (diff >= bound || diff <= (bound * -1)) ? true : false;
+                    return ret;
+                }
+                // Change to master event in recurrence
+                if (ev.data.masterEvent) {
+                    opts.masterEvent = true;
+                }
+                // Change to instance event
+                else {
+                    opts.instanceOnly = isOutOfIntervalRange();
+                }
+                // Show the confirmation dialog
+                Cal.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', opts));
+            }
+            // One-shot event
+            // -------
+            else {
+                saveEventChanges(ev);
+            }
         }
     }
     function saveEventChanges(ev, qual) {

@@ -286,7 +286,7 @@ function Block() {
     this.useLightColor = function(ev) {
         var ret = false;
         switch(true) {
-            case (ev.data.status && ev.data.status.indexOf('CANCELLED') > -1):
+            case (ev.data.status && ev.data.status == EventStatus.FYI):
             case (!ev.data.allDay && (ev.data.start.getTime() == ev.data.end.getTime())):
                 ret = true;
                 break;

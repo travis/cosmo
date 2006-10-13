@@ -58,37 +58,29 @@ var Cal = new function() {
     // The dialog box used to display
     // warnings / confirmations -- a Dialog obj
     this.dialog = new Dialog();
-    // Dummy recurrence rule for getting recurrence options
-    this.recurTemplate = new RecurrenceRule();
-    this.recurTemplate.options = ['FREQUENCY_DAILY','FREQUENCY_WEEKLY', 
-        'FREQUENCY_BIWEEKLY', 'FREQUENCY_MONTHLY', 'FREQUENCY_YEARLY'];
-
-    this.statusTemplate = new StatusTemplate();
-    this.statusTemplate.options = ['CONFIRMED', 'TENTATIVE', 'CANCELLED'];
-
-
+    
     // List of any queued-up error messages
     this.errorList = [];
-
+    
     // Used when the modal dialog box
     // in Cal.dialog is showing. Currently input is actually disabled
     // with a div that fully covers the entire UI, block/none display
     // this property also does get set to true/false at the same time
     this.inputDisabled = false;
-
+    
     // Used with the local UI timeout calculations
     // A related property is Cal.serv.serviceAccessTime in the Cosmo service
     this.inputTimestamp = null;
-
+    
     // The path to the currently selected calendar
     this.currentCalendar = null;
-
+    
     //The list of calendars available to the current user
     this.calendars = [];
-
+    
     // Create the 'Welcome to Cosmo' event?
     this.createWelcomeItem = false;
-
+    
     // ==========================
     // Init
     // ==========================

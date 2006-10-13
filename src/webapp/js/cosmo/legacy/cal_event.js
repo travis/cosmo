@@ -58,6 +58,17 @@ function CalEvent(id, block) {
         var d = this.data;
         var dO = this.dataOrig;
         var ret = [];
+        // Use special func for status since Design insists that
+        // 'CONFIRMED' and unset should somehow be the same thing
+        var compareStatus = function(curr, orig) {
+            if ((!curr && orig == EventStatus.CONFIRMED) || 
+                (curr == EventStatus.CONFIRMED && !orig)) {
+                return false;
+            }
+            else if (curr != orig) {
+                return true;
+            }
+        }
         var compareDateTime = function(curr, orig) {
             if (curr.toUTC() != orig.toUTC()) {
                 return true;
@@ -67,25 +78,23 @@ function CalEvent(id, block) {
             }
         }
         var compareRecurrence = function(curr, orig) {
-            switch (true) {
-                // No recurrence
-                case (!curr && !orig):
-                    return false;
-                    break;
-                // Either adding or removing recurrence
-                case (!curr && orig || curr && !orig):
+            // No recurrence
+            if (!curr && !orig) {
+                return false;
+            }
+            // Changing recurrence
+            else if (curr && orig) {
+                if ((curr.frequency != orig.frequency) ||
+                    (curr.endDate != orig.endDate)) {
                     return true;
-                    break;
-                // Changing recurrence
-                default:
-                    if ((curr.frequency != orig.frequency) ||
-                        (curr.endDate != orig.endDate)) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                    break;
+                }
+                else {
+                    return false;
+                }
+            }
+            // Adding or removing recurrence
+            else if ((!curr && orig) || (!orig && curr)) {
+                return true;
             }
         }
         var compareList = {
@@ -97,13 +106,13 @@ function CalEvent(id, block) {
             'pointInTime': null,
             'anyTime': null,
             'recurrenceRule': compareRecurrence,
-            'status': null
+            'status': compareStatus
         }
         
         function compareVals(prop, curr, orig, f) {
             var diff
             var a = curr || null;
-            var b = orig || null
+            var b = orig || null;
             if (f) {
                 if (f(a, b)) {
                     ret.push([prop, a, b])

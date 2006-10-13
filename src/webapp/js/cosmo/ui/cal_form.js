@@ -444,7 +444,6 @@ function CalForm() {
     };
     this.getRecurOpt = function() {
         var recurOpt = [];
-        var recurTempl = Cal.recurTemplate;
         var opt = null;
         var str = '';
         
@@ -452,9 +451,9 @@ function CalForm() {
         opt.text = 'Once';
         opt.value = '';
         recurOpt.push(opt);
-        for (var i = 0; i < recurTempl.options.length; i++) {
+        for (var i in RecurrenceRuleFrequency) {
             opt = new Object();
-            str = recurTempl[recurTempl.options[i]];
+            str = RecurrenceRuleFrequency[i];
             opt.text = Text.uppercaseFirst(str);
             opt.value = str;
             recurOpt.push(opt);
@@ -464,21 +463,20 @@ function CalForm() {
     
     this.getStatusOpt = function() {
         var statusOpt = [];
-        var statusTempl = Cal.statusTemplate;
         var opt = null;
         var str = '';
         
         opt = new Object();
-        for (var i = 0; i < statusTempl.options.length; i++) {
+        for (var i in EventStatus) {
             opt = new Object();
-            str = statusTempl[statusTempl.options[i]];
-            if(str == 'fyi') {
-                opt.text = str.toUpperCase();
-                opt.value = "CANCELLED";
-            } else {
-                opt.text = Text.uppercaseFirst(str);
-                opt.value = str.toUpperCase();
+            str = EventStatus[i];
+            if(str == EventStatus.FYI) {
+                opt.text = i;
+            } 
+            else {
+                opt.text = Text.uppercaseFirst(i.toLowerCase());
             }
+            opt.value = str;
             statusOpt.push(opt);
         }
         return statusOpt;
@@ -592,16 +590,20 @@ function CalForm() {
             ev.data.status = status;
             
             var recur = form.recurrence.value;
-            var freq = Cal.recurTemplate;
             var rule = ev.data.recurrenceRule;
             // Set to no recurrence
-            Log.print('recur: ' + recur);
-            if (!recur || recur == freq.FREQUENCY_DAILY) {
+            //Log.print('recur: ' + recur);
+            if (!recur) {
                 ev.data.recurrenceRule = null;
             }
             else {
                 if (rule) {
                     rule.frequency = recur;
+                }
+                else {
+                   rule = new RecurrenceRule();
+                   rule.frequency = recur;
+                   ev.data.recurrenceRule = rule;
                 }
             }
             return true;

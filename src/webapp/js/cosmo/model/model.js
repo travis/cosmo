@@ -95,9 +95,12 @@ function RecurrenceRule(){
 }
 
 RecurrenceRule.prototype = {
-    toString: genericToString,
-    FREQUENCY_WEEKLY: "weekly",
+    toString: genericToString
+}
+
+RecurrenceRuleFrequency = {
     FREQUENCY_DAILY: "daily",
+    FREQUENCY_WEEKLY: "weekly",
     FREQUENCY_MONTHLY: "monthly",
     FREQUENCY_YEARLY: "yearly",
     FREQUENCY_BIWEEKLY: "biweekly"
@@ -166,10 +169,10 @@ Modification.prototype = {
     toString: genericToString
 }
 
-function StatusTemplate() {
-    this.CONFIRMED = "confirmed";
-    this.TENTATIVE = "tentative";
-    this.CANCELLED = "fyi";
+EventStatus = {
+    CONFIRMED: "CONFIRMED",
+    TENTATIVE: "TENTATIVE",
+    FYI: "CANCELLED"
 }
 
 function CalendarMetadata(){

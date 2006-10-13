@@ -78,11 +78,7 @@ cosmo.view.cal.dialog = new function() {
     // Publish via topics
     function doPublish(act, qual) {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
-        var obj = {};
-        obj.action = act; // Action to publish
-        obj.data = selEv || null; // Selected cal event to act on
-        if (qual) { obj.qualifier = qual; } // Action qualifier
-        dojo.event.topic.publish('/calEvent', obj);
+        dojo.event.topic.publish('/calEvent', { 'action': act, 'qualifier': qual, data: selEv });
     }
     // Call a method on the currently selected event
     // FIXME: Use topics

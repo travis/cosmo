@@ -118,8 +118,7 @@ cosmo.view.cal.canvas = new function() {
             // If no currently selected event, put selection on
             // the final one loaded
             if (!self.selectedEvent) {
-                dojo.event.topic.publish('/calEvent', { 
-                    'action': 'setSelected', 
+                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
                     'data': self.eventRegistry.getLast() });
             }
             dojo.event.topic.publish('/calEvent', { 'action': 
@@ -174,7 +173,8 @@ cosmo.view.cal.canvas = new function() {
         // Don't re-render when requests are still processing
         if (!cosmo.view.cal.processingQueue.length) {
             if (cmd.qualifier.newEvent || cmd.qualifier.onCanvas) {
-                setSelectedEvent(cosmo.view.cal.lastSent);
+                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
+                    'data': cosmo.view.cal.lastSent });
             }
             updateEventsDisplay();
         }
@@ -213,10 +213,12 @@ cosmo.view.cal.canvas = new function() {
                     opts.saveType == 'recurrenceMaster') { 
                     ev = self.eventRegistry.getAtPos(currSel);
                 }
-                setSelectedEvent(ev);
+                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
+                    'data': ev });
             }
             else {
-                setSelectedEvent(cosmo.view.cal.lastSent);
+                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
+                    'data': cosmo.view.cal.lastSent });
             }
         }
     }

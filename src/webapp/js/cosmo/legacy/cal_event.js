@@ -55,14 +55,63 @@ function CalEvent(id, block) {
      * changed before saving
      */
     this.hasChanged = function() {
-        ret = false;
-        if ((this.data.start.toUTC() != this.dataOrig.start.toUTC()) ||
-            (this.data.end.toUTC() != this.dataOrig.end.toUTC())) {
-            ret = true;
+        var d = this.data;
+        var dO = this.dataOrig;
+        var ret = [];
+        var compareDateTime = function(curr, orig) {
+            if (curr.toUTC() != orig.toUTC()) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
-        else {
-            ret = false;
+        var compareRecurrence = function(curr, orig) {
+            if (!curr && orig || curr && !orig) {
+                return true;
+            }
+            else {
+                if ((curr.frequency != orig.frequency) ||
+                    (curr.endDate != orig.endDate)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
         }
+        var compareList = {
+            'start': compareDateTime,
+            'end': compareDateTime,
+            'title': null,
+            'description': null,
+            'allDay': null,
+            'pointInTime': null,
+            'anyTime': null,
+            'recurrenceRule': compareRecurrence,
+            'status': null
+        }
+        
+        function compareVals(prop, curr, orig, f) {
+            var diff
+            var a = curr || null;
+            var b = orig || null
+            if (f) {
+                if (f(a, b)) {
+                    ret.push([prop, a, b])
+                }
+            }
+            else {
+                if (a != b) {
+                    ret.push([prop, a, b])
+                }
+            }
+        }
+        
+        for (var i in compareList) {
+            compareVals(i, d[i], dO[i], compareList[i]);
+        }
+        ret = ret.length ? ret : null;
         return ret;
     }
     /**

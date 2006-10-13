@@ -50,24 +50,15 @@ CalEventData.clone = function(data) {
         data.status,
         data.masterEvent,
         data.instance,
+        data.instanceDate,
         data.javaClass);
     return ret;
 }
-
 
 /**
  * A recurrence rule specifies how to repeat a given event.
  */
 function RecurrenceRule(){
-    /**
-     * Frequencies for recurrence.
-     */
-    this.FREQUENCY_WEEKLY = "weekly";
-    this.FREQUENCY_DAILY = "daily";
-    this.FREQUENCY_MONTHLY = "monthly";
-    this.FREQUENCY_YEARLY = "yearly";
-    this.FREQUENCY_BIWEEKLY = "biweekly";
-
     /**
      * Specifies how often to repeat this event.
      * Must be one of the frequency constants above.
@@ -104,7 +95,12 @@ function RecurrenceRule(){
 }
 
 RecurrenceRule.prototype = {
-    toString: genericToString
+    toString: genericToString,
+    FREQUENCY_WEEKLY: "weekly",
+    FREQUENCY_DAILY: "daily",
+    FREQUENCY_MONTHLY: "monthly",
+    FREQUENCY_YEARLY: "yearly",
+    FREQUENCY_BIWEEKLY: "biweekly"
 }
 
 RecurrenceRule.clone = function(rule) {
@@ -114,6 +110,13 @@ RecurrenceRule.clone = function(rule) {
         ret.frequency = rule.frequency;
         ret.endDate = rule.endDate;
         ret.customRule = rule.customRule;
+        ret.exceptionDates = [];
+        var arr = rule.exceptionDates;
+        if (arr) {
+            for (var i = 0; i < arr.length; i++) {
+                ret.exceptionDates.push(ScoobyDate.clone(arr[i]));
+            }
+        }
     }
     return ret;
 }
@@ -135,6 +138,28 @@ function Modification(){
      * The event with the modified properties. Note: only the modified properties need to be set
      */
     this.event;
+}
+
+    
+Modification.clone = function(mod) {
+    var ret = null;
+    if (mod) {
+        ret.instanceDate = mod.instanceDate;
+        ret.modifiedProperties = [];
+        var arr = mod.modifiedProperties;
+        if (arr) {
+            for (var i = 0; i < arr.length; i++) {
+                ret.modifiedProperties.push(arr[i]);
+            }
+        }
+        ret.event = new CalEventData();
+        if (mod.event) {
+            for (var i in mod.event) {
+                ret.event[i] = mod.event[i];
+            }
+        }
+    }
+    return ret;
 }
 
 Modification.prototype = {

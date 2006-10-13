@@ -70,6 +70,7 @@ function CalForm() {
                 saveCalEvent(ev);
                 break;
             case 'setSelected':
+                self.updateFromEvent(ev);
                 self.setButtons(true, true);
                 break;
             case 'saveSuccess':
@@ -144,10 +145,10 @@ function CalForm() {
         
         // Start
         this.createDateTimeInputs('Starts', 'start', d);
-
+        
         // End
         this.createDateTimeInputs('Ends', 'end', d);
-
+        
         // Event status
         this.createLabel('Status', d);
         elem = document.createElement('div');
@@ -155,7 +156,7 @@ function CalForm() {
         this.createSelect('status', 'status', null, null,
         this.getStatusOpt(), 'selectElem', elem);
         d.appendChild(elem);
-
+        
         // Recurrence
         // ------------------------
         // Recurrence date
@@ -164,17 +165,17 @@ function CalForm() {
         elem.className = 'formElem';
         this.createSelect('recurrence', 'recurrence', null, null,
         this.getRecurOpt(), 'selectElem', elem);
-
+        
         this.createNbsp(elem);
         elem.appendChild(document.createTextNode('ending'));
         this.createNbsp(elem);
-
+        
         // Recurrence ending
         elem.className = 'formElem';
         this.createInput('text', 'recurend', 'recurend',
             10, 10, null, 'inputText', elem);
         d.appendChild(elem);
-
+        
         // Details textarea
         this.createLabel(getText(
             'Main.DetailForm.Description'), d);
@@ -189,7 +190,7 @@ function CalForm() {
         formElem.style.width = '220px';
         elem.appendChild(formElem);
         d.appendChild(elem);
-
+        
         // Div elements for Remove and Save buttons
         elem = document.createElement('div');
         elem.id = 'eventDetailSave';
@@ -209,10 +210,10 @@ function CalForm() {
         elem = document.createElement('div');
         elem.className = 'clearAll';
         d.appendChild(elem);
-
+        
         cont.appendChild(d);
         info.appendChild(cont);
-
+        
         return true;
     };
     this.createDateTimeInputs = function(label, name, d) {
@@ -332,10 +333,10 @@ function CalForm() {
         var calSelectNav = document.getElementById('calSelectNav');
         var calSelectElemDiv = document.createElement('div');
         var calSelectElem = document.createElement('select');
-
+        
         calSelectElem.id = 'calSelectElem';
         calSelectElem.name = 'calSelectElem';
-
+        
         for (var i = 0; i < calendars.length; i++) {
             var calOpt = document.createElement('option');
             calOpt.value = i;
@@ -344,7 +345,7 @@ function CalForm() {
         }
         calSelectElem.className = 'selectElem';
         calSelectElemDiv.appendChild(calSelectElem);
-
+        
         calSelectNav.appendChild(calSelectElemDiv);
         leftSidebarDiv.appendChild(calSelectNav);
     };
@@ -402,7 +403,7 @@ function CalForm() {
         textbox.className = prompt? 'inputTextDim' : 'inputText';
         textbox.value = setText;
         textbox.disabled = disabled;
-
+        
     };
     /**
      * Set up the buttons for the form -- called initially on setup
@@ -429,7 +430,7 @@ function CalForm() {
             butSave = new Button('savebutton', 74,
                 saveCalEvent, getText('App.Button.Save'));
         }
-
+        
         checkElem = document.getElementById('removeButton');
         if (checkElem) {
             checkElem.parentNode.removeChild(checkElem);
@@ -446,7 +447,7 @@ function CalForm() {
         var recurTempl = Cal.recurTemplate;
         var opt = null;
         var str = '';
-
+        
         opt = new Object();
         opt.text = 'Once';
         opt.value = '';
@@ -460,13 +461,13 @@ function CalForm() {
         }
         return recurOpt;
     };
-
+    
     this.getStatusOpt = function() {
         var statusOpt = [];
         var statusTempl = Cal.statusTemplate;
         var opt = null;
         var str = '';
-
+        
         opt = new Object();
         for (var i = 0; i < statusTempl.options.length; i++) {
             opt = new Object();
@@ -505,7 +506,7 @@ function CalForm() {
         var err = '';
         var errMsg = '';
         var e = null;
-
+        
         // Pull new values out of the event info form
         startDate = form.startdate.value;
         endDate = form.enddate.value;
@@ -515,7 +516,7 @@ function CalForm() {
         descr = form.eventdescr.value;
         status = form.status.value;
         allDay = form.eventallday.checked ? true : false;
-
+        
         // Error checking
         // =======================
         if (!title) {
@@ -544,7 +545,7 @@ function CalForm() {
                 errMsg += '\n';
             }
         }
-
+        
         // Display error or update form and submit
         // =======================
         // Err condition
@@ -572,7 +573,7 @@ function CalForm() {
                 m = Cal.extractMinutesFromTime(endTime);
                 endDate.setHours(h, m);
             }
-
+            
             // Set event properties
             // ==============
             // ScoobyDate with timezones
@@ -589,6 +590,20 @@ function CalForm() {
             ev.data.description = descr;
             ev.data.allDay = allDay;
             ev.data.status = status;
+            
+            var recur = form.recurrence.value;
+            var freq = Cal.recurTemplate;
+            var rule = ev.data.recurrenceRule;
+            // Set to no recurrence
+            Log.print('recur: ' + recur);
+            if (!recur || recur == freq.FREQUENCY_DAILY) {
+                ev.data.recurrenceRule = null;
+            }
+            else {
+                if (rule) {
+                    rule.frequency = recur;
+                }
+            }
             return true;
         }
     };

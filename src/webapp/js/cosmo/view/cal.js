@@ -30,6 +30,14 @@ cosmo.view.cal = new function() {
     // Saving changes
     // =========================
     function saveEventChangesConfirm(ev) {
+        
+        // Don't bother going through the edit process if nothing 
+        // has actually changed
+        var changedProps = ev.hasChanged();
+        if (!changedProps) {
+            return false;
+        }
+        
         var recur = ev.data.recurrenceRule;
         // Recurrence is a ball-buster
         if (recur) {
@@ -67,6 +75,12 @@ cosmo.view.cal = new function() {
         }
     }
     function saveEventChanges(ev, qual) {
+        
+        // Kill any confirmation dialog that might be showing
+        if (Cal.dialog.isDisplayed) {
+            Cal.hideDialog();
+        }
+        
         var opts = self.recurringEventOptions;
         
         // Lozenge stuff
@@ -85,10 +99,6 @@ cosmo.view.cal = new function() {
         // Display processing animation
         ev.block.showProcessing();
         
-        // Kill any confirmation dialog that might be showing
-        if (Cal.dialog.isDisplayed) {
-            Cal.hideDialog();
-        }
         // Recurring event
         var f = null;
         if (qual) {
@@ -107,48 +117,66 @@ cosmo.view.cal = new function() {
                                     'qualifier': 'editExisting', 'data': ev });
                             }
                             else {
-                                var masterStart = evData.start;
-                                var masterEnd = new ScoobyDate();
-                                
-                                var origStart = ev.dataOrig.start;
-                                var newStart = ev.data.start;
-                                var minutesToEnd = ScoobyDate.diff('n', ev.data.start, ev.data.end);
-                                // Date parts for the edited instance start
-                                var mon = newStart.getMonth();
-                                var dat = newStart.getDate();
-                                var hou = newStart.getHours();
-                                var min = newStart.getMinutes();
-                                
-                                // Mod start based on edited instance
-                                switch (ev.data.recurrenceRule.frequency) {
-                                    case 'daily':
-                                        // Can't change anything but time
-                                        break;
-                                    case 'weekly':
-                                    case 'biweekly':
-                                        var diff = Date.diff('d', origStart, newStart);
-                                        masterStart.setDate(masterStart.getDate() + diff);
-                                        break;
-                                    case 'monthly':
-                                        masterStart.setDate(dat);
-                                        break;
-                                    case 'yearly':
-                                        masterStart.setMonth(mon);
-                                        masterStart.setDate(dat);
-                                        break;
+                                // Basic properties
+                                // ----------------------
+                                var changedProps = ev.hasChanged();
+                                var startOrEndChange = false;
+                                for (var i = 0; i < changedProps.length; i++) {
+                                    var propName = changedProps[i][0];
+                                    var propVal = changedProps[i][1];
+                                    if (propName == 'start' || propName == 'end') {
+                                        startOrEndChange = true;
+                                    }
+                                    else {
+                                        evData[propName] = propVal;
+                                    }
                                 }
-                                // Always set time
-                                masterStart.setHours(hou);
-                                masterStart.setMinutes(min);
-                                
-                                masterEnd = ScoobyDate.clone(masterStart);
-                                masterEnd.add('n', minutesToEnd);
-                                evData.end.setYear(masterEnd.getFullYear());
-                                evData.end.setMonth(masterEnd.getMonth());
-                                evData.end.setDate(masterEnd.getDate());
-                                evData.end.setHours(masterEnd.getHours());
-                                evData.end.setMinutes(masterEnd.getMinutes());
-                                masterEnd = evData.end;
+                                // Start and end
+                                // ----------------------
+                                if (startOrEndChange) {
+                                    var masterStart = evData.start;
+                                    var masterEnd = new ScoobyDate();
+                                    
+                                    var origStart = ev.dataOrig.start;
+                                    var newStart = ev.data.start;
+                                    var minutesToEnd = ScoobyDate.diff('n', ev.data.start, ev.data.end);
+                                    // Date parts for the edited instance start
+                                    var mon = newStart.getMonth();
+                                    var dat = newStart.getDate();
+                                    var hou = newStart.getHours();
+                                    var min = newStart.getMinutes();
+                                    
+                                    // Mod start based on edited instance
+                                    switch (ev.data.recurrenceRule.frequency) {
+                                        case 'daily':
+                                            // Can't change anything but time
+                                            break;
+                                        case 'weekly':
+                                        case 'biweekly':
+                                            var diff = Date.diff('d', origStart, newStart);
+                                            masterStart.setDate(masterStart.getDate() + diff);
+                                            break;
+                                        case 'monthly':
+                                            masterStart.setDate(dat);
+                                            break;
+                                        case 'yearly':
+                                            masterStart.setMonth(mon);
+                                            masterStart.setDate(dat);
+                                            break;
+                                    }
+                                    // Always set time
+                                    masterStart.setHours(hou);
+                                    masterStart.setMinutes(min);
+                                    
+                                    masterEnd = ScoobyDate.clone(masterStart);
+                                    masterEnd.add('n', minutesToEnd);
+                                    evData.end.setYear(masterEnd.getFullYear());
+                                    evData.end.setMonth(masterEnd.getMonth());
+                                    evData.end.setDate(masterEnd.getDate());
+                                    evData.end.setHours(masterEnd.getHours());
+                                    evData.end.setMinutes(masterEnd.getMinutes());
+                                    masterEnd = evData.end;
+                                }
                                 
                                 // doSaveEvent expects a CalEvent with attached CalEventData
                                 var saveEv = new CalEvent();
@@ -176,7 +204,8 @@ cosmo.view.cal = new function() {
                         'originalEvent': ev, 'recurEnd': recurEnd }); };
                     break;
                 case opts.ONLY_THIS_EVENT:
-                    
+                    alert('Yay!');
+                    return;
                     break;
                 default:
                     // Do nothing

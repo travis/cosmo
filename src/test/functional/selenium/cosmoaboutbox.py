@@ -16,10 +16,11 @@ from pyselenium import seleniumunittest
 import time, re
 
 class CosmoAboutBox(seleniumunittest.SeleniumTestCase):
-    
+    """Cosmo About Box Test Case"""
     def test_cosmo(self):
+        """Main test method for cosmo about box testing"""
         sel = self.selenium
-        sel.click("link=About Scooby")
+        sel.click("link=About Cosmo")
         time.sleep(2)
 
     

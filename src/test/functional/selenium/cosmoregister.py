@@ -16,10 +16,11 @@ from pyselenium import seleniumunittest
 import time
 
 class CosmoRegister(seleniumunittest.SeleniumTestCase):
-
+    """Registration test case"""
     _registration_ = True
-
+    
     def test_cosmo(self):
+        """Main registration test"""
         sel = self.selenium
         sel.open("/")
         sel.click(link='Create an Account')
@@ -35,7 +36,10 @@ class CosmoRegister(seleniumunittest.SeleniumTestCase):
         self.account_created = True
         
     def tearDown(self):
+        """Teardown must remove user account"""
         import httplib, base64
+        
+        seleniumunittest.SeleniumTestCase.tearDown(self)
         
         # Create auth headers. If self.rootpass is set then use that, if not default to cosmo default rootpass
         if hasattr(self, 'rootpass'):
@@ -53,17 +57,17 @@ class CosmoRegister(seleniumunittest.SeleniumTestCase):
             address[1] = int(address[1].strip('/'))
         else:
             address = [striped.strip('/'), 80]
-        
         connection = httplib.HTTPConnection(address[0], address[1])
-        path = '/cmp/user/%s/' % self.userinfo['username']
-        connection.request('DELETE', path, body=None, headers={"Authorization": auth})
+        
+        headers = {"Authorization": auth}
+        path = '/cosmo/cmp/user/%s' % self.userinfo['username']
+        connection.request('DELETE', path, body=None, headers=headers)
         response = connection.getresponse()
         if response.status != 204:
             raise 'Failed to remove user account \n Status: %s' % response.status
         
-        seleniumunittest.SeleniumTestCase.tearDown(self)
 
-if __name__ == "__main__":
-    import sys
-    seleniumunittest.main([sys.argv[0]], options={'server':'~/tmp/selenium-remote-control-0.8.1/server/selenium-server.jar',
-                                                  'username':'test0', 'password':'testpass'})
+# if __name__ == "__main__":
+#     import sys
+#     seleniumunittest.main([sys.argv[0]], options={'server':'~/tmp/selenium-remote-control-0.8.1/server/selenium-server.jar',
+#                                                   'username':'test', 'password':'testpass'})

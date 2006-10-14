@@ -16,10 +16,11 @@ from pyselenium import seleniumunittest
 import time, re
 
 class CosmoAuth(seleniumunittest.SeleniumTestCase):
-    
+    """Cosmo Authorization Test Case"""
     _authorization_ = True
 
     def test_cosmo(self):
+        """Main method for authorization to cosmo"""
         sel = self.selenium
         sel.open("/")
         sel.waitForPageToLoad(3 * 1000) # Wait 3 seconds

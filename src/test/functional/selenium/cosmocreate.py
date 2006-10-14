@@ -19,7 +19,7 @@ class CosmoCreate(seleniumunittest.SeleniumTestCase):
 
     def test_cosmo(self):
         sel = self.selenium
-        sel.open("/scooby/main.page")
+        sel.open("/pim/pim.page")
         time.sleep(2)
         sel.dblclick("id=hourDiv1-1300")
         time.sleep(1)

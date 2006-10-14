@@ -12,9 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from pyselenium import seleniumtestrunner
+from pyselenium import seleniumunittest
 
 if __name__ == "__main__":
     
-    print dir(seleniumtestrunner)
-    seleniumtestrunner.main()
+    seleniumunittest.main(options={'server': '~/tmp/selenium-remote-control-0.8.1/server/selenium-server.jar',
+                                   'selenium' : '~/Documents/projects/tools/selenium/core'},
+                          )
+                                   

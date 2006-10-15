@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="index.html">
+
+  &project;
+
+  <properties>
+    <title>Documentation Index</title>
+  </properties>
+
+<body>
+
+<section name="Introduction">
+
+<p>This is the top-level entry point of the documentation bundle for the
+	<strong>Cosmo</strong> sharing server.
+</p> 
+
+</section>
+
+<section name="What is Cosmo?">
+
+<p>Cosmo is a calendar server. With your favorite calendar program
+(Chandler, Apple iCal, Mozilla Sunbird, or any other WebDAV or CalDAV
+enabled client), you can share your calendar with other people by
+publishing it to Cosmo. Once your calendar is stored on the server,
+you can give permission for others to subscribe to it, and even modify
+it if their calendar client allows.
+</p>
+
+<p>Cosmo is a file server. You can store arbitrary files in your home
+directory in Cosmo with any WebDAV client (including the Windows XP,
+Linux and Apple OS X file managers), and you can share them with
+others in the same way as your calendar.
+</p>
+
+<p>Cosmo is not a web-based personal information manager. It is a server
+that such an application could use to store and access many users'
+information over the Internet. OSAF's Scooby project aims to provide
+an innovative web interface for calendaring and will be tightly
+integrated with Cosmo.
+</p>
+
+<p>Cosmo is not a content management system. There is no support for
+common CMS features such as versioning, content editing or
+workflow. Cosmo very simply allows calendar and file management
+applications to publish and subscribe to a content repository.
+</p>
+
+</section>
+
+<section name="Reference">
+<ul>
+<li><a href="README.txt"><strong>README</strong></a></li>
+<li><a href="http://cosmo.osafoundation.org/release_notes.php"><strong>Release notes</strong></a></li>
+<li><a href="apidocs/index.html"><strong>API Documentation</strong></a></li>
+<li><a href="http://wiki.osafoundation.org/bin/view/Documentation/ServerBundleInstallation"><strong>Installation Help</strong></a></li>
+<li><a href="http://cosmo.osafoundation.org/clientsetup.php"><strong>Client Setup</strong></a></li>
+<li><a href="http://wiki.osafoundation.org/bin/view/Projects/CosmoFAQ"><strong>FAQ</strong></a></li>
+<li><a href="http://lists.osafoundation.org/mailman/listinfo/cosmo-dev"><strong>Mailing List</strong></a></li>
+</ul>
+</section>
+
+<section name="Licensing">
+<p>
+Cosmo is available under the terms of the <a href="http://apache.org/licenses/LICENSE-2.0">Apache Software License, Version 2.0</a>.
+</p>
+<ul>
+<li><a href="LICENSE.txt"><strong>LICENSE</strong></a></li>
+<li><a href="NOTICE.txt"><strong>NOTICE</strong></a></li>
+<li><a href="license"><strong>other licenses</strong></a></li>
+</ul>
+</section>
+
+</body>
+</document>

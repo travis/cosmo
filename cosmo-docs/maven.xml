@@ -20,14 +20,40 @@
 
   <postGoal name="war:webapp">
     <attainGoal name="javadoc"/>
+    <attainGoal name="generateIndex"/>
     <maven:get var="target" property="maven.war.webapp.dir" plugin="maven-war-plugin" />
     <copy todir="${target}">
       <!-- copy api docs -->
       <fileset dir="${basedir}/target/docs"/>
       <!-- copy license, README.txt, NOTICE.txt, LICENSE.TXT -->
-      <fileset dir="${basedir}/../src/docs"/>
+      <fileset dir="${basedir}/../src/docs">
+        <exlude name="presentations"/>
+      </fileset>
     </copy>
   </postGoal>
+
+  <!-- Generate index.html that contains project info and links -->
+  <goal name="generateIndex">
+    <maven:get var="target" property="maven.war.webapp.dir" plugin="maven-war-plugin" />
+    <mkdir dir="${target}/printer" />
+    <style basedir="${basedir}/src/main"
+           destdir="${target}"
+         extension=".html"
+             style="${basedir}/src/main/cosmo-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="."/>
+    </style>
+    <style basedir="${basedir}/src/main"
+           destdir="${target}/printer"
+         extension=".html"
+             style="${basedir}/src/main/cosmo-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="./.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+  </goal>
 
   <goal name="java:compile">
     <!-- Override to do nothing -->

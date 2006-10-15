@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Cosmo Documentation - Top Level Directory"
+        href="http://cosmo.osafoundation.org/">
+
+    <title>Cosmo 0.5-SNAPSHOT</title>
+
+    <logo href="/cosmo_logo.gif">
+      The Cosmo Sharing Server
+    </logo>
+
+
+    <body>
+
+    <menu name="Links">
+        <item name="Docs Home"             href="index.html"/>
+    </menu>
+
+    <menu name="Reference">
+        <item name="README"                href="README.txt"/>
+        <item name="Release Notes"         href="http://cosmo.osafoundation.org/release_notes.php"/>
+        <item name="API Docs"              href="apidocs/index.html"/>
+        <item name="Install Help"          href="http://wiki.osafoundation.org/bin/view/Documentation/ServerBundleInstallation"/>
+        <item name="Client Setup"          href="http://cosmo.osafoundation.org/clientsetup.php"/>
+        <item name="FAQ"                   href="http://wiki.osafoundation.org/bin/view/Projects/CosmoFAQ"/>
+        <item name="Mailing List"          href="http://lists.osafoundation.org/mailman/listinfo/cosmo-dev"/>
+    </menu>
+
+    <menu name="Licensing">
+        <item name="NOTICE"                 href="NOTICE.txt"/>
+        <item name="LICENSE"                href="LICENSE.txt"/>
+        <item name="other liceneses"        href="license"/>
+    </menu>
+
+    </body>
+
+</project>

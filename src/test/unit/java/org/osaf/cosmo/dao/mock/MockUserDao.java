@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.apache.commons.id.uuid.VersionFourGenerator;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
@@ -38,12 +39,16 @@ public class MockUserDao implements UserDao {
 
     private HashMap usernameIdx;
     private HashMap emailIdx;
+    private HashMap uidIdx;
+    
+    private VersionFourGenerator idGenerator = new VersionFourGenerator();
 
     /**
      */
     public MockUserDao() {
         usernameIdx = new HashMap();
         emailIdx = new HashMap();
+        uidIdx = new HashMap();
 
         // add overlord user
         User overlord = new User();
@@ -89,6 +94,15 @@ public class MockUserDao implements UserDao {
         }
         return (User) usernameIdx.get(username);
     }
+    
+    /**
+     */
+    public User getUserByUid(String uid) {
+        if (uid == null) {
+            throw new IllegalArgumentException("null uid");
+        }
+        return (User) uidIdx.get(uid);
+    }
 
     /**
      */
@@ -105,6 +119,10 @@ public class MockUserDao implements UserDao {
         if (user == null) {
             throw new IllegalArgumentException("null user");
         }
+        
+        // set unique id
+        user.setUid(idGenerator.nextIdentifier().toString());
+        
         user.validate();
         if (usernameIdx.containsKey(user.getUsername())) {
             throw new DuplicateUsernameException("username in use");
@@ -112,8 +130,10 @@ public class MockUserDao implements UserDao {
         if (emailIdx.containsKey(user.getEmail())) {
             throw new DuplicateEmailException("email in use");
         }
+        
         usernameIdx.put(user.getUsername(), user);
         emailIdx.put(user.getEmail(), user);
+        uidIdx.put(user.getUid(), user);
         return user;
     }
 

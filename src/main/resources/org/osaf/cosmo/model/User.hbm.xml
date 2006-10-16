@@ -27,8 +27,11 @@
         <id name="id" column="id" unsaved-value="-1">
             <generator class="native" />
         </id>
+        <property name="uid" type="string">
+            <column name="uid" unique="true" not-null="true" index="idx_useruid"/>
+        </property>
         <property name="username" type="string">
-            <column name="username" index="idx_username"/>
+            <column name="username" unique="true" not-null="true" index="idx_username"/>
         </property>
         <property name="password" type="string">
             <column name="password"/>
@@ -40,7 +43,7 @@
             <column name="lastname"/>
         </property>
         <property name="email" type="string">
-            <column name="email" index="idx_useremail"/>
+            <column name="email" unique="true" not-null="true" index="idx_useremail"/>
         </property>
         <property name="admin" type="boolean">
             <column name="admin"/>
@@ -53,13 +56,14 @@
         </property>
         
         <set name="items" table="items" inverse="true" lazy="true" cascade="delete">
-			<key column="ownerid" />
-			<one-to-many class="Item" />
-		</set>
+            <key column="ownerid" />
+            <one-to-many class="Item" />
+        </set>
         
     </class>
     
     <query name="user.byUsername">from User where username=:username</query>
     <query name="user.byEmail">from User where email=:email</query>
+    <query name="user.byUid">from User where uid=:uid</query>
     
 </hibernate-mapping>

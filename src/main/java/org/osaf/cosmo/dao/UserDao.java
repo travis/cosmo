@@ -52,6 +52,16 @@ public interface UserDao extends Dao {
      * exist
      */
     public User getUser(String username);
+    
+    /**
+     * Returns the user account identified by the given uid.
+     *
+     * @param uid the username of the account to return
+     *
+     * @throws DataRetrievalFailureException if the account does not
+     * exist
+     */
+    public User getUserByUid(String uid);
 
     /**
      * Returns the user account identified by the given email address.

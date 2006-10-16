@@ -103,6 +103,7 @@ public class User extends BaseModelObject {
      */
     public static final String DEFAULT_SORT_STRING = NAME_SORT_STRING;
 
+    private String uid;
     private String username;
     private String oldUsername;
     private String password;
@@ -119,6 +120,20 @@ public class User extends BaseModelObject {
      */
     public User() {
         admin = Boolean.FALSE;
+    }
+
+    /**
+     * @return
+     */
+    public String getUid() {
+        return uid;
+    }
+
+    /**
+     * @param uid
+     */
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     /**

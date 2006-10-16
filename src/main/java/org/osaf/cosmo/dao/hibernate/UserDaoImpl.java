@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.id.IdentifierGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -46,8 +47,9 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
     private static final Log log = LogFactory.getLog(UserDaoImpl.class);
 
-    private static final QueryCriteriaBuilder queryCriteriaBuilder =
-        new UserQueryCriteriaBuilder();
+    private IdentifierGenerator idGenerator;
+
+    private static final QueryCriteriaBuilder queryCriteriaBuilder = new UserQueryCriteriaBuilder();
 
     public User createUser(User user) {
 
@@ -58,22 +60,32 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             if (getUserByEmail(user.getEmail()) != null)
                 throw new DuplicateEmailException(user.getEmail());
 
-            
             user.setDateCreated(new Date());
             user.setDateModified(new Date());
-            
+
+            if (user.getUid() == null || "".equals(user.getUid()))
+                user.setUid(getIdGenerator().nextIdentifier().toString());
+
             getSession().save(user);
             return user;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
-        } 
+        }
 
     }
 
     public User getUser(String username) {
 
         try {
-           return findUserByUsername(username);
+            return findUserByUsername(username);
+        } catch (HibernateException e) {
+            throw SessionFactoryUtils.convertHibernateAccessException(e);
+        }
+    }
+
+    public User getUserByUid(String uid) {
+        try {
+            return findUserByUid(uid);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -91,40 +103,40 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         try {
             HashSet<User> users = new HashSet<User>();
             Iterator it = getSession().createQuery("from User").iterate();
-            while(it.hasNext())
+            while (it.hasNext())
                 users.add((User) it.next());
-            
+
             return users;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
-        } 
+        }
     }
 
     public PagedList getUsers(PageCriteria pageCriteria) {
         try {
-            Criteria crit = queryCriteriaBuilder.
-                buildQueryCriteria(getSession(), pageCriteria);
+            Criteria crit = queryCriteriaBuilder.buildQueryCriteria(
+                    getSession(), pageCriteria);
             List results = crit.list();
-            
+
             // Need the total
-            Integer size = (Integer) getSession().
-                createQuery("select count(*) from User").uniqueResult();
+            Integer size = (Integer) getSession().createQuery(
+                    "select count(*) from User").uniqueResult();
 
             return new ArrayPagedList(pageCriteria, results, size);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
-        } 
+        }
     }
 
     public void removeUser(String username) {
         try {
             User user = findUserByUsername(username);
             // delete user
-            if(user!=null)
+            if (user != null)
                 getSession().delete(user);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
-        } 
+        }
     }
 
     public void removeUser(User user) {
@@ -132,11 +144,12 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             getSession().delete(user);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
-        } 
+        }
     }
 
     public User updateUser(User user) {
         try {
+            user.setDateModified(new Date());
             getSession().save(user);
             return user;
         } catch (HibernateException e) {
@@ -150,8 +163,17 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     }
 
     public void init() {
-        // TODO Auto-generated method stub
+        if (idGenerator == null) {
+            throw new IllegalStateException("idGenerator is required");
+        }
+    }
 
+    public IdentifierGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
+    public void setIdGenerator(IdentifierGenerator idGenerator) {
+        this.idGenerator = idGenerator;
     }
 
     private User findUserByUsername(String username) {
@@ -178,8 +200,20 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             return null;
     }
 
-    private static class UserQueryCriteriaBuilder
-        extends StandardQueryCriteriaBuilder {
+    private User findUserByUid(String uid) {
+        Session session = getSession();
+        Query hibQuery = session.getNamedQuery("user.byUid").setParameter(
+                "uid", uid);
+        hibQuery.setCacheable(true);
+        List users = hibQuery.list();
+        if (users.size() > 0)
+            return (User) users.get(0);
+        else
+            return null;
+    }
+
+    private static class UserQueryCriteriaBuilder extends
+            StandardQueryCriteriaBuilder {
 
         public UserQueryCriteriaBuilder() {
             super(User.class);
@@ -210,11 +244,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             return orders;
         }
 
-        private Order createOrder(PageCriteria pageCriteria,
-                                  String property) {
-            return pageCriteria.isSortAscending() ?
-                Order.asc(property) :
-                Order.desc(property);
+        private Order createOrder(PageCriteria pageCriteria, String property) {
+            return pageCriteria.isSortAscending() ? Order.asc(property) : Order
+                    .desc(property);
         }
     }
+
 }

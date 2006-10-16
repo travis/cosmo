@@ -164,7 +164,7 @@
   </bean>
 
   <bean id="idGenerator"
-        class="org.apache.commons.id.random.SessionIdGenerator" />
+        class="org.apache.commons.id.uuid.VersionFourGenerator" />
 
   <bean id="txItemDao" parent="txProxyTemplate">
     <property name="proxyInterfaces">
@@ -247,6 +247,9 @@
         destroy-method="destroy">
     <property name="sessionFactory">
       <ref bean="sessionFactory" />
+    </property>
+    <property name="idGenerator">
+      <ref local="idGenerator" />
     </property>
   </bean>
 

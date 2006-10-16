@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.id.StringIdentifierGenerator;
+import org.apache.commons.id.IdentifierGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
@@ -32,17 +32,17 @@ import org.hibernate.Query;
 import org.hibernate.UnresolvableObjectException;
 import org.osaf.cosmo.dao.ItemDao;
 import org.osaf.cosmo.model.Attribute;
+import org.osaf.cosmo.model.CalendarItem;
 import org.osaf.cosmo.model.CalendarPropertyIndex;
 import org.osaf.cosmo.model.CalendarTimeRangeIndex;
-import org.osaf.cosmo.model.CalendarItem;
-import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ModelValidationException;
-import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.User;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -54,7 +54,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
 
     private static final Log log = LogFactory.getLog(ItemDaoImpl.class);
 
-    private StringIdentifierGenerator idGenerator;
+    private IdentifierGenerator idGenerator;
 
     private ItemPathTranslator itemPathTranslator = null;
 
@@ -224,7 +224,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
                 throw new IllegalArgumentException("invalid item");
 
             if (ticket.getKey() == null)
-                ticket.setKey(getIdGenerator().nextStringIdentifier());
+                ticket.setKey(getIdGenerator().nextIdentifier().toString());
 
             ticket.setCreated(new Date());
             item.addTicket(ticket);
@@ -335,7 +335,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     public void createTicket(Item item, Ticket ticket) {
         try {
             if(ticket.getKey()==null)
-                ticket.setKey(idGenerator.nextStringIdentifier());
+                ticket.setKey(idGenerator.nextIdentifier().toString());
             getSession().refresh(item);
             ticket.setCreated(new Date());
             item.addTicket(ticket);
@@ -468,11 +468,11 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
      *
      * @param idGenerator
      */
-    public void setIdGenerator(StringIdentifierGenerator idGenerator) {
+    public void setIdGenerator(IdentifierGenerator idGenerator) {
         this.idGenerator = idGenerator;
     }
 
-    public StringIdentifierGenerator getIdGenerator() {
+    public IdentifierGenerator getIdGenerator() {
         return idGenerator;
     }
 
@@ -602,7 +602,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
 
     // Set server generated item properties
     protected void setBaseItemProps(Item item) {
-        item.setUid(idGenerator.nextStringIdentifier());
+        item.setUid(idGenerator.nextIdentifier().toString());
         
         // make precision seconds because of MySQL datetime
         long currTime = (System.currentTimeMillis() / 1000) * 1000;

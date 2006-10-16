@@ -59,7 +59,73 @@
     <defaultCache
         maxElementsInMemory="10000"
         eternal="false"
-        overflowToDisk="true"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="600"
+        diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="120"
+        />
+
+    <cache
+        name="org.osaf.cosmo.model.User"
+        maxElementsInMemory="5000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="600"
+        timeToLiveSeconds="600"
+        diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="120"
+        />
+
+    <cache
+        name="org.osaf.cosmo.model.Item"
+        maxElementsInMemory="10000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="600"
+        diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="120"
+        />
+
+    <cache
+        name="org.osaf.cosmo.model.Attribute"
+        maxElementsInMemory="20000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="600"
+        diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="120"
+        />
+
+    <cache
+        name="org.osaf.cosmo.model.DictionaryAttribute.value"
+        maxElementsInMemory="5000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="600"
+        diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="120"
+        />
+
+    <cache
+        name="org.osaf.cosmo.model.MultiValueStringAttribute.value"
+        maxElementsInMemory="5000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="600"
+        diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="120"
+        />
+
+    <cache
+        name="org.osaf.cosmo.model.Item.attributes"
+        maxElementsInMemory="10000"
+        eternal="false"
+        overflowToDisk="false"
         timeToIdleSeconds="300"
         timeToLiveSeconds="600"
         diskPersistent="false"
@@ -68,10 +134,16 @@
 
     <cache
         name="org.hibernate.cache.StandardQueryCache"
-        maxElementsInMemory="10000"
+        maxElementsInMemory="2000"
         eternal="false"
-        timeToLiveSeconds="120"
-        overflowToDisk="true"
+        timeToLiveSeconds="180"
+        overflowToDisk="false"
         />
+
+    <cache
+        name="org.hibernate.cache.UpdateTimestampsCache"
+        maxElementsInMemory="5000"
+        eternal="true"
+        overflowToDisk="true"/>
 
 </ehcache>

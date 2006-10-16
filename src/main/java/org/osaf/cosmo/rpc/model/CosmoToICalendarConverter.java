@@ -126,6 +126,7 @@ public class CosmoToICalendarConverter {
     public void updateEvent(Event event, Calendar calendar) {
         VEvent vevent = getMasterVEvent(calendar);
         copyProperties(event, vevent);
+        addModificationsToCalendar(calendar, vevent, event);
     }
 
     /**
@@ -329,6 +330,9 @@ public class CosmoToICalendarConverter {
                 
                 vevent.getProperties().add(exDate);
             }
+        } else if (recurrenceRule == null) {
+            removeProperty(vevent, Property.RRULE);
+            removeProperty(vevent, Property.EXDATE);
         }
     }
 
@@ -472,13 +476,36 @@ public class CosmoToICalendarConverter {
         PropertyList l = c.getProperties().getProperties(propName);
         return l != null && l.size() > 0;
     }
+    
+    private void removeInstances(Calendar calendar){
+        for (Object o : calendar.getComponents()
+                .getComponents(Component.VEVENT)) {
+            VEvent vevent = (VEvent) o;
+            if (hasProperty(vevent, Property.RECURRENCE_ID)){
+                calendar.getComponents().remove(vevent);
+            }
+
+        }
+    }
+    
     private void addModificationsToCalendar(Calendar calendar,
             VEvent masterVEvent, Event event) {
-        if (event.getRecurrenceRule() == null
-                || StringUtils.isNotBlank(event.getRecurrenceRule()
-                        .getCustomRule())) {
+       
+        boolean isCustom = event.getRecurrenceRule() != null
+                && StringUtils.isNotBlank(event.getRecurrenceRule()
+                        .getCustomRule());
+        
+        if (isCustom){
             return;
         }
+
+        //no matter what we need to blow away modifications
+        removeInstances(calendar);
+        
+        if (event.getRecurrenceRule() == null){
+            return;
+        }
+
         DtStart dtStart = masterVEvent.getStartDate();
         RecurrenceRule recurrenceRule = event.getRecurrenceRule();
         Modification[] modifications = recurrenceRule.getModifications();

@@ -68,6 +68,8 @@
                directory="../logs" prefix="access." suffix=".log"
                pattern="combined" resolveHosts="false"/>
         <Context path="" docBase="ROOT" reloadable="false"/>
+        <Context path="/cosmo-docs" docBase="cosmo-docs-0.5-SNAPSHOT.war" 
+               reloadable="false"/>
         <Context path="/cosmo" docBase="cosmo-0.5-SNAPSHOT.war"
                  reloadable="false">
           <Environment name="cosmo/config" value="file:etc/cosmo.properties"

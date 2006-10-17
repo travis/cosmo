@@ -64,6 +64,14 @@
       <type>war</type>
     </dependency>
     <dependency>
+      <groupId>org.osaf.cosmo</groupId>
+      <artifactId>cosmo-docs</artifactId>
+      <!-- when you update this version, you must also update it in
+           src/main/config/server.xml -->
+      <version>0.5-SNAPSHOT</version>
+      <type>war</type>
+    </dependency>
+    <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
       <version>2.7.0</version> 

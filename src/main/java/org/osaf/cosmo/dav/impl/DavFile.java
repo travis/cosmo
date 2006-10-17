@@ -225,7 +225,8 @@ public class DavFile extends DavResourceBase {
                 // content length
                 content.setContent(inputContext.getInputStream());
             } catch (IOException e) {
-                throw new RuntimeException("cannot read input stream", e);
+                log.error("Cannot read resource content", e);
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "Cannot read resource content: " + e.getMessage());
             } catch (DataSizeException e) {
                 throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource content: " + e.getMessage());
             }

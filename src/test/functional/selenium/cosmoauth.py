@@ -25,8 +25,15 @@ class CosmoAuth(seleniumunittest.SeleniumTestCase):
         sel.open("/")
         sel.waitForPageToLoad(3 * 1000) # Wait 3 seconds
         sel.clickAndWait(link="Log in to Cosmo")
-        # sel.wait_for_page_to_load("30000")
         sel.type("j_username", self.userinfo['username'])
         sel.type("j_password", self.userinfo['password'])
         sel.clickAndWait(id="submitButtonText")
         self.authorized = True
+
+if __name__ == "__main__":
+
+    from pyselenium import seleniumunittest
+    seleniumunittest.main(options={#'server': '~/tmp/selenium-remote-control-0.8.2-SNAPSHOT/server/selenium-server.jar',
+                                   'selenium' : '~/Documents/projects/tools/selenium',},
+                          testfiles=('cosmoregister.py', 'cosmoauth.py', 'cosmocreatemove.py'),
+                          )

@@ -19,12 +19,28 @@ class CosmoCreateMove(seleniumunittest.SeleniumTestCase):
     
     def test_cosmo(self):
         sel = self.selenium
-        sel.open("/scooby/main.page")
-        sel.dblclick("id=hourDiv0-900")
+        sel.open("/cosmo/pim/pim.page")
+        sel.dblclick(id='hourDiv0-900')
         time.sleep(2)
-        did = sel.get_eval("this.browserbot.getCurrentWindow().Cal.eventRegistry.getFirst().id")
-        sel.dragdrop_div_cosmo("id=eventDivContent__${did}", "id=hourDiv4-1200")
+        sel.storeId('first', 'did')
+        sel.dragdropDivCosmo('id=eventDivContent__${did}', 'id=hourDiv4-1200')
         time.sleep(2)
-        sel.dragdrop_div_cosmo("id=eventDivContent__${did}", "id=hourDiv1-900")
         time.sleep(2)
-        sel.dragdrop_div_cosmo("id=eventDivContent__${did}", "id=hourDiv5-1400")
+        sel.verifyValue('id=starttime', '12:00')
+        # sel.verifyValue('1:00', id='endtime')
+        # sel.verifyValue('10/19/2006', id='startdate')
+        # sel.verifyValue('10/19/2006', id='enddate')
+        time.sleep(2)
+        sel.storeId('first', 'did')
+        sel.dragdropDivCosmo('id=eventDivContent__${did}', 'id=hourDiv1-1400')
+        time.sleep(2)
+        sel.storeId('first', 'did')
+        sel.dragdropDivCosmo('id=eventDivContent__${did}', 'id=hourDiv5-1400')
+        
+if __name__ == "__main__":
+    
+    from pyselenium import seleniumunittest
+    seleniumunittest.main(options={#'server': '~/tmp/selenium-remote-control-0.8.2-SNAPSHOT/server/selenium-server.jar',
+                                   'selenium' : '~/Documents/projects/tools/selenium',},
+                          testfiles=('cosmoregister.py', 'cosmoauth.py', 'cosmocreatemove.py'),
+                          )

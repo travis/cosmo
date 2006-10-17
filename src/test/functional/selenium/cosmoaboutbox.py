@@ -23,4 +23,10 @@ class CosmoAboutBox(seleniumunittest.SeleniumTestCase):
         sel.click("link=About Cosmo")
         time.sleep(2)
 
-    
+if __name__ == "__main__":
+
+    from pyselenium import seleniumunittest
+    seleniumunittest.main(options={#'server': '~/tmp/selenium-remote-control-0.8.2-SNAPSHOT/server/selenium-server.jar',
+                                   'selenium' : '~/Documents/projects/tools/selenium',},
+                          testfiles=('cosmoregister.py', 'cosmoauth.py', 'cosmocreatemove.py'),
+                          )

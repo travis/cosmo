@@ -16,7 +16,7 @@ from pyselenium import seleniumunittest
 
 if __name__ == "__main__":
     
-    seleniumunittest.main(options={'server': '~/tmp/selenium-remote-control-0.8.1/server/selenium-server.jar',
-                                   'selenium' : '~/Documents/projects/tools/selenium/core'},
+    seleniumunittest.main(options={#'server': '~/tmp/selenium-remote-control-0.8.2-SNAPSHOT/server/selenium-server.jar',
+                                   'selenium' : '~/Documents/projects/tools/selenium'},
                           )
                                    

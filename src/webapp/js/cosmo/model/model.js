@@ -101,9 +101,9 @@ RecurrenceRule.prototype = {
 RecurrenceRuleFrequency = {
     FREQUENCY_DAILY: "daily",
     FREQUENCY_WEEKLY: "weekly",
+    FREQUENCY_BIWEEKLY: "biweekly",
     FREQUENCY_MONTHLY: "monthly",
-    FREQUENCY_YEARLY: "yearly",
-    FREQUENCY_BIWEEKLY: "biweekly"
+    FREQUENCY_YEARLY: "yearly"
 }
 
 RecurrenceRule.clone = function(rule) {

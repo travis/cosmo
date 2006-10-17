@@ -83,7 +83,7 @@ cosmo.view.cal.canvas = new function() {
         self.eventRegistry = new Hash();
         return true;
     }
-    function removeEventRecurrenceGroup(reg, arr, dt) {
+    function removeEventRecurrenceGroup(reg, arr, dt, ignore) {
         // Default behavior is to remove the lozenge
         var str = ',' + arr.join() + ',';
         var h = new Hash();
@@ -97,7 +97,9 @@ cosmo.view.cal.canvas = new function() {
             if (compDt && (ev.data.start.toUTC() < compDt.toUTC())) {
                 removeForDate = false;
             }
-            if ((str.indexOf(',' + ev.data.id + ',') == -1) || !removeForDate) {
+            if ((str.indexOf(',' + ev.data.id + ',') == -1) || 
+                !removeForDate ||
+                ev.id == ignore) {
                 h.setItem(ev.id, ev);
             }
         }
@@ -158,16 +160,25 @@ cosmo.view.cal.canvas = new function() {
     }
     function saveSuccess(cmd) {
         var ev = cmd.data;
+        var opts = cmd.opts;
         // Updating existing
         if (!cmd.qualifier.newEvent) {
-            // Changes have placed the saved event off-canvas
-            if (!cmd.qualifier.onCanvas) {
-                removeEvent(ev);
+            if (opts.saveType == 'recurrenceMasterRemoveRecurrence') {
+                var h = self.eventRegistry.clone();
+                h = removeEventRecurrenceGroup(h, [ev.data.id], null, ev.id);
+                removeAllEvents();
+                self.eventRegistry = h;
+                self.eventRegistry.each(appendLozenge);
             }
+            
             // Saved event is still in view
-            else {
+            if (cmd.qualifier.onCanvas) {
                 ev.setInputDisabled(false);
                 ev.block.updateDisplayMain();
+            }
+            // Changes have placed the saved event off-canvas
+            else {
+                removeEvent(ev);
             }
         }
         // Don't re-render when requests are still processing
@@ -192,8 +203,11 @@ cosmo.view.cal.canvas = new function() {
         }
         else if (opts.saveType == 'instanceAllFuture') {
             h = removeEventRecurrenceGroup(h, idArr, opts.recurEnd);
-            // Remove the original dragged event lozenge -- the new master
-            // will be in the recurrence expansion from the server
+        }
+        // Remove the original dragged event lozenge -- the new master
+        // will be in the recurrence expansion from the server
+        if (opts.saveType == 'instanceAllFuture' || 
+            opts.saveType == 'singleEventAddRecurrence') {
             h.removeItem(opts.originalEvent.id);
         }
         h.append(evReg);

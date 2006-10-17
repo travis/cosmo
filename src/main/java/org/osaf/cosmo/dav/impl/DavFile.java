@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
@@ -220,17 +222,28 @@ public class DavFile extends DavResourceBase {
         ContentItem content = (ContentItem) getItem();
 
         if (inputContext.hasStream()) {
+            // read to tmp file, checking bytes read against content
+            // length if we're not using chunked encoding
+            File tmp = null;
             try {
-                // XXX: read to tmp file, checking bytes read against
-                // content length
-                content.setContent(inputContext.getInputStream());
+                tmp = IOUtil.getTempFile(inputContext.getInputStream());
+                long contentLength = inputContext.getContentLength();
+                long readLength = tmp.length();
+                if (contentLength != IOUtil.UNDEFINED_LENGTH &&
+                    contentLength != readLength)
+                    throw new IOException("Read only " + readLength + " of " + contentLength + " bytes");
+                content.setContent(new FileInputStream(tmp));
             } catch (IOException e) {
                 log.error("Cannot read resource content", e);
                 throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "Cannot read resource content: " + e.getMessage());
             } catch (DataSizeException e) {
                 throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource content: " + e.getMessage());
+            } finally {
+                // XXX: assumes that content.setContent() consumes the
+                // stream so that the tmpfile is no longer needed
+                if (tmp != null)
+                    tmp.delete();
             }
-
         }
 
         try {

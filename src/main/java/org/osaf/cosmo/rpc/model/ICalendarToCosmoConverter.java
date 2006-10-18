@@ -515,9 +515,12 @@ public class ICalendarToCosmoConverter {
         // If this is a datetime, we must convert from UTC to the appropriate
         // timezone
         if (until != null) {
-            CosmoDate scoobyDate = createCosmoDate(until, calendar, null);
+            Calendar untilCalendar = Calendar.getInstance();
+            untilCalendar.setTime(until);
+            untilCalendar.add(Calendar.DATE, -1);
+            net.fortuna.ical4j.model.Date date = new net.fortuna.ical4j.model.Date(untilCalendar.getTimeInMillis());
+            CosmoDate scoobyDate = createCosmoDate(date , calendar, null);
             recurrenceRule.setEndDate(scoobyDate);
-
         } else {
             recurrenceRule.setEndDate(null);
         }

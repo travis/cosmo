@@ -292,7 +292,10 @@ public class CosmoToICalendarConverter {
             String rule = getFrequency(recurrenceRule.getFrequency())
                     + ";";
             if (recurrenceRule.getEndDate() != null) {
-                String dateString = getDateTimeString(recurrenceRule.getEndDate(), false, false);
+                java.util.Calendar rruleEndDateCalendar = createCalendar(recurrenceRule.getEndDate());
+                rruleEndDateCalendar.add(java.util.Calendar.DATE,1);
+                String dateString = getDateTimeString(rruleEndDateCalendar, false,
+                        false); 
                 rule += "UNTIL="
                         + dateString;
             }

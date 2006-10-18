@@ -187,7 +187,7 @@ public class ICalendarToCosmoConverterTest extends TestCase {
         assertNotNull("Should have endate", endDate);
         assertEquals(endDate.getMonth(), 0);
         assertEquals(endDate.getYear(), 2006);
-        assertEquals(endDate.getDate(), 31);
+        assertEquals(endDate.getDate(), 30);
         assertTrue("Recurrence Rule should be Daily", rrule.getFrequency()
                 .equals(RecurrenceRule.FREQUENCY_DAILY));
     }
@@ -200,9 +200,9 @@ public class ICalendarToCosmoConverterTest extends TestCase {
         assertNotNull("No Recurrence Rule.", rrule);
         assertNull("Shouldn't be a custom rule", rrule.getCustomRule());
         assertNotNull("Should have endate", endDate);
-        assertEquals("Month not zero", endDate.getMonth(), CosmoDate.MONTH_FEBRUARY);
+        assertEquals("Month not zero", endDate.getMonth(), CosmoDate.MONTH_JANUARY);
         assertEquals("Year not 2006", endDate.getYear(), 2006);
-        assertEquals("Date not 31", endDate.getDate(), 01);
+        assertEquals("Date not 31", endDate.getDate(), 31);
         assertTrue("Recurrence Rule should be Daily", rrule.getFrequency()
                 .equals(RecurrenceRule.FREQUENCY_DAILY));
     };
@@ -215,9 +215,9 @@ public class ICalendarToCosmoConverterTest extends TestCase {
         assertNotNull("No Recurrence Rule.", rrule);
         assertNotNull("Should be a custom rule", rrule.getCustomRule());
         assertNotNull("Should have endate", endDate);
-        assertEquals("Month not zero", endDate.getMonth(), CosmoDate.MONTH_FEBRUARY);
+        assertEquals("Month not zero", endDate.getMonth(), CosmoDate.MONTH_JANUARY);
         assertEquals("Year not 2006", endDate.getYear(), 2006);
-        assertEquals("Date not 31", endDate.getDate(), 01);
+        assertEquals("Date not 31", endDate.getDate(), 31);
     }
     
     public void testOneExcetpionDate() throws Exception {

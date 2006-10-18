@@ -33,85 +33,125 @@ public class ContentItem extends Item {
      */
     private static final long serialVersionUID = 4904755977871771389L;
     
-    // ContentItem specific attributes
-    public static final String ATTR_CONTENT_MIMETYPE = "content:mimeType";
-    public static final String ATTR_CONTENT_ENCODING = "content:encoding";
-    public static final String ATTR_CONTENT_CONTENTLANGUAGE = "content:contentLanguage";
-    public static final String ATTR_CONTENT_DATA = "content:data";
-    public static final String ATTR_CONTENT_LENGTH = "content:length";
-
     // max content size is smaller than binary attribute value max
     // size
     public static final long MAX_CONTENT_SIZE = 10 * 1024 * 1024;
 
+    private String contentType = null;
+    private String contentLanguage = null;
+    private String contentEncoding = null;
+    private Long contentLength = null;
+    private ContentData contentData = null;
+    
     public ContentItem() {
     }
 
+   
+    /**
+     * @deprecated use setContent(InputStream)
+     */
     public byte[] getContent() {
-        return (byte[]) getAttributeValue(ATTR_CONTENT_DATA);
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            InputStream contentStream = contentData.getContentInputStream();
+            IOUtils.copy(contentStream, bos);
+            contentStream.close();
+            return bos.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Error getting content");
+        }
     }
 
     /**
      * Sets the ATTR_CONTENT_DATA with the given content, and ATTR_CONTENT_LENGTH
      * with the length of the content
      * @param content
+     * @deprecated use getContentInputStream()
      */
     public void setContent(byte[] content) {
         if (content.length > MAX_CONTENT_SIZE)
             throw new DataSizeException("Item content too large");
-        setAttribute(ATTR_CONTENT_DATA, content);
-        setContentLength((long)content.length);
+        
+        if(contentData==null) {
+            contentData = new ContentData();
+        }
+        
+        try {
+            setContent(new ByteArrayInputStream(content));
+        } catch (IOException e) {
+            throw new RuntimeException("Error setting content");
+        }
     }
 
+    /**
+     * Set ContentItem's data using InputStream.  The provided InputStream
+     * is not closed.
+     * @param is data
+     * @throws IOException
+     */
     public void setContent(InputStream is) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        IOUtils.copy(is, bos);
-        setContent(bos.toByteArray());
+        if(contentData==null) {
+            contentData = new ContentData();  
+        }
+        
+        contentData.setContentInputStream(is);
+        
+        // Verify size is not greater than MAX.
+        // TODO: do this checking in ContentData.setContentInputStream()
+        if (contentData.getSize() > MAX_CONTENT_SIZE)
+            throw new DataSizeException("Item content too large");
+        
+        setContentLength(contentData.getSize());
     }
 
     public InputStream getContentInputStream() {
-        return new ByteArrayInputStream(getContent());
+        if(contentData==null)
+            return null;
+        else
+            return contentData.getContentInputStream();
     }
 
     public String getContentEncoding() {
-        return (String) getAttributeValue(ATTR_CONTENT_ENCODING);
+        return contentEncoding;
     }
 
     public void setContentEncoding(String contentEncoding) {
-        // allow for nulls
-        addStringAttribute(ATTR_CONTENT_ENCODING, contentEncoding);
+        this.contentEncoding = contentEncoding;
     }
 
     public String getContentLanguage() {
-        return (String) getAttributeValue(ATTR_CONTENT_CONTENTLANGUAGE);
+        return contentLanguage;
     }
 
     public void setContentLanguage(String contentLanguage) {
-        // allow for nulls
-        addStringAttribute(ATTR_CONTENT_CONTENTLANGUAGE, contentLanguage);
-    }
-
-    public String getContentType() {
-        return (String) getAttributeValue(ATTR_CONTENT_MIMETYPE);
-    }
-
-    public void setContentType(String contentType) {
-        setAttribute(ATTR_CONTENT_MIMETYPE, contentType);
+        this.contentLanguage = contentLanguage;
     }
 
     public Long getContentLength() {
-       return (Long) getAttributeValue(ATTR_CONTENT_LENGTH);
+        return contentLength;
     }
+
+
+    public void setContentLength(Long contentLength) {
+        this.contentLength = contentLength;
+    }
+
+
+    public String getContentType() {
+        return contentType;
+    }
+
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
 
     public void validate() {
         super.validate();
         validateContent();
     }
-
-    protected void setContentLength(Long contentLength) {
-        setAttribute(ATTR_CONTENT_LENGTH, contentLength);
-    }
-    
+ 
     protected void validateContent() {
         if (getContentLength() == null)
             throw new ModelValidationException("Content Length must be present");
@@ -119,10 +159,10 @@ public class ContentItem extends Item {
         if (getContentLength().longValue() < 0)
             throw new ModelValidationException("Content Length must be >= 0");
 
-        if (getContent() == null)
+        if (getContentData() == null)
             throw new ModelValidationException("Content must be present");
 
-        if (getContent().length != getContentLength().longValue())
+        if (getContentData().getSize() != getContentLength().longValue())
             throw new ModelValidationException(
                     "Content Length doesn't match Content");
     }
@@ -136,6 +176,15 @@ public class ContentItem extends Item {
                 getContentEncoding()).append("contentLanguage",
                 getContentLanguage()).toString();
     }
+    
+    // For hibernate use only
+    private ContentData getContentData() {
+        return contentData;
+    }
 
+    // For hibernate use only
+    private void setContentData(ContentData contentFile) {
+        this.contentData = contentFile;
+    }
 
 }

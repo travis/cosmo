@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,6 +38,8 @@ import org.osaf.cosmo.model.CalendarItem;
 import org.osaf.cosmo.model.CalendarPropertyIndex;
 import org.osaf.cosmo.model.CalendarTimeRangeIndex;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentData;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
@@ -537,6 +541,20 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             item2.addAttribute(entry.getValue().copy());
         
        
+        // copy content
+        if(item instanceof ContentItem) {
+            ContentItem contentItem = (ContentItem) item;
+            ContentItem newContentItem = (ContentItem) item2;
+            try {
+                InputStream contentStream = contentItem.getContentInputStream();
+                newContentItem.setContent(contentStream);
+                contentStream.close();
+            } catch (IOException e) {
+                throw new RuntimeException("Error copying content");
+            }
+        }
+            
+        
         // copy calendar indexes
         if(item instanceof CalendarItem) {
             CalendarItem calendarItem = (CalendarItem) item;

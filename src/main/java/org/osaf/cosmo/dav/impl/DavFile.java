@@ -88,11 +88,11 @@ public class DavFile extends DavResourceBase {
 
         RESOURCE_TYPES = new int[] { ResourceType.DEFAULT_RESOURCE };
 
-        DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_MIMETYPE);
-        DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_ENCODING);
-        DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_CONTENTLANGUAGE);
-        DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_DATA);
-        DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_LENGTH);
+        //DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_MIMETYPE);
+        //DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_ENCODING);
+        //DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_CONTENTLANGUAGE);
+        //DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_DATA);
+        //DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_LENGTH);
     }
 
     /** */

@@ -98,21 +98,21 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         item.setContentLanguage("en");
         item.setContentEncoding("UTF8");
         item.setContentType("text/text");
-        item.removeAttribute(ContentItem.ATTR_CONTENT_LENGTH);
+        item.setContentLength(null);
 
         try {
             contentDao.createContent(root, item);
             Assert.fail("able to create invalid content.");
         } catch (ModelValidationException e) {}
         
-        item.setAttribute(ContentItem.ATTR_CONTENT_LENGTH,(new Long(-1)));
+        item.setContentLength(new Long(-1));
         
         try {
             contentDao.createContent(root, item);
             Assert.fail("able to create invalid content.");
         } catch (ModelValidationException e) {}
         
-        item.setAttribute(ContentItem.ATTR_CONTENT_LENGTH,(new Long(1)));
+        item.setContentLength(new Long(1));
         
         try {
             contentDao.createContent(root, item);

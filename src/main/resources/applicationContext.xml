@@ -83,6 +83,7 @@
         <value>org/osaf/cosmo/model/CollectionItem.hbm.xml</value>
         <value>org/osaf/cosmo/model/HomeCollectionItem.hbm.xml</value>
         <value>org/osaf/cosmo/model/ContentItem.hbm.xml</value>
+        <value>org/osaf/cosmo/model/ContentData.hbm.xml</value>
         <value>org/osaf/cosmo/model/CalendarCollectionItem.hbm.xml</value>
         <value>org/osaf/cosmo/model/CalendarItem.hbm.xml</value>
         <value>org/osaf/cosmo/model/CalendarEventItem.hbm.xml</value>

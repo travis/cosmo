@@ -19,25 +19,18 @@
    limitations under the License.
 -->
 
+<!-- Generated Jul 17, 2006 11:59:26 AM by Hibernate Tools 3.1.0.beta5 -->
 <hibernate-mapping package="org.osaf.cosmo.model">
-    <subclass name="ContentItem" extends="Item" discriminator-value="content" lazy="false">
+    
+    <class name="ContentData" table="content_data">
+        
+        <id name="id" column="id" unsaved-value="-1">
+            <generator class="native" />
+        </id>
 
-        <property name="contentEncoding" type="string">
-            <column name="contentEncoding" length="32"/>
-        </property>
-        <property name="contentLanguage" type="string">
-            <column name="contentLanguage" length="32"/>
-        </property>	
-        <property name="contentType" type="string">
-            <column name="contentType" length="64"/>
-        </property>	
-        <property name="contentLength" type="long">
-            <column name="contentLength"/>
-        </property>
-
-        <many-to-one name="contentData" class="ContentData" 
-            column="contentdataid" 
-            cascade="all" />
-
-    </subclass>
+       <property name="content" column="content" type="org.osaf.cosmo.hibernate.BinaryBlobType" length="102400000"/>
+       
+    </class>
+		
+    
 </hibernate-mapping>

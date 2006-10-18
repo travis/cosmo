@@ -54,8 +54,7 @@ cosmo.view.cal = new function() {
         // Changing recurrence rule
         // --------------
         if (changedRecur) {
-            
-            // Event with existing recurrence -- means 'All Future Events'
+            // Event with existing recurrence
             // *** Change/remove ***
             if (recur) {
                 // Removing from a master event
@@ -65,15 +64,17 @@ cosmo.view.cal = new function() {
                 // Changing recurrence for master
                 // Changing or 'removing' recurrence from an instance
                 else {
-                    // NOT IMPLEMENTED YET
-                    if (!ev.data.masterEvent) {
-                        alert('Not yet implemented');
-                        return;
-                    }
-                    
-                    // Master or instance?
                     var opts = self.recurringEventOptions;
-                    qual = ev.data.masterEvent ? opts.ALL_EVENTS : opts.ALL_FUTURE_EVENTS
+                    // Master or instance?
+                    // Only changing end date -- applies only to master
+                    if (ev.data.recurrenceRule && 
+                        (ev.data.recurrenceRule.frequency == ev.dataOrig.recurrenceRule.frequency)) {
+                        qual = opts.ALL_EVENTS;
+                    }
+                    // Otherwise figure out if it's a master or instance
+                    else {
+                        qual = ev.data.masterEvent ? opts.ALL_EVENTS : opts.ALL_FUTURE_EVENTS
+                    }
                     dojo.event.topic.publish('/calEvent', { 'action': 'save', 
                         'qualifier': qual, data: ev });
                 }
@@ -169,14 +170,14 @@ cosmo.view.cal = new function() {
                 // Removing recurrence (along with other possible edits)
                 case 'recurrenceMasterRemoveRecurrence':
                     f = function() { doSaveEvent(ev, { 
-                        'saveType': 'recurrenceMasterRemoveRecurrence', 'instanceEventId': null }) }
+                        'saveType': 'recurrenceMasterRemoveRecurrence', 'instanceEvent': null }) }
                     break;
                 
                 // Changing the recurrence master
                 case opts.ALL_EVENTS:
                     if (ev.data.masterEvent) {
                         f = function() { doSaveEvent(ev, { 
-                            'saveType': 'recurrenceMaster', 'instanceEventId': null }) }
+                            'saveType': 'recurrenceMaster', 'instanceEvent': null }) }
                     }
                     else {
                         h = function(evData, err) {
@@ -252,7 +253,7 @@ cosmo.view.cal = new function() {
                                 var saveEv = new CalEvent();
                                 saveEv.data = evData;
                                 doSaveEvent(saveEv, { 'saveType': 'recurrenceMaster', 
-                                    'instanceEventId': ev.data.id });
+                                    'instanceEvent': ev });
                             }
                         };
                         f = function() { var reqId = Cal.serv.getEvent(h, 
@@ -269,11 +270,13 @@ cosmo.view.cal = new function() {
                         start.getMonth(), start.getDate());
                     var unit = ranges[freq][0];
                     var incr = (ranges[freq][1] * -1);
+                    // Instances all have the same id as the master event
+                    var masterEventDataId = ev.data.id;
                     recurEnd = ScoobyDate.add(recurEnd, unit, incr);
                     newEv.data = CalEventData.clone(ev.data);
-                    f = function() { doSaveEventBreakRecurrence(newEv, ev.data.id, 
+                    f = function() { doSaveEventBreakRecurrence(newEv, masterEventDataId, 
                         recurEnd, { 'saveType': 'instanceAllFuture', 
-                        'originalEvent': ev, 'recurEnd': recurEnd }); };
+                        'originalEvent': ev, 'masterEventDataId': masterEventDataId, 'recurEnd': recurEnd }); };
                     break;
                 
                 // Modifications
@@ -388,12 +391,25 @@ cosmo.view.cal = new function() {
             (opts.saveType == 'recurrenceMaster' || 
             opts.saveType == 'instanceAllFuture' ||
             opts.saveType == 'singleEventAddRecurrence')) {
-            var idArr = [];
-            if (opts.saveType == 'instanceAllFuture') {
-                idArr.push(opts.originalEvent.data.id);
+            // Either single master with recurrence or 
+            // master/detached-event combo both with recurrence
+            if (saveEv.data.recurrenceRule) {
+                loadRecurrenceExpansion(Cal.viewStart, Cal.viewEnd, saveEv, opts);
             }
-            idArr.push(saveEv.data.id);
-            loadRecurrenceExpansion(idArr, Cal.viewStart, Cal.viewEnd, saveEv, opts);
+            // The detached even has a frequency of 'once' -- it's a one-shot
+            // No need to go to the server for expansion
+            else {
+                self.processingQueue.shift();
+                // saveEv is the dummy CalEvent obj created for saving
+                // Replace this with the original event that has an
+                // associated lozenge, etc. -- give it the new CalEventData id
+                // from the server
+                saveEv = opts.originalEvent;
+                saveEv.data.id = newEvId;
+                dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess', 
+                   'data': { 'saveEvent': saveEv, 'eventRegistry': null, 
+                   'opts': opts } });
+            }
         }
         else {
             self.processingQueue.shift();
@@ -449,7 +465,7 @@ cosmo.view.cal = new function() {
                                 var removeEv = new CalEvent();
                                 removeEv.data = evData;
                                 doRemoveEvent(removeEv, { 'removeType': 'recurrenceMaster', 
-                                    'instanceEventId': ev.data.id });
+                                    'instanceEvent': ev });
                             }
                         };
                         f = function() { var reqId = Cal.serv.getEvent(h, 
@@ -558,17 +574,16 @@ cosmo.view.cal = new function() {
             'data': rruleEv, 'opts': opts });
     }
     
-    function loadRecurrenceExpansion(idArr, start, end, ev, opts) {
+    function loadRecurrenceExpansion(start, end, ev, opts) {
+        var id = ev.data.id;
         var s = start.getTime();
         var e = end.getTime();
-        var id = (opts.saveType == 'recurrenceMaster' || 
-            opts.saveType == 'singleEventAddRecurrence') ? idArr[0] : idArr[1];
         var f = function(hashMap) {
             var expandEventHash = createEventRegistry(hashMap);
             self.processingQueue.shift();
             dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess', 
                'data': { 'saveEvent': ev, 'eventRegistry': expandEventHash, 
-               'idArr': idArr, 'opts': opts } });
+               'opts': opts } });
         }
 
         Cal.serv.expandEvents(f, Cal.currentCalendar.path, [id], s, e); 

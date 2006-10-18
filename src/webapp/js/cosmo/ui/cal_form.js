@@ -597,6 +597,13 @@ function CalForm() {
                 ev.data.recurrenceRule = null;
             }
             else {
+                var rE = form.recurend.value.match(/^\d/) ? 
+                    form.recurend.value : null;
+                var recurEnd = null;
+                if (rE) {
+                    rE = new Date(rE);
+                    recurEnd = new ScoobyDate(rE.getFullYear(), rE.getMonth(), rE.getDate());
+                }
                 if (rule) {
                     rule.frequency = recur;
                 }
@@ -605,6 +612,7 @@ function CalForm() {
                    rule.frequency = recur;
                    ev.data.recurrenceRule = rule;
                 }
+                ev.data.recurrenceRule.endDate = recurEnd;
             }
             return true;
         }

@@ -266,14 +266,26 @@ cosmo.view.cal = new function() {
                     var newEv = new CalEvent();
                     var freq = ev.dataOrig.recurrenceRule.frequency;
                     var start = ev.dataOrig.start;
-                    var recurEnd = new ScoobyDate(start.getFullYear(), 
+                    var startNoTime = new ScoobyDate(start.getFullYear(), 
                         start.getMonth(), start.getDate());
                     var unit = ranges[freq][0];
                     var incr = (ranges[freq][1] * -1);
                     // Instances all have the same id as the master event
                     var masterEventDataId = ev.data.id;
-                    recurEnd = ScoobyDate.add(recurEnd, unit, incr);
+                    
+                    // Calc the new end date for the original recurrence
+                    recurEnd = ScoobyDate.add(startNoTime, unit, incr);
+
+                    // Pass a CalEvent obj with an attached CalEventData obj
                     newEv.data = CalEventData.clone(ev.data);
+                    
+                    // Update the end-date of the new recurrence if needed
+                    if (newEv.data.recurrenceRule && newEv.data.recurrenceRule.endDate) {
+                        var recurEndOrig = newEv.data.recurrenceRule.endDate;
+                        var recurEndDiff = ScoobyDate.diff('d', startNoTime, recurEndOrig);
+                        newEv.data.recurrenceRule.endDate = ScoobyDate.add(newEv.data.start, 'd', recurEndDiff);
+                    }
+                    
                     f = function() { doSaveEventBreakRecurrence(newEv, masterEventDataId, 
                         recurEnd, { 'saveType': 'instanceAllFuture', 
                         'originalEvent': ev, 'masterEventDataId': masterEventDataId, 'recurEnd': recurEnd }); };

@@ -617,11 +617,23 @@ cosmo.view.cal = new function() {
             qual.onCanvas = true;
         }
         
-        // Broadcast success
-        dojo.event.topic.publish('/calEvent', { 'action': act, 
-            'data': rruleEv, 'opts': opts, 'qualifier': qual });
+        if (syncRecurrence(rruleEv)) {
+            // Broadcast success
+            dojo.event.topic.publish('/calEvent', { 'action': act, 
+                'data': rruleEv, 'opts': opts, 'qualifier': qual });
+        }
     }
-    
+    function syncRecurrence(ev) {
+        var f = function(i, e) {
+            if (e.data.id == ev.data.id) {
+                e.data.recurrenceRule = 
+                    RecurrenceRule.clone(ev.data.recurrenceRule); 
+            }
+        }
+        var evReg = cosmo.view.cal.canvas.eventRegistry;
+        evReg.each(f);
+        return true;
+    }
     function loadRecurrenceExpansion(start, end, ev, opts) {
         var id = ev.data.id;
         var s = start.getTime();

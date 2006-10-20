@@ -108,16 +108,24 @@ RecurrenceRuleFrequency = {
 
 RecurrenceRule.clone = function(rule) {
     var ret = null;
+    var arr = [];
     if (rule) {
         ret = new RecurrenceRule();
         ret.frequency = rule.frequency;
         ret.endDate = rule.endDate;
         ret.customRule = rule.customRule;
         ret.exceptionDates = [];
-        var arr = rule.exceptionDates;
+        arr = rule.exceptionDates;
         if (arr) {
             for (var i = 0; i < arr.length; i++) {
                 ret.exceptionDates.push(ScoobyDate.clone(arr[i]));
+            }
+        }
+        ret.modifications = [];
+        arr = rule.modifications;
+        if (arr) {
+            for (var i = 0; i < arr.length; i++) {
+                ret.modifications.push(Modification.clone(arr[i]));
             }
         }
     }
@@ -135,7 +143,7 @@ function Modification(){
      * The list of modified properties
      *
      */
-    this.modifiedProperties = null;
+    this.modifiedProperties = [];
     
     /**
      * The event with the modified properties. Note: only the modified properties need to be set
@@ -143,10 +151,14 @@ function Modification(){
     this.event;
 }
 
+Modification.prototype = {
+    toString: genericToString
+}
     
 Modification.clone = function(mod) {
     var ret = null;
     if (mod) {
+        ret = new Modification();
         ret.instanceDate = mod.instanceDate;
         ret.modifiedProperties = [];
         var arr = mod.modifiedProperties;

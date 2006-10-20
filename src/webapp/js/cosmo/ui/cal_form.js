@@ -70,6 +70,7 @@ function CalForm() {
                 saveCalEvent(ev);
                 break;
             case 'setSelected':
+                var c = cosmo.view.cal.canvas;
                 self.updateFromEvent(ev);
                 self.setButtons(true, true);
                 break;

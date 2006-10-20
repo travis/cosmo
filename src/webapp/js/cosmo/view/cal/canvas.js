@@ -209,13 +209,17 @@ cosmo.view.cal.canvas = new function() {
                 ev.block.updateDisplayMain();
             }
             // Changes have placed the saved event off-canvas
-            else {
+            else if (cmd.qualifier.offCanvas) {
                 removeEvent(ev);
+            }
+            else {
+                throw 'cmd.qualifier is not properly set.';
             }
         }
         // Don't re-render when requests are still processing
         if (!cosmo.view.cal.processingQueue.length) {
-            if (cmd.qualifier.newEvent || cmd.qualifier.onCanvas) {
+            if (cmd.qualifier.newEvent || 
+                (cmd.qualifier.onCanvas && opts.saveType != 'instanceOnlyThisEvent')) {
                 dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
                     'data': cosmo.view.cal.lastSent });
             }

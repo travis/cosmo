@@ -131,7 +131,10 @@ function mouseDownHandler(e) {
             }
             
             // Publish selection
-            dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': selObj });
+            var c = cosmo.view.cal.canvas;
+            if (c.selectedEvent && selObj.id != c.selectedEvent.id) {
+                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': selObj });
+            }
             
             // Set up Draggable and save dragMode -- user may be dragging
             if (strId.indexOf('AllDay') > -1) {
@@ -165,9 +168,9 @@ function mouseDownHandler(e) {
             // Update event detail form
             // ------------------------------------
             // Show clicked-on event's details in detail form
-            Cal.calForm.updateFromEvent(selObj);
+            //Cal.calForm.updateFromEvent(selObj);
             // Enable both Remove and Save buttons
-            Cal.calForm.setButtons(true, true);
+            //Cal.calForm.setButtons(true, true);
 
             break;
     }

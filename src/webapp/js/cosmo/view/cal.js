@@ -293,9 +293,28 @@ cosmo.view.cal = new function() {
                 
                 // Modifications
                 case opts.ONLY_THIS_EVENT:
-                    // NOT IMPLEMENTED YET
-                    alert('Not yet implemented');
-                    return;
+                    var rrule = ev.data.recurrenceRule;
+                    var changedProps = ev.hasChanged();
+                    var mod = new Modification();
+                    var modEv = new CalEventData();
+                    mod.instanceDate = ScoobyDate.clone(ev.data.instanceDate);
+                    for (var i = 0; i < changedProps.length; i++) {
+                        var propName = changedProps[i][0];
+                        mod.modifiedProperties.push(propName); 
+                        modEv[propName] = changedProps[i][1];
+                    }
+                    mod.event = modEv;
+                    // **** Need ScoobyDate methods here ****
+                    for (var i = 0; i < rrule.modifications.length; i++) {
+                        var m = rrule.modifications[i];
+                        if (m.instanceDate.toUTC() == mod.instanceDate.toUTC()) {
+                            rrulerule.modifications.splice(i, 1); 
+                        }
+                    }
+                    rrule.modifications.push(mod);
+                    
+                    f = function() { doSaveRecurrenceRule(ev, rrule, { 'saveAction': 'save',
+                        'saveType': 'instanceOnlyThisEvent' }) };
                     break;
                 
                 // Default -- nothing to do
@@ -563,9 +582,11 @@ cosmo.view.cal = new function() {
     }
     function handleSaveRecurrenceRuleResult(ev, err, reqId, opts) {
         var rruleEv = ev;
-        var msgKey = opts.saveAction == 'remove' ? 'EventRemoveFailed' : 'EventEditSaveFailed';
+        var errMsgKey = opts.saveAction == 'remove' ? 'EventRemoveFailed' : 'EventEditSaveFailed';
         // Simple error message to go along with details from Error obj
-        var errMsg = getText('Main.Error.' + msgKey);
+        var errMsg = getText('Main.Error.' + errMsgKey);
+        var qual = {};
+        
         if (err) {
             act = opts.saveAction + 'Failed';
             Cal.showErr(errMsg, err);
@@ -580,10 +601,19 @@ cosmo.view.cal = new function() {
         // BANDAID: need to move this into the actual Service call
         // ********************
         Cal.serv.resetServiceAccessTime();
-            
+        
+        // If new dates are out of range, remove the event from display
+        if (rruleEv.isOutOfViewRange()) {
+            qual.onCanvas = false;
+        }
+        // Otherwise update display
+        else {
+            qual.onCanvas = true;
+        }
+        
         // Broadcast success
         dojo.event.topic.publish('/calEvent', { 'action': act, 
-            'data': rruleEv, 'opts': opts });
+            'data': rruleEv, 'opts': opts, 'qualifier': qual });
     }
     
     function loadRecurrenceExpansion(start, end, ev, opts) {

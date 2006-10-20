@@ -44,6 +44,7 @@ function convertObject(object){
 
     //test if the returned value is an Array
     if (typeof object == "object" && object[0]){
+    
         var newArray = new Array();
         for (var x = 0; x < object.length; x++){
             newArray[x] = convertObject(object[x]);
@@ -69,7 +70,7 @@ function convertObject(object){
            var prop = object[propName];
 
            //if the property is an object, we need to convert it
-           if (prop && typeof prop == "object" && prop.javaClass){
+           if (prop && typeof prop == "object" ){
                prop = convertObject(prop);
            }
            

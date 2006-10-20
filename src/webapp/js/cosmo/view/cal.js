@@ -531,7 +531,13 @@ cosmo.view.cal = new function() {
                             Cal.currentCalendar.path, [ev.data.id]); };
                     break;
                 case opts.ONLY_THIS_EVENT:
+                    var rrule = ev.data.recurrenceRule;
+                    var dates = rrule.exceptionDates;
+                    var d = ScoobyDate.clone(ev.data.instanceDate);
+                    dates.push(d);
                     
+                    f = function() { doSaveRecurrenceRule(ev, rrule, { 'saveAction': 'remove',
+                        'saveType': 'instanceOnlyThisEvent' }) };
                     break;
                 default:
                     // Do nothing
@@ -668,6 +674,10 @@ cosmo.view.cal = new function() {
                     evData.start.timezone =
                         ScoobyTimezone.clone(evData.end.timezone);
                 }
+            }
+            // Make exceptionDates on recurrences default to empty array  
+            if (evData.recurrenceRule && !evData.recurrenceRule.exceptionDates) {
+                evData.recurrenceRule.exceptionDates = [];
             }
             var id = Cal.generateTempId();
             ev = new CalEvent(id, null);

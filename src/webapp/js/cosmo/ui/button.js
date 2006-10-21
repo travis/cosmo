@@ -24,13 +24,28 @@
  * @object Button -- creates a button with a text label, and images
  * for endcaps and a stretchable, tiling middle section. Comes in
  * two sizes, normal and small.
- * TO-DO: Refactor so this big ol' string function doesn't come
- * first
- * TO-DO: Consider doing this all with DOM methods 
- * FIXME: A standard object constructor function should probably not
- * return a DOM node. Is it an object? Or a DOM node? Make it a static
- * method of a Button singleton or something
  */
+
+function buttonPreload() {
+    var btnSizes = ['', '_sm'];
+    var btnSides = ['left', 'center', 'right'];
+    var btnTypes = ['', '_dim', '_lit'];
+    var btnPreload = {};
+    var f = function(base, suffix, size) {
+        var p = 'button_' + base + suffix + size;
+        btnPreload[p] = new Image();
+        btnPreload[p].src = BUTTON_DIR_PATH + p + '.gif';
+    }
+    for (var h in btnSizes) {
+        for (var i in btnSides) {
+            for (var j in btnTypes) {
+                f(btnSides[i], btnTypes[j], btnSizes[h]);
+            }
+        }
+    }
+}
+buttonPreload();
+
 function Button(elemId, width, onClickHandler, displayText, isSmall) {
 
     /**

@@ -31,12 +31,12 @@
   <div style="width:300px; margin-top:18px;">
 
     <div>
-    <html:link href="http://wiki.osafoundation.org/bin/view/Projects/CosmoHome" 
-               onclick="goURLMainWin('http://wiki.osafoundation.org/bin/view/Projects/CosmoHome'); 
-               return false;"><img src="${staticBaseUrl}/cosmo_logo_large.jpg" alt="<fmt:message 
+    <html:link href="http://cosmo.osafoundation.org/" 
+               onclick="goURLMainWin('http://cosmo.osafoundation.org/'); 
+               return false;"><img src="${staticBaseUrl}/cosmo_logo.gif" alt="<fmt:message 
                key="About.LogoAltText"/>"/></html:link>    
     </div>
-    <div class="smLabel" style="margin-top:2px;"><fmt:message 
+    <div class="smLabel"><fmt:message 
          key="About.VersionString"/>${PRODUCT_VERSION}
     </div>
     <div style="margin-top:28px;"><fmt:message key="About.LicenseOpen"/>

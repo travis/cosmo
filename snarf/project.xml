@@ -18,7 +18,7 @@
   <name>OSAF Server Bundle</name>
   <groupId>org.osaf.server</groupId>
   <artifactId>osaf-server-bundle</artifactId>
-  <currentVersion>0.5-SNAPSHOT</currentVersion>
+  <currentVersion>0.6-SNAPSHOT</currentVersion>
   <dependencies>
     <dependency>
       <groupId>activation</groupId>
@@ -60,7 +60,7 @@
       <artifactId>cosmo</artifactId>
       <!-- when you update this version, you must also update it in
            src/main/config/server.xml -->
-      <version>0.5-SNAPSHOT</version>
+      <version>0.6-SNAPSHOT</version>
       <type>war</type>
     </dependency>
     <dependency>
@@ -68,7 +68,7 @@
       <artifactId>cosmo-docs</artifactId>
       <!-- when you update this version, you must also update it in
            src/main/config/server.xml -->
-      <version>0.5-SNAPSHOT</version>
+      <version>0.6-SNAPSHOT</version>
       <type>war</type>
     </dependency>
     <dependency>

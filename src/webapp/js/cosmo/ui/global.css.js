@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-dojo.require(cosmo.env);
+dojo.require("cosmo.env");
 var uiStyles = '';
 var uiPref = []; 
 var arr = [];

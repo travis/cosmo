@@ -344,7 +344,7 @@
       <name>maven-jsar-plugin</name>
       <groupId>org.osaf</groupId>
       <artifactId>maven-jsar-plugin</artifactId>
-      <version>0.1-SNAPSHOT</version>
+      <version>0.1</version>
       <type>plugin</type>
     </dependency>
     <dependency>
@@ -356,7 +356,13 @@
     <dependency>
       <groupId>dojo</groupId>
       <artifactId>dojo-event_and_io</artifactId>
-      <version>0.3.0</version>
+      <version>0.4.0</version>
+      <type>jsar</type>
+    </dependency>
+    <dependency>
+      <groupId>olson</groupId>
+      <artifactId>olson-tzdata</artifactId>
+      <version>2006n</version>
       <type>jsar</type>
     </dependency>
     <!-- Hibernate dependencies -->

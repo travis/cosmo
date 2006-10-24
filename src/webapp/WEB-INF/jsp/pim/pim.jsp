@@ -161,7 +161,7 @@ function init() {
           </div>
         </div>
         <div id="fullMaskDiv"></div>
-        <div id="dojoDebug" dojoType="debug"><div>
+        <div id="dojoDebug" dojoType="cosmo:Debug"><div>
 </body>
 
 </html>

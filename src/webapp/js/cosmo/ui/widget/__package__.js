@@ -14,6 +14,5 @@
  * limitations under the License.
 */
 
-alert("HI!");
 dojo.require("cosmo.ui.widget.Hour");
 dojo.hostenv.moduleLoaded("cosmo.ui.widget.*");

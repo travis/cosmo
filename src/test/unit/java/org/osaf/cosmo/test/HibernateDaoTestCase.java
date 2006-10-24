@@ -121,10 +121,15 @@ public class HibernateDaoTestCase extends SpringTestCase {
 			user.setFirstName("testfn");
 			user.setLastName("testln");
 			userDao.createUser(user);
+            
+            clearSession();
+            
 			user = userDao.getUser(username);
             
             // create root item
             contentDao.createRootItem(user);
+            
+            clearSession();
 		}
 		return user;
 	}
@@ -138,6 +143,7 @@ public class HibernateDaoTestCase extends SpringTestCase {
         user.setFirstName("fristname" + index);
         user.setLastName("lastname" + index);
         userDao.createUser(user);
+        clearSession();
         user = userDao.getUser("user" + index);
         return user;
     }

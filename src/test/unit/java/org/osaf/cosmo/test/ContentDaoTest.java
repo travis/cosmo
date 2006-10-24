@@ -59,6 +59,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
     {
         super.setUp();
         removeAllUsers(userDao);
+        clearSession();
     }
 
     protected void tearDown() throws Exception
@@ -259,6 +260,8 @@ public class ContentDaoTest extends HibernateDaoTestCase {
 
         a = contentDao.createCollection(root, a);
 
+        clearSession();
+        
         Item queryItem = itemDao.findItemByUid(a.getUid());
         Assert.assertNotNull(queryItem);
         Assert.assertTrue(queryItem instanceof CollectionItem);
@@ -350,6 +353,9 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         ContentItem item = generateTestContent();
         
         ContentItem newItem = contentDao.createContent(root, item);
+        
+        clearSession();
+        
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         verifyItem(newItem, queryItem);
 
@@ -369,6 +375,9 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         ContentItem item = generateTestContent();
         
         ContentItem newItem = contentDao.createContent(root, item);
+        
+        clearSession();
+        
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         verifyItem(newItem, queryItem);
 
@@ -388,6 +397,9 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         ContentItem item = generateTestContent();
        
         ContentItem newItem = contentDao.createContent(root, item);
+        
+        clearSession();
+        
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         verifyItem(newItem, queryItem);
 
@@ -430,19 +442,21 @@ public class ContentDaoTest extends HibernateDaoTestCase {
 
         a = contentDao.createCollection(root, a);
 
+        clearSession();
+        
         Assert.assertTrue(a.getId() > -1);
         Assert.assertNotNull(a.getUid());
 
         CollectionItem queryItem = contentDao.findCollectionByUid(a.getUid());
         verifyItem(a, queryItem);
 
-        a.setName("b");
-        contentDao.updateCollection(a);
+        queryItem.setName("b");
+        contentDao.updateCollection(queryItem);
         
         clearSession();
         
         queryItem = contentDao.findCollectionByUid(a.getUid());
-        verifyItem(a, queryItem);
+        Assert.assertEquals("b", queryItem.getName());
     }
 
     public void testContentDaoDeleteCollection() throws Exception
@@ -749,7 +763,7 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         a.setOwner(getUser(userDao, "testuser2"));
 
         a = contentDao.createCollection(root, a);
-
+        
         CollectionItem b = new CollectionItem();
         b.setName("b");
         b.setOwner(getUser(userDao, "testuser2"));
@@ -839,6 +853,8 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         d = contentDao.findContentByUid(d.getUid());
         contentDao.copyItem(d, "/testuser2/dcopy",true);
         
+        clearSession();
+        
         dcopy = contentDao.findContentByPath("/testuser2/dcopy");
         Assert.assertNotNull(dcopy);
     }
@@ -851,7 +867,9 @@ public class ContentDaoTest extends HibernateDaoTestCase {
         
         CollectionItem root = (CollectionItem) contentDao.getRootItem(testuser);
         ContentItem newItem = contentDao.createContent(root, item);
-
+      
+        clearSession();
+        
         Ticket ticket1 = new Ticket();
         ticket1.setKey("ticket1");
         ticket1.setTimeout(10);

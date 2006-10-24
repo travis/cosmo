@@ -119,10 +119,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             List results = crit.list();
 
             // Need the total
-            Integer size = (Integer) getSession().createQuery(
+            Long size = (Long) getSession().createQuery(
                     "select count(*) from User").uniqueResult();
 
-            return new ArrayPagedList(pageCriteria, results, size);
+            return new ArrayPagedList(pageCriteria, results, size.intValue());
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }

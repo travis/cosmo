@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.test;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +46,7 @@ public class UserDaoTest extends HibernateDaoTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         removeAllUsers(userDao);
+        clearSession();
     }
 
     protected void tearDown() throws Exception {
@@ -93,8 +95,8 @@ public class UserDaoTest extends HibernateDaoTestCase {
         Set users = userDao.getUsers();
         Assert.assertNotNull(users);
         Assert.assertEquals(2, users.size());
-        verifyUserInSet(user1, users);
-        verifyUserInSet(user2, users);
+        verifyUserInCollection(user1, users);
+        verifyUserInCollection(user2, users);
 
         clearSession();
 
@@ -143,8 +145,8 @@ public class UserDaoTest extends HibernateDaoTestCase {
         List results = pagedList.getList();
         Assert.assertEquals(2, results.size());
         Assert.assertEquals(4, pagedList.getTotal());
-        Assert.assertTrue(results.contains(user1));
-        Assert.assertTrue(results.contains(user2));
+        verifyUserInCollection(user1, results);
+        verifyUserInCollection(user2, results);
 
         clearSession();
 
@@ -153,8 +155,8 @@ public class UserDaoTest extends HibernateDaoTestCase {
         results = pagedList.getList();
         Assert.assertEquals(2, results.size());
         Assert.assertEquals(4, pagedList.getTotal());
-        Assert.assertTrue(results.contains(user3));
-        Assert.assertTrue(results.contains(user4));
+        verifyUserInCollection(user3, results);
+        verifyUserInCollection(user4, results);
 
         pageCriteria.setSortAscending(false);
         pageCriteria.setSortTypeString(User.NAME_SORT_STRING);
@@ -164,8 +166,8 @@ public class UserDaoTest extends HibernateDaoTestCase {
         results = pagedList.getList();
         Assert.assertEquals(2, results.size());
         Assert.assertEquals(4, pagedList.getTotal());
-        Assert.assertTrue(results.contains(user3));
-        Assert.assertTrue(results.contains(user4));
+        verifyUserInCollection(user3, results);
+        verifyUserInCollection(user4, results);
     }
 
     public void testDeleteUser() throws Exception {
@@ -178,9 +180,14 @@ public class UserDaoTest extends HibernateDaoTestCase {
         user1.setAdmin(Boolean.TRUE);
 
         userDao.createUser(user1);
+        clearSession();
+        
         User queryUser1 = userDao.getUser("user1");
         Assert.assertNotNull(queryUser1);
-        userDao.removeUser(user1);
+        userDao.removeUser(queryUser1);
+        
+        clearSession();
+        
         queryUser1 = userDao.getUser("user1");
         Assert.assertNull(queryUser1);
     }
@@ -195,9 +202,15 @@ public class UserDaoTest extends HibernateDaoTestCase {
         user1.setAdmin(Boolean.TRUE);
 
         userDao.createUser(user1);
+        
+        clearSession();
+        
         User queryUser1 = userDao.getUser("user1");
         Assert.assertNotNull(queryUser1);
         userDao.removeUser(user1.getUsername());
+        
+        clearSession();
+        
         queryUser1 = userDao.getUser("user1");
         Assert.assertNull(queryUser1);
     }
@@ -212,7 +225,7 @@ public class UserDaoTest extends HibernateDaoTestCase {
         Assert.assertEquals(user1.getPassword(), user2.getPassword());
     }
 
-    private void verifyUserInSet(User user, Set users) {
+    private void verifyUserInCollection(User user, Collection users) {
         Iterator it = users.iterator();
         while (it.hasNext()) {
             User nextUser = (User) it.next();

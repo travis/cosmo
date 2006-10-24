@@ -60,6 +60,7 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
         super.setUp();
         // clean DB
         removeAllUsers(userDao);
+        clearSession();
     }
     
     protected void tearDown() throws Exception
@@ -181,6 +182,10 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
         
         CalendarEventItem event2 = generateEvent("testduplicate.ics","cal1.ics","testuser");
         
+        clearSession();
+        
+        calendar = calendarDao.findCalendarByUid(calendar.getUid());
+        
         try {
             event2 = calendarDao.addEvent(calendar, event2);
             Assert.fail("able to create event with duplicat uid");
@@ -210,6 +215,8 @@ public class CalendarDaoTest extends HibernateDaoTestCase {
 		CalendarCollectionItem calendar = generateCalendar("test","testuser");
 		calendar = calendarDao.createCalendar(calendar);
 		
+        clearSession();
+        
 		CalendarCollectionItem calendar2 = generateCalendar("test","testuser");
 		
 		try

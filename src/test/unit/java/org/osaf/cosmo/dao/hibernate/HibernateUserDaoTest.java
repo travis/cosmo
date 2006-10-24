@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.test;
+package org.osaf.cosmo.dao.hibernate;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -22,37 +22,21 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.apache.commons.id.uuid.VersionFourGenerator;
-import org.osaf.cosmo.dao.hibernate.UserDaoImpl;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
 
-/**
- * Test UserDao funtionality
- */
-public class UserDaoTest extends HibernateDaoTestCase {
-    UserDaoImpl userDao = null;
 
-    public UserDaoTest() {
-        userDao = new UserDaoImpl();
-        userDao.setSessionFactory(sessionFactory);
-        userDao.setIdGenerator(new VersionFourGenerator());
-        userDao.init();
+public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
+    
+    protected UserDaoImpl userDao = null;
+    
+    public HibernateUserDaoTest() {
+        super();
     }
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        removeAllUsers(userDao);
-        clearSession();
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    
     public void testCreateUser() {
         User user1 = new User();
         user1.setUsername("user1");
@@ -73,8 +57,6 @@ public class UserDaoTest extends HibernateDaoTestCase {
         user2.setAdmin(Boolean.FALSE);
 
         user2 = userDao.createUser(user2);
-
-        clearSession();
 
         // find by username
         User queryUser1 = userDao.getUser("user1");
@@ -125,12 +107,12 @@ public class UserDaoTest extends HibernateDaoTestCase {
         // delete user
         userDao.removeUser("user2");
     }
-
+    
     public void testPaginatedUsers() throws Exception {
-        User user1 = createDummyUser(userDao, 1);
-        User user2 = createDummyUser(userDao, 2);
-        User user3 = createDummyUser(userDao, 3);
-        User user4 = createDummyUser(userDao, 4);
+        User user1 = helper.createDummyUser(userDao, 1);
+        User user2 = helper.createDummyUser(userDao, 2);
+        User user3 = helper.createDummyUser(userDao, 3);
+        User user4 = helper.createDummyUser(userDao, 4);
 
         clearSession();
 
@@ -214,7 +196,7 @@ public class UserDaoTest extends HibernateDaoTestCase {
         queryUser1 = userDao.getUser("user1");
         Assert.assertNull(queryUser1);
     }
-
+    
     private void verifyUser(User user1, User user2) {
         Assert.assertEquals(user1.getUid(), user2.getUid());
         Assert.assertEquals(user1.getUsername(), user2.getUsername());

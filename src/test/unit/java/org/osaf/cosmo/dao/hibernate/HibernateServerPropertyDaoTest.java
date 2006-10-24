@@ -13,37 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.test;
+package org.osaf.cosmo.dao.hibernate;
 
 import junit.framework.Assert;
 
-import org.osaf.cosmo.dao.hibernate.ServerPropertyDaoImpl;
+public class HibernateServerPropertyDaoTest extends
+        AbstractHibernateDaoTestCase {
 
-/**
- * Test UserDao funtionality
- */
-public class ServerPropertyDaoTest extends HibernateDaoTestCase {
-	ServerPropertyDaoImpl serverPropertyDao = null;
-	
-	public ServerPropertyDaoTest()
-	{
-        serverPropertyDao = new ServerPropertyDaoImpl();
-        serverPropertyDao.setSessionFactory(sessionFactory);
-        serverPropertyDao.init();
-	}
+    protected ServerPropertyDaoImpl serverPropertyDao = null;
     
-    protected void setUp() throws Exception
-    {
-        super.setUp();
+    public HibernateServerPropertyDaoTest() {
+        super();
     }
     
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-    }
-	
-	public void testServerProperties() throws Exception {
-	    serverPropertyDao.setServerProperty("testprop1", "testvalue1");
+    public void testServerProperties() throws Exception {
+        serverPropertyDao.setServerProperty("testprop1", "testvalue1");
         clearSession();
         String propValue = serverPropertyDao.getServerProperty("testprop1");
         Assert.assertEquals("testvalue1", propValue);

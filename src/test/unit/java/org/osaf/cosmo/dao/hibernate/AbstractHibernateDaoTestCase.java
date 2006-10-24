@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.test;
+package org.osaf.cosmo.dao.hibernate;
 
-import org.osaf.cosmo.calendar.CalendarQueryFilterTest;
+public class AbstractHibernateDaoTestCase extends AbstractSpringDaoTestCase {
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-public class AllTests {
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for org.osaf.cosmo.test");
-		suite.addTestSuite(UserDaoTest.class);
-		suite.addTestSuite(ContentDaoTest.class);
-		suite.addTestSuite(CalendarDaoTest.class);
-        suite.addTestSuite(CalendarQueryFilterTest.class);
-        suite.addTestSuite(ServerPropertyDaoTest.class);
-		return suite;
-	}
-
+    protected HibernateTestHelper helper = null;
+    protected String baseDir = "src/test/unit/resources/testdata";
+    
+    public AbstractHibernateDaoTestCase() {
+        super();
+        helper = new HibernateTestHelper();
+    }
+    
+    protected void clearSession() {
+        // nothing for now
+    }
 }

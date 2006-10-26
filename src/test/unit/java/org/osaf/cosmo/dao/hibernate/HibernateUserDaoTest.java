@@ -108,6 +108,32 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         userDao.removeUser("user2");
     }
     
+    public void testUpdateUser() throws Exception {
+        User user1 = new User();
+        user1.setUsername("user1");
+        user1.setFirstName("User");
+        user1.setLastName("1");
+        user1.setEmail("user1@user1.com");
+        user1.setPassword("user1password");
+        user1.setAdmin(Boolean.TRUE);
+
+        user1 = userDao.createUser(user1);
+        
+        clearSession();
+        
+        // find by uid
+        User queryUser1 = userDao.getUserByUid(user1.getUid());
+        Assert.assertNotNull(queryUser1);
+        verifyUser(user1, queryUser1);
+        
+        queryUser1.setPassword("user2password");
+        userDao.updateUser(queryUser1);
+        
+        clearSession();
+        queryUser1 = userDao.getUserByUid(user1.getUid());
+        Assert.assertEquals(queryUser1.getPassword(), "user2password");
+    }
+    
     public void testPaginatedUsers() throws Exception {
         User user1 = helper.createDummyUser(userDao, 1);
         User user2 = helper.createDummyUser(userDao, 2);

@@ -150,7 +150,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     public User updateUser(User user) {
         try {
             user.setDateModified(new Date());
-            getSession().save(user);
+            getSession().update(user);
             return user;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);

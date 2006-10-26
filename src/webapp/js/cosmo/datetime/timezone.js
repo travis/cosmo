@@ -16,26 +16,156 @@
 
 dojo.provide("cosmo.datetime.timezone");
 
-var $ = function(id) {
-  return document.getElementById(id);
+cosmo.datetime.timezone.Timezone = function(tzId, zoneItems){
+    this.tzId = tzId;
+    this.zoneItems = zoneItems || [];    
 };
 
-cosmo.datetime.TimezoneRegistry = function(){
+cosmo.datetime.timezone.Timezone.prototype.addZoneItem = function(zoneItem){
+    this.zoneItems.push(zoneItem);
+};
+
+cosmo.datetime.timezone.ZoneItem = function(){
+ //TODO 
+};
+
+cosmo.datetime.timezone.RuleSet = function(name, rules){
+    this.name = name;
+    this.rules = rules || [];
+};
+
+cosmo.datetime.timezone.RuleSet.prototype.addRule = function(rule){
+    this.rules.push(rule);
+};
+
+cosmo.datetime.timezone.Rule = function(){
+    // TODO
+}
+
+cosmo.datetime.timezone.TimezoneRegistry = function(){
     this.init();
 };
 
 cosmo.datetime.timezone.TimezoneRegistry.prototype.init = function(){
+   //TODO don't hardcode this.
    var files = ["/cosmo/js/lib/olson-tzdata/northamerica"];
    dojo.lang.map(files, this._parseUri);
 };
 
 cosmo.datetime.timezone.TimezoneRegistry.prototype._parseUri = function(uri){
     var content = dojo.hostenv.getText(uri);
-    dojo.debug(content);
+    cosmo.datetime.timezone.parse(content);
 };
 
-cosmo.datetime.timezone.TimezoneParser = function(){
+cosmo.datetime.timezone.parse = function(str){ 
+       //TMP
+       var self = {};
+       self.ruleSets = [];
+       self.zones = [];
+       xxxr = self.ruleSets;
+       xxxz = self.zones;
+        var lines = str.split('\n');
+        
+        //the current zone
+        var zone = null;
+      
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            
+            if (line.match(/^\s/)) {
+                //we do this because zone lines after the first don't have a zone in it.
+                line = "Zone " + zone.tzId + line;
+            }
+            
+            //Skip comments
+            if (dojo.string.startsWith(line, "#") || line.length < 3){
+                continue;
+            }
+            
+            //split on whitespace
+	        var arr = line.split(/\s+/);
+	        
+	        //is this a zone, a rule, a link or what?
+	        var lineType = arr.shift();
+	        switch(lineType) {
+	            case 'Zone':
+	                var tzId = arr.shift();
+                    var zoneItem = this._parseZoneLine(arr);
+	                if (!self.zones[tzId]) {
+	                    zone =  new cosmo.datetime.timezone.Timezone(tzId);
+	                    self.zones[tzId] = zone;
+	                } else {
+	                    zone = self.zones[tzId];
+	                }
+	                zone.addZoneItem(zoneItem);
+	                break;
+	            case 'Rule':
+	                var ruleName = arr.shift();
+	                var rule = this._parseRuleLine(arr);
+	                if (!self.ruleSets[ruleName]) { 
+	                    ruleSet = new cosmo.datetime.timezone.RuleSet(ruleName);
+	                    self.ruleSets[ruleName] = ruleSet;
+	                } else {
+	                    ruleSet = self.ruleSets[ruleName];
+	                }
+	                ruleSet.addRule(rule);
+	                break;
+	            case 'Link':
+	                // Shouldn't exist
+	                /**TODO Handle This
+	                if (self.zones[arr[1]]) { 
+	                    alert('Error with Link ' + arr[1]); 
+	                }
+	                self.zones[arr[1]] = arr[0];
+	                **/
+	                break;
+	            case 'Leap':
+	                break;
+	            default:
+	                // Fail silently
+	                break;
+	        }//end switch
+            
+        }//end for
+        return true;
+    };//end function
 
+cosmo.datetime.timezone._parseZoneLine = function(array){
+    var zoneItem = new cosmo.datetime.timezone.ZoneItem();
+
+    var arrayPrinter = function(starter, arrayToPrint){
+        var stringy = starter;
+	    for (var index = 0; index < arrayToPrint.length; index++){
+	        stringy += index + "->'" + arrayToPrint[index] + "'    "; 
+	    }
+	    dojo.debug(stringy);
+    }
+    xxxarray = array;
+    arrayPrinter ("zoneLine --> ", array); 
+    
+    //DEBUG: zoneLine --> 0->'-10:30' 1->'-' 2->'HST' 3->'1933' 4->'Apr' 5->'30' 6->'2:00'
+    //                    GMTOFF      RULE   FORMAT   UNTIL-YR  MONTH    DAY     TIME
+	/*
+	if (!z[3]) { break; }
+	var yea = parseInt(z[3]);
+	var mon = 11;
+	var dat = 31;
+	if (z[4]) {
+	    mon = monthMap[z[4].substr(0, 3).toLowerCase()];
+	    dat = parseInt(z[5]);
+	}
+	var t = z[6] ? z[6] : '23:59:59';
+	t = parseTimeString(t);
+	var d = Date.UTC(yea, mon, dat, t[1], t[2], t[3]);
+    */
+    //TODO set properties...
+    return zoneItem;
+};
+
+cosmo.datetime.timezone._parseRuleLine = function(line){
+    var rule = new cosmo.datetime.timezone.Rule();
+    //TODO set properties...
+	return rule;
 };
 
 

@@ -185,6 +185,73 @@ fleegix.tz = new function() {
     var monthMap = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5, 
         'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 } 
     var dayMap = {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 }
+    var zoneAreas = { AFRICA: 'africa', ANTARCTICA: 'antarctica', 
+        ASIA: 'asia', AUSTRALASIA: 'australasia', BACKWARD: 'backward', 
+        ETCETERA: 'etcetera', EUROPE: 'europe', NORTHAMERICA: 'northamerica', 
+        PACIFICNEW: 'pacificnew', SOUTHAMERICA: 'southamerica', 
+        SYSTEMV: 'systemv' };
+    var zoneKeys = {
+        'Africa': this.zoneAreas.AFRICA,
+        'Indian': this.zoneAreas.AFRICA,
+        'Antarctica': this.zoneAreas.ANTARCTICA,
+        'Asia': this.zoneAreas.ASIA,
+        'Pacific': this.zoneAreas.AUSTRALASIA,
+        'Australia': this.zoneAreas.AUSTRALASIA,
+        'Etc': this.zoneAreas.ETCETERA,
+        'EST': this.zoneAreas.NORTHAMERICA,
+        'MST': this.zoneAreas.NORTHAMERICA,
+        'HST':this.zoneAreas.NORTHAMERICA,
+        'EST5EDT': this.zoneAreas.NORTHAMERICA,
+        'CST6CDT': this.zoneAreas.NORTHAMERICA,
+        'MST7MDT': this.zoneAreas.NORTHAMERICA,
+        'PST8PDT': this.zoneAreas.NORTHAMERICA,
+        'America': function() {
+            var ret = [];
+            if (!this.loadedZoneAreas[this.zoneAreas.NORTHAMERICA]) {
+                ret.push(this.zoneAreas.NORTHAMERICA);
+            }
+            if (!this.loadedZoneAreas[this.zoneAreas.SOUTHAMERICA]) {
+                ret.push(this.zoneAreas.SOUTHAMERICA);
+            u}
+            return ret;
+        },
+        'WET': this.zoneAreas.EUROPE,
+        'CET': this.zoneAreas.EUROPE,
+        'MET': this.zoneAreas.EUROPE,
+        'EET': this.zoneAreas.EUROPE,
+        'Europe': this.zoneAreas.EUROPE,
+        'SystemV': this.zoneAreas.SYSTEMV
+    };
+    var zoneExceptions = {
+        'Pacific/Honolulu': this.zoneAreas.NORTHAMERICA,
+        'Pacific/Easter': this.zoneAreas.SOUTHAMERICA,
+        'Pacific/Galapagos': this.zoneAreas.SOUTHAMERICA,
+        'America/Danmarkshavn': this.zoneAreas.EUROPE,
+        'America/Scoresbysund': this.zoneAreas.EUROPE,
+        'America/Godthab': this.zoneAreas.EUROPE,
+        'America/Thule': this.zoneAreas.EUROPE,
+        'Indian/Kerguelen': this.zoneAreas.ANTARCTICA,
+        'Indian/Chagos': this.zoneAreas.ASIA,
+        'Indian/Maldives': this.zoneAreas.ASIA,
+        'Indian/Christmas': this.zoneAreas.AUSTRALASIA,
+        'Indian/Cocos': this.zoneAreas.AUSTRALASIA,
+        'Europe/Nicosia': this.zoneAreas.ASIA,
+        'Pacific/Easter': this.zoneAreas.SOUTHAMERICA,
+        'Africa/Ceuta': this.zoneAreas.EUROPE,
+        'Asia/Yekaterinburg': this.zoneAreas.EUROPE,
+        'Asia/Omsk': this.zoneAreas.EUROPE,
+        'Asia/Novosibirsk': this.zoneAreas.EUROPE,
+        'Asia/Krasnoyarsk': this.zoneAreas.EUROPE,
+        'Asia/Irkutsk': this.zoneAreas.EUROPE,
+        'Asia/Yakutsk': this.zoneAreas.EUROPE,
+        'Asia/Vladivostok': this.zoneAreas.EUROPE,
+        'Asia/Sakhalin': this.zoneAreas.EUROPE,
+        'Asia/Magadan': this.zoneAreas.EUROPE,
+        'Asia/Kamchatka': this.zoneAreas.EUROPE,
+        'Asia/Anadyr': this.zoneAreas.EUROPE,
+        'Asia/Istanbul': this.zoneAreas.EUROPE
+    };
+    var loadedZoneAreas = {};
     
     function parseTimeString(str) {
         var pat = /(\d+)(?::0*(\d*))?(?::0*(\d*))?([wsugz])?$/;

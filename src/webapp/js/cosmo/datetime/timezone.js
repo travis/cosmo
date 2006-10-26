@@ -181,15 +181,16 @@ cosmo.datetime.TimezoneParser.DAY_MAP =  {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3,
 fleegix = {};
 fleegix.tz = new function() {
     
-    var self = this;
-    var monthMap = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5, 
-        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 } 
-    var dayMap = {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 }
-    var zoneAreas = { AFRICA: 'africa', ANTARCTICA: 'antarctica', 
+    this.zoneAreas = { AFRICA: 'africa', ANTARCTICA: 'antarctica', 
         ASIA: 'asia', AUSTRALASIA: 'australasia', BACKWARD: 'backward', 
         ETCETERA: 'etcetera', EUROPE: 'europe', NORTHAMERICA: 'northamerica', 
         PACIFICNEW: 'pacificnew', SOUTHAMERICA: 'southamerica', 
         SYSTEMV: 'systemv' };
+    
+    var self = this;
+    var monthMap = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5, 
+        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 } 
+    var dayMap = {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 }
     var zoneKeys = {
         'Africa': this.zoneAreas.AFRICA,
         'Indian': this.zoneAreas.AFRICA,

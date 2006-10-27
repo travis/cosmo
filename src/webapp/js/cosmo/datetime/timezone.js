@@ -21,7 +21,7 @@ cosmo.datetime.MINUTES_IN_HOUR = 60;
 cosmo.datetime.SECONDS_IN_MINUTE = 60;
 
 cosmo.datetime.timezone._MONTH_MAP = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5, 
-        								 'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 };
+                                         'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 };
 
 cosmo.datetime.timezone._DAY_MAP =  {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 };
 cosmo.datetime.timezone._RULE_OP_LAST = "LAST";

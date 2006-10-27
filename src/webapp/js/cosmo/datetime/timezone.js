@@ -16,6 +16,18 @@
 
 dojo.provide("cosmo.datetime.timezone");
 
+cosmo.datetime.HOURS_IN_DAY = 24;
+cosmo.datetime.MINUTES_IN_HOUR = 60;
+cosmo.datetime.SECONDS_IN_MINUTE = 60;
+
+cosmo.datetime.timezone._MONTH_MAP = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5, 
+        								 'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 };
+
+cosmo.datetime.timezone._DAY_MAP =  {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 };
+cosmo.datetime.timezone._RULE_OP_LAST = "LAST";
+cosmo.datetime.timezone._RULE_OP_GTR = "GTR";
+cosmo.datetime.timezone._RULE_OP_LESS = "LSS";
+
 cosmo.datetime.timezone.Timezone = function(tzId, zoneItems){
     this.tzId = tzId;
     this.zoneItems = zoneItems || [];    
@@ -82,91 +94,172 @@ cosmo.datetime.timezone.parse = function(str){
                 continue;
             }
             
+            
+            //in case there are any inline comments
+            line = line.split("#")[0];
+            
             //split on whitespace
-	        var arr = line.split(/\s+/);
-	        
-	        //is this a zone, a rule, a link or what?
-	        var lineType = arr.shift();
-	        switch(lineType) {
-	            case 'Zone':
-	                var tzId = arr.shift();
+            var arr = line.split(/\s+/);
+            
+            //is this a zone, a rule, a link or what?
+            var lineType = arr.shift();
+            switch(lineType) {
+                case 'Zone':
+                    var tzId = arr.shift();
                     var zoneItem = this._parseZoneLine(arr);
-	                if (!self.zones[tzId]) {
-	                    zone =  new cosmo.datetime.timezone.Timezone(tzId);
-	                    self.zones[tzId] = zone;
-	                } else {
-	                    zone = self.zones[tzId];
-	                }
-	                zone.addZoneItem(zoneItem);
-	                break;
-	            case 'Rule':
-	                var ruleName = arr.shift();
-	                var rule = this._parseRuleLine(arr);
-	                if (!self.ruleSets[ruleName]) { 
-	                    ruleSet = new cosmo.datetime.timezone.RuleSet(ruleName);
-	                    self.ruleSets[ruleName] = ruleSet;
-	                } else {
-	                    ruleSet = self.ruleSets[ruleName];
-	                }
-	                ruleSet.addRule(rule);
-	                break;
-	            case 'Link':
-	                // Shouldn't exist
-	                /**TODO Handle This
-	                if (self.zones[arr[1]]) { 
-	                    alert('Error with Link ' + arr[1]); 
-	                }
-	                self.zones[arr[1]] = arr[0];
-	                **/
-	                break;
-	            case 'Leap':
-	                break;
-	            default:
-	                // Fail silently
-	                break;
-	        }//end switch
+                    if (!self.zones[tzId]) {
+                        zone =  new cosmo.datetime.timezone.Timezone(tzId);
+                        self.zones[tzId] = zone;
+                    } else {
+                        zone = self.zones[tzId];
+                    }
+                    zone.addZoneItem(zoneItem);
+                    break;
+                case 'Rule':
+                    var ruleName = arr.shift();
+                    var rule = this._parseRuleLine(arr);
+                    if (!self.ruleSets[ruleName]) { 
+                        ruleSet = new cosmo.datetime.timezone.RuleSet(ruleName);
+                        self.ruleSets[ruleName] = ruleSet;
+                    } else {
+                        ruleSet = self.ruleSets[ruleName];
+                    }
+                    ruleSet.addRule(rule);
+                    break;
+                case 'Link':
+                    // Shouldn't exist
+                    /**TODO Handle This
+                    if (self.zones[arr[1]]) { 
+                        alert('Error with Link ' + arr[1]); 
+                    }
+                    self.zones[arr[1]] = arr[0];
+                    **/
+                    break;
+                case 'Leap':
+                    break;
+                default:
+                    // Fail silently
+                    break;
+            }//end switch
             
         }//end for
         return true;
     };//end function
 
+cosmo.datetime.timezone._arrayPrinter = function(starter, arrayToPrint){
+    var stringy = starter;
+    for (var index = 0; index < arrayToPrint.length; index++){
+        stringy += index + "->'" + arrayToPrint[index] + "'    "; 
+    }
+    dojo.debug(stringy);
+};
+
 cosmo.datetime.timezone._parseZoneLine = function(array){
     var zoneItem = new cosmo.datetime.timezone.ZoneItem();
 
-    var arrayPrinter = function(starter, arrayToPrint){
-        var stringy = starter;
-	    for (var index = 0; index < arrayToPrint.length; index++){
-	        stringy += index + "->'" + arrayToPrint[index] + "'    "; 
-	    }
-	    dojo.debug(stringy);
-    }
-    xxxarray = array;
-    arrayPrinter ("zoneLine --> ", array); 
-    
-    //DEBUG: zoneLine --> 0->'-10:30' 1->'-' 2->'HST' 3->'1933' 4->'Apr' 5->'30' 6->'2:00'
+    //The Format: zoneLine --> 0->'-10:30' 1->'-' 2->'HST' 3->'1933' 4->'Apr' 5->'30' 6->'2:00'
     //                    GMTOFF      RULE   FORMAT   UNTIL-YR  MONTH    DAY     TIME
-	/*
-	if (!z[3]) { break; }
-	var yea = parseInt(z[3]);
-	var mon = 11;
-	var dat = 31;
-	if (z[4]) {
-	    mon = monthMap[z[4].substr(0, 3).toLowerCase()];
-	    dat = parseInt(z[5]);
-	}
-	var t = z[6] ? z[6] : '23:59:59';
-	t = parseTimeString(t);
-	var d = Date.UTC(yea, mon, dat, t[1], t[2], t[3]);
-    */
-    //TODO set properties...
+
+    //first set the offset:
+    zoneItem.offsetInMinutes = this._parseTimeIntoMinutes(array[0]);
+
+    //set the rule name
+    zoneItem.ruleName = array[1];
+    
+    //set the format.
+    zoneItem.format = array[2]; 
+
+    if (!array[3]){
+        zoneItem.untilDate = null;
+    } else {
+        var until = {};
+        until.year = array[3];
+        if (array[4]){
+           until.month = this._MONTH_MAP[array[4].substr(0,3).toLowerCase()];
+           until.date = parseInt(array[5]);
+        }
+        
+        if (!array[6]){
+            until.hours = 23;
+            until.minutes = 59;
+            until.seconds = 59;
+        } else {
+            var hms = this._parseTimeString(array[6]);
+            until.hours = hms.hours;
+            until.minutes = hms.minutes;
+            until.seconds = hms.seconds;
+        }
+        zoneItem.untilDate = until;
+    }
     return zoneItem;
 };
 
-cosmo.datetime.timezone._parseRuleLine = function(line){
+cosmo.datetime.timezone._parseRuleLine = function(array){
     var rule = new cosmo.datetime.timezone.Rule();
+    
+    //The Format: DEBUG: Rule --> 0->'1942' 1->'only' 2->'-' 3->'Feb' 4->'9' 5->'2:00' 6->'1:00' 7->'W' 8->''
+    //                            FROM      TO        TYPE   IN       ON     AT        SAVE      LETTER
+    
+    //set the start year
+    rule.startYear = parseInt(array[0]) || (dojo.string.startsWith(array[0], "min") ? -99999 : 99999);
+    
+    //set the end Year
+    rule.endYear = parseInt(array[1]) 
+        || (dojo.string.startsWith(array[1], "o") ? rule.startYear : (dojo.string.startsWith(array[1], "min") ? -99999 : 99999));
+        
+    //set the type
+    rule.type = array[2];
+    
+    //set the startmonth
+    rule.startMonth = this._MONTH_MAP[array[3].substr(0,3).toLowerCase()];
+    
+    //set the start date
+    var rawOn = array[4]; //the raw "ON" data
+    if (dojo.lang.isNumber(rawOn)){
+        rule.startDate = parseInt(rawOn);
+    } else {
+        if (dojo.string.startsWith("last")){
+            rule.startDate = null;
+            rule.startDay = this._DAY_MAP[rawOn.substr(4,3).toLowerCase()];
+            rule.startOperator = this._RULE_OP_LAST;
+        } else {
+            rule.startOperator = (rawOn.indexOf(">") > -1) ? this._RULE_OP_GTR : this._RULE_OP_LESS;
+            rule.startDay = this._DAY_MAP[rawOn.substr(0,3).toLowerCase()];
+        }
+    }
+
+    //set the startTime
+    //TODO get that extra letter for wallclock, standard, etc.
+    rule.startTime = this._parseTimeString(array[5]);
+    
+    //the amount of mintues to add
+    rule.addMinutes = this._parseTimeIntoMinutes(array[6]);
+    
+    //the letter
+    rule.letter = array[7];
+    
     //TODO set properties...
-	return rule;
+    return rule;
 };
+
+cosmo.datetime.timezone._parseTimeString = function(str) {
+    var pat = /(\d+)(?::0*(\d*))?(?::0*(\d*))?([wsugz])?$/;
+    var matchArray =  str.match(pat);
+    var result = {};
+    result.hours = parseInt(matchArray[1]);
+    result.minutes = matchArray[2] ? parseInt(matchArray[2]) : 0;
+    result.seconds = matchArray[3] ? parseInt(matchArray[3]) : 0;
+    result.negative = dojo.string.startsWith(str, "-");
+    return result;
+};
+ 
+ cosmo.datetime.timezone._parseTimeIntoMinutes = function(str){
+    var hms = this._parseTimeString(str);
+    var millis = ((((hms.hours * cosmo.datetime.MINUTES_IN_HOUR) + hms.minutes) * cosmo.datetime.SECONDS_IN_MINUTE) + hms.seconds) * 1000;
+    var minutes = millis/1000/cosmo.datetime.SECONDS_IN_MINUTE;
+    minutes = minutes * (hms.negative ? -1 : 1);
+    return minutes;
+ };
 
 
 /*

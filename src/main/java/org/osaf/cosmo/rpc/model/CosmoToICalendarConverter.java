@@ -18,6 +18,7 @@ package org.osaf.cosmo.rpc.model;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.PARAM_X_OSAF_ANYTIME;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
+import static org.osaf.cosmo.util.ICalendarUtils.getMasterEvent;
 
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -124,7 +125,7 @@ public class CosmoToICalendarConverter {
      * @return
      */
     public void updateEvent(Event event, Calendar calendar) {
-        VEvent vevent = getMasterVEvent(calendar);
+        VEvent vevent = getMasterEvent(calendar);
         copyProperties(event, vevent);
         addModificationsToCalendar(calendar, vevent, event);
     }
@@ -323,15 +324,21 @@ public class CosmoToICalendarConverter {
                
                 for (int x = 0; x < exceptionDates.length; x++) {
                     try {
+                        if (dateTime){
                         exDate.getDates().add(
-                                new Date(getDateTimeString(exceptionDates[x],
+                                new DateTime(getDateTimeString(exceptionDates[x],
                                         dateTime, utc)));
+                        } else {
+                            exDate.getDates().add(
+                                    new Date(getDateTimeString(exceptionDates[x],
+                                            dateTime, utc)));
+                        }
                     } catch (ParseException pe) {
                         throw new RuntimeException(pe);
                     }
                 }
                 
-                vevent.getProperties().add(exDate);
+                addOrReplaceProperty(vevent, exDate);
             }
         } else if (recurrenceRule == null) {
             removeProperty(vevent, Property.RRULE);
@@ -457,22 +464,6 @@ public class CosmoToICalendarConverter {
         if (sourceTz != null) {
             dest.getParameters().add(sourceTz);
         }
-    }
-   
-    //TODO this is wrong. How do we REALLY determine the master event?
-    protected VEvent getMasterVEvent(Calendar calendar) {
-        ComponentList list = calendar.getComponents().getComponents(
-                Component.VEVENT);
-        for (Object obj : list) {
-            VEvent vevent = (VEvent) obj;
-            if (!hasProperty(vevent, Property.RECURRENCE_ID)
-                    && !hasProperty(vevent, Property.EXRULE)
-                    && !hasProperty(vevent, Property.EXDATE)) {
-                return vevent;
-            }
-        }
-
-        return null;
     }
 
     private boolean hasProperty(Component c, String propName) {

@@ -524,9 +524,7 @@ var Cal = new function() {
         var key = id.toLowerCase();
         var queryDate = Cal.getNewViewStart(key);
         this.goViewQueryDate(queryDate);
-        MiniCal.render();
     };
-
     this.goViewQueryDate = function(queryDate) {
         Cal.calForm.clear();
         Cal.getQuerySpan(new Date(queryDate)); // Get the new query span week
@@ -534,6 +532,7 @@ var Cal = new function() {
         cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
         // Load and display events
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
+        MiniCal.render();
         Cal.uiMask.hide();
     };
     /**

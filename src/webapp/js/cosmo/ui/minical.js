@@ -48,6 +48,8 @@ var MiniCal = new function() {
     this.monthMappings = [];
     // Start of currently viewable events from controller
     this.viewStart = null;
+    // End of currently viewable events from controller
+    this.viewEnd = null;
     // Current date from controller
     this.currDate = null;
     // The first month displayed -- 0 = Jan, 11 = Dec, etc.
@@ -444,13 +446,25 @@ var MiniCal = new function() {
         var selDays = self.selectedDays;
         var selDiv = null;
         var dt = new Date(self.viewStart.getTime());
+        var viewStartMonth = self.viewStart.getMonth();
+        var viewEndMonth = self.viewEnd.getMonth();
+        var isStartDateMonthRendered = !isNaN(self.monthMappings[viewStartMonth]);
+        var isEndDateMonthRendered = !isNaN(self.monthMappings[viewEndMonth]);
         var crossMonth = dt.getDate() > self.controller.viewEnd.getDate();
-        var monIndex = self.monthMappings[dt.getMonth()];
+        var monIndex =  null;
         var idPrefix = self.id + '_month';
+        
+        // If the actual start month is not one of the three displayed,
+        // get the start month number by subtracting one from the end
+        // month number.
+        // This fixes issues with selections that span two month tiles
+        // when only one of the two months is showing
+        monIndex = isStartDateMonthRendered ? self.monthMappings[viewStartMonth] :
+            self.monthMappings[viewEndMonth] - 1;
         
         // Bail out if viewed range of events is not in the currently
         // displayed array of months
-        if (isNaN(monIndex)) {
+        if (!(isStartDateMonthRendered || isEndDateMonthRendered)) {
             return;
         }
         
@@ -482,15 +496,21 @@ var MiniCal = new function() {
         // Create new selection
         // ----------
         // Selection spans two months -- do dim/plain, then plain/dim
+        // In some cases only the first or second of the two months
+        // may actually be rendered -- isStart/EndDateRendered
         if (crossMonth) {
             // * First month -- actual dates and dimmed dates for next month
-            selectCells(dt, idPrefix, monIndex, '_dim', '');
-            // * Second month -- dimmed dates for previous month and actual dates
-            // Move to the next month
-            monIndex++;
-            // Reset working date
-            dt = new Date(self.viewStart.getTime());
-            selectCells(dt, idPrefix, monIndex, '', '_dim');
+            if (isStartDateMonthRendered) {
+                selectCells(dt, idPrefix, monIndex, '_dim', '');
+            }
+            if (isEndDateMonthRendered) {
+                // * Second month -- dimmed dates for previous month and actual dates
+                // Move to the next month
+                monIndex++;
+                // Reset working date
+                dt = new Date(self.viewStart.getTime());
+                selectCells(dt, idPrefix, monIndex, '', '_dim');
+            }
         }
         // Selection is all within a single month -- do plain/plain
         else {
@@ -566,6 +586,7 @@ var MiniCal = new function() {
      */
     this.syncViewStart = function() {
         self.viewStart = self.controller.viewStart;
+        self.viewEnd = self.controller.viewEnd;
     }
     /**
      * Prevent memleak

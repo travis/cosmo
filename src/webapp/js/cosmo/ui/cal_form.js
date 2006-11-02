@@ -500,6 +500,8 @@ function CalForm() {
         var descr = '';
         var status = '';
         var allDay = false;
+        var recur = null; 
+        var rE = '';
         var h = 0;
         var m = 0;
         var err = '';
@@ -515,6 +517,9 @@ function CalForm() {
         descr = form.eventdescr.value;
         status = form.status.value;
         allDay = form.eventallday.checked ? true : false;
+        recur = form.recurrence.value;
+        rE = form.recurend.value != 'mm/dd/yyyy' ?
+            form.recurend.value : '';
         
         // Error checking
         // =======================
@@ -541,6 +546,14 @@ function CalForm() {
             err = Validate.timeFormat(endTime);
             if (err) {
                 errMsg += '"Ends" time field:\n' + err;
+                errMsg += '\n';
+            }
+        }
+        // Validate recurrence end date if it's there
+        if (recur && rE) {
+            err = Validate.dateFormat(rE);
+            if (err) {
+                errMsg += '"Occurs" ending date field:\n' + err;
                 errMsg += '\n';
             }
         }
@@ -596,7 +609,6 @@ function CalForm() {
             ev.data.allDay = allDay;
             ev.data.status = status;
             
-            var recur = form.recurrence.value;
             var rule = ev.data.recurrenceRule;
             // Set to no recurrence
             //Log.print('recur: ' + recur);
@@ -604,8 +616,6 @@ function CalForm() {
                 ev.data.recurrenceRule = null;
             }
             else {
-                var rE = form.recurend.value.match(/^\d/) ? 
-                    form.recurend.value : null;
                 var recurEnd = null;
                 if (rE) {
                     rE = new Date(rE);

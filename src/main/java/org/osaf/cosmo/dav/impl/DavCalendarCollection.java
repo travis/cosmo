@@ -140,6 +140,21 @@ public class DavCalendarCollection extends DavCollection
         writeICalendar(outputContext);
     }
 
+    /** */
+    public void move(DavResource destination)
+        throws DavException {
+        validateDestination(destination);
+        super.move(destination);
+    }
+
+    /** */
+    public void copy(DavResource destination,
+                     boolean shallow)
+        throws DavException {
+        validateDestination(destination);
+        super.copy(destination, shallow);
+    }
+
     // our methods
 
     /**
@@ -464,5 +479,14 @@ public class DavCalendarCollection extends DavCollection
         } catch (ValidationException e) {
             throw new IllegalStateException("unable to validate member's icalendar content", e);
         }
+    }
+
+    private void validateDestination(DavResource destination)
+        throws DavException {
+        DavResource destinationCollection = destination.getCollection();
+        if (! (destinationCollection instanceof DavCollection))
+            throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "A calendar collection may only be created within a collection");
+        if (destinationCollection instanceof DavCalendarCollection)
+            throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "A calendar collection may not be created within a calendar collection");
     }
 }

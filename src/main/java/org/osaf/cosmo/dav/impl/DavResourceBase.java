@@ -316,6 +316,10 @@ public abstract class DavResourceBase
             try {
                 parent = (DavCollection) getFactory().
                     createResource(parentLocator, getSession());
+            } catch (ClassCastException e) {
+                // XXX: really should be able to throw DavException
+                // from this method
+                throw new RuntimeException("Parent of requested resource is not a collection");
             } catch (DavException e) {
                 log.error("could not instantiate parent resource " +
                           parentPath + " for resource " + getResourcePath());

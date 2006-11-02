@@ -52,14 +52,27 @@ function CalEvent(id, block) {
     /**
      * Indicates if an event has actually been edited or not --
      * used when dragging or moving to make sure event has really
-     * changed before saving
+     * changed before saving. Mapping of comparator functions to
+     * properties are saved in compareList. Null values for the 
+     * comparator func in that list mean comparison just uses
+     * generic equality.
+     * @return Array/null, If anything has changed, returns an array
+     * of the changes -- each item in the array is an array with three
+     * items: the name of the changed property, the new value, and
+     * the original value. If nothing has changed, returns null.
+     * 
      */
     this.hasChanged = function() {
         var d = this.data;
         var dO = this.dataOrig;
         var ret = [];
-        // Use special func for status since Design insists that
-        // 'CONFIRMED' and unset should somehow be the same thing
+        /**
+         * Special func for comparing status since Design insists that
+         * 'CONFIRMED' and unset should somehow be the same thing.
+         * @param curr String the edited event status
+         * @param orig String the original event status
+         * @return Boolean, true or false
+         */
         var compareStatus = function(curr, orig) {
             if ((!curr && orig == EventStatus.CONFIRMED) || 
                 (curr == EventStatus.CONFIRMED && !orig)) {
@@ -69,6 +82,12 @@ function CalEvent(id, block) {
                 return true;
             }
         }
+        /**
+         * Compare ScoobyDate/JS Dates, use value.
+         * @param curr ScoobyDate/Date the edited date
+         * @param orig ScoobyDate/Date the original event date
+         * @return Boolean, true or false
+         */
         var compareDateTime = function(curr, orig) {
             if (curr.toUTC() != orig.toUTC()) {
                 return true;
@@ -77,6 +96,14 @@ function CalEvent(id, block) {
                 return false;
             }
         }
+        /**
+         * Compare RecurrenceRules. The salient things to look at
+         * are existence of the RecurrenceRule itself, and then
+         * frequency and endDate of the RecurrenceRule.
+         * @param curr RecurrenceRule, the edited value
+         * @param orig RecurrenceRule, the original value
+         * @return Boolean, true or false
+         */
         var compareRecurrence = function(curr, orig) {
             // No recurrence
             if (!curr && !orig) {
@@ -100,6 +127,7 @@ function CalEvent(id, block) {
                 return true;
             }
         }
+        // Comparator function mappings
         var compareList = {
             'start': compareDateTime,
             'end': compareDateTime,
@@ -111,7 +139,13 @@ function CalEvent(id, block) {
             'recurrenceRule': compareRecurrence,
             'status': compareStatus
         }
-        
+        /**
+         * Base function for doing all the prop comparisons.
+         * @param prop String, the name of the property to be checked.
+         * @param curr (various types), the edited property value
+         * @param orig (various types), the original property value
+         * @param f Function, any custom comparator function
+         */
         function compareVals(prop, curr, orig, f) {
             var diff
             var a = curr || null;

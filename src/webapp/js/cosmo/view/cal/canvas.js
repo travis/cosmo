@@ -25,15 +25,27 @@ cosmo.view.cal.canvas = new function() {
     // Resizeable area for all-day events -- a ResizeArea obj
     var allDayArea = null; 
     
+    // Avoid RSI
     function $(id) {
         return document.getElementById(id);
     }
+    /**
+     * Diagnostic function -- dump the content of an event
+     * @param key String, the Hash key for the eventRegistry
+     * @param val CalEvent object, the event whose data you
+     * want to dump
+     */
     function dumpEvData(key, val) {
         Log.print(key);
         Log.print(val.id)
         Log.print(val.data.id);
         Log.print(val.data.title);
     }    
+    /**
+     * Set the passed calendar event as the selected one on
+     * canvas
+     * @param ev CalEvent object, the event to select 
+     */
     function setSelectedEvent(ev) {
         // Deselect previously selected event if any
         if (self.selectedEvent) {
@@ -42,15 +54,16 @@ cosmo.view.cal.canvas = new function() {
         self.selectedEvent = ev; // Pointer to the currently selected event
         ev.block.setSelected(); // Show the associated block as selected
     };
-    
     /**
-     * Removes a cal event from the canvas -- called in three cases:
+     * Removes an event lozenge from the canvas -- called in three cases:
      * (1) Actually removing an event from the calendar (this gets
      *     called after the backend successfully removes it)
      * (2) Removing an event from view because it's been edited
      *     to dates outside the viewable span
      * (3) Removing the placeholder event when initial event
      *     creation fails
+     * Likely called in a loop with the Hash's 'each' method
+     * @param id String, id of the event to be removed
      * @param ev CalEvent obj, the event to be removed
      */
     function removeEventFromDisplay(id, ev) {
@@ -63,6 +76,13 @@ cosmo.view.cal.canvas = new function() {
         }
         return true;
     }
+    /**
+     * Remove a cal event object, usually removes the event
+     * lozenge as well
+     * @param ev CalEvent object, the event to select 
+     * @param rem Boolean, if explicit false is passed,
+     * don't remove the lozenge along with the CalEvent obj
+     */
     function removeEvent(ev, rem) {
         // Default behavior is to remove the lozenge
         var removeLozenge = rem != false ? true : false;
@@ -72,6 +92,12 @@ cosmo.view.cal.canvas = new function() {
         }
         ev = null;
     }
+    /**
+     * Clear the entire eventRegistry, usually clear the
+     * lozenges from the canvas as well
+     * @param rem Boolean, if explicit false is passed,
+     * don't remove the lozenges along with the CalEvent objs
+     */
     function removeAllEvents(rem) {
         // Default behavior is to remove the lozenge
         var removeLozenge = rem != false ? true : false;
@@ -83,20 +109,21 @@ cosmo.view.cal.canvas = new function() {
         self.eventRegistry = new Hash();
         return true;
     }
-    /*
-     * reg: An eventRegistry Hash from which to remove a group or
-     *   groups of recurring events
-     * arr: The array of CalEventData ids for the recurrences to
-     *   remove
-     * dt: A ScoobyDate which represents the end date of a 
-     *   recurrence -- if the dt param is present, it will remove
-     *   only the event instances which occur after the date
-     *   It will also reset the recurrence endDate for all dates
-     *   to the dt (the new recurrence end date) for all the events
-     *   that it leaves
-     * ignore: the CalEvent id of a single event to ignore from
-     *   the removal process -- used when you need to leave the
-     *   master event in a recurrence
+    /**
+     * Removes a set or sets of recurring events for an id or ids
+     * @param reg An eventRegistry Hash from which to remove a group or
+     * groups of recurring events
+     * @param arr Array of CalEventData ids for the recurrences to
+     * remove
+     * @param dt A ScoobyDate,represents the end date of a 
+     * recurrence -- if the dt param is present, it will remove
+     * only the event instances which occur after the date
+     * It will also reset the recurrence endDate for all dates
+     * to the dt (the new recurrence end date) for all the events
+     * that it leaves
+     * @param ignore String, the CalEvent id of a single event to ignore from
+     * the removal process -- used when you need to leave the
+     * master event in a recurrence
      */
     function removeEventRecurrenceGroup(reg, arr, dt, ignore) {
         // Default behavior is to remove the lozenge
@@ -137,6 +164,13 @@ cosmo.view.cal.canvas = new function() {
         }
         return h;
     };
+    /**
+     * Append an calendar event lozenge to the canvas -- likely
+     * called in a loop with the Hash's 'each' method
+     * @param key String, the Hash key for the eventRegistry
+     * @param val CalEvent obj, value in the eventRegistry
+     * for the event getting added to the canvas
+     */
     function appendLozenge(key, val) {
         var id = key;
         var ev = val;
@@ -145,6 +179,10 @@ cosmo.view.cal.canvas = new function() {
             new HasTimeBlock(id);
         ev.block.insert(id);
     }
+    /**
+     * Main function for rendering/re-rendering the cal canvas
+     * @ return Boolean, true
+     */
     function updateEventsDisplay() {
         if (self.eventRegistry.length && 
             cosmo.view.cal.conflict.calc(self.eventRegistry) && 
@@ -160,27 +198,59 @@ cosmo.view.cal.canvas = new function() {
         }
         return true;
     }
+    /**
+     * Call positionLozenges in a loop with Hash's 'each' method
+     */
     function positionLozenges() {
         return self.eventRegistry.each(positionLozenge);
     };
+    /**
+     * Position the lozenge on the canvase based on the 
+     * CalEventData props -- happens after they're put on the canvas
+     * with appendLozenge. Called in a loop with Hash's 'each' method
+     * @param key String, the Hash key for the event in the
+     * eventRegistry
+     * @param val CalEvent object, the value in the Hash
+     */
     function positionLozenge(key, val) {
         ev = val;
         ev.block.updateFromEvent(ev);
         ev.block.updateDisplayMain();
     }
+    /**
+     * Restores a cal event to it's previous state after:
+     * (1) a user cancels an edit
+     * (2) an update operation fails on the server
+     * Restores the CalEventData from the backup snapshot, and
+     * returns the lozenge to its previous position
+     * @param ev CalEvent object, the event to restore
+     */
     function restoreEvent(ev) {
         if (ev.restoreFromSnapshot()) {
             ev.block.updateFromEvent(ev);
             ev.block.updateDisplayMain();
         }
     }
+    /**
+     * Convenience method for wiping the cal canvas. Also
+     * removes the current event selection
+     */
     function wipe() {
         removeAllEvents();
         self.selectedEvent = null;
     }
+    /**
+     * Render the canvas after successfully loading events
+     * from the server -- called for initial load, and for
+     * week-to-week navigation
+     * @param ev Hash, the eventRegistry of loaded events
+     */
     function loadSuccess(ev) {
         removeAllEvents();
         self.eventRegistry = ev;
+        // FIXME: This is a hack to get the 'Welcome to Cosmo'
+        // event on the canvas -- has to happen here so you
+        // don't wipe it with the 'removeAllEvents' call above
         if (Cal.createWelcomeItem) { 
             Cal.insertCalEventNew('hourDiv3-900', true); 
             Cal.createWelcomeItem = false;
@@ -188,8 +258,19 @@ cosmo.view.cal.canvas = new function() {
         else {
             self.eventRegistry.each(appendLozenge);
         }
+        // Update the view
         updateEventsDisplay();
     }
+    /**
+     * Handles a successful update of an event, for:
+     * (1) Plain ol' single-event upates
+     * (2) Removing the recurrence from a recurrence master
+     *     (results in a plain, single event).
+     * (3) Modifications to recurrences
+     * @param cmd JS Object, the command object passed in the 
+     * published 'success' event (contains the originally edited
+     * event, cmd.data, and the update options, cmd.opts).
+     */
     function saveSuccess(cmd) {
         var ev = cmd.data;
         var opts = cmd.opts;
@@ -226,13 +307,31 @@ cosmo.view.cal.canvas = new function() {
             updateEventsDisplay();
         }
     }
+    /**
+     * Handles a successful update of an event, for recurring
+     * events -- for:
+     * (1) Edits to an entire recurrence, 'All Events'
+     * (2) Breaking a recurrence and creating a new event,
+     * 'All Future Events' -- the new event may or may not 
+     * have recurrence
+     * @param data JS Object, the data passed from the published
+     * 'success' event (data.idArr, the array of event ids to use
+     * for removing the recurrence instances; data.eventRegistry,
+     * the Hash of expanded events; data.saveEvent, the originally
+     * clicked-on event; data.opts, the JS Object of options that
+     * tells you what kind of save operation is happening)
+     */
     function addSuccess(data) {
         var idArr = data.idArr;
         var evReg = data.eventRegistry;
         var ev = data.saveEvent;
         var opts = data.opts;
-        var h = self.eventRegistry.clone();
+        var h = null;
         var idArr = [];
+        
+        // Copy the eventRegistry to remove any recurrence
+        // instances associated with the edit
+        h = self.eventRegistry.clone();
         
         // Splitting the recurrence, new event is set to frequency
         // of 'once' -- just remove previous recurrence instances
@@ -262,22 +361,37 @@ cosmo.view.cal.canvas = new function() {
                 idArr.push(ev.data.id);
             }
             
+            // Remove some of all of the recurrence instances for re-render
+            // ----------------------
+            // 'All Events' -- remove all instances of the recurrence
             if (opts.saveType == 'recurrenceMaster') {
+                // Before wiping, remember the position of the currently selected
+                // event. If the canvas renders immediately after this update, 
+                // we need to keep the selection where it was.
                 var currSel = self.eventRegistry.getPos(self.selectedEvent.id);
                 h = removeEventRecurrenceGroup(h, idArr);
             }
+            // 'All Future Events' -- remove instances appearing after the
+            // new end date
             else if (opts.saveType == 'instanceAllFuture') {
                 h = removeEventRecurrenceGroup(h, idArr, opts.recurEnd);
             }
-            // Remove the original dragged event lozenge -- the new master
+            
+            // Remove the original clicked-on event -- the new master
             // will be in the recurrence expansion from the server
+            // ----------------------
             if (opts.saveType == 'instanceAllFuture' || 
                 opts.saveType == 'singleEventAddRecurrence') {
                 h.removeItem(opts.originalEvent.id);
             }
+            // Append the new recurrence expansions from the server
+            // onto the eventRegistry
             h.append(evReg);
+            // Clear the canvas
             removeAllEvents();
+            // Swap out the eventRegistry with the new one
             self.eventRegistry = h;
+            // Stick all the event lozenges on the canvas
             self.eventRegistry.each(appendLozenge);
         }
         
@@ -291,23 +405,28 @@ cosmo.view.cal.canvas = new function() {
                 // multiple events, but can't move off of their day
                 // weekly and above can move off their day, but will only
                 // have a single instance visible on the canvas
-                // 'instanceAllFuture' creates a new recurring event
+                // 'instanceAllFuture' creates a new event that may or may
+                // not recur
                 // ==========================================================
-                // The originally clicked event
+                // Either a master recurring or a recurring new event after 
+                // breaking recurrence -- figuring selection is a party  
                 if (ev.data.recurrenceRule) {
                     ev = evReg.getAtPos(0);
-                    // If changing a recurrence end results in the expansion ending before the
-                    // start of the orignal clicked instance, lozenge selection needs to go
-                    // somewhere
+                    // If changing a recurrence-end results in the expansion 
+                    // ending before the start of the orignal clicked instance, 
+                    // lozenge selection needs to go somewhere
                     if (opts.instanceEvent && ev.data.recurrenceRule.endDate && 
-                        (ev.data.recurrenceRule.endDate.toUTC() < opts.instanceEvent.data.start.toUTC())) {
+                        (ev.data.recurrenceRule.endDate.toUTC() < 
+                            opts.instanceEvent.data.start.toUTC())) {
                         ev =  self.eventRegistry.getLast(); 
                     }
                     else {
                         // Daily recurrence events
                         if (ev.data.recurrenceRule.frequency == 'daily') {
-                            // Persist selection when editing an instance, and selecting 'All Events'
-                            if (opts.saveType == 'recurrenceMaster' && opts.instanceEvent && opts.instanceEvent.data.instance) {
+                            // Persist selection when editing an instance, and 
+                            // selecting 'All Events'
+                            if (opts.saveType == 'recurrenceMaster' && 
+                                opts.instanceEvent && opts.instanceEvent.data.instance) {
                                 ev = self.eventRegistry.getAtPos(currSel);
                             }
                             else {
@@ -318,9 +437,6 @@ cosmo.view.cal.canvas = new function() {
                         }
                     }
                 }
-                else {
-                    
-                }
                 dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
                     'data': ev });
             }
@@ -330,6 +446,12 @@ cosmo.view.cal.canvas = new function() {
             }
         }
     }
+    /**
+     * Handles a successful removal of an event 
+     * @param ev CalEvent object, the removed event 
+     * @param opts JS Object, options for the removal that
+     * tell you what kind of remove is happening
+     */
     function removeSuccess(ev, opts) {
         if (opts.removeType == 'recurrenceMaster' || 
             opts.removeType == 'instanceAllFuture') {
@@ -349,7 +471,15 @@ cosmo.view.cal.canvas = new function() {
         updateEventsDisplay();
     }
     
+    // Subscribe to the '/calEvent' channel
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
+    
+    /**
+     * Handle events published on the '/calEvent' channel, including
+     * self-published events
+     * @param cmd A JS Object, the command containing orders for
+     * how to handle the published event.
+     */
     this.handlePub = function(cmd) {
         var act = cmd.action;
         var ev = cmd.data;
@@ -371,9 +501,13 @@ cosmo.view.cal.canvas = new function() {
                 // Do nothing
                 break; 
             case 'saveFailed':
+                // If the failure was a new event, remove
+                // the placeholder lozenge
                 if (cmd.qualifier.newEvent) {
                     removeEvent(ev);
                 }
+                // Otherwise put it back where it was and
+                // restore to non-processing state
                 else {
                     restoreEvent(ev);
                     ev.setInputDisabled(false);
@@ -391,6 +525,8 @@ cosmo.view.cal.canvas = new function() {
         }
     };
     
+    // Public props
+    // ****************
     // Width of day col in week view, width of event blocks --
     // Calc'd based on client window size
     // Other pieces of the app use this, so make it public
@@ -404,9 +540,14 @@ cosmo.view.cal.canvas = new function() {
     
     // Public methods
     // ****************
+    /**
+     * Main rendering function for the calendar canvas called
+     * on init load, and week-to-week nav
+     * @param vS Date, start of the view range
+     * @param vE Date, end of the view range
+     * @param cD Date, the current date on the client
+     */
     this.render = function(vS, vE, cD) {
-        
-        // Bounding dates, current date -- passed in on render
         var viewStart = vS;
         var viewEnd = vE;
         var currDate = cD;
@@ -419,6 +560,7 @@ cosmo.view.cal.canvas = new function() {
         
         /**
          * Set up key container elements 
+         * @return Boolean, true.
          */
         function init() {
             monthHeaderNode = $('monthHeaderDiv');
@@ -432,9 +574,9 @@ cosmo.view.cal.canvas = new function() {
         /**
          * Shows list of days at the head of each column in the week view
          * Uses the Date.abbrWeekday array of names in date.js
+         * @return Boolean, true.
          */
         function showDayNameHeaders() {
-            
             var str = '';
             var start = HOUR_LISTING_WIDTH + 1;
             var idstr = '';
@@ -504,6 +646,7 @@ cosmo.view.cal.canvas = new function() {
 
         /**
          * Draws the day columns in the resizeable all-day area
+         * @return Boolean, true.
          */
         function showAllDayCols() {
             var str = '';
@@ -531,6 +674,7 @@ cosmo.view.cal.canvas = new function() {
 
         /**
          * Draws the 12 AM to 11 PM hour-range in each day column
+         * @return Boolean, true.
          */
         function showHours() {
             var str = '';
@@ -667,7 +811,6 @@ cosmo.view.cal.canvas = new function() {
         }
         /**
          * Displays the month name at the top
-         * TO-DO: Change from using innerHTML to DOM methods
          */
         function showMonthHeader() {
             var vS = viewStart;
@@ -712,6 +855,7 @@ cosmo.view.cal.canvas = new function() {
             removeAllEvents();
         }
         
+        // Init and call all the rendering functions
         init();
         showMonthHeader();
         showDayNameHeaders();
@@ -720,6 +864,10 @@ cosmo.view.cal.canvas = new function() {
     };
     /**
      * Get the scroll offset for the timed canvas
+     * @return Number, the pixel position of the top of the timed
+     * event canvas, including the menubar at the top, resizing of 
+     * the all-day area, and any amount that the timed canvas
+     * has scrolled.
      */
     this.getTimedCanvasScrollTop = function() {
         // Has to be looked up every time, as value may change
@@ -732,10 +880,20 @@ cosmo.view.cal.canvas = new function() {
         // Subtract change in resized all-day event area
         top -= (allDayArea.dragSize - allDayArea.origSize);
         return top;
-   };
+    };
+    /**
+     * Get the currently selected event -- might be okay to allow
+     * direct access to the property itself, but with a getter
+     * you could trigger certain events if neeeded whenever something
+     * grabs the selected event
+     * @return CalEvent object, the currently selected event
+     */
     this.getSelectedEvent = function() {
         return self.selectedEvent;
     };
+    /**
+     * Clean up event listeners and DOM refs
+     */
     this.cleanup = function() {
         // Let's be tidy
         self.eventRegistry = null;

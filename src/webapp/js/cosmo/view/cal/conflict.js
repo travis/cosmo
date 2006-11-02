@@ -21,17 +21,21 @@ cosmo.view.cal.conflict = new function() {
     var self = this; // Closure
     var evReg = null; // Event registry
     
-    // Clearing conflict info, sorting
+    // Clearing conflict-info, sorting
     /**
      * Sorts events by start and then end, and clears the collision
      * and tiling placement properties for recalculation
      * FIXME: Separate out sort and clearing collision props
-     * Sort should go somewhere generic like cosmo.view.cal.canvas
+     * Sort should go somewhere generic like cosmo.view.cal.canvasa
+     * @return Boolean, true.
      */
     function sortAndClearEvents() {
         
         var ev = null;
-        // Sorting events by start
+        /**
+         * Comparator function used to sort events by start
+         * @return Number, 1 or -1.
+         */
         function comp(a, b) {
             utcA = a.data.start.toUTC();
             utcB = b.data.start.toUTC();
@@ -54,7 +58,12 @@ cosmo.view.cal.conflict = new function() {
                 }
             }
         };
-        // Clear the conflict props on an event
+        /**
+         * Clear the conflict props on an event
+         * @param key String, the Hash key for the event's entry in the Hash
+         * @param val CalEvent obj, the calendar event to clear
+         * conflict properties on
+         */
         function clearProps(key, val) {
             ev = val;
             ev.beforeConflicts = [];
@@ -76,18 +85,22 @@ cosmo.view.cal.conflict = new function() {
     /**
      * Check all loaded events for conflicts -- (event overlap)
      * Need to look at events that follow the event for conflicts
-     * Use call to method in loop to allow us to jump out as soon as
+     * Use in a loop to allow us to jump out as soon as
      * we find an event with a start after the end of the event
      * in question
+     * @return Boolean, true.
      */
     function checkConflicts() {
-        
-        // Check conflicts at a specific position in the list --
-        // jump out as soon as we find a start after the end of
-        // the event in question
-        // Only looking for conflicts *after* -- if we find an
-        // 'after' conflict we also add it to the 'before' list
-        // of the subsequent event at the same time
+        /**
+         * Check conflicts at a specific position in the list --
+         * jump out as soon as we find a start after the end of
+         * the event in question
+         * Only looking for conflicts *after* -- if we find an
+         * 'after' conflict we also add it to the 'before' list
+         * of the subsequent event at the same time
+         * @param i Number, the position in the Hash for the
+         * event to check conflicts on.
+         */
         function checkConflictAtPos(i) {
             var ev = evReg.getAtPos(i);
             var evStart = ev.data.start.getTime();
@@ -118,9 +131,13 @@ cosmo.view.cal.conflict = new function() {
                 }
             }
         };
-
-        // Calculate the indent level an event based on the
-        // indent level of its preceeding conflicting events
+        /**
+         * Calculate the indent level an event based on the
+         * indent level of its preceeding conflicting events
+         * @param key String, the Hash key for the event's entry in the Hash
+         * @param val CalEvent obj, the calendar event to calc the conflict
+         * depth for.
+         */
         function calcConflictDepth(key, val) {
             var ev = val;
             var beforeEv = null;
@@ -131,8 +148,14 @@ cosmo.view.cal.conflict = new function() {
             }
             ev.conflictDepth = findFirstGapInSequence(depthList);
         };
-        
-        // Find the first gap available for indenting an event
+        /**
+         * Find the first gap available for indenting an event, in
+         * a series of overlapping events
+         * @param depthList Array, list of indentation levels for
+         * the series of overlapping events.
+         * @return Number, first indentation level where there's a
+         * an available gap
+         */
         function findFirstGapInSequence(depthList) {
             if (depthList.length) {
                 for (var i = 0; i < depthList.length; i++) {
@@ -146,9 +169,15 @@ cosmo.view.cal.conflict = new function() {
                 return  0;
             }
         };
-        
-        // The max indent level of all items that conflict with this
-        // one -- used to adjust width of a block
+        /**
+         * The max indent level of all items that conflict with this
+         * one -- used to adjust width of a block
+         * @param key String, the Hash key for the event's entry in the Hash
+         * @param val CalEvent obj, the calendar event to calc the maximum 
+         * conflict depth for.
+         * @return Number, the maximum depth of overlap for this event
+         * considering both *before* and *after* conflicts
+         */
         function calcMaxDepth(key, val) {
             var ev = val;
             var max = 0;
@@ -159,9 +188,14 @@ cosmo.view.cal.conflict = new function() {
             max = maxAfter > max ? maxAfter : max;
             ev.maxDepth = max;
         };
-        
-        // The max depth of all events that conflict with this
-        // event in a specific direction -- before, or after
+        /**
+         * The max depth of all events that conflict with this
+         * event in a specific direction -- before, or after
+         * @param evArr Array, the conflicting events for this
+         * event
+         * @return Number, the max level of overlap for this
+         * entire contiguous span of conflicting events.
+         */
         function getMaxDepth(evArr) {
             var max = 0;
             for (var i = 0; i < evArr.length; i++) {
@@ -191,12 +225,19 @@ cosmo.view.cal.conflict = new function() {
     // All-day events
     /**
      * Set matrix position for each untimed event
+     * @return Boolean, true.
      */
     function stackUntimed() {
-    
         // 'Sparse matrix' for untimed events
         var allDayMatrix = [[], [], [], [], [], [], []];
     
+        /**
+         * Set the positions in the sparse matrix for all-day
+         * event tiling
+         * @param key String, the id for the event in the Hash
+         * @param val CalEvent obj, the event that is being
+         * positioned in the resizable all-day event area
+         */
         function setMatrixPos(key, val) {
             var ev = val;
             var startCol = 0;
@@ -240,9 +281,15 @@ cosmo.view.cal.conflict = new function() {
                 }
             }
         }
-        
-        //Look in a given row in the matrix to see if there's
-        // an empty space from startCol to endCol to put this event
+        /**
+         * Look in a given row in the matrix to see if there's
+         * an empty space from startCol to endCol to put this event
+         * @param row Number, the row number in the matrix as
+         * it iterates downward along the column
+         * @param startCol Number, the left column pos of this event
+         * @param endCol Number, the right column end of this eventa
+         * @return Boolean, true.
+         */
         function placeEventInRow(row, startCol, endCol) {
             var matrix = allDayMatrix;
             // If we find a value in any of the positions, the
@@ -260,13 +307,17 @@ cosmo.view.cal.conflict = new function() {
             }
             return true;
         }
-        
         evReg.each(setMatrixPos);
         return true;
     };
     
     // Public methods
     // *******************
+    /**
+     * Calculate the conflicts, positions, and indention levels for
+     * all the overlapping events on the canvas.
+     * @param eR Hash, the eventRegistry of loaded calendar events.
+     */
     this.calc = function(eR) {
         evReg = eR;
         return sortAndClearEvents() &&

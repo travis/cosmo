@@ -40,24 +40,32 @@ import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.XProperty;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.mock.MockAnonymousPrincipal;
 import org.osaf.cosmo.security.mock.MockUserPrincipal;
+
 import org.w3c.dom.Document;
 
 /**
  */
 public class TestHelper {
+    private static final Log log = LogFactory.getLog(TestHelper.class);
+
     protected static final DocumentBuilderFactory BUILDER_FACTORY =
         DocumentBuilderFactory.newInstance();
 
     protected static CalendarBuilder calendarBuilder = new CalendarBuilder();
 
     static int apseq = 0;
+    static int cseq = 0;
     static int eseq = 0;
+    static int lseq = 0;
     static int rseq = 0;
     static int tseq = 0;
     static int useq = 0;
@@ -231,9 +239,12 @@ public class TestHelper {
 
     /** */
     public ContentItem makeDummyContent(User user) {
+        String serial = new Integer(++cseq).toString();
+        String name = "test item " + serial;
+
         ContentItem content = new ContentItem();
 
-        content.setName("test item");
+        content.setName(name);
         content.setOwner(user);
         content.setContent("test!".getBytes());
         content.setContentEncoding("UTF-8");
@@ -245,9 +256,11 @@ public class TestHelper {
 
     /** */
     public CollectionItem makeDummyCollection(User user) {
-        CollectionItem collection = new CollectionItem();
+        String serial = new Integer(++lseq).toString();
+        String name = "test collection " + serial;
 
-        collection.setName("test collection");
+        CollectionItem collection = new CollectionItem();
+        collection.setName(name);
         collection.setOwner(user);
 
         return collection;

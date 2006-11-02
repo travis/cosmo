@@ -57,7 +57,6 @@ public class RecurrenceRule {
 
     /**
      * Repeats the event until this date.
-     * @return
      */
     public CosmoDate getEndDate() {
         return endDate;
@@ -71,7 +70,6 @@ public class RecurrenceRule {
      * If this event was created outside of Scooby and has a more complex
      * recurrence rule, then a human-readable string representation is found
      * here
-     * @return
      */
     public String getCustomRule() {
         return customRule;

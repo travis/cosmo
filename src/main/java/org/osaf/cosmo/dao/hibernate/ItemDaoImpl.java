@@ -583,7 +583,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
      * Checks to see if a parent Item is currently a child of a target item. If
      * so, then this would put the hierarchy into a loop and is not allowed.
      *
-     * @param dbItem
+     * @param item
      * @param newParent
      * @throws ModelValidationException
      *             if newParent is child of item

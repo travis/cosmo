@@ -80,7 +80,6 @@ public class ICalendarToCosmoConverter {
     /**
      * Creates an Event from an iCalendar VEvent
      * @param vevent
-     * @return
      */ 
     public Event createEvent(String itemId, VEvent vevent, net.fortuna.ical4j.model.Calendar calendar){
         Event event = new Event();
@@ -168,10 +167,9 @@ public class ICalendarToCosmoConverter {
      * Returns a single array of Events for every VEVENT in every Calendar. If there
      * are any recurring events, the expanded instances will be returned for the given date
      * range
-     * @param calendarCollectionItems the calendars from which to get the VEVENTS
+     * @param calendarEventItems the calendars from which to get the VEVENTS
      * @param startDate the start date to be used when expanding recurring events
      * @param endDate  the end date to be used when expanding recurring events
-     * @return
      */
     public Event[] createEventsFromCalendars(
             Collection<CalendarEventItem> calendarEventItems,
@@ -611,7 +609,6 @@ public class ICalendarToCosmoConverter {
      * complex recurrence rule.
      * 
      * @param recur
-     * @return
      */
     private boolean isCustom(Recur recur) {
         if (recur.getFrequency().equals(Recur.SECONDLY)

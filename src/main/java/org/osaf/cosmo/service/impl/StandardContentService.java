@@ -53,7 +53,6 @@ public class StandardContentService implements ContentService {
      * Get the root item for a user
      *
      * @param user
-     * @return
      */
     public HomeCollectionItem getRootItem(User user) {
         if (log.isDebugEnabled()) {
@@ -510,7 +509,7 @@ public class StandardContentService implements ContentService {
      * Removes a ticket from an item.
      *
      * @param path the path of the item to be de-ticketed
-     * @param ticket the key of the ticket to remove
+     * @param key the key of the ticket to remove
      */
     public void removeTicket(String path,
                              String key) {

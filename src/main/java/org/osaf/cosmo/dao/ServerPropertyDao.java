@@ -26,7 +26,6 @@ public interface ServerPropertyDao extends Dao {
     /**
      * Get a server property value
      * @param property
-     * @return
      */
     public String getServerProperty(String property);
     

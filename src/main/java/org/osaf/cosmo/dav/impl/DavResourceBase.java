@@ -190,7 +190,7 @@ public abstract class DavResourceBase
      *
      * @param property the property to set
      *
-     * @see setLiveProperty(DavProperty)
+     * @see #setLiveProperty(DavProperty)
      */
     public void setProperty(DavProperty property)
         throws DavException {
@@ -216,9 +216,9 @@ public abstract class DavResourceBase
      * Attempts to interpret the property as a live property. If that
      * fails, then assumes the property is a dead property.
      *
-     * @param property the property to set
+     * @param propertyName the name of the property to set
      *
-     * @see removeLiveProperty(DavPropertyName)
+     * @see #removeLiveProperty(DavPropertyName)
      */
     public void removeProperty(DavPropertyName propertyName)
         throws DavException {
@@ -241,10 +241,10 @@ public abstract class DavResourceBase
      * resource.
      *
      * @param setProperties the properties to set
-     * @param removeProperties the names of properties to remove
+     * @param removePropertyNames the names of properties to remove
      *
-     * @see setLiveProperty(DavProperty)
-     * @see removeLiveProperty(DavPropertyName)
+     * @see #setLiveProperty(DavProperty)
+     * @see #removeLiveProperty(DavPropertyName)
      */
     public MultiStatusResponse alterProperties(DavPropertySet setProperties,
                                                DavPropertyNameSet removePropertyNames)

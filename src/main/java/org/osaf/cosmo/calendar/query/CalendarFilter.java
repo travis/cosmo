@@ -69,8 +69,6 @@ public class CalendarFilter implements CaldavConstants {
 
     /**
      * A CalendarFilter has exactly one ComponentFilter
-     * 
-     * @return
      */
     public ComponentFilter getFilter() {
         return filter;

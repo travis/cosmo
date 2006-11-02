@@ -36,8 +36,9 @@ import org.osaf.cosmo.util.DateUtil;
  * A class that formats Cosmo calendar model objects according to the
  * hCalendar specification.
  *
- * See {@link http://microformats.org/wiki/hcalendar} for more
- * information about hCalendar.
+ * See
+ * <a href="http://microformats.org/wiki/hcalendar">the hCalendar spec</a>
+ * for more information about the format.
  *
  * @see CalendarItem
  */

@@ -133,7 +133,7 @@ public class FeedGenerator {
      * various URIs for the entry.
      *
      * @param item the item on which the entry is based
-     * @param path the path address of the parent feed
+     * @param feedPath the path address of the parent feed
      */
     protected Entry createEntry(Item item,
                                 String feedPath) {

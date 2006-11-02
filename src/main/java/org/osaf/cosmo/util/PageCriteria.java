@@ -141,7 +141,7 @@ public class PageCriteria {
     }
 
     /**
-     * @param sortAscending Set to <code>true</code> for Ascending and <code>false</code> for Descending
+     * @param sortOrder Set to <code>true</code> for Ascending and <code>false</code> for Descending
      */
     public void setSortAscending(boolean sortOrder) {
         this.sortAscending = sortOrder;

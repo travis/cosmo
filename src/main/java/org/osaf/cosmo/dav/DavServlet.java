@@ -606,12 +606,12 @@ public class DavServlet extends AbstractWebdavServlet
         return null;
     }
 
-    /** {@inheritDoc} */
+    /** */
     public LockManager getLockManager() {
         return lockManager;
     }
 
-    /** {@inheritDoc} */
+    /** */
     public void setLockManager(LockManager lockManager) {
         this.lockManager = lockManager;
     }

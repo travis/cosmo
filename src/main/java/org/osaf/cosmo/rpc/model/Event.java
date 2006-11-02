@@ -47,7 +47,6 @@ public class Event {
     /**
      * When the event ends. For all day events this value represents the last day of the all
      * day event.
-     * @return
      */
 	public CosmoDate getEnd() {
 		return end;
@@ -145,7 +144,6 @@ public class Event {
     /**
      * The instance date is the date/dateTime that this instance would start if 
      * there were no modifications to it. Analogous to the RECURRENCE-ID in icalendar.
-     * @return
      */
     public CosmoDate getInstanceDate() {
         return instanceDate;

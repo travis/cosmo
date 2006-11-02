@@ -87,8 +87,8 @@ public interface ContentDao extends ItemDao {
      * Find all top level children for user. Children can consist of ContentItem
      * and CollectionItem objects.
      * 
-     * @param collection
-     *            collection to find children for
+     * @param user
+     *            user to find children for
      * @return collection of child objects for parent collection. Child objects
      *         can be either CollectionItem or ContentItem.
      */

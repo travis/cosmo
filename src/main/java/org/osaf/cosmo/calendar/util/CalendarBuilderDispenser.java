@@ -42,7 +42,6 @@ public class CalendarBuilderDispenser {
 
     /**
      * Return the CalendarBuilder singelton for the current thread
-     * @return
      */
     public static CalendarBuilder getCalendarBuilder() {
         return builder.getBuilder();

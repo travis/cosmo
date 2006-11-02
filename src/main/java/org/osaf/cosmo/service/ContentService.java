@@ -38,7 +38,6 @@ public interface ContentService extends Service {
      * Get the root item for a user
      *
      * @param user
-     * @return
      */
     public HomeCollectionItem getRootItem(User user);
 

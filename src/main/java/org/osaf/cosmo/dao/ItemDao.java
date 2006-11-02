@@ -83,14 +83,12 @@ public interface ItemDao extends Dao {
      * Get the root item for a user
      *
      * @param user
-     * @return
      */
     public HomeCollectionItem getRootItem(User user);
 
     /**
      * Create the root item for a user.
      * @param user
-     * @return
      */
     public HomeCollectionItem createRootItem(User user);
 

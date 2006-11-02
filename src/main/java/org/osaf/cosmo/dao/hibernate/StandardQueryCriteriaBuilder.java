@@ -75,8 +75,8 @@ public class StandardQueryCriteriaBuilder implements QueryCriteriaBuilder {
      *
      * This implementation simply adds one ascending or descending
      * <code>Order</code> as specified by
-     * {@link PageCriteria.isSortAscending()}, sorting on the
-     * attribute named by {@link PageCriteria.getSortTypeString()}.
+     * {@link PageCriteria#isSortAscending()}, sorting on the
+     * attribute named by {@link PageCriteria#getSortTypeString()}.
      */
     protected List<Order> buildOrders(PageCriteria pageCriteria) {
         List<Order> orders = new ArrayList<Order>();

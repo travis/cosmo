@@ -48,7 +48,7 @@ import org.osaf.cosmo.model.ModelValidationException;
  * </ul>
  *
  * @see DavCollection
- * @see CollectionItem
+ * @see org.osaf.cosmo.model.CollectionItem
  */
 public class DavHomeCollection extends DavCollection
     implements AclConstants, CaldavConstants {

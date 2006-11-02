@@ -76,7 +76,6 @@ public class CosmoToICalendarConverter {
      * "floating" dates
      * 
      * @param event
-     * @return
      */
     public Calendar createWrappedVEvent(Event event) {
         Calendar calendar = new Calendar();
@@ -96,7 +95,6 @@ public class CosmoToICalendarConverter {
      * "floating" dates
      * 
      * @param event
-     * @return
      */
     public VEvent createVEvent(Event event) {
         VEvent vevent = new VEvent();
@@ -122,7 +120,6 @@ public class CosmoToICalendarConverter {
      *            the scooby event
      * @param calendar
      *            the calendar containing the VEvent to update
-     * @return
      */
     public void updateEvent(Event event, Calendar calendar) {
         VEvent vevent = getMasterEvent(calendar);

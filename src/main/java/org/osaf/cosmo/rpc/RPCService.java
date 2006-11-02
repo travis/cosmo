@@ -39,9 +39,9 @@ public interface RPCService {
      * Returns all the events between two given dates sorted by start date ascending.
      * 
      * @param calendarPath the path to the calendar to search
-     * @param startDate returned events must have start dates greater than or equal to
+     * @param utcStartTime returned events must have start dates greater than or equal to
      *        this date
-     * @param endDate returned events must have start dates that are less than or equal
+     * @param utcEndTime returned events must have start dates that are less than or equal
      *        to this date
      * @return the array of events between the specified dates. If there are no events 
      *         found an empty array is returned
@@ -56,7 +56,7 @@ public interface RPCService {
      * id, the event with the same id in the same calendar will be updated. If there is an 
      * id but there is no matching event, a ScoobyService exception will be thrown
      * 
-     * @param calendarName the path to the calendar
+     * @param calendarPath the path to the calendar
      * @param event the event to save
      * @return the id of the event
      */
@@ -132,7 +132,6 @@ public interface RPCService {
     
     /**
      * Returns the current version of Scooby
-     * @return
      */
     public String getVersion();
     
@@ -146,8 +145,7 @@ public interface RPCService {
      * Returns the RecurrenceRule for a particular event
      * 
      * @param calendarPath
-     * @param eventId
-     * @return
+     * @param eventIds
      */
     public Map<String, RecurrenceRule> getRecurrenceRules(String calendarPath,
             String[] eventIds) throws RPCException;
@@ -178,7 +176,6 @@ public interface RPCService {
     
     /**
      * Method useful for testing remote connection. Should return "Scooby"
-     * @return
      */
     public String getTestString();
     

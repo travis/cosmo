@@ -62,7 +62,6 @@ public class ICalendarUtils {
      * @param milliseconds
      * @param tz
      * @param utc
-     * @return
      */
     public static DateTime createDateTime(int year, int month, int day,
             int hour, int minutes, int seconds, int milliseconds, TimeZone tz,
@@ -146,7 +145,6 @@ public class ICalendarUtils {
     /**
      * Returns the first master in the calendar - that is, one without a RECURRENCE-ID
      * @param calendar
-     * @return
      */
     public static VEvent getMasterEvent(net.fortuna.ical4j.model.Calendar calendar){
         ComponentList events = calendar.getComponents().getComponents(Component.VEVENT);
@@ -163,7 +161,6 @@ public class ICalendarUtils {
      * Returns the "master" VEvent - one that does not have a RECURRENCE-ID
      * 
      * @param uid
-     * @return
      */
     public static VEvent getMasterEvent(net.fortuna.ical4j.model.Calendar calendar, String uid){
         ComponentList clist = calendar.getComponents().getComponents(Component.VEVENT);
@@ -258,11 +255,11 @@ public class ICalendarUtils {
 
    
    /**
-    * This is here because the clone that comes with ical4j is broken - if you setTime() on
-    * the new object, the old object will be changed!
+    * This is here because the clone that comes with ical4j is broken
+    * if you setTime() on the new object, the old object will be
+    * changed!
     * 
     * @param date
-    * @return
     */
    public static Date clone(Date date){
        if (date instanceof DateTime){

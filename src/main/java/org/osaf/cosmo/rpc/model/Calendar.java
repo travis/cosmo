@@ -28,7 +28,6 @@ public class Calendar {
     
     /**
      * This is the name as displayed to the user 
-     * @return
      */
     public String getName() {
         return displayName;
@@ -41,7 +40,6 @@ public class Calendar {
     /**
      * This is the path to the calendar collection, relative to the user's 
      * home directory
-     * @return
      */
     public String getPath() {
         return path;

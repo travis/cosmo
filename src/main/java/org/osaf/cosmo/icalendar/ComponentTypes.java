@@ -67,7 +67,7 @@ public class ComponentTypes {
      * Returns whether or not the given component type code represents
      * a supported component type.
      *
-     * @param code a type string
+     * @param type a type string
      * @return <code>true</code> if the string represents a supported
      * component type, <code>false</code> otherwise
      */

@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
 
 /**
  * Extends {@link org.apache.jackrabbit.webdav.WebdavResponseImpl} and
- * implements {@link CosmoDavResponse}.
+ * implements methods for the DAV ticket extension.
  */
 public class StandardDavResponse extends WebdavResponseImpl
     implements TicketDavResponse, DavConstants, TicketConstants {

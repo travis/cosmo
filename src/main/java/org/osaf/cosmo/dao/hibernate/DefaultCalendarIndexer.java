@@ -105,7 +105,6 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
      * that will be indexed.  All characters after this
      * maximum length will be truncated in the index and
      * will not be searchable.
-     * @return
      */
     public int getMaxPropertyValueLength() {
         return maxPropertyValueLength;
@@ -128,7 +127,6 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
      * that will be indexed.  A property name that
      * is longer than this maximum length will
      * not be indexed.
-     * @return
      */
     public int getMaxPropertyNameLength() {
         return maxPropertyNameLength;

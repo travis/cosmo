@@ -25,7 +25,6 @@ public interface ServerPropertyService extends Service {
     /**
      * Get a server property
      * @param property
-     * @return
      */
     public String getServerProperty(String property);
     

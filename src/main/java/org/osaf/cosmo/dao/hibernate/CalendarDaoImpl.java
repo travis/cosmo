@@ -474,7 +474,6 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
      * Get instance of the CalendarTranslatorFilter.  Need to return new
      * instance each time.  
      * TODO: figure out way to move this into implementation class
-     * @return
      */
     protected CalendarFilterTranslator getCalendarFilterTranslater() {
         try {

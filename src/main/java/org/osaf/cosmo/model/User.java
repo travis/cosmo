@@ -123,7 +123,6 @@ public class User extends BaseModelObject {
     }
 
     /**
-     * @return
      */
     public String getUid() {
         return uid;

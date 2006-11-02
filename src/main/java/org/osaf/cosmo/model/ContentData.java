@@ -52,7 +52,6 @@ public class ContentData  {
      * Get an InputStream to the content data.  Repeated
      * calls to this method will return new instances
      * of InputStream.
-     * @return
      */
     public InputStream getContentInputStream() {
         if(content==null)

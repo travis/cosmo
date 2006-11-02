@@ -56,7 +56,7 @@ public abstract class Attribute extends BaseModelObject implements java.io.Seria
 	}
 
 	/**
-	 * @param Item attribute belongs to
+	 * @param item attribute belongs to
 	 */
 	public void setItem(Item item) {
 		this.item = item;

@@ -545,6 +545,28 @@ function CalForm() {
             }
         }
         
+        // Calc military datetimes from form entries
+        startDate = new Date(startDate);
+        if (!allDay) {
+            h = Cal.extractHourFromTime(startTime);
+            h = hrStd2Mil(h, form.startap[1].checked);
+            m = Cal.extractMinutesFromTime(startTime);
+            startDate.setHours(h, m);
+        }
+        endDate = new Date(endDate);
+        if (!allDay) {
+            h = Cal.extractHourFromTime(endTime);
+            h = hrStd2Mil(h, form.endap[1].checked);
+            m = Cal.extractMinutesFromTime(endTime);
+            endDate.setHours(h, m);
+        }
+        // Validate that start is before end
+        if (startDate.getTime() > endDate.getTime()) {
+            errMsg += '"Starts" and "Ends" time fields:\n';
+            errMsg += 'Event cannot end before it starts.';
+            errMsg += '\n';
+        }
+        
         // Display error or update form and submit
         // =======================
         // Err condition
@@ -557,22 +579,6 @@ function CalForm() {
         }
         // All okey-dokey -- submit
         else {
-            // Calc military datetimes from form entries
-            startDate = new Date(startDate);
-            if (!allDay) {
-                h = Cal.extractHourFromTime(startTime);
-                h = hrStd2Mil(h, form.startap[1].checked);
-                m = Cal.extractMinutesFromTime(startTime);
-                startDate.setHours(h, m);
-            }
-            endDate = new Date(endDate);
-            if (!allDay) {
-                h = Cal.extractHourFromTime(endTime);
-                h = hrStd2Mil(h, form.endap[1].checked);
-                m = Cal.extractMinutesFromTime(endTime);
-                endDate.setHours(h, m);
-            }
-            
             // Set event properties
             // ==============
             // ScoobyDate with timezones

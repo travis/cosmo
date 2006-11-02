@@ -113,7 +113,7 @@ public abstract class BaseMockServletTestCase extends TestCase {
         serializer.asDOMSerializer().serialize(doc);
         request.setContentType("text/xml");
         request.setCharacterEncoding("UTF-8");
-        //        log.debug("content: " + new String(out.toByteArray()));
+        // log.debug("content: " + new String(out.toByteArray()));
         request.setContent(out.toByteArray());;
     }
 
@@ -131,9 +131,15 @@ public abstract class BaseMockServletTestCase extends TestCase {
     protected String toAbsoluteUrl(MockHttpServletRequest request,
                                    String path) {
         StringBuffer url = new StringBuffer(request.getScheme());
-        url.append("://").append(request.getServerName()).
-            append(":").append(request.getServerPort()).
-            append(path);
+        url.append("://").append(request.getServerName());
+        if ((request.isSecure() && request.getServerPort() != 443) ||
+            (request.getServerPort() != 80)) {
+            url.append(":").append(request.getServerPort());
+        }
+        if (! request.getContextPath().equals("/")) {
+            url.append(request.getContextPath());
+        }
+        url.append(path);
         return url.toString();
     }
 

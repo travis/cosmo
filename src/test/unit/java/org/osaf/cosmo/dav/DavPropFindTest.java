@@ -71,13 +71,13 @@ public class DavPropFindTest extends BaseDavServletTestCase
                      DavServletResponse.SC_MULTI_STATUS,
                      response.getStatus());
 
+        String url = toAbsoluteUrl(request, request.getRequestURI());
+
         Set<TicketContent> contents =
-            createTicketContents(readMultiStatusResponse(response),
-                                 request.getRequestURL().toString());
+            createTicketContents(readMultiStatusResponse(response), url);
         assertTrue("No tickets in response", ! contents.isEmpty());
         assertEquals("More than one ticket in response", contents.size(), 1);
-        assertTicketEquality(ticket, contents.iterator().next(),
-                             request.getRequestURL().toString());
+        assertTicketEquality(ticket, contents.iterator().next(), url);
     }
 
     /** */
@@ -111,13 +111,13 @@ public class DavPropFindTest extends BaseDavServletTestCase
                      DavServletResponse.SC_MULTI_STATUS,
                      response.getStatus());
 
+        String url = toAbsoluteUrl(request, request.getRequestURI());
+
         Set<TicketContent> contents =
-            createTicketContents(readMultiStatusResponse(response),
-                                 request.getRequestURL().toString());
+            createTicketContents(readMultiStatusResponse(response), url);
         assertTrue("No tickets in response", ! contents.isEmpty());
         assertEquals("More than one ticket in response", contents.size(), 1);
-        assertTicketEquality(ticket1, contents.iterator().next(),
-                             request.getRequestURL().toString());
+        assertTicketEquality(ticket1, contents.iterator().next(), url);
     }
 
     private void assertTicketEquality(Ticket ticket,

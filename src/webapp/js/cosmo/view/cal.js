@@ -380,7 +380,7 @@ cosmo.view.cal = new function() {
                     for (var i = 0; i < rrule.modifications.length; i++) {
                         var m = rrule.modifications[i];
                         if (m.instanceDate.toUTC() == mod.instanceDate.toUTC()) {
-                            rrulerule.modifications.splice(i, 1); 
+                            rrule.modifications.splice(i, 1); 
                         }
                     }
                     rrule.modifications.push(mod);

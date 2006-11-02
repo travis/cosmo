@@ -18,8 +18,11 @@ package org.osaf.cosmo.cmp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.PushbackInputStream;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -37,11 +40,14 @@ import org.apache.xml.serialize.XMLSerializer;
 
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
+import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
-import org.osaf.cosmo.status.StatusSnapshot;
+import org.osaf.cosmo.server.SpaceUsageReport;
+import org.osaf.cosmo.server.StatusSnapshot;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
@@ -64,12 +70,18 @@ public class CmpServlet extends HttpServlet {
     private static final DocumentBuilderFactory BUILDER_FACTORY =
         DocumentBuilderFactory.newInstance();
 
+    private static final Pattern PATTERN_SPACE_USAGE =
+        Pattern.compile("^/server/usage/space(/[^/]+)?$");
+
+    private static final String BEAN_CONTENT_SERVICE =
+        "contentService";
     private static final String BEAN_USER_SERVICE =
         "userService";
     private static final String BEAN_SECURITY_MANAGER =
         "securityManager";
 
     private WebApplicationContext wac;
+    private ContentService contentService;
     private UserService userService;
     private CosmoSecurityManager securityManager;
 
@@ -87,14 +99,27 @@ public class CmpServlet extends HttpServlet {
         wac = WebApplicationContextUtils.
             getWebApplicationContext(getServletContext());
 
-        if (userService == null) {
-            userService = (UserService)
-                getBean(BEAN_USER_SERVICE, UserService.class);
+        if (wac != null) {
+            if (contentService == null) {
+                contentService = (ContentService)
+                    getBean(BEAN_CONTENT_SERVICE, ContentService.class);
+            }
+            if (userService == null) {
+                userService = (UserService)
+                    getBean(BEAN_USER_SERVICE, UserService.class);
+            }
+            if (securityManager == null) {
+                securityManager = (CosmoSecurityManager)
+                    getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
+            }
         }
-        if (securityManager == null) {
-            securityManager = (CosmoSecurityManager)
-                getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
-        }
+
+        if (contentService == null)
+            throw new ServletException("content service must not be null");
+        if (userService == null)
+            throw new ServletException("user service must not be null");
+        if (securityManager == null)
+            throw new ServletException("security manager must not be null");
     }
 
     // HttpServlet methods
@@ -142,6 +167,15 @@ public class CmpServlet extends HttpServlet {
         }
         if (req.getPathInfo().equals("/server/status")) {
             processServerStatus(req, resp);
+            return;
+        }
+        Matcher m = PATTERN_SPACE_USAGE.matcher(req.getPathInfo());
+        if (m.matches()) {
+            String username = m.group(1);
+            if (username != null)
+                // remove leading /
+                username = username.substring(1);
+            processSpaceUsage(req, resp, username);
             return;
         }
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -208,6 +242,18 @@ public class CmpServlet extends HttpServlet {
     }
 
     // our methods
+
+    /**
+     */
+    public ContentService getContentService() {
+        return contentService;
+    }
+
+    /**
+     */
+    public void setContentService(ContentService contentService) {
+        this.contentService = contentService;
+    }
 
     /**
      */
@@ -349,6 +395,52 @@ public class CmpServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         resp.setContentLength(snap.length);
         resp.getOutputStream().write(snap);
+    }
+
+    /*
+     * Delegated to by {@link #doGet} to handle space usage requests.
+     */
+    private void processSpaceUsage(HttpServletRequest req,
+                                   HttpServletResponse resp,
+                                   String username)
+        throws ServletException, IOException {
+        User user = null;
+        if (username != null) {
+            user = userService.getUser(username);
+            if (user == null) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            if (user.isOverlord()) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+        }
+
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.setContentType("text/plain");
+        resp.setCharacterEncoding("UTF-8");
+
+        PrintWriter writer = resp.getWriter();
+
+        if (user == null) {
+            if (log.isDebugEnabled())
+                log.debug("generating usage report for all users");
+            for (User u : (Set<User>) userService.getUsers()) {
+                if (u.isOverlord())
+                    continue;
+                writer.write(makeSpaceUsageReport(u).toString());
+            }
+        } else {
+            if (log.isDebugEnabled())
+                log.debug("generating usage report for user " + username);
+            writer.write(makeSpaceUsageReport(user).toString());
+        }
+    }
+
+    private SpaceUsageReport makeSpaceUsageReport(User user) {
+        HomeCollectionItem home = contentService.getRootItem(user);
+        return new SpaceUsageReport(user, home);
     }
 
     /*

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.status;
+package org.osaf.cosmo.server;
 
 /**
  * Encapsulates a view in time of the server status.

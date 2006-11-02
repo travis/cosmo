@@ -25,7 +25,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import org.osaf.cosmo.status.StatusSnapshot;
+import org.osaf.cosmo.server.StatusSnapshot;
 import org.osaf.cosmo.ui.CosmoAction;
 import org.osaf.cosmo.ui.UIConstants;
 

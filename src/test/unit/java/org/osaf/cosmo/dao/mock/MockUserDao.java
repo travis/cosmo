@@ -36,6 +36,7 @@ import org.osaf.cosmo.util.ArrayPagedList;
  * Mock implementation of {@link UserDao} useful for testing.
  */
 public class MockUserDao implements UserDao {
+    static int idseq = 0;
 
     private HashMap usernameIdx;
     private HashMap emailIdx;
@@ -120,7 +121,7 @@ public class MockUserDao implements UserDao {
             throw new IllegalArgumentException("null user");
         }
         
-        // set unique id
+        user.setId(new Long(++idseq));
         user.setUid(idGenerator.nextIdentifier().toString());
         
         user.validate();

@@ -182,7 +182,7 @@ public abstract class CaldavReport
     }
 
     /**
-     * Set a <code>CaldavQueryFilter</code> used to constrain the JCR query,
+     * Set a <code>CalendarFilter</code> used to constrain the query,
      * if one is provided by a specific report.
      */
     protected void setQueryFilter(CalendarFilter filter) {

@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.PushbackInputStream;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,10 +47,12 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.server.SpaceUsageReport;
 import org.osaf.cosmo.server.StatusSnapshot;
+import org.osaf.cosmo.util.PageCriteria;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
@@ -79,12 +84,19 @@ public class CmpServlet extends HttpServlet {
         "userService";
     private static final String BEAN_SECURITY_MANAGER =
         "securityManager";
+    
+    private static final int DEFAULT_PAGE_NUMBER = 1;
+    private static final int DEFAULT_PAGE_SIZE = PageCriteria.VIEW_ALL;
+    private static final boolean DEFAULT_SORT_ASCENDING = true;
+    private static final User.SortType DEFAULT_SORT_TYPE = User.SortType.USERNAME;
 
     private WebApplicationContext wac;
     private ContentService contentService;
     private UserService userService;
     private CosmoSecurityManager securityManager;
 
+    private Pattern postedDeleteCommandPattern = Pattern.compile("/user/(.+/)?delete");
+    
     /**
      * Loads the servlet context's <code>WebApplicationContext</code>
      * and wires up dependencies. If no
@@ -113,7 +125,7 @@ public class CmpServlet extends HttpServlet {
                     getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
             }
         }
-
+        
         if (contentService == null)
             throw new ServletException("content service must not be null");
         if (userService == null)
@@ -134,6 +146,12 @@ public class CmpServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest req,
                             HttpServletResponse resp)
         throws ServletException, IOException {
+    	
+    	if (req.getPathInfo().startsWith("/user/delete")){
+    		processMultiUserDelete(req, resp);
+    		return;
+    	}
+    	
         if (req.getPathInfo().startsWith("/user/")) {
             processUserDelete(req, resp);
             return;
@@ -153,6 +171,7 @@ public class CmpServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp)
         throws ServletException, IOException {
+    	
         if (req.getPathInfo().equals("/account")) {
             processAccountGet(req, resp);
             return;
@@ -194,10 +213,20 @@ public class CmpServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req,
                           HttpServletResponse resp)
         throws ServletException, IOException {
+    	
         if (req.getPathInfo().equals("/server/gc")) {
             processServerGc(req, resp);
             return;
         }
+        
+        Matcher m = postedDeleteCommandPattern.matcher(req.getPathInfo());
+        
+        if (m.matches()){
+        	
+        	doDelete(req, resp);
+        	return;
+        }
+        
         doPut(req, resp);
     }
 
@@ -213,6 +242,7 @@ public class CmpServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req,
                          HttpServletResponse resp)
         throws ServletException, IOException {
+    	
         if (! checkPutPreconditions(req, resp)) {
             return;
         }
@@ -310,9 +340,9 @@ public class CmpServlet extends HttpServlet {
     }
 
     /*
-     * Delegated to by {@link #doDelete} to handle user DELETE
-     * requests, removing the user and setting the response status and
-     * headers.
+     * Delegated to by {@link #doDelete} to handle user DELETE 
+     * (and POST /user/{username}/delete) requests, removing the 
+     * user and setting the response status and headers.
      */
     private void processUserDelete(HttpServletRequest req,
                                    HttpServletResponse resp)
@@ -328,6 +358,51 @@ public class CmpServlet extends HttpServlet {
         }
         userService.removeUser(username);
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
+    
+    /* Enforces preconditions on MultiUserDeletion. Returns <code>true</code> if
+     * all preconditions are met, otherwise sets the appropriate
+     * error response code and returns <code>false</code>.
+     */
+    private boolean checkMultiUserDeletePreconditions(HttpServletRequest req,
+            HttpServletResponse resp) {
+        
+        if (req.getContentType() == null ||
+                ! req.getContentType().startsWith("application/x-www-form-urlencoded")) {
+            resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+            return false;
+        }
+
+        return true;
+    }
+
+    /*
+     * Delegated to by {@link #doDelete} to handle
+     * POST /user/delete requests. These request MUST have a message
+     * body containing the names of the users to be deleted in standard
+     * url-encoded form input syntax, ie,
+     * 
+     * user=alice&user=bob&user=carlton
+     */
+    
+    private void processMultiUserDelete(HttpServletRequest req, 
+            HttpServletResponse resp) {
+        if (checkMultiUserDeletePreconditions(req, resp)){
+            Set<String> names = new HashSet<String>();
+            
+            for (String name : req.getParameterValues("user")){
+                names.add(name);
+            }
+            
+            try {
+                userService.removeUsersByName(names);
+            } catch (OverlordDeletionException e) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        }
     }
 
     /*
@@ -347,14 +422,89 @@ public class CmpServlet extends HttpServlet {
     }
 
     /*
+     * Turn a paging query string into a PageCriteria object.
+     * Responsible for setting a response code in the event of
+     * an error.
+     */
+    private PageCriteria<User.SortType> buildPageCriteria(HttpServletRequest req){
+        
+        PageCriteria<User.SortType> pageCriteria = new PageCriteria<User.SortType>(DEFAULT_PAGE_NUMBER,
+                                                     DEFAULT_PAGE_SIZE,
+                                                     DEFAULT_SORT_ASCENDING,
+                                                     DEFAULT_SORT_TYPE);
+        
+        Map<String, String[]> pagingParameterMap = req.getParameterMap();
+        
+        try {
+            if (pagingParameterMap.containsKey(PageCriteria.PAGE_SIZE_URL_KEY)) {
+                pageCriteria.setPageSize(Integer.parseInt(pagingParameterMap.get(PageCriteria.PAGE_SIZE_URL_KEY)[0]));
+            }
+        } catch (NumberFormatException e){
+            throw new CmpException(pagingParameterMap.get(PageCriteria.PAGE_SIZE_URL_KEY)[0] + 
+            " is not a valid page size.");
+        }
+        
+        try {
+            if (pagingParameterMap.containsKey(PageCriteria.PAGE_NUMBER_URL_KEY)) {
+                pageCriteria.setPageNumber(Integer.parseInt(pagingParameterMap.get(PageCriteria.PAGE_NUMBER_URL_KEY)[0]));
+            }
+        } catch (NumberFormatException e){
+            throw new CmpException(pagingParameterMap.get(PageCriteria.PAGE_NUMBER_URL_KEY)[0] + 
+            " is not a valid page number.");
+        }
+
+        if (pagingParameterMap.containsKey(PageCriteria.SORT_ORDER_URL_KEY)) {
+            String sortOrderParameter = pagingParameterMap.get(PageCriteria.SORT_ORDER_URL_KEY)[0];
+            if (sortOrderParameter.equals(PageCriteria.ASCENDING_STRING)){
+                pageCriteria.setSortAscending(true);
+            } else if (sortOrderParameter.equals(PageCriteria.DESCENDING_STRING)){
+                pageCriteria.setSortAscending(false);
+            } else{
+                throw new CmpException("Sort order " + sortOrderParameter + " not valid.");
+            }
+        }
+
+        if (pagingParameterMap.containsKey(PageCriteria.SORT_TYPE_URL_KEY)) {
+            
+            User.SortType sortType = User.SortType.getByUrlString(
+                    pagingParameterMap.get(PageCriteria.SORT_TYPE_URL_KEY)[0]);
+            
+            if (sortType != null){
+                pageCriteria.setSortType(sortType);
+            } else {
+                throw new CmpException("Sort type " + 
+                        pagingParameterMap.get(PageCriteria.SORT_TYPE_URL_KEY)[0]
+                        + " not valid.");
+            }
+        }
+
+        return pageCriteria;
+    }
+    
+    /*
      * Delegated to by {@link #doGet} to handle users GET
      * requests, retrieving all user accounts, setting the response
      * status and headers, and writing the response content.
      */
     private void processUsersGet(HttpServletRequest req,
-                                 HttpServletResponse resp)
-        throws ServletException, IOException {
-        Set users = userService.getUsers();
+            HttpServletResponse resp)
+    throws ServletException, IOException {
+        Collection<User> users;
+
+        if (req.getQueryString() != null){
+            PageCriteria<User.SortType> pageCriteria;
+            try {
+                pageCriteria = buildPageCriteria(req);
+            }
+            catch (CmpException e){
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+                return;
+            }
+            users = userService.getUsers(pageCriteria).getList();
+            
+        } else {
+            users = userService.getUsers();
+        }
         resp.setStatus(HttpServletResponse.SC_OK);
         sendXmlResponse(resp, new UsersResource(users, getUrlBase(req)));
     }
@@ -637,6 +787,13 @@ public class CmpServlet extends HttpServlet {
     private String usernameFromPathInfo(String pathInfo) {
         if (pathInfo.startsWith("/user/")) {
             String username = pathInfo.substring(6);
+            
+            // Find the end of the username
+            int endIndex = username.indexOf("/");
+            if (endIndex > -1){ 
+            	username = username.substring(0, endIndex);
+            }
+            
             if (! (username.equals("") ||
                    username.indexOf("/") >= 0)) {
                 return username;

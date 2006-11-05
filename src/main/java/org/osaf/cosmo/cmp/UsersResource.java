@@ -15,9 +15,7 @@
  */
 package org.osaf.cosmo.cmp;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.util.PageCriteria;
+import org.osaf.cosmo.util.PagedList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -39,19 +39,26 @@ public class UsersResource implements CmpResource {
      */
     public static final String EL_USERS = "users";
 
-    private Set users;
-    private String urlBase;
+    private static final String ATT_FIRST_PAGE_LINK = "first";
+    private static final String ATT_PREVIOUS_PAGE_LINK = "previous";
+    private static final String ATT_NEXT_PAGE_LINK = "next";
+    private static final String ATT_LAST_PAGE_LINK = "last";
+    
+    private static final String PAGING_QUERY_FORMAT_STRING = "?ps=%d&pn=%d&so=%s&st=%s"; 
 
+    private Collection<User> users;
+    private String urlBase;
+    
     /**
      * Constructs a resource that represents the given {@link User}s.
      */
-    public UsersResource(Set users, String urlBase) {
+    public UsersResource(Collection<User> users, String urlBase) {
         this.users = users;
         this.urlBase = urlBase;
     }
 
     /**
-     * Returns the <code>List</code> of <code>User</code>s that backs
+     * Returns the <code>Collection<User></code> that backs
      * this resource.
      */
     public Object getEntity() {
@@ -77,8 +84,70 @@ public class UsersResource implements CmpResource {
      */
     public Element toXml(Document doc) {
         Element e = DomUtil.createElement(doc, EL_USERS, NS_CMP);
-        for (Iterator i=users.iterator(); i.hasNext();) {
-            User user = (User) i.next();
+        
+        if (users instanceof PagedList){
+            PagedList<User, User.SortType> pagedUserList = (PagedList<User, User.SortType>) users;
+            PageCriteria<User.SortType> pageCriteria = pagedUserList.getPageCriteria();
+            
+            Element firstPageLink = DomUtil.createElement(doc, "link", NS_CMP);
+            firstPageLink.setAttribute("rel", ATT_FIRST_PAGE_LINK);
+            firstPageLink.setAttribute("href", 
+                    this.urlBase + CmpConstants.USER_LIST_PATH + 
+                    String.format(PAGING_QUERY_FORMAT_STRING,
+                            
+                    pageCriteria.getPageSize(),
+                    PageCriteria.FIRST_PAGE,
+                    pageCriteria.getSortOrder(),
+                    pageCriteria.getSortType().getUrlString()
+                    ));
+            e.appendChild(firstPageLink);
+            
+            if (pageCriteria.getPageNumber() > 1){
+                Element previousPageLink = DomUtil.createElement(doc, "link", NS_CMP);
+                previousPageLink.setAttribute("rel", ATT_PREVIOUS_PAGE_LINK);
+                previousPageLink.setAttribute("href", 
+                        this.urlBase + CmpConstants.USER_LIST_PATH + 
+                        String.format(PAGING_QUERY_FORMAT_STRING,
+                                
+                        pageCriteria.getPageSize(),
+                        Math.min(pageCriteria.getPageNumber() - 1, pagedUserList.getLastPageNumber()),
+                        pageCriteria.getSortOrder(),
+                        pageCriteria.getSortType().getUrlString()
+                ));
+                e.appendChild(previousPageLink);
+            }
+            
+            if (pageCriteria.getPageNumber() < pagedUserList.getLastPageNumber()){
+            Element nextPageLink = DomUtil.createElement(doc, "link", NS_CMP);
+            nextPageLink.setAttribute("rel", ATT_NEXT_PAGE_LINK);
+            nextPageLink.setAttribute("href", 
+                    this.urlBase + CmpConstants.USER_LIST_PATH + 
+                    String.format(PAGING_QUERY_FORMAT_STRING,
+                            
+                    pageCriteria.getPageSize(),
+                    Math.max(pageCriteria.getPageNumber() + 1, 1),
+                    pageCriteria.getSortOrder(),
+                    pageCriteria.getSortType().getUrlString()
+                    ));
+            e.appendChild(nextPageLink);
+            }
+          
+            Element lastPageLink = DomUtil.createElement(doc, "link", NS_CMP);
+            lastPageLink.setAttribute("rel", ATT_LAST_PAGE_LINK);
+            lastPageLink.setAttribute("href", 
+                    this.urlBase + CmpConstants.USER_LIST_PATH + 
+                    String.format(PAGING_QUERY_FORMAT_STRING,
+                            
+                    pageCriteria.getPageSize(),
+                    pagedUserList.getLastPageNumber(),
+                    pageCriteria.getSortOrder(),
+                    pageCriteria.getSortType().getUrlString()
+                    ));
+            e.appendChild(lastPageLink);
+          
+        }
+        
+        for (User user : this.users) {
             UserResource ur = new UserResource(user, urlBase);
             e.appendChild(ur.toXml(doc));
         }
@@ -89,7 +158,7 @@ public class UsersResource implements CmpResource {
 
     /**
      */
-    public Set getUsers() {
+    public Collection<User> getUsers() {
         return users;
     }
 }

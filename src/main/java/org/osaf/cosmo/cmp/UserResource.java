@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.cmp;
 
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,7 +23,7 @@ import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.util.DateUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,7 +58,15 @@ public class UserResource implements CmpResource {
     /**
      */
     public static final String EL_HOMEDIRURL = "homedirUrl";
-
+    /**
+     */
+    public static final String EL_CREATED = "created";
+    /**
+     */
+    public static final String EL_MODIFIED = "modified";
+    /**
+     */
+    public static final String EL_ADMINISTRATOR = "administrator";
     private User user;
     private String urlBase;
     private String userUrl;
@@ -119,6 +128,9 @@ public class UserResource implements CmpResource {
      *   <firstName>Brian</firstName>
      *   <lastName>Moseley</firstName>
      *   <email>bcm@osafoundation.org</email>
+     *   <created>2006-10-05T17:41:02-0700</created>
+     *   <modified>2006-10-05T17:41:02-0700</modified>
+     *   <administrator>true</administrator>
      *   <url>http://localhost:8080/cmp/user/bcm</url>
      *   <homedirUrl>http://localhost:8080/home/bcm</homedirUrl>
      * </user>
@@ -144,7 +156,20 @@ public class UserResource implements CmpResource {
         Element email = DomUtil.createElement(doc, EL_EMAIL, NS_CMP);
         DomUtil.setText(email, user.getEmail());
         e.appendChild(email);
-
+        
+        Element created = DomUtil.createElement(doc, EL_CREATED, NS_CMP);
+        DomUtil.setText(created, DateUtil.formatRfc3339Date(user.getDateCreated()));
+        e.appendChild(created);
+        
+        Element modified = DomUtil.createElement(doc, EL_MODIFIED, NS_CMP);
+        DomUtil.setText(modified, DateUtil.formatRfc3339Date(user.getDateModified()));
+        e.appendChild(modified);
+        
+        if (user.getAdmin()){
+            Element admin = DomUtil.createElement(doc, EL_ADMINISTRATOR, NS_CMP);
+            e.appendChild(admin);
+        }
+        
         Element url = DomUtil.createElement(doc, EL_URL, NS_CMP);
         DomUtil.setText(url, userUrl);
         e.appendChild(url);
@@ -204,7 +229,18 @@ public class UserResource implements CmpResource {
         if (! DomUtil.matches(root, EL_USER, NS_CMP)) {
             throw new CmpException("root element not user");
         }
-
+        
+        /* Set this user as NOT an administrator unless specifically changed by the XML
+         * unless user is overlord. 
+         */
+        
+        
+        if (!(user.getUsername() != null &&
+            user.getUsername().equals(User.USERNAME_OVERLORD))
+            ){
+            user.setAdmin(false);
+        }
+                        
         for (ElementIterator i=DomUtil.getChildren(root); i.hasNext();) {
             Element e = i.nextElement();
 
@@ -237,6 +273,9 @@ public class UserResource implements CmpResource {
             }
             else if (DomUtil.matches(e, EL_EMAIL, NS_CMP)) {
                 user.setEmail(DomUtil.getTextTrim(e));
+            }
+            else if (DomUtil.matches(e, EL_ADMINISTRATOR, NS_CMP)){
+                user.setAdmin(true);
             }
             else {
                 throw new CmpException("unknown user attribute element " +

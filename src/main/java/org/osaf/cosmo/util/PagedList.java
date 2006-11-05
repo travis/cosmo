@@ -25,7 +25,7 @@ import java.util.List;
  * @author EdBindl
  * 
  */
-public interface PagedList {
+public interface PagedList<T, SortType extends Enum> extends List<T>{
     
     /**
      * The request attribute in which this action places a List of
@@ -47,20 +47,25 @@ public interface PagedList {
     /**
      * Returns the Pagination criteria for the list.
      */
-    public PageCriteria getPageCriteria();
+    public PageCriteria<SortType> getPageCriteria();
 
     /**
      * Sets the Pagination criteria for the list.
      * 
      * @param pageCriteria
      */
-    public void setPageCriteria(PageCriteria pageCriteria);
+    public void setPageCriteria(PageCriteria<SortType> pageCriteria);
 
     /**
      * Returns the size of the total unpaginated list.
      */
     public int getTotal();
-
+    
+    /**
+     * Returns the number of the last page.
+     */
+    public int getLastPageNumber();
+    
     /**
      * Sets the size of the total unpaginated list.
      * @param total
@@ -70,12 +75,12 @@ public interface PagedList {
     /**
      * Returns the list meeting the Pagination Criteria
      */
-    public List getList();
+    public List<T> getList();
     
     /**
      * Sets the list meeting the Pagination Criteria
      * 
      * @param items
      */
-    public void setList(List items);
+    public void setList(List<T> items);
 }

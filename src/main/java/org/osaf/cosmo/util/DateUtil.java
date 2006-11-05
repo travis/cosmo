@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -27,6 +28,21 @@ public class DateUtil {
     /** */
     public static final String RFC_3339_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
+    /**
+     * @throws ParseException  */
+    public static Date parseRfc3339Date(String date) 
+    	throws ParseException{
+    	return parseRfc3339Date(date, RFC_3339_DATE_FORMAT);
+    }
+    
+    /** 
+     * @throws ParseException  */
+    public static Date parseRfc3339Date(String date, String format)
+    	throws ParseException{
+    	SimpleDateFormat formatter = new SimpleDateFormat(format);
+    	return formatter.parse(date);
+    
+    }
     /** */
     public static String formatRfc3339Date(Date date) {
         return formatRfc3339Date(date, null);
@@ -48,7 +64,7 @@ public class DateUtil {
     public static String formatDate(String pattern,
                                     Date date,
                                     TimeZone tz) {
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+    	SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         if (tz != null)
             formatter.setTimeZone(tz);
         return formatter.format(date);

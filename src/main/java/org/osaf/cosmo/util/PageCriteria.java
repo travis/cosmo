@@ -15,17 +15,14 @@
  */
 package org.osaf.cosmo.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class defines the criteria for pagination. Holds the Page Number, Page
  * Size, Sort Type and Sort Order
  * 
- * @author EdBindl
+ * @author EdBindl, Travis Vachon
  * 
  */
-public class PageCriteria {
+public class PageCriteria<SortType extends Enum> {
 
     /**
      * The constant to view all.
@@ -44,6 +41,38 @@ public class PageCriteria {
      * The Default sort ascending
      */
     public static final Boolean DEFAULT_SORTASCENDING = true;
+
+    public static final int FIRST_PAGE = 1;
+    
+    /**
+     * Value representing ascending sort order in URLs.
+     */
+    public static final String ASCENDING_STRING = "ascending";
+    
+    /**
+     * Value representing descending sort order in URLs.
+     */
+    public static final String DESCENDING_STRING = "descending";
+
+    /**
+     * Key for page size in URLs.
+     */
+    public static final String PAGE_SIZE_URL_KEY = "ps";
+
+    /**
+     * Key for page number in URLs.
+     */
+    public static final String PAGE_NUMBER_URL_KEY = "pn";
+
+    /**
+     * Key for sort order in URLs.
+     */
+    public static final String SORT_ORDER_URL_KEY = "so";
+
+    /**
+     * Key for sort type in URLs.
+     */
+    public static final String SORT_TYPE_URL_KEY = "st";
 
     
 	/**
@@ -71,7 +100,7 @@ public class PageCriteria {
      * dependant on the users choice of repository it is recommended that this
      * class be extended to handle the sortType
      */
-    private String sortTypeString;
+    protected SortType sortType;
 
     /**
      */
@@ -79,21 +108,13 @@ public class PageCriteria {
         initialize();
     }
     
-    public PageCriteria(PageCriteria pageCriteria) {
-        this.pageNumber = pageCriteria.getPageNumber();
-        this.pageSize = pageCriteria.getPageSize();
-        this.sortAscending = pageCriteria.isSortAscending();
-        this.sortTypeString = pageCriteria.getSortTypeString();
-    }
-
-
     /**
      */
-    public PageCriteria(Integer pageNumber, Integer pageSize, boolean sortAscending, String sortTypeString) {
+    public PageCriteria(Integer pageNumber, Integer pageSize, boolean sortAscending, SortType sortType) {
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
         this.sortAscending = sortAscending;
-        this.sortTypeString = sortTypeString;
+        this.sortType = sortType;
     }
 
     /**
@@ -122,14 +143,20 @@ public class PageCriteria {
 
     /**
      */
+    public SortType getSortType() {
+        return sortType;
+    }
+    
+    /**
+     */
     public String getSortTypeString() {
-        return sortTypeString;
+        return sortType.toString();
     }
 
     /**
      */
-    public void setSortTypeString(String sortTypeString) {
-        this.sortTypeString = sortTypeString;
+    public void setSortType(SortType sortType) {
+        this.sortType = sortType;
     }
 
     /**
@@ -145,6 +172,10 @@ public class PageCriteria {
      */
     public void setSortAscending(boolean sortOrder) {
         this.sortAscending = sortOrder;
+    }
+    
+    public String getSortOrder() {
+       return isSortAscending() ? ASCENDING_STRING : DESCENDING_STRING;
     }
     
     public void initialize() {

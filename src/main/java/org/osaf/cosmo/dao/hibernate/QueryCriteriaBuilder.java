@@ -26,7 +26,7 @@ import org.osaf.cosmo.util.PageCriteria;
  * @see Criteria
  * @see PageCriteria
  */
-public interface QueryCriteriaBuilder {
+public interface QueryCriteriaBuilder<SortType extends Enum> {
 
     /**
      * Returns a <code>Criteria</code> based on the given
@@ -34,5 +34,5 @@ public interface QueryCriteriaBuilder {
      * <code>Session</code>.
      */
     public Criteria buildQueryCriteria(Session session,
-                                       PageCriteria pageCriteria);
+                                       PageCriteria<SortType> pageCriteria);
 }

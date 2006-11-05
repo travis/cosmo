@@ -38,6 +38,9 @@ public class CmpConstants {
     public static final int SC_EMAIL_IN_USE = 432;
     /** */
     public static final String RP_EMAIL_IN_USE = "Email In Use";
+	
+	/** */
+    public static final String USER_LIST_PATH = "/cmp/users";
 
     static {
         addStatusCode(SC_USERNAME_IN_USE, RP_USERNAME_IN_USE);
@@ -53,4 +56,5 @@ public class CmpConstants {
     public static String getReasonPhrase(int statusCode) {
         return (String) statusCodes.get(new Integer(statusCode));
     }
+   
 }

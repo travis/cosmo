@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Class that paginated and stores a list, the Pagination Criteria for the list
- * and the size of the total un paginated list
+ * A paginated section of a list that knows how many elements are in the total list,
+ * and knows its pagination criteria (page size, page number, sort order, sort type).
  * 
- * @author EdBindl
+ * @author EdBindl (heavily modified by TravisVachon)
  * 
  */
-public class ArrayPagedList implements PagedList {
+public class ArrayPagedList<T, SortType extends Enum> extends ArrayList<T> implements PagedList<T, SortType> {
 	/**
      * The size of the total unpaginated list.
 	 */
@@ -34,23 +34,24 @@ public class ArrayPagedList implements PagedList {
     /**
      * Holds the Pagination information for the <code>List</code>.
      */
-	PageCriteria pageCriteria;
+	PageCriteria<SortType> pageCriteria;
 	
-    /**
+    /*TODO: remove
      * The <code>List</code> that meets the pagination criteria.
      */
-	List list;
+	//List<T> list;
     
     
     private static final int FIRST_ELEMENT = 0;
     private static final int FIRST_PAGE = 1;
 	
-    /**
-     */
+    /*TODO: remove
+    
     public ArrayPagedList(){
-        this.list = new ArrayList();
+        this.list = new ArrayList<T>();
     }
-
+     */
+    
     /**
      * Creates an ArrayPaged list that adheres to the supplied PageCriteria. If
      * an invalid page number is supplied, the list will be filled with a
@@ -62,29 +63,11 @@ public class ArrayPagedList implements PagedList {
      *            the total unpaginated list to be paginated
      * 
      */
-	public ArrayPagedList(PageCriteria pageCriteria, List list) {
+	public ArrayPagedList(PageCriteria<SortType> pageCriteria, List<T> list) {
+        super(list);
         this.total = list.size();
         this.pageCriteria = pageCriteria;
-
-        int pageSize = pageCriteria.getPageSize();
-
-        if (pageSize == PageCriteria.VIEW_ALL) {
-            this.list = list;
-        } else {
-
-            int first = (pageCriteria.getPageNumber() - 1) * pageSize;
-            int last = first + pageSize;
-
-            if (first > total - 1) {
-                first = FIRST_ELEMENT;
-                last = pageSize;
-                this.pageCriteria.setPageNumber(FIRST_PAGE);
-            }
-            if (last > total) {
-                last = total;
-            }
-            this.list = list.subList(first, last);
-        }
+        
     }
 
     /**
@@ -99,30 +82,24 @@ public class ArrayPagedList implements PagedList {
      * @param total the total number of elements in the original list
      * 
      */
-	public ArrayPagedList(PageCriteria pageCriteria,
-                              List sublist,
+	public ArrayPagedList(PageCriteria<SortType> pageCriteria,
+                              List<T> list,
                               int total) {
+        super(list);
         this.pageCriteria = pageCriteria;
-        this.list = sublist;
         this.total = total;
     }
 
     /**
      */
-    public PageCriteria getPageCriteria() {
+    public PageCriteria<SortType> getPageCriteria() {
         return pageCriteria;
     }
 
     /**
      */
     public int getTotal() {
-        return total;
-    }
-
-    /**
-     */
-    public void setPageCriteria(PageCriteria pageCriteria) {
-        this.pageCriteria = pageCriteria;
+        return this.total;
     }
 
     /**
@@ -130,16 +107,35 @@ public class ArrayPagedList implements PagedList {
     public void setTotal(int total) {
         this.total = total;
     }
-    
+
+    public int getLastPageNumber() {
+        if (pageCriteria.getPageSize() == PageCriteria.VIEW_ALL){
+            return 1;
+            
+        } else {
+            int result = getTotal() / getPageCriteria().getPageSize();
+            if (getTotal() % getPageCriteria().getPageSize() > 0) result++;
+            return result;
+        }
+    }
+
     /**
      */
-    public List getList(){
-        return list;
+    public void setPageCriteria(PageCriteria<SortType> pageCriteria) {
+        this.pageCriteria = pageCriteria;
     }
     
     /**
      */
-    public void setList(List items){
-        this.list = items;
+    public List<T> getList(){
+        return this;        
     }
+    
+    /**
+     */
+    public void setList(List<T> items){
+        this.clear();
+        this.addAll(items);
+    }
+
 }

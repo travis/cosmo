@@ -30,7 +30,7 @@ import org.osaf.cosmo.util.PageCriteria;
  * @see Criteria
  * @see PageCriteria
  */
-public class StandardQueryCriteriaBuilder implements QueryCriteriaBuilder {
+public class StandardQueryCriteriaBuilder<SortType extends Enum> implements QueryCriteriaBuilder<SortType> {
 
     private Class clazz;
 
@@ -48,7 +48,7 @@ public class StandardQueryCriteriaBuilder implements QueryCriteriaBuilder {
      * <code>Session</code>.
      */
     public Criteria buildQueryCriteria(Session session,
-                                       PageCriteria pageCriteria) {
+                                       PageCriteria<SortType> pageCriteria) {
         Criteria crit = session.createCriteria(clazz);
 
         // If page size is -1, that means get all users
@@ -78,7 +78,7 @@ public class StandardQueryCriteriaBuilder implements QueryCriteriaBuilder {
      * {@link PageCriteria#isSortAscending()}, sorting on the
      * attribute named by {@link PageCriteria#getSortTypeString()}.
      */
-    protected List<Order> buildOrders(PageCriteria pageCriteria) {
+    protected List<Order> buildOrders(PageCriteria<SortType> pageCriteria) {
         List<Order> orders = new ArrayList<Order>();
         orders.add(pageCriteria.isSortAscending() ?
                    Order.asc(pageCriteria.getSortTypeString()) :

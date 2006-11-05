@@ -49,7 +49,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
     private IdentifierGenerator idGenerator;
 
-    private static final QueryCriteriaBuilder queryCriteriaBuilder = new UserQueryCriteriaBuilder();
+    private static final QueryCriteriaBuilder<User.SortType> queryCriteriaBuilder = new UserQueryCriteriaBuilder<User.SortType>();
 
     public User createUser(User user) {
 
@@ -112,17 +112,17 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         }
     }
 
-    public PagedList getUsers(PageCriteria pageCriteria) {
+    public PagedList getUsers(PageCriteria<User.SortType> pageCriteria) {
         try {
             Criteria crit = queryCriteriaBuilder.buildQueryCriteria(
                     getSession(), pageCriteria);
-            List results = crit.list();
+            List<User> results = crit.list();
 
             // Need the total
             Long size = (Long) getSession().createQuery(
                     "select count(*) from User").uniqueResult();
 
-            return new ArrayPagedList(pageCriteria, results, size.intValue());
+            return new ArrayPagedList<User, User.SortType>(pageCriteria, results, size.intValue());
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -212,31 +212,31 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             return null;
     }
 
-    private static class UserQueryCriteriaBuilder extends
-            StandardQueryCriteriaBuilder {
+    private static class UserQueryCriteriaBuilder<SortType extends User.SortType> extends
+            StandardQueryCriteriaBuilder<SortType> {
 
         public UserQueryCriteriaBuilder() {
             super(User.class);
         }
 
-        protected List<Order> buildOrders(PageCriteria pageCriteria) {
+        protected List<Order> buildOrders(PageCriteria<SortType> pageCriteria) {
             List<Order> orders = new ArrayList<Order>();
 
-            String sort = pageCriteria.getSortTypeString();
+            User.SortType sort = pageCriteria.getSortType();
             if (sort == null)
-                sort = User.USERNAME_SORT_STRING;
+                sort = User.SortType.USERNAME;
 
-            if (sort.equals(User.NAME_SORT_STRING)) {
+            if (sort.equals(User.SortType.NAME)) {
                 orders.add(createOrder(pageCriteria, "lastName"));
                 orders.add(createOrder(pageCriteria, "firstName"));
             }
-            else if (sort.equals(User.ADMIN_SORT_STRING))
+            else if (sort.equals(User.SortType.ADMIN))
                 orders.add(createOrder(pageCriteria, "admin"));
-            else if (sort.equals(User.EMAIL_SORT_STRING))
+            else if (sort.equals(User.SortType.EMAIL))
                 orders.add(createOrder(pageCriteria, "email"));
-            else if (sort.equals(User.CREATED_SORT_STRING))
+            else if (sort.equals(User.SortType.CREATED))
                 orders.add(createOrder(pageCriteria, "dateCreated"));
-            else if (sort.equals(User.LAST_MODIFIED_SORT_STRING))
+            else if (sort.equals(User.SortType.LAST_MODIFIED))
                 orders.add(createOrder(pageCriteria, "dateModified"));
             else
                 orders.add(createOrder(pageCriteria, "username"));
@@ -245,8 +245,9 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         }
 
         private Order createOrder(PageCriteria pageCriteria, String property) {
-            return pageCriteria.isSortAscending() ? Order.asc(property) : Order
-                    .desc(property);
+            return pageCriteria.isSortAscending() ? 
+            	Order.asc(property) : 
+           		Order.desc(property);
         }
     }
 

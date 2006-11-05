@@ -29,6 +29,7 @@ import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.util.PagedList;
 import org.osaf.cosmo.util.PageCriteria;
@@ -55,7 +56,7 @@ public class StandardUserService implements UserService {
     /**
      * Returns an unordered set of all user accounts in the repository.
      */
-    public Set getUsers() {
+    public Set<User> getUsers() {
         if (log.isDebugEnabled())
             log.debug("getting all users");
         return userDao.getUsers();
@@ -67,7 +68,7 @@ public class StandardUserService implements UserService {
      *
      * @param pageCriteria the pagination criteria
      */
-    public PagedList getUsers(PageCriteria pageCriteria) {
+    public PagedList<User, User.SortType> getUsers(PageCriteria<User.SortType> pageCriteria) {
         if (log.isDebugEnabled())
             log.debug("getting users for criteria " + pageCriteria);
         return userDao.getUsers(pageCriteria);
@@ -198,6 +199,49 @@ public class StandardUserService implements UserService {
         // seems to automatically remove the user's root item
         userDao.removeUser(user);
     }
+    
+    /**
+     * Removes a set of user accounts from the repository. Will not
+     * remove the overlord.
+     * @param users
+     */
+    public void removeUsers(Set<User> users) throws OverlordDeletionException{
+        for (User user : users){
+            if (user.isOverlord())
+                throw new OverlordDeletionException();
+            userDao.removeUser(user);
+        }
+        // Only log if all removes were successful
+        if (log.isDebugEnabled()) {
+            for (User user : users){
+                log.debug("removing user " + user.getUsername());
+            }
+        }
+        
+
+    }
+    
+    /**
+     * Removes the user accounts identified by the given usernames from
+     * the repository. Will not remove overlord.
+     * @param usernames
+     */
+    public void removeUsersByName(Set<String> usernames) throws OverlordDeletionException{
+        for (String username : usernames){
+            if (username.equals(User.USERNAME_OVERLORD)) 
+                    throw new OverlordDeletionException();
+            userDao.removeUser(username);
+        }
+        // Only log if all removes were successful
+        if (log.isDebugEnabled()) {
+            for (String username : usernames){
+                log.debug("removing user " + username);
+            }
+        }
+        
+        
+        
+    }
 
     /**
      * Generates a random password in a format suitable for
@@ -326,4 +370,5 @@ public class StandardUserService implements UserService {
         // TODO Auto-generated method stub
         
     }
+
 }

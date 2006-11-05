@@ -41,7 +41,7 @@ public interface UserDao extends Dao {
      *
      * @param pageCriteria the pagination criteria
      */
-    public PagedList getUsers(PageCriteria pageCriteria);
+    public PagedList getUsers(PageCriteria<User.SortType> pageCriteria);
     
     /**
      * Returns the user account identified by the given username.

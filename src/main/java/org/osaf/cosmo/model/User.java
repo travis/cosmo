@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 public class User extends BaseModelObject {
 
     /**
-     * 
      */
     private static final long serialVersionUID = -5401963358519490736L;
     /**
@@ -102,6 +101,13 @@ public class User extends BaseModelObject {
      * The Default Sort Type
      */
     public static final String DEFAULT_SORT_STRING = NAME_SORT_STRING;
+    
+    public static final String NAME_URL_STRING = "name"; 
+    public static final String USERNAME_URL_STRING = "username";
+    public static final String ADMIN_URL_STRING = "admin";
+    public static final String EMAIL_URL_STRING = "email";
+    public static final String CREATED_URL_STRING = "created";
+    public static final String LAST_MODIFIED_URL_STRING = "modified";
 
     private String uid;
     private String username;
@@ -404,4 +410,52 @@ public class User extends BaseModelObject {
     public void setItems(Set items) {
         this.items = items;
     }
+    
+    /* I'm not sure about putting this enum here, but it seems weird 
+     * in other places too. Since sort information is already here,
+     * in the *_SORT_STRING constants, I think this is appropriate.
+    */
+    public enum SortType {
+        NAME (NAME_URL_STRING, NAME_SORT_STRING),
+        USERNAME (USERNAME_URL_STRING, USERNAME_SORT_STRING),
+        ADMIN (ADMIN_URL_STRING, ADMIN_SORT_STRING),
+        EMAIL (EMAIL_URL_STRING, EMAIL_SORT_STRING),
+        CREATED (CREATED_URL_STRING, CREATED_SORT_STRING),
+        LAST_MODIFIED (LAST_MODIFIED_URL_STRING, LAST_MODIFIED_SORT_STRING);
+        
+        private final String urlString;
+        private final String titleString;
+        
+        SortType(String urlString, String titleString){
+            this.urlString = urlString;
+            this.titleString = titleString;
+        }
+
+        public String getTitleString() {
+            return titleString;
+        }
+
+        public String getUrlString() {
+            return urlString;
+        }
+
+        public static SortType getByUrlString(String string) {
+            if (string.equals(NAME_URL_STRING)){
+                return NAME;
+            } else if (string.equals(USERNAME_URL_STRING)){
+                return USERNAME;
+            } else if (string.equals(ADMIN_URL_STRING)){
+                return ADMIN;
+            } else if (string.equals(EMAIL_URL_STRING)){
+                return EMAIL;
+            } else if (string.equals(CREATED_URL_STRING)){
+                return CREATED;
+            } else if (string.equals(LAST_MODIFIED_URL_STRING)){
+                return LAST_MODIFIED;
+            } else {
+                return null;
+            }
+        }
+    }
+
 }

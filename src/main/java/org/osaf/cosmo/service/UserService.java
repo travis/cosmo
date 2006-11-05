@@ -28,11 +28,10 @@ import org.springframework.dao.DataRetrievalFailureException;
  */
 public interface UserService extends Service {
 
-
     /**
      * Returns an unordered set of all user accounts in the repository.
      */
-    public Set getUsers();
+    public Set<User> getUsers();
 
 
     /**
@@ -53,7 +52,7 @@ public interface UserService extends Service {
      * 
      * @throws IllegalArgumentException if an invalid pageNumber is supplied in the <code>PageCriteria</code>
      */
-    public PagedList getUsers(PageCriteria pageCriteria);
+    public PagedList<User, User.SortType> getUsers(PageCriteria<User.SortType> pageCriteria);
 
     /**
      * Returns the user account identified by the given email address.
@@ -106,6 +105,21 @@ public interface UserService extends Service {
      * @param username the username of the account to return
      */
     public void removeUser(String username);
+    
+    /**
+     * Removes a set of user accounts from the repository.
+     * @param users
+     * @throws OverlordDeletionException 
+     */
+    public void removeUsers(Set<User> users) throws OverlordDeletionException;
+    
+    /**
+     * Removes the user accounts identified by the given usernames from
+     * the repository.
+     * @param usernames
+     * @throws OverlordDeletionException 
+     */
+    public void removeUsersByName(Set<String> usernames) throws OverlordDeletionException;
 
     /**
      * Generates a random password in a format suitable for

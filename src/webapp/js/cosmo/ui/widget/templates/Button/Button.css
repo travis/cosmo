@@ -19,8 +19,12 @@
     -moz-background-clip: -moz-initial; 
     -moz-background-origin: -moz-initial; 
     -moz-background-inline-policy: -moz-initial;
-}
+} 
 
 .buttonTable{
-    width: 84px;
+
+}
+
+.buttonText{
+
 }

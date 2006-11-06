@@ -49,7 +49,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     enabled : true,
     small : false,
     text : "",
-    width : 100,
+    width : null,
     handleOnClick: "",
     
     fillInTemplate: function(){

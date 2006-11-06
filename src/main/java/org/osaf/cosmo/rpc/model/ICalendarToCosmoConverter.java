@@ -301,6 +301,7 @@ public class ICalendarToCosmoConverter {
                             calendar);
                 }
                 if (instanceStartDate.equals(masterStartDate)) {
+                    instance.setMasterEvent(true);
                     events.set(0, instance);
                 } else {
                     events.add(instance);

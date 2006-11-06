@@ -136,6 +136,7 @@
       <props>
         <prop key="save*">PROPAGATION_REQUIRED</prop>
         <prop key="store*">PROPAGATION_REQUIRED</prop>
+        <prop key="remove*">PROPAGATION_REQUIRED,-OverlordDeletionException</prop>
         <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
         <prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
         <prop key="load*">PROPAGATION_REQUIRED,readOnly</prop>
@@ -503,7 +504,7 @@
       <value>/cmp</value>
     </constructor-arg>
     <constructor-arg>
-      <value>/console/home/browse</value>
+      <value>/browse</value>
     </constructor-arg>
   </bean>
 
@@ -534,6 +535,109 @@
         class="org.osaf.cosmo.ui.config.ServletContextConfigurer">
     <property name="userService">
       <ref bean="userService"/>
+    </property>
+  </bean>
+  
+  <bean id="defaultFilterInvocationInterceptor"
+         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
+     <property name="authenticationManager">
+       <ref bean="authenticationManager"/>
+     </property>
+     <property name="accessDecisionManager">
+       <ref bean="accessDecisionManager"/>
+     </property>
+     <property name="objectDefinitionSource">
+       <value>
+	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+	 PATTERN_TYPE_APACHE_ANT
+         /account/new=ROLE_ANONYMOUS
+         /account/signup=ROLE_ANONYMOUS
+         /account=ROLE_ROOT,ROLE_USER
+         /account/view=ROLE_ROOT,ROLE_USER
+         /account/update=ROLE_ROOT,ROLE_USER
+         /account/forgot=ROLE_ANONYMOUS
+         /account/remind=ROLE_ANONYMOUS
+         /login=ROLE_ANONYMOUS
+         /loginfailed=ROLE_ANONYMOUS
+         /logout=ROLE_ROOT,ROLE_USER
+         /browse/**=ROLE_USER, ROLE_ROOT
+         /admin/status/**=ROLE_ROOT
+		 /admin/user/**=ROLE_ROOT
+		 /error=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
+         /error/**=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
+		 /help/about=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /help=ROLE_ROOT,ROLE_USER
+         /help/**=ROLE_ROOT,ROLE_USER
+         /**=ROLE_ROOT
+       </value>
+     </property>
+   </bean>
+   
+   <!-- filter chain that kicks off request-time processing -->
+   
+   <bean id="defaultFilterChainProxy"
+        class="org.acegisecurity.util.FilterChainProxy">
+    <property name="filterInvocationDefinitionSource">
+      <value>
+        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+        PATTERN_TYPE_APACHE_ANT
+        /**=defaultHttpSessionContextIntegrationFilter,defaultFormBasedProcessingFilter,defaultAnonymousProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
+        
+      </value>
+    </property>
+  </bean>
+   
+  <!-- filter that integrates SecurityContext into HTTP Session -->
+
+  <bean id="defaultHttpSessionContextIntegrationFilter"
+        class="org.acegisecurity.context.HttpSessionContextIntegrationFilter"/>
+   
+  <!-- filter that performs form-based authentication -->
+   
+  <bean id="defaultFormBasedAuthenticationEntryPoint"
+        class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+    <property name="loginFormUrl">
+      <value>/login</value>
+    </property>
+    <property name="forceHttps">
+      <value>false</value>
+    </property>
+  </bean>
+
+  <bean id="defaultFormBasedProcessingFilter"
+        class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter">
+    <property name="authenticationManager">
+      <ref bean="authenticationManager"/>
+    </property>
+    <property name="filterProcessesUrl">
+      <value>/j_acegi_security_check</value>
+    </property>
+    <property name="authenticationFailureUrl">
+      <value>/loginfailed</value>
+    </property>
+    <property name="defaultTargetUrl">
+      <value>/account/view</value>
+    </property>
+  </bean>
+
+  <!-- filter that performs anonymous authentication -->
+
+  <bean id="defaultAnonymousProcessingFilter"
+        class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+    <property name="key">
+      <value>badgerbadgerbadger</value>
+    </property>
+    <property name="userAttribute">
+      <value>anonymous,ROLE_ANONYMOUS</value>
+    </property>
+  </bean>
+
+  <!-- filter that converts authen/authz exceptions to web pages -->
+
+  <bean id="defaultExceptionTranslationFilter"
+        class="org.acegisecurity.ui.ExceptionTranslationFilter">
+    <property name="authenticationEntryPoint">
+      <ref local="defaultFormBasedAuthenticationEntryPoint"/>
     </property>
   </bean>
 

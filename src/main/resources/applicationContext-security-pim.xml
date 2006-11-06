@@ -50,7 +50,7 @@
          /pim/login.page*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /pim/lang.page*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /pim/logout.page*=ROLE_ROOT,ROLE_USER
-         /pim/pim.page*=ROLE_ROOT,ROLE_USER
+         /pim*=ROLE_ROOT,ROLE_USER
          /pim/json-rpc=ROLE_ROOT,ROLE_USER
          /pim/keepalive.jsp=ROLE_ROOT,ROLE_USER
          /=ROLE_ROOT, ROLE_USER
@@ -82,7 +82,7 @@
   <bean id="pimFormBasedAuthenticationEntryPoint"
         class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
     <property name="loginFormUrl">
-      <value>/console/login</value>
+      <value>/login</value>
     </property>
     <property name="forceHttps">
       <value>false</value>
@@ -95,7 +95,7 @@
       <ref bean="authenticationManager"/>
     </property>
       <property name="authenticationFailureUrl">
-        <value>/console/login</value>
+        <value>/login</value>
       </property>
       <property name="defaultTargetUrl">
         <value>/index.jsp</value>

@@ -22,6 +22,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<cosmo:standardLayout prefix="Error.Forbidden." showNav="false">
 <%--
     Because Acegi Security's filters don't execute for forwarded requests,
     the SecurityContextHolder for this thread has been cleared, and we
@@ -54,9 +55,9 @@
   </fmt:message>
 </p>
 <p>
-  <html:link page="/console/logout">
+  <a href="<c:url value="/console/logout"/>">
     <fmt:message key="Error.Forbidden.ClickToLogOut"/>
-  </html:link>
+  </a>
 </p>
   </c:when>
   <c:when test="${isAdmin}">
@@ -64,9 +65,9 @@
   <fmt:message key="Error.Forbidden.NotAsAdmin"/>
 </p>
 <p>
-  <html:link page="/console/logout">
+  <a href="<c:url value="/console/logout"/>">
     <fmt:message key="Error.Forbidden.ClickToLogOut"/>
-  </html:link>
+  </a>
 </p>
   </c:when>
   <c:otherwise>
@@ -80,3 +81,4 @@
 </p>
   </c:otherwise>
 </c:choose>
+</cosmo:standardLayout>

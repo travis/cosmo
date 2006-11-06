@@ -21,7 +21,8 @@
 <%@ page    isErrorPage="true"               %>
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-
+<cosmo:standardLayout prefix="Error.Messaging." showNav="false">
 <p>
   <fmt:message key="Error.Messaging.UnableToSend"/>
 </p>
+</cosmo:standardLayout>

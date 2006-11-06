@@ -20,84 +20,57 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
+<cosmo:standardLayout prefix="Account.New." showNav="false">
 
-<div class="widgetBorder" style="width:460px; margin-top:24px;">
-<div class="widgetContent" style="padding:8px;">
+<%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/cmp/cmp.js"></script>
 
-<div class="hd" style="margin-bottom:4px;"><fmt:message key="Account.New.NewAccount"/></div>
+<script language="JavaScript">
+dojo.require("cosmo.cmp")
+dojo.require("cosmo.ui.widget.ModifyUserDialog")
 
-<p>
-  <fmt:message key="Account.New.AllFieldsRequired"/>
-</p>
+signupHandlerDict= {
+	handle : function(type, data, evt){
+		if (evt.status == 201){
+			window.location = cosmo.env.getNewAccountRedirect()
 
-<cosmo:cnfmsg/>
-<cosmo:errmsg/>
+		}
+		else if (evt.status == 431){
+			//TODO: username in use stuff
+			alert("Username in use")
+		}
+		else if (evt.status == 432){
+			//TODO: email in use stuff
+			alert("Email in use")
+		}	
+	
+	}
+}
 
-<html:form action="/account/signup">
-  <table cellpadding="3" cellspacing="1" border="0">
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.Form.Username"/>
-      </td>
-      <td>
-        <div class="smData"><cosmo:errmsg property="username"/></div>
-        <div><html:text property="username" size="32" maxlength="32" styleClass="textInput"/></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.Form.FirstName"/>
-      </td>
-      <td>
-        <div class="smData"><cosmo:errmsg property="firstName"/></div>
-        <div><html:text property="firstName" size="32" maxlength="128" styleClass="textInput"/></iv>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.Form.LastName"/>
-      </td>
-      <td>
-        <div class="smData"><cosmo:errmsg property="lastName"/></div>
-        <div><html:text property="lastName" size="32" maxlength="128" styleClass="textInput"/></iv>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.Form.Email"/>
-      </td>
-      <td class="mdData">
-        <div class="smData"><cosmo:errmsg property="email"/></div>
-        <div><html:text property="email" size="32" maxlength="128" styleClass="textInput"/></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.Form.Password"/>
-      </td>
-      <td class="mdData">
-        <div class="smData"><cosmo:errmsg property="password"/></div>
-        <div><html:password property="password" size="16" maxlength="16" styleClass="textInput"/></div>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="Account.Form.Confirm"/>
-      </td>
-      <td class="mdData">
-        <div class="smData"><cosmo:errmsg property="confirm"/></div>
-        <div><html:password property="confirm" size="16" maxlength="16" styleClass="textInput"/></div>
-      </td>
-    </tr>
-  </table>
-  
-<div style="margin-top:12px; text-align:right;">   
-<html:submit property="create" styleClass="buttonInput">
-<fmt:message key="Account.Form.Button.Create"/>
-</html:submit>
-</div>
-  
-</html:form>
+</script>
 
-</div>
-</div>
+<style type="text/css">
+.modifyUserForm {
+width: 50%;
+position: absolute;
+left: 25%;
+}
+</style>
+
+<div 	dojoType="cosmo:ModifyUserDialog" widgetId="signupDialog"
+		role="cosmo.ROLE_ANONYMOUS"		
+		createNew="true"
+		header='<fmt:message key="Account.New.NewAccount"/><p><fmt:message key="Account.New.AllFieldsRequired"/></p>'
+        firstNameLabel='<fmt:message key="Account.Form.FirstName"/>'
+        lastNameLabel='<fmt:message key="Account.Form.LastName"/>'
+        emailLabel='<fmt:message key="Account.Form.Email"/>'
+        passwordLabel='<fmt:message key="Account.Form.Password"/>'
+        confirmLabel='<fmt:message key="Account.Form.Confirm"/>'
+        postActionHandler="signupHandlerDict"
+        removeInputs="admin"
+        submitButtonText='<fmt:message key="Account.Form.Button.Create"/>'
+        disableCancel="true"
+		> </div>
+
+
+</cosmo:standardLayout>

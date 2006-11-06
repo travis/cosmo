@@ -303,6 +303,40 @@ public class ICalendarToCosmoConverterTest extends TestCase {
         assertEquals(30, titleChangeStartChangeEndChangeEvent.getEnd().getMinutes());
     }
     
+    public void testBug7182() throws Exception{
+        Calendar c = testHelper.loadIcs("bug7182.ics");
+        VEvent vevent = ICalendarUtils.getMasterEvent(c);
+        Event e = converter.createEvent("1234556", vevent, c);
+        
+        RecurrenceRule rr = e.getRecurrenceRule();
+        assertNotNull(rr);
+        assertEquals(1, rr.getModifications().length);
+        for (Modification modification : rr.getModifications()){
+            CosmoDate instanceDate = modification.getInstanceDate();
+            String[] modifiedProps  = modification.getModifiedProperties();
+            if (instanceDate.getDate() == 17){
+                //for this event the title was modified, 
+                //and we changed the start time and end time
+                assertEquals(17, instanceDate.getDate());
+                assertEquals(3, modifiedProps.length);
+                Set<String> s = new HashSet<String>(Arrays.asList(modifiedProps));
+                assertTrue(s.contains("start"));
+                assertTrue(s.contains("end"));
+                assertTrue(s.contains("title"));
+            }
+        }
+        
+        //let's see if this event expands out properly
+        VTimeZone vTimeZone = (VTimeZone) c.getComponents().getComponent(Component.VTIMEZONE);
+        TimeZone timezone = new TimeZone (vTimeZone);
+        DateTime rangeStart = new DateTime("20060917T000000", timezone);
+        DateTime rangeEnd   = new DateTime("20060924T000000", timezone);
+        List<Event> events = converter.expandEvent(e, vevent, c, rangeStart, rangeEnd);
+
+        Event event = events.get(0);
+        assertEquals("TitleChangeStartChangeEndChange", event.getTitle());
+    }
+    
     protected Event loadEventIcs(String name, String id) throws Exception {
         Calendar c = testHelper.loadIcs(name);
         return converter.createEvent(id, getFirstEvent(c), c);

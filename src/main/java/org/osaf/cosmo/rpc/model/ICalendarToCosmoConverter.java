@@ -256,7 +256,6 @@ public class ICalendarToCosmoConverter {
                 instanceStartDateTime.setTimeZone(masterTimezone);
             }
 
-            if (!instanceStartDate.equals(masterStartDate)) {
                 Event instance = new Event();
                 instance.setId(event.getId());
                 instance.setTitle(event.getTitle());
@@ -294,15 +293,18 @@ public class ICalendarToCosmoConverter {
                                     tzid));
                         }
                     }
-                }
-                
+
                 //let's add any individual instance modifications that may exist
                 VEvent modificationVEvent = fetcher.getInstance(instanceStartDate);
                 if (modificationVEvent != null) {
                     copyModifiedProperties(modificationVEvent, instance,
                             calendar);
                 }
-                events.add(instance);
+                if (instanceStartDate.equals(masterStartDate)) {
+                    events.set(0, instance);
+                } else {
+                    events.add(instance);
+                }
             }
         }
         return events;

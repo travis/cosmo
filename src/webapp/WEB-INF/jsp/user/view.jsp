@@ -21,6 +21,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<cosmo:standardLayout prefix="User.View.">
 <div class="widgetBorder" style="width:460px; margin-top:24px;">
 <div class="widgetContent" style="padding:8px;">
 
@@ -39,7 +40,7 @@
   </c:otherwise>
 </c:choose>
 
-<html:form action="${action}">
+<form action="${action}">
   
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>
@@ -65,7 +66,7 @@
       <td>
       	<div class="smData"><cosmo:errmsg property="username"/></div>
       	<div>
-          <html:text property="username" size="32" maxlength="32"
+          <input property="username" size="32" maxlength="32"
                      styleClass="textInput"
                      disabled="${User.overlord}"/>
       	</div>
@@ -78,7 +79,7 @@
       <td>
         <div class="smData"><cosmo:errmsg property="firstName"/></div>
         <div>
-          <html:text property="firstName" size="32" maxlength="128"
+          <input property="firstName" size="32" maxlength="128"
                      styleClass="textInput"
                      disabled="${User.overlord}"/>
       	</div>
@@ -91,7 +92,7 @@
       <td>
         <div class="smData"><cosmo:errmsg property="lastName"/></div>
         <div>
-          <html:text property="lastName" size="32" maxlength="128"
+          <input property="lastName" size="32" maxlength="128"
                      styleClass="textInput"
                      disabled="${User.overlord}"/>
       	</div>
@@ -103,7 +104,7 @@
       </td>
       <td>
         <div class="smData"><cosmo:errmsg property="email"/></div>
-        <div><html:text property="email" size="32" maxlength="128" styleClass="textInput"/></div>
+        <div><input property="email" size="32" maxlength="128" styleClass="textInput"/></div>
       </td>
     </tr>
     <tr>
@@ -120,7 +121,7 @@
       </td>
       <td>
         <div class="smData"><cosmo:errmsg property="password"/></div>
-        <div><html:password property="password" size="16" maxlength="16" styleClass="textInput"/></div>
+        <div><input type="password" property="password" size="16" maxlength="16" styleClass="textInput"/></div>
       </td>
     </tr>
     <tr>
@@ -129,14 +130,14 @@
       </td>
       <td>
         <div class="smData"><cosmo:errmsg property="confirm"/></div>
-        <div><html:password property="confirm" size="16" maxlength="16" styleClass="textInput"/></div>
+        <div><input type="password" property="confirm" size="16" maxlength="16" styleClass="textInput"/></div>
       </td>
     </tr>
     <tr>
      <td class="mdLabel" style="text-align:right; vertical-align:top;">&nbsp;</td>
       <td>  
         <div style="margin-top:8px;">
-          <html:checkbox property="admin" value="true"
+          <input type="checkbox" property="admin" value="true"
                          disabled="${User.overlord}"/>
           <fmt:message key="User.Form.MakeAdministrator"/>
         </div>
@@ -158,8 +159,9 @@
       </div>
       <br style="clear:both;"/>
     </div>
-  <html:hidden property="id"/>
-</html:form>
+  <input type="hidden" property="id"/>
+</form>
 
 </div>
 </div>
+</cosmo:standardLayout>

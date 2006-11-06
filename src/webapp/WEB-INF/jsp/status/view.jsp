@@ -20,7 +20,7 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-
+<cosmo:standardLayout prefix="Status.">
 <cosmo:cnfmsg/>
 
 <!-- simple memory stats -->
@@ -71,11 +71,12 @@
 
 <!-- controls -->
 <div class="md" style="margin-top:24px; text-align: left;">
-  <html:link page="/console/status/gc">
+  <a href="<c:url value="/admin/status/gc"/>">
     <fmt:message key="Status.Controls.RunGC"/>
-  </html:link>
+  </a>
   |
-  <html:link page="/console/status/dump">
+  <a href="<c:url value="/admin/status/dump"/>">
     <fmt:message key="Status.Controls.DumpRaw"/>
-  </html:link>
+  </a>
 </div>
+</cosmo:standardLayout>

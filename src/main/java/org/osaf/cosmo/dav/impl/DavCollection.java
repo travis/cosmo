@@ -55,7 +55,8 @@ import org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dav.CosmoDavMethods;
 import org.osaf.cosmo.dav.ExtendedDavConstants;
@@ -88,7 +89,7 @@ import org.osaf.cosmo.util.PathUtil;
  */
 public class DavCollection extends DavResourceBase
     implements ExtendedDavConstants {
-    private static final Logger log = Logger.getLogger(DavCollection.class);
+    private static final Log log = LogFactory.getLog(DavCollection.class);
     private static final int[] RESOURCE_TYPES;
     private static final Set<String> DEAD_PROPERTY_FILTER =
         new HashSet<String>();

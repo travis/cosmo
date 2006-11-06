@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
@@ -22,8 +25,6 @@ import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.ResourceType;
-
-import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dav.acl.AclConstants;
 import org.osaf.cosmo.dav.acl.property.AlternateUriSet;
@@ -52,8 +53,8 @@ import org.osaf.cosmo.model.ModelValidationException;
  */
 public class DavHomeCollection extends DavCollection
     implements AclConstants, CaldavConstants {
-    private static final Logger log =
-        Logger.getLogger(DavHomeCollection.class);
+    private static final Log log =
+        LogFactory.getLog(DavHomeCollection.class);
     private static final int[] RESOURCE_TYPES;
 
     static {

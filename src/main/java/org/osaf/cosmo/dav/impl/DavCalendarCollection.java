@@ -31,6 +31,9 @@ import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.ValidationException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -46,8 +49,6 @@ import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.ResourceType;
-
-import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.util.CalendarBuilderDispenser;
@@ -87,8 +88,8 @@ import org.osaf.cosmo.model.ModelValidationException;
  */
 public class DavCalendarCollection extends DavCollection
     implements CaldavConstants, ICalendarConstants {
-    private static final Logger log =
-        Logger.getLogger(DavCalendarCollection.class);
+    private static final Log log =
+        LogFactory.getLog(DavCalendarCollection.class);
     private static final int[] RESOURCE_TYPES;
     private static final Set<String> DEAD_PROPERTY_FILTER =
         new HashSet<String>();

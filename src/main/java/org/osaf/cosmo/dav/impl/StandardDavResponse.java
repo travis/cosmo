@@ -16,7 +16,11 @@
 package org.osaf.cosmo.dav.impl;
 
 import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
@@ -26,8 +30,6 @@ import org.apache.jackrabbit.webdav.WebdavResponseImpl;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.XmlSerializable;
-
-import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dav.ExtendedDavResource;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
@@ -44,8 +46,8 @@ import org.w3c.dom.Element;
  */
 public class StandardDavResponse extends WebdavResponseImpl
     implements TicketDavResponse, DavConstants, TicketConstants {
-    private static final Logger log =
-        Logger.getLogger(StandardDavResponse.class);
+    private static final Log log =
+        LogFactory.getLog(StandardDavResponse.class);
 
     /**
      */

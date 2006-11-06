@@ -47,7 +47,8 @@ import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.Item;
@@ -72,7 +73,7 @@ import org.osaf.cosmo.model.ModelValidationException;
  * @see ContentItem
  */
 public class DavFile extends DavResourceBase {
-    private static final Logger log = Logger.getLogger(DavFile.class);
+    private static final Log log = LogFactory.getLog(DavFile.class);
     private static final int[] RESOURCE_TYPES;
     private static final Set<String> DEAD_PROPERTY_FILTER =
         new HashSet<String>();

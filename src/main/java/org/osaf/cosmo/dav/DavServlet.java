@@ -17,10 +17,16 @@ package org.osaf.cosmo.dav;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.fortuna.ical4j.model.ValidationException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.server.AbstractWebdavServlet;
 import org.apache.jackrabbit.webdav.DavException;
@@ -47,8 +53,6 @@ import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 
-import org.apache.log4j.Logger;
-
 import org.osaf.cosmo.dav.ExtendedDavResource;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.CaldavRequest;
@@ -70,17 +74,13 @@ import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import net.fortuna.ical4j.model.ValidationException;
-
-import java.util.Iterator;
-
 /**
  * Extends jcr-server's <code>AbstractWebdavServlet</code> to
  * implement the methods for WebDAV and its extensions.
  */
 public class DavServlet extends AbstractWebdavServlet
     implements CaldavConstants {
-    private static final Logger log = Logger.getLogger(DavServlet.class);
+    private static final Log log = LogFactory.getLog(DavServlet.class);
 
     /**
      * The name of the Spring bean identifying the security manager.

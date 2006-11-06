@@ -49,7 +49,8 @@ import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.xml.Namespace;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dav.ExtendedDavResource;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
@@ -95,8 +96,8 @@ import org.osaf.cosmo.util.PathUtil;
  */
 public abstract class DavResourceBase
     implements ExtendedDavResource, TicketConstants {
-    private static final Logger log =
-        Logger.getLogger(DavResourceBase.class);
+    private static final Log log =
+        LogFactory.getLog(DavResourceBase.class);
 
     private static final Set<DavPropertyName> LIVE_PROPERTIES =
         new HashSet<DavPropertyName>();

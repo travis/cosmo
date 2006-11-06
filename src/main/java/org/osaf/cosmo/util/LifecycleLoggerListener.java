@@ -21,8 +21,6 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.log4j.LogManager;
-
 import org.osaf.cosmo.CosmoConstants;
 
 /**
@@ -48,7 +46,6 @@ public class LifecycleLoggerListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
         log.info(CosmoConstants.PRODUCT_NAME + " " +
                  CosmoConstants.PRODUCT_VERSION + " stopping");
-        LogManager.shutdown();
         java.beans.Introspector.flushCaches();
         LogFactory.releaseAll();
     }

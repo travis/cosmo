@@ -15,11 +15,12 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
-
-import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.model.CalendarEventItem;
 
@@ -33,7 +34,7 @@ import org.osaf.cosmo.model.CalendarEventItem;
  * @see CalendarEventItem
  */
 public class DavEvent extends DavCalendarResource {
-    private static final Logger log = Logger.getLogger(DavEvent.class);
+    private static final Log log = LogFactory.getLog(DavEvent.class);
 
     /** */
     public DavEvent(CalendarEventItem event,

@@ -15,9 +15,10 @@
  */
 package org.osaf.cosmo.dav.impl;
 
-import org.apache.jackrabbit.webdav.DavSession;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.jackrabbit.webdav.DavSession;
 
 /**
  * Default implementation of <code>DavSession</code> that does not
@@ -25,8 +26,8 @@ import org.apache.log4j.Logger;
  * <code>UnsupportedOperationException</code>.
  */
 public class NoOpDavSession implements DavSession {
-    private static final Logger log =
-        Logger.getLogger(NoOpDavSession.class);
+    private static final Log log =
+        LogFactory.getLog(NoOpDavSession.class);
 
     // DavSession
 

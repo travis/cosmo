@@ -24,7 +24,8 @@ import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CalendarItem;
@@ -40,8 +41,8 @@ import org.osaf.cosmo.model.CalendarItem;
  * @see CalendarItem
  */
 public class DavCalendarResource extends DavFile {
-    private static final Logger log =
-        Logger.getLogger(DavCalendarResource.class);
+    private static final Log log =
+        LogFactory.getLog(DavCalendarResource.class);
 
     /** */
     public DavCalendarResource(CalendarItem item,

@@ -15,12 +15,13 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.webdav.DavSessionProvider;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.WebdavRequest;
-
-import org.apache.log4j.Logger;
 
 /**
  * Default implementation of <code>DavSessionProvider</code> that
@@ -28,8 +29,8 @@ import org.apache.log4j.Logger;
  * <code>NoOpDavSession</code>.
  */
 public class NoOpDavSessionProvider implements DavSessionProvider {
-    private static final Logger log =
-        Logger.getLogger(NoOpDavSessionProvider.class);
+    private static final Log log =
+        LogFactory.getLog(NoOpDavSessionProvider.class);
 
     // DavSessionProvider
 

@@ -37,14 +37,7 @@
       <artifactId>activation</artifactId>
       <version>1.0.2</version>
     </dependency>
-    <dependency>
-      <groupId>antlr</groupId>
-      <artifactId>antlr</artifactId>
-      <version>2.7.2</version>
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
+<!--
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
@@ -53,6 +46,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
+-->
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -61,6 +55,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
+<!--
     <dependency>
       <groupId>commons-digester</groupId>
       <artifactId>commons-digester</artifactId>
@@ -69,6 +64,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
+-->
     <dependency>
       <groupId>commons-id</groupId>
       <artifactId>commons-id</artifactId>
@@ -93,6 +89,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
+<!--
     <dependency>
       <groupId>commons-validator</groupId>
       <artifactId>commons-validator</artifactId>
@@ -101,6 +98,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
+-->
     <dependency>
       <groupId>ical4j</groupId>
       <artifactId>ical4j-osaf</artifactId>
@@ -157,20 +155,6 @@
       </properties>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.9</version>
-      <properties>
-        <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <!-- derby used for integration testing -->
-    <dependency>
-      <groupId>org.apache.derby</groupId>
-      <artifactId>derby</artifactId>
-      <version>10.2.1.6</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-jcr-server</artifactId>
       <version>1.0-osaf-20061023</version>
@@ -194,6 +178,7 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
+    <!-- dependency of acegi security -->
     <dependency>
       <groupId>oro</groupId>
       <artifactId>oro</artifactId>
@@ -358,7 +343,14 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
+    <dependency>
+      <groupId>antlr</groupId>
+      <artifactId>antlr</artifactId>
+      <version>2.7.2</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
@@ -367,7 +359,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>springframework</groupId>
       <artifactId>spring-hibernate</artifactId>
@@ -376,7 +367,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
@@ -385,7 +375,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>springframework</groupId>
       <artifactId>spring-orm</artifactId>
@@ -394,7 +383,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>springframework</groupId>
       <artifactId>spring-aop</artifactId>
@@ -403,7 +391,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>asm</groupId>
       <artifactId>asm</artifactId>
@@ -412,7 +399,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>asm</groupId>
       <artifactId>asm-attrs</artifactId>
@@ -421,7 +407,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>cglib</groupId>
       <artifactId>cglib</artifactId>
@@ -430,7 +415,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache</artifactId>
@@ -439,7 +423,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>c3p0</groupId>
       <artifactId>c3p0</artifactId>
@@ -448,7 +431,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -457,7 +439,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>dom4j</groupId>
       <artifactId>dom4j</artifactId>
@@ -466,7 +447,6 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
     <dependency>
       <groupId>jta</groupId>
       <artifactId>jta</artifactId>
@@ -475,7 +455,17 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>
-
+    <!-- Integration testing dependencies -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.9</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>10.2.1.6</version>
+    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>

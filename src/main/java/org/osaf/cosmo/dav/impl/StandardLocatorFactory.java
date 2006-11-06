@@ -15,10 +15,11 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
-
-import org.apache.log4j.Logger;
 
 /**
  * Extends jcr-server's <code>LocatorFactoryImpl</code> to add factory
@@ -29,8 +30,8 @@ import org.apache.log4j.Logger;
  * @see org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl
  */
 public class StandardLocatorFactory extends LocatorFactoryImpl {
-    private static final Logger log =
-        Logger.getLogger(StandardLocatorFactory.class);
+    private static final Log log =
+        LogFactory.getLog(StandardLocatorFactory.class);
 
     private String atomPath;
     private String cmpPath;

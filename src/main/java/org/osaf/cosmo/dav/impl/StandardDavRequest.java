@@ -21,6 +21,9 @@ import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
@@ -31,8 +34,6 @@ import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
-
-import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.CaldavRequest;
@@ -53,8 +54,8 @@ import org.w3c.dom.Element;
 public class StandardDavRequest extends WebdavRequestImpl
     implements CaldavRequest, ReportRequest, TicketDavRequest,
                DavConstants, CaldavConstants, TicketConstants {
-    private static final Logger log =
-        Logger.getLogger(StandardDavRequest.class);
+    private static final Log log =
+        LogFactory.getLog(StandardDavRequest.class);
 
     private DavPropertySet mkcalendarSet;
     private Ticket ticket;

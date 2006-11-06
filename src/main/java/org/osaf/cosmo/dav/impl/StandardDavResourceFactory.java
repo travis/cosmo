@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -23,8 +26,6 @@ import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
-
-import org.apache.log4j.Logger;
 
 import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.dav.CosmoDavMethods;
@@ -48,8 +49,8 @@ import org.osaf.cosmo.util.PathUtil;
  * @see org.apache.jackrabbit.webdav.DavResource
  */
 public class StandardDavResourceFactory implements DavResourceFactory {
-    private static final Logger log =
-        Logger.getLogger(StandardDavResourceFactory.class);
+    private static final Log log =
+        LogFactory.getLog(StandardDavResourceFactory.class);
 
     private ContentService contentService;
     private CosmoSecurityManager securityManager;

@@ -42,33 +42,107 @@
     </property> 
 </bean> 
 
+<bean id="exceptionHandler"
+  class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+    <property name="exceptionMappings">
+       <value>
+          java.lang.Exception=error.general
+       </value>
+    </property>
+</bean>
+
 <bean id="handlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping"> 
     <property name="interceptors">
         <list> 
             <ref bean="localeChangeInterceptor"/> 
         </list> 
-    </property>     
+    </property>   
+    <property name="alwaysUseFullPath">
+		<value>true</value>
+    </property>
     <property name="mappings"> 
-        <props> 
-            <prop key="/**/*.page">jspViewController</prop> 
-            <prop key="/i18n.js">i18nController</prop> 
-        </props>
+		<value>
+	        /admin/status/*=statusController
+        	/logout=logoutController
+    	    /browse/ticket/new=newTicketForm
+           	/browse*=homeDirectoryBrowsingController
+    	    /i18n.js=i18nController
+    	    /js/cosmo/util/i18n.js=i18nController
+	        /**/*=jspViewController
+		</value>
     </property> 
 </bean> 
 
 <!-- TODO set cache settings here.... -->
 <bean id="i18nController" class="org.osaf.cosmo.spring.mvc.InternationalizationController" />
 
-<bean id="jspViewController" class="org.osaf.cosmo.spring.mvc.CosmoUrlFilenameViewController"> 
+<bean id="jspViewController" class="org.osaf.cosmo.spring.mvc.controllers.CosmoUrlFilenameViewController"> 
 	<property name="alwaysUseFullPath">
 		<value>true</value>
     </property>
 </bean> 
 
-<bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
-    <property name="viewClass" value="org.osaf.cosmo.spring.mvc.CosmoJstlView"/> 
-    <property name="prefix" value="WEB-INF/jsp/"/> 
-    <property name="suffix" value=".jsp"/> 
+<bean id="statusController" class="org.osaf.cosmo.spring.mvc.controllers.StatusController">
+	<property name="methodNameResolver"><ref bean="internalPathMethodNameResolver"/></property>
+	<property name="dumpView"><value>admin_status_dump</value></property>
+	<property name="viewView"><value>admin_status_view</value></property>
+	<property name="gcView"><value>redirect:/admin/status/view</value></property>
+</bean>
+
+<bean id="homeDirectoryBrowsingController" class="org.osaf.cosmo.spring.mvc.controllers.HomeDirectoryBrowsingController">
+	<property name="methodNameResolver"><ref bean="homeDirectoryBrowsingMethodNameResolver"/></property>
+	<property name="browseCollectionView"><value>browse_collection</value></property>
+	<property name="browseItemView"><value>browse_item</value></property>
+	<property name="eventView"><value>browse_event</value></property>
+	<property name="calendarView"><value>browse_calendar</value></property>
+	<property name="removeViewBase"><value>redirect:/browse</value></property>
+	<property name="revokeTicketBaseView"><value>redirect:/browse</value></property>
+	<property name="contentService"><ref bean="contentService" /></property>
+</bean>
+
+<bean id="homeDirectoryBrowsingMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
+	<property name="mappings">
+		<value>
+		   	/browse=browse
+    		/browse/remove=remove
+    		/browse/view=view
+			/browse/download=download
+    		/browse/ticket/grant=grantTicket
+			/browse/ticket/revoke=revokeTicket
+		</value>	
+	</property>
+</bean>
+
+<bean id="internalPathMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver">
+</bean>
+
+<bean id="logoutController" class="org.osaf.cosmo.spring.mvc.controllers.LogoutController"> 
+    <property name="forwardPath" value="login" />
+</bean> 
+
+<bean id="newTicketForm" class="org.osaf.cosmo.spring.mvc.controllers.TicketFormController">
+        <property name="commandName"><value>ticket</value></property>
+        <property name="commandClass">
+           <value>org.osaf.cosmo.model.Ticket</value>
+         </property>
+        <!-- property name="validator"><ref bean="bikeValidator"/></property-->
+        <property name="formView"><value>browse_ticket_new</value></property>
+        <property name="successView"><value>redirect:/browse</value></property>
+        <property name="cancelView"><value>redirect:/browse</value></property>
+       	<property name="contentService"><ref bean="contentService" /></property>
+       	<property name="securityManager"><ref bean="securityManager" /></property>
+</bean>
+
+<bean id="resourceBundleViewResolver" class="org.springframework.web.servlet.view.ResourceBundleViewResolver"> 
+	<property name="order" value="1"/>
+	<property name="basename" value="views" />
+</bean> 
+
+
+<!-- This resolver checks for redirect: or forward: prefixes. If none is found, it forwards to a 
+	 "resource not found" page. -->
+<bean id="defaultViewResolver" class="org.osaf.cosmo.spring.mvc.views.resolvers.CosmoDefaultViewResolver"> 
+
 </bean> 
 
 </beans>

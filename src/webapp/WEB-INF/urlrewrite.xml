@@ -28,51 +28,44 @@
     <to>/feed?path=$1</to>
   </rule>
   <rule>
-    <from>^/console/loginfailed$</from>
-    <to>/console/login?login_failed=1</to>
+    <from>^/loginfailed$</from>
+    <to>/login?login_failed=1</to>
   </rule>
   <rule>
-    <from>^/console/user/create$</from>
-    <to>/console/user/create</to>
+    <from>^/browse/remove(/.*)$</from>
+    <to>/browse/remove?path=$1</to>
   </rule>
   <rule>
-    <from>^/console/user/update$</from>
-    <to>/console/user/update</to>
+    <from>^/browse/download(/.*)$</from>
+    <to>/browse/download?path=$1</to>
   </rule>
   <rule>
-    <from>^/console/user/new$</from>
-    <to>/console/user/new</to>
+    <from>^/browse/view(/.*)$</from>
+    <to>/browse/view?path=$1</to>
   </rule>
   <rule>
-    <from>^/console/user/root$</from>
-    <to>/console/user/root?username=root</to>
+    <from>^/browse/ticket(/.*)/new$</from>
+    <to>/browse/ticket/new?path=$1</to>
+  </rule>
+ <rule>
+    <from>^/browse/ticket(/.*)/revoke/(.+)$</from>
+    <to>/browse/ticket/revoke?path=$1&amp;ticket=$2</to>
   </rule>
   <rule>
-    <from>^/console/user/([\w\s.\-\']+)$</from>
-    <to>/console/user?username=$1</to>
+    <from>^/browse(/.*)$</from>
+    <to>/browse?path=$1</to>
+  </rule>
+
+<!-- ********** New rules ************* -->
+  
+  <rule>
+	<from>^/admin/status/?$</from>
+	<to>/admin/status/view</to>
   </rule>
   <rule>
-    <from>^/console/home/browse(/.*)$</from>
-    <to>/console/home/browse?path=$1</to>
+	<from>^/admin/users/?$</from>
+	<to>/admin/user/list</to>
   </rule>
-  <rule>
-    <from>^/console/home/remove(/.*)$</from>
-    <to>/console/home/remove?path=$1</to>
-  </rule>
-  <rule>
-    <from>^/console/home/download(/.*)$</from>
-    <to>/console/home/download?path=$1</to>
-  </rule>
-  <rule>
-    <from>^/console/home/view(/.*)$</from>
-    <to>/console/home/view?path=$1</to>
-  </rule>
-  <rule>
-    <from>^/console/home/ticket(/.*)/new$</from>
-    <to>/console/home/ticket/new?path=$1</to>
-  </rule>
-  <rule>
-    <from>^/console/home/ticket(/.*)/revoke/(.+)$</from>
-    <to>/console/home/ticket/revoke?path=$1&amp;ticket=$2</to>
-  </rule>
+
+  
 </urlrewrite>

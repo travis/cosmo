@@ -1,0 +1,64 @@
+.loginBubble{
+	
+	margin:auto; 
+	width:280px; 
+	text-align:left; 
+	padding-top:24px;
+
+}
+
+#loginBubbleLoginPrompt{
+font-size: 0.8em;
+}
+
+#loginBubbleLogo{
+
+}
+
+#loginBubbleForm{
+	display: inline;
+
+}
+
+#loginBubbleFormContainer{
+	padding:12px;
+	display: inline;
+}
+
+#loginBubbleInputsBox{
+	display: inline;
+}
+
+#loginBubbleUsernameWidget{
+	display: inline;
+}
+#loginBubbleUsernamePrompt{
+	display: inline;
+}
+#loginBubbleUsernameInput{
+	display: inline;
+}
+#loginBubbleUsernameInputContainer{
+	display: inline;
+}
+#loginBubblePasswordWidget{
+	display: inline;
+}
+#loginBubblePasswordPrompt{
+	display: inline;
+}
+#loginBubblePasswordInput{
+	display: inline;
+}
+#loginBubbleUsernameInputContainer{
+	display: inline;
+
+}
+
+#loginBubbleSubmitButton{
+	display: inline;
+}
+
+
+
+

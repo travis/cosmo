@@ -21,8 +21,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"   prefix="fn"     %>
 <%@ taglib uri="http://jakarta.apache.org/taglibs/unstandard-1.0"
     prefix="u" %>
-<%@ taglib uri="http://struts.apache.org/tags-html-el"    prefix="html"   %>
-<%@ taglib uri="http://struts.apache.org/tags-logic-el"   prefix="logic"  %>
-<%@ taglib uri="http://struts.apache.org/tags-tiles-el"   prefix="tiles"  %>
+
 <%@ taglib uri="http://acegisecurity.org/authz"           prefix="authz"  %>
 <%@ taglib uri="http://osafoundation.org/cosmo/jsp/core"  prefix="cosmoui"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>

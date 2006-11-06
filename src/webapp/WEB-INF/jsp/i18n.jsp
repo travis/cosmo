@@ -21,12 +21,16 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"         prefix="fmt"    %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"   prefix="fn"     %>
 <fmt:setBundle basename="PimMessageResources"/>
- 
+
+dojo.provide("cosmo.util.i18n")
+
 var localText = [];
 
 function getText(str) {
     return localText[str];
 }
+
+cosmo.util.i18n.getText = getText
 
 <c:forEach var="key" items="${messages}">
     localText["${key}"] = "<fmt:message key="${key}"/>";

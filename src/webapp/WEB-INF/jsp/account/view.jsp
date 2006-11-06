@@ -20,6 +20,39 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
+<cosmoui:user var="user" />
+<cosmo:standardLayout prefix="Account.View.">
+
+<%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
+
+
+
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/cmp/cmp.js"></script>
+<script type="text/javascript">
+
+dojo.require("cosmo.ui.widget.ModifyUserDialog");
+
+modifyHandlerDict= {
+	handle : function(type, data, evt){
+
+		if (evt.status == 204){
+			dojo.widget.byId("modifyUserDialog").populateFields();
+
+		}
+		else if (evt.status == 431){
+			//TODO: username in use stuff
+			alert("Username in use")
+		}
+		else if (evt.status == 432){
+			//TODO: email in use stuff
+			alert("Email in use")
+		}	
+	
+	}
+}
+
+testingDict={handle:alert}
+</script>
 
 <div style="width:500px;">
 
@@ -48,86 +81,28 @@
   </p>
 
   <p>
-    <html:link page="/console/home/browse/${user.username}">
+    <a href="<c:url value="/browse/${user.username}"/>">
       <fmt:message key="Account.View.BrowseHomeDirectory"/>
-    </html:link>
+    </a>
   </p>
   
-<div class="widgetBorder" style="width:460px; margin-top:24px;">
-<div class="widgetContent" style="padding:8px;">  
-  
-  <div class="hd" style="margin-bottom:4px;"><fmt:message key="Account.View.AccountDetails.Header"/></div>
-  
-  <cosmo:errmsg/>
-  
-  <html:form action="/account/update">
-    <table cellpadding="3" cellspacing="1" border="0">
-      <tr>
-        <td class="mdLabel" style="text-align:right;">
-          <fmt:message key="Account.Form.FirstName"/>
-        </td>
-        <td>
-          <div class="smData"><cosmo:errmsg property="firstName"/></div>
-          <div><html:text property="firstName" size="32" maxlength="128" styleClass="textInput"/></div>
-        </td>
-      </tr>
-      <tr>
-        <td class="mdLabel" style="text-align:right;">
-          <fmt:message key="Account.Form.LastName"/>
-        </td>
-        <td>
-          <div class="smData"><cosmo:errmsg property="lastName"/></div>
-          <div><html:text property="lastName" size="32" maxlength="128" styleClass="textInput"/></div>
-        </td>
-      </tr>
-      <tr>
-        <td class="mdLabel" style="text-align:right;">
-          <fmt:message key="Account.Form.Email"/>
-        </td>
-        <td>
-          <div class="smData"><cosmo:errmsg property="email"/></div>
-          <div><html:text property="email" size="32" maxlength="128" styleClass="textInput"/></div>
-        </td>
-      </tr>
-      <tr>
-        <td class="mdLabel" style="text-align:right;">
-          &nbsp;
-        </td>
-        <td>
-          <span class="smData"><fmt:message key="Account.Form.PasswordBlurb"/></span>
-        </td>
-      </tr>
-      <tr>
-        <td class="mdLabel" style="text-align:right;">
-          <fmt:message key="Account.Form.Password"/>
-        </td>
-        <td>
-          <div class="smData"><cosmo:errmsg property="password"/></div>
-          <div><html:password property="password" size="16" maxlength="16" styleClass="textInput"/></div>
-        </td>
-      </tr>
-      <tr>
-        <td class="mdLabel" style="text-align:right;">
-          <fmt:message key="Account.Form.Confirm"/>
-        </td>
-        <td>
-          <div class="smData"><cosmo:errmsg property="confirm"/></div>
-          <div><html:password property="confirm" size="16" maxlength="16" styleClass="textInput"/></div>
-        </td>
-      </tr>
-    </table>
-    
-<div style="margin-top:12px; text-align:right;">    
-<html:submit property="create" styleClass="buttonInput">
-<fmt:message key="Account.Form.Button.Update"/>
-</html:submit>
-</div>
-    
-  </html:form>
-  
-</div> 
-</div>  
-  
+<div 	dojoType="cosmo:ModifyUserDialog" widgetId="modifyUserDialog"
+		role="cosmo.ROLE_AUTHENTICATED"		
+		header='<fmt:message key="Account.View.AccountDetails.Header"/>'
+        firstNameLabel='<fmt:message key="Account.Form.FirstName"/>'
+        lastNameLabel='<fmt:message key="Account.Form.LastName"/>'
+        emailLabel='<fmt:message key="Account.Form.Email"/>'
+        passwordBlurb='<fmt:message key="Account.Form.PasswordBlurb"/>'
+        passwordLabel='<fmt:message key="Account.Form.Password"/>'
+        confirmLabel='<fmt:message key="Account.Form.Confirm"/>'
+        postActionHandler="testingDict"
+        removeInputs="username,admin"
+        disableCancel="true"
+        submitButtonText='<fmt:message key="Account.Form.Button.Update"/>'
+        populateOnLoad="true"
+		> </div>
+
 </authz:authorize>
 
 </div>
+</cosmo:standardLayout>

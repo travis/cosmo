@@ -83,10 +83,7 @@ public class ICalendarToCosmoConverter {
      */ 
     public Event createEvent(String itemId, VEvent vevent, net.fortuna.ical4j.model.Calendar calendar){
         Event event = new Event();
-        event.setId(itemId);
-        event.setDescription(getPropertyValue(vevent, Property.DESCRIPTION));
-        event.setTitle(getPropertyValue(vevent, Property.SUMMARY));
-        event.setStatus(getPropertyValue(vevent, Property.STATUS));
+        setSimpleProperties(itemId, vevent, event);
         DtEnd dtEnd = (DtEnd) vevent.getProperties()
                 .getProperty(Property.DTEND);
         DtStart dtStart = (DtStart) vevent.getProperties().getProperty(
@@ -163,6 +160,47 @@ public class ICalendarToCosmoConverter {
         return event;
     }
     
+    
+    public Event createModEvent(VEvent vevent,
+            VEvent masterEvent, net.fortuna.ical4j.model.Date instanceDate, net.fortuna.ical4j.model.Calendar calendar) {
+        Event event = new Event();
+        setSimpleProperties(null, vevent, event);
+      
+        DtStart masterDtStart = (DtStart) masterEvent.getProperties()
+                .getProperty(Property.DTSTART);
+        boolean startDateHasTime = masterDtStart.getDate() instanceof DateTime;
+        
+        DtStart dtStart = (DtStart) vevent.getProperties().getProperty(
+                Property.DTSTART);
+        
+        if (dtStart != null){
+            event.setStart(createCosmoDate(dtStart, calendar));
+        }
+
+        DtEnd dtEnd = (DtEnd) vevent.getProperties()
+                .getProperty(Property.DTEND);
+
+        if (dtEnd != null){
+            if (!startDateHasTime){
+                //must be an ALL DAY event
+
+                // since it's an all-day event let's use a Date as opposed to a
+                // DateTime
+                event.setAllDay(true);
+                
+                Calendar endCalendar = Calendar.getInstance();
+                endCalendar.setTime(vevent.getEndDate().getDate());
+                endCalendar.add(Calendar.DATE, -1);
+                net.fortuna.ical4j.model.Date endDate = new net.fortuna.ical4j.model.Date(endCalendar.getTimeInMillis());
+                event.setEnd(createCosmoDate((net.fortuna.ical4j.model.Date)endDate, calendar, null));
+            } else {
+                event.setEnd(createCosmoDate(dtEnd, calendar));
+            }
+        }
+
+        return event;
+
+    }
     /**
      * Returns a single array of Events for every VEVENT in every Calendar. If there
      * are any recurring events, the expanded instances will be returned for the given date
@@ -446,8 +484,9 @@ public class ICalendarToCosmoConverter {
             if (sourceDtEnd != null) {
                 DtStart sourceDtStart = (DtStart) source.getProperties()
                         .getProperty(Property.DTSTART);
-                net.fortuna.ical4j.model.Date sourceStartDate = sourceDtStart
-                        .getDate();
+                
+                net.fortuna.ical4j.model.Date sourceStartDate = sourceDtStart != null ?
+                        sourceDtStart.getDate() : d;
                 net.fortuna.ical4j.model.Date sourceEndDate = sourceDtEnd
                         .getDate();
                 long delta = sourceEndDate.getTime()
@@ -475,7 +514,13 @@ public class ICalendarToCosmoConverter {
         }
 
     }
-
+    private void setSimpleProperties(String itemId, VEvent vevent, Event event) {
+        event.setId(itemId);
+        event.setDescription(getPropertyValue(vevent, Property.DESCRIPTION));
+        event.setTitle(getPropertyValue(vevent, Property.SUMMARY));
+        event.setStatus(getPropertyValue(vevent, Property.STATUS));
+    }
+    
     private RecurrenceRule createRecurrenceRule(RRule rrule, DtStart dtStart, VEvent vevent,
             net.fortuna.ical4j.model.Calendar calendar) {
         RecurrenceRule recurrenceRule = new RecurrenceRule();
@@ -556,7 +601,9 @@ public class ICalendarToCosmoConverter {
                     Modification modification = new Modification();
                     CosmoDate instanceDate = createCosmoDate(recurrenceId,  calendar);
                     modification.setInstanceDate(instanceDate);
-                    Event modEvent = createEvent("", curVEvent, calendar);
+                    Event modEvent = createModEvent(curVEvent, ICalendarUtils
+                            .getMasterEvent(calendar), recurrenceId.getDate(),
+                            calendar);
                     String[] modifiedProperties = getModifiedProprties(curVEvent, vevent);
                     modification.setModifiedProperties(modifiedProperties);
                     modification.setEvent(modEvent);
@@ -578,20 +625,27 @@ public class ICalendarToCosmoConverter {
         
         RecurrenceId recurrenceId = modifiedEvent.getReccurrenceId();
         net.fortuna.ical4j.model.Date origStartDate = recurrenceId.getDate();
-        net.fortuna.ical4j.model.Date modStartDate = modifiedEvent
-                .getStartDate().getDate();
-        if (!origStartDate.equals(modStartDate)) {
-            props.add(EVENT_START);
+
+        if (modifiedEvent.getStartDate() != null) {
+            net.fortuna.ical4j.model.Date modStartDate = modifiedEvent
+                    .getStartDate().getDate();
+            if (!origStartDate.equals(modStartDate)) {
+                props.add(EVENT_START);
+            }
+
         }
         
         long duration = getDuration(originalEvent);
         net.fortuna.ical4j.model.Date origEndDate = (net.fortuna.ical4j.model.Date) ICalendarUtils
                 .clone(origStartDate);
         origEndDate.setTime(origEndDate.getTime() + duration);
-        net.fortuna.ical4j.model.Date modEndDate = modifiedEvent.getEndDate()
-                .getDate();
-        if (!origEndDate.equals(modEndDate)) {
-            props.add(EVENT_END);
+        
+        if (modifiedEvent.getProperties().getProperty(Property.DTEND) != null) {
+            net.fortuna.ical4j.model.Date modEndDate = modifiedEvent
+                    .getEndDate().getDate();
+            if (!origEndDate.equals(modEndDate)) {
+                props.add(EVENT_END);
+            }
         }
         
         return props.toArray(new String[0]);

@@ -21,249 +21,339 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<cosmo:standardLayout prefix="User.List.">
+
+<%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
+<script type="text/javascript">
+
+dojo.require("dojo.widget.*");
+dojo.require("dojo.widget.Button");
+dojo.require("cosmo.env");
+</script>
+
+<style type="text/css">
+		/***
+			The following is just an example of how to use the table.
+			You can override any class names to be used if you wish.
+		***/
+
+
+		table#userList {
+			width:100%;
+
+		}
+
+		* html div.tableContainer {	/* IE only hack */
+			width:95%;
+
+		}
+
+		table#userList td,
+		table#userList th{
+			border-right:1px solid #999;
+			padding:2px;
+			font-weight:normal;
+			cursor: pointer;
+
+		}
+		table#userList thead td, table#userList thead th {
+		    font-size: 11px; 
+	  		color:#666666;
+   	 		font-weight:bold;
+    		text-align:center;
+    		background:#eeeeee;
+  		  	border:1px solid #cccccc;
+    		white-space:nowrap;
+		}
+		
+		* html div.tableContainer table thead tr td,
+		* html div.tableContainer table thead tr th{
+			/* IE Only hacks */
+			position:relative;
+			top:expression(dojo.html.getFirstAncestorByTag(this,'table').parentNode.scrollTop-2);
+		}
+		
+		html>body tbody.userListBody {
+
+		}
+
+		tbody.userListBody td, tbody.userListBody tr td {
+		    font-size: 11px;
+    		border:1px solid #cccccc;
+		
+		}
+
+		tbody.userListBody tr.alternateRow td {
+			background: #e3edfa;
+			padding: 2px;
+		}
+
+		tbody.userListBody tr.selected td {
+			background: yellow;
+			padding: 2px;
+		}
+		tbody.userListBody tr:hover td {
+			background: #a6c2e7;
+			padding: 2px;
+		}
+		tbody.userListBody tr.selected:hover td {
+			background: #ff3;
+			padding: 2px;
+		}
+		
+		a.userListPagingLink {
+			text-decoration: none;
+			color: blue;
+		}
+		
+		span#pageNumberChooser {
+			position: absolute;
+			right: 2em;
+		}
+		
+		span#pageSizeChooser {
+			position: absolute;
+			left: 2em;
+		}
+		
+		div#userListControls {
+			font-size: 0.9em;
+			height: 2em;
+		}
+		
+		form.modifyUserForm {
+
+			width: 50%;
+			position: fixed;
+			left: 25%;
+			top: 25%;
+			background: white;
+			
+		}
+		
+		img#orderIndicator {
+			padding-left : 5px;
+		}
+		
+		div#userAdminLinkBlock{
+			margin-top: 0.2em;		
+		}
+		
+		div#userAdminLinkBlock>a {
+			text-decoration: none;
+			font-size: 0.98em;
+			margin-right: 1em;
+		}
+
+	</style>
+	
+
+
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/cmp/cmp.js"></script>
+
 <script language="JavaScript">
 
-function goToPage(pageOffset){
-   
-   var pageNumberElement = getUserPageNumberElement();
-   var currentPage = parseInt(pageNumberElement.value);
-   pageNumberElement.value = currentPage + pageOffset; 
-   getPagedListForm().submit();
-}
+var GLOBAL_BAR;
 
-function getPagedListForm(){
-	return document.forms["pagedListForm"];
-}
+dojo.require("cosmo.ui.widget.CosmoUserList");
+dojo.require("cosmo.ui.widget.ModifyUserDialog");
 
-function getPagedListFormElement(elementName){
-    var form = getPagedListForm();
-    return form.elements[elementName];
-}
-
-function getUserPageNumberElement(){
-    return getPagedListFormElement("pageCriteria.pageNumber");
-}
 </script>
+
+<cosmo:staticbaseurl var="staticBaseUrl"/>
+
+
 
 <cosmo:cnfmsg/>
 
-<c:choose>
-  <c:when test="${not empty Users}">
-	<html:form method="GET" action="/users.do">
-      <html:hidden property="pageCriteria.sortTypeString"/>
-      <html:hidden property="pageCriteria.sortAscending"/>
-      <div style="margin-top:12px;">
-      <table border="0" cellpadding="0" cellspacing="0" width="100%">
-        <tr>
-          <td align="left" valign="top">
-              <fmt:message key="User.List.PageSize"/>
-              <html:select property="pageCriteria.pageSize" onchange="goToPage(0);">
-                <html:option value="10">10</html:option>
-                <html:option value="25">25</html:option>
-                <html:option value="50">50</html:option>
-                <html:option value="-1">All</html:option>
-              </html:select>
-          </td>
-        
-          <td align="right" valign="top">
-            <html:link href="javascript: goToPage(-${CurrentPage - 1});">&lt;&lt;</html:link>  
-  		    <html:link href="javascript: goToPage(-1);">&lt;</html:link>
-  		    <fmt:message key="User.List.Page"/>
-  		    <html:select property="pageCriteria.pageNumber" onchange="goToPage(0);">
-    		  <c:forEach var="i" begin="1" end="${NumPages}">
-      		    <html:option value="${i}">${i}</html:option>
-              </c:forEach>
-  		    </html:select>
-  	 	    <fmt:message key="User.List.Of"/>
-		    ${NumPages}
-		    <html:link href="javascript: goToPage(1);">&gt;</html:link>
-		    <html:link href="javascript: goToPage(${NumPages - CurrentPage});">&gt;&gt;</html:link>
-          </td>
+<table dojoType="cosmo:CosmoUserList" id="userList"
+	   widgetId="userList" headClass="userListHead" tbodyClass="userListBody" enableMultipleSelect="true" 
+	   enableAlternateRows="true" rowAlternateClass="alternateRow" multiple="true"
+	   valueField = "username">
 
-        
-        </tr>
-      </table>
-      </div>
+<thead>
+
+	<tr>
+
+			<th field="name" dataType="String">Name</th>
+			<th field="username" dataType="String" align="center">Username</th>
+			<th field="email" dataType="String" align="center">Email</th>
+			<th field="admin" dataType="String" align="center">Administrator</th>
+			<th field="created" dataType="Date" align="center">Created</th>
+			<th field="modified" dataType="Date" align="center">Last Modified</th>
+	</tr>
+</thead>
+</table>
 
 
-  </html:form>
+<div id="userAdminLinkBlock">
 
-    <div style="margin-top:12px;">
-    <table cellpadding="4" cellspacing="1" border="0" width="100%">
-      <tr>
-        <td class="smTableColHead" style="width:1%;">
-          &nbsp;
-        </td>
-        <td class="smTableColHead">
-          <c:choose>
-            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Name"}'>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Name&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.FullName"/></html:link> 
-              <c:choose>
-                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
-   	               &nbsp;&nbsp;&#8595;
-   	   		    </c:when>
-   	            <c:otherwise>
-   	               &nbsp;&nbsp;&#8593;
-   	            </c:otherwise>
-   	          </c:choose>
-            </c:when>
-            <c:otherwise>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Name&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.FullName"/></html:link> 
-            </c:otherwise>
-          </c:choose>
-        </td>
-        <td class="smTableColHead">
-          <c:choose>
-            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Username"}'>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Username&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.Username"/></html:link> 
-              <c:choose>
-                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
-   	               &nbsp;&nbsp;&#8595;
-   	   		    </c:when>
-   	            <c:otherwise>
-   	               &nbsp;&nbsp;&#8593;
-   	            </c:otherwise>
-   	          </c:choose>
-            </c:when>
-            <c:otherwise>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Username&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.Username"/></html:link> 
-            </c:otherwise>
-          </c:choose>
-        </td>
-        <td class="smTableColHead">
-          <c:choose>
-            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Administrator"}'>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Administrator&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.IsAdmin"/></html:link> 
-              <c:choose>
-                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
-   	               &nbsp;&nbsp;&#8595;
-   	   		    </c:when>
-   	            <c:otherwise>
-   	               &nbsp;&nbsp;&#8593;
-   	            </c:otherwise>
-   	          </c:choose>
-            </c:when>
-            <c:otherwise>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Administrator&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.IsAdmin"/></html:link> 
-            </c:otherwise>
-          </c:choose>
-        </td>
-        <td class="smTableColHead"">
-          <c:choose>
-            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Email"}'>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Email&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.Email"/></html:link> 
-              <c:choose>
-                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
-   	               &nbsp;&nbsp;&#8595;
-   	   		    </c:when>
-   	            <c:otherwise>
-   	               &nbsp;&nbsp;&#8593;
-   	            </c:otherwise>
-   	          </c:choose>
-            </c:when>
-            <c:otherwise>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Email&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.Email"/></html:link> 
-            </c:otherwise>
-          </c:choose>
-        </td>
-        <td class="smTableColHead">
-          <c:choose>
-            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Created"}'>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Created&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.DateCreated"/></html:link> 
-              <c:choose>
-                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
-   	               &nbsp;&nbsp;&#8595;
-   	   		    </c:when>
-   	            <c:otherwise>
-   	               &nbsp;&nbsp;&#8593;
-   	            </c:otherwise>
-   	          </c:choose>
-            </c:when>
-            <c:otherwise>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Created&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.DateCreated"/></html:link> 
-            </c:otherwise>
-          </c:choose>
-        </td>
-        <td class="smTableColHead">
-          <c:choose>
-            <c:when test='${pagedListForm.pageCriteria.sortTypeString == "Last Modified"}'>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Last%20Modified&pageCriteria.sortAscending=${!pagedListForm.pageCriteria.sortAscending}&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.DateLastModified"/></html:link> 
-              <c:choose>
-                <c:when test='${pagedListForm.pageCriteria.sortAscending == "true"}'>
-   	               &nbsp;&nbsp;&#8595;
-   	   		    </c:when>
-   	            <c:otherwise>
-   	               &nbsp;&nbsp;&#8593;
-   	            </c:otherwise>
-   	          </c:choose>
-            </c:when>
-            <c:otherwise>
-              <html:link href="/cosmo/console/users?pageCriteria.sortTypeString=Last%20Modified&pageCriteria.sortAscending=true&pageCriteria.pageSize=${pagedListForm.pageCriteria.pageSize}&pageCriteria.pageNumber=1"><fmt:message key="User.List.TH.DateLastModified"/></html:link> 
-            </c:otherwise>
-          </c:choose>
-        </td>
-      </tr>
-      <c:forEach var="user" items="${Users}">
-        <cosmo:fullName var="fullName" user="${user}"/>
-        <tr>
-          <td class="smTableData" style="text-align:center; white-space:nowrap;">
-            <html:link page="/console/user/${user.username}">
-              <fmt:message key="User.List.EditControl"/>
-            </html:link>
-            <c:choose>
-              <c:when test="${not user.overlord}">
-                <html:link page="/console/home/browse/${user.username}">
-                  <fmt:message key="User.List.HomeDirectoryControl"/>
-                </html:link>
-                <html:link page="/console/user/remove?username=${user.username}">
-                  <fmt:message key="User.List.RemoveControl"/>
-                </html:link>
-              </c:when>
-              <c:otherwise>
-                <span class="disabled">
-                  <fmt:message key="User.List.HomeDirectoryControl"/>
-                  <fmt:message key="User.List.RemoveControl"/>
-                </span>
-              </c:otherwise>
-            </c:choose> 
-          </td>
-          <td class="smTableData">
-            ${fullName}
-          </td>
-          <td class="smTableData" style="text-align:center;">
-            ${user.username}
-          </td>
-          <td class="smTableData" style="text-align:center;">
-            <c:if test="${user.admin}">
-              Yes
-            </c:if>
-          </td>
-          <td class="smTableData" style="text-align:center;">
-            <html:link href="mailto:${user.email}">${user.email}</html:link>
-          </td>
-          <td class="smTableData" style="text-align:center; white-space:nowrap;">
-            <fmt:formatDate value="${user.dateCreated}" type="date" pattern="MM-dd-yyyy"/>
-          </td>
-          <td class="smTableData" style="text-align:center; white-space:nowrap;">
-            <fmt:formatDate value="${user.dateModified}" type="date" pattern="MM-dd-yyyy"/>
-          </td>
-        </tr>
-      </c:forEach>
-    </table>
-    </div>
-  </c:when>
-  <c:otherwise>
-    <div class="md">
-      <i><fmt:message key="User.List.NoUsers"/></i>
-      </div>
-  </c:otherwise>
-</c:choose>
-
-<div style="margin-top:12px;">
-<html:link page="/console/user/new">
-  Create New User
-</html:link>
+<a href="javascript:toggleNewUser()">Create New User</a>
+<a id="modifySelectedUserLink" href="javascript:showModifySelectedUser()" style="display:none;">Modify Selected User</a>
+<a id="deleteSelectedUsersLink" href="javascript:dojo.widget.byId('userList').deleteSelectedUsers()">Delete Selected Users</a>
 </div>
 
 
+
+<script>
+
+
+function toggleNewUser(){
+	var createUserDialog = dojo.widget.byId("createUserDialog")
+	if (createUserDialog.isHidden) { 
+		createUserDialog.show() 
+	} else { 
+		createUserDialog.hide()
+	};
+	
+	void(0);
+}
+
+function showModifySelectedUser(){
+	var modifyDialog = dojo.widget.byId("modifyUserDialog")
+	
+	username = dojo.widget.byId("userList").getSelectedData()[0].username;
+
+	modifyDialog.populateFields(username)
+	modifyDialog.show();
+	void(0);
+	}
+
+
+
+modifyHandlerDict= {
+	handle : function(type, data, evt){
+		if (evt.status == 204){
+			var modifyDialog = dojo.widget.byId("modifyUserDialog")
+			
+			modifyDialog.hide();
+			modifyDialog.form.reset();
+			dojo.widget.byId('userList').updateUserList();	
+
+		}
+		else if (evt.status == 431){
+			//TODO: username in use stuff
+			alert("Username in use")
+		}
+		else if (evt.status == 432){
+			//TODO: email in use stuff
+			alert("Email in use")
+		}	
+	}
+}
+
+createHandlerDict= {
+
+	handle : function(type, data, evt){
+
+		if (evt.status == 201){
+			var createDialog = dojo.widget.byId("createUserDialog");
+			createDialog.hide();
+			createDialog.form.reset();
+			
+			dojo.widget.byId('userList').updateUserList();	
+
+		}
+		else if (evt.status == 431){
+			//TODO: username in use stuff
+			alert("Username in use")
+		}
+		else if (evt.status == 432){
+			//TODO: email in use stuff
+			alert("Email in use")
+		}	
+	
+	}
+}
+
+
+dojo.addOnLoad(function (){
+	
+	var userList = dojo.widget.byId("userList");
+	var modifyLink = document.getElementById("modifySelectedUserLink");
+	var deleteLink = document.getElementById("deleteSelectedUsersLink");
+	
+	modifyLink.disableIfNotSingleSelect = function(){
+	
+		var selection = userList.getSelectedData()
+	
+		if (dojo.lang.isArray(selection) &&
+			selection.length != 1){
+			this.style.display = 'none';
+	
+		} else {
+			this.style.display = 'inline'
+		}
+	
+	}
+	
+	
+	
+	deleteLink.disableIfRootSelected = function(){
+		this.style.display = (userList.isValueSelected(cosmo.env.OVERLORD_USERNAME))?
+			'none':'inline';
+	
+	}
+	
+	
+	/*dojo.event.topic.subscribe(
+		"/userListSelectionChanged", 
+		modifyLink,
+		"disableIfNotSingleSelect"
+		);
+	dojo.event.topic.subscribe(
+		"/userListUpdate", 
+		modifyLink,
+		"disableIfNotSingleSelect"
+		);*/
+	userList = dojo.widget.byId("userList")
+	dojo.event.connect("after", userList, "renderSelections", deleteLink, "disableIfRootSelected");
+	dojo.event.connect("after", userList, "renderSelections", modifyLink, "disableIfNotSingleSelect");
+	dojo.event.connect("after", userList, "updateUserListCallback", modifyLink, "disableIfRootSelected");
+	dojo.event.connect("after", userList, "updateUserListCallback", modifyLink, "disableIfNotSingleSelect");
+
+})
+
+
+
+</script>
+
+
+
+<div 	dojoType="cosmo:ModifyUserDialog" widgetId="createUserDialog"
+		
+		createNew="true"
+		
+		usernameLabel='<fmt:message key="User.Form.Username"/>'
+        firstNameLabel='<fmt:message key="User.Form.FirstName"/>'
+        lastNameLabel='<fmt:message key="User.Form.LastName"/>'
+        emailLabel='<fmt:message key="User.Form.Email"/>'
+        passwordLabel='<fmt:message key="User.Form.Password"/>'
+        confirmLabel='<fmt:message key="User.Form.Confirm"/>'
+        adminLabel='<fmt:message key="User.Form.MakeAdministrator"/>'
+        postActionHandler="createHandlerDict"
+        role="cosmo.ROLE_ADMINISTRATOR"
+        cancelButtonText='<fmt:message key="User.Form.Button.Cancel"/>'
+        submitButtonText='<fmt:message key="User.Form.Button.Create"/>'
+        
+        isHidden="true"
+		> </div>
+
+<div 	dojoType="cosmo:ModifyUserDialog" widgetId="modifyUserDialog"
+        usernameLabel='<fmt:message key="User.Form.Username"/>'
+        firstNameLabel='<fmt:message key="User.Form.FirstName"/>'
+        lastNameLabel='<fmt:message key="User.Form.LastName"/>'
+        emailLabel='<fmt:message key="User.Form.Email"/>'
+        passwordBlurb='<fmt:message key="User.Form.PasswordBlurb"/>'
+        passwordLabel='<fmt:message key="User.Form.Password"/>'
+        confirmLabel='<fmt:message key="User.Form.Confirm"/>'
+        adminLabel='<fmt:message key="User.Form.MakeAdministrator"/>'
+        postActionHandler="modifyHandlerDict"
+        role="cosmo.ROLE_ADMINISTRATOR"
+        cancelButtonText='<fmt:message key="User.Form.Button.Cancel"/>'
+        submitButtonText='<fmt:message key="User.Form.Button.Update"/>'
+
+        isHidden="true"
+		> </div>
+</cosmo:standardLayout>
 

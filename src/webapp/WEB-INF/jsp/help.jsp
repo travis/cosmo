@@ -21,6 +21,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<cosmo:dialogLayout prefix="Help.">
 <u:bind var="SERVER_ADMIN"
         type="org.osaf.cosmo.CosmoConstants"
         field="SC_ATTR_SERVER_ADMIN"/>
@@ -39,5 +40,5 @@
   </div>
 
 </div>
-
+</cosmo:dialogLayout>
 

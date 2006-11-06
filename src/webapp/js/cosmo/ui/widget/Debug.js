@@ -40,9 +40,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.Debug", dojo.widget.HtmlWidget, {
         var keyCode = event.keyCode ? event.keyCode : event.which;
         var ctrl = event.ctrlKey;
         var shift = event.shiftKey;
+ 	    var alt = event.altKey;
         
         //ctrl shift d
-        if (keyCode == 68 && shift && ctrl){
+        if (keyCode == 68 && shift && (alt || ctrl)){
             this.toggleHideShow();
         }
     },

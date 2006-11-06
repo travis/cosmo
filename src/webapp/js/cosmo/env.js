@@ -25,6 +25,8 @@
  
 dojo.provide("cosmo.env");
 
+cosmo.env.OVERLORD_USERNAME = "root";
+
 //private variable for storing environment information. Do not access directly, 
 //use methods below.
 cosmo.env._cosmoConfig = {};
@@ -90,7 +92,7 @@ cosmo.env.getCosmoBase = cosmo.env._getCachePropGetterPopulator("cosmoBase", fun
  */
 cosmo.env.getTemplateBase = cosmo.env._getCachePropGetterPopulator("templateBase", function(){
 //FIXME maybe this should go in our base widget (once we make one ;-) )
-    var uri = cosmo.env.getCosomoBase() + "cosmo/ui/widget/templates/";
+    var uri = cosmo.env.getCosmoBase() + "cosmo/ui/widget/templates/";
     return uri;
 });
 
@@ -120,3 +122,6 @@ cosmo.env.getImagesUrl = function(){
 cosmo.env.getRedirectUrl = function(){
 	return cosmo.env.getBaseUrl() + '/redirect_login.jsp';}
 
+cosmo.env.getNewAccountRedirect = function(){
+	return cosmo.env.getBaseUrl() + "/login";
+}

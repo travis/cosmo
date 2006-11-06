@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.cmp;
 
+import java.net.URLEncoder;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -107,5 +109,59 @@ public class CmpPostTest extends BaseCmpServletTestCase {
 
         assertEquals("incorrect status", CmpConstants.SC_USERNAME_IN_USE,
                      response.getStatus());
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testDeleteUser() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        userService.createUser(u1);
+
+        MockHttpServletRequest request =
+            createMockRequest("POST", "/user/" + u1.getUsername() + "/delete");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertTrue(response.getStatus() ==
+                   MockHttpServletResponse.SC_NO_CONTENT);
+        User test = userService.getUser(u1.getUsername());
+        assertNull(test);
+    }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testDeleteMultiUser() throws Exception {
+        //basic deletion test
+        User u1 = testHelper.makeDummyUser();
+        User u2 = testHelper.makeDummyUser();
+        User u3 = testHelper.makeDummyUser();
+        userService.createUser(u1);
+        userService.createUser(u2);
+        userService.createUser(u3);
+
+        MockHttpServletRequest request =
+            createMockRequest("POST", "/user/delete");
+        request.setContentType("application/x-www-form-urlencoded");
+        request.addParameter("user", u1.getUsername());
+        request.addParameter("user", u2.getUsername());
+        request.addParameter("user", u3.getUsername());
+                
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        assertTrue(response.getStatus() ==
+            MockHttpServletResponse.SC_NO_CONTENT);
+
+        User test1 = userService.getUser(u1.getUsername());
+        assertNull(test1);
+        User test2 = userService.getUser(u2.getUsername());
+        assertNull(test2);
+        User test3 = userService.getUser(u3.getUsername());
+        assertNull(test3);
+        
     }
 }

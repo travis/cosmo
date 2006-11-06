@@ -17,6 +17,9 @@ package org.osaf.cosmo.cmp;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -27,8 +30,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
+import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.cmp.CmpServlet;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.util.DateUtil;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -141,6 +146,16 @@ public class CmpGetTest extends BaseCmpServletTestCase {
                      u1.getLastName());
         assertNotNull("user has no email", user.getEmail());
         assertEquals("emails don't match", user.getEmail(), u1.getEmail());
+        assertNotNull("user has no creation date", user.getDateCreated());
+        assertEquals("creation dates don't match", 
+                     DateUtil.formatRfc3339Date(user.getDateCreated()), 
+                     DateUtil.formatRfc3339Date(u1.getDateCreated()));
+        assertNotNull("user has no modification date", user.getDateModified());
+        assertEquals("modification dates don't match", 
+                     DateUtil.formatRfc3339Date(user.getDateModified()), 
+                     DateUtil.formatRfc3339Date(u1.getDateModified()));
+        assertNotNull("user has no administrator boolean", user.getAdmin());
+        assertEquals("administrator booleans don't match", user.getAdmin(), u1.getAdmin());
         assertNotNull("user has no url", user.getUrl());
         assertNotNull("user has no homedir url", user.getHomedirUrl());
     }
@@ -276,7 +291,21 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         u.setHomedirUrl(DomUtil.getChildTextTrim(root,
                                                  UserResource.EL_HOMEDIRURL,
                                                  CmpResource.NS_CMP));
-
+        
+        u.setDateCreated(DateUtil.parseRfc3339Date(
+                DomUtil.getChildTextTrim(root, 
+                                         UserResource.EL_CREATED, 
+                                         CmpResource.NS_CMP)));
+        
+        u.setDateModified(DateUtil.parseRfc3339Date(
+                DomUtil.getChildTextTrim(root, 
+                                         UserResource.EL_MODIFIED, 
+                                         CmpResource.NS_CMP)));
+        
+        u.setAdmin(DomUtil.hasChildElement(root, 
+                        UserResource.EL_ADMINISTRATOR, 
+                        CmpResource.NS_CMP));
+        
         return u;
     }
 

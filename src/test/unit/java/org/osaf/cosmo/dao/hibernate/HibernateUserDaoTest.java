@@ -147,7 +147,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         pageCriteria.setPageNumber(1);
         pageCriteria.setPageSize(2);
         pageCriteria.setSortAscending(true);
-        pageCriteria.setSortTypeString(User.NAME_SORT_STRING);
+        pageCriteria.setSortType(User.SortType.NAME);
 
         PagedList pagedList = userDao.getUsers(pageCriteria);
         List results = pagedList.getList();
@@ -167,7 +167,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         verifyUserInCollection(user4, results);
 
         pageCriteria.setSortAscending(false);
-        pageCriteria.setSortTypeString(User.NAME_SORT_STRING);
+        pageCriteria.setSortType(User.SortType.NAME);
         pageCriteria.setPageNumber(1);
 
         pagedList = userDao.getUsers(pageCriteria);

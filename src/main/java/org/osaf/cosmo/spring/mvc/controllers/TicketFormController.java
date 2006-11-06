@@ -35,8 +35,8 @@ import org.springframework.web.servlet.mvc.CancellableFormController;
 
 
 /**
- * Extends {@link org.apache.struts.validator.ValidatorForm} to
- * provide attributes for tickets.
+ * Provides backing for ticket creation form.
+ * 
  */
 public class TicketFormController extends CancellableFormController {
     private static final Log log = LogFactory.getLog(TicketFormController.class);

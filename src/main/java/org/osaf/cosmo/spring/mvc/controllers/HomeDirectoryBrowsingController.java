@@ -36,10 +36,6 @@ import net.fortuna.ical4j.model.ValidationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CollectionItem;
@@ -48,7 +44,6 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.service.ContentService;
-import org.osaf.cosmo.ui.CosmoAction;
 import org.osaf.cosmo.ui.UIConstants;
 import org.osaf.cosmo.ui.bean.CalendarBean;
 import org.osaf.cosmo.ui.bean.EventBean;

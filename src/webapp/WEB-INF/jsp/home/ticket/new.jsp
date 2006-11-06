@@ -20,7 +20,29 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
+<cosmo:dialogLayout prefix="HomeDirectory.Ticket.New.">
 
+<%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
+<script language="JavaScript">
+dojo.require("dojo.io");
+
+function magicForm() {
+  var x = dojo.io.FormBind({
+    // reference your form
+    formNode: document.forms[0],
+	
+    load: function(load, data, e) {
+      // what to do when the form finishes
+      // for example, populate a DIV:
+      alert("handling")
+    }
+  });
+}
+	
+dojo.addOnLoad(magicForm);
+
+
+</script>
 <div class="widgetBorder" style="width:460px; margin-top:24px;">
 <div class="widgetContent" style="padding:8px;">
 
@@ -30,52 +52,62 @@
   </fmt:message>
 </div>
 
-<html:form method="POST" action="/home/ticket/grant">
+<form method="POST">
 
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>
       <td class="mdLabel" style="text-align:right;">
         Timeout
       </td>
+
+
       <td class="mdData">
         <div class="smData"><cosmo:errmsg property="timeout"/></div>
         <div>
-        <html:text property="timeout" size="8" styleClass="textInput"/>
+    	  <spring:bind path="ticket.timeout">
+        <input type="text" name="timeout" size="8" styleClass="textInput"/>
+
         seconds<br/>
         (leave blank for infinite)
+	      </spring:bind>
         </div>
       </td>
+
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
         Privileges
       </td>
+      
       <td class="mdData">
         <div class="smData"><cosmo:errmsg property="privileges"/></div>
         <div>
-          <html:radio property="privileges" value="ro"/> Read
-          <html:radio property="privileges" value="rw"/> Read/Write
-          <html:radio property="privileges" value="fb"/> Free-Busy
+
+		<spring:bind path="ticket.privileges">
+          <input type="radio" name="privileges" value="ro"/> Read
+          <input type="radio" name="privileges" value="rw"/> Read/Write
+          <input type="radio" name="privileges" value="fb"/> Free-Busy
+	    </spring:bind>
         </div>
       </td>
+	
     </tr>
   </table>
-  
-  <div style="margin-top:12px;">
     <div style="float:left;">
-      <html:cancel styleClass="buttonInput">
-        Cancel
-      </html:cancel>
+      <button name="_cancel.x" styleClass="buttonInput">
+		Cancel
+	  </button>
     </div>
+  
     <div style="float:right;">
-      <html:submit property="create" styleClass="buttonInput">
-        Grant Ticket
-      </html:submit>
+      <input type="submit" styleClass="buttonInput" value="Grant Ticket" />
+
     </div>
     <br style="clear:both;"/>
   </div>
-  <html:hidden property="path"/>
-</html:form>
+  <input type="hidden" property="path"/>
+</form>
 
 </div>
 </div>
+</cosmo:dialogLayout>

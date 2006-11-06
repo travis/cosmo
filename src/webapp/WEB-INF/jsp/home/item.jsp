@@ -21,6 +21,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<cosmo:standardLayout prefix="HomeDirectory.Item">
 <div>
   <span class="hd" style="margin-top: 12px;">
     <fmt:message key="HomeDirectory.Item.Title">
@@ -28,22 +29,23 @@
     </fmt:message>
   </span>
   - <span class="md">${Path}</span>
+
 </div>
 
 <div style="margin-top:12px;">
 <c:choose>
 <c:when test="${Item.class.name == 'org.osaf.cosmo.model.CalendarEventItem'}">
-<html:link page="/console/home/download${Path}">
+<a href='<c:url value="/account/home/download${Path}" />'>
   [download as iCalendar]
-</html:link>
-<html:link page="/console/home/view${Path}">
+</a>
+<a href='<c:url value="/account/home/view${Path}" />'>
   [view as HTML]
-</html:link>
+</a>
 </c:when>
 <c:otherwise>
-<html:link page="/console/home/download${Path}">
+<a href='<c:url value="/account/home/download${Path}" />'>
   [download]
-</html:link>
+</a>
 </c:otherwise>
 </c:choose>
 </div>
@@ -109,18 +111,17 @@
   </table>
 </div>
 
+<c:set var="item" value="${Collection}" scope="request"/>
+<c:set var="path" value="${Path}" scope="request"/>
 
-<tiles:insert definition="home.inc.tickets">
-  <tiles:put name="item" beanName="Item"/>
-  <tiles:put name="path" beanName="Path"/>
-</tiles:insert>
+<jsp:include page="inc-tickets.jsp" />
 
-<tiles:insert definition="home.inc.properties">
-  <tiles:put name="item" beanName="Item"/>
-  <tiles:put name="path" beanName="Path"/>
-</tiles:insert>
 
-<tiles:insert definition="home.inc.indexes">
-  <tiles:put name="item" beanName="Item"/>
-  <tiles:put name="path" beanName="Path"/>
-</tiles:insert>
+<jsp:include page="inc-properties.jsp" />
+
+
+
+<jsp:include page="inc-indexes.jsp" />
+
+
+</cosmo:standardLayout>

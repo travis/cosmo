@@ -21,6 +21,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<cosmo:standardLayout prefix="HomeDirectory.Collection.">
 <div>
   <span class="hd" style="margin-top: 12px;">
     <fmt:message key="HomeDirectory.Calendar.Title">
@@ -55,9 +56,9 @@
       </c:if>
     <tr class="vevent">
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        <html:link page="/console/home/view${Path}/${event.item.name}">
+        <a href='<c:url value="/account/home/view${Path}/${event.item.name}" />'>
           [view]
-        </html:link>
+        </a>
       </td>
       <td class="smTableData">
         <c:choose><c:when test="${not empty event.summary}"><span class="summary">${event.summary}</span></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
@@ -125,3 +126,4 @@ of the page (default UTF-8 US English).
 Note 2: hCalendar spec doesn't seem to address including timezones for
 <strong>dtstart</strong> and <strong>dtend</strong>.
 </p>
+</cosmo:standardLayout>

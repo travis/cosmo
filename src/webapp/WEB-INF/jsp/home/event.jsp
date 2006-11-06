@@ -21,6 +21,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<cosmo:standardLayout prefix="HomeDirectory.Event.">
 <div>
   <span class="hd" style="margin-top: 12px;">
     <fmt:message key="HomeDirectory.Event.Title">
@@ -28,6 +29,7 @@
     </fmt:message>
   </span>
   - <span class="md">${Path}</span>
+
 </div>
 
 <c:if test="${not empty Event.timeZone}">
@@ -134,3 +136,4 @@ Note 3: hCalendar spec doesn't seem to address including timezones for
 <pre>
 ${Event}
 </pre>
+</cosmo:standardLayout>

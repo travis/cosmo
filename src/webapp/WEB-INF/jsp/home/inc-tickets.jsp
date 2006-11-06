@@ -21,16 +21,12 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<tiles:importAttribute name="item"/>
-<tiles:importAttribute name="path"/>
-<tiles:importAttribute name="isCollection" ignore="true"/>
-
 <c:if test="${empty isCollection}">
   <c:set var="isCollection" value="false"/>
 </c:if>
 
-<c:set var="davPath" value="/home${path}"/>
-<c:set var="feedPath" value="/feed/atom/1.0${path}"/>
+<c:set var="davPath" value="/home${Path}"/>
+<c:set var="feedPath" value="/feed/atom/1.0${Path}"/>
 <c:if test="${isCollection}">
   <c:set var="davPath" value="${davPath}/"/>
 </c:if>
@@ -40,9 +36,9 @@
 </div>
 
 <div style="margin-top:12px;">
-<html:link page="/console/home/ticket${path}/new">
+<a href='<c:url value="/browse/ticket${Path}/new" />'>
   [new ticket]
-</html:link>
+</a>
 </div>
 
 <div style="margin-top:12px;">
@@ -73,17 +69,17 @@
     <c:forEach var="ticket" items="${item.tickets}">
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        <html:link page="/console/home/ticket${path}/revoke/${ticket.key}">
+        <a href='<c:url value="/browse/ticket${path}/revoke/${ticket.key}" />'>
           [revoke]
-        </html:link>
+        </a>
       </td>
       <td class="smTableData">
         ${ticket.key}
       </td>
       <td class="smTableData" style="text-align:center;">
-        <html:link page="${davPath}?ticket=${ticket.key}">[dav]</html:link>
+        <a href='<c:url value="${davPath}?ticket=${ticket.key}" />'>[dav]</a>
         <c:if test="${isCollection}">
-          <html:link page="${feedPath}?ticket=${ticket.key}">[feed]</html:link>
+          <a href='<c:url value="${feedPath}?ticket=${ticket.key}" />'>[feed]</a>
         </c:if>
       </td>
       <td class="smTableData" style="text-align:center;">

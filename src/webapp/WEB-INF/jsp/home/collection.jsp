@@ -21,27 +21,29 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<cosmo:standardLayout prefix="HomeDirectory.Collection.">
+
 <div>
   <span class="hd" style="margin-top: 12px;">
-    <fmt:message key="HomeDirectory.Collection.Title">
+  <fmt:message key="HomeDirectory.Collection.Title">
       <fmt:param value="${Collection.displayName}"/>
-    </fmt:message>
+  </fmt:message>
   </span>
-  - <span class="md">${Path}</span>
+  <span class="md">${Path}</span>
 </div>
 
 <div style="margin-top:12px;">
 <c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionItem'}">
-<html:link page="/console/home/download${Path}">
+<a href='<c:url value="/account/home/download${Path}" />'>
   [download as iCalendar]
-</html:link>
-<html:link page="/console/home/view${Path}">
+</a>
+<a href='<c:url value="/account/home/view${Path}" />'>
   [view as HTML]
-</html:link>
+</a>
 </c:if>
-<html:link page="/feed/atom/1.0${Path}">
+<a href='<c:url value="/feed/atom/1.0${Path}" />'>
   [subscribe to feed]
-</html:link>
+</a>
 </div>
 
 <c:if test="${Path != '/'}">
@@ -124,8 +126,8 @@
     <c:forEach var="item" items="${Collection.children}">
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-      <html:link page="/console/home/browse${Path}/${item.name}">[browse]</html:link>
-        <c:if test="${item.parent != null}"><html:link page="/console/home/remove${Path}/${item.name}">[remove]</html:link></c:if>
+      <a href='<c:url value="/browse${Path}/${item.name}" />'>[browse]</a>
+        <c:if test="${item.parent != null}"><a href='<c:url value="/account/home/remove${Path}/${item.name}" />'>[remove]</a></c:if>
       </td>
       <td class="smTableData">
         ${item.displayName}
@@ -147,13 +149,14 @@
   </table>
 </div>
 
-<tiles:insert definition="home.inc.tickets">
-  <tiles:put name="item" beanName="Collection"/>
-  <tiles:put name="path" beanName="Path"/>
-  <tiles:put name="isCollection" value="true"/>
-</tiles:insert>
 
-<tiles:insert definition="home.inc.properties">
-  <tiles:put name="item" beanName="Collection"/>
-  <tiles:put name="path" beanName="Path"/>
-</tiles:insert>
+<c:set var="item" value="${Collection}" scope="request"/>
+<c:set var="path" value="${Path}" scope="request"/>
+<c:set var="isCollection" value="true" scope="request"/>
+
+<jsp:include page="inc-tickets.jsp" />
+
+<jsp:include page="inc-properties.jsp" />
+
+
+</cosmo:standardLayout>

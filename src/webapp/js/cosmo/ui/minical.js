@@ -27,13 +27,26 @@ var MiniCal = new function() {
     
     var self = this;
     
-    /* helper method to pull day data.This is a cleaner implementation 
-       when we start rendering busybars.*/
+    /** helper method to pull day data. This is a cleaner implementation 
+     * when we start rendering busybars.
+     */
     function getElementOfAttribute(attr, elem) {
         if (elem.tagName == "BODY") return null
         return (elem.getAttribute(attr) != null ? 
             elem : getElementOfAttribute(attr, elem.parentNode));
     }
+    /**
+     * Hide the minical until actually rendered
+     */
+    function hide() {
+        self.displayContext.style.visibility = 'hidden';
+    };
+    /**
+     * Show the minical after initial render
+     */
+    function show() {
+        self.displayContext.style.visibility = 'visible';
+    };
     
     this.controller = null;
     this.id = '';
@@ -89,18 +102,21 @@ var MiniCal = new function() {
         self.displayContext = displayContext || null;
         self.id = 'miniCal';
         self.currDate = this.controller.currDate;
-        self.hide();
-        self.render();
-        self.show();
+        hide();
+        if (self.render()) {
+            show();
+        }
         return true;
     };
+     
+     // Interface methods (public API)
     
     /**
-     * Interface methods (public API)
-     * the render function does a complete render of the entire
+     * Does a complete render of the entire
      * minical both rendering months and rendering the selection span
      * Because this view already has a reference to the model, there
      * is no need to pass arguments
+     * @return Boolean true
      */
     this.render = function() {
        
@@ -171,9 +187,12 @@ var MiniCal = new function() {
         function setContainerSize() {
             var h = document.getElementById('miniCalNavPanel').offsetHeight;
             for (var i = 0; i < self.months.length; i++) {
-                h += self.months[i].offsetHeight;
+                if (h + self.months[i].offsetHeight < (self.controller.height - 48)) {
+                    h += self.months[i].offsetHeight;
+                }
             }
             self.displayContext.style.height = h + 'px';
+            self.displayContext.style.overflow = 'hidden';
             self.height = h;
         }
         /**
@@ -222,6 +241,8 @@ var MiniCal = new function() {
         
         // Init and week-to-week nav from main cal
         self.renderSelection();
+
+        return true;
     };
     /**
      * Render three blank month tiles and attach to tileCanvas
@@ -566,18 +587,6 @@ var MiniCal = new function() {
         f = function() { self.controller.goViewQueryDate(dt); };
         self.controller.showMaskDelayNav(f);
         
-    };
-    /**
-     * Hide the minical until actually rendered
-     */
-    this.hide = function() {
-        self.displayContext.style.visibility = 'hidden';
-    };
-    /**
-     * Show the minical after initial render
-     */
-    this.show = function() {
-        self.displayContext.style.visibility = 'visible';
     };
     /**
      * Synchronize minical viewStart property with the

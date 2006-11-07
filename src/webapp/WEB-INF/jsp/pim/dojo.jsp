@@ -22,7 +22,10 @@
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
 <script type="text/javascript">
-    var djConfig = {isDebug: true};
+
+	// Set this to true to get nice dojo debugging messages.
+	
+    var djConfig = {isDebug: false};
 </script>
 
 <script type="text/javascript" src="${staticBaseUrl}/js/lib/dojo-event_and_io/dojo.js.uncompressed.js"></script>

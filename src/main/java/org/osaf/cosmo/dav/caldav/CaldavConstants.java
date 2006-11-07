@@ -72,6 +72,8 @@ public interface CaldavConstants {
     public static final String ELEMENT_CALDAV_TIME_RANGE = "time-range";
     /** The CalDAV XML element name <CALDAV:is-not-defined> */
     public static final String ELEMENT_CALDAV_IS_NOT_DEFINED = "is-not-defined";
+    /** The (old) CalDAV XML element name <CALDAV:is-defined> */
+    public static final String ELEMENT_CALDAV_IS_DEFINED = "is-defined";
     /** The CalDAV XML element name <CALDAV:text-match> */
     public static final String ELEMENT_CALDAV_TEXT_MATCH = "text-match";
     /** The CalDAV XML element name <CALDAV:calendar-multiget> */

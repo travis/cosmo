@@ -21,6 +21,8 @@ import java.util.List;
 
 import net.fortuna.ical4j.model.component.VTimeZone;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
@@ -45,6 +47,9 @@ import org.w3c.dom.Element;
  * later.
  */
 public class ComponentFilter implements CaldavConstants {
+
+    private static final Log log = LogFactory
+            .getLog(ComponentFilter.class);
 
     private List componentFilters = new ArrayList();
 
@@ -118,6 +123,16 @@ public class ComponentFilter implements CaldavConstants {
                             "CALDAV:is-not-defined cannnot be present with other child elements",
                             -1);
                 isNotDefinedFilter = new IsNotDefinedFilter();
+            } else if (ELEMENT_CALDAV_IS_DEFINED.equals(child
+                    .getLocalName())) {
+                // XXX provided for backwards compatibility with
+                // Evolution 2.6, which does not implement
+                // is-not-defined;
+                if (childCount > 1)
+                    throw new ParseException(
+                            "CALDAV:is-defined cannnot be present with other child elements",
+                            -1);
+                log.warn("old style 'is-defined' ignored from (outdated) client!");
             } else
                 throw new ParseException(
                         "CALDAV:comp-filter an invalid element name found", -1);

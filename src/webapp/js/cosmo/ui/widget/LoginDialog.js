@@ -120,7 +120,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
 
     		dojo.event.connect(this.passwordInput, "onfocus",function(){self.loginFocus = true});
     		dojo.event.connect(this.passwordInput, "onblur",function(){self.loginFocus = false});
-    		dojo.event.connect(this.submitButton, "handleOnClick",this, "doLogin");
+
 
 			// Programmatic subwidget creation should be removed once safari supports 
 			// widgetsInTemplate
@@ -129,7 +129,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
 			dojo.dom.prependChild(button.domNode, this.submitButton.parentNode);
 			dojo.dom.removeNode(this.submitButton);
 			this.submitButton = button;
-			
+    		dojo.event.connect(this.submitButton, "handleOnClick",this, "doLogin");
+    					
 			dojo.addOnLoad(function(){self.usernameInput.focus()})
  
 		},

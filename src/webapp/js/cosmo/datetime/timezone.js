@@ -15,6 +15,7 @@
 */
 
 dojo.provide("cosmo.datetime.timezone");
+dojo.require("dojo.collections.Dictionary");
 
 cosmo.datetime.HOURS_IN_DAY = 24;
 cosmo.datetime.MINUTES_IN_HOUR = 60;
@@ -38,7 +39,10 @@ cosmo.datetime.timezone.Timezone.prototype.addZoneItem = function(zoneItem){
 };
 
 cosmo.datetime.timezone.ZoneItem = function(){
- //TODO 
+    this.offsetInMinutes = null;
+    this.ruleName = null;
+    this.format = null; 
+    this.untilDate = null;
 };
 
 cosmo.datetime.timezone.RuleSet = function(name, rules){
@@ -51,31 +55,49 @@ cosmo.datetime.timezone.RuleSet.prototype.addRule = function(rule){
 };
 
 cosmo.datetime.timezone.Rule = function(){
-    // TODO
+    rule.startYear = parseInt(array[0]) || (dojo.string.startsWith(array[0], "min") ? -99999 : 99999);
+    rule.endYear = parseInt(array[1]) 
+    rule.type = array[2];
+    rule.startMonth = this._MONTH_MAP[array[3].substr(0,3).toLowerCase()];
+        rule.startDate = parseInt(rawOn);
+            rule.startDate = null;
+            rule.startDay = this._DAY_MAP[rawOn.substr(4,3).toLowerCase()];
+            rule.startOperator = this._RULE_OP_LAST;
+    rule.startTime = this._parseTimeString(array[5]);
+    rule.addMinutes = this._parseTimeIntoMinutes(array[6]);
+    rule.letter = array[7];
 }
 
-cosmo.datetime.timezone.TimezoneRegistry = function(){
-    this.init();
+cosmo.datetime.timezone.setTimezoneRegistry =  function(timezoneRegistry){
+    cosmo.datetime.timezone._timezoneRegistry = timezoneRegistry;
+}
+
+cosmo.datetime.timezone.SimpleTimezoneRegistry = function(timezoneFileRoot){
+    this.timezoneFileRoot = timezoneFileRoot || null;  
+    this._timezones = {};
+    this._ruleSets = {};  
 };
 
-cosmo.datetime.timezone.TimezoneRegistry.prototype.init = function(){
-   //TODO don't hardcode this.
-   var files = ["/cosmo/js/lib/olson-tzdata/northamerica"];
-   dojo.lang.map(files, this._parseUri);
+cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.init = function(files){
+   dojo.lang.map(files, dojo.lang.hitch(this,this._parseUri));
 };
 
-cosmo.datetime.timezone.TimezoneRegistry.prototype._parseUri = function(uri){
-    var content = dojo.hostenv.getText(uri);
-    cosmo.datetime.timezone.parse(content);
+cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype._parseUri = function(uri){
+    var content = dojo.hostenv.getText(this.timezoneFileRoot + "/" + uri);
+    cosmo.datetime.timezone.parse(content, dojo.lang.hitch(this, this.addTimezone), dojo.lang.hitch(this, this.addRuleSet));
 };
 
-cosmo.datetime.timezone.parse = function(str){ 
-       //TMP
-       var self = {};
-       self.ruleSets = [];
-       self.zones = [];
-       xxxr = self.ruleSets;
-       xxxz = self.zones;
+cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addTimezone = function(timezone){
+    this._timezones[timezone.tzId] = timezone;
+};
+
+cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addRuleSet = function(ruleset){
+    this._ruleSets[ruleset.name] = ruleset;
+};
+
+cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback){ 
+        var ruleSets = new dojo.collections.Dictionary();
+        var zones = new dojo.collections.Dictionary();
         var lines = str.split('\n');
         
         //the current zone
@@ -84,17 +106,19 @@ cosmo.datetime.timezone.parse = function(str){
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
             
-            if (line.match(/^\s/)) {
-                //we do this because zone lines after the first don't have a zone in it.
-                line = "Zone " + zone.tzId + line;
-            }
             
             //Skip comments
+            line = dojo.string.trim(line);
+
             if (dojo.string.startsWith(line, "#") || line.length < 3){
                 continue;
             }
             
-            
+            if (line.match(/^\s/)) {
+                //we do this because zone lines after the first don't have a zone in it.
+                line = "Zone " + zone.tzId + line;
+            }
+
             //in case there are any inline comments
             line = line.split("#")[0];
             
@@ -107,22 +131,22 @@ cosmo.datetime.timezone.parse = function(str){
                 case 'Zone':
                     var tzId = arr.shift();
                     var zoneItem = this._parseZoneLine(arr);
-                    if (!self.zones[tzId]) {
+                    if (!zones.containsKey(tzId)) {
                         zone =  new cosmo.datetime.timezone.Timezone(tzId);
-                        self.zones[tzId] = zone;
+                        zones.add(tzId, zone);
                     } else {
-                        zone = self.zones[tzId];
+                        zone = zones.item(tzId);
                     }
                     zone.addZoneItem(zoneItem);
                     break;
                 case 'Rule':
                     var ruleName = arr.shift();
                     var rule = this._parseRuleLine(arr);
-                    if (!self.ruleSets[ruleName]) { 
+                    if (!ruleSets.containsKey(ruleName)) { 
                         ruleSet = new cosmo.datetime.timezone.RuleSet(ruleName);
-                        self.ruleSets[ruleName] = ruleSet;
+                        ruleSets.add(ruleName, ruleSet);
                     } else {
-                        ruleSet = self.ruleSets[ruleName];
+                        ruleSet = ruleSets.item(ruleName);
                     }
                     ruleSet.addRule(rule);
                     break;
@@ -141,8 +165,9 @@ cosmo.datetime.timezone.parse = function(str){
                     // Fail silently
                     break;
             }//end switch
-            
         }//end for
+        dojo.lang.map(zones.getValueList(),timezoneCallback);
+        dojo.lang.map(ruleSets.getValueList(), rulesetCallback);
         return true;
     };//end function
 
@@ -151,7 +176,6 @@ cosmo.datetime.timezone._arrayPrinter = function(starter, arrayToPrint){
     for (var index = 0; index < arrayToPrint.length; index++){
         stringy += index + "->'" + arrayToPrint[index] + "'    "; 
     }
-    dojo.debug(stringy);
 };
 
 cosmo.datetime.timezone._parseZoneLine = function(array){

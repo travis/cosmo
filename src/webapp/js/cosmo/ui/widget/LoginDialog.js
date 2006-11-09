@@ -137,10 +137,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
 
 	    setStyle : function(){
 	    	var stylesheetName = dojo.string.capitalize(this.widgetId);
-
-    	   	this.templateCssPath = 
-    	   		dojo.uri.dojoUri("../../cosmo/ui/widget/templates/LoginDialog/" + stylesheetName + ".css");
-
 	    }
 	    
 		

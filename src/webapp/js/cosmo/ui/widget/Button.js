@@ -72,7 +72,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     
     setWidth: function(width){
         this.width = width;
-        this.tableContainer.style.width = width + "px";
+		if (width){
+        	this.tableContainer.style.width = width + "px";
+        } else {
+        	this.tableContainer.style.width = null;
+        }
     },
     
     setEnabled: function(enabled){

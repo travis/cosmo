@@ -84,7 +84,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 			
 			for (i = 0; i < inputs.length; i++){
 				this.enabledInputs[inputs[i]] = false;
-				this[inputs[i] + "Input"].style.visibility = 'collapse';
+
+				this[inputs[i] + "Input"].style.visibility = 'hidden';
 			}
 		},
 		
@@ -105,7 +106,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 				if (this.role == cosmo.ROLE_ADMINISTRATOR) {
 					dojo.event.connect(this.submitButton, "handleOnClick", this, "createUser");	
 				} else if (this.role == cosmo.ROLE_ANONYMOUS){
-					dojo.event.connect(submitWidget, "handleOnClick", this, "signupUser");	
+					dojo.event.connect(this.submitButton, "handleOnClick", this, "signupUser");	
 				}
 			} else {
 				if (this.role == cosmo.ROLE_ADMINISTRATOR) {
@@ -115,20 +116,19 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 				}
 			}
 
-			if (!this.disableCancel) {
+			if (this.disableCancel) {
+				dojo.dom.removeNode(this.cancelButton);
+			} else {
 				var button = dojo.widget.createWidget("cosmo:Button", 
 						{text:this.cancelButtonText,
 						 small:true});
 				
-	
 				dojo.dom.prependChild(button.domNode, this.cancelButton.parentNode);
 				dojo.dom.removeNode(this.cancelButton);
 
 				this.cancelButton = button;
 				
 				dojo.event.connect(this.cancelButton, "handleOnClick", this, "cancelAction");
-	
-
 			}
 		
 		},

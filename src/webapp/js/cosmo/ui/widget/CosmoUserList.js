@@ -272,83 +272,73 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 				
 		},
 		
-		updateUserListCallback:function(cmpResponse){
+		updateUserListCallback:function(cmpXml){
 
 			this.updateControlsView();
 
 			var jsonObject = [];
 
-			var users = cmpResponse.user
+			var users = cmpXml.getElementsByTagName("user")
 
 			for (i = 0; i < users.length; i++){
-	
+
 				var user = users[i];
 				
 				var row = {};
 
-				var firstname = user.firstname[0].value
-
-				var lastname = user.lastname[0].value
-				var username = user.username[0].value
-				var email = user.email[0].value
-				var dateCreated = user.created[0].value
-				var dateModified = user.modified[0].value
-				var administrator = (user.administrator != undefined)
-
+				var firstname = user.getElementsByTagName("firstName")[0].firstChild.nodeValue
+				var lastname = user.getElementsByTagName("lastName")[0].firstChild.nodeValue
+				var username = user.getElementsByTagName("username")[0].firstChild.nodeValue
+				var email = user.getElementsByTagName("email")[0].firstChild.nodeValue
+				var dateCreated = user.getElementsByTagName("created")[0].firstChild.nodeValue
+				var dateModified = user.getElementsByTagName("modified")[0].firstChild.nodeValue
+				var administrator = (user.getElementsByTagName("administrator").length > 0)
+				
 				row.email = email;
 				row.name = firstname + " " + lastname;
 				row.username = username;	
+				
 
 				row.created = dojo.date.fromRfc3339(dateCreated);
-				/*row.created = (dateCreated.getMonth() + 1).toString() + "-" +
-								dateCreated.getDate().toString() + "-" +
-								dateCreated.getFullYear().toString();
-				*/
 
 				row.modified = dojo.date.fromRfc3339(dateModified);
-				/*row.modified = (dateModified.getMonth() + 1).toString() + "-" +
-								dateModified.getDate().toString() + "-" +
-								dateModified.getFullYear().toString();
-				*/
-
+				
 				if (administrator) {
 					row.admin = "Yes";
 				} else {
 					row.admin = "No";
 				}
-				row.toString = function(){return this.username}
-
+				
 				jsonObject.push(row);
 			}
 
-			var pagingLinks = cmpResponse.link;
-
+			var pagingLinks = cmpXml.getElementsByTagName("link");
+			
 			this.cmpFirstLink = null;
 			this.cmpPreviousLink = null;
 			this.cmpNextLink = null;
 			this.cmpLastLink = null;
 	
 			for (i=0; i< pagingLinks.length; i++){
-
-				var link = pagingLinks[i].link;
-
-				switch(link.rel){
+	
+				link = pagingLinks[i]
+				
+				switch(link.getAttribute("rel")){
 					case 'first':
-						this.cmpFirstLink = link.href;
+						this.cmpFirstLink = link.getAttribute("href");
 						break;
 					case 'previous':
-						this.cmpPreviousLink = link.href;
+						this.cmpPreviousLink = link.getAttribute("href");
 						break;
 					case 'next':
-						this.cmpNextLink = link.href;
+						this.cmpNextLink = link.getAttribute("href");
 						break;
 					case 'last':
-						this.cmpLastLink = link.href;
+						this.cmpLastLink = link.getAttribute("href");
 						break;
 				}
-
 			}
-	
+			
 			var multiPage = (this.cmpPreviousLink || this.cmpNextLink)
 	
 			document.getElementById("firstPageLink").style.visibility = 
@@ -376,7 +366,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 			var self = this;
 
 			
-			this.cmpProxy.getUsers({
+			this.cmpProxy.getUsersXML({
 				load: function(type, data, evt){self.updateUserListCallback(data)}, 
 			 	error: function(type, error){alert("update " + error.message)} 
 				 },

@@ -138,6 +138,10 @@
     <url-pattern>/feed/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
+    <filter-name>dav-security</filter-name>
+    <url-pattern>/mc/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
     <filter-name>cmp-security</filter-name>
     <url-pattern>/cmp/*</url-pattern>
   </filter-mapping>
@@ -211,6 +215,11 @@
     </init-param>
   </servlet>
   <servlet>
+    <servlet-name>mc</servlet-name>
+    <servlet-class>org.osaf.cosmo.mc.MorseCodeServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
       <servlet-name>springDispatcherServlet</servlet-name> 
       <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class> 
       <load-on-startup>1</load-on-startup> 
@@ -238,6 +247,10 @@
   <servlet-mapping>
     <servlet-name>feed</servlet-name>
     <url-pattern>/feed/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>mc</servlet-name>
+    <url-pattern>/mc/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping> 
     <servlet-name>springDispatcherServlet</servlet-name> 

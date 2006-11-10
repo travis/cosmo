@@ -511,6 +511,16 @@
   <bean id="davSessionProvider"
         class="org.osaf.cosmo.dav.impl.NoOpDavSessionProvider"/>
 
+  <!-- morse code protocol resources -->
+
+  <bean id="morseCodeController"
+        class="org.osaf.cosmo.mc.StandardMorseCodeController"
+        init-method="init">
+    <property name="contentService">
+      <ref local="contentService"/>
+    </property>
+  </bean>
+
   <!-- a helper for setting up the database schema and loading seed
        data -->
 

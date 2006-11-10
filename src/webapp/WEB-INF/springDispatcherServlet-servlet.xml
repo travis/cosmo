@@ -117,7 +117,7 @@
 </bean>
 
 <bean id="logoutController" class="org.osaf.cosmo.spring.mvc.controllers.LogoutController"> 
-    <property name="forwardPath" value="login" />
+    <property name="forwardPath" value="logout" />
 </bean> 
 
 <bean id="newTicketForm" class="org.osaf.cosmo.spring.mvc.controllers.TicketFormController">

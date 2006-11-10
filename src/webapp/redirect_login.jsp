@@ -44,6 +44,8 @@ function init() {
         Cookie.destroy('JSESSIONID', '/cosmo');
         Cookie.destroy('inputTimestamp');
         Cookie.destroy('username');
+        Cookie.destroy('CmpCred')
+
         location = '${baseUrl}/';
     }
 }

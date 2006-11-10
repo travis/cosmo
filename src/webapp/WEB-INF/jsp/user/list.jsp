@@ -190,6 +190,7 @@ dojo.require("cosmo.ui.widget.ModifyUserDialog");
 
 <a href="javascript:toggleNewUser()">Create New User</a>
 <a id="modifySelectedUserLink" href="javascript:showModifySelectedUser()" style="display:none;">Modify Selected User</a>
+<a id="browseSelectedUserLink" href="javascript:browseSelectedUser()" style="display:none;">Browse Selected User</a>
 <a id="deleteSelectedUsersLink" href="javascript:dojo.widget.byId('userList').deleteSelectedUsers()">Delete Selected Users</a>
 </div>
 
@@ -217,6 +218,13 @@ function showModifySelectedUser(){
 	modifyDialog.populateFields(username)
 	modifyDialog.show();
 	void(0);
+	}
+
+function browseSelectedUser(){
+	
+	username = dojo.widget.byId("userList").getSelectedData()[0].username;
+
+	location = cosmo.env.getBaseUrl() + "/browse/" + username
 	}
 
 
@@ -271,9 +279,10 @@ dojo.addOnLoad(function (){
 	
 	var userList = dojo.widget.byId("userList");
 	var modifyLink = document.getElementById("modifySelectedUserLink");
+	var browseLink = document.getElementById("browseSelectedUserLink");
 	var deleteLink = document.getElementById("deleteSelectedUsersLink");
-	
-	modifyLink.disableIfNotSingleSelect = function(){
+
+	function disableIfNotSingleSelect(){
 	
 		var selection = userList.getSelectedData()
 	
@@ -287,7 +296,8 @@ dojo.addOnLoad(function (){
 	
 	}
 	
-	
+	modifyLink.disableIfNotSingleSelect = disableIfNotSingleSelect;
+	browseLink.disableIfNotSingleSelect = disableIfNotSingleSelect;
 	
 	deleteLink.disableIfRootSelected = function(){
 		this.style.display = (userList.isValueSelected(cosmo.env.OVERLORD_USERNAME))?
@@ -296,22 +306,13 @@ dojo.addOnLoad(function (){
 	}
 	
 	
-	/*dojo.event.topic.subscribe(
-		"/userListSelectionChanged", 
-		modifyLink,
-		"disableIfNotSingleSelect"
-		);
-	dojo.event.topic.subscribe(
-		"/userListUpdate", 
-		modifyLink,
-		"disableIfNotSingleSelect"
-		);*/
 	userList = dojo.widget.byId("userList")
 	dojo.event.connect("after", userList, "renderSelections", deleteLink, "disableIfRootSelected");
 	dojo.event.connect("after", userList, "renderSelections", modifyLink, "disableIfNotSingleSelect");
-	dojo.event.connect("after", userList, "updateUserListCallback", modifyLink, "disableIfRootSelected");
+	dojo.event.connect("after", userList, "renderSelections", browseLink, "disableIfNotSingleSelect");
+	dojo.event.connect("after", userList, "updateUserListCallback", deleteLink, "disableIfRootSelected");
 	dojo.event.connect("after", userList, "updateUserListCallback", modifyLink, "disableIfNotSingleSelect");
-
+	dojo.event.connect("after", userList, "updateUserListCallback", browseLink, "disableIfNotSingleSelect");
 })
 
 

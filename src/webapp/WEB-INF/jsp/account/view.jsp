@@ -51,7 +51,6 @@ modifyHandlerDict= {
 	}
 }
 
-testingDict={handle:alert}
 </script>
 
 <div style="width:500px;">
@@ -95,7 +94,7 @@ testingDict={handle:alert}
         passwordBlurb='<fmt:message key="Account.Form.PasswordBlurb"/>'
         passwordLabel='<fmt:message key="Account.Form.Password"/>'
         confirmLabel='<fmt:message key="Account.Form.Confirm"/>'
-        postActionHandler="testingDict"
+        postActionHandler="modifyHandlerDict"
         removeInputs="username,admin"
         disableCancel="true"
         submitButtonText='<fmt:message key="Account.Form.Button.Update"/>'

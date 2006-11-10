@@ -24,13 +24,22 @@
         <repository>
             <id>osafoundation.org</id>
             <name>OSAF's repository</name>
-            <layout>legacy</layout>
-            <url>http://builds.osafoundation.org/maven</url>
+            <layout>default</layout>
+            <url>http://builds.osafoundation.org/maven2</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
         </repository>
     </repositories>
+<!--
+    <distributionmanagement>
+        <snapshotrepository>
+            <id>osaf-m2</id>
+            <name>OSAF M2 Repository</name>
+            <url>scp://paniolo.osafoundation.org/www/maven2</url>
+        </snapshotrepository>
+    </distributionmanagement>
+ -->
     <dependencies>
         <!--
             dependencies with the war.bundle property are included in the
@@ -46,6 +55,11 @@
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.resource</groupId>
+            <artifactId>connector</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -356,7 +370,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>jta</groupId>
+            <groupId>javax.transaction</groupId>
             <artifactId>jta</artifactId>
             <version>1.0.1B</version>
             <scope>provided</scope>

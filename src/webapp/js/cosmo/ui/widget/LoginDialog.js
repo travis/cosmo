@@ -51,7 +51,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
 	            } else {
 	                location = cosmo.env.getBaseUrl() + "/pim";
 	            }
-	            cosmo.cmp.setUser(this.usernameInput.value,
+	            cosmo.cmp.cmpProxy.setUser(this.usernameInput.value,
 								  this.passwordInput.value);
 	            
 	        }

@@ -1,4 +1,4 @@
-/* * Copyright 2006 Open Source Applications Foundation *
+3/* * Copyright 2006 Open Source Applications Foundation *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,16 +76,18 @@ function encode64(inp){
 	return out;
 }
 
-cosmo.cmp.setUser = function(username, password){
-	dojo.io.cookie.set(CMP_AUTH_COOKIE, encode64(username + ":" + password), -1, "/");
-}
-
-cosmo.cmp.unsetUser = function(username, password){
-	dojo.io.cookie.deleteCookie(CMP_AUTH_COOKIE);
-}
 
 dojo.declare("cosmo.cmp.Cmp", null, 
 	{
+		setUser : function(username, password){
+			dojo.io.cookie.set(CMP_AUTH_COOKIE, encode64(username + ":" + password), -1, "/");
+		},
+
+		unsetUser : function(username, password){
+			dojo.io.cookie.deleteCookie(CMP_AUTH_COOKIE);
+		},
+
+
 		getDefaultCMPRequest : function(handlerDict){
 		
 	        var request = {

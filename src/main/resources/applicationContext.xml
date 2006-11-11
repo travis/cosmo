@@ -519,6 +519,9 @@
     <property name="contentService">
       <ref local="contentService"/>
     </property>
+    <property name="securityManager">
+      <ref local="securityManager"/>
+    </property>
   </bean>
 
   <!-- a helper for setting up the database schema and loading seed

@@ -23,6 +23,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.UidInUseException;
+import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
 
 /**
@@ -36,6 +40,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         LogFactory.getLog(StandardMorseCodeController.class);
 
     private ContentService contentService;
+    private CosmoSecurityManager securityManager;
 
     /**
      * Causes the identified collection and all contained items to be
@@ -70,6 +75,8 @@ public class StandardMorseCodeController implements MorseCodeController {
      * the parent of the new collection.
      *
      * @returns the initial <code>SyncToken</code> for the collection
+     * @throws IllegalArgumentException if the authenticated principal
+     * is not a <code>User</code> but no parent uid was specified
      * @throws UidInUseException if the specified uid is already in
      * use by any item
      * @throws UnknownCollectionException if the collection specified
@@ -83,22 +90,31 @@ public class StandardMorseCodeController implements MorseCodeController {
                                        Set<ItemState> itemStates) {
         if (log.isDebugEnabled()) {
             if (parentUid != null)
-                log.debug("publishing collection " + uid + " with parent " + uid);
+                log.debug("publishing collection " + uid + " with parent " + parentUid);
             else
                 log.debug("publishing collection " + uid);
         }
 
-        // XXX: home collection
-        if (parentUid == null)
-            throw new MorseCodeException("publishing to home collection not yet supported");
-
-        Item parentItem = contentService.findItemByUid(parentUid);
-        if (! (parentItem instanceof CollectionItem))
-            throw new NotCollectionException("Parent item not a collection");
-        CollectionItem parent = (CollectionItem) parentItem;
+        CollectionItem parent = null;
+        if (parentUid == null) {
+            User user = securityManager.getSecurityContext().getUser();
+            if (user == null)
+                throw new IllegalArgumentException("Parent uid must be provided if authentication principal is not a user");
+            parent = contentService.getRootItem(user);
+            log.debug("parent is root item for " + user.getUsername());
+        }
+        else {
+            Item parentItem = contentService.findItemByUid(parentUid);
+            if (! (parentItem instanceof CollectionItem))
+                throw new NotCollectionException("Parent item not a collection");
+            parent = (CollectionItem) parentItem;
+            log.debug("parent is collection " + parent.getName());
+        }
 
         CollectionItem collection = new CollectionItem();
+        User owner = computeItemOwner();
         collection.setUid(uid);
+        collection.setOwner(owner);
 
         HashSet<Item> children = new HashSet<Item>();
         for (ItemState state : itemStates) {
@@ -107,6 +123,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         }
 
         // XXX:
+        // throws UidinUseException
 //         collection =
 //             contentService.createCollection(parent, collection, children);
 
@@ -262,8 +279,30 @@ public class StandardMorseCodeController implements MorseCodeController {
     }
 
     /** */
+    public CosmoSecurityManager getSecurityManager() {
+        return securityManager;
+    }
+
+    /** */
+    public void setSecurityManager(CosmoSecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
+    /** */
     public void init() {
         if (contentService == null)
             throw new IllegalStateException("contentService is required");
+        if (securityManager == null)
+            throw new IllegalStateException("securityManager is required");
+    }
+
+    private User computeItemOwner() {
+        User owner = securityManager.getSecurityContext().getUser();
+        if (owner != null)
+            return owner;
+        Ticket ticket = securityManager.getSecurityContext().getTicket();
+        if (ticket != null)
+            return ticket.getOwner();
+        throw new MorseCodeException("authenticated principal neither user nor ticket");
     }
 }

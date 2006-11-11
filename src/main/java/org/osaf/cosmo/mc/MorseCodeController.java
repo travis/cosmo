@@ -45,6 +45,8 @@ public interface MorseCodeController {
      * the parent of the new collection.
      *
      * @returns the initial <code>SyncToken</code> for the collection
+     * @throws IllegalArgumentException if the authenticated principal
+     * is not a <code>User</code> but no parent uid was specified
      * @throws UidInUseException if the specified uid is already in
      * use by any item
      * @throws UnknownCollectionException if the collection specified

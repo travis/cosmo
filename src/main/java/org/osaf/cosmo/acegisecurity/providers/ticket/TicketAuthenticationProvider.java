@@ -96,7 +96,7 @@ public class TicketAuthenticationProvider
                 log.debug("authenticating ticket " + id +
                           " for resource at path " + path);
             }
-            
+
             // If the item exists, get it
             Item item = contentService.findItemByPath(path);
             

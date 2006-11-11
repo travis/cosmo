@@ -32,6 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionLockedException;
+import org.osaf.cosmo.model.UidInUseException;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
@@ -238,6 +239,10 @@ public class MorseCodeServlet extends HttpServlet {
                     controller.publishCollection(uid, parentUid, items);
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.addHeader(HEADER_SYNC_TOKEN, token.serialize());
+                return;
+            } catch (IllegalArgumentException e) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Parent uid must be specified when authenticated principal is not a user");
                 return;
             } catch (UidInUseException e) {
                 resp.sendError(HttpServletResponse.SC_CONFLICT, "Uid in use");

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.mc;
+package org.osaf.cosmo.model;
 
 /**
- * An exception that indicates that the collection uid specified in a
- * publish request is already in use by another item.
+ * An exception that indicates that the uid chosen for an item is
+ * already in use by another item.
  */
-public class UidInUseException extends MorseCodeException {
+public class UidInUseException extends RuntimeException {
 
     /** */
     public UidInUseException(String message) {

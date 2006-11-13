@@ -247,12 +247,10 @@ HasTimeDraggable.prototype.resizeTop = function(y) {
     t = t > this.min ? this.min : t;
     t = t < 0 ? 0 : t;
     selEv.block.setTop(t);
-    //if (!selEv.block.auxDivList.length) {
-        size = this.getSize((this.absTop-yPos-cosmo.view.cal.canvas.getTimedCanvasScrollTop())
-            + this.height);
-        
-        selEv.block.setHeight(size, true);
-   // }
+    size = this.getSize((this.absTop-yPos-cosmo.view.cal.canvas.getTimedCanvasScrollTop())
+        + this.height);
+    
+    selEv.block.setHeight(size, true);
 }
 
 /**

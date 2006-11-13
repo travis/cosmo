@@ -1018,7 +1018,6 @@ cosmo.view.cal = new function() {
         }
         catch(e) {
             Cal.showErr(getText('Main.Error.LoadEventsFailed'), e);
-            Log.print(e.javaStack);
             return false;
         }
         var eventLoadHash = createEventRegistry(eventLoadList);

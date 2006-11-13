@@ -27,6 +27,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.util.DateUtil;
 
 /**
  * Aggregates information about a user's usage of storage space.
@@ -49,7 +50,9 @@ public class SpaceUsageReport {
         StringBuffer buf = new StringBuffer();
 
         for (UsageLineItem lineItem : lineItems)
-            buf.append(lineItem.getLastAccessed()).append("\t").
+            buf.append(DateUtil.formatRfc3339Date(lineItem.getLastAccessed())).
+                append("\t").
+                append(lineItem.getOwner().getUsername()).append("\t").
                 append(lineItem.getSize()).append("\t").
                 append(lineItem.getPath()).append("\n");
 
@@ -107,6 +110,11 @@ public class SpaceUsageReport {
         /** */
         public String getPath() {
             return path;
+        }
+
+        /** */
+        public User getOwner() {
+            return item.getOwner();
         }
     }
 }

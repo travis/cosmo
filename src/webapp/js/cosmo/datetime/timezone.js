@@ -22,7 +22,7 @@ cosmo.datetime.MINUTES_IN_HOUR = 60;
 cosmo.datetime.SECONDS_IN_MINUTE = 60;
 
 cosmo.datetime.timezone._MONTH_MAP = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5, 
-                                         'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 };
+                                       'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 };
 
 cosmo.datetime.timezone._DAY_MAP =  {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 };
 cosmo.datetime.timezone._RULE_OP_LAST = "LAST";
@@ -55,17 +55,17 @@ cosmo.datetime.timezone.RuleSet.prototype.addRule = function(rule){
 };
 
 cosmo.datetime.timezone.Rule = function(){
-    rule.startYear = parseInt(array[0]) || (dojo.string.startsWith(array[0], "min") ? -99999 : 99999);
-    rule.endYear = parseInt(array[1]) 
-    rule.type = array[2];
-    rule.startMonth = this._MONTH_MAP[array[3].substr(0,3).toLowerCase()];
-        rule.startDate = parseInt(rawOn);
-            rule.startDate = null;
-            rule.startDay = this._DAY_MAP[rawOn.substr(4,3).toLowerCase()];
-            rule.startOperator = this._RULE_OP_LAST;
-    rule.startTime = this._parseTimeString(array[5]);
-    rule.addMinutes = this._parseTimeIntoMinutes(array[6]);
-    rule.letter = array[7];
+    this.startYear = null;
+    this.endYear = null; 
+    this.type = null;
+    this.startMonth = null;
+    this.startDate = null;
+    this.startDate = null;
+    this.startDay = null;;
+    this.startOperator = null;
+    this.startTime = null;
+    this.addMinutes = null;
+    this.letter = null;
 }
 
 cosmo.datetime.timezone.setTimezoneRegistry =  function(timezoneRegistry){

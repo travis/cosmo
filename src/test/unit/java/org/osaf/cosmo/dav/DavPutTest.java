@@ -78,5 +78,8 @@ public class DavPutTest extends BaseDavServletTestCase {
         assertEquals("PUT content did not return Concurrency failure.",
                 "Concurrency failure.",
                 response.getErrorMessage());
+        
+        // tell the mock dao to throw an exception
+        MockContentDao.THROW_CONCURRENT_EXCEPTION = false;
     }
 }

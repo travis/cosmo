@@ -65,7 +65,7 @@
 	        /admin/status/*=statusController
         	/logout=logoutController
     	    /browse/ticket/new=newTicketForm
-           	/browse*=homeDirectoryBrowsingController
+           	/browse/**=homeDirectoryBrowsingController
     	    /i18n.js=i18nController
     	    /js/cosmo/util/i18n.js=i18nController
 	        /**/*=jspViewController
@@ -101,6 +101,9 @@
 </bean>
 
 <bean id="homeDirectoryBrowsingMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
+	<property name="alwaysUseFullPath">
+		<value>true</value>
+    </property>
 	<property name="mappings">
 		<value>
 		   	/browse=browse

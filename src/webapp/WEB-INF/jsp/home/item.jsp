@@ -35,15 +35,15 @@
 <div style="margin-top:12px;">
 <c:choose>
 <c:when test="${Item.class.name == 'org.osaf.cosmo.model.CalendarEventItem'}">
-<a href='<c:url value="/account/home/download${Path}" />'>
+<a href='<c:url value="/browse/download${Path}" />'>
   [download as iCalendar]
 </a>
-<a href='<c:url value="/account/home/view${Path}" />'>
+<a href='<c:url value="/browse/view${Path}" />'>
   [view as HTML]
 </a>
 </c:when>
 <c:otherwise>
-<a href='<c:url value="/account/home/download${Path}" />'>
+<a href='<c:url value="/browse/download${Path}" />'>
   [download]
 </a>
 </c:otherwise>

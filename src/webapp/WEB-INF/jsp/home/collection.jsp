@@ -34,10 +34,10 @@
 
 <div style="margin-top:12px;">
 <c:if test="${Collection.class.name == 'org.osaf.cosmo.model.CalendarCollectionItem'}">
-<a href='<c:url value="/account/home/download${Path}" />'>
+<a href='<c:url value="/browse/download${Path}" />'>
   [download as iCalendar]
 </a>
-<a href='<c:url value="/account/home/view${Path}" />'>
+<a href='<c:url value="/browse/view${Path}" />'>
   [view as HTML]
 </a>
 </c:if>
@@ -127,7 +127,7 @@
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
       <a href='<c:url value="/browse${Path}/${item.name}" />'>[browse]</a>
-        <c:if test="${item.parent != null}"><a href='<c:url value="/account/home/remove${Path}/${item.name}" />'>[remove]</a></c:if>
+        <c:if test="${item.parent != null}"><a href='<c:url value="/browse/remove${Path}/${item.name}" />'>[remove]</a></c:if>
       </td>
       <td class="smTableData">
         ${item.displayName}

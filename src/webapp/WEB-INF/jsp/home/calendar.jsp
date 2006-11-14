@@ -56,7 +56,7 @@
       </c:if>
     <tr class="vevent">
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        <a href='<c:url value="/account/home/view${Path}/${event.item.name}" />'>
+        <a href='<c:url value="/browse/view${Path}/${event.item.name}" />'>
           [view]
         </a>
       </td>

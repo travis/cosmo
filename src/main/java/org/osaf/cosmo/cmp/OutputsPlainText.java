@@ -16,12 +16,13 @@
 package org.osaf.cosmo.cmp;
 
 /**
- * An interface for CMP resources.
+ * An interface for CMP resources that can emit plain text
+ * representations.
  */
-public interface CmpResource {
+public interface OutputsPlainText {
 
     /**
-     * Returns the entity instance that backs this resource.
+     * Returns a plain text representation of the resource.
      */
-    public Object getEntity();
+    public String toText();
 }

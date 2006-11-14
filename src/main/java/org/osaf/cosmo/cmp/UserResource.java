@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * A resource view of a {@link User}.
  */
-public class UserResource implements CmpResource {
+public class UserResource implements CmpResource, OutputsXml {
     private static final Log log = LogFactory.getLog(UserResource.class);
 
     /**
@@ -115,6 +115,8 @@ public class UserResource implements CmpResource {
     public Object getEntity() {
         return user;
     }
+
+    // OutputsXml methods
 
     /**
      * Returns an XML representation of the resource in the form of a

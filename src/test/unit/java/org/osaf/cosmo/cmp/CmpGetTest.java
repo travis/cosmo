@@ -253,7 +253,7 @@ public class CmpGetTest extends BaseCmpServletTestCase {
 
         ElementIterator i =
             DomUtil.getChildren(doc.getDocumentElement(), UserResource.EL_USER,
-                                CmpResource.NS_CMP);
+                                OutputsXml.NS_CMP);
         while (i.hasNext()) {
             CmpUser u = createUserFromXml(i.nextElement());
             users.add(u);
@@ -279,32 +279,32 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         CmpUser u = new CmpUser();
 
         u.setUsername(DomUtil.getChildTextTrim(root, UserResource.EL_USERNAME,
-                                               CmpResource.NS_CMP));
+                                               OutputsXml.NS_CMP));
         u.setFirstName(DomUtil.getChildTextTrim(root, UserResource.EL_FIRSTNAME,
-                                                CmpResource.NS_CMP));
+                                                OutputsXml.NS_CMP));
         u.setLastName(DomUtil.getChildTextTrim(root, UserResource.EL_LASTNAME,
-                                               CmpResource.NS_CMP));
+                                               OutputsXml.NS_CMP));
         u.setEmail(DomUtil.getChildTextTrim(root, UserResource.EL_EMAIL,
-                                            CmpResource.NS_CMP));
+                                            OutputsXml.NS_CMP));
         u.setUrl(DomUtil.getChildTextTrim(root, UserResource.EL_URL,
-                                          CmpResource.NS_CMP));
+                                          OutputsXml.NS_CMP));
         u.setHomedirUrl(DomUtil.getChildTextTrim(root,
                                                  UserResource.EL_HOMEDIRURL,
-                                                 CmpResource.NS_CMP));
+                                                 OutputsXml.NS_CMP));
         
         u.setDateCreated(DateUtil.parseRfc3339Date(
                 DomUtil.getChildTextTrim(root, 
                                          UserResource.EL_CREATED, 
-                                         CmpResource.NS_CMP)));
+                                         OutputsXml.NS_CMP)));
         
         u.setDateModified(DateUtil.parseRfc3339Date(
                 DomUtil.getChildTextTrim(root, 
                                          UserResource.EL_MODIFIED, 
-                                         CmpResource.NS_CMP)));
+                                         OutputsXml.NS_CMP)));
         
         u.setAdmin(DomUtil.hasChildElement(root, 
                         UserResource.EL_ADMINISTRATOR, 
-                        CmpResource.NS_CMP));
+                        OutputsXml.NS_CMP));
         
         return u;
     }

@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * An interface for Cosmo API resources
  */
-public class UsersResource implements CmpResource {
+public class UsersResource implements CmpResource, OutputsXml {
     private static final Log log = LogFactory.getLog(UsersResource.class);
 
     /**
@@ -57,6 +57,8 @@ public class UsersResource implements CmpResource {
         this.urlBase = urlBase;
     }
 
+    // CmpResource methods
+
     /**
      * Returns the <code>Collection<User></code> that backs
      * this resource.
@@ -64,6 +66,8 @@ public class UsersResource implements CmpResource {
     public Object getEntity() {
         return users;
     }
+
+    // OutputsXml methods
 
     /**
      * Returns an XML representation of the resource in the form of a

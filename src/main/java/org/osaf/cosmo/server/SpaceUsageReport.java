@@ -46,26 +46,8 @@ public class SpaceUsageReport {
     }
 
     /** */
-    public String toString() {
-        StringBuffer buf = new StringBuffer();
-
-        for (UsageLineItem lineItem : lineItems)
-            buf.append(DateUtil.formatRfc3339Date(lineItem.getLastAccessed())).
-                append("\t").
-                append(lineItem.getOwner().getUsername()).append("\t").
-                append(lineItem.getSize()).append("\t").
-                append(lineItem.getPath()).append("\n");
-
-        return buf.toString();
-    }
-
-    /** */
-    public byte[] toBytes() {
-        try {
-            return toString().getBytes("UTF-8");
-        } catch (Exception e) {
-            throw new RuntimeException("UTF-8 not supported?");
-        }
+    public List<UsageLineItem> getLineItems() {
+        return lineItems;
     }
 
     private void addLineItems(CollectionItem item,

@@ -30,6 +30,11 @@ public class CmpConstants {
     private static HashMap statusCodes = new HashMap();
 
     /** */
+    public static final String MEDIA_TYPE_XML = "text/xml";
+    /** */
+    public static final String MEDIA_TYPE_PLAIN_TEXT = "text/plain";
+
+    /** */
     public static final int SC_USERNAME_IN_USE = 431;
     /** */
     public static final String RP_USERNAME_IN_USE = "Username In Use";

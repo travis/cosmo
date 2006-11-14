@@ -76,7 +76,7 @@ public class CmpServlet extends HttpServlet {
         DocumentBuilderFactory.newInstance();
 
     private static final Pattern PATTERN_SPACE_USAGE =
-        Pattern.compile("^/server/usage/space(/[^/]+)?$");
+        Pattern.compile("^/server/usage/space(/[^/]+)?(/xml)?$");
 
     private static final String BEAN_CONTENT_SERVICE =
         "contentService";
@@ -190,12 +190,40 @@ public class CmpServlet extends HttpServlet {
         }
         Matcher m = PATTERN_SPACE_USAGE.matcher(req.getPathInfo());
         if (m.matches()) {
-            String username = m.group(1);
-            if (username != null)
-                // remove leading /
-                username = username.substring(1);
-            processSpaceUsage(req, resp, username);
-            return;
+            String username = null;
+            boolean isXml = false;
+            boolean selected = false;
+
+            if (m.group(1) != null && m.group(2) != null) {
+                if (m.group(2).equals("/xml")) {
+                    // xml single user report
+                    username = m.group(1).substring(1);
+                    isXml = true;
+                    selected = true;
+                }
+            } else if (m.group(1) != null) {
+                if (m.group(1).equals("/xml")) {
+                    // xml aggregate report
+                    username = null;
+                    isXml = true;
+                    selected = true;
+                } else if (m.group(1).length() > 1) {
+                    // plaintext username report
+                    username = m.group(1).substring(1);
+                    isXml = false;
+                    selected = true;
+                }
+            } else {
+                // plaintext aggregate report
+                username = null;
+                isXml = false;
+                selected = true;
+            }
+
+            if (selected) {
+                processSpaceUsage(req, resp, username, isXml);
+                return;
+            }
         }
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
@@ -540,11 +568,10 @@ public class CmpServlet extends HttpServlet {
     private void processServerStatus(HttpServletRequest req,
                                      HttpServletResponse resp)
         throws ServletException, IOException {
-        byte[] snap = new StatusSnapshot().toBytes();
-        resp.setContentType("text/plain");
-        resp.setCharacterEncoding("UTF-8");
-        resp.setContentLength(snap.length);
-        resp.getOutputStream().write(snap);
+        resp.setStatus(HttpServletResponse.SC_OK);
+        StatusSnapshotResource resource =
+            new StatusSnapshotResource(new StatusSnapshot());
+        sendPlainTextResponse(resp, resource);
     }
 
     /*
@@ -552,7 +579,8 @@ public class CmpServlet extends HttpServlet {
      */
     private void processSpaceUsage(HttpServletRequest req,
                                    HttpServletResponse resp,
-                                   String username)
+                                   String username,
+                                   boolean isXml)
         throws ServletException, IOException {
         User user = null;
         if (username != null) {
@@ -567,30 +595,34 @@ public class CmpServlet extends HttpServlet {
             }
         }
 
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.setContentType("text/plain");
-        resp.setCharacterEncoding("UTF-8");
-
-        PrintWriter writer = resp.getWriter();
-
+        SpaceUsageResource resource = null;
         if (user == null) {
             if (log.isDebugEnabled())
                 log.debug("generating usage report for all users");
-            for (User u : (Set<User>) userService.getUsers()) {
+            HashSet<SpaceUsageReport> reports =
+                new HashSet<SpaceUsageReport>();
+            for (User u : userService.getUsers()) {
                 if (u.isOverlord())
                     continue;
-                writer.write(makeSpaceUsageReport(u).toString());
+                HomeCollectionItem home = contentService.getRootItem(u);
+                SpaceUsageReport report = new SpaceUsageReport(u, home);
+                reports.add(report);
             }
+            resource = new SpaceUsageResource(reports);
         } else {
             if (log.isDebugEnabled())
                 log.debug("generating usage report for user " + username);
-            writer.write(makeSpaceUsageReport(user).toString());
+            HomeCollectionItem home = contentService.getRootItem(user);
+            resource =
+                new SpaceUsageResource(new SpaceUsageReport(user, home));
         }
-    }
 
-    private SpaceUsageReport makeSpaceUsageReport(User user) {
-        HomeCollectionItem home = contentService.getRootItem(user);
-        return new SpaceUsageReport(user, home);
+        resp.setStatus(HttpServletResponse.SC_OK);
+
+        if (isXml)
+            sendXmlResponse(resp, resource);
+        else
+            sendPlainTextResponse(resp, resource);
     }
 
     /*
@@ -832,7 +864,7 @@ public class CmpServlet extends HttpServlet {
     }
 
     private void sendXmlResponse(HttpServletResponse resp,
-                                 CmpResource resource)
+                                 OutputsXml resource)
         throws ServletException, IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
  
@@ -849,10 +881,20 @@ public class CmpServlet extends HttpServlet {
         }
  
         byte[] bytes = out.toByteArray();
-        resp.setContentType("text/xml");
+        resp.setContentType(CmpConstants.MEDIA_TYPE_XML);
         resp.setCharacterEncoding("UTF-8");
         resp.setContentLength(bytes.length);
         resp.getOutputStream().write(bytes);
+    }
+
+    private void sendPlainTextResponse(HttpServletResponse resp,
+                                       OutputsPlainText resource)
+        throws ServletException, IOException {
+        String text = resource.toText();
+        resp.setContentType(CmpConstants.MEDIA_TYPE_PLAIN_TEXT);
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentLength(text.length());
+        resp.getWriter().write(text);
     }
 
     private String getUrlBase(HttpServletRequest req) {

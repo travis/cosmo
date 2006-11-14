@@ -68,6 +68,9 @@ public class CmpServerUsageTest extends BaseCmpServletTestCase {
 
         // XXX: verify output
         // log.error(response.getContentAsString());
+
+        userService.removeUser(u1);
+        userService.removeUser(u2);
     }
 
     /**
@@ -98,6 +101,8 @@ public class CmpServerUsageTest extends BaseCmpServletTestCase {
 
         // XXX: verify output
         // log.error(response.getContentAsString());
+
+        userService.removeUser(u1);
     }
 
     /**

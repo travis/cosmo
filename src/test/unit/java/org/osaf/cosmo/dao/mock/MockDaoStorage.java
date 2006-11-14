@@ -64,6 +64,7 @@ public class MockDaoStorage {
     }
 
     /** */
+
     public void setItemByUid(String uid, Item item) {
         itemsByUid.put(uid, item);
     }

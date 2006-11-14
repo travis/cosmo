@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.apache.commons.id.uuid.VersionFourGenerator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
@@ -36,6 +39,8 @@ import org.osaf.cosmo.util.ArrayPagedList;
  * Mock implementation of {@link UserDao} useful for testing.
  */
 public class MockUserDao implements UserDao {
+    private static final Log log = LogFactory.getLog(MockUserDao.class);
+
     static int idseq = 0;
 
     private HashMap usernameIdx;

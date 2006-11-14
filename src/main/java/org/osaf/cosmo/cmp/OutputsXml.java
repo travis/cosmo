@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2006 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,17 @@
  */
 package org.osaf.cosmo.cmp;
 
-/**
- * An interface for CMP resources.
- */
-public interface CmpResource {
+import org.apache.jackrabbit.webdav.xml.Namespace;
+import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
-    /**
-     * Returns the entity instance that backs this resource.
-     */
-    public Object getEntity();
+/**
+ * An interface for CMP resources that can emit XML representations.
+ */
+public interface OutputsXml extends XmlSerializable {
+
+    /** */
+    public static final Namespace NS_CMP =
+        Namespace.getNamespace("http://osafoundation.org/cosmo/CMP");
+
+    // XmlSerializable already provides toXml()
 }

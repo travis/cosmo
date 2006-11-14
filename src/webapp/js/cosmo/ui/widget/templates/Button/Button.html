@@ -15,20 +15,26 @@
   limitations under the License.
 -->
     <table dojoAttachPoint="tableContainer"
-           dojoAttachEvent="onMouseOver: _handleMouseOver; onMouseOut: _handleMouseOut; onClick: _handleOnClick"
+           dojoAttachEvent="onMouseOver:_handleMouseOver; 
+           onMouseOut:_handleMouseOut; onClick:_handleOnClick"
            class="buttonTable" border="0" cellpadding="0" cellspacing="0">
         <tbody>
             <tr>
                 <td dojoAttachPoint="leftContainer" 
-                    style="width: ${this.getCapWidth}px; height: ${this.getButtonHeight}px; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; cursor: pointer;"> 
+                    style="width:${this.getCapWidth}px; 
+                    height:${this.getButtonHeight}px; cursor:pointer;"> 
                 </td>
                 <td dojoAttachPoint="centerContainer"  
-                    style="height: ${this.getButtonHeight}px; text-align: center; vertical-align: middle; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; cursor: pointer;" >
-                    <div id="savebuttonText" class="buttonText" dojoAttachPoint="buttonTextContainer">
+                    style="height:${this.getButtonHeight}px; 
+                    text-align:center; vertical-align:middle; cursor:pointer;">
+                    <div id="savebuttonText" class="buttonText" 
+                        dojoAttachPoint="buttonTextContainer">
                     </div>
                 </td>
                 <td dojoAttachPoint="rightContainer" 
-                    style="width: ${this.getCapWidth}px; height: ${this.getButtonHeight}px; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; cursor: pointer;"> 
+                    style="width: ${this.getCapWidth}px; 
+                    height:${this.getButtonHeight}px; 
+                    cursor:pointer;"> 
                 </td>
             </tr>
         </tbody>

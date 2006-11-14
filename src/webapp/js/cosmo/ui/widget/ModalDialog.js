@@ -17,6 +17,9 @@ dojo.widget.HtmlWidget, {
         fauxPopTextDiv: null,
         fauxPopButtonDiv: null,
         
+        INFO: 'info',
+        ERROR: 'error',
+        CONFIRM: 'confirm',
         msg: '',
         btnsLeft: [],
         btnsCenter: [],

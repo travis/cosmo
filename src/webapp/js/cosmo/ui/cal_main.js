@@ -56,8 +56,8 @@ var Cal = new function() {
     // Current date for highlighting in the interface
     this.currDate = null;
     // The dialog box used to display
-    // warnings / confirmations -- a Dialog obj
-    this.dialog = new Dialog();
+    // warnings / confirmations
+    this.dialog = null; 
     
     // List of any queued-up error messages
     this.errorList = [];
@@ -88,7 +88,6 @@ var Cal = new function() {
      * Main function
      */
     this.init = function() {
-
         var viewDiv = null;
         var allDayDiv = null;
         
@@ -117,7 +116,8 @@ var Cal = new function() {
         // Load and display date info, render cal canvas
         // --------------
         if (this.loadLocaleDateInfo() && this.getQuerySpan(this.currDate)) {
-            cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
+            cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, 
+                this.currDate);
         }
 
         // Calendar event detail form 
@@ -131,6 +131,11 @@ var Cal = new function() {
         if (MiniCal.init(Cal, mcDiv)) {
            this.calForm.addJumpToDate(jpDiv);
         }
+        
+        // Modal dialog box
+        this.dialog = dojo.widget.createWidget(
+            'ModalDialog', {}, document.body, 'last');
+        dojo.require('cosmo.view.cal.dialog');
         
         // Client-side keepalive
         this.setInputTimestamp();
@@ -187,10 +192,6 @@ var Cal = new function() {
         
         // Add event listeners for form-element behaviors
         this.calForm.setEventListeners();
-
-        Cal.dialog = dojo.widget.createWidget(
-            'ModalDialog', {}, document.body, 'last');
-        console.log(Cal.dialog);
     };
 
     // ==========================

@@ -33,11 +33,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     //Constants
     DISABLED_TABLE_OPACITY : 0.6,
 
-    //FIXME - deal with skins
-    buttonDirectory : cosmo.env.getTemplateBase() + "Button/",
-    templatePath : dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/Button/Button.html"),
-    templateCssPath : dojo.uri.dojoUri("../../cosmo/ui/widget/templates/Button/Button.css"),
-
+    buttonDirectory: cosmo.env.getImagesUrl(), 
+    templatePath: dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/Button/Button.html"),
+    
     //attach points
     leftContainer: null,
     centerContainer: null,
@@ -46,43 +44,40 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     tableContainer : null,
     
     //properties to be set by tag or constructor
-    enabled : true,
-    small : false,
-    text : "",
-    width : null,
+    enabled: true,
+    small: false,
+    text: "",
+    width: 0,
     handleOnClick: "",
     
-    fillInTemplate: function(){
-         if (typeof(this.handleOnClick) == "string"){
-             eval("this.handleOnClick = function(){"+ this.handleOnClick +";}");
+    fillInTemplate: function() {
+         if (typeof(this.handleOnClick) == "string") {
+             eval("this.handleOnClick = function() {" + this.handleOnClick + ";}");
          }
          this.setText(this.text);
          this.setWidth(this.width);
          this.setEnabled(this.enabled);
     },
-    
-    setText: function(text){
+    setText: function(text) {
         this.text = text;
         var textNode = document.createTextNode(text);
-        if (this.buttonTextContainer.hasChildNodes){
+        if (this.buttonTextContainer.hasChildNodes) {
 		    dojo.dom.removeChildren(this.buttonTextContainer);
 		}
 		this.buttonTextContainer.appendChild(textNode);
     },
-    
-    setWidth: function(width){
+    setWidth: function(width) {
         this.width = width;
-		if (width){
-        	this.tableContainer.style.width = width + "px";
+		if (width) {
+        	this.tableContainer.style.width = parseInt(width) + "px";
         } else {
         	this.tableContainer.style.width = null;
         }
     },
-    
-    setEnabled: function(enabled){
+    setEnabled: function(enabled) {
         this.enabled = enabled;
         
-        if (enabled){
+        if (enabled) {
             this._setTableOpacity(1.0) 
             
         } else {
@@ -92,83 +87,54 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
         this._setButtonImages();
         
     },
-    
-    getButtonHeight: function(){
+    getButtonHeight: function() {
         return this.small ? 18 : 24;
     },
-    
-    getCapWidth: function(){
+    getCapWidth: function() {
         return this.small ? 9 : 10;
     },
-    
-    _setButtonImages: function(lit){
+    _setButtonImages: function(lit) {
         this.leftContainer.style.background="url('"+this._getLeftButtonImagePath(this.enabled, this.small, lit)+"')";
         this.centerContainer.style.background="url('"+this._getCenterButtonImagePath(this.enabled, this.small, lit)+"')";
         this.rightContainer.style.background="url('"+this._getRightButtonImagePath(this.enabled, this.small, lit)+"')";
     },
-
-    _getCenterButtonImagePath: function(enabled, small, lit){
+    _getCenterButtonImagePath: function(enabled, small, lit) {
 		return this._getButtonPath("center", enabled, small, lit);
     },
-    
-    _getLeftButtonImagePath : function(enabled, small, lit){
+    _getLeftButtonImagePath : function(enabled, small, lit) {
 		return this._getButtonPath("left", enabled, small, lit);
     },
-    
-    _getRightButtonImagePath: function(enabled, small, lit){
+    _getRightButtonImagePath: function(enabled, small, lit) {
 		return this._getButtonPath("right", enabled, small, lit);
     },
-    
-    _getButtonPath: function(leftRightCenter, enabled, small, lit){
+    _getButtonPath: function(leftRightCenter, enabled, small, lit) {
         var path = this.buttonDirectory + "button_" + leftRightCenter;
-
-        if (!enabled){
-            path += "_dim";
-        }
-        
-        if (lit){
-            path += "_lit";
-        }
-        
-        if (small) {
-            path += "_sm";
-        }
-        
+        if (!enabled) { path += "_dim"; }
+        if (lit) { path += "_lit"; }
+        if (small) { path += "_sm"; }
         path += ".gif";
-        
         return path;
     },
-    
-    _handleMouseOver: function(){
-         if (this.enabled){
+    _handleMouseOver: function() {
+         if (this.enabled) {
              this._setButtonImages(true);
          }
     },
-    
-    _handleMouseOut: function(){
-         if (this.enabled){
+    _handleMouseOut: function() {
+         if (this.enabled) {
              this._setButtonImages();
          }
     },
-    
-    _handleOnClick: function(){
-        if (this.enabled){
+    _handleOnClick: function() {
+        if (this.enabled) {
            this.handleOnClick();
         }
     },
-    
-    _setTableOpacity: function(tableOpacity){
+    _setTableOpacity: function(tableOpacity) {
 	    this.tableContainer.style.opacity = tableOpacity;
-	    if (document.all){
+	    if (document.all) {
 	        this.tableContainer.style.filter = "alpha(opacity="+ tableOpacity * 100 +")";
 	    }
     }
     
-  },
-
-  "html",
-  
-  function() {
-  }
-
-);
+  } );

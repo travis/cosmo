@@ -11,3 +11,16 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
+from pyselenium import seleniumunittest
+import time, re
+
+class CosmoCreateStacked(seleniumunittest.SeleniumTestCase):
+    
+    def test_cosmo(self):
+        sel = self.selenium
+        sel.open("/cosmo/pim/pim.page")
+        
+        for x in range(10):
+            time.sleep(2)
+            sel.dblclick(id='hourDiv3-1000')

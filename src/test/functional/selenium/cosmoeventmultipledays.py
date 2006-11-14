@@ -11,3 +11,43 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
+from pyselenium import seleniumunittest
+import time, re
+
+class CosmoEventMultipleDays(seleniumunittest.SeleniumTestCase):
+    
+    def test_cosmo(self):
+        sel = self.selenium
+        sel.open("/cosmo/pim/pim.page")
+        time.sleep(2)
+        sel.dblclick(id='hourDiv1-900')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv1-1000')
+        time.sleep(2)
+        sel.click(id='viewNavRight')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv2-1200')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv1-900')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv2-1100')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv2-1100')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv3-1200')
+        time.sleep(2)
+        sel.click(id='viewNavRight')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv4-900')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv4-1100')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv4-1200')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv5-900')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv5-1100')
+        time.sleep(2)
+        sel.dblclick(id='hourDiv5-1200')
+        time.sleep(2)

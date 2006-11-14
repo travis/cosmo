@@ -11,3 +11,25 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
+from pyselenium import seleniumunittest
+import time, re
+
+class CosmoMove(seleniumunittest.SeleniumTestCase):
+    
+    def test_cosmo(self):
+        sel = self.selenium
+        sel.open('/cosmo/pim/pim.page')
+        time.sleep(2)
+        sel.storeId('first', 'did')
+        sel.dragdropDivCosmo('id=eventDivContent__${did}', 'id=hourDiv4-1200')
+        
+if __name__ == "__main__":
+
+    from pyselenium import seleniumunittest
+    seleniumunittest.main(options={#'server': '~/tmp/selenium-remote-control-0.8.2-SNAPSHOT/server/selenium-server.jar',
+                                   'selenium' : '~/Documents/projects/tools/selenium',},
+                          testfiles=('cosmoregister.py', 'cosmoauth.py', 'cosmocreate.py', 'cosmomove.py'),
+                          )
+
+        

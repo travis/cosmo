@@ -518,7 +518,7 @@ $smButtonHeight = 18px
     background:$mainUIColor; 
     border:1px solid $uiDetailBorderColor;
     z-index:2000; 
-    display:block; 
+    display:none;
 }
 /* Fake popup center content area -- inside padding */
 #fauxPopContentDiv {

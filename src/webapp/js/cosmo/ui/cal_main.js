@@ -157,7 +157,6 @@ var Cal = new function() {
             this.currentCalendar.path = 'Cosmo';
 
             // Add 'Welcome to Cosmo' Event
-            //this.insertCalEventNew('hourDiv3-900', true);
             this.createWelcomeItem = true;
         }
         // Cals exist for this user
@@ -188,6 +187,10 @@ var Cal = new function() {
         
         // Add event listeners for form-element behaviors
         this.calForm.setEventListeners();
+
+        Cal.dialog = dojo.widget.createWidget(
+            'ModalDialog', {}, document.body, 'last');
+        console.log(Cal.dialog);
     };
 
     // ==========================

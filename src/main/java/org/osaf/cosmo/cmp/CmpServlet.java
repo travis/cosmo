@@ -388,15 +388,17 @@ public class CmpServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
     
-    /* Enforces preconditions on MultiUserDeletion. Returns <code>true</code> if
-     * all preconditions are met, otherwise sets the appropriate
-     * error response code and returns <code>false</code>.
+    /* Enforces preconditions on MultiUserDeletion. Returns 
+     * <code>true</code> if all preconditions are met, otherwise 
+     * sets the appropriate error response code and returns 
+     * <code>false</code>.
      */
     private boolean checkMultiUserDeletePreconditions(HttpServletRequest req,
             HttpServletResponse resp) {
         
         if (req.getContentType() == null ||
-                ! req.getContentType().startsWith("application/x-www-form-urlencoded")) {
+                ! req.getContentType().startsWith(
+                		"application/x-www-form-urlencoded")) {
             resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
             return false;
         }
@@ -412,7 +414,6 @@ public class CmpServlet extends HttpServlet {
      * 
      * user=alice&user=bob&user=carlton
      */
-    
     private void processMultiUserDelete(HttpServletRequest req, 
             HttpServletResponse resp) {
         if (checkMultiUserDeletePreconditions(req, resp)){
@@ -451,44 +452,63 @@ public class CmpServlet extends HttpServlet {
 
     /*
      * Turn a paging query string into a PageCriteria object.
-     * Responsible for setting a response code in the event of
-     * an error.
      */
-    private PageCriteria<User.SortType> buildPageCriteria(HttpServletRequest req){
-        
-        PageCriteria<User.SortType> pageCriteria = new PageCriteria<User.SortType>(DEFAULT_PAGE_NUMBER,
-                                                     DEFAULT_PAGE_SIZE,
-                                                     DEFAULT_SORT_ASCENDING,
-                                                     DEFAULT_SORT_TYPE);
-        
-        Map<String, String[]> pagingParameterMap = req.getParameterMap();
-        
-        try {
-            if (pagingParameterMap.containsKey(PageCriteria.PAGE_SIZE_URL_KEY)) {
-                pageCriteria.setPageSize(Integer.parseInt(pagingParameterMap.get(PageCriteria.PAGE_SIZE_URL_KEY)[0]));
-            }
-        } catch (NumberFormatException e){
-            throw new CmpException(pagingParameterMap.get(PageCriteria.PAGE_SIZE_URL_KEY)[0] + 
-            " is not a valid page size.");
-        }
-        
-        try {
-            if (pagingParameterMap.containsKey(PageCriteria.PAGE_NUMBER_URL_KEY)) {
-                pageCriteria.setPageNumber(Integer.parseInt(pagingParameterMap.get(PageCriteria.PAGE_NUMBER_URL_KEY)[0]));
-            }
-        } catch (NumberFormatException e){
-            throw new CmpException(pagingParameterMap.get(PageCriteria.PAGE_NUMBER_URL_KEY)[0] + 
-            " is not a valid page number.");
-        }
+    private PageCriteria<User.SortType> 
+    buildPageCriteria(HttpServletRequest req){
+
+    	PageCriteria<User.SortType> pageCriteria = 
+    		new PageCriteria<User.SortType>(
+    				DEFAULT_PAGE_NUMBER,
+    				DEFAULT_PAGE_SIZE,
+    				DEFAULT_SORT_ASCENDING,
+    				DEFAULT_SORT_TYPE);
+
+    	Map<String, String[]> pagingParameterMap = req.getParameterMap();
+
+    	try {
+    		if (pagingParameterMap.containsKey(
+    				PageCriteria.PAGE_SIZE_URL_KEY)) {
+
+    			pageCriteria.setPageSize(
+    					Integer.parseInt(
+    							pagingParameterMap.get(
+    									PageCriteria.PAGE_SIZE_URL_KEY)[0]));
+    		}
+    	} catch (NumberFormatException e){
+    		throw new CmpException(
+    				pagingParameterMap.get(PageCriteria.PAGE_SIZE_URL_KEY)[0] +
+    				" is not a valid page size.");
+    	}
+
+    	try {
+    		if (pagingParameterMap.containsKey(
+    				PageCriteria.PAGE_NUMBER_URL_KEY)
+    		) {
+    			pageCriteria.setPageNumber(
+    					Integer.parseInt(pagingParameterMap.get(
+    							PageCriteria.PAGE_NUMBER_URL_KEY)[0]));
+    		}
+    	} catch (NumberFormatException e){
+    		throw new CmpException(pagingParameterMap.get(
+    				PageCriteria.PAGE_NUMBER_URL_KEY)[0] + 
+    				" is not a valid page number.");
+    	}
 
         if (pagingParameterMap.containsKey(PageCriteria.SORT_ORDER_URL_KEY)) {
-            String sortOrderParameter = pagingParameterMap.get(PageCriteria.SORT_ORDER_URL_KEY)[0];
+            String sortOrderParameter = 
+            	pagingParameterMap.get(PageCriteria.SORT_ORDER_URL_KEY)[0];
+            
             if (sortOrderParameter.equals(PageCriteria.ASCENDING_STRING)){
                 pageCriteria.setSortAscending(true);
-            } else if (sortOrderParameter.equals(PageCriteria.DESCENDING_STRING)){
+            } else if (
+            		sortOrderParameter.equals(PageCriteria.DESCENDING_STRING)
+            ){
                 pageCriteria.setSortAscending(false);
             } else{
-                throw new CmpException("Sort order " + sortOrderParameter + " not valid.");
+                throw new CmpException(
+                		"Sort order " + 
+                		sortOrderParameter + 
+                		" not valid.");
             }
         }
 
@@ -500,9 +520,13 @@ public class CmpServlet extends HttpServlet {
             if (sortType != null){
                 pageCriteria.setSortType(sortType);
             } else {
-                throw new CmpException("Sort type " + 
-                        pagingParameterMap.get(PageCriteria.SORT_TYPE_URL_KEY)[0]
-                        + " not valid.");
+            	throw new CmpException(
+            			"Sort type " + 
+            			pagingParameterMap.get(
+            					PageCriteria.SORT_TYPE_URL_KEY
+            			)[0] +
+            			" not valid."
+            	);
             }
         }
 
@@ -525,8 +549,9 @@ public class CmpServlet extends HttpServlet {
                 pageCriteria = buildPageCriteria(req);
             }
             catch (CmpException e){
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-                return;
+            	resp.sendError(HttpServletResponse.SC_BAD_REQUEST, 
+            			e.getMessage());
+            	return;
             }
             users = userService.getUsers(pageCriteria).getList();
             

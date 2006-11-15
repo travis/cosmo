@@ -133,14 +133,6 @@
       <param-value>%M %U %Q %C %I</param-value>
 	</init-param>
   </filter>
-  <filter>
-  	<filter-name>http-override</filter-name>
-  	<filter-class>org.osaf.cosmo.filters.HttpOverrideFilter</filter-class>
-  </filter>
-  <filter-mapping>
-  	<filter-name>http-override</filter-name>
-  	<url-pattern>/*</url-pattern>
-  </filter-mapping>
   <filter-mapping>
     <filter-name>version-header</filter-name>
     <url-pattern>/*</url-pattern>

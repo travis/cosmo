@@ -76,11 +76,16 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     },
     setEnabled: function(enabled) {
         this.enabled = enabled;
-        
         if (enabled) {
+            if (this.handleOnClickOrig) {
+                this.handleOnClick = this.handleOnClickOrig;
+            }
             this._setTableOpacity(1.0) 
             
-        } else {
+        } 
+        else {
+            this.handleOnClickOrig = this.handleOnClick;
+            this.handleClick = null;
             this._setTableOpactiy(this.DISABLED_TABLE_OPACITY);
         }
         
@@ -92,6 +97,16 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     },
     getCapWidth: function() {
         return this.small ? 9 : 10;
+    },
+    getStyleForSize: function () {
+        var s = 'buttonText';
+        if (!this.enabled) {
+            s += 'Disabled'
+        }
+        if (this.small) {
+            s += 'Sm';
+        }
+        return s;
     },
     _setButtonImages: function(lit) {
         this.leftContainer.style.background="url('"+this._getLeftButtonImagePath(this.enabled, this.small, lit)+"')";

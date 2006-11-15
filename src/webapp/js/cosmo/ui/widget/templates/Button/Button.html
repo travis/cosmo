@@ -1,4 +1,4 @@
-<span class="buttonSpan">
+<span id="${this.widgetId}" class="buttonSpan">
 <!--
   Copyright 2006 Open Source Applications Foundation
   
@@ -27,7 +27,7 @@
                 <td dojoAttachPoint="centerContainer"  
                     style="height:${this.getButtonHeight}px; 
                     text-align:center; vertical-align:middle; cursor:pointer;">
-                    <div id="savebuttonText" class="buttonText" 
+                    <div id="savebuttonText" class="${this.getStyleForSize}" 
                         dojoAttachPoint="buttonTextContainer">
                     </div>
                 </td>

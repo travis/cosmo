@@ -1,5 +1,6 @@
 dojo.provide("cosmo.ui.widget.ModalDialog");
 
+dojo.require("cosmo.ui.widget.ButtonPanel");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.env");
 dojo.require("dojo.widget.*");
@@ -9,7 +10,6 @@ dojo.widget.HtmlWidget, {
         // Template stuff
         templatePath:dojo.uri.dojoUri(
             '../../cosmo/ui/widget/templates/ModalDialog/ModalDialog.html'),
-        templateCssPath: '',
         
         // Attach points
         fauxPopImageDiv: null,
@@ -29,16 +29,24 @@ dojo.widget.HtmlWidget, {
         
         // Instance methods
         setTop: function (n) {
-            this.domNode.style.top = parseInt(n) + 'px';
+            var s = n.toString();
+            s = s.indexOf('%') > -1 ? s : parseInt(s) + 'px';
+            this.domNode.style.top = s;
         },
         setLeft: function (n) {
-            this.domNode.style.left = parseInt(n) + 'px';
+            var s = n.toString();
+            s = s.indexOf('%') > -1 ? s : parseInt(s) + 'px';
+            this.domNode.style.left = s;
         },
         setWidth: function (n) {
-            this.domNode.style.width = parseInt(n) + 'px';
+            var s = n.toString();
+            s = s.indexOf('%') > -1 ? s : parseInt(s) + 'px';
+            this.domNode.style.width = s;
         },
         setHeight: function (n) {
-            this.domNode.style.height = parseInt(n) + 'px';
+            var s = n.toString();
+            s = s.indexOf('%') > -1 ? s : parseInt(s) + 'px';
+            this.domNode.style.height = s; 
         },
         center: function () {
             var w = dojo.html.getViewportWidth();
@@ -74,6 +82,7 @@ dojo.widget.HtmlWidget, {
                 this.height = this.height || DIALOG_BOX_HEIGHT;
                 this.setWidth(this.width);
                 this.setHeight(this.height);
+                // Content area
                 if (typeof this.msg == 'string') {
                     this.fauxPopTextDiv.innerHTML = this.msg;
                 }
@@ -83,11 +92,13 @@ dojo.widget.HtmlWidget, {
                         this.fauxPopTextDiv.appendChild(msg);
                     }
                 }
-                var panel = new ButtonPanel(this.btnsLeft, this.btnsCenter, this.btnsRight);
+                // Modal dialog box
                 if (bDiv.firstChild) {
                     bDiv.removeChild(bDiv.firstChild);
                 };
-                this.fauxPopButtonDiv.appendChild(panel);
+                var panel = dojo.widget.createWidget(
+                    'ButtonPanel', { btnsLeft: this.btnsLeft, btnsCenter: this.btnsCenter,
+                    btnsRight: this.btnsRight }, this.fauxPopButtonDiv, 'last');
                 this.center();
                 this.domNode.style.display = 'block';
                 // Call the original Dojo show method

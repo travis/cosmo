@@ -30,6 +30,8 @@
 function CalForm() {
     
     var self = this;
+    var saveButton = null;
+    var removeButton = null;
     
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
     
@@ -112,7 +114,7 @@ function CalForm() {
      */
     this.init = function() {
         this.appendElements();
-        this.setButtons(true, true);
+        this.createButtons(true, true);
     };
     this.appendElements = function() {
         var info = document.getElementById('eventInfoDiv');
@@ -411,27 +413,17 @@ function CalForm() {
      * Also called when editing/removing events to toggle button state
      * to enabled/disabled appropriately
      */
-    this.setButtons = function(enableRemove, enableSave) {
-        var butRemove = null;
-        var butSave = null;
+    this.createButtons = function(enableRemove, enableSave) {
         var checkElem = null;
-        if (!enableRemove) {
-            butRemove = new Button('removeButton', 74, null,
-                getText('App.Button.Remove'));
-        }
-        else {
-            butRemove = new Button('removeButton', 74,
-                removeCalEvent, getText('App.Button.Remove'));
-        }
-        if (!enableSave) {
-            butSave = new Button('savebutton', 74, null,
-                getText('App.Button.Save'));
-        }
-        else {
-            butSave = new Button('savebutton', 74,
-                saveCalEvent, getText('App.Button.Save'));
-        }
+        var f = null;
         
+        f = enableRemove ? removeCalEvent : null;
+        removeButton = new Button('removeButton', 74,
+            f, getText('App.Button.Remove'));
+        f = enableSave ? saveCalEvent : null;
+        saveButton = new Button('savebutton', 74,
+            f, getText('App.Button.Save'));
+
         checkElem = document.getElementById('removeButton');
         if (checkElem) {
             checkElem.parentNode.removeChild(checkElem);
@@ -440,8 +432,15 @@ function CalForm() {
         if (checkElem) {
             checkElem.parentNode.removeChild(checkElem);
         }
-        document.getElementById('eventDetailRemove').appendChild(butRemove.domNode);
-        document.getElementById('eventDetailSave').appendChild(butSave.domNode);
+        document.getElementById('eventDetailRemove').appendChild(removeButton.domNode);
+        document.getElementById('eventDetailSave').appendChild(saveButton.domNode);
+    };
+    /**
+     *
+     */
+    this.setButtons = function(r, s) {
+        removeButton.setEnabled(r);
+        saveButton.setEnabled(s);
     };
     this.getRecurOpt = function() {
         var recurOpt = [];

@@ -18,8 +18,6 @@ package org.osaf.cosmo.mc;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.UidInUseException;
+import org.osaf.cosmo.util.RepositoryUriParser;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
@@ -58,8 +57,6 @@ public class MorseCodeServlet extends HttpServlet {
 
     private static final String BEAN_CONTROLLER =
         "morseCodeController";
-    private static final Pattern PATTERN_COLLECTION_UID =
-        Pattern.compile("^/collection/([^/]+)$");
 
     /**
      * The name of the request parameter that provides the
@@ -99,7 +96,8 @@ public class MorseCodeServlet extends HttpServlet {
         if (log.isDebugEnabled())
             log.debug("handling DELETE for " + req.getPathInfo());
 
-        String uid = findCollectionUid(req.getPathInfo());
+        String uid =
+            new RepositoryUriParser(req.getPathInfo()).getCollectionUid();
         if (uid != null) {
             try {
                 controller.deleteCollection(uid);
@@ -134,7 +132,8 @@ public class MorseCodeServlet extends HttpServlet {
         if (log.isDebugEnabled())
             log.debug("handling GET for " + req.getPathInfo());
 
-        String uid = findCollectionUid(req.getPathInfo());
+        String uid =
+            new RepositoryUriParser(req.getPathInfo()).getCollectionUid();
         if (uid != null) {
             String tokenStr = req.getParameter(PARAM_SYNC_TOKEN);
             if (StringUtils.isBlank(tokenStr))
@@ -185,7 +184,8 @@ public class MorseCodeServlet extends HttpServlet {
         if (log.isDebugEnabled())
             log.debug("handling POST for " + req.getPathInfo());
 
-        String uid = findCollectionUid(req.getPathInfo());
+        String uid =
+            new RepositoryUriParser(req.getPathInfo()).getCollectionUid();
         if (uid != null) {
             try {
                 // XXX: check update preconditions
@@ -225,7 +225,8 @@ public class MorseCodeServlet extends HttpServlet {
         if (log.isDebugEnabled())
             log.debug("handling PUT for " + req.getPathInfo());
 
-        String uid = findCollectionUid(req.getPathInfo());
+        String uid =
+            new RepositoryUriParser(req.getPathInfo()).getCollectionUid();
         if (uid != null) {
             String parentUid = req.getParameter(PARAM_PARENT_UID);
             if (StringUtils.isEmpty(parentUid))
@@ -307,13 +308,6 @@ public class MorseCodeServlet extends HttpServlet {
     }
 
     // private methods
-
-    private String findCollectionUid(String path) {
-        Matcher matcher = PATTERN_COLLECTION_UID.matcher(path);
-        if (matcher.matches())
-            return matcher.group(1);
-        return null;
-    }
 
     private Object getBean(String name, Class clazz)
         throws ServletException {

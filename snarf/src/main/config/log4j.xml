@@ -49,8 +49,12 @@
     <level value="OFF"/>
   </logger>
 
-  <logger name="org.osaf.cosmo.util.LifecycleLoggerListener">
+  <logger name="org.osaf.cosmo.log.LifecycleLoggerListener">
     <level value="INFO"/>
+  </logger>
+
+  <logger name="org.osaf.cosmo.log.HttpLoggingFilter">
+    <level value="OFF"/>
   </logger>
 
   <root>

@@ -37,7 +37,7 @@
   </context-param>
   <listener>
     <listener-class>
-      org.osaf.cosmo.util.LifecycleLoggerListener
+      org.osaf.cosmo.log.LifecycleLoggerListener
     </listener-class>
   </listener>
   <listener>
@@ -121,6 +121,30 @@
       <param-value>false</param-value>
     </init-param>
   </filter>
+  <filter>
+  	<filter-name>http-logging</filter-name>
+  	<filter-class>org.osaf.cosmo.log.HttpLoggingFilter</filter-class>
+	<init-param>
+      <param-name>securityManager</param-name>
+      <param-value>securityManager</param-value>
+	</init-param>
+	<init-param>
+      <param-name>format</param-name>
+      <param-value>%M %U %Q %C %I</param-value>
+	</init-param>
+  </filter>
+  <filter>
+  	<filter-name>http-override</filter-name>
+  	<filter-class>org.osaf.cosmo.filters.HttpOverrideFilter</filter-class>
+  </filter>
+  <filter-mapping>
+  	<filter-name>http-override</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>version-header</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
   <filter-mapping>
     <filter-name>version-header</filter-name>
     <url-pattern>/*</url-pattern>
@@ -181,6 +205,11 @@
     <filter-name>json-security</filter-name>
     <url-pattern>/JSON-RPC/*</url-pattern>
   </filter-mapping>
+  <!-- http logging has to happen after security if we want authentication information-->
+  <filter-mapping>
+  	<filter-name>http-logging</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
   <!-- url rewriting has to happen after security -->
   <filter-mapping>
     <filter-name>url-rewrite</filter-name>
@@ -220,10 +249,10 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
-      <servlet-name>springDispatcherServlet</servlet-name> 
-      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class> 
-      <load-on-startup>1</load-on-startup> 
-  </servlet> 
+      <servlet-name>springDispatcherServlet</servlet-name>
+      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+  </servlet>
   <servlet>
     <servlet-name>JSON</servlet-name>
     <servlet-class>com.metaparadigm.jsonrpc.JSONRPCServlet</servlet-class>
@@ -235,7 +264,7 @@
   <!-- servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/console/*</url-pattern>
-  </servlet-mapping--> 
+  </servlet-mapping-->
   <servlet-mapping>
     <servlet-name>dav</servlet-name>
     <url-pattern>/home/*</url-pattern>
@@ -252,43 +281,43 @@
     <servlet-name>mc</servlet-name>
     <url-pattern>/mc/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping> 
-    <servlet-name>springDispatcherServlet</servlet-name> 
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
      <url-pattern>/pim/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping> 
-    <servlet-name>springDispatcherServlet</servlet-name> 
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
     <url-pattern>/admin/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping> 
-    <servlet-name>springDispatcherServlet</servlet-name> 
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
     <url-pattern>/login</url-pattern>
   </servlet-mapping>
-  <servlet-mapping> 
-    <servlet-name>springDispatcherServlet</servlet-name> 
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
     <url-pattern>/logout</url-pattern>
   </servlet-mapping>
-  <servlet-mapping> 
-    <servlet-name>springDispatcherServlet</servlet-name> 
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
     <url-pattern>/account/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping> 
-    <servlet-name>springDispatcherServlet</servlet-name> 
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
     <url-pattern>/help/*</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping> 
-    <servlet-name>springDispatcherServlet</servlet-name> 
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
     <url-pattern>/browse/*</url-pattern>
   </servlet-mapping>
 
-  <servlet-mapping> 
+  <servlet-mapping>
 	<!-- This should be deprecated -->
-    <servlet-name>springDispatcherServlet</servlet-name> 
+    <servlet-name>springDispatcherServlet</servlet-name>
      <url-pattern>/i18n.js</url-pattern>
   </servlet-mapping>
-  <servlet-mapping> 
-    <servlet-name>springDispatcherServlet</servlet-name> 
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
      <url-pattern>/js/cosmo/util/i18n.js</url-pattern>
   </servlet-mapping>
   <servlet-mapping>

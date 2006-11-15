@@ -76,12 +76,12 @@ cosmo.datetime.timezone.ZoneItem.prototype.toString = function(/*boolean (option
       + (this.ruleName || "") + "\t"
       + (this.format || "") + "\t";
       if (this.untilDate){
-	      s += this.untilDate.year + "/"
-	      + (this.untilDate.month + 1) + "/"
-	      + this.untilDate.date + " "
-	      + this.untilDate.hours + "h "
-	      + this.untilDate.minutes +"m "
-	      + this.untilDate.seconds + "s \n";
+        s += this.untilDate.year + "/"
+        + (this.untilDate.month + 1) + "/"
+        + this.untilDate.date + " "
+        + this.untilDate.hours + "h "
+        + this.untilDate.minutes +"m "
+        + this.untilDate.seconds + "s \n";
       }
     return s;
 }

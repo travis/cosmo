@@ -20,6 +20,8 @@
     <groupId>org.osaf.cosmo</groupId>
     <artifactId>cosmo</artifactId>
     <version>0.6-SNAPSHOT</version>
+    <packaging>war</packaging>
+    <url>http://cosmo.osafoundation.org</url>
     <repositories>
         <repository>
             <id>osafoundation.org</id>
@@ -42,15 +44,18 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-<!--
-    <distributionmanagement>
-        <snapshotrepository>
+    <distributionManagement>
+        <repository>
             <id>osaf-m2</id>
             <name>OSAF M2 Repository</name>
-            <url>scp://paniolo.osafoundation.org/www/maven2</url>
-        </snapshotrepository>
-    </distributionmanagement>
- -->
+            <url>scpexe://paniolo.osafoundation.org/www/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>osaf-m2</id>
+            <name>OSAF M2 Repository</name>
+            <url>scpexe://paniolo.osafoundation.org/www/maven2</url>
+        </snapshotRepository>
+    </distributionManagement>
     <dependencies>
         <!--
             dependencies with the war.bundle property are included in the
@@ -425,15 +430,6 @@
                     <configuration>
                         <source>1.5</source>
                         <target>1.5</target>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <includes>
-                            <include>**/*Test.java</include>
-                        </includes>
                     </configuration>
                 </plugin>
                 <plugin>

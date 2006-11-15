@@ -21,7 +21,7 @@ cosmo.datetime.HOURS_IN_DAY = 24;
 cosmo.datetime.MINUTES_IN_HOUR = 60;
 cosmo.datetime.SECONDS_IN_MINUTE = 60;
 
-cosmo.datetime.timezone._MONTH_MAP = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5, 
+cosmo.datetime.timezone._MONTH_MAP = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5,
                                        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 };
 
 cosmo.datetime.timezone._DAY_MAP =  {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 };
@@ -31,19 +31,60 @@ cosmo.datetime.timezone._RULE_OP_LESS = "LSS";
 
 cosmo.datetime.timezone.Timezone = function(tzId, zoneItems){
     this.tzId = tzId;
-    this.zoneItems = zoneItems || [];    
+    this.zoneItems = zoneItems || [];
+};
+
+cosmo.datetime.timezone.Timezone.prototype.toString = function(){
+    var s = "Timezone: " + this.tzId + "\n";
+    for (var x = 0; x < this.zoneItems.length; x++){
+        s +=  this.zoneItems[x].toString(x == 0);
+    }
+    return s;
 };
 
 cosmo.datetime.timezone.Timezone.prototype.addZoneItem = function(zoneItem){
     this.zoneItems.push(zoneItem);
 };
 
+cosmo.datetime.timezone.Timezone.prototype.getTimezoneOffset = function(/*Date*/ date){
+    //first get the right ZoneItem
+    var zoneItem = this._getZoneItemForDate(date);
+};
+
+cosmo.datetime.timezone.Timezone.prototype._getZoneItemForDate = function(/*date*/ date){
+
+};
+
 cosmo.datetime.timezone.ZoneItem = function(){
     this.offsetInMinutes = null;
     this.ruleName = null;
-    this.format = null; 
+    this.format = null;
     this.untilDate = null;
 };
+
+cosmo.datetime.timezone.ZoneItem.prototype.toString = function(/*boolean (optional)*/ showHeader){
+    if (typeof(showHeader) == "undefined"){
+        showHeader = true;
+    }
+
+    var s = "";
+    if (showHeader){
+        s += "Offset(Minutes)\tRule\tFormat\tUntilDate\n";
+    }
+
+    s += Math.round(this.offsetInMinutes) + "\t"
+      + (this.ruleName || "") + "\t"
+      + (this.format || "") + "\t";
+      if (this.untilDate){
+	      s += this.untilDate.year + "/"
+	      + (this.untilDate.month + 1) + "/"
+	      + this.untilDate.date + " "
+	      + this.untilDate.hours + "h "
+	      + this.untilDate.minutes +"m "
+	      + this.untilDate.seconds + "s \n";
+      }
+    return s;
+}
 
 cosmo.datetime.timezone.RuleSet = function(name, rules){
     this.name = name;
@@ -56,7 +97,7 @@ cosmo.datetime.timezone.RuleSet.prototype.addRule = function(rule){
 
 cosmo.datetime.timezone.Rule = function(){
     this.startYear = null;
-    this.endYear = null; 
+    this.endYear = null;
     this.type = null;
     this.startMonth = null;
     this.startDate = null;
@@ -73,9 +114,9 @@ cosmo.datetime.timezone.setTimezoneRegistry =  function(timezoneRegistry){
 }
 
 cosmo.datetime.timezone.SimpleTimezoneRegistry = function(timezoneFileRoot){
-    this.timezoneFileRoot = timezoneFileRoot || null;  
+    this.timezoneFileRoot = timezoneFileRoot || null;
     this._timezones = {};
-    this._ruleSets = {};  
+    this._ruleSets = {};
 };
 
 cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.init = function(files){
@@ -95,25 +136,22 @@ cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addRuleSet = function(r
     this._ruleSets[ruleset.name] = ruleset;
 };
 
-cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback){ 
+cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback){
         var ruleSets = new dojo.collections.Dictionary();
         var zones = new dojo.collections.Dictionary();
         var lines = str.split('\n');
-        
+
         //the current zone
         var zone = null;
-      
+
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
-            
-            
-            //Skip comments
-            line = dojo.string.trim(line);
 
-            if (dojo.string.startsWith(line, "#") || line.length < 3){
+            //Skip comments
+            if (dojo.string.startsWith(dojo.string.trim(line), "#") || line.length < 3){
                 continue;
             }
-            
+
             if (line.match(/^\s/)) {
                 //we do this because zone lines after the first don't have a zone in it.
                 line = "Zone " + zone.tzId + line;
@@ -121,10 +159,10 @@ cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback)
 
             //in case there are any inline comments
             line = line.split("#")[0];
-            
+
             //split on whitespace
             var arr = line.split(/\s+/);
-            
+
             //is this a zone, a rule, a link or what?
             var lineType = arr.shift();
             switch(lineType) {
@@ -142,7 +180,7 @@ cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback)
                 case 'Rule':
                     var ruleName = arr.shift();
                     var rule = this._parseRuleLine(arr);
-                    if (!ruleSets.containsKey(ruleName)) { 
+                    if (!ruleSets.containsKey(ruleName)) {
                         ruleSet = new cosmo.datetime.timezone.RuleSet(ruleName);
                         ruleSets.add(ruleName, ruleSet);
                     } else {
@@ -153,8 +191,8 @@ cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback)
                 case 'Link':
                     // Shouldn't exist
                     /**TODO Handle This
-                    if (self.zones[arr[1]]) { 
-                        alert('Error with Link ' + arr[1]); 
+                    if (self.zones[arr[1]]) {
+                        alert('Error with Link ' + arr[1]);
                     }
                     self.zones[arr[1]] = arr[0];
                     **/
@@ -174,7 +212,7 @@ cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback)
 cosmo.datetime.timezone._arrayPrinter = function(starter, arrayToPrint){
     var stringy = starter;
     for (var index = 0; index < arrayToPrint.length; index++){
-        stringy += index + "->'" + arrayToPrint[index] + "'    "; 
+        stringy += index + "->'" + arrayToPrint[index] + "'    ";
     }
 };
 
@@ -189,9 +227,9 @@ cosmo.datetime.timezone._parseZoneLine = function(array){
 
     //set the rule name
     zoneItem.ruleName = array[1];
-    
+
     //set the format.
-    zoneItem.format = array[2]; 
+    zoneItem.format = array[2];
 
     if (!array[3]){
         zoneItem.untilDate = null;
@@ -201,8 +239,11 @@ cosmo.datetime.timezone._parseZoneLine = function(array){
         if (array[4]){
            until.month = this._MONTH_MAP[array[4].substr(0,3).toLowerCase()];
            until.date = parseInt(array[5]);
+        } else {
+           until.month = 0;
+           until.date = 1;
         }
-        
+
         if (!array[6]){
             until.hours = 23;
             until.minutes = 59;
@@ -220,23 +261,23 @@ cosmo.datetime.timezone._parseZoneLine = function(array){
 
 cosmo.datetime.timezone._parseRuleLine = function(array){
     var rule = new cosmo.datetime.timezone.Rule();
-    
+
     //The Format: DEBUG: Rule --> 0->'1942' 1->'only' 2->'-' 3->'Feb' 4->'9' 5->'2:00' 6->'1:00' 7->'W' 8->''
     //                            FROM      TO        TYPE   IN       ON     AT        SAVE      LETTER
-    
+
     //set the start year
     rule.startYear = parseInt(array[0]) || (dojo.string.startsWith(array[0], "min") ? -99999 : 99999);
-    
+
     //set the end Year
-    rule.endYear = parseInt(array[1]) 
+    rule.endYear = parseInt(array[1])
         || (dojo.string.startsWith(array[1], "o") ? rule.startYear : (dojo.string.startsWith(array[1], "min") ? -99999 : 99999));
-        
+
     //set the type
     rule.type = array[2];
-    
+
     //set the startmonth
     rule.startMonth = this._MONTH_MAP[array[3].substr(0,3).toLowerCase()];
-    
+
     //set the start date
     var rawOn = array[4]; //the raw "ON" data
     if (dojo.lang.isNumber(rawOn)){
@@ -255,13 +296,13 @@ cosmo.datetime.timezone._parseRuleLine = function(array){
     //set the startTime
     //TODO get that extra letter for wallclock, standard, etc.
     rule.startTime = this._parseTimeString(array[5]);
-    
+
     //the amount of mintues to add
     rule.addMinutes = this._parseTimeIntoMinutes(array[6]);
-    
+
     //the letter
     rule.letter = array[7];
-    
+
     //TODO set properties...
     return rule;
 };
@@ -276,7 +317,7 @@ cosmo.datetime.timezone._parseTimeString = function(str) {
     result.negative = dojo.string.startsWith(str, "-");
     return result;
 };
- 
+
  cosmo.datetime.timezone._parseTimeIntoMinutes = function(str){
     var hms = this._parseTimeString(str);
     var millis = ((((hms.hours * cosmo.datetime.MINUTES_IN_HOUR) + hms.minutes) * cosmo.datetime.SECONDS_IN_MINUTE) + hms.seconds) * 1000;
@@ -287,8 +328,8 @@ cosmo.datetime.timezone._parseTimeString = function(str) {
 
 
 /*
-cosmo.datetime.TimezoneParser.MONTH_MAP = 
-    var monthMap = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5, 
+cosmo.datetime.TimezoneParser.MONTH_MAP =
+    var monthMap = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5,
         'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 };
 
 cosmo.datetime.TimezoneParser.DAY_MAP =  {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 };
@@ -297,16 +338,16 @@ cosmo.datetime.TimezoneParser.DAY_MAP =  {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3,
 
 fleegix = {};
 fleegix.tz = new function() {
-    
-    this.zoneAreas = { AFRICA: 'africa', ANTARCTICA: 'antarctica', 
-        ASIA: 'asia', AUSTRALASIA: 'australasia', BACKWARD: 'backward', 
-        ETCETERA: 'etcetera', EUROPE: 'europe', NORTHAMERICA: 'northamerica', 
-        PACIFICNEW: 'pacificnew', SOUTHAMERICA: 'southamerica', 
+
+    this.zoneAreas = { AFRICA: 'africa', ANTARCTICA: 'antarctica',
+        ASIA: 'asia', AUSTRALASIA: 'australasia', BACKWARD: 'backward',
+        ETCETERA: 'etcetera', EUROPE: 'europe', NORTHAMERICA: 'northamerica',
+        PACIFICNEW: 'pacificnew', SOUTHAMERICA: 'southamerica',
         SYSTEMV: 'systemv' };
-    
+
     var self = this;
-    var monthMap = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5, 
-        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 } 
+    var monthMap = { 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,'may': 4, 'jun': 5,
+        'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11 }
     var dayMap = {'sun': 0,'mon' :1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6 }
     var zoneKeys = {
         'Africa': this.zoneAreas.AFRICA,
@@ -370,7 +411,7 @@ fleegix.tz = new function() {
         'Asia/Istanbul': this.zoneAreas.EUROPE
     };
     var loadedZoneAreas = {};
-    
+
     function parseTimeString(str) {
         var pat = /(\d+)(?::0*(\d*))?(?::0*(\d*))?([wsugz])?$/;
         var hms = str.match(pat);
@@ -405,13 +446,13 @@ fleegix.tz = new function() {
             if (dt.getTime() < d) { break; }
         }
         if (i == zones.length) {
-           alert('No DST for ' + timezone); 
+           alert('No DST for ' + timezone);
         }
         // Get basic offset
         else {
-            return zones[i]; 
+            return zones[i];
         }
-        
+
     }
     function getBasicOffset(z) {
         var off = parseTimeString(z[0]);
@@ -427,14 +468,14 @@ fleegix.tz = new function() {
         if (!rules) { return null; }
         for (var i = 0; i < rules.length; i++) {
             r = rules[i];
-            if ((r[1] < (year - 1)) || 
+            if ((r[1] < (year - 1)) ||
                 (r[0] < (year - 1) && r[1] == 'only') ||
-                (r[0] > year)) { 
-                continue; 
+                (r[0] > year)) {
+                continue;
             };
             var mon = monthMap[r[3].substr(0, 3).toLowerCase()];
             var day = r[4];
-            
+
             if (isNaN(day)) {
                 if (day.substr(0, 4) == 'last') {
                     var day = dayMap[day.substr(4,3).toLowerCase()];
@@ -464,7 +505,7 @@ fleegix.tz = new function() {
                         if(r[4].substr(3, 2) == '>=') {
                             var t = parseTimeString(r[5]);
                             // The stated date of the month
-                            var d = new Date(Date.UTC(dt.getUTCFullYear(), mon, 
+                            var d = new Date(Date.UTC(dt.getUTCFullYear(), mon,
                                 parseInt(r[4].substr(5)), t[1], t[2], t[3]));
                             var dtDay = d.getUTCDay();
                             var diff = (day < dtDay) ? (day - dtDay + 7) : (day - dtDay);
@@ -486,7 +527,7 @@ fleegix.tz = new function() {
                         else if (day.substr(3, 2) == '<=') {
                             var t = parseTimeString(r[5]);
                             // The stated date of the month
-                            var d = new Date(Date.UTC(dt.getUTCFullYear(), mon, 
+                            var d = new Date(Date.UTC(dt.getUTCFullYear(), mon,
                                 parseInt(r[4].substr(5)), t[1], t[2], t[3]));
                             var dtDay = d.getUTCDay();
                             var diff = (day > dtDay) ? (day - dtDay - 7) : (day - dtDay);
@@ -512,8 +553,8 @@ fleegix.tz = new function() {
                 var t = parseTimeString(r[5]);
                 var d = new Date(Date.UTC(dt.getUTCFullYear(), mon, day, t[1], t[2], t[3]));
                 d.setUTCHours(d.getUTCHours() - 24*((7 - day + d.getUTCDay()) % 7));
-                if (dt < d) { 
-                    continue; 
+                if (dt < d) {
+                    continue;
                 }
                 else {
                     ruleHits.push({ 'rule': r, 'date': d });
@@ -535,9 +576,9 @@ fleegix.tz = new function() {
         ret = -Math.ceil(ret);
         return ret;
     }
-    
-    this.files = ['africa', 'antarctica', 'asia', 'australasia', 
-        'backward', 'etcetera', 'europe', 
+
+    this.files = ['africa', 'antarctica', 'asia', 'australasia',
+        'backward', 'etcetera', 'europe',
         'northamerica', 'pacificnew', 'southamerica'];
     this.zones = {};
     this.rules = {};

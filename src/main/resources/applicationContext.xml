@@ -67,7 +67,7 @@
         class="org.springframework.jndi.JndiObjectFactoryBean">
     <property name="jndiName" value="java:comp/env/jdbc/cosmo"/>
   </bean>
-  
+
   <bean id="defaultLobHandler"
         class="org.springframework.jdbc.support.lob.DefaultLobHandler">
   </bean>
@@ -109,7 +109,7 @@
       <ref bean="jdbcDataSource"/>
     </property>
   </bean>
-  
+
   <!-- Transaction manager for a single Hibernate SessionFactory
        (alternative to JTA) -->
   <bean id="transactionManager"
@@ -152,9 +152,9 @@
       <list></list>
     </property>
   </bean>
-  
+
   <!-- data access objects -->
-  
+
   <bean id="hibernateTemplate"
         class="org.springframework.orm.hibernate3.HibernateTemplate">
     <constructor-arg><ref bean="sessionFactory"/></constructor-arg>
@@ -178,7 +178,7 @@
   </bean>
 
   <bean id="itemDao"
-        class="org.osaf.cosmo.dao.hibernate.ItemDaoImpl" 
+        class="org.osaf.cosmo.dao.hibernate.ItemDaoImpl"
         init-method="init"
         destroy-method="destroy">
     <property name="sessionFactory">
@@ -191,7 +191,7 @@
       <ref local="idGenerator" />
     </property>
   </bean>
-  
+
   <bean id="txServerPropertyDao" parent="txProxyTemplate">
     <property name="proxyInterfaces">
       <value>org.osaf.cosmo.dao.ServerPropertyDao</value>
@@ -200,7 +200,7 @@
       <ref local="serverPropertyDao" />
     </property>
   </bean>
-  
+
   <bean id="serverPropertyDao"
         class="org.osaf.cosmo.dao.hibernate.ServerPropertyDaoImpl"
         init-method="init"
@@ -209,7 +209,7 @@
       <ref bean="sessionFactory" />
     </property>
   </bean>
-  
+
   <bean id="txContentDao" parent="txProxyTemplate">
     <property name="proxyInterfaces">
       <value>org.osaf.cosmo.dao.ContentDao</value>
@@ -233,7 +233,7 @@
       <ref local="idGenerator" />
     </property>
   </bean>
-  
+
   <bean id="txUserDao" parent="txProxyTemplate">
     <property name="proxyInterfaces">
       <value>org.osaf.cosmo.dao.UserDao</value>
@@ -242,7 +242,7 @@
       <ref local="userDao" />
     </property>
   </bean>
-  
+
   <bean id="userDao"
         class="org.osaf.cosmo.dao.hibernate.UserDaoImpl"
         init-method="init"
@@ -337,7 +337,7 @@
       <ref bean="contentDao"/>
     </property>
   </bean>
-  
+
   <bean id="serverPropertyService" parent="txProxyTemplate">
     <property name="proxyInterfaces">
       <value>org.osaf.cosmo.service.ServerPropertyService</value>
@@ -346,7 +346,7 @@
       <ref local="serverPropertyServiceTarget" />
     </property>
   </bean>
-  
+
   <bean id="serverPropertyServiceTarget"
         class="org.osaf.cosmo.service.impl.StandardServerPropertyService"
         init-method="init"
@@ -373,7 +373,7 @@
 
   <!-- these beans are used to initialize the JSON-RPC service -->
 
-  <bean id="JSONRPCBridge" 
+  <bean id="JSONRPCBridge"
         class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
     <property name="targetClass">
       <value>com.metaparadigm.jsonrpc.JSONRPCBridge</value>
@@ -381,9 +381,9 @@
     <property name="targetMethod">
       <value>getGlobalBridge</value>
     </property>
-  </bean>  	
+  </bean>
 
-  <bean id="registerWithJSON" 
+  <bean id="registerWithJSON"
         class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
     <property name="targetObject">
         <ref local="JSONRPCBridge"/>
@@ -399,7 +399,7 @@
       </list>
     </property>
   </bean>
-  
+
   <!-- authentication resources -->
 
   <bean id="userDetailsService"
@@ -550,7 +550,7 @@
       <ref bean="userService"/>
     </property>
   </bean>
-  
+
   <bean id="defaultFilterInvocationInterceptor"
          class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
      <property name="authenticationManager">
@@ -585,9 +585,9 @@
        </value>
      </property>
    </bean>
-   
+
    <!-- filter chain that kicks off request-time processing -->
-   
+
    <bean id="defaultFilterChainProxy"
         class="org.acegisecurity.util.FilterChainProxy">
     <property name="filterInvocationDefinitionSource">
@@ -595,18 +595,18 @@
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
         /**=defaultHttpSessionContextIntegrationFilter,defaultFormBasedProcessingFilter,defaultAnonymousProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
-        
+
       </value>
     </property>
   </bean>
-   
+
   <!-- filter that integrates SecurityContext into HTTP Session -->
 
   <bean id="defaultHttpSessionContextIntegrationFilter"
         class="org.acegisecurity.context.HttpSessionContextIntegrationFilter"/>
-   
+
   <!-- filter that performs form-based authentication -->
-   
+
   <bean id="defaultFormBasedAuthenticationEntryPoint"
         class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
     <property name="loginFormUrl">
@@ -652,6 +652,11 @@
     <property name="authenticationEntryPoint">
       <ref local="defaultFormBasedAuthenticationEntryPoint"/>
     </property>
+  </bean>
+
+  <!-- Logging resources -->
+  <bean id="httpLoggingFormat" class="java.lang.String">
+    <constructor-arg type="java.lang.String"><value>%M %U %Q %C %I</value></constructor-arg>
   </bean>
 
 </beans>

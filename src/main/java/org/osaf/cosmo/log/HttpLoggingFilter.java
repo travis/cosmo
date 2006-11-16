@@ -46,7 +46,7 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
  *
  */
 public class HttpLoggingFilter implements Filter {
-    private static final Log log = LogFactory.getLog(HttpLoggingFilter.class);
+    private static final Log log = LogFactory.getLog("http-operations");
 
     private String format = "%M %U %Q %C %I";
     private CosmoSecurityManager securityManager;
@@ -58,48 +58,39 @@ public class HttpLoggingFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
 
-        String logMessage = request.getProtocol() + " ";
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        try {
-            HttpServletRequest httpRequest = (HttpServletRequest) request;
-
-            logMessage = this.formatRequest(httpRequest, this.format);
-
-            log.debug(logMessage);
-
-        } catch (ClassCastException e) {
-            /*
-             * This is no big deal, we log only the protocol.
-             */
-            log.debug(logMessage);
-        }
+        log.info(this.formatRequest(httpRequest, this.format));
 
         chain.doFilter(request, response);
 
     }
 
     public void init(FilterConfig config) throws ServletException {
-        String securityManagerBeanName =
-            config.getInitParameter("securityManager");
 
-        if (securityManagerBeanName != null){
-            ApplicationContext ctx =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(
-                        config.getServletContext()
-                );
+        ApplicationContext ctx =
+            WebApplicationContextUtils.getRequiredWebApplicationContext(
+                    config.getServletContext()
+            );
 
-            this.securityManager =
-                (CosmoSecurityManager) ctx.getBean(securityManagerBeanName);
+        this.securityManager =
+            (CosmoSecurityManager) ctx.getBean("securityManager");
 
-        } else {
-            log.warn("No security manager registered for " +
-                    "HttpLoggingFilter. Authentication information" +
-            "will not be available.");
+        if (this.securityManager == null){
+            throw new ServletException("Could not initialize HttpLoggingFilter: " +
+                    "Could not find security manager.");
         }
 
-        String format = config.getInitParameter("format");
+        Object format =
+            ctx.getBean("httpLoggingFormat");
+
         if (format != null){
-            this.format = format;
+            try {
+                this.format = (String) format;
+            } catch (ClassCastException e){
+                throw new ServletException("Could not initialize HttpLoggingFilter: " +
+                        "httpLoggingFormat is not a string.");
+            }
         }
     }
 

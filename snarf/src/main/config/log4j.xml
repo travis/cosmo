@@ -53,8 +53,8 @@
     <level value="INFO"/>
   </logger>
 
-  <logger name="org.osaf.cosmo.log.HttpLoggingFilter">
-    <level value="OFF"/>
+  <logger name="http-operations">
+    <level value="INFO"/>
   </logger>
 
   <root>

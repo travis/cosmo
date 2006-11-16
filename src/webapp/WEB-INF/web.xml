@@ -124,14 +124,6 @@
   <filter>
   	<filter-name>http-logging</filter-name>
   	<filter-class>org.osaf.cosmo.log.HttpLoggingFilter</filter-class>
-	<init-param>
-      <param-name>securityManager</param-name>
-      <param-value>securityManager</param-value>
-	</init-param>
-	<init-param>
-      <param-name>format</param-name>
-      <param-value>%M %U %Q %C %I</param-value>
-	</init-param>
   </filter>
   <filter-mapping>
     <filter-name>version-header</filter-name>

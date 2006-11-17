@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!--
+For use with the builtin JsUnit implementation in the jsunit_wrap.js script.
+-->
+<head>
+  <title>$TITLE</title>
+    <style type="text/css">
+.button {background-color: grey; border: 1px solid black; width: 25%;}
+    </style>
+
+  <!-- scripts under test -->
+%FOR SCRIPT SCRIPTS
+  <script src="$SCRIPT" language="JavaScript" type="text/javascript"></script>
+%END
+
+  <!-- jsunit api wrapper -->
+  <script src="$JSUNIT_WRAP" language="JavaScript" type="text/javascript"></script>
+
+  <!-- test scripts -->
+%FOR TEST TESTS
+  <script src="$TEST" language="JavaScript" type="text/javascript"></script>
+%END
+
+  <!-- array of test names -->
+<!--
+  <script src="testnames.js" language="JavaScript"></script>
+-->
+</head>
+<!-- await onload before looking at script elements -->
+<!--
+-->
+<body onload="jum.init()">
+
+NOTE: At the moment, this page can only be used once; you have to reload the page before
+clicking another link.
+
+<p>
+Select what tests to run:
+
+   <span class="button" id="after" onclick="jum.runAll()">All</span>
+%FOR TEST TESTS
+   <p><span class="button" onclick="jum.runGroup('{$TEST =~ m/test_(.*)\.js/; $GROUPNAME = $1}')">$GROUPNAME</span>
+%END
+
+
+</body>
+</html>

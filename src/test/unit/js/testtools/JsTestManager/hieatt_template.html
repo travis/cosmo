@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!--
+For use with the JsUnit from www.jsunit.net
+-->
+<head>
+  <title>$TITLE</title>
+
+  <!-- JsUnit -->
+  <link rel="stylesheet" type="text/css" href="$HIEATT/css/jsUnitStyle.css">
+  <!-- hack so we can get somewhere loading this file standalone without error -->
+  <script language="JavaScript" type="text/javascript">var xbDEBUG = ''; xbDEBUG.on = false;</script>
+  <script src="$HIEATT/app/jsUnitCore.js" language="JavaScript" type="text/javascript"></script>
+
+  <!-- scripts under test -->
+%FOR SCRIPT SCRIPTS
+  <script src="$SCRIPT" language="JavaScript" type="text/javascript"></script>
+%END
+
+  <!-- jsunit api wrapper -->
+  <script src="$JSUNIT_WRAP" language="JavaScript" type="text/javascript"></script>
+
+  <!-- test scripts -->
+%FOR TEST TESTS
+  <script src="$TEST" language="JavaScript" type="text/javascript"></script>
+%END
+
+  <!-- end of jusnit wrapper -->
+<!--
+  <script src="$JSUNIT_POST" language="JavaScript" type="text/javascript"></script>
+-->
+
+  <!-- doing this in body onload seems to disable jsunit -->
+  <script language="JavaScript" type="text/javascript">
+    jum.init();
+  </script>
+</head>
+<!--<body onload="alert('hieatt_core.html onload, number scripts=' + document.getElementsByTagName('script').length); jum.init()">-->
+<!--<body onload="jum.init()">-->
+<body>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- Simply load some scripts -->
+<head>
+  <title>$TITLE</title>
+
+%FOR SCRIPT SCRIPTS
+  <script language="JavaScript">
+     if ("$SCRIPT".indexOf('burst_first')!=-1 || "$SCRIPT".indexOf('SortTable')!=-1)
+       alert('about to load script $SCRIPT');
+  </script>
+  <script src="$SCRIPT" language="JavaScript" type="text/javascript"></script>
+%END
+
+</head>
+<body>
+If you see this without any javascript errors, then these files loaded successfully:
+<ul>
+%FOR SCRIPT SCRIPTS
+  <li>$SCRIPT</li>
+%END
+</ul>
+</body>
+</html>

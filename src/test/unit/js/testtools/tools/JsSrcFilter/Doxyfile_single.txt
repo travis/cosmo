@@ -1,0 +1,40 @@
+OPTIMIZE_OUTPUT_JAVA   = YES
+WARNINGS               = YES
+PROJECT_NAME           = $(PROJECT_NAME)
+PROJECT_NUMBER         = $(PROJECT_NUMBER)
+OUTPUT_DIRECTORY       = $(OUTPUT_DIRECTORY)
+FULL_PATH_NAMES        = NO
+# if FULL_PATH_NAMES is YES
+# for example: .lib/ util/
+STRIP_FROM_PATH        = $(STRIP_FROM_PATH)
+VERBATIM_HEADERS       = NO
+JAVADOC_AUTOBRIEF      = YES
+DETAILS_AT_TOP         = YES
+INLINE_INFO            = NO
+TAB_SIZE               = 4
+INPUT                  = $(INPUT)
+RECURSIVE              = NO
+EXCLUDE_PATTERNS       = */CVS/* */test/*
+# for \include
+EXAMPLE_PATH           =
+# for \image
+IMAGE_PATH             =
+INPUT_FILTER           = $(INPUT_FILTER)
+ALPHABETICAL_INDEX     = NO
+COLS_IN_ALPHA_INDEX    = 3
+# relative to OUTPUT_DIRECTORY, defaults to "html"
+HTML_OUTPUT            = $(HTML_OUTPUT)
+# starter files can be made by: doxygen -w html headerfile.html footerfile.html cssfile.css
+# see jsunit/util/JsUnit* for examples
+#HTML_HEADER            = 
+#HTML_FOOTER            = 
+#HTML_STYLESHEET        = 
+DISABLE_INDEX          = YES
+GENERATE_LATEX         = NO
+RTF_HYPERLINKS         = YES
+GENERATE_MAN           = NO
+GENERATE_XML           = NO
+ENABLE_PREPROCESSING   = NO
+#PERL_PATH              = $(PERL_PATH)
+HAVE_DOT               = $(HAVE_DOT)
+#DOT_PATH               =

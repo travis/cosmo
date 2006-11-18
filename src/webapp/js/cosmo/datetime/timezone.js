@@ -51,9 +51,59 @@ cosmo.datetime.timezone.Timezone.prototype.getTimezoneOffset = function(/*Date*/
     var zoneItem = this._getZoneItemForDate(date);
 };
 
-cosmo.datetime.timezone.Timezone.prototype._getZoneItemForDate = function(/*date*/ date){
+cosmo.datetime.timezone.Timezone.prototype._getZoneItemForDate = function(/*Date*/ date){
+    for (var x = 0; x < this.zoneItems.length; x++){
+        var zoneItem = this.zoneItems[x];
+        var untilDate = zoneItem.untilDate;
+        if (!untilDate){
+            return zoneItem;
+        }
 
+        if (this._compareDates(date, untilDate) <= 0){
+            return zoneItem;
+        }
+    }
 };
+
+cosmo.datetime.timezone.Timezone.prototype._compareDates = function(d1, d2){
+    var fields = ["year", "month", "date", "hours", "minutes", "seconds"];
+
+    for (var x = 0; x < fields.length; x++){
+        var diff = this._getDateField(d1, fields[x]) - this._getDateField(d2, fields[x]);
+        if (diff != 0) {
+            return diff;
+        }
+    }
+
+    //fell through, so they must be equal
+    return 0;
+};
+
+cosmo.datetime.timezone.Timezone.prototype._getDateField = function(date, field){
+    if (field == "year"){
+        return date.getFullYear ? date.getFullYear() : date.year;
+    }
+    if (field == "month"){
+        var ret = date.getMonth ? date.getMonth() : date.month;
+        return typeof(ret) == "undefined" ? 0 : ret;
+    }
+    if (field == "date"){
+        var ret = date.getDate ? date.getDate() : date.date;
+        return typeof(ret) == "undefined" ? 1 : ret;
+    }
+    if (field == "hours"){
+        var ret = date.getHours ? date.getHours() : date.hours;
+        return typeof(ret) == "undefined" ? 0 : ret;
+    }
+    if (field == "minutes"){
+        var ret = date.getMinutes ? date.getMinutes() : date.minutes;
+        return typeof(ret) == "undefined" ? 0 : ret;
+    }
+    if (field == "seconds"){
+        var ret = date.getSeconds ? date.getSeconds() : date.seconds;
+        return typeof(ret) == "undefined" ? 0 : ret;
+    }
+}
 
 cosmo.datetime.timezone.ZoneItem = function(){
     this.offsetInMinutes = null;
@@ -89,6 +139,15 @@ cosmo.datetime.timezone.ZoneItem.prototype.toString = function(/*boolean (option
 cosmo.datetime.timezone.RuleSet = function(name, rules){
     this.name = name;
     this.rules = rules || [];
+
+};
+
+cosmo.datetime.timezone.RuleSet.prototype.toString = function(){
+    var s = "Rule: " + this.name+ "\n";
+    for (var x = 0; x < this.rules.length; x++){
+        s +=  this.rules[x].toString(x == 0);
+    }
+    return s;
 };
 
 cosmo.datetime.timezone.RuleSet.prototype.addRule = function(rule){
@@ -101,7 +160,6 @@ cosmo.datetime.timezone.Rule = function(){
     this.type = null;
     this.startMonth = null;
     this.startDate = null;
-    this.startDate = null;
     this.startDay = null;;
     this.startOperator = null;
     this.startTime = null;
@@ -109,8 +167,44 @@ cosmo.datetime.timezone.Rule = function(){
     this.letter = null;
 }
 
+cosmo.datetime.timezone.Rule.prototype.toString = function(/*boolean (optional)*/ showHeader){
+    if (typeof(showHeader) == "undefined"){
+        showHeader = true;
+    }
+
+    var s = "";
+    if (showHeader){
+        s += "StartYear\tEndYear\tType\tStartMonth\tStartDate\tStartDay\tStartOperator\tStartTime\tAddMin\tLetter\n";
+    }
+
+    s += this.startYear + "\t"
+      +  (this.endYear || "-") + "\t"
+      +  (this.type || "-") + "\t"
+      +  (this.startMonth  || "-") + "\t"
+      +  (this.startDate || "-") + "\t"
+      +  (this.startDay || "-") + "\t"
+      +  (this.startOperator || "-") + "\t";
+
+    if (this.startTime){
+      s += this.startTime.hours + "h "
+        +  this.startTime.minutes + "m "
+        +  this.startTime.seconds + "s" + "\t";
+    }
+
+    s += (this.addMinutes ? Math.round(this.addMinutes): "-") + "\t";
+    s += (this.letter || "-");
+    return s + "\n";
+}
 cosmo.datetime.timezone.setTimezoneRegistry =  function(timezoneRegistry){
     cosmo.datetime.timezone._timezoneRegistry = timezoneRegistry;
+}
+
+cosmo.datetime.timezone.getTimezone = function(tzId){
+    return this._timezoneRegistry.getTimezone(tzId);
+}
+
+cosmo.datetime.timezone.getRuleSet = function(ruleName){
+    return this._timezoneRegistry.getRuleSet(ruleName);
 }
 
 cosmo.datetime.timezone.SimpleTimezoneRegistry = function(timezoneFileRoot){
@@ -135,6 +229,14 @@ cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addTimezone = function(
 cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addRuleSet = function(ruleset){
     this._ruleSets[ruleset.name] = ruleset;
 };
+
+cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.getTimezone = function(tzid){
+    return this._timezones[tzid];
+}
+
+cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.getRuleSet = function(ruleName){
+    return this._ruleSets[ruleName];
+}
 
 cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback){
         var ruleSets = new dojo.collections.Dictionary();
@@ -245,9 +347,9 @@ cosmo.datetime.timezone._parseZoneLine = function(array){
         }
 
         if (!array[6]){
-            until.hours = 23;
-            until.minutes = 59;
-            until.seconds = 59;
+            until.hours = 0;
+            until.minutes = 0;
+            until.seconds = 0;
         } else {
             var hms = this._parseTimeString(array[6]);
             until.hours = hms.hours;
@@ -283,12 +385,12 @@ cosmo.datetime.timezone._parseRuleLine = function(array){
     if (dojo.lang.isNumber(rawOn)){
         rule.startDate = parseInt(rawOn);
     } else {
-        if (dojo.string.startsWith("last")){
+        if (dojo.string.startsWith(rawOn, "last")){
             rule.startDate = null;
             rule.startDay = this._DAY_MAP[rawOn.substr(4,3).toLowerCase()];
             rule.startOperator = this._RULE_OP_LAST;
         } else {
-            rule.startOperator = (rawOn.indexOf(">") > -1) ? this._RULE_OP_GTR : this._RULE_OP_LESS;
+            rule.startOperator = (rawOn.indexOf(">") > -1) ? this._RULE_OP_GTR : (rawOn.indexOf("<") > -1 ? this._RULE_OP_LESS :null);
             rule.startDay = this._DAY_MAP[rawOn.substr(0,3).toLowerCase()];
         }
     }

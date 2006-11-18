@@ -16,14 +16,26 @@ For use with the JsUnit from www.jsunit.net
   <script src="jsunit/app/jsUnitCore.js" language="JavaScript" type="text/javascript"></script>
 
   <!-- scripts under test -->
+  <script src="../../../webapp/js/cosmo/util/debug.js" language="JavaScript" type="text/javascript"></script>
   <script src="../../../webapp/js/cosmo/util/date.js" language="JavaScript" type="text/javascript"></script>
+  <script src="../../../webapp/js/cosmo/model/scoobydate.js" language="JavaScript" type="text/javascript"></script>
   <script src="../../../webapp/js/lib/dojo-event_and_io/dojo.js" language="JavaScript" type="text/javascript"></script>
-
+  
+  <!-- dojo setup stuff -->
+  <script language="JavaScript" type="text/javascript">
+      dojo.require("dojo.widget.*");
+      dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
+      dojo.require("cosmo.env");
+      cosmo.env.setBaseUrl("../../../webapp/");
+     
+  </script>
+  
   <!-- jsunit api wrapper -->
   <script src="testtools/JsTestManager/jsunit_wrap.js" language="JavaScript" type="text/javascript"></script>
 
   <!-- test scripts -->
   <script src="cosmo/test_Test.js" language="JavaScript" type="text/javascript"></script>
+  <script src="cosmo/datetime/test_timezone.js" language="JavaScript" type="text/javascript"></script>
 
   <!-- end of jusnit wrapper -->
 <!--

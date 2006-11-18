@@ -4,6 +4,7 @@ function getAL(){
 	return new dojo.collections.ArrayList(["foo","bar","test","bull"]);
 }
 
+
 function test_ArrayList_ctor(){
 	var al = getAL();
 

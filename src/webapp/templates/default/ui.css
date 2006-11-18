@@ -1,12 +1,12 @@
 /*
  * Copyright 2005-2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ $fontSizeS = 9px
 $fontSizeM = 11px
 $fontSizeL = 12px
 // Color for base areas of UI
-$mainUIColor = #ffffff 
+$mainUIColor = #ffffff
 // Selected event block color
 $selectedBlockColor = #0064cb
 // Unselected event block color
@@ -59,214 +59,278 @@ $calTopNavColor = #ffffff
  * ==================================== */
 /* All elements -- don't set the default font size here
  * because it will affect vertical size of block elements */
-* { 
-    font-family:$fontFamily; 
-    padding:0px; 
-    margin:0px; 
-    border:0px; 
+* {
+    font-family:$fontFamily;
+    padding:0px;
+    margin:0px;
+    border:0px;
     color:$fontColor;
 }
 /* Set default font size here
  * height of 100% ensures that IE can get an accurate measure
  * of the window height */
-body { 
-    padding:0px; 
-    margin:0px; 
-    border:0px; 
-    height:100%; 
-    font-size:$fontSizeL; 
+body {
+    padding:0px;
+    margin:0px;
+    border:0px;
+    height:100%;
+    font-size:$fontSizeL;
 }
-/* Stupid default behavior is to act like 
+/* Stupid default behavior is to act like
  * a block-level element */
-form { 
+form {
     display:inline;
 }
 /* Set p, td, div each separately since IE can't handle comma-
- * separated lists in with addRule for CSS */ 
-p { 
+ * separated lists in with addRule for CSS */
+p {
     font-size:$fontSizeM;
 }
-td { 
+td {
     font-size:$fontSizeM;
 }
-div { 
+div {
     font-size:$fontSizeM;
 }
-/* Default link color -- 
+/* Default link color --
  * generally color for text of active buttons should match */
-a { 
+a {
     color:$linkTextColor;
 }
 
-/* Main styles, classes 
+/* Main styles, classes
  * ==================================== */
-/* Login 
+/* Login
  * --------------------- */
 /* Login prompt -- default state */
-.promptText { 
+.promptText {
     color:$labelTextMedColor;
 }
 /* Login prompt -- error state */
-.promptTextError { 
+.promptTextError {
     color:#aa3333;
 }
 
-/* Buttons 
+
+#loginDialog{
+
+
+	margin:auto;
+	width:280px;
+	text-align:left;
+	padding-top:24px;
+
+}
+
+#loginDialogLoginPrompt{
+	height:46px;
+}
+
+#loginDialogLogo{
+	padding-bottom:12px;
+}
+
+#loginDialogForm{
+
+
+}
+
+#loginDialogFormContainer{
+	padding:12px;
+    border:1px solid $uiDetailBorderColor;
+}
+
+#loginDialogInputsBox{
+
+}
+
+#loginDialogUsernameWidget{
+	display: table-row;
+}
+#loginDialogUsernamePrompt{
+	display: table-cell;
+	text-align: right;
+}
+
+#loginDialogUsernameInputContainer{
+	display: table-cell;
+	padding-bottom:4px;
+}
+#loginDialogPasswordWidget{
+	display: table-row;
+}
+#loginDialogPasswordPrompt{
+	display: table-cell;
+	text-align: right;
+}
+#loginDialogPasswordInput{
+
+}
+#loginDialogUsernameInputContainer{
+	display: table-cell;
+}
+
+#loginDialogSubmitButton{
+	margin-top:16px;
+	float:right;
+}
+
+/* Buttons
  * --------------------- */
 /* Normal-sized buttons */
 $buttonHeight = 24px
-.buttonText { 
+.buttonText {
     font-size:$fontSizeM;
-    color:$linkTextColor; 
-    height:$buttonHeight; 
+    color:$linkTextColor;
+    height:$buttonHeight;
     line-height:$buttonHeight;
     vertical-align:middle;
 }
-.buttonTextDisabled { 
-    font-size:$fontSizeM; 
-    color:$linkTextDisabledColor; 
+.buttonTextDisabled {
+    font-size:$fontSizeM;
+    color:$linkTextDisabledColor;
     height:$buttonHeight;
     line-height:$buttonHeight;
-    vertical-align:middle; 
+    vertical-align:middle;
 }
 /* Small-sized buttons */
 $smButtonHeight = 18px
-.buttonTextSm { 
+.buttonTextSm {
     font-size:$fontSizeS;
-    color:$linkTextColor; 
-    height:$smButtonHeight; 
+    color:$linkTextColor;
+    height:$smButtonHeight;
     line-height:$smButtonHeight;
-    vertical-align:middle; 
+    vertical-align:middle;
 }
-.buttonTextDisabledSm { 
+.buttonTextDisabledSm {
     font-size:$fontSizeS;
-    color:$linkTextDisabledColor; 
-    height:$smButtonHeight; 
+    color:$linkTextDisabledColor;
+    height:$smButtonHeight;
     line-height:$smButtonHeight;
     vertical-align:middle;
 }
 
-/* General widget/UI 
+/* General widget/UI
  * --------------------- */
 /* Main areas of the UI surface */
-.baseWidget {  
-    background:$mainUIColor; 
-    border:1px solid $uiDetailBorderColor; 
+.baseWidget {
+    background:$mainUIColor;
+    border:1px solid $uiDetailBorderColor;
 }
 /* Embossed divider line */
-.embossedLine { 
-    height:1px; 
+.embossedLine {
+    height:1px;
     font-size:0px;
-    background:$uiDetailBorderColor; 
+    background:$uiDetailBorderColor;
     border-bottom:1px solid #ffffff;
-    margin-left:auto; 
-    margin-right:auto; 
+    margin-left:auto;
+    margin-right:auto;
 }
 
-/* Form elements and labels 
+/* Form elements and labels
  * --------------------- */
 /* Label appearing above form inputs */
-.labelTextVert { 
+.labelTextVert {
     color:$labelTextMedColor;
-    font-weight:bold; 
-    margin-bottom:2px; 
+    font-weight:bold;
+    margin-bottom:2px;
 }
 /* Label appearing to left of form inputs */
-.labelTextHoriz { 
+.labelTextHoriz {
     color:$labelTextMedColor;
-    font-weight:bold; 
+    font-weight:bold;
 }
 /* For block elements containing form inputs */
-.formElem { 
-    margin-bottom:8px; 
+.formElem {
+    margin-bottom:8px;
 }
 /* Text inputs */
-.inputText { 
+.inputText {
     font-family:$fontFamily;
-    font-size:$fontSizeM; 
+    font-size:$fontSizeM;
     color:#000000;
-    border:1px 
-    solid #aaaaaa; 
-    padding:2px; 
+    border:1px
+    solid #aaaaaa;
+    padding:2px;
 }
 /* Disabled text inputs */
-.inputTextDim { 
+.inputTextDim {
     font-family:$fontFamily;
     font-size:$fontSizeM;
     color:#999999;
-    border:1px solid #aaaaaa; 
-    padding:2px; 
+    border:1px solid #aaaaaa;
+    padding:2px;
 }
 /* Select box */
-.selectElem { 
+.selectElem {
     font-family:$fontFamily;
-    font-size:$fontSizeM; 
-    color:#000000; 
-    border:1px solid #aaaaaa; 
+    font-size:$fontSizeM;
+    color:#000000;
+    border:1px solid #aaaaaa;
 }
 
 /* General layout -- floats and clear
  * --------------------- */
-.floatLeft { 
-    float:left; 
+.floatLeft {
+    float:left;
 }
-.floatRight { 
-    float:right; 
+.floatRight {
+    float:right;
 }
-.clearAll { 
-    clear:both; 
-    font-size:0px; 
+.clearAll {
+    clear:both;
+    font-size:0px;
 }
 
-/* Calendar-specific styles, classes 
+/* Calendar-specific styles, classes
  * ==================================== */
 /* Error dialog box text */
-.errText { 
-    font-weight:bold; 
-    margin-bottom:4px; 
+.errText {
+    font-weight:bold;
+    margin-bottom:4px;
 }
 
 /* Event canvases -- all-day and timed events
  * --------------------- */
 /* Contain day/date at column top -- e.g., 'Sun 11' */
-.dayListDayDiv { 
+.dayListDayDiv {
     position:absolute;
     border-right:1px solid #cccccc;
-    border-bottom:1px solid #cccccc; 
-    text-align:center; 
+    border-bottom:1px solid #cccccc;
+    text-align:center;
     -moz-user-select:none;
 }
 /* Day columns for resizable all-day event area */
-.allDayListDayDiv { 
+.allDayListDayDiv {
     height:100%;
-    position:absolute; 
+    position:absolute;
     border-right:1px solid #dfdfdf;
 }
 /* Day columns for timed event canvas */
-.dayDiv { 
+.dayDiv {
     position:absolute;
-    border-right:1px solid #dfdfdf; 
+    border-right:1px solid #dfdfdf;
 }
 /* Top half-hour of a one-hour block on the timed canvas */
-.hourDivTop { 
+.hourDivTop {
     width:100%;
     border-bottom:1px dotted #cccccc;
-    vertical-align:top; 
+    vertical-align:top;
 }
 /* Bottom half-hour of a one-hour block on the timed canvas */
-.hourDivBottom { 
-    width:100%; 
+.hourDivBottom {
+    width:100%;
     border-bottom:1px solid #dddddd;
     vertical-align:top;
 }
 /* Left-hand timeline containing times of day -- e.g., '11 AM' */
-.hourDivSubLeft { 
-    color:#999999; 
+.hourDivSubLeft {
+    color:#999999;
     font-size:9px;
-    padding-top:2px; 
-    padding-right:3px; 
+    padding-top:2px;
+    padding-right:3px;
     letter-spacing:-1px;
-    text-align:right; 
+    text-align:right;
     font-weight:bold;
 }
 /* AM/PM in lighter color after time of day */
@@ -284,81 +348,81 @@ $smButtonHeight = 18px
     background:#dddddd;
 }
 
-/* Event blocks 
+/* Event blocks
  * --------------------- */
 /* All blocks */
 .eventBlock {
-    position:absolute; 
+    position:absolute;
     width:1px;
     left:0px;
     opacity:1.0;
-    z-index:5; 
-    visibility:hidden; 
+    z-index:5;
+    visibility:hidden;
     background-repeat: repeat-y;
     background-position:0px 0px;
     border-style:solid;
     border-width:1px;
 }
 /* Resize handle at the top of timed event blocks */
-.eventResizeTop { 
+.eventResizeTop {
     background:transparent;
-    padding:0px; 
-    margin:0px; 
-    font-size:1px; 
-    cursor:n-resize; 
+    padding:0px;
+    margin:0px;
+    font-size:1px;
+    cursor:n-resize;
 }
 /* Resize handle at the bottom of timed event blocks */
-.eventResizeBottom { 
+.eventResizeBottom {
     background:transparent;
-    padding:0px; 
-    margin:0px; 
-    font-size:1px; 
+    padding:0px;
+    margin:0px;
+    font-size:1px;
     cursor:s-resize;
 }
 /* Central content area bewteen resize handles --
  * this area contains two divs, one each of the
  * following two classes */
-.eventContent { 
+.eventContent {
     background:transparent;
     color:inherit;
-    cursor:move; 
-    overflow:hidden; 
+    cursor:move;
+    overflow:hidden;
 }
 /* Contains the event time on the event block */
-.eventTime { 
+.eventTime {
     color:inherit;
     font-size:9px;
-    font-weight:bold; 
-    letter-spacing:1px; 
+    font-weight:bold;
+    letter-spacing:1px;
     overflow:hidden;
 }
 /* Contains the event title on the event block */
-.eventTitle { 
-    color:inherit; 
+.eventTitle {
+    color:inherit;
     font-size:10px;
-    overflow:hidden; 
+    overflow:hidden;
 }
 
 
-/* Cal-specific, specific elements by id 
+/* Cal-specific, specific elements by id
  * ==================================== */
 /* Top menubar
  * --------------------- */
 /* Menubar main */
-#menuBarDiv { 
+#menuBarDiv {
     position:absolute;
-    background:#ffffff; 
+    background:#ffffff;
     color:#333333;
     font-size:$fontSizeS;
-    font-weight:bold; 
+    font-weight:bold;
     line-height:68px;
     text-align:right;
-    border-bottom:1px solid #dddddd; 
+    border-bottom:1px solid #dddddd;
     vertical-align:bottom;
 }
 /* The pipe character between links */
-#menuBarDiv span { 
-    font-weight:normal; 
+#menuBarDiv span {
+    font-weight:normal;
     color:$uiDetailBorderColor;
 }
 /* Cosmo logo up on menubar */
@@ -374,60 +438,60 @@ $smButtonHeight = 18px
 /* Main content area under menubar -- contains both
  * sidebars and the central column for main content
  * --------------------- */
-#calDiv { 
+#calDiv {
     position:absolute;
-    border-top:0px solid #dfdfdf; 
+    border-top:0px solid #dfdfdf;
 }
 
-/* Left sidebar 
+/* Left sidebar
  * --------------------- */
 /* Left sidebar main */
-#leftSidebarDiv { 
+#leftSidebarDiv {
     position:absolute;
-    background:$mainUIColor; 
+    background:$mainUIColor;
 }
 /* Calendar select box */
-#calSelectNav { 
+#calSelectNav {
     padding-left:12px;
     position:absolute;
     top:8px;
 }
 /* Jump-to date box */
-#jumpToDateDiv { 
+#jumpToDateDiv {
     padding:0px;
     position:absolute;
 }
 /* Right sidebar
  * --------------------- */
 /* Right sidebar main */
-#rightSidebarDiv { 
+#rightSidebarDiv {
     position:absolute;
     background:#ffffff;
 }
 /* Center column for main content
  * --------------------- */
 /* Mask to cover center content area while loading or rendering view */
-#maskDiv { 
+#maskDiv {
     position:absolute;
-    background:#ffffff; z-index:1000; 
+    background:#ffffff; z-index:1000;
     border:1px solid $uiDetailBorderColor;
-    border-top:0px; 
+    border-top:0px;
     border-bottom:0px;
 }
 /* Small box that contains 'Processing ...' message inside mask */
-#processingDiv { 
-    position:absolute; 
+#processingDiv {
+    position:absolute;
     color:$linkTextColor;
-    width:120px; 
-    height:40px; 
+    width:120px;
+    height:40px;
     border:1px solid $linkTextColor;
-    line-height:36px; 
-    text-align:center; 
+    line-height:36px;
+    text-align:center;
 }
 /* Nav button set for week-to-week nav */
-#calTopNavDiv { 
-    border-left:1px solid $uiDetailBorderColor; 
-    border-right:1px solid $uiDetailBorderColor; 
+#calTopNavDiv {
+    border-left:1px solid $uiDetailBorderColor;
+    border-right:1px solid $uiDetailBorderColor;
     position:absolute;
     border-bottom:1px solid #dfdfdf;
     background:$calTopNavColor;
@@ -435,110 +499,110 @@ $smButtonHeight = 18px
     vertical-align:middle;
 }
 /* Label for month and year */
-#monthHeaderDiv { 
+#monthHeaderDiv {
     font-size:14px;
     font-weight:bold;
     color:#333333;
     color:$navBarTextColor;
 }
 /* List of day/dates -- e.g., 'Sun 11 | Mon 12 | Tue 12' */
-#dayListDiv { 
-    border-left:1px solid $uiDetailBorderColor; 
-    border-right:1px solid $uiDetailBorderColor; 
-    position:absolute; 
+#dayListDiv {
+    border-left:1px solid $uiDetailBorderColor;
+    border-right:1px solid $uiDetailBorderColor;
+    position:absolute;
 }
 /* Shoves the day list over the width of the timeline sidebar */
 #dayListSpacer {
-    background:$sideStripeColor;    
+    background:$sideStripeColor;
 }
 /* Main container for resizable all-day event area */
-#allDayResizeMainDiv { 
-    border-left:1px solid $uiDetailBorderColor; 
-    border-right:1px solid $uiDetailBorderColor; 
+#allDayResizeMainDiv {
+    border-left:1px solid $uiDetailBorderColor;
+    border-right:1px solid $uiDetailBorderColor;
     position:absolute;
-    background:#ffffff; 
-    z-index:100; 
+    background:#ffffff;
+    z-index:100;
 }
 /* Handle to grab and drag to resize all-day event area */
 #allDayResizeHandleDiv {
-    border-top:1px solid $uiDetailBorderHighlightColor; 
-    border-bottom:1px solid $uiDetailBorderColor; 
+    border-top:1px solid $uiDetailBorderHighlightColor;
+    border-bottom:1px solid $uiDetailBorderColor;
     border-right:1px solid $uiDetailBorderColor;
     position:absolute;
-    background:$mainUIColor; 
+    background:$mainUIColor;
     line-height:12px;
     font-size:1px; cursor:s-resize;
-    z-index:100; 
+    z-index:100;
     text-align:center;
     vertical-align:middle;
 }
-/* Shoves hour cols for all-day events over the width of 
+/* Shoves hour cols for all-day events over the width of
  * the timeline sidebar */
-#allDayHourSpacerDiv { 
+#allDayHourSpacerDiv {
     position:absolute;
     background:$sideStripeColor;
-    border-right:1px solid #dfdfdf; 
+    border-right:1px solid #dfdfdf;
 }
 /* Contains the cols for the all-day events */
-#allDayContentDiv { 
+#allDayContentDiv {
     position:absolute;
-    overflow:hidden; 
-    -moz-user-select:none 
+    overflow:hidden;
+    -moz-user-select:none
 }
 /* Scrolling area containing the timeline and timed events */
-#timedScrollingMainDiv { 
-    border-left:1px solid $uiDetailBorderColor; 
+#timedScrollingMainDiv {
+    border-left:1px solid $uiDetailBorderColor;
     border-right:1px solid $uiDetailBorderColor;
     position:absolute;
     overflow:auto; overflow-y:auto; overflow-x:hidden;
     -moz-user-select:none;
 }
 /* Timeline containing hours with AM/PM alongside timed events */
-#timedHourListDiv { 
+#timedHourListDiv {
     position:absolute;
-    border-right:1px solid #dfdfdf; 
+    border-right:1px solid #dfdfdf;
     background:$sideStripeColor;
     -moz-user-select:none;
 }
 /* Canvas for timed events */
-#timedContentDiv { 
+#timedContentDiv {
     position:absolute;
-    -moz-user-select:none 
+    -moz-user-select:none
 }
 /* Contains event detail form */
-#eventInfoDiv { 
+#eventInfoDiv {
     position:absolute;
 }
 
-/* Fake popup for modal dialog box 
+/* Fake popup for modal dialog box
  * --------------------- */
 /* Main box for fake popup */
-#fauxPopDiv { 
-    position:absolute; 
-    background:$mainUIColor; 
+#fauxPopDiv {
+    position:absolute;
+    background:$mainUIColor;
     border:1px solid $uiDetailBorderColor;
-    z-index:2000; 
+    z-index:2000;
     display:none;
 }
 /* Fake popup center content area -- inside padding */
 #fauxPopContentDiv {
-    padding:24px; 
+    padding:24px;
 }
 /* Area for text content */
-#fauxPopTextDiv { 
+#fauxPopTextDiv {
     height:228px;
-    font-size:$fontSizeL; 
+    font-size:$fontSizeL;
 }
 /* Area for button panel of small buttons at the bottom */
-#fauxPopButtonDiv { 
+#fauxPopButtonDiv {
     text-align:center;
 }
 
 /* Minical styles
  * --------------------- */
 #miniCalDiv {
-    border:0px; 
-    left:15px; 
+    border:0px;
+    left:15px;
     width:140px;
     border:1px solid #cccccc;
     position:relative;
@@ -601,17 +665,17 @@ $smButtonHeight = 18px
 
 
 /* Transparent mask to cover entire UI when displaying
- * modal dialog box -- effectively disables all user input 
+ * modal dialog box -- effectively disables all user input
  * --------------------- */
-#fullMaskDiv { 
-    position:absolute; 
+#fullMaskDiv {
+    position:absolute;
     left:0px;
-    top:0px; 
-    width:100%; 
-    height:100%; 
+    top:0px;
+    width:100%;
+    height:100%;
     background:transparent;
-    z-index:1000; 
-    display:none; 
+    z-index:1000;
+    display:none;
 }
 
 

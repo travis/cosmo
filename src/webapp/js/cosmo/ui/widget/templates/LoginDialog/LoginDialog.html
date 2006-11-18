@@ -5,35 +5,35 @@
 		dojoattachpoint="loginPromptContainer">${this.loginPrompt}</div>
 
 	<div id="${this.widgetId}FormContainer">
-	
+
 	<form id="${this.widgetId}Form" dojoattachpoint="loginForm" onsubmit="return false" dojoAttachEvent="onsubmit:doLogin">
-		
-		<div id="${this.widgetId}InputsBox">
-		
-			<div id="${this.widgetId}UsernameWidget">
-			
-				<span id="${this.widgetId}UsernamePrompt" class="promptText"
-					dojoattachpoint="usernamePromptContainer">${this.usernamePrompt}</span>
-				
-				<span id="${this.widgetId}UsernameInputContainer">
-					<input 	type="text" id="${this.widgetId}UsernameInput" class="inputText" 
+
+		<table id="${this.widgetId}InputsBox">
+
+			<tr id="${this.widgetId}UsernameWidget">
+
+				<td id="${this.widgetId}UsernamePrompt" class="promptText"
+					dojoattachpoint="usernamePromptContainer">${this.usernamePrompt}</td>
+
+				<td id="${this.widgetId}UsernameInputContainer">
+					<input 	type="text" id="${this.widgetId}UsernameInput" class="inputText"
 							dojoAttachPoint="usernameInput" />
-				</span>
-			</div>
-			
-			<div id="${this.widgetId}PasswordWidget">
-				<span id="${this.widgetId}PasswordPrompt" class="promptText"
-					dojoattachpoint="passwordPromptContainer">${this.passwordPrompt}</span>
-				
-				<span id="${this.widgetId}PasswordInputContainer">
-								
+				</td>
+			</tr>
+
+			<tr id="${this.widgetId}PasswordWidget">
+				<td id="${this.widgetId}PasswordPrompt" class="promptText"
+					dojoattachpoint="passwordPromptContainer">${this.passwordPrompt}</td>
+
+				<td id="${this.widgetId}PasswordInputContainer">
+
 				<input 	type="password" id="${this.widgetId}PasswordInput" class="inputText"
 						dojoAttachPoint="passwordInput"/>
-						
-				</span>
-				
-			</div>
-		</div>			
+
+				</td>
+
+			</tr>
+		</table>
 		<div id="${this.widgetId}SubmitButton">
 			<button dojotype="cosmo:Button" text="Login"
 					dojoAttachPoint="submitButton">
@@ -41,7 +41,7 @@
 			</button>
 		</div>
 		<div style="clear:both;"></div>
-			
+
 
 	</form>
 	</div>

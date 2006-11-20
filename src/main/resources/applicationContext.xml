@@ -106,7 +106,7 @@
             <value>org.osaf.cosmo.model.HomeCollectionItem</value>
             <value>org.osaf.cosmo.model.IntegerAttribute</value>
             <value>org.osaf.cosmo.model.Item</value>
-            <value>org.osaf.cosmo.model.MessageStamp</value>			
+            <value>org.osaf.cosmo.model.MessageStamp</value>
             <value>org.osaf.cosmo.model.MultiValueStringAttribute</value>
             <value>org.osaf.cosmo.model.NoteStamp</value>
             <value>org.osaf.cosmo.model.ServerProperty</value>
@@ -327,6 +327,11 @@
   <bean id="passwordGenerator"
         class="org.apache.commons.id.random.SessionIdGenerator"/>
 
+<!-- <bean id="accountActivationService"
+  		class="org.osaf.cosmo.service.impl.AutomaticAccountActivationService">
+	<property name="userService"><ref local="userService"/></property>
+  </bean>-->
+
   <bean id="userService" parent="txProxyTemplate">
     <property name="proxyInterfaces">
       <value>org.osaf.cosmo.service.UserService</value>
@@ -349,6 +354,9 @@
     <property name="passwordGenerator">
       <ref bean="passwordGenerator"/>
     </property>
+<!--    <property name="accountActivationService">
+      <ref bean="accountActivationService"/>
+    </property>-->
   </bean>
 
   <bean id="contentService" parent="txProxyTemplate">
@@ -602,6 +610,7 @@
          /account=ROLE_ROOT,ROLE_USER
          /account/view=ROLE_ROOT,ROLE_USER
          /account/update=ROLE_ROOT,ROLE_USER
+         /account/activate=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
          /account/forgot=ROLE_ANONYMOUS
          /account/remind=ROLE_ANONYMOUS
          /login=ROLE_ANONYMOUS
@@ -690,7 +699,7 @@
 
   <!-- Logging resources -->
   <bean id="httpLoggingFormat" class="java.lang.String">
-    <constructor-arg type="java.lang.String"><value>%M %U %Q %C %I</value></constructor-arg>
+    <constructor-arg type="java.lang.String"><value>${cosmo.log.HttpLoggingFilter.format}</value></constructor-arg>
   </bean>
 
 </beans>

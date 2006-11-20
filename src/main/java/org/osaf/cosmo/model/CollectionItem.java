@@ -18,9 +18,20 @@ package org.osaf.cosmo.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 /**
  * Extends {@link Item} to represent a collection of items
  */
+@Entity
+@DiscriminatorValue("collection")
 public class CollectionItem extends Item {
 
     /**
@@ -37,6 +48,8 @@ public class CollectionItem extends Item {
     public CollectionItem() {
     };
 
+    @OneToMany(mappedBy="parent", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.DELETE }) 
     public Set<Item> getChildren() {
         return children;
     }
@@ -45,6 +58,7 @@ public class CollectionItem extends Item {
         this.children = children;
     }
 
+    @Transient
     public boolean isExcludeFreeBusyRollup() {
         Boolean val =
             (Boolean) getAttributeValue(ATTR_EXCLUDE_FREE_BUSY_ROLLUP);

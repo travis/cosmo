@@ -102,7 +102,7 @@
     <dependency>
       <groupId>ical4j</groupId>
       <artifactId>ical4j-osaf</artifactId>
-      <version>0.9.18-20061008</version>
+      <version>0.9.18-20061117</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>
@@ -344,6 +344,14 @@
       </properties>
     </dependency>
     <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-annotations</artifactId>
+      <version>3.2.0.ga</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
       <groupId>antlr</groupId>
       <artifactId>antlr</artifactId>
       <version>2.7.2</version>
@@ -451,6 +459,14 @@
       <groupId>jta</groupId>
       <artifactId>jta</artifactId>
       <version>1.0.1B</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>ejb3</groupId>
+      <artifactId>ejb3-persistence</artifactId>
+      <version>1.0</version>
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

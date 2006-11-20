@@ -15,13 +15,9 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -33,13 +29,11 @@ import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CalendarEventItem;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DuplicateEventUidException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.User;
-import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
@@ -242,65 +236,7 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.osaf.cosmo.dao.CalendarDao#findEvents(org.osaf.cosmo.model.CalendarCollectionItem,
-     *      java.util.Map)
-     */
-    public Set<CalendarEventItem> findEvents(CalendarCollectionItem calendar,
-                                             Map criteria) {
-        try {
-            StringBuffer sb = new StringBuffer();
-            sb.append("select i from CalendarEventItem as i");
-            Iterator keys = criteria.keySet().iterator();
-            int count = 0;
-            while (keys.hasNext()) {
-                sb.append(",StringAttribute sa" + count++);
-                keys.next();
-            }
-            sb.append(" where i.parent.uid=:parentuid");
-
-            count = 0;
-            keys = criteria.keySet().iterator();
-            while (keys.hasNext()) {
-                sb.append(" and sa" + count++ + ".item=i");
-                keys.next();
-            }
-            count = 0;
-            keys = criteria.keySet().iterator();
-            while (keys.hasNext()) {
-                sb.append(" and sa" + count + ".name=:name" + count);
-                sb.append(" and sa" + count + ".value=:value" + count);
-                keys.next();
-                count++;
-            }
-
-            Query hibQuery = getSession().createQuery(sb.toString());
-            hibQuery.setParameter("parentuid", calendar.getUid());
-
-            count = 0;
-            keys = criteria.keySet().iterator();
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                String value = (String) criteria.get(key);
-                hibQuery.setParameter("name" + count, key);
-                hibQuery.setParameter("value" + count, value);
-                count++;
-            }
-
-            HashSet<CalendarEventItem> events =
-                new HashSet<CalendarEventItem>();
-            for (Iterator<CalendarEventItem> i=hibQuery.list().iterator();
-                 i.hasNext();) {
-                events.add(i.next());
-            }
-            return events;
-        } catch (HibernateException e) {
-            throw SessionFactoryUtils.convertHibernateAccessException(e);
-        }
-    }
-
+    
     /*
      * (non-Javadoc)
      *

@@ -18,7 +18,6 @@
  */
 package org.osaf.cosmo.hibernate;
 
-import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

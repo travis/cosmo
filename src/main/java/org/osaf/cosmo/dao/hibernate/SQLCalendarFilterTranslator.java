@@ -43,9 +43,14 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
     private static final Log log = LogFactory
             .getLog(SQLCalendarFilterTranslator.class);
 
+    private String booleanTrueValue = "1";
     private HashMap params = new HashMap();
 
     private int paramCount = 0;
+
+    public void setBooleanTrueValue(String booleanTrueValue) {
+        this.booleanTrueValue = booleanTrueValue;
+    }
 
     /**
      * Generate Hibernate query to return calendar DbItems that match the given
@@ -69,7 +74,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         query.addEntity(CalendarItem.class);
         return (List<CalendarItem>) query.list();
     }
-
+    
     /**
      * Generate native SQL query to return all rows from item table that match
      * the given filter. The query contains named parameters.
@@ -303,14 +308,14 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         params.put("param" + paramCount, myprefix);
         paramCount++;
         buf.append(" and ((ctri" + index + ".startdate < case when ctri" + index
-                + ".isfloating=1 then '" + timeRangeFilter.getFloatEnd() + "'");
+                + ".isfloating=" + booleanTrueValue + " then '" + timeRangeFilter.getFloatEnd() + "'");
         // params.put("param" + paramCount, timeRangeFilter.getFloatEnd());
         // paramCount++;
         buf.append(" else :param" + paramCount + " end");
         params.put("param" + paramCount, timeRangeFilter.getUTCEnd());
         paramCount++;
         buf.append(" and ctri" + index + ".enddate > case when ctri" + index
-                + ".isfloating=1 then '" + timeRangeFilter.getFloatStart()
+                + ".isfloating=" + booleanTrueValue + " then '" + timeRangeFilter.getFloatStart()
                 + "'");
         // params.put("param" + paramCount, timeRangeFilter.getFloatStart());
         // paramCount++;
@@ -319,7 +324,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         paramCount++;
         buf.append(") or (");
         buf.append("ctri" + index + ".startdate >= case when ctri" + index
-                + ".isfloating=1 then '" + timeRangeFilter.getFloatStart()
+                + ".isfloating=" + booleanTrueValue + " then '" + timeRangeFilter.getFloatStart()
                 + "'");
         // params.put("param" + paramCount, timeRangeFilter.getFloatStart());
         // paramCount++;
@@ -327,7 +332,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         params.put("param" + paramCount, timeRangeFilter.getUTCStart());
         paramCount++;
         buf.append(" and ctri" + index + ".startdate < case when ctri" + index
-                + ".isfloating=1 then '" + timeRangeFilter.getFloatEnd() + "'");
+                + ".isfloating=" + booleanTrueValue + " then '" + timeRangeFilter.getFloatEnd() + "'");
         // params.put("param" + paramCount, timeRangeFilter.getFloatEnd());
         // paramCount++;
         buf.append(" else :param" + paramCount + " end)))");

@@ -72,26 +72,60 @@
         class="org.springframework.jdbc.support.lob.DefaultLobHandler">
   </bean>
 
+  <bean id="validatePreUpdateEventListener"
+      class="org.hibernate.validator.event.ValidatePreUpdateEventListener"/>
+
+  <bean id="validatePreInsertEventListener"
+      class="org.hibernate.validator.event.ValidatePreInsertEventListener"/>
+
   <bean id="sessionFactory"
-        class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
     <property name="lobHandler" ref="defaultLobHandler" />
-    <property name="mappingResources">
-      <list>
-        <value>org/osaf/cosmo/model/User.hbm.xml</value>
-        <value>org/osaf/cosmo/model/Attribute.hbm.xml</value>
-        <value>org/osaf/cosmo/model/Item.hbm.xml</value>
-        <value>org/osaf/cosmo/model/CollectionItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/HomeCollectionItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/ContentItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/ContentData.hbm.xml</value>
-        <value>org/osaf/cosmo/model/CalendarCollectionItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/CalendarItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/CalendarEventItem.hbm.xml</value>
-        <value>org/osaf/cosmo/model/CalendarPropertyIndex.hbm.xml</value>
-        <value>org/osaf/cosmo/model/CalendarTimeRangeIndex.hbm.xml</value>
-        <value>org/osaf/cosmo/model/ServerProperty.hbm.xml</value>
-        <value>org/osaf/cosmo/model/Ticket.hbm.xml</value>
-      </list>
+    <property name="annotatedPackages">
+        <list>
+            <value>org.osaf.cosmo.model</value>
+        </list>
+    </property>
+    <property name="annotatedClasses">
+        <list>
+            <value>org.osaf.cosmo.model.Attribute</value>
+            <value>org.osaf.cosmo.model.BinaryAttribute</value>
+            <value>org.osaf.cosmo.model.BooleanAttribute</value>
+            <value>org.osaf.cosmo.model.CalendarCollectionItem</value>
+            <value>org.osaf.cosmo.model.CalendarCollectionStamp</value>
+            <value>org.osaf.cosmo.model.CalendarEventItem</value>
+            <value>org.osaf.cosmo.model.CalendarItem</value>
+            <value>org.osaf.cosmo.model.CalendarPropertyIndex</value>
+            <value>org.osaf.cosmo.model.CalendarTimeRangeIndex</value>
+            <value>org.osaf.cosmo.model.CollectionItem</value>
+            <value>org.osaf.cosmo.model.ContentData</value>
+            <value>org.osaf.cosmo.model.ContentItem</value>
+            <value>org.osaf.cosmo.model.DateAttribute</value>
+            <value>org.osaf.cosmo.model.DictionaryAttribute</value>
+            <value>org.osaf.cosmo.model.EventStamp</value>
+            <value>org.osaf.cosmo.model.HomeCollectionItem</value>
+            <value>org.osaf.cosmo.model.IntegerAttribute</value>
+            <value>org.osaf.cosmo.model.Item</value>
+            <value>org.osaf.cosmo.model.MessageStamp</value>			
+            <value>org.osaf.cosmo.model.MultiValueStringAttribute</value>
+            <value>org.osaf.cosmo.model.NoteStamp</value>
+            <value>org.osaf.cosmo.model.ServerProperty</value>
+            <value>org.osaf.cosmo.model.StringAttribute</value>
+            <value>org.osaf.cosmo.model.Stamp</value>
+            <value>org.osaf.cosmo.model.TaskStamp</value>
+            <value>org.osaf.cosmo.model.Ticket</value>
+            <value>org.osaf.cosmo.model.User</value>
+        </list>
+    </property>
+    <property name="eventListeners">
+      <map>
+        <entry key="pre-update">
+          <ref local="validatePreUpdateEventListener"/>
+        </entry>
+        <entry key="pre-insert">
+          <ref local="validatePreInsertEventListener"/>
+        </entry>
+      </map>
     </property>
     <property name="hibernateProperties">
       <props>

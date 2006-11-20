@@ -17,6 +17,11 @@ package org.osaf.cosmo.model;
 
 import java.io.Serializable;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
@@ -25,6 +30,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
  *
  * @author Brian Moseley
  */
+@MappedSuperclass
 public abstract class BaseModelObject implements Serializable {
 
     private Long id = new Long(-1);
@@ -36,11 +42,12 @@ public abstract class BaseModelObject implements Serializable {
                 ToStringStyle.MULTI_LINE_STYLE);
     }
 
+    @Id @GeneratedValue(strategy=GenerationType.AUTO)
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    private void setId(Long id) {
         this.id = id;
     }
 }

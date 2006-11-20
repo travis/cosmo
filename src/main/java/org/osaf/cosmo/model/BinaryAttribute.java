@@ -15,9 +15,17 @@
  */
 package org.osaf.cosmo.model;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+import org.hibernate.annotations.Type;
+
 /**
  * Attribute with a binary value.
  */
+@Entity
+@DiscriminatorValue("binary")
 public class BinaryAttribute extends Attribute implements java.io.Serializable {
 
     /**
@@ -31,12 +39,14 @@ public class BinaryAttribute extends Attribute implements java.io.Serializable {
     public BinaryAttribute() {
     }
 
-    public BinaryAttribute(String name, byte[] value) {
-        setName(name);
+    public BinaryAttribute(QName qname, byte[] value) {
+        setQName(qname);
         this.value = value;
     }
 
     // Property accessors
+    @Column(name = "binvalue", length=102400000)
+    @Type(type="bytearray_blob")
     public byte[] getValue() {
         return this.value;
     }
@@ -59,7 +69,7 @@ public class BinaryAttribute extends Attribute implements java.io.Serializable {
      */
     public Attribute copy() {
         BinaryAttribute attr = new BinaryAttribute();
-        attr.setName(getName());
+        attr.setQName(getQName().copy());
         if (value != null)
             attr.setValue(value.clone());
         return attr;

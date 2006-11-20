@@ -65,6 +65,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
@@ -762,16 +763,16 @@ public abstract class DavResourceBase
         loadLiveProperties();
 
         // load dead properties
-        for (Iterator<Map.Entry<String,Attribute>>
+        for (Iterator<Map.Entry<QName,Attribute>>
                  i=item.getAttributes().entrySet().iterator(); i.hasNext();) {
-            Map.Entry<String,Attribute> entry = i.next();
+            Map.Entry<QName,Attribute> entry = i.next();
 
             // skip attributes that are not meant to be shown as dead
             // properties
             if (getDeadPropertyFilter().contains(entry.getKey()))
                 continue;
 
-            DavPropertyName propName = attrNameToPropName(entry.getKey());
+            DavPropertyName propName = attrNameToPropName(entry.getKey().getLocalName());
 
             // ignore live properties, as they'll be loaded separately
             if (isLiveProperty(propName))

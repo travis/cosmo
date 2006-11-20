@@ -126,7 +126,6 @@ public class MockUserDao implements UserDao {
             throw new IllegalArgumentException("null user");
         }
         
-        user.setId(new Long(++idseq));
         user.setUid(idGenerator.nextIdentifier().toString());
         
         user.validate();

@@ -15,17 +15,50 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate3.SessionHolder;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
 public class AbstractHibernateDaoTestCase extends AbstractSpringDaoTestCase {
 
     protected HibernateTestHelper helper = null;
     protected String baseDir = "src/test/unit/resources/testdata";
+    
+    protected Session session = null;
+    protected SessionFactory sessionFactory = null;
     
     public AbstractHibernateDaoTestCase() {
         super();
         helper = new HibernateTestHelper();
     }
     
+    
+    @Override
+    protected void onTearDownAfterTransaction() throws Exception {
+        super.onTearDownAfterTransaction();
+        
+        // Get a reference to the Session and bind it to the TransactionManager
+        SessionHolder holder = (SessionHolder) TransactionSynchronizationManager.getResource(sessionFactory);
+        Session s = holder.getSession(); 
+        TransactionSynchronizationManager.unbindResource(sessionFactory);
+        SessionFactoryUtils.releaseSession(s, sessionFactory);
+    }
+
+
     protected void clearSession() {
-        // nothing for now
+        session.flush();
+        session.clear();
+    }
+
+
+    @Override
+    protected void onSetUpBeforeTransaction() throws Exception {
+        super.onSetUpBeforeTransaction();
+        
+        // Unbind session from TransactionManager
+        session = SessionFactoryUtils.getSession(sessionFactory, true);
+        TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(session));
     }
 }

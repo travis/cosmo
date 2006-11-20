@@ -15,9 +15,18 @@
  */
 package org.osaf.cosmo.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Index;
+import org.hibernate.validator.NotNull;
+
 /**
  * Represents a Cosmo Server Property
  */
+@Entity
+@Table(name="server_properties")
 public class ServerProperty extends BaseModelObject implements
         java.io.Serializable {
 
@@ -42,6 +51,9 @@ public class ServerProperty extends BaseModelObject implements
         this.value = value;
     }
 
+    @Column(name = "propertyname", unique=true, length=255)
+    @Index(name="idx_svrpropname")
+    @NotNull
     public String getName() {
         return name;
     }
@@ -50,6 +62,7 @@ public class ServerProperty extends BaseModelObject implements
         this.name = name;
     }
 
+    @Column(name = "propertyvalue", length=2048)
     public String getValue() {
         return value;
     }

@@ -16,17 +16,17 @@
 package org.osaf.cosmo.model;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.persistence.DiscriminatorValue;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -35,34 +35,36 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.calendar.util.CalendarBuilderDispenser;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
+import org.osaf.cosmo.hibernate.validator.Timezone;
+
 
 /**
- * Extends {@link CollectionItem} to represent a collection containing calendar
- * items
+ * Represents a Calendar Collection.
  */
 @Entity
-@DiscriminatorValue("calendar")
-public class CalendarCollectionItem extends CollectionItem {
+@Table(name="calendar_stamp")
+@PrimaryKeyJoinColumn(name="stampid")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class CalendarCollectionStamp extends Stamp implements
+        java.io.Serializable {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -5482399651067090453L;
-    
     // possible component types
     public static final String COMPONENT_VEVENT = "VEVENT";
     public static final String COMPONENT_VTODO = "VTODO";
     public static final String COMPONENT_VJOURNAL = "VJOURNAL";
     public static final String COMPONENT_FREEBUSY = "VFREEBUSY";
-
+    
     // CalendarCollection specific attributes
-    public static final String ATTR_CALENDAR_UID = "calendar:uid";
-    public static final String ATTR_CALENDAR_DESCRIPTION = "calendar:description";
-    public static final String ATTR_CALENDAR_LANGUAGE = "calendar:language";
-    public static final String ATTR_CALENDAR_TIMEZONE = "calendar:timezone";
-    public static final String ATTR_CALENDAR_SUPPORTED_COMPONENT_SET = "calendar:supportedComponentSet";
+    public static final QName ATTR_CALENDAR_UID = new QName(
+            CalendarCollectionStamp.class, "uid");
+
+    public static final QName ATTR_CALENDAR_SUPPORTED_COMPONENT_SET = new QName(
+            CalendarCollectionStamp.class, "supportedComponentSet");
 
     // Default set of supported components used to intialize
     // calendar collection 
@@ -71,28 +73,46 @@ public class CalendarCollectionItem extends CollectionItem {
     
     private Calendar calendar;
     private Calendar timezone;
+    private String description;
+    private String language;
+ 
+    private static final long serialVersionUID = -6197756070431706553L;
 
-    public CalendarCollectionItem() {
-        // set default supported components
-        this.setSupportedComponents(getDefaultSupportedComponentSet());
+    /** default constructor */
+    public CalendarCollectionStamp() {
+        setType("calendar");
+    }
+    
+    public CalendarCollectionStamp(CollectionItem collection) {
+        this();
+        setItem(collection);
+        setSupportedComponents(getDefaultSupportedComponentSet());
     }
 
-    @Transient
+    public Stamp copy() {
+        CalendarCollectionStamp stamp = new CalendarCollectionStamp();
+        stamp.language = language;
+        stamp.description = description;
+        stamp.timezone = CalendarUtils.copyCalendar(timezone);
+        return stamp;
+    }
+    
+    @Column(name="description")
     public String getDescription() {
-        return (String) getAttributeValue(ATTR_CALENDAR_DESCRIPTION);
+        return description;
     }
 
     public void setDescription(String description) {
-        setAttribute(ATTR_CALENDAR_DESCRIPTION, description);
+        this.description = description;
     }
 
-    @Transient
+    @Column(name="language")
     public String getLanguage() {
-        return (String) getAttributeValue(ATTR_CALENDAR_LANGUAGE);
+        return language;
     }
 
     public void setLanguage(String language) {
-        setAttribute(ATTR_CALENDAR_LANGUAGE, language);
+        this.language = language;
     }
 
     /**
@@ -102,7 +122,7 @@ public class CalendarCollectionItem extends CollectionItem {
      */
     @Transient
     public Set getSupportedComponents() {
-        return (Set) getAttributeValue(ATTR_CALENDAR_SUPPORTED_COMPONENT_SET);
+        return (Set) getItem().getAttributeValue(ATTR_CALENDAR_SUPPORTED_COMPONENT_SET);
     }
 
     /**
@@ -112,31 +132,16 @@ public class CalendarCollectionItem extends CollectionItem {
      *            set of supported components
      */
     public void setSupportedComponents(Set<String> supportedComponents) {
-        setAttribute(ATTR_CALENDAR_SUPPORTED_COMPONENT_SET, supportedComponents);
+        getItem().setAttribute(ATTR_CALENDAR_SUPPORTED_COMPONENT_SET, supportedComponents);
     }
 
     /**
-     * Parse timezone definition for calendar and return as a Calendar object
-     * 
      * @return calendar object representing timezone
      */
-    @Transient
+    @Column(name = "timezone", length=100000)
+    @Type(type="calendar_clob")
+    @Timezone
     public Calendar getTimezone() {
-        if (timezone == null) {
-            String strTimezone =
-                (String) getAttributeValue(ATTR_CALENDAR_TIMEZONE);
-            if (strTimezone == null)
-                return null;
-            try {
-                CalendarBuilder builder =
-                    CalendarBuilderDispenser.getCalendarBuilder();
-                timezone = builder.build(new StringReader(strTimezone));
-            } catch (IOException e) {
-                throw new ModelConversionException("unable to build calendar object from timezone attribute", e);
-            } catch (ParserException e) {
-                throw new ModelConversionException("unable to parse timezone attribute", e);
-            }
-        }
         return timezone;
     }
 
@@ -146,8 +151,8 @@ public class CalendarCollectionItem extends CollectionItem {
      * @param timezone
      *            timezone definition in ical format
      */
-    public void setTimezone(String timezone) {
-        setAttribute(ATTR_CALENDAR_TIMEZONE, timezone);
+    public void setTimezone(Calendar timezone) {
+        this.timezone = timezone;
     }
 
     /**
@@ -193,15 +198,10 @@ public class CalendarCollectionItem extends CollectionItem {
         // for this same reason, we use a single calendar builder/time
         // zone registry.
         HashMap tzIdx = new HashMap();
-        for (Iterator<Item> i=getChildren().iterator(); i.hasNext();) {
-            Item child = i.next();
-            // XXX process other child items based on the collection's
-            // supported calendar component set
-            if (! (child instanceof CalendarEventItem)) {
-                continue;
-            }
-            CalendarEventItem event = (CalendarEventItem) child;
-            Calendar childCalendar = event.getCalendar();
+        Set<EventStamp> eventStamps = getEventStamps();
+        for (EventStamp eventStamp : eventStamps) {
+            
+            Calendar childCalendar = eventStamp.getCalendar();
 
             for (Iterator j=childCalendar.getComponents().
                      getComponents(Component.VEVENT).iterator();
@@ -232,5 +232,21 @@ public class CalendarCollectionItem extends CollectionItem {
         for(String comp: defaultSupportedComponents)
             defaultSet.add(comp);
         return defaultSet;
+    }
+    
+    /**
+     * Return a set of all EventStamps for the collection's children.
+     * @return set of EventStamps contained in children
+     */
+    @Transient
+    protected Set<EventStamp> getEventStamps() {
+        Set<EventStamp> events = new HashSet<EventStamp>();
+        for (Iterator<Item> i= ((CollectionItem) getItem()).getChildren().iterator(); i.hasNext();) {
+            Item child = i.next();
+            Stamp stamp = child.getStamp(EventStamp.class);
+            if(stamp!=null)
+                events.add((EventStamp) stamp);
+        }
+        return events;
     }
 }

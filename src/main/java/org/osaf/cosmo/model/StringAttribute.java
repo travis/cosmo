@@ -15,13 +15,23 @@
  */
 package org.osaf.cosmo.model;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+import org.hibernate.validator.Length;
+
 
 /**
  * Represents an attribute with a string value.
  */
+@Entity
+@DiscriminatorValue("string")
 public class StringAttribute extends Attribute implements
         java.io.Serializable {
 
+    public static final int VALUE_LEN_MAX = 2048;
+    
     /**
      * 
      */
@@ -34,12 +44,14 @@ public class StringAttribute extends Attribute implements
     public StringAttribute() {
     }
 
-    public StringAttribute(String name, String value) {
-        setName(name);
+    public StringAttribute(QName qname, String value) {
+        setQName(qname);
         this.value = value;
     }
 
     // Property accessors
+    @Column(name="stringvalue", length=VALUE_LEN_MAX)
+    @Length(min=0, max=VALUE_LEN_MAX)
     public String getValue() {
         return this.value;
     }
@@ -57,7 +69,7 @@ public class StringAttribute extends Attribute implements
     
     public Attribute copy() {
         StringAttribute attr = new StringAttribute();
-        attr.setName(getName());
+        attr.setQName(getQName().copy());
         attr.setValue(getValue());
         return attr;
     }

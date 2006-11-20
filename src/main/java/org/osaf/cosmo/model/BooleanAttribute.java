@@ -15,53 +15,54 @@
  */
 package org.osaf.cosmo.model;
 
-
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 /**
  * Represents attribute with an Boolean value.
  */
-public class BooleanAttribute extends Attribute
-		implements java.io.Serializable {
-	  
-	
+@Entity
+@DiscriminatorValue("boolean")
+public class BooleanAttribute extends Attribute implements java.io.Serializable {
+
     /**
      * 
      */
     private static final long serialVersionUID = -8393344132524216261L;
-    
     private Boolean value;
 
-	/** default constructor */
-	public BooleanAttribute() {
-	}
-	
-	public BooleanAttribute(String name, Boolean value)
-	{
-		setName(name);
-		this.value = value;
-	}
+    /** default constructor */
+    public BooleanAttribute() {
+    }
 
-	// Property accessors
-	public Boolean getValue() {
-		return this.value;
-	}
-    
+    public BooleanAttribute(QName qname, Boolean value) {
+        setQName(qname);
+        this.value = value;
+    }
+
+    // Property accessors
+    @Column(name = "booleanvalue")
+    public Boolean getValue() {
+        return this.value;
+    }
+
     public Attribute copy() {
         BooleanAttribute attr = new BooleanAttribute();
-        attr.setName(getName());
-        attr.setValue(getValue());
+        attr.setQName(getQName().copy());
+        attr.setValue(new Boolean(value));
         return attr;
     }
 
-	public void setValue(Boolean value) {
-		this.value = value;
-	}
-    
+    public void setValue(Boolean value) {
+        this.value = value;
+    }
+
     public void setValue(Object value) {
         if (value != null && !(value instanceof Boolean))
             throw new ModelValidationException(
                     "attempted to set non Boolean value on attribute");
         setValue((Boolean) value);
     }
-    
+
 }

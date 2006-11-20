@@ -15,25 +15,37 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 
 /**
- * Extends {@link CollectionItem} to represent a users home collection.
+ * Represents a Task Stamp.
  */
 @Entity
-@DiscriminatorValue("homecollection")
-public class HomeCollectionItem extends CollectionItem {
+@Table(name="task_stamp")
+@PrimaryKeyJoinColumn(name="stampid")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class TaskStamp extends Stamp implements
+        java.io.Serializable {
+
 
     /**
      * 
      */
-    private static final long serialVersionUID = -4301319758735788800L;
+    private static final long serialVersionUID = -6197756070431706553L;
 
-    public void setName(String name) {
-        // Prevent name changes to home collection
-        if(getName()==null)
-            super.setName(name);
+    /** default constructor */
+    public TaskStamp() {
+        setType("task");
+    }
+
+    public Stamp copy() {
+        TaskStamp stamp = new TaskStamp();
+        return stamp;
     }
 }

@@ -30,6 +30,7 @@ import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
+import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.PathUtil;
@@ -198,7 +199,7 @@ public class MockItemDao implements ItemDao {
         copy.setParent(parent);
         copy.setOwner(item.getOwner());
 
-        for(Map.Entry<String, Attribute> entry :
+        for(Map.Entry<QName, Attribute> entry :
                 item.getAttributes().entrySet())
             copy.addAttribute(entry.getValue().copy());
 

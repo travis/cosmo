@@ -146,20 +146,6 @@ public interface CalendarDao extends ItemDao {
     public CalendarEventItem findEventByIcalUid(String uid,
             CalendarCollectionItem calendar);
     
-    /**
-     * Find calendar events by criteria. Events can be searched based on a set
-     * of item attribute criteria. Only events that contain attributes with
-     * values equal to those specified in the criteria map will be returned.
-     *
-     * @param calendar
-     *            calendar collection to search
-     * @param criteria
-     *            criteria to search on.
-     * @return set of CalendarEventItem objects matching specified
-     *         criteria.
-     */
-    public Set<CalendarEventItem> findEvents(CalendarCollectionItem calendar,
-                                             Map criteria);
 
     /**
      * Find calendar events by filter.

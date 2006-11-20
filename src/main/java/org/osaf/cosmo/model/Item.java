@@ -20,10 +20,47 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.Version;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Index;
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.Length;
+import org.hibernate.validator.NotNull;
 
 /**
  * Abstract base class for shared item on server
  */
+@Entity
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@Table(name="item")
+@org.hibernate.annotations.Table(
+        appliesTo="item", 
+        indexes={@Index(name="idx_itemtype", columnNames={"itemtype"})})
+@DiscriminatorColumn(
+        name="itemtype",
+        discriminatorType=DiscriminatorType.STRING,
+        length=16)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public abstract class Item extends BaseModelObject {
 
     public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
@@ -35,14 +72,70 @@ public abstract class Item extends BaseModelObject {
     private Date creationDate;
     private Date modifiedDate;
     private Integer version;
-    private Map<String, Attribute> attributes = new HashMap<String, Attribute>(0);
-    private Set<Ticket> tickets = new HashSet<Ticket>(0);
+    private Boolean isActive = Boolean.TRUE;
     
+    private Map<QName, Attribute> attributes = new HashMap<QName, Attribute>(0);
+    private Set<Ticket> tickets = new HashSet<Ticket>(0);
+    private Set<Stamp> stamps = new HashSet<Stamp>(0);
     
     private CollectionItem parent = null;
     private User owner;
+ 
+    
+    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    public Set<Stamp> getStamps() {
+        return stamps;
+    }
 
-    public Map<String, Attribute> getAttributes() {
+    public void setStamps(Set<Stamp> stamps) {
+        this.stamps = stamps;
+    }
+    
+    /**
+     * Add stamp to Item
+     * @param stamp stamp to add
+     */
+    public void addStamp(Stamp stamp) {
+        if (stamp == null)
+            throw new IllegalArgumentException("stamp cannot be null");
+
+        for (Stamp s : stamps)
+            if (s.getClass() == stamp.getClass())
+                throw new IllegalArgumentException(
+                        "Item already has stamp of type " + s.getClass());
+        stamp.setItem(this);
+        stamps.add(stamp);
+    }
+    
+    /**
+     * Remove stamp from Item
+     * @param stamp stamp to remove
+     */
+    public void removeStamp(Stamp stamp) {
+        stamps.remove(stamp);
+    }
+    
+    /**
+     * Get the stamp that corresponds to the specified class
+     * @param clazz stamp class to return
+     * @return stamp
+     */
+    public Stamp getStamp(Class clazz) {
+        for(Stamp stamp : stamps)
+            if(clazz.isInstance(stamp))
+                return stamp;
+        
+        return null;
+    }
+
+    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    public Map<QName, Attribute> getAttributes() {
         return attributes;
     }
     
@@ -54,51 +147,194 @@ public abstract class Item extends BaseModelObject {
     public void addAttribute(Attribute attribute) {
         validateAttribute(attribute);
         attribute.setItem(this);
-        attributes.put(attribute.getName(), attribute);
+        attributes.put(attribute.getQName(), attribute);
     }
     
-    public void removeAttribute(String key) {
-        if(attributes.containsKey(key))
-            attributes.remove(key);
+    /**
+     * Remove attribute in default namespace with local name.
+     * @param name local name of attribute to remove
+     */
+    public void removeAttribute(String name) {
+       removeAttribute(new QName(name));
+    }
+    
+    /**
+     * Remove attribute.
+     * @param qname qualifed name of attribute to remove.
+     */
+    public void removeAttribute(QName qname) {
+        if(attributes.containsKey(qname))
+            attributes.remove(qname);
     }
 
-    public Attribute getAttribute(String key) {
-        return attributes.get(key);
+    /**
+     * Get attribute in default namespace with local name.
+     * @param name local name of attribute
+     * @return attribute in default namespace with given name
+     */
+    @Transient
+    public Attribute getAttribute(String name) {
+        return getAttribute(new QName(name));
     }
     
-    public Object getAttributeValue(String key) {
-        Attribute attr = attributes.get(key);
+    /**
+     * Get attribute with qualified name.
+     * @param qname qualified name of attribute to retrieve
+     * @return attribute with qualified name.
+     */
+    @Transient
+    public Attribute getAttribute(QName qname) {
+        return attributes.get(qname);
+    }
+    
+    /**
+     * Get attribute value with local name in default namespace
+     * @param name local name of attribute
+     * @return attribute value
+     */
+    @Transient
+    public Object getAttributeValue(String name) {
+       return getAttributeValue(new QName(name));
+    }
+    
+    /**
+     * Get attribute value with qualified name
+     * @param qname qualified name of attribute
+     * @return attribute value
+     */
+    @Transient
+    public Object getAttributeValue(QName qname) {
+        Attribute attr = attributes.get(qname);
         if (attr == null)
             return attr;
         return attr.getValue();
     }
 
-    public void addStringAttribute(String key, String value) {
-        addAttribute(new StringAttribute(key, value));
+    /**
+     * Add new StringAttribute in default namespace
+     * @param name local name of attribute to add
+     * @param value String value of attribute to add
+     */
+    public void addStringAttribute(String name, String value) {
+        addStringAttribute(new QName(name), value);
     }
     
-    public void addIntegerAttribute(String key, Long value) {
-        addAttribute(new IntegerAttribute(key, value));
+    /**
+     * Add new StringAttribute
+     * @param qname qualified name of attribute to add
+     * @param value String value of attribute to add
+     */
+    public void addStringAttribute(QName qname, String value) {
+        addAttribute(new StringAttribute(qname, value));
     }
     
-    public void addBooleanAttribute(String key, Boolean value) {
-        addAttribute(new BooleanAttribute(key, value));
+    /**
+     * Add new IntegerAttribute in default namespace
+     * @param name local name of attribute to add
+     * @param value Integer value of attribute to add
+     */
+    public void addIntegerAttribute(String name, Long value) {
+        addIntegerAttribute(new QName(name), value);
     }
     
-    public void addDateAttribute(String key, Date value) {
-        addAttribute(new DateAttribute(key, value));
+    /**
+     * Add new IntegerAttribute
+     * @param qname qualified name of attribute to add
+     * @param value Integer value of attribute to add
+     */
+    public void addIntegerAttribute(QName qname, Long value) {
+        addAttribute(new IntegerAttribute(qname, value));
     }
     
-    public void addMultiValueStringAttribute(String key, Set<String> value) {
-        addAttribute(new MultiValueStringAttribute(key, value));
+    /**
+     * Add new BooleanAttribute in default namespace
+     * @param name local name of attribute to add
+     * @param value Boolean value of attribute to add
+     */
+    public void addBooleanAttribute(String name, Boolean value) {
+        addBooleanAttribute(new QName(name), value);
     }
     
-    public void addDictionaryAttribute(String key, Map<String, String> value) {
-        addAttribute(new DictionaryAttribute(key, value));
+    /**
+     * Add new BooleanAttribute
+     * @param qname qualified name of attribute to addd
+     * @param value Boolean value of attribute to add
+     */
+    public void addBooleanAttribute(QName qname, Boolean value) {
+        addAttribute(new BooleanAttribute(qname, value));
     }
     
+    /**
+     * Add new DateAttribute in default namespace
+     * @param name local name of attribute to add
+     * @param value Date value of attribute to add
+     */
+    public void addDateAttribute(String name, Date value) {
+        addDateAttribute(new QName(name), value);
+    }
+    
+    /**
+     * Add new DateAttribute
+     * @param qname qualified name of attribute to add
+     * @param value Date value of attribute to add
+     */
+    public void addDateAttribute(QName qname, Date value) {
+        addAttribute(new DateAttribute(qname, value));
+    }
+    
+    /**
+     * Add new MultiValueStringAttribute in default namespace
+     * @param name local name of attribute to add
+     * @param value Set value of attribute to add
+     */
+    public void addMultiValueStringAttribute(String name, Set<String> value) {
+        addMultiValueStringAttribute(new QName(name), value);
+    }
+    
+    /**
+     * Add new MultiValueStringAttribute
+     * @param qname qualified name of attribute to add
+     * @param value Set value of attribute to add
+     */
+    public void addMultiValueStringAttribute(QName qname, Set<String> value) {
+        addAttribute(new MultiValueStringAttribute(qname, value));
+    }
+    
+    /**
+     * Add new DictionaryAttribute in default namespace
+     * @param name local name of attribute to add
+     * @param value Map value of attribute to add
+     */
+    public void addDictionaryAttribute(String name, Map<String, String> value) {
+        addDictionaryAttribute(new QName(name), value);
+    }
+    
+    /**
+     * Add new DictionaryAttribute
+     * @param qname qualified name of attribute to add
+     * @param value Map value of attribute to add
+     */
+    public void addDictionaryAttribute(QName qname, Map<String, String> value) {
+        addAttribute(new DictionaryAttribute(qname, value));
+    }
+    
+    /**
+     * Set attribute value of attribute with local name in default
+     * namespace.
+     * @param name local name of attribute
+     * @param value value to update attribute
+     */
+    public void setAttribute(String name, Object value) {
+        setAttribute(new QName(name),value);
+    }
+    
+    /**
+     * Set attribute value attribute with qualified name
+     * @param key qualified name of attribute
+     * @param value value to update attribute
+     */
     @SuppressWarnings("unchecked")
-    public void setAttribute(String key, Object value) {
+    public void setAttribute(QName key, Object value) {
         Attribute attr = (Attribute) attributes.get(key);
         
         if(attr==null)
@@ -126,6 +362,23 @@ public abstract class Item extends BaseModelObject {
         }
     }
 
+    /**
+     * Return Attributes for a given namespace.  Attributes are returned
+     * in a Map indexed by the name of the attribute.
+     * @param namespace namespace of the Attributes to return
+     * @return map of Attributes indexed by the name of the attribute
+     */
+    public Map<String, Attribute> getAttributes(String namespace) {
+        HashMap<String, Attribute> attrs = new HashMap<String, Attribute>();
+        for(Entry<QName, Attribute> e: attributes.entrySet()) {
+            if(e.getKey().getNamespace().equals(namespace))
+                attrs.put(e.getKey().getLocalName(), e.getValue());
+        }
+        
+        return attrs;
+    }
+    
+    // TODO: move to hibernate validator
     protected void validateAttribute(Attribute attribute,
                                      Object value) {
         if (value == null)
@@ -134,13 +387,13 @@ public abstract class Item extends BaseModelObject {
         if (attribute instanceof BinaryAttribute) {
             byte[] v = (byte[]) value;
             if (v.length > MAX_BINARY_ATTR_SIZE)
-                throw new DataSizeException("Binary attribute " + attribute.getName() + " too large");
+                throw new DataSizeException("Binary attribute " + attribute.getQName() + " too large");
         }
 
         if (attribute instanceof StringAttribute) {
             String v = (String) value;
             if (v.length() > MAX_STRING_ATTR_SIZE)
-                throw new DataSizeException("String attribute " + attribute.getName() + " too large");
+                throw new DataSizeException("String attribute " + attribute.getQName() + " too large");
         }
     }
 
@@ -148,12 +401,14 @@ public abstract class Item extends BaseModelObject {
         validateAttribute(attribute, attribute.getValue());
     }
     
-    private void setAttributes(Map<String, Attribute> attributes) {
+    private void setAttributes(Map<QName, Attribute> attributes) {
         // attributes not validated, as this method is only used by
         // hibernate to set attributes loaded from the db
         this.attributes = attributes;
     }
 
+    @Column(name = "datecreated")
+    @Type(type="timestamp")
     public Date getCreationDate() {
         return creationDate;
     }
@@ -162,6 +417,8 @@ public abstract class Item extends BaseModelObject {
         this.creationDate = creationDate;
     }
 
+    @Column(name = "datemodified")
+    @Type(type="timestamp")
     public Date getModifiedDate() {
         return modifiedDate;
     }
@@ -170,6 +427,10 @@ public abstract class Item extends BaseModelObject {
         this.modifiedDate = modifiedDate;
     }
 
+    @Column(name = "itemname", nullable = false, length=255)
+    @NotNull
+    @Length(min=1, max=255)
+    @Index(name="idx_itemname")
     public String getName() {
         return name;
     }
@@ -181,6 +442,7 @@ public abstract class Item extends BaseModelObject {
     /**
      * @return Item's human readable name
      */
+    @Column(name = "displayname", length=255)
     public String getDisplayName() {
         return displayName;
     }
@@ -192,6 +454,9 @@ public abstract class Item extends BaseModelObject {
         this.displayName = displayName;
     }
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="ownerid", nullable = false)
+    @NotNull
     public User getOwner() {
         return owner;
     }
@@ -200,6 +465,10 @@ public abstract class Item extends BaseModelObject {
         this.owner = owner;
     }
 
+    @Column(name = "uid", nullable = false, unique=true, length=255)
+    @NotNull
+    @Length(min=1, max=255)
+    @Index(name="idx_itemuid")
     public String getUid() {
         return uid;
     }
@@ -208,14 +477,19 @@ public abstract class Item extends BaseModelObject {
         this.uid = uid;
     }
 
+    @Version
+    @Column(name="version")
     public Integer getVersion() {
         return version;
     }
 
-    public void setVersion(Integer version) {
+    // used by hibernate
+    private void setVersion(Integer version) {
         this.version = version;
     }
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="parentid")
     public CollectionItem getParent() {
         return parent;
     }
@@ -224,16 +498,29 @@ public abstract class Item extends BaseModelObject {
         this.parent = parent;
     }
 
+    @Column(name="isactive")
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
     public Set<Ticket> getTickets() {
         return tickets;
     }
 
+    // Used by Hibernate
     private void setTickets(Set<Ticket> tickets) {
         this.tickets = tickets;
     }
     
     /**
      * Ensure Item contains valid data.
+     * TODO: move this to hibernate validator
      */
     public void validate() {
         validateName();

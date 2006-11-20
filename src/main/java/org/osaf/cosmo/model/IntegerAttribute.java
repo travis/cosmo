@@ -15,54 +15,55 @@
  */
 package org.osaf.cosmo.model;
 
-
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 /**
  * Represents attribute with an integer value.
  */
-public class IntegerAttribute extends Attribute
-		implements java.io.Serializable {
-	  
-	/**
+@Entity
+@DiscriminatorValue("integer")
+public class IntegerAttribute extends Attribute implements java.io.Serializable {
+
+    /**
      * 
      */
     private static final long serialVersionUID = -7110319771835652090L;
-    
+
     private Long value;
 
-	/** default constructor */
-	public IntegerAttribute() {
-	}
-	
-	public IntegerAttribute(String name, Long value)
-	{
-		setName(name);
-		this.value = value;
-	}
+    /** default constructor */
+    public IntegerAttribute() {
+    }
 
-	// Property accessors
-	public Long getValue() {
-		return this.value;
-	}
-    
+    public IntegerAttribute(QName qname, Long value) {
+        setQName(qname);
+        this.value = value;
+    }
+
+    // Property accessors
+    @Column(name = "intvalue")
+    public Long getValue() {
+        return this.value;
+    }
+
     public Attribute copy() {
         IntegerAttribute attr = new IntegerAttribute();
-        attr.setName(getName());
-        attr.setValue(getValue());
+        attr.setQName(getQName().copy());
+        attr.setValue(new Long(value));
         return attr;
     }
 
-	public void setValue(Long value) {
-		this.value = value;
-	}
-    
+    public void setValue(Long value) {
+        this.value = value;
+    }
+
     public void setValue(Object value) {
         if (value != null && !(value instanceof Long))
             throw new ModelValidationException(
                     "attempted to set non Long value on attribute");
         setValue((Long) value);
     }
-    
-    
 
 }

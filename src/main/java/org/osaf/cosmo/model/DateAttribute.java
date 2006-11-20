@@ -17,9 +17,17 @@ package org.osaf.cosmo.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+import org.hibernate.annotations.Type;
+
 /**
  * Represents an attribute with a date value
  */
+@Entity
+@DiscriminatorValue("date")
 public class DateAttribute extends Attribute implements
         java.io.Serializable {
 
@@ -34,12 +42,14 @@ public class DateAttribute extends Attribute implements
     public DateAttribute() {
     }
 
-    public DateAttribute(String name, Date value) {
-        setName(name);
+    public DateAttribute(QName qname, Date value) {
+        setQName(qname);
         this.value = value;
     }
 
     // Property accessors
+    @Column(name = "datevalue")
+    @Type(type="timestamp")
     public Date getValue() {
         return this.value;
     }
@@ -57,8 +67,8 @@ public class DateAttribute extends Attribute implements
     
     public Attribute copy() {
         DateAttribute attr = new DateAttribute();
-        attr.setName(getName());
-        attr.setValue(getValue());
+        attr.setQName(getQName().copy());
+        attr.setValue(value.clone());
         return attr;
     }
 

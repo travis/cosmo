@@ -16,7 +16,6 @@
 package org.osaf.cosmo.service;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
@@ -24,8 +23,11 @@ import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CalendarEventItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.DuplicateEventUidException;
+import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
@@ -234,21 +236,7 @@ public interface ContentService extends Service {
     public CalendarEventItem addEvent(CalendarCollectionItem calendar,
             CalendarEventItem event);
 
-    /**
-     * Find calendar events by criteria. Events can be searched based on a set
-     * of item attribute criteria. Only events that contain attributes with
-     * values equal to those specified in the criteria map will be returned.
-     *
-     * @param calendar
-     *            calendar collection to search
-     * @param criteria
-     *            criteria to search on.
-     * @return set of CalendarEventItem objects matching specified
-     *         criteria.
-     */
-    public Set<CalendarEventItem> findEvents(CalendarCollectionItem calendar,
-                                             Map criteria);
-
+    
     /**
      * Find calendar events by filter.
      *

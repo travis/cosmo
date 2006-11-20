@@ -18,10 +18,20 @@ package org.osaf.cosmo.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+
+import org.hibernate.annotations.CollectionOfElements;
+
 
 /**
  * Represents attribute with a List<String> as its value
  */
+@Entity
+@DiscriminatorValue("multistring")
 public class MultiValueStringAttribute extends Attribute
         implements java.io.Serializable {
 
@@ -35,13 +45,19 @@ public class MultiValueStringAttribute extends Attribute
     public MultiValueStringAttribute() {
     }
 
-    public MultiValueStringAttribute(String name, Set<String> value)
+    public MultiValueStringAttribute(QName qname, Set<String> value)
     {
-        setName(name);
+        setQName(qname);
         this.value = value;
     }
 
     // Property accessors
+    @CollectionOfElements
+    @JoinTable(
+            name="multistring_values",
+            joinColumns = @JoinColumn(name="attributeid")
+    )
+    @Column(name="stringvalue", length=2048)
     public Set<String> getValue() {
         return this.value;
     }
@@ -59,7 +75,7 @@ public class MultiValueStringAttribute extends Attribute
     
     public Attribute copy() {
         MultiValueStringAttribute attr = new MultiValueStringAttribute();
-        attr.setName(getName());
+        attr.setQName(getQName().copy());
         Set<String> newValue = new HashSet<String>(value);
         attr.setValue(newValue);
         return attr;

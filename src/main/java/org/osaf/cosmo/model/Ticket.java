@@ -20,9 +20,23 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.CollectionOfElements;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Index;
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.NotNull;
 
 /**
  * A bean encapsulating the information about a ticket used in the
@@ -35,6 +49,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Similarly, the class does not know how to convert itself to or from
  * XML.
  */
+@Entity
+@Table(name="tickets")
 public class Ticket extends BaseModelObject {
 
     /**
@@ -50,10 +66,9 @@ public class Ticket extends BaseModelObject {
     /** */
     public static final String PRIVILEGE_FREEBUSY = "freebusy";
 
-    private Long dbId;
     private String key;
     private String timeout;
-    private Set privileges;
+    private Set<String> privileges;
     private Date created;
     private User owner;
     private Item item;
@@ -61,19 +76,23 @@ public class Ticket extends BaseModelObject {
     /**
      */
     public Ticket() {
-        privileges = new HashSet();
+        privileges = new HashSet<String>();
     }
 
+    @Column(name = "ticketkey", unique = true, nullable = false, length = 255)
+    @NotNull
+    @Index(name = "idx_ticketkey")
     public String getKey() {
-		return key;
-	}
+        return key;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
     /**
      */
+    @Column(name = "tickettimeout", nullable = false, length=255)
     public String getTimeout() {
         return timeout;
     }
@@ -92,18 +111,27 @@ public class Ticket extends BaseModelObject {
 
     /**
      */
-    public Set getPrivileges() {
+    @CollectionOfElements
+    @JoinTable(
+            name="ticket_privilege",
+            joinColumns = @JoinColumn(name="ticketid")
+    )
+    @Fetch(FetchMode.JOIN)
+    @Column(name="privilege", nullable=false, length=255)
+    public Set<String> getPrivileges() {
         return privileges;
     }
 
     /**
      */
-    public void setPrivileges(Set privileges) {
+    public void setPrivileges(Set<String> privileges) {
         this.privileges = privileges;
     }
 
     /**
      */
+    @Column(name = "creationdate")
+    @Type(type="timestamp")
     public Date getCreated() {
         return created;
     }
@@ -113,16 +141,10 @@ public class Ticket extends BaseModelObject {
     public void setCreated(Date created) {
         this.created = created;
     }
-
-    public Long getDbId() {
-		return dbId;
-	}
-
-	public void setDbId(Long dbId) {
-		this.dbId = dbId;
-	}
     
-	public User getOwner() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ownerid")
+    public User getOwner() {
         return owner;
     }
 
@@ -181,6 +203,8 @@ public class Ticket extends BaseModelObject {
             toString();
     }
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="itemid")
     public Item getItem() {
         return item;
     }

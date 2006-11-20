@@ -15,18 +15,37 @@
  */
 package org.osaf.cosmo.model;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Index;
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.Email;
+import org.hibernate.validator.Length;
+import org.hibernate.validator.NotNull;
+
 /**
  */
+@Entity
+@Table(name="users")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User extends BaseModelObject {
 
     /**
@@ -120,7 +139,7 @@ public class User extends BaseModelObject {
     private Boolean admin;
     private Date dateCreated;
     private Date dateModified;
-    private Set items = new HashSet(0);
+    private Set<Item> items = new HashSet<Item>(0);
 
 	/**
      */
@@ -130,6 +149,10 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Column(name = "uid", nullable=false, unique=true, length=255)
+    @NotNull
+    @Length(min=1, max=255)
+    @Index(name="idx_useruid")
     public String getUid() {
         return uid;
     }
@@ -143,6 +166,11 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Column(name = "username", nullable=false, unique=true)
+    @Index(name="idx_username")
+    @NotNull
+    @Length(min=USERNAME_LEN_MIN, max=USERNAME_LEN_MAX)
+    @org.hibernate.validator.Pattern(regex="^[^\\t\\n\\r\\f\\a\\e\\p{Cntrl}/]+$")
     public String getUsername() {
         return username;
     }
@@ -156,18 +184,22 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Transient
     public String getOldUsername() {
         return oldUsername != null ? oldUsername : username;
     }
 
     /**
      */
+    @Transient
     public boolean isUsernameChanged() {
         return oldUsername != null && ! oldUsername.equals(username);
     }
 
     /**
      */
+    @Column(name = "password")
+    @NotNull
     public String getPassword() {
         return password;
     }
@@ -180,6 +212,8 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Column(name = "firstname")
+    @Length(min=FIRSTNAME_LEN_MIN, max=FIRSTNAME_LEN_MAX)
     public String getFirstName() {
         return firstName;
     }
@@ -192,6 +226,8 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Column(name = "lastname")
+    @Length(min=LASTNAME_LEN_MIN, max=LASTNAME_LEN_MAX)
     public String getLastName() {
         return lastName;
     }
@@ -204,6 +240,11 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Column(name = "email", nullable=false, unique=true)
+    @Index(name="idx_useremail")
+    @NotNull
+    @Length(min=EMAIL_LEN_MIN, max=EMAIL_LEN_MAX)
+    @Email
     public String getEmail() {
         return email;
     }
@@ -217,18 +258,21 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Transient
     public String getOldEmail() {
         return oldEmail;
     }
 
     /**
      */
+    @Transient
     public boolean isEmailChanged() {
         return oldEmail != null && ! oldEmail.equals(email);
     }
 
     /**
      */
+    @Column(name = "admin")
     public Boolean getAdmin() {
         return admin;
     }
@@ -241,6 +285,8 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Column(name = "datecreated")
+    @Type(type="timestamp")
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -253,6 +299,8 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Column(name = "datemodified")
+    @Type(type="timestamp")
     public Date getDateModified() {
         return dateModified;
     }
@@ -265,6 +313,7 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Transient
     public boolean isOverlord() {
         return username != null && username.equals(USERNAME_OVERLORD);
     }
@@ -403,11 +452,13 @@ public class User extends BaseModelObject {
         }
     }
 
-    public Set getItems() {
+    @OneToMany(mappedBy="owner", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.DELETE }) 
+    public Set<Item> getItems() {
         return items;
     }
 
-    public void setItems(Set items) {
+    public void setItems(Set<Item> items) {
         this.items = items;
     }
     

@@ -15,7 +15,16 @@
  */
 package org.osaf.cosmo.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Index;
+import org.hibernate.validator.NotNull;
 
 /**
  * Represents an index for a CalendarItem.
@@ -24,6 +33,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * based index for a CalendarItem.  Many CalendarIndexes can
  * be associated with a single CalendarItem.
  */
+@Entity
+@Table(name="cal_timerange_index")
 public class CalendarTimeRangeIndex extends BaseModelObject implements
         java.io.Serializable {
 
@@ -44,6 +55,8 @@ public class CalendarTimeRangeIndex extends BaseModelObject implements
     private String type;
 
     private Item item;
+    
+    private EventStamp eventStamp = null;
 
     // Constructors
 
@@ -51,6 +64,8 @@ public class CalendarTimeRangeIndex extends BaseModelObject implements
     public CalendarTimeRangeIndex() {
     }
 
+    @Column(name = "enddate", length=16)
+    @Index(name="idx_enddt")
     public String getEndDate() {
         return endDate;
     }
@@ -59,6 +74,7 @@ public class CalendarTimeRangeIndex extends BaseModelObject implements
         this.endDate = endDate;
     }
 
+    @Column(name = "isfloating")
     public Boolean getIsFloating() {
         return isFloating;
     }
@@ -67,6 +83,7 @@ public class CalendarTimeRangeIndex extends BaseModelObject implements
         this.isFloating = isFloating;
     }
 
+    @Column(name = "isrecurring")
     public Boolean getIsRecurring() {
         return isRecurring;
     }
@@ -75,6 +92,8 @@ public class CalendarTimeRangeIndex extends BaseModelObject implements
         this.isRecurring = isRecurring;
     }
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="itemid")
     public Item getItem() {
         return item;
     }
@@ -83,6 +102,18 @@ public class CalendarTimeRangeIndex extends BaseModelObject implements
         this.item = item;
     }
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="eventstampid")
+    public EventStamp getEventStamp() {
+        return eventStamp;
+    }
+
+    public void setEventStamp(EventStamp eventStamp) {
+        this.eventStamp = eventStamp;
+    }
+
+    @Column(name = "startdate", length=16)
+    @Index(name="idx_startdt")
     public String getStartDate() {
         return startDate;
     }
@@ -91,6 +122,9 @@ public class CalendarTimeRangeIndex extends BaseModelObject implements
         this.startDate = startDate;
     }
 
+    @Column(name = "componenttype", nullable = false, length=255)
+    @NotNull
+    @Index(name="idx_comptype")
     public String getType() {
         return type;
     }

@@ -27,16 +27,21 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import net.fortuna.ical4j.model.Calendar;
+
 import org.apache.commons.io.IOUtils;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.User;
 
 public class HibernateTestHelper {
     public User createDummyUser(UserDao userDao, int index) {
         User user = new User();
         user.setUsername("user" + index);
+        user.setPassword("password" + index);
         user.setEmail("user" + index + "@test" + index);
         user.setAdmin(Boolean.TRUE);
         user.setFirstName("fristname" + index);
@@ -55,9 +60,9 @@ public class HibernateTestHelper {
                 .size());
         for (Iterator it = item1.getAttributes().keySet().iterator(); it
                 .hasNext();) {
-            String key = (String) it.next();
-            Object val1 = item1.getAttributeValue(key);
-            Object val2 = item2.getAttributeValue(key);
+            QName key = (QName) it.next();
+            Object val1 = item1.getAttributeValue(key.getLocalName());
+            Object val2 = item2.getAttributeValue(key.getLocalName());
             verifyAttributeValue(val1, val2);
         }
 
@@ -112,6 +117,11 @@ public class HibernateTestHelper {
         IOUtils.copy(fis, baos);
         return baos.toByteArray();
     }
+    
+    public Calendar getCalendar(String fileName) throws Exception {
+        FileInputStream fis = new FileInputStream(fileName);
+        return CalendarUtils.parseCalendar(fis);
+    }
 
     public void verifyInputStream(InputStream is1, byte[] content)
             throws Exception {
@@ -143,6 +153,7 @@ public class HibernateTestHelper {
         if (user == null) {
             user = new User();
             user.setUsername(username);
+            user.setPassword(username);
             user.setEmail(username + "@testem");
             user.setAdmin(Boolean.TRUE);
             user.setFirstName("testfn");

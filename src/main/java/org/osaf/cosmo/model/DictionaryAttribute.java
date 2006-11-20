@@ -19,11 +19,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+
+import org.hibernate.annotations.CollectionOfElements;
+import org.hibernate.annotations.MapKey;
+
 
 /**
  * Attribute that contains a Map<String,String> as its
  * value.
  */
+@Entity
+@DiscriminatorValue("dictionary")
 public class DictionaryAttribute extends Attribute
         implements java.io.Serializable {
 
@@ -38,13 +49,20 @@ public class DictionaryAttribute extends Attribute
     public DictionaryAttribute() {
     }
 
-    public DictionaryAttribute(String name, Map<String, String> value)
+    public DictionaryAttribute(QName qname, Map<String, String> value)
     {
-        setName(name);
+        setQName(qname);
         this.value = value;
     }
 
     // Property accessors
+    @CollectionOfElements
+    @JoinTable(
+            name="dictionary_values",
+            joinColumns = @JoinColumn(name="attributeid")
+    )
+    @MapKey(columns=@Column(name="keyname", length=255))
+    @Column(name="stringvalue", length=2048)
     public Map<String, String> getValue() {
         return this.value;
     }
@@ -62,10 +80,8 @@ public class DictionaryAttribute extends Attribute
     
     public Attribute copy() {
         DictionaryAttribute attr = new DictionaryAttribute();
-        attr.setName(getName());
-        Map<String, String> newVal = new HashMap<String, String>();
-        for(Entry<String, String> entry: value.entrySet())
-            newVal.put(entry.getKey(), entry.getValue());
+        attr.setQName(getQName().copy());
+        Map<String, String> newVal = new HashMap<String, String>(value);
         attr.setValue(newVal);
         return attr;
     }

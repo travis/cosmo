@@ -15,7 +15,16 @@
  */
 package org.osaf.cosmo.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Index;
+import org.hibernate.validator.NotNull;
 
 /**
  * Represents an index for a CalendarItem.
@@ -24,6 +33,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * based index for a CalendarItem.  Many CalendarIndexes can
  * be associated with a single CalendarItem.
  */
+@Entity
+@Table(name="cal_property_index")
 public class CalendarPropertyIndex extends BaseModelObject implements
         java.io.Serializable {
 
@@ -34,6 +45,7 @@ public class CalendarPropertyIndex extends BaseModelObject implements
     private String name;
     private String value;
     private Item item;
+    private EventStamp eventStamp = null;
 
     // Constructors
 
@@ -42,19 +54,31 @@ public class CalendarPropertyIndex extends BaseModelObject implements
     }
 
     
-    
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="itemid")
     public Item getItem() {
         return item;
     }
 
-
-
     public void setItem(Item item) {
         this.item = item;
     }
+        
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="eventstampid")
+    public EventStamp getEventStamp() {
+        return eventStamp;
+    }
 
 
+    public void setEventStamp(EventStamp eventStamp) {
+        this.eventStamp = eventStamp;
+    }
 
+
+    @Column(name = "propertyname", nullable = false, length=255)
+    @NotNull
+    @Index(name="idx_calpropname")
     public String getName() {
         return name;
     }
@@ -66,7 +90,7 @@ public class CalendarPropertyIndex extends BaseModelObject implements
     }
 
 
-
+    @Column(name = "propertyvalue", length=20000)
     public String getValue() {
         return value;
     }

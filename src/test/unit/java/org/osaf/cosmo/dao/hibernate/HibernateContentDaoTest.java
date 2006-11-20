@@ -35,6 +35,7 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -908,7 +909,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         tickets = contentDao.getTickets("/testuser/" + name);
         Assert.assertEquals(0, tickets.size());
     }
-
+    
     private void verifyTicket(Ticket ticket1, Ticket ticket2) {
         Assert.assertEquals(ticket1.getKey(), ticket2.getKey());
         Assert.assertEquals(ticket1.getTimeout(), ticket2.getTimeout());
@@ -972,7 +973,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         content.setContentEncoding("UTF8");
         content.setContentType("text/text");
         content.setOwner(getUser(userDao, owner));
-        content.addAttribute(new StringAttribute("customattribute",
+        content.addAttribute(new StringAttribute(new QName("customattribute"),
                 "customattributevalue"));
         return content;
     }

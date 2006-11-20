@@ -16,19 +16,18 @@
 package org.osaf.cosmo.dao.mock;
 
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.model.CalendarCollectionItem;
-import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.CalendarItem;
 import org.osaf.cosmo.model.CalendarEventItem;
+import org.osaf.cosmo.model.CalendarItem;
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.DuplicateEventUidException;
+import org.osaf.cosmo.model.DuplicateItemNameException;
+import org.osaf.cosmo.model.ModelValidationException;
 
 /**
  * Mock implementation of <code>CalendarDao</code> useful for testing.
@@ -210,24 +209,7 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
         return (CalendarEventItem) findItemByUid(uid);
     }
 
-    /**
-     * Find calendar events by criteria. Events can be searched based on a set
-     * of item attribute criteria. Only events that contain attributes with
-     * values equal to those specified in the criteria map will be returned.
-     *
-     * @param calendar
-     *            calendar collection to search
-     * @param criteria
-     *            criteria to search on.
-     * @return set of CalendarEventItem objects matching specified
-     *         criteria.
-     */
-    public Set<CalendarEventItem> findEvents(CalendarCollectionItem calendar,
-                                             Map criteria) {
-        // XXX
-        throw new UnsupportedOperationException();
-    }
-
+  
     /**
      * Find calendar events by filter.
      * NOTE: This impl always returns an empty set, but has the side effect 

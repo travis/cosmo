@@ -40,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.hibernate.validator.InvalidStateException;
 
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
@@ -767,6 +768,8 @@ public class CmpServlet extends HttpServlet {
                            e.getMessage());
         } catch (ModelValidationException e) {
             handleModelValidationError(resp, e);
+        } catch (InvalidStateException ise) {
+            handleInvalidStateException(resp, ise);
         }
     }
 
@@ -801,9 +804,19 @@ public class CmpServlet extends HttpServlet {
                            e.getMessage());
         } catch (ModelValidationException e) {
             handleModelValidationError(resp, e);
+        } catch (InvalidStateException ise) {
+            handleInvalidStateException(resp, ise);
         }
     }
 
+    private void handleInvalidStateException(HttpServletResponse resp,
+                                             InvalidStateException ise) 
+        throws IOException {
+        String message = ise.getInvalidValues()[0].getMessage();
+        log.warn("model validation error: " + message);
+        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+    }
+    
     private void handleModelValidationError(HttpServletResponse resp,
                                             ModelValidationException e)
         throws IOException {

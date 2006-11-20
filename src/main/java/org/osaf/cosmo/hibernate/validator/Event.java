@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.dao.hibernate;
+package org.osaf.cosmo.hibernate.validator;
 
-import org.springframework.test.AbstractTransactionalSpringContextTests;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-public abstract class AbstractSpringDaoTestCase extends AbstractTransactionalSpringContextTests {
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-    public AbstractSpringDaoTestCase()
-    {
-        setPopulateProtectedVariables(true);
-    }
-    
-    @Override
-    protected String[] getConfigLocations() {
-        return new String[] {
-                "applicationContext.xml",
-                "applicationContext-test.xml",
-            };
-    }
+import org.hibernate.validator.ValidatorClass;
 
+@ValidatorClass(EventValidator.class)
+@Target(METHOD) 
+@Retention(RUNTIME)
+@Documented
+public @interface Event {
+    String message() default "has no VEVENT";
 }

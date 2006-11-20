@@ -15,12 +15,10 @@
  */
 package org.osaf.cosmo.service.impl;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.ContentDao;
@@ -28,8 +26,11 @@ import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CalendarEventItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.DuplicateEventUidException;
+import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.ContentService;
@@ -347,27 +348,7 @@ public class StandardContentService implements ContentService {
         return calendarDao.addEvent(calendar, event);
     }
 
-    /**
-     * Find calendar events by criteria. Events can be searched based on a set
-     * of item attribute criteria. Only events that contain attributes with
-     * values equal to those specified in the criteria map will be returned.
-     *
-     * @param calendar
-     *            calendar collection to search
-     * @param criteria
-     *            criteria to search on.
-     * @return set of CalendarEventItem objects matching specified
-     *         criteria.
-     */
-    public Set<CalendarEventItem> findEvents(CalendarCollectionItem calendar,
-                                             Map criteria) {
-        if (log.isDebugEnabled()) {
-            log.debug("finding events in calendar " + calendar.getName() +
-                      " by criteria " + criteria);
-        }
-        return calendarDao.findEvents(calendar, criteria);
-    }
-
+ 
     /**
      * Find calendar events by filter.
      *

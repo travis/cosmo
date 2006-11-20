@@ -20,9 +20,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.hibernate.annotations.Type;
 
 
 
@@ -32,11 +38,16 @@ import org.apache.commons.lang.builder.ToStringStyle;
  * release, this will be changed to store the data on
  * the disk, to prevent OutOfMemoryExceptions.
  */
-public class ContentData  {
+@Entity
+@Table(name="content_data")
+public class ContentData extends BaseModelObject {
 
-    private Long id = new Long(-1);
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5014854905531456753L;
     private byte[] content = null;
-    
+   
     /**
      */
     public String toString() {
@@ -44,15 +55,13 @@ public class ContentData  {
                 ToStringStyle.MULTI_LINE_STYLE);
     }
 
-    public Long getId() {
-        return id;
-    }
 
     /**
      * Get an InputStream to the content data.  Repeated
      * calls to this method will return new instances
      * of InputStream.
      */
+    @Transient
     public InputStream getContentInputStream() {
         if(content==null)
             return null;
@@ -78,18 +87,16 @@ public class ContentData  {
     /**
      * @return the size of the data read, or -1 for no data present
      */
+    @Transient
     public long getSize() {
         if(content != null)
             return content.length;
         else
             return -1;
     }
-    
-    // Hide for Hibernate's use
-    private void setId(Long id) {
-        this.id = id;
-    }
 
+    @Column(name = "content", length=102400000)
+    @Type(type="bytearray_blob")
     private byte[] getContent() {
         return content;
     }

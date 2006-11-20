@@ -19,13 +19,29 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.Min;
+import org.hibernate.validator.NotNull;
 
 /**
  * Extends {@link Item} to represent an item containing binary content
  */
+@Entity
+@DiscriminatorValue("content")
 public class ContentItem extends Item {
 
     /**
@@ -40,6 +56,9 @@ public class ContentItem extends Item {
     private String contentType = null;
     private String contentLanguage = null;
     private String contentEncoding = null;
+    private String lastModifiedBy = null;
+    private String triageStatus = null;
+    private BigDecimal triageStatusUpdated = null;
     private Long contentLength = null;
     private ContentData contentData = null;
     
@@ -48,8 +67,9 @@ public class ContentItem extends Item {
 
    
     /**
-     * @deprecated use setContent(InputStream)
+     * Get content data as byte[]
      */
+    @Transient
     public byte[] getContent() {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -63,18 +83,12 @@ public class ContentItem extends Item {
     }
 
     /**
-     * Sets the ATTR_CONTENT_DATA with the given content, and ATTR_CONTENT_LENGTH
-     * with the length of the content
+     * Sets content data using byte[]
      * @param content
-     * @deprecated use getContentInputStream()
      */
     public void setContent(byte[] content) {
         if (content.length > MAX_CONTENT_SIZE)
             throw new DataSizeException("Item content too large");
-        
-        if(contentData==null) {
-            contentData = new ContentData();
-        }
         
         try {
             setContent(new ByteArrayInputStream(content));
@@ -91,7 +105,7 @@ public class ContentItem extends Item {
      */
     public void setContent(InputStream is) throws IOException {
         if(contentData==null) {
-            contentData = new ContentData();  
+            contentData = new ContentData(); 
         }
         
         contentData.setContentInputStream(is);
@@ -104,6 +118,7 @@ public class ContentItem extends Item {
         setContentLength(contentData.getSize());
     }
 
+    @Transient
     public InputStream getContentInputStream() {
         if(contentData==null)
             return null;
@@ -111,6 +126,7 @@ public class ContentItem extends Item {
             return contentData.getContentInputStream();
     }
 
+    @Column(name = "contentEncoding", length=32)
     public String getContentEncoding() {
         return contentEncoding;
     }
@@ -119,6 +135,7 @@ public class ContentItem extends Item {
         this.contentEncoding = contentEncoding;
     }
 
+    @Column(name = "contentLanguage", length=32)
     public String getContentLanguage() {
         return contentLanguage;
     }
@@ -127,6 +144,9 @@ public class ContentItem extends Item {
         this.contentLanguage = contentLanguage;
     }
 
+    @Column(name = "contentLength")
+    @NotNull
+    @Min(value=0)
     public Long getContentLength() {
         return contentLength;
     }
@@ -137,6 +157,7 @@ public class ContentItem extends Item {
     }
 
 
+    @Column(name = "contentType", length=64)
     public String getContentType() {
         return contentType;
     }
@@ -145,13 +166,40 @@ public class ContentItem extends Item {
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
+    
+    @Column(name = "lastmodifiedby", length=255)
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
 
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    @Column(name = "triagestatus", length=64)
+    public String getTriageStatus() {
+        return triageStatus;
+    }
+
+    public void setTriageStatus(String triageStatus) {
+        this.triageStatus = triageStatus;
+    }
+
+    @Column(name = "triagestatusupdated", precision = 19, scale = 6)
+    @Type(type="org.hibernate.type.BigDecimalType")
+    public BigDecimal getTriageStatusUpdated() {
+        return triageStatusUpdated;
+    }
+
+    public void setTriageStatusUpdated(BigDecimal triageStatusUpdated) {
+        this.triageStatusUpdated = triageStatusUpdated;
+    }
 
     public void validate() {
         super.validate();
         validateContent();
     }
- 
+  
     protected void validateContent() {
         if (getContentLength() == null)
             throw new ModelValidationException("Content Length must be present");
@@ -178,6 +226,10 @@ public class ContentItem extends Item {
     }
     
     // For hibernate use only
+    @OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="contentdataid")
+    @Cascade( {CascadeType.ALL }) 
+    @NotNull
     private ContentData getContentData() {
         return contentData;
     }

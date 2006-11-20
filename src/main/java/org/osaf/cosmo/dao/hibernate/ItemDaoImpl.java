@@ -38,13 +38,14 @@ import org.osaf.cosmo.model.CalendarItem;
 import org.osaf.cosmo.model.CalendarPropertyIndex;
 import org.osaf.cosmo.model.CalendarTimeRangeIndex;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.ContentData;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.QName;
+import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
@@ -537,10 +538,13 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
         setBaseItemProps(item2);
         
         // copy attributes
-        for(Entry<String, Attribute> entry: item.getAttributes().entrySet())
+        for(Entry<QName, Attribute> entry: item.getAttributes().entrySet())
             item2.addAttribute(entry.getValue().copy());
         
-       
+        // copy stamps
+        for(Stamp stamp: item.getStamps())
+            item2.addStamp(stamp.copy());
+        
         // copy content
         if(item instanceof ContentItem) {
             ContentItem contentItem = (ContentItem) item;
@@ -548,13 +552,15 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             try {
                 InputStream contentStream = contentItem.getContentInputStream();
                 newContentItem.setContent(contentStream);
+                newContentItem.setContentEncoding(contentItem.getContentEncoding());
+                newContentItem.setContentLanguage(contentItem.getContentLanguage());
+                newContentItem.setContentType(contentItem.getContentType());
                 contentStream.close();
             } catch (IOException e) {
                 throw new RuntimeException("Error copying content");
             }
         }
             
-        
         // copy calendar indexes
         if(item instanceof CalendarItem) {
             CalendarItem calendarItem = (CalendarItem) item;

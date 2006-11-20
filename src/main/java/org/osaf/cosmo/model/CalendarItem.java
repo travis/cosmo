@@ -18,14 +18,24 @@ package org.osaf.cosmo.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
 import net.fortuna.ical4j.model.Calendar;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.osaf.cosmo.calendar.util.CalendarBuilderDispenser;
 
 /**
  * Extends {@link ContentItem} to represent a content item containing calendar
  * content. The content is in the form of iCalendar data.
  */
+@Entity
+@DiscriminatorValue("calendaritem")
 public abstract class CalendarItem extends ContentItem {
 
     private Calendar calendar;
@@ -36,6 +46,7 @@ public abstract class CalendarItem extends ContentItem {
      * content of this resource. This method will only parse the content once,
      * returning the same calendar instance on subsequent invocations.
      */
+    @Transient
     public Calendar getCalendar() {
         if (calendar == null) {
             try {
@@ -48,6 +59,8 @@ public abstract class CalendarItem extends ContentItem {
         return calendar;
     }
     
+    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
     public Set<CalendarTimeRangeIndex> getTimeRangeIndexes() {
         return timeRangIndexes;
     }
@@ -56,6 +69,8 @@ public abstract class CalendarItem extends ContentItem {
         this.timeRangIndexes = indexes;
     }
     
+    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
     public Set<CalendarPropertyIndex> getPropertyIndexes() {
         return propertyIndexes;
     }

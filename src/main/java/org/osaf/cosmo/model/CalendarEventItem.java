@@ -15,6 +15,10 @@
  */
 package org.osaf.cosmo.model;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Transient;
+
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VEvent;
 
@@ -22,6 +26,8 @@ import net.fortuna.ical4j.model.component.VEvent;
  * Extends {@link CalendarItem} to represent a calendar item containing a single
  * calendar event (VEVENT).
  */
+@Entity
+@DiscriminatorValue("event")
 public class CalendarEventItem extends CalendarItem {
     /**
      * 
@@ -33,6 +39,7 @@ public class CalendarEventItem extends CalendarItem {
 
     /**
      */
+    @Transient
     public VEvent getMasterEvent() {
         return (VEvent) getCalendar().getComponents().getComponents(
                 Component.VEVENT).get(0);

@@ -135,7 +135,9 @@ public class MorseCodeServlet extends HttpServlet {
         String uid =
             new RepositoryUriParser(req.getPathInfo()).getCollectionUid();
         if (uid != null) {
-            String tokenStr = req.getParameter(PARAM_SYNC_TOKEN);
+            String tokenStr = req.getHeader(HEADER_SYNC_TOKEN);
+            if (StringUtils.isBlank(tokenStr))
+                tokenStr = req.getParameter(PARAM_SYNC_TOKEN);
             if (StringUtils.isBlank(tokenStr))
                 tokenStr = null;
             try {
@@ -187,14 +189,26 @@ public class MorseCodeServlet extends HttpServlet {
         String uid =
             new RepositoryUriParser(req.getPathInfo()).getCollectionUid();
         if (uid != null) {
+            String tokenStr = req.getHeader(HEADER_SYNC_TOKEN);
+            if (StringUtils.isBlank(tokenStr)) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Missing sync token");
+                return;
+            }
             try {
+                SyncToken token = SyncToken.deserialize(tokenStr);
                 // XXX: check update preconditions
                 // XXX: read eimml content
                 // XXX: convert eimml to model
                 Set<ItemState> items = new HashSet<ItemState>();
-                SyncToken token = controller.updateCollection(uid, items);
+                SyncToken newToken =
+                    controller.updateCollection(uid, token, items);
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                resp.addHeader(HEADER_SYNC_TOKEN, token.serialize());
+                resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());
+                return;
+            } catch (IllegalArgumentException e) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Invalid sync token");
                 return;
             } catch (UnknownCollectionException e) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND,
@@ -205,6 +219,10 @@ public class MorseCodeServlet extends HttpServlet {
                                "Item not a collection");
             } catch (CollectionLockedException e) {
                 resp.sendError(SC_LOCKED, "Collection is locked for update");
+                return;
+            } catch (StaleCollectionException e) {
+                resp.sendError(HttpServletResponse.SC_RESET_CONTENT,
+                               "Collection contains more recently updated items");
                 return;
             } catch (MorseCodeException e) {
                 log.error("Error updating collection " + uid, e);
@@ -236,10 +254,10 @@ public class MorseCodeServlet extends HttpServlet {
                 // XXX: read eimml content
                 // XXX: convert eimml to item states
                 Set<ItemState> items = new HashSet<ItemState>();
-                SyncToken token =
+                SyncToken newToken =
                     controller.publishCollection(uid, parentUid, items);
                 resp.setStatus(HttpServletResponse.SC_CREATED);
-                resp.addHeader(HEADER_SYNC_TOKEN, token.serialize());
+                resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());
                 return;
             } catch (IllegalArgumentException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,

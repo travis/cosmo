@@ -27,6 +27,8 @@ public interface MorseCodeController {
      * Causes the identified collection and all contained items to be
      * immediately removed from storage.
      *
+     * @param uid the uid of the collection to delete
+     *
      * @throws UnknownCollectionException if the specified collection
      * is not found
      * @throws NotCollectionException if the specified item is not a
@@ -43,6 +45,12 @@ public interface MorseCodeController {
      *
      * If a parent uid is provided, the associated collection becomes
      * the parent of the new collection.
+     *
+     * @param uid the uid of the collection to publish
+     * @param parentUid the (optional) uid of the collection to set as
+     * the parent for the published collection
+     * @param itemStates the item states with which the published
+     * collection is initially populated
      *
      * @returns the initial <code>SyncToken</code> for the collection
      * @throws IllegalArgumentException if the authenticated principal
@@ -63,6 +71,8 @@ public interface MorseCodeController {
      * Retrieves the current state of every item contained within the
      * identified collection.
      *
+     * @param uid the uid of the collection to subscribe to
+     *
      * @returns a <code>ItemStateSet</code> describing the current
      * state of the collection
      * @throws UnknownCollectionException if the specified collection
@@ -77,6 +87,10 @@ public interface MorseCodeController {
      * Retrieves the current state of each non-collection child item
      * from the identified collection that has changed since the time
      * that the given synchronization token was valid.
+     *
+     * @param uid the uid of the collection to subscribe to
+     * @param token the sync token describing the last known state of
+     * the collection
      *
      * @returns a <code>ItemStateSet</code> describing the current
      * state of the changed items
@@ -103,6 +117,12 @@ public interface MorseCodeController {
      * return the state of the collection immediately prior to the
      * beginning of this update.
      *
+     * @param uid the uid of the collection to subscribe to
+     * @param token the sync token describing the last known state of
+     * the collection
+     * @param itemStates the item states with which the published
+     * collection is updated
+     *
      * @returns a new <code>SyncToken</code> that invalidates any
      * previously issued
      * @throws UnknownCollectionException if the specified collection
@@ -111,8 +131,11 @@ public interface MorseCodeController {
      * collection
      * @throws CollectionLockedException if the collection is
      * currently locked by another update
+     * @throws StaleCollectionException if the collection has been
+     * updated since the provided sync token was generated
      * @throws MorseCodeException if an unknown error occurs
      */
     public SyncToken updateCollection(String uid,
+                                      SyncToken token,
                                       Set<ItemState> itemStates);
 }

@@ -81,31 +81,30 @@ dojo.declare("cosmo.cmp.Cmp", null,
 	{
 		username : "",
 
-		setUser : function(username, password){
+		setUser: function (username, password){
 			this.username = username;
 			dojo.io.cookie.set(CMP_AUTH_COOKIE, encode64(username + ":" + password), -1, "/");
 		},
 
-		unsetUser : function(username, password){
+		unsetUser: function (username, password){
 			dojo.io.cookie.deleteCookie(CMP_AUTH_COOKIE);
 		},
 
-		setUsername : function(username){
+		setUsername: function (username){
 
 		},
 
-		setPassword : function(password){
+		setPassword: function (password){
 
 		},
 
-		getDefaultCMPRequest : function(handlerDict){
+		getDefaultCMPRequest: function (handlerDict){
 
 	        var request = {
 	                load: handlerDict.load,
 	                handle: handlerDict.handle,
 	                error: handlerDict.error,
 	                transport: "XMLHTTPTransport",
-	                mimetype: 'text/xml',
 	                contentType: 'text/xml',
 	                headers: {}
 	        }
@@ -123,7 +122,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 		 * identical to those used by dojo.io.bind
 		 */
 
-		getUserXML : function(username, handlerDict) {
+		getUserXML: function (username, handlerDict) {
 		        var requestDict = this.getDefaultCMPRequest(handlerDict, true)
 		        requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + encodeURIComponent(username)
 		        requestDict.method = "GET"
@@ -131,7 +130,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 		        dojo.io.bind(requestDict)
 		},
 
-		getUsersXML : function(handlerDict, pageNumber, pageSize, sortOrder, sortType) {
+		getUsersXML: function (handlerDict, pageNumber, pageSize, sortOrder, sortType) {
 		        var requestDict = this.getDefaultCMPRequest(handlerDict, true)
 		        requestDict.url = cosmo.env.getBaseUrl() + "/cmp/users"
 
@@ -147,7 +146,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 		        dojo.io.bind(requestDict);
 		},
 
-		getAccountXML : function(handlerDict) {
+		getAccountXML: function (handlerDict) {
 		        var requestDict = this.getDefaultCMPRequest(handlerDict, true)
 		        requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account"
 		        requestDict.method = "GET"
@@ -160,32 +159,32 @@ dojo.declare("cosmo.cmp.Cmp", null,
 		 * into a nice javascript object.
 		 */
 
-		getUser : function(username, handlerDict) {
+		getUser: function (username, handlerDict) {
 		        handlerDict.old_load = handlerDict.load;
-		        handlerDict.load = function(type, data, evt) {
+		        handlerDict.load = function (type, data, evt) {
 
 		                handlerDict.old_load(type, parser.parseElement(data.firstChild), evt);
 		        }
 		        this.getUserXML(username, handlerDict);
 		},
 
-		getUsers : function(handlerDict, pageNumber, pageSize, sortOrder, sortType) {
+		getUsers: function (handlerDict, pageNumber, pageSize, sortOrder, sortType) {
 		        handlerDict.old_load = handlerDict.load;
-		        handlerDict.load = function(type, data, evt) {
+		        handlerDict.load = function (type, data, evt) {
 		                handlerDict.old_load(type, parser.parseElement(data.firstChild), evt);
 		        }
 		        this.getUsersXML(handlerDict, pageNumber, pageSize, sortOrder, sortType);
 		},
 
-		getAccount : function(handlerDict) {
+		getAccount: function (handlerDict) {
 		        handlerDict.old_load = handlerDict.load;
-		        handlerDict.load = function(type, data, evt) {
+		        handlerDict.load = function (type, data, evt) {
 		                handlerDict.old_load(type, parser.parseElement(data.firstChild), evt);
 		        }
 		        this.getAccountXML(handlerDict);
 		},
 
-		headUser : function(username, handlerDict, sync){
+		headUser: function (username, handlerDict, sync){
 		        var requestDict = this.getDefaultCMPRequest(handlerDict, true)
 		        requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + encodeURIComponent(username)
 		        requestDict.method = "HEAD"
@@ -196,7 +195,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 		        dojo.io.bind(requestDict)
 		},
 
-		createUser : function(userHash, handlerDict) {
+		createUser: function (userHash, handlerDict) {
 		        var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
 		                        '<user xmlns="http://osafoundation.org/cosmo/CMP">' +
 		                        '<username>' + userHash.username + '</username>' +
@@ -220,7 +219,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 		        dojo.io.bind(requestDict)
 		},
 
-		modifyUser : function(username, userHash, handlerDict) {
+		modifyUser: function (username, userHash, handlerDict) {
 		        var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
 		                '<user xmlns="http://osafoundation.org/cosmo/CMP">'
 		        for (propName in userHash) {
@@ -243,7 +242,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
 		},
 
-		deleteUser : function(username, handlerDict) {
+		deleteUser: function (username, handlerDict) {
 		        var requestDict = this.getDefaultCMPRequest(handlerDict)
 		        requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
 		        					encodeURIComponent(username)// + "/delete"
@@ -253,7 +252,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
 		},
 
-		deleteUsers : function(usernames, handlerDict) {
+		deleteUsers: function (usernames, handlerDict) {
 		        var requestDict = this.getDefaultCMPRequest(handlerDict);
 		        requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/delete";
 		        requestDict.method = "POST";
@@ -271,7 +270,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
 		},
 
-		modifyAccount : function(userHash, handlerDict) {
+		modifyAccount: function (userHash, handlerDict) {
 		        var requestContent = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
 		                '<user xmlns="http://osafoundation.org/cosmo/CMP">'
 
@@ -297,7 +296,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
 		},
 
-		signup : function(userHash, handlerDict) {
+		signup: function (userHash, handlerDict) {
 		        var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
 		                        '<user xmlns="http://osafoundation.org/cosmo/CMP">' +
 		                        '<username>' + userHash.username + '</username>' +

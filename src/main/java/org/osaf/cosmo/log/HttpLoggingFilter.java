@@ -51,6 +51,11 @@ public class HttpLoggingFilter implements Filter {
     private String format = "%M %U %Q %C %I";
     private CosmoSecurityManager securityManager;
 
+    private String BEAN_SECURITY_MANAGER =
+        "securityManager";
+    private String BEAN_HTTP_LOGGING_FORMAT =
+        "httpLoggingFormat";
+
     public void destroy() {
         // Nothing to destroy
     }
@@ -74,7 +79,7 @@ public class HttpLoggingFilter implements Filter {
             );
 
         this.securityManager =
-            (CosmoSecurityManager) ctx.getBean("securityManager");
+            (CosmoSecurityManager) ctx.getBean(BEAN_SECURITY_MANAGER);
 
         if (this.securityManager == null){
             throw new ServletException("Could not initialize HttpLoggingFilter: " +
@@ -82,7 +87,7 @@ public class HttpLoggingFilter implements Filter {
         }
 
         Object format =
-            ctx.getBean("httpLoggingFormat");
+            ctx.getBean(BEAN_HTTP_LOGGING_FORMAT);
 
         if (format != null){
             try {

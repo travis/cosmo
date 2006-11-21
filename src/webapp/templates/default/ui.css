@@ -97,6 +97,10 @@ div {
 a {
     color:$linkTextColor;
 }
+/* Invisible elements */
+.invisible {
+    display:none;
+}
 
 /* Main styles, classes
  * ==================================== */
@@ -110,40 +114,26 @@ a {
 .promptTextError {
     color:#aa3333;
 }
-
-
 #loginDialog{
-
-
 	margin:auto;
 	width:280px;
 	text-align:left;
 	padding-top:24px;
-
 }
-
 #loginDialogLoginPrompt{
 	height:46px;
 }
-
 #loginDialogLogo{
 	padding-bottom:12px;
 }
-
 #loginDialogForm{
-
-
 }
-
 #loginDialogFormContainer{
 	padding:12px;
     border:1px solid $uiDetailBorderColor;
 }
-
 #loginDialogInputsBox{
-
 }
-
 #loginDialogUsernameWidget{
 	display: table-row;
 }
@@ -151,7 +141,6 @@ a {
 	display: table-cell;
 	text-align: right;
 }
-
 #loginDialogUsernameInputContainer{
 	display: table-cell;
 	padding-bottom:4px;
@@ -164,12 +153,10 @@ a {
 	text-align: right;
 }
 #loginDialogPasswordInput{
-
 }
 #loginDialogUsernameInputContainer{
 	display: table-cell;
 }
-
 #loginDialogSubmitButton{
 	margin-top:16px;
 	float:right;
@@ -240,6 +227,12 @@ $smButtonHeight = 18px
     color:$labelTextMedColor;
     font-weight:bold;
 }
+/* Add right align and padding */
+.labelTextCell {
+    text-align:right;
+    vertical-align:middle;
+    padding-right:4px;
+}
 /* For block elements containing form inputs */
 .formElem {
     margin-bottom:8px;
@@ -268,6 +261,11 @@ $smButtonHeight = 18px
     color:#000000;
     border:1px solid #aaaaaa;
 }
+/* Form-input-specific errors */
+.inputError {
+    font-size:$fontSizeS;
+    color:#aa3333;
+}
 
 /* General layout -- floats and clear
  * --------------------- */
@@ -280,6 +278,20 @@ $smButtonHeight = 18px
 .clearAll {
     clear:both;
     font-size:0px;
+}
+
+/* Tables, data display */
+table.dataDisplay {
+    border-collapse:collapse;
+    border-spacing:0;
+}
+table.dataDisplay td {
+    padding:4px;
+    border:1px solid #dfdfdf; 
+}
+td.dataDisplayLabel {
+    background-color:#eeeeee;
+    color:#666666;
 }
 
 /* Calendar-specific styles, classes
@@ -577,7 +589,9 @@ $smButtonHeight = 18px
 /* Fake popup for modal dialog box
  * --------------------- */
 /* Main box for fake popup */
-#fauxPopDiv {
+#modalDialog { 
+    position:absolute; 
+    background:$mainUIColor; 
     position:absolute;
     background:$mainUIColor;
     border:1px solid $uiDetailBorderColor;
@@ -585,17 +599,31 @@ $smButtonHeight = 18px
     display:none;
 }
 /* Fake popup center content area -- inside padding */
-#fauxPopContentDiv {
-    padding:24px;
+#modalDialogContainer {
+    padding:18px; 
+    padding-bottom:0px; 
 }
-/* Area for text content */
-#fauxPopTextDiv {
-    height:228px;
-    font-size:$fontSizeL;
+/* Only set if the dialog title exists */
+.dialogTitle {
+    background:#eeeeee;
+    text-align:left;
+    height:24px;
+    line-height:26px;
+    vertical-align:middle;
+    border:1px solid #dfdfdf;
+    padding-left:6px;
+    font-size:13px;
+    font-weight:bold;
+    color:#444444; 
 }
-/* Area for button panel of small buttons at the bottom */
-#fauxPopButtonDiv {
-    text-align:center;
+/* Only set if the dialog prompt exists */
+.dialogPrompt {
+    text-align:left;
+    padding-top:4px;
+    height:32px;
+    line-height:16px;
+    vertical-align:middle;
+    font-size:11px; 
 }
 
 /* Minical styles

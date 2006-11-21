@@ -1,11 +1,12 @@
 dojo.provide("cosmo.ui.widget.LoginDialog");
-dojo.require("cosmo.ui.widget.Button");
-dojo.require("cosmo.cmp");
-dojo.require("cosmo.env");
+
 dojo.require("dojo.io.*");
 dojo.require("dojo.widget.*");
+dojo.require("cosmo.cmp");
+dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
-dojo.require("dojo.widget.*");
+dojo.require("cosmo.ui.widget.Button");
+
 _ = cosmo.util.i18n.getText
 
 dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,

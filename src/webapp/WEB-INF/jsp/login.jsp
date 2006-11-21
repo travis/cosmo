@@ -46,7 +46,8 @@
 <script type="text/javascript">
 
 dojo.require("cosmo.ui.widget.LoginDialog");
-dojo.require("cosmo.ui.widget.Button");
+dojo.require("cosmo.ui.widget.ModalDialog");
+dojo.require("cosmo.account.create");
 
 </script>
 
@@ -58,7 +59,7 @@ dojo.require("cosmo.ui.widget.Button");
               <fmt:message key="Login.NoAccount"/>
       </div>
       <div style="padding-top:4px; text-align:center">
-          <a href="${staticBaseUrl}/account/new">
+          <a href="javascript:cosmo.account.create.showForm();">
               <fmt:message key="Login.CreateAccount"/>
           </a>
       </div>

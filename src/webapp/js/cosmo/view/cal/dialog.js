@@ -53,7 +53,7 @@ cosmo.view.cal.dialog = new function() {
         'btnsRight': [new Button('removeButtonDialog', 74, function() { doPublish('remove'); },
             getText('App.Button.Remove'), true)],
         'defaultAction': function() { doPublish('remove'); },
-        'msg': getText('Main.Prompt.EventRemoveConfirm')
+        'content': getText('Main.Prompt.EventRemoveConfirm')
     };
     props.removeRecurConfirm = {
         'type': Cal.dialog.CONFIRM,
@@ -62,7 +62,7 @@ cosmo.view.cal.dialog = new function() {
         'btnsRight': [],
         'defaultAction': function() {},
         'width': 480,
-        'msg': 'This is a recurring event. Which occurrences do you wish to remove?'
+        'content': 'This is a recurring event. Which occurrences do you wish to remove?'
     };
     props.saveRecurConfirm = {
         'type': Cal.dialog.CONFIRM,
@@ -72,7 +72,7 @@ cosmo.view.cal.dialog = new function() {
         'btnsRight': [],
         'defaultAction': function() {},
         'width': 480,
-        'msg': 'This is a recurring event. Which occurrences do you wish to change?'
+        'content': 'This is a recurring event. Which occurrences do you wish to change?'
     };
     
     // Publish via topics

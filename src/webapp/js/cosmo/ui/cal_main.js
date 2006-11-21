@@ -599,7 +599,7 @@ var Cal = new function() {
                 getText('App.Button.OK'), true);
             this.dialog.btnsCenter[0] = but;
             this.dialog.defaultAction = Cal.hideDialog;
-            this.dialog.msg = msg;
+            this.dialog.content = msg;
             this.showDialog();
         }
     };

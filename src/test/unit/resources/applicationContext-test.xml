@@ -104,9 +104,9 @@
         <prop key="hibernate.cache.use_second_level_cache">false</prop>
         <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
         <prop key="hibernate.show_sql">false</prop>
-         
+
         <prop key="hibernate.hbm2ddl.auto">update</prop>
-        
+
         <prop key="hibernate.dialect">org.hibernate.dialect.DerbyDialect</prop>
       </props>
     </property>
@@ -114,8 +114,8 @@
       <ref bean="jdbcDataSource"/>
     </property>
   </bean>
-  
-  
+
+
   <bean id="jdbcDataSource"
         class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName">
@@ -125,5 +125,8 @@
           <value>jdbc:derby:target/test-db;create=true</value>
         </property>
   </bean>
+
+  <bean id="accountActivationService"
+ 		class="org.osaf.cosmo.service.impl.AutomaticAccountActivationService"/>
 
 </beans>

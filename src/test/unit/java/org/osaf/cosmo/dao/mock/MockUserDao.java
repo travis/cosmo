@@ -1,12 +1,12 @@
 /*
  * Copyright 2005-2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,7 +46,8 @@ public class MockUserDao implements UserDao {
     private HashMap usernameIdx;
     private HashMap emailIdx;
     private HashMap uidIdx;
-    
+    private HashMap activationIdIdx;
+
     private VersionFourGenerator idGenerator = new VersionFourGenerator();
 
     /**
@@ -55,6 +56,7 @@ public class MockUserDao implements UserDao {
         usernameIdx = new HashMap();
         emailIdx = new HashMap();
         uidIdx = new HashMap();
+        activationIdIdx = new HashMap();
 
         // add overlord user
         User overlord = new User();
@@ -80,7 +82,7 @@ public class MockUserDao implements UserDao {
         }
         return tmp;
     }
-    
+
     /**
      */
     public PagedList getUsers(PageCriteria pageCriteria) {
@@ -100,7 +102,7 @@ public class MockUserDao implements UserDao {
         }
         return (User) usernameIdx.get(username);
     }
-    
+
     /**
      */
     public User getUserByUid(String uid) {
@@ -108,6 +110,15 @@ public class MockUserDao implements UserDao {
             throw new IllegalArgumentException("null uid");
         }
         return (User) uidIdx.get(uid);
+    }
+
+    /**
+     */
+    public User getUserByActivationId(String id) {
+        if (id == null) {
+            throw new IllegalArgumentException("null activation id");
+        }
+        return (User) activationIdIdx.get(id);
     }
 
     /**
@@ -125,9 +136,9 @@ public class MockUserDao implements UserDao {
         if (user == null) {
             throw new IllegalArgumentException("null user");
         }
-        
+
         user.setUid(idGenerator.nextIdentifier().toString());
-        
+
         user.validate();
         if (usernameIdx.containsKey(user.getUsername())) {
             throw new DuplicateUsernameException("username in use");
@@ -135,10 +146,11 @@ public class MockUserDao implements UserDao {
         if (emailIdx.containsKey(user.getEmail())) {
             throw new DuplicateEmailException("email in use");
         }
-        
+
         usernameIdx.put(user.getUsername(), user);
         emailIdx.put(user.getEmail(), user);
         uidIdx.put(user.getUid(), user);
+        activationIdIdx.put(user.getActivationId(), user);
         return user;
     }
 

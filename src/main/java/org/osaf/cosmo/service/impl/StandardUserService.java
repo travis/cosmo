@@ -1,12 +1,12 @@
 /*
  * Copyright 2005-2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,6 +29,7 @@ import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.service.AccountActivationService;
 import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.util.PagedList;
@@ -50,6 +51,8 @@ public class StandardUserService implements UserService {
     private StringIdentifierGenerator passwordGenerator;
     private ContentDao contentDao;
     private UserDao userDao;
+
+    private AccountActivationService accountActivationService;
 
     // UserService methods
 
@@ -123,11 +126,25 @@ public class StandardUserService implements UserService {
         user.setDateCreated(new Date());
         user.setDateModified(user.getDateCreated());
 
+
+        //TODO: should be configurable in application context
+        boolean accountActivationRequired =
+            (!user.isOverlord());
+
+        if (accountActivationRequired){
+            user.setActivationId(
+                    this.accountActivationService.getActivationToken());
+        }
+
         userDao.createUser(user);
 
         User newUser = userDao.getUser(user.getUsername());
 
         contentDao.createRootItem(newUser);
+
+        if (accountActivationRequired){
+            accountActivationService.initiateActivationProcess(newUser);
+        }
 
         return newUser;
     }
@@ -199,7 +216,7 @@ public class StandardUserService implements UserService {
         // seems to automatically remove the user's root item
         userDao.removeUser(user);
     }
-    
+
     /**
      * Removes a set of user accounts from the repository. Will not
      * remove the overlord.
@@ -217,10 +234,10 @@ public class StandardUserService implements UserService {
                 log.debug("removing user " + user.getUsername());
             }
         }
-        
+
 
     }
-    
+
     /**
      * Removes the user accounts identified by the given usernames from
      * the repository. Will not remove overlord.
@@ -228,7 +245,7 @@ public class StandardUserService implements UserService {
      */
     public void removeUsersByName(Set<String> usernames) throws OverlordDeletionException{
         for (String username : usernames){
-            if (username.equals(User.USERNAME_OVERLORD)) 
+            if (username.equals(User.USERNAME_OVERLORD))
                     throw new OverlordDeletionException();
             userDao.removeUser(username);
         }
@@ -238,9 +255,6 @@ public class StandardUserService implements UserService {
                 log.debug("removing user " + username);
             }
         }
-        
-        
-        
     }
 
     /**
@@ -270,9 +284,13 @@ public class StandardUserService implements UserService {
         if (passwordGenerator == null) {
             throw new IllegalStateException("passwordGenerator is required");
         }
+        if (accountActivationService == null) {
+            throw new IllegalStateException("accountActivationService is required");
+        }
         if (digestAlgorithm == null) {
             digestAlgorithm = DEFAULT_DIGEST_ALGORITHM;
         }
+
         try {
             digest = MessageDigest.getInstance(digestAlgorithm);
         } catch (Exception e) {
@@ -332,6 +350,10 @@ public class StandardUserService implements UserService {
         this.passwordGenerator = generator;
     }
 
+    public void setAccountActivationService(AccountActivationService accountActivationService){
+        this.accountActivationService = accountActivationService;
+    }
+
     /**
      */
     public ContentDao getContentDao() {
@@ -363,12 +385,13 @@ public class StandardUserService implements UserService {
 
     public void removePreference(String username, String preferenceName) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setPreference(String username, String preferenceName) {
         // TODO Auto-generated method stub
-        
+
     }
+
 
 }

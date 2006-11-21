@@ -1,12 +1,12 @@
 /*
  * Copyright 2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -86,6 +86,14 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     public User getUserByUid(String uid) {
         try {
             return findUserByUid(uid);
+        } catch (HibernateException e) {
+            throw SessionFactoryUtils.convertHibernateAccessException(e);
+        }
+    }
+
+    public User getUserByActivationId(String id) {
+        try {
+            return findUserByActivationId(id);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -212,6 +220,18 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             return null;
     }
 
+    private User findUserByActivationId(String id) {
+        Session session = getSession();
+        Query hibQuery = session.getNamedQuery("user.byActivationid").setParameter(
+                "activationid", id);
+        hibQuery.setCacheable(true);
+        List users = hibQuery.list();
+        if (users.size() > 0)
+            return (User) users.get(0);
+        else
+            return null;
+    }
+
     private static class UserQueryCriteriaBuilder<SortType extends User.SortType> extends
             StandardQueryCriteriaBuilder<SortType> {
 
@@ -245,8 +265,8 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         }
 
         private Order createOrder(PageCriteria pageCriteria, String property) {
-            return pageCriteria.isSortAscending() ? 
-            	Order.asc(property) : 
+            return pageCriteria.isSortAscending() ?
+            	Order.asc(property) :
            		Order.desc(property);
         }
     }

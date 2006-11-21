@@ -1,12 +1,12 @@
 /*
  * Copyright 2005-2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ public interface UserDao extends Dao {
      * @param pageCriteria the pagination criteria
      */
     public PagedList getUsers(PageCriteria<User.SortType> pageCriteria);
-    
+
     /**
      * Returns the user account identified by the given username.
      *
@@ -52,16 +52,26 @@ public interface UserDao extends Dao {
      * exist
      */
     public User getUser(String username);
-    
+
     /**
      * Returns the user account identified by the given uid.
      *
-     * @param uid the username of the account to return
+     * @param uid the uid of the account to return
      *
      * @throws DataRetrievalFailureException if the account does not
      * exist
      */
     public User getUserByUid(String uid);
+
+    /**
+     * Returns the user account identified by the given activation id.
+     *
+     * @param hash the activation hash corresponding to the account to return
+     *
+     * @throws DataRetrievalFailureException if the account does not
+     * exist
+     */
+    public User getUserByActivationId(String id);
 
     /**
      * Returns the user account identified by the given email address.

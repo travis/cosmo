@@ -1,12 +1,12 @@
 /*
  * Copyright 2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -88,9 +88,9 @@ public class User extends BaseModelObject {
     /**
      */
     public static final int EMAIL_LEN_MAX = 128;
-    
+
     // Sort Strings
-    
+
     /**
      * A String indicating the results should be sorted by Last Name then First Name
      */
@@ -115,13 +115,13 @@ public class User extends BaseModelObject {
      * A String indicating the results should be sorted by Date last Modified
      */
     public static final String LAST_MODIFIED_SORT_STRING = "Last Modified";
-    
+
     /**
      * The Default Sort Type
      */
     public static final String DEFAULT_SORT_STRING = NAME_SORT_STRING;
-    
-    public static final String NAME_URL_STRING = "name"; 
+
+    public static final String NAME_URL_STRING = "name";
     public static final String USERNAME_URL_STRING = "username";
     public static final String ADMIN_URL_STRING = "admin";
     public static final String EMAIL_URL_STRING = "email";
@@ -136,6 +136,7 @@ public class User extends BaseModelObject {
     private String lastName;
     private String email;
     private String oldEmail;
+    private String activationId;
     private Boolean admin;
     private Date dateCreated;
     private Date dateModified;
@@ -285,6 +286,21 @@ public class User extends BaseModelObject {
 
     /**
      */
+    @Column(name = "activationid", nullable=true, length=255)
+    @Length(min=1, max=255)
+    @Index(name="idx_activationid")
+    public String getActivationId() {
+        return activationId;
+    }
+
+    /**
+     */
+    public void setActivationId(String activationId) {
+        this.activationId = activationId;
+    }
+
+    /**
+     */
     @Column(name = "datecreated")
     @Type(type="timestamp")
     public Date getDateCreated() {
@@ -317,7 +333,23 @@ public class User extends BaseModelObject {
     public boolean isOverlord() {
         return username != null && username.equals(USERNAME_OVERLORD);
     }
-    
+
+    /**
+     */
+    @Transient
+    public boolean isActivated() {
+        return this.activationId == null;
+    }
+
+    /**
+     *
+     *
+     */
+    @Transient
+    public void activate(){
+       this.activationId = null;
+    }
+
     /**
      */
     public boolean equals(Object o) {
@@ -332,6 +364,7 @@ public class User extends BaseModelObject {
             append(lastName, it.lastName).
             append(email, it.email).
             append(admin, it.admin).
+            append(activationId, it.activationId).
             isEquals();
     }
 
@@ -345,6 +378,7 @@ public class User extends BaseModelObject {
             append(lastName).
             append(email).
             append(admin).
+            append(activationId).
             toHashCode();
     }
 
@@ -358,6 +392,7 @@ public class User extends BaseModelObject {
             append("lastName", lastName).
             append("email", email).
             append("admin", admin).
+            append("activationId", activationId).
             append("dateCreated", dateCreated).
             append("dateModified", dateModified).
             toString();
@@ -416,7 +451,7 @@ public class User extends BaseModelObject {
         if (firstName.length() < FIRSTNAME_LEN_MIN ||
             firstName.length() > FIRSTNAME_LEN_MAX) {
             throw new ModelValidationException("First name must be " +
-                                               FIRSTNAME_LEN_MIN + " to " + 
+                                               FIRSTNAME_LEN_MIN + " to " +
                                                FIRSTNAME_LEN_MAX +
                                                " characters in length");
         }
@@ -453,7 +488,7 @@ public class User extends BaseModelObject {
     }
 
     @OneToMany(mappedBy="owner", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.DELETE }) 
+    @Cascade( {CascadeType.DELETE })
     public Set<Item> getItems() {
         return items;
     }
@@ -461,8 +496,8 @@ public class User extends BaseModelObject {
     public void setItems(Set<Item> items) {
         this.items = items;
     }
-    
-    /* I'm not sure about putting this enum here, but it seems weird 
+
+    /* I'm not sure about putting this enum here, but it seems weird
      * in other places too. Since sort information is already here,
      * in the *_SORT_STRING constants, I think this is appropriate.
     */
@@ -473,10 +508,10 @@ public class User extends BaseModelObject {
         EMAIL (EMAIL_URL_STRING, EMAIL_SORT_STRING),
         CREATED (CREATED_URL_STRING, CREATED_SORT_STRING),
         LAST_MODIFIED (LAST_MODIFIED_URL_STRING, LAST_MODIFIED_SORT_STRING);
-        
+
         private final String urlString;
         private final String titleString;
-        
+
         SortType(String urlString, String titleString){
             this.urlString = urlString;
             this.titleString = titleString;

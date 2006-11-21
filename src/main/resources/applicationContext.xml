@@ -327,10 +327,10 @@
   <bean id="passwordGenerator"
         class="org.apache.commons.id.random.SessionIdGenerator"/>
 
-<!-- <bean id="accountActivationService"
+  <bean id="accountActivationService"
   		class="org.osaf.cosmo.service.impl.AutomaticAccountActivationService">
-	<property name="userService"><ref local="userService"/></property>
-  </bean>-->
+	<property name="userDao"><ref bean="userDao"/></property>
+  </bean>
 
   <bean id="userService" parent="txProxyTemplate">
     <property name="proxyInterfaces">
@@ -354,9 +354,9 @@
     <property name="passwordGenerator">
       <ref bean="passwordGenerator"/>
     </property>
-<!--    <property name="accountActivationService">
+    <property name="accountActivationService">
       <ref bean="accountActivationService"/>
-    </property>-->
+    </property>
   </bean>
 
   <bean id="contentService" parent="txProxyTemplate">

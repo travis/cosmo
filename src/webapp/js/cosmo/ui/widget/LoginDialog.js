@@ -123,7 +123,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
 
 			// Programmatic subwidget creation should be removed once safari supports
 			// widgetsInTemplate
-			var button = dojo.widget.createWidget("cosmo:Button", { text:_("Login.Button.Ok"), width:74 });
+			var button = dojo.widget.createWidget("cosmo:Button",
+					{ 	text: _("Login.Button.Ok"),
+						width: 74,
+						widgetId: "loginSubmitButton"
+
+					});
 
 			dojo.dom.prependChild(button.domNode, this.submitButton.parentNode);
 			dojo.dom.removeNode(this.submitButton);

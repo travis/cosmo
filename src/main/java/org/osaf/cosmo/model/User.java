@@ -141,8 +141,10 @@ public class User extends BaseModelObject {
     private Date dateCreated;
     private Date dateModified;
     private Set<Item> items = new HashSet<Item>(0);
+    private Set<CollectionSubscription> subscriptions = 
+        new HashSet<CollectionSubscription>(0);
 
-	/**
+    /**
      */
     public User() {
         admin = Boolean.FALSE;
@@ -496,11 +498,62 @@ public class User extends BaseModelObject {
     public void setItems(Set<Item> items) {
         this.items = items;
     }
+    
+    @OneToMany(mappedBy = "owner", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    public Set<CollectionSubscription> getCollectionSubscriptions() {
+        return subscriptions;
+    }
 
-    /* I'm not sure about putting this enum here, but it seems weird
-     * in other places too. Since sort information is already here,
-     * in the *_SORT_STRING constants, I think this is appropriate.
-    */
+    // Used by hibernate
+    private void setCollectionSubscriptions(
+            Set<CollectionSubscription> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
+
+    public void addSubscription(CollectionSubscription subscription) {
+        subscription.setOwner(this);
+        subscriptions.add(subscription);
+    }
+
+    /**
+     * Get the CollectionSubscription with the specified displayName
+     * @param displayname display name of subscription to return
+     * @return subscription with specified display name
+     */
+    @Transient
+    public CollectionSubscription getSubscription(String displayname) {
+
+        for (CollectionSubscription sub : subscriptions) {
+            if (sub.getDisplayName().equals(displayname))
+                return sub;
+        }
+
+        return null;
+    }
+
+    
+    /**
+     * Remove the CollectionSubscription with the specifed displayName
+     * @param name display name of the subscription to remove
+     */
+    public void removeSubscription(String displayName) {
+        removeSubscription(getSubscription(displayName));
+    }
+
+    /** */
+    public void removeSubscription(CollectionSubscription sub) {
+        if (sub != null)
+            subscriptions.remove(sub);
+    }
+
+
+    /*
+     * I'm not sure about putting this enum here, but it seems weird in other
+     * places too. Since sort information is already here, in the *_SORT_STRING
+     * constants, I think this is appropriate.
+     */
     public enum SortType {
         NAME (NAME_URL_STRING, NAME_SORT_STRING),
         USERNAME (USERNAME_URL_STRING, USERNAME_SORT_STRING),

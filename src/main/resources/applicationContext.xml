@@ -98,6 +98,7 @@
             <value>org.osaf.cosmo.model.CalendarPropertyIndex</value>
             <value>org.osaf.cosmo.model.CalendarTimeRangeIndex</value>
             <value>org.osaf.cosmo.model.CollectionItem</value>
+            <value>org.osaf.cosmo.model.CollectionSubscription</value>
             <value>org.osaf.cosmo.model.ContentData</value>
             <value>org.osaf.cosmo.model.ContentItem</value>
             <value>org.osaf.cosmo.model.DateAttribute</value>

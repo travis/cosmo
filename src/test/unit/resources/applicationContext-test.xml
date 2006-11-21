@@ -62,12 +62,13 @@
             <value>org.osaf.cosmo.model.BinaryAttribute</value>
             <value>org.osaf.cosmo.model.BooleanAttribute</value>
             <value>org.osaf.cosmo.model.CalendarCollectionItem</value>
-            <value>org.osaf.cosmo.model.CalendarCollectionStamp</value>			
+            <value>org.osaf.cosmo.model.CalendarCollectionStamp</value>
             <value>org.osaf.cosmo.model.CalendarEventItem</value>
             <value>org.osaf.cosmo.model.CalendarItem</value>
             <value>org.osaf.cosmo.model.CalendarPropertyIndex</value>
             <value>org.osaf.cosmo.model.CalendarTimeRangeIndex</value>
             <value>org.osaf.cosmo.model.CollectionItem</value>
+            <value>org.osaf.cosmo.model.CollectionSubscription</value>
             <value>org.osaf.cosmo.model.ContentData</value>
             <value>org.osaf.cosmo.model.ContentItem</value>
             <value>org.osaf.cosmo.model.DateAttribute</value>
@@ -76,7 +77,7 @@
             <value>org.osaf.cosmo.model.HomeCollectionItem</value>
             <value>org.osaf.cosmo.model.IntegerAttribute</value>
             <value>org.osaf.cosmo.model.Item</value>
-            <value>org.osaf.cosmo.model.MessageStamp</value>			
+            <value>org.osaf.cosmo.model.MessageStamp</value>
             <value>org.osaf.cosmo.model.MultiValueStringAttribute</value>
             <value>org.osaf.cosmo.model.NoteStamp</value>
             <value>org.osaf.cosmo.model.ServerProperty</value>
@@ -127,6 +128,6 @@
   </bean>
 
   <bean id="accountActivationService"
- 		class="org.osaf.cosmo.service.impl.AutomaticAccountActivationService"/>
+      class="org.osaf.cosmo.service.impl.AutomaticAccountActivationService"/>
 
 </beans>

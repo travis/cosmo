@@ -20,8 +20,8 @@ JAVA_JSON_MAPPING = {"java.util.Date":Date,
                      "net.fortuna.ical4j.model.Date":Date,
                      "net.fortuna.ical4j.model.DateTime":Date,
                      "org.osaf.cosmo.rpc.model.Event":CalEventData,
-                     "org.osaf.cosmo.rpc.model.CosmoDate":ScoobyDate,
-                     "org.osaf.cosmo.rpc.model.CosmoTimeZone":ScoobyTimezone, 
+                     "org.osaf.cosmo.rpc.model.CosmoDate":cosmo.datetime.Date,
+                     "org.osaf.cosmo.rpc.model.CosmoTimeZone":ScoobyTimezone,
                      "org.osaf.cosmo.rpc.model.RecurrenceRule":RecurrenceRule,
                      "org.osaf.cosmo.rpc.model.Modification":Modification};
 
@@ -37,14 +37,14 @@ function createSetterMethodName(propName){
     return setterMethodName;
 }
 
-function convertObject(object){        
+function convertObject(object){
     if (!object){
         return object;
-    }    
+    }
 
     //test if the returned value is an Array
     if (typeof object == "object" && object[0]){
-    
+
         var newArray = new Array();
         for (var x = 0; x < object.length; x++){
             newArray[x] = convertObject(object[x]);
@@ -60,7 +60,7 @@ function convertObject(object){
     if (object.javaClass == "java.util.HashMap"){
         return convertMap(object);
     }
-    
+
     var constructor = JAVA_JSON_MAPPING[object.javaClass];
     if (constructor){
        var newObject = new constructor();
@@ -73,7 +73,7 @@ function convertObject(object){
            if (prop && typeof prop == "object" ){
                prop = convertObject(prop);
            }
-           
+
            //see if there is a "setter" method - important especially for Date type
            var setterMethodName = createSetterMethodName(propName);
            if (newObject[setterMethodName]){
@@ -112,7 +112,7 @@ function wrapMethod(jsonRemoteObject, jsonRemoteMethod){
                     oldCallback(convertObject(result), null, requestId);
                 }
             }
-            
+
             return jsonRemoteMethod.apply(jsonRemoteObject, arguments);
         }
 
@@ -240,7 +240,7 @@ wrapGetEvents = function(getEventsFunction){
         for (var x = 0; x < returnVal.length; x++){
                 var start = returnVal[x].start.toUTC();
                 var end =  returnVal[x].end ? returnVal[x].end.toUTC() : start;
-                
+
                 // Throw out events where both start and end are on the same
                 // side of the range
                 if (!(start < realRangeStart && end < realRangeStart) &&

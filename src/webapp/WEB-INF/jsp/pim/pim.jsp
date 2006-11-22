@@ -42,12 +42,10 @@
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/log.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/date.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/hash.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/debug.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/validate.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/cookie.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/text.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/popup.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/model/scoobydate.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/model/model.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/ui.conf.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/block.js"></script>
@@ -116,10 +114,10 @@ function init() {
             <span class="menuBarDivider">|</span>
             <c:url var="aboutUrl" value="/help/about"/>
             <a href="javascript:Popup.open('${aboutUrl}', 380, 280);">
-              <fmt:message key="Main.About"/> 
+              <fmt:message key="Main.About"/>
             </a>
             <span class="menuBarDivider">|</span>
-            <a href="${staticBaseUrl}/logout"> 
+            <a href="${staticBaseUrl}/logout">
                <fmt:message key="Main.LogOut"/>
             </a>&nbsp;&nbsp;
         </div>
@@ -161,7 +159,6 @@ function init() {
           </div>
         </div>
         <div id="fullMaskDiv"></div>
-        <div id="dojoDebug" dojoType="cosmo:Debug"><div>
 </body>
 
 </html>

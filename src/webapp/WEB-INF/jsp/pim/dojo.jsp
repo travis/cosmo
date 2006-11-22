@@ -24,7 +24,7 @@
 <script type="text/javascript">
 
 	// Set this to true to get nice dojo debugging messages.
-	
+
     var djConfig = {isDebug: false};
 </script>
 
@@ -33,6 +33,7 @@
 bootstrap = function(){
     var staticBaseUrl = "${staticBaseUrl}";
     dojo.require("dojo.widget.*");
+    dojo.require("dojo.debug.console");
     dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
     dojo.widget.manager.registerWidgetPackage("cosmo.ui.widget");
 
@@ -41,15 +42,15 @@ bootstrap = function(){
 
     dojo.require("cosmo.ui.widget.Debug");
 
-    dojo.require("cosmo.datetime.*"); 
+    dojo.require("cosmo.datetime.*");
 
-    var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry("${staticBaseUrl}/js/lib/olson-tzdata/"); 
+    var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry("${staticBaseUrl}/js/lib/olson-tzdata/");
     registry.init(["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica"]);
     //registry.init([ "europe"]);
     cosmo.datetime.timezone.setTimezoneRegistry(registry);
 }
 bootstrap();
-    
+
 </script>
 
 

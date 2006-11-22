@@ -15,7 +15,7 @@
 */
 
 /**
- * A ScoobyDate is how we represent date-times in Cosmo's events
+ * A cosmo.datetime.Date is how we represent date-times in Cosmo's events
  *
  * The absence of a timezone together with the utc property being false indicates
  * a floating date-time.
@@ -27,7 +27,11 @@
  * @param timezone the timezone of the time
  * @param utc Boolean indicates that this is a utc time
  */
-function ScoobyDate(year, month, date, hours, minutes, seconds, timezone, utc) {
+
+dojo.provide("cosmo.datetime.Date");
+dojo.require("cosmo.util.debug");
+
+cosmo.datetime.Date = function (year, month, date, hours, minutes, seconds, timezone, utc) {
     this.year = year ? year : 0;
     this.month = month ? month : 0;
     this.date = date ? date : 0;
@@ -37,69 +41,72 @@ function ScoobyDate(year, month, date, hours, minutes, seconds, timezone, utc) {
     this.timezone = timezone ? timezone : null;
     this.utc = utc ? utc : false;
 }
+//This is just an alias from ScoobyDate to comso.datetime.Date for use while we
+//ferrett out all remaining ScoobyDates
+cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date, "ScoobyDate", "0.6");
 
-ScoobyDate.prototype.getFullYear = function() {
+cosmo.datetime.Date.prototype.getFullYear = function() {
     return this.getYear();
 };
-ScoobyDate.prototype.getYear = function() {
+cosmo.datetime.Date.prototype.getYear = function() {
     return this.year;
 };
-ScoobyDate.prototype.getMonth = function() {
+cosmo.datetime.Date.prototype.getMonth = function() {
     return this.month;
 };
-ScoobyDate.prototype.getDate = function() {
+cosmo.datetime.Date.prototype.getDate = function() {
     return this.date;
 };
-ScoobyDate.prototype.getHours = function() {
+cosmo.datetime.Date.prototype.getHours = function() {
     return this.hours;
 };
-ScoobyDate.prototype.getMinutes = function() {
+cosmo.datetime.Date.prototype.getMinutes = function() {
     return this.minutes;
 };
-ScoobyDate.prototype.getSeconds = function() {
+cosmo.datetime.Date.prototype.getSeconds = function() {
     return this.seconds;
 };
-ScoobyDate.prototype.setFullYear = function(yea) {
+cosmo.datetime.Date.prototype.setFullYear = function(yea) {
     this.setYear(yea);
 };
-ScoobyDate.prototype.setYear = function(yea) {
+cosmo.datetime.Date.prototype.setYear = function(yea) {
     this.year = yea;
 };
-ScoobyDate.prototype.setMonth = function(mon) {
+cosmo.datetime.Date.prototype.setMonth = function(mon) {
     this.month = mon;
 };
-ScoobyDate.prototype.setDate = function(dat) {
+cosmo.datetime.Date.prototype.setDate = function(dat) {
     this.date = dat;
 };
-ScoobyDate.prototype.setHours = function(hou, min) {
+cosmo.datetime.Date.prototype.setHours = function(hou, min) {
     this.hours = hou;
     if (min) {
         this.setMinutes(min);
     }
 };
-ScoobyDate.prototype.setMinutes = function(min) {
+cosmo.datetime.Date.prototype.setMinutes = function(min) {
     this.minutes = min;
 };
-ScoobyDate.prototype.setSeconds = function(sec) {
+cosmo.datetime.Date.prototype.setSeconds = function(sec) {
     this.seconds = sec;
 };
 /**
  * Returns the time in milliseconds since January 1st, 1970 UTC.
  */
-ScoobyDate.prototype.toUTC = function() {
+cosmo.datetime.Date.prototype.toUTC = function() {
     var utc = Date.UTC(this.getYear(), this.getMonth(), this.getDate(),
         this.getHours(), this.getMinutes(), this.getSeconds());
     return(utc - this.getTimezoneOffsetMs());
 };
 /**
- * Updates a ScoobyDate based on a UTC stamp
+ * Updates a cosmo.datetime.Date based on a UTC stamp
  * Naive implementation assumes timezone offset for new UTC does not change
  */
-ScoobyDate.prototype.updateFromUTC = function(utc) {
+cosmo.datetime.Date.prototype.updateFromUTC = function(utc) {
     var dt = null;
     // Get a fake Date object in UTC frame of reference
     dt = new Date(utc + this.getTimezoneOffsetMs());
-    // Update ScoobyDate values based on UTC values
+    // Update cosmo.datetime.Date values based on UTC values
     this.year = dt.getUTCFullYear();
     this.month = dt.getUTCMonth();
     this.date = dt.getUTCDate();
@@ -108,16 +115,16 @@ ScoobyDate.prototype.updateFromUTC = function(utc) {
     this.seconds = dt.getUTCSeconds();
     // Update TZ if needed
     if (this.timezone) {
-        this.timezone = ScoobyDate.getNewTimezoneForUTC(this.timezone, utc);
+        this.timezone = cosmo.datetime.Date.getNewTimezoneForUTC(this.timezone, utc);
     }
 };
 /**
- * Updates a ScoobyDate based on a values from a local JS Date
+ * Updates a cosmo.datetime.Date based on a values from a local JS Date
  * Naive implementation assumes timezone offset for new UTC does not change
  * BANDAID: NEEDS TO BE REFACTORED
  */
-ScoobyDate.prototype.updateFromLocalDate = function(dt) {
-    // Update ScoobyDate values based on local JS date values
+cosmo.datetime.Date.prototype.updateFromLocalDate = function(dt) {
+    // Update cosmo.datetime.Date values based on local JS date values
     // Used to make changes to dates that are already in a specific timezone
     this.year = dt.getFullYear();
     this.month = dt.getMonth();
@@ -131,7 +138,7 @@ ScoobyDate.prototype.updateFromLocalDate = function(dt) {
  * Minus GMT results sensibly in negative values -- this is opposite
  * behavior from JavaScript's Date object
  */
-ScoobyDate.prototype.getTimezoneOffset = function() {
+cosmo.datetime.Date.prototype.getTimezoneOffset = function() {
     var offsetMin = 0;
 
     // Is UTC, no need to do more work
@@ -151,15 +158,15 @@ ScoobyDate.prototype.getTimezoneOffset = function() {
 /**
  * Returns the offset from GMT in milliseconds
  */
-ScoobyDate.prototype.getTimezoneOffsetMs = function() {
+cosmo.datetime.Date.prototype.getTimezoneOffsetMs = function() {
     return(this.getTimezoneOffset()*60*1000);
 };
 /**
-  * One place to go to get the user-pref timezone offset for a ScoobyDate
+  * One place to go to get the user-pref timezone offset for a cosmo.datetime.Date
   * This should ultimately work with the Scooby app's user prefs
   * Or independently with fallback to the normal browser local offset
   */
-ScoobyDate.prototype.getUserPrefTimezoneOffset = function() {
+cosmo.datetime.Date.prototype.getUserPrefTimezoneOffset = function() {
     var offsetMin = 0;
     // Try to look up user pref
     if (typeof Pref == 'object') {
@@ -167,7 +174,7 @@ ScoobyDate.prototype.getUserPrefTimezoneOffset = function() {
     }
     // Otherwise punt and go with the browser's offset for that date
     else {
-        offsetMin = ScoobyDate.getBrowserTimezoneOffset(
+        offsetMin = cosmo.datetime.Date.getBrowserTimezoneOffset(
             this.getYear(), this.getMonth(), this.getDate(),
             this.getHours(), this.getMinutes(), this.getSeconds());
     }
@@ -177,21 +184,22 @@ ScoobyDate.prototype.getUserPrefTimezoneOffset = function() {
  * Formats the date in it's original timezone, using the strftime function
  * found in date.js.
  *
- * For example, if the timezone of the ScoobyDate is EST and it's
+ * For example, if the timezone of the Date is EST and it's
  * Date is "1/2/2006 19:30", than that is the date that this function will
  * return no matter what your local timezone is.
  */
-ScoobyDate.prototype.strftime = function(formatString){
+cosmo.datetime.Date.prototype.strftime = function(formatString){
     // No need to do any mucking around with UTC offsets or anything
     // for this function, since all we care about is the output
     var d = new Date(this.getYear(), this.getMonth(), this.getDate(),
         this.getHours(), this.getMinutes(), this.getSeconds());
     return Date.strftime(formatString, d);
 };
+
 /**
  * Increments by the desired number of specified units
  */
-ScoobyDate.prototype.add = function(interv, incr) {
+cosmo.datetime.Date.prototype.add = function(interv, incr) {
     var dt = null;
     var ret = null;
     // Get incremented localtime JS Date obj
@@ -200,65 +208,65 @@ ScoobyDate.prototype.add = function(interv, incr) {
     this.updateFromUTC(dt.getTime());
 };
 /**
- * Formats the ScoobyDate according to what time the date falls on in the user's
+ * Formats the Date according to what time the date falls on in the user's
  * local timezone.
  *
- * For example, if this ScoobyDate represents the date "1/1/2006 12am PST"
+ * For example, if this Date represents the date "1/1/2006 12am PST"
  * and your local timezone is EST, the date will be formatted as "1/1/2006 3am"
  */
-ScoobyDate.prototype.strftimeLocalTimezone = function(formatString){
-        var localScoobyDate = this.createLocalScoobyDate();
-        return localScoobyDate.strftime(formatString);
+cosmo.datetime.Date.prototype.strftimeLocalTimezone = function(formatString){
+        var localDate = this.createLocalDate();
+        return localDate.strftime(formatString);
 };
 /**
- * Returns what the ScoobyDate representing the same point in time as this ScoobyDate,
+ * Returns what the Date representing the same point in time as this Date,
  * but in the user's local timezone.
  *
- * For example, if this ScoobyDate represents the date "1/1/2006 12am PST"
+ * For example, if this Date represents the date "1/1/2006 12am PST"
  * and your local timezone is EST, the returned date will be "1/1/2006 3am EST"
  */
-ScoobyDate.prototype.createLocalScoobyDate = function(){
+cosmo.datetime.Date.prototype.createLocalDate = function(){
     //For now, we can cheat using new Date() since that gives us a local date
     //with the given UTC
     var utc = this.toUTC();
     var dt = new Date(utc);
     var tz = ScoobyTimezone.getLocalTimezone(utc);
-    var scoobDt = new ScoobyDate(dt.getFullYear(), dt.getMonth(),
+    var scoobDt = new cosmo.datetime.Date(dt.getFullYear(), dt.getMonth(),
         dt.getDate(), dt.getHours(), dt.getMinutes(),
         dt.getSeconds(), tz, false);
     return scoobDt;
 };
 /**
- * Returns the day of the week occupied by a ScoobyDate
+ * Returns the day of the week occupied by a Date
  * but in the user's local timezone.
  */
-ScoobyDate.prototype.getLocalDay = function() {
+cosmo.datetime.Date.prototype.getLocalDay = function() {
     var localDt = new Date(this.toUTC());
     return localDt.getDay();
 };
-ScoobyDate.prototype.after = function(dt){
+cosmo.datetime.Date.prototype.after = function(dt){
     var utc = (typeof dt == "number") ? dt : dt.toUTC();
     return  this.toUTC() > utc;
 };
-ScoobyDate.prototype.before = function(dt){
+cosmo.datetime.Date.prototype.before = function(dt){
     var utc = (typeof dt == "number") ? dt : dt.toUTC();
     return  this.toUTC() < utc;
 };
 /**
- * Returns UTC timestamp for a ScoobyDate
+ * Returns UTC timestamp for a Date
  * Leave for now for API compatibility
  */
-ScoobyDate.prototype.getTime = function() {
+cosmo.datetime.Date.prototype.getTime = function() {
    return this.toUTC();
 };
 
-ScoobyDate.prototype.toString = genericToString;
+cosmo.datetime.Date.prototype.toString = genericToString;
 
 
-// ScoobyDate static methods
+// Date static methods
 // ===========================
-ScoobyDate.clone = function(sdt) {
-    var ret = new ScoobyDate(sdt.getFullYear(), sdt.getMonth(),
+cosmo.datetime.Date.clone = function(sdt) {
+    var ret = new cosmo.datetime.Date(sdt.getFullYear(), sdt.getMonth(),
             sdt.getDate(), sdt.getHours(), sdt.getMinutes(),
             sdt.getSeconds(), null, sdt.utc);
     if (sdt.timezone) {
@@ -267,6 +275,7 @@ ScoobyDate.clone = function(sdt) {
     }
     return ret;
 }
+cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.clone, "ScoobyDate.clone", "0.6");
 
 /**
  * Returns the UTC offset (in milliseconds) for a particular date for the user's
@@ -274,27 +283,30 @@ ScoobyDate.clone = function(sdt) {
  * Right now the user's timezone is the javascript timezone, so this implementation
  * is rather trivial. Will be useful once a settable timezone preferences exists.
  */
-ScoobyDate.getBrowserTimezoneOffset = function(year, month, day, hours, minutes, seconds){
+cosmo.datetime.Date.getBrowserTimezoneOffset = function(year, month, day, hours, minutes, seconds){
     var date = new Date(year, month, day, hours, minutes, seconds, 0);
     // Return a negative value for minus-GMT offset -- opposite behavior from JS
     return (date.getTimezoneOffset()*-1);
 }
+cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.getBrowserTimezoneOffset, "ScoobyDate.getBrowserTimezoneOffset", "0.6");
 
 /**
- * Returns the difference in specified units between two ScoobyDates
+ * Returns the difference in specified units between two Date
  */
-ScoobyDate.diff = function(interv, sdt1, sdt2) {
+cosmo.datetime.Date.diff = function(interv, sdt1, sdt2) {
     return Date.diff(interv, sdt1.toUTC(), sdt2.toUTC());
 }
+cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.diff, "ScoobyDate.diff", "0.6");
 
 /**
- * Returns a new ScoobyDate incremented the desired number of units
+ * Returns a new Date incremented the desired number of units
  */
-ScoobyDate.add = function(sdt, interv, incr) {
-    var ret = ScoobyDate.clone(sdt);
+cosmo.datetime.Date.add = function(sdt, interv, incr) {
+    var ret = this.clone(sdt);
     ret.add(interv, incr);
     return ret;
 }
+cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.add, "ScoobyDate.add", "0.6");
 
 /**
  * Returns a new ScoobyTimezone given an existing ScoobyTimezone and UTC stamp
@@ -303,9 +315,11 @@ ScoobyDate.add = function(sdt, interv, incr) {
  * Later this will likely have to be migrated into the Scooby service
  * so we can grab this info off the server
  */
-ScoobyDate.getNewTimezoneForUTC = function(tz, utc) {
+cosmo.datetime.Date.getNewTimezoneForUTC = function(tz, utc) {
     return tz;
 }
+cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.getNewTimezoneForUTC, "ScoobyDate.getNewTimezoneForUTC", "0.6");
+
 
 /**
  * A ScoobyTimeZone is a reference to a timezone on the Scooby Server. It does not
@@ -324,7 +338,7 @@ function ScoobyTimezone(id, minutesOffset, name){
 
 }
 
-ScoobyTimezone.prototype.toString = genericToString;
+ScoobyTimezone.prototype.toString = cosmo.util.debug.genericToString;
 
 /**
  * Returns the local timezone with offset set properly for a particular date.

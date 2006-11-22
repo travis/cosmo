@@ -46,7 +46,7 @@ cosmo.datetime.timezone.Timezone.prototype.addZoneItem = function(zoneItem){
     this.zoneItems.push(zoneItem);
 };
 
-cosmo.datetime.timezone.Timezone.prototype.getTimezoneOffsetInMinutes = function(/*Date*/ date){
+cosmo.datetime.timezone.Timezone.prototype.getOffsetInMinutes = function(/*Date*/ date){
     //first get the right ZoneItem
     var zoneItem = this._getZoneItemForDate(date);
     var originalOffset = zoneItem.offsetInMinutes;

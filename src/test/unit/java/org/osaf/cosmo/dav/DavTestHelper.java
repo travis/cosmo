@@ -48,7 +48,7 @@ import org.osaf.cosmo.security.mock.MockTicketPrincipal;
 import org.osaf.cosmo.security.mock.MockUserPrincipal;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
-import org.osaf.cosmo.service.impl.AutomaticAccountActivationService;
+import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.util.PathUtil;
@@ -95,8 +95,6 @@ public class DavTestHelper extends TestHelper {
         userService.setContentDao(contentDao);
         userService.setUserDao(userDao);
         userService.setPasswordGenerator(new SessionIdGenerator());
-        userService.setAccountActivationService(
-                new AutomaticAccountActivationService());
         userService.init();
 
         resourceFactory = new StandardDavResourceFactory();

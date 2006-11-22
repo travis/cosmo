@@ -29,6 +29,7 @@ import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 
 import org.springframework.dao.DataRetrievalFailureException;
 
@@ -54,7 +55,6 @@ public class StandardUserServiceTest extends TestCase {
         service.setContentDao(contentDao);
         service.setUserDao(userDao);
         service.setPasswordGenerator(new SessionIdGenerator());
-        service.setAccountActivationService(new AutomaticAccountActivationService());
         service.init();
     }
 

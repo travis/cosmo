@@ -27,7 +27,7 @@ import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
-import org.osaf.cosmo.service.impl.AutomaticAccountActivationService;
+import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
 
@@ -64,7 +64,6 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         userService.setContentDao(contentDao);
         userService.setUserDao(userDao);
         userService.setPasswordGenerator(new SessionIdGenerator());
-        userService.setAccountActivationService(new AutomaticAccountActivationService());
         userService.init();
 
         testHelper = new TestHelper();

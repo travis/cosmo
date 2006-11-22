@@ -328,9 +328,9 @@
   <bean id="passwordGenerator"
         class="org.apache.commons.id.random.SessionIdGenerator"/>
 
-  <bean id="accountActivationService"
-  		class="org.osaf.cosmo.service.impl.AutomaticAccountActivationService">
-	<property name="userDao"><ref bean="userDao"/></property>
+  <bean id="accountActivator"
+        class="org.osaf.cosmo.service.account.AutomaticAccountActivator">
+    <property name="userDao"><ref bean="userDao"/></property>
   </bean>
 
   <bean id="userService" parent="txProxyTemplate">
@@ -355,8 +355,8 @@
     <property name="passwordGenerator">
       <ref bean="passwordGenerator"/>
     </property>
-    <property name="accountActivationService">
-      <ref bean="accountActivationService"/>
+    <property name="accountActivator">
+      <ref bean="accountActivator"/>
     </property>
   </bean>
 
@@ -604,14 +604,14 @@
      </property>
      <property name="objectDefinitionSource">
        <value>
-	 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-	 PATTERN_TYPE_APACHE_ANT
+     CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+     PATTERN_TYPE_APACHE_ANT
          /account/new=ROLE_ANONYMOUS
          /account/signup=ROLE_ANONYMOUS
          /account=ROLE_ROOT,ROLE_USER
          /account/view=ROLE_ROOT,ROLE_USER
          /account/update=ROLE_ROOT,ROLE_USER
-         /account/activate=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
+         /account/activate/*=ROLE_ANONYMOUS
          /account/forgot=ROLE_ANONYMOUS
          /account/remind=ROLE_ANONYMOUS
          /login=ROLE_ANONYMOUS
@@ -619,10 +619,10 @@
          /logout=ROLE_ROOT,ROLE_USER
          /browse/**=ROLE_USER, ROLE_ROOT
          /admin/status/**=ROLE_ROOT
-		 /admin/user/**=ROLE_ROOT
-		 /error=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
+         /admin/user/**=ROLE_ROOT
+         /error=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
          /error/**=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
-		 /help/about=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /help/about=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /help=ROLE_ROOT,ROLE_USER
          /help/**=ROLE_ROOT,ROLE_USER
          /**=ROLE_ROOT

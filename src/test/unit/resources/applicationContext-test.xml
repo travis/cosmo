@@ -127,7 +127,8 @@
         </property>
   </bean>
 
-  <bean id="accountActivationService"
-      class="org.osaf.cosmo.service.impl.AutomaticAccountActivationService"/>
+
+  <bean id="accountActivator"
+         class="org.osaf.cosmo.service.account.AutomaticAccountActivator"/>
 
 </beans>

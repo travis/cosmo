@@ -36,7 +36,7 @@ import org.osaf.cosmo.rpc.model.CosmoDate;
 import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.security.mock.MockSecurityManager;
 import org.osaf.cosmo.security.mock.MockUserPrincipal;
-import org.osaf.cosmo.service.impl.AutomaticAccountActivationService;
+import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
 
@@ -84,7 +84,7 @@ public class RPCServiceImplTest extends TestCase {
         userService.setContentDao(contentDao);
         userService.setUserDao(userDao);
         userService.setPasswordGenerator(new SessionIdGenerator());
-        userService.setAccountActivationService(new AutomaticAccountActivationService());
+        userService.setAccountActivator(new AutomaticAccountActivator());
         userService.init();
         userService.createUser(user);
 

@@ -11,13 +11,18 @@ function getNyTz(){
     return timezone;
 }
 
+function getUsRs(){
+    var rs = cosmo.datetime.timezone.getRuleSet("US");
+    return rs;
+}
+
 function test_getTimezone(){
     var timezone = getNyTz();
     jum.assertTrue(timezone != null);
 }
 
 function test_getDateField(){
-    var getDateField = cosmo.datetime.timezone.Timezone.prototype._getDateField;
+    var getDateField = cosmo.datetime.timezone._getDateField;
     var scoobyDate = new ScoobyDate(2006, 11, 10, 12, 33, 30);
     jum.assertEquals(2006, getDateField(scoobyDate, "year"));
     jum.assertEquals(11, getDateField(scoobyDate, "month"));
@@ -61,7 +66,7 @@ function test_getDateField(){
 }
 
 function test_compareDates(){
-    var compareDates = dojo.lang.hitch(getNyTz(),cosmo.datetime.timezone.Timezone.prototype._compareDates);
+    var compareDates = cosmo.datetime.timezone._compareDates;
     var jsDate1 = new Date(2006, 11, 10, 12, 33, 30);
     var jsDate2 = new Date(2007, 11, 10, 12, 33, 30);
     jum.assertTrue(compareDates(jsDate1, jsDate2) < 0);
@@ -101,4 +106,97 @@ function test_getZoneItemForDate(){
     date = new Date(1920, 1, 1);
     zoneItem = tz._getZoneItemForDate(date);
     jum.assertEquals(1942, zoneItem.untilDate.year);
+}
+
+function test_getRulesForYear(){
+    var rs = getUsRs();
+    var rules = rs._getRulesForYear(1999);
+    jum.assertEquals(2, rules.length);
+    jum.assertEquals(1967, rules[0].startYear);
+}
+
+function test_DayGreateThanNForMonthAndYear(){
+    var func = cosmo.datetime.timezone._getDayGreaterThanNForMonthAndYear;
+
+    //"get me the date of the first thursday that is greater than or equal to the 8th in November"
+    var date = func(8, 4, 10, 2006);
+    jum.assertEquals(9, date);
+
+    //"get me the date of the first wednesday that is greater than or equal to the 8th in November"
+    date = func(8, 3, 10, 2006);
+    jum.assertEquals(8, date);
+
+    //"get me the date of the first tuesday that is greater than or equal to the 8th in November"
+    date = func(8, 2, 10, 2006);
+    jum.assertEquals(14, date);
+};
+
+function test_DayLessThanNForMonthAndYear(){
+    var func = cosmo.datetime.timezone._getDayLessThanNForMonthAndYear;
+
+    //"get me the date of the last thursday that is less than or equal to the 8th in November"
+    var date = func(8,4,10,2006);
+    jum.assertEquals(2, date);
+
+    //"get me the date of the last wednesday that is less than or equal to the 8th in November"
+    var date = func(8,3,10,2006);
+    jum.assertEquals(8, date);
+
+    //"get me the date of the last tuesday that is less than or equal to the 8th in November"
+    var date = func(8,2,10,2006);
+    jum.assertEquals(7, date);
+}
+
+function test_getStartDateForYear(){
+  //to test: cosmo.datetime.timezone.Rule.prototype._getStartDateForYear = function(year)
+  var rs = getUsRs();
+  var sorter = function(a,b){return a.startMonth - b.startMonth};
+
+  var rules = rs._getRulesForYear(1967);
+  rules.sort(sorter);
+  var startDate = rules[0]._getStartDateForYear(2006);
+
+  //for sanity's sake, make sure it's APR
+  jum.assertEquals(3, startDate.month);
+
+  //rule says Apr, lastSun - last sunday in april which is the 30th
+  jum.assertEquals(30, startDate.date);
+
+  rules = rs._getRulesForYear(1974);
+  rules.sort(sorter);
+  startDate = rules[0]._getStartDateForYear(1974);
+
+  //rule says "jan 6"
+  jum.assertEquals(0, startDate.month);
+  jum.assertEquals(6, startDate.date);
+
+  rules = rs._getRulesForYear(2007);
+  rules.sort(sorter);
+  startDate = rules[0]._getStartDateForYear(2007);
+
+  //rule sun>=8 - first sunday after or on the eighth which is the 11th
+  jum.assertEquals(2, startDate.month);
+  jum.assertEquals(11, startDate.date);
+}
+
+function test_getTimezoneOffsetInMinutes(){
+    var timezone = getNyTz();
+    var date;
+    var offset;
+
+    date = new Date(2006, 1, 1);
+    offset = timezone.getTimezoneOffsetInMinutes(date);
+    jum.assertEquals(-300, offset);
+
+    date = new Date(2006, 3, 1);
+    offset = timezone.getTimezoneOffsetInMinutes(date);
+    jum.assertEquals(-300, offset);
+
+    date = new Date(2006, 3, 2, 1, 59, 69);
+    offset = timezone.getTimezoneOffsetInMinutes(date);
+    jum.assertEquals(-300, offset);
+
+    date = new Date(2006, 3, 2, 3, 0, 0);
+    offset = timezone.getTimezoneOffsetInMinutes(date);
+    jum.assertEquals(-240, offset);
 }

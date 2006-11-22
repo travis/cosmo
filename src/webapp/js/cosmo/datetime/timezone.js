@@ -46,12 +46,29 @@ cosmo.datetime.timezone.Timezone.prototype.addZoneItem = function(zoneItem){
     this.zoneItems.push(zoneItem);
 };
 
-cosmo.datetime.timezone.Timezone.prototype.getTimezoneOffset = function(/*Date*/ date){
+cosmo.datetime.timezone.Timezone.prototype.getTimezoneOffsetInMinutes = function(/*Date*/ date){
     //first get the right ZoneItem
     var zoneItem = this._getZoneItemForDate(date);
+    var originalOffset = zoneItem.offsetInMinutes;
+
+    //if there is no rulename, just return the timezone's normal offset
+    if (!zoneItem.ruleName){
+        return originalOffset;
+    }
+
+    //now find the right rule for this date.
+    var ruleSet = cosmo.datetime.timezone.getRuleSet(zoneItem.ruleName);
+    var rule = ruleSet._getRuleForDate(date);
+
+    if (rule == null){
+        return zoneItem.offsetInMinutes;
+    } else {
+        return zoneItem.offsetInMinutes + rule.addMinutes;
+    }
 };
 
 cosmo.datetime.timezone.Timezone.prototype._getZoneItemForDate = function(/*Date*/ date){
+    var compareDates = cosmo.datetime.timezone._compareDates;
     for (var x = 0; x < this.zoneItems.length; x++){
         var zoneItem = this.zoneItems[x];
         var untilDate = zoneItem.untilDate;
@@ -59,17 +76,18 @@ cosmo.datetime.timezone.Timezone.prototype._getZoneItemForDate = function(/*Date
             return zoneItem;
         }
 
-        if (this._compareDates(date, untilDate) <= 0){
+        if (compareDates(date, untilDate) <= 0){
             return zoneItem;
         }
     }
 };
 
-cosmo.datetime.timezone.Timezone.prototype._compareDates = function(d1, d2){
+cosmo.datetime.timezone._compareDates = function(d1, d2){
+    var getDateField = cosmo.datetime.timezone._getDateField;
     var fields = ["year", "month", "date", "hours", "minutes", "seconds"];
 
     for (var x = 0; x < fields.length; x++){
-        var diff = this._getDateField(d1, fields[x]) - this._getDateField(d2, fields[x]);
+        var diff = getDateField(d1, fields[x]) - getDateField(d2, fields[x]);
         if (diff != 0) {
             return diff;
         }
@@ -79,7 +97,30 @@ cosmo.datetime.timezone.Timezone.prototype._compareDates = function(d1, d2){
     return 0;
 };
 
-cosmo.datetime.timezone.Timezone.prototype._getDateField = function(date, field){
+cosmo.datetime.timezone._getLastDayForMonthAndYear = function(day, month, year){
+    var lastDayOfMonth = new Date(year, month + 1,1, -24);
+    var lastDayDay = lastDayOfMonth.getDay();
+    var diff = (day > lastDayDay) ? (day - lastDayDay - 7) : (day - lastDayDay);
+    return lastDayOfMonth.getDate() + diff;
+};
+
+cosmo.datetime.timezone._getDayGreaterThanNForMonthAndYear = function(n, day, month, year){
+    var startingDate = new Date(year, month, n);
+    var date = startingDate.getDate();
+    var startingDay = startingDate.getDay();
+    date += (day >= startingDay) ? day - startingDay : (day + 7) - startingDay;
+    return date;
+};
+
+cosmo.datetime.timezone._getDayLessThanNForMonthAndYear = function(n, day, month, year){
+    var startingDate = new Date(year, month, n);
+    var date = startingDate.getDate();
+    var startingDay = startingDate.getDay();
+    date += (day <= startingDay) ? day - startingDay : (day - 7) - startingDay;
+    return date;
+};
+
+cosmo.datetime.timezone._getDateField = function(date, field){
     if (field == "year"){
         return date.getFullYear ? date.getFullYear() : date.year;
     }
@@ -112,7 +153,12 @@ cosmo.datetime.timezone.ZoneItem = function(){
     this.untilDate = null;
 };
 
+cosmo.datetime.timezone._hasOrElse = function(obj, prop, orElse){
+   return dojo.lang.has(obj, prop) && obj[prop] != null ? obj[prop] : orElse;
+}
+
 cosmo.datetime.timezone.ZoneItem.prototype.toString = function(/*boolean (optional)*/ showHeader){
+    var hasOrElse = cosmo.datetime.timezone._hasOrElse;
     if (typeof(showHeader) == "undefined"){
         showHeader = true;
     }
@@ -123,8 +169,8 @@ cosmo.datetime.timezone.ZoneItem.prototype.toString = function(/*boolean (option
     }
 
     s += Math.round(this.offsetInMinutes) + "\t"
-      + (this.ruleName || "") + "\t"
-      + (this.format || "") + "\t";
+      + (hasOrElse(this,"ruleName", "-")) + "\t"
+      + (hasOrElse(this,"format", "-")) + "\t";
       if (this.untilDate){
         s += this.untilDate.year + "/"
         + (this.untilDate.month + 1) + "/"
@@ -154,6 +200,36 @@ cosmo.datetime.timezone.RuleSet.prototype.addRule = function(rule){
     this.rules.push(rule);
 };
 
+cosmo.datetime.timezone.RuleSet.prototype._getRulesForYear = function(year){
+     var result = [];
+     var rules = this.rules;
+     for (var x = 0; x < this.rules.length;x++){
+         var rule = rules[x];
+         if ( (year >= rule.startYear) && (year <= rule.endYear) ){
+             result.push(rule);
+         }
+     }
+     return result;
+};
+
+cosmo.datetime.timezone.RuleSet.prototype._getRuleForDate = function(date){
+    var rules = this._getRulesForYear(date.getFullYear());
+    if (!rules || !rules.length){
+        return null;
+    }
+
+    rules.sort(function(a,b){return a.startMonth - b.startMonth});
+
+    var lastApplicableRule = null;
+    for (var x = 0; x < rules.length; x++){
+        var rule = rules[x];
+        if (rule._applicable(date)){
+            lastApplicableRule = rule;
+        }
+    }
+    return lastApplicableRule;
+}
+
 cosmo.datetime.timezone.Rule = function(){
     this.startYear = null;
     this.endYear = null;
@@ -168,22 +244,24 @@ cosmo.datetime.timezone.Rule = function(){
 }
 
 cosmo.datetime.timezone.Rule.prototype.toString = function(/*boolean (optional)*/ showHeader){
+    var hasOrElse = cosmo.datetime.timezone._hasOrElse
+
     if (typeof(showHeader) == "undefined"){
         showHeader = true;
     }
 
     var s = "";
     if (showHeader){
-        s += "StartYear\tEndYear\tType\tStartMonth\tStartDate\tStartDay\tStartOperator\tStartTime\tAddMin\tLetter\n";
+        s += "sYr\tenYr\tTp\tsMth\tsDte\tsDay\tsOp\tsTime\tAddMin\tLetter\n";
     }
 
     s += this.startYear + "\t"
-      +  (this.endYear || "-") + "\t"
-      +  (this.type || "-") + "\t"
-      +  (this.startMonth  || "-") + "\t"
-      +  (this.startDate || "-") + "\t"
-      +  (this.startDay || "-") + "\t"
-      +  (this.startOperator || "-") + "\t";
+      +  (hasOrElse(this, "endYear", "-")) + "\t"
+      +  (hasOrElse(this, "type", "-")) + "\t"
+      +  (hasOrElse(this, "startMonth", "-")) + "\t"
+      +  (hasOrElse(this, "startDate", "-")) + "\t"
+      +  (hasOrElse(this, "startDay", "-")) + "\t"
+      +  (hasOrElse(this, "startOperator", "-")) + "\t";
 
     if (this.startTime){
       s += this.startTime.hours + "h "
@@ -191,10 +269,41 @@ cosmo.datetime.timezone.Rule.prototype.toString = function(/*boolean (optional)*
         +  this.startTime.seconds + "s" + "\t";
     }
 
-    s += (this.addMinutes ? Math.round(this.addMinutes): "-") + "\t";
-    s += (this.letter || "-");
+    s += (hasOrElse(this, "addMinutes") ? Math.round(this.addMinutes): "-") + "\t";
+    s += (hasOrElse(this, "letter", "-"));
     return s + "\n";
 }
+
+cosmo.datetime.timezone.Rule.prototype._applicable = function(date){
+    var ruleStartDate  = this._getStartDateForYear(date.getFullYear());
+    return cosmo.datetime.timezone._compareDates(date, ruleStartDate) >= 0 ;
+}
+
+cosmo.datetime.timezone.Rule.prototype._getStartDateForYear = function(year){
+    var startDate = { year: year,
+                      month: this.startMonth,
+                      hours: this.startTime.hours,
+                      minutes: this.startTime.minutes,
+                      seconds: this.startTime.seconds };
+
+    if (this.startDay != null){
+        if (this.startOperator == cosmo.datetime.timezone._RULE_OP_LAST){
+            var date = cosmo.datetime.timezone._getLastDayForMonthAndYear(this.startDay, this.startMonth, year);
+            startDate.date = date;
+        } else if (this.startOperator == cosmo.datetime.timezone._RULE_OP_GTR){
+            var date = cosmo.datetime.timezone._getDayGreaterThanNForMonthAndYear(this.startDate, this.startDay, this.startMonth, year);
+            startDate.date = date;
+        } else {
+            var date = cosmo.datetime.timezone._getDayLessThanNForMonthAndYear(this.startDate, this.startDay, this.startMonth, year);
+            startDate.date = date;
+        }
+    } else {
+        startDate.date = this.startDate;
+    }
+
+    return startDate;
+}
+
 cosmo.datetime.timezone.setTimezoneRegistry =  function(timezoneRegistry){
     cosmo.datetime.timezone._timezoneRegistry = timezoneRegistry;
 }
@@ -382,7 +491,8 @@ cosmo.datetime.timezone._parseRuleLine = function(array){
 
     //set the start date
     var rawOn = array[4]; //the raw "ON" data
-    if (dojo.lang.isNumber(rawOn)){
+    var parsedOn = parseInt(rawOn);
+    if (!isNaN(parsedOn)){
         rule.startDate = parseInt(rawOn);
     } else {
         if (dojo.string.startsWith(rawOn, "last")){
@@ -392,6 +502,8 @@ cosmo.datetime.timezone._parseRuleLine = function(array){
         } else {
             rule.startOperator = (rawOn.indexOf(">") > -1) ? this._RULE_OP_GTR : (rawOn.indexOf("<") > -1 ? this._RULE_OP_LESS :null);
             rule.startDay = this._DAY_MAP[rawOn.substr(0,3).toLowerCase()];
+            var parsedDate = parseInt(rawOn.substr(5, (rawOn.length-5)));
+            rule.startDate = parsedDate;
         }
     }
 

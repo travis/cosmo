@@ -1,12 +1,12 @@
 /*
  * Copyright 2005-2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,16 +43,17 @@ public interface UserService extends Service {
      * exist
      */
     public User getUser(String username);
-    
+
     /**
      * Returns the all user accounts meeting the supplied
      * <code>PageCriteria</code>'s requirements
-     * 
+     *
      * @param pageCriteria the Pagination Criteria for the PagedList
-     * 
+     *
      * @throws IllegalArgumentException if an invalid pageNumber is supplied in the <code>PageCriteria</code>
      */
-    public PagedList<User, User.SortType> getUsers(PageCriteria<User.SortType> pageCriteria);
+    public PagedList<User, User.SortType> getUsers(
+            PageCriteria<User.SortType> pageCriteria);
 
     /**
      * Returns the user account identified by the given email address.
@@ -63,6 +64,18 @@ public interface UserService extends Service {
      * exist
      */
     public User getUserByEmail(String email);
+
+    /**
+     * Returns the user account associated with the given activation id.
+     *
+     * @param activationId the activation id associated with the account to return
+     *
+     * @return the User associated with activationId
+     *
+     * @throws DataRetrievalFailureException if there is no user associated with this
+     * activation id.
+     */
+    public User getUserByActivationId(String activationId);
 
     /**
      * Creates a user account in the repository. Digests the raw
@@ -105,19 +118,19 @@ public interface UserService extends Service {
      * @param username the username of the account to return
      */
     public void removeUser(String username);
-    
+
     /**
      * Removes a set of user accounts from the repository.
      * @param users
-     * @throws OverlordDeletionException 
+     * @throws OverlordDeletionException
      */
     public void removeUsers(Set<User> users) throws OverlordDeletionException;
-    
+
     /**
      * Removes the user accounts identified by the given usernames from
      * the repository.
      * @param usernames
-     * @throws OverlordDeletionException 
+     * @throws OverlordDeletionException
      */
     public void removeUsersByName(Set<String> usernames) throws OverlordDeletionException;
 

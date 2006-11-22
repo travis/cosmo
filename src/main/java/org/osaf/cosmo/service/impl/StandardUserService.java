@@ -29,9 +29,9 @@ import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.service.AccountActivationService;
 import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.service.account.AccountActivator;
 import org.osaf.cosmo.util.PagedList;
 import org.osaf.cosmo.util.PageCriteria;
 
@@ -52,7 +52,7 @@ public class StandardUserService implements UserService {
     private ContentDao contentDao;
     private UserDao userDao;
 
-    private AccountActivationService accountActivationService;
+    private AccountActivator accountActivator;
 
     // UserService methods
 
@@ -106,6 +106,24 @@ public class StandardUserService implements UserService {
     }
 
     /**
+     * Returns the user account associated with the given activation id.
+     *
+     * @param activationId the activation id associated with the account to return
+     *
+     * @return the User associated with activationId
+     *
+     * @throws DataRetrievalFailureException if there is no user associated with this
+     * activation id.
+     */
+    public User getUserByActivationId(String activationId) {
+        if (log.isDebugEnabled())
+            log.debug("getting user associated with activation id " +
+                    activationId);
+
+        return userDao.getUserByActivationId(activationId);
+    }
+
+    /**
      * Creates a user account in the repository. Digests the raw
      * password and uses the result to replace the raw
      * password. Returns a new instance of <code>User</code>
@@ -129,11 +147,12 @@ public class StandardUserService implements UserService {
 
         //TODO: should be configurable in application context
         boolean accountActivationRequired =
-            (!user.isOverlord());
+            (!user.isOverlord() &&
+             (this.accountActivator != null));
 
         if (accountActivationRequired){
             user.setActivationId(
-                    this.accountActivationService.getActivationToken());
+                    this.accountActivator.generateActivationToken());
         }
 
         userDao.createUser(user);
@@ -143,7 +162,7 @@ public class StandardUserService implements UserService {
         contentDao.createRootItem(newUser);
 
         if (accountActivationRequired){
-            accountActivationService.initiateActivationProcess(newUser);
+            accountActivator.sendActivationMessage(newUser);
         }
 
         return newUser;
@@ -284,9 +303,6 @@ public class StandardUserService implements UserService {
         if (passwordGenerator == null) {
             throw new IllegalStateException("passwordGenerator is required");
         }
-        if (accountActivationService == null) {
-            throw new IllegalStateException("accountActivationService is required");
-        }
         if (digestAlgorithm == null) {
             digestAlgorithm = DEFAULT_DIGEST_ALGORITHM;
         }
@@ -350,8 +366,8 @@ public class StandardUserService implements UserService {
         this.passwordGenerator = generator;
     }
 
-    public void setAccountActivationService(AccountActivationService accountActivationService){
-        this.accountActivationService = accountActivationService;
+    public void setAccountActivator(AccountActivator accountActivator){
+        this.accountActivator = accountActivator;
     }
 
     /**
@@ -392,6 +408,5 @@ public class StandardUserService implements UserService {
         // TODO Auto-generated method stub
 
     }
-
 
 }

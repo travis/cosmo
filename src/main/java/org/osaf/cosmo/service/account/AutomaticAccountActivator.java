@@ -1,15 +1,15 @@
-package org.osaf.cosmo.service.impl;
+package org.osaf.cosmo.service.account;
 
 import org.osaf.cosmo.model.User;
 
-public class AutomaticAccountActivationService extends
-        AbstractCosmoAccountActivationService {
+public class AutomaticAccountActivator extends
+        AbstractCosmoAccountActivator {
 
-    public String getActivationToken() {
+    public String generateActivationToken() {
         return null;
     }
 
-    public void initiateActivationProcess(User user) {
+    public void sendActivationMessage(User user) {
         user.activate();
     }
 

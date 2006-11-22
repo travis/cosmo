@@ -18,7 +18,6 @@ package org.osaf.cosmo.cmp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.PushbackInputStream;
 import java.util.Collection;
 import java.util.HashSet;
@@ -56,6 +55,7 @@ import org.osaf.cosmo.server.StatusSnapshot;
 import org.osaf.cosmo.util.PageCriteria;
 
 import org.springframework.beans.BeansException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -78,6 +78,10 @@ public class CmpServlet extends HttpServlet {
 
     private static final Pattern PATTERN_SPACE_USAGE =
         Pattern.compile("^/server/usage/space(/[^/]+)?(/xml)?$");
+    private static final Pattern PATTERN_POSTED_DELETE =
+        Pattern.compile("/user/(.+/)?delete");
+
+    private static final String URL_ACTIVATE = "/activate/";
 
     private static final String BEAN_CONTENT_SERVICE =
         "contentService";
@@ -95,8 +99,6 @@ public class CmpServlet extends HttpServlet {
     private ContentService contentService;
     private UserService userService;
     private CosmoSecurityManager securityManager;
-
-    private Pattern postedDeleteCommandPattern = Pattern.compile("/user/(.+/)?delete");
 
     /**
      * Loads the servlet context's <code>WebApplicationContext</code>
@@ -125,6 +127,7 @@ public class CmpServlet extends HttpServlet {
                 securityManager = (CosmoSecurityManager)
                     getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
             }
+
         }
 
         if (contentService == null)
@@ -182,7 +185,11 @@ public class CmpServlet extends HttpServlet {
             return;
         }
         if (req.getPathInfo().startsWith("/user/")) {
-            processUserGet(req, resp);
+            processUserGetByUsername(req, resp);
+            return;
+        }
+        if (req.getPathInfo().startsWith(URL_ACTIVATE)) {
+            processUserGetByActivationId(req, resp);
             return;
         }
         if (req.getPathInfo().equals("/server/status")) {
@@ -248,7 +255,11 @@ public class CmpServlet extends HttpServlet {
             return;
         }
 
-        Matcher m = postedDeleteCommandPattern.matcher(req.getPathInfo());
+        if (req.getPathInfo().startsWith(URL_ACTIVATE)){
+            processActivateUser(req, resp);
+        }
+
+        Matcher m = PATTERN_POSTED_DELETE.matcher(req.getPathInfo());
 
         if (m.matches()){
 
@@ -563,13 +574,40 @@ public class CmpServlet extends HttpServlet {
         sendXmlResponse(resp, new UsersResource(users, getUrlBase(req)));
     }
 
+    private void processUserGet(User user,
+                                HttpServletRequest req,
+                                HttpServletResponse resp)
+        throws ServletException, IOException {
+        UserResource resource = new UserResource(user, getUrlBase(req));
+        resp.setHeader("ETag", resource.getEntityTag());
+        sendXmlResponse(resp, resource);
+    }
+
     /*
      * Delegated to by {@link #doGet} to handle user GET
-     * requests, retrieving the user account, setting the response
+     * requests by username, retrieving the user account, setting the response
      * status and headers, and writing the response content.
      */
-    private void processUserGet(HttpServletRequest req,
-                                HttpServletResponse resp)
+    private void processUserGetByActivationId(HttpServletRequest req,
+                                              HttpServletResponse resp)
+        throws ServletException, IOException {
+        String activationId = req.getPathInfo().substring(
+                URL_ACTIVATE.length());
+        User user = userService.getUserByActivationId(activationId);
+        if (user == null) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        processUserGet(user, req, resp);
+    }
+
+    /*
+     * Delegated to by {@link #doGet} to handle user GET
+     * requests by activationId, retrieving the user account, setting the response
+     * status and headers, and writing the response content.
+     */
+    private void processUserGetByUsername(HttpServletRequest req,
+                                          HttpServletResponse resp)
         throws ServletException, IOException {
         String username = usernameFromPathInfo(req.getPathInfo());
         if (username == null) {
@@ -581,9 +619,7 @@ public class CmpServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        UserResource resource = new UserResource(user, getUrlBase(req));
-        resp.setHeader("ETag", resource.getEntityTag());
-        sendXmlResponse(resp, resource);
+        processUserGet(user, req, resp);
     }
 
     /*
@@ -661,6 +697,22 @@ public class CmpServlet extends HttpServlet {
         throws ServletException, IOException {
         System.gc();
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
+
+    /*
+     * Delegated to by {@link #doPost} to handle user activation
+     * requests.
+     */
+    private void processActivateUser(HttpServletRequest req,
+            HttpServletResponse resp) {
+        String activationId = req.getPathInfo().substring(
+                URL_ACTIVATE.length());
+        try {
+            userService.getUserByActivationId(activationId).activate();
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        } catch (DataRetrievalFailureException e){
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 
     /*
@@ -810,13 +862,13 @@ public class CmpServlet extends HttpServlet {
     }
 
     private void handleInvalidStateException(HttpServletResponse resp,
-                                             InvalidStateException ise) 
+                                             InvalidStateException ise)
         throws IOException {
         String message = ise.getInvalidValues()[0].getMessage();
         log.warn("model validation error: " + message);
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
     }
-    
+
     private void handleModelValidationError(HttpServletResponse resp,
                                             ModelValidationException e)
         throws IOException {

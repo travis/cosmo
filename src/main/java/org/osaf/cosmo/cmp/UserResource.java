@@ -1,12 +1,12 @@
 /*
  * Copyright 2005-2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -67,6 +67,9 @@ public class UserResource implements CmpResource, OutputsXml {
     /**
      */
     public static final String EL_ADMINISTRATOR = "administrator";
+    /**
+     */
+    public static final String EL_ACTIVATIONID = "activationId";
     private User user;
     private String urlBase;
     private String userUrl;
@@ -158,23 +161,29 @@ public class UserResource implements CmpResource, OutputsXml {
         Element email = DomUtil.createElement(doc, EL_EMAIL, NS_CMP);
         DomUtil.setText(email, user.getEmail());
         e.appendChild(email);
-        
+
         Element created = DomUtil.createElement(doc, EL_CREATED, NS_CMP);
         DomUtil.setText(created, DateUtil.formatRfc3339Date(user.getDateCreated()));
         e.appendChild(created);
-        
+
         Element modified = DomUtil.createElement(doc, EL_MODIFIED, NS_CMP);
         DomUtil.setText(modified, DateUtil.formatRfc3339Date(user.getDateModified()));
         e.appendChild(modified);
-        
+
         if (user.getAdmin()){
             Element admin = DomUtil.createElement(doc, EL_ADMINISTRATOR, NS_CMP);
             e.appendChild(admin);
         }
-        
+
         Element url = DomUtil.createElement(doc, EL_URL, NS_CMP);
         DomUtil.setText(url, userUrl);
         e.appendChild(url);
+
+        if (!user.isActivated()){
+            Element activationId = DomUtil.createElement(doc, EL_ACTIVATIONID, NS_CMP);
+            DomUtil.setText(activationId, user.getActivationId());
+            e.appendChild(activationId);
+        }
 
         if (! user.getUsername().equals(User.USERNAME_OVERLORD)) {
             Element hurl = DomUtil.createElement(doc, EL_HOMEDIRURL, NS_CMP);
@@ -231,18 +240,18 @@ public class UserResource implements CmpResource, OutputsXml {
         if (! DomUtil.matches(root, EL_USER, NS_CMP)) {
             throw new CmpException("root element not user");
         }
-        
+
         /* Set this user as NOT an administrator unless specifically changed by the XML
-         * unless user is overlord. 
+         * unless user is overlord.
          */
-        
-        
+
+
         if (!(user.getUsername() != null &&
             user.getUsername().equals(User.USERNAME_OVERLORD))
             ){
             user.setAdmin(false);
         }
-                        
+
         for (ElementIterator i=DomUtil.getChildren(root); i.hasNext();) {
             Element e = i.nextElement();
 

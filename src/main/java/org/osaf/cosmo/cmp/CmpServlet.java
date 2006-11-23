@@ -708,7 +708,10 @@ public class CmpServlet extends HttpServlet {
         String activationId = req.getPathInfo().substring(
                 URL_ACTIVATE.length());
         try {
-            userService.getUserByActivationId(activationId).activate();
+            User user = userService.getUserByActivationId(activationId);
+            user.activate();
+            userService.updateUser(user);
+
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } catch (DataRetrievalFailureException e){
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

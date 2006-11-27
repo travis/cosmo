@@ -275,13 +275,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         },
 
         updateUserListCallback:function(data, evt){
-            var cmpXml = evt.responseXML
+
+            var cmpXml = evt.responseXML;
 
             this.updateControlsView();
 
             var jsonObject = [];
 
-            var users = cmpXml.getElementsByTagName("user")
+            var users = data;
 
             for (i = 0; i < users.length; i++){
 
@@ -289,24 +290,16 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
                 var row = {};
 
-                var firstname = user.getElementsByTagName("firstName")[0].firstChild.nodeValue
-                var lastname = user.getElementsByTagName("lastName")[0].firstChild.nodeValue
-                var username = user.getElementsByTagName("username")[0].firstChild.nodeValue
-                var email = user.getElementsByTagName("email")[0].firstChild.nodeValue
-                var dateCreated = user.getElementsByTagName("created")[0].firstChild.nodeValue
-                var dateModified = user.getElementsByTagName("modified")[0].firstChild.nodeValue
-                var administrator = (user.getElementsByTagName("administrator").length > 0)
-
-                row.email = email;
-                row.name = firstname + " " + lastname;
-                row.username = username;
+                row.email = user.email;
+                row.name = user.firstName + " " + user.lastName;
+                row.username = user.username;
 
 
-                row.created = dojo.date.fromRfc3339(dateCreated);
+                row.created = dojo.date.fromRfc3339(user.dateCreated);
 
-                row.modified = dojo.date.fromRfc3339(dateModified);
+                row.modified = dojo.date.fromRfc3339(user.dateModified);
 
-                if (administrator) {
+                if (user.administrator) {
                     row.admin = "Yes";
                 } else {
                     row.admin = "No";
@@ -369,7 +362,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             var self = this;
 
 
-            this.cmpProxy.getUsersXML({
+            this.cmpProxy.getUsers({
                 load: function(type, data, evt){self.updateUserListCallback(data, evt)},
                  error: function(type, error){alert("update " + error.message)}
                  },

@@ -183,31 +183,21 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
                     if (evt.status == 200){
 
-                        var cmpXml = evt.responseXML
+                        var user = data;
 
-                        var user = cmpXml.getElementsByTagName("user")[0]
-
-                        var firstName = user.getElementsByTagName("firstName")[0].firstChild.nodeValue
-                        var lastName = user.getElementsByTagName("lastName")[0].firstChild.nodeValue
-                        var username = user.getElementsByTagName("username")[0].firstChild.nodeValue
-                        var email = user.getElementsByTagName("email")[0].firstChild.nodeValue
-                        var dateCreated = user.getElementsByTagName("created")[0].firstChild.nodeValue
-                        var dateModified = user.getElementsByTagName("modified")[0].firstChild.nodeValue
-                        var administrator = (user.getElementsByTagName("administrator").length > 0)
-
-                        self.editingUsername = username
+                        self.editingUsername = user.username
 
                         form = self.form;
 
-                        form.username.value = username;
+                        form.username.value = user.username;
 
-                        form.firstName.value = firstName;
-                        form.lastName.value = lastName;
-                        form.email.value = email;
+                        form.firstName.value = user.firstName;
+                        form.lastName.value = user.lastName;
+                        form.email.value = user.email;
 
-                        form.admin.checked = administrator;
+                        form.admin.checked = user.administrator;
 
-                        overlord = (username == cosmo.env.OVERLORD_USERNAME)
+                        overlord = (user.username == cosmo.env.OVERLORD_USERNAME)
                         form.username.disabled = overlord;
                         form.firstName.disabled = overlord;
                         form.lastName.disabled = overlord;

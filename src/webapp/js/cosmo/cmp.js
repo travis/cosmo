@@ -155,30 +155,56 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * These functions are sugar for getting the XML information and parsing
          * into a nice javascript object.
          */
+        _wrapXMLHandlerFunctions: function (handlerDict, newFunc){
+            var self = this;
+
+            if (handlerDict.load != undefined){
+                handlerDict.old_load = handlerDict.load
+                handlerDict.load = function(type, data, evt){
+
+                    handlerDict.old_load(type, self[newFunc](evt.responseXML, self), evt);
+                }
+            }
+            if (handlerDict.error != undefined){
+                handlerDict.old_error = handlerDict.error
+                handlerDict.error = function(type, data, evt){
+                    handlerDict.old_error(type, self[newFunc](evt.responseXML, self), evt);
+                }
+            }
+            if (handlerDict.handle != undefined){
+                handlerDict.old_handle = handlerDict.handle
+                handlerDict.handle = function(type, data, evt){
+                    handlerDict.old_handle(type, self[newFunc](evt.responseXML, self), evt);
+                }
+            }
+        },
 
         getUser: function(username, handlerDict) {
-                handlerDict.old_load = handlerDict.load;
-                handlerDict.load = function(type, data, evt) {
+            var self = this;
+            this._wrapXMLHandlerFunctions(handlerDict, '_cmpUserXMLToJSON');
 
-                        handlerDict.old_load(type, parser.parseElement(data.firstChild), evt);
-                }
-                this.getUserXML(username, handlerDict);
+            this.getUserXML(username, handlerDict);
+        },
+
+        getUserByActivationId: function(username, handlerDict) {
+            var self = this;
+            this._wrapXMLHandlerFunctions(handlerDict, '_cmpUserXMLToJSON');
+
+            this.getUserXMLByActivationId(username, handlerDict);
         },
 
         getUsers: function (handlerDict, pageNumber, pageSize, sortOrder, sortType) {
-                handlerDict.old_load = handlerDict.load;
-                handlerDict.load = function(type, data, evt) {
-                        handlerDict.old_load(type, parser.parseElement(data.firstChild), evt);
-                }
-                this.getUsersXML(handlerDict, pageNumber, pageSize, sortOrder, sortType);
+            var self = this;
+            this._wrapXMLHandlerFunctions(handlerDict, '_cmpUsersXMLToJSON');
+
+            this.getUsersXML(handlerDict, pageNumber, pageSize, sortOrder, sortType);
         },
 
         getAccount: function (handlerDict) {
-                handlerDict.old_load = handlerDict.load;
-                handlerDict.load = function(type, data, evt) {
-                        handlerDict.old_load(type, parser.parseElement(data.firstChild), evt);
-                }
-                this.getAccountXML(handlerDict);
+            var self = this;
+            this._wrapXMLHandlerFunctions(handlerDict, '_cmpUserXMLToJSON');
+
+            this.getAccountXML(handlerDict);
         },
 
         headUser: function (username, handlerDict, sync){
@@ -318,10 +344,37 @@ dojo.declare("cosmo.cmp.Cmp", null,
             requestDict.method = "POST";
 
             dojo.io.bind(requestDict);
+        },
+
+        _cmpUserXMLToJSON: function (cmpUserXml){
+            var user = cmpUserXml;
+            var obj = {};
+            obj.firstName = user.getElementsByTagName("firstName")[0].firstChild.nodeValue;
+            obj.lastName = user.getElementsByTagName("lastName")[0].firstChild.nodeValue;
+            obj.username = user.getElementsByTagName("username")[0].firstChild.nodeValue;
+            obj.email = user.getElementsByTagName("email")[0].firstChild.nodeValue;
+            obj.dateCreated = user.getElementsByTagName("created")[0].firstChild.nodeValue;
+            obj.dateModified = user.getElementsByTagName("modified")[0].firstChild.nodeValue;
+            obj.administrator = (user.getElementsByTagName("administrator").length > 0);
+
+            return obj;
+        },
+
+        _cmpUsersXMLToJSON: function (cmpUsersXml){
+
+            var users = cmpUsersXml.getElementsByTagName("user");
+            var userList = [];
+
+            for (i = 0; i < users.length; i++){
+                userList[i] = this._cmpUserXMLToJSON(users[i]);
+            }
+
+            return userList;
         }
 
 
     }
+
 )
 
 cosmo.cmp.cmpProxy = new cosmo.cmp.Cmp();

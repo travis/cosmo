@@ -68,10 +68,6 @@ var Cal = new function() {
     // this property also does get set to true/false at the same time
     this.inputDisabled = false;
     
-    // Used with the local UI timeout calculations
-    // A related property is Cal.serv.serviceAccessTime in the Cosmo service
-    this.inputTimestamp = null;
-    
     // The path to the currently selected calendar
     this.currentCalendar = null;
     
@@ -97,6 +93,8 @@ var Cal = new function() {
         // Create and init the Cosmo service
         // --------------
         this.serv = new ScoobyService();
+        // Client-side keepalive
+        this.serv.resetServiceAccessTime(); 
         this.serv.init();
 
         // Load user prefs
@@ -137,9 +135,6 @@ var Cal = new function() {
             'ModalDialog', {}, document.body, 'last');
         dojo.require('cosmo.view.cal.dialog');
         
-        // Client-side keepalive
-        this.setInputTimestamp();
-
         // Load/create calendar to view
         // --------------
         // Get stored cals for this user
@@ -160,7 +155,7 @@ var Cal = new function() {
             this.currentCalendar = new CalendarMetadata();
             this.currentCalendar.name = 'Cosmo';
             this.currentCalendar.path = 'Cosmo';
-
+            
             // Add 'Welcome to Cosmo' Event
             this.createWelcomeItem = true;
         }
@@ -173,12 +168,12 @@ var Cal = new function() {
             // Set the first cal as the default
             this.currentCalendar = this.calendars[0];
         }
-
+        
         // Load and display events
         // --------------
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
         this.uiMask.hide();
-
+        
         // Scroll to 8am for normal event
         // Have to do this dead last because appending to the div
         // seems to reset the scrollTop in Safari
@@ -855,26 +850,9 @@ var Cal = new function() {
     // ==========================
     // Timeout and keepalive
     // ==========================
-    this.setInputTimestamp = function() {
-        /*
-         * =========================
-         * FIXME: Unify the Cal.inputTimestamp
-         * and Cal.serv.serviceAccessTime properties
-         * They represent the same thing, so right now it's redundant
-         * We have to set them both for this stuff to work
-         * =========================
-         */
-        var ts = new Date();
-        ts = ts.getTime();
-        this.inputTimestamp = ts;
-        Cookie.set('inputTimestamp', ts);
-        this.serv.resetServiceAccessTime();
-    };
     this.isTimedOut = function() {
-        var ts = new Date();
         var diff = 0;
-        ts = ts.getTime();
-        diff = ts - this.inputTimestamp;
+        diff = new Date().getTime() - this.serv.getServiceAccessTime();
         if (diff > (60000*TIMEOUT_MIN)) {
             return true;
         }
@@ -900,7 +878,7 @@ var Cal = new function() {
             // If server-side session is about to time out, refresh it by hitting JSP page
             this.serv.refreshServerSession();
             // Reset local session timing cookie
-            this.setInputTimestamp();
+            this.serv.resetServiceAccessTime(); 
             return false;
         }
     };

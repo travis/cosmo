@@ -17,7 +17,7 @@
 dojo.provide('cosmo.view.cal');
 
 cosmo.view.cal = new function() {
-    
+
     var self = this;
     var ranges = {
         'daily': ['d', 1],
@@ -26,7 +26,7 @@ cosmo.view.cal = new function() {
         'monthly': ['m', 1],
         'yearly': ['yyyy', 1]
     }
-    
+
     // Saving changes
     // =========================
     /**
@@ -37,23 +37,23 @@ cosmo.view.cal = new function() {
      * @param ev A CalEvent object, the event to be saved.
      */
     function saveEventChangesConfirm(ev) {
-        
+
         var changedProps = null;
         var changedBasicProps = false;
         var changedRecur = false;
         var recur = ev.dataOrig.recurrenceRule;
         var qual = '';
-        
+
         // Returns either false or an array of changes properties
         // with name, new value, and original value
         changedProps = ev.hasChanged();
-        
-        // Don't bother going through the edit process if nothing 
+
+        // Don't bother going through the edit process if nothing
         // has actually changed
         if (!changedProps) {
             return false;
         }
-        
+
         // Has the recurrence rule changed, or just
         // basic event properties
         for (var i = 0; i < changedProps.length; i++) {
@@ -64,7 +64,7 @@ cosmo.view.cal = new function() {
                 changedBasicProps = true;
             }
         }
-        
+
         // *** Changing recurrence
         // This means all changes will have to apply either to the entire
         // recurrence, or we're ending the recurrence and creating a new
@@ -85,7 +85,7 @@ cosmo.view.cal = new function() {
                 else {
                     var opts = self.recurringEventOptions;
                     // Only changing end date -- this can only apply to a master event
-                    if (ev.data.recurrenceRule && 
+                    if (ev.data.recurrenceRule &&
                         (ev.data.recurrenceRule.frequency == ev.dataOrig.recurrenceRule.frequency)) {
                         qual = opts.ALL_EVENTS;
                     }
@@ -93,13 +93,13 @@ cosmo.view.cal = new function() {
                     else {
                         qual = ev.data.masterEvent ? opts.ALL_EVENTS : opts.ALL_FUTURE_EVENTS
                     }
-                    dojo.event.topic.publish('/calEvent', { 'action': 'save', 
+                    dojo.event.topic.publish('/calEvent', { 'action': 'save',
                         'qualifier': qual, data: ev });
                 }
             }
             // One-shot event -- save a RecurrenceRule
             // *** Add ***
-            // 
+            //
             // -------
             else {
                 saveEventChanges(ev, 'singleEventAddRecurrence');
@@ -121,11 +121,11 @@ cosmo.view.cal = new function() {
                 // Check to see if editing a recurrence instance to go
                 // beyond the recurrence interval -- in that case, the
                 // 'All Events' option is not possible -- dim that button out
-                function isOutOfIntervalRange() { 
+                function isOutOfIntervalRange() {
                     var ret = false;
                     var dt = ev.data.start;
                     var dtOrig = ev.dataOrig.start;
-                    var origDate = new Date(dtOrig.getFullYear(), dtOrig.getMonth(), 
+                    var origDate = new Date(dtOrig.getFullYear(), dtOrig.getMonth(),
                         dtOrig.getDate());
                     var newDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
                     var unit = ranges[freq][0];
@@ -163,26 +163,26 @@ cosmo.view.cal = new function() {
      * removing recurrence completely from a master event for a recurrence.
      */
     function saveEventChanges(ev, qual) {
-        
+
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
-        // setTimeout to allow the 'processing ...' state to 
+        // setTimeout to allow the 'processing ...' state to
         // display
         var f = null;
         // A second function object used as a callback from
-        // the first f callback function -- used when the save 
+        // the first f callback function -- used when the save
         // operation needs to be made on a recurrence instance's
         // master event rather than the instance -- basically
         // just a way of chaining two async calls together
         var h = null;
-        
+
         // Kill any confirmation dialog that might be showing
         if (Cal.dialog.isDisplayed) {
             Cal.hideDialog();
         }
-        
+
         var opts = self.recurringEventOptions;
-        
+
         // Lozenge stuff
         // FIXME: Actually this stuff should be oWnZ0Rd by view.cal.canvas
         // ---------
@@ -198,28 +198,28 @@ cosmo.view.cal = new function() {
         ev.block.updateElements();
         // Display processing animation
         ev.block.showProcessing();
-        
+
         // Recurring event
         if (qual) {
             switch(qual) {
                 // Adding recurrence to a normal one-shot
                 case 'singleEventAddRecurrence':
-                    f = function() { doSaveEvent(ev, { 'saveType': 'singleEventAddRecurrence', 
+                    f = function() { doSaveEvent(ev, { 'saveType': 'singleEventAddRecurrence',
                         'originalEvent': ev } ) };
                     break;
 
                 // Removing recurrence from a recurring event (along with other possible edits)
                 case 'recurrenceMasterRemoveRecurrence':
-                    f = function() { doSaveEvent(ev, { 
+                    f = function() { doSaveEvent(ev, {
                         'saveType': 'recurrenceMasterRemoveRecurrence', 'instanceEvent': null }) }
                     break;
-                
+
                 // Changing the master event in the recurring sequence
                 case opts.ALL_EVENTS:
                     // User is making the edit directly on the master event
                     // no need to go look it up
                     if (ev.data.masterEvent) {
-                        f = function() { doSaveEvent(ev, { 
+                        f = function() { doSaveEvent(ev, {
                             'saveType': 'recurrenceMaster', 'instanceEvent': null }) }
                     }
                     // User is making the edit from a recurrence instance --
@@ -241,7 +241,7 @@ cosmo.view.cal = new function() {
                                 for (var i = 0; i < changedProps.length; i++) {
                                     var propName = changedProps[i][0];
                                     var propVal = changedProps[i][1];
-                                    
+
                                     // Changes for start and end have to be calculated relative to
                                     // the date they're on -- other prop changes can just be copied
                                     if (propName == 'start' || propName == 'end') {
@@ -265,7 +265,7 @@ cosmo.view.cal = new function() {
                                     var dat = newStart.getDate();
                                     var hou = newStart.getHours();
                                     var min = newStart.getMinutes();
-                                    
+
                                     // Modify the master's start based on values for the edited instance
                                     switch (ev.data.recurrenceRule.frequency) {
                                         // Only time can change -- this happens below
@@ -273,7 +273,7 @@ cosmo.view.cal = new function() {
                                             // No changes possible
                                             break;
                                         // Move the start on the master over the same number of
-                                        // days as the diff between the original and edited values 
+                                        // days as the diff between the original and edited values
                                         // for the instance event
                                         case 'weekly':
                                         case 'biweekly':
@@ -297,7 +297,7 @@ cosmo.view.cal = new function() {
                                     // values for the edited instance
                                     masterStart.setHours(hou);
                                     masterStart.setMinutes(min);
-                                    
+
                                     // Calculate the new end for the master -- set the end
                                     // the same minutes distance from the start as in the original
                                     masterEnd = ScoobyDate.clone(masterStart);
@@ -309,11 +309,11 @@ cosmo.view.cal = new function() {
                                     evData.end.setHours(masterEnd.getHours());
                                     evData.end.setMinutes(masterEnd.getMinutes());
                                 }
-                                
+
                                 // doSaveEvent expects a CalEvent with attached CalEventData
                                 var saveEv = new CalEvent();
                                 saveEv.data = evData;
-                                doSaveEvent(saveEv, { 'saveType': 'recurrenceMaster', 
+                                doSaveEvent(saveEv, { 'saveType': 'recurrenceMaster',
                                     'instanceEvent': ev });
                             }
                         };
@@ -323,7 +323,7 @@ cosmo.view.cal = new function() {
                             h, Cal.currentCalendar.path, ev.data.id); };
                     }
                     break;
-                
+
                 // Break the previous recurrence and start a new one
                 case opts.ALL_FUTURE_EVENTS:
                     var newEv = new CalEvent();
@@ -332,14 +332,14 @@ cosmo.view.cal = new function() {
                     // The date (no time values ) of the start time for the
                     // instance being edited -- used to calculate the new end
                     // date for the current recurrence being ended
-                    var startNoTime = new ScoobyDate(start.getFullYear(), 
+                    var startNoTime = new ScoobyDate(start.getFullYear(),
                         start.getMonth(), start.getDate());
                     // These values will tell us where to end the recurrence
                     var unit = ranges[freq][0];
                     var incr = (ranges[freq][1] * -1);
                     // Instances all have the same id as the master event
                     var masterEventDataId = ev.data.id;
-                    
+
                     // Calc the new end date for the original recurrence --
                     // go back 'one recurrence unit' (e.g., go back one day for
                     // a daily event, one week for a weekly event, etc.)
@@ -347,22 +347,22 @@ cosmo.view.cal = new function() {
 
                     // Pass a CalEvent obj with an attached CalEventData obj
                     newEv.data = CalEventData.clone(ev.data);
-                    
+
                     // If the original recurrence had an end date, and the new event
                     // is also recurring, set the end date on the new recurrence
-                    // based on the original end date, relative to the new start of 
+                    // based on the original end date, relative to the new start of
                     // the new event -- is this the correct behavior?
                     if (newEv.data.recurrenceRule && newEv.data.recurrenceRule.endDate) {
                         var recurEndOrig = newEv.data.recurrenceRule.endDate;
                         var recurEndDiff = ScoobyDate.diff('d', startNoTime, recurEndOrig);
                         newEv.data.recurrenceRule.endDate = ScoobyDate.add(newEv.data.start, 'd', recurEndDiff);
                     }
-                    
-                    f = function() { doSaveEventBreakRecurrence(newEv, masterEventDataId, 
-                        recurEnd, { 'saveType': 'instanceAllFuture', 
+
+                    f = function() { doSaveEventBreakRecurrence(newEv, masterEventDataId,
+                        recurEnd, { 'saveType': 'instanceAllFuture',
                         'originalEvent': ev, 'masterEventDataId': masterEventDataId, 'recurEnd': recurEnd }); };
                     break;
-                
+
                 // Modifications
                 case opts.ONLY_THIS_EVENT:
                     var rrule = ev.data.recurrenceRule;
@@ -373,22 +373,22 @@ cosmo.view.cal = new function() {
                     mod.instanceDate = ScoobyDate.clone(ev.data.instanceDate);
                     for (var i = 0; i < changedProps.length; i++) {
                         var propName = changedProps[i][0];
-                        mod.modifiedProperties.push(propName); 
+                        mod.modifiedProperties.push(propName);
                         modEv[propName] = changedProps[i][1];
                     }
                     mod.event = modEv;
                     for (var i = 0; i < rrule.modifications.length; i++) {
                         var m = rrule.modifications[i];
                         if (m.instanceDate.toUTC() == mod.instanceDate.toUTC()) {
-                            rrule.modifications.splice(i, 1); 
+                            rrule.modifications.splice(i, 1);
                         }
                     }
                     rrule.modifications.push(mod);
-                    
+
                     f = function() { doSaveRecurrenceRule(ev, rrule, { 'saveAction': 'save',
                         'saveType': 'instanceOnlyThisEvent' }) };
                     break;
-                
+
                 // Default -- nothing to do
                 default:
                     break;
@@ -398,7 +398,7 @@ cosmo.view.cal = new function() {
         else {
             f = function() { doSaveEvent(ev, { 'saveType': 'singleEvent' } ) };
         }
-        
+
         // Give a sec for the processing state to show
         setTimeout(f, 500);
     }
@@ -413,16 +413,16 @@ cosmo.view.cal = new function() {
     function doSaveEvent(ev, opts) {
         // Pass the original event and opts object to the handler function
         // along with the original params passed back in from the async response
-        var f = function(newEvId, err, reqId) { 
+        var f = function(newEvId, err, reqId) {
             handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
-        
+
         requestId = Cal.serv.saveEvent(
             f, Cal.currentCalendar.path, ev.data);
         // Add to processing queue -- canvas will not re-render until
         // queue is empty
         self.processingQueue.push(requestId);
-        
+
         // Selection persistence
         // --------------------
         // In these cases, the events concerned will be re-rendered
@@ -430,7 +430,7 @@ cosmo.view.cal = new function() {
         // way to preserve the original selection pointer. This means
         // that figuring out where selection goes will require some
         // calcluation
-        if (opts.saveType == 'recurrenceMaster' || 
+        if (opts.saveType == 'recurrenceMaster' ||
             opts.saveType == 'singleEventAddRecurrence') {
             self.lastSent = null;
         }
@@ -466,9 +466,9 @@ cosmo.view.cal = new function() {
     /**
      * Handles the response from the async call when saving changes
      * to events.
-     * @param ev A CalEvent object, the original event clicked on, 
+     * @param ev A CalEvent object, the original event clicked on,
      * or created by double-clicking on the cal canvas.
-     * @param newEvId String, the id for the event returned when creating a 
+     * @param newEvId String, the id for the event returned when creating a
      * new event
      * @param err A JS object, the error returned from the server when
      * a save operation fails.
@@ -482,9 +482,9 @@ cosmo.view.cal = new function() {
         var errMsg = '';
         var act = '';
         var qual = {};
-        
+
         qual.saveType = opts.saveType || 'singleEvent'; // Default to single event
-        
+
         // Failure -- display exception info
         // ============
         if (err) {
@@ -506,11 +506,11 @@ cosmo.view.cal = new function() {
         else {
             act = 'saveSuccess';
             // Set the CalEventData ID from the value returned by server
-            // This is for (1) new event creation (the original saved 
-            // event is waiting to get its id from the server) or 
-            // (2) new recurring events created by the 'All Future Events' 
+            // This is for (1) new event creation (the original saved
+            // event is waiting to get its id from the server) or
+            // (2) new recurring events created by the 'All Future Events'
             // option -- note that newEvId is actually set for these
-            // events down below after updating the saved event to 
+            // events down below after updating the saved event to
             // point to opts.originalEvent
             if (!saveEv.data.id || opts.saveType == 'instanceAllFuture') {
                 qual.newEvent = true;
@@ -519,7 +519,7 @@ cosmo.view.cal = new function() {
             else {
                 qual.newEvent = false;
             }
-            
+
             // If the event has been edited such that it is now out of
             // the viewable range, remove the event from display
             if (saveEv.isOutOfViewRange()) {
@@ -530,33 +530,33 @@ cosmo.view.cal = new function() {
                 qual.onCanvas = true;
             }
         }
-        
+
         // Resets local timer for timeout -- we know server-side
         // session has been refreshed
         // ********************
         // BANDAID: need to move this into the actual Service call
         // ********************
         Cal.serv.resetServiceAccessTime();
-        
+
         // Success for recurring events -- repaint canvas
-        if (act == 'saveSuccess' && 
-            (opts.saveType == 'recurrenceMaster' || 
+        if (act == 'saveSuccess' &&
+            (opts.saveType == 'recurrenceMaster' ||
             opts.saveType == 'instanceAllFuture' ||
             opts.saveType == 'singleEventAddRecurrence')) {
-            // Either (1) single master with recurrence or (2) 'All Future' 
+            // Either (1) single master with recurrence or (2) 'All Future'
             // master/detached-event combo where the new detached event
             // has recurrence -- we need to expand the recurrence(s) by querying the server
             if (saveEv.data.recurrenceRule) {
                 loadRecurrenceExpansion(Cal.viewStart, Cal.viewEnd, saveEv, opts);
             }
-            // If the 'All Future' detached event has a frequency of 'once,' 
+            // If the 'All Future' detached event has a frequency of 'once,'
             // it's a one-shot -- so, no need to go to the server for expansion
             else {
                 // Remove this request from the processing queue
                 self.processingQueue.shift();
                 // saveEv is the dummy CalEvent obj created for saving
                 // Replace this with the original clicked-on event that
-                // used to be part of the recurrence -- it has an 
+                // used to be part of the recurrence -- it has an
                 // associated lozenge, etc. -- replace the id (which would
                 // have been the same as the master) the new CalEventData id
                 // from the server
@@ -564,8 +564,8 @@ cosmo.view.cal = new function() {
                 // like it is for normal new events
                 saveEv = opts.originalEvent;
                 saveEv.data.id = newEvId;
-                dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess', 
-                   'data': { 'saveEvent': saveEv, 'eventRegistry': null, 
+                dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess',
+                   'data': { 'saveEvent': saveEv, 'eventRegistry': null,
                    'opts': opts } });
             }
         }
@@ -573,11 +573,11 @@ cosmo.view.cal = new function() {
         else {
             self.processingQueue.shift();
             // Broadcast message for success/failure
-            dojo.event.topic.publish('/calEvent', { 'action': act, 
+            dojo.event.topic.publish('/calEvent', { 'action': act,
                 'qualifier': qual, 'data': saveEv, 'opts': opts });
         }
     }
-    
+
     // Remove
     // =========================
     /**
@@ -608,23 +608,23 @@ cosmo.view.cal = new function() {
      * the right remove operation (i.e., for recurring events, 'All Future,'
      * 'Only This Event,' etc.)
      * @param ev A CalEvent object, the object to be saved.
-     * @param qual String, flag for different variations of removing 
+     * @param qual String, flag for different variations of removing
      * recurring events. Will be one of the three recurringEventOptions.
      */
     function removeEvent(ev, qual) {
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
-        // setTimeout to allow the 'processing ...' state to 
+        // setTimeout to allow the 'processing ...' state to
         // display
         var f = null;
         // A second function object used as a callback from
-        // the first f callback function -- used when the save 
+        // the first f callback function -- used when the save
         // operation needs to be made on a recurrence instance's
         // master event rather than the instance -- basically
         // just a way of chaining two async calls together
         var h = null;
         var opts = self.recurringEventOptions;
-        
+
         // Kill any confirmation dialog that might be showing
         if (Cal.dialog.isDisplayed) {
             Cal.hideDialog();
@@ -634,13 +634,13 @@ cosmo.view.cal = new function() {
             switch(qual) {
                 // This is easy -- remove the master event
                 case opts.ALL_EVENTS:
-                    // User is removing the master event directly -- 
+                    // User is removing the master event directly --
                     // no need to go look it up
                     if (ev.data.masterEvent) {
                         f = function() { doRemoveEvent(ev, { 'removeType': 'recurrenceMaster' }) };
                     }
-                    // User is removing all the events in the recurrence from an 
-                    // instance -- have to look up the master event. This means 
+                    // User is removing all the events in the recurrence from an
+                    // instance -- have to look up the master event. This means
                     // two chained async calls
                     else {
                         h = function(evData, err) {
@@ -654,11 +654,11 @@ cosmo.view.cal = new function() {
                                 // doRemoveEvent expects a CalEvent with attached CalEventData
                                 var removeEv = new CalEvent();
                                 removeEv.data = evData;
-                                doRemoveEvent(removeEv, { 'removeType': 'recurrenceMaster', 
+                                doRemoveEvent(removeEv, { 'removeType': 'recurrenceMaster',
                                     'instanceEvent': ev });
                             }
                         };
-                        f = function() { var reqId = Cal.serv.getEvent(h, 
+                        f = function() { var reqId = Cal.serv.getEvent(h,
                             Cal.currentCalendar.path, ev.data.id); };
                     }
                     break;
@@ -682,7 +682,7 @@ cosmo.view.cal = new function() {
                                 var start = ev.data.start;
                                 // Use the date of the selected event to figure the
                                 // new end date for the recurrence
-                                var recurEnd = new ScoobyDate(start.getFullYear(), 
+                                var recurEnd = new ScoobyDate(start.getFullYear(),
                                     start.getMonth(), start.getDate());
                                 var unit = ranges[freq][0];
                                 var incr = (ranges[freq][1] * -1);
@@ -691,12 +691,12 @@ cosmo.view.cal = new function() {
                                 // for a weekly, etc.
                                 recurEnd = ScoobyDate.add(recurEnd, unit, incr);
                                 saveRule.endDate = recurEnd;
-                                doSaveRecurrenceRule(ev, saveRule, { 'saveAction': 'remove', 
+                                doSaveRecurrenceRule(ev, saveRule, { 'saveAction': 'remove',
                                     'removeType': 'instanceAllFuture', 'recurEnd': recurEnd });
                             }
                         };
                         // Look up the RecurrenceRule and pass the result on to function h
-                        f = function() { var reqId = Cal.serv.getRecurrenceRules(h, 
+                        f = function() { var reqId = Cal.serv.getRecurrenceRules(h,
                             Cal.currentCalendar.path, [ev.data.id]); };
                     break;
                 // Save the RecurrenceRule with a new exception added for this instance
@@ -705,7 +705,7 @@ cosmo.view.cal = new function() {
                     var dates = rrule.exceptionDates;
                     var d = ScoobyDate.clone(ev.data.instanceDate);
                     dates.push(d);
-                    
+
                     f = function() { doSaveRecurrenceRule(ev, rrule, { 'saveAction': 'remove',
                         'saveType': 'instanceOnlyThisEvent' }) };
                     break;
@@ -721,7 +721,7 @@ cosmo.view.cal = new function() {
         f();
     }
     /**
-     * Call the service to do event removal -- creates an anonymous 
+     * Call the service to do event removal -- creates an anonymous
      * function to pass as the callback for the async service call.
      * Response to the async request is handled by handleRemoveEvent.
      * @param ev A CalEvent object, the event to be saved.
@@ -730,14 +730,14 @@ cosmo.view.cal = new function() {
     function doRemoveEvent(ev, opts) {
         // Pass the original event and opts object to the handler function
         // along with the original params passed back in from the async response
-        var f = function(newEvId, err, reqId) { 
+        var f = function(newEvId, err, reqId) {
             handleRemoveResult(ev, newEvId, err, reqId, opts); };
         var requestId = Cal.serv.removeEvent(
             f, Cal.currentCalendar.path, ev.data.id);
     }
     /**
-     * Handles the response from the async call when removing an event. 
-     * @param ev A CalEvent object, the original event clicked on, 
+     * Handles the response from the async call when removing an event.
+     * @param ev A CalEvent object, the original event clicked on,
      * or created by double-clicking on the cal canvas.
      * @param newEvId String, FIXME -- Why is this included in Remove?
      * @param err A JS object, the error returned from the server when
@@ -756,20 +756,20 @@ cosmo.view.cal = new function() {
         else {
             act = 'removeSuccess';
         }
-        
+
         // Resets local timer for timeout -- we know server-side
         // session has been refreshed
         // ********************
         // BANDAID: need to move this into the actual Service call
         // ********************
         Cal.serv.resetServiceAccessTime();
-            
+
         // Broadcast success
-        dojo.event.topic.publish('/calEvent', { 'action': act, 
+        dojo.event.topic.publish('/calEvent', { 'action': act,
             'data': removeEv, 'opts': opts });
     }
     /**
-     * Call the service to save a recurrence rule -- creates an anonymous 
+     * Call the service to save a recurrence rule -- creates an anonymous
      * function to pass as the callback for the async service call.
      * Response to the async request is handled by handleSaveRecurrenceRuleResult.
      * @param ev A CalEvent object, the event originally clicked on.
@@ -779,7 +779,7 @@ cosmo.view.cal = new function() {
     function doSaveRecurrenceRule(ev, rrule, opts) {
         // Pass the original event and opts object to the handler function
         // along with the original params passed back in from the async response
-        var f = function(ret, err, reqId) { 
+        var f = function(ret, err, reqId) {
             handleSaveRecurrenceRuleResult(ev, err, reqId, opts); };
         var requestId = Cal.serv.saveRecurrenceRule(
             f, Cal.currentCalendar.path, ev.data.id, rrule);
@@ -787,7 +787,7 @@ cosmo.view.cal = new function() {
     /**
      * Handles the response from the async call when saving changes
      * to a RecurrenceRule.
-     * @param ev A CalEvent object, the original event clicked on, 
+     * @param ev A CalEvent object, the original event clicked on,
      * or created by double-clicking on the cal canvas.
      * @param err A JS object, the error returned from the server when
      * a remove operation fails.
@@ -798,12 +798,12 @@ cosmo.view.cal = new function() {
         var rruleEv = ev;
         // Saving the RecurrenceRule can be part of a 'remove'
         // or 'save' -- set the message for an error appropriately
-        var errMsgKey = opts.saveAction == 'remove' ? 
+        var errMsgKey = opts.saveAction == 'remove' ?
             'EventRemoveFailed' : 'EventEditSaveFailed';
         // Simple error message to go along with details from Error obj
         var errMsg = getText('Main.Error.' + errMsgKey);
         var qual = {};
-        
+
         if (err) {
             act = opts.saveAction + 'Failed';
             Cal.showErr(errMsg, err);
@@ -811,14 +811,14 @@ cosmo.view.cal = new function() {
         else {
             act = opts.saveAction + 'Success';
         }
-        
+
         // Resets local timer for timeout -- we know server-side
         // session has been refreshed
         // ********************
         // BANDAID: need to move this into the actual Service call
         // ********************
         Cal.serv.resetServiceAccessTime();
-        
+
         // If the event has been edited such that it is now out of
         // the viewable range, remove the event from display
         if (rruleEv.isOutOfViewRange()) {
@@ -828,12 +828,12 @@ cosmo.view.cal = new function() {
         else {
             qual.onCanvas = true;
         }
-        
+
         // Sync changes to the modifications/exceptions in the
         // RecurrenceRule to all the other instances on the canvas
         if (syncRecurrence(rruleEv)) {
             // Broadcast success
-            dojo.event.topic.publish('/calEvent', { 'action': act, 
+            dojo.event.topic.publish('/calEvent', { 'action': act,
                 'data': rruleEv, 'opts': opts, 'qualifier': qual });
         }
     }
@@ -851,8 +851,8 @@ cosmo.view.cal = new function() {
         // recurrence currently on the canvas
         var f = function(i, e) {
             if (e.data.id == ev.data.id) {
-                e.data.recurrenceRule = 
-                    RecurrenceRule.clone(ev.data.recurrenceRule); 
+                e.data.recurrenceRule =
+                    RecurrenceRule.clone(ev.data.recurrenceRule);
             }
         }
         var evReg = cosmo.view.cal.canvas.eventRegistry;
@@ -861,7 +861,7 @@ cosmo.view.cal = new function() {
     }
     /**
      * Loads the recurrence expansion for a group of
-     * recurring events. Doing it as a group allows you to 
+     * recurring events. Doing it as a group allows you to
      * grab the expansions for several recurrences at once.
      * @param start Number, timestamp for the start of the
      * recurrence
@@ -881,12 +881,12 @@ cosmo.view.cal = new function() {
         var f = function(hashMap) {
             var expandEventHash = createEventRegistry(hashMap);
             self.processingQueue.shift();
-            dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess', 
-               'data': { 'saveEvent': ev, 'eventRegistry': expandEventHash, 
+            dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess',
+               'data': { 'saveEvent': ev, 'eventRegistry': expandEventHash,
                'opts': opts } });
         }
 
-        Cal.serv.expandEvents(f, Cal.currentCalendar.path, [id], s, e); 
+        Cal.serv.expandEvents(f, Cal.currentCalendar.path, [id], s, e);
     }
     /**
      * Take an array of CalEventData objects, and create a Hash of
@@ -899,7 +899,7 @@ cosmo.view.cal = new function() {
     function createEventRegistry(arrParam) {
         var h = new Hash();
         var arr = [];
-       
+
         // Param may be a single array, or hashmap of arrays -- one
         // for each recurring event sequence
         // ---------------------------------
@@ -917,24 +917,15 @@ cosmo.view.cal = new function() {
                 }
             }
         }
-        
+
         for (var i = 0; i < arr.length; i++) {
             evData = arr[i];
             // Basic paranoia checks
             if (!evData.end) {
                 evData.end = ScoobyDate.clone(evData.start);
             }
-            if (evData.start.timezone || evData.end.timezone) {
-                if (!evData.end.timezone) {
-                    evData.end.timezone =
-                        ScoobyTimezone.clone(evData.start.timezone);
-                }
-                if (!evData.start.timezone) {
-                    evData.start.timezone =
-                        ScoobyTimezone.clone(evData.end.timezone);
-                }
-            }
-            // Make exceptionDates on recurrences default to empty array  
+
+            // Make exceptionDates on recurrences default to empty array
             if (evData.recurrenceRule && !evData.recurrenceRule.exceptionDates) {
                 evData.recurrenceRule.exceptionDates = [];
             }
@@ -945,7 +936,7 @@ cosmo.view.cal = new function() {
         }
         return h;
     }
-    
+
     // Public attributes
     // ********************
     // Options for saving/removing recurring events
@@ -958,7 +949,7 @@ cosmo.view.cal = new function() {
     this.processingQueue = [];
     // Last clicked cal event -- used for selection persistence.
     this.lastSent = null;
-    
+
     // Subscribe to the '/calEvent' channel
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
 
@@ -1021,7 +1012,7 @@ cosmo.view.cal = new function() {
             return false;
         }
         var eventLoadHash = createEventRegistry(eventLoadList);
-        dojo.event.topic.publish('/calEvent', { 'action': 'eventsLoadSuccess', 
+        dojo.event.topic.publish('/calEvent', { 'action': 'eventsLoadSuccess',
             'data': eventLoadHash });
         return true;
     };

@@ -73,7 +73,5 @@ function timeFunction(object, functionName){
 //deprecate old version sans namespace
 genericToString = function(){
     dojo.deprecated("genericToString", "Use cosmo.util.debug.genericToString instead", "Version 0.6 Final Release");
-    cosmo.util.debug.apply(this, arguments);
-
-
+    return cosmo.util.debug.genericToString.apply(this, arguments);
 }

@@ -21,7 +21,6 @@ JAVA_JSON_MAPPING = {"java.util.Date":Date,
                      "net.fortuna.ical4j.model.DateTime":Date,
                      "org.osaf.cosmo.rpc.model.Event":CalEventData,
                      "org.osaf.cosmo.rpc.model.CosmoDate":cosmo.datetime.Date,
-                     "org.osaf.cosmo.rpc.model.CosmoTimeZone":ScoobyTimezone,
                      "org.osaf.cosmo.rpc.model.RecurrenceRule":RecurrenceRule,
                      "org.osaf.cosmo.rpc.model.Modification":Modification};
 

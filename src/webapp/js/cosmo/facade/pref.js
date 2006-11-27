@@ -15,13 +15,11 @@
  */
 
 var Pref = new function() {
-    this.timezoneName = '';
 
     this.init = function() {
-        var prefDate = new Date();
-        var tz = ScoobyTimezone.getLocalTimezone(prefDate.getTime());
-        this.timezoneName = tz.name;
+       //TODO find new way to get default timezone (probably wait till 0.7 to find out what that means :-) )
     };
+
     this.getTimezoneOffset = function(dt) {
         return ScoobyDate.getBrowserTimezoneOffset(dt.getYear(), dt.getMonth(),
             dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds());

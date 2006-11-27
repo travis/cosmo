@@ -22,7 +22,7 @@
  * the two main areas where blocks get displayed. HasTime are normal
  * events in the scrolling area, and NoTime are the all-day events
  * in the resizeable area at the top.
- * HasTimeBlock for a multi-day event may be a composite made up of 
+ * HasTimeBlock for a multi-day event may be a composite made up of
  * a main div element and a bunch of auxilliary divs off to the side.
  */
 
@@ -54,7 +54,7 @@ function Block() {
     this.auxDivList = [];
 
     /**
-     * Convenience method that does all the visual update stuff 
+     * Convenience method that does all the visual update stuff
      * for a block at one time
      */
     this.updateDisplayMain = function() {
@@ -72,14 +72,14 @@ function Block() {
         // Trim leading zero if need be
         strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
         // Display timezone info for event if it has one
-        if (ev.data.start.timezone) {
-            strtime += ' (' + ev.data.start.timezone.name + ')';
+        if (ev.data.start.tzId) {
+            strtime += ' (' + ev.data.start.getTimezoneAbbrName() + ')';
         }
         var timeDiv = document.getElementById(this.divId + 'Start' +
             Cal.ID_SEPARATOR + ev.id);
         var titleDiv = document.getElementById(this.divId + 'Title' +
             Cal.ID_SEPARATOR + ev.id);
-        if (timeDiv) { 
+        if (timeDiv) {
             this.setText(timeDiv, strtime);
         }
         this.setText(titleDiv, ev.data.title);
@@ -106,7 +106,7 @@ function Block() {
         var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
         var diff = (Date.diff('d', Cal.viewStart.getTime(), ev.data.start.getTime()));
         return (diff * cosmo.view.cal.canvas.dayUnitWidth);
-            
+
     };
     this.getPlatonicWidth = function() {
         var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
@@ -153,7 +153,7 @@ function Block() {
             stateId = 3;
         }
         // Change block back after completing processing --
-        // change it back to normal 'unselected' color, or 
+        // change it back to normal 'unselected' color, or
         // 'selected' color if this block is the most recently
         // clicked one
         else {
@@ -168,7 +168,7 @@ function Block() {
      * or (3) normal, unselected
      */
     this.setLozengeAppearance = function(stateId) {
-        
+
         var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
         var useLightColor = this.useLightColor(ev);
         var imgPath = '';
@@ -182,7 +182,7 @@ function Block() {
             Cal.ID_SEPARATOR + ev.id);
         var titleDiv = document.getElementById(this.divId + 'Title' +
             Cal.ID_SEPARATOR + ev.id);
-        
+
         // If this block is processing, change to 'processing' color
         switch (stateId) {
             // Selected
@@ -226,11 +226,11 @@ function Block() {
                 // Do nothing
                 break;
         }
-        
+
         if (ev.data.status && ev.data.status.indexOf('TENTATIVE') > -1) {
             borderStyle = 'dashed';
         }
-        
+
         // Main div for block
         // ------------
         mainDiv.style.color = textColor;
@@ -246,17 +246,17 @@ function Block() {
             }
             else {
                 mainDiv.style.backgroundImage = '';
-                
+
             }
         }
-        
+
         // Text colors
         // ------------
         if (timeDiv) {
             timeDiv.style.color = textColor;
         }
         titleDiv.style.color = textColor;
-        
+
         // Aux divs for multi-day events
         // ------------
         if (this.auxDivList.length) {
@@ -274,7 +274,7 @@ function Block() {
                     }
                     else {
                         auxDiv.style.backgroundImage = '';
-                        
+
                     }
                 }
             }
@@ -304,7 +304,7 @@ function Block() {
         var auxDiv = null;
 
         this.setLozengeAppearance(1);
-       
+
         // Set the z-index to the front
         this.div.style.zIndex = 25;
         if (this.auxDivList.length) {
@@ -321,9 +321,9 @@ function Block() {
      */
     this.setDeselected = function() {
         var auxDiv = null;
-        
+
         this.setLozengeAppearance(2);
-        
+
         // Set the z-index to the back
         this.div.style.zIndex = 1;
         if (this.auxDivList.length) {
@@ -338,7 +338,7 @@ function Block() {
 
 /**
  * HasTimeBlock -- sub-class of Block
- * Normal events, 'at-time' events -- these sit in the scrollable 
+ * Normal events, 'at-time' events -- these sit in the scrollable
  * area of the main viewing area
  */
 function HasTimeBlock(id) {
@@ -374,9 +374,9 @@ HasTimeBlock.prototype.showProcessing = function() {
 HasTimeBlock.prototype.resizeHandleCursorChange = function(isProc) {
     var topChange = isProc ? 'default' : 'n-resize';
     var bottomChange = isProc ? 'default' : 's-resize';
-    var topDiv = document.getElementById(this.divId + 'Top' + 
+    var topDiv = document.getElementById(this.divId + 'Top' +
         Cal.ID_SEPARATOR + this.id);
-    var bottomDiv = document.getElementById(this.divId + 'Bottom' + 
+    var bottomDiv = document.getElementById(this.divId + 'Bottom' +
         Cal.ID_SEPARATOR + this.id);
     topDiv.style.cursor = topChange;
     // Timed events that extend beyond the viewable area
@@ -407,7 +407,7 @@ HasTimeBlock.prototype.updateFromEvent = function(ev) {
     var height = 0;
     var left = 0;
     var width = 0;
-    
+
     // Events edited out of range
     // Move the block from view -- if the update fails, we need
     // to put it back
@@ -434,7 +434,7 @@ HasTimeBlock.prototype.updateFromEvent = function(ev) {
         left += (ev.conflictDepth * 10);
 
         width = cosmo.view.cal.canvas.dayUnitWidth - (ev.maxDepth * 10);
-        
+
         // BANDAID: set min height if not multi-day event
         if (!this.auxDivList.length && (height < unit)) {
             height = unit;
@@ -445,7 +445,7 @@ HasTimeBlock.prototype.updateFromEvent = function(ev) {
     // Show one-pixel border of underlying divs
     // And one-pixel border for actual block div
     // (1 + (2 * 1)) = 3 pixels
-    this.height = height - 3; 
+    this.height = height - 3;
     this.width = width - 3;
 
 }
@@ -454,7 +454,7 @@ HasTimeBlock.prototype.updateFromEvent = function(ev) {
  * Update an event from changes to the block -- usually called
  * when an event block is dragged or resized
  * The updated event is then passed back to the backend for saving
- * If the save operation fails, the event can be restored from 
+ * If the save operation fails, the event can be restored from
  * the backup copy of the CalEventData in the event's dataOrig property
  */
 HasTimeBlock.prototype.updateEvent = function(ev, dragMode) {
@@ -481,7 +481,7 @@ HasTimeBlock.prototype.updateEvent = function(ev, dragMode) {
 /**
  * Insert a new event block
  * This method places the block (single- or multi-div) on the
- * scrollable area for normal events. This just puts them on the 
+ * scrollable area for normal events. This just puts them on the
  * canvas in a hidden state. After this we have two more steps:
  * (1) Update block to reflect event's times using updateFromEvent
  * (2) Do sizing/positioning, and turn on visibility with updateDisplayMain
@@ -496,7 +496,7 @@ HasTimeBlock.prototype.insert = function(id) {
     var blockDivSub = null;
     var d = null;
     var view = null;
-    
+
     if (ev.startsBeforeViewRange()) {
         startDay = 0;
         this.startsBeforeViewRange = true;
@@ -512,11 +512,11 @@ HasTimeBlock.prototype.insert = function(id) {
         endDay = ev.data.end.getLocalDay();
     }
     auxDivCount = (endDay - startDay);
-    
+
     this.idPrefix = Cal.ID_SEPARATOR + id;
-    this.width = 1; 
+    this.width = 1;
     this.auxDivList = [];
-    
+
     // Append event block to appropriate screen area for the type of Block
     view = document.getElementById('timedContentDiv');
 
@@ -941,14 +941,14 @@ NoTimeBlock.prototype.insert = function(id) {
     blockDivSub.id = this.divId + 'Content' + this.idPrefix;
     blockDivSub.className = 'eventContent';
     blockDivSub.style.whiteSpace = 'nowrap';
-    
+
     // Title
     d = document.createElement('div');
     d.id = this.divId + 'Title' + this.idPrefix;
     d.className = 'eventTitle';
     d.style.marginLeft = BLOCK_RESIZE_LIP_HEIGHT + 'px';
     blockDivSub.appendChild(d);
-    
+
     blockDiv.appendChild(blockDivSub);
 
     view.appendChild(blockDiv);

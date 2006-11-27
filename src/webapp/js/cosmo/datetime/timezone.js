@@ -67,6 +67,23 @@ cosmo.datetime.timezone.Timezone.prototype.getOffsetInMinutes = function(/*Date*
     }
 };
 
+cosmo.datetime.timezone.Timezone.prototype.getAbbreviatedName = function(/*Date*/ date){
+    var zoneItem = this._getZoneItemForDate(date);
+    if (!zoneItem.ruleName){
+        return zoneItem.format;
+    }
+
+    var ruleSet = cosmo.datetime.timezone.getRuleSet(zoneItem.ruleName);
+    var rule = ruleSet._getRuleForDate(date);
+
+    if (!rule || !rule.letter){
+        return zoneItem.format;
+    }
+
+    return zoneItem.format.replace("%s", rule.letter);
+
+}
+
 cosmo.datetime.timezone.Timezone.prototype._getZoneItemForDate = function(/*Date*/ date){
     var compareDates = cosmo.datetime.timezone._compareDates;
     for (var x = 0; x < this.zoneItems.length; x++){
@@ -328,7 +345,7 @@ cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.init = function(files){
 
 cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype._parseUri = function(uri){
     var content = dojo.hostenv.getText(this.timezoneFileRoot + "/" + uri);
-    cosmo.datetime.timezone.parse(content, dojo.lang.hitch(this, this.addTimezone), dojo.lang.hitch(this, this.addRuleSet));
+    cosmo.datetime.timezone.parse(content, dojo.lang.hitch(this, this.addTimezone), dojo.lang.hitch(this, this.addRuleSet), dojo.lang.hitch(this, this.addLink));
 };
 
 cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addTimezone = function(timezone){
@@ -339,6 +356,10 @@ cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addRuleSet = function(r
     this._ruleSets[ruleset.name] = ruleset;
 };
 
+cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addLink = function(oldName, newName){
+    this._timezones[oldName] = this._timezones[newName];
+}
+
 cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.getTimezone = function(tzid){
     return this._timezones[tzid];
 }
@@ -347,9 +368,10 @@ cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.getRuleSet = function(r
     return this._ruleSets[ruleName];
 }
 
-cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback){
+cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback, linkCallback){
         var ruleSets = new dojo.collections.Dictionary();
         var zones = new dojo.collections.Dictionary();
+        var links = {};
         var lines = str.split('\n');
 
         //the current zone
@@ -400,13 +422,9 @@ cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback)
                     ruleSet.addRule(rule);
                     break;
                 case 'Link':
-                    // Shouldn't exist
-                    /**TODO Handle This
-                    if (self.zones[arr[1]]) {
-                        alert('Error with Link ' + arr[1]);
-                    }
-                    self.zones[arr[1]] = arr[0];
-                    **/
+                    var newName = arr.shift();
+                    var oldName = arr.shift();
+                    links[oldName] = newName;
                     break;
                 case 'Leap':
                     break;
@@ -417,6 +435,9 @@ cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback)
         }//end for
         dojo.lang.map(zones.getValueList(),timezoneCallback);
         dojo.lang.map(ruleSets.getValueList(), rulesetCallback);
+        for (var oldName in links){
+            linkCallback(oldName, links[oldName])
+        }
         return true;
     };//end function
 

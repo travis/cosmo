@@ -23,7 +23,7 @@
 
 <script type="text/javascript">
 
-	// Set this to true to get nice dojo debugging messages.
+    // Set this to true to get nice dojo debugging messages.
 
     var djConfig = {isDebug: false};
 </script>
@@ -45,7 +45,7 @@ bootstrap = function(){
     dojo.require("cosmo.datetime.*");
 
     var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry("${staticBaseUrl}/js/lib/olson-tzdata/");
-    registry.init(["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica"]);
+    registry.init(["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"]);
     //registry.init([ "europe"]);
     cosmo.datetime.timezone.setTimezoneRegistry(registry);
 }

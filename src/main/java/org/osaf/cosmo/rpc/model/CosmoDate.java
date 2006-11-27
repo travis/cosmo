@@ -125,7 +125,14 @@ public class CosmoDate implements Cloneable{
             && this.hours == that.hours
             && this.seconds == that.seconds){
 
+            if (this.tzId == null && that.tzId == null){
+                return true;
+            }
 
+            if (this.tzId != null && that.tzId != null){
+                return this.tzId.equals(
+                        that.tzId);
+            }
         }
         return false;
     }

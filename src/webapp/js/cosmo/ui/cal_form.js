@@ -20,7 +20,7 @@
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  *
- * Does some somewhat hackish stuff to suppress inut from the 
+ * Does some somewhat hackish stuff to suppress inut from the
  * keyboard when user is typing in form fields
  */
 
@@ -28,13 +28,13 @@
  * @object The form for all UI-form-elements on the page
  */
 function CalForm() {
-    
+
     var self = this;
     var saveButton = null;
     var removeButton = null;
-    
+
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
-    
+
     function saveCalEvent() {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
         // Give timeout check in onclick handler a chance to work
@@ -51,7 +51,7 @@ function CalForm() {
             dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'data': selEv });
         }
     };
-    
+
     function removeCalEvent() {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
         if (Cal.isTimedOut()) {
@@ -59,7 +59,7 @@ function CalForm() {
         }
         dojo.event.topic.publish('/calEvent', { 'action': 'removeConfirm', 'data': selEv });
     }
-    
+
     this.handlePub = function(cmd) {
         var act = cmd.action;
         var ev = cmd.data;
@@ -96,18 +96,18 @@ function CalForm() {
                 break;
         }
     };
-    
+
     // The actual form DOM elem -- form.form is redundant, so
     // changing this to formElem would be a Good Thing
     this.form = document.getElementById('calForm');
-    // If a text input currently has focus -- should disable 
+    // If a text input currently has focus -- should disable
     // listener for Delete button
     this.detailTextInputHasFocus = false;
     // If a textare currently has focus -- should disable
     // listner for Delete and Enter buttons
     this.detailTextAreaHasFocus = false;
     this.jumpToTextInputHasFocus = false;
-    
+
     /**
      * Holdover from when we used object-literal notation
      * TO-DO: Move all this stuff into the main constructor function
@@ -123,19 +123,19 @@ function CalForm() {
         var elem = null;
         var elemFloat = null;
         var formElem = null;
-        
+
         cont.id = 'eventInfoDivContent';
         cont.style.padding = '8px';
-       
+
         // Event title
         this.createLabel(getText(
             'Main.DetailForm.Title'), d);
         elem = document.createElement('div');
         elem.className = 'formElem';
-        this.createInput('text', 'eventtitle', 'eventtitle', 
-            28, 100, null, 'inputText', elem); 
+        this.createInput('text', 'eventtitle', 'eventtitle',
+            28, 100, null, 'inputText', elem);
         d.appendChild(elem);
-       
+
         // All-day checkbox
         elem = document.createElement('div');
         elem.className = 'formElem';
@@ -145,13 +145,16 @@ function CalForm() {
         this.createNbsp(elem);
         elem.appendChild(document.createTextNode('All day'));
         d.appendChild(elem);
-        
+
         // Start
         this.createDateTimeInputs('Starts', 'start', d);
-        
+
         // End
         this.createDateTimeInputs('Ends', 'end', d);
-        
+
+        //Timezones!
+        this.createTimezoneInputs(d);
+
         // Event status
         this.createLabel('Status', d);
         elem = document.createElement('div');
@@ -159,7 +162,7 @@ function CalForm() {
         this.createSelect('status', 'status', null, null,
         this.getStatusOpt(), 'selectElem', elem);
         d.appendChild(elem);
-        
+
         // Recurrence
         // ------------------------
         // Recurrence date
@@ -168,17 +171,17 @@ function CalForm() {
         elem.className = 'formElem';
         this.createSelect('recurrence', 'recurrence', null, null,
         this.getRecurOpt(), 'selectElem', elem);
-        
+
         this.createNbsp(elem);
         elem.appendChild(document.createTextNode('ending'));
         this.createNbsp(elem);
-        
+
         // Recurrence ending
         elem.className = 'formElem';
         this.createInput('text', 'recurend', 'recurend',
             10, 10, null, 'inputText', elem);
         d.appendChild(elem);
-        
+
         // Details textarea
         this.createLabel(getText(
             'Main.DetailForm.Description'), d);
@@ -193,30 +196,30 @@ function CalForm() {
         formElem.style.width = '220px';
         elem.appendChild(formElem);
         d.appendChild(elem);
-        
+
         // Div elements for Remove and Save buttons
         elem = document.createElement('div');
         elem.id = 'eventDetailSave';
         elem.className = 'floatRight';
         d.appendChild(elem);
-        
+
         elem = document.createElement('div');
         elem.className = 'floatRight';
         this.createNbsp(elem);
         d.appendChild(elem);
-        
+
         elem = document.createElement('div');
         elem.id = 'eventDetailRemove';
         elem.className = 'floatRight';
         d.appendChild(elem);
-        
+
         elem = document.createElement('div');
         elem.className = 'clearAll';
         d.appendChild(elem);
-        
+
         cont.appendChild(d);
         info.appendChild(cont);
-        
+
         return true;
     };
     this.createDateTimeInputs = function(label, name, d) {
@@ -250,6 +253,26 @@ function CalForm() {
             getText('App.PM')));
         d.appendChild(elem);
     };
+
+    this.createTimezoneInputs = function(d){
+        var elem = null;
+
+        //create the main label
+        this.createLabel(getText(
+            'Main.DetailForm.Timezone'), d);
+        elem = document.createElement('div');
+        elem.className = 'formElem';
+        elem.style.whiteSpace = 'nowrap';
+
+        //create the region selector
+//  this.createSelect = function(id, name, size, multi, options, className,
+  //      elem) {
+        this.createSelect('tzRegionSelect', 'tzRegionSelect', null, false, this.getTimezoneOptions(), 'selectElem', elem);
+
+        d.appendChild(elem);
+
+    };
+
     this.createLabel = function(str, d) {
         var elem = document.createElement('div');
         elem.className = 'labelTextVert';
@@ -262,13 +285,14 @@ function CalForm() {
             return elem;
         }
     };
+
     this.createInput = function(type, id, name,
         size, maxlength, value, className, elem) {
-        
+
         var formElem = null;
         var str = '';
-        
-        // IE falls down on DOM-method-generated 
+
+        // IE falls down on DOM-method-generated
         // radio buttons and checkboxes
         // Old-skool with conditional branching and innerHTML
         if (document.all && (type == 'radio' || type == 'checkbox')) {
@@ -298,7 +322,7 @@ function CalForm() {
         // IE -- everything but radio button and checkbox
         else {
             formElem = document.createElement('input');
-            
+
             formElem.type = type;
             formElem.name = name;
             formElem.id = id;
@@ -336,10 +360,10 @@ function CalForm() {
         var calSelectNav = document.getElementById('calSelectNav');
         var calSelectElemDiv = document.createElement('div');
         var calSelectElem = document.createElement('select');
-        
+
         calSelectElem.id = 'calSelectElem';
         calSelectElem.name = 'calSelectElem';
-        
+
         for (var i = 0; i < calendars.length; i++) {
             var calOpt = document.createElement('option');
             calOpt.value = i;
@@ -348,7 +372,7 @@ function CalForm() {
         }
         calSelectElem.className = 'selectElem';
         calSelectElemDiv.appendChild(calSelectElem);
-        
+
         calSelectNav.appendChild(calSelectElemDiv);
         leftSidebarDiv.appendChild(calSelectNav);
     };
@@ -406,7 +430,7 @@ function CalForm() {
         textbox.className = prompt? 'inputTextDim' : 'inputText';
         textbox.value = setText;
         textbox.disabled = disabled;
-        
+
     };
     /**
      * Set up the buttons for the form -- called initially on setup
@@ -416,7 +440,7 @@ function CalForm() {
     this.createButtons = function(enableRemove, enableSave) {
         var checkElem = null;
         var f = null;
-        
+
         f = enableRemove ? removeCalEvent : null;
         removeButton = new Button('removeButton', 74,
             f, getText('App.Button.Remove'));
@@ -446,7 +470,7 @@ function CalForm() {
         var recurOpt = [];
         var opt = null;
         var str = '';
-        
+
         opt = new Object();
         opt.text = 'Once';
         opt.value = '';
@@ -460,19 +484,18 @@ function CalForm() {
         }
         return recurOpt;
     };
-    
+
     this.getStatusOpt = function() {
         var statusOpt = [];
         var opt = null;
         var str = '';
-        
-        opt = new Object();
+
         for (var i in EventStatus) {
             opt = new Object();
             str = EventStatus[i];
             if(str == EventStatus.FYI) {
                 opt.text = i;
-            } 
+            }
             else {
                 opt.text = Text.uppercaseFirst(i.toLowerCase());
             }
@@ -481,6 +504,20 @@ function CalForm() {
         }
         return statusOpt;
     };
+
+    this.getTimezoneOptions = function(){
+        var options = [];
+        var option = {opt: null,
+                     text: getText("Main.DetailForm.Region")};
+        options.push(option);
+        var regions = cosmo.datetime.timezone.REGIONS;
+        for (var x = 0; x < regions.length; x++){
+            option = { text: regions[x], value: regions[x]};
+            options.push(option);
+        }
+        return options;
+    }
+
     /**
      * Update the event's CalEventData obj from the values in the form
      * Called when clicking the Save button or hitting Enter
@@ -499,14 +536,14 @@ function CalForm() {
         var descr = '';
         var status = '';
         var allDay = false;
-        var recur = null; 
+        var recur = null;
         var rE = '';
         var h = 0;
         var m = 0;
         var err = '';
         var errMsg = '';
         var e = null;
-        
+
         // Pull new values out of the event info form
         startDate = form.startdate.value;
         endDate = form.enddate.value;
@@ -519,7 +556,7 @@ function CalForm() {
         recur = form.recurrence.value;
         rE = form.recurend.value != 'mm/dd/yyyy' ?
             form.recurend.value : '';
-        
+
         // Error checking
         // =======================
         if (!title) {
@@ -556,7 +593,7 @@ function CalForm() {
                 errMsg += '\n';
             }
         }
-        
+
         // Calc military datetimes from form entries
         startDate = new Date(startDate);
         if (!allDay) {
@@ -578,7 +615,7 @@ function CalForm() {
             errMsg += 'Event cannot end before it starts.';
             errMsg += '\n';
         }
-        
+
         // Display error or update form and submit
         // =======================
         // Err condition
@@ -607,7 +644,7 @@ function CalForm() {
             ev.data.description = descr;
             ev.data.allDay = allDay;
             ev.data.status = status;
-            
+
             var rule = ev.data.recurrenceRule;
             // Set to no recurrence
             //Log.print('recur: ' + recur);
@@ -700,7 +737,7 @@ function CalForm() {
         var timeElem = null;
         var meridianElem = null;
         var strtime = '';
-        
+
         timeElem = form[name + 'time'];
         meridianElem = form[name + 'ap'];
         if (time) {
@@ -732,7 +769,7 @@ function CalForm() {
     };
     /**
      * Reloading the page in some browsers preserves form information
-     * This method empties the event info form of any entered values. 
+     * This method empties the event info form of any entered values.
      */
     this.clear = function() {
         var form = this.form;
@@ -785,17 +822,17 @@ function CalForm() {
         var descrTxt = document.getElementById('eventdescr');
         var allDayCheck = document.getElementById('eventallday');
         var form = Cal.calForm.form;
-    
+
         // Add dummy function event listener so form doesn't
         // submit on Enter keypress in Safari
         form.onsubmit = function() { return false; };
-        
+
         // Cal selector
         if (form.calSelectElem) {
-            form.calSelectElem.onchange = function() { 
+            form.calSelectElem.onchange = function() {
                 f = Cal.goSelCal; Cal.showMaskDelayNav(f); };
         }
-        
+
         // All text inputs
         for (var i=0; i < inputs.length; i++) {
             if (inputs[i].className == 'inputText') {
@@ -803,11 +840,11 @@ function CalForm() {
                 inputs[i].onblur = function() { Cal.calForm.detailTextInputHasFocus = false; };
             }
         }
-        
+
         // Recurrence
         form.recurrence.onchange = Cal.calForm.setRecurEnd;
         form.recurend.onclick = Cal.calForm.emptyTextInput;
-        
+
         // Description textarea
         descrTxt.onfocus = function() {
             Cal.calForm.detailTextInputHasFocus = true;
@@ -826,24 +863,24 @@ function CalForm() {
     this.addJumpToDate = function(dMain) {
         var top = parseInt(MiniCal.displayContext.style.top);
         var d = null;
-        
+
         // place the div just above minical
         top -= 28;
         dMain.style.top = top + 'px';
         var dc = document.createElement('div');
         dMain.appendChild(dc);
-        
+
         d = document.createElement('div');
         d.className = 'floatLeft';
         d.style.paddingTop = '3px';
         d.appendChild(document.createTextNode(getText('Main.GoTo')));
         dc.appendChild(d);
-        
+
         d = document.createElement('div');
         d.className = 'floatLeft';
         self.createNbsp(d);
         dc.appendChild(d);
-        
+
         d = document.createElement('div');
         d.className = 'formElem floatLeft';
         dc.appendChild(d);
@@ -853,24 +890,24 @@ function CalForm() {
         self.form.jumpto.onclick = Cal.calForm.emptyTextInput;
         self.form.jumpto.onfocus = function() { Cal.calForm.jumpToTextInputHasFocus = true; };
         self.form.jumpto.onblur = function() { Cal.calForm.jumpToTextInputHasFocus = false; };
-        
+
         d = document.createElement('div');
         d.className = 'floatLeft';
         self.createNbsp(d);
         self.createNbsp(d);
         dc.appendChild(d);
-        
+
         d = document.createElement('div');
         d.className = 'floatLeft';
         dc.appendChild(d);
         butJump = new Button('jumpToButton', 32, Cal.calForm.goJumpToDate,
                 getText('App.Button.Go'), true);
         d.appendChild(butJump.domNode);
-        
+
         d = document.createElement('div');
         d.className = 'clearAll';
         dc.appendChild(d);
-        
+
         // Do some hokey calculations and pixel positioning
         // to center this stuff -- so CSS is better than
         // tables HOW exactly?

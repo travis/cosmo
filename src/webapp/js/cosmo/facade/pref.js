@@ -21,7 +21,7 @@ var Pref = new function() {
     };
 
     this.getTimezoneOffset = function(dt) {
-        return ScoobyDate.getBrowserTimezoneOffset(dt.getYear(), dt.getMonth(),
+        return cosmo.datetime.Date.getBrowserTimezoneOffset(dt.getYear(), dt.getMonth(),
             dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds());
     };
 }

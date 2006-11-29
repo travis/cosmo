@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+if ARGV.length == 0
+  print "Usage: strip_comments.rb /path/to/input/file\n"
+  exit
+else
+  path = ARGV[0]
+end
+
+t = File.read(path)
+t.gsub!(/^#.*\n/, '')
+t.gsub!(/^\n/, '')
+print t

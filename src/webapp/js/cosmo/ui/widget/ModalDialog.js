@@ -30,6 +30,8 @@ dojo.widget.HtmlWidget, {
         btnsLeft: [],
         btnsCenter: [],
         btnsRight: [],
+        btnPanel: null,
+        uiFullMask: null,
         defaultAction: null,
         isDisplayed: false,
         
@@ -106,16 +108,35 @@ dojo.widget.HtmlWidget, {
             return true;
         },
         setButtons: function (l, c, r) {
+            var bDiv = this.buttonPanelNode;
+            
+            function destroyButtons(b) {
+                for (var i = 0; i < b.length; i++) {
+                    b[i].destroy();
+                }
+            }
+
+            // Clean up previous panel if any
+            if (self.btnPanel) {
+                destroyButtons(this.btnsLeft);    
+                destroyButtons(this.btnsCenter);    
+                destroyButtons(this.btnsRight);    
+                self.btnPanel.destroy();
+                if (bDiv.firstChild) {
+                    bDiv.removeChild(bDiv.firstChild);
+                }
+            }
+            
+            // Reset buttons if needed
             this.btnsLeft = l || this.btnsLeft;
             this.btnsCenter = c || this.btnsCenter;
             this.btnsRight = r || this.btnsRight;
-            var bDiv = this.buttonPanelNode;
-            if (bDiv.firstChild) {
-                bDiv.removeChild(bDiv.firstChild);
-            };
-            var panel = dojo.widget.createWidget(
+            
+            // Create and append the panel
+            self.btnPanel = dojo.widget.createWidget(
                 'ButtonPanel', { btnsLeft: this.btnsLeft, btnsCenter: this.btnsCenter,
-                btnsRight: this.btnsRight }, bDiv, 'last');
+                btnsRight: this.btnsRight });
+            bDiv.appendChild(self.btnPanel.domNode);
             return true;
         },
         render: function () {
@@ -129,6 +150,22 @@ dojo.widget.HtmlWidget, {
             var h = dojo.html.getViewportHeight();
             this.setLeft(parseInt((w - this.width)/2));
             this.setTop(parseInt((h - this.height)/2));
+            return true;
+        },
+        renderUiMask: function () {
+            if (!this.uiFullMask) {
+                m = document.createElement('div');
+                m.style.display = 'none';
+                m.style.position = 'absolute';
+                m.style.top = '0px';
+                m.style.left = '0px';
+                m.style.width = '100%';
+                m.style.height = '100%';
+                m.style.background = 'transparent';
+                this.uiFullMask = m;
+                document.body.appendChild(m);
+            }
+            this.uiFullMask.style.display = 'block';
             return true;
         },
         
@@ -167,8 +204,9 @@ dojo.widget.HtmlWidget, {
                 this.setHeight(this.height);
                 
                 // Don't display until rendered and centered
-                if (this.render() && this.center()) { 
+                if (this.render() && this.center() && this.renderUiMask()) { 
                     this.domNode.style.display = 'block';
+                    this.domNode.style.zIndex = 2000;
                     // Have to measure for content area height once div is actually on the page
                     this.setContentAreaHeight();
                     // Call the original Dojo show method
@@ -188,6 +226,7 @@ dojo.widget.HtmlWidget, {
                 this.btnsRight = [];
                 this.width = null;
                 this.height = null;
+                this.uiFullMask.style.display = 'none';
                 this.domNode.style.display = 'none';
                 this.isDisplayed = false;
             };

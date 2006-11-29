@@ -37,11 +37,11 @@ cosmo.account.create = new function () {
     fieldList.push(f);
     
     f = new Field(_('Signup.Form.FirstName'), 'firstName');
-    f.validators = function(elem) { return validateRequired(elem) };
+    f.validators = function (elem) { return validateRequired(elem) };
     fieldList.push(f);
     
     f = new Field(_('Signup.Form.LastName'), 'lastName');
-    f.validators = function(elem) { return validateRequired(elem) };
+    f.validators = function (elem) { return validateRequired(elem) };
     fieldList.push(f);
     
     f = new Field(_('Signup.Form.EMailAddress'), 'email');
@@ -55,7 +55,7 @@ cosmo.account.create = new function () {
     fieldList.push(f);
     
     f = new Field(_('Signup.Form.ConfirmPassword'), 'confirm', 'password');
-    f.validators = function(elem1, elem2) { return (validateRequired(elem1) || 
+    f.validators = function (elem1, elem2) { return (validateRequired(elem1) || 
         validateConfirmPass(elem1, elem2)) };
     fieldList.push(f);
     
@@ -100,7 +100,7 @@ cosmo.account.create = new function () {
         
         form = createElem('form');
         form.id = 'accountSignupForm';
-        form.onsubmit = function() { return false; };
+        form.onsubmit = function () { return false; };
         
         table = createElem('table');
         body = createElem('tbody');
@@ -131,7 +131,7 @@ cosmo.account.create = new function () {
             elem.id = f.elemName;
             elem.maxlength = type == 'text' ? 32 : 16;
             elem.size = type == 'text' ? 32 : 16;
-            elem.className = 'textInput';
+            elem.className = 'inputText';
             td.appendChild(elem);
             
             tr.appendChild(td);
@@ -399,8 +399,16 @@ cosmo.account.create = new function () {
         o.btnsRight = [dojo.widget.createWidget("cosmo:Button", 
             { text:_('App.Button.Submit'), width:74,
             handleOnClick: function () { self.submitCreate(); } })];
-        self.dialog = dojo.widget.createWidget('ModalDialog', o, 
-            document.body, 'last');
+
+        // Create the modal dialog widget if needed
+        if (!self.dialog) {
+            self.dialog = dojo.widget.createWidget('ModalDialog', o, 
+                document.body, 'last');
+        }
+        // Or just re-set the props on it
+        else {
+            for (var p in o) { self.dialog[p] = o[p]; }
+        }
         self.dialog.show();
     };
     /**

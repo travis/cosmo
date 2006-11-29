@@ -118,44 +118,21 @@ a {
 	margin:auto;
 	width:280px;
 	text-align:left;
-	padding-top:24px;
+	padding-top:16px;
 }
-#loginDialogLoginPrompt{
+#loginDialogInputsBox td {
+    padding-bottom:4px;
+}
+#loginDialogLoginPrompt {
 	height:46px;
 }
-#loginDialogLogo{
-	padding-bottom:12px;
+#loginDialogLogo {
+    text-align:center;
+    padding-bottom:4px;
 }
-#loginDialogForm{
-}
-#loginDialogFormContainer{
+#loginDialogFormContainer {
 	padding:12px;
     border:1px solid $uiDetailBorderColor;
-}
-#loginDialogInputsBox{
-}
-#loginDialogUsernameWidget{
-	display: table-row;
-}
-#loginDialogUsernamePrompt{
-	display: table-cell;
-	text-align: right;
-}
-#loginDialogUsernameInputContainer{
-	display: table-cell;
-	padding-bottom:4px;
-}
-#loginDialogPasswordWidget{
-	display: table-row;
-}
-#loginDialogPasswordPrompt{
-	display: table-cell;
-	text-align: right;
-}
-#loginDialogPasswordInput{
-}
-#loginDialogUsernameInputContainer{
-	display: table-cell;
 }
 #loginDialogSubmitButton{
 	margin-top:16px;

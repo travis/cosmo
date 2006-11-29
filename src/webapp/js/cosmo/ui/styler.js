@@ -16,14 +16,13 @@
 
 Styler = new function() {
     this.styles = [];
-    this.maxIndex = 0;
     this.addStyle = function(name) {
         var dynStyle = document.createElement('style');
         dynStyle.type = 'text/css';
         dynStyle.media = 'all';
         document.getElementsByTagName("head")[0].appendChild(dynStyle);
-        this.styles[name] = new StyleWrapper(document.styleSheets[this.maxIndex]);
-        this.maxIndex++;
+        dynStyle = document.styleSheets[document.styleSheets.length-1];
+        this.styles[name] = new StyleWrapper(dynStyle);
     };
     this.doOldDocumentDotWriteHack = function(rules) {
         var styleStr = '';

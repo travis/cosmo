@@ -68,6 +68,15 @@ public class NoteStamp extends Stamp implements
         this.icalUid = icalUid;
     }
     
+    /**
+     * Return NoteStamp from Item
+     * @param item
+     * @return NoteStamp from Item
+     */
+    public static NoteStamp getStamp(Item item) {
+        return (NoteStamp) item.getStamp(NoteStamp.class);
+    }
+    
     public Stamp copy() {
         NoteStamp stamp = new NoteStamp();
         stamp.body = body;

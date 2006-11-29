@@ -59,6 +59,7 @@ public class EventRecord extends EimRecord {
         rDates = stamp.getRecurrenceDates();
         exDates = stamp.getExceptionDates();
         recurrenceId = stamp.getRecurrenceId();
+        status = stamp.getStatus();
     }
 
     /** */

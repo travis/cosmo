@@ -265,12 +265,34 @@ function CalForm() {
         elem.style.whiteSpace = 'nowrap';
 
         //create the region selector
-//  this.createSelect = function(id, name, size, multi, options, className,
-  //      elem) {
+        //  this.createSelect = function(id, name, size, multi, options, className,
+        //      elem) {
         this.createSelect('tzRegionSelect', 'tzRegionSelect', null, false, this.getTimezoneOptions(), 'selectElem', elem);
-
+        this.createNbsp(elem);
+        this.createSelect('tzTzSelect', 'tzTzSelect', null, false, this.getTimezoneSelectorOptions(null), 'selectElem', elem);
         d.appendChild(elem);
 
+    };
+
+    this.getTimezoneSelectorOptions = function(region){
+        var tzIds = region ? cosmo.datetime.timezone.getTzIdsForRegion(region) : null;
+        var options = [{text:getText("Main.DetailForm.TimezoneSelector.Timezone"), value:null}];
+        if (tzIds){
+            dojo.lang.map(tzIds, function(tzId){
+                options.push({text:tzId, value:tzId});
+            });
+        }
+        return options;
+    };
+
+    this.populateTimezoneSelector = function(region){
+        var options = this.getTimezoneSelectorOptions(region);
+        var tzSelector = document.getElementById("tzTzSelect");
+        this.setSelectOptions(tzSelector, options);
+    };
+
+    this.handleRegionChanged = function(event){
+        self.populateTimezoneSelector(event.target.value);
     };
 
     this.createLabel = function(str, d) {
@@ -390,12 +412,7 @@ function CalForm() {
         if (className) {
             sel.className = className;
         }
-        for (var i = 0; i < options.length; i++) {
-            var opt = document.createElement('option');
-            opt.value = options[i].value;
-            opt.appendChild(document.createTextNode(options[i].text));
-            sel.appendChild(opt);
-        }
+        this.setSelectOptions(sel, options);
         if (elem) {
             elem.appendChild(sel);
             return true;
@@ -404,6 +421,19 @@ function CalForm() {
             return sel;
         }
     };
+
+    this.setSelectOptions = function(selectElement, options){
+        while (selectElement.firstChild){
+           selectElement.removeChild(selectElement.firstChild);
+        }
+        for (var i = 0; i < options.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = options[i].value;
+            opt.appendChild(document.createTextNode(options[i].text));
+            selectElement.appendChild(opt);
+        }
+    };
+
     this.setSelect = function(name, val) {
         var sel = this.form[name];
         for (var i = 0; i < sel.options.length; i++) {
@@ -857,6 +887,10 @@ function CalForm() {
 
         // All-day event / normal event toggling
         allDayCheck.onclick = function() { Cal.calForm.toggleBlockType() };
+
+        var regionSelectorElement = document.getElementById("tzRegionSelect");
+        dojo.event.connect(regionSelectorElement, "onchange", this.handleRegionChanged);
+
 
         descrTxt = null; // Set DOM-node-ref to null to avoid IE memleak
     };

@@ -45,6 +45,7 @@ import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteStamp;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.rpc.model.Calendar;
 import org.osaf.cosmo.rpc.model.CosmoDate;
@@ -277,10 +278,17 @@ public class RPCServiceImpl implements RPCService {
             
         } else {
             calendarEventItem = (ContentItem) contentService.findItemByUid(event.getId());
+            calendarEventItem.setDisplayName(event.getTitle());
+
             EventStamp eventStamp = EventStamp.getStamp(calendarEventItem);
             net.fortuna.ical4j.model.Calendar calendar = eventStamp.getCalendar();
             cosmoToICalendarConverter.updateEvent(event, calendar);
             eventStamp.setCalendar(calendar);
+
+            NoteStamp noteStamp = NoteStamp.getStamp(calendarEventItem);
+            noteStamp.setIcalUid(eventStamp.getIcalUid());
+            noteStamp.setBody(event.getDescription());
+
             contentService.updateContent(calendarEventItem);
         }
 
@@ -456,6 +464,7 @@ public class RPCServiceImpl implements RPCService {
         calendar.getProperties().add(CalScale.GREGORIAN);
         
         calendarEventItem = new ContentItem();
+        calendarEventItem.setDisplayName(event.getTitle());
         VEvent vevent = cosmoToICalendarConverter.createVEvent(event);
         calendar.getComponents().add(vevent);
         
@@ -463,10 +472,10 @@ public class RPCServiceImpl implements RPCService {
         eventStamp.setCalendar(calendar);
         calendarEventItem.addStamp(eventStamp);
 
-        Property summary = (Property)
-            vevent.getProperties().getProperty(Property.SUMMARY);
-        if (summary != null)
-            calendarEventItem.setDisplayName(summary.getValue());
+        NoteStamp noteStamp = new NoteStamp();
+        noteStamp.setIcalUid(eventStamp.getIcalUid());
+        noteStamp.setBody(event.getDescription());
+        calendarEventItem.addStamp(noteStamp);
 
         Iterator<String> availableNameIterator = availableNameIterator(vevent);
         

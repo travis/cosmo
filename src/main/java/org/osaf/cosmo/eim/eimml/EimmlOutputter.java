@@ -28,6 +28,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -172,7 +173,7 @@ public class EimmlOutputter implements EimmlConstants {
     private void writeRecord(XMLStreamWriter writer,
                              EventRecord record)
         throws XMLStreamException {
-        writer.writeStartElement(EL_RECORD);
+        writer.writeStartElement(NS_EVENT, EL_RECORD);
 
         writer.writeStartElement(NS_CORE, EL_UUID);
         writer.writeCharacters(record.getUuid());
@@ -192,27 +193,27 @@ public class EimmlOutputter implements EimmlConstants {
             writer.writeEndElement();
         }
 
-        if (record.getRRule() != null) {
+        if (! record.getRRules().isEmpty()) {
             writer.writeStartElement(NS_EVENT, EL_RRULE);
-            writer.writeCharacters(record.getRRule());
+            writer.writeCharacters(formatRecurrence(record.getRRules()));
             writer.writeEndElement();
         }
 
-        if (record.getExRule() != null) {
+        if (! record.getExRules().isEmpty()) {
             writer.writeStartElement(NS_EVENT, EL_EXRULE);
-            writer.writeCharacters(record.getExRule());
+            writer.writeCharacters(formatRecurrence(record.getExRules()));
             writer.writeEndElement();
         }
 
-        if (record.getRDate() != null) {
+        if (! record.getRDates().isEmpty()) {
             writer.writeStartElement(NS_EVENT, EL_RDATE);
-            writer.writeCharacters(record.getRDate());
+            writer.writeCharacters(formatRecurrence(record.getRDates()));
             writer.writeEndElement();
         }
 
-        if (record.getExDate() != null) {
+        if (! record.getExDates().isEmpty()) {
             writer.writeStartElement(NS_EVENT, EL_EXDATE);
-            writer.writeCharacters(record.getExDate());
+            writer.writeCharacters(formatRecurrence(record.getExDates()));
             writer.writeEndElement();
         }
 
@@ -234,7 +235,7 @@ public class EimmlOutputter implements EimmlConstants {
     private void writeRecord(XMLStreamWriter writer,
                              NoteRecord record)
         throws XMLStreamException {
-        writer.writeStartElement(EL_RECORD);
+        writer.writeStartElement(NS_NOTE, EL_RECORD);
 
         writer.writeStartElement(NS_CORE, EL_UUID);
         writer.writeCharacters(record.getUuid());
@@ -258,7 +259,7 @@ public class EimmlOutputter implements EimmlConstants {
     private void writeRecord(XMLStreamWriter writer,
                              TaskRecord record)
         throws XMLStreamException {
-        writer.writeStartElement(EL_RECORD);
+        writer.writeStartElement(NS_TASK, EL_RECORD);
 
         writer.writeStartElement(NS_CORE, EL_UUID);
         writer.writeCharacters(record.getUuid());
@@ -270,7 +271,7 @@ public class EimmlOutputter implements EimmlConstants {
     private void writeRecord(XMLStreamWriter writer,
                              MailMessageRecord record)
         throws XMLStreamException {
-        writer.writeStartElement(EL_RECORD);
+        writer.writeStartElement(NS_MESSAGE, EL_RECORD);
 
         writer.writeStartElement(NS_CORE, EL_UUID);
         writer.writeCharacters(record.getUuid());
@@ -309,5 +310,11 @@ public class EimmlOutputter implements EimmlConstants {
 
     private String formatDate(Date d) {
         return DateUtil.formatRfc3339Date(d);
+    }
+
+    private String formatRecurrence(List values) {
+        if (! values.iterator().hasNext())
+            return null;
+        return StringUtils.join(values.iterator(), ",");
     }
 }

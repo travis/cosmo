@@ -191,13 +191,13 @@ public class EimmlBuilder implements EimmlConstants {
             else if (reader.getLocalName().equals(EL_LOCATION))
                 record.setLocation(reader.getElementText());
             else if (reader.getLocalName().equals(EL_RRULE))
-                record.setRRule(reader.getElementText());
+                record.setRRules(parseRecurrence(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_EXRULE))
-                record.setExRule(reader.getElementText());
+                record.setExRules(parseRecurrence(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_RDATE))
-                record.setRDate(reader.getElementText());
+                record.setRDates(parseRecurrence(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_EXDATE))
-                record.setExDate(reader.getElementText());
+                record.setExDates(parseRecurrence(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_RECURRENCE_ID))
                 record.setRecurrenceId(parseDate(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_STATUS))
@@ -282,5 +282,12 @@ public class EimmlBuilder implements EimmlConstants {
         } catch (ParseException e) {
             throw new EimmlParseException("Invalid RFC 339 date " + text);
         }
+    }
+
+    private List<String> parseRecurrence(String text) {
+        ArrayList<String> values = new ArrayList<String>();
+        for (String value : text.split(","))
+            values.add(value);
+        return values;
     }
 }

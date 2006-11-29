@@ -15,17 +15,10 @@
  */
 package org.osaf.cosmo.eim;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.PropertyList;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.DtEnd;
-import net.fortuna.ical4j.model.property.DtStart;
-import net.fortuna.ical4j.model.property.Duration;
-import net.fortuna.ical4j.model.property.RecurrenceId;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,63 +33,32 @@ public class EventRecord extends EimRecord {
     private Date dtStart;
     private Date dtEnd;
     private String location;
-    private String rRule;
-    private String exRule;
-    private String rDate;
-    private String exDate;
+    private List<String> rRules;
+    private List<String> exRules;
+    private List<String> rDates;
+    private List<String> exDates;
     private Date recurrenceId;
     private String status;
 
     /** */
     public EventRecord() {
+        rRules = new ArrayList<String>();
+        exRules = new ArrayList<String>();
+        rDates = new ArrayList<String>();
+        exDates = new ArrayList<String>();
     }
 
     /** */
     public EventRecord(EventStamp stamp) {
         setUuid(stamp.getItem().getUid());
-
-        VEvent event = stamp.getMasterEvent();
-        Property p = null;
-        PropertyList pl = null;
-
-        p = event.getProperties().getProperty(Property.DTSTART);
-        dtStart = ((DtStart)p).getDate();
-
-        p = event.getProperties().getProperty(Property.DTEND);
-        if (p != null) {
-            dtEnd = ((DtEnd)p).getDate();
-        } else {
-            p = event.getProperties().getProperty(Property.DURATION);
-            dtEnd = ((Duration)p).getDuration().getTime(dtStart);
-        }
-
-        p = event.getProperties().getProperty(Property.LOCATION);
-        if (p != null)
-            location = p.getValue();
-
-        pl = event.getProperties().getProperties(Property.RRULE);
-        if (pl.iterator().hasNext())
-            rRule = StringUtils.join(pl.iterator(), ",");
-
-        pl = event.getProperties().getProperties(Property.EXRULE);
-        if (pl.iterator().hasNext())
-            exRule = StringUtils.join(pl.iterator(), ",");
-
-        pl = event.getProperties().getProperties(Property.RDATE);
-        if (pl.iterator().hasNext())
-            rDate = StringUtils.join(pl.iterator(), ",");
-
-        pl = event.getProperties().getProperties(Property.EXDATE);
-        if (pl.iterator().hasNext())
-            exDate = StringUtils.join(pl.iterator(), ",");
-
-        p = event.getProperties().getProperty(Property.RECURRENCE_ID);
-        if (p != null)
-            recurrenceId = ((RecurrenceId)p).getDate();
-
-        p = event.getProperties().getProperty(Property.STATUS);
-        if (p != null)
-            status = p.getValue();
+        dtStart = stamp.getStartDate();
+        dtEnd = stamp.getEndDate();
+        location = stamp.getLocation();
+        rRules = stamp.getRecurrenceRules();
+        exRules = stamp.getExceptionRules();
+        rDates = stamp.getRecurrenceDates();
+        exDates = stamp.getExceptionDates();
+        recurrenceId = stamp.getRecurrenceId();
     }
 
     /** */
@@ -138,43 +100,43 @@ public class EventRecord extends EimRecord {
     }
 
     /** */
-    public String getRRule() {
-        return rRule;
+    public List<String> getRRules() {
+        return rRules;
     }
 
     /** */
-    public void setRRule(String rRule) {
-        this.rRule = rRule;
+    public void setRRules(List<String> rRules) {
+        this.rRules = rRules;
     }
 
     /** */
-    public String getExRule() {
-        return exRule;
+    public List<String> getExRules() {
+        return exRules;
     }
 
     /** */
-    public void setExRule(String exRule) {
-        this.exRule = exRule;
+    public void setExRules(List<String> exRules) {
+        this.exRules = exRules;
     }
 
     /** */
-    public String getRDate() {
-        return rDate;
+    public List<String> getRDates() {
+        return rDates;
     }
 
     /** */
-    public void setRDate(String rDate) {
-        this.rDate = rDate;
+    public void setRDates(List<String> rDates) {
+        this.rDates = rDates;
     }
 
     /** */
-    public String getExDate() {
-        return exDate;
+    public List<String> getExDates() {
+        return exDates;
     }
 
     /** */
-    public void setExDate(String exDate) {
-        this.exDate = exDate;
+    public void setExDates(List<String> exDates) {
+        this.exDates = exDates;
     }
 
     /** */
@@ -196,5 +158,4 @@ public class EventRecord extends EimRecord {
     public void setStatus(String status) {
         this.status = status;
     }
-
 }

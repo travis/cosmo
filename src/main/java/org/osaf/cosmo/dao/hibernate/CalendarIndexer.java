@@ -15,11 +15,8 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
-import net.fortuna.ical4j.model.Calendar;
-
 import org.hibernate.Session;
-import org.osaf.cosmo.model.CalendarItem;
-import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.EventStamp;
 
 /**
  * Interface for a Calendar Item indexer. A CalendarIndexer is responsible for
@@ -33,7 +30,11 @@ import org.osaf.cosmo.model.Item;
  */
 public interface CalendarIndexer {
 
-    public abstract void indexCalendarEvent(Session session, CalendarItem item,
-            Calendar calendar);
+    /**
+     * Index EventStamp
+     * @param session Hibernate session
+     * @param event event to index
+     */
+    public void indexCalendarEvent(Session session, EventStamp event);
 
 }

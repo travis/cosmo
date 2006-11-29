@@ -16,8 +16,7 @@
 package org.osaf.cosmo.mc;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -29,6 +28,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.eim.EimRecord;
+import org.osaf.cosmo.eim.eimml.EimmlBuilder;
+import org.osaf.cosmo.eim.eimml.EimmlConstants;
+import org.osaf.cosmo.eim.eimml.EimmlParseException;
+import org.osaf.cosmo.eim.eimml.EimmlOutputter;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.util.RepositoryUriParser;
@@ -52,7 +56,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * http://wiki.osafoundation.org/bin/view/Projects/CosmoMorseCode
  * for the protocol specification.
  */
-public class MorseCodeServlet extends HttpServlet {
+public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
     private static final Log log = LogFactory.getLog(MorseCodeServlet.class);
 
     private static final String BEAN_CONTROLLER =
@@ -144,14 +148,16 @@ public class MorseCodeServlet extends HttpServlet {
                 SyncToken token = tokenStr != null ?
                     SyncToken.deserialize(tokenStr) :
                     null;
-                ItemStateSet states = token == null ?
+                SyncRecords records = token == null ?
                     controller.subscribeToCollection(uid) :
                     controller.synchronizeCollection(uid, token);
                 resp.setStatus(HttpServletResponse.SC_OK);
+                resp.setContentType(MEDIA_TYPE_EIMML);
+                resp.setCharacterEncoding("UTF-8");
                 resp.addHeader(HEADER_SYNC_TOKEN,
-                               states.getToken().serialize());
-                // XXX: convert item states to eimml
-                // XXX write eimml content
+                               records.getToken().serialize());
+                EimmlOutputter outputter = new EimmlOutputter();
+                outputter.output(records.getRecords(), resp.getOutputStream());
                 return;
             } catch (IllegalArgumentException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
@@ -198,17 +204,21 @@ public class MorseCodeServlet extends HttpServlet {
             try {
                 SyncToken token = SyncToken.deserialize(tokenStr);
                 // XXX: check update preconditions
-                // XXX: read eimml content
-                // XXX: convert eimml to model
-                Set<ItemState> items = new HashSet<ItemState>();
+                EimmlBuilder builder = new EimmlBuilder();
+                List<EimRecord> records = builder.build(req.getInputStream());
                 SyncToken newToken =
-                    controller.updateCollection(uid, token, items);
+                    controller.updateCollection(uid, token, records);
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());
                 return;
             } catch (IllegalArgumentException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                "Invalid sync token");
+                return;
+            } catch (EimmlParseException e) {
+                log.warn("Unable to parse request content", e);
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Unable to parse request content: " + e.getMessage());
                 return;
             } catch (UnknownCollectionException e) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND,
@@ -251,17 +261,21 @@ public class MorseCodeServlet extends HttpServlet {
                 parentUid = null;
             try {
                 // XXX: check publish preconditions
-                // XXX: read eimml content
-                // XXX: convert eimml to item states
-                Set<ItemState> items = new HashSet<ItemState>();
+                EimmlBuilder builder = new EimmlBuilder();
+                List<EimRecord> records = builder.build(req.getInputStream());
                 SyncToken newToken =
-                    controller.publishCollection(uid, parentUid, items);
+                    controller.publishCollection(uid, parentUid, records);
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());
                 return;
             } catch (IllegalArgumentException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                "Parent uid must be specified when authenticated principal is not a user");
+                return;
+            } catch (EimmlParseException e) {
+                log.warn("Unable to parse request content", e);
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Unable to parse request content: " + e.getMessage());
                 return;
             } catch (UidInUseException e) {
                 resp.sendError(HttpServletResponse.SC_CONFLICT, "Uid in use");

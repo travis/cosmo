@@ -44,6 +44,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
@@ -61,6 +62,7 @@ import org.hibernate.validator.NotNull;
         discriminatorType=DiscriminatorType.STRING,
         length=16)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Where(clause = "isactive=1")
 public abstract class Item extends BaseModelObject {
 
     public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
@@ -77,6 +79,7 @@ public abstract class Item extends BaseModelObject {
     private Map<QName, Attribute> attributes = new HashMap<QName, Attribute>(0);
     private Set<Ticket> tickets = new HashSet<Ticket>(0);
     private Set<Stamp> stamps = new HashSet<Stamp>(0);
+    private Map<String, Stamp> stampMap = null;
     
     private CollectionItem parent = null;
     private User owner;
@@ -92,6 +95,17 @@ public abstract class Item extends BaseModelObject {
 
     public void setStamps(Set<Stamp> stamps) {
         this.stamps = stamps;
+    }
+    
+    @Transient
+    public Map<String, Stamp> getStampMap() {
+        if(stampMap==null) {
+            stampMap = new HashMap<String, Stamp>();
+            for(Stamp stamp : stamps)
+                stampMap.put(stamp.getType(), stamp);
+        }
+        
+        return stampMap;
     }
     
     /**
@@ -126,6 +140,19 @@ public abstract class Item extends BaseModelObject {
     public Stamp getStamp(Class clazz) {
         for(Stamp stamp : stamps)
             if(clazz.isInstance(stamp))
+                return stamp;
+        
+        return null;
+    }
+    
+    /**
+     * Get the stamp that coresponds to the specified type
+     * @param type stamp type to return
+     * @return stamp
+     */
+    public Stamp getStamp(String type) {
+        for(Stamp stamp : stamps)
+            if(stamp.getType().equals(type))
                 return stamp;
         
         return null;

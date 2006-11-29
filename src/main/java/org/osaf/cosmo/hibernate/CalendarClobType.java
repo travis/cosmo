@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.hibernate;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.PreparedStatement;
@@ -34,7 +33,7 @@ import org.hibernate.HibernateException;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.springframework.jdbc.support.lob.LobCreator;
 import org.springframework.jdbc.support.lob.LobHandler;
-import org.springframework.orm.hibernate3.support.AbstractLobType;
+import org.springframework.orm.hibernate3.support.ClobStringType;
 
 
 /**
@@ -42,7 +41,7 @@ import org.springframework.orm.hibernate3.support.AbstractLobType;
  * to CLOB field in database.
  */
 public class CalendarClobType
-        extends AbstractLobType {
+        extends ClobStringType {
     private static final Log log = LogFactory.getLog(CalendarClobType.class);
 
     /**
@@ -71,13 +70,16 @@ public class CalendarClobType
      * @param lobHandler the LobHandler to use
      */
     protected Object nullSafeGetInternal(ResultSet resultSet, String[] columns, Object owner, LobHandler lobHandler)
-            throws SQLException, IOException, HibernateException {
+            throws SQLException, HibernateException {
         
         // we only handle one column, so panic if it isn't so
         if (columns == null || columns.length != 1)
             throw new HibernateException("Only one column name can be used for the " + getClass() + " user type");
 
         Reader reader = lobHandler.getClobAsCharacterStream(resultSet, columns[0]);
+        if(reader==null)
+            return null;
+        
         Calendar calendar = null;
         
         try {
@@ -85,10 +87,12 @@ public class CalendarClobType
         } catch (ParserException e) {
             // shouldn't happen because we always persist valid data
             throw new HibernateException("cannot parse icalendar stream");
+        } catch(IOException ioe) {
+            throw new HibernateException("cannot read icalendar stream");
         }
         finally {
             if (reader != null)
-                reader.close();
+                try {reader.close();} catch(Exception e) {}
         }
         
         return calendar;
@@ -103,19 +107,18 @@ public class CalendarClobType
      * @throws SQLException if thrown by JDBC methods
      */
     protected void nullSafeSetInternal(PreparedStatement statement, int index, Object value, LobCreator lobCreator)
-            throws SQLException, HibernateException, FileNotFoundException {
+            throws SQLException, HibernateException {
         
-        lobCreator.setClobAsString(statement, index,((Calendar) value).toString()); 
+        String icalStr = null;
+        if(value!=null)
+            icalStr = ((Calendar) value).toString();
+        super.nullSafeSetInternal(statement, index, icalStr, lobCreator);
     }
 
     @Override
     public Object deepCopy(Object value) throws HibernateException {
         Calendar calendar = (Calendar) value;
         return CalendarUtils.copyCalendar(calendar);
-    }
-
-    public int[] sqlTypes() {
-        return new int[]{Types.CLOB};
     }
 
     public Class returnedClass() {

@@ -17,7 +17,6 @@ package org.osaf.cosmo.dav.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -26,14 +25,12 @@ import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
-
-import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.dav.CosmoDavMethods;
 import org.osaf.cosmo.dav.ExtendedDavResource;
-import org.osaf.cosmo.model.CalendarCollectionItem;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.CalendarEventItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -135,18 +132,22 @@ public class StandardDavResourceFactory implements DavResourceFactory {
             return new DavHomeCollection((HomeCollectionItem) item, locator,
                                          this, session);
 
-        if (item instanceof CalendarCollectionItem)
-            return new DavCalendarCollection((CalendarCollectionItem) item,
-                                             locator, this, session);
-
-        if (item instanceof CollectionItem)
-            return new DavCollection((CollectionItem) item, locator, this,
-                                     session);
-
-        if (item instanceof CalendarEventItem)
-            return new DavEvent((CalendarEventItem) item, locator, this,
-                                session);
-
+        if (item instanceof CollectionItem) {
+            if(item.getStamp(CalendarCollectionStamp.class) != null) {
+                return new DavCalendarCollection((CollectionItem) item,
+                        locator, this, session);
+            } else {
+                return new DavCollection((CollectionItem) item, locator, this,
+                    session);
+            }
+        }
+            
+        if (item instanceof ContentItem) {
+            if(item.getStamp(EventStamp.class) != null)
+                return new DavEvent((ContentItem) item, locator, this,
+                        session);
+        } 
+            
         return new DavFile((ContentItem) item, locator, this, session);
     }
 

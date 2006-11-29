@@ -17,10 +17,10 @@ package org.osaf.cosmo.dav.impl;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
-import java.util.HashSet;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -28,28 +28,24 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.model.component.VTimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
-import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
-import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
+import org.apache.jackrabbit.webdav.io.InputContext;
+import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
-import org.apache.jackrabbit.webdav.io.InputContext;
-import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.ResourceType;
-
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.util.CalendarBuilderDispenser;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
@@ -59,12 +55,12 @@ import org.osaf.cosmo.dav.caldav.property.MaxResourceSize;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarComponentSet;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarData;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
-import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.CalendarItem;
-import org.osaf.cosmo.model.CalendarEventItem;
-import org.osaf.cosmo.model.CalendarCollectionItem;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.DuplicateEventUidException;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
 
@@ -105,15 +101,12 @@ public class DavCalendarCollection extends DavCollection
                                               NAMESPACE_CALDAV);
         RESOURCE_TYPES = new int[] { ResourceType.COLLECTION, cc };
 
-        DEAD_PROPERTY_FILTER.add(CalendarCollectionItem.ATTR_CALENDAR_UID);
-        DEAD_PROPERTY_FILTER.add(CalendarCollectionItem.ATTR_CALENDAR_DESCRIPTION);
-        DEAD_PROPERTY_FILTER.add(CalendarCollectionItem.ATTR_CALENDAR_LANGUAGE);
-        DEAD_PROPERTY_FILTER.add(CalendarCollectionItem.ATTR_CALENDAR_TIMEZONE);
-        DEAD_PROPERTY_FILTER.add(CalendarCollectionItem.ATTR_CALENDAR_SUPPORTED_COMPONENT_SET);
+        
+        DEAD_PROPERTY_FILTER.add(CalendarCollectionStamp.class.getName());
     }
 
     /** */
-    public DavCalendarCollection(CalendarCollectionItem collection,
+    public DavCalendarCollection(CollectionItem collection,
                                  DavResourceLocator locator,
                                  DavResourceFactory factory,
                                  DavSession session) {
@@ -124,7 +117,8 @@ public class DavCalendarCollection extends DavCollection
     public DavCalendarCollection(DavResourceLocator locator,
                                  DavResourceFactory factory,
                                  DavSession session) {
-        this(new CalendarCollectionItem(), locator, factory, session);
+        this(new CollectionItem(), locator, factory, session);
+        getItem().addStamp(new CalendarCollectionStamp((CollectionItem) getItem()));
     }
 
     // DavResource
@@ -168,16 +162,17 @@ public class DavCalendarCollection extends DavCollection
 
         Set<DavCalendarResource> members =
             new HashSet<DavCalendarResource>();
-        CalendarCollectionItem calendar = (CalendarCollectionItem) getItem();
-        for (CalendarItem memberItem :
-                 getContentService().findEvents(calendar, filter)) {
+        CollectionItem collection = (CollectionItem) getItem();
+        CalendarCollectionStamp calendar = getCalendarCollectionStamp();
+        for (ContentItem memberItem :
+                 getContentService().findEvents(collection, filter)) {
             String memberPath = getResourcePath() + "/" + memberItem.getName();
             DavResourceLocator memberLocator =
                 getLocator().getFactory().
                 createResourceLocator(getLocator().getPrefix(),
                                       getLocator().getWorkspacePath(),
                                       memberPath, false);
-            DavCalendarResource member = (DavCalendarResource)
+            DavEvent member = (DavEvent)
                 ((StandardDavResourceFactory)getFactory()).
                 createResource(memberLocator, getSession(), memberItem);
             members.add(member);
@@ -191,9 +186,8 @@ public class DavCalendarCollection extends DavCollection
      * one has been set.
      */
     public VTimeZone getTimeZone() {
-        CalendarCollectionItem collection = (CalendarCollectionItem)
-            getItem();
-        Calendar obj = collection.getTimezone();
+       
+        Calendar obj = getCalendarCollectionStamp().getTimezone();
         if (obj == null)
             return null;
         return (VTimeZone)
@@ -204,16 +198,20 @@ public class DavCalendarCollection extends DavCollection
     protected int[] getResourceTypes() {
         return RESOURCE_TYPES;
     }
+    
+    public CalendarCollectionStamp getCalendarCollectionStamp() {
+        return CalendarCollectionStamp.getStamp(getItem());
+    }
 
     /** */
     protected void populateItem(InputContext inputContext)
         throws DavException {
         super.populateItem(inputContext);
 
-        CalendarCollectionItem cc = (CalendarCollectionItem) getItem();
+        CalendarCollectionStamp cc = getCalendarCollectionStamp();
 
         try {
-            cc.setDescription(cc.getName());
+            cc.setDescription(getItem().getName());
             // XXX: language should come from the input context
             cc.setLanguage(Locale.getDefault().toString());
         } catch (DataSizeException e) {
@@ -225,7 +223,7 @@ public class DavCalendarCollection extends DavCollection
     protected void loadLiveProperties() {
         super.loadLiveProperties();
 
-        CalendarCollectionItem cc = (CalendarCollectionItem) getItem();
+        CalendarCollectionStamp cc = getCalendarCollectionStamp();
         if (cc == null)
             return;
 
@@ -246,7 +244,7 @@ public class DavCalendarCollection extends DavCollection
     protected void setLiveProperty(DavProperty property) {
         super.setLiveProperty(property);
 
-        CalendarCollectionItem cc = (CalendarCollectionItem) getItem();
+        CalendarCollectionStamp cc = getCalendarCollectionStamp();
         if (cc == null)
             return;
 
@@ -299,7 +297,7 @@ public class DavCalendarCollection extends DavCollection
             if (tz == null)
                 throw new ModelValidationException(CALENDARTIMEZONE + " must contain exactly one VTIMEZONE component - enclosed component not VTIMEZONE");
 
-            cc.setTimezone(value);
+            cc.setTimezone(calendar);
         }
     }
 
@@ -307,7 +305,7 @@ public class DavCalendarCollection extends DavCollection
     protected void removeLiveProperty(DavPropertyName name) {
         super.removeLiveProperty(name);
 
-        CalendarCollectionItem cc = (CalendarCollectionItem) getItem();
+        CalendarCollectionStamp cc = getCalendarCollectionStamp();
         if (cc == null)
             return;
 
@@ -340,14 +338,16 @@ public class DavCalendarCollection extends DavCollection
     /** */
     protected void saveFile(DavFile member)
         throws DavException {
-        CalendarCollectionItem collection = (CalendarCollectionItem) getItem();
+        CollectionItem collection = (CollectionItem) getItem();
+        CalendarCollectionStamp cc = getCalendarCollectionStamp();
 
         if (! (member instanceof DavEvent))
             throw new IllegalArgumentException("member not DavEvent");
-        CalendarEventItem event = (CalendarEventItem) member.getItem();
+        ContentItem content = (ContentItem) member.getItem();
+        EventStamp event = EventStamp.getStamp(content);
 
         // CALDAV:supported-calendar-data
-        String contentType = event.getContentType();
+        String contentType = content.getContentType();
         if (contentType == null)
             throw new DavException(DavServletResponse.SC_BAD_REQUEST,
                                    "No media type specified for calendar data");
@@ -368,13 +368,13 @@ public class DavCalendarCollection extends DavCollection
         }
 
         // CALDAV:valid-calendar-object-resource
-        if (hasMultipleComponentTypes(calendar))
+        if (hasMultipleComponentTypes(event.getCalendar()))
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "Calendar object contains more than one type of component");
-        if (calendar.getProperties().getProperty(Property.METHOD) != null)
+        if (event.getCalendar().getProperties().getProperty(Property.METHOD) != null)
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "Calendar object contains METHOD property");
 
         // CALDAV:supported-calendar-component
-        if (! collection.supportsCalendar(calendar))
+        if (! cc.supportsCalendar(event.getCalendar()))
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "Calendar object does not contain at least one supported component");
 
         // XXX CALDAV:calendar-collection-location-ok
@@ -396,7 +396,7 @@ public class DavCalendarCollection extends DavCollection
                 log.debug("updating event " + member.getResourcePath());
 
             try {
-                event = getContentService().updateEvent(event);
+                content = getContentService().updateContent(content);
             } catch (DuplicateEventUidException e) {
                 throw new DavException(DavServletResponse.SC_CONFLICT, "Uid already in use");
             }
@@ -405,13 +405,13 @@ public class DavCalendarCollection extends DavCollection
                 log.debug("creating event " + member.getResourcePath());
 
             try {
-                event = getContentService().addEvent(collection, event);
+                content = getContentService().createContent(collection, content);
             } catch (DuplicateEventUidException e) {
                 throw new DavException(DavServletResponse.SC_CONFLICT, "Uid already in use");
             }
         }
 
-        member.setItem(event);
+        member.setItem(content);
     }
 
     /** */
@@ -419,13 +419,14 @@ public class DavCalendarCollection extends DavCollection
         throws DavException {
         if (! (member instanceof DavEvent))
             throw new IllegalArgumentException("member not DavEvent");
-        CalendarEventItem event = (CalendarEventItem) member.getItem();
 
+        ContentItem content = (ContentItem) member.getItem();
+        
         // XXX: what exceptions need to be caught?
         if (log.isDebugEnabled())
             log.debug("removing event " + member.getResourcePath());
             
-        getContentService().removeEvent(event);
+        getContentService().removeContent(content);
     }
 
     private static boolean hasMultipleComponentTypes(Calendar calendar) {
@@ -453,9 +454,10 @@ public class DavCalendarCollection extends DavCollection
         if (log.isDebugEnabled())
             log.debug("writing icalendar for " + getItem().getName());
 
+        CalendarCollectionStamp cc = getCalendarCollectionStamp();
         Calendar calendar = null;
         try {
-            calendar = ((CalendarCollectionItem) getItem()).getCalendar();
+            calendar = cc.getCalendar();
         } catch (ParserException e) {
             throw new IllegalStateException("unable to parse member's icalendar content", e);
         }

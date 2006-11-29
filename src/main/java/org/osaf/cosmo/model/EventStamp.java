@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -56,8 +57,11 @@ public class EventStamp extends Stamp implements
     private static final long serialVersionUID = 3992468809776886156L;
 
     private Calendar calendar = null;
-    private Set<CalendarTimeRangeIndex> timeRangeIndexes = null;
-    private Set<CalendarPropertyIndex> propertyIndexes = null;
+    private Set<CalendarTimeRangeIndex> timeRangeIndexes = 
+        new HashSet<CalendarTimeRangeIndex>(0);
+
+    private Set<CalendarPropertyIndex> propertyIndexes = 
+        new HashSet<CalendarPropertyIndex>(0);
     
     /** default constructor */
     public EventStamp() {
@@ -116,6 +120,20 @@ public class EventStamp extends Stamp implements
     public VEvent getMasterEvent() {
         return (VEvent) getCalendar().getComponents().getComponents(
                 Component.VEVENT).get(0);
+    }
+    
+    @Transient
+    public String getIcalUid() {
+        return getMasterEvent().getUid().getValue();
+    }
+    
+    /**
+     * Return EventStamp from Item
+     * @param item
+     * @return EventStamp from Item
+     */
+    public static EventStamp getStamp(Item item) {
+        return (EventStamp) item.getStamp(EventStamp.class);
     }
     
     /* (non-Javadoc)

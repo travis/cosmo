@@ -15,48 +15,32 @@
  */
 package org.osaf.cosmo.dav.caldav.report;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.ParseException;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.filter.OutputFilter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
-import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
-import org.apache.jackrabbit.webdav.io.OutputContext;
-import org.apache.jackrabbit.webdav.jcr.JcrDavSession;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
-import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dav.ExtendedDavResource;
+import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
 import org.osaf.cosmo.dav.impl.DavCalendarResource;
-import org.osaf.cosmo.dav.caldav.CaldavConstants;
-import org.osaf.cosmo.model.CalendarCollectionItem;
-import org.osaf.cosmo.model.CalendarEventItem;
-
 import org.w3c.dom.Element;
 
 /**
@@ -219,56 +203,15 @@ public abstract class CaldavReport
      * Read the calendar data from the given dav resource, filtering
      * it if an output filter has been set.
      */
-    protected String readCalendarData(ExtendedDavResource resource)
+    protected String readCalendarData(DavCalendarResource resource)
         throws DavException {
-        OutputContext ctx = new OutputContext() {
-                // simple output context that ignores all setters,
-                // simply used to collect the output content
-                private ByteArrayOutputStream out =
-                    new ByteArrayOutputStream();
-
-                public boolean hasStream() {
-                    return true;
-                }
-
-                public OutputStream getOutputStream() {
-                    return out;
-                }
-
-                public void setContentLanguage(String contentLanguage) {
-                }
-
-                public void setContentLength(long contentLength) {
-                }
-
-                public void setContentType(String contentType) {
-                }
-
-                public void setModificationTime(long modificationTime) {
-                }
-
-                public void setETag(String etag) {
-                }
-
-                public void setProperty(String propertyName,
-                                        String propertyValue) {
-                }
-            };
-        try {
-            resource.spool(ctx);
-        } catch (IOException e) {
-            log.error("cannot read calendar data from resource " + resource.getResourcePath(), e);
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot read calendar data: " + e.getMessage());
-        }
-
-        String calendarData = ctx.getOutputStream().toString();
-
+        
+        Calendar calendar = resource.getCalendar();
+        String calendarData = calendar.toString();
+        
         if (outputFilter != null) {
             try {
-                CalendarBuilder builder = new CalendarBuilder();
-                Calendar calendar =
-                    builder.build(new StringReader(calendarData));
-
+                
                 // filter the output
                 StringWriter out = new StringWriter();
                 CalendarOutputter outputter = new CalendarOutputter();
@@ -282,9 +225,6 @@ public abstract class CaldavReport
             } catch (IOException e) {
                 log.error("cannot read or filter calendar data for resource " + resource.getResourcePath(), e);
                 throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot read or filter calendar data: " + e.getMessage());
-            } catch (ParserException e) {
-                log.error("cannot parse calendar data for resource " + resource.getResourcePath(), e);
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot parse calendar data: " + e.getMessage());
             } catch (ValidationException e) {
                 log.error("invalid calendar data for resource " + resource.getResourcePath(), e);
                 throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "invalid calendar data: " + e.getMessage());

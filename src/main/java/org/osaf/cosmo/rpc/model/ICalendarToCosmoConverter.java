@@ -54,7 +54,8 @@ import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 
-import org.osaf.cosmo.model.CalendarEventItem;
+import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.util.ICalendarUtils;
 
 /**
@@ -201,6 +202,8 @@ public class ICalendarToCosmoConverter {
         return event;
 
     }
+    
+    
     /**
      * Returns a single array of Events for every VEVENT in every Calendar. If there
      * are any recurring events, the expanded instances will be returned for the given date
@@ -210,22 +213,19 @@ public class ICalendarToCosmoConverter {
      * @param endDate  the end date to be used when expanding recurring events
      */
     public Event[] createEventsFromCalendars(
-            Collection<CalendarEventItem> calendarEventItems,
+            Collection<ContentItem> calendarEvents,
             DateTime startDate, DateTime endDate) {
         List<Event> events = new ArrayList<Event>();
 
         //iterate through all the CalendarEventItem's....
-        for (CalendarEventItem calendarEventItem : calendarEventItems) {
+        for (ContentItem event : calendarEvents) {
             net.fortuna.ical4j.model.Calendar calendar = null;
-            try {
-                calendar = calendarEventItem.getCalendar();
-            } catch (Exception pe) {
-                throw new RuntimeException(pe);
-            }
+            EventStamp eventStamp = EventStamp.getStamp(event);
+            calendar = eventStamp.getCalendar();
             VEvent vevent = getMasterEvent(calendar);
 
             if (vevent != null) {
-                Event e = createEvent(calendarEventItem.getUid(), vevent,
+                Event e = createEvent(eventStamp.getItem().getUid(), vevent,
                         calendar);
                 if (hasProperty(vevent, Property.RRULE)) {
                     List<Event> expandedEvents = expandEvent(e, vevent,

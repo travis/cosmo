@@ -34,7 +34,7 @@
 
 <div style="margin-top:12px;">
 <c:choose>
-<c:when test="${Item.class.name == 'org.osaf.cosmo.model.CalendarEventItem'}">
+<c:when test="${Item.stampMap['event'] != null}">
 <a href='<c:url value="/browse/download${Path}" />'>
   [download as iCalendar]
 </a>

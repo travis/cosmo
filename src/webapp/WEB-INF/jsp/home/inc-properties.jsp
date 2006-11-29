@@ -21,8 +21,9 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<tiles:importAttribute name="item"/>
-<tiles:importAttribute name="path"/>
+<c:if test="${isCollection}">
+  <c:set var="Item" value="${Collection}"/>
+</c:if>
 
 <div class="hd" style="margin-top: 12px;">
   Properties
@@ -31,6 +32,9 @@
 <div style="margin-top:12px;">
   <table cellpadding="4" cellspacing="1" border="0" width="100%">
     <tr>
+       <td class="smTableColHead" style="text-align:left;">
+        Namespace
+      </td>
       <td class="smTableColHead" style="text-align:left;">
         Name
       </td>
@@ -38,10 +42,13 @@
         Value
       </td>
     </tr>
-    <c:forEach var="entry" items="${item.attributes}">
+    <c:forEach var="entry" items="${Item.attributes}">
     <tr>
       <td class="smTableData" width="50%">
-        ${entry.value.name}
+        ${entry.key.namespace}
+      </td>
+      <td class="smTableData" width="50%">
+        ${entry.key.localName}
       </td>
       <td class="smTableData" width="50%">
         ${entry.value.value}

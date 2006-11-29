@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.mc;
-
-import org.osaf.cosmo.model.Item;
+package org.osaf.cosmo.eim.eimml;
 
 /**
- * Bean class that represents the state of a stored item, supplied by
- * the client in a publish or update request or by the server in a
- * subscribe or synchronize response.
+ * An exception indicating that an EIMML document could not be written.
  */
-public class ItemState {
+public class EimmlOutputException extends RuntimeException {
 
-    private Item item;
+    /**
+     */
+    public EimmlOutputException(String message) {
+        super(message);
+    }
 
-    /** */
-    public ItemState(Item item) {
-        this.item = item;
+    /**
+     */
+    public EimmlOutputException(String message,
+                                Throwable cause) {
+        super(message, cause);
     }
 }

@@ -239,7 +239,7 @@ public class CalendarCollectionStamp extends Stamp implements
      * @return set of EventStamps contained in children
      */
     @Transient
-    protected Set<EventStamp> getEventStamps() {
+    public Set<EventStamp> getEventStamps() {
         Set<EventStamp> events = new HashSet<EventStamp>();
         for (Iterator<Item> i= ((CollectionItem) getItem()).getChildren().iterator(); i.hasNext();) {
             Item child = i.next();
@@ -248,5 +248,14 @@ public class CalendarCollectionStamp extends Stamp implements
                 events.add((EventStamp) stamp);
         }
         return events;
+    }
+    
+    /**
+     * Return CalendarCollectionStamp from Item
+     * @param item
+     * @return CalendarCollectionStamp from Item
+     */
+    public static CalendarCollectionStamp getStamp(Item item) {
+        return (CalendarCollectionStamp) item.getStamp(CalendarCollectionStamp.class);
     }
 }

@@ -33,6 +33,9 @@ public class TimezoneValidator implements Validator<Timezone>, Serializable {
 
     public boolean isValid(Object value) {
         
+        if(value==null)
+            return true;
+        
         try {
             Calendar calendar = (Calendar) value;
             

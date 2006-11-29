@@ -15,24 +15,22 @@
  */
 package org.osaf.cosmo.feed;
 
+import java.util.Calendar;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.hcalendar.HCalendarFormatter;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.Item;
+
 import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.feed.atom.Generator;
 import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.feed.atom.Person;
-
-import java.util.Calendar;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.hcalendar.HCalendarFormatter;
-import org.osaf.cosmo.model.CalendarItem;
-import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.User;
 
 /**
  * A class that generates Atom 1.0 feeds and entries representing
@@ -158,11 +156,11 @@ public class FeedGenerator {
         webLink.setHref(webHref(entryPath));
         entry.getAlternateLinks().add(webLink);
 
-        if (item instanceof CalendarItem) {
-            CalendarItem ci = (CalendarItem) item;
+        if (item.getStamp(EventStamp.class)!=null) {
+            EventStamp event = EventStamp.getStamp(item);
             Content content = new Content();
             content.setType(Content.HTML);
-            content.setValue(HCalendarFormatter.toHCal(ci));
+            content.setValue(HCalendarFormatter.toHCal(event));
             entry.getContents().add(content);
         }
 

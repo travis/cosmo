@@ -265,8 +265,9 @@ public class TestHelper {
 
         return collection;
     }
-    
-    private InputStream getInputStream(String name){
+
+    /** */
+    public InputStream getInputStream(String name){
         InputStream in = getClass().getClassLoader().getResourceAsStream(name);
         if (in == null) {
             throw new IllegalStateException("resource " + name + " not found");

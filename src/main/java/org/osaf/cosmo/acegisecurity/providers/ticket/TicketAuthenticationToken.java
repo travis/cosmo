@@ -38,36 +38,33 @@ public class TicketAuthenticationToken extends AbstractAuthenticationToken
 
     private boolean authenticated;
     private String path;
-    private Set ids;
+    private Set<String> keys;
     private Ticket ticket;
 
     /**
      * @param path the absolute URI path to the ticketed resource
-     * @param ids all ticket ids provided for the resource
+     * @param keys all ticket keys provided for the resource
      */
-    public TicketAuthenticationToken(String path, Set ids) {
+    public TicketAuthenticationToken(String path,
+                                     Set<String> keys) {
         super(AUTHORITIES);
-        if (path == null || path.equals("")) {
+        if (path == null || path.equals(""))
             throw new IllegalArgumentException("path may not be null or empty");
-        }
-        if (ids == null || ids.isEmpty()) {
-            throw new IllegalArgumentException("ids may not be null or empty");
-        }
+        if (keys == null || keys.isEmpty())
+            throw new IllegalArgumentException("keys may not be null or empty");
         this.path = path;
-        this.ids = ids;
+        this.keys = keys;
         authenticated = false;
     }
 
     // Authentication methods
 
-    /**
-     */
+    /** */
     public void setAuthenticated(boolean isAuthenticated) {
         authenticated = isAuthenticated;
     }
 
-    /**
-     */
+    /** */
     public boolean isAuthenticated() {
         return authenticated;
     }
@@ -88,26 +85,22 @@ public class TicketAuthenticationToken extends AbstractAuthenticationToken
 
     // our methods
 
-    /**
-     */
+    /** */
     public void setTicket(Ticket ticket) {
         this.ticket = ticket;
     }
 
-    /**
-     */
+    /** */
     public String getPath() {
         return path;
     }
 
-    /**
-     */
-    public Set getIds() {
-        return ids;
+    /** */
+    public Set<String> getKeys() {
+        return keys;
     }
 
-    /**
-     */
+    /** */
     public boolean equals(Object obj) {
         if (! super.equals(obj)) {
             return false;

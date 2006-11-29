@@ -24,11 +24,15 @@ import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.AuthenticationServiceException;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.providers.AuthenticationProvider;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.util.RepositoryUriParser;
+
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -42,91 +46,59 @@ public class TicketAuthenticationProvider
 
     // AuthenticationProvider methods
 
-    /**
-     */
+    /** */
     public Authentication authenticate(Authentication authentication)
         throws AuthenticationException {
-        if (! supports(authentication.getClass())) {
+        if (! supports(authentication.getClass()))
             return null;
-        }
 
         TicketAuthenticationToken token =
             (TicketAuthenticationToken) authentication;
-        String clientPath = tokenPathToRepositoryPath(token.getPath());
-        for (Iterator i=token.getIds().iterator(); i.hasNext();) {
-            String id = (String) i.next();
-            Ticket ticket = findTicket(clientPath, id);
+        for (String key : token.getKeys()) {
+            Ticket ticket = findTicket(token.getPath(), key);
             if (ticket != null) {
                 token.setTicket(ticket);
                 token.setAuthenticated(true);
                 return token;
             }
         }
-        throw new BadCredentialsException("No valid tickets found for" +
-                                          " resource at " + clientPath);
+
+        throw new BadCredentialsException("No valid tickets found for resource at " + token.getPath());
     }
 
-    /**
-     */
+    /** */
     public boolean supports(Class authentication) {
-        return
-            (TicketAuthenticationToken.class.isAssignableFrom(authentication));
+        return TicketAuthenticationToken.class.
+            isAssignableFrom(authentication);
     }
 
     // our methods
 
-    /**
-     */
+    /** */
     public ContentService getContentService() {
         return contentService;
     }
 
-    /**
-     */
+    /** */
     public void setContentService(ContentService contentService) {
         this.contentService = contentService;
     }
 
-    /**
-     */
-    protected Ticket findTicket(String path,
-                                String id) {
+    private Ticket findTicket(String path,
+                              String key) {
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("authenticating ticket " + id +
+            if (log.isDebugEnabled())
+                log.debug("authenticating ticket " + key +
                           " for resource at path " + path);
-            }
 
-            // If the item exists, get it
-            Item item = contentService.findItemByPath(path);
-            
-            // If the item doesn't exist (PUT request), then
-            // get the parent
-            if (item == null) {
-                item = contentService.findItemParentByPath(path);
-                // Parent must exist
-                if(item==null)
-                    throw new TicketedItemNotFoundException("Resource at " +
-                            path + " not found");
-            }
-
-            // First look for ticket on item
-            Ticket ticket = contentService.getTicket(item, id);
-            
-            // Look for ticket on each parent
-            while (ticket == null && (item.getParent()!=null)) {
-                item = item.getParent();
-                ticket = contentService.getTicket(item, id);
-            }
-            
-            // If we didn't find a ticket, then its not there
-            if(ticket==null)
+            Item item = findItem(path);
+            Ticket ticket = contentService.getTicket(item, key);
+            if (ticket == null)
                 return null;
 
             if (ticket.hasTimedOut()) {
-                if (log.isDebugEnabled()) {
+                if (log.isDebugEnabled())
                     log.debug("removing timed out ticket " + ticket.getKey());
-                }
                 contentService.removeTicket(item, ticket);
                 return null;
             }
@@ -137,13 +109,28 @@ public class TicketAuthenticationProvider
         }
     }
 
-    /**
-     */
-    private String tokenPathToRepositoryPath(String tokenPath) {
-        try {
-            return URLDecoder.decode(tokenPath, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("UTF-8 not supported?!");
+    private Item findItem(String path) {
+        RepositoryUriParser p = new RepositoryUriParser(path);
+        Item item = null;
+
+        if (p.isCollectionUri()) {
+            item = contentService.findItemByUid(p.getCollectionUid());
+            // a ticket cannot be used to access a collection that
+            // does not already exist
+            if (item == null)
+                throw new TicketedItemNotFoundException("Item with uid " + p.getCollectionUid() + " not found");
+
+            return item;
         }
+
+        item = contentService.findItemByPath(path);
+        if (item == null)
+            // if the item's parent exists, the ticket may be good for
+            // that
+            item = contentService.findItemParentByPath(path);
+        if (item == null)
+            throw new TicketedItemNotFoundException("Resource at " + path + " not found");
+
+        return item;
     }
 }

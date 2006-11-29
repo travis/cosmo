@@ -29,6 +29,7 @@
 <c:set var="feedPath" value="/feed/atom/1.0${Path}"/>
 <c:if test="${isCollection}">
   <c:set var="davPath" value="${davPath}/"/>
+  <c:set var="Item" value="${Collection}"/>
 </c:if>
 
 <div class="hd" style="margin-top: 12px;">
@@ -66,7 +67,7 @@
         Created
       </td>
     </tr>
-    <c:forEach var="ticket" items="${item.tickets}">
+    <c:forEach var="ticket" items="${Item.tickets}">
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
         <a href='<c:url value="/browse/ticket${path}/revoke/${ticket.key}" />'>

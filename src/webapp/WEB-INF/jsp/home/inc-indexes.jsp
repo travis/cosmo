@@ -21,9 +21,6 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<tiles:importAttribute name="item"/>
-<tiles:importAttribute name="path"/>
-
 <div class="hd" style="margin-top: 12px;">
   Property Indexes
 </div>
@@ -38,7 +35,7 @@
         Value
       </td>
     </tr>
-    <c:forEach var="index" items="${item.propertyIndexes}">
+    <c:forEach var="index" items="${Item.stampMap['event'].propertyIndexes}">
     <tr>
       <td class="smTableData" width="50%">
         ${index.name}
@@ -74,7 +71,7 @@
         Type
       </td>
     </tr>
-    <c:forEach var="index" items="${item.timeRangeIndexes}">
+    <c:forEach var="index" items="${Item.stampMap['event'].timeRangeIndexes}">
     <tr>
       <td class="smTableData" width="50%">
         ${index.startDate}

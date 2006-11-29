@@ -163,24 +163,4 @@ public interface ContentDao extends ItemDao {
      */
     public void removeCollection(CollectionItem collection);
 
-    /**
-     * Find content or collection item by path. Path is of the format:
-     * /username/parent1/parent2/itemname
-     * 
-     * @param path
-     *            path of item to find
-     * @return item represented by path. Will be either a CollectionItem or
-     *         ContentItem.
-     */
-    public Item findItemByPath(String path);
-
-    /**
-     * Find content or collection item by uid.
-     * 
-     * @param uid
-     *            uid of item to find
-     * @return item represented by uid. Will be either a CollectionItem or
-     *         ContentItem.
-     */
-    public Item findItemByUid(String uid);
 }

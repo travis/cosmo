@@ -19,9 +19,28 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
-import org.osaf.cosmo.model.CalendarItem;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 
-
+/**
+ * Iterface that defines api for retrieving ContentItems
+ * that contain EventStamps that match a given
+ * CalendarFilter.
+ * 
+ * Used by CalendarDaoImpl.
+ *
+ */
 public interface CalendarFilterTranslator {
-	public List<CalendarItem> getCalendarItems(Session session, Long parentId, CalendarFilter filter);
+    
+    /**
+     * Retrieve ContentItems that contain data that
+     * matches the given CalendarFilter.
+     * 
+     * @param session Hibernate session obejct
+     * @param collection parent collection to search
+     * @param filter query filter
+     * @return list of matching ContentItems
+     */
+    public List<ContentItem> getCalendarItems(Session session,
+            CollectionItem collection, CalendarFilter filter);
 }

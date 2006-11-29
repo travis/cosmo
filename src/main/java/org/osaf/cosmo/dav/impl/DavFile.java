@@ -18,14 +18,13 @@ package org.osaf.cosmo.dav.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -33,7 +32,6 @@ import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
-import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
@@ -46,13 +44,8 @@ import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.model.DataSizeException;
-import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.ModelValidationException;
 
 /**
@@ -89,6 +82,7 @@ public class DavFile extends DavResourceBase {
 
         RESOURCE_TYPES = new int[] { ResourceType.DEFAULT_RESOURCE };
 
+        // TODO: remove, no longer stored as properties
         //DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_MIMETYPE);
         //DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_ENCODING);
         //DEAD_PROPERTY_FILTER.add(ContentItem.ATTR_CONTENT_CONTENTLANGUAGE);

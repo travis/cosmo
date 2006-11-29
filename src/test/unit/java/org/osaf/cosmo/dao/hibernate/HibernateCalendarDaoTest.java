@@ -15,13 +15,13 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.Assert;
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 
@@ -31,11 +31,13 @@ import org.osaf.cosmo.calendar.query.IsNotDefinedFilter;
 import org.osaf.cosmo.calendar.query.PropertyFilter;
 import org.osaf.cosmo.calendar.query.TextMatchFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.dao.UserDao;
-import org.osaf.cosmo.model.CalendarCollectionItem;
-import org.osaf.cosmo.model.CalendarEventItem;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DuplicateEventUidException;
-import org.osaf.cosmo.model.DuplicateItemNameException;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.User;
 
 public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
@@ -51,239 +53,181 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
     }
 
     public void testCalendarDaoBasic() throws Exception {
-        CalendarCollectionItem calendar = generateCalendar("test", "testuser");
-
-        CalendarCollectionItem newItem = calendarDao.createCalendar(calendar);
+        CollectionItem calendar = generateCalendar("test", "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(getUser(userDao, "testuser"));
+        
+        CollectionItem newItem = contentDao.createCollection(root, calendar);
 
         clearSession();
 
-        CalendarCollectionItem queryItem = calendarDao
-                .findCalendarByUid(calendar.getUid());
+        CollectionItem queryItem = (CollectionItem) contentDao
+                .findItemByUid(calendar.getUid());
 
+        CalendarCollectionStamp ccs = (CalendarCollectionStamp) queryItem
+                .getStamp(CalendarCollectionStamp.class);
+        
         Assert.assertNotNull(queryItem);
         Assert.assertEquals("test", queryItem.getName());
-        Assert.assertEquals("en", queryItem.getLanguage());
-        Assert.assertEquals("test description", queryItem.getDescription());
-        Assert.assertEquals("VEVENT", (String) queryItem
+        Assert.assertEquals("en", ccs.getLanguage());
+        Assert.assertEquals("test description", ccs.getDescription());
+        Assert.assertEquals("VEVENT", (String) ccs
                 .getSupportedComponents().iterator().next());
 
         // test update
         queryItem.setName("test2");
-        queryItem.setLanguage("es");
-        queryItem.setDescription("test description2");
+        ccs.setLanguage("es");
+        ccs.setDescription("test description2");
         HashSet<String> supportedComponents = new HashSet<String>();
         supportedComponents.add("VTODO");
-        queryItem.setSupportedComponents(supportedComponents);
+        ccs.setSupportedComponents(supportedComponents);
 
-        calendarDao.updateCalendar(queryItem);
+        contentDao.updateCollection(queryItem);
         Assert.assertNotNull(queryItem);
 
         clearSession();
 
-        queryItem = calendarDao.findCalendarByUid(calendar.getUid());
+        queryItem = (CollectionItem) contentDao.findItemByUid(calendar.getUid());
+        ccs = (CalendarCollectionStamp) queryItem.getStamp(CalendarCollectionStamp.class);
+        
         Assert.assertEquals("test2", queryItem.getName());
-        Assert.assertEquals("es", queryItem.getLanguage());
-        Assert.assertEquals("test description2", queryItem.getDescription());
-        Assert.assertEquals("VTODO", (String) queryItem
+        Assert.assertEquals("es", ccs.getLanguage());
+        Assert.assertEquals("test description2", ccs.getDescription());
+        Assert.assertEquals("VTODO", (String) ccs
                 .getSupportedComponents().iterator().next());
 
         // test add event
-        CalendarEventItem event = generateEvent("test.ics", "cal1.ics",
+        ContentItem event = generateEvent("test.ics", "cal1.ics",
                 "testuser");
 
-        CalendarEventItem newEvent = calendarDao.addEvent(calendar, event);
-
+        ContentItem newEvent = contentDao.createContent(calendar, event);
+        
         clearSession();
 
         // test query event
-        CalendarEventItem queryEvent = calendarDao.findEventByUid(newEvent
-                .getUid());
+        ContentItem queryEvent = (ContentItem) contentDao.findItemByUid(newEvent.getUid());
+        EventStamp evs = (EventStamp) queryEvent.getStamp(EventStamp.class);
+        
         Assert.assertEquals("test.ics", queryEvent.getName());
         Assert.assertEquals("text/calendar", queryEvent.getContentType());
         Assert.assertEquals("UTF8", queryEvent.getContentEncoding());
         Assert.assertEquals("en", queryEvent.getContentLanguage());
-
-        helper.verifyInputStream(new FileInputStream(baseDir + "/cal1.ics"),
-                queryEvent.getContent());
+        Assert.assertEquals(getCalendar(event).toString(), evs.getCalendar().toString());
 
         // test update event
         queryEvent.setName("test2.ics");
         queryEvent.setContentEncoding("UTF16");
         queryEvent.setContentLanguage("es");
         queryEvent.setContentType("text/ical");
-        queryEvent.setContent(helper.getBytes(baseDir + "/cal2.ics"));
+        evs.setCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/cal2.ics")));
+        
+        queryEvent = contentDao.updateContent(queryEvent);
 
-        queryEvent = calendarDao.updateEvent(queryEvent);
-
+        Calendar cal = evs.getCalendar();
+        
         clearSession();
 
-        queryEvent = calendarDao.findEventByUid(queryEvent.getUid());
-
+        queryEvent = (ContentItem) contentDao.findItemByUid(newEvent.getUid());
+        evs = (EventStamp) queryEvent.getStamp(EventStamp.class);
+        
         Assert.assertEquals("test2.ics", queryEvent.getName());
         Assert.assertEquals("text/ical", queryEvent.getContentType());
         Assert.assertEquals("UTF16", queryEvent.getContentEncoding());
         Assert.assertEquals("es", queryEvent.getContentLanguage());
-
-        helper.verifyInputStream(new FileInputStream(baseDir + "/cal2.ics"),
-                queryEvent.getContent());
+        Assert.assertEquals(evs.getCalendar().toString(), cal.toString());
+        
 
         // test delete
-        calendarDao.removeEvent(queryEvent);
+        contentDao.removeContent(queryEvent);
 
         clearSession();
 
-        queryEvent = calendarDao.findEventByUid(queryEvent.getUid());
+        queryEvent = (ContentItem) contentDao.findItemByUid(newEvent.getUid());
         Assert.assertNull(queryEvent);
 
-        queryItem = calendarDao.findCalendarByUid(queryItem.getUid());
-        calendarDao.removeCalendar(queryItem);
+        queryItem = (CollectionItem) contentDao.findItemByUid(calendar.getUid());
+        contentDao.removeCollection(queryItem);
 
         clearSession();
 
-        queryItem = calendarDao.findCalendarByUid(queryItem.getUid());
+        queryItem = (CollectionItem) contentDao.findItemByUid(calendar.getUid());
         Assert.assertNull(queryItem);
     }
 
     public void testLongPropertyValue() throws Exception {
-        CalendarCollectionItem calendar = generateCalendar("test", "testuser");
-        calendar = calendarDao.createCalendar(calendar);
+        CollectionItem calendar = generateCalendar("test", "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(getUser(userDao, "testuser"));
+        
+        CollectionItem newItem = contentDao.createCollection(root, calendar);
 
-        CalendarEventItem event = generateEvent("big.ics", "big.ics",
+        ContentItem event = generateEvent("big.ics", "big.ics",
                 "testuser");
 
-        event = calendarDao.addEvent(calendar, event);
+        event = contentDao.createContent(calendar, event);
 
         clearSession();
 
-        CalendarEventItem queryEvent = calendarDao.findEventByUid(event
-                .getUid());
-        helper.verifyInputStream(new FileInputStream(baseDir + "/big.ics"), queryEvent
-                .getContent());
+        ContentItem queryEvent = (ContentItem) contentDao.findItemByUid(event.getUid());
+        Assert.assertEquals(getCalendar(event).toString(), getCalendar(queryEvent).toString());
     }
 
     public void testDuplicateEventUid() throws Exception {
-        CalendarCollectionItem calendar = generateCalendar("test", "testuser");
-        calendar = calendarDao.createCalendar(calendar);
+        CollectionItem calendar = generateCalendar("test", "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(getUser(userDao, "testuser"));
+        
+        CollectionItem newItem = contentDao.createCollection(root, calendar);
 
-        CalendarEventItem event = generateEvent("test.ics", "cal1.ics",
+        ContentItem event = generateEvent("test.ics", "cal1.ics",
                 "testuser");
 
-        event = calendarDao.addEvent(calendar, event);
+        event = contentDao.createContent(calendar, event);
 
-        CalendarEventItem event2 = generateEvent("testduplicate.ics",
+        ContentItem event2 = generateEvent("testduplicate.ics",
                 "cal1.ics", "testuser");
 
         clearSession();
 
-        calendar = calendarDao.findCalendarByUid(calendar.getUid());
+        calendar = (CollectionItem) contentDao.findItemByUid(calendar.getUid());
 
         try {
-            event2 = calendarDao.addEvent(calendar, event2);
-            Assert.fail("able to create event with duplicat uid");
+            event2 = contentDao.createContent(calendar, event2);
+            Assert.fail("able to create event with duplicate uid");
         } catch (DuplicateEventUidException e) {
         }
     }
 
     public void testFindByEventIcalUid() throws Exception {
-        CalendarCollectionItem calendar = generateCalendar("test", "testuser");
-        calendar = calendarDao.createCalendar(calendar);
+        CollectionItem calendar = generateCalendar("test", "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(getUser(userDao, "testuser"));
+        
+        CollectionItem newItem = contentDao.createCollection(root, calendar);
 
-        CalendarEventItem event = generateEvent("test.ics", "cal1.ics",
+        ContentItem event = generateEvent("test.ics", "cal1.ics",
                 "testuser");
 
-        event = calendarDao.addEvent(calendar, event);
+        event = contentDao.createContent(calendar, event);
 
         clearSession();
 
-        calendar = calendarDao.findCalendarByUid(calendar.getUid());
+        calendar = (CollectionItem) contentDao.findItemByUid(calendar.getUid());
         String uid = "68ADA955-67FF-4D49-BBAC-AF182C620CF6";
-        CalendarEventItem queryEvent = calendarDao.findEventByIcalUid(uid,
+        ContentItem queryEvent = calendarDao.findEventByIcalUid(uid,
                 calendar);
         Assert.assertNotNull(queryEvent);
         Assert.assertEquals(event.getUid(), queryEvent.getUid());
     }
 
-    public void testCalendarDaoAdvanced() throws Exception {
-        CalendarCollectionItem calendar = generateCalendar("test", "testuser");
-        calendar = calendarDao.createCalendar(calendar);
-
-        clearSession();
-
-        CalendarCollectionItem calendar2 = generateCalendar("test", "testuser");
-
-        try {
-            calendarDao.createCalendar(calendar2);
-            Assert.fail("shouldn't be able to create duplicate calendar");
-        } catch (DuplicateItemNameException dine) {
-        }
-
-        calendar2.setOwner(getUser(userDao, "testuser2"));
-        calendar2 = calendarDao.createCalendar(calendar2);
-
-        // test add events
-        CalendarEventItem event = generateEvent("test.ics", "cal1.ics",
-                "testuser");
-
-        CalendarEventItem newEvent = calendarDao.addEvent(calendar, event);
-
-        CalendarEventItem event2 = generateEvent("test2.ics", "cal2.ics",
-                "testuser");
-
-        CalendarEventItem newEvent2 = calendarDao.addEvent(calendar, event2);
-
-        clearSession();
-
-        // test query by path
-        CalendarCollectionItem queryCollection = calendarDao
-                .findCalendarByPath("/testuser2/test");
-        Assert.assertNotNull(queryCollection);
-        Assert.assertEquals(calendar2.getUid(), queryCollection.getUid());
-
-        CalendarEventItem queryEvent = calendarDao
-                .findEventByPath("/testuser/test/test.ics");
-        Assert.assertNotNull(queryEvent);
-        Assert.assertEquals(event.getUid(), queryEvent.getUid());
-
-        // test get by criteria
-        // HashMap criteria = new HashMap();
-        // criteria.put("icalendar:vcalendar-vevent_description", "12:10 w/
-        // Chris (113.138.4504)");
-        // criteria.put("icalendar:vcalendar-vevent_class", "PRIVATE");
-        // criteria.put("icalendar:vcalendar-vevent_summary", "Visible Changes @
-        // Memorial City");
-        //      
-        // Set<CalendarEventItem> queryEvents = calendarDao.findEvents(calendar,
-        // criteria);
-        // Assert.assertEquals(1, queryEvents.size());
-        // CalendarEventItem nextItem = queryEvents.iterator().next();
-        // Assert.assertEquals(newEvent.getUid(), nextItem.getUid());
-        // verifyInputStream(new FileInputStream(baseDir + "/cal1.ics"),
-        // nextItem.getContent());
-
-        calendar = calendarDao.findCalendarByUid(calendar.getUid());
-        calendar2 = calendarDao.findCalendarByUid(calendar2.getUid());
-
-        // test delete
-        calendarDao.removeCalendar(calendar);
-        calendarDao.removeCalendar(calendar2);
-
-        clearSession();
-
-        queryEvent = calendarDao.findEventByPath("/testuser/test/test.ics");
-        Assert.assertNull(queryEvent);
-
-        queryEvent = calendarDao.findEventByUid(event.getUid());
-        Assert.assertNull(queryEvent);
-    }
+   
 
     public void testCalendarQuerying() throws Exception {
-        CalendarCollectionItem calendar = generateCalendar("test", "testuser");
-        calendar = calendarDao.createCalendar(calendar);
+        CollectionItem calendar = generateCalendar("test", "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(getUser(userDao, "testuser"));
+        
+        CollectionItem newItem = contentDao.createCollection(root, calendar);
 
         for (int i = 1; i <= 5; i++) {
-            CalendarEventItem event = generateEvent("test" + i + ".ics", "cal"
+            ContentItem event = generateEvent("test" + i + ".ics", "cal"
                     + i + ".ics", "testuser");
-            CalendarEventItem newEvent = calendarDao.addEvent(calendar, event);
+            ContentItem newEvent = contentDao.createContent(calendar, event);
         }
 
         CalendarFilter filter = new CalendarFilter();
@@ -298,10 +242,10 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
 
         // Should match ics.1
-        Set<CalendarEventItem> queryEvents = calendarDao.findEvents(calendar,
+        Set<ContentItem> queryEvents = calendarDao.findEvents(calendar,
                 filter);
         Assert.assertEquals(1, queryEvents.size());
-        CalendarEventItem nextItem = queryEvents.iterator().next();
+        ContentItem nextItem = queryEvents.iterator().next();
         Assert.assertEquals("test1.ics", nextItem.getName());
 
         // Should match all
@@ -329,7 +273,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         propFilter.getTextMatchFilter().setValue("vISiBlE");
         queryEvents = calendarDao.findEvents(calendar, filter);
         Assert.assertEquals(1, queryEvents.size());
-        nextItem = (CalendarEventItem) queryEvents.iterator().next();
+        nextItem = (ContentItem) queryEvents.iterator().next();
         Assert.assertEquals("test1.ics", nextItem.getName());
 
         // should match all 5 (none have rrules)
@@ -353,7 +297,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         // should match ics.1
         queryEvents = calendarDao.findEvents(calendar, filter);
         Assert.assertEquals(1, queryEvents.size());
-        nextItem = (CalendarEventItem) queryEvents.iterator().next();
+        nextItem = (ContentItem) queryEvents.iterator().next();
         Assert.assertEquals("test1.ics", nextItem.getName());
 
         // 10 year period
@@ -373,7 +317,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         // should match ics.1
         queryEvents = calendarDao.findEvents(calendar, filter);
         Assert.assertEquals(1, queryEvents.size());
-        nextItem = (CalendarEventItem) queryEvents.iterator().next();
+        nextItem = (ContentItem) queryEvents.iterator().next();
         Assert.assertEquals("test1.ics", nextItem.getName());
 
         start.setTime(new GregorianCalendar(2006, 8, 6).getTimeInMillis());
@@ -392,30 +336,45 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         return helper.getUser(userDao, contentDao, username);
     }
 
-    private CalendarCollectionItem generateCalendar(String name, String owner) {
-        CalendarCollectionItem calendar = new CalendarCollectionItem();
+    private CollectionItem generateCalendar(String name, String owner) {
+        CollectionItem calendar = new CollectionItem();
         calendar.setName(name);
         calendar.setOwner(getUser(userDao, owner));
-        calendar.setDescription("test description");
-        calendar.setLanguage("en");
+        
+        CalendarCollectionStamp ccs = new CalendarCollectionStamp();
+        calendar.addStamp(ccs);
+        
+        ccs.setDescription("test description");
+        ccs.setLanguage("en");
 
         HashSet<String> supportedComponents = new HashSet<String>();
         supportedComponents.add("VEVENT");
-        calendar.setSupportedComponents(supportedComponents);
+        ccs.setSupportedComponents(supportedComponents);
+        
         return calendar;
     }
 
-    private CalendarEventItem generateEvent(String name, String file,
+    private ContentItem generateEvent(String name, String file,
             String owner) throws Exception {
-        CalendarEventItem event = new CalendarEventItem();
+        ContentItem event = new ContentItem();
         event.setName(name);
         event.setDisplayName(name);
         event.setOwner(getUser(userDao, owner));
-        event.setContent(helper.getBytes(baseDir + "/" + file));
         event.setContentEncoding("UTF8");
         event.setContentType("text/calendar");
         event.setContentLanguage("en");
+        
+        EventStamp evs = new EventStamp();
+        event.addStamp(evs);
+        evs.setCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
+        event.setContentLength((long) evs.getCalendar().toString().getBytes().length);
+        
         return event;
+    }
+    
+    private Calendar getCalendar(ContentItem item) {
+        EventStamp evs = (EventStamp) item.getStamp(EventStamp.class);
+        return evs.getCalendar();
     }
 
 }

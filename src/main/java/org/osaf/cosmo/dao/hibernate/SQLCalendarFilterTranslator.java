@@ -30,7 +30,8 @@ import org.osaf.cosmo.calendar.query.ParamFilter;
 import org.osaf.cosmo.calendar.query.PropertyFilter;
 import org.osaf.cosmo.calendar.query.TextMatchFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
-import org.osaf.cosmo.model.CalendarItem;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 
 /**
  * Used to generate a SQL query based on a CalendarFilter. A CalendarFilter
@@ -64,15 +65,15 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
      *            query filter
      * @return hibernate query
      */
-    public List<CalendarItem> getCalendarItems(Session session, Long parentId, CalendarFilter filter) {
+    public List<ContentItem> getCalendarItems(Session session, CollectionItem collection, CalendarFilter filter) {
         SQLQuery query = session.createSQLQuery(getQueryString(filter));
-        query.setParameter("parentid", parentId);
+        query.setParameter("parentid", collection.getId());
         for (Iterator it = params.entrySet().iterator(); it.hasNext();) {
             Entry entry = (Entry) it.next();
             query.setParameter((String) entry.getKey(), entry.getValue());
         }
-        query.addEntity(CalendarItem.class);
-        return (List<CalendarItem>) query.list();
+        query.addEntity(ContentItem.class);
+        return (List<ContentItem>) query.list();
     }
     
     /**
@@ -353,7 +354,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         for (int i = 1; i <= timeRangeJoins; i++)
             buf.append(", cal_timerange_index ctri" + i);
 
-        buf.append(" where i.parentid=:parentid");
+        buf.append(" where i.parentid=:parentid and i.isactive=" + booleanTrueValue);
 
         for (int i = 1; i <= attributeJoins; i++)
             buf.append(" and cpi" + i + ".itemid=i.id");

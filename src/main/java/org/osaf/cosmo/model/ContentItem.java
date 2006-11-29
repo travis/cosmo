@@ -34,6 +34,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 import org.hibernate.validator.Min;
 import org.hibernate.validator.NotNull;
 
@@ -42,6 +43,7 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @DiscriminatorValue("content")
+@Where(clause = "isactive=1")
 public class ContentItem extends Item {
 
     /**
@@ -95,6 +97,10 @@ public class ContentItem extends Item {
         } catch (IOException e) {
             throw new RuntimeException("Error setting content");
         }
+    }
+    
+    public void clearContent() {
+        contentData = null;
     }
 
     /**
@@ -197,22 +203,6 @@ public class ContentItem extends Item {
 
     public void validate() {
         super.validate();
-        validateContent();
-    }
-  
-    protected void validateContent() {
-        if (getContentLength() == null)
-            throw new ModelValidationException("Content Length must be present");
-
-        if (getContentLength().longValue() < 0)
-            throw new ModelValidationException("Content Length must be >= 0");
-
-        if (getContentData() == null)
-            throw new ModelValidationException("Content must be present");
-
-        if (getContentData().getSize() != getContentLength().longValue())
-            throw new ModelValidationException(
-                    "Content Length doesn't match Content");
     }
     
     /**
@@ -229,7 +219,6 @@ public class ContentItem extends Item {
     @OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="contentdataid")
     @Cascade( {CascadeType.ALL }) 
-    @NotNull
     private ContentData getContentData() {
         return contentData;
     }

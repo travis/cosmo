@@ -16,60 +16,47 @@
 package org.osaf.cosmo.dav.impl;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
-import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavProperty;
-import org.apache.jackrabbit.webdav.property.DavPropertyIterator;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
-import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.version.DeltaVConstants;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty;
-
-import org.apache.commons.lang.StringEscapeUtils;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.dav.CosmoDavMethods;
 import org.osaf.cosmo.dav.ExtendedDavConstants;
 import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
 import org.osaf.cosmo.dav.caldav.report.MultigetReport;
 import org.osaf.cosmo.dav.caldav.report.QueryReport;
 import org.osaf.cosmo.dav.property.ExcludeFreeBusyRollup;
-import org.osaf.cosmo.model.CalendarCollectionItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.util.PathUtil;
 
@@ -318,27 +305,14 @@ public class DavCollection extends DavResourceBase
         throws DavException {
         CollectionItem collection = (CollectionItem) getItem();
 
-        if (member instanceof DavCalendarCollection) {
-            CalendarCollectionItem subcollection =
-                (CalendarCollectionItem) member.getItem();
+        CollectionItem subcollection = (CollectionItem) member.getItem();
 
-            if (log.isDebugEnabled())
-                log.debug("creating calendar collection " +
-                          member.getResourcePath());
+        if (log.isDebugEnabled())
+            log.debug("creating collection " + member.getResourcePath());
 
-            subcollection = getContentService().
-                createCalendar(collection, subcollection);
-            member.setItem(subcollection);
-        } else {
-            CollectionItem subcollection = (CollectionItem) member.getItem();
-
-            if (log.isDebugEnabled())
-                log.debug("creating collection " + member.getResourcePath());
-
-            subcollection = getContentService().
-                createCollection(collection, subcollection);
-            member.setItem(subcollection);
-        }
+        subcollection = getContentService().
+            createCollection(collection, subcollection);
+        member.setItem(subcollection);
     }
 
     /**
@@ -372,25 +346,13 @@ public class DavCollection extends DavResourceBase
         throws DavException {
         CollectionItem collection = (CollectionItem) getItem();
 
-        if (member instanceof DavCalendarCollection) {
-            CalendarCollectionItem subcollection =
-                (CalendarCollectionItem) member.getItem();
+        CollectionItem subcollection = (CollectionItem) member.getItem();
 
-            if (log.isDebugEnabled())
-                log.debug("removing calendar collection " +
-                          subcollection.getName() +
-                          " from " + collection.getName());
+        if (log.isDebugEnabled())
+            log.debug("removing collection " + subcollection.getName() +
+                      " from " + collection.getName());
 
-            getContentService().removeCalendar(subcollection);
-        } else {
-            CollectionItem subcollection = (CollectionItem) member.getItem();
-
-            if (log.isDebugEnabled())
-                log.debug("removing collection " + subcollection.getName() +
-                          " from " + collection.getName());
-
-            getContentService().removeCollection(subcollection);
-        }
+        getContentService().removeCollection(subcollection);
     }
 
     /**

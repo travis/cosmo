@@ -19,20 +19,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.dav.impl.DavCalendarResource;
-
-import org.w3c.dom.Document;
+import org.osaf.cosmo.dav.impl.DavEvent;
 import org.w3c.dom.Element;
 
 /**
@@ -131,7 +126,7 @@ public class MultigetReport extends CaldavMultiStatusReport {
     protected void runQuery()
         throws DavException {
         for (String href : hrefs) {
-            DavCalendarResource target = (DavCalendarResource)
+            DavEvent target = (DavEvent)
                 getResource().findMember(href);
             if (target != null)
                 getMultiStatus().addResponse(buildMultiStatusResponse(target));

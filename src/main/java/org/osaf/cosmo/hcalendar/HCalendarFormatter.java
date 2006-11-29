@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.hcalendar;
 
-import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZone;
@@ -27,9 +26,8 @@ import net.fortuna.ical4j.model.property.Duration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.model.CalendarEventItem;
-import org.osaf.cosmo.model.CalendarItem;
+import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.util.DateUtil;
 
 /**
@@ -57,9 +55,9 @@ public class HCalendarFormatter {
      * @throws IllegalArgumentException if the calendar item is of an
      * unknown type
      */
-    public static String toHCal(CalendarItem item) {
-        if (item instanceof CalendarEventItem)
-            return toHCal((CalendarEventItem) item);
+    public static String toHCal(ContentItem item) {
+        if (item.getStamp(EventStamp.class)!=null)
+            return toHCal(EventStamp.getStamp(item));
         throw new IllegalArgumentException("unknown calendar item type " + item.getClass().getName());
     }
 
@@ -72,7 +70,7 @@ public class HCalendarFormatter {
      *
      * @param event the <code>CalendarEventItem</code> to format
      */
-    public static String toHCal(CalendarEventItem event) {
+    public static String toHCal(EventStamp event) {
         StringBuffer buf = new StringBuffer();
         buf.append("<div class=\"vevent\">");
 

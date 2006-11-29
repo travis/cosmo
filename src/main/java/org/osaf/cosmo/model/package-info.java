@@ -35,20 +35,18 @@
  */
 @NamedQueries({
     // Item Queries
-    @NamedQuery(name="item.by.parentId", query="from Item where parent.id=:parentid"),
-    @NamedQuery(name="homeCollection.by.ownerId", query="from HomeCollectionItem where owner.id=:ownerid"),
-    @NamedQuery(name="item.by.ownerId.parentId.name", query="from Item where owner.id=:ownerid and parent.id=:parentid and name=:name"),
-    @NamedQuery(name="item.by.ownerId.nullParent.name", query="from Item where owner.id=:ownerid and parent.id is null and name=:name"),
-    @NamedQuery(name="item.by.ownerId.nullParent.name.minusItem", query="from Item where id!=:itemid and owner.id=:ownerid and parent.id is null and name=:name"),
-    @NamedQuery(name="item.by.ownerId.parentId.name.minusItem", query="from Item where id!=:itemid and owner.id=:ownerid and parent.id=:parentid and name=:name"),
-    @NamedQuery(name="item.by.uid", query="from Item i where i.uid=:uid"),
-    @NamedQuery(name="collectionItem.by.uid", query="from CollectionItem i where i.uid=:uid"),
-    @NamedQuery(name="contentItem.by.uid", query="from ContentItem i where i.uid=:uid"),
-    @NamedQuery(name="calendarCollectionItem.by.uid", query="from CalendarCollectionItem i where i.uid=:uid"),
-    @NamedQuery(name="calendarEventItem.by.uid", query="from CalendarEventItem i where i.uid=:uid"),
-    @NamedQuery(name="item.by.parent.name", query="from Item where parent=:parent and name=:name"),
-    @NamedQuery(name="item.by.ownerName.name.nullParent", query="select i from Item i, User u where i.owner=u and u.username=:username and i.name=:name and i.parent is null"),
-    @NamedQuery(name="item.by.ownerId.and.nullParent", query="select i from Item i where i.owner.id=:ownerid and i.parent is null"),
+    @NamedQuery(name="item.by.parentId", query="from Item where parent.id=:parentid and isActive=true"),
+    @NamedQuery(name="homeCollection.by.ownerId", query="from HomeCollectionItem where owner.id=:ownerid and isActive=true"),
+    @NamedQuery(name="item.by.ownerId.parentId.name", query="from Item where owner.id=:ownerid and parent.id=:parentid and name=:name and isActive=true"),
+    @NamedQuery(name="item.by.ownerId.nullParent.name", query="from Item where owner.id=:ownerid and parent.id is null and name=:name and isActive=true"),
+    @NamedQuery(name="item.by.ownerId.nullParent.name.minusItem", query="from Item where id!=:itemid and owner.id=:ownerid and parent.id is null and name=:name and isActive=true"),
+    @NamedQuery(name="item.by.ownerId.parentId.name.minusItem", query="from Item where id!=:itemid and owner.id=:ownerid and parent.id=:parentid and name=:name and isActive=true"),
+    @NamedQuery(name="item.by.uid", query="from Item i where i.uid=:uid and isActive=true"),
+    @NamedQuery(name="collectionItem.by.uid", query="from CollectionItem i where i.uid=:uid and isActive=true"),
+    @NamedQuery(name="contentItem.by.uid", query="from ContentItem i where i.uid=:uid and i.isActive=true"),
+    @NamedQuery(name="item.by.parent.name", query="from Item where parent=:parent and name=:name and isActive=true"),
+    @NamedQuery(name="item.by.ownerName.name.nullParent", query="select i from Item i, User u where i.owner=u and u.username=:username and i.name=:name and i.parent is null and i.isActive=true"),
+    @NamedQuery(name="item.by.ownerId.and.nullParent", query="select i from Item i where i.owner.id=:ownerid and i.parent is null and i.isActive=true"),
     
     // User Queries
     @NamedQuery(name="user.byUsername", query="from User where username=:username"),
@@ -56,7 +54,7 @@
     @NamedQuery(name="user.byUid", query="from User where uid=:uid"),
        
     // Event Queries
-    @NamedQuery(name="event.by.calendar.icaluid", query="select i from CalendarEventItem i, CalendarPropertyIndex pi where pi.item.id=i.id and i.parent=:calendar and pi.name='icalendar:vcalendar-vevent_uid' and pi.value=:uid")
+    @NamedQuery(name="event.by.calendar.icaluid", query="select i from ContentItem i, CalendarPropertyIndex pi where pi.item.id=i.id and i.parent=:calendar and pi.name='icalendar:vcalendar-vevent_uid' and pi.value=:uid and i.isActive=true")
                
 })
 package org.osaf.cosmo.model;

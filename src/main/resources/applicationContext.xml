@@ -91,10 +91,7 @@
             <value>org.osaf.cosmo.model.Attribute</value>
             <value>org.osaf.cosmo.model.BinaryAttribute</value>
             <value>org.osaf.cosmo.model.BooleanAttribute</value>
-            <value>org.osaf.cosmo.model.CalendarCollectionItem</value>
-            <value>org.osaf.cosmo.model.CalendarCollectionStamp</value>
-            <value>org.osaf.cosmo.model.CalendarEventItem</value>
-            <value>org.osaf.cosmo.model.CalendarItem</value>
+            <value>org.osaf.cosmo.model.CalendarCollectionStamp</value>			
             <value>org.osaf.cosmo.model.CalendarPropertyIndex</value>
             <value>org.osaf.cosmo.model.CalendarTimeRangeIndex</value>
             <value>org.osaf.cosmo.model.CollectionItem</value>
@@ -267,6 +264,9 @@
     <property name="idGenerator">
       <ref local="idGenerator" />
     </property>
+    <property name="calendarIndexer">
+      <ref bean="calendarIndexer" />
+    </property>
   </bean>
 
   <bean id="txUserDao" parent="txProxyTemplate">
@@ -308,9 +308,6 @@
         destroy-method="destroy">
     <property name="sessionFactory">
       <ref bean="sessionFactory" />
-    </property>
-    <property name="calendarIndexer">
-      <ref bean="calendarIndexer" />
     </property>
     <property name="calendarFilterTranslatorClass">
       <value>org.osaf.cosmo.dao.hibernate.SQLCalendarFilterTranslator</value>

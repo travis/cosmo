@@ -15,39 +15,60 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import net.fortuna.ical4j.model.Calendar;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavSession;
-
-import org.osaf.cosmo.model.CalendarEventItem;
+import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
 
 /**
  * Extends <code>DavCalendarResource</code> to adapt the Cosmo
- * <code>CalendarEventItem</code> to the DAV resource model.
+ * <code>ContentItem</code> with an <code>EventStamp</code> to 
+ * the DAV resource model.
  *
  * This class does not define any live properties.
  *
  * @see DavFile
- * @see CalendarEventItem
  */
 public class DavEvent extends DavCalendarResource {
     private static final Log log = LogFactory.getLog(DavEvent.class);
 
-    /** */
-    public DavEvent(CalendarEventItem event,
-                    DavResourceLocator locator,
-                    DavResourceFactory factory,
-                    DavSession session) {
-        super(event, locator, factory, session);
-    }
-
+   
     /** */
     public DavEvent(DavResourceLocator locator,
                     DavResourceFactory factory,
                     DavSession session) {
-        this(new CalendarEventItem(), locator, factory, session);
+        this(new ContentItem(), locator, factory, session);
+        getItem().addStamp(new EventStamp());
     }
+    
+    /** */
+    public DavEvent(ContentItem item,
+                    DavResourceLocator locator,
+                    DavResourceFactory factory,
+                    DavSession session) {
+        super(item, locator, factory, session);
+    }
+
+    
+    // our methods
+
+    /**
+     * Returns the calendar object associated with this resource.
+     */
+    public Calendar getCalendar() {
+        return getEventStamp().getCalendar();
+    }
+    
+    public EventStamp getEventStamp() {
+        return EventStamp.getStamp(getItem());
+    }
+
+    protected void setCalendar(Calendar calendar) {
+        getEventStamp().setCalendar(calendar);
+    }    
 }

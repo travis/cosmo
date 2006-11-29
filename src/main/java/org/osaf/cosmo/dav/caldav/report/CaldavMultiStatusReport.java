@@ -16,25 +16,16 @@
 package org.osaf.cosmo.dav.caldav.report;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-import org.apache.jackrabbit.webdav.xml.DomUtil;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.dav.caldav.property.CalendarData;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.osaf.cosmo.dav.impl.DavCalendarResource;
 
 /**
  * Base class for CalDAV reports that return multistatus

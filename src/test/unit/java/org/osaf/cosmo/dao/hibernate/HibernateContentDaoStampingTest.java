@@ -26,6 +26,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.MessageStamp;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.NoteStamp;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
@@ -156,7 +157,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
             contentDao.createContent(root, item);
             clearSession();
             Assert.fail("able to create invalid event!");
-        } catch (InvalidStateException e) {}
+        } catch (ModelValidationException e) {}
     }
     
     public void testCalendarCollectionStamp() throws Exception {

@@ -15,20 +15,19 @@
  */
 package org.osaf.cosmo.dav.impl;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
-import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
@@ -46,17 +45,12 @@ import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
-import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.xml.Namespace;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.dav.ExtendedDavResource;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.dav.ticket.property.TicketDiscovery;
 import org.osaf.cosmo.model.Attribute;
-import org.osaf.cosmo.model.CalendarCollectionItem;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.DuplicateItemNameException;
@@ -448,7 +442,7 @@ public abstract class DavResourceBase
      * collection.
      */
     public boolean isCalendarCollection() {
-        return item instanceof CalendarCollectionItem;
+        return item.getStamp(CalendarCollectionStamp.class)!=null;
     }
 
     /**
@@ -761,7 +755,7 @@ public abstract class DavResourceBase
 
         // load subclass live properties
         loadLiveProperties();
-
+        
         // load dead properties
         for (Iterator<Map.Entry<QName,Attribute>>
                  i=item.getAttributes().entrySet().iterator(); i.hasNext();) {
@@ -769,10 +763,10 @@ public abstract class DavResourceBase
 
             // skip attributes that are not meant to be shown as dead
             // properties
-            if (getDeadPropertyFilter().contains(entry.getKey()))
+            if (getDeadPropertyFilter().contains(entry.getKey().getNamespace()))
                 continue;
 
-            DavPropertyName propName = attrNameToPropName(entry.getKey().getLocalName());
+            DavPropertyName propName = qNameToPropName(entry.getKey());
 
             // ignore live properties, as they'll be loaded separately
             if (isLiveProperty(propName))
@@ -794,10 +788,10 @@ public abstract class DavResourceBase
 
         if (isLiveProperty(property.getName()))
             setLiveProperty(property);
-        else
-            item.addStringAttribute(propNameToAttrName(property.getName()),
-                                    value);
-
+        else {
+            item.addStringAttribute(propNameToQName(property.getName()), value);
+        }
+        
         properties.add(property);
     }
 
@@ -808,44 +802,27 @@ public abstract class DavResourceBase
 
         if (isLiveProperty(name))
             removeLiveProperty(name);
-        else
-            item.removeAttribute(propNameToAttrName(name));
-
+        else         
+            item.removeAttribute(propNameToQName(name));
+        
         properties.remove(name);
     }
 
-    private String propNameToAttrName(DavPropertyName name) {
-        String prefix = name.getNamespace() != null ?
-            name.getNamespace().getPrefix() : "";
+    private QName propNameToQName(DavPropertyName name) {
+       
         String uri = name.getNamespace() != null ?
             name.getNamespace().getURI() : "";
-        return prefix + "@:@" + uri + "@:@" + name.getName();
+        return new QName(uri, name.getName());
     }
 
-    private DavPropertyName attrNameToPropName(String name) {
-        String[] chunks = name.split("@:@", 3);
-
+    private DavPropertyName qNameToPropName(QName qname) {
+     
         // no namespace at all
-        if (chunks.length == 1)
-            return DavPropertyName.create(name);
+        if ("".equals(qname.getNamespace()))
+            return DavPropertyName.create(qname.getLocalName());
 
-        String prefix = null;
-        String uri = null;
-        String value = null;
-
-        if (chunks.length == 2) {
-            uri = chunks[0];
-            value = chunks[1];
-        } else {
-            prefix = chunks[0];
-            uri = chunks[1];
-            value = chunks[2];
-        }
-
-        Namespace ns = (prefix == null || prefix.equals("")) ?
-            Namespace.getNamespace(uri) :
-            Namespace.getNamespace(prefix, uri);
-
-        return DavPropertyName.create(value, ns);
+        Namespace ns =  Namespace.getNamespace(qname.getNamespace());
+        
+        return DavPropertyName.create(qname.getLocalName(), ns);
     }
 }

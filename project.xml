@@ -256,7 +256,15 @@
         <war.bundle>true</war.bundle>
       </properties>
     </dependency>    
-        <dependency>
+    <dependency>
+      <groupId>stax</groupId>
+      <artifactId>stax-api</artifactId>
+      <version>1.0.1</version> 
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
       <groupId>jsonrpc-java</groupId>
       <artifactId>jsonrpc-java</artifactId>
       <version>1.0</version>
@@ -290,6 +298,14 @@
       <groupId>urlrewrite</groupId>
       <artifactId>urlrewrite</artifactId>
       <version>2.6.0</version>
+      <properties>
+        <war.bundle>true</war.bundle>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>woodstox</groupId>
+      <artifactId>wstx-asl</artifactId>
+      <version>3.0.2</version> 
       <properties>
         <war.bundle>true</war.bundle>
       </properties>

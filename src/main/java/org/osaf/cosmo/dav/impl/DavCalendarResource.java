@@ -15,43 +15,45 @@
  */
 package org.osaf.cosmo.dav.impl;
 
-import net.fortuna.ical4j.model.Calendar;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.ValidationException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.model.CalendarCollectionItem;
-import org.osaf.cosmo.model.CalendarItem;
+import org.apache.jackrabbit.webdav.io.InputContext;
+import org.apache.jackrabbit.webdav.io.OutputContext;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.ModelConversionException;
 
 /**
- * Base class for extensions of <code>DavFile</code> that adapt the
- * Cosmo <code>CalendarItem</code> subclasses to the DAV resource
- * model.
- *
- * This class does not define any live properties.
- *
- * @see DavFile
- * @see CalendarItem
+ * Abstract calendar resource.
  */
-public class DavCalendarResource extends DavFile {
+public abstract class DavCalendarResource extends DavFile {
+    
     private static final Log log =
         LogFactory.getLog(DavCalendarResource.class);
-
-    /** */
-    public DavCalendarResource(CalendarItem item,
-                    DavResourceLocator locator,
-                    DavResourceFactory factory,
-                    DavSession session) {
+  
+    public DavCalendarResource(ContentItem item, DavResourceLocator locator,
+            DavResourceFactory factory, DavSession session) {
         super(item, locator, factory, session);
     }
-
+       
     // DavResource methods
 
     /** */
@@ -69,14 +71,52 @@ public class DavCalendarResource extends DavFile {
         super.copy(destination, shallow);
     }
 
+    @Override
+    protected void populateItem(InputContext inputContext) throws DavException {
+        super.populateItem(inputContext);
+        ContentItem content = (ContentItem) getItem();
+        Calendar calendar = null;
+        
+        // CALDAV:valid-calendar-data
+        try {
+            // forces the event's content to be parsed
+            calendar = CalendarUtils.parseCalendar(content.getContentInputStream());
+            calendar.validate(true);
+        } catch (IOException e) {
+            log.error("Cannot read resource content", e);
+            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "Cannot read resource content: " + e.getMessage());
+        }catch (ValidationException e) {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Invalid calendar object: " + e.getMessage());
+        } catch (ParserException e) {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Invalid calendar object: " + e.getMessage());
+        } 
+        
+        setCalendar(calendar);
+        
+        try {
+            // set the contentLength on ContentItem
+            content.setContentLength((long) calendar.toString().getBytes("UTF-8").length);
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        // no need to store content twice (already stored as event stamp)
+        content.clearContent();
+    }
+    
     // our methods
 
     /**
      * Returns the calendar object associated with this resource.
      */
-    public Calendar getCalendar() {
-        return ((CalendarItem) getItem()).getCalendar();
-    }
+    public abstract Calendar getCalendar();
+    
+    /**
+     * Set the calendar object associated with this resource.
+     * @param calendar calendar object parsed from inputcontext
+     */
+    protected abstract void setCalendar(Calendar calendar);
 
     private void validateDestination(DavResource destination)
         throws DavException {
@@ -88,9 +128,12 @@ public class DavCalendarResource extends DavFile {
         if (! (destinationCollection instanceof DavCalendarCollection))
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "Destination collection not a calendar collection");
 
-        CalendarCollectionItem collection = (CalendarCollectionItem)
+        CollectionItem collection = (CollectionItem)
             ((DavResourceBase) destinationCollection).getItem();
-        CalendarItem item = (CalendarItem) getItem();
+        CalendarCollectionStamp calendar = CalendarCollectionStamp.getStamp(collection);
+        
+        ContentItem item = (ContentItem) getItem();
+        EventStamp event = EventStamp.getStamp(item);
 
         if (log.isDebugEnabled())
             log.debug("validating destination " +
@@ -108,7 +151,7 @@ public class DavCalendarResource extends DavFile {
 
         // CALDAV:supported-calendar-component
         // destination collection may support different component set
-        if (! collection.supportsCalendar(item.getCalendar()))
+        if (! calendar.supportsCalendar(event.getCalendar()))
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "Calendar object does not contain at least one supported component");
 
         // CALDAV:calendar-collection-location-ok not required here
@@ -124,5 +167,39 @@ public class DavCalendarResource extends DavFile {
         // XXX CALDAV:max-instances
 
         // XXX CALDAV:max-attendees-per-instance
+    }
+    
+    @Override
+    /** */
+    public void spool(OutputContext outputContext)
+        throws IOException {
+        if (! exists())
+            throw new IllegalStateException("cannot spool a nonexistent resource");
+
+        if (log.isDebugEnabled())
+            log.debug("spooling file " + getResourcePath());
+
+        ContentItem content = (ContentItem) getItem();
+
+        String contentType =
+            IOUtil.buildContentType(content.getContentType(),
+                                    content.getContentEncoding());
+        outputContext.setContentType(contentType);
+
+        if (content.getContentLanguage() != null)
+            outputContext.setContentLanguage(content.getContentLanguage());
+
+        outputContext.setContentLength(content.getContentLength().longValue());
+        outputContext.setModificationTime(getModificationTime());
+        outputContext.setETag(getETag());
+
+        if (! outputContext.hasStream())
+            return;
+
+        // convert Calendar object to String, then to bytes (UTF-8), then spool
+        ByteArrayInputStream bois = 
+            new ByteArrayInputStream(getCalendar().toString().getBytes("UTF-8"));
+        
+        IOUtil.spool(bois, outputContext.getOutputStream());
     }
 }

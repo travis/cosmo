@@ -20,14 +20,8 @@ import java.util.Set;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dao.CalendarDao;
-import org.osaf.cosmo.model.CalendarCollectionItem;
-import org.osaf.cosmo.model.CalendarEventItem;
-import org.osaf.cosmo.model.CalendarItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.DuplicateEventUidException;
-import org.osaf.cosmo.model.DuplicateItemNameException;
-import org.osaf.cosmo.model.ModelValidationException;
 
 /**
  * Mock implementation of <code>CalendarDao</code> useful for testing.
@@ -57,158 +51,6 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
 
     // CalendarDao methods
 
-    /**
-     * Create new calendar collection. All calendar collections live under the
-     * top-level user collection.
-     *
-     * @param calendar
-     *            calendar collection to create
-     * @return newly created calendar collection
-     * @throws DuplicateItemNameException
-     */
-    public CalendarCollectionItem createCalendar(CalendarCollectionItem calendar) {
-        return createCalendar(null, calendar);
-    }
-
-    /**
-     * Create a new calendar collection in the specified collection.
-     * @param collection collection where calendar will live
-     * @param calendar calendar collection to create
-     * @return newly created calendar collection
-     * @throws DuplicateItemNameException
-     */
-    public CalendarCollectionItem createCalendar(CollectionItem collection,
-                                                 CalendarCollectionItem calendar) {
-        if (calendar == null)
-            throw new IllegalArgumentException("calendar cannot be null");
-        if (calendar.getOwner() == null)
-            throw new IllegalArgumentException("owner cannot be null");
-
-        if (collection == null)
-            collection = getRootItem(calendar.getOwner());
-        calendar.setParent(collection);
-
-        getStorage().storeItem(calendar);
-
-        return calendar;
-    }
-
-    /**
-     * Update existing calendar collection.
-     *
-     * @param calendar
-     *            calendar collection to update
-     * @return updated calendar collection
-     * @throws DuplicateItemNameException
-     */
-    public CalendarCollectionItem updateCalendar(CalendarCollectionItem calendar) {
-        if (calendar == null)
-            throw new IllegalArgumentException("calendar cannot be null");
-
-        getStorage().updateItem(calendar);
-
-        return calendar;
-    }
-
-    /**
-     * Create new calendar event item.
-     *
-     * @param calendar
-     *            calendar collection that new item will belong to
-     * @param event
-     *            new calendar event item
-     * @return newly created calendar event item
-     * @throws ModelValidationException
-     * @throws DuplicateItemNameException
-     * @throws DuplicateEventUidException
-     */
-    public CalendarEventItem addEvent(CalendarCollectionItem calendar,
-                                      CalendarEventItem event) {
-        if (calendar == null)
-            throw new IllegalArgumentException("calendar cannot be null");
-        if (event == null)
-            throw new IllegalArgumentException("event cannot be null");
-
-        event.setParent(calendar);
-        getStorage().storeItem(event);
-
-        return event;
-    }
-
-    /**
-     * Create a new calendar event item from an existing content item
-     * @param content
-     * @return newly created calendar event item
-     */
-    public CalendarEventItem addEvent(ContentItem content) {
-        // XXX
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Update existing calendar event item.
-     *
-     * @param event
-     *            calendar event to update
-     * @return updated calendar event
-     * @throws ModelValidationException
-     * @throws DuplicateItemNameException
-     */
-    public CalendarEventItem updateEvent(CalendarEventItem event) {
-        if (event == null)
-            throw new IllegalArgumentException("event cannot be null");
-
-        getStorage().updateItem(event);
-
-        return event;
-    }
-
-    /**
-     * Find calendar collection by path. Path is of the format:
-     * /username/calendarname
-     *
-     * @param path
-     *            path of calendar
-     * @return calendar represented by path
-     */
-    public CalendarCollectionItem findCalendarByPath(String path) {
-        return (CalendarCollectionItem) findItemByPath(path);
-    }
-
-    /**
-     * Find calendar collection by uid.
-     *
-     * @param uid
-     *            uid of calendar
-     * @return calendar represented by uid
-     */
-    public CalendarCollectionItem findCalendarByUid(String uid) {
-        return (CalendarCollectionItem) findItemByUid(uid);
-    }
-
-    /**
-     * Find calendar event item by path. Path is of the format:
-     * /username/calendarname/eventname
-     *
-     * @param path
-     *            path of calendar event to find
-     * @return calendar event represented by path
-     */
-    public CalendarEventItem findEventByPath(String path) {
-        return (CalendarEventItem) findItemByPath(path);
-    }
-
-    /**
-     * Find calendar event by uid.
-     *
-     * @param uid
-     *            uid of calendar event
-     * @return calendar event represented by uid
-     */
-    public CalendarEventItem findEventByUid(String uid) {
-        return (CalendarEventItem) findItemByUid(uid);
-    }
-
   
     /**
      * Find calendar events by filter.
@@ -221,34 +63,16 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
      * @return set CalendarEventItem objects matching specified
      *         filter.
      */
-    public Set<CalendarEventItem> findEvents(CalendarCollectionItem calendar,
+    public Set<ContentItem> findEvents(CollectionItem calendar,
                                              CalendarFilter filter) {
         lastCalendarFilter = filter;
-        return new HashSet<CalendarEventItem>();
+        return new HashSet<ContentItem>();
 
     }
 
-    /**
-     * Remove calendar collection.
-     *
-     * @param calendar
-     *            calendar collection to remove.
-     */
-    public void removeCalendar(CalendarCollectionItem calendar) {
-        removeItem(calendar);
-    }
+    
 
-    /**
-     * Remove calendar event
-     *
-     * @param event
-     *            calendar event to remove
-     */
-    public void removeEvent(CalendarEventItem event) {
-        removeItem(event);
-    }
-
-    public CalendarEventItem findEventByIcalUid(String uid, CalendarCollectionItem calendar) {
+    public ContentItem findEventByIcalUid(String uid, CollectionItem calendar) {
         // TODO implement
         return null;
     }

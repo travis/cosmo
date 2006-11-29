@@ -26,6 +26,7 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Where;
 
 /**
  * Extends {@link Item} to represent a collection of items
@@ -44,18 +45,31 @@ public class CollectionItem extends Item {
         "cosmo:excludeFreeBusyRollup";
 
     private Set<Item> children = new HashSet<Item>(0);
+    private Set<Item> allChildren = null;
     
     public CollectionItem() {
     };
 
     @OneToMany(mappedBy="parent", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.DELETE }) 
+    @Where(clause = "isactive=1")
     public Set<Item> getChildren() {
         return children;
     }
 
     private void setChildren(Set<Item> children) {
         this.children = children;
+    }
+    
+    // Only used for cascade delete by Hibernate
+    @OneToMany(mappedBy="parent", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.DELETE }) 
+    private Set<Item> getAllChildren() {
+        return allChildren;
+    }
+
+    // Only used for cascade delete by Hibernate
+    private void setAllChildren(Set<Item> allChildren) {
+        this.allChildren = allChildren;
     }
 
     @Transient

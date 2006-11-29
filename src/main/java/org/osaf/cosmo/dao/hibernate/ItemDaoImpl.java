@@ -34,9 +34,6 @@ import org.hibernate.Query;
 import org.hibernate.UnresolvableObjectException;
 import org.osaf.cosmo.dao.ItemDao;
 import org.osaf.cosmo.model.Attribute;
-import org.osaf.cosmo.model.CalendarItem;
-import org.osaf.cosmo.model.CalendarPropertyIndex;
-import org.osaf.cosmo.model.CalendarTimeRangeIndex;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DuplicateItemNameException;
@@ -243,7 +240,6 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
      * @see org.osaf.cosmo.dao.TicketDao#getTicket(java.lang.String, java.lang.String)
      */
     public Ticket getTicket(String path, String key) {
-
         if(key==null)
             throw new IllegalArgumentException("ticket key cannot be null");
 
@@ -256,12 +252,17 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             if(item==null)
                 throw new IllegalArgumentException("invalid item");
 
-            Iterator tickets = item.getTickets().iterator();
-            while (tickets.hasNext()) {
-                Ticket ticket = (Ticket) tickets.next();
-                if (ticket.getKey().equals(key))
-                    return ticket;
+            // look for the ticket on the item itself and then on each
+            // of its ancestors
+            Item testItem = item;
+            while (testItem != null) {
+                for (Ticket ticket : testItem.getTickets()) {
+                    if (ticket.getKey().equals(key))
+                        return ticket;
+                }
+                testItem = testItem.getParent();
             }
+
             return null;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -353,10 +354,16 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     public Ticket getTicket(Item item, String key) {
         try {
             getSession().refresh(item);
-            for(Iterator it = item.getTickets().iterator();it.hasNext();) {
-                Ticket ticket = (Ticket) it.next();
-                if(ticket.getKey().equals(key))
-                    return ticket;
+
+            // look for the ticket on the item itself and then on each
+            // of its ancestors
+            Item testItem = item;
+            while (testItem != null) {
+                for (Ticket ticket : testItem.getTickets()) {
+                    if (ticket.getKey().equals(key))
+                        return ticket;
+                }
+                testItem = testItem.getParent();
             }
 
             return null;
@@ -561,17 +568,6 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             }
         }
             
-        // copy calendar indexes
-        if(item instanceof CalendarItem) {
-            CalendarItem calendarItem = (CalendarItem) item;
-            CalendarItem newCalendarItem = (CalendarItem) item2;
-            for(CalendarTimeRangeIndex index: calendarItem.getTimeRangeIndexes())
-                newCalendarItem.addTimeRangeIndex(index.copy());
-            for(CalendarPropertyIndex index: calendarItem.getPropertyIndexes())
-                newCalendarItem.addPropertyIndex(index.copy());
-        }
-        
-        
         // save Item before attempting deep copy
         getSession().save(item2);
         

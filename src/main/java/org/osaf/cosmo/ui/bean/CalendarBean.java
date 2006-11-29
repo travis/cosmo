@@ -22,9 +22,9 @@ import java.util.Set;
 
 import net.fortuna.ical4j.data.ParserException;
 
+import org.osaf.cosmo.model.CalendarCollectionStamp;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.CalendarEventItem;
-import org.osaf.cosmo.model.CalendarCollectionItem;
 
 /**
  * A simple bean that translates the information about a set of
@@ -33,26 +33,28 @@ import org.osaf.cosmo.model.CalendarCollectionItem;
  */
 public class CalendarBean {
 
-    private CalendarCollectionItem item;
+    private CalendarCollectionStamp calendar;
     private HashSet<EventBean> events;
 
     /**
      */
-    public CalendarBean(CalendarCollectionItem item)
+    public CalendarBean(CalendarCollectionStamp calendar)
         throws IOException, ParserException {
-        this.item = item;
+        this.calendar = calendar;
         this.events = new HashSet<EventBean>();
-        for (Item child : item.getChildren()) {
-            if (child instanceof CalendarEventItem) {
-                events.add(new EventBean((CalendarEventItem) child));
-            }
+        for (EventStamp child : calendar.getEventStamps()) {
+            events.add(new EventBean(child));
         }
     }
 
     /**
      */
-    public CalendarCollectionItem getItem() {
-        return item;
+    public CalendarCollectionStamp getCalendarCollectionStamp() {
+        return calendar;
+    }
+    
+    public Item getItem() {
+        return calendar.getItem();
     }
 
     /**

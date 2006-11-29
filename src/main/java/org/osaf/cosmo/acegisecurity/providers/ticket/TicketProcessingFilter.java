@@ -79,8 +79,8 @@ public class TicketProcessingFilter implements Filter {
         if (sc.getAuthentication() == null) {
             if (request instanceof HttpServletRequest) {
                 HttpServletRequest httpRequest = (HttpServletRequest) request;
-                Set ids = findTicketIds(httpRequest);
-                if (! ids.isEmpty()) {
+                Set<String> keys = findTicketKeys(httpRequest);
+                if (! keys.isEmpty()) {
                     String path = httpRequest.getPathInfo();
                     if (path == null || path.equals("")) {
                         path = "/";
@@ -95,7 +95,7 @@ public class TicketProcessingFilter implements Filter {
                         path = path.substring(9);
                     }
 
-                    Authentication token = createAuthentication(path, ids);
+                    Authentication token = createAuthentication(path, keys);
                     sc.setAuthentication(token);
                     if (log.isDebugEnabled()) {
                         log.debug("Replaced ContextHolder with ticket token: " +
@@ -117,37 +117,37 @@ public class TicketProcessingFilter implements Filter {
     // our methods
 
     /**
-     * Returns a {@link java.util.Set} of all ticket ids found in the
+     * Returns a {@link java.util.Set} of all ticket keys found in the
      * request, both in the {@link #HEADER_TICKET} header and the
      * {@link #PARAM_TICKET} parameter.
      */
-    protected Set findTicketIds(HttpServletRequest request) {
-        HashSet ids = new HashSet();
+    protected Set findTicketKeys(HttpServletRequest request) {
+        HashSet<String> keys = new HashSet<String>();
         Enumeration headerValues = request.getHeaders(HEADER_TICKET);
         if (headerValues != null) {
             while (headerValues.hasMoreElements()) {
                 String value = (String) headerValues.nextElement();
                 String[] atoms = value.split(", ");
                 for (int i=0; i<atoms.length; i++) {
-                    ids.add(atoms[i]);
+                    keys.add(atoms[i]);
                 }
             }
         }
         String[] paramValues = request.getParameterValues(PARAM_TICKET);
         if (paramValues != null) {
             for (int i=0; i<paramValues.length; i++) {
-                ids.add(paramValues[i]);
+                keys.add(paramValues[i]);
             }
         }
-        return ids;
+        return keys;
     }
 
     /**
      * Returns a {@link TicketAuthenticationToken} for the given
-     * path and ticket ids
+     * path and ticket keys
      */
     protected Authentication createAuthentication(String path,
-                                                  Set ids) {
-        return new TicketAuthenticationToken(path, ids);
+                                                  Set<String> keys) {
+        return new TicketAuthenticationToken(path, keys);
     }
 }

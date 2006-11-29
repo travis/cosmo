@@ -31,7 +31,7 @@ import org.hibernate.Session;
 import org.osaf.cosmo.calendar.util.CalendarFlattener;
 import org.osaf.cosmo.model.CalendarPropertyIndex;
 import org.osaf.cosmo.model.CalendarTimeRangeIndex;
-import org.osaf.cosmo.model.CalendarItem;
+import org.osaf.cosmo.model.EventStamp;
 
 public class DefaultCalendarIndexer implements CalendarIndexer {
 
@@ -41,25 +41,19 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
     private int maxPropertyNameLength = 255;
     private int maxPropertyValueLength = 20000;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.osaf.cosmo.dao.hibernate.CalendarIndexer#indexCalendarEvent(org.hibernate.Session,
-     *      org.osaf.cosmo.model.persistence.DbItem,
-     *      net.fortuna.ical4j.model.Calendar)
-     */
-    public void indexCalendarEvent(Session session, CalendarItem item,
-            Calendar calendar) {
+   
+    public void indexCalendarEvent(Session session, EventStamp event) {
         HashMap timeRangeMap = new HashMap();
         Map propertyMap = new HashMap();
         Collection indices = new ArrayList();
         CalendarFlattener flattener = new CalendarFlattener();
+        Calendar calendar = event.getCalendar();
         propertyMap = flattener.flattenCalendarObject(calendar);
         flattener.doTimeRange(calendar, timeRangeMap);
         
         // remove previous indexes
-        item.getTimeRangeIndexes().removeAll(item.getTimeRangeIndexes());
-        item.getPropertyIndexes().removeAll(item.getPropertyIndexes());
+        event.getTimeRangeIndexes().clear();
+        event.getPropertyIndexes().clear();
         
         for (Iterator it = propertyMap.entrySet().iterator(); it.hasNext();) {
             Entry nextEntry = (Entry) it.next();
@@ -78,9 +72,7 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
             index.setName(name);
             index.setValue(getSearchablePropetyValue((String) nextEntry
                     .getValue()));
-            item.addPropertyIndex(index);
-//             if (log.isDebugEnabled())
-//                 log.debug("creating calendar property index: " + index.toString());
+            event.addPropertyIndex(index);
         }
         
         for (Iterator it = timeRangeMap.entrySet().iterator(); it.hasNext();) {
@@ -91,12 +83,8 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
 
         for (Iterator it = indices.iterator(); it.hasNext();) {
             CalendarTimeRangeIndex index = (CalendarTimeRangeIndex) it.next();
-            item.addTimeRangeIndex(index);
-//             if (log.isDebugEnabled())
-//                 log.debug("creating calendar timerange index: " + index.toString());
+            event.addTimeRangeIndex(index);
         }
-        
-        session.update(item);
     }
 
    

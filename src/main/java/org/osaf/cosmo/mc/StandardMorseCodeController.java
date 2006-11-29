@@ -15,13 +15,17 @@
  */
 package org.osaf.cosmo.mc;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.eim.EimRecord;
+import org.osaf.cosmo.eim.EimRecordFactory;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.UidInUseException;
@@ -79,8 +83,8 @@ public class StandardMorseCodeController implements MorseCodeController {
      * @param uid the uid of the collection to publish
      * @param parentUid the (optional) uid of the collection to set as
      * the parent for the published collection
-     * @param itemStates the item states with which the published
-     * collection is initially populated
+     * @param records the EIM records describing the collection and
+     * the items with which it is initially populated
      *
      * @returns the initial <code>SyncToken</code> for the collection
      * @throws IllegalArgumentException if the authenticated principal
@@ -95,7 +99,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      */
     public SyncToken publishCollection(String uid,
                                        String parentUid,
-                                       Set<ItemState> itemStates) {
+                                       List<EimRecord> records) {
         if (log.isDebugEnabled()) {
             if (parentUid != null)
                 log.debug("publishing collection " + uid + " with parent " + parentUid);
@@ -125,9 +129,9 @@ public class StandardMorseCodeController implements MorseCodeController {
         collection.setOwner(owner);
 
         HashSet<Item> children = new HashSet<Item>();
-        for (ItemState state : itemStates) {
-            // XXX: fill in collection data from item states
-            // XXX: create and fill in items from item states
+        for (EimRecord record : records) {
+            // XXX: fill in collection data from records
+            // XXX: create and fill in items from records
         }
 
         // XXX:
@@ -144,7 +148,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      *
      * @param uid the uid of the collection to subscribe to
      *
-     * @returns a <code>ItemStateSet</code> describing the current
+     * @returns a <code>SyncRecords</code> describing the current
      * state of the collection
      * @throws UnknownCollectionException if the specified collection
      * is not found
@@ -152,7 +156,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      * collection
      * @throws MorseCodeException if an unknown error occurs
      */
-    public ItemStateSet subscribeToCollection(String uid) {
+    public SyncRecords subscribeToCollection(String uid) {
         if (log.isDebugEnabled())
             log.debug("subscribing to collection " + uid);
 
@@ -163,16 +167,10 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new NotCollectionException(uid);
         CollectionItem collection = (CollectionItem) item;
 
-        HashSet<ItemState> itemStates = new HashSet<ItemState>();
-
-        itemStates.add(new ItemState(collection));
-
-        for (Item child : collection.getChildren())
-            itemStates.add(new ItemState(child));
-
+        List<EimRecord> records = EimRecordFactory.createRecords(collection);
         SyncToken token = SyncToken.generate(collection);
 
-        return new ItemStateSet(itemStates, token);
+        return new SyncRecords(records, token);
     }
 
     /**
@@ -184,7 +182,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      * @param token the sync token describing the last known state of
      * the collection
      *
-     * @returns a <code>ItemStateSet</code> describing the current
+     * @returns a <code>SyncRecords</code> describing the current
      * state of the changed items
      * @throws UnknownCollectionException if the specified collection
      * is not found
@@ -192,8 +190,8 @@ public class StandardMorseCodeController implements MorseCodeController {
      * collection
      * @throws MorseCodeException if an unknown error occurs
      */
-    public ItemStateSet synchronizeCollection(String uid,
-                                              SyncToken token) {
+    public SyncRecords synchronizeCollection(String uid,
+                                             SyncToken token) {
         if (log.isDebugEnabled())
             log.debug("synchronizing collection " + uid + " with token " +
                       token.serialize());
@@ -205,33 +203,36 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new NotCollectionException(uid);
         CollectionItem collection = (CollectionItem) item;
 
-        HashSet<ItemState> itemStates = new HashSet<ItemState>();
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
 
         if (token.isValid(collection)) {
             if (log.isDebugEnabled())
                 log.debug("collection state is unchanged");
-            return new ItemStateSet(itemStates, token);
+            return new SyncRecords(records, token);
         }
 
         if (token.hasItemChanged(collection))
-            itemStates.add(new ItemState(collection));
+            records.add(EimRecordFactory.createRecord(collection));
 
         for (Item child : collection.getChildren()) {
             // ignore subcollections
             if (child instanceof CollectionItem)
                 continue;
-            if (token.hasItemChanged(child))
-                itemStates.add(new ItemState(collection));
+            if (token.hasItemChanged(child)) {
+                List<EimRecord> itemRecords =
+                    EimRecordFactory.createRecords((ContentItem) child);
+                records.addAll(itemRecords);
+            }
         }
 
         token = SyncToken.generate(collection);
 
-        return new ItemStateSet(itemStates, token);
+        return new SyncRecords(records, token);
     }
 
     /**
      * Updates the items within the identified collection that
-     * correspond to the provided <code>ItemState</code>s. The update
+     * correspond to the provided <code>EimRecord</code>s. The update
      * is atomic; the entire update fails if any single item cannot be
      * successfully saved with its new state.
      *
@@ -246,8 +247,8 @@ public class StandardMorseCodeController implements MorseCodeController {
      * @param uid the uid of the collection to subscribe to
      * @param token the sync token describing the last known state of
      * the collection
-     * @param itemStates the item states with which the published
-     * collection is updated
+     * @param records the EIM records describing the collection and
+     * the items with which it is updated
      *
      * @returns a new <code>SyncToken</code> that invalidates any
      * previously issued
@@ -263,7 +264,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      */
     public SyncToken updateCollection(String uid,
                                       SyncToken token,
-                                      Set<ItemState> itemStates) {
+                                      List<EimRecord> records) {
         if (log.isDebugEnabled()) {
             log.debug("updating collection " + uid);
         }
@@ -282,9 +283,9 @@ public class StandardMorseCodeController implements MorseCodeController {
         }
 
         HashSet<Item> children = new HashSet<Item>();
-        for (ItemState state : itemStates) {
-            // XXX: fill in collection data from item states
-            // XXX: create and fill in items from item states
+        for (EimRecord record : records) {
+            // XXX: fill in collection data from records
+            // XXX: create and fill in items from records
         }
 
         // throws CollectionLockedException

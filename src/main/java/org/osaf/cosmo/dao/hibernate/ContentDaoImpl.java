@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,10 +23,15 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.DuplicateEventUidException;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModelConversionException;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.User;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
@@ -37,6 +43,16 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
 
     private static final Log log = LogFactory.getLog(ContentDaoImpl.class);
 
+    private CalendarIndexer calendarIndexer = null;
+    
+    public CalendarIndexer getCalendarIndexer() {
+        return calendarIndexer;
+    }
+
+    public void setCalendarIndexer(CalendarIndexer calendarIndexer) {
+        this.calendarIndexer = calendarIndexer;
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -114,6 +130,23 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             // validate content
             content.validate();
+            
+            boolean isEvent = content.getStamp(EventStamp.class) != null;
+            
+            if(isEvent) {
+                EventStamp event = EventStamp.getStamp(content);
+                verifyEventUidIsUnique(parent,event);
+                getCalendarIndexer().indexCalendarEvent(getSession(), event);
+                try {
+                    // Set the content length (required) based on the length of the
+                    // icalendar string
+                    content.setContentLength((long) event.getCalendar().toString()
+                            .getBytes("UTF-8").length);
+                } catch (UnsupportedEncodingException e) {
+                    // should never happen
+                    throw new RuntimeException("error converting to utf8");
+                }
+            }
             
             getSession().save(content);
             return content;
@@ -257,6 +290,24 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                     content.getParent().getId(), content.getName(), content.getId());
             
             updateBaseItemProps(content);
+            
+            boolean isEvent = content.getStamp(EventStamp.class) != null;
+            
+            if(isEvent) {
+                EventStamp event = EventStamp.getStamp(content);
+                // TODO: verify icaluid is unique
+                getCalendarIndexer().indexCalendarEvent(getSession(), event);
+                try {
+                    // Set the content length (required) based on the length of the
+                    // icalendar string
+                    content.setContentLength((long) event.getCalendar().toString()
+                            .getBytes("UTF-8").length);
+                } catch (UnsupportedEncodingException e) {
+                    // should never happen
+                    throw new RuntimeException("error converting to utf8");
+                }
+            }
+            
             getSession().update(content);
             return content;
         } catch (HibernateException e) {
@@ -279,7 +330,18 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
      * @see org.osaf.cosmo.dao.ContentDao#removeContent(org.osaf.cosmo.model.ContentItem)
      */
     public void removeContent(ContentItem content) {
-        removeItem(content);
+        try {
+            content.setIsActive(false);
+            content.setUid("DEL" + System.currentTimeMillis() + "DEL" + content.getUid());
+            content.setName("DELETED:" + content.getName());
+            content.clearContent();
+            content.getAttributes().clear();
+            content.getStamps().clear();
+            updateBaseItemProps(content);
+            getSession().update(content);
+        } catch (HibernateException e) {
+            throw SessionFactoryUtils.convertHibernateAccessException(e);
+        }
     }
 
     /*
@@ -348,4 +410,76 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         } 
     }
+    
+    @Override
+    public void removeItem(Item item) {
+        if(item instanceof ContentItem)
+            removeContent((ContentItem) item);
+        else
+            super.removeItem(item);
+    }
+
+    @Override
+    public void removeItemByPath(String path) {
+        Item item = this.findItemByPath(path);
+        if(item instanceof ContentItem)
+            removeContent((ContentItem) item);
+        else
+            super.removeItem(item);
+    }
+
+    @Override
+    public void removeItemByUid(String uid) {
+        Item item = this.findItemByUid(uid);
+        if(item instanceof ContentItem)
+            removeContent((ContentItem) item);
+        else
+            super.removeItem(item);
+    }
+
+    /**
+     * Initializes the DAO, sanity checking required properties and defaulting
+     * optional properties.
+     */
+    public void init() {
+        super.init();
+        
+        if (calendarIndexer == null)
+            throw new IllegalStateException("calendarIndexer is required");
+    }
+    
+    /**
+     * Verify that event uid (event UID property in ical data) is unique
+     * for the containing calendar.
+     * @param collection collection to search
+     * @param event event to verify
+     * @throws DuplicateEventUidException if an event with the same uid
+     *         exists
+     * @throws ModelValidationException if there is an error retrieving
+     *         the uid from the even ics data
+     */
+    private void verifyEventUidIsUnique(CollectionItem collection,
+            EventStamp event) {
+        String uid = null;
+        
+        try {
+            uid = event.getIcalUid();
+        } catch(ModelConversionException mce) {
+            throw mce;
+        } catch (Exception e) {
+            log.error("error retrieving master event");
+            throw new ModelValidationException("invalid event ics data");
+        }
+        
+        Query hibQuery = getSession()
+                .getNamedQuery("event.by.calendar.icaluid");
+        hibQuery.setParameter("calendar", collection);
+        hibQuery.setParameter("uid", uid);
+        List results = hibQuery.list();
+        if (results.size() > 0)
+            throw new DuplicateEventUidException("uid " + uid
+                    + " already exists in calendar");
+    }
+    
+    
 }

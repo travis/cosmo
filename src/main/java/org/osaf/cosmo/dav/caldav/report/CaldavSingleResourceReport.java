@@ -15,16 +15,13 @@
  */
 package org.osaf.cosmo.dav.caldav.report;
 
-import java.io.InputStream;
 import java.io.IOException;
-import java.util.List;
-
-import org.apache.jackrabbit.server.io.IOUtil;
-import org.apache.jackrabbit.webdav.DavServletResponse;
-import org.apache.jackrabbit.webdav.DavException;
+import java.io.InputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jackrabbit.server.io.IOUtil;
+import org.apache.jackrabbit.webdav.DavServletResponse;
 
 /**
  * Base class for CalDAV reports that return single (200 OK)

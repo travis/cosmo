@@ -19,15 +19,10 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
-import org.osaf.cosmo.model.CalendarCollectionItem;
-import org.osaf.cosmo.model.CalendarEventItem;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.DuplicateEventUidException;
-import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
@@ -183,60 +178,8 @@ public interface ContentService extends Service {
      */
     public void removeContent(ContentItem content);
 
-    /**
-     * Create a new calendar collection in the specified collection.
-     * @param collection collection where calendar will live
-     * @param calendar calendar collection to create
-     * @return newly created calendar collection
-     * @throws DuplicateItemNameException
-     */
-    public CalendarCollectionItem createCalendar(CollectionItem collection,
-                                                 CalendarCollectionItem calendar);
-
-    /**
-     * Find calendar collection by path. Path is of the format:
-     * /username/calendarname
-     *
-     * @param path
-     *            path of calendar
-     * @return calendar represented by path
-     */
-    public CalendarCollectionItem findCalendarByPath(String path);
-
-    /**
-     * Update existing calendar collection.
-     *
-     * @param calendar
-     *            calendar collection to update
-     * @return updated calendar collection
-     * @throws DuplicateItemNameException
-     */
-    public CalendarCollectionItem updateCalendar(CalendarCollectionItem calendar);
-
-    /**
-     * Remove calendar collection.
-     *
-     * @param calendar
-     *            calendar collection to remove.
-     */
-    public void removeCalendar(CalendarCollectionItem calendar);
-
-    /**
-     * Create new calendar event item.
-     *
-     * @param calendar
-     *            calendar collection that new item will belong to
-     * @param event
-     *            new calendar event item
-     * @return newly created calendar event item
-     * @throws ModelValidationException
-     * @throws DuplicateItemNameException
-     * @throws DuplicateEventUidException
-     */
-    public CalendarEventItem addEvent(CalendarCollectionItem calendar,
-            CalendarEventItem event);
-
     
+
     /**
      * Find calendar events by filter.
      *
@@ -247,37 +190,10 @@ public interface ContentService extends Service {
      * @return set CalendarEventItem objects matching specified
      *         filter.
      */
-    public Set<CalendarEventItem> findEvents(CalendarCollectionItem calendar,
+    public Set<ContentItem> findEvents(CollectionItem calendar,
                                              CalendarFilter filter);
 
-    /**
-     * Find calendar event by uid.
-     *
-     * @param uid
-     *            uid of calendar event
-     * @return calendar event represented by uid
-     */
-    public CalendarEventItem findEventByUid(String uid);
-
-    /**
-     * Update existing calendar event item.
-     *
-     * @param event
-     *            calendar event to update
-     * @return updated calendar event
-     * @throws ModelValidationException
-     * @throws DuplicateItemNameException
-     */
-    public CalendarEventItem updateEvent(CalendarEventItem event);
-
-    /**
-     * Remove calendar event
-     *
-     * @param event
-     *            calendar event to remove
-     */
-    public void removeEvent(CalendarEventItem event);
-
+    
     /**
      * Creates a ticket on an item.
      *

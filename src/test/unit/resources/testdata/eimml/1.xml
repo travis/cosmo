@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<core:records
+   xmlns:core="http://osafoundation.org/eimml/core"
+   xmlns:collection="http://osafoundation.org/eimml/collection"
+   xmlns:item="http://osafoundation.org/eimml/item"
+   xmlns:event="http://osafoundation.org/eimml/event"
+   xmlns:task="http://osafoundation.org/eimml/task"
+   xmlns:message="http://osafoundation.org/eimml/message"
+   xmlns:note="http://osafoundation.org/eimml/note">
+
+  <collection:record>
+    <core:uuid>25bc738b-1520-457c-9c11-1e9cf758ce29</core:uuid>
+  </collection:record>
+
+  <item:record>
+    <core:uuid>ffc9caaf-49e8-4978-9698-8b6a608c6baf</core:uuid>
+    <item:title>Welcome to Cosmo!</item:title>
+    <item:createdOn>2006-11-27T18:55:19-0800</item:createdOn>
+  </item:record>
+</core:records>

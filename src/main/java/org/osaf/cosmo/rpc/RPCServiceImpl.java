@@ -38,10 +38,11 @@ import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
-import org.osaf.cosmo.model.CalendarCollectionItem;
-import org.osaf.cosmo.model.CalendarEventItem;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DuplicateItemNameException;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
@@ -102,13 +103,15 @@ public class RPCServiceImpl implements RPCService {
         if (collection == null){
             throw new RPCException("No collection at " + parentPath);
         }
-        CalendarCollectionItem calendar = new CalendarCollectionItem();
+        CollectionItem calendar = new CollectionItem();
         calendar.setName(PathUtil.getBasename(absolutePath));
         calendar.setOwner(getUser());
         calendar.setDisplayName(displayName);
+        CalendarCollectionStamp ccs = new CalendarCollectionStamp(calendar);
+        calendar.addStamp(ccs);
 
         try {
-            contentService.createCalendar(collection, calendar);
+            contentService.createCollection(collection, calendar);
         } catch (DuplicateItemNameException e) {
             throw new RPCException("Calendar at " + absolutePath + " already exists", e);
         } catch (Exception e) {
@@ -125,7 +128,7 @@ public class RPCServiceImpl implements RPCService {
         List<Calendar> cals = new ArrayList<Calendar>();
         for (Iterator<Item> i=home.getChildren().iterator(); i.hasNext();) {
             Item child = i.next();
-            if (! (child instanceof CalendarCollectionItem))
+            if (child.getStamp(CalendarCollectionStamp.class)==null)
                 continue;
             Calendar calendar = new Calendar();
             calendar.setName(child.getDisplayName());
@@ -141,13 +144,19 @@ public class RPCServiceImpl implements RPCService {
         if (log.isDebugEnabled())
             log.debug("Getting event " + id + " in calendar at " +
                       absolutePath);
-        CalendarEventItem calItem = contentService.findEventByUid(id);
+        ContentItem calItem = (ContentItem) contentService.findItemByUid(id);
         if (calItem == null){
             return null;
         }
+        
+        EventStamp event = EventStamp.getStamp(calItem);
+        if (event == null){
+            return null;
+        }
+        
         try {
             return icalendarToCosmoConverter.createEvent(calItem.getUid(),
-                    calItem.getMasterEvent(), calItem.getCalendar());
+                    event.getMasterEvent(), event.getCalendar());
         } catch (Exception e) {
             log.error("Problem getting event: userName: " + getUsername() 
                     + " calendarName: " + absolutePath
@@ -180,19 +189,19 @@ public class RPCServiceImpl implements RPCService {
                       " in calendar " + absolutePath);
 
         // XXX: need ContentService.findEvents(path, filter)
-        CalendarCollectionItem collection = (CalendarCollectionItem)
-            contentService.findCalendarByPath(absolutePath);
+        CollectionItem collection = (CollectionItem)
+            contentService.findItemByPath(absolutePath);
         if (collection == null)
             throw new RPCException("Collection " + absolutePath + " does not exist");
 
-        Set<CalendarEventItem> calendarItems = null;
+        Set<ContentItem> calendarItems = null;
         try {
             calendarItems = contentService.findEvents(collection, filter);
         } catch (Exception e) {
             log.error("cannot find events for calendar " + absolutePath, e);
             throw new RPCException("Cannot find events for calendar " + absolutePath + ": " + e.getMessage(), e);
         }
-
+        
         Event[] events = null;
         try {
             DateTime beginDate = new DateTime();
@@ -246,8 +255,8 @@ public class RPCServiceImpl implements RPCService {
         if (log.isDebugEnabled())
             log.debug("Removing event " + id + " from calendar " +
                       absolutePath);
-        CalendarEventItem calItem = contentService.findEventByUid(id);
-        contentService.removeEvent(calItem);
+        ContentItem calItem = (ContentItem) contentService.findItemByUid(id);
+        contentService.removeContent(calItem);
     }
 
     public void removePreference(String preferenceName) throws RPCException {
@@ -259,19 +268,20 @@ public class RPCServiceImpl implements RPCService {
     public String saveEvent(String calendarPath, Event event)
             throws RPCException {
 
-        CalendarEventItem calendarEventItem = null;
-        CalendarCollectionItem calendarItem = getCalendarCollectionItem(calendarPath);
+        ContentItem calendarEventItem = null;
+        CollectionItem calendarItem = getCalendarCollectionItem(calendarPath);
         
         //Check to see if this is a new event
         if (StringUtils.isEmpty(event.getId())) {
             calendarEventItem = saveNewEvent(event, calendarItem);
             
         } else {
-            calendarEventItem = contentService.findEventByUid(event.getId());
-            net.fortuna.ical4j.model.Calendar calendar = calendarEventItem.getCalendar();
+            calendarEventItem = (ContentItem) contentService.findItemByUid(event.getId());
+            EventStamp eventStamp = EventStamp.getStamp(calendarEventItem);
+            net.fortuna.ical4j.model.Calendar calendar = eventStamp.getCalendar();
             cosmoToICalendarConverter.updateEvent(event, calendar);
-            calendarEventItem.setContent(calendar.toString().getBytes());
-            contentService.updateEvent(calendarEventItem);
+            eventStamp.setCalendar(calendar);
+            contentService.updateContent(calendarEventItem);
         }
 
         return calendarEventItem.getUid();
@@ -289,9 +299,10 @@ public class RPCServiceImpl implements RPCService {
         Map<String, RecurrenceRule> map = new HashMap<String, RecurrenceRule>();
         for (int x = 0; x < eventIds.length; x++) {
             String eventId = eventIds[x];
-            CalendarEventItem calItem = contentService.findEventByUid(eventId);
+            ContentItem calItem = (ContentItem) contentService.findItemByUid(eventId);
+            EventStamp eventStamp = EventStamp.getStamp(calItem);
             Event e = icalendarToCosmoConverter.createEvent(calItem.getUid(),
-                    calItem.getMasterEvent(), calItem.getCalendar());
+                    eventStamp.getMasterEvent(), eventStamp.getCalendar());
             map.put(eventId, e.getRecurrenceRule());
         }
         return map;
@@ -300,16 +311,16 @@ public class RPCServiceImpl implements RPCService {
     public void saveRecurrenceRule(String calendarPath, String eventId,
             RecurrenceRule recurrenceRule) throws RPCException {
 
-        CalendarEventItem calendarEventItem = contentService
-                .findEventByUid(eventId);
-        net.fortuna.ical4j.model.Calendar calendar = calendarEventItem.getCalendar();
+        ContentItem calItem = (ContentItem) contentService.findItemByUid(eventId);
+        EventStamp eventStamp = EventStamp.getStamp(calItem);
+        net.fortuna.ical4j.model.Calendar calendar = eventStamp.getCalendar();
         
-        Event event = icalendarToCosmoConverter.createEvent(eventId, calendarEventItem
+        Event event = icalendarToCosmoConverter.createEvent(eventId, eventStamp
                 .getMasterEvent(), calendar);
         event.setRecurrenceRule(recurrenceRule);
         cosmoToICalendarConverter.updateEvent(event, calendar);
-        calendarEventItem.setContent(calendar.toString().getBytes());
-        contentService.updateEvent(calendarEventItem);
+        eventStamp.setCalendar(calendar);
+        contentService.updateContent(calItem);
     }
 
     public Map<String, Event[]> expandEvents(String calendarPath, String[] eventIds,
@@ -317,7 +328,8 @@ public class RPCServiceImpl implements RPCService {
 
         Map<String, Event[]> map = new HashMap<String, Event[]>();
         for (String eventId : eventIds) {
-            CalendarEventItem calItem = contentService.findEventByUid(eventId);
+            ContentItem calItem = (ContentItem) contentService.findItemByUid(eventId);
+            EventStamp eventStamp = EventStamp.getStamp(calItem);
 
             DateTime start = new DateTime(utcStartTime);
             start.setUtc(true);
@@ -325,9 +337,9 @@ public class RPCServiceImpl implements RPCService {
             DateTime end = new DateTime(utcEndTime);
             end.setUtc(true);
 
-            List<CalendarEventItem> items = new ArrayList<CalendarEventItem>();
-            items.add(calItem);
-            map.put(eventId,icalendarToCosmoConverter.createEventsFromCalendars(items,
+            List<ContentItem> events = new ArrayList<ContentItem>();
+            events.add(calItem);
+            map.put(eventId,icalendarToCosmoConverter.createEventsFromCalendars(events,
                     start, end));
             
         }
@@ -337,10 +349,10 @@ public class RPCServiceImpl implements RPCService {
     
     public String saveNewEventBreakRecurrence(String calendarPath, Event event,
             String originalEventId, CosmoDate originalEventEndDate) throws RPCException {
-        CalendarCollectionItem calendarItem = getCalendarCollectionItem(calendarPath);
+        CollectionItem calendarItem = getCalendarCollectionItem(calendarPath);
         
         //first save the new event
-        CalendarEventItem calendarEventItem = saveNewEvent(event, calendarItem);
+        ContentItem calendarEventItem = saveNewEvent(event, calendarItem);
 
         //get the old event's recurrence rule
         RecurrenceRule recurrenceRule = getRecurrenceRules(calendarPath,
@@ -390,8 +402,8 @@ public class RPCServiceImpl implements RPCService {
         }
     }
     
-    private CalendarCollectionItem getCalendarCollectionItem(String calendarPath) {
-        return (CalendarCollectionItem) contentService
+    private CollectionItem getCalendarCollectionItem(String calendarPath) {
+        return (CollectionItem) contentService
                 .findItemByPath(getAbsolutePath(calendarPath));
     }
     private Iterator<String> availableNameIterator(VEvent vevent) {
@@ -435,18 +447,21 @@ public class RPCServiceImpl implements RPCService {
 
         };
     }
-    private CalendarEventItem saveNewEvent(Event event, CalendarCollectionItem calendarItem) {
-        CalendarEventItem calendarEventItem;
+    private ContentItem saveNewEvent(Event event, CollectionItem calendarItem) {
+        ContentItem calendarEventItem;
         //make an empty iCalendar
         net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
         calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
         calendar.getProperties().add(Version.VERSION_2_0);
         calendar.getProperties().add(CalScale.GREGORIAN);
         
-        calendarEventItem = new CalendarEventItem();
+        calendarEventItem = new ContentItem();
         VEvent vevent = cosmoToICalendarConverter.createVEvent(event);
         calendar.getComponents().add(vevent);
-        calendarEventItem.setContent(calendar.toString().getBytes());
+        
+        EventStamp eventStamp = new EventStamp();
+        eventStamp.setCalendar(calendar);
+        calendarEventItem.addStamp(eventStamp);
 
         Property summary = (Property)
             vevent.getProperties().getProperty(Property.SUMMARY);
@@ -465,7 +480,7 @@ public class RPCServiceImpl implements RPCService {
                 calendarEventItem.setDisplayName(name);
             try{ 
                 added = true;
-                calendarEventItem = contentService.addEvent(calendarItem,
+                calendarEventItem = contentService.createContent(calendarItem,
                             calendarEventItem);
             } catch (DuplicateItemNameException dupe){
                 added = false;

@@ -26,6 +26,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CollectionItem;
@@ -71,7 +72,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         helper.verifyItem(newItem, queryItem);
     }
 
-    public void testContentDaoInvalidContent() throws Exception {
+    public void testContentDaoInvalidContentNullLength() throws Exception {
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
@@ -86,31 +87,62 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         try {
             contentDao.createContent(root, item);
+            clearSession();
             Assert.fail("able to create invalid content.");
-        } catch (ModelValidationException e) {
+        } catch (InvalidStateException e) {
         }
+    }
 
+    public void testContentDaoInvalidContentNegativeLength() throws Exception {
+        
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        ContentItem item = new ContentItem();
+        item.setName("test");
+        item.setOwner(user);
+        item.setContent(helper.getBytes(baseDir + "/testdata1.txt"));
+        item.setContentLanguage("en");
+        item.setContentEncoding("UTF8");
+        item.setContentType("text/text");
         item.setContentLength(new Long(-1));
-
+        
         try {
             contentDao.createContent(root, item);
+            clearSession();
             Assert.fail("able to create invalid content.");
-        } catch (ModelValidationException e) {
+        } catch (InvalidStateException e) {
         }
+    }
+    
+    public void testContentDaoInvalidContentMismatchLength() throws Exception {
+        
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
+        ContentItem item = new ContentItem();
+        item.setName("test");
+        item.setOwner(user);
+        item.setContent(helper.getBytes(baseDir + "/testdata1.txt"));
+        item.setContentLanguage("en");
+        item.setContentEncoding("UTF8");
+        item.setContentType("text/text");
         item.setContentLength(new Long(1));
 
-        try {
-            contentDao.createContent(root, item);
-            Assert.fail("able to create invalid content.");
-        } catch (ModelValidationException e) {
-        }
+//        try {
+//            contentDao.createContent(root, item);
+//            Assert.fail("able to create invalid content.");
+//        } catch (ModelValidationException e) {
+//        }
 
-        // we do this so that content length is reset to what it should be
-        item.setContent(item.getContent());
-        contentDao.createContent(root, item);
+    }
+  
+    public void testContentDaoInvalidContentNullName() throws Exception {
+      
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        item = generateTestContent();
+        ContentItem item = generateTestContent();
         item.setName(null);
 
         try {
@@ -118,7 +150,13 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
             Assert.fail("able to create invalid content.");
         } catch (ModelValidationException e) {
         }
+    }
 
+    public void testContentDaoInvalidContentEmptyName() throws Exception {
+        
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+        ContentItem item = generateTestContent();
         item.setName("");
 
         try {
@@ -126,26 +164,6 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
             Assert.fail("able to create invalid content.");
         } catch (ModelValidationException e) {
         }
-
-        item.setName("lsfkjlsf");
-        contentDao.createContent(root, item);
-
-        item.setName(null);
-        try {
-            contentDao.updateContent(item);
-            Assert.fail("able to update invalid content.");
-        } catch (ModelValidationException e) {
-        }
-
-        item.setName("");
-        try {
-            contentDao.updateContent(item);
-            Assert.fail("able to update invalid content.");
-        } catch (ModelValidationException e) {
-        }
-
-        item.setName("lsfjlsslfkjlsfd");
-        contentDao.updateContent(item);
     }
 
     public void testContentAttributes() throws Exception {
@@ -353,6 +371,12 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         queryItem = contentDao.findContentByUid(queryItem.getUid());
         Assert.assertNull(queryItem);
+        
+        clearSession();
+        
+        root = (CollectionItem) contentDao.getRootItem(user);
+        Assert.assertTrue(root.getChildren().size()==0);
+        
     }
 
     public void testDeleteContentByPath() throws Exception {

@@ -15,31 +15,33 @@
  */
 package org.osaf.cosmo.mc;
 
-import java.util.Set;
+import java.util.List;
+
+import org.osaf.cosmo.eim.EimRecord;
 
 /**
- * Bean class that aggregates all of the item states for a subscribe
+ * Bean class that aggregates all of the EIM records for a subscribe
  * or synchronize response and provides the corresponding
  * synchronization token.
  *
- * @see ItemState
+ * @see EimRecord
  * @see SyncToken
  */
-public class ItemStateSet {
+public class SyncRecords {
 
     private SyncToken token;
-    private Set<ItemState> states;
+    private List<EimRecord> records;
 
     /** */
-    public ItemStateSet(Set<ItemState> states,
-                        SyncToken token) {
-        this.states = states;
+    public SyncRecords(List<EimRecord> records,
+                       SyncToken token) {
+        this.records = records;
         this.token = token;
     }
 
     /** */
-    public Set<ItemState> getStates() {
-        return states;
+    public List<EimRecord> getRecords() {
+        return records;
     }
 
     /** */

@@ -20,15 +20,15 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.DtEnd;
+import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
 
-import org.osaf.cosmo.model.CalendarEventItem;
+import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.Item;
 
 /**
  * A simple bean that translates the information about an event from
@@ -38,22 +38,27 @@ import org.osaf.cosmo.model.CalendarEventItem;
 public class EventBean {
 
     private VEvent vevent;
-    private CalendarEventItem item;
+    private EventStamp event;
 
     /**
      */
-    public EventBean(CalendarEventItem item)
+    public EventBean(EventStamp event)
         throws IOException, ParserException {
-        this.item = item;
-        this.vevent = (VEvent) item.getCalendar().getComponents().
-            getComponents(Component.VEVENT).get(0);
+        this.event = event;
+        this.vevent = event.getMasterEvent();
     }
 
     /**
      */
-    public CalendarEventItem getItem() {
-        return item;
+    public EventStamp getEventStamp() {
+        return event;
     }
+    
+    
+    public Item getItem() {
+        return event.getItem();
+    }
+    
 
     /**
      * Returns the event summary, or <code>null</code> if one was not

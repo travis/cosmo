@@ -105,10 +105,10 @@ public class EimmlOutputter implements EimmlConstants {
                 writeRecord(writer, (CollectionRecord) record);
             else if (record instanceof ItemRecord)
                 writeRecord(writer, (ItemRecord) record);
-            else if (record instanceof EventRecord)
-                writeRecord(writer, (EventRecord) record);
             else if (record instanceof NoteRecord)
                 writeRecord(writer, (NoteRecord) record);
+            else if (record instanceof EventRecord)
+                writeRecord(writer, (EventRecord) record);
             else if (record instanceof TaskRecord)
                 writeRecord(writer, (TaskRecord) record);
             else if (record instanceof MailMessageRecord)
@@ -180,11 +180,11 @@ public class EimmlOutputter implements EimmlConstants {
         writer.writeEndElement();
 
         writer.writeStartElement(NS_EVENT, EL_DTSTART);
-        writer.writeCharacters(formatDate(record.getDtStart()));
+        writer.writeCharacters(record.getDtStart().toString());
         writer.writeEndElement();
 
         writer.writeStartElement(NS_EVENT, EL_DTEND);
-        writer.writeCharacters(formatDate(record.getDtEnd()));
+        writer.writeCharacters(record.getDtEnd().toString());
         writer.writeEndElement();
 
         if (record.getLocation() != null) {
@@ -219,7 +219,7 @@ public class EimmlOutputter implements EimmlConstants {
 
         if (record.getRecurrenceId() != null) {
             writer.writeStartElement(NS_EVENT, EL_RECURRENCE_ID);
-            writer.writeCharacters(formatDate(record.getRecurrenceId()));
+            writer.writeCharacters(record.getRecurrenceId().toString());
             writer.writeEndElement();
         }
 

@@ -32,17 +32,18 @@ public class DateUtil {
      * @throws ParseException  */
     public static Date parseRfc3339Date(String date) 
     	throws ParseException{
-    	return parseRfc3339Date(date, RFC_3339_DATE_FORMAT);
+    	return parseDate(date, RFC_3339_DATE_FORMAT);
     }
     
     /** 
      * @throws ParseException  */
-    public static Date parseRfc3339Date(String date, String format)
+    public static Date parseDate(String date, String format)
     	throws ParseException{
     	SimpleDateFormat formatter = new SimpleDateFormat(format);
     	return formatter.parse(date);
     
     }
+
     /** */
     public static String formatRfc3339Date(Date date) {
         return formatRfc3339Date(date, null);

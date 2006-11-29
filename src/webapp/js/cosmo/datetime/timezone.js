@@ -348,7 +348,7 @@ cosmo.datetime.timezone.SimpleTimezoneRegistry = function(timezoneFileRoot){
     this._timezones = {};
     this._ruleSets = {};
     this._links = {};
-    this._tzsByRegion = {};
+    this._tzsByRegion = null;
 };
 
 cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.init = function(files){

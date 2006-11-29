@@ -15,7 +15,10 @@
  */
 package org.osaf.cosmo.model;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -28,7 +31,9 @@ import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.RecurrenceId;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -113,20 +118,134 @@ public class EventStamp extends Stamp implements
     }
 
     /**
-     * Get the master event.
-     * @return master event
+     * Returns the master event extracted from the underlying
+     * icalendar object. Changes to the master event will be persisted
+     * when the stamp is saved.
      */
     @Transient
     public VEvent getMasterEvent() {
         return (VEvent) getCalendar().getComponents().getComponents(
                 Component.VEVENT).get(0);
     }
-    
+
+    /**
+     * Returns a copy of the the iCalendar UID property value of the
+     * master event .
+     */
     @Transient
     public String getIcalUid() {
         return getMasterEvent().getUid().getValue();
     }
-    
+
+    /**
+     * Returns a copy of the the iCalendar DTSTART property value of
+     * the master event (never null).
+     */
+    @Transient
+    public Date getStartDate() {
+        return getMasterEvent().getStartDate().getDate();
+    }
+
+    /**
+     * Returns the end date of the master event as calculated from the
+     * iCalendar DTEND property value or the the iCalendar DTSTART +
+     * DURATION (never null).
+     */
+    @Transient
+    public Date getEndDate() {
+        return getMasterEvent().getEndDate().getDate();
+    }
+
+    /**
+     * Returns a copy of the the iCalendar LOCATION property value of
+     * the master event (can be null).
+     */
+    @Transient
+    public String getLocation() {
+        Property p = getMasterEvent().getProperties().
+            getProperty(Property.LOCATION);
+        if (p == null)
+            return null;
+        return p.getValue();
+    }
+
+    /**
+     * Returns a list of copies of the iCalendar RRULE property values
+     * of the master event (can be empty).
+     */
+    @Transient
+    public List<String> getRecurrenceRules() {
+        ArrayList l = new ArrayList();
+        for (Property p : (List<Property>) getMasterEvent().getProperties().
+                 getProperties(Property.RRULE))
+            l.add(p.getValue());
+        return l;
+    }
+
+    /**
+     * Returns a list of copies of the iCalendar EXRULE property values
+     * of the master event (can be empty).
+     */
+    @Transient
+    public List<String> getExceptionRules() {
+        ArrayList l = new ArrayList();
+        for (Property p : (List<Property>) getMasterEvent().getProperties().
+                 getProperties(Property.EXRULE))
+            l.add(p.getValue());
+        return l;
+    }
+
+    /**
+     * Returns a list of copies of the iCalendar RDATE property values
+     * of the master event (can be empty).
+     */
+    @Transient
+    public List<String> getRecurrenceDates() {
+        ArrayList l = new ArrayList();
+        for (Property p : (List<Property>) getMasterEvent().getProperties().
+                 getProperties(Property.RDATE))
+            l.add(p.getValue());
+        return l;
+    }
+
+    /**
+     * Returns a list of copies of the iCalendar EXDATE property values
+     * of the master event (can be empty).
+     */
+    @Transient
+    public List<String> getExceptionDates() {
+        ArrayList l = new ArrayList();
+        for (Property p : (List<Property>) getMasterEvent().getProperties().
+                 getProperties(Property.EXDATE))
+            l.add(p.getValue());
+        return l;
+    }
+
+    /**
+     * Returns a copy of the the iCalendar RECURRENCE_ID property
+     * value of the master event (can be null). 
+     */
+    @Transient
+    public Date getRecurrenceId() {
+        RecurrenceId rid = getMasterEvent().getReccurrenceId();
+        if (rid == null)
+            return null;
+        return rid.getDate();
+    }
+
+    /**
+     * Returns a copy of the the iCalendar STATUS property value of
+     * the master event (can be null).
+     */
+    @Transient
+    public String getStatus() {
+        Property p = getMasterEvent().getProperties().
+            getProperty(Property.STATUS);
+        if (p == null)
+            return null;
+        return p.getValue();
+    }
+
     /**
      * Return EventStamp from Item
      * @param item

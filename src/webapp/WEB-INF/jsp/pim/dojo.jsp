@@ -28,7 +28,7 @@
     var djConfig = {isDebug: false};
 </script>
 
-<script type="text/javascript" src="${staticBaseUrl}/js/lib/dojo-event_and_io/dojo.js.uncompressed.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/lib/dojo-event_and_io/dojo.js"></script>
 <script type="text/javascript">
 bootstrap = function(){
     var staticBaseUrl = "${staticBaseUrl}";

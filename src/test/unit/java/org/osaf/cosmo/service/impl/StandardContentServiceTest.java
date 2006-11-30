@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.service.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
@@ -26,6 +29,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.mock.MockContentItem;
 import org.osaf.cosmo.TestHelper;
 
 /**
@@ -133,6 +137,89 @@ public class StandardContentServiceTest extends TestCase {
         assertNull(item);
     }
 
+    public void testCreateCollectionWithChildren() throws Exception {
+        User user = testHelper.makeDummyUser();
+        CollectionItem rootCollection = contentDao.createRootItem(user);
+        
+        CollectionItem dummyCollection = new CollectionItem();
+        dummyCollection.setName("foo");
+        dummyCollection.setOwner(user);
+        
+        ContentItem dummyContent = new ContentItem();
+        dummyContent.setName("bar");
+        dummyContent.setOwner(user);
+        
+        HashSet<Item> children = new HashSet<Item>();
+        children.add(dummyContent);
+        
+        dummyCollection = 
+            service.createCollection(rootCollection, dummyCollection, children);
+        
+        assertNotNull(dummyCollection);
+        assertEquals(1, dummyCollection.getChildren().size());
+        assertEquals("bar", 
+                dummyCollection.getChildren().iterator().next().getName());
+    }
+    
+    public void testUpdateCollectionWithChildren() throws Exception {
+        User user = testHelper.makeDummyUser();
+        CollectionItem rootCollection = contentDao.createRootItem(user);
+        
+        CollectionItem dummyCollection = new CollectionItem();
+        dummyCollection.setName("foo");
+        dummyCollection.setOwner(user);
+        
+        ContentItem dummyContent1 = new MockContentItem();
+        dummyContent1.setName("bar1");
+        dummyContent1.setOwner(user);
+        
+        ContentItem dummyContent2 = new MockContentItem();
+        dummyContent2.setName("bar2");
+        dummyContent2.setOwner(user);
+        
+        HashSet<Item> children = new HashSet<Item>();
+        children.add(dummyContent1);
+        children.add(dummyContent2);
+        
+        dummyCollection = 
+            service.createCollection(rootCollection, dummyCollection, children);
+        
+        assertEquals(2, dummyCollection.getChildren().size());
+        
+        ContentItem bar1 = 
+            getContentItemFromSet(dummyCollection.getChildren(), "bar1");
+        ContentItem bar2 = 
+            getContentItemFromSet(dummyCollection.getChildren(), "bar2");
+        assertNotNull(bar1);
+        assertNotNull(bar2);
+        
+        bar1.setIsActive(false);
+        bar2.addStringAttribute("foo", "bar");
+        
+        ContentItem bar3 = new MockContentItem();
+        bar3.setName("bar3");
+        bar3.setOwner(user);
+        
+        children.clear();
+        children.add(bar1);
+        children.add(bar2);
+        children.add(bar3);
+        
+        dummyCollection = service.updateCollection(dummyCollection, children);
+          
+        assertEquals(2, dummyCollection.getChildren().size());
+        
+        bar1 = getContentItemFromSet(dummyCollection.getChildren(), "bar1");
+        bar2 = getContentItemFromSet(dummyCollection.getChildren(), "bar2");
+        bar3 = getContentItemFromSet(dummyCollection.getChildren(), "bar3");
+        
+        assertNull(bar1);
+        assertNotNull(bar2);
+        assertEquals(1,bar2.getAttributes().size());
+        assertEquals("bar", bar2.getAttributeValue("foo"));
+        assertNotNull(bar3);
+    }
+    
     /** */
     public void testNullContentDao() throws Exception {
         service.setContentDao(null);
@@ -142,5 +229,12 @@ public class StandardContentServiceTest extends TestCase {
         } catch (IllegalStateException e) {
             // expected
         }
+    }
+    
+    private ContentItem getContentItemFromSet(Set<Item> items, String name) {
+        for(Item item : items)
+            if(item.getName().equals(name))
+                return (ContentItem) item;
+        return null;
     }
 }

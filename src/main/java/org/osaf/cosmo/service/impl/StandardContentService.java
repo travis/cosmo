@@ -187,6 +187,70 @@ public class StandardContentService implements ContentService {
     }
 
     /**
+     * Create a new collection.
+     * 
+     * @param parent
+     *            parent of collection.
+     * @param collection
+     *            collection to create
+     * @param children
+     *            collection children
+     * @return newly created collection
+     */
+    public CollectionItem createCollection(CollectionItem parent, CollectionItem collection, Set<Item> children) {
+        if (log.isDebugEnabled()) {
+            log.debug("creating collection " + collection.getName() +
+                      " in " + parent.getName());
+        }
+        
+        CollectionItem newCollection = contentDao.createCollection(parent, collection);
+        for(Item item : children) {
+            if(item instanceof ContentItem)
+                contentDao.createContent(collection, (ContentItem) item);
+        }
+        
+        return newCollection;
+    }
+
+    /**
+     * Update a collection and set of children.  The set of
+     * children to be updated can include updates to existing
+     * children, new children, and removed children.  A removal
+     * of a child Item is accomplished by setting Item.isActive
+     * to false to an existing Item.
+     * 
+     * @param collection
+     *             collection to update
+     * @param children
+     *             children to update
+     * @return updated collection
+     */
+    public CollectionItem updateCollection(CollectionItem collection, Set<Item> children) {
+        if (log.isDebugEnabled()) {
+            log.debug("updating collection " + collection.getName());
+        }
+        
+        for(Item item : children) {
+            // for now, only process ContentItems
+            if(item instanceof ContentItem) {
+                // deletion
+                if(item.getIsActive()==false)
+                    contentDao.removeContent((ContentItem) item);
+                // addition
+                else  if(item.getId()==-1)
+                    contentDao.createContent(collection, (ContentItem) item);
+                // update
+                else
+                    contentDao.updateContent((ContentItem) item);
+            }
+        }
+        
+        // TODO: Find better way to refresh collection to get updated
+        //       children
+        return contentDao.findCollectionByUid(collection.getUid());
+    }
+
+    /**
      * Find all children for collection. Children can consist of ContentItem and
      * CollectionItem objects.
      * 

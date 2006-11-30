@@ -129,6 +129,37 @@ public interface ContentService extends Service {
                                            CollectionItem collection);
 
     /**
+     * Create a new collection.
+     * 
+     * @param parent
+     *            parent of collection.
+     * @param collection
+     *            collection to create
+     * @param children
+     *            collection children
+     * @return newly created collection
+     */
+    public CollectionItem createCollection(CollectionItem parent,
+                                           CollectionItem collection,
+                                           Set<Item> children);
+    
+    /**
+     * Update a collection and set of children.  The set of
+     * children to be updated can include updates to existing
+     * children, new children, and removed children.  A removal
+     * of a child Item is accomplished by setting Item.isActive
+     * to false to an existing Item.
+     * 
+     * @param collection
+     *             collection to update
+     * @param children
+     *             children to update
+     * @return updated collection
+     */
+    public CollectionItem updateCollection(CollectionItem collection,
+                                           Set<Item> children);
+    
+    /**
      * Find all children for collection. Children can consist of ContentItem and
      * CollectionItem objects.
      * 

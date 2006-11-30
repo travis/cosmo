@@ -23,6 +23,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.mock.MockContentItem;
 import org.springframework.dao.ConcurrencyFailureException;
 
 /**
@@ -154,6 +155,10 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             throw new ConcurrencyFailureException("fail!");
         
         content.setParent(parent);
+        
+        // Set mock id
+        if(content instanceof MockContentItem)
+            ((MockContentItem) content).setMockId(System.currentTimeMillis());
         getStorage().storeItem((Item)content);
 
         return content;

@@ -36,24 +36,28 @@
     </title>
     <%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
     <cosmo:staticbaseurl var="staticBaseUrl"/>
-    <!-- Login page recognition string: login-page-2ksw083judrmru58
-       This is an ugly hack to allow the AJAX handler to recognize
-       this page. In previous versions of Cosmo, this was done by
-       detecting the name of the login.js file, so I'd actually
-       call this an improvment.
-     Authentication in general should be rethought soon. -->
+    <fmt:setBundle basename="PimMessageResources"/>
     <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/ui.conf.js"></script>
     <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/styler.js"></script>
     <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/cookie.js"></script>
     <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/log.js"></script>
     <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/popup.js"></script>
-    <fmt:setBundle basename="PimMessageResources"/>
-    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/global.css.js"></script>
+    <%--
+        Login and account-creation stuff
+        Note: button.js still needed to do preloading of button images
+    --%>
+    <!-- Login failure recognition string: login-page-2ksw083judrmru58 See LoginDialog.js -->
+    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/button.js"></script>
     <script type="text/javascript">
         dojo.require("cosmo.ui.widget.LoginDialog");
         dojo.require("cosmo.ui.widget.ModalDialog");
         dojo.require("cosmo.account.create");
     </script>
+    <%-- 
+        global.css.js should go last -- in Safari is uses a document.write hack
+        to do the dynamic CSS as an inline style right on the page
+    --%>
+    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/global.css.js"></script>
   </head>
   <body>
     <div>

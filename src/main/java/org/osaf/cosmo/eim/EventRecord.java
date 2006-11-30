@@ -16,8 +16,11 @@
 package org.osaf.cosmo.eim;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
+import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.Recur;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,19 +36,19 @@ public class EventRecord extends EimRecord {
     private Date dtStart;
     private Date dtEnd;
     private String location;
-    private List<String> rRules;
-    private List<String> exRules;
-    private List<String> rDates;
-    private List<String> exDates;
+    private List<Recur> rRules;
+    private List<Recur> exRules;
+    private DateList rDates;
+    private DateList exDates;
     private Date recurrenceId;
     private String status;
 
     /** */
     public EventRecord() {
-        rRules = new ArrayList<String>();
-        exRules = new ArrayList<String>();
-        rDates = new ArrayList<String>();
-        exDates = new ArrayList<String>();
+        rRules = new ArrayList<Recur>();
+        exRules = new ArrayList<Recur>();
+        rDates = new DateList();
+        exDates = new DateList();
     }
 
     /** */
@@ -67,7 +70,15 @@ public class EventRecord extends EimRecord {
         if (! stamp.getItem().getUid().equals(getUuid()))
             throw new IllegalArgumentException("cannot apply record to item with non-matching uuid");
 
-        // XXX
+        stamp.setStartDate(dtStart);
+        stamp.setEndDate(dtEnd);
+        stamp.setLocation(location);
+        stamp.setRecurrenceRules(rRules);
+        stamp.setExceptionRules(exRules);
+        stamp.setRecurrenceDates(rDates);
+        stamp.setExceptionDates(exDates);
+        stamp.setRecurrenceId(recurrenceId);
+        stamp.setStatus(status);
     }
 
     /** */
@@ -101,42 +112,42 @@ public class EventRecord extends EimRecord {
     }
 
     /** */
-    public List<String> getRRules() {
+    public List<Recur> getRRules() {
         return rRules;
     }
 
     /** */
-    public void setRRules(List<String> rRules) {
+    public void setRRules(List<Recur> rRules) {
         this.rRules = rRules;
     }
 
     /** */
-    public List<String> getExRules() {
+    public List<Recur> getExRules() {
         return exRules;
     }
 
     /** */
-    public void setExRules(List<String> exRules) {
+    public void setExRules(List<Recur> exRules) {
         this.exRules = exRules;
     }
 
     /** */
-    public List<String> getRDates() {
+    public DateList getRDates() {
         return rDates;
     }
 
     /** */
-    public void setRDates(List<String> rDates) {
+    public void setRDates(DateList rDates) {
         this.rDates = rDates;
     }
 
     /** */
-    public List<String> getExDates() {
+    public DateList getExDates() {
         return exDates;
     }
 
     /** */
-    public void setExDates(List<String> exDates) {
+    public void setExDates(DateList exDates) {
         this.exDates = exDates;
     }
 

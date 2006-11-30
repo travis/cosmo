@@ -24,7 +24,7 @@
 
 dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
-dojo.require("dojo.dom");
+dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 
 dojo.provide("cosmo.ui.widget.Button");

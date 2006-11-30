@@ -15,16 +15,15 @@
 */
 
 /**
- * @fileoverview Button - creates a push button that can be enabled or disabled, small or 
- *                        normal size.
- *                        Adapated from mde's button.js code.
- * @author Bobby Rullo br@osafoundation.org
+ * @fileoverview ButtonPanel -- panel of buttons allowing three 
+ *      clusters of buttons: left, center, right.
+ * @author Matthew Eernisse mde@osafoundation.org
  * @license Apache License 2.0
  */
 
 dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
-dojo.require("dojo.dom");
+dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 dojo.require("cosmo.ui.widget.Button");
 

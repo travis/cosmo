@@ -16,7 +16,6 @@
 package org.osaf.cosmo.model;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,9 +30,20 @@ import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.PropertyList;
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.ExDate;
+import net.fortuna.ical4j.model.property.ExRule;
+import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.RecurrenceId;
+import net.fortuna.ical4j.model.property.RDate;
+import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.Status;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -146,6 +156,16 @@ public class EventStamp extends Stamp implements
         return getMasterEvent().getStartDate().getDate();
     }
 
+    /** 
+     * Sets the iCalendar DTSTART property of the master event.
+     *
+     * @param date a <code>Date</code>
+     */
+    @Transient
+    public void setStartDate(Date date) {
+        getMasterEvent().getStartDate().setDate(date);
+    }
+
     /**
      * Returns the end date of the master event as calculated from the
      * iCalendar DTEND property value or the the iCalendar DTSTART +
@@ -154,6 +174,16 @@ public class EventStamp extends Stamp implements
     @Transient
     public Date getEndDate() {
         return getMasterEvent().getEndDate().getDate();
+    }
+
+    /** 
+     * Sets the iCalendar DTEND property of the master event.
+     *
+     * @param date a <code>Date</code>
+     */
+    @Transient
+    public void setEndDate(Date date) {
+        getMasterEvent().getEndDate().setDate(date);
     }
 
     /**
@@ -169,17 +199,53 @@ public class EventStamp extends Stamp implements
         return p.getValue();
     }
 
+    /** 
+     * Sets the iCalendar LOCATION property of the master event.
+     *
+     * @param text a text string
+     */
+    @Transient
+    public void setLocation(String text) {
+        Location location = (Location)
+            getMasterEvent().getProperties().getProperty(Property.LOCATION);
+        if (text == null) {
+            if (location != null)
+                getMasterEvent().getProperties().remove(location);
+            return;
+        }                
+        if (location == null) {
+            location = new Location();
+            getMasterEvent().getProperties().add(location);
+        }
+        location.setValue(text);
+    }
+
     /**
      * Returns a list of copies of the iCalendar RRULE property values
      * of the master event (can be empty).
      */
     @Transient
-    public List<String> getRecurrenceRules() {
-        ArrayList l = new ArrayList();
-        for (Property p : (List<Property>) getMasterEvent().getProperties().
+    public List<Recur> getRecurrenceRules() {
+        ArrayList<Recur> l = new ArrayList<Recur>();
+        for (RRule rrule : (List<RRule>) getMasterEvent().getProperties().
                  getProperties(Property.RRULE))
-            l.add(p.getValue());
+            l.add(rrule.getRecur());
         return l;
+    }
+
+    /** 
+     * Sets the iCalendar RRULE properties of the master event,
+     * removing any RRULEs that were previously set.
+     *
+     * @param recurs a <code>List</code> of <code>Recur</code>s
+     */
+    @Transient
+    public void setRecurrenceRules(List<Recur> recurs) {
+        PropertyList pl = getMasterEvent().getProperties();
+        for (RRule rrule : (List<RRule>) pl.getProperties(Property.RRULE))
+            pl.remove(rrule);
+        for (Recur recur : recurs)
+            pl.add(new RRule(recur));
     }
 
     /**
@@ -187,12 +253,27 @@ public class EventStamp extends Stamp implements
      * of the master event (can be empty).
      */
     @Transient
-    public List<String> getExceptionRules() {
-        ArrayList l = new ArrayList();
-        for (Property p : (List<Property>) getMasterEvent().getProperties().
+    public List<Recur> getExceptionRules() {
+        ArrayList<Recur> l = new ArrayList<Recur>();
+        for (ExRule exrule : (List<ExRule>) getMasterEvent().getProperties().
                  getProperties(Property.EXRULE))
-            l.add(p.getValue());
+            l.add(exrule.getRecur());
         return l;
+    }
+
+    /** 
+     * Sets the iCalendar EXRULE properties of the master event,
+     * removing any EXRULEs that were previously set.
+     *
+     * @param recurs a <code>List</code> of <code>Recur</code>s
+     */
+    @Transient
+    public void setExceptionRules(List<Recur> recurs) {
+        PropertyList pl = getMasterEvent().getProperties();
+        for (ExRule exrule : (List<ExRule>) pl.getProperties(Property.EXRULE))
+            pl.remove(exrule);
+        for (Recur recur : recurs)
+            pl.add(new ExRule(recur));
     }
 
     /**
@@ -200,25 +281,57 @@ public class EventStamp extends Stamp implements
      * of the master event (can be empty).
      */
     @Transient
-    public List<String> getRecurrenceDates() {
-        ArrayList l = new ArrayList();
-        for (Property p : (List<Property>) getMasterEvent().getProperties().
+    public DateList getRecurrenceDates() {
+        DateList l = new DateList(Value.DATE_TIME);
+        for (RDate rdate : (List<RDate>) getMasterEvent().getProperties().
                  getProperties(Property.RDATE))
-            l.add(p.getValue());
+            l.addAll(rdate.getDates());
         return l;
     }
 
     /**
-     * Returns a list of copies of the iCalendar EXDATE property values
-     * of the master event (can be empty).
+     * Sets a single iCalendar RDATE property of the master event,
+     * removing any RDATEs that were previously set.
+     *
+     * @param dates a <code>DateList</code>
      */
     @Transient
-    public List<String> getExceptionDates() {
-        ArrayList l = new ArrayList();
-        for (Property p : (List<Property>) getMasterEvent().getProperties().
+    public void setRecurrenceDates(DateList dates) {
+        PropertyList pl = getMasterEvent().getProperties();
+        for (RDate rdate : (List<RDate>) pl.getProperties(Property.RDATE))
+            pl.remove(rdate);
+        if (dates.isEmpty())
+            return;
+        pl.add(new RDate(dates));
+    }
+
+    /**
+     * Returns a list of copies of the values of all iCalendar EXDATE
+     * properties of the master event (can be empty).
+     */
+    @Transient
+    public DateList getExceptionDates() {
+        DateList l = new DateList(Value.DATE_TIME);
+        for (ExDate exdate : (List<ExDate>) getMasterEvent().getProperties().
                  getProperties(Property.EXDATE))
-            l.add(p.getValue());
+            l.addAll(exdate.getDates());
         return l;
+    }
+
+    /**
+     * Sets a single iCalendar EXDATE property of the master event,
+     * removing any EXDATEs that were previously set.
+     *
+     * @param dates a <code>DateList</code>
+     */
+    @Transient
+    public void setExceptionDates(DateList dates) {
+        PropertyList pl = getMasterEvent().getProperties();
+        for (ExDate exdate : (List<ExDate>) pl.getProperties(Property.EXDATE))
+            pl.remove(exdate);
+        if (dates.isEmpty())
+            return;
+        pl.add(new ExDate(dates));
     }
 
     /**
@@ -233,6 +346,28 @@ public class EventStamp extends Stamp implements
         return rid.getDate();
     }
 
+    /** 
+     * Sets the iCalendar RECURRENCE_ID property of the master event.
+     *
+     * @param date a <code>Date</code>
+     */
+    @Transient
+    public void setRecurrenceId(Date date) {
+        RecurrenceId recurrenceId = (RecurrenceId)
+            getMasterEvent().getProperties().
+            getProperty(Property.RECURRENCE_ID);
+        if (date == null) {
+            if (recurrenceId != null)
+                getMasterEvent().getProperties().remove(recurrenceId);
+            return;
+        }
+        if (recurrenceId == null) {
+            recurrenceId = new RecurrenceId();
+            getMasterEvent().getProperties().add(recurrenceId);
+        }
+        recurrenceId.setDate(date);
+    }
+
     /**
      * Returns a copy of the the iCalendar STATUS property value of
      * the master event (can be null).
@@ -244,6 +379,27 @@ public class EventStamp extends Stamp implements
         if (p == null)
             return null;
         return p.getValue();
+    }
+
+    /** 
+     * Sets the iCalendar STATUS property of the master event.
+     *
+     * @param text a text string
+     */
+    @Transient
+    public void setStatus(String text) {
+        Status status = (Status)
+            getMasterEvent().getProperties().getProperty(Property.STATUS);
+        if (text == null) {
+            if (status != null)
+                getMasterEvent().getProperties().remove(status);
+            return;
+        }                
+        if (status == null) {
+            status = new Status();
+            getMasterEvent().getProperties().add(status);
+        }
+        status.setValue(text);
     }
 
     /**

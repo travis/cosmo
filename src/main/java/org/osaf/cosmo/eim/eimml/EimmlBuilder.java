@@ -23,12 +23,17 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
+import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.parameter.Value;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -185,21 +190,21 @@ public class EimmlBuilder implements EimmlConstants {
             if (reader.getLocalName().equals(EL_UUID))
                 record.setUuid(reader.getElementText());
             else if (reader.getLocalName().equals(EL_DTSTART))
-                record.setDtStart(parseDate(reader.getElementText()));
+                record.setDtStart(toICalDate(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_DTEND))
-                record.setDtEnd(parseDate(reader.getElementText()));
+                record.setDtEnd(toICalDate(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_LOCATION))
                 record.setLocation(reader.getElementText());
             else if (reader.getLocalName().equals(EL_RRULE))
-                record.setRRules(parseRecurrence(reader.getElementText()));
+                record.setRRules(parseICalRecurs(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_EXRULE))
-                record.setExRules(parseRecurrence(reader.getElementText()));
+                record.setExRules(parseICalRecurs(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_RDATE))
-                record.setRDates(parseRecurrence(reader.getElementText()));
+                record.setRDates(parseICalDates(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_EXDATE))
-                record.setExDates(parseRecurrence(reader.getElementText()));
+                record.setExDates(parseICalDates(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_RECURRENCE_ID))
-                record.setRecurrenceId(parseDate(reader.getElementText()));
+                record.setRecurrenceId(toICalDate(reader.getElementText()));
             else if (reader.getLocalName().equals(EL_STATUS))
                 record.setStatus(reader.getElementText());
             else
@@ -276,18 +281,41 @@ public class EimmlBuilder implements EimmlConstants {
         return new BigDecimal(text);
     }
 
-    private Date parseDate(String text) {
+    private java.util.Date parseDate(String text) {
         try {
             return DateUtil.parseRfc3339Date(text);
         } catch (ParseException e) {
-            throw new EimmlParseException("Invalid RFC 339 date " + text);
+            throw new EimmlParseException("Invalid RFC 339 datetime " + text);
         }
     }
 
-    private List<String> parseRecurrence(String text) {
-        ArrayList<String> values = new ArrayList<String>();
+    private List<Recur> parseICalRecurs(String text) {
+        ArrayList<Recur> recurs = new ArrayList<Recur>();
         for (String value : text.split(","))
-            values.add(value);
-        return values;
+            recurs.add(toICalRecur(value));
+        return recurs;
+    }
+
+    private DateList parseICalDates(String text) {
+        DateList dates = new DateList(Value.DATE_TIME);
+        for (String value : text.split(","))
+            dates.add(toICalDate(value));
+        return dates;
+    }
+
+    private Recur toICalRecur(String text) {
+        try {
+            return new Recur(text);
+        } catch (ParseException e) {
+            throw new EimmlParseException("Invalid iCalendar recur " + text);
+        }
+    }
+
+    private DateTime toICalDate(String text) {
+        try {
+            return new DateTime(text);
+        } catch (ParseException e) {
+            throw new EimmlParseException("Invalid iCalendar datetime " + text);
+        }
     }
 }

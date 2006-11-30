@@ -267,19 +267,19 @@ function CalForm() {
         //create the region selector
         //  this.createSelect = function(id, name, size, multi, options, className,
         //      elem) {
-        this.createSelect('tzRegionSelect', 'tzRegionSelect', null, false, this.getTimezoneOptions(), 'selectElem', elem);
+        this.createSelect('tzRegionSelect', 'tzRegion', null, false, this.getTimezoneOptions(), 'selectElem', elem);
         this.createNbsp(elem);
-        this.createSelect('tzTzSelect', 'tzTzSelect', null, false, this.getTimezoneSelectorOptions(null), 'selectElem', elem);
+        this.createSelect('tzTzSelect', 'tzId', null, false, this.getTimezoneSelectorOptions(null), 'selectElem', elem);
         d.appendChild(elem);
 
     };
 
     this.getTimezoneSelectorOptions = function(region){
-        var tzIds = region ? cosmo.datetime.timezone.getTzIdsForRegion(region) : null;
+        var tzIds = region ? cosmo.datetime.timezone.getTzIdsForRegion(region).sort() : null;
         var options = [{text:getText("Main.DetailForm.TimezoneSelector.Timezone"), value:null}];
         if (tzIds){
             dojo.lang.map(tzIds, function(tzId){
-                options.push({text:tzId, value:tzId});
+                options.push({text:tzId.substr(tzId.indexOf("/") + 1).replace(/_/g," "), value:tzId});
             });
         }
         return options;
@@ -573,7 +573,7 @@ function CalForm() {
         var err = '';
         var errMsg = '';
         var e = null;
-
+        var tzId = null;
         // Pull new values out of the event info form
         startDate = form.startdate.value;
         endDate = form.enddate.value;
@@ -586,6 +586,7 @@ function CalForm() {
         recur = form.recurrence.value;
         rE = form.recurend.value != 'mm/dd/yyyy' ?
             form.recurend.value : '';
+        tzId = form.tzId.value || null;
 
         // Error checking
         // =======================
@@ -661,9 +662,11 @@ function CalForm() {
             // Set event properties
             // ==============
             // ScoobyDate with timezones
-            if (ev.data.start.timezone) {
+            if (tzId) {
                 ev.data.start.updateFromLocalDate(startDate);
+                ev.data.start.tzId = tzId;
                 ev.data.end.updateFromLocalDate(endDate);
+                ev.data.end.tzId = tzId;
             }
             // Floating ScoobyDates
             else {
@@ -745,7 +748,25 @@ function CalForm() {
             this.setSelect('recurrence', '');
             this.setTextInput(form.recurend, 'mm/dd/yyyy', true, true);
         }
+
+        if (ev.data.start.tzId){
+            var timezone = cosmo.datetime.timezone.getTimezone(ev.data.start.tzId);
+            if (!timezone){
+                self.clearTimezone();
+            } else {
+                //we use this tzid in case the event has a "legacy" tzId,
+                //like "US/Pacific" as opposed to "America/Los_angeles"
+                var tzId = timezone.tzId;
+                var region = tzId.split("/")[0];
+                self.setSelect("tzRegion", region);
+                self.populateTimezoneSelector(region);
+                self.setSelect("tzId", tzId);
+            }
+        } else {
+            self.clearTimezone();
+        }
     };
+
     this.setRecurEnd = function() {
         var self = Cal.calForm
         var form = self.form;
@@ -819,9 +840,16 @@ function CalForm() {
         form.eventallday.checked = false;
         form.recurrence.selectedIndex = 0;
         form.status.selectedIndex = 0;
+        self.clearTimezone();
         this.setTextInput(form.recurend, 'mm/dd/yyyy', true, true);
         return true;
     };
+
+    this.clearTimezone = function(){
+        this.form.tzRegion.selectedIndex = 0;
+        self.populateTimezoneSelector();
+    }
+
     /**
      * Toggle an event from 'normal' (HasTime) to 'all-day' (NoTime)
      */

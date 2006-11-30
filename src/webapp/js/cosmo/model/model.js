@@ -41,8 +41,8 @@ CalEventData.clone = function(data) {
         data.id,
         data.title,
         data.description,
-        ScoobyDate.clone(data.start),
-        ScoobyDate.clone(data.end),
+        data.start.clone(),
+        data.end.clone(),
         data.allDay,
         data.pointInTime,
         data.anyTime,
@@ -73,19 +73,19 @@ function RecurrenceRule(){
     this.endDate = null;
 
     /**
-     * For events not created in Cosmo that have more complex rules than Cosmo 
+     * For events not created in Cosmo that have more complex rules than Cosmo
      * allows, a text representation of the rule appears here but is not editable.
      */
     this.customRule = null;
-    
+
     /**
      * This is an array of CosmoDates, each one representing a date on which the
      * event will NOT occur
      * This must be a DateTime, not just a Date
-     * 
+     *
      */
     this.exceptionDates = [];
-    
+
     /**
      * An array of modifications, each one representing a modification to an event
      * instance
@@ -138,13 +138,13 @@ function Modification(){
      *
      */
     this.instanceDate = null;
-    
+
     /**
      * The list of modified properties
      *
      */
     this.modifiedProperties = [];
-    
+
     /**
      * The event with the modified properties. Note: only the modified properties need to be set
      */
@@ -154,7 +154,7 @@ function Modification(){
 Modification.prototype = {
     toString: genericToString
 }
-    
+
 Modification.clone = function(mod) {
     var ret = null;
     if (mod) {

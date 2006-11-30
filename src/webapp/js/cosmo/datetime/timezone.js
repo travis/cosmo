@@ -497,7 +497,7 @@ cosmo.datetime.timezone._parseZoneLine = function(array){
     zoneItem.offsetInMinutes = this._parseTimeIntoMinutes(array[0]);
 
     //set the rule name
-    zoneItem.ruleName = array[1];
+    zoneItem.ruleName = array[1] == "-" ? null : array[1];
 
     //set the format.
     zoneItem.format = array[2];

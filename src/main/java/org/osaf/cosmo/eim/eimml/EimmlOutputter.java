@@ -21,12 +21,15 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.Recur;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -180,11 +183,11 @@ public class EimmlOutputter implements EimmlConstants {
         writer.writeEndElement();
 
         writer.writeStartElement(NS_EVENT, EL_DTSTART);
-        writer.writeCharacters(record.getDtStart().toString());
+        writer.writeCharacters(formatICalDate(record.getDtStart()));
         writer.writeEndElement();
 
         writer.writeStartElement(NS_EVENT, EL_DTEND);
-        writer.writeCharacters(record.getDtEnd().toString());
+        writer.writeCharacters(formatICalDate(record.getDtEnd()));
         writer.writeEndElement();
 
         if (record.getLocation() != null) {
@@ -195,31 +198,31 @@ public class EimmlOutputter implements EimmlConstants {
 
         if (! record.getRRules().isEmpty()) {
             writer.writeStartElement(NS_EVENT, EL_RRULE);
-            writer.writeCharacters(formatRecurrence(record.getRRules()));
+            writer.writeCharacters(formatRecurs(record.getRRules()));
             writer.writeEndElement();
         }
 
         if (! record.getExRules().isEmpty()) {
             writer.writeStartElement(NS_EVENT, EL_EXRULE);
-            writer.writeCharacters(formatRecurrence(record.getExRules()));
+            writer.writeCharacters(formatRecurs(record.getExRules()));
             writer.writeEndElement();
         }
 
         if (! record.getRDates().isEmpty()) {
             writer.writeStartElement(NS_EVENT, EL_RDATE);
-            writer.writeCharacters(formatRecurrence(record.getRDates()));
+            writer.writeCharacters(formatICalDates(record.getRDates()));
             writer.writeEndElement();
         }
 
         if (! record.getExDates().isEmpty()) {
             writer.writeStartElement(NS_EVENT, EL_EXDATE);
-            writer.writeCharacters(formatRecurrence(record.getExDates()));
+            writer.writeCharacters(formatICalDates(record.getExDates()));
             writer.writeEndElement();
         }
 
         if (record.getRecurrenceId() != null) {
             writer.writeStartElement(NS_EVENT, EL_RECURRENCE_ID);
-            writer.writeCharacters(record.getRecurrenceId().toString());
+            writer.writeCharacters(formatICalDate(record.getRecurrenceId()));
             writer.writeEndElement();
         }
 
@@ -308,13 +311,21 @@ public class EimmlOutputter implements EimmlConstants {
         return DECIMAL_FORMATTER.format(bd);
     }
 
-    private String formatDate(Date d) {
-        return DateUtil.formatRfc3339Date(d);
+    private String formatDate(java.util.Date date) {
+        return DateUtil.formatRfc3339Date(date);
     }
 
-    private String formatRecurrence(List values) {
-        if (! values.iterator().hasNext())
+    private String formatRecurs(List<Recur> recurs) {
+        if (! recurs.iterator().hasNext())
             return null;
-        return StringUtils.join(values.iterator(), ",");
+        return StringUtils.join(recurs.iterator(), ",");
+    }
+
+    private String formatICalDates(DateList dates) {
+        return dates.toString();
+    }
+
+    private String formatICalDate(Date date) {
+        return date.toString();
     }
 }

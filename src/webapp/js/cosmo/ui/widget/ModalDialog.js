@@ -175,8 +175,8 @@ dojo.widget.HtmlWidget, {
                 this.setButtons());
         },
         center: function () {
-            var w = dojo.html.getViewportWidth();
-            var h = dojo.html.getViewportHeight();
+            var w = dojo.html.getViewport().width;
+            var h = dojo.html.getViewport().height;
             this.setLeft(parseInt((w - this.width)/2));
             this.setTop(parseInt((h - this.height)/2));
             return true;
@@ -198,7 +198,7 @@ dojo.widget.HtmlWidget, {
             return true;
         },
         
-        // Lifecycle crap
+        // Lifecycle stuff
         postMixInProperties: function () {
             this.toggleObj =
                 dojo.lfx.toggle[this.toggle] || dojo.lfx.toggle.plain;

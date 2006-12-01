@@ -20,10 +20,22 @@ import java.util.Locale;
 import org.osaf.cosmo.model.User;
 
 public class ActivationContext {
+    public static final String LINK_TEMPLATE_VAR_ACTIVATION_ID = 
+        "activation-id";
 
     private Locale locale;
-    private boolean activationRequired;
+    private boolean activationRequired = true;
     private User sender;
+    private String activationLinkTemplate;
+    private String serverName;
+    
+    /**
+     * Creates new <code>ActivationContext</code>.
+     *
+     * @param locale
+     */
+    public ActivationContext(){
+    }
 
     /**
      * Creates new <code>ActivationContext</code> with
@@ -33,8 +45,9 @@ public class ActivationContext {
      * @param locale
      */
     public ActivationContext(Locale locale){
+        this();
         setLocale(locale);
-        setActivationRequired(true);
+        
     }
 
     /**
@@ -47,7 +60,7 @@ public class ActivationContext {
      */
     public ActivationContext(Locale locale,
             boolean activationRequired){
-        setLocale(locale);
+        this(locale);
         setActivationRequired(activationRequired);
     }
 
@@ -70,5 +83,27 @@ public class ActivationContext {
 
     public void setSender(User sender) {
         this.sender = sender;
+    }
+
+    public String getActivationLinkTemplate() {
+        return activationLinkTemplate;
+    }
+
+    public void setActivationLinkTemplate(String activationLinkTemplate) {
+        this.activationLinkTemplate = activationLinkTemplate;
+    }
+    
+    public String getActivationLink(String activationId){
+        return this.activationLinkTemplate.replace(
+                '{' + ActivationContext.LINK_TEMPLATE_VAR_ACTIVATION_ID + "}",
+                activationId);
+    }
+
+    public String getServerName() {
+        return this.serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
     }
 }

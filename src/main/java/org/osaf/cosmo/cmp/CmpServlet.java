@@ -94,7 +94,8 @@ public class CmpServlet extends HttpServlet {
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final int DEFAULT_PAGE_SIZE = PageCriteria.VIEW_ALL;
     private static final boolean DEFAULT_SORT_ASCENDING = true;
-    private static final User.SortType DEFAULT_SORT_TYPE = User.SortType.USERNAME;
+    private static final User.SortType DEFAULT_SORT_TYPE = 
+        User.SortType.USERNAME;
 
     private WebApplicationContext wac;
     private ContentService contentService;
@@ -732,7 +733,7 @@ public class CmpServlet extends HttpServlet {
             Document xmldoc = readXmlRequest(req);
             UserResource resource = new UserResource(getUrlBase(req), xmldoc);
             userService.createUser(resource.getUser(),
-                    new ActivationContext(req.getLocale()));
+                    createActivationContext(req));
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("Content-Location", resource.getHomedirUrl());
             resp.setHeader("ETag", resource.getEntityTag());
@@ -812,8 +813,7 @@ public class CmpServlet extends HttpServlet {
                                "Username does not match request URI");
                 return;
             }
-            userService.createUser(user,
-                    new ActivationContext(req.getLocale()));
+            userService.createUser(user, createActivationContext(req));
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("ETag", resource.getEntityTag());
         } catch (SAXException e) {
@@ -1010,4 +1010,17 @@ public class CmpServlet extends HttpServlet {
         }
         return buf.toString();
     }
+    
+    private ActivationContext createActivationContext(HttpServletRequest req) {
+        ActivationContext activationContext = new ActivationContext();
+        String urlBase = getUrlBase(req);
+        activationContext.setLocale(req.getLocale());
+        activationContext.setActivationLinkTemplate(
+                urlBase+ "/account/activate/" + "{" + 
+                ActivationContext.LINK_TEMPLATE_VAR_ACTIVATION_ID + "}");
+        activationContext.setServerName(urlBase);
+        return activationContext;
+    }
+
+
 }

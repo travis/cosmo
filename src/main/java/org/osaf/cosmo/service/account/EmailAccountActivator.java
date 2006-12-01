@@ -75,7 +75,9 @@ public class EmailAccountActivator extends AbstractCosmoAccountActivator {
                 String text =
                     messageSource.getMessage(MSG_ACTIVATION_TEXT,
                         new Object[] {user.getUsername(),
-                                      user.getActivationId()},
+                                      activationContext.getServerName(),
+                                      activationContext.getActivationLink(
+                                              user.getActivationId())},
                         locale);
 
 

@@ -134,10 +134,9 @@ public class StandardMorseCodeController implements MorseCodeController {
             // XXX: create and fill in items from records
         }
 
-        // XXX:
         // throws UidinUseException
-//         collection =
-//             contentService.createCollection(parent, collection, children);
+        collection =
+            contentService.createCollection(parent, collection, children);
 
         return SyncToken.generate(collection);
     }
@@ -288,10 +287,9 @@ public class StandardMorseCodeController implements MorseCodeController {
             // XXX: create and fill in items from records
         }
 
+        // XXX: add locking
         // throws CollectionLockedException
-        // XXX:
-//         collection =
-//             contentService.exclusivelyUpdateCollection(collection, children);
+        collection = contentService.updateCollection(collection, children);
 
         return SyncToken.generate(collection);
     }

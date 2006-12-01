@@ -237,7 +237,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      *
      * The collection is locked at the beginning of the update. Any
      * other update that begins before this update has completed, and
-     * the collection unlocked, will fail with a
+     * the collection unlocked, will fail immediately with a
      * <code>CollectionLockedException</code>. Any subscribe or
      * synchronize operation that begins during this update will
      * return the state of the collection immediately prior to the
@@ -287,7 +287,6 @@ public class StandardMorseCodeController implements MorseCodeController {
             // XXX: create and fill in items from records
         }
 
-        // XXX: add locking
         // throws CollectionLockedException
         collection = contentService.updateCollection(collection, children);
 

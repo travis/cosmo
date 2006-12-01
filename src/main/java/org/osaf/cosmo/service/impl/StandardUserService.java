@@ -32,6 +32,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.account.AccountActivator;
+import org.osaf.cosmo.service.account.ActivationContext;
 import org.osaf.cosmo.util.PagedList;
 import org.osaf.cosmo.util.PageCriteria;
 
@@ -53,6 +54,7 @@ public class StandardUserService implements UserService {
     private UserDao userDao;
 
     private AccountActivator accountActivator;
+    private boolean accountActivationRequired;
 
     // UserService methods
 
@@ -145,26 +147,35 @@ public class StandardUserService implements UserService {
         user.setDateModified(user.getDateCreated());
 
 
-        //TODO: should be configurable in application context
-        boolean accountActivationRequired =
-            (!user.isOverlord() &&
-             (this.accountActivator != null));
-
-        if (accountActivationRequired){
-            user.setActivationId(
-                    this.accountActivator.generateActivationToken());
-        }
-
         userDao.createUser(user);
 
         User newUser = userDao.getUser(user.getUsername());
 
         contentDao.createRootItem(newUser);
 
+
+        return newUser;
+    }
+
+    public User createUser(User user, ActivationContext activationContext) {
+        boolean accountActivationRequired =
+            (!user.isOverlord() &&
+             (this.accountActivator != null) &&
+             this.isAccountActivationRequired() &&
+             activationContext.isActivationRequired());
+
         if (accountActivationRequired){
-            accountActivator.sendActivationMessage(newUser);
+            user.setActivationId(
+                    this.accountActivator.generateActivationToken());
+        }
+        User newUser = createUser(user);
+
+        if (accountActivationRequired){
+            accountActivator.sendActivationMessage(newUser, activationContext);
         }
 
+
+        // TODO Auto-generated method stub
         return newUser;
     }
 
@@ -407,6 +418,14 @@ public class StandardUserService implements UserService {
     public void setPreference(String username, String preferenceName) {
         // TODO Auto-generated method stub
 
+    }
+
+    public boolean isAccountActivationRequired() {
+        return accountActivationRequired;
+    }
+
+    public void setAccountActivationRequired(boolean accountActivationRequired) {
+        this.accountActivationRequired = accountActivationRequired;
     }
 
 }

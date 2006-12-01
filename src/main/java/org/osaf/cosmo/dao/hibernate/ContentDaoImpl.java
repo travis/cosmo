@@ -32,6 +32,7 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
@@ -78,6 +79,13 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
 
             User owner = collection.getOwner();
             
+            // verify uid not in use
+            if (collection.getUid() != null) {
+                if (findItemByUid(collection.getUid()) != null)
+                    throw new UidInUseException("uid " + collection.getUid()
+                            + " already in use");
+            }
+            
             // We need to enforce a content hierarchy to support WebDAV
             // In a hierarchy, can't have two items with same name with
             // same owner and parent
@@ -120,6 +128,13 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             if (owner == null)
                 throw new IllegalArgumentException("content must have owner");
 
+            // verify uid not in use
+            if (content.getUid() != null) {
+                if (findItemByUid(content.getUid()) != null)
+                    throw new UidInUseException("uid " + content.getUid()
+                            + " already in use");
+            }
+            
             // Enforce hiearchy for WebDAV support
             // In a hierarchy, can't have two items with same name with
             // same parent

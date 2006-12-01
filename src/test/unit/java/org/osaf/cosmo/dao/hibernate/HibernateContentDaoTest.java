@@ -39,6 +39,7 @@ import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 
 public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
@@ -70,6 +71,28 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
 
         helper.verifyItem(newItem, queryItem);
+    }
+    
+    public void testContentDaoCreateContentDuplicateUid() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        ContentItem item1 = generateTestContent();
+        item1.setName("test");
+        item1.setUid("uid");
+
+        contentDao.createContent(root, item1);
+        
+        ContentItem item2 = generateTestContent();
+        item2.setName("test2");
+        item2.setUid("uid");
+
+        try {
+            contentDao.createContent(root, item2);
+            clearSession();
+            Assert.fail("able to create duplicate uid");
+        } catch (UidInUseException e) {
+        }
     }
 
     public void testContentDaoInvalidContentNullLength() throws Exception {

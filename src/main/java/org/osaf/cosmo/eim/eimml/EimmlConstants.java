@@ -73,6 +73,8 @@ public interface EimmlConstants {
     /** */
     public static final String EL_UUID = "uuid";
     /** */
+    public static final String EL_DELETED = "deleted";
+    /** */
     public static final String EL_TITLE = "title";
     /** */
     public static final String EL_TRIAGE_STATUS = "triageStatus";

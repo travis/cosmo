@@ -132,6 +132,11 @@ public class EimmlOutputter implements EimmlConstants {
         writer.writeCharacters(record.getUuid());
         writer.writeEndElement();
 
+        if (record.isDeleted()) {
+            writer.writeStartElement(NS_CORE, EL_DELETED);
+            writer.writeEndElement();
+        }
+
         writer.writeEndElement();
     }
 
@@ -144,31 +149,36 @@ public class EimmlOutputter implements EimmlConstants {
         writer.writeCharacters(record.getUuid());
         writer.writeEndElement();
 
-        writer.writeStartElement(NS_ITEM, EL_TITLE);
-        writer.writeCharacters(record.getTitle());
-        writer.writeEndElement();
+        if (record.isDeleted()) {
+            writer.writeStartElement(NS_CORE, EL_DELETED);
+            writer.writeEndElement();
+        } else {
+            writer.writeStartElement(NS_ITEM, EL_TITLE);
+            writer.writeCharacters(record.getTitle());
+            writer.writeEndElement();
 
-        if (record.getTriageStatus() != null) {
-            writer.writeStartElement(NS_ITEM, EL_TRIAGE_STATUS);
-            writer.writeCharacters(record.getTriageStatus());
+            if (record.getTriageStatus() != null) {
+                writer.writeStartElement(NS_ITEM, EL_TRIAGE_STATUS);
+                writer.writeCharacters(record.getTriageStatus());
+                writer.writeEndElement();
+            }
+
+            if (record.getTriageStatusChanged() != null) {
+                writer.writeStartElement(NS_ITEM, EL_TRIAGE_STATUS_CHANGED);
+                writer.writeCharacters(formatDecimal(record.getTriageStatusChanged()));
+                writer.writeEndElement();
+            }
+
+            if (record.getLastModifiedBy() != null) {
+                writer.writeStartElement(NS_ITEM, EL_LAST_MODIFIED_BY);
+                writer.writeCharacters(record.getLastModifiedBy());
+                writer.writeEndElement();
+            }
+
+            writer.writeStartElement(NS_ITEM, EL_CREATED_ON);
+            writer.writeCharacters(formatDate(record.getCreatedOn()));
             writer.writeEndElement();
         }
-
-        if (record.getTriageStatusChanged() != null) {
-            writer.writeStartElement(NS_ITEM, EL_TRIAGE_STATUS_CHANGED);
-            writer.writeCharacters(formatDecimal(record.getTriageStatusChanged()));
-            writer.writeEndElement();
-        }
-
-        if (record.getLastModifiedBy() != null) {
-            writer.writeStartElement(NS_ITEM, EL_LAST_MODIFIED_BY);
-            writer.writeCharacters(record.getLastModifiedBy());
-            writer.writeEndElement();
-        }
-
-        writer.writeStartElement(NS_ITEM, EL_CREATED_ON);
-        writer.writeCharacters(formatDate(record.getCreatedOn()));
-        writer.writeEndElement();
 
         writer.writeEndElement();
     }
@@ -182,54 +192,59 @@ public class EimmlOutputter implements EimmlConstants {
         writer.writeCharacters(record.getUuid());
         writer.writeEndElement();
 
-        writer.writeStartElement(NS_EVENT, EL_DTSTART);
-        writer.writeCharacters(formatICalDate(record.getDtStart()));
-        writer.writeEndElement();
-
-        writer.writeStartElement(NS_EVENT, EL_DTEND);
-        writer.writeCharacters(formatICalDate(record.getDtEnd()));
-        writer.writeEndElement();
-
-        if (record.getLocation() != null) {
-            writer.writeStartElement(NS_EVENT, EL_LOCATION);
-            writer.writeCharacters(record.getLocation());
+        if (record.isDeleted()) {
+            writer.writeStartElement(NS_CORE, EL_DELETED);
             writer.writeEndElement();
-        }
-
-        if (! record.getRRules().isEmpty()) {
-            writer.writeStartElement(NS_EVENT, EL_RRULE);
-            writer.writeCharacters(formatRecurs(record.getRRules()));
+        } else {
+            writer.writeStartElement(NS_EVENT, EL_DTSTART);
+            writer.writeCharacters(formatICalDate(record.getDtStart()));
             writer.writeEndElement();
-        }
 
-        if (! record.getExRules().isEmpty()) {
-            writer.writeStartElement(NS_EVENT, EL_EXRULE);
-            writer.writeCharacters(formatRecurs(record.getExRules()));
+            writer.writeStartElement(NS_EVENT, EL_DTEND);
+            writer.writeCharacters(formatICalDate(record.getDtEnd()));
             writer.writeEndElement();
-        }
 
-        if (! record.getRDates().isEmpty()) {
-            writer.writeStartElement(NS_EVENT, EL_RDATE);
-            writer.writeCharacters(formatICalDates(record.getRDates()));
-            writer.writeEndElement();
-        }
+            if (record.getLocation() != null) {
+                writer.writeStartElement(NS_EVENT, EL_LOCATION);
+                writer.writeCharacters(record.getLocation());
+                writer.writeEndElement();
+            }
 
-        if (! record.getExDates().isEmpty()) {
-            writer.writeStartElement(NS_EVENT, EL_EXDATE);
-            writer.writeCharacters(formatICalDates(record.getExDates()));
-            writer.writeEndElement();
-        }
+            if (! record.getRRules().isEmpty()) {
+                writer.writeStartElement(NS_EVENT, EL_RRULE);
+                writer.writeCharacters(formatRecurs(record.getRRules()));
+                writer.writeEndElement();
+            }
 
-        if (record.getRecurrenceId() != null) {
-            writer.writeStartElement(NS_EVENT, EL_RECURRENCE_ID);
-            writer.writeCharacters(formatICalDate(record.getRecurrenceId()));
-            writer.writeEndElement();
-        }
+            if (! record.getExRules().isEmpty()) {
+                writer.writeStartElement(NS_EVENT, EL_EXRULE);
+                writer.writeCharacters(formatRecurs(record.getExRules()));
+                writer.writeEndElement();
+            }
 
-        if (record.getStatus() != null) {
-            writer.writeStartElement(NS_EVENT, EL_STATUS);
-            writer.writeCharacters(record.getStatus());
-            writer.writeEndElement();
+            if (! record.getRDates().isEmpty()) {
+                writer.writeStartElement(NS_EVENT, EL_RDATE);
+                writer.writeCharacters(formatICalDates(record.getRDates()));
+                writer.writeEndElement();
+            }
+
+            if (! record.getExDates().isEmpty()) {
+                writer.writeStartElement(NS_EVENT, EL_EXDATE);
+                writer.writeCharacters(formatICalDates(record.getExDates()));
+                writer.writeEndElement();
+            }
+
+            if (record.getRecurrenceId() != null) {
+                writer.writeStartElement(NS_EVENT, EL_RECURRENCE_ID);
+                writer.writeCharacters(formatICalDate(record.getRecurrenceId()));
+                writer.writeEndElement();
+            }
+
+            if (record.getStatus() != null) {
+                writer.writeStartElement(NS_EVENT, EL_STATUS);
+                writer.writeCharacters(record.getStatus());
+                writer.writeEndElement();
+            }
         }
 
         writer.writeEndElement();
@@ -244,16 +259,21 @@ public class EimmlOutputter implements EimmlConstants {
         writer.writeCharacters(record.getUuid());
         writer.writeEndElement();
 
-        if (record.getBody() != null) {
-            writer.writeStartElement(NS_NOTE, EL_BODY);
-            writer.writeCharacters(record.getBody());
+        if (record.isDeleted()) {
+            writer.writeStartElement(NS_CORE, EL_DELETED);
             writer.writeEndElement();
-        }
+        } else {
+            if (record.getBody() != null) {
+                writer.writeStartElement(NS_NOTE, EL_BODY);
+                writer.writeCharacters(record.getBody());
+                writer.writeEndElement();
+            }
 
-        if (record.getIcalUid() != null) {
-            writer.writeStartElement(NS_NOTE, EL_ICAL_UID);
-            writer.writeCharacters(record.getIcalUid());
-            writer.writeEndElement();
+            if (record.getIcalUid() != null) {
+                writer.writeStartElement(NS_NOTE, EL_ICAL_UID);
+                writer.writeCharacters(record.getIcalUid());
+                writer.writeEndElement();
+            }
         }
 
         writer.writeEndElement();
@@ -268,6 +288,11 @@ public class EimmlOutputter implements EimmlConstants {
         writer.writeCharacters(record.getUuid());
         writer.writeEndElement();
 
+        if (record.isDeleted()) {
+            writer.writeStartElement(NS_CORE, EL_DELETED);
+            writer.writeEndElement();
+        }
+
         writer.writeEndElement();
     }
 
@@ -280,28 +305,33 @@ public class EimmlOutputter implements EimmlConstants {
         writer.writeCharacters(record.getUuid());
         writer.writeEndElement();
 
-        if (record.getSubject() != null) {
-            writer.writeStartElement(NS_MESSAGE, EL_SUBJECT);
-            writer.writeCharacters(record.getSubject());
+        if (record.isDeleted()) {
+            writer.writeStartElement(NS_CORE, EL_DELETED);
             writer.writeEndElement();
-        }
+        } else {
+            if (record.getSubject() != null) {
+                writer.writeStartElement(NS_MESSAGE, EL_SUBJECT);
+                writer.writeCharacters(record.getSubject());
+                writer.writeEndElement();
+            }
 
-        if (record.getTo() != null) {
-            writer.writeStartElement(NS_MESSAGE, EL_TO);
-            writer.writeCharacters(record.getTo());
-            writer.writeEndElement();
-        }
+            if (record.getTo() != null) {
+                writer.writeStartElement(NS_MESSAGE, EL_TO);
+                writer.writeCharacters(record.getTo());
+                writer.writeEndElement();
+            }
 
-        if (record.getCc() != null) {
-            writer.writeStartElement(NS_MESSAGE, EL_CC);
-            writer.writeCharacters(record.getCc());
-            writer.writeEndElement();
-        }
+            if (record.getCc() != null) {
+                writer.writeStartElement(NS_MESSAGE, EL_CC);
+                writer.writeCharacters(record.getCc());
+                writer.writeEndElement();
+            }
 
-        if (record.getBcc() != null) {
-            writer.writeStartElement(NS_MESSAGE, EL_BCC);
-            writer.writeCharacters(record.getBcc());
-            writer.writeEndElement();
+            if (record.getBcc() != null) {
+                writer.writeStartElement(NS_MESSAGE, EL_BCC);
+                writer.writeCharacters(record.getBcc());
+                writer.writeEndElement();
+            }
         }
 
         writer.writeEndElement();

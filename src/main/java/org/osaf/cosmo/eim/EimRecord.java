@@ -28,6 +28,7 @@ public abstract class EimRecord {
     private static final Log log = LogFactory.getLog(EimRecord.class);
 
     private String uuid;
+    private boolean deleted = false;
 
     /** */
     public String getUuid() {
@@ -37,6 +38,16 @@ public abstract class EimRecord {
     /** */
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    /** */
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    /** */
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     /** */

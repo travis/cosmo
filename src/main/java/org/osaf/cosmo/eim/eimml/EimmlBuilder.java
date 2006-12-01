@@ -143,6 +143,10 @@ public class EimmlBuilder implements EimmlConstants {
             reader.nextTag();
             if (reader.isEndElement())
                 break;
+            if (reader.getLocalName().equals(EL_DELETED)) {
+                record.setDeleted(true);
+                break;
+            }
             if (reader.getLocalName().equals(EL_UUID))
                 record.setUuid(reader.getElementText());
             else
@@ -160,6 +164,10 @@ public class EimmlBuilder implements EimmlConstants {
             reader.nextTag();
             if (reader.isEndElement())
                 break;
+            if (reader.getLocalName().equals(EL_DELETED)) {
+                record.setDeleted(true);
+                break;
+            }
             if (reader.getLocalName().equals(EL_UUID))
                 record.setUuid(reader.getElementText());
             else if (reader.getLocalName().equals(EL_TITLE))
@@ -187,6 +195,10 @@ public class EimmlBuilder implements EimmlConstants {
             reader.nextTag();
             if (reader.isEndElement())
                 break;
+            if (reader.getLocalName().equals(EL_DELETED)) {
+                record.setDeleted(true);
+                break;
+            }
             if (reader.getLocalName().equals(EL_UUID))
                 record.setUuid(reader.getElementText());
             else if (reader.getLocalName().equals(EL_DTSTART))
@@ -222,6 +234,10 @@ public class EimmlBuilder implements EimmlConstants {
             reader.nextTag();
             if (reader.isEndElement())
                 break;
+            if (reader.getLocalName().equals(EL_DELETED)) {
+                record.setDeleted(true);
+                break;
+            }
             if (reader.getLocalName().equals(EL_UUID))
                 record.setUuid(reader.getElementText());
             else if (reader.getLocalName().equals(EL_BODY))
@@ -260,6 +276,10 @@ public class EimmlBuilder implements EimmlConstants {
             reader.nextTag();
             if (reader.isEndElement())
                 break;
+            if (reader.getLocalName().equals(EL_DELETED)) {
+                record.setDeleted(true);
+                break;
+            }
             if (reader.getLocalName().equals(EL_UUID))
                 record.setUuid(reader.getElementText());
             else if (reader.getLocalName().equals(EL_SUBJECT))

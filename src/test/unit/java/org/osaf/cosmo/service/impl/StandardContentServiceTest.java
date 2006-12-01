@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.model.Item;
@@ -32,6 +33,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockContentItem;
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.service.lock.SingleVMLockManager;
 
 /**
  * Test Case for <code>StandardContentService</code> which uses mock
@@ -45,15 +47,23 @@ public class StandardContentServiceTest extends TestCase {
         LogFactory.getLog(StandardContentServiceTest.class);
 
     private StandardContentService service;
+    private MockCalendarDao calendarDao;
     private MockContentDao contentDao;
+    private MockDaoStorage storage;
+    private SingleVMLockManager lockManager;
     private TestHelper testHelper;
 
     /** */
     protected void setUp() throws Exception {
         testHelper = new TestHelper();
-        contentDao = new MockContentDao(new MockDaoStorage());
+        storage = new MockDaoStorage();
+        calendarDao = new MockCalendarDao(storage);
+        contentDao = new MockContentDao(storage);
         service = new StandardContentService();
+        lockManager = new SingleVMLockManager();
+        service.setCalendarDao(calendarDao);
         service.setContentDao(contentDao);
+        service.setLockManager(lockManager);
         service.init();
     }
 

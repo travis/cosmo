@@ -23,12 +23,14 @@ import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.service.lock.LockManager;
 
 /**
  * Standard implementation of <code>ContentService</code>.
@@ -42,6 +44,7 @@ public class StandardContentService implements ContentService {
 
     private CalendarDao calendarDao;
     private ContentDao contentDao;
+    private LockManager lockManager;
 
     // ContentService methods
 
@@ -219,35 +222,51 @@ public class StandardContentService implements ContentService {
      * of a child Item is accomplished by setting Item.isActive
      * to false to an existing Item.
      * 
+     * The collection is locked at the beginning of the update. Any
+     * other update that begins before this update has completed, and
+     * the collection unlocked, will fail immediately with a
+     * <code>CollectionLockedException</code>.
+     *
      * @param collection
      *             collection to update
      * @param children
      *             children to update
      * @return updated collection
+     * @throws CollectionLockedException if the collection is
+     * currently locked for an update.
      */
-    public CollectionItem updateCollection(CollectionItem collection, Set<Item> children) {
+    public CollectionItem updateCollection(CollectionItem collection,
+                                           Set<Item> children) {
         if (log.isDebugEnabled()) {
             log.debug("updating collection " + collection.getName());
         }
-        
-        for(Item item : children) {
-            // for now, only process ContentItems
-            if(item instanceof ContentItem) {
-                // deletion
-                if(item.getIsActive()==false)
-                    contentDao.removeContent((ContentItem) item);
-                // addition
-                else  if(item.getId()==-1)
-                    contentDao.createContent(collection, (ContentItem) item);
-                // update
-                else
-                    contentDao.updateContent((ContentItem) item);
+
+        if (! lockManager.lockCollection(collection, 0))
+            throw new CollectionLockedException("unable to obtain collection lock");
+
+        try {
+            for(Item item : children) {
+                // for now, only process ContentItems
+                if(item instanceof ContentItem) {
+                    // deletion
+                    if(item.getIsActive()==false)
+                        contentDao.removeContent((ContentItem) item);
+                    // addition
+                    else  if(item.getId()==-1)
+                        contentDao.createContent(collection,
+                                                 (ContentItem) item);
+                    // update
+                    else
+                        contentDao.updateContent((ContentItem) item);
+                }
             }
+
+            // update collection
+            contentDao.updateCollection(collection);
+        } finally {
+            lockManager.unlockCollection(collection);
         }
-        
-        // update collection
-        contentDao.updateCollection(collection);
-        
+
         // TODO: Find better way to refresh collection to get updated
         //       children
         return contentDao.findCollectionByUid(collection.getUid());
@@ -453,9 +472,12 @@ public class StandardContentService implements ContentService {
      * and defaulting optional properties.
      */
     public void init() {
-        if (contentDao == null) {
+        if (calendarDao == null)
+            throw new IllegalStateException("calendarDao must not be null");
+        if (contentDao == null)
             throw new IllegalStateException("contentDao must not be null");
-        }
+        if (lockManager == null)
+            throw new IllegalStateException("lockManager must not be null");
     }
 
     /**
@@ -486,5 +508,15 @@ public class StandardContentService implements ContentService {
     /** */
     public void setContentDao(ContentDao dao) {
         contentDao = dao;
+    }
+
+    /** */
+    public LockManager getLockManager() {
+        return lockManager;
+    }
+
+    /** */
+    public void setLockManager(LockManager lockManager) {
+        this.lockManager = lockManager;
     }
 }

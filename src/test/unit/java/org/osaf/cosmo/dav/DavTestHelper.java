@@ -51,6 +51,7 @@ import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
+import org.osaf.cosmo.service.lock.SingleVMLockManager;
 import org.osaf.cosmo.util.PathUtil;
 
 /**
@@ -85,10 +86,12 @@ public class DavTestHelper extends TestHelper {
         MockCalendarDao calendarDao = new MockCalendarDao(storage);
         MockContentDao contentDao = new MockContentDao(storage);
         MockUserDao userDao = new MockUserDao();
+        SingleVMLockManager lockManager = new SingleVMLockManager();
 
         contentService = new StandardContentService();
         contentService.setCalendarDao(calendarDao);
         contentService.setContentDao(contentDao);
+        contentService.setLockManager(lockManager);
         contentService.init();
 
         userService = new StandardUserService();

@@ -375,6 +375,9 @@
     </property>
   </bean>
 
+  <bean id="contentLockManager"
+        class="org.osaf.cosmo.service.lock.SingleVMLockManager"/>
+
   <bean id="contentService" parent="txProxyTemplate">
     <property name="proxyInterfaces">
       <value>org.osaf.cosmo.service.ContentService</value>
@@ -393,6 +396,9 @@
     </property>
     <property name="contentDao">
       <ref bean="contentDao"/>
+    </property>
+    <property name="lockManager">
+      <ref bean="contentLockManager"/>
     </property>
   </bean>
 

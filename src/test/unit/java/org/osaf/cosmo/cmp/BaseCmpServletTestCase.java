@@ -30,6 +30,7 @@ import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
+import org.osaf.cosmo.service.lock.SingleVMLockManager;
 
 /**
  * Base class for CMP servlet test cases.
@@ -54,10 +55,12 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         MockCalendarDao calendarDao = new MockCalendarDao(storage);
         MockContentDao contentDao = new MockContentDao(storage);
         MockUserDao userDao = new MockUserDao();
+        SingleVMLockManager lockManager = new SingleVMLockManager();
 
         contentService = new StandardContentService();
         contentService.setCalendarDao(calendarDao);
         contentService.setContentDao(contentDao);
+        contentService.setLockManager(lockManager);
         contentService.init();
 
         userService = new StandardUserService();

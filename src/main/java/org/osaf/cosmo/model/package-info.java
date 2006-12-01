@@ -1,12 +1,12 @@
 /*
  * Copyright 2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@
         name="bytearray_blob",
         typeClass = org.osaf.cosmo.hibernate.BinaryBlobType.class
     ),
-    
+
     @TypeDef(
             name="calendar_clob",
             typeClass = org.osaf.cosmo.hibernate.CalendarClobType.class
@@ -47,15 +47,16 @@
     @NamedQuery(name="item.by.parent.name", query="from Item where parent=:parent and name=:name and isActive=true"),
     @NamedQuery(name="item.by.ownerName.name.nullParent", query="select i from Item i, User u where i.owner=u and u.username=:username and i.name=:name and i.parent is null and i.isActive=true"),
     @NamedQuery(name="item.by.ownerId.and.nullParent", query="select i from Item i where i.owner.id=:ownerid and i.parent is null and i.isActive=true"),
-    
+
     // User Queries
     @NamedQuery(name="user.byUsername", query="from User where username=:username"),
     @NamedQuery(name="user.byEmail", query="from User where email=:email"),
     @NamedQuery(name="user.byUid", query="from User where uid=:uid"),
-       
+    @NamedQuery(name="user.byActivationId", query="from User where activationid=:activationId"),
+
     // Event Queries
     @NamedQuery(name="event.by.calendar.icaluid", query="select i from ContentItem i, CalendarPropertyIndex pi where pi.item.id=i.id and i.parent=:calendar and pi.name='icalendar:vcalendar-vevent_uid' and pi.value=:uid and i.isActive=true")
-               
+
 })
 package org.osaf.cosmo.model;
 

@@ -50,6 +50,7 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.service.account.ActivationContext;
 import org.osaf.cosmo.server.SpaceUsageReport;
 import org.osaf.cosmo.server.StatusSnapshot;
 import org.osaf.cosmo.util.PageCriteria;
@@ -257,6 +258,7 @@ public class CmpServlet extends HttpServlet {
 
         if (req.getPathInfo().startsWith(URL_ACTIVATE)){
             processActivateUser(req, resp);
+            return;
         }
 
         Matcher m = PATTERN_POSTED_DELETE.matcher(req.getPathInfo());
@@ -729,7 +731,8 @@ public class CmpServlet extends HttpServlet {
         try {
             Document xmldoc = readXmlRequest(req);
             UserResource resource = new UserResource(getUrlBase(req), xmldoc);
-            userService.createUser(resource.getUser());
+            userService.createUser(resource.getUser(),
+                    new ActivationContext(req.getLocale()));
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("Content-Location", resource.getHomedirUrl());
             resp.setHeader("ETag", resource.getEntityTag());
@@ -809,7 +812,8 @@ public class CmpServlet extends HttpServlet {
                                "Username does not match request URI");
                 return;
             }
-            userService.createUser(user);
+            userService.createUser(user,
+                    new ActivationContext(req.getLocale()));
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("ETag", resource.getEntityTag());
         } catch (SAXException e) {

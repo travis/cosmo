@@ -19,6 +19,12 @@
 -->
 
 <beans>
+  <bean id="messageSource"
+        class="org.springframework.context.support.ResourceBundleMessageSource">
+    <property name="basename">
+      <value>MessageResources</value>
+    </property>
+  </bean>
 
   <!-- load the cosmo properties file and make the cosmo
        config properties available to other spring beans -->
@@ -326,8 +332,20 @@
         class="org.apache.commons.id.random.SessionIdGenerator"/>
 
   <bean id="accountActivator"
-        class="org.osaf.cosmo.service.account.AutomaticAccountActivator">
-    <property name="userDao"><ref bean="userDao"/></property>
+        class="org.osaf.cosmo.service.account.EmailAccountActivator">
+    <property name="idGenerator">
+      <ref local="idGenerator" />
+    </property>
+    <property name="mailSender">
+      <ref local="mailSender" />
+    </property>
+    <property name="userService">
+      <ref local="userService" />
+    </property>
+    <property name="messageSource">
+      <ref local="messageSource" />
+    </property>
+
   </bean>
 
   <bean id="userService" parent="txProxyTemplate">
@@ -354,6 +372,9 @@
     </property>
     <property name="accountActivator">
       <ref bean="accountActivator"/>
+    </property>
+    <property name="accountActivationRequired">
+        <value>${cosmo.service.account.requireActivation}</value>
     </property>
   </bean>
 
@@ -608,7 +629,7 @@
          /account=ROLE_ROOT,ROLE_USER
          /account/view=ROLE_ROOT,ROLE_USER
          /account/update=ROLE_ROOT,ROLE_USER
-         /account/activate/*=ROLE_ANONYMOUS
+         /account/activate/*=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /account/forgot=ROLE_ANONYMOUS
          /account/remind=ROLE_ANONYMOUS
          /login=ROLE_ANONYMOUS

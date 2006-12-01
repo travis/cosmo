@@ -222,8 +222,8 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
     private User findUserByActivationId(String id) {
         Session session = getSession();
-        Query hibQuery = session.getNamedQuery("user.byActivationid").setParameter(
-                "activationid", id);
+        Query hibQuery = session.getNamedQuery("user.byActivationId").setParameter(
+                "activationId", id);
         hibQuery.setCacheable(true);
         List users = hibQuery.list();
         if (users.size() > 0)
@@ -266,8 +266,8 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
         private Order createOrder(PageCriteria pageCriteria, String property) {
             return pageCriteria.isSortAscending() ?
-            	Order.asc(property) :
-           		Order.desc(property);
+                Order.asc(property) :
+                   Order.desc(property);
         }
     }
 

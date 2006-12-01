@@ -18,6 +18,7 @@ package org.osaf.cosmo.service;
 import java.util.Set;
 
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.service.account.ActivationContext;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -88,6 +89,22 @@ public interface UserService extends Service {
      * email address is already in use
      */
     public User createUser(User user);
+
+    /**
+     * Creates a user account in the repository. Digests the raw
+     * password and uses the result to replace the raw
+     * password. Returns a new instance of <code>User</code>
+     * after saving the original one.
+     *
+     * This version of this method uses <code>activationContext</code>
+     * to determine the locale for and whether or not to send an
+     * activation message.
+     *
+     * @param user the account to create
+     * @throws DataIntegrityViolationException if the username or
+     * email address is already in use
+     */
+    public User createUser(User user, ActivationContext activationContext);
 
     /**
      * Updates a user account that exists in the repository. If the

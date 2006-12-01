@@ -53,7 +53,7 @@ public class EventRecord extends EimRecord {
 
     /** */
     public EventRecord(EventStamp stamp) {
-        setUuid(stamp.getItem().getUid());
+        super(stamp.getItem());
         dtStart = stamp.getStartDate();
         dtEnd = stamp.getEndDate();
         location = stamp.getLocation();
@@ -67,9 +67,7 @@ public class EventRecord extends EimRecord {
 
     /** */
     public void applyTo(EventStamp stamp) {
-        if (! stamp.getItem().getUid().equals(getUuid()))
-            throw new IllegalArgumentException("cannot apply record to item with non-matching uuid");
-
+        super.applyTo(stamp.getItem());
         stamp.setStartDate(dtStart);
         stamp.setEndDate(dtEnd);
         stamp.setLocation(location);

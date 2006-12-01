@@ -34,12 +34,11 @@ public class CollectionRecord extends EimRecord {
 
     /** */
     public CollectionRecord(CollectionItem collection) {
-        setUuid(collection.getUid());
+        super(collection);
     }
 
     /** */
     public void applyTo(CollectionItem collection) {
-        if (! collection.getUid().equals(getUuid()))
-            throw new IllegalArgumentException("cannot apply record to item with non-matching uuid");
+        super.applyTo(collection);
     }
 }

@@ -15,8 +15,11 @@
  */
 package org.osaf.cosmo.eim;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+
+import org.osaf.cosmo.model.Item;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +32,25 @@ public abstract class EimRecord {
 
     private String uuid;
     private boolean deleted = false;
+
+    /** */
+    public EimRecord() {
+    }
+
+    /** */
+    public EimRecord(Item item) {
+        setUuid(item.getUid());
+        if (! BooleanUtils.isTrue(item.getIsActive()))
+            deleted = true;
+    }
+
+    /** */
+    public void applyTo(Item item) {
+        if (! item.getUid().equals(getUuid()))
+            throw new IllegalArgumentException("cannot apply record to item with non-matching uuid");
+        if (deleted)
+            item.setIsActive(Boolean.FALSE);
+    }
 
     /** */
     public String getUuid() {

@@ -41,7 +41,7 @@ public class ItemRecord extends EimRecord {
 
     /** */
     public ItemRecord(ContentItem item) {
-        setUuid(item.getUid());
+        super(item);
         title = item.getDisplayName();
         triageStatus = item.getTriageStatus();
         triageStatusChanged = item.getTriageStatusUpdated();
@@ -51,8 +51,7 @@ public class ItemRecord extends EimRecord {
 
     /** */
     public void applyTo(ContentItem item) {
-        if (! item.getUid().equals(getUuid()))
-            throw new IllegalArgumentException("cannot apply record to item with non-matching uuid");
+        super.applyTo(item);
         item.setDisplayName(title);
         item.setTriageStatus(triageStatus);
         item.setTriageStatusUpdated(triageStatusChanged);

@@ -34,12 +34,11 @@ public class TaskRecord extends EimRecord {
 
     /** */
     public TaskRecord(TaskStamp stamp) {
-        setUuid(stamp.getItem().getUid());
+        super(stamp.getItem());
     }
 
     /** */
     public void applyTo(TaskStamp stamp) {
-        if (! stamp.getItem().getUid().equals(getUuid()))
-            throw new IllegalArgumentException("cannot apply record to item with non-matching uuid");
+        super.applyTo(stamp.getItem());
     }
 }

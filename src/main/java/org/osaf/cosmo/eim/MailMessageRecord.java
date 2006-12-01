@@ -37,7 +37,7 @@ public class MailMessageRecord extends EimRecord {
 
     /** */
     public MailMessageRecord(MessageStamp stamp) {
-        setUuid(stamp.getItem().getUid());
+        super(stamp.getItem());
         subject = stamp.getSubject();
         to = stamp.getTo();
         cc = stamp.getCc();
@@ -46,9 +46,7 @@ public class MailMessageRecord extends EimRecord {
 
     /** */
     public void applyTo(MessageStamp stamp) {
-        if (! stamp.getItem().getUid().equals(getUuid()))
-            throw new IllegalArgumentException("cannot apply record to item with non-matching uuid");
-
+        super.applyTo(stamp.getItem());
         stamp.setSubject(subject);
         stamp.setTo(to);
         stamp.setCc(cc);

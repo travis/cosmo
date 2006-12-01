@@ -35,16 +35,14 @@ public class NoteRecord extends EimRecord {
 
     /** */
     public NoteRecord(NoteStamp stamp) {
-        setUuid(stamp.getItem().getUid());
+        super(stamp.getItem());
         body = stamp.getBody();
         icalUid = stamp.getIcalUid();
     }
 
     /** */
     public void applyTo(NoteStamp stamp) {
-        if (! stamp.getItem().getUid().equals(getUuid()))
-            throw new IllegalArgumentException("cannot apply record to item with non-matching uuid");
-
+        super.applyTo(stamp.getItem());
         stamp.setBody(body);
         stamp.setIcalUid(icalUid);
     }

@@ -25,7 +25,6 @@ import org.apache.commons.id.IdentifierGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.service.UserService;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -38,7 +37,6 @@ public class EmailAccountActivator extends AbstractCosmoAccountActivator {
     private IdentifierGenerator idGenerator;
     private JavaMailSender mailSender;
     private ResourceBundleMessageSource messageSource;
-    private UserService userService;
 
     private static final String MSG_ACTIVATION_SUBJECT =
         "Email.Activation.Subject";
@@ -62,8 +60,8 @@ public class EmailAccountActivator extends AbstractCosmoAccountActivator {
 
                 Locale locale = activationContext.getLocale();
 
-                User rootUser = userService.getUser(User.USERNAME_OVERLORD);
-                String fromAddr = rootUser.getEmail();
+                User sender = activationContext.getSender();
+                String fromAddr = sender.getEmail();
                 String fromHandle =
                     messageSource.getMessage(MSG_ACTIVATION_HANDLE,
                             new Object[] {},
@@ -118,14 +116,6 @@ public class EmailAccountActivator extends AbstractCosmoAccountActivator {
 
     public void setMailSender(JavaMailSender mailSender) {
         this.mailSender = mailSender;
-    }
-
-    public UserService getUserService() {
-        return userService;
-    }
-
-    public void setUserService(UserService userService) {
-        this.userService = userService;
     }
 
     public ResourceBundleMessageSource getMessageSource() {

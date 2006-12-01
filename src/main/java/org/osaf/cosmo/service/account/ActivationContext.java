@@ -17,10 +17,13 @@ package org.osaf.cosmo.service.account;
 
 import java.util.Locale;
 
+import org.osaf.cosmo.model.User;
+
 public class ActivationContext {
 
     private Locale locale;
     private boolean activationRequired;
+    private User sender;
 
     /**
      * Creates new <code>ActivationContext</code> with
@@ -59,5 +62,13 @@ public class ActivationContext {
     }
     public void setLocale(Locale locale) {
         this.locale = locale;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 }

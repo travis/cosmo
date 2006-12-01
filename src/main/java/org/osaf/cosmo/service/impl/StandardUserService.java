@@ -158,6 +158,9 @@ public class StandardUserService implements UserService {
     }
 
     public User createUser(User user, ActivationContext activationContext) {
+        activationContext.setSender(
+                this.getUser(User.USERNAME_OVERLORD));
+        
         boolean accountActivationRequired =
             (!user.isOverlord() &&
              (this.accountActivator != null) &&

@@ -43,6 +43,13 @@
             <directory>src/webapp/</directory>
             <outputDirectory>tomcat/webapps/ROOT/</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>../target/</directory>
+            <outputDirectory>tomcat/webapps/</outputDirectory>
+            <includes>
+                <include>cosmo-${pom.version}.war</include>
+            </includes>
+        </fileSet>
     </fileSets>
     <files>
         <file>

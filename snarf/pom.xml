@@ -42,16 +42,29 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
+        <pluginRepository>
+            <id>people.apache.org</id>
+            <name>people.apache plugin repository</name>
+            <layout>default</layout>
+            <url>http://people.apache.org/repo/m2-shapshot-repository</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
     </pluginRepositories>
     <dependencies>
+<!--
         <dependency>
           <groupId>org.osaf.cosmo</groupId>
           <artifactId>cosmo</artifactId>
+ -->
           <!-- when you update this version, you must also update it in
                src/main/config/server.xml -->
+<!--
           <version>${pom.version}</version>
           <type>war</type>
         </dependency>
+ -->
         <dependency>
           <groupId>org.osaf</groupId>
           <artifactId>apache-tomcat</artifactId>
@@ -135,6 +148,7 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <configuration>
                         <descriptors>

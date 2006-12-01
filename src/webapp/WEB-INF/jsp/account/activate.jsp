@@ -49,6 +49,10 @@ dojo.addOnLoad( function(){
     var accountActivator = dojo.widget.byId("accountActivator");
 
     accountActivator.setActivationId(activationId);
+    
+    dojo.event.connect("after", accountActivator, "activateSuccess", 
+    	function(){location = cosmo.env.getLoginRedirect()}
+    	);
 
 
 

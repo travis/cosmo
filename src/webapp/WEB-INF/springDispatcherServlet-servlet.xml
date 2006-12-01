@@ -68,6 +68,7 @@
            	/browse/**=homeDirectoryBrowsingController
     	    /i18n.js=i18nController
     	    /js/cosmo/util/i18n.js=i18nController
+    	    /account/activate=accountActivationController
 	        /**/*=jspViewController
 		</value>
     </property> 
@@ -82,12 +83,27 @@
     </property>
 </bean> 
 
+<!-- 
+
+	Controller for server status ui 
+	
+-->
+
+<bean id="internalPathMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver">
+</bean>
+
 <bean id="statusController" class="org.osaf.cosmo.spring.mvc.controllers.StatusController">
 	<property name="methodNameResolver"><ref bean="internalPathMethodNameResolver"/></property>
 	<property name="dumpView"><value>admin_status_dump</value></property>
 	<property name="viewView"><value>admin_status_view</value></property>
 	<property name="gcView"><value>redirect:/admin/status/view</value></property>
 </bean>
+
+<!-- 
+
+	Controller for home directory browser
+
+ -->
 
 <bean id="homeDirectoryBrowsingController" class="org.osaf.cosmo.spring.mvc.controllers.HomeDirectoryBrowsingController">
 	<property name="methodNameResolver"><ref bean="homeDirectoryBrowsingMethodNameResolver"/></property>
@@ -116,13 +132,6 @@
 	</property>
 </bean>
 
-<bean id="internalPathMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver">
-</bean>
-
-<bean id="logoutController" class="org.osaf.cosmo.spring.mvc.controllers.LogoutController"> 
-    <property name="forwardPath" value="logout" />
-</bean> 
-
 <bean id="newTicketForm" class="org.osaf.cosmo.spring.mvc.controllers.TicketFormController">
         <property name="commandName"><value>ticket</value></property>
         <property name="commandClass">
@@ -136,15 +145,58 @@
        	<property name="securityManager"><ref bean="securityManager" /></property>
 </bean>
 
-<bean id="resourceBundleViewResolver" class="org.springframework.web.servlet.view.ResourceBundleViewResolver"> 
-	<property name="order" value="1"/>
-	<property name="basename" value="views" />
+<!-- 
+
+	Controller for logout
+	
+ -->
+
+<bean id="logoutController" class="org.osaf.cosmo.spring.mvc.controllers.LogoutController"> 
+    <property name="forwardPath" value="logout" />
 </bean> 
 
+<!-- 
 
-<!-- This resolver checks for redirect: or forward: prefixes. If none is found, it forwards to a 
-	 "resource not found" page. -->
-<bean id="defaultViewResolver" class="org.osaf.cosmo.spring.mvc.views.resolvers.CosmoDefaultViewResolver"> 
+	Controller for account activation
+
+ -->
+
+<bean id="accountActivationController" 
+	  class="org.osaf.cosmo.ui.account.activation.AccountActivationController"> 
+	  
+    <property name="accountActivationView" value="account_activate" />
+    <property name="notFoundView" value="error_notfound" />
+    <property name="userService"><ref bean="userService"/></property>
+</bean> 
+
+<!--
+ ********************	
+ 
+	View resolvers
+  
+ ********************
+ -->
+
+
+<bean id="resourceBundleViewResolver" 
+      class="org.springframework.web.servlet.view.ResourceBundleViewResolver"> 
+	<property name="order" value="1"/>
+	<property name="basename" value="views" />
+	<property name="defaultParentView" value="default" />
+</bean> 
+
+<!--
+	 
+	Final view resolver.
+
+	This resolver checks for redirect: or forward: prefixes and performs
+	the InternalResourceViewResolver standard behavior if found.
+	
+	If neither is found, it forwards to a pretty "resource not found" page. 
+-->	 
+
+<bean id="defaultViewResolver" 
+      class="org.osaf.cosmo.spring.mvc.views.resolvers.CosmoDefaultViewResolver"> 
 
 </bean> 
 

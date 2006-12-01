@@ -1,6 +1,6 @@
 package org.osaf.cosmo.log;
 
-import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.io.IOException;
@@ -73,21 +73,22 @@ public class HttpLoggingFilter implements Filter {
 
     public void init(FilterConfig config) throws ServletException {
 
-        ApplicationContext ctx =
+        WebApplicationContext wac =
             WebApplicationContextUtils.getRequiredWebApplicationContext(
                     config.getServletContext()
             );
 
-        this.securityManager =
-            (CosmoSecurityManager) ctx.getBean(BEAN_SECURITY_MANAGER);
+        this.securityManager = (CosmoSecurityManager)
+            wac.getBean(BEAN_SECURITY_MANAGER,
+                        CosmoSecurityManager.class);
 
         if (this.securityManager == null){
             throw new ServletException("Could not initialize HttpLoggingFilter: " +
-                    "Could not find security manager.");
+            "Could not find security manager.");
         }
 
-        Object format =
-            ctx.getBean(BEAN_HTTP_LOGGING_FORMAT);
+        String format = (String)
+            wac.getBean(BEAN_HTTP_LOGGING_FORMAT, String.class);
 
         if (format != null){
             try {

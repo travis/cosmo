@@ -1,4 +1,5 @@
-<div id="${this.widgetId}" class="baseWidget">
+
+    <table dojoAttachPoint="tableContainer" id="${this.widgetId}" class="baseWidget">
 <!--
   Copyright 2006 Open Source Applications Foundation
 
@@ -14,39 +15,43 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-    <table dojoAttachPoint="tableContainer">
+
         <tbody>
             <tr>
-                <td dojoAttachPoint="usernameLabel">
+                <td dojoAttachPoint="usernameLabel" class="labelTextCell">
                 Username:
                 </td>
-                <td dojoAttachPoint="usernameText">
+                <td dojoAttachPoint="usernameText"></td>
             </tr>
             <tr>
-                <td dojoAttachPoint="nameLabel">
+                <td dojoAttachPoint="nameLabel" class="labelTextCell">
                 Name:
                 </td>
-                <td dojoAttachPoint="nameText">
+                <td dojoAttachPoint="nameText"></td>
             </tr>
             <tr>
-                <td dojoAttachPoint="emailLabel">
+                <td dojoAttachPoint="emailLabel" class="labelTextCell">
                 Email:
                 </td>
-                <td dojoAttachPoint="emailnameText">
+                <td dojoAttachPoint="emailText"></td>
             </tr>
             <tr>
-                <td dojoAttachPoint="urlLabel">
+                <td dojoAttachPoint="urlLabel" class="labelTextCell">
                 Url:
                 </td>
-                <td dojoAttachPoint="urlText">
+                <td dojoAttachPoint="urlText"></td>
             </tr>
             <tr>
-                <td dojoAttachPoint="homedirUrlLabel">
+                <td dojoAttachPoint="homedirUrlLabel" class="labelTextCell">
                 Home Directory Url:
                 </td>
-                <td dojoAttachPoint="homedirUrlText">
+                <td dojoAttachPoint="homedirUrlText"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td dojoAttachPoint="activateButtonContainer" id="activateButtonContainer">Foo</td>
             </tr>
 
         </tbody>
     </table>
-</span>
+

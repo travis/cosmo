@@ -7,6 +7,7 @@ dojo.require("cosmo.cmp");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.ui.widget.Button");
+dojo.require("cosmo.util.cookie");
 
 _ = cosmo.util.i18n.getText
 
@@ -14,14 +15,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
     {
         stylesheet: "",
         templatePath: dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/LoginDialog/LoginDialog.html"),
-        
+
         // Props from template or set in constructor
         authProc: "",
         passwordLabel: _("Login.Password"),
         usernameLabel: _("Login.Username"),
         loginPrompt: _("Login.Prompt"),
         redirectHome: true,
-        
+
         // Attach points
         loginPromptContainer: null,
         usernameLabelContainer: null,
@@ -54,7 +55,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
                 var username  = this.usernameInput.value;
                 if (username == cosmo.env.OVERLORD_USERNAME) {
                     location = cosmo.env.getBaseUrl() + "/account/view";
-                } 
+                }
                 else {
                     location = cosmo.env.getBaseUrl() + "/pim";
                 }
@@ -77,7 +78,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
             }
             else {
                 self.showPrompt('normal', 'Logging you on. Please wait ...');
-                Cookie.set('username', un);
+                dojo.io.cookie.set('username', un);
 
                 postData = { 'j_username': un, 'j_password': pw };
 
@@ -115,13 +116,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
         },
         postCreate: function (){
             var self = this;
-            var button = dojo.widget.createWidget("cosmo:Button", 
+            var button = dojo.widget.createWidget("cosmo:Button",
                 { text: _("Login.Button.Ok"), width: 74, widgetId: "loginSubmitButton" } );
             var logo = document.createElement('img');
-            
+
             this.submitButtonContainer.appendChild(button.domNode);
             this.submitButton = button;
-            
+
             logo.src = cosmo.env.getImagesUrl() + LOGO_GRAPHIC;
             this.logoContainer.appendChild(logo);
             dojo.event.connect(this.passwordInput, "onfocus", function () { self.loginFocus = true });

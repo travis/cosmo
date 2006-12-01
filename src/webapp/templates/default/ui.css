@@ -63,9 +63,31 @@ $calTopNavColor = #ffffff
     font-family:$fontFamily;
     padding:0px;
     margin:0px;
-    border:0px;
     color:$fontColor;
 }
+img {
+    border: 0px;
+    }
+
+hr {
+    height:1px;
+    border:0px;
+    background:#cccccc;
+}
+
+a:visited {
+    color: #5555bb;
+}
+
+a:link {
+    color: #5555bb;
+}
+
+a:hover {
+    color: #9999cc;
+}
+
+
 /* Set default font size here
  * height of 100% ensures that IE can get an accurate measure
  * of the window height */
@@ -76,6 +98,7 @@ body {
     height:100%;
     font-size:$fontSizeL;
 }
+
 /* Stupid default behavior is to act like
  * a block-level element */
 form {
@@ -102,6 +125,25 @@ a {
     display:none;
 }
 
+
+
+/*************************************************
+ * Admin UI Styles                               *
+ *                                               *
+ * Until the Pim and Admin UI layouts are united *
+ * we need separate styles for the admin ui.     *
+ *************************************************
+ */
+
+
+body.adminPage {
+    font-size: $fontSizeL;
+    background: #ffffff;
+    color:#222222;
+    padding:8px;
+}
+
+
 /* Main styles, classes
  * ==================================== */
 /* Login
@@ -115,29 +157,207 @@ a {
     color:#aa3333;
 }
 #loginDialog{
-	margin:auto;
-	width:280px;
-	text-align:left;
-	padding-top:16px;
+    margin:auto;
+    width:280px;
+    text-align:left;
+    padding-top:16px;
 }
 #loginDialogInputsBox td {
     padding-bottom:4px;
 }
 #loginDialogLoginPrompt {
-	height:46px;
+    height:46px;
 }
+
 #loginDialogLogo {
     text-align:center;
     padding-bottom:4px;
 }
 #loginDialogFormContainer {
-	padding:12px;
+    padding:12px;
     border:1px solid $uiDetailBorderColor;
 }
-#loginDialogSubmitButton{
-	margin-top:16px;
-	float:right;
+
+#loginDialogInputsBox{
 }
+#loginDialogUsernameWidget{
+    display: table-row;
+}
+#loginDialogUsernamePrompt{
+    display: table-cell;
+    text-align: right;
+}
+#loginDialogUsernameInputContainer{
+    display: table-cell;
+    padding-bottom:4px;
+}
+#loginDialogPasswordWidget{
+    display: table-row;
+}
+#loginDialogPasswordPrompt{
+    display: table-cell;
+    text-align: right;
+}
+#loginDialogPasswordInput{
+}
+#loginDialogUsernameInputContainer{
+    display: table-cell;
+}
+#loginDialogSubmitButton{
+    margin-top:16px;
+    float:right;
+}
+
+/* Account Activation
+ * --------------------- */
+
+#accountActivator{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top:2em;
+
+    text-align:left;
+    padding:24px;
+}
+
+#accountActivateButton{
+    margin: 10px;
+}
+
+/* User Modification
+ * ------------------*/
+form.modifyUserForm{
+    display:block;
+    background: blue;
+}
+
+/* Home Dir Browser styles
+ * -------------------*/
+
+.smTableColHead {
+    font-size: 11px;
+    color:#666666;
+    font-weight:bold;
+    text-align:center;
+    background:#eeeeee;
+    border:1px solid #cccccc;
+    white-space:nowrap;
+}
+
+.smTableData {
+    font-size: 11px;
+    border:1px solid #cccccc;
+}
+
+
+/* User list styling
+ * ------------------- */
+       table#userList {
+            width:100%;
+
+        }
+
+        * html div.tableContainer {	/* IE only hack */
+            width:95%;
+
+        }
+
+        table#userList td,
+        table#userList th{
+            border-right:1px solid #999;
+            padding:2px;
+            font-weight:normal;
+            cursor: pointer;
+
+        }
+        table#userList thead td, table#userList thead th {
+            font-size: 11px;
+              color:#666666;
+                font-weight:bold;
+            text-align:center;
+            background:#eeeeee;
+                border:1px solid #cccccc;
+            white-space:nowrap;
+        }
+
+        * html div.tableContainer table thead tr td,
+        * html div.tableContainer table thead tr th{
+            /* IE Only hacks */
+            position:relative;
+            top:expression(dojo.html.getFirstAncestorByTag(this,'table').parentNode.scrollTop-2);
+        }
+
+        html>body tbody.userListBody {
+
+        }
+
+        tbody.userListBody td, tbody.userListBody tr td {
+            font-size: 11px;
+            border:1px solid #cccccc;
+
+        }
+
+        tbody.userListBody tr.alternateRow td {
+            background: #e3edfa;
+            padding: 2px;
+        }
+
+        tbody.userListBody tr.selected td {
+            background: yellow;
+            padding: 2px;
+        }
+        tbody.userListBody tr:hover td {
+            background: #a6c2e7;
+            padding: 2px;
+        }
+        tbody.userListBody tr.selected:hover td {
+            background: #ff3;
+            padding: 2px;
+        }
+
+        a.userListPagingLink {
+            text-decoration: none;
+            color: blue;
+        }
+
+        span#pageNumberChooser {
+            position: absolute;
+            right: 2em;
+        }
+
+        span#pageSizeChooser {
+            position: absolute;
+            left: 2em;
+        }
+
+        div#userListControls {
+            font-size: 0.9em;
+            height: 2em;
+        }
+
+        form.modifyUserForm {
+
+            width: 50%;
+            position: fixed;
+            left: 25%;
+            top: 25%;
+            background: white;
+
+        }
+
+        img#orderIndicator {
+            padding-left : 5px;
+        }
+
+        div#userAdminLinkBlock{
+            margin-top: 0.2em;
+        }
+
+        div#userAdminLinkBlock>a {
+            text-decoration: none;
+            font-size: 0.98em;
+            margin-right: 1em;
+        }
 
 /* Buttons
  * --------------------- */
@@ -264,12 +484,13 @@ table.dataDisplay {
 }
 table.dataDisplay td {
     padding:4px;
-    border:1px solid #dfdfdf; 
+    border:1px solid #dfdfdf;
 }
 td.dataDisplayLabel {
     background-color:#eeeeee;
     color:#666666;
 }
+
 
 /* Calendar-specific styles, classes
  * ==================================== */
@@ -566,9 +787,9 @@ td.dataDisplayLabel {
 /* Fake popup for modal dialog box
  * --------------------- */
 /* Main box for fake popup */
-#modalDialog { 
-    position:absolute; 
-    background:$mainUIColor; 
+#modalDialog {
+    position:absolute;
+    background:$mainUIColor;
     position:absolute;
     background:$mainUIColor;
     border:1px solid $uiDetailBorderColor;
@@ -577,8 +798,8 @@ td.dataDisplayLabel {
 }
 /* Fake popup center content area -- inside padding */
 #modalDialogContainer {
-    padding:18px; 
-    padding-bottom:0px; 
+    padding:18px;
+    padding-bottom:0px;
 }
 /* Only set if the dialog title exists */
 .dialogTitle {
@@ -591,7 +812,7 @@ td.dataDisplayLabel {
     padding-left:6px;
     font-size:13px;
     font-weight:bold;
-    color:#444444; 
+    color:#444444;
 }
 /* Only set if the dialog prompt exists */
 .dialogPrompt {
@@ -600,7 +821,7 @@ td.dataDisplayLabel {
     height:32px;
     line-height:16px;
     vertical-align:middle;
-    font-size:11px; 
+    font-size:11px;
 }
 
 /* Minical styles
@@ -684,3 +905,119 @@ td.dataDisplayLabel {
 }
 
 
+/*
+ * TODO: Deprecate these
+ * Styles from the old cosmo.css
+ */
+
+
+.lg {
+    font-size: 16px;
+    color:#333333;
+}
+
+.hd {
+    font-size: 14px;
+    color:#333333;
+    font-weight:bold;
+}
+
+.md {
+    font-size: 12px;
+    color:#333333;
+}
+
+.mdData {
+    font-size: 12px;
+    color:#333333;
+}
+
+.mdLabel {
+    font-size: 12px;
+    color:#666666;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+.sm {
+    font-size: 11px;
+    color:#333333;
+}
+
+.smData {
+    font-size: 11px;
+    color:#333333;
+}
+
+.smLabel {
+    font-size: 11px;
+    color:#666666;
+    font-weight:bold;
+}
+
+.smTableColHead {
+    font-size: 11px;
+    color:#666666;
+    font-weight:bold;
+    text-align:center;
+    background:#eeeeee;
+    border:1px solid #cccccc;
+    white-space:nowrap;
+}
+
+.smTableData {
+    font-size: 11px;
+    border:1px solid #cccccc;
+}
+
+
+.footer {
+    font-size:
+    10px; font-style: italic;
+    color:#333333;
+}
+
+.inlinecodeblock {
+    font-family: monospace;
+    white-space: pre;
+    background: #eee;
+    padding: 12px;
+}
+
+.inlinecode {
+    font-family: monospace;
+    white-space: pre;
+    background: #eee;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.pre {
+    font-family: monospace;
+    white-space: pre;
+}
+
+.error { color: #aa3333 }
+
+.confirm { color: #33aa33 }
+
+.disabled { color:#aaaaaa; }
+
+.textInput {
+    color:#000000;
+    border:1px solid #aaaaaa;
+    padding:2px;
+}
+
+.buttonInput {
+    cursor:pointer;
+    padding:1px;
+}
+
+.widgetBorder {
+    border:1px solid #cccccc;
+}
+
+.widgetContent {
+    background:#efefef;
+}

@@ -27,45 +27,92 @@ dojo.require("dojo.event.*");
 dojo.require("dojo.dom");
 dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
+dojo.require("cosmo.ui.widget.Button");
+dojo.require("cosmo.util.i18n");
 
 dojo.provide("cosmo.ui.widget.AccountActivator");
 
-dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWidget, {
+_ = cosmo.util.i18n.getText
 
-    templatePath: dojo.uri.dojoUri(
-        "../../cosmo/ui/widget/templates/AccountActivator/AccountActivator.html"),
+dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWidget,
+    function(){
 
-    //properties to be set by tag or constructor
-    activationId: "",
+    },
+    {
 
-    //attach points
-    usernameLabel: null,
-    usernameText: null,
-    nameLabel: null,
-    nameText: null,
-    emailLabel: null,
-    emailText: null,
-    urlLabel: null,
-    urlText: null,
-    homedirUrlLabel: null,
-    homedirUrlText: null,
+        templatePath: dojo.uri.dojoUri(
+            "../../cosmo/ui/widget/templates/AccountActivator/AccountActivator.html"),
 
-    setActivationId: function(id){
-        var setActivationIdHandlerDict = {
-            handle: function(type, data, evt){
-                if (evt.status == 200){
-                    alert("activated")
-                } else if (evt.status == 403){
-                    alert("couldn't find user")
-                } else {
-                    alert(evt.status)
+        //properties to be set by tag or constructor
+        activationId: "",
+
+        //attach points
+        usernameLabel: null,
+        usernameText: null,
+        nameLabel: null,
+        nameText: null,
+        emailLabel: null,
+        emailText: null,
+        urlLabel: null,
+        urlText: null,
+        homedirUrlLabel: null,
+        homedirUrlText: null,
+        activateButtonContainer: null,
+
+        fillInTemplate: function (){
+            var button = dojo.widget.createWidget("cosmo:Button",
+                {text: _("Activation.Activate"),
+                 widgetId: "accountActivateButton"});
+
+            this.activateButtonContainer.appendChild(button.domNode);
+
+            dojo.event.connect(button, "handleOnClick",this, "_activateEventHandler");
+
+        },
+
+        setActivationId: function (id){
+            var self = this;
+            self.activationId = id;
+
+            var setActivationIdHandlerDict = {
+                handle: function(type, user, evt){
+                    if (evt.status == 200){
+                        self.usernameText.innerHTML = user.username;
+                        self.nameText.innerHTML = user.firstName + " " + user.lastName;
+                        self.emailText.innerHTML = user.email;
+                        self.urlText.innerHTML = user.url;
+                        self.homedirUrlText.innerHTML = user.homedirUrl;
+                    } else if (evt.status == 403){
+                        alert("couldn't find user");
+                    } else {
+                        alert(evt.status);
+                    }
                 }
+            }
+
+            cosmo.cmp.cmpProxy.getUserByActivationId(id, setActivationIdHandlerDict);
+
+
+        },
+
+        _activateEventHandler: function(){
+            this.activate({load: this.activateSuccess,
+                           error: this.activateFailure})
+        },
+
+        activateSuccess: function(type, data, evt){},
+
+        activateFailure: function(type, data, evt){},
+
+        activate: function (activateHandlerDict, id){
+            var activationId = (id == undefined) ? this.activationId : id;
+
+            if (activationId == "" || activationId == undefined){
+                throw new Error("Activation id not specified");
+            } else {
+                cosmo.cmp.cmpProxy.activate(activationId, activateHandlerDict);
             }
         }
 
-        cosmo.cmp.cmpProxy.getUserXMLByActivationId(id, setActivationIdHandlerDict);
-
-
     }
-
-});
+);

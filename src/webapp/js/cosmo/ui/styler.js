@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+dojo.provide("cosmo.ui.styler");
 
 Styler = new function() {
     this.styles = [];

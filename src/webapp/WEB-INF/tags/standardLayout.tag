@@ -16,9 +16,12 @@
 */
 --%>
 <%@ include   file="/WEB-INF/jsp/taglibs.jsp"            %>
+<%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
 <%@ attribute name="prefix" 		%>
 <%@ attribute name="showNav"        %>
+
+<cosmo:staticbaseurl var="staticBaseUrl"/>
 
 <c:if test="${empty showNav}">
   <c:set var="showNav" value="true"/>
@@ -35,12 +38,12 @@
         </c:forEach>
       </fmt:message>
     </title>
-    <link rel="stylesheet" type="text/css"
-          href="<c:url value="/cosmo.css"/>"/>
-    <script type="text/javascript"
-            src="<c:url value="/cosmo.js"/>"> </script>
+
+    <cosmo:dojoBoilerplate/>
+    <cosmo:globalCSSSafariHack/>
+
   </head>
-  <body class="bodystyle">
+  <body class="adminPage">
 
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
       <tr>
@@ -102,7 +105,7 @@
     </c:choose>
     <div class="md">
       <!-- page body -->
-		<jsp:doBody/>
+        <jsp:doBody/>
       <!-- end page body -->
     </div>
     <div id="debug"><div>

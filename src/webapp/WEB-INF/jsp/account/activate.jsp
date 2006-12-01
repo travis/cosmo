@@ -23,7 +23,6 @@
 
 <cosmo:standardLayout prefix="Account.Activate." showNav="false">
 
-<%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
 
 <script type="text/javascript">
 var ACCOUNT_ACTIVATION_URL = "/account/activate"
@@ -36,15 +35,23 @@ var activationId = location.pathname.substring(
 );
 </script>
 
-
-
 <div dojoType="cosmo:AccountActivator" widgetId="accountActivator"></div>
 
+
+
 <script type="text/javascript">
+/*
+Initialization function for this page that will initialize the account
+activator widget.
+
+*/
 dojo.addOnLoad( function(){
     var accountActivator = dojo.widget.byId("accountActivator");
 
     accountActivator.setActivationId(activationId);
+
+
+
 });
 </script>
 

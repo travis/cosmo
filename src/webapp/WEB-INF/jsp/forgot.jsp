@@ -21,6 +21,8 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<cosmo:dialogLayout prefix="Forgot.">
+
 <fmt:message var="signupButton" key="Forgot.Button.Signup"/>
 <fmt:message var="cancelButton" key="Button.Cancel"/>
 <fmt:message var="closeButton" key="Button.Close"/>
@@ -61,3 +63,4 @@
     </p>
   </html:form>
 </logic:messagesNotPresent>
+</cosmo:dialogLayout>

@@ -3,13 +3,13 @@
 <%--
 /*
  * Copyright 2005-2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,9 +23,6 @@
 <cosmoui:user var="user" />
 <cosmo:standardLayout prefix="Account.View.">
 
-<%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
-
-
 
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/cmp/cmp.js"></script>
 <script type="text/javascript">
@@ -33,22 +30,22 @@
 dojo.require("cosmo.ui.widget.ModifyUserDialog");
 
 modifyHandlerDict= {
-	handle : function(type, data, evt){
+    handle : function(type, data, evt){
 
-		if (evt.status == 204){
-			dojo.widget.byId("modifyUserDialog").populateFields();
+        if (evt.status == 204){
+            dojo.widget.byId("modifyUserDialog").populateFields();
 
-		}
-		else if (evt.status == 431){
-			//TODO: username in use stuff
-			alert("Username in use")
-		}
-		else if (evt.status == 432){
-			//TODO: email in use stuff
-			alert("Email in use")
-		}	
-	
-	}
+        }
+        else if (evt.status == 431){
+            //TODO: username in use stuff
+            alert("Username in use")
+        }
+        else if (evt.status == 432){
+            //TODO: email in use stuff
+            alert("Email in use")
+        }
+
+    }
 }
 
 </script>
@@ -84,10 +81,10 @@ modifyHandlerDict= {
       <fmt:message key="Account.View.BrowseHomeDirectory"/>
     </a>
   </p>
-  
+
 <div 	dojoType="cosmo:ModifyUserDialog" widgetId="modifyUserDialog"
-		role="cosmo.ROLE_AUTHENTICATED"		
-		header='<fmt:message key="Account.View.AccountDetails.Header"/>'
+        role="cosmo.ROLE_AUTHENTICATED"
+        header='<fmt:message key="Account.View.AccountDetails.Header"/>'
         firstNameLabel='<fmt:message key="Account.Form.FirstName"/>'
         lastNameLabel='<fmt:message key="Account.Form.LastName"/>'
         emailLabel='<fmt:message key="Account.Form.Email"/>'
@@ -99,7 +96,7 @@ modifyHandlerDict= {
         disableCancel="true"
         submitButtonText='<fmt:message key="Account.Form.Button.Update"/>'
         populateOnLoad="true"
-		> </div>
+        > </div>
 
 </authz:authorize>
 

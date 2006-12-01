@@ -1,108 +1,108 @@
 <form dojoAttachPoint="form" class="modifyUserForm">
 
-  <div class="hd" style="margin-bottom:4px;">${this.header}</div>
-  
+  <div style="margin-bottom:4px;">${this.header}</div>
+
   <table cellpadding="3" cellspacing="1" border="0">
 
     <tr dojoAttachPoint="usernameInput">
-      <td class="mdLabel" style="text-align:right;">
-      	${this.usernameLabel}
+      <td class="labelTextCell">
+          ${this.usernameLabel}
       </td>
       <td>
-      	<div class="smData"></div>
-      	<div>
-          <input id="username" size="32" maxlength="32" id="modifyUsername" />
-                     
-      	</div>
+          <div class="smData"></div>
+          <div>
+          <input id="username" size="32" maxlength="32" id="modifyUsername" class="inputText"/>
+
+          </div>
       </td>
     </tr>
     <tr dojoAttachPoint="firstNameInput">
-      <td class="mdLabel" style="text-align:right;">
-      	${this.firstNameLabel}
+      <td class="labelTextCell">
+          ${this.firstNameLabel}
       </td>
       <td>
         <div class="smData"></div>
         <div>
-          <input property="firstName" id="firstName" size="32" maxlength="128" />
+          <input property="firstName" id="firstName" size="32" maxlength="128" class="inputText"/>
 
-      	</div>
+          </div>
       </td>
     </tr>
     <tr dojoAttachPoint="lastNameInput">
-      <td class="mdLabel" style="text-align:right;">
-      	${this.lastNameLabel}
+      <td class="labelTextCell">
+          ${this.lastNameLabel}
       </td>
       <td>
         <div class="smData"></div>
         <div>
-          <input id="lastName" size="32" maxlength="128" />
+          <input id="lastName" size="32" maxlength="128" class="inputText"/>
 
-      	</div>
+          </div>
       </td>
     </tr>
     <tr dojoAttachPoint="emailInput">
-      <td class="mdLabel" style="text-align:right;">
-      	${this.emailLabel}
+      <td class="labelTextCell">
+          ${this.emailLabel}
       </td>
       <td>
         <div class="smData"></div>
-        <div><input id="email" size="32" maxlength="128">
-        			</div>
+        <div><input id="email" size="32" maxlength="128" class="inputText">
+                    </div>
       </td>
     </tr>
     <tr dojoAttachPoint="passwordBlurb">
       <td class="mdLabel" style="text-align:right;">
         &nbsp;
       </td>
-      <td class="mdData">
+      <td class="labelTextCell">
         <span class="sm">${this.passwordBlurb}</span>
       </td>
     </tr>
     <tr dojoAttachPoint="passwordInput">
-      <td class="mdLabel" style="text-align:right;">
-       	${this.passwordLabel}
+      <td class="labelTextCell">
+           ${this.passwordLabel}
       </td>
       <td>
         <div class="smData"></div>
         <div><input type="password" id="password" size="16" maxlength="16"
-        			/></div>
+                     class="inputText"/></div>
       </td>
     </tr>
     <tr dojoAttachPoint="confirmInput">
-      <td class="mdLabel" style="text-align:right;">
-       	${this.confirmLabel}      
+      <td class="labelTextCell">
+           ${this.confirmLabel}
       </td>
       <td>
         <div class="smData"></div>
         <div><input type="password" id="confirm" size="16" maxlength="16"
-        			/></div>
+                     class="inputText"/></div>
       </td>
     </tr>
     <tr dojoAttachPoint="adminInput">
-     <td class="mdLabel" style="text-align:right; vertical-align:top;">&nbsp;</td>
-      <td>  
+     <td class="labelTextCell">&nbsp;</td>
+      <td>
         <div style="margin-top:8px;">
           <input type="checkbox" property="admin" id="admin"/>
-         	${this.adminLabel}
+             ${this.adminLabel}
         </div>
       </td>
     </tr>
-   
+
   </table>
-  
+
   <div class="cancelButtonContainer" style="margin-top:12px;">
     <div style="float:left;" >
-    	<button dojoType="cosmo:Button" dojoAttachPoint="cancelButton"
-    		text="${this.cancelButtonText}" small="true">
-    		${this.cancelButtonText}
-    	</button>
+        <button dojoType="cosmo:Button" dojoAttachPoint="cancelButton"
+            text="${this.cancelButtonText}" small="true">
+            ${this.cancelButtonText}
+        </button>
     </div>
     <div style="float:right;">
-    	<button dojoType="cosmo:Button" dojoAttachPoint="submitButton"
-       		text="${this.submitButtonText}" small="true">
-       		${this.submitButtonText}
-		</button>
-	</div>
+        <button dojoType="cosmo:Button" dojoAttachPoint="submitButton"
+               text="${this.submitButtonText}" small="true">
+               ${this.submitButtonText}
+        </button>
+    </div>
       <br style="clear:both;"/>
   </div>
 </form>

@@ -298,12 +298,20 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
                 row.created = dojo.date.fromRfc3339(user.dateCreated);
 
                 row.modified = dojo.date.fromRfc3339(user.dateModified);
+                
+                if (user.activationId) {
+                	row.activationId = user.activationId;
+                } else {
+                	row.activationId = "Activated";
+                }
 
                 if (user.administrator) {
                     row.admin = "Yes";
                 } else {
                     row.admin = "No";
                 }
+                
+                row.userObject = user;
 
                 jsonObject.push(row);
             }

@@ -74,7 +74,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                               admin: true
                           },
 
-        editingUsername : null,
+        editingUser : null,
         postActionHandlerDict : {handle: function(){}},
 
         cmpProxy : cosmo.cmp.cmpProxy,
@@ -185,7 +185,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
                         var user = data;
 
-                        self.editingUsername = user.username
+                        self.editingUser = user
 
                         form = self.form;
 
@@ -222,7 +222,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
             var form = this.form;
 
-            var userHash = {}
+            var userHash = {};
+            var user = this.editingUser;
 
             if (user.username != form.username.value
                 && this.enabledInputs.username
@@ -251,7 +252,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
 
             if (this.role == cosmo.ROLE_ADMINISTRATOR){
-                this.cmpProxy.modifyUser(this.editingUsername, userHash, this.postActionHandlerDict)
+                this.cmpProxy.modifyUser(this.editingUser.username, userHash, this.postActionHandlerDict)
             } else if (this.role == cosmo.ROLE_AUTHENTICATED){
                 this.cmpProxy.modifyAccount(userHash, this.postActionHandlerDict)
             }

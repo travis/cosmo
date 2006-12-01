@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-var Cookie = new function() {
+dojo.provide("cosmo.util.cookie");
+
+cosmo.util.cookie = new function() {
     this.set = function(name, value, days, path) {
         var expires = '';
         var setPath = path ? path : '/';
@@ -46,3 +48,5 @@ var Cookie = new function() {
         this.set(name, '', -1, path);
     };
 }
+
+var Cookie = cosmo.util.cookie;

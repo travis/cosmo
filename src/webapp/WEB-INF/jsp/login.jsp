@@ -34,8 +34,11 @@
         </c:forEach>
       </fmt:message>
     </title>
-    <%@ include file="/WEB-INF/jsp/pim/dojo.jsp" %>
+
     <cosmo:staticbaseurl var="staticBaseUrl"/>
+    <cosmo:dojoBoilerplate/>
+    <cosmo:globalCSSSafariHack/>
+
     <fmt:setBundle basename="PimMessageResources"/>
     <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/ui.conf.js"></script>
     <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/styler.js"></script>

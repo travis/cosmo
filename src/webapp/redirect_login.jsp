@@ -17,7 +17,7 @@
 --%>
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-<cosmo:baseurl var="baseUrl"/>
+
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
 <!DOCTYPE html
@@ -29,11 +29,11 @@
 <head>
 
 <title></title>
+<cosmo:dojoBoilerplate/>
 
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/cookie.js"></script>
 
 <script type="text/javascript">
-
+dojo.require("cosmo.util.cookie")
 function init() {
 
     if (opener) {
@@ -41,12 +41,12 @@ function init() {
         window.close();
     }
     else {
-        Cookie.destroy('JSESSIONID', '/cosmo');
-        Cookie.destroy('inputTimestamp');
-        Cookie.destroy('username');
-        Cookie.destroy('CmpCred')
+        cosmo.util.cookie.destroy('JSESSIONID', '/cosmo');
+        cosmo.util.cookie.destroy('inputTimestamp');
+        cosmo.util.cookie.destroy('username');
+        cosmo.util.cookie.destroy('CmpCred')
 
-        location = '${baseUrl}/';
+        location = '${staticBaseUrl}/';
     }
 }
 

@@ -3,13 +3,13 @@
 <%--
 /*
  * Copyright 2005-2006 Open Source Applications Foundation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,21 +30,21 @@ dojo.require("cosmo.cmp")
 dojo.require("cosmo.ui.widget.ModifyUserDialog")
 
 signupHandlerDict= {
-	handle : function(type, data, evt){
-		if (evt.status == 201){
-			window.location = cosmo.env.getNewAccountRedirect()
+    handle : function(type, data, evt){
+        if (evt.status == 201){
+            window.location = cosmo.env.getNewAccountRedirect()
 
-		}
-		else if (evt.status == 431){
-			//TODO: username in use stuff
-			alert("Username in use")
-		}
-		else if (evt.status == 432){
-			//TODO: email in use stuff
-			alert("Email in use")
-		}	
-	
-	}
+        }
+        else if (evt.status == 431){
+            //TODO: username in use stuff
+            alert("Username in use")
+        }
+        else if (evt.status == 432){
+            //TODO: email in use stuff
+            alert("Email in use")
+        }
+
+    }
 }
 
 </script>
@@ -58,9 +58,9 @@ left: 25%;
 </style>
 
 <div 	dojoType="cosmo:ModifyUserDialog" widgetId="signupDialog"
-		role="cosmo.ROLE_ANONYMOUS"		
-		createNew="true"
-		header='<fmt:message key="Account.New.NewAccount"/><p><fmt:message key="Account.New.AllFieldsRequired"/></p>'
+        role="cosmo.ROLE_ANONYMOUS"
+        createNew="true"
+        header='<fmt:message key="Account.New.NewAccount"/><p><fmt:message key="Account.New.AllFieldsRequired"/></p>'
         firstNameLabel='<fmt:message key="Account.Form.FirstName"/>'
         lastNameLabel='<fmt:message key="Account.Form.LastName"/>'
         emailLabel='<fmt:message key="Account.Form.Email"/>'
@@ -70,7 +70,7 @@ left: 25%;
         removeInputs="admin"
         submitButtonText='<fmt:message key="Account.Form.Button.Create"/>'
         disableCancel="true"
-		> </div>
+        > </div>
 
 
 </cosmo:standardLayout>

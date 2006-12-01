@@ -342,7 +342,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             var requestDict = this.getDefaultCMPRequest(handlerDict, true);
             requestDict.url = cosmo.env.getBaseUrl() + "/cmp/activate/" + activationId;
             requestDict.method = "POST";
-
+            requestDict.postContent = "id="+activationId;
             dojo.io.bind(requestDict);
         },
 
@@ -355,7 +355,16 @@ dojo.declare("cosmo.cmp.Cmp", null,
             obj.email = user.getElementsByTagName("email")[0].firstChild.nodeValue;
             obj.dateCreated = user.getElementsByTagName("created")[0].firstChild.nodeValue;
             obj.dateModified = user.getElementsByTagName("modified")[0].firstChild.nodeValue;
+            obj.url = user.getElementsByTagName("url")[0].firstChild.nodeValue;
+
             obj.administrator = (user.getElementsByTagName("administrator").length > 0);
+            if (user.getElementsByTagName("activationId").length > 0){
+                obj.activationId = user.getElementsByTagName("activationId")[0].firstChild.nodeValue;
+            }
+
+            if (user.getElementsByTagName("homedirUrl").length > 0){
+                obj.homedirUrl = user.getElementsByTagName("homedirUrl")[0].firstChild.nodeValue;
+            }
 
             return obj;
         },

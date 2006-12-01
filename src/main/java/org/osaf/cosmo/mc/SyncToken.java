@@ -57,8 +57,7 @@ public class SyncToken {
      * @return true or false
      */
     public boolean isValid(CollectionItem collection) {
-        // XXX: need to implement CollectionItem.hashCode()
-        return hashcode == collection.hashCode();
+        return hashcode == collection.generateHash();
     }
 
     /**

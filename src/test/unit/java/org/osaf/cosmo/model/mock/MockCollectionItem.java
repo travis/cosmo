@@ -15,16 +15,16 @@
  */
 package org.osaf.cosmo.model.mock;
 
-import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.CollectionItem;
 
 
 
 /**
- * Extend <code>ContentItem</code> to be able to set mock db id.
+ * Extend <code>CollectionItem</code> to be able to set mock db id.
  * This is useful for tests that depend on this id 
  * being set.
  */
-public class MockContentItem extends ContentItem {
+public class MockCollectionItem extends CollectionItem {
     Long mockId = new Long(-1);
     Integer mockVersion = new Integer(0);
     
@@ -45,5 +45,4 @@ public class MockContentItem extends ContentItem {
     public void setMockVersion(Integer version) {
         mockVersion = version;
     }
-   
 }

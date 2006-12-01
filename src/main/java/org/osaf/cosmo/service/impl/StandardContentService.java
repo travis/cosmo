@@ -245,6 +245,9 @@ public class StandardContentService implements ContentService {
             }
         }
         
+        // update collection
+        contentDao.updateCollection(collection);
+        
         // TODO: Find better way to refresh collection to get updated
         //       children
         return contentDao.findCollectionByUid(collection.getUid());

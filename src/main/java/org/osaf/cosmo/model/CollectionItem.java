@@ -45,11 +45,15 @@ public class CollectionItem extends Item {
         "cosmo:excludeFreeBusyRollup";
 
     private Set<Item> children = new HashSet<Item>(0);
-    private Set<Item> allChildren = null;
+    private Set<Item> allChildren = new HashSet<Item>(0);
     
     public CollectionItem() {
     };
 
+    /**
+     * Return active children items (those with isActive=true).
+     * @return active children items
+     */
     @OneToMany(mappedBy="parent", fetch=FetchType.LAZY)
     @Where(clause = "isactive=1")
     public Set<Item> getChildren() {
@@ -60,10 +64,13 @@ public class CollectionItem extends Item {
         this.children = children;
     }
     
-    // Only used for cascade delete by Hibernate
+    /**
+     * Return all children, including those with isActive=false.
+     * @return all children items
+     */
     @OneToMany(mappedBy="parent", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.DELETE }) 
-    private Set<Item> getAllChildren() {
+    public Set<Item> getAllChildren() {
         return allChildren;
     }
 
@@ -83,5 +90,21 @@ public class CollectionItem extends Item {
 
     public void setExcludeFreeBusyRollup(boolean flag) {
         setAttribute(ATTR_EXCLUDE_FREE_BUSY_ROLLUP, Boolean.valueOf(flag));
+    }
+    
+    /**
+     * Generate alternative hash code for collection.
+     * This hash code will return a different value if
+     * collection or any child items in the collection
+     * has changed since the last hash code was generated.
+     * @return
+     */
+    public int generateHash() {
+        int hash = getVersion();
+        for(Item item : getAllChildren()) {
+            // account for version starting with 0
+            hash += (item.getVersion() + 1);
+        }
+        return hash;
     }
 }

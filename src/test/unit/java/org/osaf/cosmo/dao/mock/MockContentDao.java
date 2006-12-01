@@ -23,6 +23,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockContentItem;
 import org.springframework.dao.ConcurrencyFailureException;
 
@@ -79,6 +80,10 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (collection == null)
             throw new IllegalArgumentException("collection cannot be null");
 
+        if (collection instanceof MockCollectionItem)
+            ((MockCollectionItem) collection).setMockVersion(collection
+                    .getVersion() + 1);
+        
         getStorage().updateItem(collection);
 
         return collection;
@@ -177,6 +182,9 @@ public class MockContentDao extends MockItemDao implements ContentDao {
 
         if(THROW_CONCURRENT_EXCEPTION)
             throw new ConcurrencyFailureException("fail!");
+        
+        if(content instanceof MockContentItem)
+            ((MockContentItem) content).setMockVersion(content.getVersion()+1);
         
         getStorage().updateItem((Item) content);
 

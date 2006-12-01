@@ -29,6 +29,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockContentItem;
 import org.osaf.cosmo.TestHelper;
 
@@ -218,6 +219,37 @@ public class StandardContentServiceTest extends TestCase {
         assertEquals(1,bar2.getAttributes().size());
         assertEquals("bar", bar2.getAttributeValue("foo"));
         assertNotNull(bar3);
+    }
+    
+    public void testCollectionHashGetsUpdated() throws Exception {
+        User user = testHelper.makeDummyUser();
+        CollectionItem rootCollection = contentDao.createRootItem(user);
+        
+        CollectionItem dummyCollection = new MockCollectionItem();
+        dummyCollection.setName("foo");
+        dummyCollection.setOwner(user);
+        
+        ContentItem dummyContent = new MockContentItem();
+        dummyContent.setName("bar1");
+        dummyContent.setOwner(user);
+        
+        dummyCollection = 
+            service.createCollection(rootCollection, dummyCollection);
+        
+        dummyContent = 
+            service.createContent(dummyCollection, dummyContent);
+        
+        assertEquals(1, dummyCollection.generateHash());
+        
+   
+        dummyContent.addStringAttribute("foo", "bar");
+        dummyContent = service.updateContent(dummyContent);
+           
+        assertEquals(2, dummyCollection.generateHash());
+        
+        dummyContent.addStringAttribute("foo2", "bar2");
+        dummyContent = service.updateContent(dummyContent);
+        assertEquals(3, dummyCollection.generateHash());
     }
     
     /** */

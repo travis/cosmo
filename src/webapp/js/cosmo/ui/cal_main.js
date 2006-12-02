@@ -55,18 +55,6 @@ var Cal = new function() {
     this.viewEnd = null;
     // Current date for highlighting in the interface
     this.currDate = null;
-    // The dialog box used to display
-    // warnings / confirmations
-    this.dialog = null; 
-    
-    // List of any queued-up error messages
-    this.errorList = [];
-    
-    // Used when the modal dialog box
-    // in Cal.dialog is showing. Currently input is actually disabled
-    // with a div that fully covers the entire UI, block/none display
-    // this property also does get set to true/false at the same time
-    this.inputDisabled = false;
     
     // The path to the currently selected calendar
     this.currentCalendar = null;
@@ -84,6 +72,11 @@ var Cal = new function() {
      * Main function
      */
     this.init = function() {
+        
+        // Props for confirmation dialogs
+        // --------------
+        dojo.require('cosmo.view.cal.dialog');
+        
         var viewDiv = null;
         var allDayDiv = null;
         
@@ -130,10 +123,6 @@ var Cal = new function() {
            this.calForm.addJumpToDate(jpDiv);
         }
         
-        // Modal dialog box
-        this.dialog = dojo.widget.createWidget(
-            'ModalDialog', {}, document.body, 'last');
-        dojo.require('cosmo.view.cal.dialog');
         
         // Load/create calendar to view
         // --------------
@@ -148,7 +137,7 @@ var Cal = new function() {
                 this.serv.createCalendar('Cosmo', 'Cosmo');
             }
             catch(e) {
-                Cal.showErr(getText('Main.Error.InitCalCreateFailed'), e);
+                cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);
                 return false;
             }
             // Set it as the default
@@ -554,95 +543,6 @@ var Cal = new function() {
         // Load and display events
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
         Cal.uiMask.hide();
-    };
-
-    // ==========================
-    // Modal dialog boxes
-    // ==========================
-    /**
-     * Show error dialog with either simple text msg, error object, or both
-     * If new errors get spawned while this is processing, it queues the
-     * messages for display after users dismisses the faux modal disalog box
-     */
-    this.showErr = function(str, e) {
-        var msg = '';
-        var currErr = '';
-        var but = null;
-
-        // If the error dialog is already showing, add this message to the error queue
-        if (this.dialog.isDisplayed) {
-            this.errorList.push(str);
-        }
-        // Otherwise display the error dialog
-        else {
-            // If there are errors waiting in the queue, prepend them to the error msg
-            if (this.errorList.length) {
-                while (currErr = this.errorList.shift()) {
-                    msg += '<div class="errText">' + currErr + '</div>';
-                }
-                msg += str;
-            }
-            // Otherwise just display the current message
-            else {
-                msg = '<div class="errText">' + str + '</div>';
-                if (e) {
-                    msg += '<div>' + e.message + '</div>'
-                }
-            }
-            this.dialog.type = this.dialog.ERROR;
-            but = new Button('okButton', 64, Cal.hideDialog,
-                getText('App.Button.OK'), true);
-            this.dialog.btnsCenter[0] = but;
-            this.dialog.defaultAction = Cal.hideDialog;
-            this.dialog.content = msg;
-            this.showDialog();
-        }
-    };
-    /**
-     * Display the current dialog box and throw up the transparent
-     * full-screen div that blocks all user input to the UI
-     */
-    this.showDialog = function(props) {
-        for (var p in props) {
-            Cal.dialog[p] = props[p];
-        }
-        Cal.setInputDisabled(true);
-        Cal.dialog.show();
-    };
-    /**
-     * Dismiss the faux modal dialog box -- check for queued error
-     * messages to display if needed
-     * Put away the full-screen transparent input-blocking div
-     */
-    this.hideDialog = function() {
-        // Hide the current error dialog
-        Cal.dialog.hide();
-        // If there are error messages that have been added to the queue,
-        // trigger another dialog to handle them
-        if (Cal.errorList.length) {
-            Cal.showErr('');
-        }
-        else {
-            Cal.setInputDisabled(false);
-        }
-    };
-    this.setInputDisabled = function(isDisabled) {
-        if (isDisabled) {
-            document.getElementById('fullMaskDiv').style.display = 'block'; // Block input with full-sized mask
-            this.inputDisabled = true;
-        }
-        else {
-            document.getElementById('fullMaskDiv').style.display = 'none'; // Remove full-sized mask
-            this.inputDisabled = false;
-        }
-        return this.inputDisabled;
-    };
-    /**
-     * Whether or not input from the entire UI is disabled
-     * Returns true when the faux modal dialog box is displayed
-     */
-    this.getInputDisabled = function() {
-        return this.inputDisabled;
     };
 
     // ==========================

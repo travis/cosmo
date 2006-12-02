@@ -138,34 +138,19 @@ dojo.widget.HtmlWidget, {
         },
         setButtons: function (l, c, r) {
             var bDiv = this.buttonPanelNode;
-            
-            function destroyButtons(b) {
-                for (var i = 0; i < b.length; i++) {
-                    b[i].destroy();
-                }
-            }
-
-            // Clean up previous panel if any
-            if (self.btnPanel) {
-                destroyButtons(this.btnsLeft);    
-                destroyButtons(this.btnsCenter);    
-                destroyButtons(this.btnsRight);    
-                self.btnPanel.destroy();
-                if (bDiv.firstChild) {
-                    bDiv.removeChild(bDiv.firstChild);
-                }
-            }
-            
             // Reset buttons if needed
             this.btnsLeft = l || this.btnsLeft;
             this.btnsCenter = c || this.btnsCenter;
             this.btnsRight = r || this.btnsRight;
             
             // Create and append the panel
-            self.btnPanel = dojo.widget.createWidget(
-                'ButtonPanel', { btnsLeft: this.btnsLeft, btnsCenter: this.btnsCenter,
-                btnsRight: this.btnsRight });
-            bDiv.appendChild(self.btnPanel.domNode);
+            // Append the panel as part of instantiation -- if done without
+            // a parent element to append to, the widget parser uses document.body,
+            // which causes the doc to reflow -- and
+            // scrolling canvas scrollOffset gets reset
+            this.btnPanel = dojo.widget.createWidget(
+                'cosmo:ButtonPanel', { btnsLeft: this.btnsLeft, btnsCenter: this.btnsCenter,
+                btnsRight: this.btnsRight }, bDiv, 'last');
             return true;
         },
         render: function () {
@@ -175,8 +160,8 @@ dojo.widget.HtmlWidget, {
                 this.setButtons());
         },
         center: function () {
-            var w = dojo.html.getViewport().width;
-            var h = dojo.html.getViewport().height;
+            var w = dojo.html.getViewportWidth();
+            var h = dojo.html.getViewportHeight();
             this.setLeft(parseInt((w - this.width)/2));
             this.setTop(parseInt((h - this.height)/2));
             return true;
@@ -192,18 +177,18 @@ dojo.widget.HtmlWidget, {
                 m.style.height = '100%';
                 m.style.background = 'transparent';
                 this.uiFullMask = m;
-                document.body.appendChild(m);
+                document.body.appendChild(this.uiFullMask);
             }
             this.uiFullMask.style.display = 'block';
             return true;
         },
         
-        // Lifecycle stuff
+        // Lifecycle crap
         postMixInProperties: function () {
             this.toggleObj =
                 dojo.lfx.toggle[this.toggle] || dojo.lfx.toggle.plain;
             // Clone original show method
-            this.showOrig = eval(this.show.valueOf());
+            this.showOrig = this.show;
             // Do sizing, positioning, content update
             // before calling stock Dojo show
             this.show = function (content, l, c, r, title, prompt) {
@@ -239,16 +224,36 @@ dojo.widget.HtmlWidget, {
                     // Have to measure for content area height once div is actually on the page
                     this.setContentAreaHeight();
                     // Call the original Dojo show method
-                    dojo.lang.hitch(this, this.showOrig);
+                    this.showOrig.apply(this);
                     this.isDisplayed = true;
                 }
             };
             // Clone original hide method
-            this.hideOrig = eval(this.hide.valueOf());
+            this.hideOrig = this.hide;
             // Clear buttons and actually take the div off the page
             this.hide = function () {
+                
+                var bDiv = this.buttonPanelNode;
+                function destroyButtons(b) {
+                    for (var i = 0; i < b.length; i++) {
+                        b[i].destroy();
+                    }
+                }
+                // Clean up previous panel if any
+                if (this.btnPanel) {
+                    // FIXME: calling destroy causes subsequent Buttons
+                    // to be created with no domNode
+                    //destroyButtons(this.btnsLeft);    
+                    //destroyButtons(this.btnsCenter);    
+                    //destroyButtons(this.btnsRight);    
+                    if (bDiv.firstChild) {
+                        bDiv.removeChild(bDiv.firstChild);
+                    }
+                    this.btnPanel.destroy();
+                }
+                
                 // Call the original Dojo hide method
-                dojo.lang.hitch(this, this.hideOrig);
+                this.hideOrig.apply(this);
                 this.content = null;
                 this.btnsLeft = [];
                 this.btnsCenter = [];

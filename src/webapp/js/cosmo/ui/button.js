@@ -46,8 +46,8 @@ buttonPreload();
  * two sizes, normal and small.
  */
 function Button(elemId, width, onClickHandler, displayText, isSmall) {
-    return dojo.widget.createWidget("cosmo:Button", { widgetId: elemId, 
-        text: displayText, 'width':width, 
+    // Note: This throws away elemId in favor of the incremented widget ID
+    return dojo.widget.createWidget("cosmo:Button", { text: displayText, 'width':width, 
         handleOnClick: onClickHandler, small: isSmall });
 }
 

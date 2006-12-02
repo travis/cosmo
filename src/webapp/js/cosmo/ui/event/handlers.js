@@ -248,11 +248,11 @@ function keyUpHandler(e) {
     e = !e ? window.event : e;
     
     // UI input is disabled, check for modal dialog box
-    if (Cal.getInputDisabled()) {
+    if (cosmo.app.getInputDisabled()) {
         // Execute dialog's default action if user hits Enter key
-        if (Cal.dialog.isDisplayed && Cal.dialog.defaultAction && 
-            e.keyCode == 13) {            
-            Cal.dialog.defaultAction();
+        if (cosmo.app.modalDialog.isDisplayed && cosmo.app.modalDialog.defaultAction && 
+            e.keyCode == 13) {
+            cosmo.app.modalDialog.defaultAction();
         }
     }
     // Normal UI input -- Saving changes and removing events

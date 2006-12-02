@@ -654,7 +654,7 @@ function CalForm() {
             errMsg = errMsg.replace(/\n/g, '<br/>');
             e = new ScoobyServiceClientException();
             e.message = errMsg;
-            Cal.showErr('Error in Event Detail Form input', e);
+            cosmo.app.showErr('Error in Event Detail Form input', e);
             return false;
         }
         // All okey-dokey -- submit
@@ -996,7 +996,7 @@ function CalForm() {
             err = err.replace(/\n/g, '<br/>');
             e = new ScoobyServiceClientException();
             e.message = err;
-            Cal.showErr(getText('Main.Error.GoToDate'), e);
+            cosmo.app.showErr(getText('Main.Error.GoToDate'), e);
             return false;
         }
         // All okey-dokey -- submit

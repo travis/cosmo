@@ -47,8 +47,8 @@ cosmo.view.cal.dialog = new function() {
     };
     
     props.removeConfirm = {
-        'type': Cal.dialog.CONFIRM,
-        'btnsLeft': [new Button('cancelButtonDialog', 74, Cal.hideDialog,
+        'type': cosmo.app.modalDialog.CONFIRM,
+        'btnsLeft': [new Button('cancelButtonDialog', 74, cosmo.app.hideDialog,
             getText('App.Button.Cancel'), true)],
         'btnsRight': [new Button('removeButtonDialog', 74, function() { doPublish('remove'); },
             getText('App.Button.Remove'), true)],
@@ -56,8 +56,8 @@ cosmo.view.cal.dialog = new function() {
         'content': getText('Main.Prompt.EventRemoveConfirm')
     };
     props.removeRecurConfirm = {
-        'type': Cal.dialog.CONFIRM,
-        'btnsLeft': [new Button('cancelButtonDialog', 74, Cal.hideDialog,
+        'type': cosmo.app.modalDialog.CONFIRM,
+        'btnsLeft': [new Button('cancelButtonDialog', 74, cosmo.app.hideDialog,
             getText('App.Button.Cancel'), true)],
         'btnsRight': [],
         'defaultAction': function() {},
@@ -65,7 +65,7 @@ cosmo.view.cal.dialog = new function() {
         'content': 'This is a recurring event. Which occurrences do you wish to remove?'
     };
     props.saveRecurConfirm = {
-        'type': Cal.dialog.CONFIRM,
+        'type': cosmo.app.modalDialog.CONFIRM,
         'btnsLeft': [new Button('cancelButtonDialog', 74, 
             function() { doEvMethod('cancelSave') },
             getText('App.Button.Cancel'), true)],

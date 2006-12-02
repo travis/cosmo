@@ -69,6 +69,7 @@
 
 <script type="text/javascript">
 // Dojo requires
+dojo.require('cosmo.app');
 dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.view.cal.conflict');
@@ -78,7 +79,8 @@ dojo.require('cosmo.ui.widget.ModalDialog');
 var TIMEOUT_MIN = 30;
 
 function init() {
-    Cal.init();
+    cosmo.app.initObj = Cal;
+    cosmo.app.init();
 }
 </script>
 
@@ -158,7 +160,6 @@ function init() {
               <fmt:message key="Main.Processing" />
           </div>
         </div>
-        <div id="fullMaskDiv"></div>
 </body>
 
 </html>

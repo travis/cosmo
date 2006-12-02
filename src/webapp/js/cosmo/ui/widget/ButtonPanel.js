@@ -46,15 +46,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, 
     
     fillInTemplate: function () {
         function sectionCell(area, btns) {
-            var areaLowerCase = area.toLowerCase();
-            var tbl = document.createElement('table');
-            var bdy = document.createElement('tbody');
-            var row = document.createElement('tr');
-            var cell = null;
-            tbl.setAttribute('cellpadding', '0');
-            tbl.setAttribute('cellspacing', '0');
             // Insert table of buttons for this section
             if (btns.length) {
+                var areaLowerCase = area.toLowerCase();
+                var tbl = document.createElement('table');
+                var bdy = document.createElement('tbody');
+                var row = document.createElement('tr');
+                var cell = null;
+                tbl.setAttribute('cellpadding', '0');
+                tbl.setAttribute('cellspacing', '0');
                 div = this[areaLowerCase + 'Container'];
                 div.appendChild(tbl);
                 tbl.appendChild(bdy);

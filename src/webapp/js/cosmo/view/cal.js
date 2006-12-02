@@ -143,7 +143,7 @@ cosmo.view.cal = new function() {
                     opts.instanceOnly = isOutOfIntervalRange();
                 }
                 // Show the confirmation dialog
-                Cal.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', opts));
+                cosmo.app.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', opts));
             }
             // One-shot event -- this is easy, just save the event
             // -------
@@ -177,8 +177,8 @@ cosmo.view.cal = new function() {
         var h = null;
 
         // Kill any confirmation dialog that might be showing
-        if (Cal.dialog.isDisplayed) {
-            Cal.hideDialog();
+        if (cosmo.app.modalDialog.isDisplayed) {
+            cosmo.app.hideDialog();
         }
 
         var opts = self.recurringEventOptions;
@@ -228,7 +228,7 @@ cosmo.view.cal = new function() {
                     else {
                         h = function(evData, err) {
                             if (err) {
-                                Cal.showErr('Could not retrieve master event for this recurrence.', err);
+                                cosmo.app.showErr('Could not retrieve master event for this recurrence.', err);
                                 // Broadcast failure
                                 dojo.event.topic.publish('/calEvent', { 'action': 'saveFailed',
                                     'qualifier': 'editExisting', 'data': ev });
@@ -499,7 +499,7 @@ cosmo.view.cal = new function() {
                 errMsg = getText('Main.Error.EventNewSaveFailed');
                 qual.newEvent = true;
             }
-            Cal.showErr(errMsg, err);
+            cosmo.app.showErr(errMsg, err);
         }
         // Success
         // ============
@@ -601,7 +601,7 @@ cosmo.view.cal = new function() {
         else {
             str = 'removeConfirm';
         }
-        Cal.showDialog(cosmo.view.cal.dialog.getProps(str, opts));
+        cosmo.app.showDialog(cosmo.view.cal.dialog.getProps(str, opts));
     }
     /**
      * Called for after passthrough from removeEventConfirm. Routes to
@@ -626,8 +626,8 @@ cosmo.view.cal = new function() {
         var opts = self.recurringEventOptions;
 
         // Kill any confirmation dialog that might be showing
-        if (Cal.dialog.isDisplayed) {
-            Cal.hideDialog();
+        if (cosmo.app.modalDialog.isDisplayed) {
+            cosmo.app.hideDialog();
         }
         // Recurring event
         if (qual) {
@@ -645,7 +645,7 @@ cosmo.view.cal = new function() {
                     else {
                         h = function(evData, err) {
                             if (err) {
-                                Cal.showErr('Could not retrieve master event for this recurrence.', err);
+                                cosmo.app.showErr('Could not retrieve master event for this recurrence.', err);
                                 // Broadcast failure
                                 dojo.event.topic.publish('/calEvent', { 'action': 'removeFailed',
                                     'data': ev });
@@ -668,7 +668,7 @@ cosmo.view.cal = new function() {
                         // Have to go get the recurrence rule -- this means two chained async calls
                         h = function(hashMap, err) {
                             if (err) {
-                                Cal.showErr('Could not retrieve recurrence rule for this recurrence.', err);
+                                cosmo.app.showErr('Could not retrieve recurrence rule for this recurrence.', err);
                                 // Broadcast failure
                                 dojo.event.topic.publish('/calEvent', { 'action': 'removeFailed',
                                     'data': ev });
@@ -751,7 +751,7 @@ cosmo.view.cal = new function() {
         var errMsg = getText('Main.Error.EventRemoveFailed');
         if (err) {
             act = 'removeFailed';
-            Cal.showErr(errMsg, err);
+            cosmo.app.showErr(errMsg, err);
         }
         else {
             act = 'removeSuccess';
@@ -806,7 +806,7 @@ cosmo.view.cal = new function() {
 
         if (err) {
             act = opts.saveAction + 'Failed';
-            Cal.showErr(errMsg, err);
+            cosmo.app.showErr(errMsg, err);
         }
         else {
             act = opts.saveAction + 'Success';
@@ -1008,7 +1008,7 @@ cosmo.view.cal = new function() {
             eventLoadList = Cal.serv.getEvents(Cal.currentCalendar.path, s, e);
         }
         catch(e) {
-            Cal.showErr(getText('Main.Error.LoadEventsFailed'), e);
+            cosmo.app.showErr(getText('Main.Error.LoadEventsFailed'), e);
             return false;
         }
         var eventLoadHash = createEventRegistry(eventLoadList);

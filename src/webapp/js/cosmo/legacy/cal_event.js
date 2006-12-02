@@ -178,8 +178,8 @@ function CalEvent(id, block) {
         var ev = cosmo.view.cal.canvas.getSelectedEvent();
         ev.restoreEvent();
         // Hide the confirmation dialog
-        if (Cal.dialog) {
-            Cal.hideDialog();
+        if (cosmo.app.modalDialog) {
+            cosmo.app.hideDialog();
         }
     };
     /**

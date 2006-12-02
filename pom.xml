@@ -453,6 +453,43 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-clean-plugin</artifactId>
+                  <version>2.1.1</version>
+                  <!-- This configuration is added to cleanup from war:inplace -->
+                  <configuration>
+                    <filesets>
+                      <fileset>
+                        <directory>${basedir}/</directory>
+                        <includes>
+                          <include>derby.log</include>
+                        </includes>
+                      </fileset>
+                      <fileset>
+                        <directory>${basedir}/src/main/webapp</directory>
+                        <includes>
+                          <!-- TODO: META-INF shouldn't be required, seems to be an issue with the current war plugin -->
+                          <include>META-INF</include>
+                          <include>WEB-INF/classes</include>
+                          <!-- Classes and Resources from other wars -->
+                          <include>WEB-INF/lib</include>
+                          <!-- Dependencies from other wars -->
+                          <include>WEB-INF/database</include>
+                          <!-- Database location configured in application.xml -->
+                          <include>WEB-INF/logs</include>
+                          <!-- Log file location specified in application.xml -->
+                          <include>pss</include>
+                          <!-- plexus-security css and javascript -->
+                          <include>WEB-INF/jsp/pss</include>
+                          <!-- plexus-security jsps -->
+                          <include>WEB-INF/template/pss</include>
+                          <!-- plexus-security xwork templates -->
+                        </includes>
+                      </fileset>
+                    </filesets>
+                  </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
                     <version>2.0.1</version>

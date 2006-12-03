@@ -19,6 +19,7 @@ dojo.provide('cosmo.account.create');
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.cmp");
+dojo.require("dojo.uri");
 
 
 cosmo.account.create = new function () {
@@ -258,7 +259,7 @@ cosmo.account.create = new function () {
             return false;
         }
         else {
-            self.showResultsTable();
+            self.showResultsTable(data);
             return true;
         }
     }
@@ -270,39 +271,32 @@ cosmo.account.create = new function () {
      *     data in the displayed table.
      *
      */
-    function getClientConfig() {
+    function getClientConfig(user) {
+    	
         var cfg = {};
-        var username = form.username.value;
+        var username = user.username;
+        var homedirUrl = new dojo.uri.Uri(user.homedirUrl);
         // Server settings
-        var isSSL = location.protocol.indexOf('https:') > -1 ? true : false;
-        var hostArr = location.hostname.split(':');
-        var hostName = hostArr[0];
-        var baseUrl = cosmo.env.getBaseUrl();
+        var isSSL = homedirUrl.scheme == 'https';
         
+        var portNum = homedirUrl.port;
         // Port -- if none specified use 80 (or 443 for https)
-        if (location.port) {
-            portNum = location.port;
-        }
-        else {
+        if (portNum == undefined) {
             portNum = isSSL ? 443 : 80;
         }
         
         // String to display for SSL
         isSSL = isSSL ? 'Yes' : 'No';
         
-        // Build the full URL
-        fullUrl = location.protocol + '//' + hostName;
-        fullUrl += location.port ? ':' + location.port : '';
-        fullUrl += baseUrl + '/home/' + username + '/';
-        
         // Config settings for external client setup
-        cfg['Server'] = hostName;
-        cfg['Path'] = baseUrl + '/home/' + username;
+        cfg['Server'] = homedirUrl.host;
+        cfg['Path'] = homedirUrl.path;
         cfg['Username'] = username;
         cfg['Password'] = '(Hidden)';
         cfg['PortNumber'] = portNum;
         cfg['UseSSL'] = isSSL;
-        cfg['FullURL'] = fullUrl;
+        cfg['FullURL'] = user.homedirUrl;
+
         return cfg;
     }
     /**
@@ -440,10 +434,11 @@ cosmo.account.create = new function () {
      * use the new account with an external cal client.
      * Append the Close button for the dialog
      */
-    this.showResultsTable = function () {
-        var cfg = getClientConfig();
+    this.showResultsTable = function (user) {
+        var cfg = getClientConfig(user);
         var content = getResultsTable(cfg);
         var prompt = _('Signup.Prompt.AccountSetup');
+        prompt += user.activationId == undefined ? '': "\n<br/>" + _('Signup.Prompt.AccountActivation');
         var btnsCenter = [dojo.widget.createWidget("cosmo:Button", 
             { text:_('App.Button.Close'), width:74, 
             handleOnClick: self.hide })];

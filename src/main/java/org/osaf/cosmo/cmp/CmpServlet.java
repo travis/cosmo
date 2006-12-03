@@ -732,11 +732,15 @@ public class CmpServlet extends HttpServlet {
         try {
             Document xmldoc = readXmlRequest(req);
             UserResource resource = new UserResource(getUrlBase(req), xmldoc);
-            userService.createUser(resource.getUser(),
+            User user = userService.createUser(resource.getUser(),
                     createActivationContext(req));
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("Content-Location", resource.getHomedirUrl());
             resp.setHeader("ETag", resource.getEntityTag());
+            resource =
+                new UserResource(user, getUrlBase(req), xmldoc);
+            
+            sendXmlResponse(resp, resource);
         } catch (SAXException e) {
             log.warn("error parsing request body: " + e.getMessage());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST,

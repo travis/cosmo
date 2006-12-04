@@ -44,7 +44,7 @@ import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.NoteStamp;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.rpc.model.Calendar;
 import org.osaf.cosmo.rpc.model.CosmoDate;
@@ -285,10 +285,11 @@ public class RPCServiceImpl implements RPCService {
             cosmoToICalendarConverter.updateVTimeZones(calendar);
             eventStamp.setCalendar(calendar);
 
-            NoteStamp noteStamp = NoteStamp.getStamp(calendarEventItem);
-            noteStamp.setIcalUid(eventStamp.getIcalUid());
-            noteStamp.setBody(event.getDescription());
-
+            // update NoteItem attributes
+            if(calendarEventItem instanceof NoteItem) {
+                ((NoteItem) calendarEventItem).setIcalUid(eventStamp.getIcalUid());
+                ((NoteItem) calendarEventItem).setBody(event.getDescription());
+            }
             contentService.updateContent(calendarEventItem);
         }
 
@@ -456,15 +457,15 @@ public class RPCServiceImpl implements RPCService {
 
         };
     }
-    private ContentItem saveNewEvent(Event event, CollectionItem calendarItem) {
-        ContentItem calendarEventItem;
+    private NoteItem saveNewEvent(Event event, CollectionItem calendarItem) {
+        NoteItem calendarEventItem;
         //make an empty iCalendar
         net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
         calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
         calendar.getProperties().add(Version.VERSION_2_0);
         calendar.getProperties().add(CalScale.GREGORIAN);
 
-        calendarEventItem = new ContentItem();
+        calendarEventItem = new NoteItem();
         calendarEventItem.setDisplayName(event.getTitle());
         VEvent vevent = cosmoToICalendarConverter.createVEvent(event);
         calendar.getComponents().add(vevent);
@@ -474,11 +475,10 @@ public class RPCServiceImpl implements RPCService {
         eventStamp.setCalendar(calendar);
         calendarEventItem.addStamp(eventStamp);
 
-        NoteStamp noteStamp = new NoteStamp();
-        noteStamp.setIcalUid(eventStamp.getIcalUid());
-        noteStamp.setBody(event.getDescription());
-        calendarEventItem.addStamp(noteStamp);
-
+        // set NoteItem attributes
+        calendarEventItem.setIcalUid(eventStamp.getIcalUid());
+        calendarEventItem.setBody(event.getDescription());
+    
         Iterator<String> availableNameIterator = availableNameIterator(vevent);
 
         calendarEventItem.setOwner(getUser());
@@ -491,7 +491,7 @@ public class RPCServiceImpl implements RPCService {
                 calendarEventItem.setDisplayName(name);
             try{
                 added = true;
-                calendarEventItem = contentService.createContent(calendarItem,
+                calendarEventItem = (NoteItem) contentService.createContent(calendarItem,
                             calendarEventItem);
             } catch (DuplicateItemNameException dupe){
                 added = false;

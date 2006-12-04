@@ -27,7 +27,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.MessageStamp;
 import org.osaf.cosmo.model.ModelValidationException;
-import org.osaf.cosmo.model.NoteStamp;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.StringAttribute;
@@ -46,11 +46,10 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        ContentItem item = generateTestContent();
+        NoteItem item = generateTestContent();
         
-        NoteStamp note = new NoteStamp();
-        note.setBody("this is a body");
-        note.setIcalUid("icaluid");
+        item.setIcalUid("icaluid");
+        item.setBody("this is a body");
         
         MessageStamp message = new MessageStamp();
         message.setBcc("bcc");
@@ -61,7 +60,6 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         EventStamp event = new EventStamp();
         event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
         
-        item.addStamp(note);
         item.addStamp(message);
         item.addStamp(event);
         
@@ -69,7 +67,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         clearSession();
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
-        Assert.assertEquals(3, queryItem.getStamps().size());
+        Assert.assertEquals(2, queryItem.getStamps().size());
         
         Stamp stamp = queryItem.getStamp(EventStamp.class);
         Assert.assertTrue(stamp instanceof EventStamp);
@@ -78,12 +76,8 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Assert.assertEquals(es.getCalendar().toString(), event.getCalendar()
                 .toString());
         
-        stamp = queryItem.getStamp(NoteStamp.class);
-        Assert.assertTrue(stamp instanceof NoteStamp);
-        Assert.assertEquals("note", stamp.getType());
-        NoteStamp ns = (NoteStamp) stamp;
-        Assert.assertEquals(ns.getBody(), note.getBody());
-        Assert.assertEquals(ns.getIcalUid(), note.getIcalUid());
+        Assert.assertEquals("icaluid", ((NoteItem) queryItem).getIcalUid());
+        Assert.assertEquals("this is a body", ((NoteItem) queryItem).getBody());
         
         stamp = queryItem.getStamp(MessageStamp.class);
         Assert.assertTrue(stamp instanceof MessageStamp);
@@ -101,9 +95,8 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
 
         ContentItem item = generateTestContent();
         
-        NoteStamp note = new NoteStamp();
-        note.setBody("this is a body");
-        note.setIcalUid("icaluid");
+        ((NoteItem) item).setBody("this is a body");
+        ((NoteItem) item).setIcalUid("icaluid");
         
         MessageStamp message = new MessageStamp();
         message.setBcc("bcc");
@@ -114,7 +107,6 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         EventStamp event = new EventStamp();
         event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
         
-        item.addStamp(note);
         item.addStamp(message);
         item.addStamp(event);
         
@@ -122,7 +114,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         clearSession();
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
-        Assert.assertEquals(3, queryItem.getStamps().size());
+        Assert.assertEquals(2, queryItem.getStamps().size());
         
         Stamp stamp = queryItem.getStamp(MessageStamp.class);
         queryItem.getStamps().remove(stamp);
@@ -136,7 +128,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         clearSession();
         queryItem = contentDao.findContentByUid(newItem.getUid());
-        Assert.assertEquals(2, queryItem.getStamps().size());
+        Assert.assertEquals(1, queryItem.getStamps().size());
         stamp = queryItem.getStamp(EventStamp.class);
         es = (EventStamp) stamp;
        
@@ -226,13 +218,13 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         return helper.getUser(userDao, contentDao, username);
     }
 
-    private ContentItem generateTestContent() throws Exception {
+    private NoteItem generateTestContent() throws Exception {
         return generateTestContent("test", "testuser");
     }
 
-    private ContentItem generateTestContent(String name, String owner)
+    private NoteItem generateTestContent(String name, String owner)
             throws Exception {
-        ContentItem content = new ContentItem();
+        NoteItem content = new NoteItem();
         content.setName(name);
         content.setDisplayName(name);
         content.setContent(helper.getBytes(baseDir + "/testdata1.txt"));

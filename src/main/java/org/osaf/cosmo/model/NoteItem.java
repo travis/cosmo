@@ -18,8 +18,8 @@ package org.osaf.cosmo.model;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
 /**
@@ -30,28 +30,37 @@ import org.hibernate.annotations.Where;
 @Where(clause = "isactive=1")
 public class NoteItem extends ContentItem {
 
-    /**
-     * 
-     */
+    public static final QName ATTR_NOTE_BODY = new QName(
+            NoteItem.class, "body");
+    
     private static final long serialVersionUID = -6100568628972081120L;
-    private String body = null;
     private String icalUid = null;
     
     public NoteItem() {
     }
 
     // Property accessors
-    @Column(name="body")
-    @Type(type="text")
+    @Transient
     public String getBody() {
-        return body;
+        // body stored as TextAttribute on Item
+        TextAttribute bodyAttr = (TextAttribute) getAttribute(ATTR_NOTE_BODY);
+        if(bodyAttr!=null)
+            return bodyAttr.getValue();
+        else
+            return null;
     }
 
     public void setBody(String body) {
-        this.body = body;
+        // body stored as TextAttribute on Item
+        TextAttribute bodyAttr = (TextAttribute) getAttribute(ATTR_NOTE_BODY);
+        if(bodyAttr!=null)
+            bodyAttr.setValue(body);
+        else if(body!=null) {
+            addAttribute(new TextAttribute(ATTR_NOTE_BODY,body));
+        } 
     }
 
-    @Column(name="icaluid")
+    @Column(name="icaluid", length=255)
     public String getIcalUid() {
         return icalUid;
     }

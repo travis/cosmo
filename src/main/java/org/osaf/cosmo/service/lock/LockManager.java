@@ -52,7 +52,9 @@ public interface LockManager {
      * specified timeout period has passed.
      * 
      * @param collection collection to lock
-     * @param timeout time in milliseconds to timeout waiting on lock
+     * @param timeout Time in milliseconds to timeout waiting on lock.
+     *                A value of 0 results in no waiting.  A negative
+     *                value is wait forever.
      * @return true if lock has been acquired, false if lock could
      *         not be obtained within a specified ammount of time
      */

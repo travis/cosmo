@@ -40,6 +40,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.ModelConversionException;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Abstract calendar resource.
@@ -49,7 +50,7 @@ public abstract class DavCalendarResource extends DavFile {
     private static final Log log =
         LogFactory.getLog(DavCalendarResource.class);
   
-    public DavCalendarResource(ContentItem item, DavResourceLocator locator,
+    public DavCalendarResource(NoteItem item, DavResourceLocator locator,
             DavResourceFactory factory, DavSession session) {
         super(item, locator, factory, session);
     }
@@ -74,7 +75,7 @@ public abstract class DavCalendarResource extends DavFile {
     @Override
     protected void populateItem(InputContext inputContext) throws DavException {
         super.populateItem(inputContext);
-        ContentItem content = (ContentItem) getItem();
+        NoteItem content = (NoteItem) getItem();
         Calendar calendar = null;
         
         // CALDAV:valid-calendar-data
@@ -132,7 +133,7 @@ public abstract class DavCalendarResource extends DavFile {
             ((DavResourceBase) destinationCollection).getItem();
         CalendarCollectionStamp calendar = CalendarCollectionStamp.getStamp(collection);
         
-        ContentItem item = (ContentItem) getItem();
+        NoteItem item = (NoteItem) getItem();
         EventStamp event = EventStamp.getStamp(item);
 
         if (log.isDebugEnabled())

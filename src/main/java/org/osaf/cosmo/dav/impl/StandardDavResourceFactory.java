@@ -33,6 +33,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.util.PathUtil;
@@ -142,9 +143,9 @@ public class StandardDavResourceFactory implements DavResourceFactory {
             }
         }
             
-        if (item instanceof ContentItem) {
+        if (item instanceof NoteItem) {
             if(item.getStamp(EventStamp.class) != null)
-                return new DavEvent((ContentItem) item, locator, this,
+                return new DavEvent((NoteItem) item, locator, this,
                         session);
         } 
             

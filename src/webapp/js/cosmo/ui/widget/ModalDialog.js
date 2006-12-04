@@ -187,8 +187,10 @@ dojo.widget.HtmlWidget, {
         postMixInProperties: function () {
             this.toggleObj =
                 dojo.lfx.toggle[this.toggle] || dojo.lfx.toggle.plain;
-            // Clone original show method
+                
+            // reference to original show method
             this.showOrig = this.show;
+            
             // Do sizing, positioning, content update
             // before calling stock Dojo show
             this.show = function (content, l, c, r, title, prompt) {
@@ -228,7 +230,7 @@ dojo.widget.HtmlWidget, {
                     this.isDisplayed = true;
                 }
             };
-            // Clone original hide method
+            // reference to original hide method
             this.hideOrig = this.hide;
             // Clear buttons and actually take the div off the page
             this.hide = function () {
@@ -239,6 +241,7 @@ dojo.widget.HtmlWidget, {
                         b[i].destroy();
                     }
                 }
+
                 // Clean up previous panel if any
                 if (this.btnPanel) {
                     // FIXME: calling destroy causes subsequent Buttons

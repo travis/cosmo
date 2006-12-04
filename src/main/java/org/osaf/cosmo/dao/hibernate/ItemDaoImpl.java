@@ -41,6 +41,7 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.Ticket;
@@ -566,6 +567,14 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             } catch (IOException e) {
                 throw new RuntimeException("Error copying content");
             }
+        }
+        
+        // copy note
+        if(item instanceof NoteItem) {
+            NoteItem noteItem = (NoteItem) item;
+            NoteItem newNoteItem = (NoteItem) item2;
+            newNoteItem.setBody(noteItem.getBody());
+            newNoteItem.setIcalUid(noteItem.getIcalUid());
         }
             
         // save Item before attempting deep copy

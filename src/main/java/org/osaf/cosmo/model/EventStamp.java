@@ -21,11 +21,12 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
+import javax.persistence.SecondaryTable;
 import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
@@ -40,9 +41,9 @@ import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.ExRule;
 import net.fortuna.ical4j.model.property.Location;
-import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.RDate;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Status;
 
 import org.hibernate.annotations.Cache;
@@ -59,8 +60,9 @@ import org.osaf.cosmo.hibernate.validator.Event;
  * Represents an Event Stamp.
  */
 @Entity
-@Table(name="event_stamp")
-@PrimaryKeyJoinColumn(name="stampid")
+@DiscriminatorValue("event")
+@SecondaryTable(name="event_stamp", pkJoinColumns={
+        @PrimaryKeyJoinColumn(name="stampid", referencedColumnName="id")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EventStamp extends Stamp implements
         java.io.Serializable {
@@ -80,10 +82,14 @@ public class EventStamp extends Stamp implements
     
     /** default constructor */
     public EventStamp() {
-        setType("event");
     }
-
-    @Column(name = "icaldata", length=102400000)
+    
+    @Transient
+    public String getType() {
+        return "event";
+    }
+    
+    @Column(table="event_stamp", name = "icaldata", length=102400000)
     @Type(type="calendar_clob")
     @NotNull
     @Event

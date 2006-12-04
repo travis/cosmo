@@ -16,9 +16,11 @@
 package org.osaf.cosmo.model;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
+import javax.persistence.SecondaryTable;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -30,8 +32,9 @@ import org.hibernate.annotations.Type;
  * and a unique icalendar uid.
  */
 @Entity
-@Table(name="note_stamp")
-@PrimaryKeyJoinColumn(name="stampid")
+@DiscriminatorValue("note")
+@SecondaryTable(name="note_stamp", pkJoinColumns={
+        @PrimaryKeyJoinColumn(name="stampid", referencedColumnName="id")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class NoteStamp extends Stamp implements
         java.io.Serializable {
@@ -45,11 +48,15 @@ public class NoteStamp extends Stamp implements
     
     /** default constructor */
     public NoteStamp() {
-        setType("note");
     }
-
+    
+    @Transient
+    public String getType() {
+        return "note";
+    }
+    
     // Property accessors
-    @Column(name="body")
+    @Column(table="note_stamp", name="body")
     @Type(type="text")
     public String getBody() {
         return body;
@@ -59,7 +66,7 @@ public class NoteStamp extends Stamp implements
         this.body = body;
     }
 
-    @Column(name="icaluid")
+    @Column(table="note_stamp", name="icaluid")
     public String getIcalUid() {
         return icalUid;
     }

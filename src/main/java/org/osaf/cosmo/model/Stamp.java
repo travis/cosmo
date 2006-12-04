@@ -15,7 +15,8 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
@@ -23,68 +24,65 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Index;
-import org.hibernate.validator.NotNull;
 
 /**
- * Represents an abstract Stamp on an Item.  A Stamp is a set of related
+ * Represents an abstract Stamp on an Item. A Stamp is a set of related
  * properties that is associated to an item.
  */
 @Entity
-@Inheritance(strategy=InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "stamptype", 
+                     discriminatorType = DiscriminatorType.STRING, length = 16)
 // Unique constraint for stamptype and itemid to prevent items
 // having more than one of the same stamp
-@Table(name="stamp", uniqueConstraints = {
-        @UniqueConstraint(columnNames={"itemid", "stamptype"})})
+@Table(name = "stamp", uniqueConstraints = { 
+        @UniqueConstraint(columnNames = { "itemid", "stamptype" }) })
+// Define index on discriminator
+@org.hibernate.annotations.Table(appliesTo = "stamp", 
+        indexes = { @Index(name = "idx_stamptype", columnNames = { "stamptype" }) })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public abstract class Stamp extends BaseModelObject implements java.io.Serializable {
+public abstract class Stamp extends BaseModelObject implements
+        java.io.Serializable {
 
-	// Fields
-	private Item item;
-    private String type = null;
+    // Fields
+    private Item item;
 
-	// Constructors
-	/** default constructor */
-	public Stamp() {
-	}
-	
-    /**
-	 * @return Item attribute belongs to
-	 */
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="itemid", nullable=false)
-	public Item getItem() {
-		return item;
-	}
-
-	/**
-	 * @param item attribute belongs to
-	 */
-	public void setItem(Item item) {
-		this.item = item;
-	}
-    
-    @Column(name = "stamptype", nullable = false, length=16)
-    @NotNull
-    @Index(name="idx_stamptype")
-    public String getType() {
-        return type;
-    }
-
-    protected void setType(String type) {
-        this.type = type;
+    // Constructors
+    /** default constructor */
+    public Stamp() {
     }
 
     /**
-     * Return a new instance of Attribute 
-     * containing a copy of the Attribute
+     * @return Item attribute belongs to
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "itemid", nullable = false)
+    public Item getItem() {
+        return item;
+    }
+
+    /**
+     * @param item
+     *            attribute belongs to
+     */
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    @Transient
+    public abstract String getType();
+
+    /**
+     * Return a new instance of Attribute containing a copy of the Attribute
+     * 
      * @return copy of Attribute
      */
     public abstract Stamp copy();
-    
 
 }

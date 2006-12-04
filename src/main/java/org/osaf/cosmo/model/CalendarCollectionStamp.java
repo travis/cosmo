@@ -22,9 +22,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
+import javax.persistence.SecondaryTable;
 import javax.persistence.Transient;
 
 import net.fortuna.ical4j.data.ParserException;
@@ -47,8 +48,9 @@ import org.osaf.cosmo.hibernate.validator.Timezone;
  * Represents a Calendar Collection.
  */
 @Entity
-@Table(name="calendar_stamp")
-@PrimaryKeyJoinColumn(name="stampid")
+@DiscriminatorValue("calendar")
+@SecondaryTable(name="calendar_stamp", pkJoinColumns={
+        @PrimaryKeyJoinColumn(name="stampid", referencedColumnName="id")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CalendarCollectionStamp extends Stamp implements
         java.io.Serializable {
@@ -80,7 +82,11 @@ public class CalendarCollectionStamp extends Stamp implements
 
     /** default constructor */
     public CalendarCollectionStamp() {
-        setType("calendar");
+    }
+    
+    @Transient
+    public String getType() {
+        return "calendar";
     }
     
     public CalendarCollectionStamp(CollectionItem collection) {
@@ -97,7 +103,7 @@ public class CalendarCollectionStamp extends Stamp implements
         return stamp;
     }
     
-    @Column(name="description")
+    @Column(table="calendar_stamp", name="description")
     public String getDescription() {
         return description;
     }
@@ -106,7 +112,7 @@ public class CalendarCollectionStamp extends Stamp implements
         this.description = description;
     }
 
-    @Column(name="language")
+    @Column(table="calendar_stamp", name="language")
     public String getLanguage() {
         return language;
     }
@@ -138,7 +144,7 @@ public class CalendarCollectionStamp extends Stamp implements
     /**
      * @return calendar object representing timezone
      */
-    @Column(name = "timezone", length=100000)
+    @Column(table="calendar_stamp", name = "timezone", length=100000)
     @Type(type="calendar_clob")
     @Timezone
     public Calendar getTimezone() {

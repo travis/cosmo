@@ -15,9 +15,9 @@
  */
 package org.osaf.cosmo.model;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -27,8 +27,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  * Represents a Task Stamp.
  */
 @Entity
-@Table(name="task_stamp")
-@PrimaryKeyJoinColumn(name="stampid")
+@DiscriminatorValue("task")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class TaskStamp extends Stamp implements
         java.io.Serializable {
@@ -41,9 +40,13 @@ public class TaskStamp extends Stamp implements
 
     /** default constructor */
     public TaskStamp() {
-        setType("task");
     }
 
+    @Transient
+    public String getType() {
+        return "task";
+    }
+    
     public Stamp copy() {
         TaskStamp stamp = new TaskStamp();
         return stamp;

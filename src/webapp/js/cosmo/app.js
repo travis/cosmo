@@ -31,7 +31,7 @@ cosmo.app = new function () {
     this.init = function () {
         // Set up the modal dialog box for the app
         this.modalDialog = dojo.widget.createWidget(
-            'ModalDialog', {}, document.body, 'last');
+            'cosmo:ModalDialog', {}, document.body, 'last');
         
         // Initialize the default view
         if (self.initObj.init) { self.initObj.init(); }

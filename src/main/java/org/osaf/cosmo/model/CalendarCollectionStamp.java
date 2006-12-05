@@ -97,6 +97,7 @@ public class CalendarCollectionStamp extends Stamp implements
         stamp.language = language;
         stamp.description = description;
         stamp.timezone = CalendarUtils.copyCalendar(timezone);
+        stamp.setSupportedComponents(getSupportedComponents());
         return stamp;
     }
     
@@ -124,8 +125,13 @@ public class CalendarCollectionStamp extends Stamp implements
      * @return immutable set of supported components
      */
     @Transient
-    public Set getSupportedComponents() {
-        return (Set) getItem().getAttributeValue(ATTR_CALENDAR_SUPPORTED_COMPONENT_SET);
+    public Set<String> getSupportedComponents() {
+        MultiValueStringAttribute attr = 
+            (MultiValueStringAttribute) getItem().getAttribute(ATTR_CALENDAR_SUPPORTED_COMPONENT_SET);
+        if(attr!=null)
+            return attr.getValue();
+        else
+            return null;
     }
 
     /**
@@ -135,7 +141,15 @@ public class CalendarCollectionStamp extends Stamp implements
      *            set of supported components
      */
     public void setSupportedComponents(Set<String> supportedComponents) {
-        getItem().setAttribute(ATTR_CALENDAR_SUPPORTED_COMPONENT_SET, supportedComponents);
+        MultiValueStringAttribute attr = (MultiValueStringAttribute) getItem()
+                .getAttribute(ATTR_CALENDAR_SUPPORTED_COMPONENT_SET);
+        if (attr != null)
+            attr.setValue(supportedComponents);
+        else if (supportedComponents != null)
+            getItem().addAttribute(
+                    new MultiValueStringAttribute(
+                            ATTR_CALENDAR_SUPPORTED_COMPONENT_SET,
+                            supportedComponents));       
     }
 
     /**

@@ -77,7 +77,6 @@
             <value>org.osaf.cosmo.model.MessageStamp</value>
             <value>org.osaf.cosmo.model.MultiValueStringAttribute</value>
             <value>org.osaf.cosmo.model.NoteItem</value>
-            <value>org.osaf.cosmo.model.NoteStamp</value>
             <value>org.osaf.cosmo.model.ServerProperty</value>
             <value>org.osaf.cosmo.model.StringAttribute</value>
             <value>org.osaf.cosmo.model.Stamp</value>

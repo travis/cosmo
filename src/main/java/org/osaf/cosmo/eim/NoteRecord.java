@@ -18,7 +18,7 @@ package org.osaf.cosmo.eim;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.model.NoteStamp;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Models an EIM note record.
@@ -34,17 +34,17 @@ public class NoteRecord extends EimRecord {
     }
 
     /** */
-    public NoteRecord(NoteStamp stamp) {
-        super(stamp.getItem());
-        body = stamp.getBody();
-        icalUid = stamp.getIcalUid();
+    public NoteRecord(NoteItem item) {
+        super(item);
+        body = item.getBody();
+        icalUid = item.getIcalUid();
     }
 
     /** */
-    public void applyTo(NoteStamp stamp) {
-        super.applyTo(stamp.getItem());
-        stamp.setBody(body);
-        stamp.setIcalUid(icalUid);
+    public void applyTo(NoteItem item) {
+        super.applyTo(item);
+        item.setBody(body);
+        item.setIcalUid(icalUid);
     }
 
     /** */

@@ -26,7 +26,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.MessageStamp;
-import org.osaf.cosmo.model.NoteStamp;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.TaskStamp;
 
@@ -66,6 +66,8 @@ public final class EimRecordFactory {
         ArrayList<EimRecord> records = new ArrayList<EimRecord>();
 
         records.add(createRecord(item));
+        if (item instanceof NoteItem)
+            records.add(createRecord((NoteItem)item));
 
         for (Stamp stamp : item.getStamps())
             records.add(createRecord(stamp));
@@ -84,13 +86,22 @@ public final class EimRecordFactory {
     }
 
     /**
-     * Returns an EIM record describing the entire state of the item
+     * Returns an EIM record describing the state of the content item
      * (but not its stamps).
      *
-     * @param item the item to convert to EIM
+     * @param item the content item to convert to EIM
      */
     public static EimRecord createRecord(ContentItem item) {
         return new ItemRecord(item);
+    }
+
+    /**
+     * Returns an EIM record describing the state of the note item.
+     *
+     * @param item the note item to convert to EIM
+     */
+    public static EimRecord createRecord(NoteItem item) {
+        return new NoteRecord(item);
     }
 
     /**
@@ -104,8 +115,6 @@ public final class EimRecordFactory {
     public static EimRecord createRecord(Stamp stamp) {
         if (stamp instanceof EventStamp)
             return new EventRecord((EventStamp) stamp);
-        if (stamp instanceof NoteStamp)
-            return new NoteRecord((NoteStamp) stamp);
         if (stamp instanceof TaskStamp)
             return new TaskRecord((TaskStamp) stamp);
         if (stamp instanceof MessageStamp)

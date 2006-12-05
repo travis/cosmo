@@ -48,7 +48,7 @@ public class TextAttribute extends Attribute implements
     }
 
     // Property accessors
-    @Column(name="textvalue")
+    @Column(name="textvalue", length=102400000)
     @Type(type="text")
     public String getValue() {
         return this.value;

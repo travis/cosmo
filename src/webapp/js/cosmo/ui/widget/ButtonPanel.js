@@ -78,6 +78,17 @@ dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, 
         sectionCell.apply(this, ['center', this.btnsCenter]);
         sectionCell.apply(this, ['right', this.btnsRight]);
     },
+    destroyButtons: function () {
+        // FIXME: Fix button reuse/reinstantiation issue with domNode
+        function destroyButtons(b) {
+            for (var i = 0; i < b.length; i++) {
+                b[i].destroy();
+            }
+        }
+        //destroyButtons(this.btnsLeft);    
+        //destroyButtons(this.btnsCenter);    
+        //destroyButtons(this.btnsRight);    
+    },
     setWidth: function (width) {
         this.width = width;
 		if (width) {

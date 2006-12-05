@@ -33,8 +33,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
         submitButtonContainer: null,
         logoContainer: null,
 
-        // Internal use
-        loginFocus: false,
+        _usernameFocus: false,
+        _passwordFocus: false,
 
         handleLoginResp: function (str) {
             /*
@@ -109,12 +109,28 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
         },
         keyUpHandler: function (e) {
             e = !e ? window.event : e;
-            if (e.keyCode == 13 && this.loginFocus) {
-                this.doLogin();
-            return false;
+            if (e.keyCode == 13) {
+                if (cosmo.app.modalDialog.isDisplayed) {
+                    cosmo.app.modalDialog.defaultAction();
+                }
+                else if (this._usernameFocus || this._passwordFocus)  {
+                    this.doLogin();
+                    return false;
+                }
             }
         },
-        postCreate: function (){
+        setFocus: function (e) {
+            // Toggle values for _usernameFocus, _passwordFocus
+            t = e.target.id || '';
+            if (t) {
+                var f = e.type == 'focus' ? true : false;
+                t = t.toLowerCase();
+                t = t.replace('logindialog', '');
+                t = t.replace('input', '');
+                this['_' + t + 'Focus'] = f;
+            }
+        },
+        postCreate: function () {
             var self = this;
             var button = dojo.widget.createWidget("cosmo:Button",
                 { text: _("Login.Button.Ok"), width: 74, widgetId: "loginSubmitButton" } );
@@ -125,8 +141,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
 
             logo.src = cosmo.env.getImagesUrl() + LOGO_GRAPHIC;
             this.logoContainer.appendChild(logo);
-            dojo.event.connect(this.passwordInput, "onfocus", function () { self.loginFocus = true });
-            dojo.event.connect(this.passwordInput, "onblur", function () { self.loginFocus = false });
+            dojo.event.connect(this.passwordInput, "onfocus", this, 'setFocus');
+            dojo.event.connect(this.passwordInput, "onblur", this, 'setFocus');
+            dojo.event.connect(this.usernameInput, "onfocus", this, 'setFocus');
+            dojo.event.connect(this.usernameInput, "onblur", this, 'setFocus');
             dojo.event.connect(this.submitButton, "handleOnClick", this, "doLogin");
             dojo.addOnLoad(function(){self.usernameInput.focus()})
         },

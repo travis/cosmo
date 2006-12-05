@@ -53,6 +53,8 @@ dojo.widget.HtmlWidget, {
         INFO: 'info',
         ERROR: 'error',
         CONFIRM: 'confirm',
+        width: null,
+        height: null,
         title: '',
         prompt: '',
         content: null,
@@ -143,6 +145,15 @@ dojo.widget.HtmlWidget, {
             this.btnsCenter = c || this.btnsCenter;
             this.btnsRight = r || this.btnsRight;
             
+            // Clean up previous panel if any
+            if (this.btnPanel) {
+                this.btnPanel.destroyButtons();
+                if (bDiv.firstChild) {
+                    bDiv.removeChild(bDiv.firstChild);
+                }
+                this.btnPanel.destroy();
+            }
+           
             // Create and append the panel
             // Append the panel as part of instantiation -- if done without
             // a parent element to append to, the widget parser uses document.body,
@@ -160,8 +171,8 @@ dojo.widget.HtmlWidget, {
                 this.setButtons());
         },
         center: function () {
-            var w = dojo.html.getViewportWidth();
-            var h = dojo.html.getViewportHeight();
+            var w = dojo.html.getViewport().width;
+            var h = dojo.html.getViewport().height;
             this.setLeft(parseInt((w - this.width)/2));
             this.setTop(parseInt((h - this.height)/2));
             return true;
@@ -196,14 +207,15 @@ dojo.widget.HtmlWidget, {
             this.show = function (content, l, c, r, title, prompt) {
                 // Accommodate either original multiple param or
                 // object param input
+
+                // FIXME: 'content' passed could be a DOM node, which is
+                // an obj -- however only older code uses the param style,
+                // and most older code uses HTML strings for content
                 if (typeof arguments[0] == 'object') {
                     var o = arguments[0];
-                    if (o.content) { this.content = o.content; }
-                    if (o.btnsLeft) { l = o.btnsLeft; }
-                    if (o.btnsCenter) { l = o.btnsCenter; }
-                    if (o.btnsRight) { l = o.btnsRight; }
-                    if (o.title) { this.title = o.title; }
-                    if (o.prompt) { this.prompt = o.prompt; }
+                    for (var i in o) {
+                        this[i] = o[i];
+                    }
                 }
                 else {
                     this.content = content || this.content;
@@ -231,30 +243,9 @@ dojo.widget.HtmlWidget, {
                 }
             };
             // reference to original hide method
-            this.hideOrig = this.hide;
+            this.hideOrig = this.hide; 
             // Clear buttons and actually take the div off the page
             this.hide = function () {
-                
-                var bDiv = this.buttonPanelNode;
-                function destroyButtons(b) {
-                    for (var i = 0; i < b.length; i++) {
-                        b[i].destroy();
-                    }
-                }
-
-                // Clean up previous panel if any
-                if (this.btnPanel) {
-                    // FIXME: calling destroy causes subsequent Buttons
-                    // to be created with no domNode
-                    //destroyButtons(this.btnsLeft);    
-                    //destroyButtons(this.btnsCenter);    
-                    //destroyButtons(this.btnsRight);    
-                    if (bDiv.firstChild) {
-                        bDiv.removeChild(bDiv.firstChild);
-                    }
-                    this.btnPanel.destroy();
-                }
-                
                 // Call the original Dojo hide method
                 this.hideOrig.apply(this);
                 this.content = null;

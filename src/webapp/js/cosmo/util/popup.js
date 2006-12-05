@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-var Popup = new function() {
-    
+dojo.provide("cosmo.util.popup");
+
+cosmo.util.popup = new function () {
+    var self = this;
     // Reference to the pop-up window
     this.win = null;
     /**
      * Opens a new pop-up window -- optional final
      * param allows turning on the scrollbars for the window
      */
-    this.open = function(url, w, h, scroller) {
-        var self = Popup;
+    this.open = function (url, w, h, scroller) {
         var scr = scroller ? 1 : 0;
         if(!self.win || self.win.closed) {
             self.win = null;    
@@ -40,13 +41,11 @@ var Popup = new function() {
      * Sends the opener of the window to a new location
      * and closes the pop up.     
      */
-    this.goURLMainWin = function(url) {
-        var self = Popup;
+    this.goURLMainWin = function (url) {
         location = url;
         self.win.window.close();
     };
 }
 
-Popup.constructor = null;
-
+var Popup = cosmo.util.popup;
 

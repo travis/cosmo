@@ -38,13 +38,9 @@
     <cosmo:staticbaseurl var="staticBaseUrl"/>
     <cosmo:dojoBoilerplate/>
     <cosmo:globalCSSSafariHack/>
-
+    
     <fmt:setBundle basename="PimMessageResources"/>
-    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/ui.conf.js"></script>
-    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/styler.js"></script>
-    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/cookie.js"></script>
-    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/log.js"></script>
-    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/popup.js"></script>
+    
     <%--
         Login and account-creation stuff
         Note: button.js still needed to do preloading of button images
@@ -52,15 +48,18 @@
     <!-- Login failure recognition string: login-page-2ksw083judrmru58 See LoginDialog.js -->
     <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/button.js"></script>
     <script type="text/javascript">
+        dojo.require("cosmo.app");
+        dojo.require("cosmo.account.create");
+        dojo.require("cosmo.util.popup");
         dojo.require("cosmo.ui.widget.LoginDialog");
         dojo.require("cosmo.ui.widget.ModalDialog");
-        dojo.require("cosmo.account.create");
+        
+        dojo.event.browser.addListener(window, "onload", init, false);
+
+        function init() {
+            cosmo.app.init();
+        }
     </script>
-    <%-- 
-        global.css.js should go last -- in Safari is uses a document.write hack
-        to do the dynamic CSS as an inline style right on the page
-    --%>
-    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/global.css.js"></script>
   </head>
   <body>
     <div>
@@ -76,7 +75,7 @@
         </a>
       </div>
       <div style="padding-top:36px; text-align:center;">
-        <a href="javascript:Popup.open('${staticBaseUrl}/help/about', 340, 280);">
+        <a href="javascript:cosmo.util.popup.open('${staticBaseUrl}/help/about', 340, 280);">
           <fmt:message key="Login.About"/>
         </a>
       </div>

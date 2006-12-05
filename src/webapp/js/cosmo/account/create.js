@@ -255,7 +255,7 @@ cosmo.account.create = new function () {
             else {
                 err = _('Signup.Error.Generic') + ' (' + data.message + ')';
             }
-            self.dialog.setPrompt(err);
+            cosmo.app.modalDialog.setPrompt(err);
             return false;
         }
         else {
@@ -360,7 +360,7 @@ cosmo.account.create = new function () {
         p.style.marginTop = '12px';
         p.style.textAlign = 'center';
         a = createElem('a');
-        a.href = 'javascript:cosmo.account.create.hide();';
+        a.href = 'javascript:cosmo.app.modalDialog.hide();';
         a.appendChild(createText(_('Signup.Links.LogInToCosmo')));
         p.appendChild(a);
         dO.appendChild(p);
@@ -369,11 +369,6 @@ cosmo.account.create = new function () {
         return dO;
     }
     
-    // Public props 
-    // =============================
-    // The dialog box for the UI display -- a ModalDialog widget
-    this.dialog = null;
-
     // Public methods
     // =============================
     /**
@@ -389,21 +384,16 @@ cosmo.account.create = new function () {
         o.content = getFormTable();
         o.btnsLeft = [dojo.widget.createWidget("cosmo:Button", 
             { text:_('App.Button.Cancel'), width:74, 
-            handleOnClick: function () { self.hide(); } })];
+            handleOnClick: function () { cosmo.app.modalDialog.hide(); } })];
+        // Have to set empty center set of buttons -- showForm will be called
+        // without buttons getting cleared by 'hide.'
+        o.btnsCenter = []; 
         o.btnsRight = [dojo.widget.createWidget("cosmo:Button", 
             { text:_('App.Button.Submit'), width:74,
             handleOnClick: function () { self.submitCreate(); } })];
+        o.defaultAction = function () { self.submitCreate(); };
 
-        // Create the modal dialog widget if needed
-        if (!self.dialog) {
-            self.dialog = dojo.widget.createWidget('ModalDialog', o, 
-                document.body, 'last');
-        }
-        // Or just re-set the props on it
-        else {
-            for (var p in o) { self.dialog[p] = o[p]; }
-        }
-        self.dialog.show();
+        cosmo.app.modalDialog.show(o);
     };
     /**
      * Submit the call via XHR to cosmo.cmp to sign the user 
@@ -415,7 +405,7 @@ cosmo.account.create = new function () {
         var err = validateForm();
         
         if (err) {
-            self.dialog.setPrompt(err);
+            cosmo.app.modalDialog.setPrompt(err);
         }
         else {
             var hand = { handle: handleCreateResult };
@@ -438,18 +428,17 @@ cosmo.account.create = new function () {
         var cfg = getClientConfig(user);
         var content = getResultsTable(cfg);
         var prompt = _('Signup.Prompt.AccountSetup');
-        prompt += user.activationId == undefined ? '': "\n<br/>" + _('Signup.Prompt.AccountActivation');
+        var d = cosmo.app.modalDialog;
         var btnsCenter = [dojo.widget.createWidget("cosmo:Button", 
             { text:_('App.Button.Close'), width:74, 
-            handleOnClick: self.hide })];
-        self.dialog.setPrompt(prompt);
-        self.dialog.setContent(content);
-        self.dialog.setButtons([], btnsCenter, []);
-    }
-    /**
-     * Hide the dialog box
-     */
-    this.hide = function () {
-        self.dialog.hide();
+            handleOnClick: function () { cosmo.app.modalDialog.hide(); } })];
+        
+        prompt += user.activationId == undefined ? '': "\n<br/>" + _('Signup.Prompt.AccountActivation');
+        
+        // Update dialog in place
+        d.setPrompt(prompt);
+        d.setContent(content);
+        d.setButtons([], btnsCenter, []);
+        d.defaultAction = function () { cosmo.app.modalDialog.hide(); };
     };
 }

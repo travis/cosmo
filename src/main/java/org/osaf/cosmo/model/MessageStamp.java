@@ -57,7 +57,7 @@ public class MessageStamp extends Stamp implements
     }
     
     // Property accessors
-    @Column(table="message_stamp", name="msgbcc")
+    @Column(table="message_stamp", name="msgbcc", length=262144)
     @Type(type="text")
     public String getBcc() {
         return bcc;
@@ -67,7 +67,7 @@ public class MessageStamp extends Stamp implements
         this.bcc = bcc;
     }
 
-    @Column(table="message_stamp", name="msgcc")
+    @Column(table="message_stamp", name="msgcc", length=262144)
     @Type(type="text")
     public String getCc() {
         return cc;
@@ -77,7 +77,7 @@ public class MessageStamp extends Stamp implements
         this.cc = cc;
     }
 
-    @Column(table="message_stamp", name="msgsubject")
+    @Column(table="message_stamp", name="msgsubject", length=262144)
     @Type(type="text")
     public String getSubject() {
         return subject;
@@ -87,7 +87,7 @@ public class MessageStamp extends Stamp implements
         this.subject = subject;
     }
 
-    @Column(table="message_stamp", name="msgto")
+    @Column(table="message_stamp", name="msgto", length=262144)
     @Type(type="text")
     public String getTo() {
         return to;

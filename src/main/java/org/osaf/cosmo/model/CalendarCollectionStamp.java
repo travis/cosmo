@@ -62,9 +62,6 @@ public class CalendarCollectionStamp extends Stamp implements
     public static final String COMPONENT_FREEBUSY = "VFREEBUSY";
     
     // CalendarCollection specific attributes
-    public static final QName ATTR_CALENDAR_UID = new QName(
-            CalendarCollectionStamp.class, "uid");
-
     public static final QName ATTR_CALENDAR_SUPPORTED_COMPONENT_SET = new QName(
             CalendarCollectionStamp.class, "supportedComponentSet");
 

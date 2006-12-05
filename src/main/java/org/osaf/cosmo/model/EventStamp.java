@@ -89,7 +89,7 @@ public class EventStamp extends Stamp implements
         return "event";
     }
     
-    @Column(table="event_stamp", name = "icaldata", length=102400000)
+    @Column(table="event_stamp", name = "icaldata", length=102400000, nullable = false)
     @Type(type="calendar_clob")
     @NotNull
     @Event

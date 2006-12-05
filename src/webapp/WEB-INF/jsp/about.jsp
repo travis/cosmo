@@ -23,6 +23,8 @@
 
 <cosmo:dialogLayout prefix="About.">
 <cosmo:staticbaseurl var="staticBaseUrl"/>
+<cosmo:dojoBoilerplate/>
+<cosmo:globalCSSSafariHack/>
 
 <u:bind var="PRODUCT_VERSION"
         type="org.osaf.cosmo.CosmoConstants"

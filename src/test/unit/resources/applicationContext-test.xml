@@ -69,6 +69,7 @@
             <value>org.osaf.cosmo.model.ContentData</value>
             <value>org.osaf.cosmo.model.ContentItem</value>
             <value>org.osaf.cosmo.model.DateAttribute</value>
+            <value>org.osaf.cosmo.model.DecimalAttribute</value>
             <value>org.osaf.cosmo.model.DictionaryAttribute</value>
             <value>org.osaf.cosmo.model.EventStamp</value>
             <value>org.osaf.cosmo.model.HomeCollectionItem</value>

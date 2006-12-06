@@ -16,6 +16,7 @@
 package org.osaf.cosmo.dao.hibernate;
 
 import java.io.FileInputStream;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.DecimalAttribute;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
@@ -196,6 +198,11 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem item = generateTestContent();
         item.addIntegerAttribute("intattribute", new Long(22));
         item.addBooleanAttribute("booleanattribute", Boolean.TRUE);
+        
+        DecimalAttribute decAttr = 
+            new DecimalAttribute(new QName("","decimalattribute"),new BigDecimal("1.234567"));
+        item.addAttribute(decAttr);
+        
         // TODO: figure out db date type is handled because i'm seeing
         // issues with accuracy
         // item.addAttribute(new DateAttribute("dateattribute", new Date()));
@@ -219,6 +226,11 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
 
+        Attribute attr = queryItem.getAttribute(new QName("","decimalattribute"));
+        Assert.assertNotNull(attr);
+        Assert.assertTrue(attr instanceof DecimalAttribute);
+        Assert.assertEquals(attr.getValue().toString(),"1.234567");
+        
         Set<String> querySet = (Set<String>) queryItem
                 .getAttributeValue("multistringattribute");
         Assert.assertTrue(querySet.contains("value1"));

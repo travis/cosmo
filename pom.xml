@@ -41,7 +41,7 @@
                 <enabled>true</enabled>
             </snapshots>
             <releases>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </releases>
         </pluginRepository>
         <pluginRepository>
@@ -67,6 +67,11 @@
         </snapshotRepository>
     </distributionManagement>
     <dependencies>
+        <dependency>
+            <groupId>org.osaf</groupId>
+            <artifactId>maven-jsar-plugin</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>acegisecurity</groupId>
             <artifactId>acegi-security</artifactId>
@@ -442,7 +447,6 @@
                 <directory>src/test/unit/resources/testdata</directory>
             </testResource>
         </testResources>
-        <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -504,8 +508,10 @@
                 <plugin>
                     <groupId>org.osaf</groupId>
                     <artifactId>maven-jsar-plugin</artifactId>
+                    <version>1.0-SNAPSHOT</version>
                     <executions>
                         <execution>
+                            <phase>package</phase>
                             <goals>
                                 <goal>installScripts</goal>
                             </goals>
@@ -513,7 +519,6 @@
                     </executions>
                 </plugin>
             </plugins>
-        </pluginManagement>
     </build>
 </project>
 

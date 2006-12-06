@@ -15,10 +15,17 @@
  */
 package org.osaf.cosmo.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
+import org.apache.commons.io.IOUtils;
 import org.hibernate.annotations.Type;
 
 /**
@@ -43,6 +50,23 @@ public class BinaryAttribute extends Attribute implements java.io.Serializable {
         setQName(qname);
         this.value = value;
     }
+    
+    /**
+     * Construct BinaryAttribute and initialize data using
+     * an InputStream
+     * @param qname 
+     * @param value
+     */
+    public BinaryAttribute(QName qname, InputStream value) {
+        setQName(qname);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            IOUtils.copy(value, bos);
+        } catch (IOException e) {
+           throw new RuntimeException("error reading input stream");
+        }
+        this.value = bos.toByteArray();
+    }
 
     // Property accessors
     @Column(name = "binvalue", length=102400000)
@@ -62,6 +86,27 @@ public class BinaryAttribute extends Attribute implements java.io.Serializable {
         setValue((byte[]) value);
     }
 
+    /**
+     * @return legnth of data
+     */
+    @Transient
+    public int getLength() {
+        if(value!=null)
+            return value.length;
+        else
+            return 0;
+    }
+    
+    /**
+     * @return inputstream to data
+     */
+    @Transient
+    public InputStream getInputStream() {
+        if(value!=null)
+            return new ByteArrayInputStream(value);
+        else return null;
+    }
+    
     /*
      * (non-Javadoc)
      * 

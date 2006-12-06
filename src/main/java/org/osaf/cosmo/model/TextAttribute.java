@@ -15,10 +15,17 @@
  */
 package org.osaf.cosmo.model;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
+import org.apache.commons.io.IOUtils;
 import org.hibernate.annotations.Type;
 
 
@@ -46,6 +53,21 @@ public class TextAttribute extends Attribute implements
         setQName(qname);
         this.value = value;
     }
+    
+    /**
+     * Construct TextAttribute from Reader
+     * @param qname
+     * @param reader
+     */
+    public TextAttribute(QName qname, Reader reader) {
+        StringWriter writer = new StringWriter();
+        try {
+            IOUtils.copy(reader, writer);
+        } catch (IOException e) {
+            throw new RuntimeException("error reading stream");
+        }
+        this.value = writer.toString();
+    }
 
     // Property accessors
     @Column(name="textvalue", length=102400000)
@@ -56,6 +78,28 @@ public class TextAttribute extends Attribute implements
 
     public void setValue(String value) {
         this.value = value;
+    }
+    
+    /**
+     * @return reader to value
+     */
+    @Transient
+    public Reader getReader() {
+        if(value!=null)
+            return new StringReader(value);
+        else
+            return null;
+    }
+    
+    /**
+     * @return length of text
+     */
+    @Transient
+    public int getLength() {
+        if(value!=null)
+            return value.length();
+        else
+            return 0;
     }
     
     public void setValue(Object value) {

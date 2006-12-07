@@ -136,6 +136,7 @@
     		/browse/remove=remove
     		/browse/view=view
 			/browse/download=download
+			/browse/ticket/revoke=revokeTicket
 		</value>	
 	</property>
 </bean>

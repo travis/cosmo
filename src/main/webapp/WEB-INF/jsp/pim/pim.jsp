@@ -36,7 +36,7 @@
 <head>
 
 <title><fmt:message key="App.Welcome"/></title>
-<%@ include file="dojo.jsp" %>
+<cosmo:dojoBoilerplate/>
 
 <script type="text/javascript" src="${staticBaseUrl}/i18n.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/log.js"></script>

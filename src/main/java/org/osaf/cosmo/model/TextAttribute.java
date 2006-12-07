@@ -60,13 +60,7 @@ public class TextAttribute extends Attribute implements
      * @param reader
      */
     public TextAttribute(QName qname, Reader reader) {
-        StringWriter writer = new StringWriter();
-        try {
-            IOUtils.copy(reader, writer);
-        } catch (IOException e) {
-            throw new RuntimeException("error reading stream");
-        }
-        this.value = writer.toString();
+        this.value = read(reader);
     }
 
     // Property accessors
@@ -103,10 +97,15 @@ public class TextAttribute extends Attribute implements
     }
     
     public void setValue(Object value) {
-        if (value != null && !(value instanceof String))
+        if (value != null && !(value instanceof String) &&
+            !(value instanceof Reader))
             throw new ModelValidationException(
-                    "attempted to set non String value on attribute");
-        setValue((String) value);
+                    "attempted to set non String or Reader value on attribute");
+        if (value instanceof Reader) {
+            setValue(read((Reader) value));
+        } else {
+            setValue((String) value);
+        }
     }
     
     public Attribute copy() {
@@ -114,5 +113,15 @@ public class TextAttribute extends Attribute implements
         attr.setQName(getQName().copy());
         attr.setValue(getValue());
         return attr;
+    }
+
+    private String read(Reader reader) {
+        StringWriter writer = new StringWriter();
+        try {
+            IOUtils.copy(reader, writer);
+        } catch (IOException e) {
+            throw new RuntimeException("error reading stream");
+        }
+        return writer.toString();
     }
 }

@@ -16,7 +16,7 @@
 package org.osaf.cosmo.mc;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -29,10 +29,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.eim.EimRecord;
-import org.osaf.cosmo.eim.eimml.EimmlBuilder;
+import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
-import org.osaf.cosmo.eim.eimml.EimmlParseException;
-import org.osaf.cosmo.eim.eimml.EimmlOutputter;
+import org.osaf.cosmo.eim.eimml.EimmlStreamReader;
+import org.osaf.cosmo.eim.eimml.EimmlStreamWriter;
+import org.osaf.cosmo.eim.eimml.EimmlStreamException;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.util.RepositoryUriParser;
@@ -151,13 +152,19 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 SyncRecords records = token == null ?
                     controller.subscribeToCollection(uid) :
                     controller.synchronizeCollection(uid, token);
+
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.setContentType(MEDIA_TYPE_EIMML);
                 resp.setCharacterEncoding("UTF-8");
                 resp.addHeader(HEADER_SYNC_TOKEN,
                                records.getToken().serialize());
-                EimmlOutputter outputter = new EimmlOutputter();
-                outputter.output(records.getRecords(), resp.getOutputStream());
+
+                EimmlStreamWriter writer =
+                    new EimmlStreamWriter(resp.getOutputStream());
+                for (EimRecordSet recordset : records.getRecordSets())
+                    writer.writeRecordSet(recordset);
+                writer.close();
+
                 return;
             } catch (IllegalArgumentException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
@@ -170,6 +177,11 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
             } catch (NotCollectionException e) {
                 resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
                                "Item not a collection");
+            } catch (EimmlStreamException e) {
+                String msg = "Error writing EIMML stream";
+                log.error(msg, e);
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                               msg + ": " + e.getMessage());
             } catch (MorseCodeException e) {
                 String msg = tokenStr == null ?
                     "Error subscribing to collection" :
@@ -203,11 +215,20 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
             }
             try {
                 SyncToken token = SyncToken.deserialize(tokenStr);
+
                 // XXX: check update preconditions
-                EimmlBuilder builder = new EimmlBuilder();
-                List<EimRecord> records = builder.build(req.getInputStream());
+
+                ArrayList<EimRecordSet> recordsets =
+                    new ArrayList<EimRecordSet>();
+                EimmlStreamReader reader =
+                    new EimmlStreamReader(req.getInputStream());
+                while (reader.hasNext())
+                    recordsets.add(reader.nextRecordSet());
+                reader.close();
+
                 SyncToken newToken =
-                    controller.updateCollection(uid, token, records);
+                    controller.updateCollection(uid, token, recordsets);
+
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());
                 return;
@@ -215,10 +236,10 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                "Invalid sync token");
                 return;
-            } catch (EimmlParseException e) {
-                log.warn("Unable to parse request content", e);
+            } catch (EimmlStreamException e) {
+                log.warn("Unable to read EIM stream", e);
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Unable to parse request content: " + e.getMessage());
+                               "Unable to read EIM stream: " + e.getMessage());
                 return;
             } catch (UnknownCollectionException e) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND,
@@ -261,10 +282,18 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 parentUid = null;
             try {
                 // XXX: check publish preconditions
-                EimmlBuilder builder = new EimmlBuilder();
-                List<EimRecord> records = builder.build(req.getInputStream());
+
+                ArrayList<EimRecordSet> recordsets =
+                    new ArrayList<EimRecordSet>();
+                EimmlStreamReader reader =
+                    new EimmlStreamReader(req.getInputStream());
+                while (reader.hasNext())
+                    recordsets.add(reader.nextRecordSet());
+                reader.close();
+
                 SyncToken newToken =
-                    controller.publishCollection(uid, parentUid, records);
+                    controller.publishCollection(uid, parentUid, recordsets);
+
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());
                 return;
@@ -272,10 +301,10 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                "Parent uid must be specified when authenticated principal is not a user");
                 return;
-            } catch (EimmlParseException e) {
-                log.warn("Unable to parse request content", e);
+            } catch (EimmlStreamException e) {
+                log.warn("Unable to read EIM stream", e);
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Unable to parse request content: " + e.getMessage());
+                               "Unable to read EIM stream: " + e.getMessage());
                 return;
             } catch (UidInUseException e) {
                 resp.sendError(HttpServletResponse.SC_CONFLICT, "Uid in use");

@@ -17,7 +17,7 @@ package org.osaf.cosmo.mc;
 
 import java.util.List;
 
-import org.osaf.cosmo.eim.EimRecord;
+import org.osaf.cosmo.eim.EimRecordSet;
 
 /**
  * Bean class that aggregates all of the EIM records for a subscribe
@@ -30,18 +30,18 @@ import org.osaf.cosmo.eim.EimRecord;
 public class SyncRecords {
 
     private SyncToken token;
-    private List<EimRecord> records;
+    private List<EimRecordSet> recordsets;
 
     /** */
-    public SyncRecords(List<EimRecord> records,
+    public SyncRecords(List<EimRecordSet> recordsets,
                        SyncToken token) {
-        this.records = records;
+        this.recordsets = recordsets;
         this.token = token;
     }
 
     /** */
-    public List<EimRecord> getRecords() {
-        return records;
+    public List<EimRecordSet> getRecordSets() {
+        return recordsets;
     }
 
     /** */

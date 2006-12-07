@@ -17,7 +17,7 @@ package org.osaf.cosmo.mc;
 
 import java.util.List;
 
-import org.osaf.cosmo.eim.EimRecord;
+import org.osaf.cosmo.eim.EimRecordSet;
 
 /**
  * Interface for controllers that implement the operations specified
@@ -51,7 +51,7 @@ public interface MorseCodeController {
      * @param uid the uid of the collection to publish
      * @param parentUid the (optional) uid of the collection to set as
      * the parent for the published collection
-     * @param records the EIM records with which the published
+     * @param recordsets the EIM record sets with which the published
      * collection is initially populated
      *
      * @returns the initial <code>SyncToken</code> for the collection
@@ -67,7 +67,7 @@ public interface MorseCodeController {
      */
     public SyncToken publishCollection(String uid,
                                        String parentUid,
-                                       List<EimRecord> records);
+                                       List<EimRecordSet> recordsets);
    
     /**
      * Retrieves the current state of every item contained within the
@@ -122,7 +122,7 @@ public interface MorseCodeController {
      * @param uid the uid of the collection to subscribe to
      * @param token the sync token describing the last known state of
      * the collection
-     * @param records the EIM records with which the published
+     * @param recordsets the EIM recordsets with which the published
      * collection is updated
      *
      * @returns a new <code>SyncToken</code> that invalidates any
@@ -139,5 +139,5 @@ public interface MorseCodeController {
      */
     public SyncToken updateCollection(String uid,
                                       SyncToken token,
-                                      List<EimRecord> records);
+                                      List<EimRecordSet> recordsets);
 }

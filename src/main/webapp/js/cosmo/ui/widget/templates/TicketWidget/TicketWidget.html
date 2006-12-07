@@ -1,0 +1,42 @@
+<form action="javascript:void(0)" dojoAttachPoint="ticketForm">
+
+      <span class="mdLabel" style="text-align:right;">
+        Timeout
+      </span>
+
+
+
+        <span class="smData">
+
+        <input type="text" name="timeout" size="8" styleClass="textInput"/>
+
+        seconds
+        (leave blank for infinite)
+		<span class="inputError" dojoAttachPoint="timeoutErrorSpan"></span>
+        </span>
+
+
+
+      <span class="mdLabel" style="text-align:right;">
+        Privileges
+      </span>
+        <span class="smData">
+        <span>
+          <input type="radio" name="privileges" value="ro"/> Read
+          <input type="radio" name="privileges" value="rw"/> Read/Write
+          <input type="radio" name="privileges" value="fb"/> Free-Busy
+        </span>
+
+<span class="inputError" dojoAttachPoint="privilegesErrorSpan"></span>
+
+    <span>
+      <button styleClass="buttonInput"  dojoAttachEvent="onClick:createTicket"/>
+		Grant Ticket
+		</button>
+    </span>
+
+  </span>
+
+</form>
+
+

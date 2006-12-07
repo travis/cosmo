@@ -29,11 +29,14 @@
 <head>
 
 <title></title>
+
 <cosmo:dojoBoilerplate/>
 
 
 <script type="text/javascript">
-dojo.require("cosmo.util.cookie")
+dojo.require("cosmo.util.cookie");
+dojo.require("cosmo.util.auth");
+
 function init() {
 
     if (opener) {
@@ -44,7 +47,7 @@ function init() {
         cosmo.util.cookie.destroy('JSESSIONID', '/cosmo');
         cosmo.util.cookie.destroy('inputTimestamp');
         cosmo.util.cookie.destroy('username');
-        cosmo.util.cookie.destroy('CmpCred')
+		cosmo.util.auth.clearAuth();
 
         location = '${staticBaseUrl}/';
     }
@@ -56,6 +59,6 @@ window.onload = init;
 
 </head>
 
-<body></body>
+<body>Logging out...</body>
 
 </html>

@@ -14,16 +14,13 @@
 
 dojo.require("dojo.io.*");
 dojo.require("cosmo.env");
+dojo.require("cosmo.util.auth");
 dojo.provide("cosmo.cmp");
-
-parser = new dojo.xml.Parse();
 
 DEFAULT_PAGE_NUMBER = 1;
 DEFAULT_PAGE_SIZE = 25;
 DEFAULT_SORT_ORDER = "ascending";
 DEFAULT_SORT_TYPE= "username";
-
-CMP_AUTH_COOKIE = "CmpCred";
 
 EL_ADMINISTRATOR = "administrator";
 
@@ -31,78 +28,20 @@ cosmo.ROLE_ADMINISTRATOR = "administrator"
 cosmo.ROLE_ANONYMOUS = "anonymous"
 cosmo.ROLE_AUTHENTICATED = "authenticated"
 
-function encode64(inp){
-    var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + //all caps
-    "abcdefghijklmnopqrstuvwxyz" + //all lowercase
-    "0123456789+/="; // all numbers plus +/=
-
-    var out = ""; //This is the output
-    var chr1, chr2, chr3 = ""; //These are the 3 bytes to be encoded
-    var enc1, enc2, enc3, enc4 = ""; //These are the 4 encoded bytes
-    var i = 0; //Position counter
-
-    do { //Set up the loop here
-        chr1 = inp.charCodeAt(i++); //Grab the first byte
-        chr2 = inp.charCodeAt(i++); //Grab the second byte
-        chr3 = inp.charCodeAt(i++); //Grab the third byte
-
-        //Here is the actual base64 encode part.
-        //There really is only one way to do it.
-        enc1 = chr1 >> 2;
-        enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-        enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-        enc4 = chr3 & 63;
-
-        if (isNaN(chr2)) {
-        enc3 = enc4 = 64;
-        } else if (isNaN(chr3)) {
-        enc4 = 64;
-        }
-
-        //Lets spit out the 4 encoded bytes
-        out = out +
-                keyStr.charAt(enc1) +
-                keyStr.charAt(enc2) +
-                keyStr.charAt(enc3) +
-                keyStr.charAt(enc4);
-
-        // OK, now clean out the variables used.
-        chr1 = chr2 = chr3 = "";
-        enc1 = enc2 = enc3 = enc4 = "";
-
-    } while (i < inp.length); //And finish off the loop
-
-    //Now return the encoded values.
-    return out;
-}
-
-
 dojo.declare("cosmo.cmp.Cmp", null,
     {
-        setUser: function (username, password){
-            dojo.io.cookie.set(CMP_AUTH_COOKIE, encode64(username + ":" + password), -1, "/");
-        },
-
-        unsetUser: function (username, password){
-            dojo.io.cookie.deleteCookie(CMP_AUTH_COOKIE);
-        },
 
         getDefaultCMPRequest: function (handlerDict, sync){
+			
+            var request = cosmo.util.auth.getAuthorizedRequest()
 
-            var request = {
-                    load: handlerDict.load,
-                    handle: handlerDict.handle,
-                    error: handlerDict.error,
-                    transport: "XMLHTTPTransport",
-                    contentType: 'text/xml',
-                    sync: sync,
-                    headers: {}
-            }
-            var credentials = dojo.io.cookie.get(CMP_AUTH_COOKIE);
-
-            if (credentials) {
-                request.headers.Authorization = "Basic " + credentials;
-            }
+            request.load = handlerDict.load;
+            request.handle =  handlerDict.handle;
+            request.error = handlerDict.error;
+            request.transport = "XMLHTTPTransport";
+            request.contentType =  'text/xml';
+            request.sync = sync;
+            
             return request;
         },
 

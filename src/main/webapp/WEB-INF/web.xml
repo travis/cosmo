@@ -125,6 +125,14 @@
   	<filter-name>http-logging</filter-name>
   	<filter-class>org.osaf.cosmo.log.HttpLoggingFilter</filter-class>
   </filter>
+  <filter>
+  	<filter-name>http-override</filter-name>
+  	<filter-class>org.osaf.cosmo.filters.HttpOverrideFilter</filter-class>
+  </filter>
+  <filter-mapping>
+  	<filter-name>http-override</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
   <filter-mapping>
     <filter-name>version-header</filter-name>
     <url-pattern>/*</url-pattern>
@@ -245,10 +253,6 @@
       <param-value>0</param-value>
     </init-param>
   </servlet>
-  <!-- servlet-mapping>
-    <servlet-name>action</servlet-name>
-    <url-pattern>/console/*</url-pattern>
-  </servlet-mapping-->
   <servlet-mapping>
     <servlet-name>dav</servlet-name>
     <url-pattern>/home/*</url-pattern>

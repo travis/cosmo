@@ -3,7 +3,7 @@ dojo.provide("cosmo.ui.widget.LoginDialog");
 dojo.require("dojo.io.*");
 dojo.require("dojo.widget.*");
 dojo.require("dojo.html.common");
-dojo.require("cosmo.cmp");
+dojo.require("cosmo.util.auth");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.ui.widget.Button");
@@ -59,7 +59,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
                 else {
                     location = cosmo.env.getBaseUrl() + "/pim";
                 }
-                cosmo.cmp.cmpProxy.setUser(this.usernameInput.value,
+                cosmo.util.auth.setUser(this.usernameInput.value,
                     this.passwordInput.value);
             }
         },

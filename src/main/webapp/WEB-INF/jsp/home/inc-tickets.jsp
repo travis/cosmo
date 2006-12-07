@@ -21,6 +21,10 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<script type="text/javascript">
+dojo.require("cosmo.ui.widget.TicketWidget");
+</script>
+
 <c:if test="${empty isCollection}">
   <c:set var="isCollection" value="false"/>
 </c:if>
@@ -35,12 +39,24 @@
 <div class="hd" style="margin-top: 12px;">
   Tickets
 </div>
-
+<!-- 
 <div style="margin-top:12px;">
-<a href='<c:url value="/browse/ticket${Path}/new" />'>
+
+ <a href='javascript:dojo.widget.byId("newTicketWidget").show()'>
   [new ticket]
 </a>
-</div>
+</div>-->
+
+<div dojoType="cosmo:TicketWidget" widgetId = "newTicketWidget"  itemId="${Path}"></div>
+<script type="text/javascript">
+dojo.addOnLoad(function(){
+	dojo.event.connect(dojo.widget.byId("newTicketWidget"), "createSuccess", 
+		function(){location = location});
+	
+	});
+</script>
+
+
 
 <div style="margin-top:12px;">
   <table cellpadding="4" cellspacing="1" border="0" width="100%">

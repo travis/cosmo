@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.model;
 
+import java.io.Reader;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -60,6 +62,16 @@ public class NoteItem extends ContentItem {
         } 
     }
 
+    public void setBody(Reader body) {
+        // body stored as TextAttribute on Item
+        TextAttribute bodyAttr = (TextAttribute) getAttribute(ATTR_NOTE_BODY);
+        if(bodyAttr!=null)
+            bodyAttr.setValue(body);
+        else if(body!=null) {
+            addAttribute(new TextAttribute(ATTR_NOTE_BODY,body));
+        } 
+    }
+
     @Column(name="icaluid", length=255)
     public String getIcalUid() {
         return icalUid;
@@ -68,5 +80,4 @@ public class NoteItem extends ContentItem {
     public void setIcalUid(String icalUid) {
         this.icalUid = icalUid;
     }
-
 }

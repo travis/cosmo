@@ -64,11 +64,11 @@
 		<value>
 	        /admin/status/*=statusController
         	/logout=logoutController
-    	    /browse/ticket/new=newTicketForm
            	/browse/**=homeDirectoryBrowsingController
     	    /i18n.js=i18nController
     	    /js/cosmo/util/i18n.js=i18nController
     	    /account/activate=accountActivationController
+    	    /pim/collection/*=collectionBookmarkController
 	        /**/*=jspViewController
 		</value>
     </property> 
@@ -82,6 +82,16 @@
 		<value>true</value>
     </property>
 </bean> 
+
+<!-- 
+
+	Controller for bookmarkable collection urls
+
+ -->
+ 
+ <bean id="collectionBookmarkController" class="org.osaf.cosmo.ui.pim.CollectionBookmarkController">
+ 	<property name="view"><value>pim</value></property>
+ </bean>
 
 <!-- 
 
@@ -126,23 +136,8 @@
     		/browse/remove=remove
     		/browse/view=view
 			/browse/download=download
-    		/browse/ticket/grant=grantTicket
-			/browse/ticket/revoke=revokeTicket
 		</value>	
 	</property>
-</bean>
-
-<bean id="newTicketForm" class="org.osaf.cosmo.spring.mvc.controllers.TicketFormController">
-        <property name="commandName"><value>ticket</value></property>
-        <property name="commandClass">
-           <value>org.osaf.cosmo.model.Ticket</value>
-         </property>
-        <!-- property name="validator"><ref bean="bikeValidator"/></property-->
-        <property name="formView"><value>browse_ticket_new</value></property>
-        <property name="successView"><value>redirect:/browse</value></property>
-        <property name="cancelView"><value>redirect:/browse</value></property>
-       	<property name="contentService"><ref bean="contentService" /></property>
-       	<property name="securityManager"><ref bean="securityManager" /></property>
 </bean>
 
 <!-- 

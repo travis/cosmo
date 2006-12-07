@@ -94,7 +94,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
             // Programmatic subwidget creation should be phased out once safari supports it.
             var button = dojo.widget.createWidget("cosmo:Button",
                     {text:this.submitButtonText,
-                     small:true});
+                     small:true,
+                     widgetId: this.widgetId + "SubmitButton"});
 
 
             dojo.dom.prependChild(button.domNode, this.submitButton.parentNode);
@@ -121,7 +122,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
             } else {
                 var button = dojo.widget.createWidget("cosmo:Button",
                         {text:this.cancelButtonText,
-                         small:true});
+                         small:true,
+                         widgetId: this.widgetId + "CancelButton"});
 
                 dojo.dom.prependChild(button.domNode, this.cancelButton.parentNode);
                 dojo.dom.removeNode(this.cancelButton);

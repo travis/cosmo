@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.eim.eimml;
+package org.osaf.cosmo.eim;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * An exception indicating that an EIMML document could not be parsed.
+ * Represents an EIM field whose value is an unsigned 32-bit integer.
  */
-public class EimmlParseException extends RuntimeException {
+public class IntegerField extends EimRecordField {
+    private static final Log log = LogFactory.getLog(IntegerField.class);
 
-    /**
-     */
-    public EimmlParseException(String message) {
-        super(message);
+    private Integer value;
+
+    /** */
+    public IntegerField(String name,
+                        Integer value) {
+        super(name);
+        this.value = value;
     }
 
-    /**
-     */
-    public EimmlParseException(String message,
-                               Throwable cause) {
-        super(message, cause);
+    /** */
+    public Integer getInteger() {
+        return value;
     }
 }

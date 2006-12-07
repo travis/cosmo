@@ -16,19 +16,19 @@
 package org.osaf.cosmo.eim.eimml;
 
 /**
- * An exception indicating that an EIMML document could not be written.
+ * The base exception for unexpected EIMML processing errors.
  */
-public class EimmlOutputException extends RuntimeException {
+public class EimmlStreamException extends Exception {
 
     /**
      */
-    public EimmlOutputException(String message) {
+    public EimmlStreamException(String message) {
         super(message);
     }
 
     /**
      */
-    public EimmlOutputException(String message,
+    public EimmlStreamException(String message,
                                 Throwable cause) {
         super(message, cause);
     }

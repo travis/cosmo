@@ -25,44 +25,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Represents a single EIM record.
+ * Represents a set of EIM records that are related to the same
+ * logical entity.
  * <p>
- * An EIM record is associated with a particular namespace that allows
- * EIM processors to understand the semantics of the entity modeled by
- * the record.
+ * All records in a set are associated with the same item as
+ * represented by the set's uuid.
  * <p>
- * A record is composed of a uuid and 1..n fields. The uuid is a
- * string that uniquely identifies the entity, while the fields
- * represent its data.
- * <p>
- * A record may be marked as "deleted", representing the fact that an
- * aspect of an entity (for example a stamp) has been removed from
- * storage.
- *
- * @see EimRecordField
+ * A recordset may be marked as "deleted", representing an entity
+ * that has been removed from storage.
  */
-public class EimRecord {
-    private static final Log log = LogFactory.getLog(EimRecord.class);
+public class EimRecordSet {
+    private static final Log log = LogFactory.getLog(EimRecordSet.class);
 
-    private EimRecordSet recordset;
-    private String namespace;
     private String uuid;
-    private ArrayList<EimRecordField> fields;
+    private ArrayList<EimRecord> records;
     private boolean deleted = false;
 
     /** */
-    public EimRecord() {
-        fields = new ArrayList<EimRecordField>();
-    }
-
-    /** */
-    public String getNamespace() {
-        return namespace;
-    }
-
-    /** */
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
+    public EimRecordSet() {
+        records = new ArrayList<EimRecord>();
     }
 
     /** */
@@ -76,14 +57,14 @@ public class EimRecord {
     }
 
     /** */
-    public List<EimRecordField> getFields() {
-        return fields;
+    public List<EimRecord> getRecords() {
+        return records;
     }
 
     /** */
-    public void addField(EimRecordField field) {
-        fields.add(field);
-        field.setRecord(this);
+    public void addRecord(EimRecord record) {
+        records.add(record);
+        record.setRecordSet(this);
     }
 
     /** */
@@ -94,16 +75,6 @@ public class EimRecord {
     /** */
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
-    }
-
-    /** */
-    public EimRecordSet getRecordSet() {
-        return recordset;
-    }
-
-    /** */
-    public void setRecordSet(EimRecordSet recordset) {
-        this.recordset = recordset;
     }
 
     /** */

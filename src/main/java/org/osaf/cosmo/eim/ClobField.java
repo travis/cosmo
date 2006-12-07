@@ -15,30 +15,32 @@
  */
 package org.osaf.cosmo.eim;
 
+import java.io.Reader;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.model.CollectionItem;
-
 /**
- * Models an EIM collection record.
- *
- * Note that collection records do not currently have any fields.
+ * Represents an EIM field whose value is an arbitrary-length chunk of
+ * character data.
+ * 
+ * No information is provided as to the media type or character
+ * encoding of the value.
  */
-public class CollectionRecord extends EimRecord {
-    private static final Log log = LogFactory.getLog(CollectionRecord.class);
+public class ClobField extends EimRecordField {
+    private static final Log log = LogFactory.getLog(ClobField.class);
+
+    private Reader value;
 
     /** */
-    public CollectionRecord() {
+    public ClobField(String name,
+                     Reader value) {
+        super(name);
+        this.value = value;
     }
 
     /** */
-    public CollectionRecord(CollectionItem collection) {
-        super(collection);
-    }
-
-    /** */
-    public void applyTo(CollectionItem collection) {
-        super.applyTo(collection);
+    public Reader getClob() {
+        return value;
     }
 }

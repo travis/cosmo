@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.eim.eimml;
 
-import java.text.DecimalFormat;
-
 import javax.xml.namespace.QName;
 
 /**
@@ -67,55 +65,42 @@ public interface EimmlConstants {
     public static final String EL_RECORDS = "records";
     /** */
     public static final QName QN_RECORDS = new QName(NS_CORE, EL_RECORDS);
-
     /** */
-    public static final String EL_RECORD = "record"; 
+    public static final String EL_RECORDSET = "recordset"; 
+    /** */
+    public static final QName QN_RECORDSET = new QName(NS_CORE, EL_RECORDSET);
     /** */
     public static final String EL_UUID = "uuid";
     /** */
+    public static final QName QN_UUID = new QName(NS_CORE, EL_UUID);
+    /** */
     public static final String EL_DELETED = "deleted";
     /** */
-    public static final String EL_TITLE = "title";
-    /** */
-    public static final String EL_TRIAGE_STATUS = "triageStatus";
-    /** */
-    public static final String EL_TRIAGE_STATUS_CHANGED = "triageStatusChanged";
-    /** */
-    public static final String EL_LAST_MODIFIED_BY = "lastModifiedBy";
-    /** */
-    public static final String EL_CREATED_ON = "createdOn";
-    /** */
-    public static final String EL_DTSTART = "dtstart";
-    /** */
-    public static final String EL_DTEND = "dtend";
-    /** */
-    public static final String EL_LOCATION = "location";
-    /** */
-    public static final String EL_RRULE = "rrule";
-    /** */
-    public static final String EL_EXRULE = "exrule";
-    /** */
-    public static final String EL_RDATE = "rdate";
-    /** */
-    public static final String EL_EXDATE = "exdate";
-    /** */
-    public static final String EL_RECURRENCE_ID = "recurrenceId";
-    /** */
-    public static final String EL_STATUS = "status";
-    /** */
-    public static final String EL_BODY = "body";
-    /** */
-    public static final String EL_ICAL_UID = "icalUid";
-    /** */
-    public static final String EL_SUBJECT = "subject";
-    /** */
-    public static final String EL_TO = "to";
-    /** */
-    public static final String EL_CC = "cc";
-    /** */
-    public static final String EL_BCC = "bcc";
+    public static final QName QN_DELETED = new QName(NS_CORE, EL_DELETED);
 
     /** */
-    public static final DecimalFormat DECIMAL_FORMATTER =
-        new DecimalFormat("###########.##");
+    public static final String EL_RECORD = "record"; 
+
+    /** */
+    public static final String ATTR_UUID = "uuid";
+    /** */
+    public static final String ATTR_TYPE = "type";
+    /** */
+    public static final String ATTR_TRANSFER_ENCODING = "transferEncoding";
+
+    /** */
+    public static final String TRANSFER_ENCODING_BASE64 = "base64";
+
+    /** */
+    public static final String TYPE_BYTES = "bytes";
+    /** */
+    public static final String TYPE_TEXT = "text";
+    /** */
+    public static final String TYPE_LOB = "lob";
+    /** */
+    public static final String TYPE_INTEGER = "integer";
+    /** */
+    public static final String TYPE_DATETIME = "datetime";
+    /** */
+    public static final String TYPE_DECIMAL = "decimal";
 }

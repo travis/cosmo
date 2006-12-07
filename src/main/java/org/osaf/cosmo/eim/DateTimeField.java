@@ -15,30 +15,28 @@
  */
 package org.osaf.cosmo.eim;
 
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.model.TaskStamp;
-
 /**
- * Models an EIM task record.
- *
- * Note that task records do not currently have any fields.
+ * Represents an EIM field whose value is a datetime.
  */
-public class TaskRecord extends EimRecord {
-    private static final Log log = LogFactory.getLog(TaskRecord.class);
+public class DateTimeField extends EimRecordField {
+    private static final Log log = LogFactory.getLog(DateTimeField.class);
+
+    private Date value;
 
     /** */
-    public TaskRecord() {
+    public DateTimeField(String name,
+                         Date value) {
+        super(name);
+        this.value = value;
     }
 
     /** */
-    public TaskRecord(TaskStamp stamp) {
-        super(stamp.getItem());
-    }
-
-    /** */
-    public void applyTo(TaskStamp stamp) {
-        super.applyTo(stamp.getItem());
+    public Date getDate() {
+        return value;
     }
 }

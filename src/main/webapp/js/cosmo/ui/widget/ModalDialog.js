@@ -242,10 +242,23 @@ dojo.widget.HtmlWidget, {
                     this.isDisplayed = true;
                 }
             };
+
             // reference to original hide method
             this.hideOrig = this.hide; 
+
             // Clear buttons and actually take the div off the page
             this.hide = function () {
+               
+                var bDiv = this.buttonPanelNode;
+
+                // Clean up previous panel if any
+                if (this.btnPanel) {
+                    if (bDiv.firstChild) {
+                        bDiv.removeChild(bDiv.firstChild);
+                    }
+                    this.btnPanel.destroy();
+                }
+
                 // Call the original Dojo hide method
                 this.hideOrig.apply(this);
                 this.content = null;
@@ -257,6 +270,7 @@ dojo.widget.HtmlWidget, {
                 this.uiFullMask.style.display = 'none';
                 this.domNode.style.display = 'none';
                 this.isDisplayed = false;
+                
             };
         },
         

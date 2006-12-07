@@ -46,9 +46,17 @@ buttonPreload();
  * two sizes, normal and small.
  */
 function Button(elemId, width, onClickHandler, displayText, isSmall) {
+    //if you don't do this dummyDom business, the page reflows and scrollbars 
+    //are reset
+    var dummyDom = document.createElement('span');
+    
     // Note: This throws away elemId in favor of the incremented widget ID
-    return dojo.widget.createWidget("cosmo:Button", { text: displayText, 'width':width, 
-        handleOnClick: onClickHandler, small: isSmall });
+    var widget =  dojo.widget.createWidget("cosmo:Button", { text: displayText, 'width':width, 
+        handleOnClick: onClickHandler, small: isSmall }, dummyDom, 'last');
+
+    dummyDom.removeChild(widget.domNode);
+    
+    return widget;
 }
 
 /**

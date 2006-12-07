@@ -54,6 +54,10 @@ export CATALINA_HOME="$OSAFSRV_HOME"/tomcat
 CATALINA_BINDIR="$CATALINA_HOME"/bin
 TOMCAT_SCRIPT=catalina.sh
 
+# temp work-around until the maven 2 assembly plugin bug is fixed
+mkdir logs > /dev/null
+chmod +x "$CATALINA_BINDIR"/*.sh
+
 # check that the tomcat control script exists
 if [ ! -x "$CATALINA_BINDIR"/"$TOMCAT_SCRIPT" ]; then
   echo "Cannot find $CATALINA_BINDIR/$TOMCAT_SCRIPT"
@@ -102,6 +106,6 @@ cd $OSAFSRV_HOME
 
 export JAVA_OPTS="$JAVA_OPTS $OSAFSRV_OPTS"
 
-echo "Using OSAFSRV_HOME:      $OSAFSRV_HOME"
+echo "Using OSAFSRV_HOME:    $OSAFSRV_HOME"
 
 exec "$CATALINA_BINDIR"/"$TOMCAT_SCRIPT" "$@"

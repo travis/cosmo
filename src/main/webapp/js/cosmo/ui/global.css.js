@@ -15,6 +15,7 @@
 */
 
 dojo.require("cosmo.env");
+dojo.require("cosmo.ui.conf");
 dojo.require("dojo.html.common");
 
 var uiStyles = '';

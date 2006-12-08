@@ -20,7 +20,7 @@
 
 <beans>
     <!--
-    <bean id="mySqlSource"
+    <bean id="dataSource"
         class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     
         <property name="driverClassName">
@@ -37,7 +37,7 @@
         </property>
     </bean>
     -->
-    <bean id="derbyDataSource"
+    <bean id="dataSource"
         class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName">
             <value>org.apache.derby.jdbc.EmbeddedDriver</value>
@@ -61,7 +61,7 @@
             <!--<value>MySQL5</value>-->
             <value>Derby</value>
         </property>
-        <property name="datasource" ref="derbyDataSource"/>
+        <property name="datasource" ref="dataSource"/>
         <property name="migrations">
             <list>
                 <ref local="zeroPointFiveToZeroPointSix"/>

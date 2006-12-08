@@ -42,12 +42,13 @@ import org.osaf.cosmo.service.impl.StandardUserService;
 
 public class RPCServiceImplTest extends TestCase {
     private static final String TEST_CALENDAR_NAME = "RemoteCosmoService";
-    private static final String TEST_CALENDAR_PATH = "RemoteCosmoServiceTest";
+    
     private static final Log log = LogFactory.getLog(RPCServiceImplTest.class);
 
     private TestHelper testHelper;
 
     private User user;
+    private String testCalendarUid;
 
     private MockDaoStorage storage;
 
@@ -67,6 +68,7 @@ public class RPCServiceImplTest extends TestCase {
         testHelper = new TestHelper();
 
         user = testHelper.makeDummyUser();
+        
 
         storage = new MockDaoStorage();
 
@@ -94,8 +96,10 @@ public class RPCServiceImplTest extends TestCase {
         rpcService.setUserService(userService);
 
         try {
-            rpcService.createCalendar(TEST_CALENDAR_NAME, TEST_CALENDAR_PATH );
+            rpcService.createCalendar(TEST_CALENDAR_NAME);
             calendars = rpcService.getCalendars();
+            testCalendarUid = calendars[0].getUid();
+            
         } catch (RPCException e) {
             log.info(e);
         }
@@ -138,13 +142,13 @@ public class RPCServiceImplTest extends TestCase {
         Event evt2 = createOneHourEvent("Test Event 3", "event3 in range", 2006, CosmoDate.MONTH_APRIL, 5, 18);
         Event evt3 = createOneHourEvent("Test Event 4", "event4 after range", 2006, CosmoDate.MONTH_JUNE, 4, 9);
 
-        rpcService.saveEvent(TEST_CALENDAR_PATH, evt0);
-        rpcService.saveEvent(TEST_CALENDAR_PATH, evt1);
-        rpcService.saveEvent(TEST_CALENDAR_PATH, evt2);
-        rpcService.saveEvent(TEST_CALENDAR_PATH, evt3);
+        rpcService.saveEvent(testCalendarUid, evt0);
+        rpcService.saveEvent(testCalendarUid, evt1);
+        rpcService.saveEvent(testCalendarUid, evt2);
+        rpcService.saveEvent(testCalendarUid, evt3);
         long UTC_MAR_ONE = 1141200000000L;    // 3/1/2006 - 1141200000000
         long UTC_MAY_ONE = 1146466800000L;    // 5/1/2006 - 1146466800000
-        Event events[] = rpcService.getEvents(TEST_CALENDAR_PATH, UTC_MAR_ONE, UTC_MAY_ONE);
+        Event events[] = rpcService.getEvents(testCalendarUid, UTC_MAR_ONE, UTC_MAY_ONE);
 
         CalendarFilter calendarFilter = calendarDao.getLastCalendarFilter();
         ComponentFilter filter = (ComponentFilter)calendarFilter.getFilter().getComponentFilters().get(0);
@@ -161,25 +165,25 @@ public class RPCServiceImplTest extends TestCase {
 
     public void testSaveEvent() throws Exception {
         Event evt = createTestEvent();
-        String id = rpcService.saveEvent(TEST_CALENDAR_PATH, evt);
+        String id = rpcService.saveEvent(testCalendarUid, evt);
         assertNotNull(id);
     }
 
     public void testRemoveEvent() throws Exception {
         Event evt = createTestEvent();
-        String id = rpcService.saveEvent(TEST_CALENDAR_PATH, evt);
-        Event evt1 = rpcService.getEvent(TEST_CALENDAR_PATH, id);
+        String id = rpcService.saveEvent(testCalendarUid, evt);
+        Event evt1 = rpcService.getEvent(testCalendarUid, id);
         assertNotNull(evt1);
-        rpcService.removeEvent(TEST_CALENDAR_PATH, id);
-        Event evt2 = rpcService.getEvent(TEST_CALENDAR_PATH, id);
+        rpcService.removeEvent(testCalendarUid, id);
+        Event evt2 = rpcService.getEvent(testCalendarUid, id);
         assertNull(evt2);
     }
 
     public void testGetEvent() throws Exception {
         Event evt = createTestEvent();
-        String id = rpcService.saveEvent(TEST_CALENDAR_PATH, evt);
+        String id = rpcService.saveEvent(testCalendarUid, evt);
 
-        Event evt1 = rpcService.getEvent(TEST_CALENDAR_PATH, id);
+        Event evt1 = rpcService.getEvent(testCalendarUid, id);
         evt.setId(evt1.getId()); // to pass equality test
         assertEquals(evt, evt1);
     }
@@ -190,10 +194,10 @@ public class RPCServiceImplTest extends TestCase {
     }
 
     public void testGetCalendars() throws Exception {
-        rpcService.createCalendar(TEST_CALENDAR_NAME+"1", TEST_CALENDAR_PATH+"1" );
+        rpcService.createCalendar(TEST_CALENDAR_NAME+"1");
         calendars = rpcService.getCalendars();
         assertEquals(calendars.length, 2);
-        rpcService.removeCalendar(TEST_CALENDAR_PATH+"1");
+        rpcService.removeCalendar(testCalendarUid);
         calendars = rpcService.getCalendars();
         assertEquals(calendars.length, 1);
     }
@@ -201,8 +205,8 @@ public class RPCServiceImplTest extends TestCase {
     public void testCreateCalendar() throws Exception {
         boolean found = false;
         for (Calendar c : calendars) {
-            log.info(c.getPath());
-            if (c.getPath().equals("/RemoteCosmoServiceTest")) {
+            log.info(c.getUid());
+            if (c.getUid().equals(testCalendarUid)) {
                 found = true;
             }
         }
@@ -215,7 +219,7 @@ public class RPCServiceImplTest extends TestCase {
 
     public void testRemoveCalendar() throws Exception {
         int initialNumberOfCalendars = calendars.length;
-        rpcService.removeCalendar(TEST_CALENDAR_PATH);
+        rpcService.removeCalendar(testCalendarUid);
         calendars = rpcService.getCalendars();
         assertEquals(calendars.length, initialNumberOfCalendars - 1);
     }

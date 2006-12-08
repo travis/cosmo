@@ -134,7 +134,7 @@ var Cal = new function() {
         if (!this.calendars.length){
             // Create initial cal
             try {
-                this.serv.createCalendar('Cosmo', 'Cosmo');
+                this.serv.createCalendar('Cosmo');
             }
             catch(e) {
                 cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);

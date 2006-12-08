@@ -91,8 +91,10 @@ public class RPCServiceImpl implements RPCService {
         this.userService = userService;
     }
 
-    public void createCalendar(String displayName, String path)
+    public String createCalendar(String displayName)
         throws RPCException {
+        String path = displayName;
+        //TODO: make sure path is unique
         String absolutePath = getAbsolutePath(path);
         if (log.isDebugEnabled())
             log.debug("Creating calendar at " + absolutePath);
@@ -117,6 +119,7 @@ public class RPCServiceImpl implements RPCService {
         } catch (Exception e) {
             throw new RPCException("Cannot create calendar: " + e.getMessage(), e);
         }
+        return calendar.getUid();
     }
 
     public Calendar[] getCalendars() throws RPCException {
@@ -132,41 +135,59 @@ public class RPCServiceImpl implements RPCService {
                 continue;
             Calendar calendar = new Calendar();
             calendar.setName(child.getDisplayName());
-            calendar.setPath("/" + child.getName());
+            calendar.setUid(child.getUid());
+            
             cals.add(calendar);
         }
         //TODO sort these
         return (Calendar[]) cals.toArray(new Calendar[cals.size()]);
     }
 
-    public Event getEvent(String calendarPath, String id) throws RPCException {
-        String absolutePath = getAbsolutePath(calendarPath);
+    public Event getEvent(String collectionUid, String id) throws RPCException {
+        return this.doGetEvent(collectionUid, id);
+    }
+    
+    public Event getEvent(String collectionUid, String id, String ticket) throws RPCException {
+        return doGetEvent(collectionUid, id);
+    }
+
+    private Event doGetEvent(String collectionUid, String id) throws RPCException{
+        
         if (log.isDebugEnabled())
-            log.debug("Getting event " + id + " in calendar at " +
-                      absolutePath);
+            log.debug("Getting event " + id + " in calendar with uid " +
+                      collectionUid);
         ContentItem calItem = (ContentItem) contentService.findItemByUid(id);
         if (calItem == null){
             return null;
         }
-
+    
         EventStamp event = EventStamp.getStamp(calItem);
         if (event == null){
             return null;
         }
-
+    
         try {
             return icalendarToCosmoConverter.createEvent(calItem.getUid(),
                     event.getMasterEvent(), event.getCalendar());
         } catch (Exception e) {
             log.error("Problem getting event: userName: " + getUsername()
-                    + " calendarName: " + absolutePath
+                    + " calendarUid: " + collectionUid
                     + " id: " +id, e);
             throw new RPCException("Problem getting event", e);
         }
     }
 
-    public Event[] getEvents(String calendarPath, long utcStartTime,
-                             long utcEndTime) throws RPCException {
+    public Event[] getEvents(String collectionUid, long utcStartTime,
+            long utcEndTime) throws RPCException {
+        
+        return doGetEvents(collectionUid, utcStartTime, utcEndTime);
+    }
+    public Event[] getEvents(String collectionUid, long utcStartTime, long utcEndTime, String ticket) throws RPCException {
+        return doGetEvents(collectionUid, utcStartTime, utcEndTime);
+    }
+
+    private Event[] doGetEvents(String collectionUid, long utcStartTime,
+                long utcEndTime) throws RPCException {
         DateTime start = new DateTime(utcStartTime);
         start.setUtc(true);
 
@@ -183,23 +204,23 @@ public class RPCServiceImpl implements RPCService {
         CalendarFilter filter = new CalendarFilter();
         filter.setFilter(calFilter);
 
-        String absolutePath = getAbsolutePath(calendarPath);
+        
         if (log.isDebugEnabled())
             log.debug("Getting events between " + start + " and " + end +
-                      " in calendar " + absolutePath);
+                      " in calendar with uid " + collectionUid);
 
         // XXX: need ContentService.findEvents(path, filter)
         CollectionItem collection = (CollectionItem)
-            contentService.findItemByPath(absolutePath);
+            contentService.findItemByUid(collectionUid);
         if (collection == null)
-            throw new RPCException("Collection " + absolutePath + " does not exist");
+            throw new RPCException("Collection with uid " + collectionUid + " does not exist");
 
         Set<ContentItem> calendarItems = null;
         try {
             calendarItems = contentService.findEvents(collection, filter);
         } catch (Exception e) {
-            log.error("cannot find events for calendar " + absolutePath, e);
-            throw new RPCException("Cannot find events for calendar " + absolutePath + ": " + e.getMessage(), e);
+            log.error("cannot find events for calendar with uid " + collectionUid, e);
+            throw new RPCException("Cannot find events for calendar with uid " + collectionUid + ": " + e.getMessage(), e);
         }
 
         Event[] events = null;
@@ -215,7 +236,7 @@ public class RPCServiceImpl implements RPCService {
                 createEventsFromCalendars(calendarItems, beginDate, endDate);
         } catch (Exception e) {
             log.error("Problem getting events: userName: " + getUsername()
-                      + " calendarName: " + absolutePath
+                      + " calendarUid: " + collectionUid
                       + " beginDate: " + utcStartTime
                       + " endDate: " + utcStartTime, e);
             throw new RPCException("Problem getting events", e);
@@ -229,32 +250,36 @@ public class RPCServiceImpl implements RPCService {
        return userService.getPreference(getUsername(), preferenceName);
     }
 
-    public String getTestString() {
-        return "Scooby";
-    }
-
     public String getVersion() {
         return CosmoConstants.PRODUCT_VERSION;
     }
 
-    public void moveEvent(String sourceCalendar, String id,
-            String destinationCalendar) throws RPCException {
-        //TODO Not implemented yet
-    }
-
-    public void removeCalendar(String calendarPath) throws RPCException {
-        String absolutePath = getAbsolutePath(calendarPath);
+    public void removeCalendar(String collectionUid) throws RPCException {
+        
         if (log.isDebugEnabled())
-            log.debug("Removing calendar " + absolutePath);
-        contentService.removeItem(absolutePath);
+            log.debug("Removing collection with uid " + collectionUid);
+        
+        contentService.removeItem(
+                contentService.findItemByUid(collectionUid));
+        
     }
-
-    public void removeEvent(String calendarPath, String id)
+    
+    public void removeEvent(String collectionUid, String id) 
         throws RPCException {
-        String absolutePath = getAbsolutePath(calendarPath);
+        doRemoveEvent(collectionUid, id);
+    }
+    
+    public void removeEvent(String collectionUid, String id, String ticket) throws RPCException {
+        doRemoveEvent(collectionUid, id);
+        
+    }
+
+    private void doRemoveEvent(String collectionUid, String id)
+        throws RPCException {
+        
         if (log.isDebugEnabled())
-            log.debug("Removing event " + id + " from calendar " +
-                      absolutePath);
+            log.debug("Removing event " + id + " from calendar with uid" +
+                      collectionUid);
         ContentItem calItem = (ContentItem) contentService.findItemByUid(id);
         contentService.removeContent(calItem);
     }
@@ -265,12 +290,23 @@ public class RPCServiceImpl implements RPCService {
         userService.removePreference(getUsername(), preferenceName);
     }
 
-    public String saveEvent(String calendarPath, Event event)
-            throws RPCException {
+    public String saveEvent(String collectionUid, Event event)
+        throws RPCException {
+        return doSaveEvent(collectionUid, event);
+    }
+    
+    public String saveEvent(String collectionUid, Event event, String ticket) throws RPCException {
+        return doSaveEvent(collectionUid, event);
+    }
+
+    private String doSaveEvent(String collectionUid, Event event)
+        throws RPCException {
 
         ContentItem calendarEventItem = null;
-        CollectionItem calendarItem = getCalendarCollectionItem(calendarPath);
-
+        
+        CollectionItem calendarItem = getCalendarCollectionItem(collectionUid);
+        calendarItem = (CollectionItem) contentService.findItemByUid(collectionUid);
+        
         //Check to see if this is a new event
         if (StringUtils.isEmpty(event.getId())) {
             calendarEventItem = saveNewEvent(event, calendarItem);
@@ -303,7 +339,17 @@ public class RPCServiceImpl implements RPCService {
         userService.setPreference(getUsername(),preferenceName);
     }
 
-    public Map<String, RecurrenceRule> getRecurrenceRules(String calendarPath,
+    
+    public Map<String, RecurrenceRule> getRecurrenceRules(String collectionUid,
+            String[] eventIds) throws RPCException {
+        return doGetRecurrenceRules(collectionUid, eventIds); 
+    }
+    public Map<String, RecurrenceRule> getRecurrenceRules(String collectionUid, String[] eventIds, String ticket) throws RPCException {
+
+        return doGetRecurrenceRules(collectionUid, eventIds);
+    }
+
+    private Map<String, RecurrenceRule> doGetRecurrenceRules(String collectionUid,
             String[] eventIds) throws RPCException {
         Map<String, RecurrenceRule> map = new HashMap<String, RecurrenceRule>();
         for (int x = 0; x < eventIds.length; x++) {
@@ -317,7 +363,17 @@ public class RPCServiceImpl implements RPCService {
         return map;
     }
 
-    public void saveRecurrenceRule(String calendarPath, String eventId,
+    public void saveRecurrenceRule(String collectionUid, String eventId,
+            RecurrenceRule recurrenceRule) throws RPCException {
+        doSaveRecurrenceRule(collectionUid, eventId, recurrenceRule);
+    }
+    
+    public void saveRecurrenceRule(String collectionUid, String eventId, RecurrenceRule recurrenceRule, String ticket) throws RPCException {
+        doSaveRecurrenceRule(collectionUid, eventId, recurrenceRule);
+        
+    }
+
+    private void doSaveRecurrenceRule(String collectionUid, String eventId,
             RecurrenceRule recurrenceRule) throws RPCException {
 
         ContentItem calItem = (ContentItem) contentService.findItemByUid(eventId);
@@ -333,7 +389,16 @@ public class RPCServiceImpl implements RPCService {
         contentService.updateContent(calItem);
     }
 
-    public Map<String, Event[]> expandEvents(String calendarPath, String[] eventIds,
+    public Map<String, Event[]> expandEvents(String collectionUid, String[] eventIds,
+            long utcStartTime, long utcEndTime) throws RPCException{
+        return doExpandEvents(collectionUid, eventIds, utcStartTime, utcEndTime);
+    }
+    
+    public Map<String, Event[]> expandEvents(String collectionUid, String[] eventIds, long utcStartTime, long utcEndTime, String ticket) throws RPCException {
+        return doExpandEvents(collectionUid, eventIds, utcStartTime, utcEndTime);
+    }
+
+    private Map<String, Event[]> doExpandEvents(String collectionUid, String[] eventIds,
             long utcStartTime, long utcEndTime) throws RPCException{
 
         Map<String, Event[]> map = new HashMap<String, Event[]>();
@@ -357,19 +422,33 @@ public class RPCServiceImpl implements RPCService {
 
     }
 
-    public String saveNewEventBreakRecurrence(String calendarPath, Event event,
-            String originalEventId, CosmoDate originalEventEndDate) throws RPCException {
-        CollectionItem calendarItem = getCalendarCollectionItem(calendarPath);
+    public String saveNewEventBreakRecurrence(String collectionUid, 
+            Event event, String originalEventId, 
+            CosmoDate originalEventEndDate) throws RPCException {
+        
+        return doSaveNewEventBreakRecurrence(collectionUid, event, 
+                originalEventId, originalEventEndDate);
+    }
+    
+    public String saveNewEventBreakRecurrence(String collectionUid, Event event, String originalEventId, CosmoDate originalEventEndDate, String ticket) throws RPCException {
+        return doSaveNewEventBreakRecurrence(collectionUid, event, originalEventId, originalEventEndDate);
+    }
+
+    private String doSaveNewEventBreakRecurrence(String collectionUid, 
+            Event event, String originalEventId, 
+            CosmoDate originalEventEndDate) throws RPCException {
+        
+        CollectionItem calendarItem = getCalendarCollectionItem(collectionUid);
 
         //first save the new event
         ContentItem calendarEventItem = saveNewEvent(event, calendarItem);
 
         //get the old event's recurrence rule
-        RecurrenceRule recurrenceRule = getRecurrenceRules(calendarPath,
+        RecurrenceRule recurrenceRule = getRecurrenceRules(collectionUid,
                 new String[] { originalEventId }).get(originalEventId);
 
         recurrenceRule.setEndDate(originalEventEndDate);
-        saveRecurrenceRule(calendarPath, originalEventId, recurrenceRule);
+        saveRecurrenceRule(collectionUid, originalEventId, recurrenceRule);
 
         return calendarEventItem.getUid();
     }
@@ -412,9 +491,9 @@ public class RPCServiceImpl implements RPCService {
         }
     }
 
-    private CollectionItem getCalendarCollectionItem(String calendarPath) {
+    private CollectionItem getCalendarCollectionItem(String collectionUid) {
         return (CollectionItem) contentService
-                .findItemByPath(getAbsolutePath(calendarPath));
+                .findItemByUid(collectionUid);
     }
     private Iterator<String> availableNameIterator(VEvent vevent) {
         String  baseName = new StringBuffer(vevent.getUid()
@@ -481,7 +560,12 @@ public class RPCServiceImpl implements RPCService {
     
         Iterator<String> availableNameIterator = availableNameIterator(vevent);
 
-        calendarEventItem.setOwner(getUser());
+        User owner = getUser();
+        if (owner == null){
+            owner = calendarItem.getOwner();
+        }
+        
+        calendarEventItem.setOwner(owner);
 
         boolean added = false;
         do {

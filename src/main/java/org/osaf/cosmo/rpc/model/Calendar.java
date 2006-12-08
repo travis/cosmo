@@ -25,6 +25,7 @@ public class Calendar {
 	
     private String displayName = null;
     private String path = null;
+    private String uid = null;
     
     /**
      * This is the name as displayed to the user 
@@ -47,5 +48,16 @@ public class Calendar {
     public void setPath(String path) {
         this.path = path;
     }
-	
+    
+    /**
+     * This is the uid of this collection.
+     */
+    public String getUid() {
+        return uid;
+    }
+    
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+    
 }

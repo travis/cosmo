@@ -15,6 +15,8 @@
 */
 
 dojo.require("cosmo.env");
+dojo.require("dojo.html.common");
+
 var uiStyles = '';
 var uiPref = []; 
 var arr = [];
@@ -60,22 +62,8 @@ function doStyles(type, data, evt) {
     uiStyles = uiStyles.replace(/}/g, '}\n');
     // Trim
     uiStyles = uiStyles.replace(/^\s+/g, '').replace(/\s+$/g, '');
-
-    //Log.print(uiStyles);
-
-    // Split into array of styles
-    uiStyles = uiStyles.split(/\n/g);
-
-    // Safari can't deal with DOM methods for styles
-    if (navigator.userAgent.indexOf('Safari') > -1) {
-        Styler.doOldDocumentDotWriteHack(uiStyles);
-    }
-    else {
-        // Create stylesheet and load styles
-        // ===================
-        Styler.addStyle('global');
-        Styler.styles['global'].loadRules(uiStyles);
-    }
+    
+    dojo.html.insertCssText(uiStyles);
 }
 
 

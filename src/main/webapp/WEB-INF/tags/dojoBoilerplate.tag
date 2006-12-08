@@ -32,6 +32,7 @@ bootstrap = function(){
     var staticBaseUrl = "${staticBaseUrl}";
     dojo.require("dojo.widget.*");
     dojo.require("dojo.debug.console");
+
     dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
     dojo.widget.manager.registerWidgetPackage("cosmo.ui.widget");
 
@@ -46,6 +47,8 @@ bootstrap = function(){
     registry.init(["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"]);
     //registry.init([ "europe"]);
     cosmo.datetime.timezone.setTimezoneRegistry(registry);
+
+    dojo.require('cosmo.ui.conf');
 }
 bootstrap();
 

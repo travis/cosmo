@@ -133,8 +133,9 @@ var Cal = new function() {
         // No cals for this user
         if (!this.calendars.length){
             // Create initial cal
+            var uid = null;
             try {
-                this.serv.createCalendar('Cosmo');
+                uid = this.serv.createCalendar('Cosmo');
             }
             catch(e) {
                 cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);
@@ -144,6 +145,7 @@ var Cal = new function() {
             this.currentCalendar = new CalendarMetadata();
             this.currentCalendar.name = 'Cosmo';
             this.currentCalendar.path = 'Cosmo';
+            this.currentCalendar.uid = uid;
             
             // Add 'Welcome to Cosmo' Event
             this.createWelcomeItem = true;

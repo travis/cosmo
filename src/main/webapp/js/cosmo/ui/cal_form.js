@@ -586,7 +586,7 @@ function CalForm() {
         recur = form.recurrence.value;
         rE = form.recurend.value != 'mm/dd/yyyy' ?
             form.recurend.value : '';
-        tzId = form.tzId.value || null;
+        tzId = form.tzTzSelect.value || null;
 
         // Error checking
         // =======================

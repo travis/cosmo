@@ -71,7 +71,6 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -121,13 +120,11 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.9</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <version>10.2.1.6</version>
-            <scope>provided</scope>
         </dependency>
 		<dependency>
           <groupId>mysql</groupId>
@@ -158,19 +155,23 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-antrun-plugin</artifactId>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
                     <executions>
                         <execution>
-                            <phase>integration-test</phase>
+                            <phase>package</phase>
                             <configuration>
-                                <tasks>
-                                    <java classname="org.osaf.cosmo.migrate.Main">
-                                        <classpath refid="maven.compile.classpath"/>
-                                    </java>
-                                </tasks>
+                                <descriptorRefs>
+                                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                                </descriptorRefs>
+                                <archive>
+                                    <manifest>
+                                        <mainClass>org.osaf.cosmo.migrate.Main</mainClass>
+                                    </manifest>
+                               </archive>
                             </configuration>
                             <goals>
-                                <goal>run</goal>
+                                <goal>assembly</goal>
                             </goals>
                         </execution>
                     </executions>

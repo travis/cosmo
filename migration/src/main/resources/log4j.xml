@@ -25,13 +25,8 @@
     </layout>
   </appender>
 
-  
-  <logger name="org.osaf.cosmo.migrate">
-    <level value="DEBUG"/>
-  </logger>
-
   <root>
-    <level value="WARN"/>
+    <level value="INFO"/>
     <appender-ref ref="CONSOLE"/>
   </root>
 

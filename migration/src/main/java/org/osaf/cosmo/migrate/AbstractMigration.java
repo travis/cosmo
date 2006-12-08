@@ -37,7 +37,9 @@ import org.apache.commons.logging.LogFactory;
  * [fromVersion]-to-[toVersion]-[dialect]-post.sql
  * 
  * The "pre" script is run first, then the migrateData()
- * method is called, then the "post" script is run.
+ * method is called, then the "post" script is run.  The
+ * scripts are run if found, but execution continues if
+ * a script is not found.
  *
  */
 public abstract class AbstractMigration implements Migration {
@@ -76,8 +78,12 @@ public abstract class AbstractMigration implements Migration {
         String resourceName = "/" + getSchemaUpdateFileName(dialect);
         InputStream is = getClass().getResourceAsStream(resourceName);
         
-        if(is==null)
-            throw new RuntimeException("unable to find script: " + resourceName);
+        if(is==null) {
+            log.info("unable to find script: " + resourceName);
+            return;
+        } else {
+            log.info("found script: " + resourceName);
+        }
         
         InputStreamReader reader = new InputStreamReader(is);
         
@@ -108,8 +114,12 @@ public abstract class AbstractMigration implements Migration {
         String resourceName = "/" + getPostMigrationUpdateFileName(dialect);
         InputStream is = getClass().getResourceAsStream(resourceName);
         
-        if(is==null)
-            throw new RuntimeException("unable to find script: " + resourceName);
+        if(is==null) {
+            log.info("unable to find script: " + resourceName);
+            return;
+        } else {
+            log.info("found script: " + resourceName);
+        }
         
         InputStreamReader reader = new InputStreamReader(is);
         

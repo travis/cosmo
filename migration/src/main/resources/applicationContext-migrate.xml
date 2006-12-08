@@ -36,8 +36,7 @@
             <value>pass</value>
         </property>
     </bean>
-	-->
-	
+    -->
     <bean id="derbyDataSource"
         class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName">
@@ -50,23 +49,23 @@
             <value>sa</value>
         </property>
     </bean>
-	
+
     <bean id="zeroPointFiveToZeroPointSix"
-	    class="org.osaf.cosmo.migrate.ZeroPointFiveToZeroPointSixMigration">
+        class="org.osaf.cosmo.migrate.ZeroPointFiveToZeroPointSixMigration">
     </bean>
-	
+
     <bean id="migrationManager"
-	    class="org.osaf.cosmo.migrate.MigrationManager">
-	   
-		<property name="dialect">
+        class="org.osaf.cosmo.migrate.MigrationManager">
+
+        <property name="dialect">
             <!--<value>MySQL5</value>-->
             <value>Derby</value>
-	    </property>
-	    <property name="datasource" ref="derbyDataSource"/>
-	    <property name="migrations">
+        </property>
+        <property name="datasource" ref="derbyDataSource"/>
+        <property name="migrations">
             <list>
                 <ref local="zeroPointFiveToZeroPointSix"/>
-		    </list>
+            </list>
         </property>
     </bean>
 

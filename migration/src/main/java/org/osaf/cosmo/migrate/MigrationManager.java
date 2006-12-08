@@ -104,7 +104,7 @@ public class MigrationManager {
         }
     }
     
-    private String getCurrentVersion(Connection conn) throws Exception {
+    protected String getCurrentVersion(Connection conn) throws Exception {
         PreparedStatement stmt = conn.prepareStatement("select propertyvalue from server_properties where propertyname=?");
         stmt.setString(1, "cosmo.schemaVersion");
         ResultSet rs = stmt.executeQuery();

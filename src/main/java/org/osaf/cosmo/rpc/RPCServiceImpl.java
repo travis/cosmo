@@ -93,33 +93,36 @@ public class RPCServiceImpl implements RPCService {
 
     public String createCalendar(String displayName)
         throws RPCException {
-        String path = displayName;
-        //TODO: make sure path is unique
-        String absolutePath = getAbsolutePath(path);
-        if (log.isDebugEnabled())
-            log.debug("Creating calendar at " + absolutePath);
 
-        String parentPath = PathUtil.getParentPath(absolutePath);
-        CollectionItem collection = (CollectionItem)
-            contentService.findItemByPath(parentPath);
-        if (collection == null){
-            throw new RPCException("No collection at " + parentPath);
+        User user = getUser();
+        if (user == null){
+            throw new RPCException("You must be logged in to create a collection");
         }
+                
+        CollectionItem collection = contentService.getRootItem(getUser());
         CollectionItem calendar = new CollectionItem();
-        calendar.setName(PathUtil.getBasename(absolutePath));
-        calendar.setOwner(getUser());
+        calendar.setName(displayName);
+        calendar.setOwner(user);
         calendar.setDisplayName(displayName);
         CalendarCollectionStamp ccs = new CalendarCollectionStamp(calendar);
         calendar.addStamp(ccs);
 
         try {
-            contentService.createCollection(collection, calendar);
-        } catch (DuplicateItemNameException e) {
-            throw new RPCException("Calendar at " + absolutePath + " already exists", e);
+            this.createCalendarHandleDuplicateName(collection, calendar, 0);
         } catch (Exception e) {
             throw new RPCException("Cannot create calendar: " + e.getMessage(), e);
         }
         return calendar.getUid();
+    }
+    
+    private void createCalendarHandleDuplicateName(CollectionItem collection, 
+        CollectionItem calendar, int i) throws RPCException {
+        try {
+            contentService.createCollection(collection, calendar);
+        } catch (DuplicateItemNameException e) {
+            calendar.setName(calendar.getName() + Integer.toString(i));
+            createCalendarHandleDuplicateName(collection, calendar, i+1);
+        }
     }
 
     public Calendar[] getCalendars() throws RPCException {

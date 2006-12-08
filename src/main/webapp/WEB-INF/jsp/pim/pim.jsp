@@ -47,6 +47,8 @@
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/text.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/popup.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/model/model.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/conf.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/button.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/block.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/dialog.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/cal_main.js"></script>

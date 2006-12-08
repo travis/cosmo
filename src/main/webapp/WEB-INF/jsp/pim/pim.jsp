@@ -72,7 +72,6 @@ dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.view.cal.conflict');
 dojo.require('cosmo.ui.widget.ModalDialog');
-dojo.require('cosmo.ui.button');
 // FIXME: Need to get timeout value from server
 var TIMEOUT_MIN = 30;
 

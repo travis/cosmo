@@ -17,14 +17,15 @@
 dojo.provide('cosmo.app');
 
 dojo.require('cosmo.ui.widget.ModalDialog');
+dojo.require("cosmo.ui.button");
 
 cosmo.app = new function () {
     var self = this;
-   
+
     // App section code to run on init
     this.initObj = {};
     // warnings / confirmations
-    this.modalDialog = null; 
+    this.modalDialog = null;
     // List of any queued-up error messages
     this.errorList = [];
 
@@ -32,11 +33,11 @@ cosmo.app = new function () {
         // Set up the modal dialog box for the app
         this.modalDialog = dojo.widget.createWidget(
             'cosmo:ModalDialog', {}, document.body, 'last');
-        
+
         // Initialize the default view
         if (self.initObj.init) { self.initObj.init(); }
     }
-    
+
     // ==========================
     // Modal dialog boxes
     // ==========================

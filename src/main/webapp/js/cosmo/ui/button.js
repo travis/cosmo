@@ -20,6 +20,8 @@
  * @license Apache License 2.0
  */
 
+dojo.provide("cosmo.ui.button");
+
 function buttonPreload() {
     var btnSizes = ['', '_sm'];
     var btnSides = ['left', 'center', 'right'];
@@ -46,16 +48,16 @@ buttonPreload();
  * two sizes, normal and small.
  */
 function Button(elemId, width, onClickHandler, displayText, isSmall) {
-    //if you don't do this dummyDom business, the page reflows and scrollbars 
+    //if you don't do this dummyDom business, the page reflows and scrollbars
     //are reset
     var dummyDom = document.createElement('span');
-    
+
     // Note: This throws away elemId in favor of the incremented widget ID
-    var widget =  dojo.widget.createWidget("cosmo:Button", { text: displayText, 'width':width, 
+    var widget =  dojo.widget.createWidget("cosmo:Button", { text: displayText, 'width':width,
         handleOnClick: onClickHandler, small: isSmall }, dummyDom, 'last');
 
     dummyDom.removeChild(widget.domNode);
-    
+
     return widget;
 }
 
@@ -67,16 +69,16 @@ function Button(elemId, width, onClickHandler, displayText, isSmall) {
  * container the NavButtonSet is sitting in
  */
 function NavButtonSet(id, leftHandler, rightHandler) {
-    
+
     var self = this;
-    
+
     // Private method to create the button-set table
     var doButtonTable = function() {
         var nbTable = document.createElement('table');
         var nbTBody = document.createElement('tbody');
         var nbRow = document.createElement('tr');
         var nbDivider = null;
-        
+
         nbTable.style.width = '45px';
         nbTable.style.height = '18px';
         nbTable.cellPadding = '0px'; // Note camelCaps here, fun!! :)
@@ -105,13 +107,13 @@ function NavButtonSet(id, leftHandler, rightHandler) {
     var doButtonSetCap = function(side, clickHandler) {
         var nbData = document.createElement('td');
         var lowerCaseSide = side.toLowerCase();
-        
+
         nbData.id = id + side;
         nbData.style.width = '9px';
         nbData.style.height = '18px';
         nbData.style.lineHeight = '18px';
         nbData.style.cursor = 'pointer';
-        nbData.style.background = 'url(' + BUTTON_DIR_PATH + 
+        nbData.style.background = 'url(' + BUTTON_DIR_PATH +
             'button_' + lowerCaseSide + '_sm.gif)';
         nbData.onmouseover = function() { self.rolloverHandler(side, 'lit'); }
         nbData.onmouseout = function() { self.rolloverHandler(side, ''); }
@@ -123,25 +125,25 @@ function NavButtonSet(id, leftHandler, rightHandler) {
         var nbData = document.createElement('td');
         var nbImg = document.createElement('img');
         var lowerCaseSide = side.toLowerCase();
-        
+
         nbData.id = id + 'Center' + side;
         nbData.style.width = '13px';
         nbData.style.height = '18px';
         nbData.style.lineHeight = '18px';
         nbData.style.textAlign = lowerCaseSide;
-        nbData.style.background = 'url(' + BUTTON_DIR_PATH + 
+        nbData.style.background = 'url(' + BUTTON_DIR_PATH +
             'button_center_sm.gif)';
         nbData.style.backgroundRepeat = 'repeat-x';
         nbData.style.cursor = 'pointer';
-        nbImg.src = BUTTON_DIR_PATH + 'nav_arrow_' + 
-            lowerCaseSide + '.gif'; 
+        nbImg.src = BUTTON_DIR_PATH + 'nav_arrow_' +
+            lowerCaseSide + '.gif';
         nbData.appendChild(nbImg);
         nbData.onmouseover = function() { self.rolloverHandler(side, 'lit'); }
         nbData.onmouseout = function() { self.rolloverHandler(side, ''); }
         nbData.onclick = clickHandler;
         return nbData;
     }
-    
+
     // Main properties and methods
     // ========
     this.id = id;
@@ -155,9 +157,9 @@ function NavButtonSet(id, leftHandler, rightHandler) {
         var btnSide = side.toLowerCase();
         var btnState = state ? '_' + state : '';
         var dividerColor = state == 'lit' ? '#000000' : '#aaaaaa';
-        document.getElementById(this.id + 'Center' + side).style.background = 
+        document.getElementById(this.id + 'Center' + side).style.background =
             'url(' + BUTTON_DIR_PATH + 'button_center' + btnState + '_sm.gif)';
-        document.getElementById(this.id + side).style.background = 
+        document.getElementById(this.id + side).style.background =
             'url(' + BUTTON_DIR_PATH + 'button_' + btnSide + btnState + '_sm.gif)';
         document.getElementById(this.id + 'ButtonDivider').style.background = dividerColor;
     };

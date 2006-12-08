@@ -56,7 +56,6 @@
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/event/handlers.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/styler.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/contentcontainer.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/button.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/minical.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/widget/Layout.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/facade/pref.js"></script>
@@ -73,7 +72,7 @@ dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.view.cal.conflict');
 dojo.require('cosmo.ui.widget.ModalDialog');
-
+dojo.require('cosmo.ui.button');
 // FIXME: Need to get timeout value from server
 var TIMEOUT_MIN = 30;
 

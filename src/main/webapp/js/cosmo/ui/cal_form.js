@@ -846,7 +846,7 @@ function CalForm() {
     };
 
     this.clearTimezone = function(){
-        this.form.tzRegion.selectedIndex = 0;
+        this.form.tzRegionSelect.selectedIndex = 0;
         self.populateTimezoneSelector();
     }
 

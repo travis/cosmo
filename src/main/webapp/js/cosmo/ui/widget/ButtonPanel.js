@@ -98,7 +98,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, 
     
     destroy: function(){
         this.destroyButtons();
-    },
+    }
     
 
   } );

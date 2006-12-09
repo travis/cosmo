@@ -139,7 +139,7 @@ public class RPCServiceImpl implements RPCService {
         List<Calendar> cals = new ArrayList<Calendar>();
         for (Iterator<Item> i=home.getChildren().iterator(); i.hasNext();) {
             Item child = i.next();
-            if (child.getStamp(CalendarCollectionStamp.class)==null)
+            if (child.getStamp(CalendarCollectionStamp.class) == null)
                 continue;
             Calendar calendar = new Calendar();
             calendar.setName(child.getDisplayName());
@@ -697,7 +697,7 @@ public class RPCServiceImpl implements RPCService {
             throw new RPCException("No user logged in.");
         }
         
-        if (collection.getOwner() != user){
+        if (!collection.getOwner().equals(user)){
             throw new RPCException("You do not own the collection with uid " 
                     + collection.getUid());
         }
@@ -710,7 +710,7 @@ public class RPCServiceImpl implements RPCService {
         Ticket ticket = null;
         
         for (Ticket thisTicket: collection.getTickets()){
-            if (ticketKey == thisTicket.getKey()){
+            if (ticketKey.equals(thisTicket.getKey())){
                 ticket = thisTicket; 
                 break;
             }

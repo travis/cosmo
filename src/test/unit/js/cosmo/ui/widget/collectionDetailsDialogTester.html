@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!--
+For use with the JsUnit from www.jsunit.net
+-->
+<head>
+
+  <title>CollectionDetails Dialog Tests</title>
+
+  <!-- JsUnit -->
+  <link rel="stylesheet" type="text/css" href="../../../jsunit/css/jsUnitStyle.css">
+  <!-- hack so we can get somewhere loading this file standalone without error -->
+  <script language="JavaScript" type="text/javascript">
+      var xbDEBUG = ''; xbDEBUG.on = false;
+      var djConfig = {isDebug: true};
+  </script>
+
+
+  <script src="../../../../../../main/webapp/js/lib/dojo-event_and_io/dojo.js" language="JavaScript" type="text/javascript"></script>
+  <script src="../../../../../../main/webapp/js/cosmo/util/debug.js" language="JavaScript" type="text/javascript"></script>
+
+  <!-- dojo setup stuff -->
+  <script language="JavaScript" type="text/javascript">
+      dojo.require("dojo.widget.*");
+      dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
+      dojo.require("cosmo.env");
+      cosmo.env.setBaseUrl("../../../../../../main/webapp/");
+  </script>
+
+  <!--  bare minimum amount of stuff to display dialogs.  -->
+  <script language="JavaScript" type="text/javascript">
+     /* This is to trick cosmo into thinking we have a i18n lib loaded */
+      dojo.provide("cosmo.util.i18n")
+      function getText(str) {
+        return str;
+      }
+
+      dojo.require("cosmo.ui.styler");
+      dojo.require("cosmo.ui.conf");
+      eval(dojo.hostenv.getText(cosmo.env.getBaseUrl() + "js/cosmo/ui/global.css.js"));
+      dojo.require("cosmo.app");
+
+  </script>
+
+  <script language="JavaScript" type="text/javascript">
+    showDialog = function(){
+        cosmo.app.showDialog({
+            content: dojo.widget.createWidget("cosmo:CollectionDetailsDialog", {}, null, 'last'),
+            width: "500",
+            btnsLeft: [ dojo.widget.createWidget(
+                          "cosmo:Button",
+                          {  text: "Bye Bye",
+                             width: "100px",
+                             handleOnClick: cosmo.app.hideDialog,
+                             small: false },
+                           null, 'last')]
+            }
+        );
+    }
+  </script>
+
+
+
+</head>
+<body>
+
+  <div id="button"/>
+
+  <script language="JavaScript" type="text/javascript">
+       cosmo.app.init();
+       dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
+        dojo.widget.createWidget("cosmo:Button",
+                  { text: "Show CollectionDetails Dialog",
+                    width: "250px",
+                    handleOnClick: showDialog,
+                    small: false }, dojo.byId("button"), 'last');
+                    
+        showDialog();                    
+  </script>
+
+</body>
+</html>

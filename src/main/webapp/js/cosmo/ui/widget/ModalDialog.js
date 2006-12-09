@@ -122,19 +122,22 @@ dojo.widget.HtmlWidget, {
             }
             return true;
         },
+        _removeChildren: function(node){
+            while(node.firstChild) {
+                node.removeChild(node.firstChild);
+            }
+        },
         setContent: function (content) {
             this.content = content || this.content;
             // Content area
             if (typeof this.content == 'string') {
                 this.contentNode.innerHTML = this.content;
-            }
-            else {
-                var ch = this.contentNode.firstChild;
-                while(ch) {
-                    this.contentNode.removeChild(ch);
-                    ch = this.contentNode.firstChild;
-                }
+            } else if (dojo.html.isNode(this.content)) {
+                this._removeChildren(this.contentNode);
                 this.contentNode.appendChild(this.content);
+            } else if (this.content instanceof dojo.widget.HtmlWidget){
+                this._removeChildren(this.contentNode);
+                this.contentNode.appendChild(this.content.domNode);
             }
             return true;
         },
@@ -165,10 +168,11 @@ dojo.widget.HtmlWidget, {
             return true;
         },
         render: function () {
-            return (this.setTitle() &&
-                this.setPrompt() &&
-                this.setContent() &&
-                this.setButtons());
+            this.setTitle();
+            this.setPrompt();
+            this.setContent();
+            this.setButtons();
+            return true;
         },
         center: function () {
             var w = dojo.html.getViewport().width;
@@ -194,7 +198,7 @@ dojo.widget.HtmlWidget, {
             return true;
         },
         
-        // Lifecycle crap
+        // Lifecycle functions
         postMixInProperties: function () {
             this.toggleObj =
                 dojo.lfx.toggle[this.toggle] || dojo.lfx.toggle.plain;
@@ -225,26 +229,24 @@ dojo.widget.HtmlWidget, {
                     this.title = title || this.title;
                     this.prompt = prompt || this.prompt;
                 }
+
                 // Sizing
                 this.width = this.width || DIALOG_BOX_WIDTH;
                 this.height = this.height || DIALOG_BOX_HEIGHT;
                 this.setWidth(this.width);
                 this.setHeight(this.height);
                 
-                // Don't display until rendered and centered
-                if (this.render() && this.center() && this.renderUiMask()) { 
-                    this.domNode.style.display = 'block';
-                    this.domNode.style.zIndex = 2000;
-                    // Have to measure for content area height once div is actually on the page
-                    this.setContentAreaHeight();
-                    // Call the original Dojo show method
-                    this.showOrig.apply(this);
-                    this.isDisplayed = true;
-                }
-            };
+                this.render();
+                this.center();
+                this.renderUiMask();
+                this.domNode.style.display = 'block';
+                this.domNode.style.zIndex = 2000;
 
-            // reference to original hide method
-            this.hideOrig = this.hide; 
+                // Have to measure for content area height once div is actually on the page
+                this.setContentAreaHeight();
+                this.isDisplayed = true;
+
+            };
 
             // Clear buttons and actually take the div off the page
             this.hide = function () {
@@ -258,9 +260,11 @@ dojo.widget.HtmlWidget, {
                     }
                     this.btnPanel.destroy();
                 }
-
-                // Call the original Dojo hide method
-                this.hideOrig.apply(this);
+ 
+                if (this.content instanceof dojo.widget.HtmlWidget){
+                    this.content.destroy();
+                }
+                
                 this.content = null;
                 this.btnsLeft = [];
                 this.btnsCenter = [];

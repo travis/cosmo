@@ -56,6 +56,37 @@ For use with the JsUnit from www.jsunit.net
             }
         );
     }
+
+    showDOMContentDialog = function(){
+        var contentNode = document.createElement("span");
+        contentNode.appendChild(document.createTextNode("I am such a text node!"));
+        cosmo.app.showDialog({
+            content: contentNode,
+            btnsLeft: [ dojo.widget.createWidget(
+                          "cosmo:Button",
+                          {  text: "Bye Bye",
+                             width: "100px",
+                             handleOnClick: cosmo.app.hideDialog,
+                             small: false },
+                           null, 'last')]
+            }
+        );
+    }
+    
+    showWidgetContentDialog = function(){
+        dojo.require("dojo.widget.Clock");
+        cosmo.app.showDialog({
+            content: dojo.widget.createWidget("Clock",{},null, "last"),
+            btnsLeft: [ dojo.widget.createWidget(
+                          "cosmo:Button",
+                          {  text: "Bye Bye",
+                             width: "100px",
+                             handleOnClick: cosmo.app.hideDialog,
+                             small: false },
+                           null, 'last')]
+            }
+        );
+    }
   </script>
 
 
@@ -66,6 +97,10 @@ For use with the JsUnit from www.jsunit.net
   <div id="showErrorButton"/>
   <br>
   <div id="showDialogWithStringContentButton"/>
+  <br>
+  <div id="showDialogWithDOMContentButton"/>
+  <br>
+  <div id="showDialogWithWidgetContentButton"/>
 
   <script language="JavaScript" type="text/javascript">
        cosmo.app.init();
@@ -81,6 +116,19 @@ For use with the JsUnit from www.jsunit.net
                     width: "275px",
                     handleOnClick: showStringContentDialog,
                     small: false }, dojo.byId("showDialogWithStringContentButton"), 'last');
+
+        dojo.widget.createWidget("cosmo:Button",
+                  { text: "Show a Dialog Box with Content Set By a DOM Node",
+                    width: "300px",
+                    handleOnClick: showDOMContentDialog,
+                    small: false }, dojo.byId("showDialogWithDOMContentButton"), 'last');
+
+        dojo.widget.createWidget("cosmo:Button",
+                  { text: "Show a Dialog Box with Content Set By a Widget",
+                    width: "300px",
+                    handleOnClick: showWidgetContentDialog,
+                    small: false }, dojo.byId("showDialogWithWidgetContentButton"), 'last');
+
   </script>
 
 </body>

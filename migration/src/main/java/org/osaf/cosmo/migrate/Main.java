@@ -15,14 +15,14 @@ package org.osaf.cosmo.migrate;
  * limitations under the License.
  */
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.util.Iterator;
+import java.util.Properties;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
@@ -32,69 +32,56 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class Main {
 
-    private static final Class[] parameters = new Class[]{URL.class};
-    
-    public static void addFile(String s) throws IOException {
-        File f = new File(s);
-        addURL(f.toURL());
-    }
- 
-    public static void addURL(URL u) throws IOException {
- 
-        URLClassLoader sysloader = (URLClassLoader)ClassLoader.getSystemClassLoader();
-        Class sysclass = URLClassLoader.class;
-        
-        try {
-            Method method = sysclass.getDeclaredMethod("addURL",parameters);
-            method.setAccessible(true);
-            method.invoke(sysloader,new Object[]{ u });
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new IOException("Error, could not add URL to system classloader");
-        }
-    }
-    
     public static void main(String[] args) {
+       
+        // check correct number of args
+        if (args.length > 2 || args.length == 0)
+            outputUsage();
+
+        // verify correct args
+        if ((args.length == 2 && !"-v".equals(args[0]))
+                || (args.length == 1 && "-v".equals(args[0])))
+            outputUsage();
+
+        File resourceFile = null;
+
+        // get args
+        if (args.length == 2) {
+            resourceFile = new File(args[1]);
+            // set verbose mode
+            Logger.getLogger("org.osaf.cosmo.migrate").setLevel(Level.DEBUG);
+        } else {
+            resourceFile = new File(args[0]);
+        }
+
+        // verify properties file exists
+        if (!resourceFile.exists()) {
+            System.out.println("unable to load migration.properties!");
+            outputUsage();
+        }
+        
+        // Load properties
+        Properties props = new Properties();
         try {
-            
-            // check correct number of args
-            if(args.length>2 || args.length==0)
-                outputUsage();
-            
-            // verify correct args
-            if ((args.length == 2 && !"-v".equals(args[0]))
-                    || (args.length == 1 && "-v".equals(args[0])))
-                outputUsage();
-            
-            String resourceDir = null;
-            
-            // get args
-            if(args.length==2) {
-                resourceDir = args[1];
-                // set verbose mode
-                Logger.getLogger("org.osaf.cosmo.migrate").setLevel(Level.DEBUG);
-            }
-            else {
-                resourceDir = args[0];
-            }
-            
-            // add directory containing migration.properties to classpath
-            addFile(resourceDir);
-            
-            // verify we can load migration.properties
-            if (ClassLoader.getSystemClassLoader().getResource(
-                    "migration.properties") == null) {
-                System.out.println("unable to load migration.properties!");
-                outputUsage();
-            }
-            
+            props.load(new FileInputStream(resourceFile));
+        } catch (FileNotFoundException e1) {
+            System.out.println("unable to load migration.properties!");
+            outputUsage();
         } catch (IOException e1) {
-            e1.printStackTrace();
-            System.exit(1);
+            System.out.println("error loading migration.properties!");
+            outputUsage();
+        }
+        
+        // Set system properties for use by PropertyPlaceholderConfigurer
+        Iterator keys = props.keySet().iterator();
+        while(keys.hasNext()) {
+            String key = (String) keys.next();
+            String val = props.getProperty(key);
+            System.setProperty(key, val);
         }
         
         // Run the MigrationManager
-        ApplicationContext context = new ClassPathXmlApplicationContext(
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
                 new String[] {"applicationContext-migrate.xml"});
         
         MigrationManager migrationManager = 
@@ -109,7 +96,7 @@ public class Main {
     }
     
     private static void outputUsage() {
-        System.out.println("usage: java -jar cosmo-migration.jar [-v] [dir containing migration.propeties]");
+        System.out.println("usage: java -jar cosmo-migration.jar [-v] [migration properties file]");
         System.exit(1);
     }
     

@@ -14,8 +14,8 @@ Instructions for Running
 2. Backup your database!!
 3. run mvn package
 4. edit migration.properties to fit your database
-5. run java -jar target/cosmo-migration-0.6-SNAPSHOT-jar-with-dependencies.jar .
+5. run java -jar target/cosmo-migration-0.6-SNAPSHOT-jar-with-dependencies.jar migration.properties
    - or for verbose output -
-   run java -jar target/cosmo-migration-0.6-SNAPSHOT-jar-with-dependencies.jar -v .
+   run java -jar target/cosmo-migration-0.6-SNAPSHOT-jar-with-dependencies.jar -v migration.properties
 6. If no errors occur, you can configure Cosmo 0.6 to run against
    the migrated 0.5 database and start up normally.

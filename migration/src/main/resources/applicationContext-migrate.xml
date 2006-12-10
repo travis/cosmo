@@ -42,9 +42,7 @@
 
     <bean id="propertyPlaceHolderConfigurer"
         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="location" value="classpath:migration.properties">
-    </property>
-  </bean>
+    </bean>
 	
     <bean id="migrationManager"
         class="org.osaf.cosmo.migrate.MigrationManager">

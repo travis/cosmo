@@ -137,15 +137,13 @@ public class RPCServiceImpl implements RPCService {
         // XXX no ContentService.findCalendars yet
         HomeCollectionItem home = contentService.getRootItem(getUser());
         List<Calendar> cals = new ArrayList<Calendar>();
-        for (Iterator<Item> i=home.getChildren().iterator(); i.hasNext();) {
+        for (Iterator<Item> i = home.getChildren().iterator(); i.hasNext();) {
             Item child = i.next();
-            if (child.getStamp(CalendarCollectionStamp.class) == null)
-                continue;
-            Calendar calendar = new Calendar();
-            calendar.setName(child.getDisplayName());
-            calendar.setUid(child.getUid());
+            if (child.getStamp(CalendarCollectionStamp.class) != null) {
+                Calendar calendar = createCalendarFromItem(child);
 
-            cals.add(calendar);
+                cals.add(calendar);
+            }
         }
         //TODO sort these
         return (Calendar[]) cals.toArray(new Calendar[cals.size()]);
@@ -784,4 +782,20 @@ public class RPCServiceImpl implements RPCService {
         return calendarEventItem;
     }
 
+    private Calendar createCalendarFromItem(Item child) {
+        Calendar calendar = new Calendar();
+        calendar.setName(child.getDisplayName());
+        calendar.setUid(child.getUid());
+
+        // TODO replace with real protocol urls
+        Map<String, String> protocolUrls = new HashMap<String, String>();
+        protocolUrls.put("dav", "http://osaf.us/cosmo/home/"
+                + getUsername());
+        protocolUrls.put("webcal", "http://osaf.us/cosmo/home/"
+                + getUsername());
+        protocolUrls.put("Atom", "http://osaf.us/cosmo/home/"
+                + getUsername());
+        calendar.setProtocolUrls(protocolUrls);
+        return calendar;
+    }
 }

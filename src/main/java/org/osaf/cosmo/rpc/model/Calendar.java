@@ -28,7 +28,15 @@ public class Calendar {
     private String displayName = null;
     private String uid = null;
 
+    private Map<String, String> protocolUrls;
 
+    public Map<String, String> getProtocolUrls() {
+        return protocolUrls;
+    }
+
+    public void setProtocolUrls(Map<String, String> protocolUrls) {
+        this.protocolUrls = protocolUrls;
+    }
     /**
      * This is the name as displayed to the user
      */

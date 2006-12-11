@@ -25,7 +25,12 @@ import java.util.TimeZone;
  */
 public class DateUtil {
 
-    /** */
+    /**
+     * Note that this is not a perfect match to the RFC 3339
+     * format. In particular, it does not correctly parse timezone
+     * offsets of the form <code>xx:yy</code>. It requires RFC 822
+     * style timezone offsets, fo the form <code>xxyy</code>.
+     */
     public static final String RFC_3339_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     /**

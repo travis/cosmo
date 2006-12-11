@@ -78,6 +78,8 @@ public class EimmlTypeConverter implements EimmlConstants {
     public static String toText(String value,
                                 String encoding)
         throws EimmlConversionException {
+        if (encoding == null)
+            throw new IllegalArgumentException("no original encoding specified");
         if (encoding.equals("UTF-8"))
             return value;
         try {
@@ -166,7 +168,7 @@ public class EimmlTypeConverter implements EimmlConstants {
     }
 
     /**
-     * Returns the given value as a calendar, potentially with an
+     * Returns the given value as a date, potentially with an
      * attached timezone. If the provided timezone id is not
      * recognized, or one is not provided, GMT is used.
      */

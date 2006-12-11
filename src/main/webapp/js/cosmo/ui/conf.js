@@ -43,5 +43,5 @@ var DIALOG_BOX_WIDTH = 380;
 var DIALOG_BOX_HEIGHT = 280;
 var LOGO_GRAPHIC = 'logo_main.gif';
 var LOGO_GRAPHIC_SM = 'logo_sm.gif';
-var BUTTON_DIR_PATH = cosmo.env.getBaseUrl() + '/templates/' + TEMPLATE_DIRECTORY + '/images/';
+var BUTTON_DIR_PATH = cosmo.env.getBaseUrl() + '/templates' + TEMPLATE_DIRECTORY + '/images/';
 

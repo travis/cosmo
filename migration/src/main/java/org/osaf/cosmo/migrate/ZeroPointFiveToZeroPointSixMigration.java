@@ -77,7 +77,7 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
         
         try {
             stmt = conn.prepareStatement("select id, attributename from attribute");
-            updateStmt = conn.prepareStatement("update attribute set localname=?, namespace=? where id=?");
+            updateStmt = conn.prepareStatement("update attribute set namespace=?, localname=? where id=?");
             rs = stmt.executeQuery();
             
             while(rs.next()) {
@@ -89,8 +89,26 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                     updateStmt.setString(1,"supportedComponentSet" );
                     updateStmt.setString(2, "org.osaf.cosmo.model.CalendarCollectionStamp");
                 } else if(attributeName.indexOf("@:@") >= 0) {
-                    String namespace = attributeName.substring(3, attributeName.indexOf("@:@", 3));
-                    String localname = attributeName.substring(attributeName.indexOf("@:@", 3) + 3);
+                    String namespace = null;
+                    String localname = null;
+                    String[] chunks = attributeName.split("@:@",3);
+                    
+                    // no namespace
+                    if(chunks.length==1) {
+                        namespace = "";
+                        localname = chunks[0];
+                    } 
+                    // no prefix
+                    else if(chunks.length==2) {
+                        namespace = chunks[0];
+                        localname = chunks[1];
+                    } 
+                    // all three present, just need namespace and localname
+                    else {
+                        namespace = chunks[1];
+                        localname = chunks[2];
+                    }
+                    
                     updateStmt.setString(1, namespace);
                     updateStmt.setString(2, localname);
                 } else {
@@ -102,9 +120,12 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                 updateStmt.executeUpdate();
             }
         } finally {
-            rs.close();
-            stmt.close();
-            updateStmt.close();
+            if(rs!=null)
+                rs.close();
+            if(stmt!=null)
+                stmt.close();
+            if(updateStmt!=null)
+                updateStmt.close();
         }
         
         log.debug("processed " + count + " attributes");
@@ -221,14 +242,22 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
             updateCollectionStmt.executeUpdate();
             
         } finally {
-            rs.close();
-            stmt.close();
-            insertStampStmt1.close();
-            insertStampStmt2.close();
-            insertCalendarStmt.close();
-            deleteAttributeStmt.close();
-            selectAttributeStmt.close();
-            updateCollectionStmt.close();
+            if(rs!=null)
+                rs.close();
+            if(stmt!=null)
+                stmt.close();
+            if(insertStampStmt1!=null)
+                insertStampStmt1.close();
+            if(insertStampStmt2!=null)
+                insertStampStmt2.close();
+            if(insertCalendarStmt!=null)
+                insertCalendarStmt.close();
+            if(deleteAttributeStmt!=null)
+                deleteAttributeStmt.close();
+            if(selectAttributeStmt!=null)
+                selectAttributeStmt.close();
+            if(updateCollectionStmt!=null)
+                updateCollectionStmt.close();
         }
         
         log.debug("processed " + count + " calendars");

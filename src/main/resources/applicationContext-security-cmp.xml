@@ -86,7 +86,7 @@
   <!-- filter that performs anonymous authentication -->
 
   <bean id="cmpAnonymousProcessingFilter"
-        class="org.osaf.cosmo.acegisecurity.providers.anonymous.NoSessionAnonymousProcessingFilter">
+        class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
     <property name="key">
       <value>badgerbadgerbadger</value>
     </property>

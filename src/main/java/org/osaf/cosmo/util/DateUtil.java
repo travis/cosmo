@@ -17,6 +17,7 @@ package org.osaf.cosmo.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -46,7 +47,6 @@ public class DateUtil {
     	throws ParseException{
     	SimpleDateFormat formatter = new SimpleDateFormat(format);
     	return formatter.parse(date);
-    
     }
 
     /** */
@@ -58,6 +58,12 @@ public class DateUtil {
     public static String formatRfc3339Date(Date date,
                                            TimeZone tz) {
         return formatDate(RFC_3339_DATE_FORMAT, date, tz);
+    }
+
+    /** */
+    public static String formatRfc3339Date(Calendar cal) {
+        return formatDate(RFC_3339_DATE_FORMAT,
+                          cal.getTime(), cal.getTimeZone());
     }
 
     /** */

@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -153,8 +154,8 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
             Reader value = ((ClobField)field).getClob();
             item.addAttribute(new TextAttribute(qn, value));
         } else if (field instanceof DateTimeField) {
-            Date value = ((DateTimeField)field).getDate();
-            item.addAttribute(new DateAttribute(qn, value));
+            Calendar value = ((DateTimeField)field).getCalendar();
+            item.addAttribute(new DateAttribute(qn, value.getTime()));
         } else if (field instanceof DecimalField) {
             BigDecimal value = ((DecimalField)field).getDecimal();
             item.addAttribute(new DecimalAttribute(qn, value));
@@ -278,11 +279,11 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
      *
      * @throws EimValidationException if the value is invalid
      */
-    protected Date validateDateTime(EimRecordField field)
+    protected Calendar validateDateTime(EimRecordField field)
         throws EimValidationException {
         if (! (field instanceof DateTimeField))
             throw new EimValidationException("Field " + field.getName() + " is not a datetime field");
-        Date value = ((DateTimeField)field).getDate();
+        Calendar value = ((DateTimeField)field).getCalendar();
         return value;
     }
 

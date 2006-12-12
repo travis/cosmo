@@ -16,7 +16,7 @@
 package org.osaf.cosmo.eim.schema;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.Calendar;
 
 import org.osaf.cosmo.eim.DateTimeField;
 import org.osaf.cosmo.eim.DecimalField;
@@ -97,8 +97,8 @@ public class ItemTranslator extends EimSchemaTranslator {
             String value = validateText(field, MAXLEN_LAST_MODIFIED_BY);
             ci.setLastModifiedBy(value);
         } else if (field.getName().equals(FIELD_CREATED_ON)) {
-            Date value = validateDateTime(field);
-            ci.setCreationDate(value);
+            Calendar value = validateDateTime(field);
+            ci.setCreationDate(value.getTime());
         } else {
             applyUnknownField(field, item);
         }

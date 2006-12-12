@@ -168,7 +168,7 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
             type = TYPE_LOB;
         } else if (field instanceof DateTimeField) {
             value = EimmlTypeConverter.
-                fromDateTime(((DateTimeField)field).getDate());
+                fromDateTime(((DateTimeField)field).getCalendar());
             type = TYPE_DATETIME;
         } else if (field instanceof DecimalField) {
             DecimalField df = (DecimalField)field;

@@ -26,7 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.Date;
+import java.util.Calendar;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -168,14 +168,15 @@ public class EimmlTypeConverter implements EimmlConstants {
     }
 
     /**
-     * Returns the given value as a date, potentially with an
-     * attached timezone. If the provided timezone id is not
-     * recognized, or one is not provided, GMT is used.
+     * Returns the given value as a calendar. The calendar's timezone
+     * is set to the system's default timezone.
      */
-    public static Date toDateTime(String value)
+    public static Calendar toDateTime(String value)
         throws EimmlConversionException {
         try {
-            return DateUtil.parseRfc3339Date(value);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(DateUtil.parseRfc3339Date(value));
+            return cal;
         } catch (ParseException e) {
             throw new EimmlConversionException("Provided value " + value + " is not a valid RFC 3339 datetime", e);
         }
@@ -184,7 +185,7 @@ public class EimmlTypeConverter implements EimmlConstants {
     /**
      * Returns the given value as a string.
      */
-    public static String fromDateTime(Date value)
+    public static String fromDateTime(Calendar value)
         throws EimmlConversionException {
         return DateUtil.formatRfc3339Date(value);
     }

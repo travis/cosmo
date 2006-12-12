@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.Calendar;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -246,7 +246,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
                     toInteger(xmlReader.getElementText());
                 record.addField(new IntegerField(name, value));
             } else if (type.equals(TYPE_DATETIME)) {
-                Date value = EimmlTypeConverter.
+                Calendar value = EimmlTypeConverter.
                     toDateTime(xmlReader.getElementText());
                 record.addField(new DateTimeField(name, value));
             } else if (type.equals(TYPE_DECIMAL)) {

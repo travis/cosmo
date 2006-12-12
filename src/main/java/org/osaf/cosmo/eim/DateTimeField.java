@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.eim;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -26,17 +27,25 @@ import org.apache.commons.logging.LogFactory;
 public class DateTimeField extends EimRecordField {
     private static final Log log = LogFactory.getLog(DateTimeField.class);
 
-    private Date value;
+    private Calendar value;
 
     /** */
     public DateTimeField(String name,
-                         Date value) {
+                         Calendar value) {
         super(name);
         this.value = value;
     }
 
     /** */
-    public Date getDate() {
+    public DateTimeField(String name,
+                         Date date) {
+        super(name);
+        this.value = Calendar.getInstance();
+        this.value.setTime(date);
+    }
+
+    /** */
+    public Calendar getCalendar() {
         return value;
     }
 }

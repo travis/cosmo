@@ -214,10 +214,13 @@ public class EimmlTypeConverterTest extends TestCase
     public void testToDateTime() throws Exception {
         String testString = "1996-12-19T16:39:57-0800";
 
-        Date resultDate = EimmlTypeConverter.toDateTime(testString);
-        Calendar resultCalendar =
-            Calendar.getInstance(TimeZone.getTimeZone("GMT-8"));
-        resultCalendar.setTime(resultDate);
+        Calendar resultCalendar = EimmlTypeConverter.toDateTime(testString);
+
+        // since the test string's timezone is not actually parsed,
+        // set the result calendar's timezone explicitly so that we
+        // don't get variable numbers based on the system default
+        // timezone
+        resultCalendar.setTimeZone(TimeZone.getTimeZone("GMT-8"));
 
         assertEquals("Result year does not match", 1996,
                      resultCalendar.get(Calendar.YEAR));
@@ -231,9 +234,6 @@ public class EimmlTypeConverterTest extends TestCase
                      resultCalendar.get(Calendar.MINUTE));
         assertEquals("Result second does not match", 57,
                      resultCalendar.get(Calendar.SECOND));
-        assertEquals("Result timezone offset does not match",
-                     1000 * 60 * 60 * -8,
-                     resultCalendar.get(Calendar.ZONE_OFFSET));
     }
 
     /** */
@@ -248,10 +248,8 @@ public class EimmlTypeConverterTest extends TestCase
         testCalendar.set(Calendar.HOUR_OF_DAY, 16);
         testCalendar.set(Calendar.MINUTE, 39);
         testCalendar.set(Calendar.SECOND, 57);
-        testCalendar.set(Calendar.ZONE_OFFSET, 1000 * 60 * 60  * -8);
 
-        String resultString =
-            EimmlTypeConverter.fromDateTime(testCalendar.getTime());
+        String resultString = EimmlTypeConverter.fromDateTime(testCalendar);
 
         assertEquals("Result string does not match", testString, resultString);
     }

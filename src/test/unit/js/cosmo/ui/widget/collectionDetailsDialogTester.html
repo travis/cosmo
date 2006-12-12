@@ -30,10 +30,8 @@ For use with the JsUnit from www.jsunit.net
   <!--  bare minimum amount of stuff to display dialogs.  -->
   <script language="JavaScript" type="text/javascript">
      /* This is to trick cosmo into thinking we have a i18n lib loaded */
-      dojo.provide("cosmo.util.i18n")
-      function getText(str) {
-        return str;
-      }
+      dojo.require("cosmo.util.jsi18n");
+      cosmo.util.jsi18n.init(dojo.hostenv.getBaseScriptUri() + "../../../../resources/PimMessageResources.properties");
 
       dojo.require("cosmo.ui.styler");
       dojo.require("cosmo.ui.conf");
@@ -44,18 +42,18 @@ For use with the JsUnit from www.jsunit.net
 
   <script language="JavaScript" type="text/javascript">
     showDialog = function(){
-        cosmo.app.showDialog({
-            content: dojo.widget.createWidget("cosmo:CollectionDetailsDialog", {}, null, 'last'),
-            width: "600",
-            btnsRight	: [ dojo.widget.createWidget(
-                          "cosmo:Button",
-                          {  text: "Bye Bye",
-                             width: "100px",
-                             handleOnClick: cosmo.app.hideDialog,
-                             small: false },
-                           null, 'last')]
-            }
-        );
+        var calendar = {
+            name: "Cosmonauts",
+            uid: "12345-1231245-12312445",
+            protocolUrls: {
+                dav : "http://cosmo.us/home/bobby/dav/cosmonauts",
+                atom: "http://cosmo.us/home/bobby/atom/cosmonauts",
+                mc  : "http://cosmo.us/home/bobby/mc/cosmonauts",
+                web : "http://cosmo.us/home/bobby/web/cosmonauts",
+                webcal: "http://cosmo.us/home/bobby/webcal/cosmonauts"
+            } 
+        };
+        cosmo.app.showDialog(cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(calendar));
     }
   </script>
 

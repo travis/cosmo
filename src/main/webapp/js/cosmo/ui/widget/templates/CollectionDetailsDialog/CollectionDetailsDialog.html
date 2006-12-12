@@ -1,24 +1,49 @@
 <div>
     <table>
 
-        <tr dojoAttachPoint="dummy">
+        <tr>
 
             <td class="labelTextVert">
                ${this.strings.nameLabel}:
             </td>
 
             <td class="labelTextVert">
-                'CosmoNaut' ${this.strings.calendarLabel}
-            </td>
-
-            <td>
-                &nbsp;
+                '${this.calendar.name}' ${this.strings.calendarLabel}
             </td>
 
         </tr>
+        
+        <tr>
+            <td>&nbsp;
+        </tr>
+        
+        <tr>
 
+            <td class="labelTextVert">
+               ${this.strings.selectYourClient}:
+            </td>
 
+            <td>
+                <div>
+                    <select dojoAttachPoint="clientSelector" 
+                            dojoAttachEvent="onChange: _handleClientChanged;"/>
+                    </select>
+                </div>
+            </td>
 
+        </tr>
     </table>
+
+     <br/>
+     <br/>
+
+     <div dojoAttachPoint="instructionsBlock" style="display: none;">
+         <span dojoAttachPoint="clientInstructions"> Copy the following link into Chandler and blah blah blah</span>   
+    
+         <br/>
+         <br/>
+    
+         <a dojoAttachPoint="protocolLink" href="#">http://blah blah blah</a>
+     </div>
 </div>
 

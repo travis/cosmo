@@ -45,6 +45,8 @@ public class StandardContentService implements ContentService {
     private CalendarDao calendarDao;
     private ContentDao contentDao;
     private LockManager lockManager;
+    
+    private long lockTimeout = 0;
 
     // ContentService methods
 
@@ -109,9 +111,10 @@ public class StandardContentService implements ContentService {
         if (log.isDebugEnabled()) {
             log.debug("updating item " + item.getName());
         }
+        
         if (item instanceof CollectionItem)
-            return contentDao.updateCollection((CollectionItem) item);
-        return contentDao.updateContent((ContentItem) item);
+            return updateCollection((CollectionItem) item);
+        return updateContent((ContentItem) item);
     }
 
     /**
@@ -124,9 +127,42 @@ public class StandardContentService implements ContentService {
      *         if parent item specified by path does not exist
      * @throws org.osaf.cosmo.model.DuplicateItemNameException
      *         if path points to an item with the same path
+     * @throws org.osaf.cosmo.model.CollectionLockedException
+     *         if Item is a ContentItem and destination CollectionItem
+     *         is lockecd.
      */
     public void copyItem(Item item, String path, boolean deepCopy) {
-        contentDao.copyItem(item, path, deepCopy);
+        
+        // handle case of copying ContentItem (need to sync on dest collection)
+        if(item != null && item instanceof ContentItem) {
+            
+            // need to get exclusive lock to destination collection
+            CollectionItem parent = 
+                (CollectionItem) contentDao.findItemParentByPath(path);
+            
+            // only attempt to lock if destination exists
+            if(parent!=null) {
+                
+                // if we can't get lock, then throw exception
+                if (!lockManager.lockCollection(parent, lockTimeout))
+                    throw new CollectionLockedException(
+                            "unable to obtain collection lock");
+
+                try {
+                    contentDao.copyItem(item, path, deepCopy);
+                } finally {
+                    lockManager.unlockCollection(parent);
+                }
+                
+            } else { 
+                // let the dao handle throwing an error
+                contentDao.copyItem(item, path, deepCopy);
+            }
+        }
+        else { 
+            // no need to synchronize if not ContentItem
+            contentDao.copyItem(item, path, deepCopy);
+        }
     }
   
     /**
@@ -137,9 +173,63 @@ public class StandardContentService implements ContentService {
      *         if parent item specified by path does not exist
      * @throws org.osaf.cosmo.model.DuplicateItemNameException
      *         if path points to an item with the same path
+     * @throws org.osaf.cosmo.model.CollectionLockedException
+     *         if Item is a ContentItem and source or destination 
+     *         CollectionItem is lockecd.
      */
     public void moveItem(Item item, String path) {
-        contentDao.moveItem(item, path);
+        
+        // handle case of moving ContentItem 
+        // (need to synch on src and dest collections)
+        if(item != null && item instanceof ContentItem) {
+            
+            // need to get exclusive lock to source and destination parent
+            CollectionItem destParent = 
+                (CollectionItem) contentDao.findItemParentByPath(path);
+            CollectionItem srcParent = item.getParent();
+            
+            // only attempt to lock if source and destination exist
+            if(srcParent != null && destParent != null) {
+                
+                // lock destination first
+                if (! lockManager.lockCollection(destParent, lockTimeout))
+                    throw new CollectionLockedException("unable to obtain collection lock");
+               
+                // lock source
+                try {
+                    if (! lockManager.lockCollection(srcParent, lockTimeout))
+                            throw new CollectionLockedException("unable to obtain collection lock");
+                } catch (RuntimeException e) {
+                    lockManager.unlockCollection(destParent);
+                    throw e;
+                } 
+                
+                // now we have exclusive locks to both collections
+                try {
+                    // copy Item to destination collection
+                    contentDao.copyItem(item, path, false);
+                    ContentItem copy = (ContentItem) contentDao.findItemByPath(path);
+                    
+                    // delete item from source collection
+                    contentDao.removeContent((ContentItem) item);
+                    
+                    // update uid on copy, so that copy uid matches original
+                    copy.setUid(item.getUid());
+                    contentDao.updateContent(copy);
+                    
+                } finally {
+                    lockManager.unlockCollection(srcParent);
+                    lockManager.unlockCollection(destParent);
+                }
+                
+            } else {
+                // let dao throw errors
+                contentDao.moveItem(item, path);
+            }
+        } else {
+            // no need to sync
+            contentDao.moveItem(item, path);
+        }
     }
     
     /**
@@ -147,12 +237,20 @@ public class StandardContentService implements ContentService {
      * 
      * @param item
      *            item to remove
+     * @throws org.osaf.cosmo.model.CollectionLockedException
+     *         if Item is a ContentItem and parent CollectionItem
+     *         is locked
      */
     public void removeItem(Item item) {
         if (log.isDebugEnabled()) {
             log.debug("removing item " + item.getName());
         }
-        contentDao.removeItem(item);
+        
+        // Let service handle ContentItems (for sync purposes)
+        if(item instanceof ContentItem)
+            removeContent((ContentItem) item);
+        else
+            contentDao.removeItem(item);
     }
 
     /**
@@ -160,6 +258,9 @@ public class StandardContentService implements ContentService {
      * 
      * @param path
      *            path of item to remove
+     * @throws org.osaf.cosmo.model.CollectionLockedException
+     *         if Item is a ContentItem and parent CollectionItem
+     *         is locked
      */
     public void removeItem(String path) {
         if (log.isDebugEnabled()) {
@@ -168,7 +269,8 @@ public class StandardContentService implements ContentService {
         Item item = contentDao.findItemByPath(path);
         if (item == null)
             return;
-        contentDao.removeItem(item);
+        
+        removeItem(item);
     }
 
     /**
@@ -212,7 +314,29 @@ public class StandardContentService implements ContentService {
                 contentDao.createContent(collection, (ContentItem) item);
         }
         
-        return newCollection;
+        // TODO: Find better way to refresh collection to get updated children
+        return contentDao.findCollectionByUid(newCollection.getUid());
+    }
+    
+    /**
+     * Update collection item
+     * 
+     * @param collection
+     *            collection item to update
+     * @return updated collection
+     * @throws org.osaf.cosmo.model.CollectionLockedException
+     *         if CollectionItem is locked
+     */
+    public CollectionItem updateCollection(CollectionItem collection) {
+
+        if (! lockManager.lockCollection(collection, lockTimeout))
+            throw new CollectionLockedException("unable to obtain collection lock");
+        
+        try {
+            return contentDao.updateCollection(collection);
+        } finally {
+            lockManager.unlockCollection(collection);
+        }
     }
 
     /**
@@ -233,7 +357,7 @@ public class StandardContentService implements ContentService {
      *             children to update
      * @return updated collection
      * @throws CollectionLockedException if the collection is
-     * currently locked for an update.
+     *         currently locked for an update.
      */
     public CollectionItem updateCollection(CollectionItem collection,
                                            Set<Item> children) {
@@ -241,7 +365,7 @@ public class StandardContentService implements ContentService {
             log.debug("updating collection " + collection.getName());
         }
 
-        if (! lockManager.lockCollection(collection, 0))
+        if (! lockManager.lockCollection(collection, lockTimeout))
             throw new CollectionLockedException("unable to obtain collection lock");
 
         try {
@@ -263,13 +387,15 @@ public class StandardContentService implements ContentService {
 
             // update collection
             contentDao.updateCollection(collection);
+            
+            //  TODO: Find better way to refresh collection to get updated
+            //  children
+            return contentDao.findCollectionByUid(collection.getUid());
+            
         } finally {
             lockManager.unlockCollection(collection);
         }
 
-        // TODO: Find better way to refresh collection to get updated
-        //       children
-        return contentDao.findCollectionByUid(collection.getUid());
     }
 
     /**
@@ -312,6 +438,8 @@ public class StandardContentService implements ContentService {
      * @param content
      *            content to create
      * @return newly created content
+     * @throws org.osaf.cosmo.model.CollectionLockedException
+     *         if parent CollectionItem is locked
      */
     public ContentItem createContent(CollectionItem parent,
                                      ContentItem content) {
@@ -319,7 +447,15 @@ public class StandardContentService implements ContentService {
             log.debug("creating content item " + content.getName() +
                       " in " + parent.getName());
         }
-        return contentDao.createContent(parent, content);
+        
+        if (! lockManager.lockCollection(parent, lockTimeout))
+            throw new CollectionLockedException("unable to obtain collection lock");
+        
+        try {
+            return contentDao.createContent(parent, content);
+        } finally {
+            lockManager.unlockCollection(parent);
+        }   
     }
 
     /**
@@ -328,12 +464,24 @@ public class StandardContentService implements ContentService {
      * @param content
      *            content item to update
      * @return updated content item
+     * @throws org.osaf.cosmo.model.CollectionLockedException
+     *         if parent CollectionItem is locked
      */
     public ContentItem updateContent(ContentItem content) {
         if (log.isDebugEnabled()) {
             log.debug("updating content item " + content.getName());
         }
-        return contentDao.updateContent(content);
+        
+        CollectionItem parent = content.getParent();
+        
+        if (! lockManager.lockCollection(parent, lockTimeout))
+            throw new CollectionLockedException("unable to obtain collection lock");
+        
+        try {
+            return contentDao.updateContent(content);
+        } finally {
+            lockManager.unlockCollection(parent);
+        }
     }
 
     /**
@@ -341,12 +489,24 @@ public class StandardContentService implements ContentService {
      * 
      * @param content
      *            content item to remove
+     * @throws org.osaf.cosmo.model.CollectionLockedException
+     *         if parent CollectionItem is locked           
      */
     public void removeContent(ContentItem content) {
         if (log.isDebugEnabled()) {
             log.debug("removing content item " + content.getName());
         }
-        contentDao.removeContent(content);
+        
+        CollectionItem parent = content.getParent();
+        
+        if (! lockManager.lockCollection(parent, lockTimeout))
+            throw new CollectionLockedException("unable to obtain collection lock");
+        
+        try {
+            contentDao.removeContent(content);
+        } finally {
+            lockManager.unlockCollection(parent);
+        }
     }
 
     
@@ -518,5 +678,15 @@ public class StandardContentService implements ContentService {
     /** */
     public void setLockManager(LockManager lockManager) {
         this.lockManager = lockManager;
+    }
+    
+    
+    /**
+     * Sets the maximum ammount of time (in millisecondes) that the
+     * service will wait on acquiring an exclusive lock on a CollectionItem.
+     * @param lockTimeout
+     */
+    public void setLockTimeout(long lockTimeout) {
+        this.lockTimeout = lockTimeout;
     }
 }

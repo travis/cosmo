@@ -179,6 +179,15 @@ public interface ContentService extends Service {
     public void removeCollection(CollectionItem collection);
 
     /**
+     * Update collection item
+     * 
+     * @param collection
+     *            collection item to update
+     * @return updated collection
+     */
+    public CollectionItem updateCollection(CollectionItem collection);
+    
+    /**
      * Create new content item. A content item represents a piece of content or
      * file.
      * 
@@ -200,7 +209,8 @@ public interface ContentService extends Service {
      * @return updated content item
      */
     public ContentItem updateContent(ContentItem content);
-
+    
+    
     /**
      * Remove content item
      * 
@@ -210,7 +220,6 @@ public interface ContentService extends Service {
     public void removeContent(ContentItem content);
 
     
-
     /**
      * Find calendar events by filter.
      *

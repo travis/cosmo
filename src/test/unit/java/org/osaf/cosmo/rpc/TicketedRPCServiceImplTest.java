@@ -46,6 +46,7 @@ import org.osaf.cosmo.security.mock.MockUserPrincipal;
 import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
+import org.osaf.cosmo.service.lock.SingleVMLockManager;
 
 public class TicketedRPCServiceImplTest extends TestCase {
     private static final String TEST_CALENDAR_NAME = "RemoteCosmoService";
@@ -96,6 +97,7 @@ public class TicketedRPCServiceImplTest extends TestCase {
         contentService = new StandardContentService();
         contentService.setContentDao(contentDao);
         contentService.setCalendarDao(calendarDao);
+        contentService.setLockManager(new SingleVMLockManager());
         userService = new StandardUserService();
         userService.setContentDao(contentDao);
         userService.setUserDao(userDao);

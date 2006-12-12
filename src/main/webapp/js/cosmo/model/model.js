@@ -189,6 +189,6 @@ EventStatus = {
 
 function CalendarMetadata(){
     this.name = null;
-    this.path = null;
     this.uid = null;
+    this.protocolUrls = {};
 }

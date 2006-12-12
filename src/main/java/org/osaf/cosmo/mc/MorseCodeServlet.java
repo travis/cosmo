@@ -36,7 +36,7 @@ import org.osaf.cosmo.eim.eimml.EimmlStreamWriter;
 import org.osaf.cosmo.eim.eimml.EimmlStreamException;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.UidInUseException;
-import org.osaf.cosmo.util.RepositoryUriParser;
+import org.osaf.cosmo.server.CollectionPath;
 
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
@@ -101,11 +101,10 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
         if (log.isDebugEnabled())
             log.debug("handling DELETE for " + req.getPathInfo());
 
-        String uid =
-            new RepositoryUriParser(req.getPathInfo()).getCollectionUid();
-        if (uid != null) {
+        CollectionPath cp = CollectionPath.parse(req.getPathInfo());
+        if (cp != null) {
             try {
-                controller.deleteCollection(uid);
+                controller.deleteCollection(cp.getUid());
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 return;
             } catch (UnknownCollectionException e) {
@@ -116,7 +115,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
                                "Item not a collection");
             } catch (MorseCodeException e) {
-                log.error("Error deleting collection " + uid, e);
+                log.error("Error deleting collection " + cp.getUid(), e);
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                "Error deleting collection: " + e.getMessage());
                 return;
@@ -137,9 +136,8 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
         if (log.isDebugEnabled())
             log.debug("handling GET for " + req.getPathInfo());
 
-        String uid =
-            new RepositoryUriParser(req.getPathInfo()).getCollectionUid();
-        if (uid != null) {
+        CollectionPath cp = CollectionPath.parse(req.getPathInfo());
+        if (cp != null) {
             String tokenStr = req.getHeader(HEADER_SYNC_TOKEN);
             if (StringUtils.isBlank(tokenStr))
                 tokenStr = req.getParameter(PARAM_SYNC_TOKEN);
@@ -150,8 +148,8 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                     SyncToken.deserialize(tokenStr) :
                     null;
                 SyncRecords records = token == null ?
-                    controller.subscribeToCollection(uid) :
-                    controller.synchronizeCollection(uid, token);
+                    controller.subscribeToCollection(cp.getUid()) :
+                    controller.synchronizeCollection(cp.getUid(), token);
 
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.setContentType(MEDIA_TYPE_EIMML);
@@ -186,7 +184,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 String msg = tokenStr == null ?
                     "Error subscribing to collection" :
                     "Error synchronizing collection";
-                log.error(msg + " " + uid, e);
+                log.error(msg + " " + cp.getUid(), e);
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                msg + ": " + e.getMessage());
                 return;
@@ -204,9 +202,8 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
         if (log.isDebugEnabled())
             log.debug("handling POST for " + req.getPathInfo());
 
-        String uid =
-            new RepositoryUriParser(req.getPathInfo()).getCollectionUid();
-        if (uid != null) {
+        CollectionPath cp = CollectionPath.parse(req.getPathInfo());
+        if (cp != null) {
             String tokenStr = req.getHeader(HEADER_SYNC_TOKEN);
             if (StringUtils.isBlank(tokenStr)) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
@@ -227,7 +224,8 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 reader.close();
 
                 SyncToken newToken =
-                    controller.updateCollection(uid, token, recordsets);
+                    controller.updateCollection(cp.getUid(), token,
+                                                recordsets);
 
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());
@@ -256,7 +254,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                "Collection contains more recently updated items");
                 return;
             } catch (MorseCodeException e) {
-                log.error("Error updating collection " + uid, e);
+                log.error("Error updating collection " + cp.getUid(), e);
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                "Error updating collection: " + e.getMessage());
                 return;
@@ -274,9 +272,8 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
         if (log.isDebugEnabled())
             log.debug("handling PUT for " + req.getPathInfo());
 
-        String uid =
-            new RepositoryUriParser(req.getPathInfo()).getCollectionUid();
-        if (uid != null) {
+        CollectionPath cp = CollectionPath.parse(req.getPathInfo());
+        if (cp != null) {
             String parentUid = req.getParameter(PARAM_PARENT_UID);
             if (StringUtils.isEmpty(parentUid))
                 parentUid = null;
@@ -292,7 +289,8 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 reader.close();
 
                 SyncToken newToken =
-                    controller.publishCollection(uid, parentUid, recordsets);
+                    controller.publishCollection(cp.getUid(), parentUid,
+                                                 recordsets);
 
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());
@@ -318,7 +316,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                "Parent item not a collection");
                 return;
             } catch (MorseCodeException e) {
-                log.error("Error publishing collection " + uid, e);
+                log.error("Error publishing collection " + cp.getUid(), e);
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                "Error publishing collection: " +
                                e.getMessage());

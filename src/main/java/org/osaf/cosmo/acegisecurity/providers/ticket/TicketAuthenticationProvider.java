@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.service.ContentService;
-import org.osaf.cosmo.util.RepositoryUriParser;
+import org.osaf.cosmo.server.CollectionPath;
 
 import org.springframework.dao.DataAccessException;
 
@@ -110,15 +110,15 @@ public class TicketAuthenticationProvider
     }
 
     private Item findItem(String path) {
-        RepositoryUriParser p = new RepositoryUriParser(path);
+        CollectionPath cp = CollectionPath.parse(path, true);
         Item item = null;
 
-        if (p.isCollectionUri()) {
-            item = contentService.findItemByUid(p.getCollectionUid());
+        if (cp != null) {
+            item = contentService.findItemByUid(cp.getUid());
             // a ticket cannot be used to access a collection that
             // does not already exist
             if (item == null)
-                throw new TicketedItemNotFoundException("Item with uid " + p.getCollectionUid() + " not found");
+                throw new TicketedItemNotFoundException("Item with uid " + cp.getUid() + " not found");
 
             return item;
         }

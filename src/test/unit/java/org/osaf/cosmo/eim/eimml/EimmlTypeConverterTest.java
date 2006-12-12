@@ -22,6 +22,7 @@ import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -214,7 +215,8 @@ public class EimmlTypeConverterTest extends TestCase
         String testString = "1996-12-19T16:39:57-0800";
 
         Date resultDate = EimmlTypeConverter.toDateTime(testString);
-        Calendar resultCalendar = Calendar.getInstance();
+        Calendar resultCalendar =
+            Calendar.getInstance(TimeZone.getTimeZone("GMT-8"));
         resultCalendar.setTime(resultDate);
 
         assertEquals("Result year does not match", 1996,

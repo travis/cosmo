@@ -15,12 +15,20 @@
  */
 package org.osaf.cosmo.ui.pim;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.service.ContentService;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -32,18 +40,80 @@ public class CollectionBookmarkController extends AbstractController {
     private static final Log log = LogFactory
             .getLog(CollectionBookmarkController.class);
     
-    private String view;
+    private String pimView;
+    private ContentService contentService;
+    private CosmoSecurityManager securityManager;
         
     /** 
      */
     public ModelAndView handleRequestInternal(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+       
+        String path = request.getPathInfo();
+        String collectionUid = path.substring(path.lastIndexOf('/') + 1);
+        
+        // Get the collection and make sure it's valid.
+        CollectionItem collection = null;
+        try{
+            collection = 
+                (CollectionItem) contentService.findItemByUid(collectionUid);
+        } catch (ClassCastException e){
+            // This isn't quite the right thing to do, but is a good idea for now.
+            return new ModelAndView("error_notfound");     
+        }
+
+        if (collection == null){
+            return new ModelAndView("error_notfound");
+        }
+        
+        // First try to find a ticket principal
         String ticketId = request.getParameter("ticket");
-        return new ModelAndView(view);
+        
+        if (ticketId != null) {
+        
+            Ticket ticket = contentService.getTicket(
+                    contentService.findItemByUid(collectionUid), ticketId);
+        
+            if (ticket != null){
+                Map<String, Object> model = new HashMap<String, Object>();
+                
+                model.put("principal", ticket);
+                model.put("collection", collection);
+                return new ModelAndView(pimView, model);
+
+            } else {
+                return new ModelAndView("error_forbidden");
+            }
+        } else {
+            
+            // If we can't find a ticket principal, use the current user.
+            
+            User currentUser = securityManager.getSecurityContext().getUser();
+            if (collection.getOwner().equals(currentUser)){
+                    
+                Map<String, Object> model = new HashMap<String, Object>();
+                
+                model.put("principal", currentUser);
+                model.put("collection", collection);
+                return new ModelAndView(pimView, model);
+            } else {
+                return new ModelAndView("error_forbidden");
+            }
+        }
+        
+        
     }
 
-    public void setView(String view) {
-        this.view = view;
+    public void setPimView(String pimView) {
+        this.pimView = pimView;
+    }
+
+    public void setContentService(ContentService contentService) {
+        this.contentService = contentService;
+    }
+
+    public void setSecurityManager(CosmoSecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
 
 }

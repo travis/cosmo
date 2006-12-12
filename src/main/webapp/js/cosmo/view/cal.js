@@ -319,8 +319,15 @@ cosmo.view.cal = new function() {
                         };
                         // Look up the master event for the recurrence and pass the result
                         // on to function h
-                        f = function() { var reqId = Cal.serv.getEvent(
-                            h, Cal.currentCalendar.uid, ev.data.id); };
+                        f = function() { 
+                        	var reqId = Cal.currentCalendar.ticketKey ? 
+                        		Cal.serv.getEvent(
+                            		h, Cal.currentCalendar.uid, ev.data.id, 
+                            		Cal.currentCalendar.ticketKey): 
+                        		Cal.serv.getEvent(
+                            		h, Cal.currentCalendar.uid, ev.data.id); 
+                            
+                            };
                     }
                     break;
 
@@ -417,8 +424,11 @@ cosmo.view.cal = new function() {
             handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
 
-        requestId = Cal.serv.saveEvent(
-            f, Cal.currentCalendar.uid, ev.data);
+        requestId = Cal.currentCalendar.ticketKey?
+        	Cal.serv.saveEvent(
+            	f, Cal.currentCalendar.uid, ev.data, Cal.currentCalendar.ticketKey):
+        	Cal.serv.saveEvent(
+            	f, Cal.currentCalendar.uid, ev.data);
         // Add to processing queue -- canvas will not re-render until
         // queue is empty
         self.processingQueue.push(requestId);
@@ -458,8 +468,11 @@ cosmo.view.cal = new function() {
         var f = function(newEvId, err, reqId) {
             handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
-        requestId = Cal.serv.saveNewEventBreakRecurrence(
-            f, Cal.currentCalendar.uid, ev.data, origId, recurEnd);
+        requestId = Cal.currentCalendar.ticketKey?
+        	Cal.serv.saveNewEventBreakRecurrence(
+            	f, Cal.currentCalendar.uid, ev.data, origId, recurEnd, Cal.currentCalendar.ticketKey):
+        	Cal.serv.saveNewEventBreakRecurrence(
+            	f, Cal.currentCalendar.uid, ev.data, origId, recurEnd);
         self.processingQueue.push(requestId);
         self.lastSent = null;
     }
@@ -658,8 +671,13 @@ cosmo.view.cal = new function() {
                                     'instanceEvent': ev });
                             }
                         };
-                        f = function() { var reqId = Cal.serv.getEvent(h,
-                            Cal.currentCalendar.uid, ev.data.id); };
+                        f = function() { 
+                        
+                        	var reqId = Cal.currentCalendar.ticketKey?
+	         	    	        Cal.serv.getEvent(h, Cal.currentCalendar.uid, ev.data.id,
+	         	    	        	Cal.currentCalendar.ticketKey):
+	         	    	        Cal.serv.getEvent(h, Cal.currentCalendar.uid, ev.data.id);
+                        };
                     }
                     break;
                 // 'Removing' all future events really just means setting the
@@ -696,8 +714,13 @@ cosmo.view.cal = new function() {
                             }
                         };
                         // Look up the RecurrenceRule and pass the result on to function h
-                        f = function() { var reqId = Cal.serv.getRecurrenceRules(h,
-                            Cal.currentCalendar.uid, [ev.data.id]); };
+                        f = function() { var reqId = Cal.currentCalendar.tickeyKey?
+                        	Cal.serv.getRecurrenceRules(h,
+                            	Cal.currentCalendar.uid, [ev.data.id], Cal.currentCalendar.ticketKey):
+                        	Cal.serv.getRecurrenceRules(h,
+                            	Cal.currentCalendar.uid, [ev.data.id]); 
+                            
+                            };
                     break;
                 // Save the RecurrenceRule with a new exception added for this instance
                 case opts.ONLY_THIS_EVENT:
@@ -732,8 +755,11 @@ cosmo.view.cal = new function() {
         // along with the original params passed back in from the async response
         var f = function(newEvId, err, reqId) {
             handleRemoveResult(ev, newEvId, err, reqId, opts); };
-        var requestId = Cal.serv.removeEvent(
-            f, Cal.currentCalendar.uid, ev.data.id);
+        var requestId = Cal.currentCalendar.ticketKey?
+        	Cal.serv.removeEvent(
+            	f, Cal.currentCalendar.uid, ev.data.id, Cal.currentCalendar.ticketKey):
+        	Cal.serv.removeEvent(
+            	f, Cal.currentCalendar.uid, ev.data.id);
     }
     /**
      * Handles the response from the async call when removing an event.
@@ -781,8 +807,11 @@ cosmo.view.cal = new function() {
         // along with the original params passed back in from the async response
         var f = function(ret, err, reqId) {
             handleSaveRecurrenceRuleResult(ev, err, reqId, opts); };
-        var requestId = Cal.serv.saveRecurrenceRule(
-            f, Cal.currentCalendar.uid, ev.data.id, rrule);
+        var requestId = Cal.currentCalendar.ticketKey?
+	        Cal.serv.saveRecurrenceRule(
+    	        f, Cal.currentCalendar.uid, ev.data.id, rrule, Cal.currentCalendar.ticketKey):
+	        Cal.serv.saveRecurrenceRule(
+    	        f, Cal.currentCalendar.uid, ev.data.id, rrule);
     }
     /**
      * Handles the response from the async call when saving changes
@@ -886,7 +915,10 @@ cosmo.view.cal = new function() {
                'opts': opts } });
         }
 
-        Cal.serv.expandEvents(f, Cal.currentCalendar.uid, [id], s, e);
+        Cal.currentCalendar.ticketKey?
+           	Cal.serv.expandEvents(f, Cal.currentCalendar.uid, [id], s, e, 
+           		Cal.currentCalendar.ticketKey):
+           	Cal.serv.expandEvents(f, Cal.currentCalendar.uid, [id], s, e);
     }
     /**
      * Take an array of CalEventData objects, and create a Hash of
@@ -1005,7 +1037,10 @@ cosmo.view.cal = new function() {
         // Load the array of events
         // ======================
         try {
-            eventLoadList = Cal.serv.getEvents(Cal.currentCalendar.uid, s, e);
+            eventLoadList = Cal.currentCalendar.ticketKey?
+            	Cal.serv.getEvents(Cal.currentCalendar.uid, s, e, 
+            		Cal.currentCalendar.ticketKey):
+            	Cal.serv.getEvents(Cal.currentCalendar.uid, s, e);
         }
         catch(e) {
             cosmo.app.showErr(getText('Main.Error.LoadEventsFailed'), e);

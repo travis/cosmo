@@ -51,8 +51,8 @@
          /pim/lang.page*=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /pim/logout.page*=ROLE_ROOT,ROLE_USER
          /pim*=ROLE_ROOT,ROLE_USER
-         /pim/json-rpc=ROLE_ROOT,ROLE_USER
          /pim/keepalive.jsp=ROLE_ROOT,ROLE_USER
+         /pim/collection/**=ROLE_USER,ROLE_ANONYMOUS
          /=ROLE_ROOT, ROLE_USER
          /**=ROLE_ROOT
        </value>

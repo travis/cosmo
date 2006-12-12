@@ -101,12 +101,21 @@ public interface RPCService {
     public Calendar[] getCalendars() throws RPCException;
     
     /**
+     * Returns the calendar with uid collectionUid.
+     * 
+     * @param collectionUid the uid of the calendar to return
+     * @param ticket the key of a ticket that provides access to the calendar
+     * @return the calendar corresponding to collectionUid 
+     */
+    public Calendar getTicketedCalendar(String collectionUid, String ticket);
+    
+    /**
      * Creates a calendar with the given name
      * @param displayName the name as it is displayed to the user
      * @param path the name as it is displayed to the user
      * @throws RPCException
      */
-    public String createCalendar(String displayName)
+    public void createCalendar(String displayName)
             throws RPCException;
     
     /**

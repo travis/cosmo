@@ -35,7 +35,7 @@ cosmo.app = new function () {
             'cosmo:ModalDialog', {}, document.body, 'last');
 
         // Initialize the default view
-        if (self.initObj.init) { self.initObj.init(); }
+        if (self.initObj.init) { self.initObj.init.apply(this.initObj, arguments)};
     }
 
     // ==========================

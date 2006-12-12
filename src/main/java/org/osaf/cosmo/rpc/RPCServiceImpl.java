@@ -96,7 +96,7 @@ public class RPCServiceImpl implements RPCService {
         this.userService = userService;
     }
 
-    public String createCalendar(String displayName)
+    public void createCalendar(String displayName)
         throws RPCException {
 
         User user = getUser();
@@ -117,7 +117,6 @@ public class RPCServiceImpl implements RPCService {
         } catch (Exception e) {
             throw new RPCException("Cannot create calendar: " + e.getMessage(), e);
         }
-        return calendar.getUid();
     }
 
     private void createCalendarHandleDuplicateName(CollectionItem collection,
@@ -134,8 +133,13 @@ public class RPCServiceImpl implements RPCService {
         if (log.isDebugEnabled())
             log.debug("Getting calendars in home collection of " +
                       getUser().getUsername());
+        User user = getUser();
+
+        if (user == null){
+            return new Calendar[]{};
+        }
         // XXX no ContentService.findCalendars yet
-        HomeCollectionItem home = contentService.getRootItem(getUser());
+        HomeCollectionItem home = contentService.getRootItem(user);
         List<Calendar> cals = new ArrayList<Calendar>();
         for (Iterator<Item> i = home.getChildren().iterator(); i.hasNext();) {
             Item child = i.next();
@@ -147,6 +151,18 @@ public class RPCServiceImpl implements RPCService {
         }
         //TODO sort these
         return (Calendar[]) cals.toArray(new Calendar[cals.size()]);
+    }
+    
+    public Calendar getTicketedCalendar(String collectionUid, String ticketKey){
+        
+        Item collection = contentService.findItemByUid(collectionUid);
+        contentService.getTicket(collection, ticketKey);
+        
+        Calendar calendar = createCalendarFromItem(collection);
+        
+        calendar.setTicketKey(ticketKey);
+        
+        return calendar;
     }
 
     public Event getEvent(String collectionUid, String eventUid)
@@ -790,11 +806,11 @@ public class RPCServiceImpl implements RPCService {
         // TODO replace with real protocol urls
         Map<String, String> protocolUrls = new HashMap<String, String>();
         protocolUrls.put("dav", "http://osaf.us/cosmo/home/"
-                + getUsername());
+                + "fixme");
         protocolUrls.put("webcal", "http://osaf.us/cosmo/home/"
-                + getUsername());
+                + "fixme");
         protocolUrls.put("Atom", "http://osaf.us/cosmo/home/"
-                + getUsername());
+                + "fixme");
         calendar.setProtocolUrls(protocolUrls);
         return calendar;
     }

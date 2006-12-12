@@ -90,7 +90,9 @@
  -->
  
  <bean id="collectionBookmarkController" class="org.osaf.cosmo.ui.pim.CollectionBookmarkController">
- 	<property name="view"><value>pim</value></property>
+ 	<property name="pimView"><value>pim</value></property>
+	<property name="contentService"><ref bean="contentService" /></property>
+	<property name="securityManager"><ref bean="securityManager" /></property>
  </bean>
 
 <!-- 

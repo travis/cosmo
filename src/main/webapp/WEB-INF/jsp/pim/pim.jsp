@@ -78,14 +78,22 @@ dojo.require('cosmo.ui.widget.ModalDialog');
 var TIMEOUT_MIN = 30;
 
 function init() {
+	var collectionUid = undefined;
+	var ticketKey = undefined;
+<c:if test="${collection != null}">
+	collectionUid = '${collection.uid}';
+</c:if>
+<c:if test="${principal.class.name == 'org.osaf.cosmo.model.Ticket'}">
+	ticketKey = '${principal.key }';
+</c:if>
+	
     cosmo.app.initObj = Cal;
-    cosmo.app.init();
+	cosmo.app.init(collectionUid, ticketKey);
 }
 </script>
 
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/event/listeners.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/global.css.js"></script>
-
 
 </head>
 

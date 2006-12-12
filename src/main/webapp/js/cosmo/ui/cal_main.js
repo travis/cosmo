@@ -71,8 +71,8 @@ var Cal = new function() {
     /**
      * Main function
      */
-    this.init = function() {
-        
+    this.init = function(collectionUid, ticketKey) {
+
         // Props for confirmation dialogs
         // --------------
         dojo.require('cosmo.view.cal.dialog');
@@ -96,13 +96,13 @@ var Cal = new function() {
 
         // Place all the UI DOM elements based on window size
         // --------------
-        if (this.createUI()) {
-            viewDiv = document.getElementById('timedScrollingMainDiv');
-            allDayDiv = document.getElementById('allDayContentDiv');
-            this.placeUI();
-            this.setImagesForSkin();
-            this.setUpNavButtons();
-        }
+
+        viewDiv = document.getElementById('timedScrollingMainDiv');
+        allDayDiv = document.getElementById('allDayContentDiv');
+        this.placeUI();
+        this.setImagesForSkin();
+        this.setUpNavButtons();
+
 
         // Load and display date info, render cal canvas
         // --------------
@@ -126,40 +126,55 @@ var Cal = new function() {
         
         // Load/create calendar to view
         // --------------
-        // Get stored cals for this user
-        this.calendars = this.serv.getCalendars();
-        //TODO need to sort
-        this.calendars.sort(); // Sort by alpha
-        // No cals for this user
-        if (!this.calendars.length){
-            // Create initial cal
-            var uid = null;
-            try {
-                uid = this.serv.createCalendar('Cosmo');
-            }
-            catch(e) {
-                cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);
-                return false;
-            }
-            // Set it as the default
-            this.currentCalendar = new CalendarMetadata();
-            this.currentCalendar.name = 'Cosmo';
-            this.currentCalendar.path = 'Cosmo';
-            this.currentCalendar.uid = uid;
-            
-            // Add 'Welcome to Cosmo' Event
-            this.createWelcomeItem = true;
-        }
-        // Cals exist for this user
-        else {
-            // If more than one cal exists, create the cal selector nav
-            if (this.calendars.length > 1) {
-                this.calForm.addCalSelector(this.calendars);
-            }
-            // Set the first cal as the default
-            this.currentCalendar = this.calendars[0];
+        // If we received a ticket, just grab the specified collection
+        
+        if (ticketKey){
+        	this.calendars = [
+        		this.serv.getTicketedCalendar(collectionUid, ticketKey)
+        		];
+
         }
         
+		// Otherwise, get all calendars for this user
+		else {
+	        this.calendars = this.serv.getCalendars();
+	
+	        //TODO need to sort
+	        this.calendars.sort(); // Sort by alpha
+	        // No cals for this user
+	        if (!this.calendars.length){
+	            // Create initial cal
+	            try {
+	                this.serv.createCalendar('Cosmo');
+	            }
+	            catch(e) {
+	                cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);
+	                return false;
+	            }
+				this.calendars = this.serv.getCalendars();
+	            
+	            // Add 'Welcome to Cosmo' Event
+	            this.createWelcomeItem = true;
+	        }
+		}
+        // If more than one cal exists, create the cal selector nav
+        if (this.calendars.length > 1) {
+            this.calForm.addCalSelector(this.calendars);
+        }
+        
+        // If we received a collectionUid, select that collection
+		if (collectionUid){
+			for (var i = 0; i < this.calendars.length; i++){
+				if (this.calendars[i].uid == collectionUid){
+					this.currentCalendar = this.calendars[i];
+					break;
+				}
+			}
+        }
+        // Otherwise, use the first calendar
+        else {
+	        this.currentCalendar = this.calendars[0];
+        }
         // Load and display events
         // --------------
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
@@ -183,10 +198,6 @@ var Cal = new function() {
     // ==========================
     // GUI element display
     // ==========================
-    this.createUI = function() {
-        //FIXME this method should go away
-        return true;
-    }
 
     /**
      * Performs the absolute placement of the UI elements based

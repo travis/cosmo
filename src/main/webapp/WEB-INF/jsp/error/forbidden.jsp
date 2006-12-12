@@ -65,17 +65,12 @@
   <fmt:message key="Error.Forbidden.NotAsAdmin"/>
 </p>
 <p>
-  <a href="<c:url value="/console/logout"/>">
+  <a href="<c:url value="/logout"/>">
     <fmt:message key="Error.Forbidden.ClickToLogOut"/>
   </a>
 </p>
   </c:when>
   <c:otherwise>
-    <%--
-        This should never happen, since anonymous users will always
-        get 401 (the login page) rather than 403 (this page), but just
-        to be safe...
-      --%>
 <p>
   <fmt:message key="Error.Forbidden.NotAllowed"/>
 </p>

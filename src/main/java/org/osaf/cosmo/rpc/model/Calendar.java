@@ -17,6 +17,8 @@ package org.osaf.cosmo.rpc.model;
 
 import java.util.Map;
 
+import org.osaf.cosmo.model.Ticket;
+
 
 /**
  * This class contains information about a user's calendar.
@@ -27,6 +29,7 @@ public class Calendar {
 
     private String displayName = null;
     private String uid = null;
+    private String ticketKey;
 
     private Map<String, String> protocolUrls;
 
@@ -59,5 +62,20 @@ public class Calendar {
     public void setUid(String uid) {
         this.uid = uid;
     }
+    
+    /**
+     * A ticket that provides access to this collection.
+     * @return
+     */
+    public String getTicketKey() {
+        return ticketKey;
+    }
+
+    public void setTicketKey(String ticket) {
+        this.ticketKey = ticket;
+    }
+
+
+
 
 }

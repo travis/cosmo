@@ -50,6 +50,28 @@
                 <include>cosmo-${pom.version}.war</include>
             </includes>
         </fileSet>
+        <!-- Include cosmo-migration files -->
+        <fileSet>
+            <directory>../migration/src/main/config</directory>
+            <outputDirectory>migration</outputDirectory>
+            <includes>
+                <include>migration.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../migration/src/docs</directory>
+            <outputDirectory>migration</outputDirectory>
+            <includes>
+                <include>README.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../migration/target/</directory>
+            <outputDirectory>migration</outputDirectory>
+            <includes>
+                <include>cosmo-migration-${pom.version}-jar-with-dependencies.jar</include>
+            </includes>
+        </fileSet>
     </fileSets>
     <files>
         <file>

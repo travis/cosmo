@@ -16,7 +16,9 @@
 package org.osaf.cosmo.ui.pim;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +31,8 @@ import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
+
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -43,6 +47,10 @@ public class CollectionBookmarkController extends AbstractController {
     private String pimView;
     private ContentService contentService;
     private CosmoSecurityManager securityManager;
+    private ResourceBundleMessageSource messageSource;
+    
+    private static final String MSG_FREEBUSY_TICKET = 
+        "Error.Ticket.Freebusy";
         
     /** 
      */
@@ -65,25 +73,48 @@ public class CollectionBookmarkController extends AbstractController {
         if (collection == null){
             return new ModelAndView("error_notfound");
         }
-        
+
         // First try to find a ticket principal
         String ticketId = request.getParameter("ticket");
-        
+
         if (ticketId != null) {
-        
+
             Ticket ticket = contentService.getTicket(
                     contentService.findItemByUid(collectionUid), ticketId);
-        
+            
+            // If we found a ticket
             if (ticket != null){
-                Map<String, Object> model = new HashMap<String, Object>();
                 
-                model.put("principal", ticket);
-                model.put("collection", collection);
-                return new ModelAndView(pimView, model);
+                Set privileges = ticket.getPrivileges();
+                
+                // Check permissions
+                // If this ticket has read privileges, render a calendar
+                if (privileges.contains(Ticket.PRIVILEGE_READ)){
 
-            } else {
-                return new ModelAndView("error_forbidden");
+                    Map<String, Object> model = new HashMap<String, Object>();
+
+                    model.put("principal", ticket);
+                    model.put("collection", collection);
+                    return new ModelAndView(pimView, model);
+
+                } else if (privileges.contains(Ticket.PRIVILEGE_FREEBUSY)){
+                    Map<String,Object> model = new HashMap<String,Object>();
+                    Set<String> messages = new HashSet<String>();
+                    messages.add(messageSource.getMessage(
+                            MSG_FREEBUSY_TICKET, 
+                            null, 
+                            request.getLocale()));
+                    
+                    model.put("messages", messages);
+                    return new ModelAndView("error_general", model);
+                }
             }
+
+            // If we get here, the ticket did not provide 
+            // appropriate permissions
+            return new ModelAndView("error_forbidden");
+            
+            
         } else {
             
             // If we can't find a ticket principal, use the current user.
@@ -114,6 +145,10 @@ public class CollectionBookmarkController extends AbstractController {
 
     public void setSecurityManager(CosmoSecurityManager securityManager) {
         this.securityManager = securityManager;
+    }
+
+    public void setMessageSource(ResourceBundleMessageSource messageSource) {
+        this.messageSource = messageSource;
     }
 
 }

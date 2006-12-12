@@ -21,10 +21,9 @@
 <%@ page    isErrorPage="true"               %>
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-<cosmo:standardLayout prefix="Error.General." showNav="false">
-<c:forEach var="message" items="${messages}">
+<cosmo:standardLayout prefix="Error.Exception." showNav="false">
 <p>
-<c:out value="${message}"/>
+  <fmt:message key="Error.Exception.ErrorOccurred"/>
 </p>
-</c:forEach>
+<cosmo:stacktrace exception="${Exception}"/>
 </cosmo:standardLayout>

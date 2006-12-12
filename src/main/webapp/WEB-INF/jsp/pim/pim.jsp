@@ -100,8 +100,9 @@ function init() {
 <body id="body">
         <div id="menuBarDiv">
             <div id="smallLogoDiv"></div>
-            <fmt:message key="Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
+
             <authz:authorize ifAnyGranted="ROLE_USER">
+	          <fmt:message key="Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
               <span class="menuBarDivider">|</span>
               <c:url var="homeUrl" value="/browse/${user.username}"/>
               <a href="${homeUrl}"><fmt:message key="Main.Home"/></a>
@@ -111,13 +112,15 @@ function init() {
               <span class="menuBarDivider">|</span>
               <c:url var="calendarUrl" value="/pim"/>
               <a href="${calendarUrl}"><fmt:message key="Main.Calendar"/></a>
+              <span class="menuBarDivider">|</span>
             </authz:authorize>
             <authz:authorize ifAllGranted="ROLE_ROOT">
               <span class="menuBarDivider">|</span>
               <c:url var="consoleUrl" value="/admin/users"/>
               <a href="${consoleUrl}"><fmt:message key="Main.Console"/></a>
+              <span class="menuBarDivider">|</span>
             </authz:authorize>
-            <span class="menuBarDivider">|</span>
+
             <c:url var="helpUrl" value="/help"/>
             <a href="${helpUrl}"><fmt:message key="Main.Help"/></a>
             <span class="menuBarDivider">|</span>
@@ -125,10 +128,12 @@ function init() {
             <a href="javascript:Popup.open('${aboutUrl}', 380, 280);">
               <fmt:message key="Main.About"/>
             </a>
+            <authz:authorize ifAnyGranted="ROLE_USER">
             <span class="menuBarDivider">|</span>
             <a href="${staticBaseUrl}/logout">
                <fmt:message key="Main.LogOut"/>
             </a>&nbsp;&nbsp;
+            </authz:authorize>
         </div>
         <div id="calDiv">
             <form method="post" id="calForm" name="calForm" action="">

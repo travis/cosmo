@@ -46,7 +46,7 @@
   class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
     <property name="exceptionMappings">
        <value>
-          java.lang.Exception=error.general
+          java.lang.Exception=error_exception
        </value>
     </property>
 </bean>
@@ -93,6 +93,7 @@
  	<property name="pimView"><value>pim</value></property>
 	<property name="contentService"><ref bean="contentService" /></property>
 	<property name="securityManager"><ref bean="securityManager" /></property>
+	<property name="messageSource"><ref bean="messageSource" /></property>	
  </bean>
 
 <!-- 

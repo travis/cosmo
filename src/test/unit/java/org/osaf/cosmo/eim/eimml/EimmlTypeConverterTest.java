@@ -240,7 +240,8 @@ public class EimmlTypeConverterTest extends TestCase
     public void testFromDateTime() throws Exception {
         String testString = "1996-12-19T16:39:57-0800";
 
-        Calendar testCalendar = Calendar.getInstance();
+        Calendar testCalendar =
+            Calendar.getInstance(TimeZone.getTimeZone("GMT-8"));
         testCalendar.set(Calendar.YEAR, 1996);
         testCalendar.set(Calendar.MONTH, 11);
         testCalendar.set(Calendar.DAY_OF_MONTH, 19);

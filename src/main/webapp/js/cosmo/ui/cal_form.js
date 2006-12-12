@@ -27,6 +27,9 @@
 /**
  * @object The form for all UI-form-elements on the page
  */
+ 
+dojo.require("cosmo.util.html");
+
 function CalForm() {
 
     var self = this;
@@ -288,7 +291,7 @@ function CalForm() {
     this.populateTimezoneSelector = function(region){
         var options = this.getTimezoneSelectorOptions(region);
         var tzSelector = document.getElementById("tzTzSelect");
-        this.setSelectOptions(tzSelector, options);
+        cosmo.util.html.setSelectOptions(tzSelector, options);
     };
 
     this.handleRegionChanged = function(event){
@@ -412,7 +415,7 @@ function CalForm() {
         if (className) {
             sel.className = className;
         }
-        this.setSelectOptions(sel, options);
+        cosmo.util.html.setSelectOptions(sel, options);
         if (elem) {
             elem.appendChild(sel);
             return true;
@@ -422,26 +425,11 @@ function CalForm() {
         }
     };
 
-    this.setSelectOptions = function(selectElement, options){
-        while (selectElement.firstChild){
-           selectElement.removeChild(selectElement.firstChild);
-        }
-        for (var i = 0; i < options.length; i++) {
-            var opt = document.createElement('option');
-            opt.value = options[i].value;
-            opt.appendChild(document.createTextNode(options[i].text));
-            selectElement.appendChild(opt);
-        }
-    };
-
     this.setSelect = function(name, val) {
         var sel = this.form[name];
-        for (var i = 0; i < sel.options.length; i++) {
-            if (sel.options[i].value == val) {
-                sel.selectedIndex = i;
-            }
-        }
+        cosmo.util.html.setSelect(sel, val);
     };
+    
     this.emptyTextInput = function(param) {
         if (!param || !param.id) {
             param = param || window.event;

@@ -22,7 +22,8 @@ JAVA_JSON_MAPPING = {"java.util.Date":Date,
                      "org.osaf.cosmo.rpc.model.Event":CalEventData,
                      "org.osaf.cosmo.rpc.model.CosmoDate":cosmo.datetime.Date,
                      "org.osaf.cosmo.rpc.model.RecurrenceRule":RecurrenceRule,
-                     "org.osaf.cosmo.rpc.model.Modification":Modification};
+                     "org.osaf.cosmo.rpc.model.Modification":Modification,
+                     "org.osaf.cosmo.rpc.model.Calendar":CalendarMetadata };
 
 JAVA_EXCEPTION_MAPPING = {"org.osaf.scooby.rpc.RPCException":ScoobyServiceRemoteException,
                           "org.osaf.scooby.rpc.NotAuthenticatedException":NotAuthenticatedException};
@@ -83,6 +84,7 @@ function convertObject(object){
        }
        return newObject
     }
+
     return object;
 }
 

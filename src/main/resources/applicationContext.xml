@@ -543,6 +543,16 @@
     </property>
   </bean>
 
+  <!-- general protocol/interface resources -->
+
+  <bean id="serviceLocatorFactory"
+        class="org.osaf.cosmo.server.ServiceLocatorFactory">
+    <property name="davPrefix"><value>/dav</value></property>
+    <property name="atomPrefix"><value>/atom</value></property>
+    <property name="morseCodePrefix"><value>/mc</value></property>
+    <property name="webPrefix"><value>/pim</value></property>
+  </bean>
+
   <!-- dav protocol resources -->
 
   <bean id="davLockManager"

@@ -147,21 +147,22 @@ cosmo.datetime.Date.prototype.getTimezoneOffset = function() {
     if (this.utc) {
         offsetMin = 0;
     }
-
-    // Has timezone, use offset from timezone
-    if (this.tzId) {
-        var timezone = cosmo.datetime.timezone.getTimezone(this.tzId);
-        if(timezone){
-            return timezone.getOffsetInMinutes(this);
-        } else {
-            //couldn't find timezone just make it utc?
-            return 0;
-        }
-    }
-
-    // No timezone, no UTC -- must be a floating date
     else {
-        offsetMin = this.getUserPrefTimezoneOffset();
+        // Has timezone, use offset from timezone
+        if (this.tzId) {
+            var timezone = cosmo.datetime.timezone.getTimezone(this.tzId);
+            if(timezone){
+                return timezone.getOffsetInMinutes(this);
+            } else {
+                //couldn't find timezone just make it utc?
+                return 0;
+            }
+        }
+
+        // No timezone, no UTC -- must be a floating date
+        else {
+            offsetMin = this.getUserPrefTimezoneOffset();
+        }
     }
     return offsetMin;
 };

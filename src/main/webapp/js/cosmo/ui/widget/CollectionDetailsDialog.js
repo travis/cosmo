@@ -36,16 +36,27 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.widget.ModalDialog");
 
-dojo.widget.defineWidget("cosmo.ui.widget.CollectionDetailsDialog", 
+dojo.widget.defineWidget("cosmo.ui.widget.CollectionDetailsDialog",
 dojo.widget.HtmlWidget, {
         // Template stuff
         templatePath:dojo.uri.dojoUri(
             '../../cosmo/ui/widget/templates/CollectionDetailsDialog/CollectionDetailsDialog.html'),
-        
+
         // Attach points
 
         // Instance methods
+
         
+        //i18n
+        strings: { 
+            nameLabel: getText("Main.CollectionDetails.NameLabel"),
+            collectionAddress: getText("Main.CollectionDetails.CollectionAddress"),
+            instructions1: getText("Main.CollectionDetails.Instructions.1"),
+            instructions2: getText("Main.CollectionDetails.Instructions.2"),
+            close: getText("Main.CollectionDetails.Close")
+            
+        },
+
         // Lifecycle functions
-        postMixInProperties: function () { } }
+        /*postMixInProperties: function () { }*/ }
  );

@@ -16,7 +16,7 @@ For use with the JsUnit from www.jsunit.net
   </script>
 
 
-  <script src="../../../../../../main/webapp/js/lib/dojo-event_and_io/dojo.js" language="JavaScript" type="text/javascript"></script>
+  <script src="../../../../../../main/webapp/js/lib/dojo-event_and_io/dojo.js.uncompressed.js" language="JavaScript" type="text/javascript"></script>
   <script src="../../../../../../main/webapp/js/cosmo/util/debug.js" language="JavaScript" type="text/javascript"></script>
 
   <!-- dojo setup stuff -->
@@ -46,8 +46,8 @@ For use with the JsUnit from www.jsunit.net
     showDialog = function(){
         cosmo.app.showDialog({
             content: dojo.widget.createWidget("cosmo:CollectionDetailsDialog", {}, null, 'last'),
-            width: "500",
-            btnsLeft: [ dojo.widget.createWidget(
+            width: "600",
+            btnsRight	: [ dojo.widget.createWidget(
                           "cosmo:Button",
                           {  text: "Bye Bye",
                              width: "100px",
@@ -63,7 +63,9 @@ For use with the JsUnit from www.jsunit.net
 
 </head>
 <body>
-
+  <a href="http://wiki.osafoundation.org/bin/view/Journal/WorkflowsZeroDotSix">Original Design Found here</a>
+  <br/>
+  <br/>
   <div id="button"/>
 
   <script language="JavaScript" type="text/javascript">
@@ -74,8 +76,8 @@ For use with the JsUnit from www.jsunit.net
                     width: "250px",
                     handleOnClick: showDialog,
                     small: false }, dojo.byId("button"), 'last');
-                    
-        showDialog();                    
+
+        showDialog();
   </script>
 
 </body>

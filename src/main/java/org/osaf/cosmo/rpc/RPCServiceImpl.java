@@ -131,7 +131,7 @@ public class RPCServiceImpl implements RPCService {
         } catch (Exception e) {
             throw new RPCException("Cannot create calendar: " + e.getMessage(), e);
         }
-        return collection.getUid();
+        return calendar.getUid();
     }
 
     private void createCalendarHandleDuplicateName(CollectionItem collection,

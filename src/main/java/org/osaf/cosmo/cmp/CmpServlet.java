@@ -1025,6 +1025,4 @@ public class CmpServlet extends HttpServlet {
         activationContext.setServerName(urlBase);
         return activationContext;
     }
-
-
 }

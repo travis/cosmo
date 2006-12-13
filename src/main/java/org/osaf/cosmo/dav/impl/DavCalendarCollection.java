@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -128,12 +127,6 @@ public class DavCalendarCollection extends DavCollection
     public String getSupportedMethods() {
         // calendar collections not allowed inside calendar collections
         return "OPTIONS, GET, HEAD, TRACE, PROPFIND, PROPPATCH, COPY, DELETE, MOVE, MKTICKET, DELTICKET, MKCOL";
-    }
-
-    /** */
-    public void spool(OutputContext outputContext)
-        throws IOException {
-        writeICalendar(outputContext);
     }
 
     /** */
@@ -453,44 +446,6 @@ public class DavCalendarCollection extends DavCollection
                 return true;
         }
         return false;
-    }
-
-    private void writeICalendar(OutputContext context)
-        throws IOException {
-        if (! exists())
-            return;
-
-        if (log.isDebugEnabled())
-            log.debug("writing icalendar for " + getItem().getName());
-
-        CalendarCollectionStamp cc = getCalendarCollectionStamp();
-        Calendar calendar = null;
-        try {
-            calendar = cc.getCalendar();
-        } catch (ParserException e) {
-            throw new IllegalStateException("unable to parse member's icalendar content", e);
-        }
-
-        if (calendar.getComponents().isEmpty())
-            return;
-
-        context.setContentType(IOUtil.buildContentType("text/calendar",
-                                                       "UTF-8"));
-
-        // XXX content length unknown unless we write a temp file
-        // modification time and etag are undefined for a collection
-
-        if (! context.hasStream()) {
-            return;
-        }
-
-        CalendarOutputter outputter = new CalendarOutputter();
-        outputter.setValidating(false);
-        try {
-            outputter.output(calendar, context.getOutputStream());
-        } catch (ValidationException e) {
-            throw new IllegalStateException("unable to validate member's icalendar content", e);
-        }
     }
 
     private void validateDestination(DavResource destination)

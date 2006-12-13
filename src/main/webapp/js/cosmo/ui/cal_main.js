@@ -123,26 +123,22 @@ var Cal = new function() {
            this.calForm.addJumpToDate(jpDiv);
         }
         
-        
         // Load/create calendar to view
         // --------------
         // If we received a ticket, just grab the specified collection
-        
         if (ticketKey){
         	this.calendars = [
         		this.serv.getCalendar(collectionUid, ticketKey)
         		];
-
         }
         
 		// Otherwise, get all calendars for this user
 		else {
 	        this.calendars = this.serv.getCalendars();
-	
 	        //TODO need to sort
 	        this.calendars.sort(); // Sort by alpha
 	        // No cals for this user
-	        if (!this.calendars.length){
+	        if (this.calendars.length == 0){
 	            // Create initial cal
 	            try {
 	                var uid = this.serv.createCalendar('Cosmo');
@@ -151,7 +147,7 @@ var Cal = new function() {
 	                cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);
 	                return false;
 	            }
-				this.calendars = this.serv.getCalendar(uid);
+				this.calendars = [this.serv.getCalendar(uid)];
 	            
 	            // Add 'Welcome to Cosmo' Event
 	            this.createWelcomeItem = true;

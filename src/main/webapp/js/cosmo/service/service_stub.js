@@ -111,7 +111,9 @@ ScoobyService.prototype = {
 	*
 	* Return the collection identified by collectionUid
 	*/
-	getTicketedCalendar: function(collectionUid, ticketKey){},
+	getCalendar: function(collectionUid, ticketKey){},
+	
+    getCalendar: function(collectionUid){},
 
     /**
      * Creates a calendar with the given name

@@ -134,6 +134,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.TicketWidget", dojo.widget.HtmlWidget,
 		return timeoutValid && privsSelected;
 		
    	
+   	},
+   	
+   	postCreate: function(){
+		this.ticketForm.privileges[0].checked = true;
+		
+		
    	}
 
     

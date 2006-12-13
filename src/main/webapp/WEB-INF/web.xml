@@ -151,7 +151,7 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>dav-security</filter-name>
-    <url-pattern>/feed/*</url-pattern>
+    <url-pattern>/atom/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>dav-security</filter-name>
@@ -209,13 +209,12 @@
   <!-- url rewriting has to happen after security -->
   <filter-mapping>
     <filter-name>url-rewrite</filter-name>
-    <url-pattern>/feed/*</url-pattern>
+    <url-pattern>/atom/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>url-rewrite</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-
   <servlet>
     <servlet-name>dav</servlet-name>
     <servlet-class>org.osaf.cosmo.dav.DavServlet</servlet-class>
@@ -227,17 +226,9 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
-    <servlet-name>feed</servlet-name>
-    <servlet-class>org.osaf.cosmo.feed.FeedServlet</servlet-class>
+    <servlet-name>atom</servlet-name>
+    <servlet-class>org.osaf.cosmo.atom.AtomServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
-    <init-param>
-      <param-name>home-path</param-name>
-      <param-value>/home</param-value>
-    </init-param>
-    <init-param>
-      <param-name>browse-path</param-name>
-      <param-value>/browse</param-value>
-    </init-param>
   </servlet>
   <servlet>
     <servlet-name>mc</servlet-name>
@@ -271,8 +262,8 @@
     <url-pattern>/cmp/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>feed</servlet-name>
-    <url-pattern>/feed/*</url-pattern>
+    <servlet-name>atom</servlet-name>
+    <url-pattern>/atom/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>mc</servlet-name>

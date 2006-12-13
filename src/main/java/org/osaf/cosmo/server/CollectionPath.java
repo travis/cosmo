@@ -72,8 +72,8 @@ public class CollectionPath {
      *
      * @param urlPath the servlet-relative url-path
      *
-     * @throws IllegalArgumentException if the given url-path is null
-     * or not servlet-relative (starts with a "/")
+     * @throws IllegalArgumentException if the given url-path is not
+     * servlet-relative (starts with a "/")
      * @throws IllegalStateException if the given url-path does not
      * represent a collection path
      */

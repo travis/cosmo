@@ -20,14 +20,6 @@
 
 <urlrewrite>
   <rule>
-    <from>^/feed/atom/1.0(/.*)\?ticket=(.*)+$</from>
-    <to>/feed?path=$1&amp;ticket=$2</to>
-  </rule>
-  <rule>
-    <from>^/feed/atom/1.0(/.*)$</from>
-    <to>/feed?path=$1</to>
-  </rule>
-  <rule>
     <from>^/loginfailed$</from>
     <to>/login?login_failed=1</to>
   </rule>

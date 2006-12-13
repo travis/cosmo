@@ -128,14 +128,12 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
 
     // our methods
 
-    /**
-     */
+    /** */
     public ContentService getContentService() {
         return contentService;
     }
 
-    /**
-     */
+    /** */
     public void setContentService(ContentService contentService) {
         this.contentService = contentService;
     }

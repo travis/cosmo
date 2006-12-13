@@ -211,4 +211,8 @@ public interface RPCService {
 
     public String saveNewEventBreakRecurrence(String collectionUid, Event event,
             String originalEventId, CosmoDate originalEventEndDate, String ticket) throws RPCException;
+    
+    public void saveSubscription(String collectionUid, String ticket, String displayName) throws RPCException;
+    
+    public void deleteSubscription(String collectionUid, String ticket) throws RPCException;
 }

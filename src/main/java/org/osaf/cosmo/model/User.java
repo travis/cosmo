@@ -532,7 +532,35 @@ public class User extends BaseModelObject {
 
         return null;
     }
+    
+    /**
+     * Get the CollectionSubscription with the specified collectionUid 
+     * and ticketKey
+     * @param collectionUid collection uid of subscription to return
+     * @param ticketKey ticketKey of subscription to return
+     * @return subscription with specified collectionUid and ticketKey
+     */
+    @Transient
+    public CollectionSubscription getSubscription(String collectionUid, String ticketKey){
+        for (CollectionSubscription sub : subscriptions) {
+            if (sub.getCollectionUid().equals(collectionUid)
+                    && sub.getTicketKey().equals(ticketKey)) {
+                return sub;
+            }
+        }
 
+        return null;
+    }
+
+    
+    /**
+     * Remove the CollectionSubscription with the specifed collectionUid and ticketKey
+     * @param collectionUid collection uid of subscription to remove
+     * @param ticketKey ticketKey of subscription to remove
+     */
+    public void removeSubscription(String collectionUid, String ticketKey){
+        removeSubscription(getSubscription(collectionUid, ticketKey));
+    }
     
     /**
      * Remove the CollectionSubscription with the specifed displayName

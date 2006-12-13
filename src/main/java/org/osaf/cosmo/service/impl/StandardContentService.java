@@ -302,20 +302,24 @@ public class StandardContentService implements ContentService {
      *            collection children
      * @return newly created collection
      */
-    public CollectionItem createCollection(CollectionItem parent, CollectionItem collection, Set<Item> children) {
+    public CollectionItem createCollection(CollectionItem parent,
+            CollectionItem collection, Set<Item> children) {
         if (log.isDebugEnabled()) {
-            log.debug("creating collection " + collection.getName() +
-                      " in " + parent.getName());
+            log.debug("creating collection " + collection.getName() + " in "
+                    + parent.getName());
         }
-        
-        CollectionItem newCollection = contentDao.createCollection(parent, collection);
-        for(Item item : children) {
-            if(item instanceof ContentItem)
-                contentDao.createContent(collection, (ContentItem) item);
+
+        CollectionItem newCollection = contentDao.createCollection(parent,
+                collection);
+        for (Item item : children) {
+            if (item instanceof ContentItem) {
+                ContentItem newItem = contentDao.createContent(collection,
+                        (ContentItem) item);
+                newCollection.getChildren().add(newItem);
+            }
         }
-        
-        // TODO: Find better way to refresh collection to get updated children
-        return contentDao.findCollectionByUid(newCollection.getUid());
+
+        return collection;
     }
     
     /**
@@ -376,9 +380,11 @@ public class StandardContentService implements ContentService {
                     if(item.getIsActive()==false)
                         contentDao.removeContent((ContentItem) item);
                     // addition
-                    else  if(item.getId()==-1)
-                        contentDao.createContent(collection,
+                    else  if(item.getId()==-1) {
+                        ContentItem newItem = contentDao.createContent(collection,
                                                  (ContentItem) item);
+                        collection.getChildren().add(newItem);
+                    }
                     // update
                     else
                         contentDao.updateContent((ContentItem) item);
@@ -386,12 +392,9 @@ public class StandardContentService implements ContentService {
             }
 
             // update collection
-            contentDao.updateCollection(collection);
+            collection = contentDao.updateCollection(collection);
             
-            //  TODO: Find better way to refresh collection to get updated
-            //  children
-            return contentDao.findCollectionByUid(collection.getUid());
-            
+            return collection;
         } finally {
             lockManager.unlockCollection(collection);
         }

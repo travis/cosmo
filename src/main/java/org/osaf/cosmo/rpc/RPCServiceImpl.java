@@ -110,7 +110,7 @@ public class RPCServiceImpl implements RPCService {
     }
 
     //methods for RPCService
-    public void createCalendar(String displayName)
+    public String createCalendar(String displayName)
         throws RPCException {
 
         User user = getUser();
@@ -131,6 +131,7 @@ public class RPCServiceImpl implements RPCService {
         } catch (Exception e) {
             throw new RPCException("Cannot create calendar: " + e.getMessage(), e);
         }
+        return collection.getUid();
     }
 
     private void createCalendarHandleDuplicateName(CollectionItem collection,
@@ -166,21 +167,35 @@ public class RPCServiceImpl implements RPCService {
         //TODO sort these
         return (Calendar[]) cals.toArray(new Calendar[cals.size()]);
     }
-    
-    public Calendar getTicketedCalendar(String collectionUid, String ticketKey, HttpServletRequest request){
+
+    public Calendar getCalendar(String collectionUid, String ticketKey, 
+            HttpServletRequest request) throws RPCException{
         
-        Item collection = contentService.findItemByUid(collectionUid);
-        contentService.getTicket(collection, ticketKey);
+        CollectionItem collection = getCollectionItem(collectionUid);
+        
+        this.checkTicketProvidesPermissions(collection, ticketKey, READ_PERM);
         
         Calendar calendar = createCalendarFromItem(request, collection);
-        
+
         calendar.setTicketKey(ticketKey);
-        
+
         return calendar;
     }
+    
+    public Calendar getCalendar(String collectionUid, 
+            HttpServletRequest request) throws RPCException{
 
+        CollectionItem collection = getCollectionItem(collectionUid);
+        
+        this.checkCurrentUserOwnsCollection(collection);
+        
+        Calendar calendar = createCalendarFromItem(request, collection);
+
+        return calendar;
+    }
+    
     public Event getEvent(String collectionUid, String eventUid)
-        throws RPCException {
+    throws RPCException {
 
         CollectionItem collection =
             getCollectionItem(collectionUid);

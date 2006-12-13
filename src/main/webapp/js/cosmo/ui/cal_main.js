@@ -130,7 +130,7 @@ var Cal = new function() {
         
         if (ticketKey){
         	this.calendars = [
-        		this.serv.getTicketedCalendar(collectionUid, ticketKey)
+        		this.serv.getCalendar(collectionUid, ticketKey)
         		];
 
         }
@@ -145,13 +145,13 @@ var Cal = new function() {
 	        if (!this.calendars.length){
 	            // Create initial cal
 	            try {
-	                this.serv.createCalendar('Cosmo');
+	                var uid = this.serv.createCalendar('Cosmo');
 	            }
 	            catch(e) {
 	                cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);
 	                return false;
 	            }
-				this.calendars = this.serv.getCalendars();
+				this.calendars = this.serv.getCalendar(uid);
 	            
 	            // Add 'Welcome to Cosmo' Event
 	            this.createWelcomeItem = true;

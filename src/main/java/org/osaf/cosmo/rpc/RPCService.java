@@ -108,8 +108,13 @@ public interface RPCService {
      * @param collectionUid the uid of the calendar to return
      * @param ticket the key of a ticket that provides access to the calendar
      * @return the calendar corresponding to collectionUid 
+     * @throws RPCException 
      */
-    public Calendar getTicketedCalendar(String collectionUid, String ticket, HttpServletRequest request);
+    public Calendar getCalendar(String collectionUid, 
+            HttpServletRequest request) throws RPCException;
+    
+    public Calendar getCalendar(String collectionUid, String ticket, 
+            HttpServletRequest request) throws RPCException;
     
     /**
      * Creates a calendar with the given name
@@ -117,7 +122,7 @@ public interface RPCService {
      * @param path the name as it is displayed to the user
      * @throws RPCException
      */
-    public void createCalendar(String displayName)
+    public String createCalendar(String displayName)
             throws RPCException;
     
     /**

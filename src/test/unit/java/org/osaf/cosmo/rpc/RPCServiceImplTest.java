@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.rpc;
 
+import javax.servlet.http.HttpServletRequest;
+
 import junit.framework.TestCase;
 
 import net.fortuna.ical4j.model.DateTime;
@@ -22,6 +24,7 @@ import net.fortuna.ical4j.model.DateTime;
 import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.BaseMockServletTestCase;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
@@ -36,12 +39,13 @@ import org.osaf.cosmo.rpc.model.CosmoDate;
 import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.security.mock.MockSecurityManager;
 import org.osaf.cosmo.security.mock.MockUserPrincipal;
+import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
 
-public class RPCServiceImplTest extends TestCase {
+public class RPCServiceImplTest extends BaseMockServletTestCase {
     private static final String TEST_CALENDAR_NAME = "RemoteCosmoService";
     
     private static final Log log = LogFactory.getLog(RPCServiceImplTest.class);
@@ -60,16 +64,22 @@ public class RPCServiceImplTest extends TestCase {
 
     private StandardContentService contentService;
     private StandardUserService userService;
+    private ServiceLocatorFactory serviceLocatorFactory;
 
     private RPCServiceImpl rpcService;
+    
+    private HttpServletRequest request;
 
     private org.osaf.cosmo.rpc.model.Calendar[] calendars;
+    
+    private static final String SERVLET_PATH = "/JSON-RPC";
 
     public void setUp(){
         testHelper = new TestHelper();
+        
+        request = createMockRequest("POST", "");
 
         user = testHelper.makeDummyUser();
-        
 
         storage = new MockDaoStorage();
 
@@ -91,15 +101,18 @@ public class RPCServiceImplTest extends TestCase {
         userService.setAccountActivator(new AutomaticAccountActivator());
         userService.init();
         userService.createUser(user);
+        
+        serviceLocatorFactory = new ServiceLocatorFactory();
 
         rpcService = new RPCServiceImpl();
         rpcService.setContentService(contentService);
         rpcService.setCosmoSecurityManager(securityManager);
         rpcService.setUserService(userService);
+        rpcService.setServiceLocatorFactory(serviceLocatorFactory);
 
         try {
             rpcService.createCalendar(TEST_CALENDAR_NAME);
-            calendars = rpcService.getCalendars();
+            calendars = rpcService.getCalendars(request);
             testCalendarUid = calendars[0].getUid();
             
         } catch (RPCException e) {
@@ -197,10 +210,10 @@ public class RPCServiceImplTest extends TestCase {
 
     public void testGetCalendars() throws Exception {
         rpcService.createCalendar(TEST_CALENDAR_NAME+"1");
-        calendars = rpcService.getCalendars();
+        calendars = rpcService.getCalendars(request);
         assertEquals(calendars.length, 2);
         rpcService.removeCalendar(testCalendarUid);
-        calendars = rpcService.getCalendars();
+        calendars = rpcService.getCalendars(request);
         assertEquals(calendars.length, 1);
     }
 
@@ -222,8 +235,12 @@ public class RPCServiceImplTest extends TestCase {
     public void testRemoveCalendar() throws Exception {
         int initialNumberOfCalendars = calendars.length;
         rpcService.removeCalendar(testCalendarUid);
-        calendars = rpcService.getCalendars();
+        calendars = rpcService.getCalendars(request);
         assertEquals(calendars.length, initialNumberOfCalendars - 1);
+    }
+    
+    public String getServletPath() {
+        return SERVLET_PATH;
     }
 
 /* XXX Uncomment once we add preferences to the Cosmo data model

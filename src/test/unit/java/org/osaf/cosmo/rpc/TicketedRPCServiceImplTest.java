@@ -25,6 +25,7 @@ import net.fortuna.ical4j.model.DateTime;
 import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.BaseMockServletTestCase;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
@@ -48,11 +49,11 @@ import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
 
-public class TicketedRPCServiceImplTest extends TestCase {
+public class TicketedRPCServiceImplTest extends BaseMockServletTestCase {
     private static final String TEST_CALENDAR_NAME = "RemoteCosmoService";
     private static final String TEST_CALENDAR_PATH = "RemoteCosmoServiceTest";
     private static final Log log = LogFactory.getLog(TicketedRPCServiceImplTest.class);
-
+    private static final String SERVLET_PATH = "/JSON-RPC";
     private TestHelper testHelper;
 
     private Ticket readTicket;
@@ -292,6 +293,10 @@ public class TicketedRPCServiceImplTest extends TestCase {
         }
         evt.setId(evt1.getId()); // to pass equality test
         assertEquals(evt, evt1);
+    }
+    
+    public String getServletPath() {
+        return SERVLET_PATH;
     }
 
 /* XXX Uncomment once we add preferences to the Cosmo data model

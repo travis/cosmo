@@ -17,6 +17,8 @@ package org.osaf.cosmo.rpc;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.osaf.cosmo.rpc.model.Calendar;
 import org.osaf.cosmo.rpc.model.CosmoDate;
 import org.osaf.cosmo.rpc.model.Event;
@@ -98,7 +100,7 @@ public interface RPCService {
      * for the current user
      * @throws RPCException
      */
-    public Calendar[] getCalendars() throws RPCException;
+    public Calendar[] getCalendars(HttpServletRequest request) throws RPCException;
     
     /**
      * Returns the calendar with uid collectionUid.
@@ -107,7 +109,7 @@ public interface RPCService {
      * @param ticket the key of a ticket that provides access to the calendar
      * @return the calendar corresponding to collectionUid 
      */
-    public Calendar getTicketedCalendar(String collectionUid, String ticket);
+    public Calendar getTicketedCalendar(String collectionUid, String ticket, HttpServletRequest request);
     
     /**
      * Creates a calendar with the given name

@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -54,6 +56,8 @@ import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter;
 import org.osaf.cosmo.rpc.model.RecurrenceRule;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.server.ServiceLocator;
+import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
 
@@ -71,7 +75,8 @@ public class RPCServiceImpl implements RPCService {
     private CosmoSecurityManager cosmoSecurityManager = null;
     private ICalendarToCosmoConverter icalendarToCosmoConverter = new ICalendarToCosmoConverter();
     private CosmoToICalendarConverter cosmoToICalendarConverter = new CosmoToICalendarConverter();
-
+    private ServiceLocatorFactory serviceLocatorFactory =  null;
+    
     public CosmoSecurityManager getCosmoSecurityManager() {
         return cosmoSecurityManager;
     }
@@ -95,7 +100,16 @@ public class RPCServiceImpl implements RPCService {
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
+    
+    public ServiceLocatorFactory getServiceLocatorFactory() {
+        return serviceLocatorFactory;
+    }
 
+    public void setServiceLocatorFactory(ServiceLocatorFactory serviceLocatorFactory) {
+        this.serviceLocatorFactory = serviceLocatorFactory;
+    }
+
+    //methods for RPCService
     public void createCalendar(String displayName)
         throws RPCException {
 
@@ -129,7 +143,7 @@ public class RPCServiceImpl implements RPCService {
         }
     }
 
-    public Calendar[] getCalendars() throws RPCException {
+    public Calendar[] getCalendars(HttpServletRequest request) throws RPCException {
         if (log.isDebugEnabled())
             log.debug("Getting calendars in home collection of " +
                       getUser().getUsername());
@@ -144,7 +158,7 @@ public class RPCServiceImpl implements RPCService {
         for (Iterator<Item> i = home.getChildren().iterator(); i.hasNext();) {
             Item child = i.next();
             if (child.getStamp(CalendarCollectionStamp.class) != null) {
-                Calendar calendar = createCalendarFromItem(child);
+                Calendar calendar = createCalendarFromItem(request, child);
 
                 cals.add(calendar);
             }
@@ -153,12 +167,12 @@ public class RPCServiceImpl implements RPCService {
         return (Calendar[]) cals.toArray(new Calendar[cals.size()]);
     }
     
-    public Calendar getTicketedCalendar(String collectionUid, String ticketKey){
+    public Calendar getTicketedCalendar(String collectionUid, String ticketKey, HttpServletRequest request){
         
         Item collection = contentService.findItemByUid(collectionUid);
         contentService.getTicket(collection, ticketKey);
         
-        Calendar calendar = createCalendarFromItem(collection);
+        Calendar calendar = createCalendarFromItem(request, collection);
         
         calendar.setTicketKey(ticketKey);
         
@@ -805,20 +819,15 @@ public class RPCServiceImpl implements RPCService {
         return calendarEventItem;
     }
 
-    private Calendar createCalendarFromItem(Item child) {
+    private Calendar createCalendarFromItem(HttpServletRequest request, Item item) {
         Calendar calendar = new Calendar();
-        calendar.setName(child.getDisplayName());
-        calendar.setUid(child.getUid());
-
-        // TODO replace with real protocol urls
-        Map<String, String> protocolUrls = new HashMap<String, String>();
-        protocolUrls.put("dav", "http://osaf.us/cosmo/home/"
-                + "fixme");
-        protocolUrls.put("webcal", "http://osaf.us/cosmo/home/"
-                + "fixme");
-        protocolUrls.put("Atom", "http://osaf.us/cosmo/home/"
-                + "fixme");
+        calendar.setName(item.getDisplayName());
+        calendar.setUid(item.getUid());
+        
+        ServiceLocator serviceLocator = serviceLocatorFactory.createServiceLocator(request);
+        Map<String, String> protocolUrls = serviceLocator.getCollectionUrls((CollectionItem) item);
         calendar.setProtocolUrls(protocolUrls);
         return calendar;
     }
+
 }

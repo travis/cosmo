@@ -45,6 +45,7 @@ public class EimRecord {
     private static final Log log = LogFactory.getLog(EimRecord.class);
 
     private EimRecordSet recordset;
+    private String prefix;
     private String namespace;
     private String uuid;
     private ArrayList<EimRecordField> fields;
@@ -52,7 +53,27 @@ public class EimRecord {
 
     /** */
     public EimRecord() {
+        this(null, null, null);
+    }
+
+    /** */
+    public EimRecord(String prefix,
+                     String namespace,
+                     String uuid) {
+        this.prefix = prefix;
+        this.namespace = namespace;
+        this.uuid = uuid;
         fields = new ArrayList<EimRecordField>();
+    }
+
+    /** */
+    public String getPrefix() {
+        return prefix;
+    }
+
+    /** */
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 
     /** */

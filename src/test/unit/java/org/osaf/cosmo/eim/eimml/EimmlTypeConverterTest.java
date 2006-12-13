@@ -31,8 +31,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.TestHelper;
-
 /**
  * Test Case for {@link EimmlTypeConverter}.
  */
@@ -40,8 +38,6 @@ public class EimmlTypeConverterTest extends TestCase
     implements EimmlConstants {
     private static final Log log =
         LogFactory.getLog(EimmlTypeConverterTest.class);
-
-    private static final TestHelper helper = new TestHelper();
 
     /** */
     public void testToBytes() throws Exception {

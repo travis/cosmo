@@ -58,7 +58,7 @@ public class MessageTranslator extends EimSchemaTranslator {
 
     /** */
     public MessageTranslator() {
-        super(NS_MESSAGE);
+        super(PREFIX_MESSAGE, NS_MESSAGE);
     }
 
     /**

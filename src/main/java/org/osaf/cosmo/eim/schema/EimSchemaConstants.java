@@ -26,20 +26,32 @@ public interface EimSchemaConstants {
     public static final String NS_COLLECTION =
         "http://osafoundation.org/eim/collection";
     /** */
+    public static final String PREFIX_COLLECTION = "collection";
+    /** */
     public static final String NS_ITEM =
         "http://osafoundation.org/eim/item";
     /** */
-    public static final String NS_EVENT =
-        "http://osafoundation.org/eim/event";
+    public static final String PREFIX_ITEM = "item";
     /** */
+    public static final String NS_EVENT =
+        "http://osafoundation.org/eim/event"; 
+    /** */
+    public static final String PREFIX_EVENT = "event";
+   /** */
     public static final String NS_TASK =
         "http://osafoundation.org/eim/task";
+    /** */
+    public static final String PREFIX_TASK = "task";
     /** */
     public static final String NS_MESSAGE =
         "http://osafoundation.org/eim/message";
     /** */
+    public static final String PREFIX_MESSAGE = "message";
+    /** */
     public static final String NS_NOTE =
         "http://osafoundation.org/eim/note";
+    /** */
+    public static final String PREFIX_NOTE = "note";
 
     /** */
     public static final String FIELD_RECORD = "record"; 

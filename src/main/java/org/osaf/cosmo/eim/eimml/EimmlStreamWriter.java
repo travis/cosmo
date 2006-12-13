@@ -50,7 +50,6 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         XMLOutputFactory.newInstance();
 
     private XMLStreamWriter xmlWriter;
-    private boolean isStarted;
 
     /**
      * Writes the document header and opens the root element.
@@ -136,11 +135,18 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
     private void doWriteRecord(EimRecord record)
         throws EimmlStreamException, XMLStreamException {
 
+        xmlWriter.setPrefix(record.getPrefix(), record.getNamespace());
+
         xmlWriter.writeStartElement(record.getNamespace(), EL_RECORD);
+        xmlWriter.writeNamespace(record.getPrefix(), record.getNamespace());
         xmlWriter.writeAttribute(NS_CORE, ATTR_UUID, record.getUuid());
 
-        for (EimRecordField field : record.getFields())
-            writeField(field);
+        if (record.isDeleted()) {
+            xmlWriter.writeAttribute(NS_CORE, ATTR_DELETED, "");
+        } else {
+            for (EimRecordField field : record.getFields())
+                writeField(field);
+        }
 
         xmlWriter.writeEndElement();
     }
@@ -195,6 +201,8 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         if (needsTransferEncoding)
             xmlWriter.writeAttribute(NS_CORE, ATTR_TRANSFER_ENCODING,
                                      TRANSFER_ENCODING_BASE64);
+
+        xmlWriter.writeCData(value);
 
         xmlWriter.writeEndElement();
     }

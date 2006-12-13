@@ -48,7 +48,7 @@ public class NoteTranslator extends EimSchemaTranslator {
 
     /** */
     public NoteTranslator() {
-        super(NS_NOTE);
+        super(PREFIX_NOTE, NS_NOTE);
     }
 
     /**

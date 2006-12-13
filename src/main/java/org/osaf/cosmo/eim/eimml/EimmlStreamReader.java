@@ -197,21 +197,24 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
             return null;
 
         EimRecord record = new EimRecord();
+        record.setPrefix(xmlReader.getPrefix());
         record.setNamespace(xmlReader.getNamespaceURI());
+
+        for (int i=0; i<xmlReader.getAttributeCount(); i++) {
+            if (xmlReader.getAttributeName(i).equals(QN_DELETED))
+                record.setDeleted(true);
+            else if (xmlReader.getAttributeName(i).equals(QN_UUID))
+                record.setUuid(xmlReader.getAttributeValue(i));
+            else
+                log.warn("skipped unrecognized record attribute " +
+                         xmlReader.getAttributeName(i));
+        }
 
         while (xmlReader.hasNext()) {
             xmlReader.nextTag();
 
             if (xmlReader.isEndElement())
                 break;
-            if (xmlReader.getName().equals(QN_DELETED)) {
-                record.setDeleted(true);
-                break;
-            }
-            if (xmlReader.getName().equals(QN_UUID)) {
-                record.setUuid(xmlReader.getElementText());
-                continue;
-            }
 
             String name = xmlReader.getLocalName();
             String type = xmlReader.getAttributeValue(NS_CORE, ATTR_TYPE);

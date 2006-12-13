@@ -78,7 +78,7 @@ public class EventTranslator extends EimSchemaTranslator {
 
     /** */
     public EventTranslator() {
-        super(NS_EVENT);
+        super(PREFIX_EVENT, NS_EVENT);
     }
 
     /**

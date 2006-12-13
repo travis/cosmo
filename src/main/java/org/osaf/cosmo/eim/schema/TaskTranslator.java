@@ -41,7 +41,7 @@ public class TaskTranslator extends EimSchemaTranslator {
 
     /** */
     public TaskTranslator() {
-        super(NS_TASK);
+        super(PREFIX_TASK, NS_TASK);
     }
 
     /**

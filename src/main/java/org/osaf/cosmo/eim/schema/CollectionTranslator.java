@@ -37,7 +37,7 @@ public class CollectionTranslator extends EimSchemaTranslator {
 
     /** */
     public CollectionTranslator() {
-        super(NS_COLLECTION);
+        super(PREFIX_COLLECTION, NS_COLLECTION);
     }
 
     /**

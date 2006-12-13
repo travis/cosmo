@@ -77,12 +77,15 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
     private static final Log log =
         LogFactory.getLog(EimSchemaTranslator.class);
 
+    private String prefix;
     private String namespace;
 
     /**
      * This class should not be instantiated directly.
      */
-    protected EimSchemaTranslator(String namespace) {
+    protected EimSchemaTranslator(String prefix,
+                                  String namespace) {
+        this.prefix = prefix;
         this.namespace = namespace;
     }
 
@@ -173,7 +176,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
     /**
      * Creates an EIM record containing the data from the given item.
      * <p>
-     * Sets the record's namespace and uuid.
+     * Sets the record's prefix, namespace and uuid.
      * <p>
      * If the item is inactive, the record is marked deleted.
      * <p>
@@ -181,9 +184,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
      * and {@link #addUnknownFields(EimRecord, Item)} are called.
      */
     public EimRecord createRecord(Item item) {
-        EimRecord record = new EimRecord();
-        record.setNamespace(namespace);
-        record.setUuid(item.getUid());
+        EimRecord record = new EimRecord(prefix, namespace, item.getUid());
 
         if (! item.getIsActive()) {
             record.setDeleted(true);
@@ -198,15 +199,14 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
     /**
      * Creates an EIM record containing the data from the given stamp.
      * <p>
-     * Sets the record's namespace and uuid.
+     * Sets the record's prefix, namespace and uuid.
      * <p>
      * Calls {@link #addFields(EimRecord, Stamp)}
      * and {@link #addUnknownFields(EimRecord, Stamp)}.
      */
     public EimRecord createRecord(Stamp stamp) {
-        EimRecord record = new EimRecord();
-        record.setNamespace(namespace);
-        record.setUuid(stamp.getItem().getUid());
+        EimRecord record =
+            new EimRecord(prefix, namespace, stamp.getItem().getUid());
 
         addFields(record, stamp);
         addUnknownFields(record, stamp.getItem());

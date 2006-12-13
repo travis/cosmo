@@ -70,23 +70,25 @@ public interface EimmlConstants {
     /** */
     public static final QName QN_RECORDSET = new QName(NS_CORE, EL_RECORDSET);
     /** */
-    public static final String EL_UUID = "uuid";
-    /** */
-    public static final QName QN_UUID = new QName(NS_CORE, EL_UUID);
-    /** */
-    public static final String EL_DELETED = "deleted";
-    /** */
-    public static final QName QN_DELETED = new QName(NS_CORE, EL_DELETED);
-
-    /** */
     public static final String EL_RECORD = "record"; 
 
     /** */
     public static final String ATTR_UUID = "uuid";
     /** */
+    public static final QName QN_UUID = new QName(NS_CORE, ATTR_UUID);
+    /** */
+    public static final String ATTR_DELETED = "deleted";
+    /** */
+    public static final QName QN_DELETED = new QName(NS_CORE, ATTR_DELETED);
+    /** */
     public static final String ATTR_TYPE = "type";
     /** */
+    public static final QName QN_TYPE = new QName(NS_CORE, ATTR_TYPE);
+    /** */
     public static final String ATTR_TRANSFER_ENCODING = "transferEncoding";
+    /** */
+    public static final QName QN_TRANSFER_ENCODING =
+        new QName(NS_CORE, ATTR_TRANSFER_ENCODING);
 
     /** */
     public static final String TRANSFER_ENCODING_BASE64 = "base64";

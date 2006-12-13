@@ -64,7 +64,7 @@ public class ItemTranslator extends EimSchemaTranslator {
 
     /** */
     public ItemTranslator() {
-        super(NS_ITEM);
+        super(PREFIX_ITEM, NS_ITEM);
     }
 
     /**

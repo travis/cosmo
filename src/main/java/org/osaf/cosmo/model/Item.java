@@ -62,7 +62,7 @@ import org.hibernate.validator.NotNull;
         discriminatorType=DiscriminatorType.STRING,
         length=16)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@Where(clause = "isactive=1")
+//@Where(clause = "isactive=1")
 public abstract class Item extends BaseModelObject {
 
     public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;

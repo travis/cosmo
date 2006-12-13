@@ -17,7 +17,6 @@ package org.osaf.cosmo.dao.hibernate;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -32,7 +31,6 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
-import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
@@ -80,11 +78,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             User owner = collection.getOwner();
             
             // verify uid not in use
-            if (collection.getUid() != null) {
-                if (findItemByUid(collection.getUid()) != null)
-                    throw new UidInUseException("uid " + collection.getUid()
-                            + " already in use");
-            }
+            checkForDuplicateUid(collection);
             
             // We need to enforce a content hierarchy to support WebDAV
             // In a hierarchy, can't have two items with same name with
@@ -129,11 +123,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 throw new IllegalArgumentException("content must have owner");
 
             // verify uid not in use
-            if (content.getUid() != null) {
-                if (findItemByUid(content.getUid()) != null)
-                    throw new UidInUseException("uid " + content.getUid()
-                            + " already in use");
-            }
+            checkForDuplicateUid(content);
             
             // Enforce hiearchy for WebDAV support
             // In a hierarchy, can't have two items with same name with
@@ -192,11 +182,9 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
      */
     public CollectionItem findCollectionByUid(String uid) {
         try {
-            List results = getSession().getNamedQuery("collectionItem.by.uid").setParameter("uid", uid).list();
-            if(results.size()>0)
-                return (CollectionItem) results.get(0);
-            else
-                return null;
+            return (CollectionItem) getSession().getNamedQuery(
+                    "collectionItem.by.uid").setParameter("uid", uid)
+                    .uniqueResult();
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -243,11 +231,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
      */
     public ContentItem findContentByUid(String uid) {
         try {
-            List results = getSession().getNamedQuery("contentItem.by.uid").setParameter("uid", uid).list();
-            if(results.size()>0)
-                return (ContentItem) results.get(0);
-            else
-                return null;
+            return (ContentItem) getSession().getNamedQuery(
+                    "contentItem.by.uid").setParameter("uid", uid).uniqueResult();
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -347,7 +332,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
     public void removeContent(ContentItem content) {
         try {
             content.setIsActive(false);
-            content.setUid("DEL" + System.currentTimeMillis() + "DEL" + content.getUid());
             content.setName("DELETED:" + content.getName());
             content.clearContent();
             content.getAttributes().clear();
@@ -490,8 +474,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 .getNamedQuery("event.by.calendar.icaluid");
         hibQuery.setParameter("calendar", collection);
         hibQuery.setParameter("uid", uid);
-        List results = hibQuery.list();
-        if (results.size() > 0)
+        if (hibQuery.uniqueResult()!=null)
             throw new DuplicateEventUidException("uid " + uid
                     + " already exists in calendar");
     }

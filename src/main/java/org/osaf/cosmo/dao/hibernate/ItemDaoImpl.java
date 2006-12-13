@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -45,6 +44,7 @@ import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -99,11 +99,21 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             Query hibQuery = getSession().getNamedQuery("item.by.uid")
                     .setParameter("uid", uid);
             hibQuery.setCacheable(true);
-            List results = hibQuery.list();
-            if (results.size() > 0)
-                return (Item) results.get(0);
-            else
-                return null;
+            return (Item) hibQuery.uniqueResult();
+        } catch (HibernateException e) {
+            throw SessionFactoryUtils.convertHibernateAccessException(e);
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.dao.ItemDao#findAnyItemByUid(java.lang.String)
+     */
+    public Item findAnyItemByUid(String uid) {
+        try {
+            Query hibQuery = getSession().getNamedQuery("item.any.by.uid")
+                    .setParameter("uid", uid);
+            hibQuery.setCacheable(true);
+            return (Item) hibQuery.uniqueResult();
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -125,7 +135,6 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
 
             getSession().refresh(item);
             getSession().delete(item);
-            getSession().flush();
             
         } catch(ObjectNotFoundException onfe) {
             throw new ItemNotFoundException("item not found");
@@ -649,48 +658,39 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
 
     protected Item findItemByParentAndName(Long userDbId, Long parentDbId,
             String name) {
-        List results = null;
+        Query hibQuery = null;
         if (parentDbId != null) {
-            Query hibQuery = getSession().getNamedQuery(
+            hibQuery = getSession().getNamedQuery(
                     "item.by.ownerId.parentId.name").setParameter("ownerid",
                     userDbId).setParameter("parentid", parentDbId)
                     .setParameter("name", name);
-            results = hibQuery.list();
+            
         } else {
-            Query hibQuery = getSession().getNamedQuery(
+            hibQuery = getSession().getNamedQuery(
                     "item.by.ownerId.nullParent.name").setParameter("ownerid",
                     userDbId).setParameter("name", name);
-            results = hibQuery.list();
         }
 
-        if (results.size() > 0)
-            return (Item) results.get(0);
-        else
-            return null;
+        return (Item) hibQuery.uniqueResult();
     }
     
     protected Item findItemByParentAndNameMinusItem(Long userDbId, Long parentDbId,
             String name, Long itemId) {
-        List results = null;
+        Query hibQuery = null;
         if (parentDbId != null) {
-            Query hibQuery = getSession().getNamedQuery(
+            hibQuery = getSession().getNamedQuery(
                     "item.by.ownerId.parentId.name.minusItem").setParameter("itemid", itemId)
                     .setParameter("ownerid",
                     userDbId).setParameter("parentid", parentDbId)
-                    .setParameter("name", name);
-            results = hibQuery.list();
+                    .setParameter("name", name);      
         } else {
-            Query hibQuery = getSession().getNamedQuery(
+            hibQuery = getSession().getNamedQuery(
                     "item.by.ownerId.nullParent.name.minusItem").setParameter("itemid", itemId)
                     .setParameter("ownerid",
                     userDbId).setParameter("name", name);
-            results = hibQuery.list();
         }
 
-        if (results.size() > 0)
-            return (Item) results.get(0);
-        else
-            return null;
+        return (Item) hibQuery.uniqueResult();
     }
 
     protected HomeCollectionItem findRootItem(Long dbUserId) {
@@ -698,14 +698,28 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
                 "homeCollection.by.ownerId").setParameter("ownerid",
                 dbUserId);
         hibQuery.setCacheable(true);
-        List results = hibQuery.list();
+        
 
-        if (results.size() > 0)
-            return (HomeCollectionItem) results.get(0);
-        else
-            return null;
+        return (HomeCollectionItem) hibQuery.uniqueResult();
     }
 
+    protected void checkForDuplicateUid(Item item) {
+        // verify uid not in use
+        if (item.getUid() != null) {
+            Item duplicate  = findAnyItemByUid(item.getUid());
+            
+            // if uid is in use and item is active, throw exception
+            if(duplicate!=null && duplicate.getIsActive()) {
+                throw new UidInUseException("uid " + item.getUid()
+                        + " already in use");
+            }
+            else if(duplicate!=null){
+                // otherwise remove deleted item to make way for new one
+                getSession().delete(duplicate);
+            }
+        }
+    }
+    
     protected void checkForDuplicateItemName(Long userDbId, Long parentDbId,
             String name) {
         if (findItemByParentAndName(userDbId, parentDbId, name) != null)

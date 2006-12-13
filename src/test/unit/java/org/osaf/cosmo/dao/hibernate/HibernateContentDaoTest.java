@@ -455,6 +455,42 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         queryItem = contentDao.findContentByUid(queryItem.getUid());
         Assert.assertNull(queryItem);
     }
+    
+    public void testLogicalDeleteContent() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        ContentItem item = generateTestContent();
+
+        ContentItem newItem = contentDao.createContent(root, item);
+
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        helper.verifyItem(newItem, queryItem);
+
+        contentDao.removeContent(queryItem);
+
+        clearSession();
+
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        Assert.assertNull(queryItem);
+        
+        queryItem = (ContentItem) contentDao.findAnyItemByUid(newItem.getUid());
+        Assert.assertNotNull(queryItem);
+        Assert.assertFalse(queryItem.getIsActive());
+        
+        item = generateTestContent();
+        item.setUid(newItem.getUid());
+        
+        contentDao.createContent(root, item);
+
+        clearSession();
+        
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        
+        Assert.assertNotNull(queryItem);
+    }
 
     public void testContentDaoCreateCollection() throws Exception {
         User user = getUser(userDao, "testuser2");

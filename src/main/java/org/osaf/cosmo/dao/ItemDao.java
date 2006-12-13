@@ -31,7 +31,7 @@ public interface ItemDao extends Dao {
 
     /**
      * Find an item with the specified uid. The return type will be one of
-     * ContentItem, CollectionItem, CalendarCollectionItem, CalendarItem.
+     * ContentItem, CollectionItem, NoteItem.
      *
      * @param uid
      *            uid of item to find
@@ -40,8 +40,19 @@ public interface ItemDao extends Dao {
     public Item findItemByUid(String uid);
 
     /**
+     * Find any item (active or inactive) with the specified uid. 
+     * The return type will be one of ContentItem, CollectionItem, 
+     * NoteItem.
+     *
+     * @param uid
+     *            uid of item to find
+     * @return item represented by uid
+     */
+    public Item findAnyItemByUid(String uid);
+    
+    /**
      * Find an item with the specified path. The return type will be one of
-     * ContentItem, CollectionItem, CalendarCollectionItem, CalendarItem.
+     * ContentItem, NoteItem, CollectionItem.
      *
      * @param path
      *            path of item to find
@@ -51,7 +62,7 @@ public interface ItemDao extends Dao {
     
     /**
      * Find the parent item of the item with the specified path. 
-     * The return type will be one of CollectionItem, CalendarCollectionItem.
+     * The return type will be of type CollectionItem.
      *
      * @param path
      *            path of item

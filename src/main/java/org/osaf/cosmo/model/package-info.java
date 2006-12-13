@@ -42,6 +42,7 @@
     @NamedQuery(name="item.by.ownerId.nullParent.name.minusItem", query="from Item where id!=:itemid and owner.id=:ownerid and parent.id is null and name=:name and isActive=true"),
     @NamedQuery(name="item.by.ownerId.parentId.name.minusItem", query="from Item where id!=:itemid and owner.id=:ownerid and parent.id=:parentid and name=:name and isActive=true"),
     @NamedQuery(name="item.by.uid", query="from Item i where i.uid=:uid and isActive=true"),
+    @NamedQuery(name="item.any.by.uid", query="from Item i where i.uid=:uid"),
     @NamedQuery(name="collectionItem.by.uid", query="from CollectionItem i where i.uid=:uid and isActive=true"),
     @NamedQuery(name="contentItem.by.uid", query="from ContentItem i where i.uid=:uid and i.isActive=true"),
     @NamedQuery(name="item.by.parent.name", query="from Item where parent=:parent and name=:name and isActive=true"),

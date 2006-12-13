@@ -93,7 +93,6 @@
  	<property name="pimView"><value>pim</value></property>
 	<property name="contentService"><ref bean="contentService" /></property>
 	<property name="securityManager"><ref bean="securityManager" /></property>
-	<property name="messageSource"><ref bean="messageSource" /></property>	
  </bean>
 
 <!-- 

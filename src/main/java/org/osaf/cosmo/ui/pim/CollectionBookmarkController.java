@@ -32,7 +32,6 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
 
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -47,10 +46,6 @@ public class CollectionBookmarkController extends AbstractController {
     private String pimView;
     private ContentService contentService;
     private CosmoSecurityManager securityManager;
-    private ResourceBundleMessageSource messageSource;
-    
-    private static final String MSG_FREEBUSY_TICKET = 
-        "Error.Ticket.Freebusy";
         
     /** 
      */
@@ -114,10 +109,6 @@ public class CollectionBookmarkController extends AbstractController {
 
     public void setSecurityManager(CosmoSecurityManager securityManager) {
         this.securityManager = securityManager;
-    }
-
-    public void setMessageSource(ResourceBundleMessageSource messageSource) {
-        this.messageSource = messageSource;
     }
 
 }

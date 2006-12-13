@@ -55,6 +55,7 @@ import org.osaf.cosmo.dav.caldav.report.MultigetReport;
 import org.osaf.cosmo.dav.caldav.report.QueryReport;
 import org.osaf.cosmo.dav.property.ExcludeFreeBusyRollup;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
@@ -310,9 +311,13 @@ public class DavCollection extends DavResourceBase
         if (log.isDebugEnabled())
             log.debug("creating collection " + member.getResourcePath());
 
-        subcollection = getContentService().
-            createCollection(collection, subcollection);
-        member.setItem(subcollection);
+        try {
+            subcollection = getContentService().
+                createCollection(collection, subcollection);
+            member.setItem(subcollection);
+        } catch (CollectionLockedException e) {
+            throw new DavException(DavServletResponse.SC_LOCKED);
+        }
     }
 
     /**
@@ -323,17 +328,21 @@ public class DavCollection extends DavResourceBase
         CollectionItem collection = (CollectionItem) getItem();
         ContentItem content = (ContentItem) member.getItem();
 
-        if (content.getId() != -1) {
-            if (log.isDebugEnabled())
-                log.debug("updating file " + member.getResourcePath());
+        try {
+            if (content.getId() != -1) {
+                if (log.isDebugEnabled())
+                    log.debug("updating file " + member.getResourcePath());
 
-            content = getContentService().updateContent(content);
-        } else {
-            if (log.isDebugEnabled())
-                log.debug("creating file " + member.getResourcePath());
+                content = getContentService().updateContent(content);
+            } else {
+                if (log.isDebugEnabled())
+                    log.debug("creating file " + member.getResourcePath());
 
-            content =
-                getContentService().createContent(collection, content);
+                content =
+                    getContentService().createContent(collection, content);
+            }
+        } catch (CollectionLockedException e) {
+            throw new DavException(DavServletResponse.SC_LOCKED);
         }
 
         member.setItem(content);
@@ -352,7 +361,11 @@ public class DavCollection extends DavResourceBase
             log.debug("removing collection " + subcollection.getName() +
                       " from " + collection.getName());
 
-        getContentService().removeCollection(subcollection);
+        try {
+            getContentService().removeCollection(subcollection);
+        } catch (CollectionLockedException e) {
+            throw new DavException(DavServletResponse.SC_LOCKED);
+        }
     }
 
     /**
@@ -367,7 +380,11 @@ public class DavCollection extends DavResourceBase
             log.debug("removing content " + content.getName() +
                       " from " + collection.getName());
 
-        getContentService().removeContent(content);
+        try {
+            getContentService().removeContent(content);
+        } catch (CollectionLockedException e) {
+            throw new DavException(DavServletResponse.SC_LOCKED);
+        }
     }
 
     /**

@@ -57,6 +57,7 @@ import org.osaf.cosmo.dav.caldav.property.SupportedCalendarData;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.DuplicateEventUidException;
@@ -399,6 +400,8 @@ public class DavCalendarCollection extends DavCollection
                 content = getContentService().updateContent(content);
             } catch (DuplicateEventUidException e) {
                 throw new DavException(DavServletResponse.SC_CONFLICT, "Uid already in use");
+            } catch (CollectionLockedException e) {
+                throw new DavException(DavServletResponse.SC_LOCKED);
             }
         } else {
             if (log.isDebugEnabled())
@@ -408,6 +411,8 @@ public class DavCalendarCollection extends DavCollection
                 content = getContentService().createContent(collection, content);
             } catch (DuplicateEventUidException e) {
                 throw new DavException(DavServletResponse.SC_CONFLICT, "Uid already in use");
+            } catch (CollectionLockedException e) {
+                throw new DavException(DavServletResponse.SC_LOCKED);
             }
         }
 
@@ -425,8 +430,12 @@ public class DavCalendarCollection extends DavCollection
         // XXX: what exceptions need to be caught?
         if (log.isDebugEnabled())
             log.debug("removing event " + member.getResourcePath());
-            
-        getContentService().removeContent(content);
+
+        try {
+            getContentService().removeContent(content);
+        } catch (CollectionLockedException e) {
+            throw new DavException(DavServletResponse.SC_LOCKED);
+        }
     }
 
     private static boolean hasMultipleComponentTypes(Calendar calendar) {

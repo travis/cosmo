@@ -52,6 +52,7 @@ import org.osaf.cosmo.dav.ticket.property.TicketDiscovery;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
@@ -203,7 +204,11 @@ public abstract class DavResourceBase
             throw new DavException(DavServletResponse.SC_FORBIDDEN, "Property cannot be stored: " + e.getMessage());
         }
 
-        getContentService().updateItem(item);
+        try {
+            getContentService().updateItem(item);
+        } catch (CollectionLockedException e) {
+            throw new DavException(DavServletResponse.SC_LOCKED);
+        }
     }
 
     /**
@@ -229,7 +234,11 @@ public abstract class DavResourceBase
             throw new DavException(DavServletResponse.SC_CONFLICT);
         }
 
-        getContentService().updateItem(item);
+        try {
+            getContentService().updateItem(item);
+        } catch (CollectionLockedException e) {
+            throw new DavException(DavServletResponse.SC_LOCKED);
+        }
     }
 
     /**
@@ -284,7 +293,11 @@ public abstract class DavResourceBase
             }
         }
 
-        getContentService().updateItem(item);
+        try {
+            getContentService().updateItem(item);
+        } catch (CollectionLockedException e) {
+            throw new DavException(DavServletResponse.SC_LOCKED);
+        }
 
         return msr;
     }
@@ -341,6 +354,8 @@ public abstract class DavResourceBase
             throw new DavException(DavServletResponse.SC_CONFLICT);
         } catch (DuplicateItemNameException e) {
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED);
+        } catch (CollectionLockedException e) {
+            throw new DavException(DavServletResponse.SC_LOCKED);
         }
     }
 
@@ -364,6 +379,8 @@ public abstract class DavResourceBase
         } catch (DuplicateItemNameException e) {
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED,
                                    "Item with that name already exists");
+        } catch (CollectionLockedException e) {
+            throw new DavException(DavServletResponse.SC_LOCKED);
         }
     }
 

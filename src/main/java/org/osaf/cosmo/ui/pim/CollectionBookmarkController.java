@@ -30,6 +30,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
 
 import org.springframework.web.servlet.ModelAndView;
@@ -46,6 +47,7 @@ public class CollectionBookmarkController extends AbstractController {
     private String pimView;
     private ContentService contentService;
     private CosmoSecurityManager securityManager;
+    private ServiceLocatorFactory serviceLocatorFactory;
         
     /** 
      */
@@ -69,27 +71,28 @@ public class CollectionBookmarkController extends AbstractController {
             return new ModelAndView("error_notfound");
         }
 
+        Map<String, Object> model = new HashMap<String, Object>();
+        
+        Map<String, String> relationLinks = serviceLocatorFactory.
+            createServiceLocator(request).getCollectionUrls(collection);
+        
+        model.put("relationLinks", relationLinks);
+        model.put("collection", collection);
+        
         // First try to find a ticket principal
         String ticketKey = request.getParameter("ticket");
 
         if (ticketKey != null) {
 
-            Map<String, Object> model = new HashMap<String, Object>();
-
             model.put("ticketKey", ticketKey);
-            model.put("collection", collection);
             return new ModelAndView(pimView, model);
 
         } else {
 
             // If we can't find a ticket principal, use the current user.
-
             User currentUser = securityManager.getSecurityContext().getUser();
             if (collection.getOwner().equals(currentUser)){
-                    
-                Map<String, Object> model = new HashMap<String, Object>();
                 
-                model.put("collection", collection);
                 return new ModelAndView(pimView, model);
             } else {
                 return new ModelAndView("error_forbidden");
@@ -109,6 +112,10 @@ public class CollectionBookmarkController extends AbstractController {
 
     public void setSecurityManager(CosmoSecurityManager securityManager) {
         this.securityManager = securityManager;
+    }
+
+    public void setServiceLocatorFactory(ServiceLocatorFactory serviceLocatorFactory) {
+        this.serviceLocatorFactory = serviceLocatorFactory;
     }
 
 }

@@ -735,7 +735,14 @@ public class RPCServiceImpl implements RPCService {
                     " not found on collection with uid " +
                     collection.getUid());
         }
-
+        
+        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_FREEBUSY)
+                && !ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ)
+                && !ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE)){
+            throw new RPCException(
+                    "Support for freebusy tickets has not been implemented.");
+        }
+        
         if (ticket.hasTimedOut()){
             throw new RPCException("Ticket " + ticketKey +
                     " has expired.");

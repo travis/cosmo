@@ -75,56 +75,25 @@ public class CollectionBookmarkController extends AbstractController {
         }
 
         // First try to find a ticket principal
-        String ticketId = request.getParameter("ticket");
+        String ticketKey = request.getParameter("ticket");
 
-        if (ticketId != null) {
+        if (ticketKey != null) {
 
-            Ticket ticket = contentService.getTicket(
-                    contentService.findItemByUid(collectionUid), ticketId);
-            
-            // If we found a ticket
-            if (ticket != null){
-                
-                Set privileges = ticket.getPrivileges();
-                
-                // Check permissions
-                // If this ticket has read privileges, render a calendar
-                if (privileges.contains(Ticket.PRIVILEGE_READ)){
+            Map<String, Object> model = new HashMap<String, Object>();
 
-                    Map<String, Object> model = new HashMap<String, Object>();
+            model.put("ticketKey", ticketKey);
+            model.put("collection", collection);
+            return new ModelAndView(pimView, model);
 
-                    model.put("principal", ticket);
-                    model.put("collection", collection);
-                    return new ModelAndView(pimView, model);
-
-                } else if (privileges.contains(Ticket.PRIVILEGE_FREEBUSY)){
-                    Map<String,Object> model = new HashMap<String,Object>();
-                    Set<String> messages = new HashSet<String>();
-                    messages.add(messageSource.getMessage(
-                            MSG_FREEBUSY_TICKET, 
-                            null, 
-                            request.getLocale()));
-                    
-                    model.put("messages", messages);
-                    return new ModelAndView("error_general", model);
-                }
-            }
-
-            // If we get here, the ticket did not provide 
-            // appropriate permissions
-            return new ModelAndView("error_forbidden");
-            
-            
         } else {
-            
+
             // If we can't find a ticket principal, use the current user.
-            
+
             User currentUser = securityManager.getSecurityContext().getUser();
             if (collection.getOwner().equals(currentUser)){
                     
                 Map<String, Object> model = new HashMap<String, Object>();
                 
-                model.put("principal", currentUser);
                 model.put("collection", collection);
                 return new ModelAndView(pimView, model);
             } else {

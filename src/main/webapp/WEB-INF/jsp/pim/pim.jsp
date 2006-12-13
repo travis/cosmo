@@ -83,8 +83,8 @@ function init() {
 <c:if test="${collection != null}">
 	collectionUid = '${collection.uid}';
 </c:if>
-<c:if test="${principal.class.name == 'org.osaf.cosmo.model.Ticket'}">
-	ticketKey = '${principal.key }';
+<c:if test="${not empty ticketKey}">
+	ticketKey = '${ticketKey}';
 </c:if>
 	
     cosmo.app.initObj = Cal;

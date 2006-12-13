@@ -23,7 +23,7 @@
 
     // Set this to true to get nice dojo debugging messages.
 
-    var djConfig = {isDebug: true};
+    var djConfig = {isDebug: false};
 </script>
 
 <script type="text/javascript" src="${staticBaseUrl}/js/lib/dojo-event_and_io/dojo.js"></script>

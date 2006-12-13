@@ -439,9 +439,16 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             this.updateUserList()
 
         }
-        dojo.event.connect("after", this, "postCreate", this, "userListPostCreate")
-        dojo.event.connect("before", this, "onSelect", function(e){if (!e.ctrlKey){self.resetSelections()}})
+        dojo.event.connect("after", this, "postCreate", this, "userListPostCreate");
 
+		this.aroundCreateRow = function (invocation){
+			var user = invocation.args[0].src;
+			var row = invocation.proceed();
+			row.id = user.username + "Row";
+			return row;
 
+		};
+        dojo.event.connect("around", this, "createRow", this, "aroundCreateRow");
+        	
     }
 );

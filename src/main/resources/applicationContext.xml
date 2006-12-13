@@ -469,83 +469,6 @@
     </property>
   </bean>
 
-  <!-- authentication resources -->
-
-  <bean id="userDetailsService"
-        class="org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetailsService">
-     <property name="userDao">
-       <ref bean="userDao"/>
-     </property>
-  </bean>
-
-  <bean id="passwordEncoder"
-        class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
-
-  <bean id="daoAuthenticationProvider"
-        class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
-    <property name="userDetailsService">
-      <ref local="userDetailsService"/>
-    </property>
-    <property name="passwordEncoder">
-      <ref local="passwordEncoder"/>
-    </property>
-  </bean>
-
-  <bean id="anonymousAuthenticationProvider"
-        class="org.acegisecurity.providers.anonymous.AnonymousAuthenticationProvider">
-    <property name="key">
-      <value>badgerbadgerbadger</value>
-    </property>
-  </bean>
-
-  <bean id="ticketAuthenticationProvider"
-        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationProvider">
-    <property name="contentService">
-      <ref bean="contentService"/>
-    </property>
-  </bean>
-
-  <bean id="authenticationManager"
-        class="org.acegisecurity.providers.ProviderManager">
-    <property name="providers">
-      <list>
-        <ref local="daoAuthenticationProvider"/>
-        <ref local="anonymousAuthenticationProvider"/>
-        <ref local="ticketAuthenticationProvider"/>
-      </list>
-    </property>
-  </bean>
-
-  <!-- authorization resources -->
-
-  <bean id="ticketVoter"
-        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketVoter"/>
-  <bean id="homedirVoter" class="org.osaf.cosmo.acegisecurity.providers.homedir.HomedirVoter"/>
-  <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
-
-  <bean id="accessDecisionManager"
-        class="org.acegisecurity.vote.AffirmativeBased">
-    <property name="allowIfAllAbstainDecisions">
-      <value>false</value>
-    </property>
-    <property name="decisionVoters">
-      <list>
-        <ref bean="ticketVoter"/>
-        <ref bean="homedirVoter"/>
-        <ref bean="roleVoter"/>
-      </list>
-    </property>
-  </bean>
-
-  <!-- security facade resources -->
-
-  <bean id="securityManager"
-        class="org.osaf.cosmo.security.impl.CosmoSecurityManagerImpl">
-    <property name="authenticationManager">
-      <ref local="authenticationManager"/>
-    </property>
-  </bean>
-
   <!-- general protocol/interface resources -->
 
   <bean id="serviceLocatorFactory"
@@ -630,13 +553,95 @@
     </property>
   </bean>
 
+  <!-- authentication resources -->
+
+  <bean id="userDetailsService"
+        class="org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetailsService">
+     <property name="userDao">
+       <ref bean="userDao"/>
+     </property>
+  </bean>
+
+  <bean id="passwordEncoder"
+        class="org.acegisecurity.providers.encoding.Md5PasswordEncoder"/>
+
+  <bean id="daoAuthenticationProvider"
+        class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+    <property name="userDetailsService">
+      <ref local="userDetailsService"/>
+    </property>
+    <property name="passwordEncoder">
+      <ref local="passwordEncoder"/>
+    </property>
+  </bean>
+
+  <bean id="anonymousAuthenticationProvider"
+        class="org.acegisecurity.providers.anonymous.AnonymousAuthenticationProvider">
+    <property name="key">
+      <value>badgerbadgerbadger</value>
+    </property>
+  </bean>
+
+  <bean id="ticketAuthenticationProvider"
+        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationProvider">
+    <property name="contentService">
+      <ref bean="contentService"/>
+    </property>
+  </bean>
+
+  <bean id="authenticationManager"
+        class="org.acegisecurity.providers.ProviderManager">
+    <property name="providers">
+      <list>
+        <ref local="daoAuthenticationProvider"/>
+        <ref local="anonymousAuthenticationProvider"/>
+        <ref local="ticketAuthenticationProvider"/>
+      </list>
+    </property>
+  </bean>
+
+  <!-- authorization resources -->
+
+  <bean id="ticketVoter"
+        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketVoter"/>
+
+  <bean id="ownerVoter"
+        class="org.osaf.cosmo.acegisecurity.providers.owner.OwnerVoter">
+    <property name="contentService">
+      <ref bean="contentService"/>
+    </property>
+  </bean>
+
+  <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
+
+  <bean id="defaultAccessDecisionManager"
+        class="org.acegisecurity.vote.AffirmativeBased">
+    <property name="allowIfAllAbstainDecisions">
+      <value>false</value>
+    </property>
+    <property name="decisionVoters">
+      <list>
+        <ref bean="roleVoter"/>
+      </list>
+    </property>
+  </bean>
+
+  <!-- security facade resources -->
+
+  <bean id="securityManager"
+        class="org.osaf.cosmo.security.impl.CosmoSecurityManagerImpl">
+    <property name="authenticationManager">
+      <ref local="authenticationManager"/>
+    </property>
+  </bean>
+
   <bean id="defaultFilterInvocationInterceptor"
          class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
      <property name="authenticationManager">
        <ref bean="authenticationManager"/>
      </property>
      <property name="accessDecisionManager">
-       <ref bean="accessDecisionManager"/>
+       <ref bean="defaultAccessDecisionManager"/>
      </property>
      <property name="objectDefinitionSource">
        <value>

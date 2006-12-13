@@ -72,8 +72,8 @@ public class CollectionPath {
      *
      * @param urlPath the servlet-relative url-path
      *
-     * @throws IllegalArgumentException if the given url-path is not
-     * servlet-relative (starts with a "/")
+     * @throws IllegalArgumentException if the given url-path is null
+     * or not servlet-relative (starts with a "/")
      * @throws IllegalStateException if the given url-path does not
      * represent a collection path
      */
@@ -157,6 +157,8 @@ public class CollectionPath {
      */
     public static CollectionPath parse(String urlPath,
                                        boolean allowSelectors) {
+        if (urlPath == null)
+            return null;
         try {
             CollectionPath cp = new CollectionPath(urlPath);
             if (! allowSelectors && ! cp.getSelectors().isEmpty())

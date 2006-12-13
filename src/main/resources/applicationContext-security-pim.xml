@@ -22,6 +22,19 @@
 
 <beans>
 
+  <bean id="pimAccessDecisionManager"
+        class="org.acegisecurity.vote.AffirmativeBased">
+    <property name="allowIfAllAbstainDecisions">
+      <value>false</value>
+    </property>
+    <property name="decisionVoters">
+      <list>
+        <ref bean="ticketVoter"/>
+        <ref bean="roleVoter"/>
+      </list>
+    </property>
+  </bean>
+
   <!-- interceptor which performs authorization for web requests -->
 
    <bean id="pimFilterInvocationInterceptor"
@@ -30,7 +43,7 @@
        <ref bean="authenticationManager"/>
      </property>
      <property name="accessDecisionManager">
-       <ref bean="accessDecisionManager"/>
+       <ref bean="pimAccessDecisionManager"/>
      </property>
      <property name="objectDefinitionSource">
        <value>

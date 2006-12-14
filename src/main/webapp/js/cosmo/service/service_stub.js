@@ -106,15 +106,6 @@ ScoobyService.prototype = {
      */
     getCalendars: function() {},
 
-	/**
-	* Returns the collection identified by collectionUid
-	*
-	* Return the collection identified by collectionUid
-	*/
-	getCalendar: function(collectionUid, ticketKey){},
-	
-    getCalendar: function(collectionUid){},
-
     /**
      * Creates a calendar with the given name
      * @param calendarName
@@ -180,6 +171,33 @@ ScoobyService.prototype = {
         originalEventId, originalEventEndDate){},
     
     /**
+     * Get the subscription identified with the specified collectionId and ticketKey
+     */
+    getSubscription: function(collectionId, ticketKey){},
+    
+    /**
+     * Get the ticket identified with the specified collectionId and ticketKey
+     */
+    getTicket: function(ticketKey, collectionId){},
+    
+    /**
+     * Deletes the subscription with the specified collectionId and ticketKey
+     */
+    deleteSubscription: function(collectionId, ticketKey){},
+    
+    /**
+     * Creates or updates a subscription for the current user with the specified collectionId
+     * and ticketKey.
+     */
+    saveSubscription: function(cid, ticketKey, displayName){},
+    
+    /**
+     * Gets all the subscriptions for the current user
+     */
+    getSubscriptions: function(){},
+    
+
+    /**
      * Returns the version of Cosmo
      */
     getVersion: function(){}
@@ -190,6 +208,9 @@ ScoobyService.prototype = {
  */
 ScoobyServiceException = function(){};
 ScoobyServiceException.prototype = new Error();
+
+
+//TODO This is not how to do inheritance. 
 
 /**
  * This exception is the root for all exceptions that occur on the client side

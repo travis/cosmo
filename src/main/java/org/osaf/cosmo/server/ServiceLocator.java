@@ -83,6 +83,10 @@ public class ServiceLocator {
      * The service id for the Web UI
      */
     public static final String SVC_WEB = "web";
+    /**
+     * The service id for webcal
+     */
+    public static final String SVC_WEBCAL = "webcal";
 
     private static final String PATH_COLLECTION = "collection";
 
@@ -109,6 +113,7 @@ public class ServiceLocator {
         urls.put(SVC_ATOM, getAtomUrl(collection));
         urls.put(SVC_MORSE_CODE, getMorseCodeUrl(collection));
         urls.put(SVC_WEB, getWebUrl(collection));
+        urls.put(SVC_WEBCAL, getWebcalUrl(collection));
         return urls;
     }
 
@@ -139,6 +144,13 @@ public class ServiceLocator {
      */
     public String getWebUrl(CollectionItem collection) {
         return calculateCollectionUrl(collection, factory.getWebPrefix());
+    }
+
+    /**
+     * Returns the webcal URL of the collection.
+     */
+    public String getWebcalUrl(CollectionItem collection) {
+        return calculateCollectionUrl(collection, factory.getWebcalPrefix());
     }
 
     private String calculateCollectionUrl(CollectionItem collection,

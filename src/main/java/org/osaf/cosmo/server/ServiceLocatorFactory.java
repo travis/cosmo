@@ -35,6 +35,7 @@ public class ServiceLocatorFactory {
     private String atomPrefix;
     private String morseCodePrefix;
     private String webPrefix;
+    private String webcalPrefix;
 
     /**
      * Returns a <code>ServiceLocator</code> instance that returns
@@ -85,6 +86,16 @@ public class ServiceLocatorFactory {
         webPrefix = prefix;
     }
 
+    /** */
+    public String getWebcalPrefix() {
+        return webcalPrefix;
+    }
+
+    /** */
+    public void setWebcalPrefix(String prefix) {
+        webcalPrefix = prefix;
+    }
+
     /**
      * Initializes the factory, sanity checking required properties
      * and defaulting optional properties.
@@ -98,6 +109,8 @@ public class ServiceLocatorFactory {
             throw new IllegalStateException("morseCodePrefix must not be null");
         if (webPrefix == null)
             throw new IllegalStateException("webPrefix must not be null");
+        if (webcalPrefix == null)
+            throw new IllegalStateException("webcalPrefix must not be null");
     }
 
     private String calculateAppMountUrl(HttpServletRequest request) {

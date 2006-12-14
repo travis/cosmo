@@ -29,6 +29,7 @@ import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.util.PathUtil;
 
 /**
  * Allows access to an item if the authenticated user owns the item.
@@ -68,33 +69,22 @@ public class OwnerVoter implements AccessDecisionVoter {
             ((FilterInvocation)object).getHttpRequest().getPathInfo();
         if (path == null)
             return ACCESS_ABSTAIN;
+        // remove trailing slash that denotes a collection
+        if (! path.equals("/") && path.endsWith("/"))
+            path = path.substring(0, path.length()-1);
 
         CosmoUserDetails details =
             (CosmoUserDetails) authentication.getPrincipal();
 
-        Item item = null;
-        CollectionPath cp = CollectionPath.parse(path);
-        if (cp != null) {
-            item = contentService.findItemByUid(cp.getUid());
-            if (item == null) {
-                log.warn("Item with uid " + cp.getUid() +
-                         " not found; abstaining");
-                return ACCESS_ABSTAIN;
-            }
-            if (log.isDebugEnabled())
-                log.debug("Checking ownership of item " + cp.getUid() +
-                          " by user " + details.getUser().getUsername());
-        } else {
-            item = contentService.findItemByPath(path);
-            if (item == null) {
-                log.warn("Item at path " + path + " not found; abstaining");
-                return ACCESS_ABSTAIN;
-            }
-            if (log.isDebugEnabled())
-                log.debug("Checking ownership of item at path " + path +
-                          " by user " + details.getUser().getUsername());
+        Item item = findItem(path, true);
+        if (item == null) {
+            log.warn("Item at " + path + " not found; abstaining");
+            return ACCESS_ABSTAIN;
         }
 
+        if (log.isDebugEnabled())
+            log.debug("Checking ownership of item at " + path +
+                      " by user " + details.getUser().getUsername());
 
         if (! item.getOwner().equals(details.getUser())) {
             if (log.isDebugEnabled())
@@ -131,5 +121,21 @@ public class OwnerVoter implements AccessDecisionVoter {
     /** */
     public void setContentService(ContentService service) {
         contentService = service;
+    }
+
+    private Item findItem(String path,
+                          boolean checkParent) {
+        CollectionPath cp = CollectionPath.parse(path);
+        if (cp != null) {
+            return contentService.findItemByUid(cp.getUid());
+        } else {
+            Item item = contentService.findItemByPath(path);
+            if (item == null)
+                // this might be a PUT - if so, check to see if there
+                // is a parent that the user owns
+                if (checkParent)
+                    return findItem(PathUtil.getParentPath(path), false);
+            return item;
+        }
     }
 }

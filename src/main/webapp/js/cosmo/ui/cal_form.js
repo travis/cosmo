@@ -270,9 +270,9 @@ function CalForm() {
         //create the region selector
         //  this.createSelect = function(id, name, size, multi, options, className,
         //      elem) {
-        this.createSelect('tzRegionSelect', 'tzRegion', null, false, this.getTimezoneOptions(), 'selectElem', elem);
+        this.createSelect('tzRegion', 'tzRegion', null, false, this.getTimezoneOptions(), 'selectElem', elem);
         this.createNbsp(elem);
-        this.createSelect('tzTzSelect', 'tzId', null, false, this.getTimezoneSelectorOptions(null), 'selectElem', elem);
+        this.createSelect('tzId', 'tzId', null, false, this.getTimezoneSelectorOptions(null), 'selectElem', elem);
         d.appendChild(elem);
 
     };
@@ -290,8 +290,7 @@ function CalForm() {
 
     this.populateTimezoneSelector = function(region){
         var options = this.getTimezoneSelectorOptions(region);
-        var tzSelector = document.getElementById("tzTzSelect");
-        cosmo.util.html.setSelectOptions(tzSelector, options);
+        cosmo.util.html.setSelectOptions(this.form.tzId, options);
     };
 
     this.handleRegionChanged = function(event){
@@ -834,7 +833,7 @@ function CalForm() {
     };
 
     this.clearTimezone = function(){
-        this.form.tzRegionSelect.selectedIndex = 0;
+        this.form.tzRegion.selectedIndex = 0;
         self.populateTimezoneSelector();
     }
 
@@ -904,7 +903,7 @@ function CalForm() {
         // All-day event / normal event toggling
         allDayCheck.onclick = function() { Cal.calForm.toggleBlockType() };
 
-        var regionSelectorElement = document.getElementById("tzRegionSelect");
+        var regionSelectorElement = document.getElementById("tzRegion");
         dojo.event.connect(regionSelectorElement, "onchange", this.handleRegionChanged);
 
 

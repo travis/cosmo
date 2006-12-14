@@ -768,7 +768,12 @@ public class RPCServiceImpl implements RPCService {
 
     private User getUser() {
         try {
-            return cosmoSecurityManager.getSecurityContext().getUser();
+            User user = cosmoSecurityManager.getSecurityContext().getUser();
+            if (user == null){
+                return null;
+            }
+            String name = user.getUsername();
+            return userService.getUser(name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

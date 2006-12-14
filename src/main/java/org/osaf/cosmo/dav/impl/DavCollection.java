@@ -466,7 +466,12 @@ public class DavCollection extends DavResourceBase
         PrintWriter writer =
             new PrintWriter(new OutputStreamWriter(context.getOutputStream(),
                                                    "utf8"));
-        String title = getLocator().getResourcePath();
+
+        String title = getItem().getDisplayName();
+        if (title == null)
+            title = getItem().getUid();
+        title = title + " (" + getResourcePath() + ")";
+
         writer.write("<html><head><title>");
         writer.write(StringEscapeUtils.escapeHtml(title));
         writer.write("</title></head>");

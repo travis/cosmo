@@ -28,17 +28,62 @@
  * @param utc Boolean indicates that this is a utc time
  */
 dojo.provide("cosmo.datetime.Date");
+dojo.provide("cosmo.datetime.timezone");
 dojo.require("cosmo.util.debug");
 
-cosmo.datetime.Date = function (year, month, date, hours, minutes, seconds, tzId, utc) {
-    this.year = year ? year : 0;
-    this.month = month ? month : 0;
-    this.date = date ? date : 0;
-    this.hours= hours ? hours : 0;
-    this.minutes = minutes ? minutes : 0;
-    this.seconds = seconds ? seconds : 0;
-    this.tzId = tzId || null; //should this default to user's default timezone? (which we don't have yet :-) )
-    this.utc = utc ? utc : false;
+cosmo.datetime.Date = function () {
+    
+    var args = Array.prototype.slice.apply(arguments);
+    var t = null;
+    var dt = null;
+    var tz = null;
+    var utc = false;
+
+    // Date string or timestamp -- assumes floating
+    if (args.length == 1) {
+        dt = new Date(args[0]);
+    }
+    // year, month, [date,] [hours,] [minutes,] [seconds,] [milliseconds,] [tzId,] [utc]
+    else {
+        t = args[args.length-1];
+        // Last arg is utc
+        if (typeof t == 'boolean') {
+            utc = args.pop();
+            tz = args.pop();
+        }
+        // Last arg is tzId
+        else if (typeof t == 'string') {
+            tz = args.pop();
+            if (tz == 'Etc/UTC' || tz == 'Etc/GMT') {
+                utc = true;
+            }
+        }
+
+        // Date string (e.g., '12/27/2006')
+        t = args[args.length-1];
+        if (typeof t == 'string') {
+            dt = new Date(args[0]);
+        }
+        // Date part numbers
+        else {
+            var a = [];
+            for (var i = 0; i < 8; i++) {
+                a[i] = args[i] || 0;
+            }
+            dt = new Date(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
+        }
+    }
+    this.year = 0;
+    this.month = 0;
+    this.date = 0;
+    this.hours= 0;
+    this.minutes = 0;
+    this.seconds = 0;
+    this.milliseconds = 0;
+    this.tzId = tz || null; 
+    this.utc = utc || false;
+    
+    this.setFromDateObjProxy(dt);
 }
 
 //This is just an alias from ScoobyDate to comso.datetime.Date for use while we
@@ -46,10 +91,10 @@ cosmo.datetime.Date = function (year, month, date, hours, minutes, seconds, tzId
 cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date, "ScoobyDate", "0.6");
 
 cosmo.datetime.Date.prototype.getFullYear = function() {
-    return this.getYear();
+    return this.year;
 };
 cosmo.datetime.Date.prototype.getYear = function() {
-    return this.year;
+    return this.getFullYear();
 };
 cosmo.datetime.Date.prototype.getMonth = function() {
     return this.month;
@@ -66,29 +111,110 @@ cosmo.datetime.Date.prototype.getMinutes = function() {
 cosmo.datetime.Date.prototype.getSeconds = function() {
     return this.seconds;
 };
-cosmo.datetime.Date.prototype.setFullYear = function(yea) {
-    this.setYear(yea);
+cosmo.datetime.Date.prototype.getMilliseconds = function() {
+    return this.milliseconds;
 };
-cosmo.datetime.Date.prototype.setYear = function(yea) {
-    this.year = yea;
+cosmo.datetime.Date.prototype.getUTCDate = function () { 
+    return this.getUTCDateProxy().getUTCDate(); 
 };
-cosmo.datetime.Date.prototype.setMonth = function(mon) {
-    this.month = mon;
+cosmo.datetime.Date.prototype.getUTCDay = function () { 
+    return this.getUTCDateProxy().getUTCDay(); 
 };
-cosmo.datetime.Date.prototype.setDate = function(dat) {
-    this.date = dat;
+cosmo.datetime.Date.prototype.getUTCFullYear = function () { 
+    return this.getUTCDateProxy().getUTCFullYear(); 
 };
-cosmo.datetime.Date.prototype.setHours = function(hou, min) {
-    this.hours = hou;
-    if (min) {
-        this.setMinutes(min);
-    }
+cosmo.datetime.Date.prototype.getUTCHours = function () { 
+    return this.getUTCDateProxy().getUTCHours(); 
 };
-cosmo.datetime.Date.prototype.setMinutes = function(min) {
-    this.minutes = min;
+cosmo.datetime.Date.prototype.getUTCMilliseconds = function () { 
+    return this.getUTCDateProxy().getUTCMilliseconds(); 
 };
-cosmo.datetime.Date.prototype.setSeconds = function(sec) {
-    this.seconds = sec;
+cosmo.datetime.Date.prototype.getUTCMinutes = function () { 
+    return this.getUTCDateProxy().getUTCMinutes(); 
+};
+cosmo.datetime.Date.prototype.getUTCMonth = function () { 
+    return this.getUTCDateProxy().getUTCMonth(); 
+};
+cosmo.datetime.Date.prototype.getUTCSeconds = function () { 
+    return this.getUTCDateProxy().getUTCSeconds(); 
+};
+cosmo.datetime.Date.prototype.setFullYear = function(n) {
+    this.setAttribute('year', n);
+};
+cosmo.datetime.Date.prototype.setYear = function(n) {
+    this.setAttribute('year', n);
+};
+cosmo.datetime.Date.prototype.setMonth = function(n) {
+    this.setAttribute('month', n);
+};
+cosmo.datetime.Date.prototype.setDate = function(n) {
+    this.setAttribute('date', n);
+};
+cosmo.datetime.Date.prototype.setHours = function(n) {
+    this.setAttribute('hours', n);
+};
+cosmo.datetime.Date.prototype.setMinutes = function(n) {
+    this.setAttribute('minutes', n);
+};
+cosmo.datetime.Date.prototype.setSeconds = function(n) {
+    this.setAttribute('seconds', n);
+};
+cosmo.datetime.Date.prototype.setMilliseconds = function(n) {
+    this.setAttribute('milliseconds', n);
+};
+cosmo.datetime.Date.prototype.setUTCDate = function (n) { 
+    this.setUTCAttribute('date', n); 
+};
+cosmo.datetime.Date.prototype.setUTCFullYear = function (n) { 
+    this.setUTCAttribute('year', n); 
+};
+cosmo.datetime.Date.prototype.setUTCHours = function (n) { 
+    this.setUTCAttribute('hours', n); 
+};
+cosmo.datetime.Date.prototype.setUTCMilliseconds = function (n) { 
+    this.setUTCAttribute('milliseconds', n); 
+};
+cosmo.datetime.Date.prototype.setUTCMinutes = function (n) { 
+    this.setUTCAttribute('minutes', n); 
+};
+cosmo.datetime.Date.prototype.setUTCMonth = function (n) { 
+    this.setUTCAttribute('month', n); 
+};
+cosmo.datetime.Date.prototype.setUTCSeconds = function (n) { 
+    this.setUTCAttribute('seconds', n); 
+};
+cosmo.datetime.Date.prototype.setFromDateObjProxy = function (dt, fromUTC) {
+    this.year = fromUTC ? dt.getUTCFullYear() : dt.getFullYear();
+    this.month = fromUTC ? dt.getUTCMonth() : dt.getMonth();
+    this.date = fromUTC ? dt.getUTCDate() : dt.getDate();
+    this.hours = fromUTC ? dt.getUTCHours() : dt.getHours();
+    this.minutes = fromUTC ? dt.getUTCMinutes() : dt.getMinutes();
+    this.seconds = fromUTC ? dt.getUTCSeconds() : dt.getSeconds();
+    this.milliseconds = fromUTC ? dt.getUTCMilliseconds() : dt.getMilliseconds();
+};
+cosmo.datetime.Date.prototype.getUTCDateProxy = function () {
+    var dt = new Date(Date.UTC(this.year, this.month, this.date, 
+        this.hours, this.minutes, this.seconds, this.milliseconds));
+    dt.setUTCMinutes(dt.getUTCMinutes() - this.getTimezoneOffset());
+    return dt;
+};
+cosmo.datetime.Date.prototype.setAttribute = function (unit, n) {
+    if (isNaN(n)) { throw('Units must be a number.'); }
+    var dt = new Date(this.year, this.month, this.date,
+        this.hours, this.minutes, this.seconds, this.milliseconds);
+    var meth = unit == 'year' ? 'FullYear' : unit.substr(0, 1).toUpperCase() +
+        unit.substr(1);
+    dt['set' + meth](n);
+    this.setFromDateObjProxy(dt);
+};
+cosmo.datetime.Date.prototype.setUTCAttribute = function (unit, n) {
+    if (isNaN(n)) { throw('Units must be a number.'); }
+    var meth = unit == 'year' ? 'FullYear' : unit.substr(0, 1).toUpperCase() +
+        unit.substr(1);
+    var dt = this.getUTCDateProxy();
+    dt['setUTC' + meth](n);
+    dt.setUTCMinutes(dt.getUTCMinutes() + this.getTimezoneOffset());
+    this.setFromDateObjProxy(dt, true);
 };
 
 /**
@@ -96,8 +222,8 @@ cosmo.datetime.Date.prototype.setSeconds = function(sec) {
  */
 cosmo.datetime.Date.prototype.toUTC = function() {
     var utc = Date.UTC(this.getYear(), this.getMonth(), this.getDate(),
-        this.getHours(), this.getMinutes(), this.getSeconds());
-    return(utc - this.getTimezoneOffsetMs());
+        this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds());
+    return(utc + this.getTimezoneOffsetMs());
 };
 
 /**
@@ -108,7 +234,7 @@ cosmo.datetime.Date.prototype.updateFromUTC = function(utc) {
     var dt = null;
 
     // Get a fake Date object in UTC frame of reference
-    dt = new Date(utc + this.getTimezoneOffsetMs());
+    dt = new Date(utc - this.getTimezoneOffsetMs());
 
     // Update cosmo.datetime.Date values based on UTC values
     this.year = dt.getUTCFullYear();
@@ -117,6 +243,7 @@ cosmo.datetime.Date.prototype.updateFromUTC = function(utc) {
     this.hours = dt.getUTCHours();
     this.minutes = dt.getUTCMinutes();
     this.seconds = dt.getUTCSeconds();
+    this.milliseconds = dt.getUTCMilliseconds();
 };
 
 /**
@@ -133,16 +260,14 @@ cosmo.datetime.Date.prototype.updateFromLocalDate = function(dt) {
     this.hours = dt.getHours();
     this.minutes = dt.getMinutes();
     this.seconds = dt.getSeconds();
+    this.milliseconds = dt.getMilliseconds();
 };
 
 /**
  * Returns the offset from GMT in minutes
- * Minus GMT results sensibly in negative values -- this is opposite
- * behavior from JavaScript's Date object
  */
 cosmo.datetime.Date.prototype.getTimezoneOffset = function() {
     var offsetMin = 0;
-
     // Is UTC, no need to do more work
     if (this.utc) {
         offsetMin = 0;
@@ -151,9 +276,10 @@ cosmo.datetime.Date.prototype.getTimezoneOffset = function() {
         // Has timezone, use offset from timezone
         if (this.tzId) {
             var timezone = cosmo.datetime.timezone.getTimezone(this.tzId);
-            if(timezone){
-                return timezone.getOffsetInMinutes(this);
-            } else {
+            if (timezone){
+                return (timezone.getOffsetInMinutes(this)*-1);
+            } 
+            else {
                 //couldn't find timezone just make it utc?
                 return 0;
             }
@@ -251,7 +377,7 @@ cosmo.datetime.Date.prototype.createLocalDate = function(){
     var tz = ScoobyTimezone.getLocalTimezone(utc);
     var scoobDt = new cosmo.datetime.Date(dt.getFullYear(), dt.getMonth(),
         dt.getDate(), dt.getHours(), dt.getMinutes(),
-        dt.getSeconds(), tz, false);
+        dt.getSeconds(), dt.getMilliseconds(), tz);
     return scoobDt;
 };
 
@@ -287,7 +413,7 @@ cosmo.datetime.Date.prototype.toString = cosmo.util.debug.genericToString;
 cosmo.datetime.Date.prototype.clone = function(){
     var ret = new cosmo.datetime.Date(this.getFullYear(), this.getMonth(),
             this.getDate(), this.getHours(), this.getMinutes(),
-            this.getSeconds(), this.tzId, this.utc);
+            this.getSeconds(), this.getMilliseconds(), this.tzId);
 
     return ret;
 }
@@ -306,14 +432,16 @@ cosmo.datetime.Date.prototype.getTimezoneAbbrName = function(){
 // Date static methods
 // ===========================
 cosmo.datetime.Date.clone = function(sdt) {
-    dojo.deprecated("cosmo.datetime.Date.clone", "Use the instance method, rather than the static version", "0.6");
+    dojo.deprecated("cosmo.datetime.Date.clone", 
+    "Use the instance method, rather than the static version", "0.6");
     var ret = new cosmo.datetime.Date(sdt.getFullYear(), sdt.getMonth(),
             sdt.getDate(), sdt.getHours(), sdt.getMinutes(),
-            sdt.getSeconds(), sdt.tzId, sdt.utc);
+            sdt.getSeconds(), sdt.getMilliseconds(), sdt.tzId);
 
     return ret;
 }
-cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.clone, "ScoobyDate.clone", "0.6");
+cosmo.util.debug.aliasToDeprecatedFuncion(
+    cosmo.datetime.Date.clone, "ScoobyDate.clone", "0.6");
 
 /**
  * Returns the UTC offset (in milliseconds) for a particular date for the user's
@@ -323,10 +451,11 @@ cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.clone, "ScoobyDate
  */
 cosmo.datetime.Date.getBrowserTimezoneOffset = function(year, month, day, hours, minutes, seconds){
     var date = new Date(year, month, day, hours, minutes, seconds, 0);
-    // Return a negative value for minus-GMT offset -- opposite behavior from JS
-    return (date.getTimezoneOffset()*-1);
+    return date.getTimezoneOffset();
 }
-cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.getBrowserTimezoneOffset, "ScoobyDate.getBrowserTimezoneOffset", "0.6");
+cosmo.util.debug.aliasToDeprecatedFuncion(
+    cosmo.datetime.Date.getBrowserTimezoneOffset, 
+    "ScoobyDate.getBrowserTimezoneOffset", "0.6");
 
 /**
  * Returns the difference in specified units between two Date
@@ -334,7 +463,8 @@ cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.getBrowserTimezone
 cosmo.datetime.Date.diff = function(interv, sdt1, sdt2) {
     return Date.diff(interv, sdt1.toUTC(), sdt2.toUTC());
 }
-cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.diff, "ScoobyDate.diff", "0.6");
+cosmo.util.debug.aliasToDeprecatedFuncion(
+    cosmo.datetime.Date.diff, "ScoobyDate.diff", "0.6");
 
 
 /**
@@ -345,4 +475,5 @@ cosmo.datetime.Date.add = function(sdt, interv, incr) {
     ret.add(interv, incr);
     return ret;
 }
-cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date.add, "ScoobyDate.add", "0.6");
+cosmo.util.debug.aliasToDeprecatedFuncion(
+    cosmo.datetime.Date.add, "ScoobyDate.add", "0.6");

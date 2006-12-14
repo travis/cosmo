@@ -457,8 +457,8 @@ var Cal = new function() {
             mon = evdate.getMonth();
             dat = evdate.getDate();
             startstr = Cal.extractTimeFromId(startstr);
-            hou = Cal.extractHourFromTime(startstr);
-            min = Cal.extractMinutesFromTime(startstr);
+            hou = parseInt(Cal.extractHourFromTime(startstr));
+            min = parseInt(Cal.extractMinutesFromTime(startstr));
             start = new ScoobyDate(yea, mon, dat, hou, min);
             end = ScoobyDate.add(start, 'n', 60);
         }

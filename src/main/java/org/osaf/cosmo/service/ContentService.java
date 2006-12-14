@@ -272,6 +272,18 @@ public interface ContentService extends Service {
                             String key);
 
     /**
+     * Returns the identified ticket on the given item, or
+     * <code>null</code> if the ticket does not exists. Tickets are
+     * inherited, so if the specified item does not have the ticket
+     * but an ancestor does, it will still be returned.
+     *
+     * @param itemId the uid of the item whose ticket you want
+     * @param key the ticket to return
+     */
+    public Ticket getTicket(String itemId,
+                            String key);
+
+    /**
      * Removes a ticket from an item.
      *
      * @param item the item to be de-ticketed

@@ -23,6 +23,8 @@ import org.osaf.cosmo.rpc.model.Calendar;
 import org.osaf.cosmo.rpc.model.CosmoDate;
 import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.rpc.model.RecurrenceRule;
+import org.osaf.cosmo.rpc.model.Subscription;
+import org.osaf.cosmo.rpc.model.Ticket;
 
 /**
  * This is the interface that is exposed to web-clients via json-rpc or other 
@@ -101,6 +103,13 @@ public interface RPCService {
      * @throws RPCException
      */
     public Calendar[] getCalendars(HttpServletRequest request) throws RPCException;
+    
+    /**
+     * Returns all the subscriptions that the current user is subscribed to.
+     * @return
+     * @throws RPCException
+     */
+    public Subscription[] getSubscriptions(HttpServletRequest request) throws RPCException;
     
     /**
      * Returns the calendar with uid collectionUid.
@@ -210,9 +219,20 @@ public interface RPCService {
             String originalEventId, CosmoDate originalEventEndDate) throws RPCException;
 
     public String saveNewEventBreakRecurrence(String collectionUid, Event event,
-            String originalEventId, CosmoDate originalEventEndDate, String ticket) throws RPCException;
+            String originalEventId, CosmoDate originalEventEndDate, String ticketId) throws RPCException;
     
-    public void saveSubscription(String collectionUid, String ticket, String displayName) throws RPCException;
+    public void saveSubscription(String collectionUid, String ticketId, String displayName) throws RPCException;
     
-    public void deleteSubscription(String collectionUid, String ticket) throws RPCException;
+    public void deleteSubscription(String collectionUid, String ticketId) throws RPCException;
+    
+    /**
+     * Returns the ticket with the specified id for a collection
+     * 
+     * @param ticketId
+     * @param collectionId
+     * @return
+     */
+    public Ticket getTicket(String ticketId, String collectionId) throws RPCException;
+    
+    public Subscription getSubscription(String collectionuid, String ticketId, HttpServletRequest request) throws RPCException;
 }

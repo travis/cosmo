@@ -56,6 +56,7 @@ import org.osaf.cosmo.rpc.model.CosmoToICalendarConverter;
 import org.osaf.cosmo.rpc.model.Event;
 import org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter;
 import org.osaf.cosmo.rpc.model.RecurrenceRule;
+import org.osaf.cosmo.rpc.model.Subscription;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
@@ -77,7 +78,7 @@ public class RPCServiceImpl implements RPCService {
     private ICalendarToCosmoConverter icalendarToCosmoConverter = new ICalendarToCosmoConverter();
     private CosmoToICalendarConverter cosmoToICalendarConverter = new CosmoToICalendarConverter();
     private ServiceLocatorFactory serviceLocatorFactory =  null;
-    
+
     public CosmoSecurityManager getCosmoSecurityManager() {
         return cosmoSecurityManager;
     }
@@ -101,7 +102,7 @@ public class RPCServiceImpl implements RPCService {
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
-    
+
     public ServiceLocatorFactory getServiceLocatorFactory() {
         return serviceLocatorFactory;
     }
@@ -155,7 +156,7 @@ public class RPCServiceImpl implements RPCService {
             return new Calendar[]{};
         }
         // XXX no ContentService.findCalendars yet
-        
+
         //first find all the calenders that the user owns
         HomeCollectionItem home = contentService.getRootItem(user);
         List<Calendar> cals = new ArrayList<Calendar>();
@@ -167,48 +168,35 @@ public class RPCServiceImpl implements RPCService {
                 cals.add(calendar);
             }
         }
-        
-        //Now find all the subscribed calendars
-        Set<CollectionSubscription> subscriptions = user.getCollectionSubscriptions();
-        for (CollectionSubscription sub : subscriptions){
-            Calendar calendar = getCalendar(sub.getCollectionUid(), sub
-                    .getTicketKey(), request);
-            //set it here, since it could be different than the 
-            //collection display name
-            calendar.setName(sub.getDisplayName());
-            cals.add(calendar);
-        }
-        
+
         //TODO sort these
         return (Calendar[]) cals.toArray(new Calendar[cals.size()]);
     }
 
-    public Calendar getCalendar(String collectionUid, String ticketKey, 
+    public Calendar getCalendar(String collectionUid, String ticketKey,
             HttpServletRequest request) throws RPCException{
-        
+
         CollectionItem collection = getCollectionItem(collectionUid);
-        
+
         this.checkTicketProvidesPermissions(collection, ticketKey, READ_PERM);
-        
-        Calendar calendar = createCalendarFromItem(request, collection);
 
-        calendar.setTicketKey(ticketKey);
+        Calendar calendar = createCalendarFromItem(request, collection);
 
         return calendar;
     }
-    
-    public Calendar getCalendar(String collectionUid, 
+
+    public Calendar getCalendar(String collectionUid,
             HttpServletRequest request) throws RPCException{
 
         CollectionItem collection = getCollectionItem(collectionUid);
-        
+
         this.checkCurrentUserOwnsCollection(collection);
-        
+
         Calendar calendar = createCalendarFromItem(request, collection);
 
         return calendar;
     }
-    
+
     public Event getEvent(String collectionUid, String eventUid)
     throws RPCException {
 
@@ -678,13 +666,13 @@ public class RPCServiceImpl implements RPCService {
 
         return calendarEventItem.getUid();
     }
-    
+
     public void saveSubscription(String collectionUid, String ticket, String displayName) throws RPCException{
         User user = getUser();
         if (user == null){
             throw new RPCException("You must be logged in to subscribe to a collection");
         }
-        
+
         CollectionSubscription sub = null;
 
         //first see if that subscription exists
@@ -699,18 +687,75 @@ public class RPCServiceImpl implements RPCService {
         } else {
             sub.setDisplayName(displayName);
         }
-        
+
         userService.updateUser(user);
     }
-    
+
     public void deleteSubscription(String collectionUid, String ticket) throws RPCException{
         User user = getUser();
         if (user == null){
             throw new RPCException("You must be logged in to subscribe to a collection");
         }
-        
+
         user.removeSubscription(collectionUid, ticket);
         userService.updateUser(user);
+    }
+
+    public Subscription[] getSubscriptions(HttpServletRequest request)
+            throws RPCException {
+
+        User user = getUser();
+        if (user == null) {
+            throw new RPCException(
+                    "You must be logged in to get subscriptions");
+        }
+
+        List<Subscription> subscriptions = new ArrayList<Subscription>();
+        Set<CollectionSubscription> collectionSubscriptions = user
+                .getCollectionSubscriptions();
+        for (CollectionSubscription colSub : collectionSubscriptions) {
+            Subscription sub = createSubscription(colSub, request);
+            subscriptions.add(sub);
+        }
+        return (Subscription[]) subscriptions
+                .toArray(new Subscription[subscriptions.size()]);
+    }
+
+    public org.osaf.cosmo.rpc.model.Ticket getTicket(String ticketId, String collectionId) throws RPCException{
+        org.osaf.cosmo.rpc.model.Ticket rpcTicket = new org.osaf.cosmo.rpc.model.Ticket();
+        Ticket ticket = contentService.getTicket(collectionId, ticketId);
+        rpcTicket.setPriveleges(ticket.getPrivileges());
+        rpcTicket.setTicketId(ticketId);
+        return rpcTicket;
+    }
+
+    public Subscription getSubscription(String cid, String ticketId,
+            HttpServletRequest request) throws RPCException {
+        User user = getUser();
+        if (user == null) {
+            throw new RPCException(
+                    "You must be logged in to subscribe to a collection");
+        }
+        CollectionSubscription colsub = user.getSubscription(cid, ticketId);
+        return createSubscription(colsub, request);
+    }
+
+    private Subscription createSubscription(
+            CollectionSubscription collectionSubscription,
+            HttpServletRequest request) throws RPCException {
+        Subscription subscription = new Subscription();
+
+        Calendar calendar = getCalendar(collectionSubscription
+                .getCollectionUid(), collectionSubscription.getTicketKey(),
+                request);
+        subscription.setCalendar(calendar);
+
+        subscription.setDisplayName(collectionSubscription.getDisplayName());
+
+        org.osaf.cosmo.rpc.model.Ticket ticket = getTicket(collectionSubscription.getTicketKey(),
+                collectionSubscription.getCollectionUid());
+        subscription.setTicket(ticket);
+        return subscription;
     }
 
     private String getUsername() {
@@ -813,14 +858,14 @@ public class RPCServiceImpl implements RPCService {
                     " not found on collection with uid " +
                     collection.getUid());
         }
-        
+
         if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_FREEBUSY)
                 && !ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ)
                 && !ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE)){
             throw new RPCException(
                     "Support for freebusy tickets has not been implemented.");
         }
-        
+
         if (ticket.hasTimedOut()){
             throw new RPCException("Ticket " + ticketKey +
                     " has expired.");
@@ -887,11 +932,10 @@ public class RPCServiceImpl implements RPCService {
         Calendar calendar = new Calendar();
         calendar.setName(item.getDisplayName());
         calendar.setUid(item.getUid());
-        
+
         ServiceLocator serviceLocator = serviceLocatorFactory.createServiceLocator(request);
         Map<String, String> protocolUrls = serviceLocator.getCollectionUrls((CollectionItem) item);
         calendar.setProtocolUrls(protocolUrls);
         return calendar;
     }
-
 }

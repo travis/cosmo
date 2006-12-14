@@ -593,6 +593,11 @@ public class StandardContentService implements ContentService {
         return contentDao.getTicket(item, key);
     }
 
+    public Ticket getTicket(String itemId, String key){
+        Item item = findItemByUid(itemId);
+        return getTicket(item, key);
+    }
+
     /**
      * Removes a ticket from an item.
      *

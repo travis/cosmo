@@ -17,8 +17,6 @@ package org.osaf.cosmo.rpc;
 
 import javax.servlet.http.HttpServletRequest;
 
-import junit.framework.TestCase;
-
 import net.fortuna.ical4j.model.DateTime;
 
 import org.apache.commons.id.random.SessionIdGenerator;
@@ -33,6 +31,7 @@ import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.rpc.model.Calendar;
 import org.osaf.cosmo.rpc.model.CosmoDate;
@@ -238,6 +237,22 @@ public class RPCServiceImplTest extends BaseMockServletTestCase {
         calendars = rpcService.getCalendars(request);
         assertEquals(calendars.length, initialNumberOfCalendars - 1);
     }
+    
+    public void testAddGetRemoveSubscriptions() throws Exception{
+        rpcService.saveSubscription("SUB1", "12345", "DISP_NAME");
+        User updatedUser = userService.getUser(user.getUsername());
+        CollectionSubscription cs = updatedUser.getSubscription("SUB1", "12345");
+        assertNotNull(cs);
+        assertEquals("DISP_NAME", cs.getDisplayName());
+        rpcService.saveSubscription("SUB1", "12345", "NEW_DISP");
+        updatedUser = userService.getUser(user.getUsername());
+        cs = updatedUser.getSubscription("SUB1", "12345");
+        assertEquals("NEW_DISP", cs.getDisplayName());
+        rpcService.deleteSubscription("SUB1", "12345");
+        updatedUser = userService.getUser(user.getUsername());
+        cs = updatedUser.getSubscription("SUB1", "12345");
+        assertNull(cs);
+        }
     
     public String getServletPath() {
         return SERVLET_PATH;

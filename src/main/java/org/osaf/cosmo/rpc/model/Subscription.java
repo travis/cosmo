@@ -15,48 +15,35 @@
  */
 package org.osaf.cosmo.rpc.model;
 
-import java.util.Map;
 
 
 /**
- * This class contains information about a user's calendar.
+ * This represents one collection that the user has subscribed to, and contains the 
+ * metadata for the calendar, and the ticket.
  *
  * @author bobbyrullo
  */
-public class Calendar {
-
-    private String displayName = null;
-    private String uid = null;
-
-    private Map<String, String> protocolUrls;
-
-    public Map<String, String> getProtocolUrls() {
-        return protocolUrls;
+public class Subscription {
+    private String displayName;
+    private Calendar calendar;
+    private Ticket ticket;
+    
+    public Calendar getCalendar() {
+        return calendar;
     }
-
-    public void setProtocolUrls(Map<String, String> protocolUrls) {
-        this.protocolUrls = protocolUrls;
+    public void setCalendar(Calendar calendar) {
+        this.calendar = calendar;
     }
-    /**
-     * This is the name as displayed to the user
-     */
-    public String getName() {
+    public String getDisplayName() {
         return displayName;
     }
-
-    public void setName(String displayName) {
+    public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
-
-    /**
-     * This is the uid of this collection.
-     */
-    public String getUid() {
-        return uid;
+    public Ticket getTicket() {
+        return ticket;
     }
-
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
     }
-
 }

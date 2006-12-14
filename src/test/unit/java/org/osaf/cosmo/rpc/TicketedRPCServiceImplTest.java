@@ -139,10 +139,6 @@ public class TicketedRPCServiceImplTest extends BaseMockServletTestCase {
         readWriteTicket.setCreated(new Date());
         readWriteTicket.setKey("readwriteticket");
         readWriteTicket.setPrivileges(readWritePermissions);
-        
-        
-
-        
     }
     
     protected Event createOneHourEvent(String title, String description, int year, int month, int date, int hour) {

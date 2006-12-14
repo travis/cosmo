@@ -33,7 +33,7 @@ public class Ticket {
         this.priveleges = priveleges;
     }
     
-    public String getTicketId() {
+    public String getTicketKey() {
         return ticketId;
     }
     public void setTicketId(String ticketId) {

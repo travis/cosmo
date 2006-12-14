@@ -192,3 +192,14 @@ function CalendarMetadata(){
     this.uid = null;
     this.protocolUrls = {};
 }
+
+function Subscription(){
+    this.calendar = null;
+    this.displayName = null;
+    this.ticket = null;
+}
+
+function Ticket(){
+    this.priveleges = {}; //a Set
+    this.ticketKey = null;
+}

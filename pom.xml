@@ -127,7 +127,7 @@
         <dependency>
             <groupId>ical4j</groupId>
             <artifactId>ical4j-osaf</artifactId>
-            <version>0.9.18-20061117</version>
+            <version>0.9.18-20061214</version>
         </dependency>
         <!-- required by jcr-server -->
         <!-- XXX: should be 1.0 release version -->

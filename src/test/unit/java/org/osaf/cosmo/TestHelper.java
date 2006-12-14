@@ -261,6 +261,7 @@ public class TestHelper {
 
         CollectionItem collection = new CollectionItem();
         collection.setName(name);
+        collection.setDisplayName(name);
         collection.setOwner(user);
 
         return collection;

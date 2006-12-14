@@ -247,15 +247,15 @@ public abstract class CaldavReport
     protected void doQuery(DavResource resource,
                            boolean recurse)
         throws DavException {
-        if (! ((ExtendedDavResource)resource).isCalendarCollection())
-            return;
-
-        try {
-            DavCalendarCollection collection = (DavCalendarCollection) resource;
-            addResults(collection.findMembers(queryFilter));
-        } catch (Exception e) {
-            log.error("cannot run report query", e);
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot run report query: " + e.getMessage());
+        
+        if (((ExtendedDavResource)resource).isCalendarCollection()) {
+            try {
+                DavCalendarCollection collection = (DavCalendarCollection) resource;
+                addResults(collection.findMembers(queryFilter));
+            } catch (Exception e) {
+                log.error("cannot run report query", e);
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot run report query: " + e.getMessage());
+            }
         }
 
         if (! recurse)

@@ -15,10 +15,6 @@
  */
 package org.osaf.cosmo.atom;
 
-import com.sun.syndication.feed.atom.Feed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedOutput;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
@@ -27,6 +23,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.abdera.Abdera;
+import org.apache.abdera.model.Feed;
+import org.apache.abdera.writer.Writer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -159,17 +159,8 @@ public class AtomServlet extends HttpServlet implements AtomConstants {
         resp.setContentType(MEDIA_TYPE_ATOM);
         resp.setCharacterEncoding("UTF-8");
 
-        // spool data
-        try {
-            WireFeedOutput outputter = new WireFeedOutput();
-            outputter.output(feed, resp.getWriter());
-        } catch (FeedException e) {
-            log.error("can't spool feed for collection " + collection.getUid(),
-                      e);
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                           "can't spool feed for collection: " +
-                           e.getMessage());
-        }
+        Writer writer = Abdera.getNewWriterFactory().getWriter("PrettyXML");
+        writer.writeTo(feed, resp.getOutputStream());
     }
 
     // GenericServlet methods

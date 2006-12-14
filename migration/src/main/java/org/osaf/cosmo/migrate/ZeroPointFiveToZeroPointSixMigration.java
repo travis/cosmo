@@ -88,6 +88,9 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                 if("calendar:supportedComponentSet".equals(attributeName)) {
                     updateStmt.setString(1,"supportedComponentSet" );
                     updateStmt.setString(2, "org.osaf.cosmo.model.CalendarCollectionStamp");
+                } else if("cosmo:excludeFreeBusyRollup".equals(attributeName)) {
+                    updateStmt.setString(1,"excludeFreeBusyRollup" );
+                    updateStmt.setString(2, "org.osaf.cosmo.model.CollectionItem");
                 } else if(attributeName.indexOf("@:@") >= 0) {
                     String namespace = null;
                     String localname = null;

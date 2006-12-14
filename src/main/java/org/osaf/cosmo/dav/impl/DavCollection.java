@@ -95,7 +95,7 @@ public class DavCollection extends DavResourceBase
         REPORT_TYPES.add(MultigetReport.REPORT_TYPE_CALDAV_MULTIGET);
         REPORT_TYPES.add(FreeBusyReport.REPORT_TYPE_CALDAV_FREEBUSY);
 
-        DEAD_PROPERTY_FILTER.add(CollectionItem.ATTR_EXCLUDE_FREE_BUSY_ROLLUP);
+        DEAD_PROPERTY_FILTER.add(CollectionItem.class.getName());
     }
 
     /** */

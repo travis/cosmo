@@ -41,8 +41,8 @@ public class CollectionItem extends Item {
     private static final long serialVersionUID = 2873258323314048223L;
     
     // CollectionItem specific attributes
-    public static final String ATTR_EXCLUDE_FREE_BUSY_ROLLUP =
-        "cosmo:excludeFreeBusyRollup";
+    public static final QName ATTR_EXCLUDE_FREE_BUSY_ROLLUP =
+        new QName(CollectionItem.class, "excludeFreeBusyRollup");
 
     private Set<Item> children = new HashSet<Item>(0);
     private Set<Item> allChildren = new HashSet<Item>(0);

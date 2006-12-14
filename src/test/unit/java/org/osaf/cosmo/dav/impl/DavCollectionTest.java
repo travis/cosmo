@@ -40,7 +40,7 @@ public class DavCollectionTest extends BaseDavTestCase
 
         boolean found = false;
         for (String name : dc.getDeadPropertyFilter()) {
-            if (name.equals(CollectionItem.ATTR_EXCLUDE_FREE_BUSY_ROLLUP)) {
+            if (name.equals(CollectionItem.class.getName())) {
                 found = true;
                 break;
             }

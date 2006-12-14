@@ -29,7 +29,6 @@ cosmo.util.html.setSelectOptions = function(selectElement, options){
 };
 
 cosmo.util.html.setSelect = function(sel, val) {
-    var sel;
     for (var i = 0; i < sel.options.length; i++) {
         if (sel.options[i].value == val) {
             sel.selectedIndex = i;

@@ -14,6 +14,9 @@
  * limitations under the License.
 */
 
+dojo.require('dojo.event.*');
+dojo.require('cosmo.ui.event.handlers');
+
 dojo.provide('cosmo.view.cal.canvas');
 
 cosmo.view.cal.canvas = new function() {
@@ -21,7 +24,7 @@ cosmo.view.cal.canvas = new function() {
     // Need some closure for scope
     var self = this;
     // Rendering the first time
-    var initRender = true; 
+    var initRender = false; 
     // Resizeable area for all-day events -- a ResizeArea obj
     var allDayArea = null; 
     
@@ -470,6 +473,111 @@ cosmo.view.cal.canvas = new function() {
         }
         updateEventsDisplay();
     }
+    /**
+     * Single-clicks -- do event dispatch based on ID of event's
+     * DOM-element source. Includes selecting/moving/resizing event blocks
+     * and resizing all-day event area
+     * Mousedown on an event always creates a Draggable in anticipation
+     * of a user dragging the block. Draggable is destroyed on mouseup.
+     * cosmo.app.dragItem may either be set to this Draggable, or to
+     * the ResizeArea for all-day events
+     */
+    function mouseDownHandler(e) {
+        var id = '';
+        var dragItem = null;
+        var elem = null;
+        var selObj = null;
+        var s = '';
+        var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
+        var id = elem.id;
+        // ======================================
+        // Event dispatch
+        // ======================================
+        switch (true) {
+            // Mouse down on the hour columns -- exit to prevent text selection
+            case (id.indexOf('hourDiv') > -1):
+                return false;
+                break;
+            
+            // On event block -- simple select, or move/resize
+            case (id.indexOf('eventDiv') > -1):
+                // Get the clicked-on event
+                s = Cal.getIndexEvent(id);
+                selObj = cosmo.view.cal.canvas.eventRegistry.getItem(s);
+
+                // If this object is currently in 'processing' state, ignore any input
+                if (selObj.getInputDisabled()) {
+                    return false;
+                }
+                
+                // Publish selection
+                var c = cosmo.view.cal.canvas;
+                if (c.selectedEvent && selObj.id != c.selectedEvent.id) {
+                    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': selObj });
+                }
+                
+                // Set up Draggable and save dragMode -- user may be dragging
+                if (id.indexOf('AllDay') > -1) {
+                    dragItem = new NoTimeDraggable(s);
+                }
+                else {
+                    dragItem = new HasTimeDraggable(s);
+                }
+                
+                switch(true) {
+                    // Main content area -- drag entire event
+                    case id.indexOf('Content') > -1:
+                    case id.indexOf('Title') > -1:
+                    case id.indexOf('Start') > -1:
+                        dragItem.init('drag');
+                        break;
+                    // Top lip -- resize top
+                    case id.indexOf('Top') > -1:
+                        dragItem.init('resizetop');
+                        break;
+                    // Bottom lip -- resize bottom
+                    case id.indexOf('Bottom') > -1:
+                        dragItem.init('resizebottom');
+                        break;
+                    default:
+                        // Do nothing
+                        break;
+                }
+                
+                // Set the Cal draggable to the dragged block
+                cosmo.app.dragItem = dragItem;
+                
+                break;
+        }
+    }
+    /**
+     * Double-clicks -- if event source is in the scrolling area
+     * for normal events, or in the resizeable all-day event area
+     * calls insertCalEventNew to create a new event
+     * FIXME: This could be segregated into two functions
+     * attached to each of the two canvas areas
+     */
+    function dblClickHandler(e) {
+        var id = '';
+        var elem = null;
+
+        e = !e ? window.event : e;
+        elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
+        id = elem.id
+        
+        switch (true) {
+            // On hour column -- create a new event
+            case (id.indexOf('hourDiv') > -1):
+            // On all-day column -- create new all-day event
+            case (id.indexOf('allDayListDiv') > -1):
+                Cal.insertCalEventNew(id);
+                break;
+            // On event title -- edit-in-place
+            case (id.indexOf('eventDiv') > -1):
+                // Edit-in-place will go here
+                break;
+        }
+    }
     
     // Subscribe to the '/calEvent' channel
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
@@ -563,11 +671,20 @@ cosmo.view.cal.canvas = new function() {
          * @return Boolean, true.
          */
         function init() {
+            // Link local variables to DOM nodes
             monthHeaderNode = $('monthHeaderDiv');
             timelineNode = $('timedHourListDiv');
-            hoursNode = $('timedContentDiv');
             dayNameHeadersNode = $('dayListDiv');
+            hoursNode = $('timedContentDiv');
             allDayColsNode = $('allDayContentDiv');
+            
+            // Create event listeners
+            dojo.event.connect(hoursNode, 'onmousedown', mouseDownHandler);
+            dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
+            dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
+            dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
+
+            // All done, woot
             return true;
         }
         
@@ -842,14 +959,14 @@ cosmo.view.cal.canvas = new function() {
         
         // Do it!
         // -----------
-        if (initRender) {
+        if (!initRender) {
             // Make the all-day event area resizeable
             // --------------
             allDayArea = new ResizeArea('allDayResizeMainDiv', 'allDayResizeHandleDiv');
             allDayArea.init('down');
             allDayArea.addAdjacent('timedScrollingMainDiv');
             allDayArea.setDragLimit();
-            initRender = false;
+            initRender = true;
         }
         else {
             removeAllEvents();

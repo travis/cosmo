@@ -29,6 +29,7 @@
  */
  
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.ui.event.handlers");
 
 function CalForm() {
 
@@ -432,7 +433,7 @@ function CalForm() {
     this.emptyTextInput = function(param) {
         if (!param || !param.id) {
             param = param || window.event;
-            textbox = getSrcElem(param);
+            textbox = cosmo.ui.event.handlers.getSrcElemByProp(param, 'id');
         }
         else {
             textbox = param;
@@ -573,7 +574,7 @@ function CalForm() {
         recur = form.recurrence.value;
         rE = form.recurend.value != 'mm/dd/yyyy' ?
             form.recurend.value : '';
-        tzId = form.tzTzSelect.value || null;
+        tzId = form.tzId.value || null;
 
         // Error checking
         // =======================

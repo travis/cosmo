@@ -39,8 +39,6 @@ var Cal = new function() {
     // Used to cal positions for draggable elems
     // Changes when resizing all-day event area
     this.viewOffset = 0;
-    // The element currently being dragged -- a Draggable obj
-    this.dragElem = null;
     // Width of the middle column of UI elements
     // All-day resizable area, scrolling area for normal events, detail form
     // Calculated based on client window size
@@ -72,7 +70,7 @@ var Cal = new function() {
      * Main function
      */
     this.init = function(collectionUid, ticketKey) {
-
+        
         // Props for confirmation dialogs
         // --------------
         dojo.require('cosmo.view.cal.dialog');
@@ -131,8 +129,8 @@ var Cal = new function() {
         		this.serv.getCalendar(collectionUid, ticketKey)
         		];
         }
-        
-		// Otherwise, get all calendars for this user
+		
+        // Otherwise, get all calendars for this user
 		else {
 	        this.calendars = this.serv.getCalendars();
 	        //TODO need to sort
@@ -229,7 +227,7 @@ var Cal = new function() {
         // Set reference to UI mask to use later
         this.uiMask = uiMask;
 
-        // Calculate position values for main UI display, set properties
+       // Calculate position values for main UI display, set properties
         this.height = parseInt(winheight*DISPLAY_WIDTH_PERCENT) - TOP_MENU_HEIGHT;
         this.width = parseInt(winwidth*DISPLAY_HEIGHT_PERCENT);
         this.top = TOP_MENU_HEIGHT;

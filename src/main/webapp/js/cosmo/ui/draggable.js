@@ -89,6 +89,22 @@ function Draggable(id) {
         //    cosmo.view.cal.canvas.getSelectedEvent().block.setOpacity(60);
         //}
     };
+    this.doDrag = function () {
+        // Hand off to Draggable methods based on dragMode
+        // Set by mouseDownHandler based on location of click
+        switch (this.dragMode) {
+            case 'drag':
+                this.move();
+                break;
+            case 'resizetop':
+            case 'resizebottom':
+                this.resize();
+                break;
+            default:
+                // Do nothing
+                break;
+        }
+    };
     /**
      * Move the Draggable's block
      * Note that this moves the block's visual position, but the
@@ -179,7 +195,7 @@ function Draggable(id) {
      * or doesn't have a valid dragMode
      */
     this.paranoia = function() {
-        if (!cosmo.view.cal.canvas.getSelectedEvent() || !Cal.dragElem.dragMode || 
+        if (!cosmo.view.cal.canvas.getSelectedEvent() || !cosmo.app.dragItem.dragMode || 
             cosmo.view.cal.canvas.getSelectedEvent().getInputDisabled()) {
             return false;
         }

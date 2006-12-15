@@ -38,7 +38,7 @@ function ResizeArea(id, handleId) {
     this.init = function(dir, off) {
         self.contentDiv = document.getElementById(this.id);
         self.handleDiv = document.getElementById(this.handleId);
-        self.handleDiv.onmousedown = function() { Cal.dragElem = self };
+        self.handleDiv.onmousedown = function() { cosmo.app.dragItem = self };
         self.direction = dir ? dir : this.direction;
         self.origSize = this.getHeight(this.contentDiv) + 
             self.getHeight(this.handleDiv);
@@ -57,6 +57,9 @@ function ResizeArea(id, handleId) {
             ALL_DAY_RESIZE_HANDLE_HEIGHT;
     };
     this.compareNumbers = function(a, b) { return a - b };
+    this.doDrag = function () {
+        this.resize();  
+    };
     this.resize = function() {
         var offset = this.contentDiv.offsetTop;
         var pos = yPos - TOP_MENU_HEIGHT;

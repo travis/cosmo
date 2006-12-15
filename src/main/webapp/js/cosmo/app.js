@@ -26,6 +26,8 @@ cosmo.app = new function () {
     this.initObj = {};
     // warnings / confirmations
     this.modalDialog = null;
+    // The item in the UI being dragged
+    this.dragItem = null;
     // List of any queued-up error messages
     this.errorList = [];
 

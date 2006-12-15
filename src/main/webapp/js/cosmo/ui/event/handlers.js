@@ -29,27 +29,32 @@
  * got clicked (i.e., requiring irritating regex filtering), but 
  * allows more more centralized control of the event flow.
  */
+
+dojo.provide('cosmo.ui.event.handlers');
  
 /**
  * Generic function to get the source elem of a UI event
+ * that has the desired attribute (e.g., id or some custom
+ * attribute). If the actual source elem does not have the
+ * specificed property, it looks up the doc tree until it
+ * finds one that does
  * @param e A DOM event
- * @return A DOM element that was the source of the event
- * Returns the parent node if the source was a text node
+ * @return Object, a DOM element
  */
-function getSrcElem(e) {
+cosmo.ui.event.handlers.getSrcElemByProp = function (e, prop) {
     var ret = null;
-    
     if (e.srcElement) ret = e.srcElement;
     else if (e.target) ret = e.target;
     
     // Disabled form elements in IE return a bogus object
-    if (typeof ret.id == 'undefined') {
+    if (typeof ret[prop] == 'undefined') {
         return document.body;
     }
-    // Look up the id of the elem or its parent
+    // Look up the designated prop of the elem or its parent
     else {
-        // Look for something with an id -- not a text node
-        while (!ret.id || ret.nodeType == 3) {
+        // Look for something with an the prop in question -- 
+        // not a text node
+        while (!ret[prop] || ret.nodeType == 3) {
             ret = ret.parentNode;
         }
     }
@@ -57,159 +62,34 @@ function getSrcElem(e) {
 };
 
 /**
- * Double-clicks -- if event source is in the scrolling area
- * for normal events, or in the resizeable all-day event area
- * calls insertCalEventNew to create a new event
- * Eventually will also be used for edit-in-place of event info
+ * Double clicks -- currently nothing app-wide 
  */
-function dblClickHandler(e) {
-    var strId = '';
-    var objElem = null;
-
-    e = !e ? window.event : e;
-    objElem = getSrcElem(e);
-    strId = objElem.id
-
-    switch (true) {
-        // On hour column -- create a new event
-        case (strId.indexOf('hourDiv') > -1):
-        // On all-day column -- create new all-day event
-        case (strId.indexOf('allDayListDiv') > -1):
-            Cal.insertCalEventNew(strId);
-            break;
-        // On event title -- edit-in-place
-        case (strId.indexOf('eventDiv') > -1):
-            // Edit-in-place will go here
-            break;
-    }
+cosmo.ui.event.handlers.dblClickHandler = function (e) {
+    // Do nothing right now
 }
 
 /**
- * Single-clicks -- do event dispatch based on ID of event's
- * DOM-element source. Includes selecting/moving/resizing event blocks
- * and resizing all-day event area
- * Mousedown on an event always creates a Draggable in anticipation
- * of a user dragging the block. Draggable is destroyed on mousedown.
- * The Cal's dragElem may either be set to this Draggable, or to
- * the ResizeArea for all-day events
+ * Check for client-side timeout if user clicks 
  */
-function mouseDownHandler(e) {
-
-    var strId = '';
-    var dragElem = null;
-    var objElem = null;
-    var selObj = null;
-    var id = '';
-
+cosmo.ui.event.handlers.mouseDownHandler = function (e) {
     // =================
     // Check for client-side timeout on all mouse clicks
     // =================
     Cal.checkTimeout();
-
-    e = !e ? window.event : e;
-    objElem = getSrcElem(e);
-    strId = objElem.id;
-
-    // ======================================
-    // Event dispatch
-    // ======================================
-    switch (true) {
-        // Mouse down on the hour columns -- exit to prevent text selection
-        case (strId.indexOf('hourDiv') > -1):
-            return false;
-            break;
-        
-        // On event block -- simple select, or move/resize
-        case (strId.indexOf('eventDiv') > -1):
-            // Get the clicked-on event
-            id = Cal.getIndexEvent(strId);
-            selObj = cosmo.view.cal.canvas.eventRegistry.getItem(id);
-
-            // If this object is currently in 'processing' state, ignore any input
-            if (selObj.getInputDisabled()) {
-                return false;
-            }
-            
-            // Publish selection
-            var c = cosmo.view.cal.canvas;
-            if (c.selectedEvent && selObj.id != c.selectedEvent.id) {
-                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': selObj });
-            }
-            
-            // Set up Draggable and save dragMode -- user may be dragging
-            if (strId.indexOf('AllDay') > -1) {
-                dragElem = new NoTimeDraggable(id);
-            }
-            else {
-                dragElem = new HasTimeDraggable(id);
-            }
-            // Set the Cal draggable to the dragged block
-            Cal.dragElem = dragElem;
-            switch(true) {
-                // Main content area -- drag entire event
-                case strId.indexOf('Content') > -1:
-                case strId.indexOf('Title') > -1:
-                case strId.indexOf('Start') > -1:
-                    dragElem.init('drag');
-                    break;
-                // Top lip -- resize top
-                case strId.indexOf('Top') > -1:
-                    dragElem.init('resizetop');
-                    break;
-                // Bottom lip -- resize bottom
-                case strId.indexOf('Bottom') > -1:
-                    dragElem.init('resizebottom');
-                    break;
-                default:
-                    // Do nothing
-                    break;
-            }
-
-            // Update event detail form
-            // ------------------------------------
-            // Show clicked-on event's details in detail form
-            //Cal.calForm.updateFromEvent(selObj);
-            // Enable both Remove and Save buttons
-            //Cal.calForm.setButtons(true, true);
-
-            break;
-    }
 }
 
 /**
  * Moving the mouse -- Used for dragging event blocks, 
  * or for resizing the all-day event area.
  */
-function mouseMoveHandler(e) {
-    var dragElem = Cal.dragElem;
-    
+cosmo.ui.event.handlers.mouseMoveHandler = function (e) {
+    var d = cosmo.app.dragItem;
     // Set global x-y coords
     xPos = e ? e.pageX : window.event.x;
     yPos = e ? e.pageY : (window.event.y + document.body.scrollTop);
-    
-    // Dragging
-    if (dragElem) {
-        // No dragMode -- it's the ResizeArea for all-day events
-        if (!dragElem.dragMode) {
-            dragElem.resize();
-        }
-        // Event block
-        else {
-            // Hand off to Draggable methods based on dragMode
-            // Set by mouseDownHandler based on location of click
-            switch (dragElem.dragMode) {
-                case 'drag':
-                    dragElem.move();
-                    break;
-                case 'resizetop':
-                case 'resizebottom':
-                    dragElem.resize();
-                    break;
-                default:
-                    // Do nothing
-                    break;
-            }
-        }
+    // Drag the app's draggable if there is one
+    if (d) {
+       d.doDrag(); 
     }
 }
 
@@ -217,14 +97,12 @@ function mouseMoveHandler(e) {
  * Releasing the mouse -- clicking on nav arrows, or dropping
  * after a drag
  */
-function mouseUpHandler(e) {
-    e = !e ? window.event : e;
-    objElem = getSrcElem(e);
-    strId = objElem.id;
-    // Drop after dragging -- both ResizeArea or event Block
-    if (Cal.dragElem) {
-        Cal.dragElem.drop();
-        Cal.dragElem = null;
+cosmo.ui.event.handlers.mouseUpHandler = function (e) {
+    // Drop anything the user is dragging
+    if (cosmo.app.dragItem) {
+        cosmo.app.dragItem.drop();
+        // Clear out the app draggable
+        cosmo.app.dragItem = null;
     }
 }
 
@@ -233,7 +111,7 @@ function mouseUpHandler(e) {
  * Also had to do some hacky stuff to suppress Enter and Delete key
  * input when user is typing event detail form fields
  */
-function keyUpHandler(e) {
+cosmo.ui.event.handlers.keyUpHandler = function (e) {
 
     // =================
     // Check for client-side timeout on all keyboard input
@@ -294,7 +172,6 @@ function keyUpHandler(e) {
  * Do cleanup of DOM-element refs to avoid memleak in IE
  */
 function cleanup() {
-    //Cal.wipeView();
     Cal.cleanup();
     Cal = null;
 }

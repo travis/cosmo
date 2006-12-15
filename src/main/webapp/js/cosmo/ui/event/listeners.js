@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
+dojo.require('cosmo.ui.event.handlers');
+
 // Event listeners
 // ==============================
-document.ondblclick = dblClickHandler;
-document.onmousemove = mouseMoveHandler;
-document.onmousedown = mouseDownHandler;
-document.onmouseup = mouseUpHandler;
-document.onkeyup = keyUpHandler;
+document.ondblclick = cosmo.ui.event.handlers.dblClickHandler;
+document.onmousemove = cosmo.ui.event.handlers.mouseMoveHandler;
+document.onmousedown = cosmo.ui.event.handlers.mouseDownHandler;
+document.onmouseup = cosmo.ui.event.handlers.mouseUpHandler;
+document.onkeyup = cosmo.ui.event.handlers.keyUpHandler;
 // IE and Safari -- prevent entire area and text getting selected while you drag
 document.ondrag = function () { return false; };
 document.onselectstart = function () { return false; };

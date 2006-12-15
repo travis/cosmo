@@ -25,11 +25,11 @@ public class Ticket {
     private String ticketId;
     private Set priveleges;
     
-    public Set getPriveleges() {
+    public Set getPrivileges() {
         return priveleges;
     }
     
-    public void setPriveleges(Set priveleges) {
+    public void setPrivileges(Set priveleges) {
         this.priveleges = priveleges;
     }
     

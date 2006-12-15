@@ -838,8 +838,8 @@ public class RPCServiceImpl implements RPCService {
         if (user == null){
             throw new RPCException("No user logged in.");
         }
-
-        if (!collection.getOwner().equals(user)){
+        
+        if (!collection.getOwner().getUid().equals(user.getUid())) {
             throw new RPCException("You do not own the collection with uid "
                     + collection.getUid());
         }

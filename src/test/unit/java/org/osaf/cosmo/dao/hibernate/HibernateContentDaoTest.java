@@ -949,6 +949,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem newItem = contentDao.createContent(root, item);
 
         clearSession();
+        newItem = contentDao.findContentByUid(newItem.getUid());
 
         Ticket ticket1 = new Ticket();
         ticket1.setKey("ticket1");
@@ -959,7 +960,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         privs.add("privs2");
         ticket1.setPrivileges(privs);
 
-        contentDao.createTicket("/testuser/" + name, ticket1);
+        contentDao.createTicket(newItem, ticket1);
 
         Ticket ticket2 = new Ticket();
         ticket2.setKey("ticket2");
@@ -970,7 +971,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         privs.add("priv4");
         ticket2.setPrivileges(privs);
 
-        contentDao.createTicket("/testuser/" + name, ticket2);
+        contentDao.createTicket(newItem, ticket2);
 
         clearSession();
 

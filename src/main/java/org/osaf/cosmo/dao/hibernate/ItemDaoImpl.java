@@ -215,26 +215,6 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.dao.TicketDao#createTicket(java.lang.String, org.osaf.cosmo.model.Ticket)
-     */
-    public void createTicket(String path, Ticket ticket) {
-
-        if(path==null)
-            throw new IllegalArgumentException("path cannot be null");
-
-        try {
-            Item item = getItemPathTranslator().findItemByPath(path);
-            if (item == null)
-                throw new ItemNotFoundException("item at " + path
-                        + " not found");
-
-            createTicket(item, ticket);
-        } catch (HibernateException e) {
-            throw SessionFactoryUtils.convertHibernateAccessException(e);
-        }
-    }
-
-    /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.TicketDao#getTicket(java.lang.String, java.lang.String)
      */
     public Ticket getTicket(String path, String key) {

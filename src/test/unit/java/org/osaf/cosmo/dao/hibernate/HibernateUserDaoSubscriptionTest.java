@@ -42,7 +42,7 @@ public class HibernateUserDaoSubscriptionTest
         User user = getUser(userDao, "subuser1");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
         CollectionItem collection = getCollection(root, "subcoll1");
-        Ticket ticket = generateTicket("/subuser1/subcoll1", user);
+        Ticket ticket = generateTicket(collection, user);
 
         CollectionSubscription sub1 = new CollectionSubscription();
         sub1.setDisplayName("sub1");
@@ -113,12 +113,12 @@ public class HibernateUserDaoSubscriptionTest
         return contentDao.createCollection(parent, collection);
     }
 
-    private Ticket generateTicket(String path,
+    private Ticket generateTicket(Item item,
                                   User owner) {
         Ticket ticket = new Ticket();
         ticket.setOwner(owner);
         ticket.setTimeout(Ticket.TIMEOUT_INFINITE);
-        contentDao.createTicket(path, ticket);
+        contentDao.createTicket(item, ticket);
         return ticket;
     }
 }

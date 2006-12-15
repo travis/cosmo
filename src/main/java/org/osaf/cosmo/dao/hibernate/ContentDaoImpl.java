@@ -343,21 +343,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.osaf.cosmo.dao.hibernate.ItemDaoImpl#findItemByPath(java.lang.String)
-     */
-    public Item findItemByPath(String path) {
-
-        try {
-            Item item = getItemPathTranslator().findItemByPath(path);
-            return item;
-        } catch (HibernateException e) {
-            throw SessionFactoryUtils.convertHibernateAccessException(e);
-        }
-    }
-
     
     /*
      * (non-Javadoc)

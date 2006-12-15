@@ -17,6 +17,7 @@ package org.osaf.cosmo.rpc;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -721,10 +722,11 @@ public class RPCServiceImpl implements RPCService {
                 .toArray(new Subscription[subscriptions.size()]);
     }
 
-    public org.osaf.cosmo.rpc.model.Ticket getTicket(String ticketId, String collectionId) throws RPCException{
+    public org.osaf.cosmo.rpc.model.Ticket getTicket(String ticketId,
+            String collectionId) throws RPCException {
         org.osaf.cosmo.rpc.model.Ticket rpcTicket = new org.osaf.cosmo.rpc.model.Ticket();
         Ticket ticket = contentService.getTicket(collectionId, ticketId);
-        rpcTicket.setPriveleges(ticket.getPrivileges());
+        rpcTicket.setPrivileges(new HashSet<String>(ticket.getPrivileges()));
         rpcTicket.setTicketId(ticketId);
         return rpcTicket;
     }

@@ -280,7 +280,7 @@ function CalForm() {
 
     this.getTimezoneSelectorOptions = function(region){
         var tzIds = region ? cosmo.datetime.timezone.getTzIdsForRegion(region).sort() : null;
-        var options = [{text:getText("Main.DetailForm.TimezoneSelector.Timezone"), value:null}];
+        var options = [{text:getText("Main.DetailForm.TimezoneSelector.Timezone"), value:""}];
         if (tzIds){
             dojo.lang.map(tzIds, function(tzId){
                 options.push({text:tzId.substr(tzId.indexOf("/") + 1).replace(/_/g," "), value:tzId});
@@ -575,15 +575,7 @@ function CalForm() {
         rE = form.recurend.value != 'mm/dd/yyyy' ?
             form.recurend.value : '';
         tzId = form.tzId.value || null;
-        /*
-        FIXME!!!!!
-        
-        */
-        if (tzId == "Time Zone..."){
-            tzId = null;
-        }
 
-        
         // Error checking
         // =======================
         if (!title) {

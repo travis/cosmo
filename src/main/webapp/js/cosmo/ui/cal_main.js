@@ -14,6 +14,8 @@
  * limitations under the License.
 */
 
+dojo.require("cosmo.conduits");
+
 // Global variables for X and Y position for mouse
 var xPos = 0;
 var yPos = 0;
@@ -54,12 +56,12 @@ var Cal = new function () {
     // Current date for highlighting in the interface
     this.currDate = null;
     
-    // The path to the currently selected calendar
-    this.currentCalendar = null;
+    // The path to the currently selected collection
+    this.currentCollection = null;
     
     //The list of calendars available to the current user
-    this.calendars = [];
-    
+    this.currentCollections = [];
+
     // Create the 'Welcome to Cosmo' event?
     this.createWelcomeItem = false;
     
@@ -79,7 +81,6 @@ var Cal = new function () {
         var allDayDiv = null;
         
         this.currDate = new Date();
-        this.calendars = [];
 
         // Create and init the Cosmo service
         // --------------
@@ -123,20 +124,51 @@ var Cal = new function () {
         
         // Load/create calendar to view
         // --------------
+        // TODO: Remember to sort at some point
         // If we received a ticket, just grab the specified collection
         if (ticketKey){
-        	this.calendars = [
-        		this.serv.getCalendar(collectionUid, ticketKey)
-        		];
+        	var collection = this.serv.getCalendar(collectionUid, ticketKey);
+        	this.currentCollections.push(
+        		{
+        			collection: collection,
+        			transportInfo: this.serv.getTicket(ticketKey, collectionUid),
+        			conduit: cosmo.conduits.AnonymousTicketedConduit,
+        			displayName: collection.name
+        		}
+        		);
         }
 		
         // Otherwise, get all calendars for this user
 		else {
-	        this.calendars = this.serv.getCalendars();
-	        //TODO need to sort
-	        this.calendars.sort(); // Sort by alpha
+
+	        var userCollections = this.serv.getCalendars();
+			for (var i = 0; i < userCollections.length; i++){
+				var collection = userCollections[i];
+				this.currentCollections.push(
+					{
+        			collection: collection,
+        			transportInfo: null,
+        			conduit: cosmo.conduits.OwnedCollectionConduit,
+        			displayName: collection.name
+					}
+				);
+			}
+	        
+	        var subscriptions = this.serv.getSubscriptions();
+			for (var i = 0; i < subscriptions.length; i++){
+				var subscription = subscriptions[i];
+				this.currentCollections.push(
+					{
+        			collection: subscription.calendar,
+        			transportInfo: subscription.ticket,
+        			conduit: cosmo.conduits.SubscriptionConduit,
+        			displayName: subscription.displayName
+					}
+				);
+			}
+	        
 	        // No cals for this user
-	        if (this.calendars.length == 0){
+	        if (this.currentCollections.length == 0){
 	            // Create initial cal
 	            try {
 	                var uid = this.serv.createCalendar('Cosmo');
@@ -145,33 +177,45 @@ var Cal = new function () {
 	                cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);
 	                return false;
 	            }
-				this.calendars = [this.serv.getCalendar(uid)];
+		        var collection = this.serv.getCalendar(uid);
+	            this.currentCollections.push(
+					{
+        			collection: collection,
+        			transportInfo: null,
+        			conduit: cosmo.conduits.OwnedCollectionConduit,
+        			displayName: calendar.name
+					}
+				);
 	            
 	            // Add 'Welcome to Cosmo' Event
 	            this.createWelcomeItem = true;
 	        }
 		}
+		
         // If more than one cal exists, create the cal selector nav
-        if (this.calendars.length > 1) {
-            this.calForm.addCalSelector(this.calendars);
+        if (this.currentCollections.length > 1) {
+            this.calForm.addCalSelector(this.currentCollections);
         }
         
         // If we received a collectionUid, select that collection
 		if (collectionUid){
-			for (var i = 0; i < this.calendars.length; i++){
-				if (this.calendars[i].uid == collectionUid){
-					this.currentCalendar = this.calendars[i];
+			for (var i = 0; i < this.currentCollections.length; i++){
+				if (this.currentCollections[i].collection.uid == collectionUid){
+					this.currentCollection = this.currentCollections[i];
 					break;
 				}
 			}
         }
         // Otherwise, use the first calendar
         else {
-	        this.currentCalendar = this.calendars[0];
+	        this.currentCollection = this.currentCollections[0];
         }
+        
         // Load and display events
         // --------------
+
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
+
         this.uiMask.hide();
         
         // Scroll to 8am for normal event
@@ -546,7 +590,7 @@ var Cal = new function () {
     this.goSelCal = function () {
         var selectElement = Cal.calForm.form.calSelectElem;
         var index = selectElement.options[selectElement.selectedIndex].value;
-        Cal.currentCalendar = Cal.calendars[index];
+        Cal.currentCollection = Cal.currentCollections[index];
         // Load and display events
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
         Cal.uiMask.hide();

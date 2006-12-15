@@ -31,7 +31,9 @@ import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.rpc.model.Calendar;
 import org.osaf.cosmo.rpc.model.CosmoDate;
@@ -237,23 +239,32 @@ public class RPCServiceImplTest extends BaseMockServletTestCase {
         calendars = rpcService.getCalendars(request);
         assertEquals(calendars.length, initialNumberOfCalendars - 1);
     }
-    
+
     public void testAddGetRemoveSubscriptions() throws Exception{
-        rpcService.saveSubscription("SUB1", "12345", "DISP_NAME");
+        CollectionItem collection = testHelper.makeDummyCollection(user);
+        Ticket ticket = testHelper.makeDummyTicket();
+        contentService.createCollection(
+                contentService.getRootItem(user), collection);
+        contentService.createTicket(collection, ticket);
+        
+        String subName = collection.getUid();
+        String ticketKey = ticket.getKey();
+        
+        rpcService.saveSubscription(subName, ticketKey, "DISP_NAME");
         User updatedUser = userService.getUser(user.getUsername());
-        CollectionSubscription cs = updatedUser.getSubscription("SUB1", "12345");
+        CollectionSubscription cs = updatedUser.getSubscription(subName, ticketKey);
         assertNotNull(cs);
         assertEquals("DISP_NAME", cs.getDisplayName());
-        rpcService.saveSubscription("SUB1", "12345", "NEW_DISP");
+        rpcService.saveSubscription(subName, ticketKey, "NEW_DISP");
         updatedUser = userService.getUser(user.getUsername());
-        cs = updatedUser.getSubscription("SUB1", "12345");
+        cs = updatedUser.getSubscription(subName, ticketKey);
         assertEquals("NEW_DISP", cs.getDisplayName());
-        rpcService.deleteSubscription("SUB1", "12345");
+        rpcService.deleteSubscription(subName, ticketKey);
         updatedUser = userService.getUser(user.getUsername());
-        cs = updatedUser.getSubscription("SUB1", "12345");
+        cs = updatedUser.getSubscription(subName, ticketKey);
         assertNull(cs);
         }
-    
+
     public String getServletPath() {
         return SERVLET_PATH;
     }

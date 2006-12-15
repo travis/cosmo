@@ -22,21 +22,21 @@ import java.util.Set;
  * @author bobbyrullo
  */
 public class Ticket {
-    private String ticketId;
-    private Set priveleges;
+    private String ticketKey;
+    private Set privileges;
     
     public Set getPrivileges() {
-        return priveleges;
+        return privileges;
     }
     
     public void setPrivileges(Set priveleges) {
-        this.priveleges = priveleges;
+        this.privileges = priveleges;
     }
     
     public String getTicketKey() {
-        return ticketId;
+        return ticketKey;
     }
     public void setTicketId(String ticketId) {
-        this.ticketId = ticketId;
+        this.ticketKey = ticketId;
     }
  }

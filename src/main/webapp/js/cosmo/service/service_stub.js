@@ -171,6 +171,12 @@ ScoobyService.prototype = {
         originalEventId, originalEventEndDate){},
     
     /**
+     * Get the calendar with the specified uid.
+     * @param collectionId the uid of the collection to get
+     */
+    getCalendar: function(collectionId){},
+    
+    /**
      * Get the subscription identified with the specified collectionId and ticketKey
      */
     getSubscription: function(collectionId, ticketKey){},

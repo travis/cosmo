@@ -203,3 +203,4 @@ function Ticket(){
     this.priveleges = {}; //a Set
     this.ticketKey = null;
 }
+

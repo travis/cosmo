@@ -668,22 +668,26 @@ public class RPCServiceImpl implements RPCService {
         return calendarEventItem.getUid();
     }
 
-    public void saveSubscription(String collectionUid, String ticket, String displayName) throws RPCException{
+    public void saveSubscription(String collectionUid, String ticketKey, String displayName) throws RPCException{
         User user = getUser();
         if (user == null){
             throw new RPCException("You must be logged in to subscribe to a collection");
         }
+        
+        this.checkTicketProvidesPermissions(
+                getCollectionItem(collectionUid), ticketKey, 
+                this.READ_PERM);
 
         CollectionSubscription sub = null;
 
         //first see if that subscription exists
-        sub = user.getSubscription(collectionUid, ticket);
+        sub = user.getSubscription(collectionUid, ticketKey);
         if (sub == null){
             sub = new CollectionSubscription();
             sub.setCollectionUid(collectionUid);
             sub.setDisplayName(displayName);
             sub.setOwner(user);
-            sub.setTicketKey(ticket);
+            sub.setTicketKey(ticketKey);
             user.addSubscription(sub);
         } else {
             sub.setDisplayName(displayName);
@@ -692,13 +696,13 @@ public class RPCServiceImpl implements RPCService {
         userService.updateUser(user);
     }
 
-    public void deleteSubscription(String collectionUid, String ticket) throws RPCException{
+    public void deleteSubscription(String collectionUid, String ticketKey) throws RPCException{
         User user = getUser();
         if (user == null){
             throw new RPCException("You must be logged in to subscribe to a collection");
         }
 
-        user.removeSubscription(collectionUid, ticket);
+        user.removeSubscription(collectionUid, ticketKey);
         userService.updateUser(user);
     }
 
@@ -731,25 +735,33 @@ public class RPCServiceImpl implements RPCService {
         return rpcTicket;
     }
 
-    public Subscription getSubscription(String cid, String ticketId,
+    public Subscription getSubscription(String collectionUid, String ticketKey,
             HttpServletRequest request) throws RPCException {
         User user = getUser();
         if (user == null) {
             throw new RPCException(
                     "You must be logged in to subscribe to a collection");
         }
-        CollectionSubscription colsub = user.getSubscription(cid, ticketId);
+        
+        checkTicketProvidesPermissions(
+                getCollectionItem(collectionUid), ticketKey, READ_PERM);
+        
+        CollectionSubscription colsub = user.getSubscription(collectionUid, ticketKey);
         return createSubscription(colsub, request);
     }
 
     private Subscription createSubscription(
             CollectionSubscription collectionSubscription,
             HttpServletRequest request) throws RPCException {
+        
+        
+        
         Subscription subscription = new Subscription();
 
         Calendar calendar = getCalendar(collectionSubscription
                 .getCollectionUid(), collectionSubscription.getTicketKey(),
                 request);
+                
         subscription.setCalendar(calendar);
 
         subscription.setDisplayName(collectionSubscription.getDisplayName());

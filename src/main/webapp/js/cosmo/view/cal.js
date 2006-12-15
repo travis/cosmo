@@ -320,13 +320,9 @@ cosmo.view.cal = new function() {
                         // Look up the master event for the recurrence and pass the result
                         // on to function h
                         f = function() { 
-                        	var reqId = Cal.currentCalendar.ticketKey ? 
-                        		Cal.serv.getEvent(
-                            		h, Cal.currentCalendar.uid, ev.data.id, 
-                            		Cal.currentCalendar.ticketKey): 
-                        		Cal.serv.getEvent(
-                            		h, Cal.currentCalendar.uid, ev.data.id); 
-                            
+                        	var reqId = Cal.currentCollection.conduit.getEvent(
+					            Cal.currentCollection.collection.uid, ev.data.id, 
+	            				Cal.currentCollection.transportInfo, h);
                             };
                     }
                     break;
@@ -420,15 +416,15 @@ cosmo.view.cal = new function() {
     function doSaveEvent(ev, opts) {
         // Pass the original event and opts object to the handler function
         // along with the original params passed back in from the async response
+
         var f = function(newEvId, err, reqId) {
             handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
 
-        requestId = Cal.currentCalendar.ticketKey?
-        	Cal.serv.saveEvent(
-            	f, Cal.currentCalendar.uid, ev.data, Cal.currentCalendar.ticketKey):
-        	Cal.serv.saveEvent(
-            	f, Cal.currentCalendar.uid, ev.data);
+        requestId = Cal.currentCollection.conduit.saveEvent(
+			Cal.currentCollection.collection.uid, ev.data, 
+	        Cal.currentCollection.transportInfo, f);
+        
         // Add to processing queue -- canvas will not re-render until
         // queue is empty
         self.processingQueue.push(requestId);
@@ -468,11 +464,10 @@ cosmo.view.cal = new function() {
         var f = function(newEvId, err, reqId) {
             handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
-        requestId = Cal.currentCalendar.ticketKey?
-        	Cal.serv.saveNewEventBreakRecurrence(
-            	f, Cal.currentCalendar.uid, ev.data, origId, recurEnd, Cal.currentCalendar.ticketKey):
-        	Cal.serv.saveNewEventBreakRecurrence(
-            	f, Cal.currentCalendar.uid, ev.data, origId, recurEnd);
+        requestId = Cal.currentCollection.conduit.saveNewEventBreakRecurrence(
+			Cal.currentCollection.collection.uid, ev.data, origId, recurEnd,
+	        Cal.currentCollection.transportInfo, f);
+        
         self.processingQueue.push(requestId);
         self.lastSent = null;
     }
@@ -672,11 +667,9 @@ cosmo.view.cal = new function() {
                             }
                         };
                         f = function() { 
-                        
-                        	var reqId = Cal.currentCalendar.ticketKey?
-	         	    	        Cal.serv.getEvent(h, Cal.currentCalendar.uid, ev.data.id,
-	         	    	        	Cal.currentCalendar.ticketKey):
-	         	    	        Cal.serv.getEvent(h, Cal.currentCalendar.uid, ev.data.id);
+                            var reqId = Cal.currentCollection.conduit.getEvent(
+								Cal.currentCollection.collection.uid, ev.data.id,
+						        Cal.currentCollection.transportInfo, h);
                         };
                     }
                     break;
@@ -714,12 +707,10 @@ cosmo.view.cal = new function() {
                             }
                         };
                         // Look up the RecurrenceRule and pass the result on to function h
-                        f = function() { var reqId = Cal.currentCalendar.tickeyKey?
-                        	Cal.serv.getRecurrenceRules(h,
-                            	Cal.currentCalendar.uid, [ev.data.id], Cal.currentCalendar.ticketKey):
-                        	Cal.serv.getRecurrenceRules(h,
-                            	Cal.currentCalendar.uid, [ev.data.id]); 
-                            
+                        f = function() { 
+                            var reqId = Cal.currentCollection.conduit.getRecurrenceRules(
+								Cal.currentCollection.collection.uid, [ev.data.id],
+						        Cal.currentCollection.transportInfo, h);
                             };
                     break;
                 // Save the RecurrenceRule with a new exception added for this instance
@@ -755,11 +746,10 @@ cosmo.view.cal = new function() {
         // along with the original params passed back in from the async response
         var f = function(newEvId, err, reqId) {
             handleRemoveResult(ev, newEvId, err, reqId, opts); };
-        var requestId = Cal.currentCalendar.ticketKey?
-        	Cal.serv.removeEvent(
-            	f, Cal.currentCalendar.uid, ev.data.id, Cal.currentCalendar.ticketKey):
-        	Cal.serv.removeEvent(
-            	f, Cal.currentCalendar.uid, ev.data.id);
+            
+        var requestId = Cal.currentCollection.conduit.removeEvent(
+			Cal.currentCollection.collection.uid, ev.data.id,
+	        Cal.currentCollection.transportInfo, f);
     }
     /**
      * Handles the response from the async call when removing an event.
@@ -807,11 +797,10 @@ cosmo.view.cal = new function() {
         // along with the original params passed back in from the async response
         var f = function(ret, err, reqId) {
             handleSaveRecurrenceRuleResult(ev, err, reqId, opts); };
-        var requestId = Cal.currentCalendar.ticketKey?
-	        Cal.serv.saveRecurrenceRule(
-    	        f, Cal.currentCalendar.uid, ev.data.id, rrule, Cal.currentCalendar.ticketKey):
-	        Cal.serv.saveRecurrenceRule(
-    	        f, Cal.currentCalendar.uid, ev.data.id, rrule);
+        var requestId = Cal.currentCollection.conduit.saveRecurrenceRule(
+        	Cal.currentCollection.collection.uid,
+			ev.data.id, rrule,
+	        Cal.currentCollection.transportInfo, f);
     }
     /**
      * Handles the response from the async call when saving changes
@@ -915,10 +904,10 @@ cosmo.view.cal = new function() {
                'opts': opts } });
         }
 
-        Cal.currentCalendar.ticketKey?
-           	Cal.serv.expandEvents(f, Cal.currentCalendar.uid, [id], s, e, 
-           		Cal.currentCalendar.ticketKey):
-           	Cal.serv.expandEvents(f, Cal.currentCalendar.uid, [id], s, e);
+        Cal.currentCollection.conduit.expandEvents(
+        	Cal.currentCollection.collection.uid, [id], s, e,
+	        Cal.currentCollection.transportInfo, f);
+
     }
     /**
      * Take an array of CalEventData objects, and create a Hash of
@@ -1037,15 +1026,17 @@ cosmo.view.cal = new function() {
         // Load the array of events
         // ======================
         try {
-            eventLoadList = Cal.currentCalendar.ticketKey?
-            	Cal.serv.getEvents(Cal.currentCalendar.uid, s, e, 
-            		Cal.currentCalendar.ticketKey):
-            	Cal.serv.getEvents(Cal.currentCalendar.uid, s, e);
+
+            eventLoadList = Cal.currentCollection.conduit.getEvents(
+	            Cal.currentCollection.collection.uid, s, e, 
+	            Cal.currentCollection.transportInfo);
+
         }
         catch(e) {
             cosmo.app.showErr(getText('Main.Error.LoadEventsFailed'), e);
             return false;
         }
+
         var eventLoadHash = createEventRegistry(eventLoadList);
         dojo.event.topic.publish('/calEvent', { 'action': 'eventsLoadSuccess',
             'data': eventLoadHash });

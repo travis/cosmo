@@ -22,16 +22,16 @@
 dojo.provide("cosmo.util.debug");
 
 //TODO better place for this?
-cosmo.util.debug.aliasToDeprecatedFuncion = function(currentFunction, deprecatedName, version){
-    var func = function(){
+cosmo.util.debug.aliasToDeprecatedFuncion = function (currentFunction, deprecatedName, version){
+    var func = function (){
         dojo.deprecated(deprecatedName, null, version);
         return currentFunction.apply(this, arguments);
     }
     eval("window." + deprecatedName +  " = func");
     eval("window." + deprecatedName + ".prototype = currentFunction.prototype");
-}
+};
 
-cosmo.util.debug.genericToString = function(){
+cosmo.util.debug.genericToString = function (){
     var str = "";
     for (var propName in this){
         var prop = this[propName];
@@ -40,38 +40,53 @@ cosmo.util.debug.genericToString = function(){
         }
     }
     return str;
-}
+};
 
-Timer = function(functionName) {
+cosmo.util.debug.dumpIntoPopup = function (str) {
+    var errorWin;
+    // Create new window and display error
+    try {
+      errorWin = window.open('about:blank', 'errorWin');
+      errorWin.document.body.innerHTML = str;
+    }
+    // If pop-up gets blocked, inform user
+    catch(e) {
+      alert('An error occurred, but the error message cannot be' +
+      ' displayed because of your browser\'s pop-up blocker.\n' +
+      'Please allow pop-ups from this Web site.');
+    }
+};
+
+Timer = function (functionName) {
    this.functionName = functionName;
    var now = new Date();
    this.startTime = now.getTime();
    this.endTime = 0;
    log.debug("Start function '" + functionName + "'");
-}
+};
 
-Timer.prototype.end = function(){
+Timer.prototype.end = function (){
     var now = new Date();
     this.endTime = now.getTime();
     var elapsedTime = this.endTime - this.startTime;
     log.debug("End function '" + this.functionName + "'; elapsedTime: "
         + elapsedTime + "ms");
-}
+};
 
 Timer.prototype.toString = cosmo.util.debug.genericToString;
 
 function timeFunction(object, functionName){
    var oldMethod = object[functionName];
-   object[functionName] = function(){
+   object[functionName] = function (){
        var timer = new Timer(functionName);
        var result = oldMethod.apply(object, arguments);
        timer.end();
        return result;
    }
-}
+};
 
 //deprecate old version sans namespace
-genericToString = function(){
+genericToString = function (){
     dojo.deprecated("genericToString", "Use cosmo.util.debug.genericToString instead", "Version 0.6 Final Release");
     return cosmo.util.debug.genericToString.apply(this, arguments);
-}
+};

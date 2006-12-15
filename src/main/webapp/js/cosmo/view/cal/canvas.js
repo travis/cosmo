@@ -19,7 +19,7 @@ dojo.require('cosmo.ui.event.handlers');
 
 dojo.provide('cosmo.view.cal.canvas');
 
-cosmo.view.cal.canvas = new function() {
+cosmo.view.cal.canvas = new function () {
     
     // Need some closure for scope
     var self = this;
@@ -178,8 +178,8 @@ cosmo.view.cal.canvas = new function() {
         var id = key;
         var ev = val;
         // Create the lozenge and link it to the event
-        ev.lozenge = ev.data.allDay ? new NoTimeLozenge(id) :
-            new HasTimeLozenge(id);
+        ev.lozenge = ev.data.allDay ? new cosmo.view.cal.NoTimeLozenge(id) :
+            new cosmo.view.cal.HasTimeLozenge(id);
         ev.lozenge.insert(id);
     }
     /**
@@ -588,7 +588,7 @@ cosmo.view.cal.canvas = new function() {
      * @param cmd A JS Object, the command containing orders for
      * how to handle the published event.
      */
-    this.handlePub = function(cmd) {
+    this.handlePub = function (cmd) {
         var act = cmd.action;
         var ev = cmd.data;
         var opts = cmd.opts;
@@ -655,7 +655,7 @@ cosmo.view.cal.canvas = new function() {
      * @param vE Date, end of the view range
      * @param cD Date, the current date on the client
      */
-    this.render = function(vS, vE, cD) {
+    this.render = function (vS, vE, cD) {
         var viewStart = vS;
         var viewEnd = vE;
         var currDate = cD;
@@ -986,7 +986,7 @@ cosmo.view.cal.canvas = new function() {
      * the all-day area, and any amount that the timed canvas
      * has scrolled.
      */
-    this.getTimedCanvasScrollTop = function() {
+    this.getTimedCanvasScrollTop = function () {
         // Has to be looked up every time, as value may change
         // either when user scrolls or resizes all-day event area
         var top = $('timedScrollingMainDiv').scrollTop;
@@ -1005,13 +1005,13 @@ cosmo.view.cal.canvas = new function() {
      * grabs the selected event
      * @return CalEvent object, the currently selected event
      */
-    this.getSelectedEvent = function() {
+    this.getSelectedEvent = function () {
         return self.selectedEvent;
     };
     /**
      * Clean up event listeners and DOM refs
      */
-    this.cleanup = function() {
+    this.cleanup = function () {
         // Let's be tidy
         self.eventRegistry = null;
         allDayArea.cleanup();

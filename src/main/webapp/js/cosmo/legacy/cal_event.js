@@ -62,7 +62,7 @@ function CalEvent(id, lozenge) {
      * the original value. If nothing has changed, returns null.
      * 
      */
-    this.hasChanged = function() {
+    this.hasChanged = function () {
         var d = this.data;
         var dO = this.dataOrig;
         var ret = [];
@@ -73,7 +73,7 @@ function CalEvent(id, lozenge) {
          * @param orig String the original event status
          * @return Boolean, true or false
          */
-        var compareStatus = function(curr, orig) {
+        var compareStatus = function (curr, orig) {
             if ((!curr && orig == EventStatus.CONFIRMED) || 
                 (curr == EventStatus.CONFIRMED && !orig)) {
                 return false;
@@ -88,7 +88,7 @@ function CalEvent(id, lozenge) {
          * @param orig ScoobyDate/Date the original event date
          * @return Boolean, true or false
          */
-        var compareDateTime = function(curr, orig) {
+        var compareDateTime = function (curr, orig) {
             if (curr.toUTC() != orig.toUTC()) {
                 return true;
             }
@@ -104,7 +104,7 @@ function CalEvent(id, lozenge) {
          * @param orig RecurrenceRule, the original value
          * @return Boolean, true or false
          */
-        var compareRecurrence = function(curr, orig) {
+        var compareRecurrence = function (curr, orig) {
             // No recurrence
             if (!curr && !orig) {
                 return false;
@@ -172,7 +172,7 @@ function CalEvent(id, lozenge) {
      * Allows the user to cancel before saving changes to an event
      * Restores event to its position previous to the aborted save
      */
-    this.cancelSave = function() {
+    this.cancelSave = function () {
         // Put the lozenge back where it was
         // FIXME: Use topics
         var ev = cosmo.view.cal.canvas.getSelectedEvent();
@@ -188,15 +188,15 @@ function CalEvent(id, lozenge) {
      * e.g., between all-day and normal, or between normal single
      * and normal composite
      */
-    this.replaceLozenge = function() {
+    this.replaceLozenge = function () {
         // Remove the current lozenge
         this.lozenge.remove();
         // Replace with new one
         if (this.data.allDay) {
-            this.lozenge = new NoTimeLozenge(this.id);
+            this.lozenge = new cosmo.view.cal.NoTimeLozenge(this.id);
         }
         else {
-            this.lozenge = new HasTimeLozenge(this.id);
+            this.lozenge = new cosmo.view.cal.HasTimeLozenge(this.id);
         }
         this.lozenge.insert(this.id);
     };
@@ -206,7 +206,7 @@ function CalEvent(id, lozenge) {
      * Used when canceling a save from the confirmation dialog
      * and when a save operation fails
      */
-    this.restoreEvent = function() {
+    this.restoreEvent = function () {
         if (this.restoreFromSnapshot()) {
             this.lozenge.updateFromEvent(this);
             // Update lozenge and event detail form display
@@ -221,7 +221,7 @@ function CalEvent(id, lozenge) {
      * store in the dataOrig property. This is used to back out of
      * a cancelled/failed save operation or failed remove operation.
      */
-    this.makeSnapshot = function() {
+    this.makeSnapshot = function () {
         // Make backup snapshot before saving
         // ================
         this.dataOrig = CalEventData.clone(this.data);
@@ -232,7 +232,7 @@ function CalEvent(id, lozenge) {
      * store in the dataOrig property. This is used to back out of
      * a cancelled/failed save operation or failed remove operation.
      */
-    this.restoreFromSnapshot = function() {
+    this.restoreFromSnapshot = function () {
         // Restore from backup snapshot
         // ================
         this.data = CalEventData.clone(this.dataOrig);
@@ -244,7 +244,7 @@ function CalEvent(id, lozenge) {
      * TO-DO: Since this is just a checked property, do we really need
      * setter/getter for this?
      */
-    this.setInputDisabled = function(isDisabled) {
+    this.setInputDisabled = function (isDisabled) {
         if (isDisabled) {
             this.inputDisabled = true;
         }
@@ -259,14 +259,14 @@ function CalEvent(id, lozenge) {
      * TO-DO: Since this is just a checked property, do we really need
      * setter/getter for this?
      */
-    this.getInputDisabled = function() {
+    this.getInputDisabled = function () {
         return this.inputDisabled;
     };
     /**
      * Whether the start and end properties of an event put it
      * on one side or the other of the current view span
      */
-    this.isOutOfViewRange = function() {
+    this.isOutOfViewRange = function () {
         // Note event data dates are ScoobyDate, viewStart/viewEnd are Date
         // Return true only if both start and end are before view range
         // or both are after view range
@@ -275,16 +275,16 @@ function CalEvent(id, lozenge) {
         return ret;
 
     };
-    this.startsBeforeViewRange = function() {
+    this.startsBeforeViewRange = function () {
         return (this.data.start.toUTC() < Cal.viewStart.getTime());
     };
-    this.endsBeforeViewRange = function() {
+    this.endsBeforeViewRange = function () {
         return (this.data.end.toUTC() < Cal.viewStart.getTime());
     };
-    this.startsAfterViewRange = function() {
+    this.startsAfterViewRange = function () {
         return (this.data.start.toUTC() > Cal.viewEnd.getTime());
     };
-    this.endsAfterViewRange = function() {
+    this.endsAfterViewRange = function () {
         return (this.data.end.toUTC() > Cal.viewEnd.getTime());
     };
     //toString = genericToString;

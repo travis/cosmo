@@ -756,7 +756,6 @@ function CalForm() {
                 var region = tzId.split("/")[0];
                 self.setSelect("tzRegion", region);
                 self.populateTimezoneSelector(region);
-                alert(region)
                 self.setSelect("tzId", tzId);
             }
         } else {

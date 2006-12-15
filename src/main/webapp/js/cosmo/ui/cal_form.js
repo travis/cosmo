@@ -392,7 +392,7 @@ function CalForm() {
         for (var i = 0; i < calendars.length; i++) {
             var calOpt = document.createElement('option');
             calOpt.value = i;
-            calOpt.appendChild(document.createTextNode(calendars[i].collection.name));
+            calOpt.appendChild(document.createTextNode(calendars[i].displayName));
             calSelectElem.appendChild(calOpt);
         }
         calSelectElem.className = 'selectElem';
@@ -575,15 +575,15 @@ function CalForm() {
         rE = form.recurend.value != 'mm/dd/yyyy' ?
             form.recurend.value : '';
         tzId = form.tzId.value || null;
-		/*
-		FIXME!!!!!
-		
-		*/
-		if (tzId == "Time Zone..."){
-			tzId = null;
-		}
+        /*
+        FIXME!!!!!
+        
+        */
+        if (tzId == "Time Zone..."){
+            tzId = null;
+        }
 
-		
+        
         // Error checking
         // =======================
         if (!title) {

@@ -127,88 +127,88 @@ var Cal = new function () {
         // TODO: Remember to sort at some point
         // If we received a ticket, just grab the specified collection
         if (ticketKey){
-        	var collection = this.serv.getCalendar(collectionUid, ticketKey);
-        	this.currentCollections.push(
-        		{
-        			collection: collection,
-        			transportInfo: this.serv.getTicket(ticketKey, collectionUid),
-        			conduit: cosmo.conduits.AnonymousTicketedConduit,
-        			displayName: collection.name
-        		}
-        		);
+            var collection = this.serv.getCalendar(collectionUid, ticketKey);
+            this.currentCollections.push(
+                {
+                    collection: collection,
+                    transportInfo: this.serv.getTicket(ticketKey, collectionUid),
+                    conduit: cosmo.conduits.AnonymousTicketedConduit,
+                    displayName: collection.name
+                }
+                );
         }
-		
+        
         // Otherwise, get all calendars for this user
-		else {
+        else {
 
-	        var userCollections = this.serv.getCalendars();
-			for (var i = 0; i < userCollections.length; i++){
-				var collection = userCollections[i];
-				this.currentCollections.push(
-					{
-        			collection: collection,
-        			transportInfo: null,
-        			conduit: cosmo.conduits.OwnedCollectionConduit,
-        			displayName: collection.name
-					}
-				);
-			}
-	        
-	        var subscriptions = this.serv.getSubscriptions();
-			for (var i = 0; i < subscriptions.length; i++){
-				var subscription = subscriptions[i];
-				this.currentCollections.push(
-					{
-        			collection: subscription.calendar,
-        			transportInfo: subscription.ticket,
-        			conduit: cosmo.conduits.SubscriptionConduit,
-        			displayName: subscription.displayName
-					}
-				);
-			}
-	        
-	        // No cals for this user
-	        if (this.currentCollections.length == 0){
-	            // Create initial cal
-	            try {
-	                var uid = this.serv.createCalendar('Cosmo');
-	            }
-	            catch(e) {
-	                cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);
-	                return false;
-	            }
-		        var collection = this.serv.getCalendar(uid);
-	            this.currentCollections.push(
-					{
-        			collection: collection,
-        			transportInfo: null,
-        			conduit: cosmo.conduits.OwnedCollectionConduit,
-        			displayName: calendar.name
-					}
-				);
-	            
-	            // Add 'Welcome to Cosmo' Event
-	            this.createWelcomeItem = true;
-	        }
-		}
-		
+            var userCollections = this.serv.getCalendars();
+            for (var i = 0; i < userCollections.length; i++){
+                var collection = userCollections[i];
+                this.currentCollections.push(
+                    {
+                    collection: collection,
+                    transportInfo: null,
+                    conduit: cosmo.conduits.OwnedCollectionConduit,
+                    displayName: collection.name
+                    }
+                );
+            }
+            
+            var subscriptions = this.serv.getSubscriptions();
+            for (var i = 0; i < subscriptions.length; i++){
+                var subscription = subscriptions[i];
+                this.currentCollections.push(
+                    {
+                    collection: subscription.calendar,
+                    transportInfo: subscription,
+                    conduit: cosmo.conduits.SubscriptionConduit,
+                    displayName: subscription.displayName
+                    }
+                );
+            }
+            
+            // No cals for this user
+            if (this.currentCollections.length == 0){
+                // Create initial cal
+                try {
+                    var uid = this.serv.createCalendar('Cosmo');
+                }
+                catch(e) {
+                    cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);
+                    return false;
+                }
+                var collection = this.serv.getCalendar(uid);
+                this.currentCollections.push(
+                    {
+                    collection: collection,
+                    transportInfo: null,
+                    conduit: cosmo.conduits.OwnedCollectionConduit,
+                    displayName: calendar.name
+                    }
+                );
+                
+                // Add 'Welcome to Cosmo' Event
+                this.createWelcomeItem = true;
+            }
+        }
+        
         // If more than one cal exists, create the cal selector nav
         if (this.currentCollections.length > 1) {
             this.calForm.addCalSelector(this.currentCollections);
         }
         
         // If we received a collectionUid, select that collection
-		if (collectionUid){
-			for (var i = 0; i < this.currentCollections.length; i++){
-				if (this.currentCollections[i].collection.uid == collectionUid){
-					this.currentCollection = this.currentCollections[i];
-					break;
-				}
-			}
+        if (collectionUid){
+            for (var i = 0; i < this.currentCollections.length; i++){
+                if (this.currentCollections[i].collection.uid == collectionUid){
+                    this.currentCollection = this.currentCollections[i];
+                    break;
+                }
+            }
         }
         // Otherwise, use the first calendar
         else {
-	        this.currentCollection = this.currentCollections[0];
+            this.currentCollection = this.currentCollections[0];
         }
         
         // Load and display events

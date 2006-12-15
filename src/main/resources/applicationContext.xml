@@ -256,6 +256,9 @@
   <bean id="calendarIndexer"
         class="org.osaf.cosmo.dao.hibernate.DefaultCalendarIndexer" />
 
+  <bean id="calendarFilterTranslator"
+        class="org.osaf.cosmo.dao.hibernate.SQLCalendarFilterTranslator" />
+
   <bean id="calendarDao"
         class="org.osaf.cosmo.dao.hibernate.CalendarDaoImpl"
         init-method="init"
@@ -263,17 +266,8 @@
     <property name="sessionFactory">
       <ref bean="sessionFactory" />
     </property>
-    <property name="calendarFilterTranslatorClass">
-      <value>org.osaf.cosmo.dao.hibernate.SQLCalendarFilterTranslator</value>
-    </property>
-    <property name="itemPathTranslator">
-      <ref bean="itemPathTranslator" />
-    </property>
-    <property name="idGenerator">
-      <ref local="idGenerator" />
-    </property>
-    <property name="ticketKeyGenerator">
-      <ref local="ticketKeyGenerator" />
+    <property name="calendarFilterTranslator">
+      <ref bean="calendarFilterTranslator" />
     </property>
   </bean>
 

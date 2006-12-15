@@ -29,19 +29,16 @@ import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * Implemtation of CalendarDao using Hibernate persistence objects.
  */
-public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
+public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao {
 
     private static final Log log = LogFactory.getLog(CalendarDaoImpl.class);
 
-    private String calendarFilterTranslatorClass = null;
-
-    private Class calendarFilterTranslator = null;
-
-
+    private CalendarFilterTranslator calendarFilterTranslator = null;
   
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.CalendarDao#findEvents(org.osaf.cosmo.model.CollectionItem, org.osaf.cosmo.calendar.query.CalendarFilter)
@@ -50,7 +47,7 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
                                              CalendarFilter filter) {
 
         try {
-            List calendarItems = getCalendarFilterTranslater().
+            List calendarItems = calendarFilterTranslator.
                 getCalendarItems(getSession(), collection, filter);
             HashSet<ContentItem> events =
                 new HashSet<ContentItem>();
@@ -77,25 +74,21 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
                     "event.by.calendar.icaluid");
             hibQuery.setParameter("calendar", calendar);
             hibQuery.setParameter("uid", uid);
-            List results = hibQuery.list();
-            if (results.size() > 0)
-                return (ContentItem) results.get(0);
-            else
-                return null;
+            return (ContentItem) hibQuery.uniqueResult();
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
     }
 
-    public String getCalendarFilterTranslatorClass() {
-        return calendarFilterTranslatorClass;
+   
+
+    public CalendarFilterTranslator getCalendarFilterTranslator() {
+        return calendarFilterTranslator;
     }
 
-    public void setCalendarFilterTranslatorClass(
-            String calendarFilterTranslatorClass) {
-        if(calendarFilterTranslatorClass != null)
-            calendarFilterTranslatorClass = calendarFilterTranslatorClass.trim();
-        this.calendarFilterTranslatorClass = calendarFilterTranslatorClass;
+    public void setCalendarFilterTranslator(
+            CalendarFilterTranslator calendarFilterTranslator) {
+        this.calendarFilterTranslator = calendarFilterTranslator;
     }
 
     /**
@@ -103,35 +96,12 @@ public class CalendarDaoImpl extends ItemDaoImpl implements CalendarDao {
      * optional properties.
      */
     public void init() {
-        super.init();
-        if (calendarFilterTranslatorClass == null) {
+        
+        if (calendarFilterTranslator == null) {
             throw new IllegalStateException(
                     "calendarFilterTranslatorClass is required");
         }
 
-        try {
-            calendarFilterTranslator = Class.forName(calendarFilterTranslatorClass);
-            calendarFilterTranslator.newInstance();
-        } catch (Exception e) {
-            log.error(e);
-            throw new IllegalStateException(
-                    "calendarFilterTranslatorClass must be of correct type");
-        }
-
-    }
-    
-  
-    /**
-     * Get instance of the CalendarTranslatorFilter.  Need to return new
-     * instance each time.  
-     * TODO: figure out way to move this into implementation class
-     */
-    protected CalendarFilterTranslator getCalendarFilterTranslater() {
-        try {
-            return (CalendarFilterTranslator) calendarFilterTranslator.newInstance();
-        } catch (Exception e) {
-            return null;
-        }
     }
     
 }

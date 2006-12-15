@@ -26,7 +26,7 @@ import org.osaf.cosmo.model.ContentItem;
  * ContentItems with EventStamps matching certain criteria.
  * 
  */
-public interface CalendarDao extends ItemDao {
+public interface CalendarDao {
 
     /**
      * Find calendar event with a specified icalendar uid. The icalendar format

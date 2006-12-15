@@ -45,9 +45,6 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
             .getLog(SQLCalendarFilterTranslator.class);
 
     private String booleanTrueValue = "1";
-    private HashMap params = new HashMap();
-
-    private int paramCount = 0;
 
     public void setBooleanTrueValue(String booleanTrueValue) {
         this.booleanTrueValue = booleanTrueValue;
@@ -65,8 +62,10 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
      *            query filter
      * @return hibernate query
      */
-    public List<ContentItem> getCalendarItems(Session session, CollectionItem collection, CalendarFilter filter) {
-        SQLQuery query = session.createSQLQuery(getQueryString(filter));
+    public List<ContentItem> getCalendarItems(Session session,
+            CollectionItem collection, CalendarFilter filter) {
+        HashMap params = new HashMap();
+        SQLQuery query = session.createSQLQuery(getQueryString(filter, params));
         query.setParameter("parentid", collection.getId());
         for (Iterator it = params.entrySet().iterator(); it.hasNext();) {
             Entry entry = (Entry) it.next();
@@ -75,18 +74,19 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         query.addEntity(ContentItem.class);
         return (List<ContentItem>) query.list();
     }
-    
+
     /**
      * Generate native SQL query to return all rows from item table that match
      * the given filter. The query contains named parameters.
      * 
      * @param filter
      *            query filter
+     * @param params
+     *            HashMap to store query parameters
      * @return SQL query
      */
-    public String getQueryString(CalendarFilter filter) {
-        params.clear();
-        paramCount = 0;
+    public String getQueryString(CalendarFilter filter, HashMap params) {
+
         StringBuffer buf = new StringBuffer();
         ComponentFilter rootFilter = filter.getFilter();
 
@@ -95,24 +95,26 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         for (Iterator it = rootFilter.getComponentFilters().iterator(); it
                 .hasNext();)
             generateCompFilterSQL(buf, (ComponentFilter) it.next(), prefix, "",
-                    0, "", 0);
+                    0, "", 0, params);
 
         for (Iterator it = rootFilter.getPropFilters().iterator(); it.hasNext();)
             generatePropFilterSQL(buf, (PropertyFilter) it.next(), prefix, "",
-                    0, "", 0);
+                    0, "", 0, params);
 
         return buf.toString();
     }
 
     private void generateCompFilterSQL(StringBuffer sqlBuf,
             ComponentFilter filter, String prefix, String attributeWhere,
-            int attributeJoins, String timeRangeWhere, int timeRangeJoins) {
+            int attributeJoins, String timeRangeWhere, int timeRangeJoins,
+            HashMap params) {
         String myprefix = prefix + "-" + filter.getName().toLowerCase();
 
         // road ends if this is defined
         if (filter.getIsNotDefinedFilter() != null) {
             attributeJoins++;
-            attributeWhere += generateIsNotDefinedSQL(myprefix, attributeJoins);
+            attributeWhere += generateIsNotDefinedSQL(myprefix, attributeJoins,
+                    params);
 
             if (sqlBuf.length() > 0)
                 sqlBuf.append(" union ");
@@ -134,14 +136,15 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
 
             timeRangeWhere += " and "
                     + getTimeRangeWhere(myprefix, filter.getTimeRangeFilter(),
-                            timeRangeJoins);
+                            timeRangeJoins, params);
         }
 
         // end of road if no other filters
         if (!hasCompFilters && !hasPropFilters) {
             if (!hasTimeRangeFilter) {
                 attributeJoins++;
-                attributeWhere += generateIsDefinedSQL(myprefix, attributeJoins);
+                attributeWhere += generateIsDefinedSQL(myprefix,
+                        attributeJoins, params);
             }
 
             if (sqlBuf.length() > 0)
@@ -158,7 +161,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
                 PropertyFilter propFilter = (PropertyFilter) it.next();
                 generatePropFilterSQL(sqlBuf, propFilter, myprefix,
                         attributeWhere, attributeJoins, timeRangeWhere,
-                        timeRangeJoins);
+                        timeRangeJoins, params);
             }
         }
 
@@ -168,7 +171,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
                 ComponentFilter compFilter = (ComponentFilter) it.next();
                 generateCompFilterSQL(sqlBuf, compFilter, myprefix,
                         attributeWhere, attributeJoins, timeRangeWhere,
-                        timeRangeJoins);
+                        timeRangeJoins, params);
             }
         }
 
@@ -176,7 +179,8 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
 
     private void generatePropFilterSQL(StringBuffer sqlBuf,
             PropertyFilter propFilter, String prefix, String attributeWhere,
-            int attributeJoins, String timeRangeWhere, int timeRangeJoins) {
+            int attributeJoins, String timeRangeWhere, int timeRangeJoins,
+            HashMap params) {
         String myprefix = null;
         myprefix = prefix + "_" + propFilter.getName().toLowerCase();
 
@@ -188,7 +192,8 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         // end of road if present
         if (hasIsNotDefinedFilter) {
             attributeJoins++;
-            attributeWhere += generateIsNotDefinedSQL(myprefix, attributeJoins);
+            attributeWhere += generateIsNotDefinedSQL(myprefix, attributeJoins,
+                    params);
 
             if (sqlBuf.length() > 0)
                 sqlBuf.append(" union ");
@@ -206,14 +211,15 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
 
             timeRangeWhere += " and "
                     + getTimeRangeWhere(myprefix, propFilter
-                            .getTimeRangeFilter(), timeRangeJoins);
+                            .getTimeRangeFilter(), timeRangeJoins, params);
         }
 
         // another end of road
         if (!hasIsNotDefinedFilter && !hasTextMatchFilter && !hasParamFilters) {
             if (!hasTimeRangeFilter) {
                 attributeJoins++;
-                attributeWhere += generateIsDefinedSQL(myprefix, attributeJoins);
+                attributeWhere += generateIsDefinedSQL(myprefix,
+                        attributeJoins, params);
             }
 
             if (sqlBuf.length() > 0)
@@ -229,7 +235,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
             TextMatchFilter textMatch = propFilter.getTextMatchFilter();
             attributeJoins++;
             attributeWhere += generateTextMatchSQL(myprefix, attributeJoins,
-                    textMatch);
+                    textMatch, params);
         }
 
         // Deepest we can go is a param filter
@@ -239,11 +245,11 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
                 ParamFilter paramFilter = (ParamFilter) it.next();
                 generateParamFilterSQL(sqlBuf, paramFilter, myprefix,
                         attributeWhere, attributeJoins, timeRangeWhere,
-                        timeRangeJoins);
+                        timeRangeJoins, params);
             }
             return;
         }
-        
+
         // else we generate the query and return
         if (sqlBuf.length() > 0)
             sqlBuf.append(" union ");
@@ -254,7 +260,8 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
 
     private void generateParamFilterSQL(StringBuffer sqlBuf,
             ParamFilter paramFilter, String prefix, String attributeWhere,
-            int attributeJoins, String timeRangeWhere, int timeRangeJoins) {
+            int attributeJoins, String timeRangeWhere, int timeRangeJoins,
+            HashMap params) {
         String myprefix = null;
         myprefix = prefix + "_" + paramFilter.getName().toLowerCase();
 
@@ -263,7 +270,8 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
 
         if (hasIsNotDefinedFilter) {
             attributeJoins++;
-            attributeWhere += generateIsNotDefinedSQL(myprefix, attributeJoins);
+            attributeWhere += generateIsNotDefinedSQL(myprefix, attributeJoins,
+                    params);
 
             if (sqlBuf.length() > 0)
                 sqlBuf.append(" union ");
@@ -278,7 +286,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
 
             attributeJoins++;
             attributeWhere += generateTextMatchSQL(myprefix, attributeJoins,
-                    textMatch);
+                    textMatch, params);
 
             if (sqlBuf.length() > 0)
                 sqlBuf.append(" union ");
@@ -290,7 +298,8 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
 
         if (!hasIsNotDefinedFilter && !hasTextMatchFilter) {
             attributeJoins++;
-            attributeWhere += generateIsDefinedSQL(myprefix, attributeJoins);
+            attributeWhere += generateIsDefinedSQL(myprefix, attributeJoins,
+                    params);
 
             if (sqlBuf.length() > 0)
                 sqlBuf.append(" union ");
@@ -302,43 +311,40 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
     }
 
     private String getTimeRangeWhere(String prefix,
-            TimeRangeFilter timeRangeFilter, int index) {
+            TimeRangeFilter timeRangeFilter, int index, HashMap params) {
         String myprefix = prefix + "--timerange";
         StringBuffer buf = new StringBuffer();
-        buf.append("(ctri" + index + ".componenttype = :param" + paramCount);
-        params.put("param" + paramCount, myprefix);
-        paramCount++;
-        buf.append(" and ((ctri" + index + ".startdate < case when ctri" + index
-                + ".isfloating=" + booleanTrueValue + " then '" + timeRangeFilter.getFloatEnd() + "'");
-        // params.put("param" + paramCount, timeRangeFilter.getFloatEnd());
-        // paramCount++;
-        buf.append(" else :param" + paramCount + " end");
-        params.put("param" + paramCount, timeRangeFilter.getUTCEnd());
-        paramCount++;
+        buf.append("(ctri" + index + ".componenttype = :param" + params.size());
+        params.put("param" + params.size(), myprefix);
+        buf.append(" and ((ctri" + index + ".startdate < case when ctri"
+                + index + ".isfloating=" + booleanTrueValue + " then '"
+                + timeRangeFilter.getFloatEnd() + "'");
+
+        buf.append(" else :param" + params.size() + " end");
+        params.put("param" + params.size(), timeRangeFilter.getUTCEnd());
+
         buf.append(" and ctri" + index + ".enddate > case when ctri" + index
-                + ".isfloating=" + booleanTrueValue + " then '" + timeRangeFilter.getFloatStart()
-                + "'");
-        // params.put("param" + paramCount, timeRangeFilter.getFloatStart());
-        // paramCount++;
-        buf.append(" else :param" + paramCount + " end");
-        params.put("param" + paramCount, timeRangeFilter.getUTCStart());
-        paramCount++;
+                + ".isfloating=" + booleanTrueValue + " then '"
+                + timeRangeFilter.getFloatStart() + "'");
+
+        buf.append(" else :param" + params.size() + " end");
+        params.put("param" + params.size(), timeRangeFilter.getUTCStart());
+
         buf.append(") or (");
         buf.append("ctri" + index + ".startdate >= case when ctri" + index
-                + ".isfloating=" + booleanTrueValue + " then '" + timeRangeFilter.getFloatStart()
-                + "'");
-        // params.put("param" + paramCount, timeRangeFilter.getFloatStart());
-        // paramCount++;
-        buf.append(" else :param" + paramCount + " end");
-        params.put("param" + paramCount, timeRangeFilter.getUTCStart());
-        paramCount++;
+                + ".isfloating=" + booleanTrueValue + " then '"
+                + timeRangeFilter.getFloatStart() + "'");
+
+        buf.append(" else :param" + params.size() + " end");
+        params.put("param" + params.size(), timeRangeFilter.getUTCStart());
+
         buf.append(" and ctri" + index + ".startdate < case when ctri" + index
-                + ".isfloating=" + booleanTrueValue + " then '" + timeRangeFilter.getFloatEnd() + "'");
+                + ".isfloating=" + booleanTrueValue + " then '"
+                + timeRangeFilter.getFloatEnd() + "'");
         // params.put("param" + paramCount, timeRangeFilter.getFloatEnd());
         // paramCount++;
-        buf.append(" else :param" + paramCount + " end)))");
-        params.put("param" + paramCount, timeRangeFilter.getUTCEnd());
-        paramCount++;
+        buf.append(" else :param" + params.size() + " end)))");
+        params.put("param" + params.size(), timeRangeFilter.getUTCEnd());
 
         return buf.toString();
     }
@@ -354,11 +360,12 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         for (int i = 1; i <= timeRangeJoins; i++)
             buf.append(", cal_timerange_index ctri" + i);
 
-        buf.append(" where i.parentid=:parentid and i.isactive=" + booleanTrueValue);
+        buf.append(" where i.parentid=:parentid and i.isactive="
+                + booleanTrueValue);
 
         for (int i = 1; i <= attributeJoins; i++)
             buf.append(" and cpi" + i + ".itemid=i.id");
-            
+
         for (int i = 1; i <= timeRangeJoins; i++)
             buf.append(" and ctri" + i + ".itemid=i.id");
 
@@ -368,20 +375,19 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         return buf.toString();
     }
 
-    private String generateIsNotDefinedSQL(String prefix, int joinIndex) {
+    private String generateIsNotDefinedSQL(String prefix, int joinIndex,
+            HashMap params) {
         String sql = " and cpi" + joinIndex + ".propertyname <> :param"
-                + paramCount;
-        params.put("param" + paramCount, prefix);
-        paramCount++;
+                + params.size();
+        params.put("param" + params.size(), prefix);
         return sql;
     }
 
     private String generateTextMatchSQL(String prefix, int joinIndex,
-            TextMatchFilter textMatch) {
+            TextMatchFilter textMatch, HashMap params) {
         String sql = " and cpi" + joinIndex + ".propertyname=:param"
-                + paramCount;
-        params.put("param" + paramCount, prefix);
-        paramCount++;
+                + params.size();
+        params.put("param" + params.size(), prefix);
 
         if (textMatch.isCaseless())
             sql += " and lower(cpi" + joinIndex + ".propertyvalue) ";
@@ -391,23 +397,23 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         if (textMatch.isNegateCondition())
             sql += "not ";
 
-        sql += "like :param" + paramCount;
+        sql += "like :param" + params.size();
 
         if (textMatch.isCaseless())
-            params.put("param" + paramCount, "%"
+            params.put("param" + params.size(), "%"
                     + textMatch.getValue().toLowerCase() + "%");
         else
-            params.put("param" + paramCount, "%" + textMatch.getValue() + "%");
-
-        paramCount++;
+            params.put("param" + params.size(), "%" + textMatch.getValue()
+                    + "%");
 
         return sql;
     }
 
-    private String generateIsDefinedSQL(String prefix, int joinIndex) {
+    private String generateIsDefinedSQL(String prefix, int joinIndex,
+            HashMap params) {
         String sql = " and cpi" + joinIndex + ".propertyname=:param"
-                + paramCount;
-        params.put("param" + paramCount, prefix);
+                + params.size();
+        params.put("param" + params.size(), prefix);
         return sql;
     }
 

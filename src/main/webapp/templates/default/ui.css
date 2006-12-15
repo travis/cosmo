@@ -561,7 +561,7 @@ td.dataDisplayLabel {
 /* Event blocks
  * --------------------- */
 /* All blocks */
-.eventBlock {
+.eventLozenge {
     position:absolute;
     width:1px;
     left:0px;

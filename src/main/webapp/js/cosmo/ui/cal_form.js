@@ -50,7 +50,7 @@ function CalForm() {
         // Update CalEvent obj
         if (self.updateEvent(selEv)) {
             // Save the changes to the backend -- handler for remote save
-            // process will update block position and size
+            // process will update lozenge position and size
             // ==========================
             dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'data': selEv });
         }
@@ -841,7 +841,7 @@ function CalForm() {
     /**
      * Toggle an event from 'normal' (HasTime) to 'all-day' (NoTime)
      */
-    this.toggleBlockType = function() {
+    this.toggleLozengeType = function() {
         var allDay = this.form.eventallday.checked ? true : false;
         var setDate = new Date();
         setDate.setMinutes(0);
@@ -902,7 +902,7 @@ function CalForm() {
         };
 
         // All-day event / normal event toggling
-        allDayCheck.onclick = function() { Cal.calForm.toggleBlockType() };
+        allDayCheck.onclick = function() { Cal.calForm.toggleLozengeType() };
 
         var regionSelectorElement = document.getElementById("tzRegion");
         dojo.event.connect(regionSelectorElement, "onchange", this.handleRegionChanged);

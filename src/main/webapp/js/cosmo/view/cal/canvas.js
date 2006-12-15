@@ -52,10 +52,10 @@ cosmo.view.cal.canvas = new function() {
     function setSelectedEvent(ev) {
         // Deselect previously selected event if any
         if (self.selectedEvent) {
-            self.selectedEvent.block.setDeselected();
+            self.selectedEvent.lozenge.setDeselected();
         }
         self.selectedEvent = ev; // Pointer to the currently selected event
-        ev.block.setSelected(); // Show the associated block as selected
+        ev.lozenge.setSelected(); // Show the associated lozenge as selected
     };
     /**
      * Removes an event lozenge from the canvas -- called in three cases:
@@ -71,8 +71,8 @@ cosmo.view.cal.canvas = new function() {
      */
     function removeEventFromDisplay(id, ev) {
         var selEv = self.getSelectedEvent();
-        // Remove the block
-        ev.block.remove();
+        // Remove the lozenge
+        ev.lozenge.remove();
         // Remove selection if need be
         if (selEv && (selEv.id == ev.id)) {
             self.selectedEvent = null;
@@ -177,10 +177,10 @@ cosmo.view.cal.canvas = new function() {
     function appendLozenge(key, val) {
         var id = key;
         var ev = val;
-        // Create the block and link it to the event
-        ev.block = ev.data.allDay ? new NoTimeBlock(id) :
-            new HasTimeBlock(id);
-        ev.block.insert(id);
+        // Create the lozenge and link it to the event
+        ev.lozenge = ev.data.allDay ? new NoTimeLozenge(id) :
+            new HasTimeLozenge(id);
+        ev.lozenge.insert(id);
     }
     /**
      * Main function for rendering/re-rendering the cal canvas
@@ -217,8 +217,8 @@ cosmo.view.cal.canvas = new function() {
      */
     function positionLozenge(key, val) {
         ev = val;
-        ev.block.updateFromEvent(ev);
-        ev.block.updateDisplayMain();
+        ev.lozenge.updateFromEvent(ev);
+        ev.lozenge.updateDisplayMain();
     }
     /**
      * Restores a cal event to it's previous state after:
@@ -230,8 +230,8 @@ cosmo.view.cal.canvas = new function() {
      */
     function restoreEvent(ev) {
         if (ev.restoreFromSnapshot()) {
-            ev.block.updateFromEvent(ev);
-            ev.block.updateDisplayMain();
+            ev.lozenge.updateFromEvent(ev);
+            ev.lozenge.updateDisplayMain();
         }
     }
     /**
@@ -290,7 +290,7 @@ cosmo.view.cal.canvas = new function() {
             // Saved event is still in view
             if (cmd.qualifier.onCanvas) {
                 ev.setInputDisabled(false);
-                ev.block.updateDisplayMain();
+                ev.lozenge.updateDisplayMain();
             }
             // Changes have placed the saved event off-canvas
             else if (cmd.qualifier.offCanvas) {
@@ -475,10 +475,10 @@ cosmo.view.cal.canvas = new function() {
     }
     /**
      * Single-clicks -- do event dispatch based on ID of event's
-     * DOM-element source. Includes selecting/moving/resizing event blocks
+     * DOM-element source. Includes selecting/moving/resizing event lozenges
      * and resizing all-day event area
      * Mousedown on an event always creates a Draggable in anticipation
-     * of a user dragging the block. Draggable is destroyed on mouseup.
+     * of a user dragging the lozenge. Draggable is destroyed on mouseup.
      * cosmo.app.dragItem may either be set to this Draggable, or to
      * the ResizeArea for all-day events
      */
@@ -499,7 +499,7 @@ cosmo.view.cal.canvas = new function() {
                 return false;
                 break;
             
-            // On event block -- simple select, or move/resize
+            // On event lozenge -- simple select, or move/resize
             case (id.indexOf('eventDiv') > -1):
                 // Get the clicked-on event
                 s = Cal.getIndexEvent(id);
@@ -544,7 +544,7 @@ cosmo.view.cal.canvas = new function() {
                         break;
                 }
                 
-                // Set the Cal draggable to the dragged block
+                // Set the Cal draggable to the dragged lozenge
                 cosmo.app.dragItem = dragItem;
                 
                 break;
@@ -635,7 +635,7 @@ cosmo.view.cal.canvas = new function() {
     
     // Public props
     // ****************
-    // Width of day col in week view, width of event blocks --
+    // Width of day col in week view, width of event lozenges --
     // Calc'd based on client window size
     // Other pieces of the app use this, so make it public
     this.dayUnitWidth = 0;

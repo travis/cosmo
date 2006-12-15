@@ -15,23 +15,23 @@
 */
 
 /**
- * @fileoverview An event block being dragged or resized
+ * @fileoverview An event lozenge being dragged or resized
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  *
  * Has two sub-classes, HasTimeDraggable and NoTimeDraggable to represent
- * the two main areas where blocks get displayed. HasTime are normal
+ * the two main areas where lozenges get displayed. HasTime are normal
  * events in the scrolling area, and NoTime are the all-day events
  * in the resizeable area at the top.
  * 
- * Lots of annoying math in here for calculating size/pos of the block.
+ * Lots of annoying math in here for calculating size/pos of the lozenge.
  * Multiple levels of vertical offset from translation of absolute XY
  * for mouse pos to relative placement of dragged divs, in addition to
  * vert offset when area scrolls.
  */
 
 /**
- * @object An event block being dragged or resized
+ * @object An event lozenge being dragged or resized
  */
 function Draggable(id) {
     // Unused -- TO-DO: Get rid of this property
@@ -42,11 +42,11 @@ function Draggable(id) {
     this.dragged = false;
     // Used in calcluations for resizing
     this.height = 0;
-    // The top of the block being dragged -- essentially div.offsetTop
+    // The top of the lozenge being dragged -- essentially div.offsetTop
     // because now Cal.top is always set to zero 
     this.absTop = 0;
-    // The offset of the left/top edges of the dragged block from the 
-    // mouse click position -- lets you keep the block a fixed pos 
+    // The offset of the left/top edges of the dragged lozenge from the 
+    // mouse click position -- lets you keep the lozenge a fixed pos 
     // from the location of the pointer while dragging
     this.clickOffsetX = 0;
     this.clickOffsetY = 0;
@@ -63,17 +63,17 @@ function Draggable(id) {
      * to be shared between the sub-classes
      */
     this.init = function(dragMode) {
-        // Reference to the main block and div for this Draggable
+        // Reference to the main lozenge and div for this Draggable
         var ev = cosmo.view.cal.canvas.getSelectedEvent();
-        var block = ev.block;
-        var div = block.div;
+        var lozenge = ev.lozenge;
+        var div = lozenge.div;
         
         this.dragMode = dragMode;
         // Snapshot measurements
         this.origDivLeft = div.offsetLeft;
         this.origDivWidth = div.offsetWidth;
-        this.plantonicBlockLeft = block.getPlatonicLeft();
-        this.platonicBlockWidth = block.getPlatonicWidth();
+        this.plantonicLozengeLeft = lozenge.getPlatonicLeft();
+        this.platonicLozengeWidth = lozenge.getPlatonicWidth();
         this.height = div.offsetHeight;
         this.absTop = div.offsetTop + Cal.top;
         this.bottom = div.offsetTop + this.height;
@@ -86,7 +86,7 @@ function Draggable(id) {
         // FIXME: This causes a really irritating CSS bug in Mozilla/Firefox
         // Set opacity if moving
         //if (this.dragMode == 'drag') {
-        //    cosmo.view.cal.canvas.getSelectedEvent().block.setOpacity(60);
+        //    cosmo.view.cal.canvas.getSelectedEvent().lozenge.setOpacity(60);
         //}
     };
     this.doDrag = function () {
@@ -106,14 +106,14 @@ function Draggable(id) {
         }
     };
     /**
-     * Move the Draggable's block
-     * Note that this moves the block's visual position, but the
+     * Move the Draggable's lozenge
+     * Note that this moves the lozenge's visual position, but the
      * properties (.top, .left, .height, .width)  don't get updated
      * until the actual drop occurs
      */
     this.move = function() {
         // Compensate for crack-fiend clicking -- make sure there's
-        // a selected block
+        // a selected lozenge
         if (!cosmo.view.cal.canvas.getSelectedEvent()) {
             return false;
         }
@@ -121,49 +121,49 @@ function Draggable(id) {
         // Not just a simple click
         this.dragged = true;
         
-        // Block associated with this Draggable
-        var moveBlock = cosmo.view.cal.canvas.getSelectedEvent().block;
+        // Lozenge associated with this Draggable
+        var moveLozenge = cosmo.view.cal.canvas.getSelectedEvent().lozenge;
         // Subtract the offset to get where the left/top
-        // of the block should be
+        // of the lozenge should be
         var moveX = (xPos - this.clickOffsetX);
         var moveY = (yPos - this.clickOffsetY);
         // Right-hand move constraint
         var rLimit = this.rLimit;
-        // Bottom move constraint -- need to know height of block
-        var bLimit = this.getBLimit(moveBlock);
+        // Bottom move constraint -- need to know height of lozenge
+        var bLimit = this.getBLimit(moveLozenge);
         // Add drag constraints
         // -----------------------------
         moveX = moveX < 0 ? 0 : moveX; // Left bound
         moveX = moveX > rLimit ? rLimit : moveX; // Right bound
         moveY = moveY < 0 ? 0 : moveY; // Top bound
         moveY = moveY > bLimit ? bLimit : moveY; // bottom bound
-        // Move the block -- don't actually reset block properties
+        // Move the lozenge -- don't actually reset lozenge properties
         // until drop
-        moveBlock.setLeft(moveX);
+        moveLozenge.setLeft(moveX);
         // Don't move multi-day events vertically yet
-        if (!moveBlock.auxDivList.length) {
-            moveBlock.setTop(moveY);
+        if (!moveLozenge.auxDivList.length) {
+            moveLozenge.setTop(moveY);
         }
     };
     /**
      * Convenience method for ensuring the size set for the
-     * associated block is at least the minimum of a 30-min. chunk
+     * associated lozenge is at least the minimum of a 30-min. chunk
      */
     this.getSize = function(size) {
         var ret = 0;
         ret = parseInt(size);
         // Single-day events only
         // Min size is 30 minutes -- two 15-min. chunks
-        if (!cosmo.view.cal.canvas.getSelectedEvent().block.auxDivList.length) {
+        if (!cosmo.view.cal.canvas.getSelectedEvent().lozenge.auxDivList.length) {
             ret = ret < this.unit ? this.unit : ret;
         }
         return ret;
     };
     /**
-     * Main method for updating block/event, called after drop
-     * The block properties get updated one-by-one in the drop
+     * Main method for updating lozenge/event, called after drop
+     * The lozenge properties get updated one-by-one in the drop
      * and here is where we update the event data based on the
-     * updated block
+     * updated lozenge
      * This method also calls remoteSaveMain which save the
      * changes to the event to the backend
      */
@@ -172,8 +172,8 @@ function Draggable(id) {
         // Make backup snapshot of event data in case save/remove
         // operation fails
         selEv.makeSnapshot();
-        // Update the event properties based on the block pos/size
-        if (selEv.block.updateEvent(selEv, this.dragMode)) {
+        // Update the event properties based on the lozenge pos/size
+        if (selEv.lozenge.updateEvent(selEv, this.dragMode)) {
             // Check against the backup to make sure the event has
             // actually been edited
             if (selEv.hasChanged()) {
@@ -182,11 +182,11 @@ function Draggable(id) {
                 // ==========================
                 dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'data': selEv });
             }
-            // If no real edit, then just reposition the block
+            // If no real edit, then just reposition the lozenge
             // With conflict calculations and snap-to
             else {
-                selEv.block.updateFromEvent(selEv);
-                selEv.block.updateElements();
+                selEv.lozenge.updateFromEvent(selEv);
+                selEv.lozenge.updateElements();
             }
         }
     };
@@ -217,12 +217,12 @@ HasTimeDraggable.prototype = new Draggable();
 
 /**
  * Resizes both upward and downward -- irritating math calculations
- * caused by the fact that the position measurements for the block
+ * caused by the fact that the position measurements for the lozenge
  * have to be set relative to the scrolling div they sit in, but the
  * X and Y for the mouse pos are absolute.
  * Of course the div they sit in can also scroll, so that adds another
  * nice layer of vertical offset.
- * Resizing up means moving the block up while simultaneously 
+ * Resizing up means moving the lozenge up while simultaneously 
  * growing the height
  * Resizing down means just growing the height
  */
@@ -234,13 +234,13 @@ HasTimeDraggable.prototype.resize = function() {
     // to figure out top and bottom positions
     // ====================================
     // Grabbing the top resize handle, resizing upward
-    // Observe min. size constraints for block size and top constraints
+    // Observe min. size constraints for lozenge size and top constraints
     // for sizing upward
     if (this.dragMode == 'resizetop') {
         this.resizeTop(yPos);
     }
     // Grabbing the bottom resize handle, resizing downward
-    // Observe min. size constraints for block size and bottom
+    // Observe min. size constraints for lozenge size and bottom
     // constraints for sizing downward 
     else if (this.dragMode == 'resizebottom') {
         this.resizeBottom(yPos);
@@ -248,13 +248,13 @@ HasTimeDraggable.prototype.resize = function() {
 }
 
 /**
- * Resize for top edge of normal event block -- moves div
+ * Resize for top edge of normal event lozenge -- moves div
  * element up at same rate it resizes. 
  */
 HasTimeDraggable.prototype.resizeTop = function(y) {
     // The selected event
     var selEv = cosmo.view.cal.canvas.getSelectedEvent();
-    // Where the top edge of the block should go, given any offset for the
+    // Where the top edge of the lozenge should go, given any offset for the
     // top of the calendar, and any scrolling in the scrollable area
     // Used when resizing up
     var t = (y-Cal.top)+cosmo.view.cal.canvas.getTimedCanvasScrollTop();
@@ -262,37 +262,37 @@ HasTimeDraggable.prototype.resizeTop = function(y) {
     
     t = t > this.min ? this.min : t;
     t = t < 0 ? 0 : t;
-    selEv.block.setTop(t);
+    selEv.lozenge.setTop(t);
     size = this.getSize((this.absTop-yPos-cosmo.view.cal.canvas.getTimedCanvasScrollTop())
         + this.height);
     
-    selEv.block.setHeight(size, true);
+    selEv.lozenge.setHeight(size, true);
 }
 
 /**
- * Resize for bottom edge of normal event block -- simply grows
+ * Resize for bottom edge of normal event lozenge -- simply grows
  * height of div
  */
 HasTimeDraggable.prototype.resizeBottom = function(y) {
    // The selected event
     var selEv = cosmo.view.cal.canvas.getSelectedEvent();
-    // Where the bottom edge of the block should go -- this is a
+    // Where the bottom edge of the lozenge should go -- this is a
     // relative measurement based on pos on the scrollable area
     var b = (y-this.absTop)+cosmo.view.cal.canvas.getTimedCanvasScrollTop();
     var max = (VIEW_DIV_HEIGHT - this.absTop);
     b = b > max ? max : b;
     size = this.getSize(b);
-    selEv.block.setHeight(size);
+    selEv.lozenge.setHeight(size);
 
 }
 
 /**
  * Happens on mouseup -- does snap-to in 15-min. increments, 
- * and updates block properties based on final block position
+ * and updates lozenge properties based on final lozenge position
  * The annoying CSS 1px border thing is a major irritation here --
  * it adds to the actual size, but not to the style width/height
- * After updating pos/size properties for the block, this method
- * calls doUpdate to save the changes to block/event and do the 
+ * After updating pos/size properties for the lozenge, this method
+ * calls doUpdate to save the changes to lozenge/event and do the 
  * visual update
  */
 HasTimeDraggable.prototype.drop = function() {
@@ -316,9 +316,9 @@ HasTimeDraggable.prototype.drop = function() {
     
     // Abstract away getting top and bottom -- multi-day events
     // have multiple divs, treat as a composite here
-    top = selEv.block.getTop();
-    left = selEv.block.getLeft();
-    size = selEv.block.getBottom()-top;
+    top = selEv.lozenge.getTop();
+    left = selEv.lozenge.getLeft();
+    size = selEv.lozenge.getBottom()-top;
     
     // Snap-to for top position: both simple move and resize up
     if (this.dragMode == 'drag' || this.dragMode == 'resizetop') {
@@ -331,7 +331,7 @@ HasTimeDraggable.prototype.drop = function() {
         else {
             top = top-deltaY;
         }
-        selEv.block.top = top;
+        selEv.lozenge.top = top;
     }
     // Snap-to for size: both resize up and resize down
     if (this.dragMode.indexOf('resize') > -1) {
@@ -347,7 +347,7 @@ HasTimeDraggable.prototype.drop = function() {
         else {
             size = size-deltaY;
         }
-        selEv.block.height = size;
+        selEv.lozenge.height = size;
     }
     // 1px border -- add the 1px taken out for the 1px border 
     // back to the size
@@ -365,7 +365,7 @@ HasTimeDraggable.prototype.drop = function() {
         else {
             left = left-deltaX;
         }
-        selEv.block.left = left;
+        selEv.lozenge.left = left;
     }
     // Do the actual update
     // =================
@@ -373,10 +373,10 @@ HasTimeDraggable.prototype.drop = function() {
 }
 
 /**
- * Get the bottom constraint for moving/resizing a block
+ * Get the bottom constraint for moving/resizing a lozenge
  */
-HasTimeDraggable.prototype.getBLimit = function(moveblock) {
-    return (VIEW_DIV_HEIGHT - moveblock.height);
+HasTimeDraggable.prototype.getBLimit = function(movelozenge) {
+    return (VIEW_DIV_HEIGHT - movelozenge.height);
 }
 
 HasTimeDraggable.prototype.setDragWidth = function() {}
@@ -393,9 +393,9 @@ NoTimeDraggable.prototype = new Draggable();
 
 /**
  * Happens on mouseup -- does snap-to in 15-min. increments, 
- * and updates block properties based on final block position
- * After updating pos/size properties for the block, this method
- * calls doUpdate to save the changes to block/event and do the 
+ * and updates lozenge properties based on final lozenge position
+ * After updating pos/size properties for the lozenge, this method
+ * calls doUpdate to save the changes to lozenge/event and do the 
  * visual update
  */
 NoTimeDraggable.prototype.drop = function() {
@@ -408,8 +408,8 @@ NoTimeDraggable.prototype.drop = function() {
     var deltaX = 0;
     var deltaY = 0;
     var selEv = cosmo.view.cal.canvas.getSelectedEvent();
-    top = selEv.block.getTop();
-    left = selEv.block.getLeft();
+    top = selEv.lozenge.getTop();
+    left = selEv.lozenge.getLeft();
     
     // Side-to-side snap
     if (this.dragMode == 'drag') {
@@ -422,9 +422,9 @@ NoTimeDraggable.prototype.drop = function() {
         else {
             left = left-deltaX;
         }
-        selEv.block.left = left;
+        selEv.lozenge.left = left;
     }
-    selEv.block.top = top;
+    selEv.lozenge.top = top;
     
     // Do the actual update
     // =================
@@ -432,9 +432,9 @@ NoTimeDraggable.prototype.drop = function() {
 }
 
 /**
- * Get the bottom constraint for moving/resizing a block
+ * Get the bottom constraint for moving/resizing a lozenge
  */
-NoTimeDraggable.prototype.getBLimit = function(moveblock) {
+NoTimeDraggable.prototype.getBLimit = function(movelozenge) {
     // This area resizes vertically -- imposing a drag limit makes no sense here
     return 10000000;
 

@@ -13,38 +13,38 @@
 */
 
 /**
- * @fileoverview Event blocks that represent the span of time
+ * @fileoverview Event lozenges that represent the span of time
  * of an event on the calendar
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  *
- * Has two sub-classes, HasTimeBlock and NoTimeBlock to represent
- * the two main areas where blocks get displayed. HasTime are normal
+ * Has two sub-classes, HasTimeLozenge and NoTimeLozenge to represent
+ * the two main areas where lozenges get displayed. HasTime are normal
  * events in the scrolling area, and NoTime are the all-day events
  * in the resizeable area at the top.
- * HasTimeBlock for a multi-day event may be a composite made up of
+ * HasTimeLozenge for a multi-day event may be a composite made up of
  * a main div element and a bunch of auxilliary divs off to the side.
  */
 
 /**
- * @object A visual block to represent the span of time of a calendar
+ * @object A visual lozenge to represent the span of time of a calendar
  * event
  */
-function Block() {
+function Lozenge() {
     // Properties for position and size
     this.top = 0;
     this.left = 0;
     this.height = 0;
     this.width = 0;
-    // Whether or not this particular Block is selected.
+    // Whether or not this particular Lozenge is selected.
     // TO-DO: Figure out if this is still used ... ?
     this.selected = false;
     // 30-min minimum height, minus a pixel at top and bottom
     // per retarded CSS spec for borders
     this.unit = (HOUR_UNIT_HEIGHT/2)-2;
-    // DOM elem ref to the primary div for the Block
+    // DOM elem ref to the primary div for the Lozenge 
     this.div = null;
-    // DOM elem ref for inner div of the Block
+    // DOM elem ref for inner div of the Lozenge 
     this.innerDiv = null;
     // The separator plus ID -- convenience to avoid
     // concatenating the same thing over and over
@@ -52,315 +52,314 @@ function Block() {
     // Array of div elems appearing to the side on multi-day normal
     // events
     this.auxDivList = [];
-
-    /**
-     * Convenience method that does all the visual update stuff
-     * for a block at one time
-     */
-    this.updateDisplayMain = function() {
-        this.updateElements();
-        this.hideProcessing();
-        this.updateText();
-    };
-    /**
-     * Updates the info displayed on a block for the event time
-     * and description
-     */
-    this.updateText = function() {
-        var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
-        var strtime = ev.data.start.strftime('%I:%M%p');
-        // Trim leading zero if need be
-        strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
-        // Display timezone info for event if it has one
-        if (ev.data.start.tzId) {
-            strtime += ' (' + ev.data.start.getTimezoneAbbrName() + ')';
-        }
-        var timeDiv = document.getElementById(this.divId + 'Start' +
-            Cal.ID_SEPARATOR + ev.id);
-        var titleDiv = document.getElementById(this.divId + 'Title' +
-            Cal.ID_SEPARATOR + ev.id);
-        if (timeDiv) {
-            this.setText(timeDiv, strtime);
-        }
-        this.setText(titleDiv, ev.data.title);
-    };
-    /**
-     * A bit of a misnomer -- just static text at the moment
-     * TO-DO: Add animation -- either GIF or using CSS effects
-     */
-    this.showStatusAnim = function() {
-        var titleDiv = document.getElementById(this.divId + 'Title' +
-            Cal.ID_SEPARATOR + this.id);
-        this.setText(titleDiv, 'Processing ...');
-    };
-    /**
-     * Toggle cursor to 'default' while block is in processing
-     * state -- should not appear to be draggable
-     */
-    this.mainAreaCursorChange = function(isProc) {
-        var cursorChange = isProc ? 'progress' : 'move';
-        document.getElementById(this.divId + 'Content' +
-            Cal.ID_SEPARATOR + this.id).style.cursor = cursorChange;
-    };
-    this.getPlatonicLeft = function() {
-        var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
-        var diff = (Date.diff('d', Cal.viewStart.getTime(), ev.data.start.getTime()));
-        return (diff * cosmo.view.cal.canvas.dayUnitWidth);
-
-    };
-    this.getPlatonicWidth = function() {
-        var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
-        var diff = (ScoobyDate.diff('d', ev.data.start, ev.data.end))+3;
-        return (diff * cosmo.view.cal.canvas.dayUnitWidth);
+}
+/**
+ * Convenience method that does all the visual update stuff
+ * for a lozenge at one time
+ */
+Lozenge.prototype.updateDisplayMain = function() {
+    this.updateElements();
+    this.hideProcessing();
+    this.updateText();
+};
+/**
+ * Updates the info displayed on a lozenge for the event time
+ * and description
+ */
+Lozenge.prototype.updateText = function() {
+    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
+    var strtime = ev.data.start.strftime('%I:%M%p');
+    // Trim leading zero if need be
+    strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
+    // Display timezone info for event if it has one
+    if (ev.data.start.tzId) {
+        strtime += ' (' + ev.data.start.getTimezoneAbbrName() + ')';
     }
-    /**
-     * Cross-browser wrapper for setting CSS opacity
-     * Would like to use this again if I can figure out a
-     * workaround for the weird scrolling-div-breakage it causes
-     */
-    this.setOpacity = function(opac) {
-        elem = this.div;
-        // =============
-        // opac is a whole number to be used as the percent opacity
-        // =============
-        // IE uses a whole number as a percent (e.g. 75 for 75%)
-        //  Moz/compat uses a fractional value (e.g. 0.75)
-        var nDecOpacity = opac/100;
-        if (document.all) {
-            elem.filters.alpha.opacity = opac;
-        }
-        elem.style.opacity = nDecOpacity;
-        return true;
+    var timeDiv = document.getElementById(this.divId + 'Start' +
+        Cal.ID_SEPARATOR + ev.id);
+    var titleDiv = document.getElementById(this.divId + 'Title' +
+        Cal.ID_SEPARATOR + ev.id);
+    if (timeDiv) {
+        this.setText(timeDiv, strtime);
     }
-    /**
-     * Use DOM to set text inside a node
-     */
-    this.setText = function(node, str) {
-        if (node.firstChild) {
-            node.removeChild(node.firstChild);
-        }
-        node.appendChild(document.createTextNode(str));
-    };
-    /**
-     * Change color of block to indicate (1) selected (2) normal
-     * or (3) processing
-     */
-    this.setState = function(isProc) {
-        var isSel = null;
-        var stateId = 0; // 1 selected 2 normal 3 processing
-        // If this block is processing, change to 'processing' color
-        if (isProc) {
-            stateId = 3;
-        }
-        // Change block back after completing processing --
-        // change it back to normal 'unselected' color, or
-        // 'selected' color if this block is the most recently
-        // clicked one
-        else {
-            var selEv = cosmo.view.cal.canvas.getSelectedEvent();
-            stateId = (selEv && (this.id == selEv.id)) ?
-                1 : 2;
-        }
-        this.setLozengeAppearance(stateId);
+    this.setText(titleDiv, ev.data.title);
+};
+/**
+ * A bit of a misnomer -- just static text at the moment
+ * TO-DO: Add animation -- either GIF or using CSS effects
+ */
+Lozenge.prototype.showStatusAnim = function() {
+    var titleDiv = document.getElementById(this.divId + 'Title' +
+        Cal.ID_SEPARATOR + this.id);
+    this.setText(titleDiv, 'Processing ...');
+};
+/**
+ * Toggle cursor to 'default' while lozenge is in processing
+ * state -- should not appear to be draggable
+ */
+Lozenge.prototype.mainAreaCursorChange = function(isProc) {
+    var cursorChange = isProc ? 'progress' : 'move';
+    document.getElementById(this.divId + 'Content' +
+        Cal.ID_SEPARATOR + this.id).style.cursor = cursorChange;
+};
+Lozenge.prototype.getPlatonicLeft = function() {
+    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
+    var diff = (Date.diff('d', Cal.viewStart.getTime(), ev.data.start.getTime()));
+    return (diff * cosmo.view.cal.canvas.dayUnitWidth);
+
+};
+Lozenge.prototype.getPlatonicWidth = function() {
+    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
+    var diff = (ScoobyDate.diff('d', ev.data.start, ev.data.end))+3;
+    return (diff * cosmo.view.cal.canvas.dayUnitWidth);
+}
+/**
+ * Cross-browser wrapper for setting CSS opacity
+ * Would like to use this again if I can figure out a
+ * workaround for the weird scrolling-div-breakage it causes
+ */
+Lozenge.prototype.setOpacity = function(opac) {
+    elem = this.div;
+    // =============
+    // opac is a whole number to be used as the percent opacity
+    // =============
+    // IE uses a whole number as a percent (e.g. 75 for 75%)
+    //  Moz/compat uses a fractional value (e.g. 0.75)
+    var nDecOpacity = opac/100;
+    if (document.all) {
+        elem.filters.alpha.opacity = opac;
     }
-    /**
-     * Change color of block to indicate (1) selected (2) processing
-     * or (3) normal, unselected
-     */
-    this.setLozengeAppearance = function(stateId) {
+    elem.style.opacity = nDecOpacity;
+    return true;
+}
+/**
+ * Use DOM to set text inside a node
+ */
+Lozenge.prototype.setText = function(node, str) {
+    if (node.firstChild) {
+        node.removeChild(node.firstChild);
+    }
+    node.appendChild(document.createTextNode(str));
+};
+/**
+ * Change color of lozenge to indicate (1) selected (2) normal
+ * or (3) processing
+ */
+Lozenge.prototype.setState = function(isProc) {
+    var isSel = null;
+    var stateId = 0; // 1 selected 2 normal 3 processing
+    // If this lozenge is processing, change to 'processing' color
+    if (isProc) {
+        stateId = 3;
+    }
+    // Change lozenge back after completing processing --
+    // change it back to normal 'unselected' color, or
+    // 'selected' color if this lozenge is the most recently
+    // clicked one
+    else {
+        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        stateId = (selEv && (this.id == selEv.id)) ?
+            1 : 2;
+    }
+    this.setLozengeAppearance(stateId);
+}
+/**
+ * Change color of lozenge to indicate (1) selected (2) processing
+ * or (3) normal, unselected
+ */
+Lozenge.prototype.setLozengeAppearance = function(stateId) {
 
-        var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
-        var useLightColor = this.useLightColor(ev);
-        var imgPath = '';
-        var textColor = '';
-        var borderColor = '';
-        var borderStyle = 'solid';
-        var blockColor = '';
-        var mainDiv = document.getElementById(this.divId + Cal.ID_SEPARATOR +
-            this.id);
-        var timeDiv = document.getElementById(this.divId + 'Start' +
-            Cal.ID_SEPARATOR + ev.id);
-        var titleDiv = document.getElementById(this.divId + 'Title' +
-            Cal.ID_SEPARATOR + ev.id);
+    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
+    var useLightColor = this.useLightColor(ev);
+    var imgPath = '';
+    var textColor = '';
+    var borderColor = '';
+    var borderStyle = 'solid';
+    var lozengeColor = '';
+    var mainDiv = document.getElementById(this.divId + Cal.ID_SEPARATOR +
+        this.id);
+    var timeDiv = document.getElementById(this.divId + 'Start' +
+        Cal.ID_SEPARATOR + ev.id);
+    var titleDiv = document.getElementById(this.divId + 'Title' +
+        Cal.ID_SEPARATOR + ev.id);
 
-        // If this block is processing, change to 'processing' color
-        switch (stateId) {
-            // Selected
-            case 1:
-                if (useLightColor) {
-                    textColor = '#0064cb';
-                    borderColor = '#3398ff';
-                    blockColor = '#bedeff';
-                    imgPath = '';
-                }
-                else {
-                    textColor = '#ffffff';
-                    borderColor = '#ffffff';
-                    blockColor = '#0064cb';
-                    imgPath = cosmo.env.getImagesUrl() + 'block_gradient_dark.png';
-                }
-                break;
-            // Unselected
-            case 2:
-                if (useLightColor) {
-                    textColor = '#0064cb';
-                    borderColor = '#3398ff';
-                    blockColor = '#e6f2ff';
-                    imgPath = '';
-                }
-                else {
-                    textColor = '#ffffff';
-                    borderColor = '#ffffff';
-                    blockColor = '#3398ff';
-                    imgPath = cosmo.env.getImagesUrl() + 'block_gradient_light.png';
-                }
-                break;
-            // Processing
-            case 3:
-                textColor = '#ffffff';
-                borderColor = '#ffffff';
-                blockColor = '#9fd1fc';
+    // If this lozenge is processing, change to 'processing' color
+    switch (stateId) {
+        // Selected
+        case 1:
+            if (useLightColor) {
+                textColor = '#0064cb';
+                borderColor = '#3398ff';
+                lozengeColor = '#bedeff';
                 imgPath = '';
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-
-        if (ev.data.status && ev.data.status.indexOf('TENTATIVE') > -1) {
-            borderStyle = 'dashed';
-        }
-
-        // Main div for block
-        // ------------
-        mainDiv.style.color = textColor;
-        mainDiv.style.borderColor = borderColor;
-        mainDiv.style.backgroundColor = blockColor;
-        mainDiv.style.borderStyle = borderStyle;
-        // Using the AlphaImageLoader hack b0rks normal z-indexing
-        // No pretty transparent PNGs for IE6 -- works nicely in IE7
-        //if (!(dojo.render.html.ie && !dojo.render.html.ie7)) { // Wait for 0.4
-        if (!(document.all && navigator.appVersion.indexOf('MSIE 7') == -1)) {
-            if (imgPath) {
-                mainDiv.style.backgroundImage = 'url(' + imgPath + ')';
             }
             else {
-                mainDiv.style.backgroundImage = '';
-
+                textColor = '#ffffff';
+                borderColor = '#ffffff';
+                lozengeColor = '#0064cb';
+                imgPath = cosmo.env.getImagesUrl() + 'block_gradient_dark.png';
             }
+            break;
+        // Unselected
+        case 2:
+            if (useLightColor) {
+                textColor = '#0064cb';
+                borderColor = '#3398ff';
+                lozengeColor = '#e6f2ff';
+                imgPath = '';
+            }
+            else {
+                textColor = '#ffffff';
+                borderColor = '#ffffff';
+                lozengeColor = '#3398ff';
+                imgPath = cosmo.env.getImagesUrl() + 'block_gradient_light.png';
+            }
+            break;
+        // Processing
+        case 3:
+            textColor = '#ffffff';
+            borderColor = '#ffffff';
+            lozengeColor = '#9fd1fc';
+            imgPath = '';
+            break;
+        default:
+            // Do nothing
+            break;
+    }
+
+    if (ev.data.status && ev.data.status.indexOf('TENTATIVE') > -1) {
+        borderStyle = 'dashed';
+    }
+
+    // Main div for lozenge
+    // ------------
+    mainDiv.style.color = textColor;
+    mainDiv.style.borderColor = borderColor;
+    mainDiv.style.backgroundColor = lozengeColor;
+    mainDiv.style.borderStyle = borderStyle;
+    // Using the AlphaImageLoader hack b0rks normal z-indexing
+    // No pretty transparent PNGs for IE6 -- works nicely in IE7
+    //if (!(dojo.render.html.ie && !dojo.render.html.ie7)) { // Wait for 0.4
+    if (!(document.all && navigator.appVersion.indexOf('MSIE 7') == -1)) {
+        if (imgPath) {
+            mainDiv.style.backgroundImage = 'url(' + imgPath + ')';
         }
+        else {
+            mainDiv.style.backgroundImage = '';
 
-        // Text colors
-        // ------------
-        if (timeDiv) {
-            timeDiv.style.color = textColor;
         }
-        titleDiv.style.color = textColor;
+    }
 
-        // Aux divs for multi-day events
-        // ------------
-        if (this.auxDivList.length) {
-            for (var i = 0; i < this.auxDivList.length; i++) {
-                auxDiv = this.auxDivList[i];
-                auxDiv.style.color = textColor;
-                auxDiv.style.borderColor = borderColor;
-                auxDiv.style.backgroundColor = blockColor;
-                auxDiv.style.borderStyle = borderStyle;
-                // Use transparent PNG background in non-IE6 browsers
-                //if (!(dojo.render.html.ie && !dojo.render.html.ie7)) { // Wait for 0.4
-                if (!(document.all && navigator.appVersion.indexOf('MSIE 7') == -1)) {
-                    if (imgPath) {
-                        auxDiv.style.backgroundImage = 'url(' + imgPath + ')';
-                    }
-                    else {
-                        auxDiv.style.backgroundImage = '';
+    // Text colors
+    // ------------
+    if (timeDiv) {
+        timeDiv.style.color = textColor;
+    }
+    titleDiv.style.color = textColor;
 
-                    }
+    // Aux divs for multi-day events
+    // ------------
+    if (this.auxDivList.length) {
+        for (var i = 0; i < this.auxDivList.length; i++) {
+            auxDiv = this.auxDivList[i];
+            auxDiv.style.color = textColor;
+            auxDiv.style.borderColor = borderColor;
+            auxDiv.style.backgroundColor = lozengeColor;
+            auxDiv.style.borderStyle = borderStyle;
+            // Use transparent PNG background in non-IE6 browsers
+            //if (!(dojo.render.html.ie && !dojo.render.html.ie7)) { // Wait for 0.4
+            if (!(document.all && navigator.appVersion.indexOf('MSIE 7') == -1)) {
+                if (imgPath) {
+                    auxDiv.style.backgroundImage = 'url(' + imgPath + ')';
+                }
+                else {
+                    auxDiv.style.backgroundImage = '';
+
                 }
             }
         }
     }
-    /**
-     * Use light or dark pallette colors
-     */
-    this.useLightColor = function(ev) {
-        var ret = false;
-        switch(true) {
-            case (ev.data.status && ev.data.status == EventStatus.FYI):
-            case (!ev.data.allDay && (ev.data.start.getTime() == ev.data.end.getTime())):
-                ret = true;
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-        return ret;
-    };
-    /**
-     * Make the block look selected -- change color and
-     * move forward to z-index of 25
-     */
-    this.setSelected = function() {
-        var auxDiv = null;
+}
+/**
+ * Use light or dark pallette colors
+ */
+Lozenge.prototype.useLightColor = function(ev) {
+    var ret = false;
+    switch(true) {
+        case (ev.data.status && ev.data.status == EventStatus.FYI):
+        case (!ev.data.allDay && (ev.data.start.getTime() == ev.data.end.getTime())):
+            ret = true;
+            break;
+        default:
+            // Do nothing
+            break;
+    }
+    return ret;
+};
+/**
+ * Make the lozenge look selected -- change color and
+ * move forward to z-index of 25
+ */
+Lozenge.prototype.setSelected = function() {
+    var auxDiv = null;
 
-        this.setLozengeAppearance(1);
+    this.setLozengeAppearance(1);
 
-        // Set the z-index to the front
-        this.div.style.zIndex = 25;
-        if (this.auxDivList.length) {
-            for (var i = 0; i < this.auxDivList.length; i++) {
-                auxDiv = this.auxDivList[i];
-                //auxDiv.style.background = SEL_BLOCK_COLOR;
-                auxDiv.style.zIndex = 25;
-            }
+    // Set the z-index to the front
+    this.div.style.zIndex = 25;
+    if (this.auxDivList.length) {
+        for (var i = 0; i < this.auxDivList.length; i++) {
+            auxDiv = this.auxDivList[i];
+            //auxDiv.style.background = SEL_BLOCK_COLOR;
+            auxDiv.style.zIndex = 25;
         }
     }
-    /**
-     * Make the block look unselected -- change color and
-     * move back to z-index of 1
-     */
-    this.setDeselected = function() {
-        var auxDiv = null;
+}
+/**
+ * Make the lozenge look unselected -- change color and
+ * move back to z-index of 1
+ */
+Lozenge.prototype.setDeselected = function() {
+    var auxDiv = null;
 
-        this.setLozengeAppearance(2);
+    this.setLozengeAppearance(2);
 
-        // Set the z-index to the back
-        this.div.style.zIndex = 1;
-        if (this.auxDivList.length) {
-            for (var i = 0; i < this.auxDivList.length; i++) {
-                auxDiv = this.auxDivList[i];
-                //auxDiv.style.background = UNSEL_BLOCK_COLOR;
-                auxDiv.style.zIndex = 1;
-            }
+    // Set the z-index to the back
+    this.div.style.zIndex = 1;
+    if (this.auxDivList.length) {
+        for (var i = 0; i < this.auxDivList.length; i++) {
+            auxDiv = this.auxDivList[i];
+            //auxDiv.style.background = UNSEL_BLOCK_COLOR;
+            auxDiv.style.zIndex = 1;
         }
     }
 }
 
 /**
- * HasTimeBlock -- sub-class of Block
+ * HasTimeLozenge -- sub-class of Lozenge 
  * Normal events, 'at-time' events -- these sit in the scrollable
  * area of the main viewing area
  */
-function HasTimeBlock(id) {
+function HasTimeLozenge(id) {
     this.id = id;
 }
-HasTimeBlock.prototype = new Block();
+HasTimeLozenge.prototype = new Lozenge();
 
-// Div elem prefix -- all component divs of normal event blocks
+// Div elem prefix -- all component divs of normal event lozenges
 // begin with this
-HasTimeBlock.prototype.divId = 'eventDiv';
+HasTimeLozenge.prototype.divId = 'eventDiv';
 // Does a multi-day event start before the viewable area
-HasTimeBlock.prototype.startsBeforeViewRange = false;
+HasTimeLozenge.prototype.startsBeforeViewRange = false;
 // Does a multi-day event extend past the viewable area
-HasTimeBlock.prototype.endsAfterViewRange = false;
+HasTimeLozenge.prototype.endsAfterViewRange = false;
 
 /**
- * Change block color to 'processing' color
+ * Change lozenge color to 'processing' color
  * Change the cursors for the resize handles at top and bottom,
  * and for the central content div
  * Display status animation
  */
-HasTimeBlock.prototype.showProcessing = function() {
+HasTimeLozenge.prototype.showProcessing = function() {
     this.setState(true);
     this.resizeHandleCursorChange(true);
     this.mainAreaCursorChange(true);
@@ -371,7 +370,7 @@ HasTimeBlock.prototype.showProcessing = function() {
  * Change the cursors for the resize handles at top and bottom
  * Change to 'default' when processing so it won't look draggable
  */
-HasTimeBlock.prototype.resizeHandleCursorChange = function(isProc) {
+HasTimeLozenge.prototype.resizeHandleCursorChange = function(isProc) {
     var topChange = isProc ? 'default' : 'n-resize';
     var bottomChange = isProc ? 'default' : 's-resize';
     var topDiv = document.getElementById(this.divId + 'Top' +
@@ -387,20 +386,20 @@ HasTimeBlock.prototype.resizeHandleCursorChange = function(isProc) {
 }
 
 /**
- * Return the block to normal after processing
+ * Return the lozenge to normal after processing
  */
-HasTimeBlock.prototype.hideProcessing = function() {
+HasTimeLozenge.prototype.hideProcessing = function() {
     this.resizeHandleCursorChange(false);
     this.mainAreaCursorChange(false);
     this.setState(false);
 }
 
 /**
- * Update the block properties from an event
+ * Update the lozenge properties from an event
  * Called when editing from the form, or on drop after resizing/dragging
- * the block has to be updated to show the changes to the event
+ * the lozenge has to be updated to show the changes to the event
  */
-HasTimeBlock.prototype.updateFromEvent = function(ev) {
+HasTimeLozenge.prototype.updateFromEvent = function(ev) {
     var unit = HOUR_UNIT_HEIGHT/2;
     var startPos = 0;
     var endPos = 0;
@@ -409,7 +408,7 @@ HasTimeBlock.prototype.updateFromEvent = function(ev) {
     var width = 0;
 
     // Events edited out of range
-    // Move the block from view -- if the update fails, we need
+    // Move the lozenge from view -- if the update fails, we need
     // to put it back
     if (ev.isOutOfViewRange()) {
        startPos = -10000;
@@ -443,7 +442,7 @@ HasTimeBlock.prototype.updateFromEvent = function(ev) {
     this.left = left;
     this.top = startPos;
     // Show one-pixel border of underlying divs
-    // And one-pixel border for actual block div
+    // And one-pixel border for actual lozenge div
     // (1 + (2 * 1)) = 3 pixels
     this.height = height - 3;
     this.width = width - 3;
@@ -451,20 +450,20 @@ HasTimeBlock.prototype.updateFromEvent = function(ev) {
 }
 
 /**
- * Update an event from changes to the block -- usually called
- * when an event block is dragged or resized
+ * Update an event from changes to the lozenge -- usually called
+ * when an event lozenge is dragged or resized
  * The updated event is then passed back to the backend for saving
  * If the save operation fails, the event can be restored from
  * the backup copy of the CalEventData in the event's dataOrig property
  */
-HasTimeBlock.prototype.updateEvent = function(ev, dragMode) {
+HasTimeLozenge.prototype.updateEvent = function(ev, dragMode) {
 
     var evStart = Cal.calcDateFromPos(this.left);
     var diff = this.auxDivList.length;
     var evEnd = Date.add('d', diff, evStart);
     var startTime = Cal.calcTimeFromPos(this.top);
     // Add +1 to height for border on background
-    // Add +2 to height for border on block div
+    // Add +2 to height for border on lozenge div
     var endTime = Cal.calcTimeFromPos(this.top+(this.height + 3));
 
     evStart.setHours(Cal.extractHourFromTime(startTime));
@@ -479,21 +478,21 @@ HasTimeBlock.prototype.updateEvent = function(ev, dragMode) {
 }
 
 /**
- * Insert a new event block
- * This method places the block (single- or multi-div) on the
+ * Insert a new event lozenge
+ * This method places the lozenge (single- or multi-div) on the
  * scrollable area for normal events. This just puts them on the
  * canvas in a hidden state. After this we have two more steps:
- * (1) Update block to reflect event's times using updateFromEvent
+ * (1) Update lozenge to reflect event's times using updateFromEvent
  * (2) Do sizing/positioning, and turn on visibility with updateDisplayMain
  */
-HasTimeBlock.prototype.insert = function(id) {
+HasTimeLozenge.prototype.insert = function(id) {
 
     var ev = cosmo.view.cal.canvas.eventRegistry.getItem(id);
     var startDay = 0;
     var endDay = 0;
     var auxDivCount = 0;
-    var blockDiv = null;
-    var blockDivSub = null;
+    var lozengeDiv = null;
+    var lozengeDivSub = null;
     var d = null;
     var view = null;
 
@@ -517,55 +516,55 @@ HasTimeBlock.prototype.insert = function(id) {
     this.width = 1;
     this.auxDivList = [];
 
-    // Append event block to appropriate screen area for the type of Block
+    // Append event lozenge to appropriate screen area for the type of Lozenge 
     view = document.getElementById('timedContentDiv');
 
-    blockDiv = document.createElement('div');
-    blockDivSub = document.createElement('div');
+    lozengeDiv = document.createElement('div');
+    lozengeDivSub = document.createElement('div');
 
     // Event lozenge main div and components
     // -----------------------
     // Main lozenge div
-    blockDiv.id = this.divId + this.idPrefix;
-    blockDiv.className = 'eventBlock';
-    blockDiv.style.width = this.width + 'px';
+    lozengeDiv.id = this.divId + this.idPrefix;
+    lozengeDiv.className = 'eventLozenge';
+    lozengeDiv.style.width = this.width + 'px';
 
     /*
-    // Just a small little bit of fun to change the border style of a block
+    // Just a small little bit of fun to change the border style of a lozenge
     // depending on the status of the event.
     if (ev.data.status && ev.data.status.indexOf('TENTATIVE') > -1) {
-        blockDiv.style.borderStyle = 'dashed';
+        lozengeDiv.style.borderStyle = 'dashed';
     }
     */
 
     // Resize-up handle
-    blockDivSub.id = this.divId + 'Top' + this.idPrefix;
-    blockDivSub.className = 'eventResizeTop';
-    blockDivSub.style.height = BLOCK_RESIZE_LIP_HEIGHT + 'px';
-    blockDiv.appendChild(blockDivSub);
+    lozengeDivSub.id = this.divId + 'Top' + this.idPrefix;
+    lozengeDivSub.className = 'eventResizeTop';
+    lozengeDivSub.style.height = BLOCK_RESIZE_LIP_HEIGHT + 'px';
+    lozengeDiv.appendChild(lozengeDivSub);
 
     // Central content area
-    blockDivSub = document.createElement('div');
-    blockDivSub.id = this.divId + 'Content' + this.idPrefix;
-    blockDivSub.className = 'eventContent';
-    blockDivSub.style.marginLeft = BLOCK_RESIZE_LIP_HEIGHT + 'px';
-    blockDivSub.style.marginRight = BLOCK_RESIZE_LIP_HEIGHT + 'px';
+    lozengeDivSub = document.createElement('div');
+    lozengeDivSub.id = this.divId + 'Content' + this.idPrefix;
+    lozengeDivSub.className = 'eventContent';
+    lozengeDivSub.style.marginLeft = BLOCK_RESIZE_LIP_HEIGHT + 'px';
+    lozengeDivSub.style.marginRight = BLOCK_RESIZE_LIP_HEIGHT + 'px';
 
     // Start time display
     d = document.createElement('div');
     d.id = this.divId + 'Start' + this.idPrefix;
     d.className = 'eventTime';
     d.style.width = '100%'; // Needed for IE, which sucks
-    blockDivSub.appendChild(d);
+    lozengeDivSub.appendChild(d);
 
     // Title
     d = document.createElement('div');
     d.id = this.divId + 'Title' + this.idPrefix
     d.className = 'eventTitle';
     d.style.width = '100%'; // Needed for IE, which sucks
-    blockDivSub.appendChild(d);
+    lozengeDivSub.appendChild(d);
 
-    blockDiv.appendChild(blockDivSub);
+    lozengeDiv.appendChild(lozengeDivSub);
 
     // Before adding the bottom resize handle, add any intervening
     // auxilliary div elems for multi-day events
@@ -576,26 +575,26 @@ HasTimeBlock.prototype.insert = function(id) {
     if (auxDivCount) {
         for (var i = 0; i < auxDivCount; i++) {
             // Append previous div
-            view.appendChild(blockDiv);
+            view.appendChild(lozengeDiv);
 
-            var blockDiv = document.createElement('div');
-            blockDiv.id = this.divId + Cal.ID_SEPARATOR +  +
+            var lozengeDiv = document.createElement('div');
+            lozengeDiv.id = this.divId + Cal.ID_SEPARATOR +  +
                 'aux' + (i+1) + this.idPrefix;
-            blockDiv.className = 'eventBlock';
-            blockDiv.style.width = this.width + 'px';
+            lozengeDiv.className = 'eventLozenge';
+            lozengeDiv.style.width = this.width + 'px';
 
             // Central content area
-            blockDivSub = document.createElement('div');
-            blockDivSub.id = this.divId + 'Content' + this.idPrefix;
-            blockDivSub.className = 'eventContent';
-            blockDiv.appendChild(blockDivSub);
+            lozengeDivSub = document.createElement('div');
+            lozengeDivSub.id = this.divId + 'Content' + this.idPrefix;
+            lozengeDivSub.className = 'eventContent';
+            lozengeDiv.appendChild(lozengeDivSub);
 
             // Don't set height to 100% for empty content area of last aux div
             // It has resize handle at the bottom, so empty content area
-            // gets an absolute numeric height when the Block gets placed and
+            // gets an absolute numeric height when the Lozenge gets placed and
             // sized in updateFromEvent
             if (this.endsAfterViewRange || (i < (auxDivCount-1))) {
-                blockDivSub.style.height = '100%';
+                lozengeDivSub.style.height = '100%';
             }
         }
     }
@@ -604,14 +603,14 @@ HasTimeBlock.prototype.insert = function(id) {
     // or to final div for multi-day event -- don't append when
     // event extends past view area
     if (!this.endsAfterViewRange) {
-        blockDivSub = document.createElement('div');
-        blockDivSub.id = this.divId + 'Bottom' + this.idPrefix;
-        blockDivSub.className = 'eventResizeBottom';
-        blockDivSub.style.height = BLOCK_RESIZE_LIP_HEIGHT + 'px';
-        blockDiv.appendChild(blockDivSub);
+        lozengeDivSub = document.createElement('div');
+        lozengeDivSub.id = this.divId + 'Bottom' + this.idPrefix;
+        lozengeDivSub.className = 'eventResizeBottom';
+        lozengeDivSub.style.height = BLOCK_RESIZE_LIP_HEIGHT + 'px';
+        lozengeDiv.appendChild(lozengeDivSub);
     }
 
-    view.appendChild(blockDiv);
+    view.appendChild(lozengeDiv);
 
     // DOM node references
     this.div = document.getElementById(this.divId + this.idPrefix);
@@ -629,9 +628,9 @@ HasTimeBlock.prototype.insert = function(id) {
 }
 
 /**
- * Removes the block -- including multiple divs for multi-day events
+ * Removes the lozenge -- including multiple divs for multi-day events
  */
-HasTimeBlock.prototype.remove = function(id) {
+HasTimeLozenge.prototype.remove = function(id) {
     this.innerDiv.parentNode.removeChild(this.innerDiv);
     this.div.parentNode.removeChild(this.div);
     if (this.auxDivList.length) {
@@ -647,13 +646,13 @@ HasTimeBlock.prototype.remove = function(id) {
 }
 
 /**
- * Move the left side of the block to the given pixel position
+ * Move the left side of the lozenge to the given pixel position
  * *** Note: the pos is passed in instead of using the property
  * because during dragging, we don't continuously update the
- * block properties -- we only update them on drop ***
- * @param pos The X pixel position for the block
+ * lozenge properties -- we only update them on drop ***
+ * @param pos The X pixel position for the lozenge
  */
-HasTimeBlock.prototype.setLeft = function(pos) {
+HasTimeLozenge.prototype.setLeft = function(pos) {
     var leftPos = parseInt(pos);
     var auxDiv = null;
     this.div.style.left = leftPos + 'px';
@@ -667,20 +666,20 @@ HasTimeBlock.prototype.setLeft = function(pos) {
 }
 
 /**
- * Move the top side of the block to the given pixel position
+ * Move the top side of the lozenge to the given pixel position
  * *** Note: the pos is passed in instead of using the property
  * because during dragging, we don't continuously update the
- * block properties -- we only update them on drop ***
- * @param pos The Y pixel position for the block
+ * lozenge properties -- we only update them on drop ***
+ * @param pos The Y pixel position for the lozenge
  */
-HasTimeBlock.prototype.setTop = function(pos) {
+HasTimeLozenge.prototype.setTop = function(pos) {
     this.div.style.top = parseInt(pos) + 'px';
 }
 
 /**
  *
  */
-HasTimeBlock.prototype.setWidth = function(width) {
+HasTimeLozenge.prototype.setWidth = function(width) {
     var w = parseInt(width);
     this.div.style.width = w + 'px';
     if (this.auxDivList.length) {
@@ -692,14 +691,14 @@ HasTimeBlock.prototype.setWidth = function(width) {
 }
 
 /**
- * Sizes an event block vertically -- or the starting and ending
- * blocks for a multi-day event. Note: in the case of a
+ * Sizes an event lozenge vertically -- or the starting and ending
+ * lozenges for a multi-day event. Note: in the case of a
  * multi-day event where the start time is later than the end time,
  * you will have a NEGATIVE value for 'size', which is WHAT YOU WANT.
  * @param size Int difference in start and end positions of the
- * event block, or of start and end blocks for a multi-day event
+ * event lozenge, or of start and end lozenges for a multi-day event
  */
-HasTimeBlock.prototype.setHeight = function(size, overrideMulti) {
+HasTimeLozenge.prototype.setHeight = function(size, overrideMulti) {
     var doMulti = ((this.auxDivList.length || this.endsAfterViewRange)
         && !overrideMulti);
     var mainSize = 0;
@@ -752,9 +751,9 @@ HasTimeBlock.prototype.setHeight = function(size, overrideMulti) {
 }
 
 /**
- * Position and resize the block, and turn on its visibility
+ * Position and resize the lozenge, and turn on its visibility
  */
-HasTimeBlock.prototype.updateElements = function() {
+HasTimeLozenge.prototype.updateElements = function() {
     this.setLeft(this.left);
     this.setTop(this.top);
     this.setHeight(this.height);
@@ -762,7 +761,7 @@ HasTimeBlock.prototype.updateElements = function() {
     this.makeVisible();
 }
 
-HasTimeBlock.prototype.makeVisible = function() {
+HasTimeLozenge.prototype.makeVisible = function() {
     // Turn on visibility for all the divs
     this.div.style.visibility = 'visible';
     if (this.auxDivList.length) {
@@ -774,19 +773,19 @@ HasTimeBlock.prototype.makeVisible = function() {
 }
 
 /**
- * Get the pixel position of the top of the block div, or for
+ * Get the pixel position of the top of the lozenge div, or for
  * the far-left div in a multi-day event
  */
-HasTimeBlock.prototype.getTop = function() {
+HasTimeLozenge.prototype.getTop = function() {
     var t = this.div.offsetTop;
     return parseInt(t);
 }
 
 /**
- * Get the pixel posiiton of the bottom of the block div, or for
+ * Get the pixel posiiton of the bottom of the lozenge div, or for
  * the far-right div in a multi-day event
  */
-HasTimeBlock.prototype.getBottom = function() {
+HasTimeLozenge.prototype.getBottom = function() {
 
     var t = 0;
     var h = 0;
@@ -808,57 +807,57 @@ HasTimeBlock.prototype.getBottom = function() {
 }
 
 /**
- * Get the pixel position of the far-left edge of the event block
- * or blocks in a muli-day event
+ * Get the pixel position of the far-left edge of the event lozenge
+ * or lozenges in a muli-day event
  */
-HasTimeBlock.prototype.getLeft = function() {
+HasTimeLozenge.prototype.getLeft = function() {
     var l = this.div.offsetLeft;
     return parseInt(l);
 }
 
 /**
- * NoTimeBlock -- sub-class of Block
+ * NoTimeLozenge -- sub-class of Lozenge 
  * All-day events, 'any-time' events -- these sit up in the
  * resizable area at the top of the UI
  */
-function NoTimeBlock(id) {
+function NoTimeLozenge(id) {
     this.id = id;
 }
-NoTimeBlock.prototype = new Block();
+NoTimeLozenge.prototype = new Lozenge();
 
 // All-day events are a fixed height --
 // I just picked 16 because it looked about right
-NoTimeBlock.prototype.height = 16;
-// Div elem prefix -- all component divs of normal event blocks
+NoTimeLozenge.prototype.height = 16;
+// Div elem prefix -- all component divs of normal event lozenges
 // begin with this
-NoTimeBlock.prototype.divId = 'eventDivAllDay';
+NoTimeLozenge.prototype.divId = 'eventDivAllDay';
 
 /**
- * Change block color to 'processing' color
+ * Change lozenge color to 'processing' color
  * Change the cursors for the resize handles at top and bottom,
  * and for the central content div
  * Display status animation
  */
-NoTimeBlock.prototype.showProcessing = function() {
+NoTimeLozenge.prototype.showProcessing = function() {
     this.setState(true);
     this.mainAreaCursorChange(true);
     this.showStatusAnim();
 }
 
 /**
- * Return the block to normal after processing
+ * Return the lozenge to normal after processing
  */
-NoTimeBlock.prototype.hideProcessing = function() {
+NoTimeLozenge.prototype.hideProcessing = function() {
     this.setState(false);
     this.mainAreaCursorChange(false);
 }
 
 /**
- * Update the block properties from an event
+ * Update the lozenge properties from an event
  * Called when editing from the form, or on drop after resizing/dragging
- * the block has to be updated to show the changes to the event
+ * the lozenge has to be updated to show the changes to the event
  */
-NoTimeBlock.prototype.updateFromEvent = function(ev, temp) {
+NoTimeLozenge.prototype.updateFromEvent = function(ev, temp) {
     var diff = ScoobyDate.diff('d', ev.data.start, ev.data.end) + 1;
 
     this.left = this.getPlatonicLeft();
@@ -869,13 +868,13 @@ NoTimeBlock.prototype.updateFromEvent = function(ev, temp) {
 }
 
 /**
- * Update an event from changes to the block -- usually called
- * when an event block is dragged or resized
+ * Update an event from changes to the lozenge -- usually called
+ * when an event lozenge is dragged or resized
  * The updated event is then passed back to the backend for saving
  * If the save operation fails, the event can be restored from
  * the backup copy of the CalEventData in the event's dataOrig property
  */
-NoTimeBlock.prototype.updateEvent = function(ev, dragMode) {
+NoTimeLozenge.prototype.updateEvent = function(ev, dragMode) {
     // Dragged-to date
     var evDate = Cal.calcDateFromPos(this.left);
     // Difference in days
@@ -889,13 +888,13 @@ NoTimeBlock.prototype.updateEvent = function(ev, dragMode) {
 }
 
 /**
- * Calculate the width of an all-day event block -- for events that
+ * Calculate the width of an all-day event lozenge -- for events that
  * have an end past the current view span, make sure the width truncates
  * at the end of the view span properly -- this is currently hard-coded
  * to Saturday.
  * TO-DO: Check the view type to figure out the end of the view span
  */
-NoTimeBlock.prototype.calcWidth = function(startDay, ev) {
+NoTimeLozenge.prototype.calcWidth = function(startDay, ev) {
 
     var diff = 0;
     var maxDiff = (7-startDay);
@@ -910,48 +909,48 @@ NoTimeBlock.prototype.calcWidth = function(startDay, ev) {
 }
 
 /**
- * Insert a new event block
- * This method places the block on the resizable area for
+ * Insert a new event lozenge
+ * This method places the lozenge on the resizable area for
  * all-day events. This just puts them on the canvas in a hidden state.
  * After this we have two more steps:
- * (1) Update block to reflect event's times using updateFromEvent
+ * (1) Update lozenge to reflect event's times using updateFromEvent
  * (2) Do sizing/positioning, and turn on visibility with updateDisplayMain
  */
-NoTimeBlock.prototype.insert = function(id) {
+NoTimeLozenge.prototype.insert = function(id) {
     var ev = cosmo.view.cal.canvas.eventRegistry.getItem(id);
-    var blockDiv = document.createElement('div');
-    var blockDivSub = document.createElement('div');
+    var lozengeDiv = document.createElement('div');
+    var lozengeDivSub = document.createElement('div');
     var d = null;
     var view = null;
 
     this.idPrefix = Cal.ID_SEPARATOR + id;
     this.width = 1;
 
-    // Append event block to appropriate screen area for the type of Block
+    // Append event lozenge to appropriate screen area for the type of Lozenge 
     view = document.getElementById('allDayContentDiv');
     // Event lozenge main div and components
     // -----------------------
     // Main lozenge div
-    blockDiv.id = this.divId + this.idPrefix;
-    blockDiv.className = 'eventBlock';
+    lozengeDiv.id = this.divId + this.idPrefix;
+    lozengeDiv.className = 'eventLozenge';
     // Set other style props separately because setAttribute() is broken in IE
-    blockDiv.style.width = this.width + 'px';
+    lozengeDiv.style.width = this.width + 'px';
 
     // Central content area
-    blockDivSub.id = this.divId + 'Content' + this.idPrefix;
-    blockDivSub.className = 'eventContent';
-    blockDivSub.style.whiteSpace = 'nowrap';
+    lozengeDivSub.id = this.divId + 'Content' + this.idPrefix;
+    lozengeDivSub.className = 'eventContent';
+    lozengeDivSub.style.whiteSpace = 'nowrap';
 
     // Title
     d = document.createElement('div');
     d.id = this.divId + 'Title' + this.idPrefix;
     d.className = 'eventTitle';
     d.style.marginLeft = BLOCK_RESIZE_LIP_HEIGHT + 'px';
-    blockDivSub.appendChild(d);
+    lozengeDivSub.appendChild(d);
 
-    blockDiv.appendChild(blockDivSub);
+    lozengeDiv.appendChild(lozengeDivSub);
 
-    view.appendChild(blockDiv);
+    view.appendChild(lozengeDiv);
 
     // DOM node references
     this.div = document.getElementById(this.divId + this.idPrefix);
@@ -962,9 +961,9 @@ NoTimeBlock.prototype.insert = function(id) {
 }
 
 /**
- * Removes the block
+ * Removes the lozenge
  */
-NoTimeBlock.prototype.remove = function(id) {
+NoTimeLozenge.prototype.remove = function(id) {
     this.innerDiv.parentNode.removeChild(this.innerDiv);
     this.div.parentNode.removeChild(this.div);
     this.div = null;
@@ -972,32 +971,32 @@ NoTimeBlock.prototype.remove = function(id) {
 }
 
 /**
- * Move the left side of the block to the given pixel position
+ * Move the left side of the lozenge to the given pixel position
  * *** Note: the pos is passed in instead of using the property
  * because during dragging, we don't continuously update the
- * block properties -- we only update them on drop ***
- * @param pos The X pixel position for the block
+ * lozenge properties -- we only update them on drop ***
+ * @param pos The X pixel position for the lozenge
  */
-NoTimeBlock.prototype.setLeft = function(pos) {
+NoTimeLozenge.prototype.setLeft = function(pos) {
     this.div.style.left = parseInt(pos) + 'px';
 }
 
 /**
- * Move the top side of the block to the given pixel position
+ * Move the top side of the lozenge to the given pixel position
  * *** Note: the pos is passed in instead of using the property
  * because during dragging, we don't continuously update the
- * block properties -- we only update them on drop ***
- * @param pos The Y pixel position for the block
+ * lozenge properties -- we only update them on drop ***
+ * @param pos The Y pixel position for the lozenge
  */
-NoTimeBlock.prototype.setTop = function(pos) {
+NoTimeLozenge.prototype.setTop = function(pos) {
     this.div.style.top = parseInt(pos) + 'px';
 }
 
 /**
- * Sets the pixel width of the all-day event block's
+ * Sets the pixel width of the all-day event lozenge's
  * div element
  */
-NoTimeBlock.prototype.setWidth = function(width) {
+NoTimeLozenge.prototype.setWidth = function(width) {
     this.div.style.width = parseInt(width) + 'px';
     // Needed for IE not to push the content out past
     // the width of the containing div
@@ -1009,16 +1008,16 @@ NoTimeBlock.prototype.setWidth = function(width) {
  * TO-DO: Figure out if this is needed anymore -- aren't these
  * a fixed height?
  */
-NoTimeBlock.prototype.setHeight = function(size) {
+NoTimeLozenge.prototype.setHeight = function(size) {
     size = parseInt(size);
     this.div.style.height = size + 'px';
     this.innerDiv.style.height = size + 'px';
 }
 
 /**
- * Position and resize the block, and turn on its visibility
+ * Position and resize the lozenge, and turn on its visibility
  */
-NoTimeBlock.prototype.updateElements = function() {
+NoTimeLozenge.prototype.updateElements = function() {
     this.setLeft(this.left);
     this.setTop(this.top);
     this.setHeight(this.height);
@@ -1026,14 +1025,14 @@ NoTimeBlock.prototype.updateElements = function() {
     this.makeVisible();
 }
 
-NoTimeBlock.prototype.makeVisible = function() {
+NoTimeLozenge.prototype.makeVisible = function() {
     this.div.style.visibility = 'visible';
 }
 
 /**
  * TO-DO: Figure out if this is needed anymore
  */
-NoTimeBlock.prototype.getTop = function() {
+NoTimeLozenge.prototype.getTop = function() {
     var t = this.div.offsetTop;
     return parseInt(t);
 }
@@ -1041,7 +1040,7 @@ NoTimeBlock.prototype.getTop = function() {
 /**
  * TO-DO: Figure out if this is needed anymore
  */
-NoTimeBlock.prototype.getBottom = function() {
+NoTimeLozenge.prototype.getBottom = function() {
     var t = this.div.offsetTop;
     var h = this.div.offsetHeight;
     return parseInt(t+h);
@@ -1050,7 +1049,7 @@ NoTimeBlock.prototype.getBottom = function() {
 /**
  * TO-DO: Figure out if this is needed anymore
  */
-NoTimeBlock.prototype.getLeft = function() {
+NoTimeLozenge.prototype.getLeft = function() {
     var l = this.div.offsetLeft;
     return parseInt(l);
 }

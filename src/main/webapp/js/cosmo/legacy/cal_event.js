@@ -15,21 +15,21 @@
 */
 
 /**
- * @fileoverview Calendar events -- links the Block to the CalEventData
+ * @fileoverview Calendar events -- links the Lozenge to the CalEventData
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  */
 
 /**
  * @object CalEvent -- an event on the Calendar, links to the event's
- * Block and CalEventDate objects
+ * Lozenge and CalEventDate objects
  */
-function CalEvent(id, block) {
+function CalEvent(id, lozenge) {
     // Randomly generated ID for each CalEvent
-    // Block div elements get their id suffixes from this
+    // Lozenge div elements get their id suffixes from this
     this.id = id;
-    // Points to this event's Block obj
-    this.block = block;
+    // Points to this event's Lozenge obj
+    this.lozenge = lozenge;
     // Points to this event's CalEventData obj
     this.data = null;
     // A backup copy (clone) of the .data property made 
@@ -173,7 +173,7 @@ function CalEvent(id, block) {
      * Restores event to its position previous to the aborted save
      */
     this.cancelSave = function() {
-        // Put the block back where it was
+        // Put the lozenge back where it was
         // FIXME: Use topics
         var ev = cosmo.view.cal.canvas.getSelectedEvent();
         ev.restoreEvent();
@@ -183,36 +183,36 @@ function CalEvent(id, block) {
         }
     };
     /**
-     * Creates a brand-new block for the event
-     * Resets the block because we may be changing to the new type --
+     * Creates a brand-new lozenge for the event
+     * Resets the lozenge because we may be changing to the new type --
      * e.g., between all-day and normal, or between normal single
      * and normal composite
      */
-    this.replaceBlock = function() {
-        // Remove the current block
-        this.block.remove();
+    this.replaceLozenge = function() {
+        // Remove the current lozenge
+        this.lozenge.remove();
         // Replace with new one
         if (this.data.allDay) {
-            this.block = new NoTimeBlock(this.id);
+            this.lozenge = new NoTimeLozenge(this.id);
         }
         else {
-            this.block = new HasTimeBlock(this.id);
+            this.lozenge = new HasTimeLozenge(this.id);
         }
-        this.block.insert(this.id);
+        this.lozenge.insert(this.id);
     };
     /**
-     * Puts an event block back where it originally was using the
+     * Puts an event lozenge back where it originally was using the
      * snapshot backup clone of its data in the dataOrig property
      * Used when canceling a save from the confirmation dialog
      * and when a save operation fails
      */
     this.restoreEvent = function() {
         if (this.restoreFromSnapshot()) {
-            this.block.updateFromEvent(this);
-            // Update block and event detail form display
+            this.lozenge.updateFromEvent(this);
+            // Update lozenge and event detail form display
             // FIXME: Use topics
             var ev = cosmo.view.cal.canvas.getSelectedEvent();
-            ev.block.updateDisplayMain();
+            ev.lozenge.updateDisplayMain();
             this.setInputDisabled(false);
         }
     };

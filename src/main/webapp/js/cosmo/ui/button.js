@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview Calendar events -- links the Block to the CalEventData
+ * @fileoverview Button -- button-related functions 
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  */

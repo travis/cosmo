@@ -422,7 +422,7 @@ var Cal = new function() {
         var evSource = '';
         var evType = '';
         var allDay = false;
-        var block = null; // New blank block
+        var lozenge = null; // New blank lozenge
         var startstr = '';
         var evdate = '';
         var dayind = 0;
@@ -437,16 +437,16 @@ var Cal = new function() {
         var evTitle = '';
         var evDesc = '';
         
-        // ID for the block -- random strings, also used for div elem IDs
+        // ID for the lozenge -- random strings, also used for div elem IDs
         id = Cal.generateTempId();
         
-        // Create the CalEvent obj, attach the CalEventData obj, create the Block
+        // Create the CalEvent obj, attach the CalEventData obj, create the Lozenge 
         // ================================
         evType = (evParam.indexOf('allDayListDiv') > -1) ? 'allDayMain' : 'normal';
         evSource = 'click';
-        // Create the block
+        // Create the lozenge
         if (evType =='normal') {
-            block = new HasTimeBlock(id);
+            lozenge = new HasTimeLozenge(id);
             allDay = false;
             startstr = Cal.getIndexFromHourDiv(evParam);
             dayind = Cal.extractDayIndexFromId(startstr);
@@ -461,7 +461,7 @@ var Cal = new function() {
             end = ScoobyDate.add(start, 'n', 60);
         }
         else if (evType == 'allDayMain') {
-            block = new NoTimeBlock(id);
+            lozenge = new NoTimeLozenge(id);
             allDay = true;
             dayind = Cal.getIndexFromAllDayDiv(evParam);
             start = Cal.calcDateFromIndex(dayind);
@@ -473,8 +473,8 @@ var Cal = new function() {
                 start.getMonth(), start.getDate());
         }
         
-        // Create the CalEvent, connect it to its block
-        ev = new CalEvent(id, block);
+        // Create the CalEvent, connect it to its lozenge
+        ev = new CalEvent(id, lozenge);
         
         // Set CalEventData start and end calculated from click position
         // --------
@@ -487,9 +487,9 @@ var Cal = new function() {
         // ================================
         cosmo.view.cal.canvas.eventRegistry.setItem(id, ev);
         
-        // Update the block
+        // Update the lozenge
         // ================================
-        if (block.insert(id)) { // Insert the block on the view
+        if (lozenge.insert(id)) { // Insert the lozenge on the view
             // Save new event
             dojo.event.topic.publish('/calEvent', { 'action': 'save', 'data': ev })
         }
@@ -556,9 +556,9 @@ var Cal = new function() {
     // Time/position calculations
     // ==========================
     /**
-     * Figures out the date based on Y-pos of left edge of event block
+     * Figures out the date based on Y-pos of left edge of event lozenge
      * with respect to canvas (scrollable div 'timedScrollingMainDiv').
-     * @param point Left edge of dragged event block after snap-to.
+     * @param point Left edge of dragged event lozenge after snap-to.
      * @return A Date object
      */
     this.calcDateFromPos = function(point) {
@@ -567,9 +567,9 @@ var Cal = new function() {
         return posdate;
     };
     /**
-     * Figures out the hour based on X-pos of top and bottom edges of event block
+     * Figures out the hour based on X-pos of top and bottom edges of event lozenge
      * with respect to canvas (scrollable div 'timedScrollingMainDiv').
-     * @param point top or bottom edge of dragged event block after snap-to.
+     * @param point top or bottom edge of dragged event lozenge after snap-to.
      * @return A time string in in military time format
      */
     this.calcTimeFromPos = function(point) {
@@ -583,10 +583,10 @@ var Cal = new function() {
         return h + ':' + m;
     };
     /**
-     * Figures out the X-position for the top or bottom edge of an event block
+     * Figures out the X-position for the top or bottom edge of an event lozenge
      * based on a military time.
      * @param miltime time string in military time format
-     * @return An integer of the X-position for the top/bottom edge of an event block
+     * @return An integer of the X-position for the top/bottom edge of an event lozenge
      */
     this.calcPosFromTime = function(miltime) {
         var h = this.extractHourFromTime(miltime);
@@ -617,11 +617,11 @@ var Cal = new function() {
     // ==========================
     /**
      * Takes the ID of any of the component DOM elements that collectively make up
-     * an event block, and look up which event the block belongs to.
-     * Event block components are all similarly named, beginning with 'eventDiv',
+     * an event lozenge, and look up which event the lozenge belongs to.
+     * Event lozenge components are all similarly named, beginning with 'eventDiv',
      * then followed by some indentifying text, a separator, and then the ID.
      * (e.g., 'eventDivBottom__12' or 'eventDivContent__8').
-     * @return A string representing the event identifier for the event block clicked on
+     * @return A string representing the event identifier for the event lozenge clicked on
      */
     this.getIndexEvent = function(strId) {
         // Use regex to pull out the actual ID number

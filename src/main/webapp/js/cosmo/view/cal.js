@@ -186,18 +186,18 @@ cosmo.view.cal = new function() {
         // Lozenge stuff
         // FIXME: Actually this stuff should be oWnZ0Rd by view.cal.canvas
         // ---------
-        // Reset the block because we may be changing to the new type --
+        // Reset the lozenge because we may be changing to the new type --
         // e.g., between all-day and normal, or between normal single
         // and normal composite
         if (ev.dataOrig && !(ev.data.allDay && ev.dataOrig.allDay)) {
-            ev.replaceBlock();
+            ev.replaceLozenge();
         }
-        // Reset the block properties from the event
-        ev.block.updateFromEvent(ev, true);
+        // Reset the lozenge properties from the event
+        ev.lozenge.updateFromEvent(ev, true);
         // Do visual updates to size, position
-        ev.block.updateElements();
+        ev.lozenge.updateElements();
         // Display processing animation
-        ev.block.showProcessing();
+        ev.lozenge.showProcessing();
 
         // Recurring event
         if (qual) {

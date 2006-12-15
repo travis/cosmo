@@ -207,39 +207,9 @@
 
   <bean id="idGenerator"
         class="org.apache.commons.id.uuid.VersionFourGenerator" />
-
-  <bean id="txItemDao" parent="txProxyTemplate">
-    <property name="proxyInterfaces">
-      <value>org.osaf.cosmo.dao.ItemDao</value>
-    </property>
-    <property name="target">
-      <ref local="itemDao" />
-    </property>
-  </bean>
-
-  <bean id="itemDao"
-        class="org.osaf.cosmo.dao.hibernate.ItemDaoImpl"
-        init-method="init"
-        destroy-method="destroy">
-    <property name="sessionFactory">
-      <ref bean="sessionFactory" />
-    </property>
-    <property name="itemPathTranslator">
-      <ref bean="itemPathTranslator" />
-    </property>
-    <property name="idGenerator">
-      <ref local="idGenerator" />
-    </property>
-  </bean>
-
-  <bean id="txServerPropertyDao" parent="txProxyTemplate">
-    <property name="proxyInterfaces">
-      <value>org.osaf.cosmo.dao.ServerPropertyDao</value>
-    </property>
-    <property name="target">
-      <ref local="serverPropertyDao" />
-    </property>
-  </bean>
+  
+  <bean id="ticketKeyGenerator"
+        class="org.apache.commons.id.random.SessionIdGenerator" />
 
   <bean id="serverPropertyDao"
         class="org.osaf.cosmo.dao.hibernate.ServerPropertyDaoImpl"
@@ -247,15 +217,6 @@
         destroy-method="destroy">
     <property name="sessionFactory">
       <ref bean="sessionFactory" />
-    </property>
-  </bean>
-
-  <bean id="txContentDao" parent="txProxyTemplate">
-    <property name="proxyInterfaces">
-      <value>org.osaf.cosmo.dao.ContentDao</value>
-    </property>
-    <property name="target">
-      <ref local="contentDao" />
     </property>
   </bean>
 
@@ -272,17 +233,11 @@
     <property name="idGenerator">
       <ref local="idGenerator" />
     </property>
+    <property name="ticketKeyGenerator">
+      <ref local="ticketKeyGenerator" />
+    </property>
     <property name="calendarIndexer">
       <ref bean="calendarIndexer" />
-    </property>
-  </bean>
-
-  <bean id="txUserDao" parent="txProxyTemplate">
-    <property name="proxyInterfaces">
-      <value>org.osaf.cosmo.dao.UserDao</value>
-    </property>
-    <property name="target">
-      <ref local="userDao" />
     </property>
   </bean>
 
@@ -295,15 +250,6 @@
     </property>
     <property name="idGenerator">
       <ref local="idGenerator" />
-    </property>
-  </bean>
-
-  <bean id="txCalendarDao" parent="txProxyTemplate">
-    <property name="proxyInterfaces">
-      <value>org.osaf.cosmo.dao.CalendarDao</value>
-    </property>
-    <property name="target">
-      <ref local="calendarDao" />
     </property>
   </bean>
 
@@ -325,6 +271,9 @@
     </property>
     <property name="idGenerator">
       <ref local="idGenerator" />
+    </property>
+    <property name="ticketKeyGenerator">
+      <ref local="ticketKeyGenerator" />
     </property>
   </bean>
 

@@ -57,8 +57,8 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
 
     private static final Log log = LogFactory.getLog(ItemDaoImpl.class);
 
-    private IdentifierGenerator idGenerator;
-
+    private IdentifierGenerator idGenerator = null;
+    private IdentifierGenerator ticketKeyGenerator = null;
     private ItemPathTranslator itemPathTranslator = null;
 
     /*
@@ -219,28 +219,16 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
      */
     public void createTicket(String path, Ticket ticket) {
 
-        if(ticket==null)
-            throw new IllegalArgumentException("ticket cannot be null");
-
         if(path==null)
             throw new IllegalArgumentException("path cannot be null");
 
         try {
-            User owner = ticket.getOwner();
-            if (owner == null)
-                throw new IllegalArgumentException("ticket must have owner");
-
             Item item = getItemPathTranslator().findItemByPath(path);
+            if (item == null)
+                throw new ItemNotFoundException("item at " + path
+                        + " not found");
 
-            if(item==null)
-                throw new IllegalArgumentException("invalid item");
-
-            if (ticket.getKey() == null)
-                ticket.setKey(getIdGenerator().nextIdentifier().toString());
-
-            ticket.setCreated(new Date());
-            item.addTicket(ticket);
-            getSession().save(item);
+            createTicket(item, ticket);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -259,8 +247,9 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
         try {
             Item item = getItemPathTranslator().findItemByPath(path);
 
-            if(item==null)
-                throw new IllegalArgumentException("invalid item");
+            if (item == null)
+                throw new ItemNotFoundException("item at " + path
+                        + " not found");
 
             // look for the ticket on the item itself and then on each
             // of its ancestors
@@ -292,7 +281,8 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             Item item = getItemPathTranslator().findItemByPath(path);
 
             if(item==null)
-                throw new IllegalArgumentException("invalid item");
+                throw new ItemNotFoundException("item at " + path
+                        + " not found");
 
             return item.getTickets();
         } catch (HibernateException e) {
@@ -314,7 +304,8 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             Item item = getItemPathTranslator().findItemByPath(path);
 
             if(item==null)
-                throw new IllegalArgumentException("invalid item");
+                throw new ItemNotFoundException("item at " + path
+                        + " not found");
 
             Iterator it = item.getTickets().iterator();
             Ticket toDelete = null;
@@ -329,7 +320,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
 
             if (toDelete != null) {
                 item.getTickets().remove(toDelete);
-                getSession().save(item);
+                getSession().update(item);
             }
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -350,12 +341,22 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
 
     public void createTicket(Item item, Ticket ticket) {
         try {
-            if(ticket.getKey()==null)
-                ticket.setKey(idGenerator.nextIdentifier().toString());
-            getSession().refresh(item);
+            if(ticket==null)
+                throw new IllegalArgumentException("ticket cannot be null");
+            
+            if(item==null)
+                throw new IllegalArgumentException("item cannot be null");
+
+            User owner = ticket.getOwner();
+            if (owner == null)
+                throw new IllegalArgumentException("ticket must have owner");
+
+            if (ticket.getKey() == null)
+                ticket.setKey(ticketKeyGenerator.nextIdentifier().toString());
+
             ticket.setCreated(new Date());
             item.addTicket(ticket);
-            getSession().save(item);
+            getSession().update(item);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -386,7 +387,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
         try {
             getSession().refresh(item);
             item.getTickets().remove(ticket);
-            getSession().save(item);
+            getSession().update(item);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -399,6 +400,9 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     public void removeItemByPath(String path) {
         try {
             Item item = itemPathTranslator.findItemByPath(path);
+            if(item==null)
+                throw new ItemNotFoundException("item at " + path
+                        + " not found");
             removeItem(item);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -412,11 +416,15 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     public void removeItemByUid(String uid) {
         try {
             Item item = findItemByUid(uid);
+            if (item == null)
+                throw new ItemNotFoundException("item with uid " + uid
+                        + " not found");
             removeItem(item);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
     }
+    
 
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.ItemDao#copyItem(org.osaf.cosmo.model.Item, java.lang.String, boolean)
@@ -497,6 +505,19 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     public IdentifierGenerator getIdGenerator() {
         return idGenerator;
     }
+    
+    /**
+     * Set the unique key generator for new tickets
+     *
+     * @param idGenerator
+     */
+    public void setTicketKeyGenerator(IdentifierGenerator ticketKeyGenerator) {
+        this.ticketKeyGenerator = ticketKeyGenerator;
+    }
+
+    public IdentifierGenerator getTicketKeyGenerator() {
+        return ticketKeyGenerator;
+    }
 
     public ItemPathTranslator getItemPathTranslator() {
         return itemPathTranslator;
@@ -530,6 +551,10 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     public void init() {
         if (idGenerator == null) {
             throw new IllegalStateException("idGenerator is required");
+        }
+        
+        if (ticketKeyGenerator == null) {
+            throw new IllegalStateException("ticketKeyGenerator is required");
         }
 
         if (itemPathTranslator == null) {

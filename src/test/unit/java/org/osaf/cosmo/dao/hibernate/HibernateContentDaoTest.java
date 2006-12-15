@@ -50,8 +50,6 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
     protected ContentDaoImpl contentDao = null;
 
-    protected ItemDaoImpl itemDao = null;
-
     public HibernateContentDaoTest() {
         super();
     }
@@ -289,7 +287,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         }
     }
 
-    public void testFindWithItemDao() throws Exception {
+    public void testFindItem() throws Exception {
         User testuser2 = getUser(userDao, "testuser2");
 
         CollectionItem root = (CollectionItem) contentDao
@@ -303,11 +301,11 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        Item queryItem = itemDao.findItemByUid(a.getUid());
+        Item queryItem = contentDao.findItemByUid(a.getUid());
         Assert.assertNotNull(queryItem);
         Assert.assertTrue(queryItem instanceof CollectionItem);
 
-        queryItem = itemDao.findItemByPath("/testuser2/a");
+        queryItem = contentDao.findItemByPath("/testuser2/a");
         Assert.assertNotNull(queryItem);
         Assert.assertTrue(queryItem instanceof CollectionItem);
 
@@ -317,13 +315,13 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        queryItem = itemDao.findItemByPath("/testuser2/a/test");
+        queryItem = contentDao.findItemByPath("/testuser2/a/test");
         Assert.assertNotNull(queryItem);
         Assert.assertTrue(queryItem instanceof ContentItem);
 
         clearSession();
 
-        queryItem = itemDao.findItemParentByPath("/testuser2/a/test");
+        queryItem = contentDao.findItemParentByPath("/testuser2/a/test");
         Assert.assertNotNull(queryItem);
         Assert.assertEquals(a.getUid(), queryItem.getUid());
     }

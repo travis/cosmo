@@ -80,13 +80,19 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
             if (this.handleOnClickOrig) {
                 this.handleOnClick = this.handleOnClickOrig;
             }
+            this.leftContainer.style.cursor = 'pointer';
+            this.centerContainer.style.cursor = 'pointer';
+            this.rightContainer.style.cursor = 'pointer';
             this._setTableOpacity(1.0) 
             
         } 
         else {
             this.handleOnClickOrig = this.handleOnClick;
             this.handleClick = null;
-            this._setTableOpactiy(this.DISABLED_TABLE_OPACITY);
+            this.leftContainer.style.cursor = 'default';
+            this.centerContainer.style.cursor = 'default';
+            this.rightContainer.style.cursor = 'default';
+            this._setTableOpacity(this.DISABLED_TABLE_OPACITY);
         }
         
         this._setButtonImages();

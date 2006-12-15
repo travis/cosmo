@@ -63,7 +63,6 @@ function convertObject(object){
         return convertMap(object);
     }
     
-    dojo.debug("JC: " + object.javaClass);
     if (object.javaClass == "java.util.HashSet"){
         return convertSet(object);
     }
@@ -105,7 +104,6 @@ function convertMap(map){
 }
 
 function convertSet(set){
-    dojo.debug("convertSet");
     set = set.set;
     var newset = {};
     for (var prop in set){

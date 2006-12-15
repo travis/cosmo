@@ -23,7 +23,9 @@ JAVA_JSON_MAPPING = {"java.util.Date":Date,
                      "org.osaf.cosmo.rpc.model.CosmoDate":cosmo.datetime.Date,
                      "org.osaf.cosmo.rpc.model.RecurrenceRule":RecurrenceRule,
                      "org.osaf.cosmo.rpc.model.Modification":Modification,
-                     "org.osaf.cosmo.rpc.model.Calendar":CalendarMetadata };
+                     "org.osaf.cosmo.rpc.model.Calendar":CalendarMetadata,
+                     "org.osaf.cosmo.rpc.model.Subscription" : Subscription,
+                     "org.osaf.cosmo.rpc.model.Ticket" : Ticket };
 
 JAVA_EXCEPTION_MAPPING = {"org.osaf.scooby.rpc.RPCException":ScoobyServiceRemoteException,
                           "org.osaf.scooby.rpc.NotAuthenticatedException":NotAuthenticatedException};
@@ -60,6 +62,11 @@ function convertObject(object){
     if (object.javaClass == "java.util.HashMap"){
         return convertMap(object);
     }
+    
+    dojo.debug("JC: " + object.javaClass);
+    if (object.javaClass == "java.util.HashSet"){
+        return convertSet(object);
+    }
 
     var constructor = JAVA_JSON_MAPPING[object.javaClass];
     if (constructor){
@@ -95,6 +102,17 @@ function convertMap(map){
         newmap[propName] = convertObject(map[propName]);
     }
     return newmap;
+}
+
+function convertSet(set){
+    dojo.debug("convertSet");
+    set = set.set;
+    var newset = {};
+    for (var prop in set){
+        prop = convertObject(prop);
+        newset[prop] = prop;
+    }
+    return newset;
 }
 
 function wrapMethod(jsonRemoteObject, jsonRemoteMethod){

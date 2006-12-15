@@ -183,7 +183,7 @@ var Cal = new function () {
                     collection: collection,
                     transportInfo: null,
                     conduit: cosmo.conduits.OwnedCollectionConduit,
-                    displayName: calendar.name
+                    displayName: collection.name
                     }
                 );
                 

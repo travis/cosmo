@@ -29,8 +29,8 @@ public class Ticket {
         return privileges;
     }
     
-    public void setPrivileges(Set priveleges) {
-        this.privileges = priveleges;
+    public void setPrivileges(Set privileges) {
+        this.privileges = privileges;
     }
     
     public String getTicketKey() {

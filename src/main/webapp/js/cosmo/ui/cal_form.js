@@ -165,7 +165,7 @@ function CalForm() {
         elem = document.createElement('div');
         elem.className = 'formElem';
         this.createSelect('status', 'status', null, null,
-        this.getStatusOpt(), 'selectElem', elem);
+            this.getStatusOpt(), 'selectElem', elem);
         d.appendChild(elem);
 
         // Recurrence
@@ -175,7 +175,7 @@ function CalForm() {
         elem = document.createElement('div');
         elem.className = 'formElem';
         this.createSelect('recurrence', 'recurrence', null, null,
-        this.getRecurOpt(), 'selectElem', elem);
+            this.getRecurOpt(), 'selectElem', elem);
 
         this.createNbsp(elem);
         elem.appendChild(document.createTextNode('ending'));
@@ -660,28 +660,32 @@ function CalForm() {
         else {
             // Set event properties
             // ==============
-            // ScoobyDate with timezones
+            var d = ev.data;
+            // cosmo.datetime.Date with timezones
             if (tzId) {
-                ev.data.start.updateFromLocalDate(startDate);
-                ev.data.start.tzId = tzId;
-                ev.data.end.updateFromLocalDate(endDate);
-                ev.data.end.tzId = tzId;
+                d.start.updateFromLocalDate(startDate);
+                d.start.tzId = tzId;
+                d.end.updateFromLocalDate(endDate);
+                d.end.tzId = tzId;
             }
-            // Floating ScoobyDates
+            // Floating cosmo.datetime.Date 
             else {
-                ev.data.start.updateFromUTC(startDate.getTime());
-                ev.data.end.updateFromUTC(endDate.getTime());
+                d.start.updateFromUTC(startDate.getTime());
+                d.start.tzId = null;
+                d.start.utc = false;
+                d.end.updateFromUTC(endDate.getTime());
+                d.end.tzId = null;
+                d.end.utc = false;
             }
-            ev.data.title = title;
-            ev.data.description = descr;
-            ev.data.allDay = allDay;
-            ev.data.status = status;
+            d.title = title;
+            d.description = descr;
+            d.allDay = allDay;
+            d.status = status;
 
-            var rule = ev.data.recurrenceRule;
+            var rule = d.recurrenceRule;
             // Set to no recurrence
-            //Log.print('recur: ' + recur);
             if (!recur) {
-                ev.data.recurrenceRule = null;
+                d.recurrenceRule = null;
             }
             else {
                 var recurEnd = null;
@@ -695,9 +699,9 @@ function CalForm() {
                 else {
                    rule = new RecurrenceRule();
                    rule.frequency = recur;
-                   ev.data.recurrenceRule = rule;
+                   d.recurrenceRule = rule;
                 }
-                ev.data.recurrenceRule.endDate = recurEnd;
+                d.recurrenceRule.endDate = recurEnd;
             }
             return true;
         }

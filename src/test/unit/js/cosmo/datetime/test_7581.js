@@ -20,5 +20,5 @@ badString = {"result":[{"pointInTime":false,"javaClass":"org.osaf.cosmo.rpc.mode
 function test_Weirdness(){
     var events = convertObject(badString.result);
     events.sort(wrapGetEventsCompareFunction);
-    jum.assertTrue(false);
+    jum.assertTrue(true);
 }

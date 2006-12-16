@@ -100,7 +100,15 @@ cosmo.view.cal.Lozenge.prototype.showStatusAnim = function () {
  * state -- should not appear to be draggable
  */
 cosmo.view.cal.Lozenge.prototype.mainAreaCursorChange = function (isProc) {
-    var cursorChange = isProc ? 'progress' : 'move';
+    var cursorChange = '';
+    // Read-only collection -- clickable but not draggable/resizable
+    if (!Cal.currentCollection.privileges.write) {
+        cursorChange = 'pointer';
+    }
+    // Writeable collection -- drag/resize cursors
+    else {
+        cursorChange = isProc ? 'progress' : 'move';
+    }
     document.getElementById(this.divId + 'Content' +
         Cal.ID_SEPARATOR + this.id).style.cursor = cursorChange;
 };
@@ -373,8 +381,18 @@ cosmo.view.cal.HasTimeLozenge.prototype.showProcessing = function () {
  * Change to 'default' when processing so it won't look draggable
  */
 cosmo.view.cal.HasTimeLozenge.prototype.resizeHandleCursorChange = function (isProc) {
-    var topChange = isProc ? 'default' : 'n-resize';
-    var bottomChange = isProc ? 'default' : 's-resize';
+    var topChange = ''; 
+    var bottomChange = ''; 
+    // Read-only collection -- clickable but not draggable/resizable
+    if (!Cal.currentCollection.privileges.write) {
+        topChange = 'pointer';
+        bottomChange = 'pointer';
+    }
+    // Writeable collection -- drag/resize cursors
+    else {
+        topChange = isProc ? 'default' : 'n-resize';
+        bottomChange = isProc ? 'default' : 's-resize';
+    }
     var topDiv = document.getElementById(this.divId + 'Top' +
         Cal.ID_SEPARATOR + this.id);
     var bottomDiv = document.getElementById(this.divId + 'Bottom' +

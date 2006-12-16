@@ -492,8 +492,14 @@ function CalForm() {
      *
      */
     this.setButtons = function(r, s) {
-        removeButton.setEnabled(r);
-        saveButton.setEnabled(s);
+        rem = r;
+        sav = s;
+        if (!Cal.currentCollection.privileges.write) {
+            rem = false;
+            sav = false;
+        }
+        removeButton.setEnabled(rem);
+        saveButton.setEnabled(sav);
     };
     this.getRecurOpt = function() {
         var recurOpt = [];

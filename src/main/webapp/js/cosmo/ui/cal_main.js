@@ -128,12 +128,14 @@ var Cal = new function () {
         // If we received a ticket, just grab the specified collection
         if (ticketKey){
             var collection = this.serv.getCalendar(collectionUid, ticketKey);
+            var ticket = this.serv.getTicket(ticketKey, collectionUid);
             this.currentCollections.push(
                 {
                     collection: collection,
-                    transportInfo: this.serv.getTicket(ticketKey, collectionUid),
+                    transportInfo: ticket,
                     conduit: cosmo.conduits.AnonymousTicketedConduit,
-                    displayName: collection.name
+                    displayName: collection.name,
+                    privileges: ticket.privileges
                 }
                 );
         }
@@ -149,7 +151,8 @@ var Cal = new function () {
                     collection: collection,
                     transportInfo: null,
                     conduit: cosmo.conduits.OwnedCollectionConduit,
-                    displayName: collection.name
+                    displayName: collection.name,
+                    privileges: {'read':'read', 'write':'write'}
                     }
                 );
             }
@@ -162,7 +165,8 @@ var Cal = new function () {
                     collection: subscription.calendar,
                     transportInfo: subscription,
                     conduit: cosmo.conduits.SubscriptionConduit,
-                    displayName: subscription.displayName
+                    displayName: subscription.displayName,
+                    privileges: subscription.ticket.privileges
                     }
                 );
             }

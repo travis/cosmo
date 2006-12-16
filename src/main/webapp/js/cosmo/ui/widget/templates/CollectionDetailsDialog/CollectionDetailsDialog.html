@@ -8,7 +8,7 @@
             </td>
 
             <td class="labelTextVert">
-                '${this.calendar.name}' ${this.strings.calendarLabel}
+                '${this.calendar.name}' ${this.strings.calendarLabel} <a href="${this.calendar.protocolUrls.web}">(Link)</a>
             </td>
 
         </tr>
@@ -25,25 +25,68 @@
 
             <td>
                 <div>
-                    <select dojoAttachPoint="clientSelector" 
+                    <select style="width:100px" dojoAttachPoint="clientSelector" 
                             dojoAttachEvent="onChange: _handleClientChanged;"/>
                     </select>
                 </div>
             </td>
 
         </tr>
+
+         <tr><td>&nbsp;&nbsp;</td></tr>
+
+         <tbody dojoAttachPoint="clientInstructionRows" style="display: none">
+             <tr>
+                 <td colspan="3">
+                     <span dojoAttachPoint="clientInstructions"> Copy the following link into Chandler and blah blah blah blah blah blah blah</span>   
+                 </td>
+             </tr>
+    
+             <tr><td>&nbsp;&nbsp;</td></tr>
+    
+             <tr>
+                <td class="labelTextVert">
+                   ${this.strings.collectionAddress}:
+                </td>
+                <td>
+                     <input size="40" type="text" dojoAttachPoint="clientCollectionAddress" value=""/>
+                </td>                 
+             </tr>
+         </tbody>  
+
+         <tbody dojoAttachPoint="protocolRows" style="display: none">
+             <tr><td>&nbsp;&nbsp;</td></tr>
+             <tr>
+                 <td colspan="3">
+                     ${this.strings.protocolInstructions}
+                 </td>
+             </tr>
+             <tr><td>&nbsp;&nbsp;</td></tr>
+             <tr>
+                <td class="labelTextVert">
+                   ${this.strings.caldav}:
+                </td>
+                <td>
+                     <input size="40" type="text" value="${this.calendar.protocolUrls.dav}"/>
+                </td>                 
+             </tr>
+             <tr>
+                <td class="labelTextVert">
+                   ${this.strings.webcal}:
+                </td>
+                <td>
+                     <input size="40" type="text" value="${this.calendar.protocolUrls.webcal}"/>
+                </td>                 
+             </tr>
+             <tr>
+                <td class="labelTextVert">
+                   ${this.strings.atom}:
+                </td>
+                <td>
+                     <input size="40" type="text" value="${this.calendar.protocolUrls.atom}"/>
+                </td>                 
+             </tr>
+         </tbody>       
     </table>
-
-     <br/>
-     <br/>
-
-     <div dojoAttachPoint="instructionsBlock" style="display: none;">
-         <span dojoAttachPoint="clientInstructions"> Copy the following link into Chandler and blah blah blah</span>   
-    
-         <br/>
-         <br/>
-    
-         <a dojoAttachPoint="protocolLink" href="#">http://blah blah blah</a>
-     </div>
 </div>
 

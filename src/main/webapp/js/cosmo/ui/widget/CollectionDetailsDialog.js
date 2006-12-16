@@ -35,7 +35,6 @@ dojo.widget.HtmlWidget, function(){
 ,
 //Prototype Properties 
 {
-
         //User supplied properties:
         calendar: /*CalendarMetadata*/ null,
         
@@ -46,11 +45,9 @@ dojo.widget.HtmlWidget, function(){
         // Attach points
         clientSelector: null, //Selector for different client apps
         clientInstructions: null, //Instructions for the selected client
-        protocolLink: null, //The link for the selected client
-        instructionsBlock: null, //The instructions, link for the selected client
-        
-        // Instance methods
-
+        clientCollectionAddress: null, //The link for the selected client
+        clientInstructionRows: null, //The instructions for the selected client
+        protocolRows: null, //The rows for all the protocols
         
         //i18n
         strings: { 
@@ -60,51 +57,91 @@ dojo.widget.HtmlWidget, function(){
             collectionAddress: getText("Main.CollectionDetails.CollectionAddress"),
             instructions1: getText("Main.CollectionDetails.Instructions.1"),
             instructions2: getText("Main.CollectionDetails.Instructions.2"),
-            close: getText("Main.CollectionDetails.Close")
+            close: getText("Main.CollectionDetails.Close"),
+            caldav:getText("Main.CollectionDetails.caldav"),
+            webcal:getText("Main.CollectionDetails.webcal"),
+            atom:getText("Main.CollectionDetails.atom"),
+            protocolInstructions:getText("Main.CollectionDetails.protocolInstructions")
         },
         
         //clients - note: the order in which they appear here is the order in
         //                they will appear in the select box
-        clients: ["Chandler", "iCal", "Evolution", "Outlook", "Sunbird" ],
+        clients: ["Chandler", "iCal", "FeedReader"],
         
         clientsToProtocols: {
             Chandler: "mc",
             iCal: "webcal",
-            Evolution: "dav",
-            Outlook: "webcal",
-            Sunbird: "dav"
+            FeedReader: "atom"
         },
 
         // Lifecycle functions
         fillInTemplate: function(){
             //set up the select box
-            var options = [{value: "", text: ""}];
+            var options = [];
             dojo.lang.map(this.clients,function(client){
                 options.push({
                     value:client,
                     text: getText("Main.CollectionDetails.Client." + client)
                 })
-            });
-          cosmo.util.html.setSelectOptions(this.clientSelector, options);
+            }); 
+            options.push({text: getText("Main.CollectionDetails.Download"),
+                          value: "download"});
+                          
+            options.push({text: getText("Main.CollectionDetails.Other"),
+                          value: "other"});
+          
+           cosmo.util.html.setSelectOptions(this.clientSelector, options);
+           this.clientSelector.selectedIndex = 0;
+           this._handleClientChanged();
         },
         
         //handles when the user selects a client
         _handleClientChanged: function(){
-            this.instructionsBlock.style.display = "block";
+            var client = this._getClientChoice();
+            if (client =="download"){
+            } else if (client =="other"){
+                this._showClientInstructionsAndAddress(false);
+                this._showProtocolRows(true);
+            } else {
+                this._showClientInstructionsAndAddress(true);
+                this._showProtocolRows(false);
+                this._setClientInstructions(client);
+                this._setClientCollectionAddress(client);
+            }
+        },
+                
+        // Instance methods
+        _showClientInstructionsAndAddress: function(show){
+            var hideshow = show ? "" : "none"; 
+            this.clientInstructionRows.style.display = hideshow;
+        }, 
+
+        _showProtocolRows: function(show){
+            var hideshow = show ? "" : "none"; 
+            this.protocolRows.style.display = hideshow;
+        }, 
+        
+        _getClientChoice: function(){
             var selectedIndex = this.clientSelector.selectedIndex;
-            var client = this.clientSelector.options[selectedIndex].value;
+            return this.clientSelector.options[selectedIndex].value;
+        },
+        
+        _setClientInstructions: function(client){
             dojo.dom.replaceChildren(this.clientInstructions, document.createTextNode(getText("Main.CollectionDetails.Instructions." + client)));
+        }, 
+        
+        _setClientCollectionAddress: function(client){
             var url =  this.calendar.protocolUrls[this.clientsToProtocols[client]];
-            this.protocolLink.href = url;
-            dojo.dom.replaceChildren(this.protocolLink, document.createTextNode(url));
+            this.clientCollectionAddress.value = url;
         }
+        
  }
  );
  
  cosmo.ui.widget.CollectionDetailsDialog.getInitProperties = function(/*CalendarMetadata*/ calendar){
     return {
         content: dojo.widget.createWidget("cosmo:CollectionDetailsDialog", {calendar: calendar}, null, 'last'),
-        width: "400",
+        width: "450",
         btnsRight: [dojo.widget.createWidget(
                     "cosmo:Button",
                     { text: getText("Main.CollectionDetails.Close"),

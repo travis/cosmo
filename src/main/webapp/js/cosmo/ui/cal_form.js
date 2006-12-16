@@ -30,6 +30,7 @@
  
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.event.handlers");
+dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 
 function CalForm() {
 
@@ -399,6 +400,16 @@ function CalForm() {
         calSelectElemDiv.appendChild(calSelectElem);
 
         calSelectNav.appendChild(calSelectElemDiv);
+
+        //TODO replace this with an image when I get it from Priss
+        var infoLinkSpan = document.createElement("span");
+        var infoLink = document.createTextNode(" Info");
+        infoLinkSpan.onclick=function(){
+                cosmo.app.showDialog(cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(Cal.currentCollection.collection));
+        };
+        infoLinkSpan.appendChild(infoLink);
+        calSelectElemDiv.appendChild(infoLinkSpan);
+        
         leftSidebarDiv.appendChild(calSelectNav);
     };
     this.createSelect = function(id, name, size, multi, options, className,

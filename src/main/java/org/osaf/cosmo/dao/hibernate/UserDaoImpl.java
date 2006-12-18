@@ -63,13 +63,11 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             if (findUserByUsernameIgnoreCase(user.getUsername()) != null)
                 throw new DuplicateUsernameException(user.getUsername());
 
-            if (getUserByEmail(user.getEmail()) != null)
+            if (findUserByEmailIgnoreCase(user.getEmail()) != null)
                 throw new DuplicateEmailException(user.getEmail());
 
             user.setDateCreated(new Date());
             user.setDateModified(new Date());
-            // always store email as lowercase
-            user.setEmail(user.getEmail().toLowerCase());
 
             if (user.getUid() == null || "".equals(user.getUid()))
                 user.setUid(getIdGenerator().nextIdentifier().toString());
@@ -117,7 +115,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             throw new IllegalArgumentException("email required");
             
         try {
-            return findUserByEmail(email.toLowerCase());
+            return findUserByEmail(email);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -183,12 +181,11 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             if (findUser!=null && !findUser.getId().equals(user.getId()))
                 throw new DuplicateUsernameException(user.getUsername());
             
-            findUser = getUserByEmail(user.getEmail());
+            findUser = findUserByEmailIgnoreCase(user.getEmail());
             if (findUser!=null && !findUser.getId().equals(user.getId()))
                 throw new DuplicateEmailException(user.getEmail());
 
             user.setDateModified(new Date());
-            user.setEmail(user.getEmail().toLowerCase());
             
             // merge transient instance with persistent instance
             getSession().merge(user);
@@ -242,6 +239,18 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     private User findUserByEmail(String email) {
         Session session = getSession();
         Query hibQuery = session.getNamedQuery("user.byEmail").setParameter(
+                "email", email);
+        hibQuery.setCacheable(true);
+        List users = hibQuery.list();
+        if (users.size() > 0)
+            return (User) users.get(0);
+        else
+            return null;
+    }
+    
+    private User findUserByEmailIgnoreCase(String email) {
+        Session session = getSession();
+        Query hibQuery = session.getNamedQuery("user.byEmail.ignorecase").setParameter(
                 "email", email);
         hibQuery.setCacheable(true);
         List users = hibQuery.list();

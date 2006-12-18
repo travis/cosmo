@@ -47,7 +47,8 @@ cosmo.ui.event.handlers.getSrcElemByProp = function (e, prop) {
     else if (e.target) ret = e.target;
     
     // Disabled form elements in IE return a bogus object
-    if (typeof ret[prop] == 'undefined') {
+    // Also return document body for props that are empty string
+    if (typeof ret[prop] == 'undefined' || !ret[prop]) {
         return document.body;
     }
     // Look up the designated prop of the elem or its parent
@@ -125,7 +126,8 @@ cosmo.ui.event.handlers.keyUpHandler = function (e) {
 
     e = !e ? window.event : e;
     
-    // UI input is disabled, check for modal dialog box
+    // Modal dialog box is up -- exec default action on Enter
+    // ======
     if (cosmo.app.getInputDisabled()) {
         // Execute dialog's default action if user hits Enter key
         if (cosmo.app.modalDialog.isDisplayed && cosmo.app.modalDialog.defaultAction && 
@@ -137,34 +139,9 @@ cosmo.ui.event.handlers.keyUpHandler = function (e) {
     // (1) Needs an event to be selected
     // (2) Selected event can't be in 'procssing' state
     // (3) Don't trigger Save/Remove when typing in form fields
-    // ---------------
-    // TO-DO: Move redundant conditionals up a level
+    // ======
     else {
-        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
-        switch (e.keyCode) {
-            // Enter key
-            case 13:
-                if (selEv && 
-                    !selEv.getInputDisabled() && 
-                    Cal.calForm.detailTextInputHasFocus) {
-                    //Cal.calForm.saveCalEvent();
-                    dojo.event.topic.publish('/calEvent', { 'action': 'saveFromForm' });
-                }
-                else if (Cal.calForm.jumpToTextInputHasFocus) {
-                    Cal.calForm.goJumpToDate();
-                }
-                break;
-            // Delete key
-            case 46:
-                if (selEv && 
-                    !selEv.getInputDisabled() && 
-                    !Cal.calForm.detailTextInputHasFocus) {
-                    dojo.event.topic.publish('/calEvent', { 'action': 'removeConfirm', 'data': selEv });
-                    //Cal.showDialog(
-                    //    cosmo.view.cal.dialog.getProps('removeConfirm'));
-                }
-                break;
-        }
+        dojo.event.topic.publish('/app', { type: 'keyboardInput', appEvent: e });
     }
 }
 

@@ -68,10 +68,6 @@ function Draggable(id) {
         var lozenge = ev.lozenge;
         var div = lozenge.div;
         
-        if (!Cal.currentCollection.privileges.write) {
-            return;
-        }
-        
         this.dragMode = dragMode;
         // Snapshot measurements
         this.origDivLeft = div.offsetLeft;

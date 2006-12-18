@@ -516,37 +516,39 @@ cosmo.view.cal.canvas = new function () {
                     dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': selObj });
                 }
                 
-                // Set up Draggable and save dragMode -- user may be dragging
-                if (id.indexOf('AllDay') > -1) {
-                    dragItem = new NoTimeDraggable(s);
+                // No move/resize for read-only collections
+                if (Cal.currentCollection.privileges.write) {
+                    // Set up Draggable and save dragMode -- user may be dragging
+                    if (id.indexOf('AllDay') > -1) {
+                        dragItem = new NoTimeDraggable(s);
+                    }
+                    else {
+                        dragItem = new HasTimeDraggable(s);
+                    }
+                    
+                    switch(true) {
+                        // Main content area -- drag entire event
+                        case id.indexOf('Content') > -1:
+                        case id.indexOf('Title') > -1:
+                        case id.indexOf('Start') > -1:
+                            dragItem.init('drag');
+                            break;
+                        // Top lip -- resize top
+                        case id.indexOf('Top') > -1:
+                            dragItem.init('resizetop');
+                            break;
+                        // Bottom lip -- resize bottom
+                        case id.indexOf('Bottom') > -1:
+                            dragItem.init('resizebottom');
+                            break;
+                        default:
+                            // Do nothing
+                            break;
+                    }
+                    
+                    // Set the Cal draggable to the dragged lozenge
+                    cosmo.app.dragItem = dragItem;
                 }
-                else {
-                    dragItem = new HasTimeDraggable(s);
-                }
-                
-                switch(true) {
-                    // Main content area -- drag entire event
-                    case id.indexOf('Content') > -1:
-                    case id.indexOf('Title') > -1:
-                    case id.indexOf('Start') > -1:
-                        dragItem.init('drag');
-                        break;
-                    // Top lip -- resize top
-                    case id.indexOf('Top') > -1:
-                        dragItem.init('resizetop');
-                        break;
-                    // Bottom lip -- resize bottom
-                    case id.indexOf('Bottom') > -1:
-                        dragItem.init('resizebottom');
-                        break;
-                    default:
-                        // Do nothing
-                        break;
-                }
-                
-                // Set the Cal draggable to the dragged lozenge
-                cosmo.app.dragItem = dragItem;
-                
                 break;
         }
     }
@@ -560,22 +562,25 @@ cosmo.view.cal.canvas = new function () {
     function dblClickHandler(e) {
         var id = '';
         var elem = null;
-
-        e = !e ? window.event : e;
-        elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
-        id = elem.id
         
-        switch (true) {
-            // On hour column -- create a new event
-            case (id.indexOf('hourDiv') > -1):
-            // On all-day column -- create new all-day event
-            case (id.indexOf('allDayListDiv') > -1):
-                Cal.insertCalEventNew(id);
-                break;
-            // On event title -- edit-in-place
-            case (id.indexOf('eventDiv') > -1):
-                // Edit-in-place will go here
-                break;
+        // Event creation only in write-mode
+        if (Cal.currentCollection.privileges.write) {
+            e = !e ? window.event : e;
+            elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
+            id = elem.id
+            
+            switch (true) {
+                // On hour column -- create a new event
+                case (id.indexOf('hourDiv') > -1):
+                // On all-day column -- create new all-day event
+                case (id.indexOf('allDayListDiv') > -1):
+                    Cal.insertCalEventNew(id);
+                    break;
+                // On event title -- edit-in-place
+                case (id.indexOf('eventDiv') > -1):
+                    // Edit-in-place will go here
+                    break;
+            }
         }
     }
     

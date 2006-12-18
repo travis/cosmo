@@ -21,7 +21,7 @@
 @TypeDefs({
     @TypeDef(
         name="bytearray_blob",
-        typeClass = org.osaf.cosmo.hibernate.BinaryBlobType.class
+        typeClass = org.springframework.orm.hibernate3.support.BlobByteArrayType.class
     ),
 
     @TypeDef(

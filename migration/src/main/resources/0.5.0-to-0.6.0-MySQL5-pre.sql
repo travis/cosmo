@@ -52,12 +52,12 @@ alter table ticket_privilege add constraint FKE492FD3E41A22318 foreign key FKE49
 
 
 # add new tables
-create table calendar_stamp (stampid bigint not null, language varchar(255), description varchar(255), timezone mediumtext, primary key (stampid));
-create table event_stamp (stampid bigint not null, icaldata longtext not null, primary key (stampid));
-create table message_stamp (stampid bigint not null, msgsubject mediumtext, msgto mediumtext, msgcc mediumtext, msgbcc mediumtext, primary key (stampid));
+create table calendar_stamp (stampid bigint not null, language varchar(255), description varchar(255), timezone mediumtext, primary key (stampid)) ENGINE=InnoDB
+create table event_stamp (stampid bigint not null, icaldata longtext not null, primary key (stampid)) ENGINE=InnoDB
+create table message_stamp (stampid bigint not null, msgsubject mediumtext, msgto mediumtext, msgcc mediumtext, msgbcc mediumtext, primary key (stampid)) ENGINE=InnoDB
 
-create table stamp (id bigint not null auto_increment, stamptype varchar(16) not null, itemid bigint not null, primary key (id), unique (itemid, stamptype));
-create table subscription (id bigint not null auto_increment, displayname varchar(255) not null, collectionuid varchar(255) not null, ticketkey varchar(255) not null, ownerid bigint not null, primary key (id), unique (ownerid, displayname));
+create table stamp (id bigint not null auto_increment, stamptype varchar(16) not null, itemid bigint not null, primary key (id), unique (itemid, stamptype)) ENGINE=InnoDB
+create table subscription (id bigint not null auto_increment, displayname varchar(255) not null, collectionuid varchar(255) not null, ticketkey varchar(255) not null, ownerid bigint not null, primary key (id), unique (ownerid, displayname)) ENGINE=InnoDB
 
 alter table calendar_stamp add index FK2B603B8280655080 (stampid), add constraint FK2B603B8280655080 foreign key (stampid) references stamp (id);
 alter table event_stamp add index FK1ACFBDDE2F8DB5CC (stampid), add constraint FK1ACFBDDE2F8DB5CC foreign key (stampid) references stamp (id);

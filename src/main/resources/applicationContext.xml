@@ -257,7 +257,11 @@
         class="org.osaf.cosmo.dao.hibernate.DefaultCalendarIndexer" />
 
   <bean id="calendarFilterTranslator"
-        class="org.osaf.cosmo.dao.hibernate.SQLCalendarFilterTranslator" />
+        class="org.osaf.cosmo.dao.hibernate.SQLCalendarFilterTranslator">
+    <property name="booleanTrueValue">
+        <value>${cosmo.hibernate.sql.booleanStringValue}</value>
+    </property>
+  </bean>
 
   <bean id="calendarDao"
         class="org.osaf.cosmo.dao.hibernate.CalendarDaoImpl"

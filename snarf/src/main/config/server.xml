@@ -33,16 +33,33 @@
          Comment the above Resource and uncomment the following
          Resource to configure Cosmo to run against a MySQL DB   -->
     <!-- 
-	<Resource name="osafsrv/db"
+        <Resource name="osafsrv/db"
              type="javax.sql.DataSource"
              maxActive="100"
              maxIdle="30"
              maxWait="10000"
              username="[user]"
              password="[pass]"
+             defaultAutoCommit="false"
              driverClassName="com.mysql.jdbc.Driver"
              url="jdbc:mysql://[server]:3306/[db]"/>
     -->
+    <!-- PostgreSQL configuration 
+         Comment the above Resource and uncomment the following
+         Resource to configure Cosmo to run against a PostgreSQL DB   -->
+    <!-- 
+        <Resource name="osafsrv/db"
+             type="javax.sql.DataSource"
+             maxActive="100"
+             maxIdle="30"
+             maxWait="10000"
+             username="[user]"
+             password="[pass]"
+             defaultAutoCommit="false"
+             driverClassName="org.postgresql.Driver"
+             url="jdbc:postgresql://[server]:5432/[db]"/>
+    -->
+
     <Resource name="osafsrv/mail"
               type="javax.mail.Session"
               mail.transport.protocol="smtp"

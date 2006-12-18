@@ -44,7 +44,6 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.Where;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
@@ -62,7 +61,6 @@ import org.hibernate.validator.NotNull;
         discriminatorType=DiscriminatorType.STRING,
         length=16)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-//@Where(clause = "isactive=1")
 public abstract class Item extends BaseModelObject {
 
     public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
@@ -525,7 +523,9 @@ public abstract class Item extends BaseModelObject {
         this.parent = parent;
     }
 
-    @Column(name="isactive")
+    @Column(name="isactive", nullable=false)
+    @Type(type="boolean_integer")
+    @Index(name="idx_itemisactive")
     public Boolean getIsActive() {
         return isActive;
     }

@@ -360,8 +360,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         for (int i = 1; i <= timeRangeJoins; i++)
             buf.append(", cal_timerange_index ctri" + i);
 
-        buf.append(" where i.parentid=:parentid and i.isactive="
-                + booleanTrueValue);
+        buf.append(" where i.parentid=:parentid and i.isactive=1");
 
         for (int i = 1; i <= attributeJoins; i++)
             buf.append(" and cpi" + i + ".itemid=i.id");

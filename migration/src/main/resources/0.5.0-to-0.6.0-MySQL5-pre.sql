@@ -32,7 +32,7 @@ alter table cal_timerange_index drop index FK98D277F2EA427E04;
 
 # migrate item table
 # - add isactive, lastmodifiedby, triagestatus, triagestatusupdated, icaluid
-alter table item add column isactive bit;
+alter table item add column isactive smallint not null;
 alter table item add column lastmodifiedby varchar(255);
 alter table item add column triagestatus varchar(64);
 alter table item add column triagestatusupdated numeric(19,6);

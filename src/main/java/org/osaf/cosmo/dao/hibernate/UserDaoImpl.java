@@ -54,7 +54,13 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     public User createUser(User user) {
 
         try {
-            if (getUser(user.getUsername()) != null)
+            if(user==null)
+                throw new IllegalArgumentException("user is required");
+            
+            if(user.getId()!=-1)
+                throw new IllegalArgumentException("new user is required");
+            
+            if (findUserByUsernameIgnoreCase(user.getUsername()) != null)
                 throw new DuplicateUsernameException(user.getUsername());
 
             if (getUserByEmail(user.getEmail()) != null)
@@ -62,6 +68,8 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
             user.setDateCreated(new Date());
             user.setDateModified(new Date());
+            // always store email as lowercase
+            user.setEmail(user.getEmail().toLowerCase());
 
             if (user.getUid() == null || "".equals(user.getUid()))
                 user.setUid(getIdGenerator().nextIdentifier().toString());
@@ -75,15 +83,17 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     }
 
     public User getUser(String username) {
-
         try {
             return findUserByUsername(username);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
     }
-
+    
     public User getUserByUid(String uid) {
+        if(uid==null)
+            throw new IllegalArgumentException("uid required");
+        
         try {
             return findUserByUid(uid);
         } catch (HibernateException e) {
@@ -92,6 +102,9 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     }
 
     public User getUserByActivationId(String id) {
+        if(id==null)
+            throw new IllegalArgumentException("id required");
+        
         try {
             return findUserByActivationId(id);
         } catch (HibernateException e) {
@@ -100,8 +113,11 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     }
 
     public User getUserByEmail(String email) {
+        if(email==null)
+            throw new IllegalArgumentException("email required");
+            
         try {
-            return findUserByEmail(email);
+            return findUserByEmail(email.toLowerCase());
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -157,9 +173,28 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
     public User updateUser(User user) {
         try {
+            
+            // Evict user from session cache to prevent auto flush occuring
+            // when searching for duplicates
+            if(getSession().contains(user))
+                getSession().evict(user);
+            
+            User findUser = findUserByUsernameIgnoreCase(user.getUsername());
+            if (findUser!=null && !findUser.getId().equals(user.getId()))
+                throw new DuplicateUsernameException(user.getUsername());
+            
+            findUser = getUserByEmail(user.getEmail());
+            if (findUser!=null && !findUser.getId().equals(user.getId()))
+                throw new DuplicateEmailException(user.getEmail());
+
             user.setDateModified(new Date());
-            getSession().update(user);
-            return user;
+            user.setEmail(user.getEmail().toLowerCase());
+            
+            // merge transient instance with persistent instance
+            getSession().merge(user);
+           
+            // return persistent instance
+            return (User) getSession().load(User.class, user.getId());
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -189,6 +224,14 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         Query hibQuery = session.getNamedQuery("user.byUsername").setParameter(
                 "username", username);
         hibQuery.setCacheable(true);
+        return (User) hibQuery.uniqueResult();
+    }
+    
+    private User findUserByUsernameIgnoreCase(String username) {
+        Session session = getSession();
+        Query hibQuery = session.getNamedQuery("user.byUsername.ignorecase").setParameter(
+                "username", username);
+        hibQuery.setCacheable(true);
         List users = hibQuery.list();
         if (users.size() > 0)
             return (User) users.get(0);
@@ -213,11 +256,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         Query hibQuery = session.getNamedQuery("user.byUid").setParameter(
                 "uid", uid);
         hibQuery.setCacheable(true);
-        List users = hibQuery.list();
-        if (users.size() > 0)
-            return (User) users.get(0);
-        else
-            return null;
+        return (User) hibQuery.uniqueResult();
     }
 
     private User findUserByActivationId(String id) {
@@ -225,11 +264,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         Query hibQuery = session.getNamedQuery("user.byActivationId").setParameter(
                 "activationId", id);
         hibQuery.setCacheable(true);
-        List users = hibQuery.list();
-        if (users.size() > 0)
-            return (User) users.get(0);
-        else
-            return null;
+        return (User) hibQuery.uniqueResult();
     }
 
     private static class UserQueryCriteriaBuilder<SortType extends User.SortType> extends

@@ -187,7 +187,8 @@ var Cal = new function () {
                     collection: collection,
                     transportInfo: null,
                     conduit: cosmo.conduits.OwnedCollectionConduit,
-                    displayName: collection.name
+                    displayName: collection.name,
+                    privileges: {'read':'read', 'write':'write'}
                     }
                 );
                 

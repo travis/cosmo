@@ -1,0 +1,52 @@
+# -*- rnc -*-
+# RELAX NG Compact Syntax Grammar for the
+# EIMML item record type Version 1
+
+namespace item = "http://osafoundation.org/eim/item"
+
+include "eimml-core.rnc"
+
+eimItemRecord =
+   element item:record {
+      (eimUuid
+       & itemTitle?
+       & itemTriageStatus?
+       & itemTriageStatusChanged?
+       & itemLastModifiedBy?
+       & itemCreatedOn?
+       & anyItemField*)
+   }
+
+itemTitle =
+   element item:title {
+      eimTextFieldContent
+   }
+
+itemTriageStatus =
+   element item:triageStatus {
+      eimTextFieldContent
+   }
+
+itemTriageStatusChanged =
+   element item:triageStatusChanged {
+      eimDecimalFieldContent
+   }
+
+itemLastModifiedBy =
+   element item:lastModifiedBy {
+      eimTextFieldContent
+   }
+
+itemCreatedOn =
+   element item:createdOn {
+      eimDateTimeFieldContent
+   }
+
+anyItemField =
+   element item:* {
+      (eimTextFieldContent
+       | eimDecimalFieldContent
+       | eimDateTimeFieldContent
+       | eimBytesFieldContent
+       | eimLobFieldContent)*
+   }

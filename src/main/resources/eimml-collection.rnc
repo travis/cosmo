@@ -1,0 +1,22 @@
+# -*- rnc -*-
+# RELAX NG Compact Syntax Grammar for the
+# EIMML collection record type Version 1
+
+namespace collection = "http://osafoundation.org/eim/collection"
+
+include "eimml-core.rnc"
+
+eimCollectionRecord =
+   element collection:record {
+      (eimUuid
+       & anyCollectionField*)
+   }
+
+anyCollectionField =
+   element collection:* {
+      (eimTextFieldContent
+       | eimDecimalFieldContent
+       | eimDateTimeFieldContent
+       | eimBytesFieldContent
+       | eimLobFieldContent)*
+   }

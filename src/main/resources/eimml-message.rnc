@@ -1,0 +1,46 @@
+# -*- rnc -*-
+# RELAX NG Compact Syntax Grammar for the
+# EIMML message record type Version 1
+
+namespace message = "http://osafoundation.org/eim/message"
+
+include "eimml-core.rnc"
+
+eimMessageRecord =
+   element message:record {
+      (eimUuid
+       & messageSubject?
+       & messageTo?
+       & messageCc?
+       & messageBcc?
+       & anyMessageField*)
+   }
+
+messageSubject =
+   element message:subject {
+      eimTextFieldContent
+   }
+
+messageTo =
+   element message:to {
+      eimTextFieldContent
+   }
+
+messageCc =
+   element message:cc {
+      eimTextFieldContent
+   }
+
+messageBcc =
+   element message:bcc {
+      eimTextFieldContent
+   }
+
+anyMessageField =
+   element message:* {
+      (eimTextFieldContent
+       | eimDecimalFieldContent
+       | eimDateTimeFieldContent
+       | eimBytesFieldContent
+       | eimLobFieldContent)*
+   }

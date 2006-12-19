@@ -1,0 +1,64 @@
+# -*- rnc -*-
+# RELAX NG Compact Syntax Grammar for the
+# EIMML core schema Version 1
+
+namespace eim = "http://osafoundation.org/eim"
+
+start = eimRecords
+
+eimUuid =
+   attribute eim:uuid { text }
+
+eimTextFieldContent = {
+   attribute eim:type { "text" }
+   eim:textValue
+}
+
+eimDecimalFieldContent = {
+   attribute eim:type { "decimal" }
+   eim:decimalValue
+}
+
+eimDateTimeFieldContent = {
+   attribute eim:type { "datetime" }
+   eim:dateTimeValue
+}
+
+eimBytesFieldContent = {
+   attribute eim:type { "bytes" }
+   eim:encodedTextValue
+}
+
+eimLobFieldContent = {
+   attribute eim:type { "lob" }
+   attribute eim:encoded { "true" | "false"}
+   (eim:encodedTextValue
+    | eim:textValue)
+}
+
+eimRecords =
+   element eim:records {
+      eimUuid,
+      eimRecordSet*
+   }
+
+eimRecordSet = 
+   element eim:recordSet {
+      (eimUuid
+       & anyRecord*)
+   }
+
+anyRecord =
+   element *:record {
+      (eimUuid
+       & anyField*)
+   }
+
+anyField =
+   element *:* {
+      (eimTextFieldContent
+       | eimDecimalFieldContent
+       | eimDateTimeFieldContent
+       | eimBytesFieldContent
+       | eimLobFieldContent)*
+   }

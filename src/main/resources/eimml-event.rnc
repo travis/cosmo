@@ -8,8 +8,8 @@ include "eimml-core.rnc"
 
 eimEventRecord =
    element event:record {
-      (eimUuid
-       & eventDtStart?
+      (eimCommonRecordAttributes,
+         eventDtStart?
        & eventDtend?
        & eventLocation?
        & eventRRule?

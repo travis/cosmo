@@ -8,8 +8,8 @@ include "eimml-core.rnc"
 
 eimNoteRecord =
    element note:record {
-      (eimUuid
-       & noteBody?
+      (eimCommonRecordAttributes,
+         noteBody?
        & noteIcalUid?
        & anyNoteField*)
    }

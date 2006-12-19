@@ -8,8 +8,8 @@ include "eimml-core.rnc"
 
 eimMessageRecord =
    element message:record {
-      (eimUuid
-       & messageSubject?
+      (eimCommonRecordAttributes,
+         messageSubject?
        & messageTo?
        & messageCc?
        & messageBcc?

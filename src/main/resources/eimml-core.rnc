@@ -7,51 +7,71 @@ namespace eim = "http://osafoundation.org/eim"
 start = eimRecords
 
 eimUuid =
-   attribute eim:uuid { text }
+   attribute eim:uuid { xsd:string }
+
+eimDeleted =
+   attribute eim:deleted { xsd:boolean }
+
+eimCommonRecordAttributes = {
+   eimUuid,
+   eimDeleted?
+}
+
+# These patterns define the allowable content of the elements
+# representing EIM record fields. Field types not defined in this
+# schema are not permitted in EIMML.
 
 eimTextFieldContent = {
-   attribute eim:type { "text" }
-   eim:textValue
+   attribute eim:type { "text" },
+   xsd:string { maxLength = "1024" }
 }
 
 eimDecimalFieldContent = {
-   attribute eim:type { "decimal" }
-   eim:decimalValue
+   attribute eim:type { "decimal" },
+   xsd:decimal
 }
 
 eimDateTimeFieldContent = {
-   attribute eim:type { "datetime" }
-   eim:dateTimeValue
+   attribute eim:type { "datetime" },
+   xsd:dateTime    # UTC (eg "2002-10-09T19:00:00Z")
 }
 
 eimBytesFieldContent = {
-   attribute eim:type { "bytes" }
-   eim:encodedTextValue
+   attribute eim:type { "bytes" },
+   xsd:base64Binary { maxlength = "1024" }
 }
 
 eimLobFieldContent = {
-   attribute eim:type { "lob" }
-   attribute eim:encoded { "true" | "false"}
-   (eim:encodedTextValue
-    | eim:textValue)
+   attribute eim:type { "lob" },
+   attribute eim:encoded { xsd:boolean }?,
+   (xsd:base64Binary
+    | xsd:string)
 }
+
+# The root element of an EIMML document.
 
 eimRecords =
    element eim:records {
-      eimUuid,
       eimRecordSet*
    }
 
+# A container for records that apply to the same item (identified by
+# the enclosed UUID).
+
 eimRecordSet = 
    element eim:recordSet {
-      (eimUuid
-       & anyRecord*)
+      eimCommonRecordAttributes,
+      anyRecord*
    }
+
+# Schema extensions may define new record types by composing the
+# elementary field types into a new record type in the extension's
+# namespace.
 
 anyRecord =
    element *:record {
-      (eimUuid
-       & anyField*)
+      eimCommonRecordAttributes,
+      anyField*
    }
 
 anyField =

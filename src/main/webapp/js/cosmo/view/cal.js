@@ -15,6 +15,9 @@
 */
 
 dojo.provide('cosmo.view.cal');
+dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.util.hash");
+dojo.require("cosmo.model");
 
 cosmo.view.cal = new function () {
 
@@ -1081,7 +1084,6 @@ cosmo.view.cal = new function () {
         // Load the array of events
         // ======================
         try {
-
             eventLoadList = Cal.currentCollection.conduit.getEvents(
 	            Cal.currentCollection.collection.uid, s, e, 
 	            Cal.currentCollection.transportInfo);

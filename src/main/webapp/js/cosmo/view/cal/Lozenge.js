@@ -25,6 +25,7 @@
  * cosmo.view.cal.HasTimeLozenge for a multi-day event may be a composite made up of
  * a main div element and a bunch of auxilliary divs off to the side.
  */
+dojo.require("cosmo.view.cal");
 
 dojo.provide('cosmo.view.cal.Lozenge');
 

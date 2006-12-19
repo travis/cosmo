@@ -20,11 +20,16 @@
  * @license Apache License 2.0
  */
 
+dojo.require("cosmo.model");
+dojo.require('cosmo.view.cal.Lozenge');
+
+dojo.provide("cosmo.legacy.cal_event");
+
 /**
  * @object CalEvent -- an event on the Calendar, links to the event's
  * Lozenge and CalEventDate objects
  */
-function CalEvent(id, lozenge) {
+cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
     // Randomly generated ID for each CalEvent
     // Lozenge div elements get their id suffixes from this
     this.id = id;
@@ -289,3 +294,4 @@ function CalEvent(id, lozenge) {
     };
     //toString = genericToString;
 }
+CalEvent = cosmo.legacy.cal_event.CalEvent;

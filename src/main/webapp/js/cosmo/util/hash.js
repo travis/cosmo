@@ -14,7 +14,9 @@
  * limitations under the License.
 */
 
-function Hash() {
+dojo.provide("cosmo.util.hash");
+
+cosmo.util.hash.Hash = function() {
     
     var self = this;
     
@@ -239,4 +241,4 @@ function Hash() {
         return (a.toLowerCase() < b.toLowerCase()) ? 1 : -1;
     };
 }
-
+Hash = cosmo.util.hash.Hash;

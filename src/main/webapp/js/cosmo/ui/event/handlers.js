@@ -148,7 +148,7 @@ cosmo.ui.event.handlers.keyUpHandler = function (e) {
 /**
  * Do cleanup of DOM-element refs to avoid memleak in IE
  */
-function cleanup() {
+cosmo.ui.event.handlers.cleanup = function () {
     Cal.cleanup();
     Cal = null;
 }

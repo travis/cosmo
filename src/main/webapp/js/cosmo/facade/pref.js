@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+dojo.provide("cosmo.facade.pref");
 
-var Pref = new function() {
+cosmo.facade.pref.Pref = new function() {
 
     this.init = function() {
        //TODO find new way to get default timezone (probably wait till 0.7 to find out what that means :-) )
@@ -25,3 +27,4 @@ var Pref = new function() {
             dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds());
     };
 }
+Pref = cosmo.facade.pref.Pref;

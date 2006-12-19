@@ -47,7 +47,7 @@ buttonPreload();
  * for endcaps and a stretchable, tiling middle section. Comes in
  * two sizes, normal and small.
  */
-function Button(elemId, width, onClickHandler, displayText, isSmall) {
+cosmo.ui.button.Button = function(elemId, width, onClickHandler, displayText, isSmall) {
     //if you don't do this dummyDom business, the page reflows and scrollbars
     //are reset
     var dummyDom = document.createElement('span');
@@ -61,6 +61,8 @@ function Button(elemId, width, onClickHandler, displayText, isSmall) {
     return widget;
 }
 
+Button = cosmo.ui.button.Button;
+
 /**
  * @object NavButtonSet -- creates a two-button cluster with a
  * left and right arrow
@@ -68,7 +70,7 @@ function Button(elemId, width, onClickHandler, displayText, isSmall) {
  * for the table cells otherwise they inherit from the
  * container the NavButtonSet is sitting in
  */
-function NavButtonSet(id, leftHandler, rightHandler) {
+cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
 
     var self = this;
 
@@ -164,3 +166,6 @@ function NavButtonSet(id, leftHandler, rightHandler) {
         document.getElementById(this.id + 'ButtonDivider').style.background = dividerColor;
     };
 }
+
+// FIXME: legacy, remove soon.
+NavButtonSet = cosmo.ui.button.NavButtonSet;

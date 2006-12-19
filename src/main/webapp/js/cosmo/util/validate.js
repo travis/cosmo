@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+dojo.require("cosmo.util.i18n");
+dojo.provide("cosmo.util.validate");
 
-var Validate = new function() {
+cosmo.util.validate = new function() {
 
     this.dateFormat = function(str) {
         // Checks for the following valid date formats:
@@ -81,4 +83,5 @@ var Validate = new function() {
     }
 }
 
-Validate.constructor = null;
+cosmo.util.validate.constructor = null;
+Validate = cosmo.util.validate;

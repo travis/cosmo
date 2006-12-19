@@ -14,7 +14,9 @@
  * limitations under the License.
 */
 
-function CalEventData(id, title, description, start, end, allDay,
+dojo.provide("cosmo.model");
+
+cosmo.model.CalEventData = function (id, title, description, start, end, allDay,
     pointInTime, anyTime, recurrenceRule, status, masterEvent, instance, instanceDate) {
 
     this.id = id;
@@ -31,6 +33,7 @@ function CalEventData(id, title, description, start, end, allDay,
     this.instance = instance ? instance : false;
     this.instanceDate = instanceDate ? instanceDate : null;
 };
+CalEventData = cosmo.model.CalEventData;
 
 CalEventData.prototype = {
     toString: genericToString
@@ -58,7 +61,7 @@ CalEventData.clone = function(data) {
 /**
  * A recurrence rule specifies how to repeat a given event.
  */
-function RecurrenceRule(){
+cosmo.model.RecurrenceRule = function(){
     /**
      * Specifies how often to repeat this event.
      * Must be one of the frequency constants above.
@@ -93,7 +96,7 @@ function RecurrenceRule(){
      */
     this.modifications = [];
 }
-
+RecurrenceRule = cosmo.model.RecurrenceRule;
 RecurrenceRule.prototype = {
     toString: genericToString
 }
@@ -132,7 +135,7 @@ RecurrenceRule.clone = function(rule) {
     return ret;
 }
 
-function Modification(){
+cosmo.model.Modification = function (){
     /**
      * References the instance date which is being modified
      *
@@ -150,6 +153,7 @@ function Modification(){
      */
     this.event;
 }
+Modification = cosmo.model.Modification;
 
 Modification.prototype = {
     toString: genericToString
@@ -187,20 +191,22 @@ EventStatus = {
     FYI: "CANCELLED"
 }
 
-function CalendarMetadata(){
+cosmo.model.CalendarMetadata = function (){
     this.name = null;
     this.uid = null;
     this.protocolUrls = {};
 }
+CalendarMetadata = cosmo.model.CalendarMetadata;
 
-function Subscription(){
+cosmo.model.Subscription = function (){
     this.calendar = null;
     this.displayName = null;
     this.ticket = null;
 }
+Subscription = cosmo.model.Subscription;
 
-function Ticket(){
-    this.priveleges = {}; //a Set
+cosmo.model.Ticket = function (){
+    this.privileges = {}; //a Set
     this.ticketKey = null;
 }
-
+Ticket = cosmo.model.Ticket;

@@ -23,7 +23,10 @@
  * @author Jeremy Epstein mailto:eggfree@eggfree.net
  * @license Apache License 2.0
  */
-var MiniCal = new function() {
+ 
+dojo.provide("cosmo.ui.minical");
+ 
+cosmo.ui.minical.MiniCal = new function() {
     
     var self = this;
     
@@ -616,3 +619,5 @@ var MiniCal = new function() {
         }
     };
 }
+
+MiniCal = cosmo.ui.minical.MiniCal;

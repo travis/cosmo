@@ -27,6 +27,6 @@
 
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/conf.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/styler.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/global.css.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/global_css.js"></script>
 
 

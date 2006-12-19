@@ -37,7 +37,7 @@
 
     <cosmo:staticbaseurl var="staticBaseUrl"/>
     <cosmo:dojoBoilerplate/>
-    <cosmo:globalCSSSafariHack/>
+
     
     <fmt:setBundle basename="PimMessageResources"/>
     
@@ -48,6 +48,8 @@
     <!-- Login failure recognition string: login-page-2ksw083judrmru58 See LoginDialog.js -->
     <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/button.js"></script>
     <script type="text/javascript">
+
+	    dojo.require('cosmo.ui.global_css');
         dojo.require("cosmo.app");
         dojo.require("cosmo.account.create");
         dojo.require("cosmo.util.popup");

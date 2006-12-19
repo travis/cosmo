@@ -40,7 +40,9 @@
     </title>
 
     <cosmo:dojoBoilerplate/>
-    <cosmo:globalCSSSafariHack/>
+    <script type="text/javascript">
+    dojo.require("cosmo.ui.global_css");
+    </script>
 
   </head>
   <body class="adminPage">

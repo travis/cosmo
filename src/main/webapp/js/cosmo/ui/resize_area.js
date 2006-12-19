@@ -14,13 +14,16 @@
  * limitations under the License.
 */
 
-function ResizeAreaAdjacent(div, origPos, origSize) {
+dojo.provide("cosmo.ui.resize_area");
+
+cosmo.ui.resize_area.ResizeAreaAdjacent = function (div, origPos, origSize) {
     this.div = div;
     this.origPos = origPos;
     this.origSize = origSize;
 }
+ResizeAreaAdjacent = cosmo.ui.resize_area.ResizeAreaAdjacent;
 
-function ResizeArea(id, handleId) {
+cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
     
     var self = this;
     
@@ -97,3 +100,4 @@ function ResizeArea(id, handleId) {
         }
     };
 }
+ResizeArea = cosmo.ui.resize_area.ResizeArea;

@@ -28,6 +28,8 @@
  * buttons) or the centered single button if there is only one
  */
 
+dojo.provide("cosmo.ui.dialog");
+
 /**
  * @object A dialog box with a message and buttons at the bottom
  */

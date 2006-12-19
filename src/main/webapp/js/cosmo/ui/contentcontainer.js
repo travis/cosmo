@@ -14,9 +14,11 @@
  * limitations under the License.
 */
 
+dojo.provide("cosmo.ui.contentcontainer");
+
 // Generic content container class
 // ==============================
-ContentContainer = function(id) {
+cosmo.ui.contentcontainer.ContentContainer = function(id) {
     this.id = id;
     this.elem = document.getElementById(this.id);
     this.style = this.elem.style;
@@ -73,4 +75,4 @@ ContentContainer = function(id) {
         elem.appendChild(elemInput);
     };
 }
-
+ContentContainer = cosmo.ui.contentcontainer.ContentContainer;

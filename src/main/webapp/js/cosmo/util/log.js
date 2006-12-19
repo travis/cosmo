@@ -15,6 +15,10 @@
 */
 
 Log = new function() {
+    dojo.deprecated("cosmo.util.log", 
+    "cosmo.util.log no longer needed", "0.6");
+
+
     // No-console browsers
     if (typeof console == 'undefined') {
          this.print = function() {

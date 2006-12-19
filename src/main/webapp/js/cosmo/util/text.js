@@ -26,6 +26,9 @@
  */
 
 Text = new function() {
+    dojo.deprecated("cosmo.util.text", 
+    "cosmo.util.text no longer needed", "0.6");
+
     this.uppercaseFirst = function(str) {
         first = str.substr(0, 1).toUpperCase();
         return first + str.substr(1);

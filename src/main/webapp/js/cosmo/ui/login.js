@@ -24,6 +24,11 @@
  * @object Login -- singleton for doing user auth
  */
 dojo.require("cosmo.env");
+
+dojo.provide("cosmo.ui.login");
+dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.util.cookie");
+
 var Login = new function () {
     
     var self = this;

@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+dojo.require("cosmo.service.service_stub");
+
+dojo.provide("cosmo.service.json_service_impl")
 JSON_SERVICE_OBJECT_NAME = "scoobyService";
 
 JAVA_JSON_MAPPING = {"java.util.Date":Date,
@@ -41,13 +44,14 @@ function createSetterMethodName(propName){
 
 function convertObject(object){
     if (!object){
+
         return object;
     }
 
     //test if the returned value is an Array
     if (typeof object == "object" && object[0]){
 
-        var newArray = new Array();
+        var newArray = [];
         for (var x = 0; x < object.length; x++){
             newArray[x] = convertObject(object[x]);
         }
@@ -201,15 +205,18 @@ ScoobyService.prototype.init = function() {
             var remoteMethod = jsonRemoteObject[propName];
             proto[propName] = wrapMethod(jsonRemoteObject, remoteMethod);
 
-            if (propName == "getEvents") {
-                proto[propName] = wrapGetEvents(proto[propName]);
-            }
+           if (propName == "getEvents") {
+               proto[propName] = wrapGetEvents(proto[propName]);
+           }
         }
     }
 }
-wrapGetEventsCompareFunction  = function(a,b){
+var wrapGetEventsCompareFunction  = function(a,b){
+
            utcA = a.start.toUTC();
            utcB = b.start.toUTC();
+
+		   return utcA - utcB;
            if (utcA > utcB) {
               return 1;
            }
@@ -217,6 +224,7 @@ wrapGetEventsCompareFunction  = function(a,b){
            if (utcA < utcB) {
                return -1;
            }
+
            return 0;
         }
 /**
@@ -238,6 +246,7 @@ wrapGetEventsCompareFunction  = function(a,b){
 wrapGetEvents = function(getEventsFunction){
     var oldFunction = getEventsFunction;
     var newFunction = function(){
+		
         var realRangeStart = arguments[1];
         var realRangeEnd   = arguments[2];
 
@@ -248,8 +257,7 @@ wrapGetEvents = function(getEventsFunction){
         arguments[1] = paddedRangeStart;
         arguments[2] = paddedRangeEnd;
 
-        var returnVal = oldFunction.apply(this, arguments);
-
+		var returnVal = oldFunction.apply(this, arguments);
 
         returnVal.sort(wrapGetEventsCompareFunction);
 

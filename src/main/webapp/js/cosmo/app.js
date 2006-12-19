@@ -18,6 +18,7 @@ dojo.provide('cosmo.app');
 
 dojo.require('cosmo.ui.widget.ModalDialog');
 dojo.require("cosmo.ui.button");
+dojo.require("cosmo.util.i18n");
 
 cosmo.app = new function () {
     var self = this;

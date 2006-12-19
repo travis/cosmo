@@ -14,16 +14,33 @@
  * limitations under the License.
 */
 
+dojo.require("cosmo.util.date");
 dojo.require("cosmo.conduits");
+dojo.require("cosmo.ui.conf");
+dojo.require("cosmo.ui.minical");
+dojo.require("cosmo.ui.button");
+dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.model");
+dojo.require("cosmo.ui.cal_form");
+dojo.require("cosmo.ui.contentcontainer");
+dojo.require("cosmo.facade.pref");
+dojo.require("cosmo.service.json_service_impl");
+dojo.require("cosmo.legacy.cal_event");
+dojo.require('cosmo.ui.widget.CollectionSelector');
+dojo.require('cosmo.view.cal');
+dojo.require('cosmo.view.cal.Lozenge');
+dojo.require('cosmo.view.cal.canvas');
+
+dojo.provide("cosmo.ui.cal_main");
 
 // Global variables for X and Y position for mouse
-var xPos = 0;
-var yPos = 0;
+xPos = 0;
+yPos = 0;
 
 /**
  * @object The Cal singleton
  */
-var Cal = new function () {
+cosmo.ui.cal_main.Cal = new function () {
     
     var self = this;
     
@@ -854,6 +871,8 @@ var Cal = new function () {
         this.allDayArea = null;
     };
 }
-
 // Cal is a singleton
-Cal.constructor = null;
+cosmo.ui.cal_main.Cal.constructor = null
+
+Cal = cosmo.ui.cal_main.Cal;
+

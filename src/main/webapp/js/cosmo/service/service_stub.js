@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-
+dojo.provide("cosmo.service.service_stub")
 /**
  * The ScoobyService is the place where all client/server communcations are
  * brokered. The methods here are all empty because the intent is that you

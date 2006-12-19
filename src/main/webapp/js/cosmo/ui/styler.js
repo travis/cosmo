@@ -15,7 +15,7 @@
 */
 dojo.provide("cosmo.ui.styler");
 
-Styler = new function() {
+cosmo.ui.styler.Styler = new function() {
     this.styles = [];
     this.addStyle = function(name) {
         var dynStyle = document.createElement('style');
@@ -35,6 +35,7 @@ Styler = new function() {
         document.write(styleStr);
     }
 }
+Styler = cosmo.ui.styler.Styler;
 
 function StyleWrapper(sheet) {
     this.sheet = sheet;

@@ -26,10 +26,18 @@
  */
  
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.util.date");
+dojo.require("dojo.string");
 dojo.require("cosmo.ui.event.handlers");
 dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
+dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.util.validate");
+dojo.require("cosmo.model");
+dojo.require("cosmo.view.cal.canvas");
 
-function CalForm() {
+dojo.provide("cosmo.ui.cal_form");
+
+cosmo.ui.cal_form.CalForm = function () {
 
     var self = this;
     var saveButton = null;
@@ -376,7 +384,7 @@ function CalForm() {
         for (var i in RecurrenceRuleFrequency) {
             opt = new Object();
             str = RecurrenceRuleFrequency[i];
-            opt.text = Text.uppercaseFirst(str);
+            opt.text = dojo.string.capitalize(str);
             opt.value = str;
             recurOpt.push(opt);
         }
@@ -395,7 +403,7 @@ function CalForm() {
                 opt.text = i;
             }
             else {
-                opt.text = Text.uppercaseFirst(i.toLowerCase());
+                opt.text = dojo.string.capitalize(i.toLowerCase());
             }
             opt.value = str;
             statusOpt.push(opt);
@@ -868,3 +876,4 @@ function CalForm() {
         }
     };
 }
+CalForm = cosmo.ui.cal_form.CalForm;

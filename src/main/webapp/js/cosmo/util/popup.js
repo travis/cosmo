@@ -47,5 +47,3 @@ cosmo.util.popup = new function () {
     };
 }
 
-var Popup = cosmo.util.popup;
-

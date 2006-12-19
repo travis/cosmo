@@ -29,11 +29,13 @@
  * for mouse pos to relative placement of dragged divs, in addition to
  * vert offset when area scrolls.
  */
+ 
+ dojo.provide("cosmo.ui.draggable");
 
 /**
  * @object An event lozenge being dragged or resized
  */
-function Draggable(id) {
+cosmo.ui.draggable.Draggable = function (id) {
     // Unused -- TO-DO: Get rid of this property
     this.id = id;
     // Unused -- TO-DO: Get rid of this property
@@ -205,14 +207,18 @@ function Draggable(id) {
     };
 }
 
+Draggable = cosmo.ui.draggable.Draggable;
+
 /**
  * HasTimeDraggable -- sub-class of Draggable
  * Normal events, 'at-time' events -- these sit in the scrollable 
  * area of the main viewing area
  */
-function HasTimeDraggable(id) {
+cosmo.ui.draggable.HasTimeDraggable = function (id) {
     this.id = id;
 }
+HasTimeDraggable = cosmo.ui.draggable.HasTimeDraggable;
+
 HasTimeDraggable.prototype = new Draggable();
 
 /**
@@ -386,9 +392,12 @@ HasTimeDraggable.prototype.setDragWidth = function() {}
  * All-day events, 'any-time' events -- these sit up in the 
  * resizable area at the top of the UI
  */
-function NoTimeDraggable(id) {
+cosmo.ui.draggable.NoTimeDraggable = function(id) {
     this.id = id;
 }
+
+NoTimeDraggable = cosmo.ui.draggable.NoTimeDraggable;
+
 NoTimeDraggable.prototype = new Draggable();
 
 /**

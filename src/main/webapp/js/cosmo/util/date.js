@@ -21,6 +21,8 @@
  * @version 0.1
  */
 
+dojo.provide("cosmo.util.date");
+
 Date.formats = {
     'a': function(dt) { return Date.abbrWeekday[dt.getDay()]; },
     'A': function(dt) { return Date.fullWeekday[dt.getDay()]; },
@@ -122,7 +124,7 @@ Date.strftime = function(format, dt) {
  * @param yr Integer year number
  * @return String for last two digits of year (e.g., '07', '02')
  */
-function yearTwoDigits(yr) {
+cosmo.util.date.yearTwoDigits = function (yr) {
     // Add a millenium to take care of years before the year 1000, 
     // since we're only taking the last two digits
     var millenYear = yr + 1000;
@@ -130,18 +132,19 @@ function yearTwoDigits(yr) {
     str = str.substr(2); // Get the last two digits
     return str
 }
-
+yearTwoDigits = cosmo.util.date.yearTwoDigits;
 /**
  * Convert a 24-hour formatted hour to 12-hour format
  * @param hour Integer hour number
  * @return String for hour in 12-hour format -- may be string length of one
  */
-function hrMil2Std(hour) {
+cosmo.util.date.hrMil2Std = function (hour) {
     var h = typeof hour == 'number' ? hour : parseInt(hour);
     var str = h > 12 ? h - 12 : h;
     str = str == 0 ? 12 : str;
     return str;
 }
+hrMil2Std = cosmo.util.date.hrMil2Std;
 
 /**
  * Convert a 12-hour formatted hour with meridian flag to 24-hour format
@@ -149,7 +152,7 @@ function hrMil2Std(hour) {
  * @param pm Boolean flag, if PM hour then set to true
  * @return String for hour in 24-hour format
  */
-function hrStd2Mil(hour, pm) {
+cosmo.util.date.hrStd2Mil = function  (hour, pm) {
     var h = typeof hour == 'number' ? hour : parseInt(hour);
     var str = '';
     // PM
@@ -162,13 +165,13 @@ function hrStd2Mil(hour, pm) {
     }
     return str;
 }
-
+hrStd2Mil = cosmo.util.date.hrStd2Mil;
 /**
  * Make sure a string is specified length
  * @param instr Any string or var with toString method
  * @return String with specified length with spacer char added
  */
-function lPadStr(instr, len, spacer) {
+cosmo.util.date.lPadStr = function (instr, len, spacer) {
     var str = instr.toString();
     var sp = spacer ? spacer : ' '; // spacer char optional, default to space
     while (str.length < len) {
@@ -176,33 +179,33 @@ function lPadStr(instr, len, spacer) {
     }
     return str;
 }
-
+lPadStr = cosmo.util.date.lPadStr;
 /**
  * Return 'AM' or 'PM' based on hour in 24-hour format
  * @param h Integer for hour in 24-hour format
  * @return String of either 'AM' or 'PM' based on hour number
  */
-function meridian(h) {
+cosmo.util.date.meridian = function (h) {
     return h > 11 ? Date.meridian['PM'] : Date.meridian['AM'];
 }
-
+meridian = cosmo.util.date.meridian;
 /**
  * Calculate the century to which a particular year belongs
  * @param y Integer year number
  * @return Integer century number
  */
-function calcCentury(y) {
+cosmo.util.date.calcCentury = function(y) {
     var ret = parseInt(y/100);
     ret = ret.toString();
     return lPadStr(ret);
 }
-
+calcCentury = cosmo.util.date.calcCentury;
 /**
  * Calculate the day number in the year a particular date is on
  * @param dt JavaScript date object
  * @return Integer day number in the year for the given date
  */
-function calcDays(dt) {
+cosmo.util.date.calcDays = function(dt) {
     var first = new Date(dt.getFullYear(), 0, 1);
     var diff = 0;
     var ret = 0;
@@ -211,16 +214,16 @@ function calcDays(dt) {
     ret = parseInt(((((diff/1000)/60)/60)/24))+1;
     return ret;
 }
-
+calcDays = cosmo.util.date.calcDays;
 /**
  * Adjust from 0-6 base week to 1-7 base week
  * @param d integer for day of week
  * @return Integer day number for 1-7 base week
  */
-function adjSun(d) {
+cosmo.util.date.adjSun = function(d) {
     return d == 0 ? 7 : d;
 }
-
+adjSun = cosmo.util.date.adjSun;
 /**
  * Get a string of all the supported strtime formats in Date.strftime
  * @return String of all the supported formats appended together

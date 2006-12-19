@@ -47,48 +47,20 @@
 
 <cosmo:dojoBoilerplate/>
 
-<script type="text/javascript" src="${staticBaseUrl}/i18n.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/log.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/date.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/hash.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/validate.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/cookie.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/text.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/util/popup.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/model.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/conf.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/button.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/dialog.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/cal_main.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/draggable.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/resize_area.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/cal_form.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/event/handlers.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/styler.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/contentcontainer.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/minical.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/widget/Layout.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/facade/pref.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/service/service_stub.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/service/json_service_impl.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/legacy/cal_event.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/legacy/async.js"></script>
 <script type="text/javascript" src="${staticBaseUrl}/js/lib/jsonrpc-java-js/jsonrpc.js"></script>
 
 <script type="text/javascript">
 // Dojo requires
 dojo.require('cosmo.app');
-dojo.require('cosmo.view.cal');
-dojo.require('cosmo.view.cal.canvas');
-dojo.require('cosmo.view.cal.conflict');
-dojo.require('cosmo.view.cal.Lozenge');
-dojo.require('cosmo.ui.widget.CollectionSelector');
-dojo.require('cosmo.ui.widget.ModalDialog');
+dojo.require('cosmo.ui.cal_main');
+dojo.require('cosmo.ui.global_css');
 
 // FIXME: Need to get timeout value from server
 var TIMEOUT_MIN = 30;
 
-function init() {
+// Added automatically to window.onload by 
+// cosmo.ui.event.listeners.hookUpListeners
+cosmo.ui.event.handlers.init = function () {
 	var collectionUid = undefined;
 	var ticketKey = undefined;
 <c:if test="${collection != null}">
@@ -101,10 +73,11 @@ function init() {
     cosmo.app.initObj = Cal;
 	cosmo.app.init(collectionUid, ticketKey);
 }
-</script>
 
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/event/listeners.js"></script>
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/global.css.js"></script>
+dojo.require("cosmo.ui.event.listeners");
+cosmo.ui.event.listeners.hookUpListeners();
+
+</script>
 
 </head>
 

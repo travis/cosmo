@@ -26,11 +26,11 @@ dojo.provide("cosmo.util.i18n")
 
 var localText = [];
 
-function getText(str) {
+cosmo.util.i18n.getText = function(str) {
     return localText[str] || "[[" + str + "]]";
 }
 
-cosmo.util.i18n.getText = getText
+getText = cosmo.util.i18n.getText;
 
 <c:forEach var="key" items="${messages}">
     localText["${key}"] = "<fmt:message key="${key}"/>";

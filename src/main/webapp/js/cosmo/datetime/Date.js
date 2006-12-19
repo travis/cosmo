@@ -28,8 +28,9 @@
  * @param utc Boolean indicates that this is a utc time
  */
 dojo.provide("cosmo.datetime.Date");
-dojo.provide("cosmo.datetime.timezone");
+dojo.require("cosmo.datetime.timezone");
 dojo.require("cosmo.util.debug");
+dojo.require("cosmo.facade.pref");
 
 cosmo.datetime.Date = function () {
     

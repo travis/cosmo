@@ -19,9 +19,6 @@
  * selected event
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
- *
- * Does some somewhat hackish stuff to suppress inut from the
- * keyboard when user is typing in form fields
  */
 
 /**
@@ -37,6 +34,7 @@ function CalForm() {
     var self = this;
     var saveButton = null;
     var removeButton = null;
+    var _html = cosmo.util.html;
 
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
 
@@ -65,7 +63,7 @@ function CalForm() {
         dojo.event.topic.publish('/calEvent', { 'action': 'removeConfirm', 'data': selEv });
     }
 
-    this.handlePub = function(cmd) {
+    this.handlePub = function (cmd) {
         var act = cmd.action;
         var ev = cmd.data;
         switch (act) {
@@ -105,23 +103,16 @@ function CalForm() {
     // The actual form DOM elem -- form.form is redundant, so
     // changing this to formElem would be a Good Thing
     this.form = document.getElementById('calForm');
-    // If a text input currently has focus -- should disable
-    // listener for Delete button
-    this.detailTextInputHasFocus = false;
-    // If a textare currently has focus -- should disable
-    // listner for Delete and Enter buttons
-    this.detailTextAreaHasFocus = false;
-    this.jumpToTextInputHasFocus = false;
 
     /**
      * Holdover from when we used object-literal notation
      * TO-DO: Move all this stuff into the main constructor function
      */
-    this.init = function() {
+    this.init = function () {
         this.appendElements();
         this.createButtons(true, true);
     };
-    this.appendElements = function() {
+    this.appendElements = function () {
         var info = document.getElementById('eventInfoDiv');
         var cont = document.createElement('div');
         var d = document.createElement('div');
@@ -137,17 +128,17 @@ function CalForm() {
             'Main.DetailForm.Title'), d);
         elem = document.createElement('div');
         elem.className = 'formElem';
-        this.createInput('text', 'eventtitle', 'eventtitle',
+        _html.createInput('text', 'eventtitle', 'eventtitle',
             28, 100, null, 'inputText', elem);
         d.appendChild(elem);
 
         // All-day checkbox
         elem = document.createElement('div');
         elem.className = 'formElem';
-        this.createInput('checkbox', 'eventallday', 'eventallday',
+        _html.createInput('checkbox', 'eventallday', 'eventallday',
             null, null, 'true', null, elem);
-        this.createNbsp(elem);
-        this.createNbsp(elem);
+        _html.appendNbsp(elem);
+        _html.appendNbsp(elem);
         elem.appendChild(document.createTextNode('All day'));
         d.appendChild(elem);
 
@@ -164,7 +155,7 @@ function CalForm() {
         this.createLabel('Status', d);
         elem = document.createElement('div');
         elem.className = 'formElem';
-        this.createSelect('status', 'status', null, null,
+        _html.createSelect('status', 'status', null, null,
             this.getStatusOpt(), 'selectElem', elem);
         d.appendChild(elem);
 
@@ -174,16 +165,16 @@ function CalForm() {
         this.createLabel('Occurs', d);
         elem = document.createElement('div');
         elem.className = 'formElem';
-        this.createSelect('recurrence', 'recurrence', null, null,
+        _html.createSelect('recurrence', 'recurrence', null, null,
             this.getRecurOpt(), 'selectElem', elem);
 
-        this.createNbsp(elem);
+        _html.appendNbsp(elem);
         elem.appendChild(document.createTextNode('ending'));
-        this.createNbsp(elem);
+        _html.appendNbsp(elem);
 
         // Recurrence ending
         elem.className = 'formElem';
-        this.createInput('text', 'recurend', 'recurend',
+        _html.createInput('text', 'recurend', 'recurend',
             10, 10, null, 'inputText', elem);
         d.appendChild(elem);
 
@@ -210,7 +201,7 @@ function CalForm() {
 
         elem = document.createElement('div');
         elem.className = 'floatRight';
-        this.createNbsp(elem);
+        _html.appendNbsp(elem);
         d.appendChild(elem);
 
         elem = document.createElement('div');
@@ -227,39 +218,39 @@ function CalForm() {
 
         return true;
     };
-    this.createDateTimeInputs = function(label, name, d) {
+    this.createDateTimeInputs = function (label, name, d) {
         var elem = null;
         this.createLabel(getText(
             'Main.DetailForm.' + label), d);
         elem = document.createElement('div');
         elem.className = 'formElem';
         elem.style.whiteSpace = 'nowrap';
-        this.createInput('text', name + 'date', name + 'date',
+        _html.createInput('text', name + 'date', name + 'date',
             10, 10, null, 'inputText', elem);
-        this.createNbsp(elem);
+        _html.appendNbsp(elem);
         elem.appendChild(document.createTextNode(
             getText('Main.DetailForm.At')));
-        this.createNbsp(elem);
-        this.createInput('text', name + 'time', name + 'time',
+        _html.appendNbsp(elem);
+        _html.createInput('text', name + 'time', name + 'time',
             5, 5, null, 'inputText', elem);
-        this.createNbsp(elem);
-        this.createNbsp(elem);
-        this.createInput('radio', name + 'ap', name + 'ap', null,
+        _html.appendNbsp(elem);
+        _html.appendNbsp(elem);
+        _html.createInput('radio', name + 'ap', name + 'ap', null,
             null, 1, null, elem);
-        this.createNbsp(elem);
+        _html.appendNbsp(elem);
         elem.appendChild(document.createTextNode(
             getText('App.AM')));
-        this.createNbsp(elem);
-        this.createNbsp(elem);
-        this.createInput('radio', name + 'ap', name + 'ap', null,
+        _html.appendNbsp(elem);
+        _html.appendNbsp(elem);
+        _html.createInput('radio', name + 'ap', name + 'ap', null,
             null, 2, null, elem);
-        this.createNbsp(elem);
+        _html.appendNbsp(elem);
         elem.appendChild(document.createTextNode(
             getText('App.PM')));
         d.appendChild(elem);
     };
 
-    this.createTimezoneInputs = function(d){
+    this.createTimezoneInputs = function (d){
         var elem = null;
 
         //create the main label
@@ -270,36 +261,38 @@ function CalForm() {
         elem.style.whiteSpace = 'nowrap';
 
         //create the region selector
-        //  this.createSelect = function(id, name, size, multi, options, className,
-        //      elem) {
-        this.createSelect('tzRegion', 'tzRegion', null, false, this.getTimezoneOptions(), 'selectElem', elem);
-        this.createNbsp(elem);
-        this.createSelect('tzId', 'tzId', null, false, this.getTimezoneSelectorOptions(null), 'selectElem', elem);
+        _html.createSelect('tzRegion', 'tzRegion', null, 
+            false, this.getTimezoneOptions(), 'selectElem', elem);
+        _html.appendNbsp(elem);
+        _html.createSelect('tzId', 'tzId', null, 
+            false, this.getTimezoneSelectorOptions(null), 'selectElem', elem);
         d.appendChild(elem);
 
     };
 
-    this.getTimezoneSelectorOptions = function(region){
+    this.getTimezoneSelectorOptions = function (region){
         var tzIds = region ? cosmo.datetime.timezone.getTzIdsForRegion(region).sort() : null;
-        var options = [{text:getText("Main.DetailForm.TimezoneSelector.Timezone"), value:""}];
+        var options = [{ 
+            text: getText("Main.DetailForm.TimezoneSelector.Timezone"), 
+            value: "" }];
         if (tzIds){
-            dojo.lang.map(tzIds, function(tzId){
+            dojo.lang.map(tzIds, function (tzId) {
                 options.push({text:tzId.substr(tzId.indexOf("/") + 1).replace(/_/g," "), value:tzId});
             });
         }
         return options;
     };
 
-    this.populateTimezoneSelector = function(region){
+    this.populateTimezoneSelector = function (region){
         var options = this.getTimezoneSelectorOptions(region);
-        cosmo.util.html.setSelectOptions(this.form.tzId, options);
+        _html.setSelectOptions(this.form.tzId, options);
     };
 
-    this.handleRegionChanged = function(event){
+    this.handleRegionChanged = function (event){
         self.populateTimezoneSelector(event.target.value);
     };
 
-    this.createLabel = function(str, d) {
+    this.createLabel = function (str, d) {
         var elem = document.createElement('div');
         elem.className = 'labelTextVert';
         elem.appendChild(document.createTextNode((str)));
@@ -311,137 +304,7 @@ function CalForm() {
             return elem;
         }
     };
-
-    this.createInput = function(type, id, name,
-        size, maxlength, value, className, elem) {
-
-        var formElem = null;
-        var str = '';
-
-        // IE falls down on DOM-method-generated
-        // radio buttons and checkboxes
-        // Old-skool with conditional branching and innerHTML
-        if (document.all && (type == 'radio' || type == 'checkbox')) {
-            str = '<input type="' + type + '"' +
-                ' name="' + name + '"' +
-                ' id ="' + id + '"';
-            if (size) {
-                str += ' size="' + size + '"';
-            }
-            if (maxlength) {
-                str += ' maxlength="' + maxlength + '"';
-            }
-            if (className) {
-                str += ' class="' + className + '"';
-            }
-            str += '>';
-            if (elem) {
-                elem.innerHTML += str;
-            }
-            else {
-                formElem = document.createElement('span');
-                formElem.innerHTML = str;
-                return formElem.firstChild;
-            }
-        }
-        // Standards-compliant browsers -- all intputs
-        // IE -- everything but radio button and checkbox
-        else {
-            formElem = document.createElement('input');
-
-            formElem.type = type;
-            formElem.name = name;
-            formElem.id = id;
-            if (size) {
-                formElem.size = size;
-            }
-            if (maxlength) {
-                //formElem.maxlength = maxlength; // Setting the prop directly is broken in FF
-                formElem.setAttribute('maxlength', maxlength);
-            }
-            if (value) {
-                formElem.value = value;
-            }
-            if (className) {
-                formElem.className = className;
-            }
-            if (elem) {
-                elem.appendChild(formElem);
-                return true;
-            }
-            else {
-                return formElem;
-            }
-        }
-    };
-    this.createNbsp = function(elem) {
-        elem.appendChild(document.createTextNode('\u00A0'));
-    };
-    /**
-     * Inserts the select box for choosing from multiple calendars
-     * Only actually called if multiple calendars exist
-     */
-    this.addCalSelector = function(calendars) {
-        var leftSidebarDiv = document.getElementById('leftSidebarDiv');
-        var calSelectNav = document.getElementById('calSelectNav');
-        var calSelectElemDiv = document.createElement('div');
-        var calSelectElem = document.createElement('select');
-
-        calSelectElem.id = 'calSelectElem';
-        calSelectElem.name = 'calSelectElem';
-
-        for (var i = 0; i < calendars.length; i++) {
-            var calOpt = document.createElement('option');
-            calOpt.value = i;
-            calOpt.appendChild(document.createTextNode(calendars[i].displayName));
-            calSelectElem.appendChild(calOpt);
-        }
-        calSelectElem.className = 'selectElem';
-        calSelectElemDiv.appendChild(calSelectElem);
-
-        calSelectNav.appendChild(calSelectElemDiv);
-
-        //TODO replace this with an image when I get it from Priss
-        var infoLinkSpan = document.createElement("span");
-        var infoLink = document.createTextNode(" Info");
-        infoLinkSpan.onclick=function(){
-                cosmo.app.showDialog(cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(Cal.currentCollection.collection));
-        };
-        infoLinkSpan.appendChild(infoLink);
-        calSelectElemDiv.appendChild(infoLinkSpan);
-        
-        leftSidebarDiv.appendChild(calSelectNav);
-    };
-    this.createSelect = function(id, name, size, multi, options, className,
-        elem) {
-        var sel = document.createElement('select');
-        sel.id = id
-        sel.name = name;
-        if (size) {
-            sel.size = size;
-        }
-        if (multi) {
-            sel.multiple = 'multiple';
-        }
-        if (className) {
-            sel.className = className;
-        }
-        cosmo.util.html.setSelectOptions(sel, options);
-        if (elem) {
-            elem.appendChild(sel);
-            return true;
-        }
-        else {
-            return sel;
-        }
-    };
-
-    this.setSelect = function(name, val) {
-        var sel = this.form[name];
-        cosmo.util.html.setSelect(sel, val);
-    };
-    
-    this.emptyTextInput = function(param) {
+    this.emptyTextInput = function (param) {
         if (!param || !param.id) {
             param = param || window.event;
             textbox = cosmo.ui.event.handlers.getSrcElemByProp(param, 'id');
@@ -454,7 +317,7 @@ function CalForm() {
             textbox.value = '';
         }
     };
-    this.setTextInput = function(textbox,
+    this.setTextInput = function (textbox,
         setText, prompt, disabled) {
         textbox.className = prompt? 'inputTextDim' : 'inputText';
         textbox.value = setText;
@@ -466,7 +329,7 @@ function CalForm() {
      * Also called when editing/removing events to toggle button state
      * to enabled/disabled appropriately
      */
-    this.createButtons = function(enableRemove, enableSave) {
+    this.createButtons = function (enableRemove, enableSave) {
         var checkElem = null;
         var f = null;
 
@@ -491,7 +354,7 @@ function CalForm() {
     /**
      *
      */
-    this.setButtons = function(r, s) {
+    this.setButtons = function (r, s) {
         rem = r;
         sav = s;
         if (!Cal.currentCollection.privileges.write) {
@@ -501,7 +364,7 @@ function CalForm() {
         removeButton.setEnabled(rem);
         saveButton.setEnabled(sav);
     };
-    this.getRecurOpt = function() {
+    this.getRecurOpt = function () {
         var recurOpt = [];
         var opt = null;
         var str = '';
@@ -520,7 +383,7 @@ function CalForm() {
         return recurOpt;
     };
 
-    this.getStatusOpt = function() {
+    this.getStatusOpt = function () {
         var statusOpt = [];
         var opt = null;
         var str = '';
@@ -540,7 +403,7 @@ function CalForm() {
         return statusOpt;
     };
 
-    this.getTimezoneOptions = function(){
+    this.getTimezoneOptions = function (){
         var options = [];
         var option = {opt: null,
                      text: getText("Main.DetailForm.Region")};
@@ -561,7 +424,7 @@ function CalForm() {
      * event based on those -- should be building ScoobyDates directly
      * from the form
      */
-    this.updateEvent = function(ev) {
+    this.updateEvent = function (ev) {
         var form = this.form;
         var startDate = '';
         var endDate = '';
@@ -716,7 +579,7 @@ function CalForm() {
      * Update values displayed in the form from the properties in the
      * CalEventData obj for the event.
      */
-    this.updateFromEvent = function(ev) {
+    this.updateFromEvent = function (ev) {
         var form = this.form;
         var recur = ev.data.recurrenceRule;
         var status = ev.data.status;
@@ -737,13 +600,13 @@ function CalForm() {
         }
 
         if(status) {
-            this.setSelect("status", status);
+            _html.setSelect(this.form.status, status);
         } else {
-            this.setSelect("status", "CONFIRMED");
+            _html.setSelect(this.form.status, "CONFIRMED");
         }
 
         if (recur) {
-            this.setSelect('recurrence', recur.frequency);
+            _html.setSelect(this.form.recurrence, recur.frequency);
             form.recurend.disabled = false;
             if (recur.endDate) {
                 this.setTextInput(form.recurend,
@@ -754,7 +617,7 @@ function CalForm() {
             }
         }
         else {
-            this.setSelect('recurrence', '');
+            _html.setSelect(this.form.recurrence, '');
             this.setTextInput(form.recurend, 'mm/dd/yyyy', true, true);
         }
 
@@ -767,16 +630,16 @@ function CalForm() {
                 //like "US/Pacific" as opposed to "America/Los_angeles"
                 var tzId = timezone.tzId;
                 var region = tzId.split("/")[0];
-                self.setSelect("tzRegion", region);
+                _html.setSelect(this.form.tzRegion, region);
                 self.populateTimezoneSelector(region);
-                self.setSelect("tzId", tzId);
+                _html.setSelect(this.form.tzId, tzId);
             }
         } else {
             self.clearTimezone();
         }
     };
 
-    this.setRecurEnd = function() {
+    this.setRecurEnd = function () {
         var self = Cal.calForm
         var form = self.form;
         if (form.recurrence.selectedIndex == 0) {
@@ -792,7 +655,7 @@ function CalForm() {
      * @param time Date object with times set
      * @param name Name of form element to set (e.g., 'start' or 'end')
      */
-    this.setTimeElem = function(time, name) {
+    this.setTimeElem = function (time, name) {
         var form = this.form;
         var timeElem = null;
         var meridianElem = null;
@@ -831,7 +694,7 @@ function CalForm() {
      * Reloading the page in some browsers preserves form information
      * This method empties the event info form of any entered values.
      */
-    this.clear = function() {
+    this.clear = function () {
         var form = this.form;
         // Update info in event form
         form.eventtitle.value = '';
@@ -854,7 +717,7 @@ function CalForm() {
         return true;
     };
 
-    this.clearTimezone = function(){
+    this.clearTimezone = function (){
         this.form.tzRegion.selectedIndex = 0;
         self.populateTimezoneSelector();
     }
@@ -862,7 +725,7 @@ function CalForm() {
     /**
      * Toggle an event from 'normal' (HasTime) to 'all-day' (NoTime)
      */
-    this.toggleLozengeType = function() {
+    this.toggleLozengeType = function () {
         var allDay = this.form.eventallday.checked ? true : false;
         var setDate = new Date();
         setDate.setMinutes(0);
@@ -884,7 +747,7 @@ function CalForm() {
      * Also adds event listener to 'all-day' checkbox to toggle
      * event type
      */
-    this.setEventListeners = function() {
+    this.setEventListeners = function () {
         var inputs = document.getElementsByTagName('input');
         var descrTxt = document.getElementById('eventdescr');
         var allDayCheck = document.getElementById('eventallday');
@@ -892,20 +755,12 @@ function CalForm() {
 
         // Add dummy function event listener so form doesn't
         // submit on Enter keypress in Safari
-        form.onsubmit = function() { return false; };
+        form.onsubmit = function () { return false; };
 
         // Cal selector
         if (form.calSelectElem) {
-            form.calSelectElem.onchange = function() {
+            form.calSelectElem.onchange = function () {
                 f = Cal.goSelCal; Cal.showMaskDelayNav(f); };
-        }
-
-        // All text inputs
-        for (var i=0; i < inputs.length; i++) {
-            if (inputs[i].className == 'inputText') {
-                inputs[i].onfocus = function() { Cal.calForm.detailTextInputHasFocus = true; };
-                inputs[i].onblur = function() { Cal.calForm.detailTextInputHasFocus = false; };
-            }
         }
 
         // Recurrence
@@ -913,17 +768,17 @@ function CalForm() {
         form.recurend.onclick = Cal.calForm.emptyTextInput;
 
         // Description textarea
-        descrTxt.onfocus = function() {
+        descrTxt.onfocus = function () {
             Cal.calForm.detailTextInputHasFocus = true;
             Cal.calForm.textAreaHasFocus = true;
         };
-        descrTxt.onblur = function() {
+        descrTxt.onblur = function () {
             Cal.calForm.detailTextInputHasFocus = false;
             Cal.calForm.textAreaHasFocus = false;
         };
 
         // All-day event / normal event toggling
-        allDayCheck.onclick = function() { Cal.calForm.toggleLozengeType() };
+        allDayCheck.onclick = function () { Cal.calForm.toggleLozengeType() };
 
         var regionSelectorElement = document.getElementById("tzRegion");
         dojo.event.connect(regionSelectorElement, "onchange", this.handleRegionChanged);
@@ -931,7 +786,7 @@ function CalForm() {
 
         descrTxt = null; // Set DOM-node-ref to null to avoid IE memleak
     };
-    this.addJumpToDate = function(dMain) {
+    this.addJumpToDate = function (dMain) {
         var top = parseInt(MiniCal.displayContext.style.top);
         var d = null;
 
@@ -949,23 +804,21 @@ function CalForm() {
 
         d = document.createElement('div');
         d.className = 'floatLeft';
-        self.createNbsp(d);
+        _html.appendNbsp(d);
         dc.appendChild(d);
 
         d = document.createElement('div');
         d.className = 'formElem floatLeft';
         dc.appendChild(d);
-        self.createInput('text', 'jumpto', 'jumpto',
+        _html.createInput('text', 'jumpto', 'jumpto',
             10, 10, null, 'inputText', d);
         self.setTextInput(self.form.jumpto, 'mm/dd/yyyy', true, false);
         self.form.jumpto.onclick = Cal.calForm.emptyTextInput;
-        self.form.jumpto.onfocus = function() { Cal.calForm.jumpToTextInputHasFocus = true; };
-        self.form.jumpto.onblur = function() { Cal.calForm.jumpToTextInputHasFocus = false; };
-
+        
         d = document.createElement('div');
         d.className = 'floatLeft';
-        self.createNbsp(d);
-        self.createNbsp(d);
+        _html.appendNbsp(d);
+        _html.appendNbsp(d);
         dc.appendChild(d);
 
         d = document.createElement('div');
@@ -990,7 +843,7 @@ function CalForm() {
         dc.style.left = lOffset + 'px';
         dMain.style.width = LEFT_SIDEBAR_WIDTH + 'px';
     };
-    this.goJumpToDate = function() {
+    this.goJumpToDate = function () {
         var e = null;
         var err = '';
         var val = self.form.jumpto.value;
@@ -1010,7 +863,7 @@ function CalForm() {
         }
         // All okey-dokey -- submit
         else {
-            f = function() { Cal.goViewQueryDate(val); };
+            f = function () { Cal.goViewQueryDate(val); };
             Cal.showMaskDelayNav(f);
         }
     };

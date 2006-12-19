@@ -142,7 +142,6 @@ var Cal = new function () {
         
         // Otherwise, get all calendars for this user
         else {
-
             var userCollections = this.serv.getCalendars();
             for (var i = 0; i < userCollections.length; i++){
                 var collection = userCollections[i];
@@ -197,11 +196,6 @@ var Cal = new function () {
             }
         }
         
-        // If more than one cal exists, create the cal selector nav
-        if (this.currentCollections.length > 1) {
-            this.calForm.addCalSelector(this.currentCollections);
-        }
-        
         // If we received a collectionUid, select that collection
         if (collectionUid){
             for (var i = 0; i < this.currentCollections.length; i++){
@@ -211,14 +205,18 @@ var Cal = new function () {
                 }
             }
         }
-        // Otherwise, use the first calendar
+        // Otherwise, use the first collection 
         else {
             this.currentCollection = this.currentCollections[0];
         }
         
+        // Display selector or single cal name
+        var selector = dojo.widget.createWidget(
+            'cosmo:CollectionSelector', { 'collections': this.currentCollections, 
+            'ticketKey': ticketKey }, document.getElementById('calSelectNav'), 'last');
+        
         // Load and display events
         // --------------
-
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
 
         this.uiMask.hide();

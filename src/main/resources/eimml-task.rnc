@@ -18,5 +18,6 @@ anyTaskField =
        | eimDecimalFieldContent
        | eimDateTimeFieldContent
        | eimBytesFieldContent
-       | eimLobFieldContent)*
+       | eimBlobFieldContent
+       | eimClobFieldContent)*
    }

@@ -41,11 +41,14 @@ eimBytesFieldContent = {
    xsd:base64Binary { maxlength = "1024" }
 }
 
-eimLobFieldContent = {
-   attribute eim:type { "lob" },
-   attribute eim:encoded { xsd:boolean }?,
-   (xsd:base64Binary
-    | xsd:string)
+eimBlobFieldContent = {
+   attribute eim:type { "blob" },
+   xsd:base64Binary
+}
+
+eimClobFieldContent = {
+   attribute eim:type { "clob" },
+   xsd:string
 }
 
 # The root element of an EIMML document.
@@ -80,5 +83,6 @@ anyField =
        | eimDecimalFieldContent
        | eimDateTimeFieldContent
        | eimBytesFieldContent
-       | eimLobFieldContent)*
+       | eimBlobFieldContent
+       | eimClobFieldContent)*
    }

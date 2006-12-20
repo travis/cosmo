@@ -48,5 +48,6 @@ anyItemField =
        | eimDecimalFieldContent
        | eimDateTimeFieldContent
        | eimBytesFieldContent
-       | eimLobFieldContent)*
+       | eimBlobFieldContent
+       | eimClobFieldContent)*
    }

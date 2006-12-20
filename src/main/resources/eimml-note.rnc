@@ -30,5 +30,6 @@ anyNoteField =
        | eimDecimalFieldContent
        | eimDateTimeFieldContent
        | eimBytesFieldContent
-       | eimLobFieldContent)*
+       | eimBlobFieldContent
+       | eimClobFieldContent)*
    }

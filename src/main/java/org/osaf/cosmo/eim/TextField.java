@@ -40,12 +40,14 @@ public class TextField extends EimRecordField {
     public TextField(String name,
                      String value) {
         super(name);
-        try {
-            int len = value.getBytes("UTF-8").length;
-            if (len > MAX_LENGTH)
-                throw new IllegalArgumentException("Value is " + len + " text, exceeding maximum length of " + MAX_LENGTH);
-        } catch (UnsupportedEncodingException e) {
-            // won't happen
+        if (value != null) {
+            try {
+                int len = value.getBytes("UTF-8").length;
+                if (len > MAX_LENGTH)
+                    throw new IllegalArgumentException("Value is " + len + " text, exceeding maximum length of " + MAX_LENGTH);
+            } catch (UnsupportedEncodingException e) {
+                // won't happen
+            }
         }
         this.value = value;
     }

@@ -156,7 +156,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
             xmlReader.nextTag();
 
             if (xmlReader.isStartElement()) {
-                String uuid = xmlReader.getAttributeValue(NS_CORE, ATTR_UUID);
+                String uuid = xmlReader.getAttributeValue(null, ATTR_UUID);
                 if (StringUtils.isBlank(uuid))
                     throw new EimmlStreamException("Recordset element requires " + ATTR_UUID + " attribute");
                 recordset.setUuid(uuid);

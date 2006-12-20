@@ -124,7 +124,7 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         throws EimmlStreamException, XMLStreamException {
 
         xmlWriter.writeStartElement(NS_CORE, EL_RECORDSET);
-        xmlWriter.writeAttribute(NS_CORE, ATTR_UUID, recordset.getUuid());
+        xmlWriter.writeAttribute(ATTR_UUID, recordset.getUuid());
 
         for (EimRecord record : recordset.getRecords())
             writeRecord(record);

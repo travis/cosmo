@@ -164,7 +164,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 writer.close();
 
                 return;
-            } catch (IllegalArgumentException e) {
+            } catch (SyncTokenException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                "Invalid sync token");
                 return;
@@ -230,7 +230,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());
                 return;
-            } catch (IllegalArgumentException e) {
+            } catch (SyncTokenException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                "Invalid sync token");
                 return;

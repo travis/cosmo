@@ -83,30 +83,28 @@ public class SyncToken {
      * Converts a serialized token string into a sync token.
      *
      * @return the deserialized <code>SyncToken</code>
-     * @throws IllegalArgumentException if the given string cannot be
+     * @throws SyncTokenException if the given string cannot be
      * deserialized
      */
     public static SyncToken deserialize(String str) {
-        if (str == null)
-            throw new IllegalArgumentException("token string is null");
         String[] chunks = str.split("-", 2);
         if (chunks.length != 2 ||
             StringUtils.isBlank(chunks[0]) ||
             StringUtils.isBlank(chunks[1]))
-            throw new IllegalArgumentException("malformed token string");
+            throw new SyncTokenException("malformed token string");
 
         long timestamp = -1;
         try {
             timestamp = Long.parseLong(chunks[0]);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("malformed token string", e);
+            throw new SyncTokenException("malformed token string", e);
         }
 
         int hashcode = -1;
         try {
             hashcode = Integer.parseInt(chunks[1]);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("malformed token string", e);
+            throw new SyncTokenException("malformed token string", e);
         }
 
         return new SyncToken(timestamp, hashcode);

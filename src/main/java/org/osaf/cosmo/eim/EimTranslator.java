@@ -106,8 +106,7 @@ public class EimTranslator implements EimSchemaConstants {
 
     private static void fillInRecordSet(EimRecordSet recordset,
                                         Item item) {
-        if (! recordset.getUuid().equals(item.getUid()))
-            throw new IllegalArgumentException("recordset and item uuids do not match");
+        recordset.setUuid(item.getUid());
 
         if (! BooleanUtils.isTrue(item.getIsActive())) {
             recordset.setDeleted(true);

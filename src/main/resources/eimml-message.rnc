@@ -46,6 +46,7 @@ anyMessageField =
    element message:* {
       (eimTextFieldContent
        | eimDecimalFieldContent
+       | eimIntegerFieldContent
        | eimDateTimeFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent

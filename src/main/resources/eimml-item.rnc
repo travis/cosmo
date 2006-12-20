@@ -52,6 +52,7 @@ anyItemField =
    element item:* {
       (eimTextFieldContent
        | eimDecimalFieldContent
+       | eimIntegerFieldContent
        | eimDateTimeFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent

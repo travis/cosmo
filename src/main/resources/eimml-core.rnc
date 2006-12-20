@@ -6,39 +6,55 @@ namespace eim = "http://osafoundation.org/eim"
 
 start = eimRecords
 
+eimKey =
+   attribute eim:key { xsd:boolean }
+
 eimDeleted =
-   attribute eim:deleted { xsd:boolean }
+   attribute eim:deleted { xsd:boolean }?
 
 # These patterns define the allowable content of the elements
 # representing EIM record fields. Field types not defined in this
 # schema are not permitted in EIMML.
 
 eimTextFieldContent = {
+   eimKey,
    attribute eim:type { "text" },
    xsd:string { maxLength = "1024" }
 }
 
 eimDecimalFieldContent = {
+   eimKey,
    attribute eim:type { "decimal" },
    xsd:decimal
 }
 
+eimIntegerFieldContent = {
+   eimKey,
+   attribute eim:type { "integer" },
+   xsd:int
+}
+
 eimDateTimeFieldContent = {
+   eimKey,
    attribute eim:type { "datetime" },
-   xsd:dateTime    # UTC (eg "2002-10-09T19:00:00Z")
+   # UTC (eg "2002-10-09T19:00:00Z") or floating ("2002-10-09T19:00:00")
+   xsd:dateTime
 }
 
 eimBytesFieldContent = {
+   eimKey,
    attribute eim:type { "bytes" },
    xsd:base64Binary { maxlength = "1024" }
 }
 
 eimBlobFieldContent = {
+   eimKey,
    attribute eim:type { "blob" },
    xsd:base64Binary
 }
 
 eimClobFieldContent = {
+   eimKey,
    attribute eim:type { "clob" },
    xsd:string
 }
@@ -73,6 +89,7 @@ anyField =
    element *:* {
       (eimTextFieldContent
        | eimDecimalFieldContent
+       | eimIntegerFieldContent
        | eimDateTimeFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent

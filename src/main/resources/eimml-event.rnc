@@ -76,6 +76,7 @@ anyEventField =
    element event:* {
       (eimTextFieldContent
        | eimDecimalFieldContent
+       | eimIntegerFieldContent
        | eimDateTimeFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent

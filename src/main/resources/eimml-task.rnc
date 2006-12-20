@@ -22,6 +22,7 @@ anyTaskField =
    element task:* {
       (eimTextFieldContent
        | eimDecimalFieldContent
+       | eimIntegerFieldContent
        | eimDateTimeFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent

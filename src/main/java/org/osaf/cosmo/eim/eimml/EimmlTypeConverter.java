@@ -68,6 +68,10 @@ public class EimmlTypeConverter implements EimmlConstants {
             throw new IllegalArgumentException("no transfer encoding specified");
         if (! transferEncoding.equals(TRANSFER_ENCODING_BASE64))
             throw new EimmlConversionException("Transfer encoding " + transferEncoding + " is not supported");
+
+        if (value == null)
+            return null;
+
         return encodeHexedBase64String(value);
     }
 
@@ -104,6 +108,9 @@ public class EimmlTypeConverter implements EimmlConstants {
      */
     public static String fromClob(Reader value)
         throws EimmlConversionException {
+        if (value == null)
+            return null;
+
         StringWriter writer = new StringWriter();
         try {
             IOUtils.copy(value, writer);
@@ -138,6 +145,10 @@ public class EimmlTypeConverter implements EimmlConstants {
             throw new IllegalArgumentException("no transfer encoding specified");
         if (! transferEncoding.equals(TRANSFER_ENCODING_BASE64))
             throw new EimmlConversionException("Transfer encoding " + transferEncoding + " is not supported");
+
+        if (value == null)
+            return null;
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             IOUtils.copy(value, out);
@@ -164,6 +175,8 @@ public class EimmlTypeConverter implements EimmlConstants {
      */
     public static String fromInteger(Integer value)
         throws EimmlConversionException {
+        if (value == null)
+            return null;
         return value.toString();
     }
 
@@ -187,6 +200,8 @@ public class EimmlTypeConverter implements EimmlConstants {
      */
     public static String fromDateTime(Calendar value)
         throws EimmlConversionException {
+        if (value == null)
+            return null;
         return DateUtil.formatRfc3339Date(value);
     }
 
@@ -217,12 +232,19 @@ public class EimmlTypeConverter implements EimmlConstants {
         if (decimalPlaces <= 0)
             throw new IllegalArgumentException("Number of decimal places must be positive");
 
+        if (value == null)
+            return null;
+
         StringBuffer pattern = new StringBuffer();
         for (int i=1; i<= digits; i++)
             pattern.append("#");
         pattern.append(".");
         for (int i=1; i<=decimalPlaces; i++)
             pattern.append("#");
+
+        if (log.isDebugEnabled())
+            log.debug("formatting decimal value " + value + " with pattern " +
+                      pattern);
 
         return new DecimalFormat(pattern.toString()).format(value);
     }

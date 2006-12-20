@@ -52,4 +52,7 @@ public interface EimSchemaConstants {
         "http://osafoundation.org/eim/note";
     /** */
     public static final String PREFIX_NOTE = "note";
+
+    /** */
+    public static final String FIELD_UUID = "uuid";
 }

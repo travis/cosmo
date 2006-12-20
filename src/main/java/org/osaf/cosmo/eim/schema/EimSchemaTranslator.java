@@ -99,8 +99,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
      * record field.
      * 
      * @throws IllegalArgumentException if the record's namespace does
-     * not match this translator's namespace or if the record's uuid
-     * does not match the item's uid
+     * not match this translator's namespace
      * @throws EimSchemaException if the record is improperly
      * constructed or cannot otherwise be applied to the item 
      */
@@ -109,8 +108,6 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
         throws EimSchemaException {
         if (record.getNamespace() != namespace)
             throw new IllegalArgumentException("Record namespace " + record.getNamespace() + " does not match " + namespace);
-        if (! record.getUuid().equals(item.getUid()))
-            throw new IllegalArgumentException("Record uuid " + record.getUuid() + " does not match item uid " + item.getUid());
 
         if (record.isDeleted()) {
             item.setIsActive(false);
@@ -176,7 +173,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
     /**
      * Creates an EIM record containing the data from the given item.
      * <p>
-     * Sets the record's prefix, namespace and uuid.
+     * Sets the record's prefix and namespace.
      * <p>
      * If the item is inactive, the record is marked deleted.
      * <p>
@@ -184,7 +181,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
      * and {@link #addUnknownFields(EimRecord, Item)} are called.
      */
     public EimRecord createRecord(Item item) {
-        EimRecord record = new EimRecord(prefix, namespace, item.getUid());
+        EimRecord record = new EimRecord(prefix, namespace);
 
         if (! item.getIsActive()) {
             record.setDeleted(true);
@@ -199,14 +196,13 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
     /**
      * Creates an EIM record containing the data from the given stamp.
      * <p>
-     * Sets the record's prefix, namespace and uuid.
+     * Sets the record's prefix and namespace.
      * <p>
      * Calls {@link #addFields(EimRecord, Stamp)}
      * and {@link #addUnknownFields(EimRecord, Stamp)}.
      */
     public EimRecord createRecord(Stamp stamp) {
-        EimRecord record =
-            new EimRecord(prefix, namespace, stamp.getItem().getUid());
+        EimRecord record = new EimRecord(prefix, namespace);
 
         addFields(record, stamp);
         addUnknownFields(record, stamp.getItem());

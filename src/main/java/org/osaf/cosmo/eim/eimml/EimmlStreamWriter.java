@@ -139,7 +139,6 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
 
         xmlWriter.writeStartElement(record.getNamespace(), EL_RECORD);
         xmlWriter.writeNamespace(record.getPrefix(), record.getNamespace());
-        xmlWriter.writeAttribute(NS_CORE, ATTR_UUID, record.getUuid());
 
         if (record.isDeleted()) {
             xmlWriter.writeAttribute(NS_CORE, ATTR_DELETED, "");

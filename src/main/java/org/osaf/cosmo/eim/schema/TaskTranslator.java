@@ -60,6 +60,10 @@ public class TaskTranslator extends EimSchemaTranslator {
         if (stamp == null)
             throw new IllegalArgumentException("Item does not have an task stamp");
 
+        // ignore immutable uuid key field
+        if (field.getName().equals(FIELD_UUID))
+            return;
+
         applyUnknownField(field, stamp.getItem());
     }
 
@@ -80,6 +84,8 @@ public class TaskTranslator extends EimSchemaTranslator {
                              Stamp stamp) {
         if (! (stamp instanceof TaskStamp))
             throw new IllegalArgumentException("Stamp is not an task stamp");
+
+        record.addField(new TextField(FIELD_UUID, stamp.getItem().getUid()));
 
         addUnknownFields(record, stamp.getItem());
     }

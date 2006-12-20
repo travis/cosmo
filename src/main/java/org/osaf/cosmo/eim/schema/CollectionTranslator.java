@@ -17,6 +17,7 @@ package org.osaf.cosmo.eim.schema;
 
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
+import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Stamp;
@@ -54,6 +55,10 @@ public class CollectionTranslator extends EimSchemaTranslator {
             throw new IllegalArgumentException("Item is not a collection");
         CollectionItem c = (CollectionItem) item;
 
+        // ignore immutable uuid key field
+        if (field.getName().equals(FIELD_UUID))
+            return;
+
         applyUnknownField(field, item);
     }
 
@@ -68,6 +73,8 @@ public class CollectionTranslator extends EimSchemaTranslator {
         if (! (item instanceof CollectionItem))
             throw new IllegalArgumentException("Item is not a collection");
         CollectionItem ci = (CollectionItem) item;
+
+        record.addField(new TextField(FIELD_UUID, item.getUid()));
 
         addUnknownFields(record, item);
     }

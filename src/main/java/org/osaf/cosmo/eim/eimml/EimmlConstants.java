@@ -45,8 +45,6 @@ public interface EimmlConstants {
     /** */
     public static final String ATTR_UUID = "uuid";
     /** */
-    public static final QName QN_UUID = new QName(NS_CORE, ATTR_UUID);
-    /** */
     public static final String ATTR_DELETED = "deleted";
     /** */
     public static final QName QN_DELETED = new QName(NS_CORE, ATTR_DELETED);

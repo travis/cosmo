@@ -203,8 +203,6 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
         for (int i=0; i<xmlReader.getAttributeCount(); i++) {
             if (xmlReader.getAttributeName(i).equals(QN_DELETED))
                 record.setDeleted(true);
-            else if (xmlReader.getAttributeName(i).equals(QN_UUID))
-                record.setUuid(xmlReader.getAttributeValue(i));
             else
                 log.warn("skipped unrecognized record attribute " +
                          xmlReader.getAttributeName(i));

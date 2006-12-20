@@ -29,11 +29,11 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * An EIM record is associated with a particular namespace that allows
  * EIM processors to understand the semantics of the entity modeled by
- * the record.
+ * the record. The namespace has an accompanying prefix that can be
+ * used as a shorthand for the namespace when serializing the record.
  * <p>
- * A record is composed of a uuid and 1..n fields. The uuid is a
- * string that uniquely identifies the entity, while the fields
- * represent its data.
+ * A record is composed of 1..n fields representing the data of the
+ * record.
  * <p>
  * A record may be marked as "deleted", representing the fact that an
  * aspect of an entity (for example a stamp) has been removed from
@@ -47,22 +47,19 @@ public class EimRecord {
     private EimRecordSet recordset;
     private String prefix;
     private String namespace;
-    private String uuid;
     private ArrayList<EimRecordField> fields;
     private boolean deleted = false;
 
     /** */
     public EimRecord() {
-        this(null, null, null);
+        this(null, null);
     }
 
     /** */
     public EimRecord(String prefix,
-                     String namespace,
-                     String uuid) {
+                     String namespace) {
         this.prefix = prefix;
         this.namespace = namespace;
-        this.uuid = uuid;
         fields = new ArrayList<EimRecordField>();
     }
 
@@ -84,16 +81,6 @@ public class EimRecord {
     /** */
     public void setNamespace(String namespace) {
         this.namespace = namespace;
-    }
-
-    /** */
-    public String getUuid() {
-        return uuid;
-    }
-
-    /** */
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     /** */

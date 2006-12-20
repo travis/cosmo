@@ -202,7 +202,8 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
             xmlWriter.writeAttribute(NS_CORE, ATTR_TRANSFER_ENCODING,
                                      TRANSFER_ENCODING_BASE64);
 
-        xmlWriter.writeCData(value);
+        if (value != null)
+            xmlWriter.writeCData(value);
 
         xmlWriter.writeEndElement();
     }

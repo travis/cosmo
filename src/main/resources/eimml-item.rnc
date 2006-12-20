@@ -8,13 +8,19 @@ include "eimml-core.rnc"
 
 eimItemRecord =
    element item:record {
-      (eimCommonRecordAttributes,
-         itemTitle?
+      (eimDeleted,
+         itemUuid
+       & itemTitle?
        & itemTriageStatus?
        & itemTriageStatusChanged?
        & itemLastModifiedBy?
        & itemCreatedOn?
        & anyItemField*)
+   }
+
+itemUuid =
+   element item:uuid {
+      eimTextFieldContent
    }
 
 itemTitle =

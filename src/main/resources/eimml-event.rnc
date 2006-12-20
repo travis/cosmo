@@ -8,8 +8,9 @@ include "eimml-core.rnc"
 
 eimEventRecord =
    element event:record {
-      (eimCommonRecordAttributes,
-         eventDtStart?
+      (eimDeleted,
+         eventUuid
+       & eventDtStart?
        & eventDtend?
        & eventLocation?
        & eventRRule?
@@ -19,6 +20,11 @@ eimEventRecord =
        & eventRecurrenceId?
        & eventStatus?
        & anyEventField*)
+   }
+
+eventUuid =
+   element event:uuid {
+      eimTextFieldContent
    }
 
 eventDtStart =

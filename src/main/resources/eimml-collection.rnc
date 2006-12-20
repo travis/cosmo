@@ -8,8 +8,14 @@ include "eimml-core.rnc"
 
 eimCollectionRecord =
    element collection:record {
-      eimCommonRecordAttributes,
-      anyCollectionField*
+      (eimDeleted,
+         collectionUuid
+       & anyCollectionField*)
+   }
+
+collectionUuid =
+   element collection:uuid {
+      eimTextFieldContent
    }
 
 anyCollectionField =

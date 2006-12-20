@@ -8,12 +8,18 @@ include "eimml-core.rnc"
 
 eimMessageRecord =
    element message:record {
-      (eimCommonRecordAttributes,
-         messageSubject?
+      (eimDeleted,
+         messageUuid
+       & messageSubject?
        & messageTo?
        & messageCc?
        & messageBcc?
        & anyMessageField*)
+   }
+
+messageUuid =
+   element message:uuid {
+      eimTextFieldContent
    }
 
 messageSubject =

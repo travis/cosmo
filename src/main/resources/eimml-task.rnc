@@ -8,8 +8,14 @@ include "eimml-core.rnc"
 
 eimTaskRecord =
    element task:record {
-      eimCommonRecordAttributes,
-      anyTaskField*
+      (eimDeleted,
+         taskUuid
+       & anyTaskField*)
+   }
+
+taskUuid =
+   element task:uuid {
+      eimTextFieldContent
    }
 
 anyTaskField =

@@ -6,16 +6,8 @@ namespace eim = "http://osafoundation.org/eim"
 
 start = eimRecords
 
-eimUuid =
-   attribute eim:uuid { xsd:string }
-
 eimDeleted =
    attribute eim:deleted { xsd:boolean }
-
-eimCommonRecordAttributes = {
-   eimUuid,
-   eimDeleted?
-}
 
 # These patterns define the allowable content of the elements
 # representing EIM record fields. Field types not defined in this
@@ -62,8 +54,8 @@ eimRecords =
 # the enclosed UUID).
 
 eimRecordSet = 
-   element eim:recordSet {
-      eimCommonRecordAttributes,
+   element eim:recordset {
+      attribute uuid { xsd:string },
       anyRecord*
    }
 
@@ -73,8 +65,8 @@ eimRecordSet =
 
 anyRecord =
    element *:record {
-      eimCommonRecordAttributes,
-      anyField*
+      (eimDeleted,
+         anyField*)
    }
 
 anyField =

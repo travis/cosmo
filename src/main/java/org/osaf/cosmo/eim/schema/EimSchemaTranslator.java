@@ -380,11 +380,15 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
 
     /** */
     public static String formatICalDates(DateList dates) {
+        if (! dates.iterator().hasNext())
+            return null;
         return dates.toString();
     }
 
     /** */
     public static String formatICalDate(net.fortuna.ical4j.model.Date date) {
+        if (date == null)
+            return null;
         return date.toString();
     }
 }

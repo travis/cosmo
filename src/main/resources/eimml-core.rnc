@@ -37,7 +37,13 @@ eimIntegerFieldContent = {
 eimDateTimeFieldContent = {
    eimKey,
    attribute eim:type { "datetime" },
-   # UTC (eg "2002-10-09T19:00:00Z") or floating ("2002-10-09T19:00:00")
+   xsd:dateTime
+}
+
+eimTimeStampFieldContent = {
+   eimKey,
+   attribute eim:type { "timestamp" },
+   # UTC (eg "2002-10-09T19:00:00Z")
    xsd:dateTime
 }
 
@@ -91,6 +97,7 @@ anyField =
        | eimDecimalFieldContent
        | eimIntegerFieldContent
        | eimDateTimeFieldContent
+       | eimTimeStampFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent
        | eimClobFieldContent)*

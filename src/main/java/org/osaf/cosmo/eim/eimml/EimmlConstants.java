@@ -27,39 +27,9 @@ public interface EimmlConstants {
 
     /** */
     public static final String NS_CORE =
-        "http://osafoundation.org/eimml/core";
+        "http://osafoundation.org/eim";
     /** */
-    public static final String PRE_CORE = "core";
-    /** */
-    public static final String NS_COLLECTION =
-        "http://osafoundation.org/eimml/collection";
-    /** */
-    public static final String PRE_COLLECTION = "collection";
-    /** */
-    public static final String NS_ITEM =
-        "http://osafoundation.org/eimml/item";
-    /** */
-    public static final String PRE_ITEM = "item";
-    /** */
-    public static final String NS_EVENT =
-        "http://osafoundation.org/eimml/event";
-    /** */
-    public static final String PRE_EVENT = "event";
-    /** */
-    public static final String NS_TASK =
-        "http://osafoundation.org/eimml/task";
-    /** */
-    public static final String PRE_TASK = "task";
-    /** */
-    public static final String NS_MESSAGE =
-        "http://osafoundation.org/eimml/message";
-    /** */
-    public static final String PRE_MESSAGE = "message";
-    /** */
-    public static final String NS_NOTE =
-        "http://osafoundation.org/eimml/note";
-    /** */
-    public static final String PRE_NOTE = "note";
+    public static final String PRE_CORE = "eim";
 
     /** */
     public static final String EL_RECORDS = "records";

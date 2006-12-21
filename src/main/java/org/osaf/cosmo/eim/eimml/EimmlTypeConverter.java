@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -203,6 +204,28 @@ public class EimmlTypeConverter implements EimmlConstants {
         if (value == null)
             return null;
         return DateUtil.formatRfc3339Date(value);
+    }
+
+    /**
+     * Returns the given value as a timestamp in UTC.
+     */
+    public static Date toTimeStamp(String value)
+        throws EimmlConversionException {
+        try {
+            return DateUtil.parseRfc3339TimeStamp(value);
+        } catch (ParseException e) {
+            throw new EimmlConversionException("Provided value " + value + " is not a valid RFC 3339 timestamp", e);
+        }
+    }
+
+    /**
+     * Returns the given value as a string.
+     */
+    public static String fromTimeStamp(Date value)
+        throws EimmlConversionException {
+        if (value == null)
+            return null;
+        return DateUtil.formatRfc3339TimeStamp(value);
     }
 
     /**

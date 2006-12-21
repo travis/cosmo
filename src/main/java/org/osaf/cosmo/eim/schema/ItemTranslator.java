@@ -16,13 +16,14 @@
 package org.osaf.cosmo.eim.schema;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
+import java.util.Date;
 
 import org.osaf.cosmo.eim.DateTimeField;
 import org.osaf.cosmo.eim.DecimalField;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
+import org.osaf.cosmo.eim.TimeStampField;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Stamp;
@@ -97,8 +98,8 @@ public class ItemTranslator extends EimSchemaTranslator {
             String value = validateText(field, MAXLEN_LAST_MODIFIED_BY);
             ci.setLastModifiedBy(value);
         } else if (field.getName().equals(FIELD_CREATED_ON)) {
-            Calendar value = validateDateTime(field);
-            ci.setCreationDate(value.getTime());
+            Date value = validateTimeStamp(field);
+            ci.setCreationDate(value);
         } else {
             applyUnknownField(field, item);
         }
@@ -126,8 +127,8 @@ public class ItemTranslator extends EimSchemaTranslator {
                                          DEC_TRIAGE_STATUS_CHANGED));
         record.addField(new TextField(FIELD_LAST_MODIFIED_BY,
                                       ci.getLastModifiedBy()));
-        record.addField(new DateTimeField(FIELD_CREATED_ON,
-                                          ci.getCreationDate()));
+        record.addField(new TimeStampField(FIELD_CREATED_ON,
+                                           ci.getCreationDate()));
         addUnknownFields(record, item);
     }
 

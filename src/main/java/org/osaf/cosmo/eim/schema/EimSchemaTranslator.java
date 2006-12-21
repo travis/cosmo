@@ -40,6 +40,7 @@ import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.TextField;
+import org.osaf.cosmo.eim.TimeStampField;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.DateAttribute;
@@ -326,6 +327,19 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
                 // will never happen
             }
         }
+        return value;
+    }
+
+    /**
+     * Validates and returns a timestamp field value.
+     *
+     * @throws EimValidationException if the value is invalid
+     */
+    protected Date validateTimeStamp(EimRecordField field)
+        throws EimValidationException {
+        if (! (field instanceof TimeStampField))
+            throw new EimValidationException("Field " + field.getName() + " is not a timestamp field");
+        Date value = ((TimeStampField)field).getTimeStamp();
         return value;
     }
 

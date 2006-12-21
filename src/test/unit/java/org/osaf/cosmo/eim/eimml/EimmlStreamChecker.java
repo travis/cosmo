@@ -91,9 +91,19 @@ public class EimmlStreamChecker implements EimmlConstants {
     public boolean checkAttribute(int pos,
                                   QName qn,
                                   String value)
-    throws XMLStreamException {
+        throws XMLStreamException {
         return reader.isStartElement() &&
             reader.getAttributeName(pos).equals(qn) &&
+            reader.getAttributeValue(pos).equals(value);
+    }
+
+    /** */
+    public boolean checkAttribute(int pos,
+                                  String name,
+                                  String value)
+        throws XMLStreamException {
+        return reader.isStartElement() &&
+            reader.getAttributeLocalName(pos).equals(name) &&
             reader.getAttributeValue(pos).equals(value);
     }
 }

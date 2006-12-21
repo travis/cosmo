@@ -56,16 +56,17 @@ public class EimmlStreamWriterTest extends TestCase
         EimRecordSet recordset = new EimRecordSet();
         recordset.setUuid(uuid);
 
-        EimRecord record1 = new EimRecord(prefix1, ns1, uuid);
-        record1.addField(makeClobField());
+        EimRecord record1 = new EimRecord(prefix1, ns1);
+        record1.addKeyField(makeClobField());
         recordset.addRecord(record1);
 
-        EimRecord record2 = new EimRecord(prefix2, ns2, uuid);
-        record2.addField(new TextField("deadbeef", "http://deadbeef.maz.org/"));
+        EimRecord record2 = new EimRecord(prefix2, ns2);
+        record2.addKeyField(new TextField("deadbeef", "http://deadbeef.maz.org/"));
         recordset.addRecord(record2);
 
-        EimRecord record3 = new EimRecord(prefix2, ns2, uuid);
+        EimRecord record3 = new EimRecord(prefix2, ns2);
         record3.setDeleted(true);
+        record3.addKeyField(new TextField("cosmo", "http://cosmo.osafoundation.org/"));
         recordset.addRecord(record3);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -90,8 +91,8 @@ public class EimmlStreamWriterTest extends TestCase
         if (! checker.checkStartElement(QN_RECORDSET))
             fail("Expected element " + QN_RECORDSET);
         if (! (checker.checkAttributeCount(1) &&
-               checker.checkAttribute(0, QN_UUID, uuid)))
-            fail("Expected attribute " + QN_UUID + "=" + uuid);
+               checker.checkAttribute(0, ATTR_UUID, uuid)))
+            fail("Expected attribute " + ATTR_UUID + "=" + uuid);
 
         checker.nextTag();
         if (! checker.checkStartElement(ns1, EL_RECORD))
@@ -99,9 +100,6 @@ public class EimmlStreamWriterTest extends TestCase
         if (! (checker.checkNamespaceCount(1) &&
                checker.checkNamespace(0, prefix1, ns1)))
             fail("Expected namespace mapping " + prefix1+ "=" + ns1);
-        if (! (checker.checkAttributeCount(1) &&
-               checker.checkAttribute(0, QN_UUID, uuid)))
-            fail("Expected attribute " + QN_UUID + "=" + uuid);
     }
 
     private ClobField makeClobField() {

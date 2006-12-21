@@ -77,5 +77,7 @@ public interface EimmlConstants {
     /** */
     public static final String TYPE_DATETIME = "datetime";
     /** */
+    public static final String TYPE_TIMESTAMP = "timestamp";
+    /** */
     public static final String TYPE_DECIMAL = "decimal";
 }

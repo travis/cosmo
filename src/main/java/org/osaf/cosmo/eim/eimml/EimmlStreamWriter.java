@@ -42,6 +42,7 @@ import org.osaf.cosmo.eim.EimRecordKey;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
+import org.osaf.cosmo.eim.TimeStampField;
 
 /**
  */
@@ -152,10 +153,12 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         xmlWriter.writeStartElement(record.getNamespace(), EL_RECORD);
         xmlWriter.writeNamespace(record.getPrefix(), record.getNamespace());
 
-        if (record.isDeleted()) {
-            xmlWriter.writeAttribute(NS_CORE, ATTR_DELETED, "");
-        } else {
-            writeKey(record.getKey());
+        if (record.isDeleted())
+            xmlWriter.writeAttribute(NS_CORE, ATTR_DELETED, "true");
+
+        writeKey(record.getKey());
+
+        if (! record.isDeleted()) {
             for (EimRecordField field : record.getFields())
                 writeField(field);
         }
@@ -213,6 +216,10 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
             // no conversion required - already a UTF-8 string
             value = ((TextField)field).getText();
             type = TYPE_TEXT;
+        } else if (field instanceof TimeStampField) {
+            value = EimmlTypeConverter.
+                fromTimeStamp(((TimeStampField)field).getTimeStamp());
+            type = TYPE_TIMESTAMP;
         } else {
             throw new EimmlStreamException("Unrecognized field type");
         }

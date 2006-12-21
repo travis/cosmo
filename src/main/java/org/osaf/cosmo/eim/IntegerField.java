@@ -24,17 +24,14 @@ import org.apache.commons.logging.LogFactory;
 public class IntegerField extends EimRecordField {
     private static final Log log = LogFactory.getLog(IntegerField.class);
 
-    private Integer value;
-
     /** */
     public IntegerField(String name,
                         Integer value) {
-        super(name);
-        this.value = value;
+        super(name, value);
     }
 
     /** */
     public Integer getInteger() {
-        return value;
+        return (Integer) getValue();
     }
 }

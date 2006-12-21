@@ -26,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 public class DecimalField extends EimRecordField {
     private static final Log log = LogFactory.getLog(DecimalField.class);
 
-    private BigDecimal value;
     private int digits;
     private int decimalPlaces;
 
@@ -41,15 +40,14 @@ public class DecimalField extends EimRecordField {
                         BigDecimal value,
                         int digits,
                         int decimalPlaces) {
-        super(name);
-        this.value = value;
+        super(name, value);
         this.digits = digits;
         this.decimalPlaces = decimalPlaces;
     }
 
     /** */
     public BigDecimal getDecimal() {
-        return value;
+        return (BigDecimal) getValue();
     }
 
     /** */

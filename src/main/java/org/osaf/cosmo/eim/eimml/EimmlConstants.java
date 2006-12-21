@@ -44,6 +44,7 @@ public interface EimmlConstants {
 
     /** */
     public static final String ATTR_UUID = "uuid";
+    // no namespace for uuid, which is only valid on recordset
     /** */
     public static final String ATTR_DELETED = "deleted";
     /** */
@@ -52,6 +53,10 @@ public interface EimmlConstants {
     public static final String ATTR_TYPE = "type";
     /** */
     public static final QName QN_TYPE = new QName(NS_CORE, ATTR_TYPE);
+    /** */
+    public static final String ATTR_KEY = "key";
+    /** */
+    public static final QName QN_KEY = new QName(NS_CORE, ATTR_KEY);
     /** */
     public static final String ATTR_TRANSFER_ENCODING = "transferEncoding";
     /** */

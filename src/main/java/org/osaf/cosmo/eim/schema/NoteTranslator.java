@@ -66,10 +66,6 @@ public class NoteTranslator extends EimSchemaTranslator {
             throw new IllegalArgumentException("Item is not a note item");
         NoteItem ni = (NoteItem) item;
 
-        // ignore immutable uuid key field
-        if (field.getName().equals(FIELD_UUID))
-            return;
-
         if (field.getName().equals(FIELD_BODY)) {
             Reader value = validateClob(field);
             ni.setBody(value);
@@ -92,7 +88,7 @@ public class NoteTranslator extends EimSchemaTranslator {
             throw new IllegalArgumentException("Item is not a note item");
         NoteItem ni = (NoteItem) item;
 
-        record.addField(new TextField(FIELD_UUID, item.getUid()));
+        record.addKeyField(new TextField(FIELD_UUID, item.getUid()));
         record.addField(new ClobField(FIELD_BODY,
                                       new StringReader(ni.getBody())));
         record.addField(new TextField(FIELD_ICALUID, ni.getIcalUid()));

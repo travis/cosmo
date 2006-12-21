@@ -27,25 +27,21 @@ import org.apache.commons.logging.LogFactory;
 public class DateTimeField extends EimRecordField {
     private static final Log log = LogFactory.getLog(DateTimeField.class);
 
-    private Calendar value;
-
     /** */
     public DateTimeField(String name,
                          Calendar value) {
-        super(name);
-        this.value = value;
+        super(name, value);
     }
 
     /** */
     public DateTimeField(String name,
                          Date date) {
-        super(name);
-        this.value = Calendar.getInstance();
-        this.value.setTime(date);
+        super(name, Calendar.getInstance());
+        getCalendar().setTime(date);
     }
 
     /** */
     public Calendar getCalendar() {
-        return value;
+        return (Calendar) getValue();
     }
 }

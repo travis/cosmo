@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +38,7 @@ import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.DateTimeField;
 import org.osaf.cosmo.eim.DecimalField;
 import org.osaf.cosmo.eim.EimRecord;
+import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
@@ -215,6 +217,8 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
                 break;
 
             String name = xmlReader.getLocalName();
+            EimRecordField field = null;
+
             String type = xmlReader.getAttributeValue(NS_CORE, ATTR_TYPE);
             if (StringUtils.isBlank(type))
                 throw new EimmlStreamException(xmlReader.getName() + " element requires " + ATTR_TYPE + " attribute");
@@ -225,38 +229,45 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
                     throw new EimmlStreamException(xmlReader.getName() + " element requires " + ATTR_TRANSFER_ENCODING + " attribute");
                 byte[] value = EimmlTypeConverter.
                     toBytes(xmlReader.getElementText(), transferEncoding);
-                record.addField(new BytesField(name, value));
+                field = new BytesField(name, value);
             } else if (type.equals(TYPE_TEXT)) {
                 String value = EimmlTypeConverter.
                     toText(xmlReader.getElementText(), documentEncoding);
-                record.addField(new TextField(name, value));
+                field = new TextField(name, value);
             } else if (type.equals(TYPE_LOB)) {
                 String transferEncoding = xmlReader.
                     getAttributeValue(NS_CORE, ATTR_TRANSFER_ENCODING);
                 if (transferEncoding != null) {
                     InputStream value = EimmlTypeConverter.
                         toBlob(xmlReader.getElementText(), transferEncoding);
-                    record.addField(new BlobField(name, value));
+                    field = new BlobField(name, value);
                 } else {
                     Reader value = EimmlTypeConverter.
                         toClob(xmlReader.getElementText());
-                    record.addField(new ClobField(name, value));
+                    field = new ClobField(name, value);
                 }
             } else if (type.equals(TYPE_INTEGER)) {
                 Integer value = EimmlTypeConverter.
                     toInteger(xmlReader.getElementText());
-                record.addField(new IntegerField(name, value));
+                field = new IntegerField(name, value);
             } else if (type.equals(TYPE_DATETIME)) {
                 Calendar value = EimmlTypeConverter.
                     toDateTime(xmlReader.getElementText());
-                record.addField(new DateTimeField(name, value));
+                field = new DateTimeField(name, value);
             } else if (type.equals(TYPE_DECIMAL)) {
                 BigDecimal value = EimmlTypeConverter.
                     toDecimal(xmlReader.getElementText());
-                record.addField(new DecimalField(name, value));
+                field = new DecimalField(name, value);
             } else {
                 throw new EimmlStreamException("Unrecognized field type");
             }
+
+            boolean isKey = BooleanUtils.
+                toBoolean(xmlReader.getAttributeValue(NS_CORE, ATTR_TYPE));
+            if (isKey)
+                record.addKeyField(field);
+            else
+                record.addField(field);
         }
 
         return record;

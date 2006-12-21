@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.eim;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
@@ -22,52 +25,29 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Base class for an EIM record field.
- *
- * Subclasses are required to provide accessors and mutators for field
- * values with Java types (eg byte[], String, BigDecimal, etc).
+ * Represents the primary key of an EIM record. Composed of one or
+ * more record fields.
  */
-public abstract class EimRecordField {
-    private static final Log log = LogFactory.getLog(EimRecordField.class);
+public class EimRecordKey {
+    private static final Log log = LogFactory.getLog(EimRecordKey.class);
 
     private EimRecord record;
+    private List<EimRecordField> fields;
 
     /** */
-    public static int BYTES = 1;
-    /** */
-    public static int TEXT = 2;
-    /** */
-    public static int LOB = 3;
-    /** */
-    public static int INTEGER = 4;
-    /** */
-    public static int DATETIME = 5;
-    /** */
-    public static int DECIMAL = 6;
-
-    private String name;
-    private Object value;
-
-    /** */
-    public EimRecordField(String name) {
-        this(name, null);
+    public EimRecordKey() {
+        fields = new ArrayList<EimRecordField>();
     }
 
     /** */
-    public EimRecordField(String name,
-                          Object value) {
-        this.name = name;
-        this.value = value;
+    public List<EimRecordField> getFields() {
+        return fields;
     }
 
     /** */
-    public String getName() {
-        return name;
-    }
-
-    /** */
-    public Object getValue() {
-        return value;
+    public void addField(EimRecordField field) {
+        fields.add(field);
+        field.setRecord(record);
     }
 
     /** */

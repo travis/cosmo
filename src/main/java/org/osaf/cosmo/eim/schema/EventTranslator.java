@@ -98,10 +98,6 @@ public class EventTranslator extends EimSchemaTranslator {
             throw new IllegalArgumentException("Item does not have an event stamp");
 
 
-        // ignore immutable uuid key field
-        if (field.getName().equals(FIELD_UUID))
-            return;
-
         if (field.getName().equals(FIELD_DTSTART)) {
             String value = validateText(field, MAXLEN_DTSTART);
             stamp.setStartDate(parseICalDate(value));
@@ -154,7 +150,8 @@ public class EventTranslator extends EimSchemaTranslator {
         EventStamp es = (EventStamp) stamp;
         String value = null;
 
-        record.addField(new TextField(FIELD_UUID, stamp.getItem().getUid()));
+        record.addKeyField(new TextField(FIELD_UUID,
+                                         stamp.getItem().getUid()));
         record.addField(new TextField(FIELD_DTSTART, 
                                       formatICalDate(es.getStartDate())));
 

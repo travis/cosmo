@@ -31,15 +31,13 @@ public class TextField extends EimRecordField {
     /** */
     public static final int MAX_LENGTH = 1024;
 
-    private String value;
-
     /**
      * @throws IllegalArgumentException if the value is longer than
      * {@link #MAX_LENGTH}.
      */
     public TextField(String name,
                      String value) {
-        super(name);
+        super(name, value);
         if (value != null) {
             try {
                 int len = value.getBytes("UTF-8").length;
@@ -49,11 +47,10 @@ public class TextField extends EimRecordField {
                 // won't happen
             }
         }
-        this.value = value;
     }
 
     /** */
     public String getText() {
-        return value;
+        return (String) getValue();
     }
 }

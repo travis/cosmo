@@ -96,7 +96,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
      * <p>
      * If the record is not marked deleted, then
      * {@link #applyField(EimRecordField, Item)} is called for each
-     * record field.
+     * non-key record field.
      * 
      * @throws IllegalArgumentException if the record's namespace does
      * not match this translator's namespace

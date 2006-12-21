@@ -82,10 +82,6 @@ public class ItemTranslator extends EimSchemaTranslator {
             throw new IllegalArgumentException("Item is not a content item");
         ContentItem ci = (ContentItem) item;
 
-        // ignore immutable uuid key field
-        if (field.getName().equals(FIELD_UUID))
-            return;
-
         if (field.getName().equals(FIELD_TITLE)) {
             String value = validateText(field, MAXLEN_TITLE);
             ci.setDisplayName(value);
@@ -120,7 +116,7 @@ public class ItemTranslator extends EimSchemaTranslator {
             throw new IllegalArgumentException("Item is not a content item");
         ContentItem ci = (ContentItem) item;
 
-        record.addField(new TextField(FIELD_UUID, item.getUid()));
+        record.addKeyField(new TextField(FIELD_UUID, item.getUid()));
         record.addField(new TextField(FIELD_TITLE, ci.getDisplayName()));
         record.addField(new TextField(FIELD_TRIAGE_STATUS,
                                       ci.getTriageStatus()));

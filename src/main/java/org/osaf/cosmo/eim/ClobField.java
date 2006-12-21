@@ -30,17 +30,14 @@ import org.apache.commons.logging.LogFactory;
 public class ClobField extends EimRecordField {
     private static final Log log = LogFactory.getLog(ClobField.class);
 
-    private Reader value;
-
     /** */
     public ClobField(String name,
                      Reader value) {
-        super(name);
-        this.value = value;
+        super(name, value);
     }
 
     /** */
     public Reader getClob() {
-        return value;
+        return (Reader) getValue();
     }
 }

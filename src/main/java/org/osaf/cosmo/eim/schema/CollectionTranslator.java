@@ -55,10 +55,6 @@ public class CollectionTranslator extends EimSchemaTranslator {
             throw new IllegalArgumentException("Item is not a collection");
         CollectionItem c = (CollectionItem) item;
 
-        // ignore immutable uuid key field
-        if (field.getName().equals(FIELD_UUID))
-            return;
-
         applyUnknownField(field, item);
     }
 
@@ -74,7 +70,7 @@ public class CollectionTranslator extends EimSchemaTranslator {
             throw new IllegalArgumentException("Item is not a collection");
         CollectionItem ci = (CollectionItem) item;
 
-        record.addField(new TextField(FIELD_UUID, item.getUid()));
+        record.addKeyField(new TextField(FIELD_UUID, item.getUid()));
 
         addUnknownFields(record, item);
     }

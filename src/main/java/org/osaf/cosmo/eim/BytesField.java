@@ -29,22 +29,19 @@ public class BytesField extends EimRecordField {
     /** */
     public static final int MAX_LENGTH = 1024;
 
-    private byte[] value;
-
     /**
      * @throws IllegalArgumentException if the value is longer than
      * {@link #MAX_LENGTH}.
      */
     public BytesField(String name,
                       byte[] value) {
-        super(name);
+        super(name, value);
         if (value.length > MAX_LENGTH)
             throw new IllegalArgumentException("Value is " + value.length + " bytes, exceeding maximum length of " + MAX_LENGTH);
-        this.value = value;
     }
 
     /** */
     public byte[] getBytes() {
-        return value;
+        return (byte[]) getValue();
     }
 }

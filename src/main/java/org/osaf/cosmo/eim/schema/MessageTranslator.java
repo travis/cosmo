@@ -77,10 +77,6 @@ public class MessageTranslator extends EimSchemaTranslator {
         if (stamp == null)
             throw new IllegalArgumentException("Item does not have a message stamp");
 
-        // ignore immutable uuid key field
-        if (field.getName().equals(FIELD_UUID))
-            return;
-
         if (field.getName().equals(FIELD_SUBJECT)) {
             String value = validateText(field, MAXLEN_SUBJECT);
             stamp.setSubject(value);
@@ -117,7 +113,8 @@ public class MessageTranslator extends EimSchemaTranslator {
             throw new IllegalArgumentException("Stamp is not a message stamp");
         MessageStamp ms = (MessageStamp) stamp;
 
-        record.addField(new TextField(FIELD_UUID, stamp.getItem().getUid()));
+        record.addKeyField(new TextField(FIELD_UUID,
+                                         stamp.getItem().getUid()));
         record.addField(new TextField(FIELD_SUBJECT, ms.getSubject()));
         record.addField(new TextField(FIELD_TO, ms.getTo()));
         record.addField(new TextField(FIELD_CC, ms.getCc()));

@@ -49,6 +49,7 @@ public class EimRecord {
     private String namespace;
     private ArrayList<EimRecordField> fields;
     private boolean deleted = false;
+    private EimRecordKey key;
 
     /** */
     public EimRecord() {
@@ -84,8 +85,22 @@ public class EimRecord {
     }
 
     /** */
+    public EimRecordKey getKey() {
+        return key;
+    }
+
+    /** */
     public List<EimRecordField> getFields() {
         return fields;
+    }
+
+    /** */
+    public void addKeyField(EimRecordField field) {
+        if (key == null) {
+            key = new EimRecordKey();
+            key.setRecord(this);
+        }
+        key.addField(field);
     }
 
     /** */

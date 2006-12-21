@@ -29,17 +29,14 @@ import org.apache.commons.logging.LogFactory;
 public class BlobField extends EimRecordField {
     private static final Log log = LogFactory.getLog(BlobField.class);
 
-    private InputStream value;
-
     /** */
     public BlobField(String name,
                      InputStream value) {
-        super(name);
-        this.value = value;
+        super(name, value);
     }
 
     /** */
     public InputStream getBlob() {
-        return value;
+        return (InputStream) getValue();
     }
 }

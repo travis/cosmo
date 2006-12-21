@@ -38,6 +38,7 @@ import org.osaf.cosmo.eim.DateTimeField;
 import org.osaf.cosmo.eim.DecimalField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
+import org.osaf.cosmo.eim.EimRecordKey;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
@@ -97,6 +98,17 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
     }
 
     /** */
+    public void writeKey(EimRecordKey key)
+        throws EimmlStreamException {
+        try {
+            doWriteKey(key);
+        } catch (XMLStreamException e) {
+            close();
+            throw new EimmlStreamException("Error writing key", e);
+        }
+    }
+
+    /** */
     public void writeField(EimRecordField field)
         throws EimmlStreamException {
         try {
@@ -143,6 +155,7 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         if (record.isDeleted()) {
             xmlWriter.writeAttribute(NS_CORE, ATTR_DELETED, "");
         } else {
+            writeKey(record.getKey());
             for (EimRecordField field : record.getFields())
                 writeField(field);
         }
@@ -150,9 +163,20 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         xmlWriter.writeEndElement();
     }
 
+    private void doWriteKey(EimRecordKey key)
+        throws EimmlStreamException, XMLStreamException {
+        for (EimRecordField field : key.getFields())
+            doWriteField(field, true);
+    }
+
     private void doWriteField(EimRecordField field)
         throws EimmlStreamException, XMLStreamException {
+        doWriteField(field, false);
+    }
 
+    private void doWriteField(EimRecordField field,
+                              boolean isKey)
+        throws EimmlStreamException, XMLStreamException {
         String value = null;
         String type = null;
         boolean needsTransferEncoding = false;
@@ -196,6 +220,8 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         xmlWriter.writeStartElement(field.getRecord().getNamespace(),
                                     field.getName());
         xmlWriter.writeAttribute(NS_CORE, ATTR_TYPE, type);
+        if (isKey)
+            xmlWriter.writeAttribute(NS_CORE, ATTR_KEY, "true");
 
         if (needsTransferEncoding)
             xmlWriter.writeAttribute(NS_CORE, ATTR_TRANSFER_ENCODING,

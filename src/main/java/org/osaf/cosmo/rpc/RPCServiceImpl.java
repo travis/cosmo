@@ -753,9 +753,6 @@ public class RPCServiceImpl implements RPCService {
     private Subscription createSubscription(
             CollectionSubscription collectionSubscription,
             HttpServletRequest request) throws RPCException {
-        
-        
-        
         Subscription subscription = new Subscription();
 
         Calendar calendar = getCalendar(collectionSubscription

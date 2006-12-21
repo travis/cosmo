@@ -30,22 +30,47 @@ public class DateUtil {
      * Note that this is not a perfect match to the RFC 3339
      * format. In particular, it does not correctly parse timezone
      * offsets of the form <code>xx:yy</code>. It requires RFC 822
-     * style timezone offsets, fo the form <code>xxyy</code>.
+     * style timezone offsets, of the form <code>xxyy</code>.
      */
     public static final String RFC_3339_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+
+    /** */
+    public static final String RFC_3339_TIMESTAMP_FORMAT =
+        "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
+    private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
     /**
      * @throws ParseException  */
     public static Date parseRfc3339Date(String date) 
-    	throws ParseException{
+    	throws ParseException {
     	return parseDate(date, RFC_3339_DATE_FORMAT);
+    }
+    
+    /**
+     * @throws ParseException  */
+    public static Date parseRfc3339TimeStamp(String date) 
+    	throws ParseException {
+    	return parseDate(date, RFC_3339_TIMESTAMP_FORMAT, GMT);
     }
     
     /** 
      * @throws ParseException  */
-    public static Date parseDate(String date, String format)
-    	throws ParseException{
+    public static Date parseDate(String date,
+                                 String format)
+    	throws ParseException {
+        return parseDate(date, format, null);
+    }
+
+    /** 
+     * @throws ParseException  */
+    public static Date parseDate(String date,
+                                 String format,
+                                 TimeZone tz)
+    	throws ParseException {
     	SimpleDateFormat formatter = new SimpleDateFormat(format);
+        if (tz != null)
+            formatter.setTimeZone(tz);
     	return formatter.parse(date);
     }
 
@@ -64,6 +89,11 @@ public class DateUtil {
     public static String formatRfc3339Date(Calendar cal) {
         return formatDate(RFC_3339_DATE_FORMAT,
                           cal.getTime(), cal.getTimeZone());
+    }
+
+    /** */
+    public static String formatRfc3339TimeStamp(Date date) {
+        return formatDate(RFC_3339_TIMESTAMP_FORMAT, date, GMT);
     }
 
     /** */

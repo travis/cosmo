@@ -8,8 +8,7 @@ include "eimml-core.rnc"
 
 eimCollectionRecord =
    element collection:record {
-      (eimDeleted,
-         collectionUuid
+      (collectionUuid
        & anyCollectionField*)
    }
 

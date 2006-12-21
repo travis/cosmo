@@ -29,8 +29,6 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -46,34 +44,21 @@ public class EimmlTypeConverter implements EimmlConstants {
 
     /**
      * Returns the given value as a byte array, converting it from
-     * its transfer encoding.
+     * a Base64 encoded string.
      */
-    public static byte[] toBytes(String value,
-                                 String transferEncoding)
+    public static byte[] toBytes(String value)
         throws EimmlConversionException {
-        if (transferEncoding == null)
-            throw new IllegalArgumentException("no transfer encoding specified");
-        if (! transferEncoding.equals(TRANSFER_ENCODING_BASE64))
-            throw new EimmlConversionException("Transfer encoding " + transferEncoding + " is not supported");
-        return decodeHexedBase64String(value);
+        return decodeBase64String(value);
     }
 
     /**
-     * Returns the value as a string, encoding it with the given
-     * transfer encoding.
+     * Returns the value as a Base64 encoded string.
      */
-    public static String fromBytes(byte[] value,
-                                   String transferEncoding)
+    public static String fromBytes(byte[] value)
         throws EimmlConversionException {
-        if (transferEncoding == null)
-            throw new IllegalArgumentException("no transfer encoding specified");
-        if (! transferEncoding.equals(TRANSFER_ENCODING_BASE64))
-            throw new EimmlConversionException("Transfer encoding " + transferEncoding + " is not supported");
-
         if (value == null)
             return null;
-
-        return encodeHexedBase64String(value);
+        return encodeBase64String(value);
     }
 
     /**
@@ -123,30 +108,18 @@ public class EimmlTypeConverter implements EimmlConstants {
 
     /**
      * Returns the given value as an input stream, converting it from
-     * its transfer encoding.
+     * a Base64 encoded string.
      */
-    public static InputStream toBlob(String value,
-                                     String transferEncoding)
+    public static InputStream toBlob(String value)
         throws EimmlConversionException {
-        if (transferEncoding == null)
-            throw new IllegalArgumentException("no transfer encoding specified");
-        if (! transferEncoding.equals(TRANSFER_ENCODING_BASE64))
-            throw new EimmlConversionException("Transfer encoding " + transferEncoding + " is not supported");
-        return new ByteArrayInputStream(decodeHexedBase64String(value));
+        return new ByteArrayInputStream(decodeBase64String(value));
     }
 
     /**
-     * Returns the given value as a string, encoding it with the given
-     * transfer encoding.
+     * Returns the given value as a Base64 encoded string.
      */
-    public static String fromBlob(InputStream value,
-                                  String transferEncoding)
+    public static String fromBlob(InputStream value)
         throws EimmlConversionException {
-        if (transferEncoding == null)
-            throw new IllegalArgumentException("no transfer encoding specified");
-        if (! transferEncoding.equals(TRANSFER_ENCODING_BASE64))
-            throw new EimmlConversionException("Transfer encoding " + transferEncoding + " is not supported");
-
         if (value == null)
             return null;
 
@@ -156,7 +129,7 @@ public class EimmlTypeConverter implements EimmlConstants {
         } catch (IOException e) {
             throw new EimmlConversionException("Unable to convert InputStream to String", e);
         }
-        return encodeHexedBase64String(out.toByteArray());
+        return encodeBase64String(out.toByteArray());
     }
 
     /**
@@ -272,17 +245,13 @@ public class EimmlTypeConverter implements EimmlConstants {
         return new DecimalFormat(pattern.toString()).format(value);
     }
 
-    private static byte[] decodeHexedBase64String(String value)
+    private static byte[] decodeBase64String(String value)
         throws EimmlConversionException {
-        try {
-            return Base64.decodeBase64(Hex.decodeHex(value.toCharArray()));
-        } catch (DecoderException e) {
-            throw new EimmlConversionException("Error decoding byte array", e);
-        }
+        return Base64.decodeBase64(value.getBytes());
     }
 
-    private static String encodeHexedBase64String(byte[] value)
+    private static String encodeBase64String(byte[] value)
         throws EimmlConversionException {
-        return new String(Hex.encodeHex(Base64.encodeBase64(value)));
+        return new String(Base64.encodeBase64(value));
     }
 }

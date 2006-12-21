@@ -8,8 +8,7 @@ include "eimml-core.rnc"
 
 eimItemRecord =
    element item:record {
-      (eimDeleted,
-         itemUuid
+      (itemUuid
        & itemTitle?
        & itemTriageStatus?
        & itemTriageStatusChanged?

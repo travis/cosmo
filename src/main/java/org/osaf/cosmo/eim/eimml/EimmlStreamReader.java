@@ -225,29 +225,21 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
             if (StringUtils.isBlank(type))
                 throw new EimmlStreamException(xmlReader.getName() + " element requires " + ATTR_TYPE + " attribute");
             if (type.equals(TYPE_BYTES)) {
-                String transferEncoding = xmlReader.
-                    getAttributeValue(NS_CORE, ATTR_TRANSFER_ENCODING);
-                if (transferEncoding == null)
-                    throw new EimmlStreamException(xmlReader.getName() + " element requires " + ATTR_TRANSFER_ENCODING + " attribute");
                 byte[] value = EimmlTypeConverter.
-                    toBytes(xmlReader.getElementText(), transferEncoding);
+                    toBytes(xmlReader.getElementText());
                 field = new BytesField(name, value);
             } else if (type.equals(TYPE_TEXT)) {
                 String value = EimmlTypeConverter.
                     toText(xmlReader.getElementText(), documentEncoding);
                 field = new TextField(name, value);
-            } else if (type.equals(TYPE_LOB)) {
-                String transferEncoding = xmlReader.
-                    getAttributeValue(NS_CORE, ATTR_TRANSFER_ENCODING);
-                if (transferEncoding != null) {
-                    InputStream value = EimmlTypeConverter.
-                        toBlob(xmlReader.getElementText(), transferEncoding);
-                    field = new BlobField(name, value);
-                } else {
-                    Reader value = EimmlTypeConverter.
-                        toClob(xmlReader.getElementText());
-                    field = new ClobField(name, value);
-                }
+            } else if (type.equals(TYPE_BLOB)) {
+                InputStream value = EimmlTypeConverter.
+                    toBlob(xmlReader.getElementText());
+                field = new BlobField(name, value);
+            } else if (type.equals(TYPE_CLOB)) {
+                Reader value = EimmlTypeConverter.
+                    toClob(xmlReader.getElementText());
+                field = new ClobField(name, value);
             } else if (type.equals(TYPE_INTEGER)) {
                 Integer value = EimmlTypeConverter.
                     toInteger(xmlReader.getElementText());

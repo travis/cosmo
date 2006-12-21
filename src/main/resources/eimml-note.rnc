@@ -8,8 +8,7 @@ include "eimml-core.rnc"
 
 eimNoteRecord =
    element note:record {
-      (eimDeleted,
-         noteUuid
+      (noteUuid
        & noteBody?
        & noteIcalUid?
        & anyNoteField*)

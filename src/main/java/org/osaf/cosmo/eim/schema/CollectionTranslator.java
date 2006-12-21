@@ -42,6 +42,18 @@ public class CollectionTranslator extends EimSchemaTranslator {
     }
 
     /**
+     * Deactivates the collection associated with the record.
+     */
+    protected void applyDeletion(Item item)
+        throws EimSchemaException {
+        if (! (item instanceof CollectionItem))
+            throw new IllegalArgumentException("Item is not a collection");
+        CollectionItem c = (CollectionItem) item;
+
+        c.setIsActive(false);
+    }
+
+    /**
      * Copies the data from the given record field into the collection.
      *
      * @throws IllegalArgumentException if the item is not a collection

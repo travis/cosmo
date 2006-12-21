@@ -45,6 +45,18 @@ public class TaskTranslator extends EimSchemaTranslator {
     }
 
     /**
+     * Removes the task stamp associated with the record.
+     */
+    protected void applyDeletion(Item item)
+        throws EimSchemaException {
+        TaskStamp stamp = TaskStamp.getStamp(item);
+        if (stamp == null)
+            throw new IllegalArgumentException("Item does not have an task stamp");
+
+        item.removeStamp(stamp);
+    }
+
+    /**
      * Copies the data from the given record field into the task
      * stamp.
      *

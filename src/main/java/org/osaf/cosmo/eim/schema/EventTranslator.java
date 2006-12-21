@@ -82,6 +82,18 @@ public class EventTranslator extends EimSchemaTranslator {
     }
 
     /**
+     * Removes the event stamp associated with the record.
+     */
+    protected void applyDeletion(Item item)
+        throws EimSchemaException {
+        EventStamp stamp = EventStamp.getStamp(item);
+        if (stamp == null)
+            throw new IllegalArgumentException("Item does not have an event stamp");
+
+        item.removeStamp(stamp);
+    }
+
+    /**
      * Copies the data from the given record field into the event
      * stamp.
      *

@@ -26,7 +26,6 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,21 +42,9 @@ public class EimmlTypeConverterTest extends TestCase
     public void testToBytes() throws Exception {
         String testString = "this is a test string";
 
-        try {
-            EimmlTypeConverter.toBytes(testString, null);
-            fail("Converted to bytes with a null transfer encoding");
-        } catch (IllegalArgumentException e) {}
-
-        try {
-            EimmlTypeConverter.toBytes(testString, "bogus-encoding");
-            fail("Converted to bytes with a bogus transfer encoding");
-        } catch (EimmlConversionException e) {}
-
         byte[] testBytes = testString.getBytes();
-        String testEncoded =
-            new String(Hex.encodeHex(Base64.encodeBase64(testBytes)));
-        byte[] resultBytes =
-            EimmlTypeConverter.toBytes(testEncoded, TRANSFER_ENCODING_BASE64);
+        String testEncoded = new String(Base64.encodeBase64(testBytes));
+        byte[] resultBytes = EimmlTypeConverter.toBytes(testEncoded);
 
         for (int i=0; i<resultBytes.length; i++)
             assertEquals("Byte " + i + " does not match", testBytes[i],
@@ -69,21 +56,10 @@ public class EimmlTypeConverterTest extends TestCase
         String testString = "this is a test string";
         byte[] testBytes = testString.getBytes();
 
-        try {
-            EimmlTypeConverter.fromBytes(testBytes, null);
-            fail("Converted from bytes with a null transfer encoding");
-        } catch (IllegalArgumentException e) {}
-
-        try {
-            EimmlTypeConverter.fromBytes(testBytes, "bogus-encoding");
-            fail("Converted from bytes with a bogus transfer encoding");
-        } catch (EimmlConversionException e) {}
-
-        String resultEncoded =
-            EimmlTypeConverter.fromBytes(testBytes, TRANSFER_ENCODING_BASE64);
+        String resultEncoded = EimmlTypeConverter.fromBytes(testBytes);
 
         assertEquals("Encoded string does not match",
-                     new String(Hex.encodeHex(Base64.encodeBase64(testBytes))),
+                     new String(Base64.encodeBase64(testBytes)),
                      resultEncoded);
     }
 
@@ -137,21 +113,9 @@ public class EimmlTypeConverterTest extends TestCase
     public void testToBlob() throws Exception {
         String testString = "this is a test string";
 
-        try {
-            EimmlTypeConverter.toBlob(testString, null);
-            fail("Converted to blob with a null transfer encoding");
-        } catch (IllegalArgumentException e) {}
-
-        try {
-            EimmlTypeConverter.toBlob(testString, "bogus-encoding");
-            fail("Converted to blob with a bogus transfer encoding");
-        } catch (EimmlConversionException e) {}
-
         byte[] testBytes = testString.getBytes();
-        String testEncoded =
-            new String(Hex.encodeHex(Base64.encodeBase64(testBytes)));
-        InputStream resultStream =
-            EimmlTypeConverter.toBlob(testEncoded, TRANSFER_ENCODING_BASE64);
+        String testEncoded = new String(Base64.encodeBase64(testBytes));
+        InputStream resultStream = EimmlTypeConverter.toBlob(testEncoded);
 
         for (int i=0; i<testBytes.length; i++) {
             int rv = resultStream.read();
@@ -166,21 +130,10 @@ public class EimmlTypeConverterTest extends TestCase
         String testString = "this is a test string";
         byte[] testBytes = testString.getBytes();
         String testEncoded =
-            new String(Hex.encodeHex(Base64.encodeBase64(testBytes)));
+            new String(Base64.encodeBase64(testBytes));
         ByteArrayInputStream testStream = new ByteArrayInputStream(testBytes);
 
-        try {
-            EimmlTypeConverter.fromBlob(testStream, null);
-            fail("Converted from blob with a null transfer encoding");
-        } catch (IllegalArgumentException e) {}
-
-        try {
-            EimmlTypeConverter.fromBlob(testStream, "bogus-encoding");
-            fail("Converted from blob with a bogus transfer encoding");
-        } catch (EimmlConversionException e) {}
-
-        String resultEncoded =
-            EimmlTypeConverter.fromBlob(testStream, TRANSFER_ENCODING_BASE64);
+        String resultEncoded = EimmlTypeConverter.fromBlob(testStream);
 
         assertEquals("Result string does not match", testEncoded,
                      resultEncoded);

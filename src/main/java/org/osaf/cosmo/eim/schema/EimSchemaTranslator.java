@@ -93,7 +93,8 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
     /**
      * Copies the data from an EIM record into an item.
      * <p>
-     * If the record is marked deleted, the item is set inactive.
+     * If the record is marked deleted, then
+     * {@link #applyDeletion(Item)} is called.
      * <p>
      * If the record is not marked deleted, then
      * {@link #applyField(EimRecordField, Item)} is called for each
@@ -111,7 +112,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
             throw new IllegalArgumentException("Record namespace " + record.getNamespace() + " does not match " + namespace);
 
         if (record.isDeleted()) {
-            item.setIsActive(false);
+            applyDeletion(item);
             return;
         }
 
@@ -119,6 +120,15 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
             applyField(field, item);
         }
     }
+
+    /**
+     * Deletes the data associated with the record.
+     *
+     * @throws EimSchemaException if deletion is not allowed for this
+     * record type or if deletion cannot otherwise be processed.
+     */
+    protected abstract void applyDeletion(Item item)
+        throws EimSchemaException;
 
     /**
      * Copies the data from the given record field into the item.

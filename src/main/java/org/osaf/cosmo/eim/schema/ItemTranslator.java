@@ -69,6 +69,18 @@ public class ItemTranslator extends EimSchemaTranslator {
     }
 
     /**
+     * Deactivates the item associated with the record.
+     */
+    protected void applyDeletion(Item item)
+        throws EimSchemaException {
+        if (! (item instanceof ContentItem))
+            throw new IllegalArgumentException("Item is not a content item");
+        ContentItem c = (ContentItem) item;
+
+        c.setIsActive(false);
+    }
+
+    /**
      * Copies the data from the given record field into the item.
      *
      * @throws IllegalArgumentException if the item is not a content

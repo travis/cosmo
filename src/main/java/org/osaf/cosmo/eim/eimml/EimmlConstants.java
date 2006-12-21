@@ -57,21 +57,15 @@ public interface EimmlConstants {
     public static final String ATTR_KEY = "key";
     /** */
     public static final QName QN_KEY = new QName(NS_CORE, ATTR_KEY);
-    /** */
-    public static final String ATTR_TRANSFER_ENCODING = "transferEncoding";
-    /** */
-    public static final QName QN_TRANSFER_ENCODING =
-        new QName(NS_CORE, ATTR_TRANSFER_ENCODING);
-
-    /** */
-    public static final String TRANSFER_ENCODING_BASE64 = "base64";
 
     /** */
     public static final String TYPE_BYTES = "bytes";
     /** */
     public static final String TYPE_TEXT = "text";
     /** */
-    public static final String TYPE_LOB = "lob";
+    public static final String TYPE_BLOB = "blob";
+    /** */
+    public static final String TYPE_CLOB = "clob";
     /** */
     public static final String TYPE_INTEGER = "integer";
     /** */

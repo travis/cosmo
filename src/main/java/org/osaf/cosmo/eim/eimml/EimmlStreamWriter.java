@@ -182,22 +182,17 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         throws EimmlStreamException, XMLStreamException {
         String value = null;
         String type = null;
-        boolean needsTransferEncoding = false;
         if (field instanceof BlobField) {
             value = EimmlTypeConverter.
-                fromBlob(((BlobField)field).getBlob(),
-                         TRANSFER_ENCODING_BASE64);
-            type = TYPE_LOB;
-            needsTransferEncoding = true;
+                fromBlob(((BlobField)field).getBlob());
+            type = TYPE_BLOB;
         } else if (field instanceof BytesField) {
             value = EimmlTypeConverter.
-                fromBytes(((BytesField)field).getBytes(),
-                          TRANSFER_ENCODING_BASE64);
+                fromBytes(((BytesField)field).getBytes());
             type = TYPE_BYTES;
-            needsTransferEncoding = true;
         } else if (field instanceof ClobField) {
             value = EimmlTypeConverter.fromClob(((ClobField)field).getClob());
-            type = TYPE_LOB;
+            type = TYPE_CLOB;
         } else if (field instanceof DateTimeField) {
             value = EimmlTypeConverter.
                 fromDateTime(((DateTimeField)field).getCalendar());
@@ -229,10 +224,6 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         xmlWriter.writeAttribute(NS_CORE, ATTR_TYPE, type);
         if (isKey)
             xmlWriter.writeAttribute(NS_CORE, ATTR_KEY, "true");
-
-        if (needsTransferEncoding)
-            xmlWriter.writeAttribute(NS_CORE, ATTR_TRANSFER_ENCODING,
-                                     TRANSFER_ENCODING_BASE64);
 
         if (value != null)
             xmlWriter.writeCData(value);

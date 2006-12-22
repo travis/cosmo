@@ -109,31 +109,30 @@ public class EventTranslator extends EimSchemaTranslator {
         if (stamp == null)
             throw new IllegalArgumentException("Item does not have an event stamp");
 
-
         if (field.getName().equals(FIELD_DTSTART)) {
             String value = validateText(field, MAXLEN_DTSTART);
-            stamp.setStartDate(parseICalDate(value));
+            stamp.setStartDate(EimValueConverter.toICalDate(value));
         } else if (field.getName().equals(FIELD_DTEND)) {
             String value = validateText(field, MAXLEN_DTEND);
-            stamp.setEndDate(parseICalDate(value));
+            stamp.setEndDate(EimValueConverter.toICalDate(value));
         } else if (field.getName().equals(FIELD_LOCATION)) {
             String value = validateText(field, MAXLEN_LOCATION);
             stamp.setLocation(value);
         } else if (field.getName().equals(FIELD_RRULE)) {
             String value = validateText(field, MAXLEN_RRULE);
-            stamp.setRecurrenceRules(parseICalRecurs(value));
+            stamp.setRecurrenceRules(EimValueConverter.toICalRecurs(value));
         } else if (field.getName().equals(FIELD_EXRULE)) {
             String value = validateText(field, MAXLEN_EXRULE);
-            stamp.setExceptionRules(parseICalRecurs(value));
+            stamp.setExceptionRules(EimValueConverter.toICalRecurs(value));
         } else if (field.getName().equals(FIELD_RDATE)) {
             String value = validateText(field, MAXLEN_RDATE);
-            stamp.setRecurrenceDates(parseICalDates(value));
+            stamp.setRecurrenceDates(EimValueConverter.toICalDates(value));
         } else if (field.getName().equals(FIELD_EXDATE)) {
             String value = validateText(field, MAXLEN_EXDATE);
-            stamp.setExceptionDates(parseICalDates(value));
+            stamp.setExceptionDates(EimValueConverter.toICalDates(value));
         } else if (field.getName().equals(FIELD_RECURRENCE_ID)) {
             String value = validateText(field, MAXLEN_RECURRENCE_ID);
-            stamp.setRecurrenceId(parseICalDate(value));
+            stamp.setRecurrenceId(EimValueConverter.toICalDate(value));
         } else if (field.getName().equals(FIELD_STATUS)) {
             String value = validateText(field, MAXLEN_STATUS);
             stamp.setStatus(value);
@@ -164,27 +163,28 @@ public class EventTranslator extends EimSchemaTranslator {
 
         record.addKeyField(new TextField(FIELD_UUID,
                                          stamp.getItem().getUid()));
-        record.addField(new TextField(FIELD_DTSTART, 
-                                      formatICalDate(es.getStartDate())));
 
-        record.addField(new TextField(FIELD_DTEND, 
-                                      formatICalDate(es.getEndDate())));
+        value = EimValueConverter.fromICalDate(es.getStartDate());
+        record.addField(new TextField(FIELD_DTSTART, value));
+                                      
+        value = EimValueConverter.fromICalDate(es.getEndDate());
+        record.addField(new TextField(FIELD_DTEND, value));
 
         record.addField(new TextField(FIELD_LOCATION, es.getLocation()));
 
-        value = formatRecurs(es.getRecurrenceRules());
+        value = EimValueConverter.fromICalRecurs(es.getRecurrenceRules());
         record.addField(new TextField(FIELD_RRULE, value));
 
-        value = formatRecurs(es.getExceptionRules());
+        value = EimValueConverter.fromICalRecurs(es.getExceptionRules());
         record.addField(new TextField(FIELD_EXRULE, value));
 
-        value = formatICalDates(es.getRecurrenceDates());
+        value = EimValueConverter.fromICalDates(es.getRecurrenceDates());
         record.addField(new TextField(FIELD_RDATE, value));
 
-        value = formatICalDates(es.getExceptionDates());
+        value = EimValueConverter.fromICalDates(es.getExceptionDates());
         record.addField(new TextField(FIELD_EXDATE, value));
 
-        value = formatICalDate(es.getRecurrenceId());
+        value = EimValueConverter.fromICalDate(es.getRecurrenceId());
         record.addField(new TextField(FIELD_RECURRENCE_ID, value));
 
         record.addField(new TextField(FIELD_STATUS, es.getStatus()));

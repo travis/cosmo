@@ -19,17 +19,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
-
-import net.fortuna.ical4j.model.DateList;
-import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.parameter.Value;
 
 import org.osaf.cosmo.eim.BlobField;
 import org.osaf.cosmo.eim.BytesField;
@@ -52,7 +43,6 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -248,7 +238,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
                 InputStream value = ((BinaryAttribute)attr).getInputStream();
                 record.addField(new BlobField(attr.getName(), value));
             } else if (attr instanceof DateAttribute) {
-                Date value = ((DateAttribute)attr).getValue();
+                java.util.Date value = ((DateAttribute)attr).getValue();
                 record.addField(new DateTimeField(attr.getName(), value));
             } else if (attr instanceof DecimalAttribute) {
                 BigDecimal value = ((DecimalAttribute)attr).getValue();
@@ -345,70 +335,11 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
      *
      * @throws EimValidationException if the value is invalid
      */
-    protected Date validateTimeStamp(EimRecordField field)
+    protected java.util.Date validateTimeStamp(EimRecordField field)
         throws EimValidationException {
         if (! (field instanceof TimeStampField))
             throw new EimValidationException("Field " + field.getName() + " is not a timestamp field");
-        Date value = ((TimeStampField)field).getTimeStamp();
+        java.util.Date value = ((TimeStampField)field).getTimeStamp();
         return value;
-    }
-
-    /** */
-    public List<Recur> parseICalRecurs(String text)
-        throws EimValidationException {
-        ArrayList<Recur> recurs = new ArrayList<Recur>();
-        for (String value : text.split(","))
-            recurs.add(parseICalRecur(value));
-        return recurs;
-    }
-
-    /** */
-    public DateList parseICalDates(String text)
-        throws EimValidationException {
-        DateList dates = new DateList(Value.DATE_TIME);
-        for (String value : text.split(","))
-            dates.add(parseICalDate(value));
-        return dates;
-    }
-
-    /** */
-    public Recur parseICalRecur(String text)
-        throws EimValidationException {
-        try {
-            return new Recur(text);
-        } catch (ParseException e) {
-            throw new EimValidationException("Invalid iCalendar recur " + text);
-        }
-    }
-
-    /** */
-    public DateTime parseICalDate(String text)
-        throws EimValidationException {
-        try {
-            return new DateTime(text);
-        } catch (ParseException e) {
-            throw new EimValidationException("Invalid iCalendar datetime " + text);
-        }
-    }
-
-    /** */
-    public static String formatRecurs(List<Recur> recurs) {
-        if (! recurs.iterator().hasNext())
-            return null;
-        return StringUtils.join(recurs.iterator(), ",");
-    }
-
-    /** */
-    public static String formatICalDates(DateList dates) {
-        if (! dates.iterator().hasNext())
-            return null;
-        return dates.toString();
-    }
-
-    /** */
-    public static String formatICalDate(net.fortuna.ical4j.model.Date date) {
-        if (date == null)
-            return null;
-        return date.toString();
     }
 }

@@ -15,37 +15,35 @@
  */
 package org.osaf.cosmo.dav.impl;
 
-import java.util.Iterator;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.WebdavRequestImpl;
-import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
+import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
-
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.CaldavRequest;
-import org.osaf.cosmo.dav.caldav.property.CalendarTimezone;
 import org.osaf.cosmo.dav.caldav.property.CalendarDescription;
+import org.osaf.cosmo.dav.caldav.property.CalendarTimezone;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarComponentSet;
 import org.osaf.cosmo.dav.report.ReportRequest;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.dav.ticket.TicketDavRequest;
-import org.osaf.cosmo.icalendar.ComponentTypes;
 import org.osaf.cosmo.model.Ticket;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -60,12 +58,23 @@ public class StandardDavRequest extends WebdavRequestImpl
     private DavPropertySet mkcalendarSet;
     private Ticket ticket;
     private ReportInfo reportInfo;
+    private File requestContentFile;
+    private boolean bufferRequestContent = false;
 
     /**
      */
     public StandardDavRequest(HttpServletRequest request,
                               DavLocatorFactory factory) {
         super(request, factory);
+    }
+    
+    /**
+     */
+    public StandardDavRequest(HttpServletRequest request,
+                              DavLocatorFactory factory,
+                              boolean bufferRequestContent) {
+        super(request, factory);
+        this.bufferRequestContent = bufferRequestContent;
     }
 
     // CosmoDavRequest methods
@@ -151,8 +160,8 @@ public class StandardDavRequest extends WebdavRequestImpl
         return reportInfo;
     }
 
+  
     // private methods
-
     private DavPropertySet parseMkCalendarRequest() {
         DavPropertySet propertySet = new DavPropertySet();
 
@@ -372,4 +381,41 @@ public class StandardDavRequest extends WebdavRequestImpl
         return new ReportInfo(requestDocument.getDocumentElement(),
                               getDepth(DEPTH_0));
     }
+
+    @Override
+    public ServletInputStream getInputStream() throws IOException {
+        if(!bufferRequestContent)
+            return super.getInputStream();
+        
+        // If request is configured to buffer the content, then read
+        // content into a temp file
+        if(requestContentFile==null) {
+            requestContentFile = IOUtil.getTempFile(super.getInputStream());
+        }
+        return new FileServletInputStream(requestContentFile);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        try {
+            if(requestContentFile!=null)
+                requestContentFile.delete();
+        } catch(Exception e) {
+            log.error("error deleting temp file: "
+                    + requestContentFile.getAbsolutePath(), e);
+        }
+    }
+    
+    public long getBufferedContentLength() {
+        if(bufferRequestContent)
+            return requestContentFile.length();
+        else
+            return -1;
+    }
+    
+    public boolean isRequestContentBuffered() {
+        return bufferRequestContent;
+    }
+    
 }

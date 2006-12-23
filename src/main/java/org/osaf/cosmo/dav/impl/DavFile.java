@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.dav.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +42,7 @@ import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
+import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.ModelValidationException;
@@ -217,28 +216,25 @@ public class DavFile extends DavResourceBase {
         ContentItem content = (ContentItem) getItem();
 
         if (inputContext.hasStream()) {
-            // read to tmp file, checking bytes read against content
-            // length if we're not using chunked encoding
-            File tmp = null;
+            
             try {
-                tmp = IOUtil.getTempFile(inputContext.getInputStream());
+                // make sure content length matches what was read
                 long contentLength = inputContext.getContentLength();
-                long readLength = tmp.length();
-                if (contentLength != IOUtil.UNDEFINED_LENGTH &&
-                    contentLength != readLength)
-                    throw new IOException("Read only " + readLength + " of " + contentLength + " bytes");
-                content.setContent(new FileInputStream(tmp));
+                long bufferedLength = ((DavInputContext) inputContext)
+                        .getBufferedContentLength();
+
+                if (contentLength != IOUtil.UNDEFINED_LENGTH
+                        && contentLength != bufferedLength)
+                    throw new IOException("Read only " + bufferedLength
+                            + " of " + contentLength + " bytes");
+                
+                content.setContent(inputContext.getInputStream());
             } catch (IOException e) {
                 log.error("Cannot read resource content", e);
                 throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "Cannot read resource content: " + e.getMessage());
             } catch (DataSizeException e) {
                 throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource content: " + e.getMessage());
-            } finally {
-                // XXX: assumes that content.setContent() consumes the
-                // stream so that the tmpfile is no longer needed
-                if (tmp != null)
-                    tmp.delete();
-            }
+            } 
         }
 
         try {

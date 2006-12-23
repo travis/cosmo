@@ -38,6 +38,7 @@ public class DavInputContext extends InputContextImpl
     private static final Log log = LogFactory.getLog(DavInputContext.class);
 
     private String contentType;
+    private long bufferedContentLength = 0;
 
     /**
      * If the HTTP request method is MKCALENDAR, sets the context's
@@ -50,7 +51,16 @@ public class DavInputContext extends InputContextImpl
             contentType = CONTENT_TYPE_CALENDAR_COLLECTION;
         }
     }
+    
+    public DavInputContext(HttpServletRequest request, InputStream in, long length) {
+        this(request, in);
+        bufferedContentLength = length;
+    }
 
+    public long getBufferedContentLength() {
+        return bufferedContentLength;
+    }
+    
     // InputContext methods
 
     /**

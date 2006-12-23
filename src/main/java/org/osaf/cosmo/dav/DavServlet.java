@@ -15,19 +15,15 @@
  */
 package org.osaf.cosmo.dav;
 
-import java.io.InputStream;
 import java.io.IOException;
-import java.util.Iterator;
+import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.fortuna.ical4j.model.ValidationException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.server.AbstractWebdavServlet;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
@@ -40,36 +36,22 @@ import org.apache.jackrabbit.webdav.DavSessionProvider;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.WebdavRequest;
-import org.apache.jackrabbit.webdav.WebdavRequestImpl;
 import org.apache.jackrabbit.webdav.WebdavResponse;
-import org.apache.jackrabbit.webdav.WebdavResponseImpl;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.lock.LockManager;
-import org.apache.jackrabbit.webdav.property.DavProperty;
-import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
-import org.apache.jackrabbit.webdav.simple.LocatorFactoryImpl;
-import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
-
-import org.osaf.cosmo.dav.ExtendedDavResource;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.CaldavRequest;
-import org.osaf.cosmo.dav.caldav.property.CalendarTimezone;
-import org.osaf.cosmo.dav.caldav.property.SupportedCalendarComponentSet;
 import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
 import org.osaf.cosmo.dav.impl.StandardDavRequest;
 import org.osaf.cosmo.dav.impl.StandardDavResponse;
 import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.dav.ticket.TicketDavRequest;
 import org.osaf.cosmo.dav.ticket.TicketDavResponse;
-import org.osaf.cosmo.model.ModelConversionException;
-import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
-
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -308,16 +290,47 @@ public class DavServlet extends AbstractWebdavServlet
             return;
         }
 
-        // catch concurrency failure and return 500 with
-        // nice message instead of stack trace
-        try {
-            super.doPut(request, response, resource);
-        } catch (org.springframework.dao.ConcurrencyFailureException e) {
-            log.warn("Concurrency failure during PUT", e);
-            response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Concurrency failure.");
+        // Catch DataAccessException (concurrency failure or data integrity
+        // failure) and retry a maximum of 5 attempts and return 500 
+        // if all attempts fail.
+        boolean success = false;
+        int tries = 0;
+        while (!success && tries<5) {
+            tries++;
+            try {
+                super.doPut(request, response, resource);
+                success = true;
+            } catch (org.springframework.dao.DataAccessException e) {
+                log.warn("Concurrency failure during PUT", e);
+                
+                // Need to re-initialze resource because it has changed.
+                // check matching if=header for lock-token relevant operations
+                resource = getResourceFactory().createResource(request.getRequestLocator(), request, response);
+                if (!isPreconditionValid(request, resource)) {
+                    response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
+                    return;
+                }
+
+                // check If-None-Match header
+                if (ifNoneMatch(request, resource)) {
+                    response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
+                    return;
+                }
+
+                // check If-Match header
+                if (ifMatch(request, resource)) {
+                    response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
+                    return;
+                }
+            }
         }
 
+        if (!success) {
+            response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Concurrency failure.");
+            return;
+        }
+        
         response.setHeader("ETag", resource.getETag());
     }
 
@@ -571,7 +584,12 @@ public class DavServlet extends AbstractWebdavServlet
      * provided <code>HttpServletRequest</code>.
      */
     protected WebdavRequest createWebdavRequest(HttpServletRequest request) {
-        return new StandardDavRequest(request, getLocatorFactory());
+        // Create buffered request if method is PUT so we can retry
+        // on concurrency exceptions
+        if (request.getMethod().equals(DavMethods.METHOD_PUT))
+            return new StandardDavRequest(request, getLocatorFactory(), true);
+        else
+            return new StandardDavRequest(request, getLocatorFactory());   
     }
 
     /**
@@ -589,7 +607,14 @@ public class DavServlet extends AbstractWebdavServlet
      */
     public InputContext getInputContext(DavServletRequest request,
                                         InputStream in) {
-        return new DavInputContext(request, in);
+        // If the request is a PUT, then we have buffered the input and
+        // know the exact length read
+        if(request.getMethod().equals(DavMethods.METHOD_PUT)) {
+            long bufferedLength = ((StandardDavRequest) request).getBufferedContentLength();
+            return new DavInputContext(request, in, bufferedLength);
+        } else {
+            return new DavInputContext(request, in);
+        }
     }
 
     /** {@inheritDoc} */

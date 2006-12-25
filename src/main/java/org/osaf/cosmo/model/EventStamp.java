@@ -38,6 +38,8 @@ import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.DtEnd;
+import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.ExRule;
 import net.fortuna.ical4j.model.property.Location;
@@ -45,6 +47,7 @@ import net.fortuna.ical4j.model.property.RDate;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Status;
+import net.fortuna.ical4j.model.property.Summary;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -154,12 +157,49 @@ public class EventStamp extends Stamp implements
     }
 
     /**
+     * Returns a copy of the the iCalendar SUMMARY property value of
+     * the master event (can be null).
+     */
+    @Transient
+    public String getSummary() {
+        Property p = getMasterEvent().getProperties().
+            getProperty(Property.SUMMARY);
+        if (p == null)
+            return null;
+        return p.getValue();
+    }
+
+    /** 
+     * Sets the iCalendar SUMMARY property of the master event.
+     *
+     * @param text a text string
+     */
+    @Transient
+    public void setSummary(String text) {
+        Summary summary = (Summary)
+            getMasterEvent().getProperties().getProperty(Property.SUMMARY);
+        if (text == null) {
+            if (summary != null)
+                getMasterEvent().getProperties().remove(summary);
+            return;
+        }                
+        if (summary == null) {
+            summary = new Summary();
+            getMasterEvent().getProperties().add(summary);
+        }
+        summary.setValue(text);
+    }
+
+    /**
      * Returns a copy of the the iCalendar DTSTART property value of
      * the master event (never null).
      */
     @Transient
     public Date getStartDate() {
-        return getMasterEvent().getStartDate().getDate();
+        DtStart dtStart = getMasterEvent().getStartDate();
+        if (dtStart == null)
+            return null;
+        return dtStart.getDate();
     }
 
     /** 
@@ -179,7 +219,10 @@ public class EventStamp extends Stamp implements
      */
     @Transient
     public Date getEndDate() {
-        return getMasterEvent().getEndDate().getDate();
+        DtEnd dtEnd = getMasterEvent().getEndDate();
+        if (dtEnd == null)
+            return null;
+        return dtEnd.getDate();
     }
 
     /** 

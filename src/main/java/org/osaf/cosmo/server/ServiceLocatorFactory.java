@@ -20,6 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.security.CosmoSecurityManager;
+
 /**
  * This class produces instances of <code>ServiceLocator</code> that
  * can build URLs for services and collections as described in the
@@ -36,6 +39,7 @@ public class ServiceLocatorFactory {
     private String morseCodePrefix;
     private String webPrefix;
     private String webcalPrefix;
+    private CosmoSecurityManager securityManager;
 
     /**
      * Returns a <code>ServiceLocator</code> instance that returns
@@ -43,7 +47,12 @@ public class ServiceLocatorFactory {
      * information in the given request.
      */
     public ServiceLocator createServiceLocator(HttpServletRequest request) {
-        return new ServiceLocator(calculateAppMountUrl(request), this);
+        String appMountUrl = calculateAppMountUrl(request);
+
+        Ticket ticket = securityManager.getSecurityContext().getTicket();
+        String ticketKey = ticket != null ? ticket.getKey() : null;
+
+        return new ServiceLocator(appMountUrl, ticketKey, this);
     }
 
     /** */
@@ -96,6 +105,16 @@ public class ServiceLocatorFactory {
         webcalPrefix = prefix;
     }
 
+    /** */
+    public CosmoSecurityManager getSecurityManager() {
+        return securityManager;
+    }
+
+    /** */
+    public void setSecurityManager(CosmoSecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
     /**
      * Initializes the factory, sanity checking required properties
      * and defaulting optional properties.
@@ -111,6 +130,8 @@ public class ServiceLocatorFactory {
             throw new IllegalStateException("webPrefix must not be null");
         if (webcalPrefix == null)
             throw new IllegalStateException("webcalPrefix must not be null");
+        if (securityManager == null)
+            throw new IllegalStateException("securityManager must not be null");
     }
 
     private String calculateAppMountUrl(HttpServletRequest request) {

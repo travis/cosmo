@@ -64,7 +64,7 @@ import org.osaf.cosmo.model.CollectionItem;
  * @see ServiceLocatorFactory
  * @see CollectionPath
  */
-public class ServiceLocator {
+public class ServiceLocator implements ServerConstants {
     private static final Log log = LogFactory.getLog(ServiceLocator.class);
 
     /**
@@ -91,16 +91,36 @@ public class ServiceLocator {
     private static final String PATH_COLLECTION = "collection";
 
     private String appMountUrl;
+    private String ticketKey;
     private ServiceLocatorFactory factory;
 
     /**
      * Returns a <code>ServiceLocator</code> instance that uses the
-     * given request to calculate the application mount URL which is
-     * the base for all service URLs.
+     * uses the given application mount URL as the base for all
+     * service URLs.
+     *
+     * @param appMountUrl the application mount URL
+     * @param factory the service location factory
      */
     public ServiceLocator(String appMountUrl,
                           ServiceLocatorFactory factory) {
+        this(appMountUrl, null, factory);
+    }
+
+    /**
+     * Returns a <code>ServiceLocator</code> instance that uses the
+     * uses the given application mount URL as the base for and
+     * includes the given ticket key in all service URLs.
+     *
+     * @param appMountUrl the application mount URL
+     * @param factory the service location factory
+     * @param ticketKey the ticket key
+     */
+    public ServiceLocator(String appMountUrl,
+                          String ticketKey,
+                          ServiceLocatorFactory factory) {
         this.appMountUrl = appMountUrl;
+        this.ticketKey = ticketKey;
         this.factory = factory;
     }
 
@@ -156,9 +176,15 @@ public class ServiceLocator {
     private String calculateCollectionUrl(CollectionItem collection,
                                           String servicePrefix) {
         StringBuffer buf = new StringBuffer(appMountUrl);
+
         buf.append(servicePrefix).
             append("/").append(PATH_COLLECTION).
             append("/").append(collection.getUid());
+
+        if (ticketKey != null)
+            buf.append("?").
+                append(PARAM_TICKET).append("=").append(ticketKey);
+
         return buf.toString();
     }
 }

@@ -425,6 +425,9 @@
     <property name="morseCodePrefix"><value>/mc</value></property>
     <property name="webPrefix"><value>/pim</value></property>
     <property name="webcalPrefix"><value>/user</value></property>
+    <property name="securityManager">
+      <ref bean="securityManager"/>
+    </property>
   </bean>
 
   <!-- dav protocol resources -->

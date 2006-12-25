@@ -31,7 +31,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.hcalendar.HCalendarFormatter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
@@ -161,7 +160,7 @@ public class FeedGenerator implements AtomConstants {
         // last saw it
         StringBuffer id = new StringBuffer();
         id.append("urn:uuid:").append(item.getUid()).
-            append("#").append(item.getModifiedDate().getTime());
+            append(":").append(item.getModifiedDate().getTime());
 
         Entry entry = factory.newEntry();
         try {
@@ -169,13 +168,20 @@ public class FeedGenerator implements AtomConstants {
         } catch (IRISyntaxException e) {
             throw new IllegalStateException("Attempted to set invalid entry id " + id, e);
         }
-        entry.setTitle(item.getDisplayName());
+        if (item.getDisplayName() != null)
+            entry.setTitle(item.getDisplayName());
+        else
+            entry.setTitle(item.getName());
         entry.setUpdated(item.getModifiedDate());
         entry.setPublished(item.getCreationDate());
 
         EventStamp stamp = EventStamp.getStamp(item);
-        if (stamp != null)
-            entry.setContentAsHtml(HCalendarFormatter.toHCal(stamp));
+        if (stamp != null) {
+            // XXX: localize
+            EventEntryFormatter f = new EventEntryFormatter(stamp);
+            entry.setSummary(f.formatTextSummary());
+            entry.setContentAsHtml(f.formatHtmlContent());
+        }
 
         return entry;
     }

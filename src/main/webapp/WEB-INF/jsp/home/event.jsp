@@ -124,11 +124,6 @@ of the page (default UTF-8 US English).
 Note 2: Recurrence and alarms not supported; unclear how to display.
 </p>
 
-<p>
-Note 3: hCalendar spec doesn't seem to address including timezones for
-<strong>dtstart</strong> and <strong>dtend</strong>.
-</p>
-
 <div class="hd" style="margin-top: 12px;">
   Original iCalendar
 </div>

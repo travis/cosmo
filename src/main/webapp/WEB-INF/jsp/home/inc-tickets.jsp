@@ -29,12 +29,11 @@ dojo.require("cosmo.ui.widget.TicketWidget");
   <c:set var="isCollection" value="false"/>
 </c:if>
 
-<c:set var="davPath" value="/home${Path}"/>
-<c:set var="feedPath" value="/feed/atom/1.0${Path}"/>
 <c:if test="${isCollection}">
-  <c:set var="davPath" value="${davPath}/"/>
   <c:set var="Item" value="${Collection}"/>
+  <c:set var="feedPath" value="/atom/collection/${Collection.uid}"/>
 </c:if>
+<c:set var="davPath" value="/home${Path}"/>
 
 <div class="hd" style="margin-top: 12px;">
   Tickets

@@ -41,7 +41,7 @@
   [view as HTML]
 </a>
 </c:if>
-<a href='<c:url value="/feed/atom/1.0${Path}" />'>
+<a href='<c:url value="/atom/collection/${Collection.uid}" />'>
   [subscribe to feed]
 </a>
 </div>
@@ -139,10 +139,10 @@
         <fmt:formatDate value="${item.creationDate}" type="both"/>
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.ContentItem'}"><fmt:formatDate value="${item.modifiedDate}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.NoteItem'}"><fmt:formatDate value="${item.modifiedDate}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.ContentItem'}"><fmt:formatNumber value="${item.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.NoteItem'}"><fmt:formatNumber value="${item.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     </c:forEach>

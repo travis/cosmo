@@ -35,6 +35,8 @@ import org.acegisecurity.context.SecurityContextHolder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.server.ServerUtils;
+
 /**
  * Servlet filter that populates the
  * {@link org.acegisecurity.ContextHolder} with a
@@ -43,11 +45,6 @@ import org.apache.commons.logging.LogFactory;
 public class TicketProcessingFilter implements Filter {
     private static final Log log =
         LogFactory.getLog(TicketProcessingFilter.class);
-
-    /** the request parameter containing a ticket: <code>ticket</code> */
-    public static final String PARAM_TICKET = "ticket";
-    /** the request header containing a ticket: <code>Ticket</code> */
-    public static final String HEADER_TICKET = "Ticket";
 
     // Filter methods
 
@@ -59,11 +56,8 @@ public class TicketProcessingFilter implements Filter {
     }
 
     /**
-     * Examines HTTP servlet requests for ticket ids, creating a
+     * Examines HTTP servlet requests for ticket keys, creating a
      * {@link TicketAuthenticationToken} if any are found.
-     *
-     * This method consults {@link #findTicketIds(HttpServletRequest)}
-     * to find the set of ticket ids present in the request.
      *
      * Tokens are created with the
      * {@link #createAuthentication(String, Set)} method.
@@ -79,7 +73,7 @@ public class TicketProcessingFilter implements Filter {
         if (sc.getAuthentication() == null) {
             if (request instanceof HttpServletRequest) {
                 HttpServletRequest httpRequest = (HttpServletRequest) request;
-                Set<String> keys = findTicketKeys(httpRequest);
+                Set<String> keys = ServerUtils.findTicketKeys(httpRequest);
                 if (! keys.isEmpty()) {
                     String path = httpRequest.getPathInfo();
                     if (path == null || path.equals("")) {
@@ -115,32 +109,6 @@ public class TicketProcessingFilter implements Filter {
     }
 
     // our methods
-
-    /**
-     * Returns a {@link java.util.Set} of all ticket keys found in the
-     * request, both in the {@link #HEADER_TICKET} header and the
-     * {@link #PARAM_TICKET} parameter.
-     */
-    protected Set findTicketKeys(HttpServletRequest request) {
-        HashSet<String> keys = new HashSet<String>();
-        Enumeration headerValues = request.getHeaders(HEADER_TICKET);
-        if (headerValues != null) {
-            while (headerValues.hasMoreElements()) {
-                String value = (String) headerValues.nextElement();
-                String[] atoms = value.split(", ");
-                for (int i=0; i<atoms.length; i++) {
-                    keys.add(atoms[i]);
-                }
-            }
-        }
-        String[] paramValues = request.getParameterValues(PARAM_TICKET);
-        if (paramValues != null) {
-            for (int i=0; i<paramValues.length; i++) {
-                keys.add(paramValues[i]);
-            }
-        }
-        return keys;
-    }
 
     /**
      * Returns a {@link TicketAuthenticationToken} for the given

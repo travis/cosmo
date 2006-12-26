@@ -17,6 +17,8 @@ package org.osaf.cosmo.eim.schema;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.TextField;
@@ -36,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * TBD
  */
-public class NoteTranslator extends EimSchemaTranslator {
+public class NoteTranslator extends BaseItemTranslator {
     private static final Log log = LogFactory.getLog(NoteTranslator.class);
 
     /** */
@@ -86,15 +88,16 @@ public class NoteTranslator extends EimSchemaTranslator {
     }
 
     /**
-     * Adds record fields for each applicable note property.
+     * Copies the data from a note item into a note record.
      *
      * @throws IllegalArgumentException if the item is not a note item
      */
-    protected void addFields(EimRecord record,
-                             Item item) {
+    public List<EimRecord> toRecords(Item item) {
         if (! (item instanceof NoteItem))
             throw new IllegalArgumentException("Item is not a note item");
         NoteItem ni = (NoteItem) item;
+
+        EimRecord record = createRecord(item);
 
         record.addKeyField(new TextField(FIELD_UUID, item.getUid()));
         record.addField(new ClobField(FIELD_BODY,
@@ -102,10 +105,10 @@ public class NoteTranslator extends EimSchemaTranslator {
         record.addField(new TextField(FIELD_ICALUID, ni.getIcalUid()));
 
         addUnknownFields(record, item);
-    }
 
-    protected void addFields(EimRecord record,
-                             Stamp stamp) {
-        throw new RuntimeException("NoteTranslator does not translate stamps");
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+        records.add(record);
+
+        return records;
     }
 }

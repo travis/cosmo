@@ -68,6 +68,12 @@ public class EimRecordSet {
     }
 
     /** */
+    public void addRecords(List<EimRecord> records) {
+        for (EimRecord r : records)
+            addRecord(r);
+    }
+
+    /** */
     public boolean isDeleted() {
         return deleted;
     }

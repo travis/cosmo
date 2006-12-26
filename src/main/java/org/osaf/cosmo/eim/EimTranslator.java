@@ -21,10 +21,10 @@ import java.util.List;
 import org.apache.commons.lang.BooleanUtils;
 
 import org.osaf.cosmo.eim.schema.CollectionTranslator;
+import org.osaf.cosmo.eim.schema.ContentItemTranslator;
 import org.osaf.cosmo.eim.schema.EimSchemaConstants;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EventTranslator;
-import org.osaf.cosmo.eim.schema.ItemTranslator;
 import org.osaf.cosmo.eim.schema.MessageTranslator;
 import org.osaf.cosmo.eim.schema.NoteTranslator;
 import org.osaf.cosmo.eim.schema.TaskTranslator;
@@ -66,7 +66,7 @@ public class EimTranslator implements EimSchemaConstants {
             if (record.getNamespace().equals(NS_COLLECTION))
                 new CollectionTranslator().applyRecord(record, item);
             else if (record.getNamespace().equals(NS_ITEM))
-                new ItemTranslator().applyRecord(record, item);
+                new ContentItemTranslator().applyRecord(record, item);
             else if (record.getNamespace().equals(NS_NOTE))
                 new NoteTranslator().applyRecord(record, item);
             else if (record.getNamespace().equals(NS_EVENT))
@@ -75,6 +75,8 @@ public class EimTranslator implements EimSchemaConstants {
                 new TaskTranslator().applyRecord(record, item);
             else if (record.getNamespace().equals(NS_MESSAGE))
                 new MessageTranslator().applyRecord(record, item);
+//             else if (record.getNamespace().equals(NS_ICAL))
+//                 new ICalExtensionRecord().applyRecord(record, item);
 //             else
 //                 t = new UnknownTranslator();
         }
@@ -113,21 +115,23 @@ public class EimTranslator implements EimSchemaConstants {
             return;
         }
 
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+
         if (item instanceof CollectionItem)
-            recordset.addRecord(new CollectionTranslator().createRecord(item));
+            recordset.addRecords(new CollectionTranslator().toRecords(item));
         if (item instanceof ContentItem)
-            recordset.addRecord(new ItemTranslator().createRecord(item));
+            recordset.addRecords(new ContentItemTranslator().toRecords(item));
         if (item instanceof NoteItem)
-            recordset.addRecord(new NoteTranslator().createRecord(item));
+            recordset.addRecords(new NoteTranslator().toRecords(item));
         for (Stamp stamp : item.getStamps()) {
             if (stamp instanceof EventStamp)
-                recordset.addRecord(new EventTranslator().createRecord(stamp));
+                recordset.addRecords(new EventTranslator().toRecords(stamp));
             else if (stamp instanceof TaskStamp)
-                recordset.addRecord(new TaskTranslator().createRecord(stamp));
+                recordset.addRecords(new TaskTranslator().toRecords(stamp));
             else if (stamp instanceof MessageStamp)
-                recordset.addRecord(new MessageTranslator().createRecord(stamp));
+                recordset.addRecords(new MessageTranslator().toRecords(stamp));
         }
 
-//         recordset.addRecord(new UnknownTranslator().createRecord(item));
+//         recordset.addRecords(new UnknownTranslator().toRecords(item));
     }
 }

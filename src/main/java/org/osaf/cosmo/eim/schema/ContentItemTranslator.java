@@ -16,7 +16,9 @@
 package org.osaf.cosmo.eim.schema;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.osaf.cosmo.eim.DateTimeField;
 import org.osaf.cosmo.eim.DecimalField;
@@ -38,8 +40,9 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * TBD
  */
-public class ItemTranslator extends EimSchemaTranslator {
-    private static final Log log = LogFactory.getLog(ItemTranslator.class);
+public class ContentItemTranslator extends BaseItemTranslator {
+    private static final Log log =
+        LogFactory.getLog(ContentItemTranslator.class);
 
     /** */
     public static final String FIELD_TITLE = "title";
@@ -62,9 +65,11 @@ public class ItemTranslator extends EimSchemaTranslator {
     public static final int MAXLEN_LAST_MODIFIED_BY = 256;
     /** */
     public static final String FIELD_CREATED_ON = "createdOn";
+    /** */
+    public static final String FIELD_REMIND_ON = "remindOn";
 
     /** */
-    public ItemTranslator() {
+    public ContentItemTranslator() {
         super(PREFIX_ITEM, NS_ITEM);
     }
 
@@ -112,22 +117,26 @@ public class ItemTranslator extends EimSchemaTranslator {
         } else if (field.getName().equals(FIELD_CREATED_ON)) {
             Date value = validateTimeStamp(field);
             ci.setCreationDate(value);
+//         } else if (field.getName().equals(FIELD_REMIND_ON)) {
+//             Date value = validateTimeStamp(filed);
+//             ci.setRemindOn(value);
         } else {
             applyUnknownField(field, item);
         }
     }
 
     /**
-     * Adds record fields for each applicable item property.
+     * Copies the data from a content item into an item record.
      *
      * @throws IllegalArgumentException if the item is not a content
      * item
      */
-    protected void addFields(EimRecord record,
-                             Item item) {
+    public List<EimRecord> toRecords(Item item) {
         if (! (item instanceof ContentItem))
             throw new IllegalArgumentException("Item is not a content item");
         ContentItem ci = (ContentItem) item;
+
+        EimRecord record = createRecord(item);
 
         record.addKeyField(new TextField(FIELD_UUID, item.getUid()));
         record.addField(new TextField(FIELD_TITLE, ci.getDisplayName()));
@@ -141,11 +150,14 @@ public class ItemTranslator extends EimSchemaTranslator {
                                       ci.getLastModifiedBy()));
         record.addField(new TimeStampField(FIELD_CREATED_ON,
                                            ci.getCreationDate()));
-        addUnknownFields(record, item);
-    }
+//         record.addField(new TimeStampField(FIELD_REMIND_ON,
+//                                            ci.getRemindOn()));
 
-    protected void addFields(EimRecord record,
-                             Stamp stamp) {
-        throw new RuntimeException("ItemTranslator does not translate stamps");
+        addUnknownFields(record, item);
+
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+        records.add(record);
+
+        return records;
     }
 }

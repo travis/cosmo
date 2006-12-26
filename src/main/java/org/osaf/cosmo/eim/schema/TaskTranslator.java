@@ -17,6 +17,8 @@ package org.osaf.cosmo.eim.schema;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.TextField;
@@ -36,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * TBD
  */
-public class TaskTranslator extends EimSchemaTranslator {
+public class TaskTranslator extends BaseStampTranslator {
     private static final Log log = LogFactory.getLog(TaskTranslator.class);
 
     /** */
@@ -76,26 +78,24 @@ public class TaskTranslator extends EimSchemaTranslator {
     }
 
     /**
-     * Adds record fields for each applicable task property.
-     */
-    protected void addFields(EimRecord record,
-                             Item item) {
-        addFields(record, TaskStamp.getStamp(item));
-    }
-
-    /**
-     * Adds record fields for each applicable task property.
+     * Copies message properties into a task record.
      *
      * @throws IllegalArgumentException if the stamp is not an task stamp
      */
-    protected void addFields(EimRecord record,
-                             Stamp stamp) {
+    public List<EimRecord> toRecords(Stamp stamp) {
         if (! (stamp instanceof TaskStamp))
             throw new IllegalArgumentException("Stamp is not an task stamp");
+
+        EimRecord record = createRecord(stamp);
 
         record.addKeyField(new TextField(FIELD_UUID,
                                          stamp.getItem().getUid()));
 
         addUnknownFields(record, stamp.getItem());
+
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+        records.add(record);
+
+        return records;
     }
 }

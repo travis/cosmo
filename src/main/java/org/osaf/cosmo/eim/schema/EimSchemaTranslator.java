@@ -20,6 +20,8 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.osaf.cosmo.eim.BlobField;
@@ -171,60 +173,6 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
         }
     }
 
-    /**
-     * Creates an EIM record containing the data from the given item.
-     * <p>
-     * Sets the record's prefix and namespace.
-     * <p>
-     * If the item is inactive, the record is marked deleted.
-     * <p>
-     * If the item is active, then {@link #addFields(EimRecord, Item)}
-     * and {@link #addUnknownFields(EimRecord, Item)} are called.
-     */
-    public EimRecord createRecord(Item item) {
-        EimRecord record = new EimRecord(prefix, namespace);
-
-        if (! item.getIsActive()) {
-            record.setDeleted(true);
-        } else {
-            addFields(record, item);
-            addUnknownFields(record, item);
-        }
-
-        return record;
-    }
-
-    /**
-     * Creates an EIM record containing the data from the given stamp.
-     * <p>
-     * Sets the record's prefix and namespace.
-     * <p>
-     * Calls {@link #addFields(EimRecord, Stamp)}
-     * and {@link #addUnknownFields(EimRecord, Stamp)}.
-     */
-    public EimRecord createRecord(Stamp stamp) {
-        EimRecord record = new EimRecord(prefix, namespace);
-
-        addFields(record, stamp);
-        addUnknownFields(record, stamp.getItem());
-
-        return record;
-    }
-
-    /**
-     * Adds record fields for each applicable item property.
-     *
-     * @throws EimSchemaException if fields cannot be added to
-     * the record for some reason
-     */
-    protected abstract void addFields(EimRecord record,
-                                      Item item);
-
-    /**
-     * Adds record fields for each applicable stamp property.
-     */
-    protected abstract void addFields(EimRecord record,
-                                      Stamp stamp);
 
     /**
      * Adds a record field for each item attribute with the same
@@ -238,7 +186,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
                 InputStream value = ((BinaryAttribute)attr).getInputStream();
                 record.addField(new BlobField(attr.getName(), value));
             } else if (attr instanceof DateAttribute) {
-                java.util.Date value = ((DateAttribute)attr).getValue();
+                Date value = ((DateAttribute)attr).getValue();
                 record.addField(new DateTimeField(attr.getName(), value));
             } else if (attr instanceof DecimalAttribute) {
                 BigDecimal value = ((DecimalAttribute)attr).getValue();
@@ -256,6 +204,16 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
                 log.warn("Skipping attribute " + attr.getQName() + " of unknown type " + attr.getClass().getName());
             }
         }
+    }
+
+    /** */
+    public String getPrefix() {
+        return prefix;
+    }
+
+    /** */
+    public String getNamespace() {
+        return namespace;
     }
 
     /**
@@ -335,11 +293,24 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
      *
      * @throws EimValidationException if the value is invalid
      */
-    protected java.util.Date validateTimeStamp(EimRecordField field)
+    protected Date validateTimeStamp(EimRecordField field)
         throws EimValidationException {
         if (! (field instanceof TimeStampField))
             throw new EimValidationException("Field " + field.getName() + " is not a timestamp field");
-        java.util.Date value = ((TimeStampField)field).getTimeStamp();
+        Date value = ((TimeStampField)field).getTimeStamp();
+        return value;
+    }
+
+    /**
+     * Validates and returns a integer field value.
+     *
+     * @throws EimValidationException if the value is invalid
+     */
+    protected Integer validateInteger(EimRecordField field)
+        throws EimValidationException {
+        if (! (field instanceof IntegerField))
+            throw new EimValidationException("Field " + field.getName() + " is not a integer field");
+        Integer value = ((IntegerField)field).getInteger();
         return value;
     }
 }

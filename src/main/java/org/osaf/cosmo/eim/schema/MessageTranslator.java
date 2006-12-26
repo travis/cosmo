@@ -17,6 +17,8 @@ package org.osaf.cosmo.eim.schema;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.TextField;
@@ -36,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * TBD
  */
-public class MessageTranslator extends EimSchemaTranslator {
+public class MessageTranslator extends BaseStampTranslator {
     private static final Log log = LogFactory.getLog(MessageTranslator.class);
 
     /** */
@@ -107,23 +109,17 @@ public class MessageTranslator extends EimSchemaTranslator {
     }
 
     /**
-     * Adds record fields for each applicable message property.
-     */
-    protected void addFields(EimRecord record,
-                             Item item) {
-        addFields(record, MessageStamp.getStamp(item));
-    }
-
-    /**
-     * Adds record fields for each applicable message property.
+     * Copies message properties into a mail message record.
      *
-     * @throws IllegalArgumentException if the stamp is not a message stamp
+     * @throws IllegalArgumentException if the stamp is not a message
+     * stamp
      */
-    protected void addFields(EimRecord record,
-                             Stamp stamp) {
+    public List<EimRecord> toRecords(Stamp stamp) {
         if (! (stamp instanceof MessageStamp))
             throw new IllegalArgumentException("Stamp is not a message stamp");
         MessageStamp ms = (MessageStamp) stamp;
+
+        EimRecord record = createRecord(stamp);
 
         record.addKeyField(new TextField(FIELD_UUID,
                                          stamp.getItem().getUid()));
@@ -131,6 +127,12 @@ public class MessageTranslator extends EimSchemaTranslator {
         record.addField(new TextField(FIELD_TO, ms.getTo()));
         record.addField(new TextField(FIELD_CC, ms.getCc()));
         record.addField(new TextField(FIELD_BCC, ms.getBcc()));
+
         addUnknownFields(record, stamp.getItem());
+
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+        records.add(record);
+
+        return records;
     }
 }

@@ -17,6 +17,8 @@ package org.osaf.cosmo.eim.schema;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.TextField;
@@ -36,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * TBD
  */
-public class EventTranslator extends EimSchemaTranslator {
+public class EventTranslator extends BaseStampTranslator {
     private static final Log log = LogFactory.getLog(EventTranslator.class);
 
     /** */
@@ -75,6 +77,8 @@ public class EventTranslator extends EimSchemaTranslator {
     public static final String FIELD_STATUS = "status";
     /** */
     public static final int MAXLEN_STATUS = 256;
+    /** */
+    public static final String FIELD_TRIGGER = "trigger";
 
     /** */
     public EventTranslator() {
@@ -136,59 +140,73 @@ public class EventTranslator extends EimSchemaTranslator {
         } else if (field.getName().equals(FIELD_STATUS)) {
             String value = validateText(field, MAXLEN_STATUS);
             stamp.setStatus(value);
+        } else if (field.getName().equals(FIELD_TRIGGER)) {
+            Integer value = validateInteger(field);
+            // XXX convert to alarm
         } else {
             applyUnknownField(field, stamp.getItem());
         }
     }
 
     /**
-     * Adds record fields for each applicable event property.
-     */
-    protected void addFields(EimRecord record,
-                             Item item) {
-        addFields(record, EventStamp.getStamp(item));
-    }
-
-    /**
-     * Adds record fields for each applicable event property.
+     * Copies event properties into event records, one for the master
+     * instance and one for each exception instance.
+     * <p>
+     * All unknown fields in the event namespace are copied into the
+     * master record.
      *
-     * @throws IllegalArgumentException if the stamp is not an event stamp
+     * @throws IllegalArgumentException if the stamp is not an event
+     * stamp
      */
-    protected void addFields(EimRecord record,
-                             Stamp stamp) {
+    public List<EimRecord> toRecords(Stamp stamp) {
         if (! (stamp instanceof EventStamp))
             throw new IllegalArgumentException("Stamp is not an event stamp");
         EventStamp es = (EventStamp) stamp;
         String value = null;
 
-        record.addKeyField(new TextField(FIELD_UUID,
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+
+        // master event record
+
+        EimRecord master = createRecord(stamp);
+
+        master.addKeyField(new TextField(FIELD_UUID,
                                          stamp.getItem().getUid()));
 
         value = EimValueConverter.fromICalDate(es.getStartDate());
-        record.addField(new TextField(FIELD_DTSTART, value));
+        master.addField(new TextField(FIELD_DTSTART, value));
                                       
         value = EimValueConverter.fromICalDate(es.getEndDate());
-        record.addField(new TextField(FIELD_DTEND, value));
+        master.addField(new TextField(FIELD_DTEND, value));
 
-        record.addField(new TextField(FIELD_LOCATION, es.getLocation()));
+        master.addField(new TextField(FIELD_LOCATION, es.getLocation()));
 
         value = EimValueConverter.fromICalRecurs(es.getRecurrenceRules());
-        record.addField(new TextField(FIELD_RRULE, value));
+        master.addField(new TextField(FIELD_RRULE, value));
 
         value = EimValueConverter.fromICalRecurs(es.getExceptionRules());
-        record.addField(new TextField(FIELD_EXRULE, value));
+        master.addField(new TextField(FIELD_EXRULE, value));
 
         value = EimValueConverter.fromICalDates(es.getRecurrenceDates());
-        record.addField(new TextField(FIELD_RDATE, value));
+        master.addField(new TextField(FIELD_RDATE, value));
 
         value = EimValueConverter.fromICalDates(es.getExceptionDates());
-        record.addField(new TextField(FIELD_EXDATE, value));
+        master.addField(new TextField(FIELD_EXDATE, value));
 
         value = EimValueConverter.fromICalDate(es.getRecurrenceId());
-        record.addField(new TextField(FIELD_RECURRENCE_ID, value));
+        master.addField(new TextField(FIELD_RECURRENCE_ID, value));
 
-        record.addField(new TextField(FIELD_STATUS, es.getStatus()));
+        master.addField(new TextField(FIELD_STATUS, es.getStatus()));
 
-        addUnknownFields(record, stamp.getItem());
+        // XXX: convert alarm to trigger
+        // master.addField(new IntegerField(FIELD_TRIGGER, es.getTrigger()));
+
+        addUnknownFields(master, stamp.getItem());
+
+        records.add(master);
+
+        // XXX: exception instance records
+
+        return records;
     }
 }

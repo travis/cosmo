@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.eim.schema;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.TextField;
@@ -32,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * TBD
  */
-public class CollectionTranslator extends EimSchemaTranslator {
+public class CollectionTranslator extends BaseItemTranslator {
     private static final Log log =
         LogFactory.getLog(CollectionTranslator.class);
 
@@ -71,24 +74,25 @@ public class CollectionTranslator extends EimSchemaTranslator {
     }
 
     /**
-     * Adds record fields for each applicable collection property.
+     * Copies collection properties into a collection record.
      *
      * @throws IllegalArgumentException if the item is not a content
      * item
      */
-    protected void addFields(EimRecord record,
-                             Item item) {
+    public List<EimRecord> toRecords(Item item) {
         if (! (item instanceof CollectionItem))
             throw new IllegalArgumentException("Item is not a collection");
         CollectionItem ci = (CollectionItem) item;
 
+        EimRecord record = createRecord(item);
+
         record.addKeyField(new TextField(FIELD_UUID, item.getUid()));
 
         addUnknownFields(record, item);
-    }
 
-    protected void addFields(EimRecord record,
-                             Stamp stamp) {
-        throw new RuntimeException("NoteTranslator does not translate stamps");
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+        records.add(record);
+
+        return records;
     }
 }

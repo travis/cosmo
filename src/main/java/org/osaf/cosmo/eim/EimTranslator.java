@@ -25,6 +25,7 @@ import org.osaf.cosmo.eim.schema.ContentItemTranslator;
 import org.osaf.cosmo.eim.schema.EimSchemaConstants;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EventTranslator;
+//import org.osaf.cosmo.eim.schema.ICalExtensionTranslator;
 import org.osaf.cosmo.eim.schema.MessageTranslator;
 import org.osaf.cosmo.eim.schema.NoteTranslator;
 import org.osaf.cosmo.eim.schema.TaskTranslator;
@@ -62,6 +63,8 @@ public class EimTranslator implements EimSchemaConstants {
             return;
         }
 
+        //        ArrayList<EimRecord> icalRecords = new ArrayList<EimRecord>();
+
         for (EimRecord record : recordset.getRecords()) {
             if (record.getNamespace().equals(NS_COLLECTION))
                 new CollectionTranslator().applyRecord(record, item);
@@ -75,44 +78,28 @@ public class EimTranslator implements EimSchemaConstants {
                 new TaskTranslator().applyRecord(record, item);
             else if (record.getNamespace().equals(NS_MESSAGE))
                 new MessageTranslator().applyRecord(record, item);
-//             else if (record.getNamespace().equals(NS_ICAL))
-//                 new ICalExtensionRecord().applyRecord(record, item);
+//             else if (record.getNamespace().equals(NS_ICALEXT))
+//                 icalRecords.add(record);
 //             else
-//                 t = new UnknownTranslator();
+//                 new UnknownTranslator().applyRecord(record, item);
         }
+
+        // ical records are special. the entire set of ical records
+        // represents all of the icalendar properties defined on the
+        // item that aren't otherwise covered by one of the
+        // stamps. the translator handles them all as a single batch.
+        // new ICalExtensionTranslator().applyRecords(icalRecords, item);
     }
 
     /**
      */
-    public static List<EimRecordSet> createAggregateRecordSet(CollectionItem collection) {
-        ArrayList<EimRecordSet> recordsets = new ArrayList<EimRecordSet>();
-
-        recordsets.add(createRecordSet(collection));
-
-        for (Item child : collection.getChildren()) {
-            if (child instanceof CollectionItem)
-                continue;
-            recordsets.add(createRecordSet(child));
-        }
-
-        return recordsets;
-    }
-
-    /**
-     */
-    public static EimRecordSet createRecordSet(Item item) {
+    public static EimRecordSet toRecordSet(Item item) {
         EimRecordSet recordset = new EimRecordSet();
-        fillInRecordSet(recordset, item);
-        return recordset;
-    }
-
-    private static void fillInRecordSet(EimRecordSet recordset,
-                                        Item item) {
         recordset.setUuid(item.getUid());
 
         if (! BooleanUtils.isTrue(item.getIsActive())) {
             recordset.setDeleted(true);
-            return;
+            return recordset;
         }
 
         ArrayList<EimRecord> records = new ArrayList<EimRecord>();
@@ -124,14 +111,17 @@ public class EimTranslator implements EimSchemaConstants {
         if (item instanceof NoteItem)
             recordset.addRecords(new NoteTranslator().toRecords(item));
         for (Stamp stamp : item.getStamps()) {
-            if (stamp instanceof EventStamp)
+            if (stamp instanceof EventStamp) {
                 recordset.addRecords(new EventTranslator().toRecords(stamp));
-            else if (stamp instanceof TaskStamp)
+ //                recordset.addRecords(new ICalExtensionTranslator().toRecords(stamp));
+            } else if (stamp instanceof TaskStamp)
                 recordset.addRecords(new TaskTranslator().toRecords(stamp));
             else if (stamp instanceof MessageStamp)
                 recordset.addRecords(new MessageTranslator().toRecords(stamp));
         }
 
 //         recordset.addRecords(new UnknownTranslator().toRecords(item));
+
+        return recordset;
     }
 }

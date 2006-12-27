@@ -52,6 +52,11 @@ public interface EimSchemaConstants {
         "http://osafoundation.org/eim/note";
     /** */
     public static final String PREFIX_NOTE = "note";
+    /** */
+    public static final String NS_ICALEXT =
+        "http://osafoundation.org/eim/icalext";
+    /** */
+    public static final String PREFIX_ICALEXT = "icalext";
 
     /** */
     public static final String FIELD_UUID = "uuid";

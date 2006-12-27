@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.mc;
 
-import java.util.List;
+import java.util.Iterator;
 
 import org.osaf.cosmo.eim.EimRecordSet;
 
@@ -67,7 +67,7 @@ public interface MorseCodeController {
      */
     public SyncToken publishCollection(String uid,
                                        String parentUid,
-                                       List<EimRecordSet> recordsets);
+                                       Iterator<EimRecordSet> recordsets);
    
     /**
      * Retrieves the current state of every item contained within the
@@ -139,5 +139,5 @@ public interface MorseCodeController {
      */
     public SyncToken updateCollection(String uid,
                                       SyncToken token,
-                                      List<EimRecordSet> recordsets);
+                                      Iterator<EimRecordSet> recordsets);
 }

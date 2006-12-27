@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.mc;
 
-import java.util.List;
+import java.util.Iterator;
 
 import org.osaf.cosmo.eim.EimRecordSet;
 
@@ -29,18 +29,18 @@ import org.osaf.cosmo.eim.EimRecordSet;
  */
 public class SyncRecords {
 
+    private Iterator<EimRecordSet> recordsets;
     private SyncToken token;
-    private List<EimRecordSet> recordsets;
 
     /** */
-    public SyncRecords(List<EimRecordSet> recordsets,
+    public SyncRecords(Iterator<EimRecordSet> recordsets,
                        SyncToken token) {
         this.recordsets = recordsets;
         this.token = token;
     }
 
     /** */
-    public List<EimRecordSet> getRecordSets() {
+    public Iterator<EimRecordSet> getRecordSets() {
         return recordsets;
     }
 

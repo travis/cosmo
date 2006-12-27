@@ -193,6 +193,17 @@ public abstract class Item extends BaseModelObject {
     }
 
     /**
+     * Remove all attributes in a namespace.
+     * @param namespace namespace of attributes to remove
+     */
+    public void removeAttributes(String namespace) {
+        for (QName qname: attributes.keySet()) {
+            if (qname.getNamespace().equals(namespace))
+                attributes.remove(qname);
+        }
+    }
+
+    /**
      * Get attribute in default namespace with local name.
      * @param name local name of attribute
      * @return attribute in default namespace with given name

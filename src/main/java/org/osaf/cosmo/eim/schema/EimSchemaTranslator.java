@@ -86,7 +86,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
      * Copies the data from an EIM record into an item.
      * <p>
      * If the record is marked deleted, then
-     * {@link #applyDeletion(Item)} is called.
+     * {@link #applyDeletion(EimRecord, Item)} is called.
      * <p>
      * If the record is not marked deleted, then
      * {@link #applyField(EimRecordField, Item)} is called for each
@@ -104,7 +104,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
             throw new IllegalArgumentException("Record namespace " + record.getNamespace() + " does not match " + namespace);
 
         if (record.isDeleted()) {
-            applyDeletion(item);
+            applyDeletion(record, item);
             return;
         }
 
@@ -119,7 +119,8 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
      * @throws EimSchemaException if deletion is not allowed for this
      * record type or if deletion cannot otherwise be processed.
      */
-    protected abstract void applyDeletion(Item item)
+    protected abstract void applyDeletion(EimRecord record,
+                                          Item item)
         throws EimSchemaException;
 
     /**
@@ -137,8 +138,8 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
         throws EimSchemaException;
 
     /**
-     * Copies the field into an attribute of the item with this
-     * translator's namespace.
+     * Copies the field into an attribute of the item in the record's
+     * namespace.
      *
      * @throws EimSchemaException if the field is improperly
      * cannot be applied to the item 
@@ -146,7 +147,7 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
     protected void applyUnknownField(EimRecordField field,
                                      Item item)
         throws EimSchemaException {
-        QName qn = new QName(namespace, field.getName());
+        QName qn = new QName(field.getRecord().getNamespace(), field.getName());
         if (field instanceof BlobField) {
             InputStream value = ((BlobField)field).getBlob();
             item.addAttribute(new BinaryAttribute(qn, value));
@@ -173,14 +174,14 @@ public abstract class EimSchemaTranslator implements EimSchemaConstants {
         }
     }
 
-
     /**
      * Adds a record field for each item attribute with the same
-     * namespace as this translator.
+     * namespace as the record.
      */
     protected void addUnknownFields(EimRecord record,
                                     Item item) {
-        Map<String, Attribute> attrs = item.getAttributes(namespace);
+        Map<String, Attribute> attrs =
+            item.getAttributes(record.getNamespace());
         for (Attribute attr : attrs.values()) {
             if (attr instanceof BinaryAttribute) {
                 InputStream value = ((BinaryAttribute)attr).getInputStream();

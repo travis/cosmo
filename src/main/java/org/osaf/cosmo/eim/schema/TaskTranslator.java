@@ -47,9 +47,10 @@ public class TaskTranslator extends BaseStampTranslator {
     }
 
     /**
-     * Removes the task stamp associated with the record.
+     * Removes the task stamp.
      */
-    protected void applyDeletion(Item item)
+    protected void applyDeletion(EimRecord record,
+                                 Item item)
         throws EimSchemaException {
         TaskStamp stamp = TaskStamp.getStamp(item);
         if (stamp == null)

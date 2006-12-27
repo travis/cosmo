@@ -74,9 +74,10 @@ public class ContentItemTranslator extends BaseItemTranslator {
     }
 
     /**
-     * Deactivates the item associated with the record.
+     * Deactivates the item.
      */
-    protected void applyDeletion(Item item)
+    protected void applyDeletion(EimRecord record,
+                                 Item item)
         throws EimSchemaException {
         if (! (item instanceof ContentItem))
             throw new IllegalArgumentException("Item is not a content item");

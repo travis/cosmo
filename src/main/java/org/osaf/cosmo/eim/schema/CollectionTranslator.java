@@ -45,9 +45,10 @@ public class CollectionTranslator extends BaseItemTranslator {
     }
 
     /**
-     * Deactivates the collection associated with the record.
+     * Deactivates the collection.
      */
-    protected void applyDeletion(Item item)
+    protected void applyDeletion(EimRecord record,
+                                 Item item)
         throws EimSchemaException {
         if (! (item instanceof CollectionItem))
             throw new IllegalArgumentException("Item is not a collection");

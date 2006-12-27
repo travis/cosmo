@@ -86,9 +86,10 @@ public class EventTranslator extends BaseStampTranslator {
     }
 
     /**
-     * Removes the event stamp associated with the record.
+     * Removes the event stamp.
      */
-    protected void applyDeletion(Item item)
+    protected void applyDeletion(EimRecord record,
+                                 Item item)
         throws EimSchemaException {
         EventStamp stamp = EventStamp.getStamp(item);
         if (stamp == null)

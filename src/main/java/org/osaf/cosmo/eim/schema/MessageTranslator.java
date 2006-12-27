@@ -64,9 +64,10 @@ public class MessageTranslator extends BaseStampTranslator {
     }
 
     /**
-     * Removes the message stamp associated with the record.
+     * Removes the message stamp.
      */
-    protected void applyDeletion(Item item)
+    protected void applyDeletion(EimRecord record,
+                                 Item item)
         throws EimSchemaException {
         MessageStamp stamp = MessageStamp.getStamp(item);
         if (stamp == null)

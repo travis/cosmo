@@ -56,7 +56,8 @@ public class NoteTranslator extends BaseItemTranslator {
     /**
      * @throws EimSchemaException
      */
-    protected void applyDeletion(Item item)
+    protected void applyDeletion(EimRecord record,
+                                 Item item)
         throws EimSchemaException {
         throw new EimSchemaException("Note-ness may not be deleted");
     }

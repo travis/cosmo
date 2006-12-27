@@ -29,6 +29,7 @@ import org.osaf.cosmo.eim.schema.EventTranslator;
 import org.osaf.cosmo.eim.schema.MessageTranslator;
 import org.osaf.cosmo.eim.schema.NoteTranslator;
 import org.osaf.cosmo.eim.schema.TaskTranslator;
+import org.osaf.cosmo.eim.schema.UnknownAttributeTranslator;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
@@ -80,8 +81,8 @@ public class EimTranslator implements EimSchemaConstants {
                 new MessageTranslator().applyRecord(record, item);
 //             else if (record.getNamespace().equals(NS_ICALEXT))
 //                 icalRecords.add(record);
-//             else
-//                 new UnknownTranslator().applyRecord(record, item);
+            else
+                new UnknownAttributeTranslator().applyRecord(record, item);
         }
 
         // ical records are special. the entire set of ical records
@@ -120,7 +121,7 @@ public class EimTranslator implements EimSchemaConstants {
                 recordset.addRecords(new MessageTranslator().toRecords(stamp));
         }
 
-//         recordset.addRecords(new UnknownTranslator().toRecords(item));
+        recordset.addRecords(new UnknownAttributeTranslator().toRecords(item));
 
         return recordset;
     }

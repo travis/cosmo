@@ -23,7 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.eim.EimRecordSet;
-import org.osaf.cosmo.eim.EimTranslator;
+import org.osaf.cosmo.eim.schema.EimTranslator;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
@@ -345,7 +345,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         }
 
         public EimRecordSet next() {
-            return EimTranslator.toRecordSet(items.next());
+            return new EimTranslator(items.next()).generateRecords();
         }
 
         public void remove() {
@@ -380,7 +380,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         }
 
         public EimRecordSet next() {
-            return EimTranslator.toRecordSet(items.next());
+            return new EimTranslator(items.next()).generateRecords();
         }
 
         public void remove() {

@@ -19,7 +19,8 @@ import javax.persistence.Embeddable;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
 /**
  * Represents a qualified name. A qualified name 
@@ -118,5 +119,10 @@ public class QName {
             append(localName, it.localName).
             isEquals();
     }
-    
+
+    /** */
+    public String toString() {
+        return ToStringBuilder.
+            reflectionToString(this, ToStringStyle.SIMPLE_STYLE);
+    }
 }

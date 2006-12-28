@@ -104,6 +104,7 @@ public class RPCServiceImplTest extends BaseMockServletTestCase {
         userService.createUser(user);
         
         serviceLocatorFactory = new ServiceLocatorFactory();
+        serviceLocatorFactory.setSecurityManager(securityManager);
 
         rpcService = new RPCServiceImpl();
         rpcService.setContentService(contentService);

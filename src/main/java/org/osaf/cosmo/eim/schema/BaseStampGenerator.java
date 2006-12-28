@@ -24,40 +24,33 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Base class for schema translators that translates stamp attributes.
+ * Base class for generators that map to <code>Stamp</code>s.
+ *
+ * @see Stamp
  */
-public abstract class BaseStampTranslator extends EimSchemaTranslator {
+public abstract class BaseStampGenerator extends BaseGenerator {
     private static final Log log =
-        LogFactory.getLog(BaseStampTranslator.class);
+        LogFactory.getLog(BaseStampGenerator.class);
+
+    private Stamp stamp;
 
     /**
      * This class should not be instantiated directly.
      */
-    protected BaseStampTranslator(String prefix,
-                                  String namespace) {
-        super(prefix, namespace);
+    protected BaseStampGenerator(String prefix,
+                                 String namespace,
+                                 Stamp stamp) {
+        super(prefix, namespace, stamp.getItem());
+        this.stamp = stamp;
     }
 
     /**
-     * Copies the data from an stamp into one or more EIM records.
+     * Copies the data from a stamp into one or more EIM records.
      */
-    public abstract List<EimRecord> toRecords(Stamp stamp);
+    public abstract List<EimRecord> generateRecords();
 
-    /**
-     * Creates an empty EIM record that can subsequently be filled
-     * with data.
-     * <p>
-     * Sets the record's prefix and namespace.
-     * <p>
-     * If the stamp is inactive, the record is marked deleted.
-     */
-    public EimRecord createRecord(Stamp stamp) {
-        EimRecord record = new EimRecord(getPrefix(), getNamespace());
-
-        // XXX:
-//         if (! stamp.getIsActive())
-//             record.setDeleted(true);
-
-        return record;
+    /** */
+    public Stamp getStamp() {
+        return stamp;
     }
 }

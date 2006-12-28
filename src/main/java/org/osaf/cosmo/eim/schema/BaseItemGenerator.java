@@ -24,39 +24,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Base class for schema translators that translates item attributes.
+ * Base class for generators that map to <code>Item</code>s.
+ *
+ * @see Item
  */
-public abstract class BaseItemTranslator extends EimSchemaTranslator {
+public abstract class BaseItemGenerator extends BaseGenerator {
     private static final Log log =
-        LogFactory.getLog(BaseItemTranslator.class);
+        LogFactory.getLog(BaseItemGenerator.class);
 
     /**
      * This class should not be instantiated directly.
      */
-    protected BaseItemTranslator(String prefix,
-                                 String namespace) {
-        super(prefix, namespace);
+    protected BaseItemGenerator(String prefix,
+                                String namespace,
+                                Item item) {
+        super(prefix, namespace, item);
     }
 
     /**
      * Copies the data from an item into one or more EIM records.
      */
-    public abstract List<EimRecord> toRecords(Item item);
-
-    /**
-     * Creates an empty EIM record that can subsequently be filled
-     * with data.
-     * <p>
-     * Sets the record's prefix and namespace.
-     * <p>
-     * If the item is inactive, the record is marked deleted.
-     */
-    public EimRecord createRecord(Item item) {
-        EimRecord record = new EimRecord(getPrefix(), getNamespace());
-
-        if (! item.getIsActive())
-            record.setDeleted(true);
-
-        return record;
-    }
+    public abstract List<EimRecord> generateRecords();
 }

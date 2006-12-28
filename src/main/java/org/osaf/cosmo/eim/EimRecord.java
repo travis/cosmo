@@ -110,6 +110,12 @@ public class EimRecord {
     }
 
     /** */
+    public void addFields(List<EimRecordField> fields) {
+        for (EimRecordField field : fields)
+            addField(field);
+    }
+
+    /** */
     public boolean isDeleted() {
         return deleted;
     }

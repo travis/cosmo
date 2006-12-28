@@ -168,6 +168,8 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
 
     private void doWriteKey(EimRecordKey key)
         throws EimmlStreamException, XMLStreamException {
+        if (key == null)
+            return;
         for (EimRecordField field : key.getFields())
             doWriteField(field, true);
     }

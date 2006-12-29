@@ -17,6 +17,7 @@ package org.osaf.cosmo.dao.hibernate;
 
 import java.io.FileInputStream;
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import junit.framework.Assert;
 import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Attribute;
+import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DecimalAttribute;
@@ -198,7 +200,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         item.addBooleanAttribute("booleanattribute", Boolean.TRUE);
         
         DecimalAttribute decAttr = 
-            new DecimalAttribute(new QName("","decimalattribute"),new BigDecimal("1.234567"));
+            new DecimalAttribute(new QName("decimalattribute"),new BigDecimal("1.234567"));
         item.addAttribute(decAttr);
         
         // TODO: figure out db date type is handled because i'm seeing
@@ -224,7 +226,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
 
-        Attribute attr = queryItem.getAttribute(new QName("","decimalattribute"));
+        Attribute attr = queryItem.getAttribute(new QName("decimalattribute"));
         Assert.assertNotNull(attr);
         Assert.assertTrue(attr instanceof DecimalAttribute);
         Assert.assertEquals(attr.getValue().toString(),"1.234567");
@@ -261,11 +263,52 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         queryDictionary = (Map) queryItem
                 .getAttributeValue("dictionaryattribute");
         Attribute queryAttribute = queryItem.getAttribute("customattribute");
+       
         Assert.assertTrue(querySet.contains("value3"));
         Assert.assertEquals("value3", queryDictionary.get("key3"));
         Assert.assertNotNull(queryAttribute);
         Assert.assertNull(queryAttribute.getValue());
         Assert.assertNull(queryItem.getAttribute("intattribute"));
+    }
+    
+    public void testCalendarAttribute() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        ContentItem item = generateTestContent();
+        
+        CalendarAttribute calAttr = 
+            new CalendarAttribute(new QName("calendarattribute"), "2002-10-10T00:00:00+05:00"); 
+        item.addAttribute(calAttr);
+        
+        ContentItem newItem = contentDao.createContent(root, item);
+
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+
+        Attribute attr = queryItem.getAttribute(new QName("calendarattribute"));
+        Assert.assertNotNull(attr);
+        Assert.assertTrue(attr instanceof CalendarAttribute);
+        
+        Calendar cal = (Calendar) attr.getValue();
+        Assert.assertEquals(cal.getTimeZone().getID(), "GMT+05:00");
+        Assert.assertTrue(cal.equals(calAttr.getValue()));
+        
+        attr.setValue("2003-10-10T00:00:00+02:00");
+
+        contentDao.updateContent(queryItem);
+
+        clearSession();
+
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        Attribute queryAttr = queryItem.getAttribute(new QName("calendarattribute"));
+        Assert.assertNotNull(queryAttr);
+        Assert.assertTrue(queryAttr instanceof CalendarAttribute);
+        
+        cal = (Calendar) queryAttr.getValue();
+        Assert.assertEquals(cal.getTimeZone().getID(), "GMT+02:00");
+        Assert.assertTrue(cal.equals(attr.getValue()));
     }
 
     public void testCreateDuplicateRootItem() throws Exception {

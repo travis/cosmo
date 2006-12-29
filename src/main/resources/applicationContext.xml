@@ -97,6 +97,7 @@
             <value>org.osaf.cosmo.model.Attribute</value>
             <value>org.osaf.cosmo.model.BinaryAttribute</value>
             <value>org.osaf.cosmo.model.BooleanAttribute</value>
+            <value>org.osaf.cosmo.model.CalendarAttribute</value>
             <value>org.osaf.cosmo.model.CalendarCollectionStamp</value>			
             <value>org.osaf.cosmo.model.CalendarPropertyIndex</value>
             <value>org.osaf.cosmo.model.CalendarTimeRangeIndex</value>

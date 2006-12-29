@@ -8,6 +8,7 @@ alter table attribute add column localname varchar(255) not null;
 alter table attribute add column namespace varchar(255) not null;
 alter table attribute add column textvalue text;
 alter table attribute add column decvalue numeric(19,6);
+alter table attribute add column tzvalue varchar(32);
 alter table attribute modify column itemid bigint(20) not null;
 alter table attribute drop index attrname_idx;
 alter table attribute add index idx_attrns (namespace);

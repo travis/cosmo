@@ -8,6 +8,7 @@ alter table attribute add column localname varchar(255) not null default ''
 alter table attribute add column namespace varchar(255) not null default ''
 alter table attribute add column textvalue clob(102400000)
 alter table attribute add column decvalue numeric(19,6)
+alter table attribute add column tzvalue varchar(32)
 alter table attribute alter column itemid not null
 # do this because in Derby we can't drop a column
 alter table attribute alter column attributename null

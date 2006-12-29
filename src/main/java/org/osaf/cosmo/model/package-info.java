@@ -30,6 +30,11 @@
     ),
     
     @TypeDef(
+            name="composite_calendar",
+            typeClass = org.osaf.cosmo.hibernate.CalendarType.class
+    ),
+    
+    @TypeDef(
             name="boolean_integer",
             typeClass = org.osaf.cosmo.hibernate.BooleanIntegerType.class
     )

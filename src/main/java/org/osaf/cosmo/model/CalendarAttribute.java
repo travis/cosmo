@@ -1,0 +1,150 @@
+/*
+ * Copyright 2006 Open Source Applications Foundation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.osaf.cosmo.model;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.Type;
+
+/**
+ * Represents an attribute with a java.util.Calendar value.
+ */
+@Entity
+@DiscriminatorValue("calendar")
+public class CalendarAttribute extends Attribute implements
+        java.io.Serializable {
+
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssz";
+    
+    private Calendar value;
+
+    /** default constructor */
+    public CalendarAttribute() {
+    }
+
+    /**
+     * @param qname qualified name
+     * @param value initial value
+     */
+    public CalendarAttribute(QName qname, Calendar value) {
+        setQName(qname);
+        this.value = value;
+    }
+    
+    /**
+     * @param qname qualified name
+     * @param value String representation of Calendar
+     */
+    public CalendarAttribute(QName qname, String value) {
+        setQName(qname);
+        setValue(value);
+    }
+
+    // Property accessors
+    @Columns(columns = { 
+            @Column(name = "datevalue"), @Column(name = "tzvalue", length=32) })
+    @Type(type="composite_calendar")
+    public Calendar getValue() {
+        return this.value;
+    }
+
+    public void setValue(Calendar value) {
+        this.value = value;
+    }
+    
+    public void setValue(Object value) {
+        if (value != null && !(value instanceof Calendar)
+                && !(value instanceof String))
+            throw new ModelValidationException(
+                    "attempted to set non Calendar value on attribute");
+        
+        if(value instanceof Calendar)
+            setValue((Calendar) value);
+        else 
+            setValue((String) value);
+    }
+    
+    /**
+     * Set Calendar value with a date string 
+     * tha is in one of the following formats:
+     * 
+     * 2002-10-10T00:00:00+05:00
+     * 2002-10-09T19:00:00Z
+     * 2002-10-10T00:00:00GMT+05:00
+     * 
+     * @param date string
+     */
+    public void setValue(String value) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+            TimeZone timezone = null;
+            Date date = null;
+            if(value.charAt(value.length()-1)=='Z') {
+                value = value.replace("Z", "GMT-00:00");
+                timezone = TimeZone.getTimeZone("GMT-00:00");
+                date = sdf.parse(value);
+            }
+            else if(value.indexOf("GMT")==-1 && 
+                    (value.charAt(value.length()-6) == '+' ||
+                     value.charAt(value.length()-6) == '-')) {
+                String tzId = "GMT" + value.substring(value.length()-6);
+                value = value.substring(0, value.length()-6) + tzId;
+                timezone = TimeZone.getTimeZone(tzId);
+                date = sdf.parse(value);
+            } else {
+                String tzId = value.substring(value.length()-9);
+                timezone = TimeZone.getTimeZone(tzId);
+                date = sdf.parse(value);
+            }
+            
+            this.value = new GregorianCalendar(timezone);
+            this.value.setTime(date);
+            
+        } catch (ParseException e) {
+            throw new ModelValidationException("invalid date format: " + value);
+        }
+    }
+    
+    public Attribute copy() {
+        CalendarAttribute attr = new CalendarAttribute();
+        attr.setQName(getQName().copy());
+        attr.setValue(value.clone());
+        return attr;
+    }
+    
+    /**
+     * Return Calendar representation in the format:
+     * 2002-10-10T00:00:00+05:00
+     */
+    public String toString() {
+        if(value==null)
+            return "null";
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        sdf.setTimeZone(value.getTimeZone());
+        return sdf.format(value.getTime()).replace("GMT", "");
+    }
+
+}

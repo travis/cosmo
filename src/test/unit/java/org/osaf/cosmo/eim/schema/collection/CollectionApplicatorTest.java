@@ -15,50 +15,38 @@
  */
 package org.osaf.cosmo.eim.schema.collection;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.eim.EimRecord;
-import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.TextField;
-import org.osaf.cosmo.eim.schema.EimSchemaConstants;
-import org.osaf.cosmo.model.Attribute;
+import org.osaf.cosmo.eim.schema.BaseApplicatorTestCase;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.QName;
 
 /**
  * Test Case for {@link CollectionApplicator}.
  */
-public class CollectionApplicatorTest extends TestCase
-    implements EimSchemaConstants {
+public class CollectionApplicatorTest extends BaseApplicatorTestCase {
     private static final Log log =
         LogFactory.getLog(CollectionApplicatorTest.class);
 
     public void testApplyField() throws Exception {
         CollectionItem collection = new CollectionItem();
 
-        EimRecordField field = makeTestRecordField();
+        EimRecord record = makeTestRecord();
 
         CollectionApplicator applicator = new CollectionApplicator(collection);
-        applicator.applyField(field);
+        applicator.applyRecord(record);
 
-        QName qname = new QName(NS_COLLECTION, field.getName());
-        Attribute attr = collection.getAttribute(qname);
-        assertNotNull("attribute " + qname + " not found", attr);
-        assertEquals("incorrect attribute value", field.getValue(),
-                     attr.getValue());
+        checkUnknownValue(record.getFields().get(0), collection);
     }
 
-    private EimRecordField makeTestRecordField() {
-        String n = "deadbeef";
-        String v = "The quick brown fox etc and so forth.";
-        TextField field = new TextField(n, v);
-
+    private EimRecord makeTestRecord() {
         EimRecord record = new EimRecord(PREFIX_COLLECTION, NS_COLLECTION);
-        record.addField(field);
 
-        return field;
+        record.addField(new TextField("Iron Maiden",
+                                      "Die With Your Boots On"));
+
+        return record;
     }
 }

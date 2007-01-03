@@ -67,23 +67,36 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 cosmo.util.html.setSelect(sel, c);
                 
             }
-            function renderInfoButton() {
-                // TODO replace this with an image when I get it from Priss
-                var infoLinkSpan = _createElem("span");
-                var infoLinkLink = _createElem('a');
-                var infoLinkText = _createText("[info]");
-                infoLinkLink.onclick = function () {
-                    cosmo.app.showDialog(
-                        cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                        Cal.currentCollection.collection));
-                };
-                infoLinkLink.href = '#';
-                infoLinkLink.appendChild(infoLinkText);
-                infoLinkSpan.appendChild(_createText('\u00A0'));
-                infoLinkSpan.appendChild(infoLinkLink);
-                collSelectNode.appendChild(infoLinkSpan);
+            function renderButton() {
+                var str = '';
+                var f = null;
+                // If using a ticket, add the 'Add' button
+                if (key) {
+                    str = 'add';
+                    f = function () {
+                        // Not implemented yet
+                        alert('Add this to my account.');
+                    };
+                }
+                // Otherwise the user is logged in -- use the 'Info' button
+                else {
+                    str = 'info';
+                    f = function () {
+                        cosmo.app.showDialog(
+                            cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
+                            Cal.currentCollection.collection));
+                    };
+                }
+                var btnSpan = _createElem("span");
+                var btnLink = _createElem('a');
+                var btnText = _createText('[' + str + ']');
+                btnLink.onclick = f;
+                btnLink.href = '#';
+                btnLink.appendChild(btnText);
+                btnSpan.appendChild(_createText('\u00A0'));
+                btnSpan.appendChild(btnLink);
+                collSelectNode.appendChild(btnSpan);
             }
-            // Single collection -- may have plus sign for subscribing
             function renderSingleCollectionName() {
                 var d = _createElem('div');
                 d.id = 'collectionLabelPrompt';
@@ -99,14 +112,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             // Multiple collections -- display selector
             if (col.length > 1) {
                 renderSelector();
-                renderInfoButton();
             }
             else {
                 renderSingleCollectionName();
-                if (!key) {
-                    renderInfoButton();
-                }
             }
+            renderButton();
         }
 } );
 

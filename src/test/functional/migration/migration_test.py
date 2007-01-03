@@ -44,12 +44,26 @@ def compare_pickle_events_to_cosmo(server_url, username, password, filename):
     print 'Loading pickle'
     all_events = pickle.load(f)
     
+    total = 0
+    passed = 0
+    failed = 0
+    
     print 'Starting validation'
     for user, events in all_events.items():
         for event in events:
             print 'Verifying %s' % event['href']
-            body = client.get(event['href'].strip(client._url.geturl()))
-            assert event['body'] == body
+            body = client.get(event['href'].replace(client._url.geturl(), ''))
+            try:
+                total = total + 1
+                assert event['body'] == body
+                passed = passed + 1
+            except AssertionError:
+                failed = failed + 1
+                print "failure in %s" % event['href']
+                print "Pre::%s" % event['body']
+                print "Post::%s"% body
+    
+    print "Ran %s tests. %s passed. %s failed" % (total, passed, failed)
             
 def main():
 

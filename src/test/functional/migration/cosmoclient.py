@@ -17,7 +17,7 @@ import davclient, copy
 class CosmoClient(davclient.DAVClient):
     """Class for adding cosmo specific functionality to DAVClient"""
     
-    _cosmo_path = 'cosmo/'
+    _cosmo_path = '/cosmo/'
     _cmp_path = _cosmo_path+'cmp'
     
     def set_cmp_path(self, path):
@@ -43,7 +43,8 @@ class CosmoClient(davclient.DAVClient):
         for ref in hrefs:
             if ref.text.endswith('.ics'):
                 event = {'href':ref.text}
-                self.get(ref.text.strip(self._url.geturl()))
+                print ref.text.replace(self._url.geturl(), '')
+                self.get(ref.text.replace(self._url.geturl(), ''))
                 event['body'] = copy.copy(self.response.body)
                 events.append(event)
         return events

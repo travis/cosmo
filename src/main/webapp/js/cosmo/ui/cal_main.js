@@ -403,14 +403,12 @@ cosmo.ui.cal_main.Cal = new function () {
         handleImg = document.createElement('img');
         handleImg.src = cosmo.env.getImagesUrl() + 'resize_handle_image.gif';
        
-       
         document.getElementById('allDayResizeHandleDiv').appendChild(handleImg);
         logoDiv.style.background =
             'url(' + cosmo.env.getImagesUrl() + LOGO_GRAPHIC_SM + ')';
-
+        
         // Wheeeee, IE6 resets background tiling when you set an image background
-        //if (!(dojo.render.html.ie && !dojo.render.html.ie7)) { // Wait for 0.4
-        if (!(document.all && navigator.appVersion.indexOf('MSIE 7') == -1)) {
+        if (document.all && (navigator.appVersion.indexOf('MSIE 7') == -1)) {
             logoDiv.style.backgroundRepeat = 'no-repeat';
         }
     };

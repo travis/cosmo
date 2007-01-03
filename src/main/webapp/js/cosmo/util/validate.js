@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-dojo.require("cosmo.util.i18n");
 dojo.provide("cosmo.util.validate");
+
+dojo.require("cosmo.util.i18n");
 
 cosmo.util.validate = new function() {
 

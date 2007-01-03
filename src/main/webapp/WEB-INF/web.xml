@@ -304,13 +304,8 @@
   </servlet-mapping>
 
   <servlet-mapping>
-	<!-- This should be deprecated -->
     <servlet-name>springDispatcherServlet</servlet-name>
      <url-pattern>/i18n.js</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>springDispatcherServlet</servlet-name>
-     <url-pattern>/js/cosmo/util/i18n.js</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>JSON</servlet-name>

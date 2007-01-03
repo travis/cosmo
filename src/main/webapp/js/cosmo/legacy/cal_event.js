@@ -20,10 +20,10 @@
  * @license Apache License 2.0
  */
 
+dojo.provide("cosmo.legacy.cal_event");
+
 dojo.require("cosmo.model");
 dojo.require('cosmo.view.cal.Lozenge');
-
-dojo.provide("cosmo.legacy.cal_event");
 
 /**
  * @object CalEvent -- an event on the Calendar, links to the event's

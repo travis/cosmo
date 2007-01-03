@@ -14,6 +14,8 @@
  * limitations under the License.
 */
 
+dojo.provide("cosmo.ui.cal_main");
+
 dojo.require("cosmo.util.date");
 dojo.require("cosmo.conduits");
 dojo.require("cosmo.ui.conf");
@@ -30,8 +32,6 @@ dojo.require('cosmo.ui.widget.CollectionSelector');
 dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.Lozenge');
 dojo.require('cosmo.view.cal.canvas');
-
-dojo.provide("cosmo.ui.cal_main");
 
 // Global variables for X and Y position for mouse
 xPos = 0;

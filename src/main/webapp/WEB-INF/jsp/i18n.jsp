@@ -22,16 +22,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"   prefix="fn"     %>
 <fmt:setBundle basename="PimMessageResources"/>
 
-dojo.provide("cosmo.util.i18n")
-
-var localText = [];
-
-cosmo.util.i18n.getText = function(str) {
-    return localText[str] || "[[" + str + "]]";
-}
-
-getText = cosmo.util.i18n.getText;
+<%-- This jsp generates javascript used by cosmo.util.i18n. 
+     Please see /src/main/webapp/cosmo/util/i18n.js for more details. --%>
+var localText = cosmo.util.i18n._localtext;
 
 <c:forEach var="key" items="${messages}">
-    localText["${key}"] = "<fmt:message key="${key}"/>";
-</c:forEach>
+localText["${key}"] = "<fmt:message key="${key}"/>";</c:forEach>

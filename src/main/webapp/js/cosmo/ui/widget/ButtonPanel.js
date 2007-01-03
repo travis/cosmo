@@ -21,13 +21,13 @@
  * @license Apache License 2.0
  */
 
+dojo.provide("cosmo.ui.widget.ButtonPanel");
+
 dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
 dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 dojo.require("cosmo.ui.widget.Button");
-
-dojo.provide("cosmo.ui.widget.ButtonPanel");
 
 dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, {
     

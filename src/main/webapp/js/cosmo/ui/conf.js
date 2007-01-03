@@ -14,8 +14,9 @@
  * limitations under the License.
 */
 
-dojo.require("cosmo.env");
 dojo.provide("cosmo.ui.conf");
+
+dojo.require("cosmo.env");
 // Configurable UI options
 
 

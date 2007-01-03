@@ -27,8 +27,9 @@ cosmo.util.debug.aliasToDeprecatedFuncion = function (currentFunction, deprecate
         dojo.deprecated(deprecatedName, null, version);
         return currentFunction.apply(this, arguments);
     }
+    var p = currentFunction.prototype; // to help dojo builder
     eval("window." + deprecatedName +  " = func");
-    eval("window." + deprecatedName + ".prototype = currentFunction.prototype");
+    eval("window." + deprecatedName + ".prototype = p");
 };
 
 cosmo.util.debug.genericToString = function (){

@@ -23,9 +23,9 @@
 /**
  * @object Login -- singleton for doing user auth
  */
-dojo.require("cosmo.env");
-
 dojo.provide("cosmo.ui.login");
+
+dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.cookie");
 

@@ -15,6 +15,7 @@
 */
 
 dojo.provide('cosmo.view.cal.dialog');
+
 dojo.require("cosmo.util.i18n");
 
 cosmo.view.cal.dialog = new function() {

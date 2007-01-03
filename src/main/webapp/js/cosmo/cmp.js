@@ -12,10 +12,11 @@
  * limitations under the License.
  */
 
+dojo.provide("cosmo.cmp");
+
 dojo.require("dojo.io.*");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.auth");
-dojo.provide("cosmo.cmp");
 
 DEFAULT_PAGE_NUMBER = 1;
 DEFAULT_PAGE_SIZE = 25;

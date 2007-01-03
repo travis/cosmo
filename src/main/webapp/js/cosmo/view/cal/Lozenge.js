@@ -25,9 +25,9 @@
  * cosmo.view.cal.HasTimeLozenge for a multi-day event may be a composite made up of
  * a main div element and a bunch of auxilliary divs off to the side.
  */
-dojo.require("cosmo.view.cal");
-
 dojo.provide('cosmo.view.cal.Lozenge');
+
+dojo.require("cosmo.view.cal");
 
 /**
  * @object A visual lozenge to represent the span of time of a calendar
@@ -599,7 +599,7 @@ cosmo.view.cal.HasTimeLozenge.prototype.insert = function (id) {
             view.appendChild(lozengeDiv);
 
             var lozengeDiv = document.createElement('div');
-            lozengeDiv.id = this.divId + Cal.ID_SEPARATOR +  +
+            lozengeDiv.id = this.divId + Cal.ID_SEPARATOR +
                 'aux' + (i+1) + this.idPrefix;
             lozengeDiv.className = 'eventLozenge';
             lozengeDiv.style.width = this.width + 'px';
@@ -641,7 +641,7 @@ cosmo.view.cal.HasTimeLozenge.prototype.insert = function (id) {
     if (auxDivCount) {
         for (var i = 0; i < auxDivCount; i++) {
             this.auxDivList[i] = document.getElementById(this.divId +
-                Cal.ID_SEPARATOR +  + 'aux' + (i+1) + this.idPrefix);
+                Cal.ID_SEPARATOR + 'aux' + (i+1) + this.idPrefix);
         }
     }
     // All done

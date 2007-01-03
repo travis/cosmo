@@ -20,6 +20,8 @@
  * @license Apache License 2.0
  */
 
+dojo.provide("cosmo.ui.widget.CosmoUserList");
+
 dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
 dojo.require("dojo.dom");
@@ -29,8 +31,6 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
 
 dojo.require("dojo.widget.FilteringTable");
-
-dojo.provide("cosmo.ui.widget.CosmoUserList");
 
 ASCENDING = "ascending";
 DESCENDING = "descending";

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-dojo.require("cosmo.view.cal");
-
 dojo.provide('cosmo.view.cal.conflict');
+
+dojo.require("cosmo.view.cal");
 
 cosmo.view.cal.conflict = new function() {
     

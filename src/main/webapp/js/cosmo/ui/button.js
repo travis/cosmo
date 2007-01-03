@@ -19,8 +19,8 @@
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  */
-
 dojo.provide("cosmo.ui.button");
+dojo.require("cosmo.ui.conf");
 
 function buttonPreload() {
     var btnSizes = ['', '_sm'];

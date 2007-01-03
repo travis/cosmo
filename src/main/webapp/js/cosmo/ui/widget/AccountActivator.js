@@ -22,6 +22,8 @@
  * @license Apache License 2.0
  */
 
+dojo.provide("cosmo.ui.widget.AccountActivator");
+
 dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
 dojo.require("dojo.dom");
@@ -29,8 +31,6 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.util.i18n");
-
-dojo.provide("cosmo.ui.widget.AccountActivator");
 
 _ = cosmo.util.i18n.getText
 

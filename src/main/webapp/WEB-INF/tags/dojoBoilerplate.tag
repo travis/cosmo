@@ -24,12 +24,13 @@
     // Set this to true to get nice dojo debugging messages.
 
     var djConfig = {isDebug: false};
+    var staticBaseUrl = "${staticBaseUrl}";
 </script>
 
 <script type="text/javascript" src="${staticBaseUrl}/js/lib/dojo-event_and_io/dojo.js"></script>
 <script type="text/javascript">
-bootstrap = function(){
-    var staticBaseUrl = "${staticBaseUrl}";
+
+function bootstrap(){
     dojo.require("dojo.widget.*");
     dojo.require("dojo.debug.console");
 

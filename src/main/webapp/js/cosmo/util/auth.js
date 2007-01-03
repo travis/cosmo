@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
+dojo.provide("cosmo.util.auth");
+
 dojo.require("dojo.io.cookie");
 dojo.require("cosmo.util.cookie"); 
 // dojo.io.cookie.destroyCookie doesn't appear to be working...
-
-dojo.provide("cosmo.util.auth");
 
 var COSMO_AUTH_COOKIE = "CosmoCred";
 

@@ -20,6 +20,8 @@
  * @license Apache License 2.0
  */
 
+dojo.provide("cosmo.ui.widget.TicketWidget");
+
 dojo.require("dojo.widget.*");
 dojo.require("dojo.validate.*");
 dojo.require("cosmo.util.i18n");
@@ -27,8 +29,6 @@ dojo.require("cosmo.util.auth");
 dojo.require("dojo.lang");
 
 _ = cosmo.util.i18n.getText;
-
-dojo.provide("cosmo.ui.widget.TicketWidget");
 
 dojo.widget.defineWidget("cosmo.ui.widget.TicketWidget", dojo.widget.HtmlWidget, {
 

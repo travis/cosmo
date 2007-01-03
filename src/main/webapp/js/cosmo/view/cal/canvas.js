@@ -14,6 +14,8 @@
  * limitations under the License.
 */
 
+dojo.provide('cosmo.view.cal.canvas');
+
 dojo.require('dojo.event.*');
 dojo.require("cosmo.util.date");
 dojo.require('cosmo.ui.event.handlers');
@@ -25,8 +27,6 @@ dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.view.cal");
 dojo.require('cosmo.view.cal.Lozenge');
 dojo.require("cosmo.view.cal.conflict");
-
-dojo.provide('cosmo.view.cal.canvas');
 
 cosmo.view.cal.canvas = new function () {
     

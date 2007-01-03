@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-dojo.require("cosmo.service.service_stub");
-
 dojo.provide("cosmo.service.json_service_impl")
+
+dojo.require("cosmo.service.service_stub");
+dojo.require("cosmo.datetime.*");
 JSON_SERVICE_OBJECT_NAME = "scoobyService";
 
 JAVA_JSON_MAPPING = {"java.util.Date":Date,

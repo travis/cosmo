@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
 dojo.provide("cosmo.model");
+
+dojo.require("cosmo.util.debug");
 
 cosmo.model.CalEventData = function (id, title, description, start, end, allDay,
     pointInTime, anyTime, recurrenceRule, status, masterEvent, instance, instanceDate) {

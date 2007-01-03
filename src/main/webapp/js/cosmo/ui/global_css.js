@@ -14,11 +14,13 @@
  * limitations under the License.
 */
 
+dojo.provide("cosmo.ui.global_css");
+
 dojo.require("cosmo.env");
 dojo.require("cosmo.ui.conf");
 dojo.require("dojo.html.common");
-
-dojo.provide("cosmo.ui.global_css");
+dojo.require("dojo.html.style");
+dojo.require("dojo.io.*");
 
 var uiStyles = '';
 var uiPref = []; 

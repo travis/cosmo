@@ -63,6 +63,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 }
                 var sel = cosmo.util.html.createSelect({ id: 'calSelectElem', name: 'calSelectElem',
                     options: o, className: 'selectElem' }, collSelectNode);
+                sel.style.width = '120px';
                 // Set the select to the current collection
                 cosmo.util.html.setSelect(sel, c);
                 

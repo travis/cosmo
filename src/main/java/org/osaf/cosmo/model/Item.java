@@ -69,6 +69,7 @@ public abstract class Item extends BaseModelObject {
     private String uid;
     private String name;
     private String displayName;
+    private Date clientCreationDate;
     private Date creationDate;
     private Date modifiedDate;
     private Integer version;
@@ -443,8 +444,18 @@ public abstract class Item extends BaseModelObject {
         this.attributes = attributes;
     }
 
-    @Column(name = "datecreated")
-    @Type(type="timestamp")
+    @Column(name = "clientcreatedate")
+    @Type(type="long_timestamp")
+    public Date getClientCreationDate() {
+        return clientCreationDate;
+    }
+
+    public void setClientCreationDate(Date clientCreationDate) {
+        this.clientCreationDate = clientCreationDate;
+    }
+    
+    @Column(name = "createdate")
+    @Type(type="long_timestamp")
     public Date getCreationDate() {
         return creationDate;
     }
@@ -453,8 +464,8 @@ public abstract class Item extends BaseModelObject {
         this.creationDate = creationDate;
     }
 
-    @Column(name = "datemodified")
-    @Type(type="timestamp")
+    @Column(name = "modifydate")
+    @Type(type="long_timestamp")
     public Date getModifiedDate() {
         return modifiedDate;
     }

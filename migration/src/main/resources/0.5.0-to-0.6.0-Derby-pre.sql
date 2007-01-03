@@ -40,10 +40,16 @@ alter table item add column lastmodifiedby varchar(255)
 alter table item add column triagestatus varchar(64)
 alter table item add column triagestatusupdated numeric(19,6)
 alter table item add column icaluid varchar(255)
+alter table item add column createdate bigint
+alter table item add column modifydate bigint
+alter table item add column clientcreatedate bigint
 
 # migrate users table
+# - add createdate, modifydate
 # - add activationid
 # - add index on activationid
+alter table users add column createdate bigint
+alter table users add column modifydate bigint
 alter table users add column activationid varchar(255)
 create index idx_activationid on users (activationid)
 

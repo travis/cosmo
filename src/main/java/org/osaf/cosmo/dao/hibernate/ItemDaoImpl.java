@@ -648,16 +648,15 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
         if(item.getUid()==null)
             item.setUid(idGenerator.nextIdentifier().toString());
         
-        // make precision seconds because of MySQL datetime
-        long currTime = (System.currentTimeMillis() / 1000) * 1000;
+        long currTime = System.currentTimeMillis();
         item.setCreationDate(new Date(currTime));
         item.setModifiedDate(new Date(currTime));
+        item.setClientCreationDate(new Date(currTime));
     }
     
     //  Update server generated item properties
     protected void updateBaseItemProps(Item item) {
-        // make precision seconds because of MySQL datetime
-        long currTime = (System.currentTimeMillis() / 1000) * 1000;
+        long currTime = System.currentTimeMillis();
         item.setModifiedDate(new Date(currTime));
     }
 

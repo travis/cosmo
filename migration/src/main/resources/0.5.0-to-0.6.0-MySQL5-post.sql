@@ -1,6 +1,10 @@
 # 0.5.0-to-0.6.0-MySQL5-post.sql
 # remove old data
 alter table attribute drop column attributename;
+alter table item drop column datemodified;
+alter table item drop column datecreated;
+alter table users drop column datecreated;
+alter table users drop column datemodified;
 
 # add new constraints
 alter table attribute add unique itemid (itemid, namespace, localname);

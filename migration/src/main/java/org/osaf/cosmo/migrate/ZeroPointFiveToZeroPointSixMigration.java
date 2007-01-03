@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.sql.Types;
 
 import org.apache.commons.io.IOUtils;
@@ -62,9 +63,83 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
         
         log.debug("updated " + updated + " item rows");
         
+        migrateUsers(conn);
+        migrateItems(conn);
         migrateAttributes(conn);
         migrateCalendarCollections(conn, dialect);
         migrateEvents(conn, dialect);
+    }
+    
+    private void migrateUsers(Connection conn) throws Exception {
+        PreparedStatement stmt = null;
+        PreparedStatement updateStmt = null;
+        ResultSet rs =  null;
+        long count = 0;
+        log.debug("starting migrateUsers()");
+        
+        try {
+            stmt = conn.prepareStatement("select id, datecreated, datemodified from users");
+            updateStmt = conn.prepareStatement("update users set createdate=?, modifydate=? where id=?");
+            rs = stmt.executeQuery();
+            
+            while(rs.next()) {
+                count++;
+                long itemId = rs.getLong(1);
+                Timestamp createTs = rs.getTimestamp(2);
+                Timestamp modifyTs = rs.getTimestamp(3);
+                
+                updateStmt.setLong(1, createTs.getTime());
+                updateStmt.setLong(2, modifyTs.getTime());
+                updateStmt.setLong(3, itemId);
+
+                updateStmt.executeUpdate();
+            }
+        } finally {
+            if(rs!=null)
+                rs.close();
+            if(stmt!=null)
+                stmt.close();
+            if(updateStmt!=null)
+                updateStmt.close();
+        }
+        
+        log.debug("processed " + count + " users");
+    }
+    
+    private void migrateItems(Connection conn) throws Exception {
+        PreparedStatement stmt = null;
+        PreparedStatement updateStmt = null;
+        ResultSet rs =  null;
+        long count = 0;
+        log.debug("starting migrateItems()");
+        
+        try {
+            stmt = conn.prepareStatement("select id, datecreated, datemodified from item");
+            updateStmt = conn.prepareStatement("update item set createdate=?, modifydate=? where id=?");
+            rs = stmt.executeQuery();
+            
+            while(rs.next()) {
+                count++;
+                long itemId = rs.getLong(1);
+                Timestamp createTs = rs.getTimestamp(2);
+                Timestamp modifyTs = rs.getTimestamp(3);
+                
+                updateStmt.setLong(1, createTs.getTime());
+                updateStmt.setLong(2, modifyTs.getTime());
+                updateStmt.setLong(3, itemId);
+
+                updateStmt.executeUpdate();
+            }
+        } finally {
+            if(rs!=null)
+                rs.close();
+            if(stmt!=null)
+                stmt.close();
+            if(updateStmt!=null)
+                updateStmt.close();
+        }
+        
+        log.debug("processed " + count + " items");
     }
     
     private void migrateAttributes(Connection conn) throws Exception {

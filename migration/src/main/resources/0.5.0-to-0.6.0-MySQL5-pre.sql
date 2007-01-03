@@ -34,14 +34,20 @@ alter table cal_timerange_index drop index FK98D277F2EA427E04;
 # migrate item table
 # - add isactive, lastmodifiedby, triagestatus, triagestatusupdated, icaluid
 alter table item add column isactive smallint not null;
+alter table item add column createdate bigint;
+alter table item add column modifydate bigint;
+alter table item add column clientcreatedate bigint;
 alter table item add column lastmodifiedby varchar(255);
 alter table item add column triagestatus varchar(64);
 alter table item add column triagestatusupdated numeric(19,6);
 alter table item add column icaluid varchar(255);
 
 # migrate users table
+# - add createdate, modifydate
 # - add activationid
 # - add index on activationid
+alter table users add column createdate bigint;
+alter table users add column modifydate bigint;
 alter table users add column activationid varchar(255);
 create index idx_activationid on users (activationid);
 

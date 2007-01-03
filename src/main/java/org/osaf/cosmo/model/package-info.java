@@ -35,6 +35,11 @@
     ),
     
     @TypeDef(
+            name="long_timestamp",
+            typeClass = org.osaf.cosmo.hibernate.LongTimestampType.class
+    ),
+    
+    @TypeDef(
             name="boolean_integer",
             typeClass = org.osaf.cosmo.hibernate.BooleanIntegerType.class
     )

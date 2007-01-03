@@ -303,8 +303,8 @@ public class User extends BaseModelObject {
 
     /**
      */
-    @Column(name = "datecreated")
-    @Type(type="timestamp")
+    @Column(name = "createdate")
+    @Type(type="long_timestamp")
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -317,8 +317,8 @@ public class User extends BaseModelObject {
 
     /**
      */
-    @Column(name = "datemodified")
-    @Type(type="timestamp")
+    @Column(name = "modifydate")
+    @Type(type="long_timestamp")
     public Date getDateModified() {
         return dateModified;
     }

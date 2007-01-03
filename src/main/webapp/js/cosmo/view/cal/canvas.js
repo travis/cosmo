@@ -691,12 +691,6 @@ cosmo.view.cal.canvas = new function () {
             dayNameHeadersNode = $('dayListDiv');
             hoursNode = $('timedContentDiv');
             allDayColsNode = $('allDayContentDiv');
-            
-            // Create event listeners
-            dojo.event.connect(hoursNode, 'onmousedown', mouseDownHandler);
-            dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
-            dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
-            dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
 
             // All done, woot
             return true;
@@ -980,7 +974,6 @@ cosmo.view.cal.canvas = new function () {
             allDayArea.init('down');
             allDayArea.addAdjacent('timedScrollingMainDiv');
             allDayArea.setDragLimit();
-            initRender = true;
         }
         else {
             removeAllEvents();
@@ -992,6 +985,16 @@ cosmo.view.cal.canvas = new function () {
         showDayNameHeaders();
         showAllDayCols();
         showHours();
+        
+        // Create event listeners
+        if (!initRender) {
+            dojo.event.connect(hoursNode, 'onmousedown', mouseDownHandler);
+            dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
+            dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
+            dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
+        }
+
+        initRender = true;
     };
     /**
      * Get the scroll offset for the timed canvas

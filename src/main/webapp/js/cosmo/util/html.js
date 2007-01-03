@@ -62,12 +62,8 @@ cosmo.util.html.createSelect = function (id, name, size,
     // Append the select if passed somewhere to put it
     if (appendElem) {
         appendElem.appendChild(sel);
-        return true;
     }
-    // Otherwise just return the select
-    else {
-        return sel;
-    }
+    return sel;
 };
     
 cosmo.util.html.setSelectOptions = function (selectElement, options){
@@ -145,11 +141,8 @@ cosmo.util.html.createInput = function (type, id, name,
         }
         if (elem) {
             elem.appendChild(formElem);
-            return true;
         }
-        else {
-            return formElem;
-        }
+        return formElem;
     }
 };
 

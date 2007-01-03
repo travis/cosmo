@@ -22,6 +22,7 @@ $fontColor = #000000
 $fontSizeS = 9px
 $fontSizeM = 11px
 $fontSizeL = 12px
+$fontSizeXL = 14px
 // Color for base areas of UI
 $mainUIColor = #ffffff
 // Selected event block color
@@ -430,6 +431,12 @@ $smButtonHeight = 18px
     vertical-align:middle;
     padding-right:4px;
 }
+.labelTextXL {
+    font-size:$fontSizeXL;
+    font-weight:bold;
+    color:#333333;
+    color:$navBarTextColor;
+}
 /* For block elements containing form inputs */
 .formElem {
     margin-bottom:8px;
@@ -660,11 +667,15 @@ td.dataDisplayLabel {
     position:absolute;
     background:$mainUIColor;
 }
-/* Calendar select box */
+/* Collection select box */
 #calSelectNav {
     padding-left:12px;
     position:absolute;
     top:8px;
+}
+/* Text for single collections */
+#collectionLabelPrompt {
+    color:#aaaaaa;
 }
 /* Jump-to date box */
 #jumpToDateDiv {
@@ -707,13 +718,6 @@ td.dataDisplayLabel {
     background:$calTopNavColor;
     line-height:34px;
     vertical-align:middle;
-}
-/* Label for month and year */
-#monthHeaderDiv {
-    font-size:14px;
-    font-weight:bold;
-    color:#333333;
-    color:$navBarTextColor;
 }
 /* List of day/dates -- e.g., 'Sun 11 | Mon 12 | Tue 12' */
 #dayListDiv {

@@ -25,46 +25,87 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
     dojo.widget.HtmlWidget, {
         templateString: '<span></span>',
         collections: [],
+        currentCollection: {},
+        ticketKey: '',
         /**
-         * Inserts the select box for choosing from multiple calendars
-         * Only actually called if multiple calendars exist
+         * Inserts the select box for choosing from multiple collections
+         * Only actually called if multiple collections exist
          */
         fillInTemplate: function () {
             var col = this.collections;
-            var calSelectNav = this.domNode; 
+            var curr = this.currentCollection;
+            var key = this.ticketKey;
+            var collSelectNode = this.domNode; 
             
+            function $(s) {
+                return document.getElementById(s);
+            }
+            function _createElem(s) {
+                return document.createElement(s);
+            }
+            function _createText(s) {
+                return document.createTextNode(s);
+            }
+            
+            // Break into a couple of different functions depending
+            // on ticket/account, and single/multiple collections
+            // --------------------
             // More than one collection
             function renderSelector() {
                 var o = [];
+                var c = 0;
                 for (var i in col) {
+                    // Grab the currently selected collection's index
+                    if (col[i].displayName == curr.displayName) {
+                        c = i;
+                    }
                     o.push( { value: i, text: col[i].displayName } );
                 }
-                cosmo.util.html.createSelect({ id: 'calSelectElem', name: 'calSelectElem',
-                    options: o, className: 'selectElem' }, calSelectNav);
+                var sel = cosmo.util.html.createSelect({ id: 'calSelectElem', name: 'calSelectElem',
+                    options: o, className: 'selectElem' }, collSelectNode);
+                // Set the select to the current collection
+                cosmo.util.html.setSelect(sel, c);
                 
+            }
+            function renderInfoButton() {
                 // TODO replace this with an image when I get it from Priss
-                var infoLinkSpan = document.createElement("span");
-                var infoLink = document.createTextNode(" Info");
-                infoLinkSpan.onclick = function () {
-                        cosmo.app.showDialog(
+                var infoLinkSpan = _createElem("span");
+                var infoLinkLink = _createElem('a');
+                var infoLinkText = _createText("[info]");
+                infoLinkLink.onclick = function () {
+                    cosmo.app.showDialog(
                         cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
                         Cal.currentCollection.collection));
                 };
-                infoLinkSpan.appendChild(infoLink);
-                calSelectNav.appendChild(infoLinkSpan);
+                infoLinkLink.href = '#';
+                infoLinkLink.appendChild(infoLinkText);
+                infoLinkSpan.appendChild(_createText('\u00A0'));
+                infoLinkSpan.appendChild(infoLinkLink);
+                collSelectNode.appendChild(infoLinkSpan);
             }
-            
             // Single collection -- may have plus sign for subscribing
             function renderSingleCollectionName() {
-
+                var d = _createElem('div');
+                d.id = 'collectionLabelPrompt';
+                d.appendChild(_createText('You are currently viewing:'));
+                collSelectNode.appendChild(d);
+                var s = _createElem('span');
+                s.id = 'collectionLabelName';
+                s.className = 'labelTextXL';
+                s.appendChild(_createText(curr.displayName));
+                collSelectNode.appendChild(s);
             }
             
             // Multiple collections -- display selector
             if (col.length > 1) {
                 renderSelector();
+                renderInfoButton();
             }
             else {
-                
+                renderSingleCollectionName();
+                if (!key) {
+                    renderInfoButton();
+                }
             }
         }
 } );

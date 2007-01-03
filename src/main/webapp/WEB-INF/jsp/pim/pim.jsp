@@ -134,7 +134,7 @@ cosmo.ui.event.listeners.hookUpListeners();
                             <td>&nbsp;&nbsp;&nbsp;</td>
                             <td id="viewNavButtons"></td>
                             <td>&nbsp;&nbsp;&nbsp;</td>
-                            <td id="monthHeaderDiv"></td>
+                            <td id="monthHeaderDiv" class="labelTextXL"></td>
                         </tr>
                     </table>
                 </div>

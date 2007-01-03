@@ -213,6 +213,12 @@ cosmo.ui.cal_main.Cal = new function () {
             }
         }
         
+        // Sort the collections, for Pete's sake
+        var f = function (a, b) {
+            return (a.displayName.toLowerCase() >= b.displayName.toLowerCase()) ? 1 : -1;
+        };
+        this.currentCollections.sort(f); 
+
         // If we received a collectionUid, select that collection
         if (collectionUid){
             for (var i = 0; i < this.currentCollections.length; i++){
@@ -230,6 +236,7 @@ cosmo.ui.cal_main.Cal = new function () {
         // Display selector or single cal name
         var selector = dojo.widget.createWidget(
             'cosmo:CollectionSelector', { 'collections': this.currentCollections, 
+            'currentCollection': this.currentCollection,
             'ticketKey': ticketKey }, document.getElementById('calSelectNav'), 'last');
         
         // Load and display events

@@ -127,7 +127,9 @@ dojo.widget.HtmlWidget, function(){
         },
         
         _setClientInstructions: function(client){
-            dojo.dom.replaceChildren(this.clientInstructions, document.createTextNode(getText("Main.CollectionDetails.Instructions." + client)));
+            dojo.dom.replaceChildren(this.clientInstructions, 
+                document.createTextNode(
+                getText("Main.CollectionDetails.Instructions." + client)));
         }, 
         
         _setClientCollectionAddress: function(client){

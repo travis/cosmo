@@ -67,7 +67,7 @@ public class ContentItemGenerator extends BaseItemGenerator
         record.addField(new TextField(FIELD_LAST_MODIFIED_BY,
                                       contentItem.getLastModifiedBy()));
         record.addField(new TimeStampField(FIELD_CREATED_ON,
-                                           contentItem.getCreationDate()));
+                                           contentItem.getClientCreationDate()));
 
         record.addFields(generateUnknownFields());
 

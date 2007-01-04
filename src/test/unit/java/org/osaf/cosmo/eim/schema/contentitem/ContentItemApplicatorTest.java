@@ -57,7 +57,7 @@ public class ContentItemApplicatorTest extends BaseApplicatorTestCase
         checkTextValue(record.getFields().get(3),
                        contentItem.getLastModifiedBy());
         checkTimeStampValue(record.getFields().get(4),
-                            contentItem.getCreationDate());
+                            contentItem.getClientCreationDate());
         checkUnknownValue(record.getFields().get(5), contentItem);
     }
 

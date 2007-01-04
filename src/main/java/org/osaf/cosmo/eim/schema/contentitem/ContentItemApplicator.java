@@ -77,7 +77,7 @@ public class ContentItemApplicator extends BaseItemApplicator
             contentItem.setLastModifiedBy(value);
         } else if (field.getName().equals(FIELD_CREATED_ON)) {
             Date value = EimFieldValidator.validateTimeStamp(field);
-            contentItem.setCreationDate(value);
+            contentItem.setClientCreationDate(value);
         } else {
             applyUnknownField(field);
         }

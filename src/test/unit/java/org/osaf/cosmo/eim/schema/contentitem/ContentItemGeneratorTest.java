@@ -46,7 +46,7 @@ public class ContentItemGeneratorTest extends BaseGeneratorTestCase
         contentItem.setTriageStatus("DONE");
         contentItem.setTriageStatusUpdated(new BigDecimal("666.66"));
         contentItem.setLastModifiedBy("bcm@osafoundation.org");
-        contentItem.setCreationDate(Calendar.getInstance().getTime());
+        contentItem.setClientCreationDate(Calendar.getInstance().getTime());
 
         StringAttribute unknownAttr = makeStringAttribute();
         contentItem.addAttribute(unknownAttr);
@@ -83,7 +83,7 @@ public class ContentItemGeneratorTest extends BaseGeneratorTestCase
 
         EimRecordField createdOn = fields.get(4);
         checkTimeStampField(createdOn, FIELD_CREATED_ON,
-                            contentItem.getCreationDate());
+                            contentItem.getClientCreationDate());
 
         EimRecordField unknown = fields.get(5);
         checkTextField(unknown, unknownAttr.getName(), unknownAttr.getValue());

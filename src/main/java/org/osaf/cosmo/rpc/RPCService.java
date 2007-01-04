@@ -235,4 +235,12 @@ public interface RPCService {
     public Ticket getTicket(String ticketId, String collectionId) throws RPCException;
     
     public Subscription getSubscription(String collectionuid, String ticketId, HttpServletRequest request) throws RPCException;
+    
+    /**
+     * Changes the displayName for a collection.
+     * 
+     * @param collectionUid
+     * @param displayName
+     */
+    public void saveDisplayName(String collectionUid, String displayName) throws RPCException;
 }

@@ -546,6 +546,22 @@ public class RPCServiceImpl implements RPCService {
         return createSubscription(colsub, request);
     }
 
+    public void saveDisplayName(String collectionUid, String displayName)
+            throws RPCException {
+        User user = getUser();
+        if (user == null) {
+            throw new RPCException(
+                    "You must be logged in to create a collection");
+        }
+
+        CollectionItem collection = getCollectionItem(collectionUid);
+
+        this.checkCurrentUserOwnsCollection(collection);
+        
+        collection.setDisplayName(displayName);
+        contentService.updateCollection(collection);
+    }
+    
     private Subscription createSubscription(
             CollectionSubscription collectionSubscription,
             HttpServletRequest request) throws RPCException {
@@ -956,4 +972,5 @@ public class RPCServiceImpl implements RPCService {
         }
         return map;
     }
+
 }

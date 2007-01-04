@@ -26,7 +26,7 @@ cosmo.conduits.Conduit =
     saveRecurrenceRule: function(eventUid, recurrenceRule, transportInfo){},
     expandEvents: function(eventUids, startTime, endTime, transportInfo){},
     saveNewEventBreakRecurrence: function(event, originalEventUid, 
-        originalEventEndDate, transportInfo){},
+        originalEventEndDate, transportInfo){}, 
     saveDisplayName: function(collectionUid, newDisplayName, transportInfo){}
     
 };
@@ -104,8 +104,15 @@ cosmo.conduits.OwnedCollectionConduit =
             return Cal.serv.saveNewEventBreakRecurrence(collectionUid, event, 
                 originalEventUid, originalEventEndDate);
         }
+    },
+    
+    saveDisplayName: function(collectionUid, newDisplayName, transportInfo, handlerFunc){
+        if (handlerFunc){
+            Cal.serv.saveDisplayName(handlerFunc, collectionUid, newDisplayName);
+        } else {
+            Cal.serv.saveDisplayName(collectionUid, newDisplayName);
+        }
     }
-
 };
 
 cosmo.conduits.TicketedConduit =
@@ -189,8 +196,12 @@ cosmo.conduits.SubscriptionConduit =
     getTicket: function(transportInfo){
         return transportInfo.ticket.ticketKey;
     },
-    saveDisplayName: function(collectionUid, newDisplayName, transportInfo){
-         Cal.serv.saveSubscription(collectionUid, transportInfo.ticket.ticketKey, newDisplayName);
+    saveDisplayName: function(collectionUid, newDisplayName, transportInfo, handlerFunc){
+        if (handlerFunc){
+            Cal.serv.saveSubscription(handlerFunc, collectionUid, transportInfo.ticket.ticketKey, newDisplayName);
+        } else {
+            Cal.serv.saveSubscription(collectionUid, transportInfo.ticket.ticketKey, newDisplayName);
+        }
     }
 };
 dojo.lang.mixin(cosmo.conduits.SubscriptionConduit, cosmo.conduits.TicketedConduit)

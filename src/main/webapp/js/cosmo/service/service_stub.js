@@ -206,7 +206,13 @@ ScoobyService.prototype = {
     /**
      * Returns the version of Cosmo
      */
-    getVersion: function(){}
+    getVersion: function(){},
+    
+    /**
+     * Changes the display name for a collection. Must be a collection
+     * owned by the user
+     */
+    saveDisplayName: function(cid, displayName){}
 }
 
 /**

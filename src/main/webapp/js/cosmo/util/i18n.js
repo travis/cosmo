@@ -34,4 +34,6 @@ function getText(str) {
 }
 
 cosmo.util.i18n.getText = getText
-cosmo.util.i18n.init(djConfig['i18nLocation']);
+if (djConfig['i18nLocation']){
+	cosmo.util.i18n.init(djConfig['i18nLocation']);
+}

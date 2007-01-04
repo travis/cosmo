@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 public class TimeStampField extends DecimalField {
     private static final Log log = LogFactory.getLog(TimeStampField.class);
 
-    private static final int NUM_DIGITS = 15;
+    private static final int NUM_DIGITS = 20;
 
     /** */
     public TimeStampField(String name,

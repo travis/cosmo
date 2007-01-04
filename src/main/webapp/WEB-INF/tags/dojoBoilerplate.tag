@@ -21,13 +21,14 @@
 
 <script type="text/javascript">
 
-    // Set this to true to get nice dojo debugging messages.
+    // Set isDebug to true to get nice dojo debugging messages.
 
-    var djConfig = {isDebug: false};
-    var staticBaseUrl = "${staticBaseUrl}";
+    var djConfig = {isDebug: false, 
+    				staticBaseUrl: "${staticBaseUrl}",
+    				i18nLocation: "${staticBaseUrl}/i18n.js"};
 </script>
 
-<script type="text/javascript" src="${staticBaseUrl}/js/lib/dojo-event_and_io/dojo.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/lib/dojo/dojo.js"></script>
 <script type="text/javascript">
 
 function bootstrap(){
@@ -38,7 +39,8 @@ function bootstrap(){
     dojo.widget.manager.registerWidgetPackage("cosmo.ui.widget");
 
     dojo.require("cosmo.env");
-    cosmo.env.setBaseUrl("${staticBaseUrl}");
+
+    cosmo.env.setBaseUrl(djConfig['staticBaseUrl']);
 
     dojo.require("cosmo.ui.widget.Debug");
 

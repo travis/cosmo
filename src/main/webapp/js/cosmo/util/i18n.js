@@ -22,11 +22,10 @@ dojo.provide("cosmo.util.i18n");
 
 cosmo.util.i18n.loadI18n = function(uri){
 	var s = dojo.hostenv.getText(uri);
-	eval(s);
+	cosmo.util.i18n._localtext = eval("(" + s + ")");
 }
 
 cosmo.util.i18n.init = function(uri){
-	cosmo.util.i18n._localtext = {};
     cosmo.util.i18n.loadI18n(uri);
 }
 
@@ -35,5 +34,4 @@ function getText(str) {
 }
 
 cosmo.util.i18n.getText = getText
-cosmo.util.i18n.init(
-	cosmo.env.getBaseUrl() + "/i18n.js");
+cosmo.util.i18n.init(djConfig['i18nLocation']);

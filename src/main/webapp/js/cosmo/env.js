@@ -30,7 +30,7 @@ cosmo.env.OVERLORD_USERNAME = "root";
 //private variable for storing environment information. Do not access directly, 
 //use methods below.
 cosmo.env._cosmoConfig = {};
-cosmo.env._cosmoConfig["baseUrl"] = staticBaseUrl;
+cosmo.env._cosmoConfig["baseUrl"] = djConfig['staticBaseUrl'];
 cosmo.env._NULL = {};
 cosmo.env._FALSE_OR_ZERO = {};
 cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction ){

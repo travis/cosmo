@@ -16,6 +16,7 @@
 
 dojo.provide("cosmo.datetime.timezone");
 dojo.require("dojo.collections.Dictionary");
+dojo.require("dojo.string.extras");
 
 cosmo.datetime.HOURS_IN_DAY = 24;
 cosmo.datetime.MINUTES_IN_HOUR = 60;

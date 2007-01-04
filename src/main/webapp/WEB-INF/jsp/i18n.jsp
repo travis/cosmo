@@ -22,9 +22,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"   prefix="fn"     %>
 <fmt:setBundle basename="PimMessageResources"/>
 
-<%-- This jsp generates javascript used by cosmo.util.i18n. 
+<%-- This jsp generates json used by cosmo.util.i18n. 
      Please see /src/main/webapp/cosmo/util/i18n.js for more details. --%>
-var localText = cosmo.util.i18n._localtext;
 
-<c:forEach var="key" items="${messages}">
-localText["${key}"] = "<fmt:message key="${key}"/>";</c:forEach>
+{<c:forEach var="key" items="${messages}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>"${key}": "<fmt:message key="${key}"/>"</c:forEach>}

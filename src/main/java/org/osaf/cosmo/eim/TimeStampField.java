@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.eim;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -22,18 +23,24 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Represents an EIM field whose value is an instant in time.
+ *
+ * Timestamp is not an actual EIM value type but rather is derived
+ * from the decimal value type.
  */
-public class TimeStampField extends EimRecordField {
+public class TimeStampField extends DecimalField {
     private static final Log log = LogFactory.getLog(TimeStampField.class);
+
+    private static final int NUM_DIGITS = 15;
 
     /** */
     public TimeStampField(String name,
                           Date value) {
-        super(name, value);
+        super(name, (value != null ? new BigDecimal(value.getTime()) : null),
+              NUM_DIGITS, 0);
     }
 
     /** */
     public Date getTimeStamp() {
-        return (Date) getValue();
+        return new Date(getDecimal().longValue());
     }
 }

@@ -178,28 +178,6 @@ public class EimmlTypeConverter implements EimmlConstants {
     }
 
     /**
-     * Returns the given value as a timestamp.
-     */
-    public static Date toTimeStamp(String value)
-        throws EimmlConversionException {
-        try {
-            return new Date(Long.parseLong(value));
-        } catch (NumberFormatException e) {
-            throw new EimmlConversionException("Provided value " + value + " is not a long integer", e);
-        }
-    }
-
-    /**
-     * Returns the given value as a string.
-     */
-    public static String fromTimeStamp(Date value)
-        throws EimmlConversionException {
-        if (value == null)
-            return null;
-        return Long.toString(value.getTime());
-    }
-
-    /**
      * Returns the given value as a decimal.
      */
     public static BigDecimal toDecimal(String value)

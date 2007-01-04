@@ -43,7 +43,6 @@ import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
-import org.osaf.cosmo.eim.TimeStampField;
 
 /**
  * Provides forward, read-only access to an EIMML stream.
@@ -248,10 +247,6 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
                 Calendar value = EimmlTypeConverter.
                     toDateTime(xmlReader.getElementText());
                 field = new DateTimeField(name, value);
-            } else if (type.equals(TYPE_TIMESTAMP)) {
-                Date value = EimmlTypeConverter.
-                    toTimeStamp(xmlReader.getElementText());
-                field = new TimeStampField(name, value);
             } else if (type.equals(TYPE_DECIMAL)) {
                 BigDecimal value = EimmlTypeConverter.
                     toDecimal(xmlReader.getElementText());

@@ -204,25 +204,6 @@ public class EimmlTypeConverterTest extends TestCase
     }
 
     /** */
-    public void testToTimeStamp() throws Exception {
-        String testString = "116787214";
-
-        Date resultDate = EimmlTypeConverter.toTimeStamp(testString);
-
-        assertEquals(testString, Long.toString(resultDate.getTime()));
-    }
-
-    /** */
-    public void testFromTimeStamp() throws Exception {
-        String testString = "116787214";
-        Date testDate = new Date(Long.parseLong(testString));
-
-        String resultString = EimmlTypeConverter.fromTimeStamp(testDate);
-
-        assertEquals("Result string does not match", testString, resultString);
-    }
-
-    /** */
     public void testToDecimal() throws Exception {
         try {
             EimmlTypeConverter.toDecimal("deadbeef");

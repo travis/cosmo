@@ -31,7 +31,6 @@ import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.TextField;
-import org.osaf.cosmo.eim.TimeStampField;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.CalendarAttribute;
@@ -103,9 +102,6 @@ public abstract class BaseApplicator implements EimSchemaConstants {
         } else if (field instanceof TextField) {
             String value = ((TextField)field).getText();
             item.addAttribute(new StringAttribute(qn, value));
-        } else if (field instanceof TimeStampField) {
-            Date value = ((TimeStampField)field).getTimeStamp();
-            item.addAttribute(new DateAttribute(qn, value));
         } else {
             throw new EimSchemaException("Field " + field.getName() + " is of unknown type " + field.getClass().getName());
         }

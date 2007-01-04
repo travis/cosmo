@@ -41,6 +41,8 @@ public class TimeStampField extends DecimalField {
 
     /** */
     public Date getTimeStamp() {
+        if (getValue() == null)
+            return null;
         return new Date(getDecimal().longValue());
     }
 }

@@ -137,15 +137,7 @@ public class RPCServiceImpl implements RPCService {
         return calendar.getUid();
     }
 
-    private void createCalendarHandleDuplicateName(CollectionItem collection,
-        CollectionItem calendar, int i) throws RPCException {
-        try {
-            contentService.createCollection(collection, calendar);
-        } catch (DuplicateItemNameException e) {
-            calendar.setName(calendar.getName() + Integer.toString(i));
-            createCalendarHandleDuplicateName(collection, calendar, i+1);
-        }
-    }
+
 
     public Calendar[] getCalendars(HttpServletRequest request) throws RPCException {
         if (log.isDebugEnabled())
@@ -225,32 +217,6 @@ public class RPCServiceImpl implements RPCService {
         return doGetEvent(collection, eventUid);
     }
 
-    private Event doGetEvent(CollectionItem collection, String eventUid) throws RPCException{
-
-        if (log.isDebugEnabled())
-            log.debug("Getting event " + eventUid + " in calendar with uid " +
-                      collection.getUid());
-        ContentItem calItem = (ContentItem) contentService.findItemByUid(eventUid);
-        if (calItem == null){
-            return null;
-        }
-
-        EventStamp event = EventStamp.getStamp(calItem);
-        if (event == null){
-            return null;
-        }
-
-        try {
-            return icalendarToCosmoConverter.createEvent(calItem.getUid(),
-                    event.getMasterEvent(), event.getCalendar());
-        } catch (Exception e) {
-            log.error("Problem getting event: userName: " + getUsername()
-                    + " calendarUid: " + collection.getUid()
-                    + " id: " +eventUid, e);
-            throw new RPCException("Problem getting event", e);
-        }
-    }
-
     public Event[] getEvents(String collectionUid, long utcStartTime,
             long utcEndTime) throws RPCException {
 
@@ -279,65 +245,7 @@ public class RPCServiceImpl implements RPCService {
         return doGetEvents(collection, utcStartTime, utcEndTime);
     }
 
-    private Event[] doGetEvents(CollectionItem collection, long utcStartTime,
-                long utcEndTime) throws RPCException {
-        DateTime start = new DateTime(utcStartTime);
-        start.setUtc(true);
-
-        DateTime end = new DateTime(utcEndTime);
-        end.setUtc(true);
-
-        ComponentFilter eventFilter = new ComponentFilter(Component.VEVENT);
-        eventFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
-
-        ComponentFilter calFilter =
-            new ComponentFilter(net.fortuna.ical4j.model.Calendar.VCALENDAR);
-        calFilter.getComponentFilters().add(eventFilter);
-
-        CalendarFilter filter = new CalendarFilter();
-        filter.setFilter(calFilter);
-
-
-        if (log.isDebugEnabled())
-            log.debug("Getting events between " + start + " and " + end +
-                      " in calendar with uid " + collection.getUid());
-
-        // XXX: need ContentService.findEvents(path, filter)
-        if (collection == null)
-            throw new RPCException("Collection with uid " + collection.getUid() + " does not exist");
-
-        Set<ContentItem> calendarItems = null;
-        try {
-            calendarItems = contentService.findEvents(collection, filter);
-        } catch (Exception e) {
-            log.error("cannot find events for calendar with uid " +
-                    collection.getUid(), e);
-            throw new RPCException("Cannot find events for calendar with uid " +
-                    collection.getUid() + ": " + e.getMessage(), e);
-        }
-
-        Event[] events = null;
-        try {
-            DateTime beginDate = new DateTime();
-            beginDate.setUtc(true);
-            beginDate.setTime(utcStartTime);
-            DateTime endDate = new DateTime();
-            endDate.setUtc(true);
-            endDate.setTime(utcEndTime);
-
-            events = icalendarToCosmoConverter.
-                createEventsFromCalendars(calendarItems, beginDate, endDate);
-        } catch (Exception e) {
-            log.error("Problem getting events: userName: " + getUsername()
-                      + " calendarUid: " + collection.getUid()
-                      + " beginDate: " + utcStartTime
-                      + " endDate: " + utcStartTime, e);
-            throw new RPCException("Problem getting events", e);
-        }
-        return events;
-    }
-
-    public String getPreference(String preferenceName) throws RPCException {
+     public String getPreference(String preferenceName) throws RPCException {
         if (log.isDebugEnabled())
             log.debug("Getting preference " + preferenceName);
        return userService.getPreference(getUsername(), preferenceName);
@@ -389,16 +297,6 @@ public class RPCServiceImpl implements RPCService {
 
     }
 
-    private void doRemoveEvent(CollectionItem collection, String eventUid)
-        throws RPCException {
-
-        if (log.isDebugEnabled())
-            log.debug("Removing event " + eventUid + " from calendar with uid " +
-                      collection.getUid());
-        ContentItem calItem = (ContentItem) contentService.findItemByUid(eventUid);
-        contentService.removeContent(calItem);
-    }
-
     public void removePreference(String preferenceName) throws RPCException {
         if (log.isDebugEnabled())
             log.debug("Removing preference " + preferenceName);
@@ -430,36 +328,6 @@ public class RPCServiceImpl implements RPCService {
         }
 
         return doSaveEvent(collection, event);
-    }
-
-    private String doSaveEvent(CollectionItem collection, Event event)
-        throws RPCException {
-
-        ContentItem calendarEventItem = null;
-
-        //Check to see if this is a new event
-        if (StringUtils.isEmpty(event.getId())) {
-            calendarEventItem = saveNewEvent(event, collection);
-
-        } else {
-            calendarEventItem = (ContentItem) contentService.findItemByUid(event.getId());
-            calendarEventItem.setDisplayName(event.getTitle());
-
-            EventStamp eventStamp = EventStamp.getStamp(calendarEventItem);
-            net.fortuna.ical4j.model.Calendar calendar = eventStamp.getCalendar();
-            cosmoToICalendarConverter.updateEvent(event, calendar);
-            cosmoToICalendarConverter.updateVTimeZones(calendar);
-            eventStamp.setCalendar(calendar);
-
-            // update NoteItem attributes
-            if(calendarEventItem instanceof NoteItem) {
-                ((NoteItem) calendarEventItem).setIcalUid(eventStamp.getIcalUid());
-                ((NoteItem) calendarEventItem).setBody(event.getDescription());
-            }
-            contentService.updateContent(calendarEventItem);
-        }
-
-        return calendarEventItem.getUid();
     }
 
     public void setPreference(String preferenceName, String value)
@@ -499,21 +367,6 @@ public class RPCServiceImpl implements RPCService {
         return doGetRecurrenceRules(collection, eventUids);
     }
 
-    private Map<String, RecurrenceRule> doGetRecurrenceRules(CollectionItem collection,
-            String[] eventUids) throws RPCException {
-
-        Map<String, RecurrenceRule> map = new HashMap<String, RecurrenceRule>();
-        for (int x = 0; x < eventUids.length; x++) {
-            String eventId = eventUids[x];
-            ContentItem calItem = (ContentItem) contentService.findItemByUid(eventId);
-            EventStamp eventStamp = EventStamp.getStamp(calItem);
-            Event e = icalendarToCosmoConverter.createEvent(calItem.getUid(),
-                    eventStamp.getMasterEvent(), eventStamp.getCalendar());
-            map.put(eventId, e.getRecurrenceRule());
-        }
-        return map;
-    }
-
     public void saveRecurrenceRule(String collectionUid, String eventUid,
             RecurrenceRule recurrenceRule) throws RPCException {
 
@@ -546,22 +399,6 @@ public class RPCServiceImpl implements RPCService {
 
     }
 
-    private void doSaveRecurrenceRule(CollectionItem collection, String eventUid,
-            RecurrenceRule recurrenceRule) throws RPCException {
-
-        ContentItem calItem = (ContentItem) contentService.findItemByUid(eventUid);
-        EventStamp eventStamp = EventStamp.getStamp(calItem);
-        net.fortuna.ical4j.model.Calendar calendar = eventStamp.getCalendar();
-
-        Event event = icalendarToCosmoConverter.createEvent(eventUid, eventStamp
-                .getMasterEvent(), calendar);
-        event.setRecurrenceRule(recurrenceRule);
-        cosmoToICalendarConverter.updateEvent(event, calendar);
-        cosmoToICalendarConverter.updateVTimeZones(calendar);
-        eventStamp.setCalendar(calendar);
-        contentService.updateContent(calItem);
-    }
-
     public Map<String, Event[]> expandEvents(String collectionUid,
             String[] eventUids, long utcStartTime,
             long utcEndTime) throws RPCException{
@@ -591,30 +428,6 @@ public class RPCServiceImpl implements RPCService {
         }
 
         return doExpandEvents(collection, eventUids, utcStartTime, utcEndTime);
-    }
-
-    private Map<String, Event[]> doExpandEvents(CollectionItem collection, String[] eventUids,
-            long utcStartTime, long utcEndTime) throws RPCException{
-
-        Map<String, Event[]> map = new HashMap<String, Event[]>();
-        for (String eventUid : eventUids) {
-            ContentItem calItem = (ContentItem) contentService.findItemByUid(eventUid);
-            EventStamp eventStamp = EventStamp.getStamp(calItem);
-
-            DateTime start = new DateTime(utcStartTime);
-            start.setUtc(true);
-
-            DateTime end = new DateTime(utcEndTime);
-            end.setUtc(true);
-
-            List<ContentItem> events = new ArrayList<ContentItem>();
-            events.add(calItem);
-            map.put(eventUid,icalendarToCosmoConverter.createEventsFromCalendars(events,
-                    start, end));
-
-        }
-        return map;
-
     }
 
     public String saveNewEventBreakRecurrence(String collectionUid,
@@ -649,23 +462,6 @@ public class RPCServiceImpl implements RPCService {
 
         return doSaveNewEventBreakRecurrence(collection, event,
                 originalEventUid, originalEventEndDate);
-    }
-
-    private String doSaveNewEventBreakRecurrence(CollectionItem collection,
-            Event event, String originalEventUid,
-            CosmoDate originalEventEndDate) throws RPCException {
-
-        //first save the new event
-        ContentItem calendarEventItem = saveNewEvent(event, collection);
-
-        //get the old event's recurrence rule
-        RecurrenceRule recurrenceRule = doGetRecurrenceRules(collection,
-                new String[] { originalEventUid }).get(originalEventUid);
-
-        recurrenceRule.setEndDate(originalEventEndDate);
-        doSaveRecurrenceRule(collection, originalEventUid, recurrenceRule);
-
-        return calendarEventItem.getUid();
     }
 
     public void saveSubscription(String collectionUid, String ticketKey, String displayName) throws RPCException{
@@ -953,5 +749,211 @@ public class RPCServiceImpl implements RPCService {
         Map<String, String> protocolUrls = serviceLocator.getCollectionUrls((CollectionItem) item);
         calendar.setProtocolUrls(protocolUrls);
         return calendar;
+    }
+    private void createCalendarHandleDuplicateName(CollectionItem collection,
+            CollectionItem calendar, int i) throws RPCException {
+            try {
+                contentService.createCollection(collection, calendar);
+            } catch (DuplicateItemNameException e) {
+                calendar.setName(calendar.getName() + Integer.toString(i));
+                createCalendarHandleDuplicateName(collection, calendar, i+1);
+            }
+    }
+    
+    private String doSaveNewEventBreakRecurrence(CollectionItem collection,
+            Event event, String originalEventUid,
+            CosmoDate originalEventEndDate) throws RPCException {
+
+        //first save the new event
+        ContentItem calendarEventItem = saveNewEvent(event, collection);
+
+        //get the old event's recurrence rule
+        RecurrenceRule recurrenceRule = doGetRecurrenceRules(collection,
+                new String[] { originalEventUid }).get(originalEventUid);
+
+        recurrenceRule.setEndDate(originalEventEndDate);
+        doSaveRecurrenceRule(collection, originalEventUid, recurrenceRule);
+
+        return calendarEventItem.getUid();
+    }
+    private Event doGetEvent(CollectionItem collection, String eventUid) throws RPCException{
+
+        if (log.isDebugEnabled())
+            log.debug("Getting event " + eventUid + " in calendar with uid " +
+                      collection.getUid());
+        ContentItem calItem = (ContentItem) contentService.findItemByUid(eventUid);
+        if (calItem == null){
+            return null;
+        }
+
+        EventStamp event = EventStamp.getStamp(calItem);
+        if (event == null){
+            return null;
+        }
+
+        try {
+            return icalendarToCosmoConverter.createEvent(calItem.getUid(),
+                    event.getMasterEvent(), event.getCalendar());
+        } catch (Exception e) {
+            log.error("Problem getting event: userName: " + getUsername()
+                    + " calendarUid: " + collection.getUid()
+                    + " id: " +eventUid, e);
+            throw new RPCException("Problem getting event", e);
+        }
+    }
+    
+    private Event[] doGetEvents(CollectionItem collection, long utcStartTime,
+            long utcEndTime) throws RPCException {
+        DateTime start = new DateTime(utcStartTime);
+        start.setUtc(true);
+
+        DateTime end = new DateTime(utcEndTime);
+        end.setUtc(true);
+
+        ComponentFilter eventFilter = new ComponentFilter(Component.VEVENT);
+        eventFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
+
+        ComponentFilter calFilter = new ComponentFilter(
+                net.fortuna.ical4j.model.Calendar.VCALENDAR);
+        calFilter.getComponentFilters().add(eventFilter);
+
+        CalendarFilter filter = new CalendarFilter();
+        filter.setFilter(calFilter);
+
+        if (log.isDebugEnabled())
+            log.debug("Getting events between " + start + " and " + end
+                    + " in calendar with uid " + collection.getUid());
+
+        // XXX: need ContentService.findEvents(path, filter)
+        if (collection == null)
+            throw new RPCException("Collection with uid " + collection.getUid()
+                    + " does not exist");
+
+        Set<ContentItem> calendarItems = null;
+        try {
+            calendarItems = contentService.findEvents(collection, filter);
+        } catch (Exception e) {
+            log.error("cannot find events for calendar with uid "
+                    + collection.getUid(), e);
+            throw new RPCException("Cannot find events for calendar with uid "
+                    + collection.getUid() + ": " + e.getMessage(), e);
+        }
+
+        Event[] events = null;
+        try {
+            DateTime beginDate = new DateTime();
+            beginDate.setUtc(true);
+            beginDate.setTime(utcStartTime);
+            DateTime endDate = new DateTime();
+            endDate.setUtc(true);
+            endDate.setTime(utcEndTime);
+
+            events = icalendarToCosmoConverter.createEventsFromCalendars(
+                    calendarItems, beginDate, endDate);
+        } catch (Exception e) {
+            log.error("Problem getting events: userName: " + getUsername()
+                    + " calendarUid: " + collection.getUid() + " beginDate: "
+                    + utcStartTime + " endDate: " + utcStartTime, e);
+            throw new RPCException("Problem getting events", e);
+        }
+        return events;
+    }
+    private Map<String, Event[]> doExpandEvents(CollectionItem collection,
+            String[] eventUids, long utcStartTime, long utcEndTime)
+            throws RPCException {
+
+        Map<String, Event[]> map = new HashMap<String, Event[]>();
+        for (String eventUid : eventUids) {
+            ContentItem calItem = (ContentItem) contentService
+                    .findItemByUid(eventUid);
+            EventStamp eventStamp = EventStamp.getStamp(calItem);
+
+            DateTime start = new DateTime(utcStartTime);
+            start.setUtc(true);
+
+            DateTime end = new DateTime(utcEndTime);
+            end.setUtc(true);
+
+            List<ContentItem> events = new ArrayList<ContentItem>();
+            events.add(calItem);
+            map.put(eventUid, icalendarToCosmoConverter
+                    .createEventsFromCalendars(events, start, end));
+
+        }
+        return map;
+
+    }
+    private void doRemoveEvent(CollectionItem collection, String eventUid)
+            throws RPCException {
+
+        if (log.isDebugEnabled())
+            log.debug("Removing event " + eventUid + " from calendar with uid "
+                    + collection.getUid());
+        ContentItem calItem = (ContentItem) contentService
+                .findItemByUid(eventUid);
+        contentService.removeContent(calItem);
+    }
+
+    private String doSaveEvent(CollectionItem collection, Event event)
+            throws RPCException {
+
+        ContentItem calendarEventItem = null;
+
+        // Check to see if this is a new event
+        if (StringUtils.isEmpty(event.getId())) {
+            calendarEventItem = saveNewEvent(event, collection);
+
+        } else {
+            calendarEventItem = (ContentItem) contentService
+                    .findItemByUid(event.getId());
+            calendarEventItem.setDisplayName(event.getTitle());
+
+            EventStamp eventStamp = EventStamp.getStamp(calendarEventItem);
+            net.fortuna.ical4j.model.Calendar calendar = eventStamp
+                    .getCalendar();
+            cosmoToICalendarConverter.updateEvent(event, calendar);
+            cosmoToICalendarConverter.updateVTimeZones(calendar);
+            eventStamp.setCalendar(calendar);
+
+            // update NoteItem attributes
+            if (calendarEventItem instanceof NoteItem) {
+                ((NoteItem) calendarEventItem).setIcalUid(eventStamp
+                        .getIcalUid());
+                ((NoteItem) calendarEventItem).setBody(event.getDescription());
+            }
+            contentService.updateContent(calendarEventItem);
+        }
+
+        return calendarEventItem.getUid();
+    }
+
+    private void doSaveRecurrenceRule(CollectionItem collection, String eventUid,
+            RecurrenceRule recurrenceRule) throws RPCException {
+
+        ContentItem calItem = (ContentItem) contentService.findItemByUid(eventUid);
+        EventStamp eventStamp = EventStamp.getStamp(calItem);
+        net.fortuna.ical4j.model.Calendar calendar = eventStamp.getCalendar();
+
+        Event event = icalendarToCosmoConverter.createEvent(eventUid, eventStamp
+                .getMasterEvent(), calendar);
+        event.setRecurrenceRule(recurrenceRule);
+        cosmoToICalendarConverter.updateEvent(event, calendar);
+        cosmoToICalendarConverter.updateVTimeZones(calendar);
+        eventStamp.setCalendar(calendar);
+        contentService.updateContent(calItem);
+    }
+    private Map<String, RecurrenceRule> doGetRecurrenceRules(CollectionItem collection,
+            String[] eventUids) throws RPCException {
+
+        Map<String, RecurrenceRule> map = new HashMap<String, RecurrenceRule>();
+        for (int x = 0; x < eventUids.length; x++) {
+            String eventId = eventUids[x];
+            ContentItem calItem = (ContentItem) contentService.findItemByUid(eventId);
+            EventStamp eventStamp = EventStamp.getStamp(calItem);
+            Event e = icalendarToCosmoConverter.createEvent(calItem.getUid(),
+                    eventStamp.getMasterEvent(), eventStamp.getCalendar());
+            map.put(eventId, e.getRecurrenceRule());
+        }
+        return map;
     }
 }

@@ -37,6 +37,9 @@ dojo.widget.HtmlWidget, function(){
 {
         //User supplied properties:
         calendar: /*CalendarMetadata*/ null,
+        conduit: /*cosmo.conduits.Conduit*/ null,
+        transportInfo: null,
+        displayName: null, //the collection display name
         
         // Template stuff
         templatePath:dojo.uri.dojoUri(
@@ -48,6 +51,9 @@ dojo.widget.HtmlWidget, function(){
         clientCollectionAddress: null, //The link for the selected client
         clientInstructionRows: null, //The instructions for the selected client
         protocolRows: null, //The rows for all the protocols
+        collectionNameText: null, //Label with the calendar name
+        collectionNameInputSpan: null, //span with textbox with the calendar name
+        collectionNameInput: null, //Textbox with the calendar name
         
         //i18n
         strings: { 
@@ -91,8 +97,19 @@ dojo.widget.HtmlWidget, function(){
                           value: "other"});
           
            cosmo.util.html.setSelectOptions(this.clientSelector, options);
+           
+           if (this.conduit != null && this.conduit.saveDisplayName){
+               this.collectionNameInputSpan.style.display = "";
+           } else {
+               this.collectionNameText.style.display = "";
+           }
+           
            this.clientSelector.selectedIndex = 0;
            this._handleClientChanged();
+        },
+        
+        saveDisplayName: function(){
+            this.conduit.saveDisplayName(this.calendar.uid, this._getDisplayName(), this.transportInfo);
         },
         
         //handles when the user selects a client
@@ -135,21 +152,55 @@ dojo.widget.HtmlWidget, function(){
         _setClientCollectionAddress: function(client){
             var url =  this.calendar.protocolUrls[this.clientsToProtocols[client]];
             this.clientCollectionAddress.value = url;
+        },
+        
+        _getDisplayName: function(){
+            return this.collectionNameInput.value;
         }
+        
         
  }
  );
  
- cosmo.ui.widget.CollectionDetailsDialog.getInitProperties = function(/*CalendarMetadata*/ calendar){
-    return {
-        content: dojo.widget.createWidget("cosmo:CollectionDetailsDialog", {calendar: calendar}, null, 'last'),
-        width: "450",
-        btnsRight: [dojo.widget.createWidget(
+ cosmo.ui.widget.CollectionDetailsDialog.getInitProperties = 
+    function(/*CalendarMetadata*/ calendar, 
+             /*string*/ displayName,
+             /*cosmo.conduits.Conduit*/ conduit, 
+             transportInfo){
+
+    var contentWidget = dojo.widget.createWidget("cosmo:CollectionDetailsDialog",
+                    { calendar: calendar, 
+                      displayName: displayName,
+                      conduit: conduit, 
+                      transportInfo: transportInfo }, 
+                 null, 'last');
+    var btnsRight = [];
+
+    btnsRight.push(dojo.widget.createWidget(
                     "cosmo:Button",
                     { text: getText("Main.CollectionDetails.Close"),
                       width: "50px",
                       handleOnClick: cosmo.app.hideDialog,
                       small: false },
-                      null, 'last')]
+                      null, 'last'));
+                      
+    if (conduit && conduit.saveDisplayName){
+        btnsRight.push(dojo.widget.createWidget(
+                        "cosmo:Button",
+                        { text: getText("Main.CollectionDetails.Save"),
+                          width: "50px",
+                          //TODO - Handle Errors properly!
+                          handleOnClick: function(){
+                                             contentWidget.saveDisplayName(); 
+                                             cosmo.app.hideDialog();
+                                         },
+                          small: false },
+                          null, 'last'));
+    }
+
+    return {
+        content: contentWidget,
+        width: "450",
+        btnsRight: btnsRight
     };
  };

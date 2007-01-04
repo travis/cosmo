@@ -81,6 +81,9 @@ cosmo.ui.cal_main.Cal = new function () {
 
     // Create the 'Welcome to Cosmo' event?
     this.createWelcomeItem = false;
+
+    //A handle to the collection selector widget
+    this._collectionSelector = null;
     
     // ==========================
     // Init
@@ -238,7 +241,7 @@ cosmo.ui.cal_main.Cal = new function () {
             'cosmo:CollectionSelector', { 'collections': this.currentCollections, 
             'currentCollection': this.currentCollection,
             'ticketKey': ticketKey }, document.getElementById('calSelectNav'), 'last');
-        
+        this._collectionSelector = selector;
         // Load and display events
         // --------------
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);

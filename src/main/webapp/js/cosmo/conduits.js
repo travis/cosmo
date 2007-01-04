@@ -26,7 +26,8 @@ cosmo.conduits.Conduit =
     saveRecurrenceRule: function(eventUid, recurrenceRule, transportInfo){},
     expandEvents: function(eventUids, startTime, endTime, transportInfo){},
     saveNewEventBreakRecurrence: function(event, originalEventUid, 
-        originalEventEndDate, transportInfo){}
+        originalEventEndDate, transportInfo){},
+    saveDisplayName: function(collectionUid, newDisplayName, transportInfo){}
     
 };
 
@@ -187,6 +188,9 @@ cosmo.conduits.SubscriptionConduit =
 {
     getTicket: function(transportInfo){
         return transportInfo.ticket.ticketKey;
+    },
+    saveDisplayName: function(collectionUid, newDisplayName, transportInfo){
+         Cal.serv.saveSubscription(collectionUid, transportInfo.ticket.ticketKey, newDisplayName);
     }
 };
 dojo.lang.mixin(cosmo.conduits.SubscriptionConduit, cosmo.conduits.TicketedConduit)

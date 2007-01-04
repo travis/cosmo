@@ -8,7 +8,15 @@
             </td>
 
             <td class="labelTextVert">
-                '${this.calendar.name}' ${this.strings.calendarLabel} <a href="${this.calendar.protocolUrls.web}">(Link)</a>
+                <span dojoAttachPoint="collectionNameText" style="display: none">
+                    '${this.displayName}' ${this.strings.calendarLabel}
+                </span> 
+                <span dojoAttachPoint="collectionNameInputSpan" style="display: none">
+                   <input dojoAttachPoint="collectionNameInput" 
+                          type="text" 
+                          value="${this.displayName}" />
+                </span>
+                <a href="${this.calendar.protocolUrls.web}">(Link)</a>
             </td>
 
         </tr>

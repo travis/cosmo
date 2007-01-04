@@ -85,7 +85,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     f = function () {
                         cosmo.app.showDialog(
                             cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                            Cal.currentCollection.collection));
+                            Cal.currentCollection.collection,
+                            Cal.currentCollection.displayName,
+                            Cal.currentCollection.conduit,
+                            Cal.currentCollection.transportInfo));
                     };
                 }
                 var btnSpan = _createElem("span");

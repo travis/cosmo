@@ -190,7 +190,9 @@ dojo.widget.HtmlWidget, {
                 m.style.left = '0px';
                 m.style.width = '100%';
                 m.style.height = '100%';
-                m.style.background = 'transparent';
+                m.style.zIndex = 1999;
+                m.style.background = '#ffffff';
+                m.style.opacity = 0.6;
                 this.uiFullMask = m;
                 document.body.appendChild(this.uiFullMask);
             }

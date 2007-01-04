@@ -161,9 +161,7 @@ public class EimmlTypeConverter implements EimmlConstants {
     public static Calendar toDateTime(String value)
         throws EimmlConversionException {
         try {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(DateUtil.parseRfc3339Date(value));
-            return cal;
+            return DateUtil.parseRfc3339Calendar(value);
         } catch (ParseException e) {
             throw new EimmlConversionException("Provided value " + value + " is not a valid RFC 3339 datetime", e);
         }
@@ -176,18 +174,18 @@ public class EimmlTypeConverter implements EimmlConstants {
         throws EimmlConversionException {
         if (value == null)
             return null;
-        return DateUtil.formatRfc3339Date(value);
+        return DateUtil.formatRfc3339Calendar(value);
     }
 
     /**
-     * Returns the given value as a timestamp in UTC.
+     * Returns the given value as a timestamp.
      */
     public static Date toTimeStamp(String value)
         throws EimmlConversionException {
         try {
-            return DateUtil.parseRfc3339TimeStamp(value);
-        } catch (ParseException e) {
-            throw new EimmlConversionException("Provided value " + value + " is not a valid RFC 3339 timestamp", e);
+            return new Date(Long.parseLong(value));
+        } catch (NumberFormatException e) {
+            throw new EimmlConversionException("Provided value " + value + " is not a long integer", e);
         }
     }
 
@@ -198,7 +196,7 @@ public class EimmlTypeConverter implements EimmlConstants {
         throws EimmlConversionException {
         if (value == null)
             return null;
-        return DateUtil.formatRfc3339TimeStamp(value);
+        return Long.toString(value.getTime());
     }
 
     /**

@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Represents an EIM field whose value is a timestamp.
+ * Represents an EIM field whose value is an instant in time.
  */
 public class TimeStampField extends EimRecordField {
     private static final Log log = LogFactory.getLog(TimeStampField.class);

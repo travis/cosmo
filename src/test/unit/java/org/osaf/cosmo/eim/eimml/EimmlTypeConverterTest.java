@@ -161,7 +161,7 @@ public class EimmlTypeConverterTest extends TestCase
 
     /** */
     public void testToDateTime() throws Exception {
-        String testString = "1996-12-19T16:39:57-0800";
+        String testString = "1996-12-19T16:39:57-08:00";
 
         Calendar resultCalendar = EimmlTypeConverter.toDateTime(testString);
 
@@ -187,7 +187,7 @@ public class EimmlTypeConverterTest extends TestCase
 
     /** */
     public void testFromDateTime() throws Exception {
-        String testString = "1996-12-19T16:39:57-0800";
+        String testString = "1996-12-19T16:39:57-08:00";
 
         Calendar testCalendar =
             Calendar.getInstance(TimeZone.getTimeZone("GMT-8"));
@@ -205,43 +205,19 @@ public class EimmlTypeConverterTest extends TestCase
 
     /** */
     public void testToTimeStamp() throws Exception {
-        String testString = "1996-12-19T16:39:57Z";
+        String testString = "116787214";
 
         Date resultDate = EimmlTypeConverter.toTimeStamp(testString);
 
-        Calendar resultCalendar = Calendar.getInstance();
-        resultCalendar.setTime(resultDate);
-        resultCalendar.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-        assertEquals("Result year does not match", 1996,
-                     resultCalendar.get(Calendar.YEAR));
-        assertEquals("Result month does not match", 11,
-                     resultCalendar.get(Calendar.MONTH));
-        assertEquals("Result day of week does not match", 19,
-                     resultCalendar.get(Calendar.DAY_OF_MONTH));
-        assertEquals("Result hour of day does not match", 16,
-                     resultCalendar.get(Calendar.HOUR_OF_DAY));
-        assertEquals("Result minute does not match", 39,
-                     resultCalendar.get(Calendar.MINUTE));
-        assertEquals("Result second does not match", 57,
-                     resultCalendar.get(Calendar.SECOND));
+        assertEquals(testString, Long.toString(resultDate.getTime()));
     }
 
     /** */
     public void testFromTimeStamp() throws Exception {
-        String testString = "1996-12-19T16:39:57Z";
+        String testString = "116787214";
+        Date testDate = new Date(Long.parseLong(testString));
 
-        Calendar testCalendar =
-            Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        testCalendar.set(Calendar.YEAR, 1996);
-        testCalendar.set(Calendar.MONTH, 11);
-        testCalendar.set(Calendar.DAY_OF_MONTH, 19);
-        testCalendar.set(Calendar.HOUR_OF_DAY, 16);
-        testCalendar.set(Calendar.MINUTE, 39);
-        testCalendar.set(Calendar.SECOND, 57);
-
-        String resultString =
-            EimmlTypeConverter.fromTimeStamp(testCalendar.getTime());
+        String resultString = EimmlTypeConverter.fromTimeStamp(testDate);
 
         assertEquals("Result string does not match", testString, resultString);
     }

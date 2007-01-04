@@ -18,6 +18,7 @@ package org.osaf.cosmo.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -25,45 +26,84 @@ import java.util.TimeZone;
  * Provides utility methods for working with dates and times.
  */
 public class DateUtil {
-
-    /**
-     * Note that this is not a perfect match to the RFC 3339
-     * format. In particular, it does not correctly parse timezone
-     * offsets of the form <code>xx:yy</code>. It requires RFC 822
-     * style timezone offsets, of the form <code>xxyy</code>.
-     */
-    public static final String RFC_3339_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
-
-    /** */
-    public static final String RFC_3339_TIMESTAMP_FORMAT =
-        "yyyy-MM-dd'T'HH:mm:ss'Z'";
-
+    private static final String RFC3339_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssz";
     private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
     /**
-     * @throws ParseException  */
+     * Parses a datetime+timezone string in one of the following
+     * formats, returning a calendar in the given timezone.
+     * 
+     * 2002-10-10T00:00:00+05:00
+     * 2002-10-09T19:00:00Z
+     * 2002-10-10T00:00:00GMT+05:00
+     * 
+     * @param date string
+     */
+    public static Calendar parseRfc3339Calendar(String value)
+        throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat(RFC3339_DATE_FORMAT);
+        TimeZone timezone = null;
+        Date date = null;
+        if(value.charAt(value.length()-1)=='Z') {
+            value = value.replace("Z", "GMT-00:00");
+            timezone = TimeZone.getTimeZone("GMT-00:00");
+            date = sdf.parse(value);
+        }
+        else if(value.indexOf("GMT")==-1 && 
+                (value.charAt(value.length()-6) == '+' ||
+                 value.charAt(value.length()-6) == '-')) {
+            String tzId = "GMT" + value.substring(value.length()-6);
+            value = value.substring(0, value.length()-6) + tzId;
+            timezone = TimeZone.getTimeZone(tzId);
+            date = sdf.parse(value);
+        } else {
+            String tzId = value.substring(value.length()-9);
+            timezone = TimeZone.getTimeZone(tzId);
+            date = sdf.parse(value);
+        }
+            
+        GregorianCalendar cal = new GregorianCalendar(timezone);
+        cal.setTime(date);
+
+        return cal;
+    }
+
+    /**
+     * Parses a datetime+timezone string in one of the following
+     * formats, returning a UTC date:
+     * 
+     * 2002-10-10T00:00:00+05:00
+     * 2002-10-09T19:00:00Z
+     * 2002-10-10T00:00:00GMT+05:00
+     * 
+     * @param date string
+     * @throws ParseException
+     */
     public static Date parseRfc3339Date(String date) 
     	throws ParseException {
-    	return parseDate(date, RFC_3339_DATE_FORMAT);
+    	return parseDate(date, RFC3339_DATE_FORMAT);
     }
     
     /**
-     * @throws ParseException  */
-    public static Date parseRfc3339TimeStamp(String date) 
-    	throws ParseException {
-    	return parseDate(date, RFC_3339_TIMESTAMP_FORMAT, GMT);
-    }
-    
-    /** 
-     * @throws ParseException  */
+     * Parses a datetime+timezone string in the given format,
+     * returning a UTC date.
+     * 
+     * @param date string
+     * @throws ParseException
+     */
     public static Date parseDate(String date,
                                  String format)
     	throws ParseException {
         return parseDate(date, format, null);
     }
 
-    /** 
-     * @throws ParseException  */
+    /**
+     * Parses a datetime+timezone string in the given format and
+     * timezone, returning a UTC date.
+     * 
+     * @param date string
+     * @throws ParseException
+     */
     public static Date parseDate(String date,
                                  String format,
                                  TimeZone tz)
@@ -75,6 +115,11 @@ public class DateUtil {
     }
 
     /** */
+    public static String formatRfc3339Calendar(Calendar cal) {
+        return formatRfc3339Date(cal.getTime(), cal.getTimeZone());
+    }
+
+    /** */
     public static String formatRfc3339Date(Date date) {
         return formatRfc3339Date(date, null);
     }
@@ -82,18 +127,8 @@ public class DateUtil {
     /** */
     public static String formatRfc3339Date(Date date,
                                            TimeZone tz) {
-        return formatDate(RFC_3339_DATE_FORMAT, date, tz);
-    }
-
-    /** */
-    public static String formatRfc3339Date(Calendar cal) {
-        return formatDate(RFC_3339_DATE_FORMAT,
-                          cal.getTime(), cal.getTimeZone());
-    }
-
-    /** */
-    public static String formatRfc3339TimeStamp(Date date) {
-        return formatDate(RFC_3339_TIMESTAMP_FORMAT, date, GMT);
+        String raw = formatDate(RFC3339_DATE_FORMAT, date, tz);
+        return raw.replaceFirst("GMT", "");
     }
 
     /** */

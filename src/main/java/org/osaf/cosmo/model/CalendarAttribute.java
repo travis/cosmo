@@ -29,6 +29,8 @@ import javax.persistence.Entity;
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
 
+import org.osaf.cosmo.util.DateUtil;
+
 /**
  * Represents an attribute with a java.util.Calendar value.
  */
@@ -37,8 +39,6 @@ import org.hibernate.annotations.Type;
 public class CalendarAttribute extends Attribute implements
         java.io.Serializable {
 
-    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssz";
-    
     private Calendar value;
 
     /** default constructor */
@@ -88,8 +88,8 @@ public class CalendarAttribute extends Attribute implements
     }
     
     /**
-     * Set Calendar value with a date string 
-     * tha is in one of the following formats:
+     * Set Calendar value with a date string
+     * that is in one of the following formats:
      * 
      * 2002-10-10T00:00:00+05:00
      * 2002-10-09T19:00:00Z
@@ -99,30 +99,7 @@ public class CalendarAttribute extends Attribute implements
      */
     public void setValue(String value) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-            TimeZone timezone = null;
-            Date date = null;
-            if(value.charAt(value.length()-1)=='Z') {
-                value = value.replace("Z", "GMT-00:00");
-                timezone = TimeZone.getTimeZone("GMT-00:00");
-                date = sdf.parse(value);
-            }
-            else if(value.indexOf("GMT")==-1 && 
-                    (value.charAt(value.length()-6) == '+' ||
-                     value.charAt(value.length()-6) == '-')) {
-                String tzId = "GMT" + value.substring(value.length()-6);
-                value = value.substring(0, value.length()-6) + tzId;
-                timezone = TimeZone.getTimeZone(tzId);
-                date = sdf.parse(value);
-            } else {
-                String tzId = value.substring(value.length()-9);
-                timezone = TimeZone.getTimeZone(tzId);
-                date = sdf.parse(value);
-            }
-            
-            this.value = new GregorianCalendar(timezone);
-            this.value.setTime(date);
-            
+            this.value = DateUtil.parseRfc3339Calendar(value);
         } catch (ParseException e) {
             throw new ModelValidationException("invalid date format: " + value);
         }
@@ -136,15 +113,11 @@ public class CalendarAttribute extends Attribute implements
     }
     
     /**
-     * Return Calendar representation in the format:
-     * 2002-10-10T00:00:00+05:00
+     * Return Calendar representation in RFC 3339 format.
      */
     public String toString() {
         if(value==null)
             return "null";
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-        sdf.setTimeZone(value.getTimeZone());
-        return sdf.format(value.getTime()).replace("GMT", "");
+        return DateUtil.formatRfc3339Calendar(value);
     }
-
 }

@@ -34,6 +34,7 @@ import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.TimeStampField;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BinaryAttribute;
+import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.DateAttribute;
 import org.osaf.cosmo.model.DecimalAttribute;
 import org.osaf.cosmo.model.IntegerAttribute;
@@ -92,7 +93,7 @@ public abstract class BaseApplicator implements EimSchemaConstants {
             item.addAttribute(new TextAttribute(qn, value));
         } else if (field instanceof DateTimeField) {
             Calendar value = ((DateTimeField)field).getCalendar();
-            item.addAttribute(new DateAttribute(qn, value.getTime()));
+            item.addAttribute(new CalendarAttribute(qn, value));
         } else if (field instanceof DecimalField) {
             BigDecimal value = ((DecimalField)field).getDecimal();
             item.addAttribute(new DecimalAttribute(qn, value));
@@ -102,6 +103,9 @@ public abstract class BaseApplicator implements EimSchemaConstants {
         } else if (field instanceof TextField) {
             String value = ((TextField)field).getText();
             item.addAttribute(new StringAttribute(qn, value));
+        } else if (field instanceof TimeStampField) {
+            Date value = ((TimeStampField)field).getTimeStamp();
+            item.addAttribute(new DateAttribute(qn, value));
         } else {
             throw new EimSchemaException("Field " + field.getName() + " is of unknown type " + field.getClass().getName());
         }

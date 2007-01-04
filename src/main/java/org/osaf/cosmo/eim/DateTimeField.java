@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Represents an EIM field whose value is a datetime.
+ * Represents an EIM field whose value is a datetime with a timezone.
  */
 public class DateTimeField extends EimRecordField {
     private static final Log log = LogFactory.getLog(DateTimeField.class);
@@ -31,13 +31,6 @@ public class DateTimeField extends EimRecordField {
     public DateTimeField(String name,
                          Calendar value) {
         super(name, value);
-    }
-
-    /** */
-    public DateTimeField(String name,
-                         Date date) {
-        super(name, Calendar.getInstance());
-        getCalendar().setTime(date);
     }
 
     /** */

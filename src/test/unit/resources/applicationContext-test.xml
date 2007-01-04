@@ -48,6 +48,9 @@
   <bean id="validatePreInsertEventListener"
       class="org.hibernate.validator.event.ValidatePreInsertEventListener"/>
 
+  <bean id="cosmoHibernateInterceptor"
+      class="org.osaf.cosmo.hibernate.CosmoInterceptor"/>
+
   <bean id="sessionFactory"
         class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
     <property name="lobHandler" ref="defaultLobHandler" />
@@ -87,6 +90,9 @@
             <value>org.osaf.cosmo.model.Ticket</value>
             <value>org.osaf.cosmo.model.User</value>
         </list>
+    </property>
+    <property name="entityInterceptor">
+      <ref bean="cosmoHibernateInterceptor"/>
     </property>
     <property name="eventListeners">
       <map>

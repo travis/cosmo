@@ -69,7 +69,7 @@ create table calendar_stamp (language varchar(255), description varchar(255), ti
 create table event_stamp (icaldata clob(102400000) not null, stampid bigint not null, primary key (stampid))
 create table message_stamp (msgsubject clob(262144), msgto clob(262144), msgcc clob(262144), msgbcc clob(262144), stampid bigint not null, primary key (stampid))
 
-create table stamp (stamptype varchar(16) not null, id bigint not null, itemid bigint not null, primary key (id), unique (itemid, stamptype))
+create table stamp (stamptype varchar(16) not null, id bigint not null, createdate bigint, modifydate bigint, isactive smallint not null, itemid bigint not null, primary key (id), unique (itemid, stamptype))
 create table subscription (id bigint not null, displayname varchar(255) not null, collectionuid varchar(255) not null, ticketkey varchar(255) not null, ownerid bigint not null, primary key (id), unique (ownerid, displayname))
 
 alter table calendar_stamp add constraint FK2B603B8280655080 foreign key (stampid) references stamp

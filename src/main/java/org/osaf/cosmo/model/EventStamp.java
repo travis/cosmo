@@ -477,4 +477,14 @@ public class EventStamp extends Stamp implements
         
         return stamp;
     }
+
+    @Override
+    public void remove() {
+        super.remove();
+        // clear indexes
+        timeRangeIndexes.clear();
+        propertyIndexes.clear();
+    }
+    
+    
 }

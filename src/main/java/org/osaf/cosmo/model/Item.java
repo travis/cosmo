@@ -61,7 +61,7 @@ import org.hibernate.validator.NotNull;
         discriminatorType=DiscriminatorType.STRING,
         length=16)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public abstract class Item extends BaseModelObject {
+public abstract class Item extends AuditableObject {
 
     public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
     public static final long MAX_STRING_ATTR_SIZE = 1 * 1024;
@@ -70,20 +70,37 @@ public abstract class Item extends BaseModelObject {
     private String name;
     private String displayName;
     private Date clientCreationDate;
-    private Date creationDate;
-    private Date modifiedDate;
     private Integer version;
     private Boolean isActive = Boolean.TRUE;
     
     private Map<QName, Attribute> attributes = new HashMap<QName, Attribute>(0);
     private Set<Ticket> tickets = new HashSet<Ticket>(0);
     private Set<Stamp> stamps = new HashSet<Stamp>(0);
+    private Set<Stamp> activeStamps = null;
     private Map<String, Stamp> stampMap = null;
     
     private CollectionItem parent = null;
     private User owner;
- 
+  
+    @Transient 
+    public Set<Stamp> getActiveStamps() {
+        if(activeStamps!=null)
+            return activeStamps;
+        
+        activeStamps = new HashSet<Stamp>(stamps.size());
+        for(Stamp s: stamps)
+            if(s.getIsActive())
+                activeStamps.add(s);
+        
+        return activeStamps;
+    }
     
+    /**
+     * Return all stamps associated with Item.  This set includes
+     * both active and inactive stamps.  Use getActiveStamps() to 
+     * only retrieve active stamps.
+     * @return
+     */
     @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
     @Fetch(FetchMode.SUBSELECT)
     @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
@@ -92,16 +109,24 @@ public abstract class Item extends BaseModelObject {
         return stamps;
     }
 
-    public void setStamps(Set<Stamp> stamps) {
+    // should always use addStamp()
+    private void setStamps(Set<Stamp> stamps) {
         this.stamps = stamps;
     }
     
+    /**
+     * @return Map of Stamps indexed by Stamp type.  Only
+     *         includes active stamps.
+     */
     @Transient
     public Map<String, Stamp> getStampMap() {
         if(stampMap==null) {
             stampMap = new HashMap<String, Stamp>();
-            for(Stamp stamp : stamps)
-                stampMap.put(stamp.getType(), stamp);
+            for(Stamp stamp : stamps) {
+                // Only care about active stamps
+                if(stamp.getIsActive())
+                    stampMap.put(stamp.getType(), stamp);
+            }
         }
         
         return stampMap;
@@ -115,20 +140,38 @@ public abstract class Item extends BaseModelObject {
         if (stamp == null)
             throw new IllegalArgumentException("stamp cannot be null");
 
-        for (Stamp s : stamps)
-            if (s.getClass() == stamp.getClass())
-                throw new IllegalArgumentException(
+        for (Stamp s : stamps) {
+            if (s.getClass() == stamp.getClass()) {
+                // If there is already an active stamp of this type,
+                // throw an exception, otherwise remove inactive stamp
+                // to make way for a new active one
+                if(s.getIsActive())
+                    throw new ModelValidationException(
                         "Item already has stamp of type " + s.getClass());
+                else
+                    stamps.remove(s);
+            }
+        }
+        
         stamp.setItem(this);
         stamps.add(stamp);
     }
     
     /**
-     * Remove stamp from Item
+     * Remove stamp from Item.  Stamp is not removed from database.  
+     * Instead, the stamp is set to "inactive".
      * @param stamp stamp to remove
      */
     public void removeStamp(Stamp stamp) {
-        stamps.remove(stamp);
+        // only remove stamps that belong to item
+        if(!stamps.contains(stamp))
+            return;
+        
+        stamp.remove();
+        
+        // remove from activeStamps if it has been initialized
+        if(activeStamps!=null)
+            activeStamps.remove(stamp);
     }
     
     /**
@@ -138,7 +181,8 @@ public abstract class Item extends BaseModelObject {
      */
     public Stamp getStamp(Class clazz) {
         for(Stamp stamp : stamps)
-            if(clazz.isInstance(stamp))
+            // only return stamp if it matches class and is active
+            if(clazz.isInstance(stamp) && stamp.getIsActive())
                 return stamp;
         
         return null;
@@ -151,7 +195,8 @@ public abstract class Item extends BaseModelObject {
      */
     public Stamp getStamp(String type) {
         for(Stamp stamp : stamps)
-            if(stamp.getType().equals(type))
+            // only return stamp if it matches class and is active
+            if(stamp.getType().equals(type) && stamp.getIsActive())
                 return stamp;
         
         return null;
@@ -454,26 +499,6 @@ public abstract class Item extends BaseModelObject {
         this.clientCreationDate = clientCreationDate;
     }
     
-    @Column(name = "createdate")
-    @Type(type="long_timestamp")
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    @Column(name = "modifydate")
-    @Type(type="long_timestamp")
-    public Date getModifiedDate() {
-        return modifiedDate;
-    }
-
-    public void setModifiedDate(Date modifiedDate) {
-        this.modifiedDate = modifiedDate;
-    }
-
     @Column(name = "itemname", nullable = false, length=255)
     @NotNull
     @Length(min=1, max=255)
@@ -531,7 +556,7 @@ public abstract class Item extends BaseModelObject {
     }
 
     // used by hibernate
-    private void setVersion(Integer version) {
+    public void setVersion(Integer version) {
         this.version = version;
     }
 

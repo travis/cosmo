@@ -68,6 +68,7 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
         migrateAttributes(conn);
         migrateCalendarCollections(conn, dialect);
         migrateEvents(conn, dialect);
+        migrateStamps(conn, dialect);
     }
     
     private void migrateUsers(Connection conn) throws Exception {
@@ -173,7 +174,7 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                     
                     // no namespace
                     if(chunks.length==1) {
-                        namespace = "";
+                        namespace = "org.osaf.cosmo.default";
                         localname = chunks[0];
                     } 
                     // no prefix
@@ -190,7 +191,7 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                     updateStmt.setString(1, namespace);
                     updateStmt.setString(2, localname);
                 } else {
-                    updateStmt.setString(1, "" );
+                    updateStmt.setString(1, "org.osaf.cosmo.default" );
                     updateStmt.setString(2, attributeName);
                 }
                 
@@ -228,9 +229,9 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
             stmt = conn.prepareStatement("select id from item where itemtype=?");
             stmt.setString(1, "calendar");
             
-            insertStampStmt1 = conn.prepareStatement("insert into stamp (stamptype, itemid) values (?,?)");
+            insertStampStmt1 = conn.prepareStatement("insert into stamp (stamptype, itemid, isactive) values (?,?,1)");
             insertStampStmt1.setString(1, "calendar");
-            insertStampStmt2 = conn.prepareStatement("insert into stamp (stamptype, itemid, id) values (?,?,?)");
+            insertStampStmt2 = conn.prepareStatement("insert into stamp (stamptype, itemid, id, isactive) values (?,?,?,1)");
             insertStampStmt2.setString(1, "calendar");
             
             insertCalendarStmt = conn.prepareStatement("insert into calendar_stamp (stampid, language, description, timezone) values (?,?,?,?)");
@@ -361,9 +362,9 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
             stmt = conn.prepareStatement("select id, contentdataid from item where itemtype=?");
             stmt.setString(1, "event");
             
-            insertStampStmt1 = conn.prepareStatement("insert into stamp (stamptype, itemid) values (?,?)");
+            insertStampStmt1 = conn.prepareStatement("insert into stamp (stamptype, itemid, isactive) values (?,?,1)");
             insertStampStmt1.setString(1, "event");
-            insertStampStmt2 = conn.prepareStatement("insert into stamp (stamptype, itemid, id) values (?,?,?)");
+            insertStampStmt2 = conn.prepareStatement("insert into stamp (stamptype, itemid, id, isactive) values (?,?,?,1)");
             insertStampStmt2.setString(1, "event");
             
             deleteContentDataStmt = conn.prepareStatement("delete from content_data where id=?");
@@ -470,6 +471,28 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
         log.debug("processed " + count + " events");
     }
     
-    
+    private void migrateStamps(Connection conn, String dialect) throws Exception {
+        PreparedStatement stmt = null;
+        PreparedStatement updateStmt = null;
+        ResultSet rs =  null;
+        long count = 0;
+        log.debug("starting migrateStamps()");
+        
+        try {
+            
+            updateStmt = conn.prepareStatement("update stamp set createdate=?, modifydate=?, isactive=1");
+            long currTime = System.currentTimeMillis();
+            updateStmt.setLong(1, currTime);
+            updateStmt.setLong(2, currTime);
+            
+            count = updateStmt.executeUpdate();
+            
+        } finally {
+            if(updateStmt!=null)
+                updateStmt.close();
+        }
+        
+        log.debug("processed " + count + " stamps");
+    }
 
 }

@@ -509,6 +509,8 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         helper.verifyItem(newItem, queryItem);
+        
+        Assert.assertTrue(queryItem.getVersion().equals(0));
 
         contentDao.removeContent(queryItem);
 
@@ -520,6 +522,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         queryItem = (ContentItem) contentDao.findAnyItemByUid(newItem.getUid());
         Assert.assertNotNull(queryItem);
         Assert.assertFalse(queryItem.getIsActive());
+        Assert.assertTrue(queryItem.getVersion().equals(1));
         
         item = generateTestContent();
         item.setUid(newItem.getUid());
@@ -531,6 +534,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         queryItem = contentDao.findContentByUid(newItem.getUid());
         
         Assert.assertNotNull(queryItem);
+        Assert.assertTrue(queryItem.getVersion().equals(2));
     }
 
     public void testContentDaoCreateCollection() throws Exception {

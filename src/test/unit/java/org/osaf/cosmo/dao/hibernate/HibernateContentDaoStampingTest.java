@@ -68,8 +68,12 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         Assert.assertEquals(2, queryItem.getStamps().size());
+        Assert.assertEquals(2, queryItem.getActiveStamps().size());
         
         Stamp stamp = queryItem.getStamp(EventStamp.class);
+        Assert.assertNotNull(stamp.getCreationDate());
+        Assert.assertNotNull(stamp.getModifiedDate());
+        Assert.assertTrue(stamp.getCreationDate().equals(stamp.getModifiedDate()));
         Assert.assertTrue(stamp instanceof EventStamp);
         Assert.assertEquals("event", stamp.getType());
         EventStamp es = (EventStamp) stamp;
@@ -115,9 +119,10 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         Assert.assertEquals(2, queryItem.getStamps().size());
+        Assert.assertEquals(2, queryItem.getActiveStamps().size());
         
         Stamp stamp = queryItem.getStamp(MessageStamp.class);
-        queryItem.getStamps().remove(stamp);
+        queryItem.removeStamp(stamp);
         
         stamp = queryItem.getStamp(EventStamp.class);
         EventStamp es = (EventStamp) stamp;
@@ -128,10 +133,13 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         clearSession();
         queryItem = contentDao.findContentByUid(newItem.getUid());
-        Assert.assertEquals(1, queryItem.getStamps().size());
+        Assert.assertEquals(2, queryItem.getStamps().size());
+        Assert.assertEquals(1, queryItem.getActiveStamps().size());
+        Assert.assertNull(queryItem.getStamp(MessageStamp.class));
         stamp = queryItem.getStamp(EventStamp.class);
         es = (EventStamp) stamp;
        
+        Assert.assertTrue(stamp.getModifiedDate().after(stamp.getCreationDate()));
         Assert.assertEquals(es.getCalendar().toString(), newCal.toString());
     }
     
@@ -181,6 +189,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         CollectionItem queryCol = contentDao.findCollectionByUid(root.getUid());
         Assert.assertEquals(1, queryCol.getStamps().size());
+        Assert.assertEquals(1, queryCol.getActiveStamps().size());
         Stamp stamp = queryCol.getStamp(CalendarCollectionStamp.class);
         Assert.assertTrue(stamp instanceof CalendarCollectionStamp);
         Assert.assertEquals("calendar", stamp.getType());

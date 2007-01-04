@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.model;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
@@ -30,6 +31,7 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Index;
+import org.hibernate.annotations.Type;
 
 /**
  * Represents an abstract Stamp on an Item. A Stamp is a set of related
@@ -47,11 +49,12 @@ import org.hibernate.annotations.Index;
 @org.hibernate.annotations.Table(appliesTo = "stamp", 
         indexes = { @Index(name = "idx_stamptype", columnNames = { "stamptype" }) })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public abstract class Stamp extends BaseModelObject implements
+public abstract class Stamp extends AuditableObject implements
         java.io.Serializable {
 
     // Fields
     private Item item;
+    private Boolean isActive = Boolean.TRUE;
 
     // Constructors
     /** default constructor */
@@ -74,7 +77,26 @@ public abstract class Stamp extends BaseModelObject implements
     public void setItem(Item item) {
         this.item = item;
     }
+    
+    
+    
+    /**
+     * @return stamp status
+     */
+    @Column(name="isactive", nullable=false)
+    @Type(type="boolean_integer")
+    @Index(name="idx_stampisactive")
+    public Boolean getIsActive() {
+        return isActive;
+    }
 
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    /**
+     * @return Stamp type
+     */
     @Transient
     public abstract String getType();
 
@@ -84,5 +106,11 @@ public abstract class Stamp extends BaseModelObject implements
      * @return copy of Attribute
      */
     public abstract Stamp copy();
-
+    
+    /**
+     * Prepare stamp for removal
+     */
+    public void remove() {
+        setIsActive(false);
+    }
 }

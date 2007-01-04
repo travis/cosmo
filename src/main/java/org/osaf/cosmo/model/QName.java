@@ -29,7 +29,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 @Embeddable
 public class QName {
     
-    public static final String DEFAULT_NAMESPACE = "";
+    public static final String DEFAULT_NAMESPACE = "org.osaf.cosmo.default";
     
     private String namespace = null;
     private String localName = null;

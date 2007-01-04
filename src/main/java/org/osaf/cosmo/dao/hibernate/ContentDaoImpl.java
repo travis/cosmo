@@ -16,6 +16,7 @@
 package org.osaf.cosmo.dao.hibernate;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -255,10 +256,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 checkForDuplicateItemNameMinusItem(collection.getOwner().getId(), 
                     collection.getParent().getId(), collection.getName(), collection.getId());
             
-            updateBaseItemProps(collection);
-            
             // validate item
             collection.validate();
+            
+            collection.setModifiedDate(new Date());
             
             getSession().update(collection);
             return collection;
@@ -289,8 +290,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             checkForDuplicateItemNameMinusItem(content.getOwner().getId(), 
                     content.getParent().getId(), content.getName(), content.getId());
             
-            updateBaseItemProps(content);
-            
             boolean isEvent = content.getStamp(EventStamp.class) != null;
             
             if(isEvent) {
@@ -307,6 +306,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                     throw new RuntimeException("error converting to utf8");
                 }
             }
+            
+            content.setModifiedDate(new Date());
             
             getSession().update(content);
             return content;
@@ -336,7 +337,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             content.clearContent();
             content.getAttributes().clear();
             content.getStamps().clear();
-            updateBaseItemProps(content);
             getSession().update(content);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);

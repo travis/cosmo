@@ -63,7 +63,7 @@ create table calendar_stamp (stampid bigint not null, language varchar(255), des
 create table event_stamp (stampid bigint not null, icaldata longtext not null, primary key (stampid)) ENGINE=InnoDB
 create table message_stamp (stampid bigint not null, msgsubject mediumtext, msgto mediumtext, msgcc mediumtext, msgbcc mediumtext, primary key (stampid)) ENGINE=InnoDB
 
-create table stamp (id bigint not null auto_increment, stamptype varchar(16) not null, itemid bigint not null, primary key (id), unique (itemid, stamptype)) ENGINE=InnoDB
+create table stamp (stamptype varchar(16) not null, id bigint not null auto_increment, createdate bigint, modifydate bigint, isactive smallint not null, itemid bigint not null, primary key (id), unique (itemid, stamptype)) ENGINE=InnoDB
 create table subscription (id bigint not null auto_increment, displayname varchar(255) not null, collectionuid varchar(255) not null, ticketkey varchar(255) not null, ownerid bigint not null, primary key (id), unique (ownerid, displayname)) ENGINE=InnoDB
 
 alter table calendar_stamp add index FK2B603B8280655080 (stampid), add constraint FK2B603B8280655080 foreign key (stampid) references stamp (id);

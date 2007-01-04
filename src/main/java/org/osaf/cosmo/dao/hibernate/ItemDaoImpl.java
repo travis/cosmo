@@ -564,7 +564,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             item2.addAttribute(entry.getValue().copy());
         
         // copy stamps
-        for(Stamp stamp: item.getStamps())
+        for(Stamp stamp: item.getActiveStamps())
             item2.addStamp(stamp.copy());
         
         // copy content
@@ -647,17 +647,6 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
     protected void setBaseItemProps(Item item) {
         if(item.getUid()==null)
             item.setUid(idGenerator.nextIdentifier().toString());
-        
-        long currTime = System.currentTimeMillis();
-        item.setCreationDate(new Date(currTime));
-        item.setModifiedDate(new Date(currTime));
-        item.setClientCreationDate(new Date(currTime));
-    }
-    
-    //  Update server generated item properties
-    protected void updateBaseItemProps(Item item) {
-        long currTime = System.currentTimeMillis();
-        item.setModifiedDate(new Date(currTime));
     }
 
     protected Item findItemByParentAndName(Long userDbId, Long parentDbId,
@@ -696,7 +685,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
 
         return (Item) hibQuery.uniqueResult();
     }
-
+    
     protected HomeCollectionItem findRootItem(Long dbUserId) {
         Query hibQuery = getSession().getNamedQuery(
                 "homeCollection.by.ownerId").setParameter("ownerid",
@@ -718,7 +707,10 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
                         + " already in use");
             }
             else if(duplicate!=null){
-                // otherwise remove deleted item to make way for new one
+                // Otherwise remove deleted item to make way for new one.
+                // Initialize new Item with old Item's version to generate
+                // correct CollectionItem hash codes.
+                item.setVersion(duplicate.getVersion()+1);
                 getSession().delete(duplicate);
             }
         }

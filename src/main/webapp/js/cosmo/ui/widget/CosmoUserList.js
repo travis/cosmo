@@ -172,8 +172,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             i = document.createElement("input");
             i.setAttribute("type", "text");
-            i.setAttribute("size", "1");
-            i.setAttribute("maxlength", "2");
+            i.setAttribute("size", "4");
+            i.setAttribute("maxlength", "4");
             i.setAttribute("value", this.pageSize);
             i.setAttribute("align", "middle");
 

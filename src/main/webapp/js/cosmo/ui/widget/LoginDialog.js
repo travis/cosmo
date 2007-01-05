@@ -20,7 +20,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
         authProc: cosmo.env.getAuthProc(),
         passwordLabel: _("Login.Password"),
         usernameLabel: _("Login.Username"),
-        loginPrompt: _("Login.Prompt"),
+        loginPrompt: _("Login.Prompt.Init"),
         redirectHome: true,
 
         // Attach points
@@ -77,7 +77,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
                 self.showErr(err);
             }
             else {
-                self.showPrompt('normal', 'Logging you on. Please wait ...');
+                self.showPrompt('normal', _('Login.Prompt.Processing'));
                 dojo.io.cookie.set('username', un);
 
                 postData = { 'j_username': un, 'j_password': pw };

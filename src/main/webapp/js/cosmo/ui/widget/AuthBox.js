@@ -41,43 +41,52 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
            
             Authentication in general should be rethought soon. 
             */
+            // Auth failed -- bad password? Reset for retry
             if (str.indexOf('login-page-2ksw083judrmru58') > -1){
                 this._showErr(_('Login.Error.AuthFailed'));
                 this.passwordInput.value = '';
             }
+            // Auth successful -- try to do whatever action
+            // was contingent on the auth
             else {
-                this._attemptAuthAction();
+                this.attemptAuthAction(this.authAction.attemptParams);
             }
         },
-        _attemptAuthAction: function () {
-            this._showPrompt(this.authAction.attemptPrompt);
-            if (this.authAction.async) {
+        _attemptOrHandle: function (type, args) {
+            var res = null;
+            // If this is just a plain ol' function, execute it inline here
+            if (this.authAction.execInline) {
+                res = this.authAction[type + 'Func'].apply(null, args);
+            }
+            // Otherwise it's a method to execute in an obj context 
+            else {
+                // If execution context got passed in, apply the method
+                // to that object
                 if (this.authAction.execContext) {
-                    this.authAction.attemptFunc.apply(this.authAction.execContext);
+                    res = this.authAction[type + 'Func'].apply(this.authAction.execContext, args);
                 }
+                // No execution context -- execute the method in the
+                // context of the AuthBox itself
                 else {
-                    this.authAction.attemptFunc.apply(this);
+                    res = this.authAction[type + 'Func'].apply(this, args);
                 }
             }
-            else {
-                this.authAction.attemptFunc();
-            }
+            return res;
         },
-        _handleAuthActionResp: function () {
+        attemptAuthAction: function (args) {
+            // If an informational prompt for the action was
+            // specified, display it
+            if (this.authAction.attemptPrompt) {
+                this._showPrompt(this.authAction.attemptPrompt);
+            }
+            // Take whatever action was specified in the authAction obj
+            return this._attemptOrHandle('attempt', args);    
+        },
+        handleAuthActionResp: function () {
             var args = Array.prototype.slice.apply(arguments);
-            var success = false;
-            if (this.authAction.async) {
-                if (this.authAction.execContext) {
-                    success = this.authAction.successFunc.apply(this.authAction.execContext, args);
-                }
-                else {
-                    success = this.authAction.successFunc.apply(this, args);
-                }
-            }
-            else {
-                success = this.authAction.successFunc(args);
-            }
-            return success;
+            // Take whatever response (if any) to the action was specified
+            // in the authAction obj
+            return this._attemptOrHandle('success', args);    
         },
         doAuth: function () {
             var un = this.usernameInput.value;
@@ -93,7 +102,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
                 this._showErr(err);
             }
             else {
-                this._showPrompt('Verifying username and password. Please wait ...');
+                if (this.authAction.authProcessingPrompt) {
+                    this._showPrompt(this.authAction.authPocessingPrompt);
+                }
+                else {
+                    this._showPrompt(_('Login.Prompt.Processing'));
+                }
 
                 postData = { 'j_username': un, 'j_password': pw };
 
@@ -169,6 +183,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
     "html");
 
 cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) {
+    var initPrompt = authAction.authInitPrompt || _('Login.Prompt.Init')
     var s = document.createElement('span');
     var c = dojo.widget.createWidget("cosmo:AuthBox", { 
         'authAction': authAction }, s, 'last');
@@ -185,7 +200,7 @@ cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) 
         handleOnClick: function () { c.doAuth.apply(c) },
         small: true }, s, 'last');
     s.removeChild(submitButton.domNode); 
-    return { prompt: 'Please enter the login information for your Cosmo account.', 
+    return { prompt: initPrompt, 
         content: c,
         height: 200,
         width: 360,

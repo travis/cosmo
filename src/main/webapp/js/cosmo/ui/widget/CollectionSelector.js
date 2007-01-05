@@ -34,7 +34,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
         fillInTemplate: function () {
             var col = this.collections;
             var curr = this.currentCollection;
-            var key = this.ticketKey;
+            var passedKey = this.ticketKey;
             var collSelectNode = this.domNode; 
             
             function $(s) {
@@ -71,31 +71,48 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             function renderButton() {
                 var str = '';
                 var f = null;
+                var _ = cosmo.util.i18n.getText;
                 // If using a ticket, add the 'Add' button
-                if (key) {
+                if (passedKey) {
                     str = 'add';
+                    // Set up the authAction obj for the AuthBox -- this tells it
+                    // what to do if the user auths successfully
                     var authAction = { 
-                        async: true,
+                        execInline: false,
+                        authInitPrompt: 'Please enter the login information for your Cosmo account.',
+                        authProcessingPrompt: null, // Use the default
+                        // Action to take after successful auth -- try to add the
+                        // collection subscription
                         attemptFunc: function () {
-                            var self = this;
-                            Cal.serv.saveSubscription(function (a, b, c) { 
-                                self._handleAuthActionResp.apply(self, [a, b, c]) }, 
-                                curr.collection.uid, key, curr.displayName)
+                            // Special Doug Henning section -- some closure to get the
+                            // callback from the async response to exec in the AuthBox
+                            // scope. Here I'm going back into the AuthBox to call
+                            // the response handler, which just executes successFunc below
+                            // I could just set up an anon function here to handle the
+                            // response, but I think it's clearer having a success handler 
+                            // specifically defined
+                            var self = this; // Reference to the AuthBox
+                            var n = function (a, b, c) {
+                                self.handleAuthActionResp.apply(self, [a, b, c]) 
+                            };
+                            Cal.serv.saveSubscription(n, curr.collection.uid, passedKey, 
+                                curr.displayName)
                         },
-                        attemptPrompt: 'Adding this collection to your account ...', 
+                        attemptPrompt: _('Main.CollectionAdd.AttemptPrompt'), 
                         successFunc: function (whatIsThisParam, err, requestId) {
+                            var msg = this.authAction.successPrompt; // 'this' is the AuthBox
                             if (err) {
                                 cosmo.app.hideDialog();
-                                cosmo.app.showErr('Error: could not add the collection to your account.', err);
+                                cosmo.app.showErr(_('Main.CollectionAdd.ErrorPrompt'), err);
                                 return false;
                             }
                             else {
-                                var successProps =  cosmo.ui.widget.AuthBox.getSuccessProperties(
-                                    'Successfully added this collection to your account.');
+                                var successProps =  cosmo.ui.widget.AuthBox.getSuccessProperties(msg);
                                 cosmo.app.hideDialog();
                                 cosmo.app.showDialog(successProps);
                             }
-                        } };
+                        },
+                        successPrompt: _('Main.CollectionAdd.SuccessPrompt') };
                     f = function () {
                         var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties(authAction);
                         cosmo.app.showDialog(authBoxProps);

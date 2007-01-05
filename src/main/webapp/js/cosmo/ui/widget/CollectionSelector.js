@@ -74,9 +74,32 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 // If using a ticket, add the 'Add' button
                 if (key) {
                     str = 'add';
+                    var authAction = { 
+                        async: true,
+                        attemptFunc: function () {
+                            var self = this;
+                            Cal.serv.saveSubscription(function (a, b, c) { 
+                                self._handleAuthActionResp.apply(self, [a, b, c]) }, 
+                                curr.collection.uid, key, curr.displayName)
+                        },
+                        attemptPrompt: 'Adding this collection to your account ...', 
+                        successFunc: function (whatIsThisParam, err, requestId) {
+                            if (err) {
+                                cosmo.app.hideDialog();
+                                cosmo.app.showErr('Error: could not add the collection to your account.', err);
+                                return false;
+                            }
+                            else {
+                                var successProps =  cosmo.ui.widget.AuthBox.getSuccessProperties(
+                                    'Successfully added this collection to your account.');
+                                cosmo.app.hideDialog();
+                                cosmo.app.showDialog(successProps);
+                            }
+                        } };
                     f = function () {
-                        // Not implemented yet
-                        alert('Add this to my account.');
+                        var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties(authAction);
+                        cosmo.app.showDialog(authBoxProps);
+                        cosmo.app.modalDialog.content.usernameInput.focus();
                     };
                 }
                 // Otherwise the user is logged in -- use the 'Info' button
@@ -94,7 +117,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 var btnSpan = _createElem("span");
                 var btnLink = _createElem('a');
                 var btnText = _createText('[' + str + ']');
-                btnLink.onclick = f;
+                dojo.event.connect(btnLink, 'onclick', f);
                 btnLink.href = '#';
                 btnLink.appendChild(btnText);
                 btnSpan.appendChild(_createText('\u00A0'));

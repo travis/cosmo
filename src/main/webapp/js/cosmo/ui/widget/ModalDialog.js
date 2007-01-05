@@ -110,10 +110,15 @@ dojo.widget.HtmlWidget, {
             }
             return true;
         },
-        setPrompt: function (prompt) {
+        setPrompt: function (prompt, promptType) {
             this.prompt = prompt || this.prompt;
             if (this.prompt) {
                 this.promptNode.className = 'dialogPrompt';
+                if (promptType) {
+                    if (promptType = 'error') {
+                        this.promptNode.className += ' promptTextError';
+                    }
+                }
                 this.promptNode.innerHTML = this.prompt;
             }
             else {
@@ -267,6 +272,8 @@ dojo.widget.HtmlWidget, {
                     this.content.destroy();
                 }
                 
+                this.title = '';
+                this.prompt = '';
                 this.content = null;
                 this.btnsLeft = [];
                 this.btnsCenter = [];

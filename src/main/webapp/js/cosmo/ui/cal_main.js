@@ -22,6 +22,7 @@ dojo.require("cosmo.ui.conf");
 dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.util.i18n");
+var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.model");
 dojo.require("cosmo.ui.cal_form");
 dojo.require("cosmo.ui.contentcontainer");
@@ -198,7 +199,7 @@ cosmo.ui.cal_main.Cal = new function () {
                     var uid = this.serv.createCalendar('Cosmo');
                 }
                 catch(e) {
-                    cosmo.app.showErr(getText('Main.Error.InitCalCreateFailed'), e);
+                    cosmo.app.showErr(_('Main.Error.InitCalCreateFailed'), e);
                     return false;
                 }
                 var collection = this.serv.getCalendar(uid);
@@ -434,7 +435,7 @@ cosmo.ui.cal_main.Cal = new function () {
         keys = Date.abbrWeekday;
         newArr = [];
         for (var i = 0; i < keys.length; i++) {
-            newArr.push(getText('App.' + keys[i]));
+            newArr.push(_('App.' + keys[i]));
         }
         Date.abbrWeekday = newArr;
         // Full month names array
@@ -442,14 +443,14 @@ cosmo.ui.cal_main.Cal = new function () {
         keys = Date.fullMonth;
         newArr = [];
         for (var i = 0; i < keys.length; i++) {
-            newArr.push(getText('App.' + keys[i]));
+            newArr.push(_('App.' + keys[i]));
         }
         Date.fullMonth = newArr;
         // AM/PM
         // ============
         newArr = [];
-        newArr['AM'] = getText('App.AM');
-        newArr['PM'] = getText('App.PM');
+        newArr['AM'] = _('App.AM');
+        newArr['PM'] = _('App.PM');
         Date.meridian = newArr;
         return true;
     };
@@ -551,7 +552,7 @@ cosmo.ui.cal_main.Cal = new function () {
         
         // Set CalEventData start and end calculated from click position
         // --------
-        evTitle = newCal ? 'Welcome to Cosmo!' : getText('Main.NewEvent');
+        evTitle = newCal ? 'Welcome to Cosmo!' : _('Main.NewEvent');
         evDesc = newCal ? 'Welcome to Cosmo!' : '';
         ev.data = new CalEventData(null, evTitle, evDesc,
             start, end, allDay);

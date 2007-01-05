@@ -33,7 +33,7 @@ function getText(str) {
     return cosmo.util.i18n._localtext[str] || "[[" + str + "]]";
 }
 
-cosmo.util.i18n.getText = getText
+cosmo.util.i18n.getText = getText;
 if (djConfig['i18nLocation']){
 	cosmo.util.i18n.init(djConfig['i18nLocation']);
 }

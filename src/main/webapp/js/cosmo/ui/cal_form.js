@@ -31,6 +31,7 @@ dojo.require("dojo.string");
 dojo.require("cosmo.ui.event.handlers");
 dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.util.i18n");
+var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.model");
 dojo.require("cosmo.view.cal.canvas");
@@ -132,7 +133,7 @@ cosmo.ui.cal_form.CalForm = function () {
         cont.style.padding = '8px';
 
         // Event title
-        this.createLabel(getText(
+        this.createLabel(_(
             'Main.DetailForm.Title'), d);
         elem = document.createElement('div');
         elem.className = 'formElem';
@@ -187,7 +188,7 @@ cosmo.ui.cal_form.CalForm = function () {
         d.appendChild(elem);
 
         // Details textarea
-        this.createLabel(getText(
+        this.createLabel(_(
             'Main.DetailForm.Description'), d);
         elem = document.createElement('div');
         elem.className = 'formElem';
@@ -228,7 +229,7 @@ cosmo.ui.cal_form.CalForm = function () {
     };
     this.createDateTimeInputs = function (label, name, d) {
         var elem = null;
-        this.createLabel(getText(
+        this.createLabel(_(
             'Main.DetailForm.' + label), d);
         elem = document.createElement('div');
         elem.className = 'formElem';
@@ -237,7 +238,7 @@ cosmo.ui.cal_form.CalForm = function () {
             10, 10, null, 'inputText', elem);
         _html.appendNbsp(elem);
         elem.appendChild(document.createTextNode(
-            getText('Main.DetailForm.At')));
+            _('Main.DetailForm.At')));
         _html.appendNbsp(elem);
         _html.createInput('text', name + 'time', name + 'time',
             5, 5, null, 'inputText', elem);
@@ -247,14 +248,14 @@ cosmo.ui.cal_form.CalForm = function () {
             null, 1, null, elem);
         _html.appendNbsp(elem);
         elem.appendChild(document.createTextNode(
-            getText('App.AM')));
+            _('App.AM')));
         _html.appendNbsp(elem);
         _html.appendNbsp(elem);
         _html.createInput('radio', name + 'ap', name + 'ap', null,
             null, 2, null, elem);
         _html.appendNbsp(elem);
         elem.appendChild(document.createTextNode(
-            getText('App.PM')));
+            _('App.PM')));
         d.appendChild(elem);
     };
 
@@ -262,7 +263,7 @@ cosmo.ui.cal_form.CalForm = function () {
         var elem = null;
 
         //create the main label
-        this.createLabel(getText(
+        this.createLabel(_(
             'Main.DetailForm.Timezone'), d);
         elem = document.createElement('div');
         elem.className = 'formElem';
@@ -281,7 +282,7 @@ cosmo.ui.cal_form.CalForm = function () {
     this.getTimezoneSelectorOptions = function (region){
         var tzIds = region ? cosmo.datetime.timezone.getTzIdsForRegion(region).sort() : null;
         var options = [{ 
-            text: getText("Main.DetailForm.TimezoneSelector.Timezone"), 
+            text: _("Main.DetailForm.TimezoneSelector.Timezone"), 
             value: "" }];
         if (tzIds){
             dojo.lang.map(tzIds, function (tzId) {
@@ -343,10 +344,10 @@ cosmo.ui.cal_form.CalForm = function () {
 
         f = enableRemove ? removeCalEvent : null;
         removeButton = new Button('removeButton', 74,
-            f, getText('App.Button.Remove'));
+            f, _('App.Button.Remove'));
         f = enableSave ? saveCalEvent : null;
         saveButton = new Button('savebutton', 74,
-            f, getText('App.Button.Save'));
+            f, _('App.Button.Save'));
 
         checkElem = document.getElementById('removeButton');
         if (checkElem) {
@@ -414,7 +415,7 @@ cosmo.ui.cal_form.CalForm = function () {
     this.getTimezoneOptions = function (){
         var options = [];
         var option = {opt: null,
-                     text: getText("Main.DetailForm.Region")};
+                     text: _("Main.DetailForm.Region")};
         options.push(option);
         var regions = cosmo.datetime.timezone.REGIONS;
         for (var x = 0; x < regions.length; x++){
@@ -807,7 +808,7 @@ cosmo.ui.cal_form.CalForm = function () {
         d = document.createElement('div');
         d.className = 'floatLeft';
         d.style.paddingTop = '3px';
-        d.appendChild(document.createTextNode(getText('Main.GoTo')));
+        d.appendChild(document.createTextNode(_('Main.GoTo')));
         dc.appendChild(d);
 
         d = document.createElement('div');
@@ -833,7 +834,7 @@ cosmo.ui.cal_form.CalForm = function () {
         d.className = 'floatLeft';
         dc.appendChild(d);
         butJump = new Button('jumpToButton', 32, Cal.calForm.goJumpToDate,
-                getText('App.Button.Go'), true);
+                _('App.Button.Go'), true);
         d.appendChild(butJump.domNode);
 
         d = document.createElement('div');
@@ -866,7 +867,7 @@ cosmo.ui.cal_form.CalForm = function () {
             err = err.replace(/\n/g, '<br/>');
             e = new ScoobyServiceClientException();
             e.message = err;
-            cosmo.app.showErr(getText('Main.Error.GoToDate'), e);
+            cosmo.app.showErr(_('Main.Error.GoToDate'), e);
             return false;
         }
         // All okey-dokey -- submit

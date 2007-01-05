@@ -19,7 +19,7 @@ dojo.provide('cosmo.app');
 dojo.require('cosmo.ui.widget.ModalDialog');
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.util.i18n");
-
+var _ = cosmo.util.i18n.getText;
 cosmo.app = new function () {
     var self = this;
 
@@ -76,7 +76,7 @@ cosmo.app = new function () {
             }
             this.modalDialog.type = this.modalDialog.ERROR;
             but = new Button('okButton', 64, self.hideDialog,
-                getText('App.Button.OK'), true);
+                _('App.Button.OK'), true);
             this.modalDialog.btnsCenter[0] = but;
             this.modalDialog.defaultAction = self.hideDialog;
             this.modalDialog.content = msg;

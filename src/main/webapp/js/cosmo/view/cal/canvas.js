@@ -21,6 +21,7 @@ dojo.require("cosmo.util.date");
 dojo.require('cosmo.ui.event.handlers');
 dojo.require('cosmo.ui.draggable');
 dojo.require("cosmo.util.i18n");
+var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
 dojo.require("cosmo.ui.resize_area");
@@ -838,7 +839,7 @@ cosmo.view.cal.canvas = new function () {
             
             // Timeline of hours on left
             for (var j = 0; j < 24; j++) {
-                hour = j == 12 ? getText('App.Noon') : cosmo.util.date.hrMil2Std(j);
+                hour = j == 12 ? _('App.Noon') : cosmo.util.date.hrMil2Std(j);
                 meridian = j > 11 ? ' PM' : ' AM';
                 meridian = j == 12 ? '' : '<span>' + meridian + '</span>';
                 row = '';

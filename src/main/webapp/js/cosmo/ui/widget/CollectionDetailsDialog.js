@@ -22,6 +22,7 @@ dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 dojo.require("cosmo.app");
 dojo.require("cosmo.util.i18n");
+var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.widget.ModalDialog");
@@ -57,17 +58,17 @@ dojo.widget.HtmlWidget, function(){
         
         //i18n
         strings: { 
-            nameLabel: getText("Main.CollectionDetails.NameLabel"),
-            calendarLabel: getText("Main.CollectionDetails.CalendarLabel"),
-            selectYourClient: getText("Main.CollectionDetails.SelectYourClient"),
-            collectionAddress: getText("Main.CollectionDetails.CollectionAddress"),
-            instructions1: getText("Main.CollectionDetails.Instructions.1"),
-            instructions2: getText("Main.CollectionDetails.Instructions.2"),
-            close: getText("Main.CollectionDetails.Close"),
-            caldav:getText("Main.CollectionDetails.caldav"),
-            webcal:getText("Main.CollectionDetails.webcal"),
-            atom:getText("Main.CollectionDetails.atom"),
-            protocolInstructions:getText("Main.CollectionDetails.protocolInstructions")
+            nameLabel: _("Main.CollectionDetails.NameLabel"),
+            calendarLabel: _("Main.CollectionDetails.CalendarLabel"),
+            selectYourClient: _("Main.CollectionDetails.SelectYourClient"),
+            collectionAddress: _("Main.CollectionDetails.CollectionAddress"),
+            instructions1: _("Main.CollectionDetails.Instructions.1"),
+            instructions2: _("Main.CollectionDetails.Instructions.2"),
+            close: _("Main.CollectionDetails.Close"),
+            caldav:_("Main.CollectionDetails.caldav"),
+            webcal:_("Main.CollectionDetails.webcal"),
+            atom:_("Main.CollectionDetails.atom"),
+            protocolInstructions:_("Main.CollectionDetails.protocolInstructions")
         },
         
         //clients - note: the order in which they appear here is the order in
@@ -87,13 +88,13 @@ dojo.widget.HtmlWidget, function(){
             dojo.lang.map(this.clients,function(client){
                 options.push({
                     value:client,
-                    text: getText("Main.CollectionDetails.Client." + client)
+                    text: _("Main.CollectionDetails.Client." + client)
                 })
             }); 
-            options.push({text: getText("Main.CollectionDetails.Download"),
+            options.push({text: _("Main.CollectionDetails.Download"),
                           value: "download"});
                           
-            options.push({text: getText("Main.CollectionDetails.Other"),
+            options.push({text: _("Main.CollectionDetails.Other"),
                           value: "other"});
           
            cosmo.util.html.setSelectOptions(this.clientSelector, options);
@@ -146,7 +147,7 @@ dojo.widget.HtmlWidget, function(){
         _setClientInstructions: function(client){
             dojo.dom.replaceChildren(this.clientInstructions, 
                 document.createTextNode(
-                getText("Main.CollectionDetails.Instructions." + client)));
+                _("Main.CollectionDetails.Instructions." + client)));
         }, 
         
         _setClientCollectionAddress: function(client){
@@ -178,7 +179,7 @@ dojo.widget.HtmlWidget, function(){
 
     btnsRight.push(dojo.widget.createWidget(
                     "cosmo:Button",
-                    { text: getText("Main.CollectionDetails.Close"),
+                    { text: _("Main.CollectionDetails.Close"),
                       width: "50px",
                       handleOnClick: cosmo.app.hideDialog,
                       small: false },

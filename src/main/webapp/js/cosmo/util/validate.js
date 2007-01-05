@@ -16,6 +16,7 @@
 dojo.provide("cosmo.util.validate");
 
 dojo.require("cosmo.util.i18n");
+var _ = cosmo.util.i18n.getText;
 
 cosmo.util.validate = new function() {
 
@@ -31,7 +32,7 @@ cosmo.util.validate = new function() {
         // Check format
         var matchArray = str.match(pat);
         if (!matchArray) {
-            errMsg += getText('App.Error.InvalidDateFormat') + '\n';
+            errMsg += _('App.Error.InvalidDateFormat') + '\n';
         }
         else {
             // Parse date parts into vars
@@ -40,11 +41,11 @@ cosmo.util.validate = new function() {
             year = matchArray[4];
             // Month range
             if (month < 1 || month > 12) {
-                errMsg += getText('App.Error.InvalidMonthRange') + '\n';
+                errMsg += _('App.Error.InvalidMonthRange') + '\n';
             }
             // Day range
             if (day < 1 || day > 31) {
-                errMsg += getText('App.Error.InvalidDayRange') + '\n';
+                errMsg += _('App.Error.InvalidDayRange') + '\n';
             }
             // Day 31 for correct months
             if ((month == 4 || month == 6 || month == 9 || month == 11) 
@@ -55,7 +56,7 @@ cosmo.util.validate = new function() {
             if (month == 2) {
                 var isLeap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
                 if (day > 29 || (day == 29 && !isLeap)) {
-                    errMsg += getText('App.Error.FebruaryDays') + '\n';
+                    errMsg += _('App.Error.FebruaryDays') + '\n';
                 }
             }
         }
@@ -68,16 +69,16 @@ cosmo.util.validate = new function() {
         // Check format
         var matchArray = str.match(pat);
         if (!matchArray) {
-            errMsg += getText('App.Error.InvalidTimeFormat') + '\n';
+            errMsg += _('App.Error.InvalidTimeFormat') + '\n';
         }
         else {
             hours = matchArray[1];
             minutes = matchArray[3];
             if (hours < 1 || hours > 12) {
-                errMsg += getText('App.Error.InvalidHourRange') + '\n';
+                errMsg += _('App.Error.InvalidHourRange') + '\n';
             }
             if (minutes < 0 || minutes > 59) {
-                errMsg += getText('App.Error.InvalidMinutesRange') + '\n';
+                errMsg += _('App.Error.InvalidMinutesRange') + '\n';
             }
         }
         return errMsg;

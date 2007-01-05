@@ -17,6 +17,7 @@
 dojo.provide('cosmo.view.cal.dialog');
 
 dojo.require("cosmo.util.i18n");
+var _ = cosmo.util.i18n.getText;
 
 cosmo.view.cal.dialog = new function() {
     
@@ -77,11 +78,11 @@ cosmo.view.cal.dialog = new function() {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [new Button('cancelButtonDialog', 74, cosmo.app.hideDialog,
-                getText('App.Button.Cancel'), true)],
+                _('App.Button.Cancel'), true)],
             'btnsRight': [new Button('removeButtonDialog', 74, function() { doPublish('remove'); },
-                getText('App.Button.Remove'), true)],
+                _('App.Button.Remove'), true)],
             'defaultAction': function() { doPublish('remove'); },
-            'content': getText('Main.Prompt.EventRemoveConfirm')
+            'content': _('Main.Prompt.EventRemoveConfirm')
         };
     };
     
@@ -89,7 +90,7 @@ cosmo.view.cal.dialog = new function() {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [new Button('cancelButtonDialog', 74, cosmo.app.hideDialog,
-                getText('App.Button.Cancel'), true)],
+                _('App.Button.Cancel'), true)],
             'btnsRight': [],
             'defaultAction': function() {},
             'width': 480,
@@ -102,7 +103,7 @@ cosmo.view.cal.dialog = new function() {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [new Button('cancelButtonDialog', 74, 
                 function() { doEvMethod('cancelSave') },
-                getText('App.Button.Cancel'), true)],
+                _('App.Button.Cancel'), true)],
             'btnsRight': [],
             'defaultAction': function() {},
             'width': 480,

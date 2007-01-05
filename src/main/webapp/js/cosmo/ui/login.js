@@ -27,6 +27,7 @@ dojo.provide("cosmo.ui.login");
 
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
+var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.util.cookie");
 
 var Login = new function () {
@@ -40,7 +41,7 @@ var Login = new function () {
 
     this.init = function() {
         var but = new Button('submitButton', 74, Login.doLogin, 
-            getText('App.Button.Submit'));
+            _('App.Button.Submit'));
         self.loginForm = document.getElementById('loginForm');
         self.authProc = AUTH_PROC;
         self.loginForm.j_username.focus();
@@ -51,7 +52,7 @@ var Login = new function () {
     }
     this.handleLoginResp = function(str) {
         if (str.indexOf('login.js') > -1) {
-            self.showErr(getText('Login.Error.AuthFailed'));
+            self.showErr(_('Login.Error.AuthFailed'));
             self.loginForm.j_password.value = ''; 
         }
         else {
@@ -71,7 +72,7 @@ var Login = new function () {
         var err = '';
 
         if (!un || !pw) {
-            err = getText('Login.Error.RequiredFields');
+            err = _('Login.Error.RequiredFields');
         }
         if (err) {
             self.showErr(err);

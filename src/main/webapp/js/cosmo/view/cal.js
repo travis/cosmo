@@ -16,6 +16,7 @@
 
 dojo.provide('cosmo.view.cal');
 dojo.require("cosmo.util.i18n");
+var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
 
@@ -502,12 +503,12 @@ cosmo.view.cal = new function () {
             act = 'saveFailed';
             // Failed update
             if (saveEv.dataOrig) {
-                errMsg = getText('Main.Error.EventEditSaveFailed');
+                errMsg = _('Main.Error.EventEditSaveFailed');
                 qual.newEvent = false;
             }
             // Failed create
             else {
-                errMsg = getText('Main.Error.EventNewSaveFailed');
+                errMsg = _('Main.Error.EventNewSaveFailed');
                 qual.newEvent = true;
             }
             cosmo.app.showErr(errMsg, err);
@@ -767,7 +768,7 @@ cosmo.view.cal = new function () {
     function handleRemoveResult(ev, newEvId, err, reqId, opts) {
         var removeEv = ev;
         // Simple error message to go along with details from Error obj
-        var errMsg = getText('Main.Error.EventRemoveFailed');
+        var errMsg = _('Main.Error.EventRemoveFailed');
         if (err) {
             act = 'removeFailed';
             cosmo.app.showErr(errMsg, err);
@@ -822,7 +823,7 @@ cosmo.view.cal = new function () {
         var errMsgKey = opts.saveAction == 'remove' ?
             'EventRemoveFailed' : 'EventEditSaveFailed';
         // Simple error message to go along with details from Error obj
-        var errMsg = getText('Main.Error.' + errMsgKey);
+        var errMsg = _('Main.Error.' + errMsgKey);
         var qual = {};
 
         if (err) {
@@ -1090,7 +1091,7 @@ cosmo.view.cal = new function () {
 
         }
         catch(e) {
-            cosmo.app.showErr(getText('Main.Error.LoadEventsFailed'), e);
+            cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), e);
             return false;
         }
 

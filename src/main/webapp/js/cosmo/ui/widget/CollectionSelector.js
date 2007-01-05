@@ -174,7 +174,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 var textNode = _createText(curr.displayName)
                 s.appendChild(textNode);
                 collSelectNode.appendChild(s);
-                dojo.debug("display it");
                 self.displayNameText = textNode;
             }
             
@@ -206,15 +205,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var updatedSubscription = message.subscription;
             for (var x = 0; x < this.collections.length;x++){
                 var col = this.collections[x];
-                dojo.debug("x: " + x);
-                dojo.debug(col.transportInfo);
-                dojo.debug("cur uid: " + (col.transportInfo ? col.transportInfo.calendar.uid : "none"));
-                dojo.debug("up uid: " + updatedSubscription.calendar.uid);
                 if (col.transportInfo && 
                     col.transportInfo instanceof cosmo.model.Subscription &&
                     col.transportInfo.calendar.uid == updatedSubscription.calendar.uid &&
                     col.transportInfo.ticketKey == updatedSubscription.ticketKey){
-                    dojo.debug("in there");
                     col.transportInfo = updatedSubscription;
                     col.displayName = updatedSubscription.displayName;
                     break;

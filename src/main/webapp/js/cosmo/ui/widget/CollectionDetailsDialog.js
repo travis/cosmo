@@ -115,9 +115,7 @@ dojo.widget.HtmlWidget, function(){
             //TODO - This should not here. The publishing should happen at the service level, 
             //otherwise everyone who wants to user a service level method has to publish. Hard to do right
             //now with current RPC setup
-            xxx = this.transportInfo;
             if (this.transportInfo instanceof cosmo.model.Subscription){
-                 dojo.debug("subbie");	
                  this.transportInfo.displayName = this._getDisplayName();
                  cosmo.topics.publish(cosmo.topics.SubscriptionUpdatedMessage,[this.transportInfo]);
             } else {
@@ -188,6 +186,7 @@ dojo.widget.HtmlWidget, function(){
                       conduit: conduit, 
                       transportInfo: transportInfo }, 
                  null, 'last');
+                 
     var btnsRight = [];
 
     btnsRight.push(dojo.widget.createWidget(

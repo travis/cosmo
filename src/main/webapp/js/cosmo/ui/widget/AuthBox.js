@@ -17,7 +17,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
         // Props from template or set in constructor
         authAction: null, 
         //authProc: "",
-        authProc: '/cosmo/j_acegi_security_check',
+        authProc: cosmo.env.getAuthProc(),
         usernameLabel: _("Login.Username"),
         passwordLabel: _("Login.Password"),
         

@@ -125,3 +125,7 @@ cosmo.env.getRedirectUrl = function(){
 cosmo.env.getLoginRedirect = function(){
 	return cosmo.env.getBaseUrl() + "/login";
 }
+
+cosmo.env.getAuthProc = function(){
+	return cosmo.env.getBaseUrl() + "/j_acegi_security_check";
+}

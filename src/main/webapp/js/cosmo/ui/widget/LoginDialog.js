@@ -17,7 +17,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
         templatePath: dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/LoginDialog/LoginDialog.html"),
 
         // Props from template or set in constructor
-        authProc: "",
+        authProc: cosmo.env.getAuthProc(),
         passwordLabel: _("Login.Password"),
         usernameLabel: _("Login.Username"),
         loginPrompt: _("Login.Prompt"),

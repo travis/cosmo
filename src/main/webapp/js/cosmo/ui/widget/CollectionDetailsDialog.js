@@ -26,6 +26,7 @@ var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.widget.ModalDialog");
+dojo.require("cosmo.topics");
 
 dojo.widget.defineWidget("cosmo.ui.widget.CollectionDetailsDialog", "html",
 
@@ -111,6 +112,18 @@ dojo.widget.HtmlWidget, function(){
         
         saveDisplayName: function(){
             this.conduit.saveDisplayName(this.calendar.uid, this._getDisplayName(), this.transportInfo);
+            //TODO - This should not here. The publishing should happen at the service level, 
+            //otherwise everyone who wants to user a service level method has to publish. Hard to do right
+            //now with current RPC setup
+            xxx = this.transportInfo;
+            if (this.transportInfo instanceof cosmo.model.Subscription){
+                 dojo.debug("subbie");	
+                 this.transportInfo.displayName = this._getDisplayName();
+                 cosmo.topics.publish(cosmo.topics.SubscriptionUpdatedMessage,[this.transportInfo]);
+            } else {
+                 this.calendar.name = this._getDisplayName();
+                 cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage,[this.calendar]);
+            }
         },
         
         //handles when the user selects a client

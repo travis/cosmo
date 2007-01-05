@@ -20,18 +20,34 @@ dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.topics");
 
 dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector", 
-    dojo.widget.HtmlWidget, {
+    dojo.widget.HtmlWidget,
+    
+    //initializer
+    function(){
+        dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, this, this.handleCollectionUpdated);
+        dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, this, this.handleSubscriptionUpdated);
+    },
+    {
+    
         templateString: '<span></span>',
         collections: [],
         currentCollection: {},
+        selectFunction: null,
         ticketKey: '',
+        
+        //references to various DOM nodes
+        selector: null,  //the actual select element, if there are >1 collections
+        displayNameText: null, //the display name if there is just one collection
+        
         /**
          * Inserts the select box for choosing from multiple collections
          * Only actually called if multiple collections exist
          */
         fillInTemplate: function () {
+            var self = this; 
             var col = this.collections;
             var curr = this.currentCollection;
             var passedKey = this.ticketKey;
@@ -66,6 +82,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 sel.style.width = '120px';
                 // Set the select to the current collection
                 cosmo.util.html.setSelect(sel, c);
+                self.selector = sel;
+                dojo.event.connect(sel, "onchange", function(){
+                    self.selectFunction();
+                    self.currentCollection = self.collections[sel.selectedIndex];
+                });
                 
             }
             function renderButton() {
@@ -141,6 +162,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 btnSpan.appendChild(btnLink);
                 collSelectNode.appendChild(btnSpan);
             }
+            
             function renderSingleCollectionName() {
                 var d = _createElem('div');
                 d.id = 'collectionLabelPrompt';
@@ -149,8 +171,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 var s = _createElem('span');
                 s.id = 'collectionLabelName';
                 s.className = 'labelTextXL';
-                s.appendChild(_createText(curr.displayName));
+                var textNode = _createText(curr.displayName)
+                s.appendChild(textNode);
                 collSelectNode.appendChild(s);
+                dojo.debug("display it");
+                self.displayNameText = textNode;
             }
             
             // Multiple collections -- display selector
@@ -161,6 +186,55 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 renderSingleCollectionName();
             }
             renderButton();
+        },
+        
+        handleCollectionUpdated: function(/*cosmo.topics.CollectionUpdatedMessage*/ message){
+            var updatedCollection = message.collection;
+            for (var x = 0; x < this.collections.length;x++){
+                if (this.collections[x].collection.uid == updatedCollection.uid){
+                    this.collections[x].collection = updatedCollection;
+                    if (!this.collections[x].transportInfo){
+                        this.collections[x].displayName = updatedCollection.name;
+                    }
+                    break;
+                }
+            }
+            this._redraw();
+        },
+        
+        handleSubscriptionUpdated: function(/*cosmo.topics.SubscriptionUpdatedMessage*/ message){
+            var updatedSubscription = message.subscription;
+            for (var x = 0; x < this.collections.length;x++){
+                var col = this.collections[x];
+                dojo.debug("x: " + x);
+                dojo.debug(col.transportInfo);
+                dojo.debug("cur uid: " + (col.transportInfo ? col.transportInfo.calendar.uid : "none"));
+                dojo.debug("up uid: " + updatedSubscription.calendar.uid);
+                if (col.transportInfo && 
+                    col.transportInfo instanceof cosmo.model.Subscription &&
+                    col.transportInfo.calendar.uid == updatedSubscription.calendar.uid &&
+                    col.transportInfo.ticketKey == updatedSubscription.ticketKey){
+                    dojo.debug("in there");
+                    col.transportInfo = updatedSubscription;
+                    col.displayName = updatedSubscription.displayName;
+                    break;
+                }
+            }
+            
+            if (this.currentCollection.transportInfo 
+                   && this.currentCollection.transportInfo.calendar.uid == updatedSubscription.calendar.uid
+                   && this.currentCollection.transportInfo.ticketKey == updatedSubscription.ticketKey ){
+                this.currentCollection.displayName = updatedSubscription.displayName;
+                this.currentCollection.transportInfo = updatedSubscription;
+            }
+            this._redraw();
+        } ,
+        
+        _redraw: function(){
+            while (this.domNode.firstChild){
+                this.domNode.removeChild(this.domNode.firstChild);
+            }
+            this.fillInTemplate();
         }
 } );
 

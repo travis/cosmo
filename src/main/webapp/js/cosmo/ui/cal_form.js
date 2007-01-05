@@ -766,12 +766,6 @@ cosmo.ui.cal_form.CalForm = function () {
         // submit on Enter keypress in Safari
         form.onsubmit = function () { return false; };
 
-        // Cal selector
-        if (form.calSelectElem) {
-            form.calSelectElem.onchange = function () {
-                f = Cal.goSelCal; Cal.showMaskDelayNav(f); };
-        }
-
         // Recurrence
         form.recurrence.onchange = Cal.calForm.setRecurEnd;
         form.recurend.onclick = Cal.calForm.emptyTextInput;

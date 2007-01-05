@@ -240,9 +240,12 @@ cosmo.ui.cal_main.Cal = new function () {
         
         // Display selector or single cal name
         var selector = dojo.widget.createWidget(
-            'cosmo:CollectionSelector', { 'collections': this.currentCollections, 
-            'currentCollection': this.currentCollection,
-            'ticketKey': ticketKey }, document.getElementById('calSelectNav'), 'last');
+            'cosmo:CollectionSelector', { 
+                'collections': this.currentCollections, 
+                'currentCollection': this.currentCollection,
+                'ticketKey': ticketKey,
+                'selectFunction': function(){var f = Cal.goSelCal; Cal.showMaskDelayNav(f); }
+            }, document.getElementById('calSelectNav'), 'last');
         this._collectionSelector = selector;
         // Load and display events
         // --------------

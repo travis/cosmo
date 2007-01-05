@@ -2,7 +2,7 @@
 
 <%--
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 <cosmo:standardLayout prefix="Account.View.">
 
 
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/cmp/cmp.js"></script>
 <script type="text/javascript">
 
 dojo.require("cosmo.ui.widget.ModifyUserDialog");
@@ -73,7 +72,7 @@ modifyHandlerDict= {
 
   <p style="line-height:18px;">
     <fmt:message key="Account.View.HomeDirectory.FullURLIs"/><br/>
-    <strong>${baseurl}${homedir}</strong>
+    <strong>${relationLinks['dav']}</strong>
   </p>
 
   <p>
@@ -96,6 +95,7 @@ modifyHandlerDict= {
         disableCancel="true"
         submitButtonText='<fmt:message key="Account.Form.Button.Update"/>'
         populateOnLoad="true"
+		style="position: static; margin-top: 1em"
         > </div>
 
 </authz:authorize>

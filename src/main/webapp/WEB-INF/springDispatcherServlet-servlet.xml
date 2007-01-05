@@ -3,7 +3,7 @@
           "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
-    Copyright 2006 Open Source Applications Foundation
+    Copyright 2007 Open Source Applications Foundation
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -68,7 +68,9 @@
     	    /i18n.js=i18nController
     	    /js/cosmo/util/i18n.js=i18nController
     	    /account/activate=accountActivationController
+    	    /account/view=accountViewController
     	    /pim/collection/*=collectionBookmarkController
+    	    
 	        /**/*=jspViewController
 		</value>
     </property> 
@@ -91,6 +93,16 @@
  
  <bean id="collectionBookmarkController" class="org.osaf.cosmo.ui.pim.CollectionBookmarkController">
  	<property name="pimView"><value>pim</value></property>
+	<property name="contentService"><ref bean="contentService" /></property>
+	<property name="securityManager"><ref bean="securityManager" /></property>
+	<property name="serviceLocatorFactory">
+      <ref bean="serviceLocatorFactory"/>
+    </property>
+	
+ </bean>
+
+ <bean id="accountViewController" class="org.osaf.cosmo.ui.account.AccountViewController">
+ 	<property name="accountView"><value>account_view</value></property>
 	<property name="contentService"><ref bean="contentService" /></property>
 	<property name="securityManager"><ref bean="securityManager" /></property>
 	<property name="serviceLocatorFactory">

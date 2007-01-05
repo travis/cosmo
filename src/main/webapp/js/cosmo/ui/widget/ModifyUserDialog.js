@@ -317,11 +317,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
 	    validatePassword : function(){
 	    	var password = this.form.password.value;
-	    	if (password == ""){
-	    		this.passwordError.innerHTML = _("Signup.Error.RequiredField");
-	    		return false;
-	    	}
-	    	if (password.length < 5 || password.length > 16){
+	    	if ((password.length < 5 || password.length > 16)
+	    		&& password != ""){
 	    		this.passwordError.innerHTML = _("Signup.Error.PasswordInvalidLength");
 	    		return false;
 	    	}

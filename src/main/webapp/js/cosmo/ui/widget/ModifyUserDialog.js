@@ -24,6 +24,11 @@ dojo.provide("cosmo.ui.widget.ModifyUserDialog");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.env");
+dojo.require("cosmo.util.i18n");
+dojo.require("dojo.validate.web");
+dojo.require("dojo.event");
+
+var _ = cosmo.util.i18n.getText;
 
 dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWidget,
     {
@@ -46,6 +51,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         passwordLabel : "Password:",
         confirmLabel : "Confirm",
         adminLabel : "Admin?",
+        
+        usernameError : null,
+        firstNameError : null,
+        lastNameError : null,
+        emailError : null,
+        passwordError : null,
+        confirmError : null,
 
         cancelButtonText : "Cancel",
         submitButtonText : "Submit",
@@ -116,6 +128,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                     dojo.event.connect(this.submitButton, "handleOnClick", this, "modifyUser");
                 }
             }
+            
+            // Make sure we reset errors before submitting.
+            dojo.event.connect("before", this, "modifyUser", this, "clearErrors");
+            dojo.event.connect("before", this, "createUser", this, "clearErrors");
+            dojo.event.connect("before", this, "signupUser", this, "clearErrors");
 
             if (this.disableCancel) {
                 dojo.dom.removeNode(this.cancelButton);
@@ -172,9 +189,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
         cancelAction : function(){
             this.form.reset();
+            this.clearErrors();
             this.hide();
         },
-
+        
         populateFields : function(populateUsername){
             // username only needed if logged in as administrator
 
@@ -219,8 +237,111 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                 cosmo.cmp.cmpProxy.getAccount(handlerDict);
             }
         },
+        
+        validateFields : function(){
+			var usernameValid = this.validateUsername();
+			var emailValid = this.validateEmail();
+			var firstNameValid = this.validateFirstName();
+			var lastNameValid = this.validateLastName();
+			var passwordValid = this.validatePassword();
+			var confirmValid = this.validateConfirm();
+			return usernameValid &&
+					emailValid &&
+					firstNameValid &&
+					lastNameValid &&
+					passwordValid &&
+					confirmValid;
+        	
+	    },
+	    
+	    clearErrors : function(){
+	    	this.usernameError.innerHTML = "";
+	    	this.firstNameError.innerHTML = "";
+	    	this.lastNameError.innerHTML = "";
+	    	this.emailError.innerHTML = "";
+	    	this.passwordError.innerHTML = "";
+	    	this.confirmError.innerHTML = "";
+	    },
+	    
+	    validateUsername : function(){
+	    	var username = this.form.username.value;
+	    	if (username == ""){
+	    		this.usernameError.innerHTML = _("Signup.Error.RequiredField");
+	    		return false;
+	    	}
+	    	if (username.length < 3 || username.length > 32){
+	    		this.usernameError.innerHTML = _("Signup.Error.UsernameInvalidLength");
+	    		return false;
+	    	}
+	    	return true;
+	    },
+
+	    validateFirstName : function(){
+	    	var firstName = this.form.firstName.value;
+	    	if (firstName == ""){
+	    		this.firstNameError.innerHTML = _("Signup.Error.RequiredField");
+	    		return false;
+	    	}
+	    	if (firstName.length < 1 || firstName.length > 128){
+	    		this.firstNameError.innerHTML = _("Signup.Error.FirstNameInvalidLength");
+	    		return false;
+	    	}
+	    	return true;
+	    },
+
+	    validateLastName : function(){
+	    	var lastName = this.form.lastName.value;
+	    	if (lastName == ""){
+	    		this.lastNameError.innerHTML = _("Signup.Error.RequiredField");
+	    		return false;
+	    	}
+	    	if (lastName.length < 1 || lastName.length > 128){
+	    		this.firstNameError.innerHTML = _("Signup.Error.LastNameInvalidLength");
+	    		return false;
+	    	}
+	    	return true;
+	    },
+
+	    validateEmail : function(){
+	    	var email = this.form.email.value;
+	    	if (email == ""){
+	    		this.emailError.innerHTML = _("Signup.Error.RequiredField");
+	    		return false;
+	    	}
+	    	if (!dojo.validate.isEmailAddress(email)){
+	    		this.emailError.innerHTML = _("Signup.Error.ValidEMail");
+	    		return false;
+	    	}
+	    	return true;
+	    },
+
+	    validatePassword : function(){
+	    	var password = this.form.password.value;
+	    	if (password == ""){
+	    		this.passwordError.innerHTML = _("Signup.Error.RequiredField");
+	    		return false;
+	    	}
+	    	if (password.length < 5 || password.length > 16){
+	    		this.passwordError.innerHTML = _("Signup.Error.PasswordInvalidLength");
+	    		return false;
+	    	}
+	    	return true;
+	    },
+
+	    validateConfirm : function(){
+	    	var password = this.form.password.value;
+	    	var confirm = this.form.confirm.value;
+	    	if (password != confirm){
+	    		this.confirmError.innerHTML = _("Signup.Error.MatchPassword");
+	    		return false;
+	    	}
+	    	return true;
+	    },
 
         modifyUser : function(){
+        	if (!this.validateFields()){
+        		return;
+        	}
 
             var form = this.form;
 
@@ -275,6 +396,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         },
 
         signupUser : function(){
+         	if (!this.validateFields()){
+        		return;
+        	}
+        	
             userHash = this.userHashFromForm(this.form)
 
             cosmo.cmp.cmpProxy.signup(
@@ -285,6 +410,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         },
 
         createUser : function(){
+         	if (!this.validateFields()){
+        		return;
+        	}
+ 
             var self = this
 
             //Check if user exists

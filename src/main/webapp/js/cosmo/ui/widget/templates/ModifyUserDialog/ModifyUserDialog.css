@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-form.modifyUserForm {
+.modifyUserForm {
 	background:#efefef;
     border:1px solid #cccccc;
     padding: 8px;
+	position: fixed;
+	left: 25%;
+	right: 25%;
+	top: 7em;
 }

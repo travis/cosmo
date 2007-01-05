@@ -33,7 +33,7 @@ var _ = cosmo.util.i18n.getText;
 dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWidget,
     {
         templatePath : dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/ModifyUserDialog/ModifyUserDialog.html"),
-           templateCssPath : dojo.uri.dojoUri("../../cosmo/ui/widget/templates/ModifyUserDialog/ModifyUserDialog.css"),
+        templateCssPath : dojo.uri.dojoUri("../../cosmo/ui/widget/templates/ModifyUserDialog/ModifyUserDialog.css"),
 
         // Programmatic widget creation disabled because of problems in safari. Reenable when
         // this is fixed
@@ -58,6 +58,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         emailError : null,
         passwordError : null,
         confirmError : null,
+        
+        style: "",
 
         cancelButtonText : "Cancel",
         submitButtonText : "Submit",

@@ -29,6 +29,7 @@ dojo.require("cosmo.facade.pref");
 dojo.require("cosmo.service.json_service_impl");
 dojo.require("cosmo.legacy.cal_event");
 dojo.require('cosmo.ui.widget.CollectionSelector');
+dojo.require('cosmo.ui.widget.AuthBox');
 dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.Lozenge');
 dojo.require('cosmo.view.cal.canvas');

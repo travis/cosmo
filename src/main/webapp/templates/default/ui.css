@@ -323,12 +323,12 @@ form.modifyUserForm{
 
         span#pageNumberChooser {
             position: absolute;
-            right: 2em;
+            left: 2em;
         }
 
         span#pageSizeChooser {
             position: absolute;
-            left: 2em;
+            right: 2em;
         }
 
         div#userListControls {

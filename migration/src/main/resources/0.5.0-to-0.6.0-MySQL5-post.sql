@@ -8,8 +8,7 @@ alter table users drop column datemodified;
 
 # add new constraints
 alter table attribute add unique itemid (itemid, namespace, localname);
-alter table cal_property_index add index FKBA988E7927801F2 (eventstampid), add constraint FKBA988E7927801F2 foreign key (eventstampid) references event_stamp (stampid);
-alter table cal_timerange_index add index FK98D277F227801F2 (eventstampid), add constraint FK98D277F227801F2 foreign key (eventstampid) references event_stamp (stampid);
-
+alter table cal_property_index add index FKBA988E7927801F2 (eventstampid), add constraint FKBA988E7927801F2 foreign key (eventstampid) references stamp (id) on delete cascade;
+alter table cal_timerange_index add index FK98D277F227801F2 (eventstampid), add constraint FK98D277F227801F2 foreign key (eventstampid) references stamp (id) on delete cascade;
 # update server version
 update server_properties SET propertyvalue='0.6-SNAPSHOT' WHERE propertyname='cosmo.schemaVersion';

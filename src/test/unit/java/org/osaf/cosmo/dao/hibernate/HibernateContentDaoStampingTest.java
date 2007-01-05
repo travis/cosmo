@@ -160,6 +160,41 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         } catch (ModelValidationException e) {}
     }
     
+    public void testRemoveStamp() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        NoteItem item = generateTestContent();
+        
+        item.setIcalUid("icaluid");
+        item.setBody("this is a body");
+        
+        EventStamp event = new EventStamp();
+        event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        
+        item.addStamp(event);
+        
+        ContentItem newItem = contentDao.createContent(root, item);
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        Assert.assertEquals(1, queryItem.getStamps().size());
+        Assert.assertEquals(1, queryItem.getActiveStamps().size());
+        
+        Stamp stamp = queryItem.getStamp(EventStamp.class);
+        queryItem.removeStamp(stamp);
+        contentDao.updateContent(queryItem);
+        clearSession();
+        
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        Assert.assertNotNull(queryItem);
+        Assert.assertEquals(queryItem.getStamps().size(),1);
+        Assert.assertEquals(queryItem.getActiveStamps().size(),0);
+        Assert.assertTrue(
+                queryItem.getStamps().iterator().next() instanceof EventStamp);
+        
+    }
+    
     public void testCalendarCollectionStamp() throws Exception {
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);

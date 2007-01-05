@@ -53,6 +53,8 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
@@ -106,6 +108,7 @@ public class EventStamp extends Stamp implements
     
     @OneToMany(mappedBy = "eventStamp", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
+    @OnDelete(action=OnDeleteAction.CASCADE)
     public Set<CalendarTimeRangeIndex> getTimeRangeIndexes() {
         return timeRangeIndexes;
     }
@@ -116,6 +119,7 @@ public class EventStamp extends Stamp implements
     
     @OneToMany(mappedBy = "eventStamp", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
+    @OnDelete(action=OnDeleteAction.CASCADE)
     public Set<CalendarPropertyIndex> getPropertyIndexes() {
         return propertyIndexes;
     }

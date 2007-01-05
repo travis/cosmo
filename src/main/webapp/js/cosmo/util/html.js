@@ -17,7 +17,7 @@
 dojo.provide("cosmo.util.html");
 
 cosmo.util.html.createSelect = function (id, name, size, 
-    multi, selOptions, className, elem) {
+    multi, selOptions, className, parentNode) {
 
     var sel = document.createElement('select');
     var o = {};
@@ -43,7 +43,7 @@ cosmo.util.html.createSelect = function (id, name, size,
     // Normal order-based param invocation
     else {
         options = selOptions;
-        appendElem = elem;
+        appendElem = parentNode;
         sel.id = id
         sel.name = name;
         if (size) {
@@ -87,66 +87,79 @@ cosmo.util.html.setSelect = function (sel, val) {
 };
 
 cosmo.util.html.createInput = function (type, id, name,
-    size, maxlength, value, className, elem) {
+    size, maxlength, value, className, parentNode) {
 
-    var formElem = null;
+    var o = {};
+    var input = null;
     var str = '';
+    
+    // Also accept a keyword obj as a param -- options are passed
+    // as a keyword prop, appendElem is a second arg after the obj
+    // e.g, createInput({ type: 'password', name: 'foo', id: 'foo', 
+    //      value: 'asdf', className: 'fooFoo' },  nodeToAppendTo);
+    if (typeof arguments[0] == 'object') {
+        o = arguments[0];
+        appendElem = arguments[1];
+    }
+    // Normal order-based param invocation
+    else {
+        o.type = type;
+        o.name = name;
+        o.id = id;
+        if (size) {
+            o.size = size;
+        }
+        if (maxlength) {
+            o.maxlength = maxlength;
+        }
+        if (value) {
+            o.value = value;
+        }
+        if (className) {
+            o.className = className;
+        }
+        appendElem = parentNode;
+    }
 
     // IE falls down on DOM-method-generated
     // radio buttons and checkboxes
     // Old-skool with conditional branching and innerHTML
     if (document.all && (type == 'radio' || type == 'checkbox')) {
         str = '<input type="' + type + '"' +
-            ' name="' + name + '"' +
-            ' id ="' + id + '"';
-        if (size) {
-            str += ' size="' + size + '"';
+            ' name="' + o.name + '"' +
+            ' id ="' + o.id + '"';
+        if (o.size) {
+            str += ' size="' + o.size + '"';
         }
-        if (maxlength) {
-            str += ' maxlength="' + maxlength + '"';
+        if (o.maxlength) {
+            str += ' maxlength="' + o.maxlength + '"';
         }
-        if (className) {
-            str += ' class="' + className + '"';
+        if (o.className) {
+            str += ' class="' + o.className + '"';
         }
         str += '>';
-        if (elem) {
-            elem.innerHTML += str;
-        }
-        else {
-            formElem = document.createElement('span');
-            formElem.innerHTML = str;
-            return formElem.firstChild;
-        }
+        var s = document.createElement('span');
+        s.innerHTML = str;
+        input = s.firstChild;
+        s.removeChild(input); 
     }
     // Standards-compliant browsers -- all intputs
     // IE -- everything but radio button and checkbox
     else {
-        formElem = document.createElement('input');
-        
-        formElem.type = type;
-        formElem.name = name;
-        formElem.id = id;
-        if (size) {
-            formElem.size = size;
+        input = document.createElement('input');
+        for (var p in o) {
+            input[p] = o[p];
         }
-        if (maxlength) {
-            //formElem.maxlength = maxlength; // Setting the prop directly is broken in FF
-            formElem.setAttribute('maxlength', maxlength);
-        }
-        if (value) {
-            formElem.value = value;
-        }
-        if (className) {
-            formElem.className = className;
-        }
-        if (elem) {
-            elem.appendChild(formElem);
-        }
-        return formElem;
+            
     }
+    
+    if (appendElem) {
+        appendElem.appendChild(input);
+    }
+    return input;
 };
 
-cosmo.util.html.appendNbsp = function (elem) {
-    elem.appendChild(document.createTextNode('\u00A0'));
+cosmo.util.html.appendNbsp = function (parentNode) {
+    parentNode.appendChild(document.createTextNode('\u00A0'));
 };
 

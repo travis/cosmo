@@ -43,6 +43,7 @@ import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.TimestampAttribute;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 
@@ -309,6 +310,45 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         cal = (Calendar) queryAttr.getValue();
         Assert.assertEquals(cal.getTimeZone().getID(), "GMT+02:00");
         Assert.assertTrue(cal.equals(attr.getValue()));
+    }
+    
+    public void testTimestampAttribute() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        ContentItem item = generateTestContent();
+        Date dateVal = new Date();
+        TimestampAttribute tsAttr = 
+            new TimestampAttribute(new QName("timestampattribute"), dateVal); 
+        item.addAttribute(tsAttr);
+        
+        ContentItem newItem = contentDao.createContent(root, item);
+
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+
+        Attribute attr = queryItem.getAttribute(new QName("timestampattribute"));
+        Assert.assertNotNull(attr);
+        Assert.assertTrue(attr instanceof TimestampAttribute);
+        
+        Date val = (Date) attr.getValue();
+        Assert.assertTrue(dateVal.equals(val));
+        
+        dateVal.setTime(dateVal.getTime() + 101);
+        attr.setValue(dateVal);
+
+        contentDao.updateContent(queryItem);
+
+        clearSession();
+
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        Attribute queryAttr = queryItem.getAttribute(new QName("timestampattribute"));
+        Assert.assertNotNull(queryAttr);
+        Assert.assertTrue(queryAttr instanceof TimestampAttribute);
+        
+        val = (Date) queryAttr.getValue();
+        Assert.assertTrue(dateVal.equals(val));
     }
 
     public void testCreateDuplicateRootItem() throws Exception {

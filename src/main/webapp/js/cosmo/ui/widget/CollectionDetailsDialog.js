@@ -56,7 +56,7 @@ dojo.widget.HtmlWidget, function(){
         collectionNameText: null, //Label with the calendar name
         collectionNameInputSpan: null, //span with textbox with the calendar name
         collectionNameInput: null, //Textbox with the calendar name
-        
+        linkSpan: null, //where to put the link image
         //i18n
         strings: { 
             nameLabel: _("Main.CollectionDetails.NameLabel"),
@@ -105,6 +105,8 @@ dojo.widget.HtmlWidget, function(){
            } else {
                this.collectionNameText.style.display = "";
            }
+           
+           this.linkSpan.appendChild(cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImagesUrl() + "link.png"));
            
            this.clientSelector.selectedIndex = 0;
            this._handleClientChanged();

@@ -163,3 +163,25 @@ cosmo.util.html.appendNbsp = function (parentNode) {
     parentNode.appendChild(document.createTextNode('\u00A0'));
 };
 
+//TODO Should this be a widget, or too granular? Discuss.
+cosmo.util.html.createRollOverMouseDownImage = function(normalImageUrl){
+    var i = normalImageUrl.lastIndexOf(".");
+    var suffix = normalImageUrl.substr(i);
+    var prefix = normalImageUrl.substr(0,i);
+    var img = document.createElement("img");
+    img.src = normalImageUrl;
+    dojo.event.connect(img, "onmouseover", function(){
+       img.src = prefix + "_rollover" + suffix;
+    });
+    dojo.event.connect(img, "onmouseout", function(){
+       img.src = normalImageUrl;
+    });
+    dojo.event.connect(img, "onmousedown", function(){
+       img.src = prefix + "_mousedown" + suffix;
+    });
+    dojo.event.connect(img, "onmouseup", function(){
+       img.src = prefix + "_rollover" + suffix;
+    });
+    return img;
+
+}

@@ -142,7 +142,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 }
                 // Otherwise the user is logged in -- use the 'Info' button
                 else {
-                    str = 'info';
                     f = function () {
                         cosmo.app.showDialog(
                             cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
@@ -154,10 +153,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 }
                 var btnSpan = _createElem("span");
                 var btnLink = _createElem('a');
-                var btnText = _createText('[' + str + ']');
+                var infoIcon = cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImagesUrl() + "collectionDetails.png")
                 dojo.event.connect(btnLink, 'onclick', f);
                 btnLink.href = '#';
-                btnLink.appendChild(btnText);
+                btnLink.appendChild(infoIcon);
                 btnSpan.appendChild(_createText('\u00A0'));
                 btnSpan.appendChild(btnLink);
                 collSelectNode.appendChild(btnSpan);

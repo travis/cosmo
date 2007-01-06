@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 public interface EimmlConstants {
 
     /** */
-    public static final String MEDIA_TYPE_EIMML = "text/xml";
+    public static final String MEDIA_TYPE_EIMML = "application/eim+xml";
 
     /** */
     public static final String NS_CORE =

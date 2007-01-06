@@ -780,14 +780,17 @@ cosmo.ui.cal_form.CalForm = function () {
             Cal.calForm.textAreaHasFocus = false;
         };
 
+        descrTxt = null; // Set DOM-node-ref to null to avoid IE memleak
+
         // All-day event / normal event toggling
         allDayCheck.onclick = function () { Cal.calForm.toggleLozengeType() };
 
         var regionSelectorElement = document.getElementById("tzRegion");
         dojo.event.connect(regionSelectorElement, "onchange", this.handleRegionChanged);
 
+        dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, Cal, Cal.handleCollectionUpdated);
+        dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, Cal, Cal.handleSubscriptionUpdated);
 
-        descrTxt = null; // Set DOM-node-ref to null to avoid IE memleak
     };
     this.addJumpToDate = function (dMain) {
         var top = parseInt(MiniCal.displayContext.style.top);
@@ -870,5 +873,6 @@ cosmo.ui.cal_form.CalForm = function () {
             Cal.showMaskDelayNav(f);
         }
     };
+    
 }
 CalForm = cosmo.ui.cal_form.CalForm;

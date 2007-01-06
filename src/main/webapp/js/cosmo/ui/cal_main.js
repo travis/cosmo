@@ -866,9 +866,41 @@ cosmo.ui.cal_main.Cal = new function () {
             return false;
         }
     };
+
+    this.handleCollectionUpdated = function(/*cosmo.topics.CollectionUpdatedMessage*/ message){
+        var updatedCollection = message.collection;
+        var updateCollection = function(collection){
+            if (collection.collection.uid == updatedCollection.uid){
+                collection.collection = updatedCollection;
+            }
+            if (!collection.transportInfo){
+                collection.displayName = updatedCollection.name;
+            }
+        }
+
+        updateCollection(this.currentCollection);        
+        dojo.lang.map(this.currentCollections, updateCollection);
+    }
+    
+    this.handleSubscriptionUpdated = function(/*cosmo.topics.SubscriptionUpdatedMessage*/ message){
+        var updatedSubscription = message.subscription;
+        var updateCollection = function(collection){
+            var transportInfo = collection.transportInfo;
+            if (transportInfo && transportInfo instanceof cosmo.model.Subscription){
+                if (transportInfo.calendar.uid = updatedSubscription.calendar.uid){
+                    collection.transportInfo = updatedSubscription;
+                    collection.displayName = updatedSubscription.displayName;
+                }
+            }
+        }
+        updateCollection(this.currentCollection);        
+        dojo.lang.map(this.currentCollections, updateCollection);
+    }
+
     this.redirectTimeout = function () {
         location = cosmo.env.getRedirectUrl();
-    },
+    };
+
 
     // ==========================
     // Cleanup

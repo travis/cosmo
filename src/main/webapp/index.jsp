@@ -19,4 +19,6 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<jsp:forward page="/login"/>
+<script type="text/javascript">
+	location = 'login';
+</script>

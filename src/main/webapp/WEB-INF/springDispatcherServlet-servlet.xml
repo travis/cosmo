@@ -64,6 +64,7 @@
 		<value>
 	        /admin/status/*=statusController
         	/logout=logoutController
+        	/login=loginController
            	/browse/**=homeDirectoryBrowsingController
     	    /i18n.js=i18nController
     	    /js/cosmo/util/i18n.js=i18nController
@@ -161,12 +162,18 @@
 
 <!-- 
 
-	Controller for logout
+	Controllers for login and logout
 	
  -->
 
-<bean id="logoutController" class="org.osaf.cosmo.spring.mvc.controllers.LogoutController"> 
+<bean id="logoutController" class="org.osaf.cosmo.ui.account.LogoutController"> 
     <property name="forwardPath" value="logout" />
+</bean> 
+
+<bean id="loginController" class="org.osaf.cosmo.ui.account.LoginController"> 
+    <property name="loginView" value="login" />
+    <property name="messageSource"><ref bean="messageSource"/></property>
+    <property name="securityManager"><ref bean="securityManager" /></property>
 </bean> 
 
 <!-- 

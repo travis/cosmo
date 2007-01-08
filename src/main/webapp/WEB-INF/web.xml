@@ -179,11 +179,11 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>default-security</filter-name>
-    <url-pattern>/login*</url-pattern>
+    <url-pattern>/login</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>default-security</filter-name>
-    <url-pattern>/logout*</url-pattern>
+    <url-pattern>/logout</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>default-security</filter-name>

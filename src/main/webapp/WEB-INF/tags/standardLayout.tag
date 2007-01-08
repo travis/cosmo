@@ -25,6 +25,9 @@
 
 <c:if test="${empty showNav}">
   <c:set var="showNav" value="true"/>
+</c:if>
+
+<c:if test="${showNav}">
   <cosmoui:user var="user"/>
 </c:if>
 
@@ -46,7 +49,6 @@
 
   </head>
   <body class="adminPage">
-
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
       <tr>
         <td align="left" valign="top">

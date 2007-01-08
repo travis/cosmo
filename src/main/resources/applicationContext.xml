@@ -614,7 +614,7 @@
          /account/activate/*=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /account/forgot=ROLE_ANONYMOUS
          /account/remind=ROLE_ANONYMOUS
-         /login=ROLE_ANONYMOUS
+         /login=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /loginfailed=ROLE_ANONYMOUS
          /logout=ROLE_ROOT,ROLE_USER
          /browse/**=ROLE_USER, ROLE_ROOT

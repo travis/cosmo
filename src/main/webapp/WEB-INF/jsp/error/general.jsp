@@ -21,7 +21,11 @@
 <%@ page    isErrorPage="true"               %>
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-<cosmo:standardLayout prefix="Error.General." showNav="false">
+<c:if test="${empty showNav}">
+  <c:set var="showNav" value="false"/>
+</c:if>
+
+<cosmo:standardLayout prefix="Error.General." showNav="${showNav}">
 <c:forEach var="message" items="${messages}">
 <p>
 <c:out value="${message}"/>

@@ -53,6 +53,7 @@
         dojo.require("cosmo.app");
         dojo.require("cosmo.account.create");
         dojo.require("cosmo.util.popup");
+        dojo.require("cosmo.convenience");
         dojo.require("cosmo.ui.widget.LoginDialog");
         dojo.require("cosmo.ui.widget.ModalDialog");
         

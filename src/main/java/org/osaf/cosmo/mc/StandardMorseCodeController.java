@@ -23,10 +23,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.eim.EimRecordSet;
+import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimTranslator;
+import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
@@ -95,6 +98,8 @@ public class StandardMorseCodeController implements MorseCodeController {
      * by the given parent uid is not found
      * @throws NotCollectionException if the item specified
      * by the given parent uid is not a collection
+     * @throws ValidationException if the recordset contains invalid
+     * data according to the records' schemas
      * @throws MorseCodeException if an unknown error occurs
      */
     public SyncToken publishCollection(String uid,
@@ -129,12 +134,23 @@ public class StandardMorseCodeController implements MorseCodeController {
         collection.setOwner(owner);
 
         HashSet<Item> children = new HashSet<Item>();
+        EimTranslator translator = null;
         while (recordsets.hasNext()) {
             EimRecordSet recordset = recordsets.next();
-            if (recordset.getUuid().equals(collection.getUid())) {
-                // XXX: fill in collection data from recordset
-            } else {
-                // XXX: create and fill in item from recordset
+            try {
+                if (recordset.getUuid().equals(collection.getUid())) {
+                    // XXX: set collection name from recordset
+                    translator = new EimTranslator(collection);
+                    translator.applyRecords(recordset);
+                } else {
+                    Item child = createChildItem(collection, recordset);
+                    translator = new EimTranslator(child);
+                    translator.applyRecords(recordset);
+                }
+            } catch (EimValidationException e) {
+                throw new ValidationException("could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
+            } catch (EimSchemaException e) {
+                throw new MorseCodeException("unknown EIM schema problem", e);
             }
         }
 
@@ -245,6 +261,8 @@ public class StandardMorseCodeController implements MorseCodeController {
      * currently locked by another update
      * @throws StaleCollectionException if the collection has been
      * updated since the provided sync token was generated
+     * @throws ValidationException if the recordset contains invalid
+     * data according to the records' schemas
      * @throws MorseCodeException if an unknown error occurs
      */
     public SyncToken updateCollection(String uid,
@@ -268,12 +286,25 @@ public class StandardMorseCodeController implements MorseCodeController {
         }
 
         HashSet<Item> children = new HashSet<Item>();
+        EimTranslator translator = null;
         while (recordsets.hasNext()) {
             EimRecordSet recordset = recordsets.next();
-            if (recordset.getUuid().equals(collection.getUid())) {
-                // XXX: fill in collection data from recordset
-            } else {
-                // XXX: create and fill in item from recordset
+            try {
+                if (recordset.getUuid().equals(collection.getUid())) {
+                    // XXX: set collection name from recordset
+                    translator = new EimTranslator(collection);
+                    translator.applyRecords(recordset);
+                } else {
+                    Item child = collection.getChild(recordset.getUuid());
+                    if (child == null)
+                        child = createChildItem(collection, recordset);
+                    translator = new EimTranslator(child);
+                    translator.applyRecords(recordset);
+                }
+            } catch (EimValidationException e) {
+                throw new ValidationException("could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
+            } catch (EimSchemaException e) {
+                throw new MorseCodeException("unknown EIM schema problem", e);
             }
         }
 
@@ -321,6 +352,18 @@ public class StandardMorseCodeController implements MorseCodeController {
         if (ticket != null)
             return ticket.getOwner();
         throw new MorseCodeException("authenticated principal neither user nor ticket");
+    }
+
+
+    // creates a new item and adds it as a child of the collection
+    private ContentItem createChildItem(CollectionItem collection,
+                                        EimRecordSet recordset) {
+        NoteItem child = new NoteItem();
+        child.setName(recordset.getUuid());
+        child.setUid(recordset.getUuid());
+        child.setOwner(collection.getOwner());
+        collection.getChildren().add(child);
+        return child;
     }
 
     private class SubscriptionIterator implements Iterator {

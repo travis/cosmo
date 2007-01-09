@@ -250,6 +250,11 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 resp.sendError(HttpServletResponse.SC_RESET_CONTENT,
                                "Collection contains more recently updated items");
                 return;
+            } catch (ValidationException e) {
+                log.warn("Recordset contains invalid data", e);
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Recordset contains invalid data");
+                return;
             } catch (MorseCodeException e) {
                 log.error("Error updating collection " + cp.getUid(), e);
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
@@ -310,6 +315,11 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
             } catch (NotCollectionException e) {
                 resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
                                "Parent item not a collection");
+                return;
+            } catch (ValidationException e) {
+                log.warn("Recordset contains invalid data", e);
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Recordset contains invalid data");
                 return;
             } catch (MorseCodeException e) {
                 log.error("Error publishing collection " + cp.getUid(), e);

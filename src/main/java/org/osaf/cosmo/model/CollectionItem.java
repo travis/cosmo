@@ -79,6 +79,19 @@ public class CollectionItem extends Item {
         this.allChildren = allChildren;
     }
 
+    /**
+     * Return child item with matching uid
+     * @return identified child item, or null if no child with that
+     * uid exists
+     */
+    public Item getChild(String uid) {
+        for (Item child : allChildren) {
+            if (child.getUid().equals(uid))
+                return child;
+        }
+        return null;
+    }
+
     @Transient
     public boolean isExcludeFreeBusyRollup() {
         Boolean val =

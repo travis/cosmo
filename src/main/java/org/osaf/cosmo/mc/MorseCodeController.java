@@ -63,6 +63,8 @@ public interface MorseCodeController {
      * by the given parent uid is not found
      * @throws NotCollectionException if the item specified
      * by the given parent uid is not a collection
+     * @throws ValidationException if the recordset contains invalid
+     * data according to the records' schemas
      * @throws MorseCodeException if an unknown error occurs
      */
     public SyncToken publishCollection(String uid,
@@ -135,6 +137,8 @@ public interface MorseCodeController {
      * currently locked by another update
      * @throws StaleCollectionException if the collection has been
      * updated since the provided sync token was generated
+     * @throws ValidationException if the recordset contains invalid
+     * data according to the records' schemas
      * @throws MorseCodeException if an unknown error occurs
      */
     public SyncToken updateCollection(String uid,

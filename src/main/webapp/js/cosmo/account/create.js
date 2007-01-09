@@ -21,6 +21,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.cmp");
 dojo.require("dojo.uri");
 
+var userAccount = {};
 
 cosmo.account.create = new function () {
    
@@ -260,6 +261,7 @@ cosmo.account.create = new function () {
             return false;
         }
         else {
+            accountUser = data;
             self.showResultsTable(data);
             return true;
         }
@@ -310,7 +312,7 @@ cosmo.account.create = new function () {
      * @return Object (HtmlDivElement), div containing the
      *     table to append to the content area of the dialog
      */
-    function getResultsTable(cfg) {
+    function getResultsTable(user, cfg) {
         var p = null;
         var a = null;
         var tr = null;
@@ -319,11 +321,25 @@ cosmo.account.create = new function () {
         // Outer div
         var dO = createElem('div');
         
+        if (user.unactivated) {
+            p = createElem('div');
+            p.style.marginBottom = '16px';
+            p.style.textAlign = 'center';
+            p.className = 'borderBox';
+            p.appendChild(_createText(_('Signup.Prompt.AccountActivation')));
+            dO.appendChild(p);
+        }
+        
+        p = createElem('div');
+        p.appendChild(_createText(_('Signup.Prompt.AccountSetup')));
+        dO.appendChild(p);
+        
         // Create the table, append rows for each config value
         var table = createElem('table');
         table.className = 'dataDisplay';
         table.style.width = '80%';
-        table.style.margin = 'auto';        
+        table.style.margin = 'auto'; 
+        table.style.marginTop = '12px';
         
         var body = createElem('tbody');
 
@@ -346,25 +362,20 @@ cosmo.account.create = new function () {
         table.appendChild(body);
         dO.appendChild(table);
         
-        // Link to create a new account
-        p = createElem('div');
-        p.style.marginTop = '20px';
-        p.style.textAlign = 'center';
-        a = createElem('a');
-        a.href = 'javascript:cosmo.account.create.showForm();';
-        a.appendChild(createText(_('Signup.Links.CreateAnotherAccount')));
-        p.appendChild(a);
-        dO.appendChild(p);
-        
+        /*
+        ***** Leave this out until we can actually do auto-login *****
         // Link to begin using new account
-        p = createElem('div');
-        p.style.marginTop = '12px';
-        p.style.textAlign = 'center';
-        a = createElem('a');
-        a.href = 'javascript:cosmo.app.modalDialog.hide();';
-        a.appendChild(createText(_('Signup.Links.LogInToCosmo')));
-        p.appendChild(a);
-        dO.appendChild(p);
+        if (!user.unactivated) {
+            p = createElem('div');
+            p.style.marginTop = '12px';
+            p.style.textAlign = 'center';
+            a = createElem('a');
+            a.href = 'javascript:cosmo.app.modalDialog.hide();';
+            a.appendChild(createText(_('Signup.Links.LogInToCosmo')));
+            p.appendChild(a);
+            dO.appendChild(p);
+        }
+        */
         
         // Return the div containing the content
         return dO;
@@ -427,14 +438,12 @@ cosmo.account.create = new function () {
      */
     this.showResultsTable = function (user) {
         var cfg = getClientConfig(user);
-        var content = getResultsTable(cfg);
-        var prompt = _('Signup.Prompt.AccountSetup');
+        var content = getResultsTable(user, cfg);
+        var prompt = _('Signup.Prompt.Success');
         var d = cosmo.app.modalDialog;
         var btnsCenter = [dojo.widget.createWidget("cosmo:Button", 
             { text:_('App.Button.Close'), width:74, 
             handleOnClick: function () { cosmo.app.modalDialog.hide(); } })];
-        
-        prompt += user.activationId == undefined ? '': "\n<br/>" + _('Signup.Prompt.AccountActivation');
         
         // Update dialog in place
         d.setPrompt(prompt);

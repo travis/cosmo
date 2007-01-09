@@ -481,6 +481,11 @@ $smButtonHeight = 18px
     font-size:$fontSizeS;
     color:#aa3333;
 }
+/* A simple bordered box */
+.borderBox {
+    border:1px solid #cccccc;
+    padding:8px;
+}
 
 /* General layout -- floats and clear
  * --------------------- */

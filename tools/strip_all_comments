@@ -1,0 +1,16 @@
+#! /bin/bash
+
+files=("africa"  "antarctica" "asia" "australasia"
+       "backward" "europe" 
+       "northamerica" "pacificnew" "southamerica" )
+
+filesLength=${#files[@]}
+
+pathToFiles=$1
+
+for ((i=0;i<$filesLength;i++));
+   do
+       fileName="${files[$i]}"
+      ./strip_comments $pathToFiles/$fileName > $pathToFiles/"$fileName".new
+      mv $pathToFiles/"$fileName".new $pathToFiles/$fileName
+   done

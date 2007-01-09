@@ -98,15 +98,21 @@ Jsar file list:
         mkdir olson-tzdata
         cd olson-tzdata
         tar xzf ../tzdata2006o.tar.gz
-        jar cvf ../olson-tzdata-2006o.jsar *
-
+        cd $COSMO_HOME/tools
+        # for now the following command needs to be run from 
+        # within the tools directory
+        ./strip_all_comments /path/to/olson-tzdata
+        cd /path/to/olson-tzdata
+        jar cvf ../olson-tzdata-2006o-1.jsar *
+        
+        
         mvn deploy:deploy-file -Durl=scpexe://paniolo.osafoundation.org/www/maven2 \
                                -DrepositoryId=osaf-m2 \
                                -DgroupId=olson \
                                -DartifactId=olson-tzdata \
-                               -Dversion=2006o \
+                               -Dversion=2006o-1 \
                                -Dpackaging=jsar \
-                               -Dfile=olson-tzdata-2006o.jsar
+                               -Dfile=olson-tzdata-2006o-1.jsar
 
 
 Jar file list:

@@ -26,7 +26,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
     dojo.widget.HtmlWidget,
     
     //initializer
-    function(){
+    function () {
         dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, this, this.handleCollectionUpdated);
         dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, this, this.handleSubscriptionUpdated);
     },
@@ -77,8 +77,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     }
                     o.push( { value: i, text: col[i].displayName } );
                 }
+                var d = _createElem('div');
+                d.className = 'floatLeft';
                 var sel = cosmo.util.html.createSelect({ id: 'calSelectElem', name: 'calSelectElem',
-                    options: o, className: 'selectElem' }, collSelectNode);
+                    options: o, className: 'selectElem' }, d);
                 sel.style.width = '120px';
                 // Set the select to the current collection
                 cosmo.util.html.setSelect(sel, c);
@@ -87,15 +89,17 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     self.selectFunction();
                     self.currentCollection = self.collections[sel.selectedIndex];
                 });
+                collSelectNode.appendChild(d);
                 
             }
             function renderButton() {
-                var str = '';
+                var imgPath = '';
                 var f = null;
                 var _ = cosmo.util.i18n.getText;
                 // If using a ticket, add the 'Add' button
                 if (passedKey) {
-                    str = 'add';
+                    imgPath = 'subscribe';
+                    imgTitle = _('Main.CollectionAdd.Tooltip');
                     // Set up the authAction obj for the AuthBox -- this tells it
                     // what to do if the user auths successfully
                     var authAction = { 
@@ -142,6 +146,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 }
                 // Otherwise the user is logged in -- use the 'Info' button
                 else {
+                    imgPath = 'details';
+                    imgTitle = _('Main.CollectionDetails.Tooltip');
                     f = function () {
                         cosmo.app.showDialog(
                             cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
@@ -151,15 +157,23 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                             Cal.currentCollection.transportInfo));
                     };
                 }
-                var btnSpan = _createElem("span");
-                var btnLink = _createElem('a');
-                var infoIcon = cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImagesUrl() + "collectionDetails.png")
-                dojo.event.connect(btnLink, 'onclick', f);
-                btnLink.href = '#';
-                btnLink.appendChild(infoIcon);
-                btnSpan.appendChild(_createText('\u00A0'));
-                btnSpan.appendChild(btnLink);
-                collSelectNode.appendChild(btnSpan);
+                var d = null;
+                var collectionIcon = cosmo.util.html.createRollOverMouseDownImage(
+                    cosmo.env.getImagesUrl() + 'collection_' + imgPath + ".png");
+                collectionIcon.style.cursor = 'pointer';
+                collectionIcon.title = imgTitle;
+                dojo.event.connect(collectionIcon, 'onclick', f);
+                
+                // Non-breaking space
+                d = _createElem("div");
+                d.className = 'floatLeft';
+                d.appendChild(_createText('\u00A0'));
+                collSelectNode.appendChild(d);
+                // Image
+                d = _createElem("div");
+                d.className = 'floatLeft';
+                d.appendChild(collectionIcon);
+                collSelectNode.appendChild(d);
             }
             
             function renderSingleCollectionName() {
@@ -167,12 +181,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 d.id = 'collectionLabelPrompt';
                 d.appendChild(_createText('You are currently viewing:'));
                 collSelectNode.appendChild(d);
-                var s = _createElem('span');
-                s.id = 'collectionLabelName';
-                s.className = 'labelTextXL';
+                d = _createElem("div");
+                d.id = 'collectionLabelName';
+                d.className = 'floatLeft labelTextXL';
                 var textNode = _createText(curr.displayName)
-                s.appendChild(textNode);
-                collSelectNode.appendChild(s);
+                d.appendChild(textNode);
+                collSelectNode.appendChild(d);
                 self.displayNameText = textNode;
             }
             
@@ -184,6 +198,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 renderSingleCollectionName();
             }
             renderButton();
+
+            // Close the left float
+            var d = _createElem("div");
+            d.className = 'clearBoth';
+            collSelectNode.appendChild(d);
         },
         
         handleCollectionUpdated: function(/*cosmo.topics.CollectionUpdatedMessage*/ message){

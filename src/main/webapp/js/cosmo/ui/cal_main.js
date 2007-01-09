@@ -136,17 +136,8 @@ cosmo.ui.cal_main.Cal = new function () {
         this.calForm = new CalForm();
         this.calForm.init();
         
-        // Load minical and jump-to date
-        var mcDiv = document.getElementById('miniCalDiv');
-        var jpDiv = document.getElementById('jumpToDateDiv');
-        // Place jump-to date based on mini-cal pos
-        if (MiniCal.init(Cal, mcDiv)) {
-           this.calForm.addJumpToDate(jpDiv);
-        }
-        
         // Load/create calendar to view
         // --------------
-        // TODO: Remember to sort at some point
         // If we received a ticket, just grab the specified collection
         if (ticketKey){
             var collection = this.serv.getCalendar(collectionUid, ticketKey);
@@ -239,14 +230,23 @@ cosmo.ui.cal_main.Cal = new function () {
         }
         
         // Display selector or single cal name
-        var selector = dojo.widget.createWidget(
+        this._collectionSelectContainer = document.getElementById('calSelectNav');
+        this._collectionSelector = dojo.widget.createWidget(
             'cosmo:CollectionSelector', { 
                 'collections': this.currentCollections, 
                 'currentCollection': this.currentCollection,
                 'ticketKey': ticketKey,
                 'selectFunction': function(){var f = Cal.goSelCal; Cal.showMaskDelayNav(f); }
-            }, document.getElementById('calSelectNav'), 'last');
-        this._collectionSelector = selector;
+            }, this._collectionSelectContainer, 'last');
+
+        // Load minical and jump-to date
+        var mcDiv = document.getElementById('miniCalDiv');
+        var jpDiv = document.getElementById('jumpToDateDiv');
+        // Place jump-to date based on mini-cal pos
+        if (MiniCal.init(Cal, mcDiv)) {
+           this.calForm.addJumpToDate(jpDiv);
+        }
+        
         // Load and display events
         // --------------
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);

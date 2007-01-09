@@ -106,12 +106,6 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     handlerDict.old_load(type, self[newFunc](evt.responseXML, self), evt);
                 }
             }
-            if (handlerDict.error != undefined){
-                handlerDict.old_error = handlerDict.error
-                handlerDict.error = function(type, data, evt){
-                    handlerDict.old_error(type, self[newFunc](evt.responseXML, self), evt);
-                }
-            }
 			// Don't mess with "error". These responses shouldn't be XML.
 			// Don't mess with "handle". This is a "don't mess with my stuff" handler.
         },

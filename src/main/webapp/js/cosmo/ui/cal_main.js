@@ -22,7 +22,6 @@ dojo.require("cosmo.ui.conf");
 dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.util.i18n");
-var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.model");
 dojo.require("cosmo.ui.cal_form");
 dojo.require("cosmo.ui.contentcontainer");
@@ -34,6 +33,8 @@ dojo.require('cosmo.ui.widget.AuthBox');
 dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.Lozenge');
 dojo.require('cosmo.view.cal.canvas');
+dojo.require('cosmo.account.create');
+dojo.require('cosmo.convenience');
 
 // Global variables for X and Y position for mouse
 xPos = 0;
@@ -404,20 +405,37 @@ cosmo.ui.cal_main.Cal = new function () {
      * Set skin-specific images
      */
     this.setImagesForSkin =  function () {
-        var logoDiv = document.getElementById('smallLogoDiv');
-        var skinImagesDir = 'templates/' + TEMPLATE_DIRECTORY + '/images/';
-        var handleImg = null;
+        var logoDiv = $('smallLogoDiv');
+        var signupDiv = $('signupGraphic');
         
-        handleImg = document.createElement('img');
-        handleImg.src = cosmo.env.getImagesUrl() + 'resize_handle_image.gif';
+        // Resize handle for all-day area
+        var i = _createElem('img');
+        i.src = cosmo.env.getImagesUrl() + 'resize_handle_image.gif';
+        document.getElementById('allDayResizeHandleDiv').appendChild(i);
        
-        document.getElementById('allDayResizeHandleDiv').appendChild(handleImg);
+        // Cosmo logo
         logoDiv.style.background =
             'url(' + cosmo.env.getImagesUrl() + LOGO_GRAPHIC_SM + ')';
-        
         // Wheeeee, IE6 resets background tiling when you set an image background
         if (document.all && (navigator.appVersion.indexOf('MSIE 7') == -1)) {
             logoDiv.style.backgroundRepeat = 'no-repeat';
+        }
+        
+        // Signup graphic div is only on the page in ticket mode
+        if (signupDiv) {
+            var w = 0;
+            var p = 0;
+            signupDiv.style.position = 'absolute';
+            signupDiv.style.visibility = 'hidden';
+            var i = cosmo.util.html.createRollOverMouseDownImage(
+                    cosmo.env.getImagesUrl() + "signup.png");
+            i.style.cursor = 'pointer';
+            i.onclick = function () { cosmo.account.create.showForm(); };
+            signupDiv.appendChild(i);
+            w = signupDiv.offsetWidth + 24;
+            p = Cal.midColWidth  + LEFT_SIDEBAR_WIDTH - w;
+            signupDiv.style.left = p + 'px';
+            signupDiv.style.visibility = 'visible';
         }
     };
     /**

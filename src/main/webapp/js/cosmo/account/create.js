@@ -28,7 +28,6 @@ cosmo.account.create = new function () {
     var form = null; // The form containing the signup fields
     var fieldList = []; // List of form fields
     var f = null; // Temp var
-    var _ = cosmo.util.i18n.getText // Shortcut for i18n text
     
     // Form fields
     // -----------------
@@ -234,12 +233,14 @@ cosmo.account.create = new function () {
      * table with external client config on success.
      * @return Boolean, true on success, false on failure
      */
-    function handleCreateResult(type, data, evt) {
-        var resp = evt;
+    function handleCreateResult(type, data, resp) {
         var err = '';
         if (type == 'error') {
             if (resp.status && (resp.status > 399)) {
                 switch (resp.status) {
+                    case 403:
+                        err = _('Signup.Error.AlreadyLoggedIn');
+                        break;
                     case 431:
                         err = _('Signup.Error.UsernameInUse'); 
                         break;
@@ -408,7 +409,7 @@ cosmo.account.create = new function () {
             cosmo.app.modalDialog.setPrompt(err);
         }
         else {
-            var hand = { handle: handleCreateResult };
+            var hand = { load: handleCreateResult, error: handleCreateResult };
             var user = {};
             // Create a hash from the form field values
             for (var i = 0; i < fieldList.length; i++) {

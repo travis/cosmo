@@ -1,9 +1,9 @@
 <div>
-    <table>
+    <table dojoAttachPoint="table">
 
         <tr>
 
-            <td class="labelTextVert">
+            <td  class="labelTextVert">
                ${this.strings.nameLabel}:
             </td>
 
@@ -46,7 +46,7 @@
          <tbody dojoAttachPoint="clientInstructionRows" style="display: none">
              <tr>
                  <td colspan="3">
-                     <span dojoAttachPoint="clientInstructions"> Copy the following link into Chandler and blah blah blah blah blah blah blah</span>   
+                     <span dojoAttachPoint="clientInstructions"> </span>   
                  </td>
              </tr>
     
@@ -56,8 +56,9 @@
                 <td class="labelTextVert">
                    ${this.strings.collectionAddress}:
                 </td>
-                <td>
-                     <input size="40" type="text" dojoAttachPoint="clientCollectionAddress" value=""/>
+                <td >
+                     <input style="display: none" size="40" type="text" dojoAttachPoint="clientCollectionAddress" value=""/>
+                     <a style="display: none" dojoAttachPoint="clientCollectionLink" href="">${this.strings.clickHere}</a>
                 </td>                 
              </tr>
          </tbody>  
@@ -94,7 +95,16 @@
                      <input size="40" type="text" value="${this.calendar.protocolUrls.atom}"/>
                 </td>                 
              </tr>
-         </tbody>       
+         </tbody>
     </table>
+    <div dojoAttachPoint="helpText" style="visibility: hidden; position:absolute; top:0px; left:0px">
+    ${this.strings.help}
+    <span dojoAttachPoint="chandlerPlug" style="display:none">| ${this.strings.dontHave}
+        <a class="cleanLink" href="${this.strings.chandlerLink}">Chandler? </a>
+        <a href="${this.strings.chandlerDownloadLink}" class="cleanLink"> 
+            <span style="font-size: 9px">${this.strings.downloadHere}</span>
+        </a>
+    </span>
+    </div>
 </div>
 

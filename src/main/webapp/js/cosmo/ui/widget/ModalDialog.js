@@ -251,6 +251,12 @@ dojo.widget.HtmlWidget, {
 
                 // Have to measure for content area height once div is actually on the page
                 this.setContentAreaHeight();
+                
+                if (this.content instanceof dojo.widget.HtmlWidget 
+                    && this.content.appendedToParent){
+                    this.content.appendedToParent(this);
+                }
+                
                 this.isDisplayed = true;
 
             };

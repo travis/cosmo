@@ -48,15 +48,19 @@ dojo.widget.HtmlWidget, function(){
             '../../cosmo/ui/widget/templates/CollectionDetailsDialog/CollectionDetailsDialog.html'),
 
         // Attach points
+        table: null, //the table, which has pretty much all the content
         clientSelector: null, //Selector for different client apps
         clientInstructions: null, //Instructions for the selected client
         clientCollectionAddress: null, //The link for the selected client
+        clientCollectionLink: null, //The anchor element with client collection address
         clientInstructionRows: null, //The instructions for the selected client
         protocolRows: null, //The rows for all the protocols
         collectionNameText: null, //Label with the calendar name
         collectionNameInputSpan: null, //span with textbox with the calendar name
         collectionNameInput: null, //Textbox with the calendar name
         linkSpan: null, //where to put the link image
+        chandlerPlug: null, //span with info about downloading chandler
+        
         //i18n
         strings: { 
             nameLabel: _("Main.CollectionDetails.NameLabel"),
@@ -69,7 +73,14 @@ dojo.widget.HtmlWidget, function(){
             caldav:_("Main.CollectionDetails.caldav"),
             webcal:_("Main.CollectionDetails.webcal"),
             atom:_("Main.CollectionDetails.atom"),
-            protocolInstructions:_("Main.CollectionDetails.protocolInstructions")
+            protocolInstructions:_("Main.CollectionDetails.protocolInstructions"),
+            helpLink:_("Main.CollectionDetails.HelpUrl"),
+            chandlerLink:_("Main.CollectionDetails.ChandlerUrl"),
+            chandlerDownloadLink:_("Main.CollectionDetails.ChandlerDownloadUrl"),
+            help:_("Main.CollectionDetails.Help"),
+            downloadHere:_("Main.CollectionDetails.DownloadHere"),
+            dontHave:_("Main.CollectionDetails.DontHave"),
+            clickHere:_("Main.CollectionDetails.ClickHere")
         },
         
         //clients - note: the order in which they appear here is the order in
@@ -126,25 +137,41 @@ dojo.widget.HtmlWidget, function(){
             }
         },
         
+        appendedToParent: function(parent){
+            //this.table.style.height = parent.contentNode.offsetHeight + "px";
+            var helpHeight = this.helpText.offsetHeight;
+            var contentHeight = parent.contentNode.offsetHeight;
+            var top = contentHeight - helpHeight;
+            this.helpText.style.top = top + "px";
+            this.helpText.style.left = "18px";
+            this.helpText.style.visibility = "visible";
+        },
+        
         //handles when the user selects a client
         _handleClientChanged: function(){
             var client = this._getClientChoice();
             if (client =="download"){
+                this._showClientInstructionsAndAddress(true, true);
+                this._setClientInstructions(client);
             } else if (client =="other"){
-                this._showClientInstructionsAndAddress(false);
+                this._showClientInstructionsAndAddress(false, false);
                 this._showProtocolRows(true);
             } else {
-                this._showClientInstructionsAndAddress(true);
+                this._showClientInstructionsAndAddress(true, false);
                 this._showProtocolRows(false);
                 this._setClientInstructions(client);
                 this._setClientCollectionAddress(client);
             }
+            
+            this._showChandlerPlug(client == "Chandler");
         },
                 
         // Instance methods
-        _showClientInstructionsAndAddress: function(show){
+        _showClientInstructionsAndAddress: function(show, showLink){
             var hideshow = show ? "" : "none"; 
             this.clientInstructionRows.style.display = hideshow;
+            this.clientCollectionAddress.style.display = (showLink ? "none" : "") ;            
+            this.clientCollectionLink.style.display = (!showLink ? "none" : "");            
         }, 
 
         _showProtocolRows: function(show){
@@ -166,13 +193,16 @@ dojo.widget.HtmlWidget, function(){
         _setClientCollectionAddress: function(client){
             var url =  this.calendar.protocolUrls[this.clientsToProtocols[client]];
             this.clientCollectionAddress.value = url;
+            this.clientCollectionLink.href = url;
         },
         
         _getDisplayName: function(){
             return this.collectionNameInput.value;
+        },
+        
+        _showChandlerPlug: function(show){
+            this.chandlerPlug.style.display = (show ? "" : "none");            
         }
-        
-        
  }
  );
  
@@ -215,6 +245,7 @@ dojo.widget.HtmlWidget, function(){
 
     return {
         content: contentWidget,
+        height: "300",
         width: "450",
         btnsRight: btnsRight
     };

@@ -85,40 +85,46 @@ cosmo.ui.event.listeners.hookUpListeners();
         <div id="menuBarDiv">
             <div id="smallLogoDiv"></div>
             <%-- Begin main nav menu --%>
-            <c:if test="${empty ticketKey}">
-              <authz:authorize ifAnyGranted="ROLE_USER">
-              <fmt:message key="Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
+            <c:choose>
+              <c:when test="${empty ticketKey}">
+                <authz:authorize ifAnyGranted="ROLE_USER">
+                <fmt:message key="Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
+                  <span class="menuBarDivider">|</span>
+                  <c:url var="homeUrl" value="/browse/${user.username}"/>
+                  <a href="${homeUrl}"><fmt:message key="Main.Home"/></a>
+                  <span class="menuBarDivider">|</span>
+                  <c:url var="accountUrl" value="/account/view"/>
+                  <a href="${accountUrl}"><fmt:message key="Main.Account"/></a>
+                  <span class="menuBarDivider">|</span>
+                  <c:url var="calendarUrl" value="/pim"/>
+                  <a href="${calendarUrl}"><fmt:message key="Main.Calendar"/></a>
+                  <span class="menuBarDivider">|</span>
+                </authz:authorize>
+                <authz:authorize ifAllGranted="ROLE_ROOT">
+                  <span class="menuBarDivider">|</span>
+                  <c:url var="consoleUrl" value="/admin/users"/>
+                  <a href="${consoleUrl}"><fmt:message key="Main.Console"/></a>
+                  <span class="menuBarDivider">|</span>
+                </authz:authorize>
+                <c:url var="helpUrl" value="/help"/>
+                <a href="${helpUrl}"><fmt:message key="Main.Help"/></a>
                 <span class="menuBarDivider">|</span>
-                <c:url var="homeUrl" value="/browse/${user.username}"/>
-                <a href="${homeUrl}"><fmt:message key="Main.Home"/></a>
+                <c:url var="aboutUrl" value="/help/about"/>
+                <a href="javascript:Popup.open('${aboutUrl}', 380, 280);">
+                  <fmt:message key="Main.About"/>
+                </a>
+                <authz:authorize ifAnyGranted="ROLE_USER">
                 <span class="menuBarDivider">|</span>
-                <c:url var="accountUrl" value="/account/view"/>
-                <a href="${accountUrl}"><fmt:message key="Main.Account"/></a>
-                <span class="menuBarDivider">|</span>
-                <c:url var="calendarUrl" value="/pim"/>
-                <a href="${calendarUrl}"><fmt:message key="Main.Calendar"/></a>
-                <span class="menuBarDivider">|</span>
-              </authz:authorize>
-              <authz:authorize ifAllGranted="ROLE_ROOT">
-                <span class="menuBarDivider">|</span>
-                <c:url var="consoleUrl" value="/admin/users"/>
-                <a href="${consoleUrl}"><fmt:message key="Main.Console"/></a>
-                <span class="menuBarDivider">|</span>
-              </authz:authorize>
-              <c:url var="helpUrl" value="/help"/>
-              <a href="${helpUrl}"><fmt:message key="Main.Help"/></a>
-              <span class="menuBarDivider">|</span>
-              <c:url var="aboutUrl" value="/help/about"/>
-              <a href="javascript:Popup.open('${aboutUrl}', 380, 280);">
-                <fmt:message key="Main.About"/>
-              </a>
-              <authz:authorize ifAnyGranted="ROLE_USER">
-              <span class="menuBarDivider">|</span>
-              <a href="${staticBaseUrl}/logout">
-                 <fmt:message key="Main.LogOut"/>
-              </a>&nbsp;&nbsp;
-              </authz:authorize>
-            </c:if>
+                <a href="${staticBaseUrl}/logout">
+                   <fmt:message key="Main.LogOut"/>
+                </a>&nbsp;&nbsp;
+                </authz:authorize>
+              </c:when>
+              <c:otherwise>
+                <div id="signupGraphic"></div>
+                <div id="subscribeSelector"></div>
+              </c:otherwise>
+            </c:choose>
             <%-- End main nav menu --%>
         </div>
         <div id="calDiv">

@@ -211,26 +211,31 @@ dojo.widget.HtmlWidget, function(){
              /*string*/ displayName,
              /*cosmo.conduits.Conduit*/ conduit, 
              transportInfo){
-
+   
+    var dummyNode = document.createElement('span');
     var contentWidget = dojo.widget.createWidget("cosmo:CollectionDetailsDialog",
                     { calendar: calendar, 
                       displayName: displayName,
                       conduit: conduit, 
                       transportInfo: transportInfo }, 
-                 null, 'last');
-                 
+                 dummyNode, 'last');
+    
+    dummyNode.removeChild(contentWidget.domNode);  
     var btnsRight = [];
 
-    btnsRight.push(dojo.widget.createWidget(
+    var closeButton = dojo.widget.createWidget(
                     "cosmo:Button",
                     { text: _("Main.CollectionDetails.Close"),
                       width: "50px",
                       handleOnClick: cosmo.app.hideDialog,
                       small: false },
-                      null, 'last'));
+                      dummyNode, 'last');
                       
+    btnsRight.push(closeButton);
+    dummyNode.removeChild(closeButton.domNode);  
+
     if (conduit && conduit.saveDisplayName){
-        btnsRight.push(dojo.widget.createWidget(
+        var saveButton = dojo.widget.createWidget(
                         "cosmo:Button",
                         { text: getText("Main.CollectionDetails.Save"),
                           width: "50px",
@@ -240,7 +245,9 @@ dojo.widget.HtmlWidget, function(){
                                              cosmo.app.hideDialog();
                                          },
                           small: false },
-                          null, 'last'));
+                          dummyNode, 'last');
+        btnsRight.push(saveButton);
+        dummyNode.removeChild(saveButton.domNode);  
     }
 
     return {

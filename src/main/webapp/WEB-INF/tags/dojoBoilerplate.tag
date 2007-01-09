@@ -16,16 +16,23 @@
 */
 --%>
 
+<%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:staticbaseurl var="staticBaseUrl"/>
+<%@ attribute name="timezones"        %>
+
+<c:if test="${empty timezones}">
+  <c:set var="timezones" value="false"/>
+</c:if>
 
 <script type="text/javascript">
 
     // Set isDebug to true to get nice dojo debugging messages.
 
+
     var djConfig = {isDebug: false, 
-    				staticBaseUrl: "${staticBaseUrl}",
-    				i18nLocation: "${staticBaseUrl}/i18n.js"};
+                    staticBaseUrl: "${staticBaseUrl}",
+                    i18nLocation: "${staticBaseUrl}/i18n.js"};
 </script>
 
 <script type="text/javascript" src="${staticBaseUrl}/js/lib/dojo-event_and_io/dojo.js"></script>
@@ -46,11 +53,12 @@ function bootstrap(){
 
     dojo.require("cosmo.datetime.*");
 
-    var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry("${staticBaseUrl}/js/lib/olson-tzdata/");
-    registry.init(["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"]);
-    //registry.init([ "europe"]);
-    cosmo.datetime.timezone.setTimezoneRegistry(registry);
-
+    if (${timezones}){
+        var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry("${staticBaseUrl}/js/lib/olson-tzdata/");
+        registry.init(["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"]);
+        //registry.init([ "europe"]);
+        cosmo.datetime.timezone.setTimezoneRegistry(registry);
+    }
     dojo.require('cosmo.ui.conf');
 }
 bootstrap();

@@ -297,7 +297,7 @@
         <dependency>
             <groupId>olson</groupId>
             <artifactId>olson-tzdata</artifactId>
-            <version>2006o</version>
+            <version>2006o-1</version>
             <type>jsar</type>
         </dependency>
         <!-- Hibernate dependencies -->

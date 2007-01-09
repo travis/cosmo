@@ -45,7 +45,7 @@
 <link rel="alternate" type="text/calendar" href="${relationLinks['webcal']}"/>
 </c:if>
 
-<cosmo:dojoBoilerplate/>
+<cosmo:dojoBoilerplate timezones="true"/>
 
 <script type="text/javascript" src="${staticBaseUrl}/js/lib/jsonrpc-java-js/jsonrpc.js"></script>
 
@@ -61,17 +61,17 @@ var TIMEOUT_MIN = 30;
 // Added automatically to window.onload by 
 // cosmo.ui.event.listeners.hookUpListeners
 cosmo.ui.event.handlers.init = function () {
-	var collectionUid = undefined;
-	var ticketKey = undefined;
+    var collectionUid = undefined;
+    var ticketKey = undefined;
 <c:if test="${collection != null}">
-	collectionUid = '${collection.uid}';
+    collectionUid = '${collection.uid}';
 </c:if>
 <c:if test="${not empty ticketKey}">
-	ticketKey = '${ticketKey}';
+    ticketKey = '${ticketKey}';
 </c:if>
-	
+    
     cosmo.app.initObj = Cal;
-	cosmo.app.init(collectionUid, ticketKey);
+    cosmo.app.init(collectionUid, ticketKey);
 }
 
 dojo.require("cosmo.ui.event.listeners");

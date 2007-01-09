@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,45 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         assertEquals("emails don't match", user.getEmail(), u1.getEmail());
         assertNotNull("user has no url", user.getUrl());
         assertNotNull("user has no homedir url", user.getHomedirUrl());
+    }
+    
+    public void testGetUserCount() throws Exception {
+        MockHttpServletRequest request = createMockRequest("GET", "/users/count");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        String count = response.getContentAsString();
+        assertTrue(count + " not equal to 1.", count.equals("1"));
+        
+        User u1 = testHelper.makeDummyUser();
+        userService.createUser(u1);
+        
+        request = createMockRequest("GET", "/users/count");
+        response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        count = response.getContentAsString();
+        assertTrue(count + " not equal to 2.", count.equals("2"));
+        
+        User u2 = testHelper.makeDummyUser();
+        userService.createUser(u2);
+
+        request = createMockRequest("GET", "/users/count");
+        response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        count = response.getContentAsString();
+        assertTrue(count + " not equal to 3.", count.equals("3"));
+
+        User u3 = testHelper.makeDummyUser();
+        userService.createUser(u3);
+
+        request = createMockRequest("GET", "/users/count");
+        response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        count = response.getContentAsString();
+        assertTrue(count + " not equal to 4.", count.equals("4"));
     }
 
     /**

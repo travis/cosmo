@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,6 +185,9 @@ public class CmpServlet extends HttpServlet {
         if (req.getPathInfo().equals("/users")) {
             processUsersGet(req, resp);
             return;
+        }
+        if (req.getPathInfo().equals("/users/count")){
+            processGetUserCount(req, resp);
         }
         if (req.getPathInfo().startsWith("/user/")) {
             processUserGetByUsername(req, resp);
@@ -546,6 +549,22 @@ public class CmpServlet extends HttpServlet {
         }
 
         return pageCriteria;
+    }
+    
+    /*
+     * Delegated to by {@link #doGet} to handle requests
+     * for the total number of users in the system.
+     */
+    private void processGetUserCount(HttpServletRequest req,
+            HttpServletResponse resp)
+    throws ServletException, IOException {
+        resp.setStatus(HttpServletResponse.SC_OK);
+        String text = Integer.toString(userService.getUsers().size());
+        resp.setContentType(CmpConstants.MEDIA_TYPE_PLAIN_TEXT);
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentLength(text.length());
+        resp.getWriter().write(text);
+        return;
     }
 
     /*
@@ -989,7 +1008,7 @@ public class CmpServlet extends HttpServlet {
     }
 
     private void sendPlainTextResponse(HttpServletResponse resp,
-                                       OutputsPlainText resource)
+            OutputsPlainText resource)
         throws ServletException, IOException {
         String text = resource.toText();
         resp.setContentType(CmpConstants.MEDIA_TYPE_PLAIN_TEXT);

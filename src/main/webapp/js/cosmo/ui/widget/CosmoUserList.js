@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ DEFAULT_SORT_ORDER = "ascending";
 
 dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringTable,
     {
-           resourceDirectory : cosmo.env.getTemplateBase() + "CosmoUserList/",
+        resourceDirectory : cosmo.env.getTemplateBase() + "CosmoUserList/",
 
         sortOrder : null,
         sortType : null,
@@ -51,6 +51,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         cmpPreviousLink : null,
         cmpNextLink : null,
         cmpLast : null,
+        userCountIndicator: null,
 
         cmpProxy : cosmo.cmp.cmpProxy,
 
@@ -75,7 +76,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             return node;
         },
-
+        
         setSortOrder : function(order){
             if (order == DESCENDING){
                 this.sortOrder = order;
@@ -91,7 +92,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             var header;
 
-            tableHeaders = this.domNode.getElementsByTagName("th");
+            var tableHeaders = this.domNode.getElementsByTagName("th");
             for (i = 0; i < tableHeaders.length; i++){
                 if (tableHeaders[i].getAttribute("field") == type){
                     header = tableHeaders[i];
@@ -151,7 +152,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         },
 
         createPagingLink:function(label, id, jsText){
-            a = document.createElement("a");
+            var a = document.createElement("a");
             a.setAttribute("class", "userListPagingLink");
             a.setAttribute("id", id);
             a.setAttribute("href", "javascript:void(0)");
@@ -165,12 +166,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         },
 
         createPageSizeChooser:function(){
-            s = document.createElement("span");
+            var s = document.createElement("span");
             s.setAttribute("id", "pageSizeChooser");
 
             s.appendChild(document.createTextNode("Users per page: "));
 
-            i = document.createElement("input");
+            var i = document.createElement("input");
             i.setAttribute("type", "text");
             i.setAttribute("size", "4");
             i.setAttribute("maxlength", "4");
@@ -189,7 +190,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         },
 
         createPageNumberChooser:function(){
-            s = document.createElement("span");
+            var s = document.createElement("span");
             s.setAttribute("id", "pageNumberChooser");
             s.style.visibility = "hidden";
 
@@ -198,7 +199,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             s.appendChild(document.createTextNode("Go to page: "));
 
-            i = document.createElement("input");
+            var i = document.createElement("input");
             i.setAttribute("type", "text");
             i.setAttribute("size", "2");
             i.setAttribute("maxlength", "10");
@@ -220,6 +221,37 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             return s;
         },
 
+      
+        createUserCountIndicator: function(){
+        	var s = document.createElement("span");
+        	s.setAttribute("id", "userCountIndicatorSpan");
+        	
+			var count = document.createElement("span");
+			
+			this.userCountIndicator = count;
+			
+			s.appendChild(document.createTextNode("Total Users: "));
+			s.appendChild(count);
+    
+			this.updateTotalUserCount();
+        	return s;
+        },
+        
+        updateTotalUserCount: function(){
+        	var self = this;
+	       	var setCountCallback = function (type, data, evt){
+				self.userCountIndicator.innerHTML = data;
+    	   	}
+        	
+        	cosmo.cmp.cmpProxy.getUserCount({
+        		load: setCountCallback,
+        		error: function(type, error){
+        			alert(error.message);
+        		}
+        	});
+        	
+        },
+        
         onPageNumberChooserChange : function (evt){
             this.pageNumber = evt.target.value;
             this.updateUserList();
@@ -271,6 +303,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             document.getElementById("pageNumberChooser").
                 getElementsByTagName("input")[0].value = this.pageNumber;
+                
+           	this.updateTotalUserCount();
 
         },
 
@@ -429,10 +463,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             controls.appendChild(this.createPageSizeChooser());
             controls.appendChild(this.createPageNumberChooser());
-
+            controls.appendChild(this.createUserCountIndicator());
 
             table.parentNode.insertBefore(controls, table);
-
 
             dojo.event.topic.registerPublisher("/userListSelectionChanged", this, "renderSelections");
 

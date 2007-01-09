@@ -336,6 +336,11 @@ body.adminPage {
             position: absolute;
             right: 2em;
         }
+        
+        span#userCountIndicatorSpan {
+        	position: absolute;
+			left: 45%;
+        }
 
         div#userListControls {
             font-size: 0.9em;

@@ -52,7 +52,7 @@ function bootstrap(){
     dojo.require("cosmo.env");
 
     cosmo.env.setBaseUrl(djConfig['staticBaseUrl']);
-    cosmo.env.version = ${PRODUCT_VERSION};
+    cosmo.env.version = "${PRODUCT_VERSION}";
 
     dojo.require("cosmo.ui.widget.Debug");
 

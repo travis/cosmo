@@ -389,20 +389,23 @@ cosmo.account.create = new function () {
      */
     this.showForm = function () {
         var o = {};
+        var b = null;
+        
         o.width = 540;
         o.height = 480;
         o.title = 'Create an Account';
         o.prompt = _('Signup.Prompt.AllFieldsRequired');
         o.content = getFormTable();
-        o.btnsLeft = [dojo.widget.createWidget("cosmo:Button", 
-            { text:_('App.Button.Cancel'), width:74, 
-            handleOnClick: function () { cosmo.app.modalDialog.hide(); } })];
+
+        b = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
+            handleOnClick: function () { cosmo.app.modalDialog.hide(); } });
+        o.btnsLeft = [b];
         // Have to set empty center set of buttons -- showForm will be called
         // without buttons getting cleared by 'hide.'
         o.btnsCenter = []; 
-        o.btnsRight = [dojo.widget.createWidget("cosmo:Button", 
-            { text:_('App.Button.Submit'), width:74,
-            handleOnClick: function () { self.submitCreate(); } })];
+        b = new cosmo.ui.button.Button({ text:_('App.Button.Submit'), width:74,
+            handleOnClick: function () { self.submitCreate(); } });
+        o.btnsRight = [b];
         o.defaultAction = function () { self.submitCreate(); };
 
         cosmo.app.modalDialog.show(o);

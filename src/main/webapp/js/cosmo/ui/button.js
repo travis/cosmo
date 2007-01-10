@@ -51,11 +51,18 @@ cosmo.ui.button.Button = function(elemId, width, onClickHandler, displayText, is
     //if you don't do this dummyDom business, the page reflows and scrollbars
     //are reset
     var dummyDom = document.createElement('span');
-
-    // Note: This throws away elemId in favor of the incremented widget ID
-    var widget =  dojo.widget.createWidget("cosmo:Button", { text: displayText, 'width':width,
-        handleOnClick: onClickHandler, small: isSmall }, dummyDom, 'last');
-
+    var widget = null;
+    
+    // Allow instantiation from obj/keyword param
+    if (typeof arguments[0] == 'object') {
+        widget =  dojo.widget.createWidget("cosmo:Button", arguments[0], dummyDom, 'last');
+    }
+    // Normal params in order
+    else {
+        // Note: This throws away elemId in favor of the incremented widget ID
+        widget =  dojo.widget.createWidget("cosmo:Button", { text: displayText, 'width':width,
+            handleOnClick: onClickHandler, small: isSmall }, dummyDom, 'last');
+    }
     dummyDom.removeChild(widget.domNode);
 
     return widget;

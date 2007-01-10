@@ -456,6 +456,7 @@ $smButtonHeight = 18px
 .inputText {
     font-family:$fontFamily;
     font-size:$fontSizeM;
+    font-weight:normal;
     color:#000000;
     border:1px
     solid #aaaaaa;
@@ -465,6 +466,7 @@ $smButtonHeight = 18px
 .inputTextDim {
     font-family:$fontFamily;
     font-size:$fontSizeM;
+    font-weight:normal;
     color:#999999;
     border:1px solid #aaaaaa;
     padding:2px;
@@ -473,6 +475,7 @@ $smButtonHeight = 18px
 .selectElem {
     font-family:$fontFamily;
     font-size:$fontSizeM;
+    font-weight:normal;
     color:#000000;
     border:1px solid #aaaaaa;
 }

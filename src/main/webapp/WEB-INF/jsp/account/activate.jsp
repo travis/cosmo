@@ -20,44 +20,12 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-
+<fmt:setBundle basename="PimMessageResources"/>
 <cosmo:standardLayout prefix="Account.Activate." showNav="false">
+<cosmo:staticbaseurl var="staticBaseUrl"/>
 
-
-<script type="text/javascript">
-var ACCOUNT_ACTIVATION_URL = "/account/activate"
-
-dojo.require("cosmo.ui.widget.AccountActivator");
-
-var activationId = location.pathname.substring(
-    location.pathname.indexOf(ACCOUNT_ACTIVATION_URL) +
-    ACCOUNT_ACTIVATION_URL.length + 1
-);
-</script>
-
-<div dojoType="cosmo:AccountActivator" widgetId="accountActivator"></div>
-
-
-
-<script type="text/javascript">
-/*
-Initialization function for this page that will initialize the account
-activator widget.
-
-*/
-dojo.addOnLoad( function(){
-    var accountActivator = dojo.widget.byId("accountActivator");
-
-    accountActivator.setActivationId(activationId);
-    
-    dojo.event.connect("after", accountActivator, "activateSuccess", 
-    	function(){location = cosmo.env.getLoginRedirect()}
-    	);
-
-
-
-});
-</script>
-
+<fmt:message key="Account.Activate.ActivatedMessage"/>
+<a href="${staticBaseUrl}/login">
+<fmt:message key="Account.Activate.ActivatedMessageLogIn"/></a>.
 
 </cosmo:standardLayout>

@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.UserService;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -43,7 +44,10 @@ public class AccountActivationController extends AbstractController {
             HttpServletResponse response) throws Exception {
         String activationId = request.getParameter("id");
         
-        if (userService.getUserByActivationId(activationId) != null){
+        User user = userService.getUserByActivationId(activationId);
+        
+        if (user != null){
+            user.activate();
             return new ModelAndView(accountActivationView);    
         } else {
             return new ModelAndView(notFoundView);

@@ -51,7 +51,7 @@
          /cmp/users=ROLE_ROOT
          /cmp/user/*=ROLE_ROOT
          /cmp/signup=ROLE_ANONYMOUS
-         /cmp/activate/*=ROLE_ANONYMOUS, ROLE_ROOT, ROLE_USER
+         /cmp/activate/*=ROLE_ROOT
          /cmp/account=ROLE_USER
          /**=ROLE_ROOT
        </value>

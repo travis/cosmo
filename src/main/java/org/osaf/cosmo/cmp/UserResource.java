@@ -69,7 +69,7 @@ public class UserResource implements CmpResource, OutputsXml {
     public static final String EL_ADMINISTRATOR = "administrator";
     /**
      */
-    public static final String EL_ACTIVATIONID = "activationId";
+    public static final String EL_UNACTIVATED = "unactivated";
     private User user;
     private String urlBase;
     private String userUrl;
@@ -180,9 +180,8 @@ public class UserResource implements CmpResource, OutputsXml {
         e.appendChild(url);
 
         if (!user.isActivated()){
-            Element activationId = DomUtil.createElement(doc, EL_ACTIVATIONID, NS_CMP);
-            DomUtil.setText(activationId, user.getActivationId());
-            e.appendChild(activationId);
+            Element unactivated = DomUtil.createElement(doc, EL_UNACTIVATED, NS_CMP);
+            e.appendChild(unactivated);
         }
 
         if (! user.getUsername().equals(User.USERNAME_OVERLORD)) {

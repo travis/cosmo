@@ -193,10 +193,6 @@ public class CmpServlet extends HttpServlet {
             processUserGetByUsername(req, resp);
             return;
         }
-        if (req.getPathInfo().startsWith(URL_ACTIVATE)) {
-            processUserGetByActivationId(req, resp);
-            return;
-        }
         if (req.getPathInfo().equals("/server/status")) {
             processServerStatus(req, resp);
             return;
@@ -607,24 +603,6 @@ public class CmpServlet extends HttpServlet {
 
     /*
      * Delegated to by {@link #doGet} to handle user GET
-     * requests by username, retrieving the user account, setting the response
-     * status and headers, and writing the response content.
-     */
-    private void processUserGetByActivationId(HttpServletRequest req,
-                                              HttpServletResponse resp)
-        throws ServletException, IOException {
-        String activationId = req.getPathInfo().substring(
-                URL_ACTIVATE.length());
-        User user = userService.getUserByActivationId(activationId);
-        if (user == null) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        processUserGet(user, req, resp);
-    }
-
-    /*
-     * Delegated to by {@link #doGet} to handle user GET
      * requests by activationId, retrieving the user account, setting the response
      * status and headers, and writing the response content.
      */
@@ -727,17 +705,24 @@ public class CmpServlet extends HttpServlet {
      */
     private void processActivateUser(HttpServletRequest req,
             HttpServletResponse resp) {
-        String activationId = req.getPathInfo().substring(
+
+        String username = req.getPathInfo().substring(
                 URL_ACTIVATE.length());
         try {
-            User user = userService.getUserByActivationId(activationId);
+            User user = userService.getUser(username);
+            if (user.isActivated()){
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
             user.activate();
             userService.updateUser(user);
 
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } catch (DataRetrievalFailureException e){
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }
+            return; 
+        }  
     }
 
     /*

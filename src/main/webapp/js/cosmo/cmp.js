@@ -60,14 +60,6 @@ dojo.declare("cosmo.cmp.Cmp", null,
             dojo.io.bind(requestDict);
         },
 
-        getUserXMLByActivationId: function (activationId, handlerDict, sync) {
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/activate/" + activationId;
-            requestDict.method = "GET";
-
-            dojo.io.bind(requestDict);
-        },
-
         getUsersXML: function (handlerDict, pageNumber, pageSize, sortOrder, sortType, sync) {
             var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
             requestDict.url = cosmo.env.getBaseUrl() + "/cmp/users";
@@ -115,13 +107,6 @@ dojo.declare("cosmo.cmp.Cmp", null,
             this._wrapXMLHandlerFunctions(handlerDict, '_cmpUserXMLToJSON');
 
             this.getUserXML(username, handlerDict, sync);
-        },
-
-        getUserByActivationId: function(username, handlerDict, sync) {
-            var self = this;
-            this._wrapXMLHandlerFunctions(handlerDict, '_cmpUserXMLToJSON');
-
-            this.getUserXMLByActivationId(username, handlerDict, sync);
         },
 
         getUsers: function (handlerDict, pageNumber, pageSize, sortOrder, sortType, sync) {
@@ -276,11 +261,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
             this.getSignupXML(userHash, handlerDict, sync);
         },
 
-        activate: function (activationId, handlerDict, sync) {
+        activate: function (username, handlerDict, sync) {
             var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/activate/" + activationId;
+            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/activate/" + username;
             requestDict.method = "POST";
-            requestDict.postContent = "id="+activationId;
+            requestDict.postContent = "id="+username;
             dojo.io.bind(requestDict);
         },
         
@@ -303,8 +288,8 @@ dojo.declare("cosmo.cmp.Cmp", null,
             obj.url = user.getElementsByTagName("url")[0].firstChild.nodeValue;
 
             obj.administrator = (user.getElementsByTagName("administrator").length > 0);
-            if (user.getElementsByTagName("activationId").length > 0){
-                obj.activationId = user.getElementsByTagName("activationId")[0].firstChild.nodeValue;
+            if (user.getElementsByTagName("unactivated").length > 0){
+                obj.unactivated = true;
             }
 
             if (user.getElementsByTagName("homedirUrl").length > 0){

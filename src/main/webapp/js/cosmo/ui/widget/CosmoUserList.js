@@ -333,10 +333,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
                 row.modified = dojo.date.fromRfc3339(user.dateModified);
                 
-                if (user.activationId) {
-                	row.activationId = user.activationId;
+                if (user.unactivated) {
+                	row.activated = "No";
                 } else {
-                	row.activationId = "Activated";
+                	row.activated = "Yes";
                 }
 
                 if (user.administrator) {

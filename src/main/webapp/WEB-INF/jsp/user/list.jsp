@@ -59,7 +59,7 @@ dojo.require("cosmo.ui.widget.ModifyUserDialog");
             <th field="username" dataType="String" align="center">Username</th>
             <th field="email" dataType="String" align="center">Email</th>
             <th field="admin" dataType="String" align="center">Administrator</th>
-            <th field="activationId" dataType="String" align="center">Activation Id</th>
+            <th field="activated" dataType="String" align="center">Activated</th>
             <th field="created" dataType="Date" align="center">Created</th>
             <th field="modified" dataType="Date" align="center">Last Modified</th>
     </tr>
@@ -111,21 +111,19 @@ function browseSelectedUser(){
 
 function activateSelectedUser(){
 
-	var activationId = dojo.widget.byId("userList").getSelectedData()[0].userObject.activationId;
+	var username = dojo.widget.byId("userList").getSelectedData()[0].userObject.username;
 
-	if (activationId != undefined){
-		var activateHandlerDict = { 
-			load: function (type, data, evt){
-	            dojo.widget.byId('userList').updateUserList();
-			},
-			error: function(type, data, evt){
-				alert("Error activating user");
-				// TODO: Remove alert messages
-			}
+	var activateHandlerDict = { 
+		load: function (type, data, evt){
+            dojo.widget.byId('userList').updateUserList();
+		},
+		error: function(type, data, evt){
+			alert("Error activating user");
+			// TODO: Remove alert messages
 		}
-	
-		cosmo.cmp.cmpProxy.activate(activationId, activateHandlerDict);
 	}
+
+	cosmo.cmp.cmpProxy.activate(username, activateHandlerDict);
 
 }
 
@@ -215,7 +213,7 @@ dojo.addOnLoad(function (){
     activateLink.disableIfActivated = function(){
     	var selection = userList.getSelectedData()[0];
     	
-    	if (selection.userObject.activationId == undefined){
+    	if (selection.userObject.unactivated == undefined){
     		this.style.display = 'none';
     	} else {
     		this.style.display = 'inline';

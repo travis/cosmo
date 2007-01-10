@@ -6,7 +6,7 @@ dojo.require("dojo.html.common");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
-dojo.require("cosmo.utl.html");
+dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.Button");
 
 _ = cosmo.util.i18n.getText

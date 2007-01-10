@@ -21,6 +21,7 @@ import java.util.Iterator;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.schema.EimRecordTranslationIterator;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 
 /**
@@ -34,13 +35,13 @@ public class SubRecords {
 
     protected SyncToken token;
     private EimRecordTranslationIterator iterator;
-    private String name;
+    private CollectionItem collection;
 
     /** */
     public SubRecords(CollectionItem collection) {
         this.token = SyncToken.generate(collection);
         this.iterator = createIterator(collection);
-        this.name = collection.getName();
+        this.collection = collection;
     }
 
     /** */
@@ -54,20 +55,23 @@ public class SubRecords {
     }
 
     /** */
+    public String getUid() {
+        return collection.getUid();
+    }
+
+    /** */
     public String getName() {
-        return name;
+        return collection.getDisplayName();
     }
 
     /** */
     protected EimRecordTranslationIterator createIterator(CollectionItem collection) {
-        ArrayList<Item> items = new ArrayList<Item>();
-
-        items.add(collection);
+        ArrayList<ContentItem> items = new ArrayList<ContentItem>();
 
         for (Item child : collection.getChildren()) {
-            if (child instanceof CollectionItem)
+            if (! (child instanceof ContentItem))
                 continue;
-            items.add(child);
+            items.add((ContentItem)child);
         }
 
         return new EimRecordTranslationIterator(items);

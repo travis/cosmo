@@ -21,8 +21,6 @@ import java.util.List;
 
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.schema.BaseGenerator;
-import org.osaf.cosmo.model.CalendarCollectionStamp;
-import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.QName;
@@ -43,11 +41,8 @@ public class UnknownGenerator extends BaseGenerator {
         new HashSet<String>();
 
     static {
-        KNOWN_ATTRIBUTES.add(CollectionItem.ATTR_EXCLUDE_FREE_BUSY_ROLLUP);
-        KNOWN_ATTRIBUTES.add(CalendarCollectionStamp.ATTR_CALENDAR_SUPPORTED_COMPONENT_SET);
         KNOWN_ATTRIBUTES.add(NoteItem.ATTR_NOTE_BODY);
 
-        KNOWN_NAMESPACES.add(NS_COLLECTION);
         KNOWN_NAMESPACES.add(NS_ITEM);
         KNOWN_NAMESPACES.add(NS_NOTE);
         KNOWN_NAMESPACES.add(NS_EVENT);

@@ -30,13 +30,11 @@ import org.apache.commons.logging.LogFactory;
 public class TimeStampField extends DecimalField {
     private static final Log log = LogFactory.getLog(TimeStampField.class);
 
-    private static final int NUM_DIGITS = 20;
-
     /** */
     public TimeStampField(String name,
                           Date value) {
         super(name, (value != null ? new BigDecimal(value.getTime()) : null),
-              NUM_DIGITS, 0);
+              20, 0);
     }
 
     /** */

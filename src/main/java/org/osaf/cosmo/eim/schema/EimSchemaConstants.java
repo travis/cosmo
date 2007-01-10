@@ -23,11 +23,6 @@ import java.text.DecimalFormat;
 public interface EimSchemaConstants {
 
     /** */
-    public static final String NS_COLLECTION =
-        "http://osafoundation.org/eim/collection";
-    /** */
-    public static final String PREFIX_COLLECTION = "collection";
-    /** */
     public static final String NS_ITEM =
         "http://osafoundation.org/eim/item";
     /** */

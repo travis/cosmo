@@ -201,8 +201,8 @@ public class EimmlTypeConverter implements EimmlConstants {
         throws EimmlConversionException {
         if (digits <= 0)
             throw new IllegalArgumentException("Number of digits must be positive");
-        if (decimalPlaces <= 0)
-            throw new IllegalArgumentException("Number of decimal places must be positive");
+        if (decimalPlaces < 0)
+            throw new IllegalArgumentException("Number of decimal places must be positive or 0");
 
         if (value == null)
             return null;

@@ -19,8 +19,6 @@ import org.apache.commons.lang.BooleanUtils;
 
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordSet;
-import org.osaf.cosmo.eim.schema.collection.CollectionApplicator;
-import org.osaf.cosmo.eim.schema.collection.CollectionGenerator;
 import org.osaf.cosmo.eim.schema.contentitem.ContentItemApplicator;
 import org.osaf.cosmo.eim.schema.contentitem.ContentItemGenerator;
 import org.osaf.cosmo.eim.schema.note.NoteApplicator;
@@ -33,7 +31,6 @@ import org.osaf.cosmo.eim.schema.message.MessageApplicator;
 import org.osaf.cosmo.eim.schema.message.MessageGenerator;
 import org.osaf.cosmo.eim.schema.unknown.UnknownApplicator;
 import org.osaf.cosmo.eim.schema.unknown.UnknownGenerator;
-import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
@@ -56,8 +53,6 @@ public class EimTranslator implements EimSchemaConstants {
     private static final Log log = LogFactory.getLog(EimTranslator.class);
 
     private Item item;
-    private CollectionApplicator collectionApplicator;
-    private CollectionGenerator collectionGenerator;
     private ContentItemApplicator contentItemApplicator;
     private ContentItemGenerator contentItemGenerator;
     private NoteApplicator noteApplicator;
@@ -72,39 +67,31 @@ public class EimTranslator implements EimSchemaConstants {
     private UnknownGenerator unknownGenerator;
 
     /** */
-    public EimTranslator(Item item) {
+    public EimTranslator(ContentItem item) {
         this.item = item;
 
-        if (item instanceof CollectionItem) {
-            collectionApplicator =
-                new CollectionApplicator((CollectionItem) item);
-            collectionGenerator =
-                new CollectionGenerator((CollectionItem) item);
+        contentItemApplicator =
+            new ContentItemApplicator((ContentItem) item);
+        contentItemGenerator =
+            new ContentItemGenerator((ContentItem) item);
+
+        if (item instanceof NoteItem) {
+            noteApplicator = new NoteApplicator((NoteItem) item);
+            noteGenerator =  new NoteGenerator((NoteItem) item);
         }
-        else {
-            contentItemApplicator =
-                new ContentItemApplicator((ContentItem) item);
-            contentItemGenerator =
-                new ContentItemGenerator((ContentItem) item);
 
-            if (item instanceof NoteItem) {
-                noteApplicator = new NoteApplicator((NoteItem) item);
-                noteGenerator =  new NoteGenerator((NoteItem) item);
-            }
-
-            for (Stamp stamp : item.getStamps()) {
-                if (stamp instanceof EventStamp) {
-                    eventApplicator = new EventApplicator((EventStamp) stamp);
-                    eventGenerator = new EventGenerator((EventStamp) stamp);
-                } else if (stamp instanceof TaskStamp) {
-                    taskApplicator = new TaskApplicator((TaskStamp) stamp);
-                    taskGenerator = new TaskGenerator((TaskStamp) stamp);
-                } else if (stamp instanceof MessageStamp) {
-                    messageApplicator =
-                        new MessageApplicator((MessageStamp) stamp);
-                    messageGenerator =
-                        new MessageGenerator((MessageStamp) stamp);
-                }
+        for (Stamp stamp : item.getStamps()) {
+            if (stamp instanceof EventStamp) {
+                eventApplicator = new EventApplicator((EventStamp) stamp);
+                eventGenerator = new EventGenerator((EventStamp) stamp);
+            } else if (stamp instanceof TaskStamp) {
+                taskApplicator = new TaskApplicator((TaskStamp) stamp);
+                taskGenerator = new TaskGenerator((TaskStamp) stamp);
+            } else if (stamp instanceof MessageStamp) {
+                messageApplicator =
+                    new MessageApplicator((MessageStamp) stamp);
+                messageGenerator =
+                    new MessageGenerator((MessageStamp) stamp);
             }
         }
 
@@ -151,20 +138,16 @@ public class EimTranslator implements EimSchemaConstants {
             return recordset;
         }
 
-        if (collectionGenerator != null) {
-            recordset.addRecords(collectionGenerator.generateRecords());
-        } else {
-            recordset.addRecords(contentItemGenerator.generateRecords());
+        recordset.addRecords(contentItemGenerator.generateRecords());
 
-            if (noteGenerator != null)
-                recordset.addRecords(noteGenerator.generateRecords());
-            if (eventGenerator != null)
-                recordset.addRecords(eventGenerator.generateRecords());
-            if (taskGenerator != null)
-                recordset.addRecords(taskGenerator.generateRecords());
-            if (messageGenerator != null)
-                recordset.addRecords(messageGenerator.generateRecords());
-        }
+        if (noteGenerator != null)
+            recordset.addRecords(noteGenerator.generateRecords());
+        if (eventGenerator != null)
+            recordset.addRecords(eventGenerator.generateRecords());
+        if (taskGenerator != null)
+            recordset.addRecords(taskGenerator.generateRecords());
+        if (messageGenerator != null)
+            recordset.addRecords(messageGenerator.generateRecords());
 
         recordset.addRecords(unknownGenerator.generateRecords());
 
@@ -178,11 +161,7 @@ public class EimTranslator implements EimSchemaConstants {
 
     private void applyRecord(EimRecord record)
         throws EimSchemaException {
-        if (record.getNamespace().equals(NS_COLLECTION)) {
-            if (collectionApplicator == null)
-                throw new EimSchemaException("collection record cannot be applied to non-collection item");
-            collectionApplicator.applyRecord(record);
-        } else if (record.getNamespace().equals(NS_ITEM)) {
+        if (record.getNamespace().equals(NS_ITEM)) {
             if (contentItemApplicator == null)
                 throw new EimSchemaException("item record cannot be applied to non-content item");
             contentItemApplicator.applyRecord(record);

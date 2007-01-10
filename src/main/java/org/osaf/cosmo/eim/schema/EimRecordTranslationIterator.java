@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.schema.EimTranslator;
-import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ContentItem;
 
 /**
  * Iterator that translates items to EIM records.
@@ -30,10 +30,10 @@ import org.osaf.cosmo.model.Item;
  */
 public class EimRecordTranslationIterator implements Iterator {
 
-    private Iterator<Item> decorated;
+    private Iterator<ContentItem> decorated;
 
     /** */
-    public EimRecordTranslationIterator(List<Item> items) {
+    public EimRecordTranslationIterator(List<ContentItem> items) {
         decorated = items.iterator();
     }
 

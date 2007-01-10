@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.schema.EimRecordTranslationIterator;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 
 /**
@@ -40,17 +41,14 @@ public class SyncRecords extends SubRecords {
 
     /** */
     protected EimRecordTranslationIterator createIterator(CollectionItem collection) {
-        ArrayList<Item> items = new ArrayList<Item>();
+        ArrayList<ContentItem> items = new ArrayList<ContentItem>();
 
         if (! prevToken.isValid(collection)) {
-            if (prevToken.hasItemChanged(collection))
-                items.add(collection);
-
             for (Item child : collection.getChildren()) {
-                if (child instanceof CollectionItem)
+                if (! (child instanceof ContentItem))
                     continue;
                 if (prevToken.hasItemChanged(child))
-                    items.add(child);
+                    items.add((ContentItem)child);
             }
         }
 

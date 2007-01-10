@@ -132,24 +132,20 @@ public class StandardMorseCodeController implements MorseCodeController {
         User owner = computeItemOwner();
         collection.setUid(uid);
         collection.setOwner(owner);
+        collection.setName(uid);
         if (records.getName() != null)
-            collection.setName(records.getName());
+            collection.setDisplayName(records.getName());
         else
-            collection.setName(uid);
+            collection.setDisplayName(uid);
 
         HashSet<Item> children = new HashSet<Item>();
         EimTranslator translator = null;
         while (records.getRecordSets().hasNext()) {
             EimRecordSet recordset = records.getRecordSets().next();
             try {
-                if (recordset.getUuid().equals(collection.getUid())) {
-                    translator = new EimTranslator(collection);
-                    translator.applyRecords(recordset);
-                } else {
-                    Item child = createChildItem(collection, recordset);
-                    translator = new EimTranslator(child);
-                    translator.applyRecords(recordset);
-                }
+                ContentItem child = createChildItem(collection, recordset);
+                translator = new EimTranslator(child);
+                translator.applyRecords(recordset);
             } catch (EimValidationException e) {
                 throw new ValidationException("could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
             } catch (EimSchemaException e) {
@@ -280,23 +276,21 @@ public class StandardMorseCodeController implements MorseCodeController {
         }
 
         if (records.getName() != null)
-            collection.setName(records.getName());
+            collection.setDisplayName(records.getName());
 
         HashSet<Item> children = new HashSet<Item>();
         EimTranslator translator = null;
         while (records.getRecordSets().hasNext()) {
             EimRecordSet recordset = records.getRecordSets().next();
             try {
-                if (recordset.getUuid().equals(collection.getUid())) {
-                    translator = new EimTranslator(collection);
-                    translator.applyRecords(recordset);
-                } else {
-                    Item child = collection.getChild(recordset.getUuid());
-                    if (child == null)
-                        child = createChildItem(collection, recordset);
-                    translator = new EimTranslator(child);
-                    translator.applyRecords(recordset);
-                }
+                Item child = collection.getChild(recordset.getUuid());
+                if (child == null)
+                    child = createChildItem(collection, recordset);
+                else
+                    if (! (child instanceof ContentItem))
+                        throw new ValidationException("Child item " + recordset.getUuid() + " is not a content item");
+                translator = new EimTranslator((ContentItem)child);
+                translator.applyRecords(recordset);
             } catch (EimValidationException e) {
                 throw new ValidationException("could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
             } catch (EimSchemaException e) {
@@ -356,6 +350,7 @@ public class StandardMorseCodeController implements MorseCodeController {
                                         EimRecordSet recordset) {
         NoteItem child = new NoteItem();
         child.setName(recordset.getUuid());
+        child.setDisplayName(recordset.getUuid());
         child.setUid(recordset.getUuid());
         child.setOwner(collection.getOwner());
         collection.getChildren().add(child);

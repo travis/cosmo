@@ -159,6 +159,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
 
                 EimmlStreamWriter writer =
                     new EimmlStreamWriter(resp.getOutputStream(),
+                                          records.getUid(),
                                           records.getName());
                 Iterator<EimRecordSet> i = records.getRecordSets();
                 while (i.hasNext())
@@ -219,6 +220,15 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 // XXX: check update preconditions
 
                 reader = new EimmlStreamReader(req.getInputStream());
+                if (! reader.getCollectionUuid().equals(cp.getUid())) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                                   "EIMML collection uid " +
+                                   reader.getCollectionUuid() +
+                                   " does not match target collection uid " +
+                                   cp.getUid());
+                    return;
+                }
+
                 Iterator<EimRecordSet> i =
                     new EimmlStreamReaderIterator(reader);
                 PubRecords records =
@@ -290,6 +300,15 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 // XXX: check publish preconditions
 
                 reader = new EimmlStreamReader(req.getInputStream());
+                if (! reader.getCollectionUuid().equals(cp.getUid())) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                                   "EIMML collection uid " +
+                                   reader.getCollectionUuid() +
+                                   " does not match target collection uid " +
+                                   cp.getUid());
+                    return;
+                }
+
                 Iterator<EimRecordSet> i =
                     new EimmlStreamReaderIterator(reader);
                 PubRecords records =

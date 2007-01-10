@@ -59,11 +59,12 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
 
     private XMLStreamReader xmlReader;
     private String documentEncoding;
+    private String uuid;
     private String name;
 
     /**
-     * Reads the document header, positioning the cursor just after
-     * it.
+     * Reads the document header and root element, positioning the
+     * cursor just before the first recordset.
      */
     public EimmlStreamReader(InputStream in)
         throws IOException, EimmlStreamException {
@@ -79,6 +80,13 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
         } catch (XMLStreamException e) {
             throw new EimmlStreamException("Unable to read EIM records", e);
         }
+    }
+
+    /**
+     * Returns the uid of the collection.
+     */
+    public String getCollectionUuid() {
+        return uuid;
     }
 
     /**
@@ -100,7 +108,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
     }
 
     /**
-     * Returns the next set of records in the stream. Returns null
+     * Returns the next recordset in the stream. Returns null
      * if there are no more recordsets in the stream.
      */
     public EimRecordSet nextRecordSet()
@@ -145,10 +153,12 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
 
             xmlReader.nextTag();
             if (! xmlReader.isStartElement() &&
-                xmlReader.getName().equals(QN_RECORDS))
-                throw new EimmlStreamException("Outermost element must be " + QN_RECORDS);
+                xmlReader.getName().equals(QN_COLLECTION))
+                throw new EimmlStreamException("Outermost element must be " + QN_COLLECTION);
 
-            name = xmlReader.getAttributeValue(null, ATTR_COLLECTION);
+            uuid = xmlReader.getAttributeValue(null, ATTR_UUID);
+
+            name = xmlReader.getAttributeValue(null, ATTR_NAME);
             if (StringUtils.isBlank(name))
                 name = null;
 

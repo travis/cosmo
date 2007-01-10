@@ -55,9 +55,10 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
     /**
      * Writes the document header and opens the root element.
      */
-    public EimmlStreamWriter(OutputStream out)
+    public EimmlStreamWriter(OutputStream out,
+                             String uuid)
         throws IOException, EimmlStreamException {
-        this(out, null);
+        this(out, uuid, null);
     }
 
     /**
@@ -65,6 +66,7 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
      * including the collection name attribute.
      */
     public EimmlStreamWriter(OutputStream out,
+                             String uuid,
                              String name)
         throws IOException, EimmlStreamException {
         try {
@@ -78,11 +80,13 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
 
             xmlWriter.writeStartDocument();
 
-            xmlWriter.writeStartElement(NS_CORE, EL_RECORDS);
+            xmlWriter.writeStartElement(NS_CORE, EL_COLLECTION);
             xmlWriter.writeNamespace(PRE_CORE, NS_CORE);
 
+            xmlWriter.writeAttribute(ATTR_UUID, uuid);
+
             if (name != null)
-                xmlWriter.writeAttribute(ATTR_COLLECTION, name);
+                xmlWriter.writeAttribute(ATTR_NAME, name);
         } catch (XMLStreamException e) {
             throw new EimmlStreamException("Error writing root element", e);
         }

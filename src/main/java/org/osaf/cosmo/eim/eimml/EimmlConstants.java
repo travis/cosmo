@@ -32,9 +32,10 @@ public interface EimmlConstants {
     public static final String PRE_CORE = "eim";
 
     /** */
-    public static final String EL_RECORDS = "records";
+    public static final String EL_COLLECTION = "collection";
     /** */
-    public static final QName QN_RECORDS = new QName(NS_CORE, EL_RECORDS);
+    public static final QName QN_COLLECTION =
+        new QName(NS_CORE, EL_COLLECTION);
     /** */
     public static final String EL_RECORDSET = "recordset"; 
     /** */
@@ -43,8 +44,8 @@ public interface EimmlConstants {
     public static final String EL_RECORD = "record"; 
 
     /** */
-    public static final String ATTR_COLLECTION = "collection";
-    // no namespace for collection, which is only valid on records
+    public static final String ATTR_NAME = "name";
+    // no namespace for name, which is only valid on collection
     /** */
     public static final String ATTR_UUID = "uuid";
     // no namespace for uuid, which is only valid on recordset

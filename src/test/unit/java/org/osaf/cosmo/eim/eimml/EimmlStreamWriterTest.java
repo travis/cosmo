@@ -47,6 +47,8 @@ public class EimmlStreamWriterTest extends TestCase
 
     /** */
     public void testBasicWrite() throws Exception {
+        String collUuid = "cafebebe";
+        String collName = "Test Collection";
         String uuid = "deadbeef";
         String ns1 = "cosmo:test:ns1";
         String prefix1 = "ns1";
@@ -71,7 +73,8 @@ public class EimmlStreamWriterTest extends TestCase
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        EimmlStreamWriter writer = new EimmlStreamWriter(out);
+        EimmlStreamWriter writer =
+            new EimmlStreamWriter(out, collUuid, collName);
         writer.writeRecordSet(recordset);
         writer.close();
 
@@ -81,11 +84,17 @@ public class EimmlStreamWriterTest extends TestCase
         EimmlStreamChecker checker = new EimmlStreamChecker(in);
 
         checker.nextTag();
-        if (! checker.checkStartElement(QN_RECORDS))
-            fail("Expected element " + QN_RECORDS);
+        if (! checker.checkStartElement(QN_COLLECTION))
+            fail("Expected element " + QN_COLLECTION);
         if (! (checker.checkNamespaceCount(1) &&
                checker.checkNamespace(0, PRE_CORE, NS_CORE)))
             fail("Expected namespace mapping " + PRE_CORE + "=" + NS_CORE);
+        if (! checker.checkAttributeCount(2))
+            fail("Expected two attributes on " + QN_COLLECTION);
+        if (!checker.checkAttribute(0, ATTR_UUID, collUuid))
+            fail("Expected attribute " + ATTR_UUID + "=" + collUuid);
+        if (!checker.checkAttribute(1, ATTR_NAME, collName))
+            fail("Expected attribute " + ATTR_NAME + "=" + collName);
 
         checker.nextTag();
         if (! checker.checkStartElement(QN_RECORDSET))

@@ -59,6 +59,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
 
     private XMLStreamReader xmlReader;
     private String documentEncoding;
+    private String name;
 
     /**
      * Reads the document header, positioning the cursor just after
@@ -78,6 +79,13 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
         } catch (XMLStreamException e) {
             throw new EimmlStreamException("Unable to read EIM records", e);
         }
+    }
+
+    /**
+     * Returns the name of the collection, if any is specified.
+     */
+    public String getCollectionName() {
+        return name;
     }
 
     /** */
@@ -129,10 +137,22 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
     }
 
     private void readDocumentHeader()
-        throws XMLStreamException {
+        throws XMLStreamException, EimmlStreamException {
         while (xmlReader.hasNext()) {
-            if (xmlReader.next() == START_DOCUMENT)
-                return;
+            xmlReader.nextTag();
+            if (xmlReader.next() != START_DOCUMENT)
+                continue;
+
+            xmlReader.nextTag();
+            if (! xmlReader.isStartElement() &&
+                xmlReader.getName().equals(QN_RECORDS))
+                throw new EimmlStreamException("Outermost element must be " + QN_RECORDS);
+
+            name = xmlReader.getAttributeValue(null, ATTR_COLLECTION);
+            if (StringUtils.isBlank(name))
+                name = null;
+
+            return;
         }
     }
 

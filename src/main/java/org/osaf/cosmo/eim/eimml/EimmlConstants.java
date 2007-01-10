@@ -43,6 +43,9 @@ public interface EimmlConstants {
     public static final String EL_RECORD = "record"; 
 
     /** */
+    public static final String ATTR_COLLECTION = "collection";
+    // no namespace for collection, which is only valid on records
+    /** */
     public static final String ATTR_UUID = "uuid";
     // no namespace for uuid, which is only valid on recordset
     /** */

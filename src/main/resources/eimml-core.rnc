@@ -69,8 +69,9 @@ eimClobFieldContent = {
 
 eimCollection =
    element eim:collection {
-      attribute name { xsd:string },
-      eimRecordSet*
+      (eimDeleted,
+         attribute name { xsd:string },
+         eimRecordSet*)
    }
 
 # A container for records that apply to the same item (identified by

@@ -53,16 +53,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var passedKey = this.ticketKey;
             var collSelectNode = this.domNode; 
             
-            function $(s) {
-                return document.getElementById(s);
-            }
-            function _createElem(s) {
-                return document.createElement(s);
-            }
-            function _createText(s) {
-                return document.createTextNode(s);
-            }
-            
             // Break into a couple of different functions depending
             // on ticket/account, and single/multiple collections
             // --------------------
@@ -132,9 +122,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                                 return false;
                             }
                             else {
-                                var successProps =  cosmo.ui.widget.AuthBox.getSuccessProperties(msg);
-                                cosmo.app.hideDialog();
-                                cosmo.app.showDialog(successProps);
+                                // Log the user into Cosmo and display the current collection
+                                this._showPrompt(msg);
+                                location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.collection.uid;
                             }
                         },
                         successPrompt: _('Main.CollectionAdd.SuccessPrompt') };

@@ -26,6 +26,7 @@ var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.widget.ModalDialog");
+dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.topics");
 
 dojo.widget.defineWidget("cosmo.ui.widget.CollectionDetailsDialog", "html",
@@ -41,7 +42,8 @@ dojo.widget.HtmlWidget, function(){
         calendar: /*CalendarMetadata*/ null,
         conduit: /*cosmo.conduits.Conduit*/ null,
         transportInfo: null,
-        displayName: null, //the collection display name
+        displayName: null, //the collection display nama
+        displayedSelection: '', // The selection item to display if invoked from ticket view
         
         // Template stuff
         templatePath:dojo.uri.dojoUri(
@@ -83,10 +85,6 @@ dojo.widget.HtmlWidget, function(){
             clickHere:_("Main.CollectionDetails.ClickHere")
         },
         
-        //clients - note: the order in which they appear here is the order in
-        //                they will appear in the select box
-        clients: ["Chandler", "iCal", "FeedReader"],
-        
         clientsToProtocols: {
             Chandler: "mc",
             iCal: "webcal",
@@ -94,21 +92,8 @@ dojo.widget.HtmlWidget, function(){
         },
 
         // Lifecycle functions
-        fillInTemplate: function(){
-            //set up the select box
-            var options = [];
-            dojo.lang.map(this.clients,function(client){
-                options.push({
-                    value:client,
-                    text: _("Main.CollectionDetails.Client." + client)
-                })
-            }); 
-            options.push({text: _("Main.CollectionDetails.Download"),
-                          value: "download"});
-                          
-            options.push({text: _("Main.CollectionDetails.Other"),
-                          value: "other"});
-          
+        fillInTemplate: function () {
+           var options = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
            cosmo.util.html.setSelectOptions(this.clientSelector, options);
            
            if (this.conduit != null && this.conduit.saveDisplayName){
@@ -117,9 +102,19 @@ dojo.widget.HtmlWidget, function(){
                this.collectionNameText.style.display = "";
            }
            
-           this.linkSpan.appendChild(cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImagesUrl() + "link.png"));
+           this.linkSpan.appendChild(
+                cosmo.util.html.createRollOverMouseDownImage(
+                cosmo.env.getImagesUrl() + "link.png"));
            
-           this.clientSelector.selectedIndex = 0;
+           // Show the selection choice if passed from the selector in 
+           // ticket view -- otherwise default to 'Chandler'
+           var selI =0
+           if (this.displayedSelection) {
+               selI = cosmo.ui.widget.CollectionDetailsDialog.clientMappings[
+                   this.displayedSelection];
+           }
+           this.clientSelector.selectedIndex = selI;
+           
            this._handleClientChanged();
         },
         
@@ -150,10 +145,10 @@ dojo.widget.HtmlWidget, function(){
         //handles when the user selects a client
         _handleClientChanged: function(){
             var client = this._getClientChoice();
-            if (client =="download"){
+            if (client =="Download"){
                 this._showClientInstructionsAndAddress(true, true);
                 this._setClientInstructions(client);
-            } else if (client =="other"){
+            } else if (client =="Other"){
                 this._showClientInstructionsAndAddress(false, false);
                 this._showProtocolRows(true);
             } else {
@@ -210,14 +205,16 @@ dojo.widget.HtmlWidget, function(){
     function(/*CalendarMetadata*/ calendar, 
              /*string*/ displayName,
              /*cosmo.conduits.Conduit*/ conduit, 
-             transportInfo){
-   
+             transportInfo, 
+             /* string */ displayedSelection) {
+    
     var dummyNode = document.createElement('span');
     var contentWidget = dojo.widget.createWidget("cosmo:CollectionDetailsDialog",
                     { calendar: calendar, 
                       displayName: displayName,
                       conduit: conduit, 
-                      transportInfo: transportInfo }, 
+                      transportInfo: transportInfo,
+                      displayedSelection: displayedSelection }, 
                  dummyNode, 'last');
     
     dummyNode.removeChild(contentWidget.domNode);  
@@ -226,9 +223,9 @@ dojo.widget.HtmlWidget, function(){
     var closeButton = dojo.widget.createWidget(
                     "cosmo:Button",
                     { text: _("Main.CollectionDetails.Close"),
-                      width: "50px",
+                      width: "60px",
                       handleOnClick: cosmo.app.hideDialog,
-                      small: false },
+                      small: true },
                       dummyNode, 'last');
                       
     btnsRight.push(closeButton);
@@ -238,13 +235,13 @@ dojo.widget.HtmlWidget, function(){
         var saveButton = dojo.widget.createWidget(
                         "cosmo:Button",
                         { text: getText("Main.CollectionDetails.Save"),
-                          width: "50px",
+                          width: "60px",
                           //TODO - Handle Errors properly!
                           handleOnClick: function(){
                                              contentWidget.saveDisplayName(); 
                                              cosmo.app.hideDialog();
                                          },
-                          small: false },
+                          small: true },
                           dummyNode, 'last');
         btnsRight.push(saveButton);
         dummyNode.removeChild(saveButton.domNode);  
@@ -257,3 +254,26 @@ dojo.widget.HtmlWidget, function(){
         btnsRight: btnsRight
     };
  };
+
+// Clients -- note: the order in which they appear here is the order in
+// they will appear in the select box
+cosmo.ui.widget.CollectionDetailsDialog.clients = 
+    ["Chandler", "iCal", "FeedReader", "Download", "Other"];
+// Reverse mappings -- set up when getClientOptions is called
+cosmo.ui.widget.CollectionDetailsDialog.clientMappings = {}; 
+
+cosmo.ui.widget.CollectionDetailsDialog.getClientOptions = function () {
+    var options = [];
+    var clients = cosmo.ui.widget.CollectionDetailsDialog.clients;
+    for (var i = 0; i < clients.length; i++) {
+        var c = clients[i];
+        options.push({
+            value: c,
+            text: _("Main.CollectionDetails.Client." + c)
+        });
+        cosmo.ui.widget.CollectionDetailsDialog.clientMappings[c] = i;
+    }
+    return options;
+}
+
+ 

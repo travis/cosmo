@@ -16,6 +16,7 @@
 package org.osaf.cosmo.mc;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.schema.EimRecordTranslationIterator;
@@ -23,35 +24,50 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 
 /**
- * Bean class that aggregates all of the EIM records for a synchronize
- * response based on a previous synchronization token and provides the
- * new token.
+ * Bean class that aggregates all of the EIM records for a subscribe
+ * response and provides the corresponding synchronization token.
+ *
+ * @see EimRecord
+ * @see SyncToken
  */
-public class SyncRecords extends SubRecords {
+public class SubRecords {
 
-    private SyncToken prevToken;
+    protected SyncToken token;
+    private EimRecordTranslationIterator iterator;
+    private String name;
 
     /** */
-    public SyncRecords(CollectionItem collection,
-                       SyncToken prevToken) {
-        super(collection);
-        this.prevToken = prevToken;
+    public SubRecords(CollectionItem collection) {
+        this.token = SyncToken.generate(collection);
+        this.iterator = createIterator(collection);
+        this.name = collection.getName();
+    }
+
+    /** */
+    public Iterator<EimRecordSet> getRecordSets() {
+        return iterator;
+    }
+
+    /** */
+    public SyncToken getToken() {
+        return token;
+    }
+
+    /** */
+    public String getName() {
+        return name;
     }
 
     /** */
     protected EimRecordTranslationIterator createIterator(CollectionItem collection) {
         ArrayList<Item> items = new ArrayList<Item>();
 
-        if (! prevToken.isValid(collection)) {
-            if (prevToken.hasItemChanged(collection))
-                items.add(collection);
+        items.add(collection);
 
-            for (Item child : collection.getChildren()) {
-                if (child instanceof CollectionItem)
-                    continue;
-                if (prevToken.hasItemChanged(child))
-                    items.add(child);
-            }
+        for (Item child : collection.getChildren()) {
+            if (child instanceof CollectionItem)
+                continue;
+            items.add(child);
         }
 
         return new EimRecordTranslationIterator(items);

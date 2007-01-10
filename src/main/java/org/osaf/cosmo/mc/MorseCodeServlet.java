@@ -147,7 +147,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 SyncToken token = tokenStr != null ?
                     SyncToken.deserialize(tokenStr) :
                     null;
-                SyncRecords records = token == null ?
+                SubRecords records = token == null ?
                     controller.subscribeToCollection(cp.getUid()) :
                     controller.synchronizeCollection(cp.getUid(), token);
 
@@ -158,7 +158,8 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                records.getToken().serialize());
 
                 EimmlStreamWriter writer =
-                    new EimmlStreamWriter(resp.getOutputStream());
+                    new EimmlStreamWriter(resp.getOutputStream(),
+                                          records.getName());
                 Iterator<EimRecordSet> i = records.getRecordSets();
                 while (i.hasNext())
                     writer.writeRecordSet(i.next());
@@ -220,9 +221,11 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 reader = new EimmlStreamReader(req.getInputStream());
                 Iterator<EimRecordSet> i =
                     new EimmlStreamReaderIterator(reader);
+                PubRecords records =
+                    new PubRecords(i, reader.getCollectionName());
 
                 SyncToken newToken =
-                    controller.updateCollection(cp.getUid(), token, i);
+                    controller.updateCollection(cp.getUid(), token, records);
 
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());
@@ -289,9 +292,12 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 reader = new EimmlStreamReader(req.getInputStream());
                 Iterator<EimRecordSet> i =
                     new EimmlStreamReaderIterator(reader);
+                PubRecords records =
+                    new PubRecords(i, reader.getCollectionName());
 
                 SyncToken newToken =
-                    controller.publishCollection(cp.getUid(), parentUid, i);
+                    controller.publishCollection(cp.getUid(), parentUid,
+                                                 records);
 
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.addHeader(HEADER_SYNC_TOKEN, newToken.serialize());

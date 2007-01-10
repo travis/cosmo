@@ -51,7 +51,7 @@ public interface MorseCodeController {
      * @param uid the uid of the collection to publish
      * @param parentUid the (optional) uid of the collection to set as
      * the parent for the published collection
-     * @param recordsets the EIM record sets with which the published
+     * @param records the EIM records with which the published
      * collection is initially populated
      *
      * @returns the initial <code>SyncToken</code> for the collection
@@ -69,7 +69,7 @@ public interface MorseCodeController {
      */
     public SyncToken publishCollection(String uid,
                                        String parentUid,
-                                       Iterator<EimRecordSet> recordsets);
+                                       PubRecords records);
    
     /**
      * Retrieves the current state of every item contained within the
@@ -85,7 +85,7 @@ public interface MorseCodeController {
      * collection
      * @throws MorseCodeException if an unknown error occurs
      */
-    public SyncRecords subscribeToCollection(String uid);
+    public SubRecords subscribeToCollection(String uid);
 
     /**
      * Retrieves the current state of each non-collection child item
@@ -124,7 +124,7 @@ public interface MorseCodeController {
      * @param uid the uid of the collection to subscribe to
      * @param token the sync token describing the last known state of
      * the collection
-     * @param recordsets the EIM recordsets with which the published
+     * @param records the EIM records with which the published
      * collection is updated
      *
      * @returns a new <code>SyncToken</code> that invalidates any
@@ -143,5 +143,5 @@ public interface MorseCodeController {
      */
     public SyncToken updateCollection(String uid,
                                       SyncToken token,
-                                      Iterator<EimRecordSet> recordsets);
+                                      PubRecords records);
 }

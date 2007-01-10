@@ -104,7 +104,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      */
     public SyncToken publishCollection(String uid,
                                        String parentUid,
-                                       Iterator<EimRecordSet> recordsets) {
+                                       PubRecords records) {
         if (log.isDebugEnabled()) {
             if (parentUid != null)
                 log.debug("publishing collection " + uid + " with parent " + parentUid);
@@ -132,14 +132,17 @@ public class StandardMorseCodeController implements MorseCodeController {
         User owner = computeItemOwner();
         collection.setUid(uid);
         collection.setOwner(owner);
+        if (records.getName() != null)
+            collection.setName(records.getName());
+        else
+            collection.setName(uid);
 
         HashSet<Item> children = new HashSet<Item>();
         EimTranslator translator = null;
-        while (recordsets.hasNext()) {
-            EimRecordSet recordset = recordsets.next();
+        while (records.getRecordSets().hasNext()) {
+            EimRecordSet recordset = records.getRecordSets().next();
             try {
                 if (recordset.getUuid().equals(collection.getUid())) {
-                    // XXX: set collection name from recordset
                     translator = new EimTranslator(collection);
                     translator.applyRecords(recordset);
                 } else {
@@ -175,7 +178,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      * collection
      * @throws MorseCodeException if an unknown error occurs
      */
-    public SyncRecords subscribeToCollection(String uid) {
+    public SubRecords subscribeToCollection(String uid) {
         if (log.isDebugEnabled())
             log.debug("subscribing to collection " + uid);
 
@@ -186,11 +189,7 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new NotCollectionException(uid);
         CollectionItem collection = (CollectionItem) item;
 
-        Iterator<EimRecordSet> recordsets =
-            new SubscriptionIterator(collection);
-        SyncToken token = SyncToken.generate(collection);
-
-        return new SyncRecords(recordsets, token);
+        return new SubRecords(collection);
     }
 
     /**
@@ -223,12 +222,7 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new NotCollectionException(uid);
         CollectionItem collection = (CollectionItem) item;
 
-        Iterator<EimRecordSet> recordsets =
-            new SynchronizationIterator(collection, token);
-
-        token = SyncToken.generate(collection);
-
-        return new SyncRecords(recordsets, token);
+        return new SyncRecords(collection, token);
     }
 
     /**
@@ -267,7 +261,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      */
     public SyncToken updateCollection(String uid,
                                       SyncToken token,
-                                      Iterator<EimRecordSet> recordsets) {
+                                      PubRecords records) {
         if (log.isDebugEnabled()) {
             log.debug("updating collection " + uid);
         }
@@ -285,13 +279,15 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new StaleCollectionException(uid);
         }
 
+        if (records.getName() != null)
+            collection.setName(records.getName());
+
         HashSet<Item> children = new HashSet<Item>();
         EimTranslator translator = null;
-        while (recordsets.hasNext()) {
-            EimRecordSet recordset = recordsets.next();
+        while (records.getRecordSets().hasNext()) {
+            EimRecordSet recordset = records.getRecordSets().next();
             try {
                 if (recordset.getUuid().equals(collection.getUid())) {
-                    // XXX: set collection name from recordset
                     translator = new EimTranslator(collection);
                     translator.applyRecords(recordset);
                 } else {
@@ -364,70 +360,5 @@ public class StandardMorseCodeController implements MorseCodeController {
         child.setOwner(collection.getOwner());
         collection.getChildren().add(child);
         return child;
-    }
-
-    private class SubscriptionIterator implements Iterator {
-        private Iterator<Item> items;
-
-        public SubscriptionIterator(CollectionItem collection) {
-            ArrayList<Item> tmp = new ArrayList<Item>();
-
-            tmp.add(collection);
-
-            for (Item child : collection.getChildren()) {
-                if (child instanceof CollectionItem)
-                    continue;
-                tmp.add(child);
-            }
-
-            items = tmp.iterator();
-        }
-
-        public boolean hasNext() {
-            return items.hasNext();
-        }
-
-        public EimRecordSet next() {
-            return new EimTranslator(items.next()).generateRecords();
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException("remove method not supported");
-        }
-    }
-
-    private class SynchronizationIterator implements Iterator {
-        private Iterator<Item> items;
-
-        public SynchronizationIterator(CollectionItem collection,
-                                       SyncToken token) {
-            ArrayList<Item> tmp = new ArrayList<Item>();
-
-            if (! token.isValid(collection)) {
-                if (token.hasItemChanged(collection))
-                    tmp.add(collection);
-
-                for (Item child : collection.getChildren()) {
-                    if (child instanceof CollectionItem)
-                        continue;
-                    if (token.hasItemChanged(child))
-                        tmp.add(child);
-                }
-            }
-
-            items = tmp.iterator();
-        }
-
-        public boolean hasNext() {
-            return items.hasNext();
-        }
-
-        public EimRecordSet next() {
-            return new EimTranslator(items.next()).generateRecords();
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException("remove method not supported");
-        }
     }
 }

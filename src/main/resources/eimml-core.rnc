@@ -4,7 +4,7 @@
 
 namespace eim = "http://osafoundation.org/eim"
 
-start = eimRecords
+start = eimCollection
 
 eimKey =
    attribute eim:key { xsd:boolean }
@@ -43,8 +43,8 @@ eimDateTimeFieldContent = {
 eimTimeStampFieldContent = {
    eimKey,
    attribute eim:type { "timestamp" },
-   # UTC (eg "2002-10-09T19:00:00Z")
-   xsd:dateTime
+   # the number of milliseconds since the epoch
+   xsd:decimal { totalDigits = "20", fractionDigits = "0" }
 }
 
 eimBytesFieldContent = {
@@ -67,8 +67,9 @@ eimClobFieldContent = {
 
 # The root element of an EIMML document.
 
-eimRecords =
-   element eim:records {
+eimCollection =
+   element eim:collection {
+      attribute name { xsd:string },
       eimRecordSet*
    }
 

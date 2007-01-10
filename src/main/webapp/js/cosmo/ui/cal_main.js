@@ -28,13 +28,13 @@ dojo.require("cosmo.ui.contentcontainer");
 dojo.require("cosmo.facade.pref");
 dojo.require("cosmo.service.json_service_impl");
 dojo.require("cosmo.legacy.cal_event");
-dojo.require('cosmo.ui.widget.CollectionSelector');
-dojo.require('cosmo.ui.widget.AuthBox');
 dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.Lozenge');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.account.create');
 dojo.require('cosmo.convenience');
+dojo.require('cosmo.ui.widget.CollectionSelector');
+dojo.require('cosmo.ui.widget.AuthBox');
 
 // Global variables for X and Y position for mouse
 xPos = 0;
@@ -248,6 +248,35 @@ cosmo.ui.cal_main.Cal = new function () {
            this.calForm.addJumpToDate(jpDiv);
         }
         
+        // Add the collection subscription selector in ticket view
+        if (ticketKey) {
+            var s = $('subscribeSelector');
+            var clientOpts = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
+            clientOpts.unshift({ text: 'Subscribe with ...', value: '' });
+            var selOpts = { name: 'subscriptionSelect', id: 'subscriptionSelect',
+               options: clientOpts, className: 'selectElem' }; 
+            var subscrSel = cosmo.util.html.createSelect(selOpts);
+            var f = function (e) {
+                // Show the subcription dialog if the empty "Subscribe with ..."
+                // option is not the one selected
+                var sel = e.target;
+                if (sel.selectedIndex != 0) {
+                cosmo.app.showDialog(
+                    cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
+                        Cal.currentCollection.collection,
+                        Cal.currentCollection.displayName,
+                        Cal.currentCollection.conduit,
+                        Cal.currentCollection.transportInfo,
+                        sel.options[sel.selectedIndex].value));
+                }
+            };
+
+            dojo.event.connect(subscrSel, 'onchange', f);
+            s.style.position = 'absolute';
+            s.style.left = (LEFT_SIDEBAR_WIDTH + this.midColWidth) + 'px'; 
+            s.appendChild(subscrSel);
+        }
+        
         // Load and display events
         // --------------
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
@@ -430,7 +459,7 @@ cosmo.ui.cal_main.Cal = new function () {
             var i = cosmo.util.html.createRollOverMouseDownImage(
                     cosmo.env.getImagesUrl() + "signup.png");
             i.style.cursor = 'pointer';
-            i.onclick = function () { cosmo.account.create.showForm(); };
+            dojo.event.connect(i, 'onclick', cosmo.account.create.showForm);
             signupDiv.appendChild(i);
             w = signupDiv.offsetWidth + 24;
             p = Cal.midColWidth  + LEFT_SIDEBAR_WIDTH - w;

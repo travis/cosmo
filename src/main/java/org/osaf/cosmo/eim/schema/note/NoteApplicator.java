@@ -23,6 +23,7 @@ import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseItemApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 
 import org.apache.commons.logging.Log;
@@ -38,12 +39,11 @@ public class NoteApplicator extends BaseItemApplicator
     private static final Log log =
         LogFactory.getLog(NoteApplicator.class);
 
-    private NoteItem note;
-
     /** */
-    public NoteApplicator(NoteItem note) {
-        super(PREFIX_NOTE, NS_NOTE, note);
-        this.note = note;
+    public NoteApplicator(Item item) {
+        super(PREFIX_NOTE, NS_NOTE, item);
+        if (! (item instanceof NoteItem))
+            throw new IllegalArgumentException("item " + item.getUid() + " not a note item");
     }
 
     /**
@@ -56,6 +56,8 @@ public class NoteApplicator extends BaseItemApplicator
      */
     protected void applyField(EimRecordField field)
         throws EimSchemaException {
+        NoteItem note = (NoteItem) getItem();
+
         if (field.getName().equals(FIELD_BODY)) {
             Reader value = EimFieldValidator.validateClob(field);
             note.setBody(value);

@@ -20,6 +20,8 @@ import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
+import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.TaskStamp;
 
 import org.apache.commons.logging.Log;
@@ -34,12 +36,15 @@ public class TaskApplicator extends BaseStampApplicator {
     private static final Log log =
         LogFactory.getLog(TaskApplicator.class);
 
-    private TaskStamp task;
+    /** */
+    public TaskApplicator(Item item) {
+        super(PREFIX_TASK, NS_TASK, item);
+        setStamp(TaskStamp.getStamp(item));
+    }
 
     /** */
-    public TaskApplicator(TaskStamp task) {
-        super(PREFIX_TASK, NS_TASK, task);
-        this.task = task;
+    protected Stamp createStamp() {
+        return new TaskStamp();
     }
 
     /**

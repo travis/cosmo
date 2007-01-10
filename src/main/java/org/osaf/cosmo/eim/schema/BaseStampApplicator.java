@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Stamp;
 
 import org.apache.commons.logging.Log;
@@ -40,9 +41,8 @@ public abstract class BaseStampApplicator extends BaseApplicator {
      */
     protected BaseStampApplicator(String prefix,
                                   String namespace,
-                                  Stamp stamp) {
-        super(prefix, namespace, stamp.getItem());
-        this.stamp = stamp;
+                                  Item item) {
+        super(prefix, namespace, item);
     }
 
     /**
@@ -50,6 +50,9 @@ public abstract class BaseStampApplicator extends BaseApplicator {
      * <p>
      * If the record is marked deleted, then
      * {@link #applyDeletion(EimRecord)} is called.
+     * <p>
+     * If the stamp corresponding to this record does not already
+     * exist, then {@link #createStamp()} is called.
      * <p>
      * If the record is not marked deleted, then
      * {@link #applyField(EimRecordField)} is called for each
@@ -73,10 +76,23 @@ public abstract class BaseStampApplicator extends BaseApplicator {
             return;
         }
 
+        if (stamp == null) {
+            stamp = createStamp();
+            getItem().addStamp(stamp);
+        }
+
         for (EimRecordField field : record.getFields()) {
             applyField(field);
         }
     }
+
+    /**
+     * Creates and returns a stamp instance that can be added by
+     * <code>BaseStampApplicator</code> to the item. Used when a
+     * stamp record is applied to an item that does not already have
+     * that stamp.
+     */
+    protected abstract Stamp createStamp();
 
     /**
      * Deletes the stamp.
@@ -86,7 +102,8 @@ public abstract class BaseStampApplicator extends BaseApplicator {
      */
     protected void applyDeletion(EimRecord record)
         throws EimSchemaException {
-        getItem().removeStamp(stamp);
+        if (stamp != null)
+            getItem().removeStamp(stamp);
     }
 
     /**
@@ -106,5 +123,10 @@ public abstract class BaseStampApplicator extends BaseApplicator {
     /** */
     public Stamp getStamp() {
         return stamp;
+    }
+
+    /** */
+    protected void setStamp(Stamp stamp) {
+        this.stamp = stamp;
     }
 }

@@ -26,6 +26,7 @@ import org.osaf.cosmo.eim.schema.BaseItemApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.Item;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,12 +41,11 @@ public class ContentItemApplicator extends BaseItemApplicator
     private static final Log log =
         LogFactory.getLog(ContentItemApplicator.class);
 
-    private ContentItem contentItem;
-
     /** */
-    public ContentItemApplicator(ContentItem contentItem) {
-        super(PREFIX_ITEM, NS_ITEM, contentItem);
-        this.contentItem = contentItem;
+    public ContentItemApplicator(Item item) {
+        super(PREFIX_ITEM, NS_ITEM, item);
+        if (! (item instanceof ContentItem))
+            throw new IllegalArgumentException("item " + item.getUid() + " not a content item");
     }
 
     /**
@@ -58,6 +58,8 @@ public class ContentItemApplicator extends BaseItemApplicator
      */
     protected void applyField(EimRecordField field)
         throws EimSchemaException {
+        ContentItem contentItem = (ContentItem) getItem();
+
         if (field.getName().equals(FIELD_TITLE)) {
             String value = EimFieldValidator.validateText(field, MAXLEN_TITLE);
             contentItem.setDisplayName(value);

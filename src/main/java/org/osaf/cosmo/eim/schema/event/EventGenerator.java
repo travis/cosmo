@@ -23,6 +23,7 @@ import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Stamp;
 
 import org.apache.commons.logging.Log;
@@ -38,18 +39,22 @@ public class EventGenerator extends BaseStampGenerator
     private static final Log log =
         LogFactory.getLog(EventGenerator.class);
 
-    private EventStamp event;
-
     /** */
-    public EventGenerator(EventStamp event) {
-        super(PREFIX_EVENT, NS_EVENT, event);
-        this.event = event;
+    public EventGenerator(Item item) {
+        super(PREFIX_EVENT, NS_EVENT, item);
+        setStamp(EventStamp.getStamp(item));
     }
 
     /**
      * Copies event properties and attributes into a event record.
      */
     public List<EimRecord> generateRecords() {
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+
+        EventStamp event = (EventStamp) getStamp();
+        if (event == null)
+            return records;
+
         EimRecord master = new EimRecord(getPrefix(), getNamespace());
         String value = null;
 
@@ -82,7 +87,6 @@ public class EventGenerator extends BaseStampGenerator
 
         master.addFields(generateUnknownFields());
 
-        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
         records.add(master);
 
         // XXX: exception instance records

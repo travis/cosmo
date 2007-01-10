@@ -22,6 +22,8 @@ import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.Stamp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,16 +38,24 @@ public class EventApplicator extends BaseStampApplicator
     private static final Log log =
         LogFactory.getLog(EventApplicator.class);
 
-    private EventStamp event;
-
     /** */
-    public EventApplicator(EventStamp event) {
-        super(PREFIX_EVENT, NS_EVENT, event);
-        this.event = event;
+    public EventApplicator(Item item) {
+        super(PREFIX_EVENT, NS_EVENT, item);
+        setStamp(EventStamp.getStamp(item));
     }
 
     /**
-     * Copies record field values to event properties and
+     * Creates and returns a stamp instance that can be added by
+     * <code>BaseStampApplicator</code> to the item. Used when a
+     * stamp record is applied to an item that does not already have
+     * that stamp.
+     */
+    protected Stamp createStamp() {
+        return new EventStamp();
+    }
+
+    /**
+     * Copies record field values to stamp properties and
      * attributes.
      *
      * @throws EimValidationException if the field value is invalid
@@ -54,6 +64,8 @@ public class EventApplicator extends BaseStampApplicator
      */
     protected void applyField(EimRecordField field)
         throws EimSchemaException {
+        EventStamp event = (EventStamp) getStamp();
+
         if (field.getName().equals(FIELD_DTSTART)) {
             String value =
                 EimFieldValidator.validateText(field, MAXLEN_DTSTART);

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.MessageStamp;
 import org.osaf.cosmo.model.Stamp;
 
@@ -40,15 +41,21 @@ public class MessageGenerator extends BaseStampGenerator
     private MessageStamp message;
 
     /** */
-    public MessageGenerator(MessageStamp message) {
-        super(PREFIX_MESSAGE, NS_MESSAGE, message);
-        this.message = message;
+    public MessageGenerator(Item item) {
+        super(PREFIX_MESSAGE, NS_MESSAGE, item);
+        setStamp(MessageStamp.getStamp(item));
     }
 
     /**
      * Copies message properties and attributes into a message record.
      */
     public List<EimRecord> generateRecords() {
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+
+        MessageStamp message = (MessageStamp) getStamp();
+        if (message == null)
+            return records;
+
         EimRecord record = new EimRecord(getPrefix(), getNamespace());
 
         record.addKeyField(new TextField(FIELD_UUID,
@@ -61,7 +68,6 @@ public class MessageGenerator extends BaseStampGenerator
 
         record.addFields(generateUnknownFields());
 
-        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
         records.add(record);
 
         return records;

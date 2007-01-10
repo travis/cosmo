@@ -21,8 +21,9 @@ import java.util.ArrayList;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
-import org.osaf.cosmo.model.TaskStamp;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Stamp;
+import org.osaf.cosmo.model.TaskStamp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,25 +37,28 @@ public class TaskGenerator extends BaseStampGenerator {
     private static final Log log =
         LogFactory.getLog(TaskGenerator.class);
 
-    private TaskStamp task;
-
     /** */
-    public TaskGenerator(TaskStamp task) {
-        super(PREFIX_TASK, NS_TASK, task);
-        this.task = task;
+    public TaskGenerator(Item item) {
+        super(PREFIX_TASK, NS_TASK, item);
+        setStamp(TaskStamp.getStamp(item));
     }
 
     /**
      * Copies task properties and attributes into a task record.
      */
     public List<EimRecord> generateRecords() {
+        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+
+        TaskStamp task = (TaskStamp) getStamp();
+        if (task == null)
+            return records;
+
         EimRecord record = new EimRecord(getPrefix(), getNamespace());
 
         record.addKeyField(new TextField(FIELD_UUID, task.getItem().getUid()));
 
         record.addFields(generateUnknownFields());
 
-        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
         records.add(record);
 
         return records;

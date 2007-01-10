@@ -20,7 +20,9 @@ import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.MessageStamp;
+import org.osaf.cosmo.model.Stamp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,12 +37,20 @@ public class MessageApplicator extends BaseStampApplicator
     private static final Log log =
         LogFactory.getLog(MessageApplicator.class);
 
-    private MessageStamp message;
-
     /** */
-    public MessageApplicator(MessageStamp message) {
-        super(PREFIX_MESSAGE, NS_MESSAGE, message);
-        this.message = message;
+    public MessageApplicator(Item item) {
+        super(PREFIX_MESSAGE, NS_MESSAGE, item);
+        setStamp(MessageStamp.getStamp(item));
+    }
+
+    /**
+     * Creates and returns a stamp instance that can be added by
+     * <code>BaseStampApplicator</code> to the item. Used when a
+     * stamp record is applied to an item that does not already have
+     * that stamp.
+     */
+    protected Stamp createStamp() {
+        return new MessageStamp();
     }
 
     /**
@@ -53,6 +63,8 @@ public class MessageApplicator extends BaseStampApplicator
      */
     protected void applyField(EimRecordField field)
         throws EimSchemaException {
+        MessageStamp message = (MessageStamp) getStamp();
+
         if (field.getName().equals(FIELD_SUBJECT)) {
             String value =
                 EimFieldValidator.validateText(field, MAXLEN_SUBJECT);

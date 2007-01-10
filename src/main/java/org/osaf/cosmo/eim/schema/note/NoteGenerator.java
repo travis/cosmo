@@ -39,18 +39,19 @@ public class NoteGenerator extends BaseItemGenerator
     private static final Log log =
         LogFactory.getLog(NoteGenerator.class);
 
-    private NoteItem note;
-
     /** */
-    public NoteGenerator(NoteItem note) {
-        super(PREFIX_NOTE, NS_NOTE, note);
-        this.note = note;
+    public NoteGenerator(Item item) {
+        super(PREFIX_NOTE, NS_NOTE, item);
+        if (! (item instanceof NoteItem))
+            throw new IllegalArgumentException("item " + item.getUid() + " not a note item");
     }
 
     /**
      * Copies note properties and attributes into a note record.
      */
     public List<EimRecord> generateRecords() {
+        NoteItem note = (NoteItem) getItem();
+
         EimRecord record = new EimRecord(getPrefix(), getNamespace());
 
         record.addKeyField(new TextField(FIELD_UUID, note.getUid()));

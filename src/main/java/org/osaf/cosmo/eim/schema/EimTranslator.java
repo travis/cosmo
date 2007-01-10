@@ -31,7 +31,6 @@ import org.osaf.cosmo.eim.schema.message.MessageApplicator;
 import org.osaf.cosmo.eim.schema.message.MessageGenerator;
 import org.osaf.cosmo.eim.schema.unknown.UnknownApplicator;
 import org.osaf.cosmo.eim.schema.unknown.UnknownGenerator;
-import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.MessageStamp;
@@ -67,33 +66,23 @@ public class EimTranslator implements EimSchemaConstants {
     private UnknownGenerator unknownGenerator;
 
     /** */
-    public EimTranslator(ContentItem item) {
+    public EimTranslator(Item item) {
         this.item = item;
 
-        contentItemApplicator =
-            new ContentItemApplicator((ContentItem) item);
-        contentItemGenerator =
-            new ContentItemGenerator((ContentItem) item);
+        contentItemApplicator = new ContentItemApplicator(item);
+        contentItemGenerator = new ContentItemGenerator(item);
 
-        if (item instanceof NoteItem) {
-            noteApplicator = new NoteApplicator((NoteItem) item);
-            noteGenerator =  new NoteGenerator((NoteItem) item);
-        }
+        noteApplicator = new NoteApplicator(item);
+        noteGenerator = new NoteGenerator(item);
 
-        for (Stamp stamp : item.getStamps()) {
-            if (stamp instanceof EventStamp) {
-                eventApplicator = new EventApplicator((EventStamp) stamp);
-                eventGenerator = new EventGenerator((EventStamp) stamp);
-            } else if (stamp instanceof TaskStamp) {
-                taskApplicator = new TaskApplicator((TaskStamp) stamp);
-                taskGenerator = new TaskGenerator((TaskStamp) stamp);
-            } else if (stamp instanceof MessageStamp) {
-                messageApplicator =
-                    new MessageApplicator((MessageStamp) stamp);
-                messageGenerator =
-                    new MessageGenerator((MessageStamp) stamp);
-            }
-        }
+        eventApplicator = new EventApplicator(item);
+        eventGenerator = new EventGenerator(item);
+
+        taskApplicator = new TaskApplicator(item);
+        taskGenerator = new TaskGenerator(item);
+
+        messageApplicator = new MessageApplicator(item);
+        messageGenerator = new MessageGenerator(item);
 
         unknownApplicator = new UnknownApplicator(item);
         unknownGenerator = new UnknownGenerator(item);
@@ -119,8 +108,20 @@ public class EimTranslator implements EimSchemaConstants {
             return;
         }
 
-        for (EimRecord record : recordset.getRecords())
-            applyRecord(record);
+        for (EimRecord record : recordset.getRecords()) {
+            if (record.getNamespace().equals(NS_ITEM))
+                contentItemApplicator.applyRecord(record);
+            else if (record.getNamespace().equals(NS_NOTE))
+                noteApplicator.applyRecord(record);
+            else if (record.getNamespace().equals(NS_EVENT))
+                eventApplicator.applyRecord(record);
+            else if (record.getNamespace().equals(NS_TASK))
+                taskApplicator.applyRecord(record);
+            else if (record.getNamespace().equals(NS_MESSAGE))
+                messageApplicator.applyRecord(record);
+            else
+                unknownApplicator.applyRecord(record);
+        }
     }
 
     /**
@@ -139,16 +140,10 @@ public class EimTranslator implements EimSchemaConstants {
         }
 
         recordset.addRecords(contentItemGenerator.generateRecords());
-
-        if (noteGenerator != null)
-            recordset.addRecords(noteGenerator.generateRecords());
-        if (eventGenerator != null)
-            recordset.addRecords(eventGenerator.generateRecords());
-        if (taskGenerator != null)
-            recordset.addRecords(taskGenerator.generateRecords());
-        if (messageGenerator != null)
-            recordset.addRecords(messageGenerator.generateRecords());
-
+        recordset.addRecords(noteGenerator.generateRecords());
+        recordset.addRecords(eventGenerator.generateRecords());
+        recordset.addRecords(taskGenerator.generateRecords());
+        recordset.addRecords(messageGenerator.generateRecords());
         recordset.addRecords(unknownGenerator.generateRecords());
 
         return recordset;
@@ -157,32 +152,5 @@ public class EimTranslator implements EimSchemaConstants {
     /** */
     public Item getItem() {
         return item;
-    }
-
-    private void applyRecord(EimRecord record)
-        throws EimSchemaException {
-        if (record.getNamespace().equals(NS_ITEM)) {
-            if (contentItemApplicator == null)
-                throw new EimSchemaException("item record cannot be applied to non-content item");
-            contentItemApplicator.applyRecord(record);
-        } else if (record.getNamespace().equals(NS_NOTE)) {
-            if (noteApplicator == null)
-                throw new EimSchemaException("note record cannot be applied to non-note item");
-            noteApplicator.applyRecord(record);
-        } else if (record.getNamespace().equals(NS_EVENT)) {
-            if (eventApplicator == null)
-                throw new EimSchemaException("event record cannot be applied to non-event item");
-            eventApplicator.applyRecord(record);
-        } else if (record.getNamespace().equals(NS_TASK)) {
-            if (taskApplicator == null)
-                throw new EimSchemaException("task record cannot be applied to non-task item");
-            taskApplicator.applyRecord(record);
-        } else if (record.getNamespace().equals(NS_MESSAGE)) {
-            if (messageApplicator == null)
-                throw new EimSchemaException("message record cannot be applied to non-message item");
-            messageApplicator.applyRecord(record);
-        } else {
-            unknownApplicator.applyRecord(record);
-        }
     }
 }

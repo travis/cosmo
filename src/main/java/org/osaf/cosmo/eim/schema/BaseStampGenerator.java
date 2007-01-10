@@ -18,6 +18,7 @@ package org.osaf.cosmo.eim.schema;
 import java.util.List;
 
 import org.osaf.cosmo.eim.EimRecord;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Stamp;
 
 import org.apache.commons.logging.Log;
@@ -39,9 +40,8 @@ public abstract class BaseStampGenerator extends BaseGenerator {
      */
     protected BaseStampGenerator(String prefix,
                                  String namespace,
-                                 Stamp stamp) {
-        super(prefix, namespace, stamp.getItem());
-        this.stamp = stamp;
+                                 Item item) {
+        super(prefix, namespace, item);
     }
 
     /**
@@ -52,5 +52,10 @@ public abstract class BaseStampGenerator extends BaseGenerator {
     /** */
     public Stamp getStamp() {
         return stamp;
+    }
+
+    /** */
+    protected void setStamp(Stamp stamp) {
+        this.stamp = stamp;
     }
 }

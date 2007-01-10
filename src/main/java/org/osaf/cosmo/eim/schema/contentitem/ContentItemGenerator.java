@@ -39,12 +39,11 @@ public class ContentItemGenerator extends BaseItemGenerator
     private static final Log log =
         LogFactory.getLog(ContentItemGenerator.class);
 
-    private ContentItem contentItem;
-
     /** */
-    public ContentItemGenerator(ContentItem contentItem) {
-        super(PREFIX_ITEM, NS_ITEM, contentItem);
-        this.contentItem = contentItem;
+    public ContentItemGenerator(Item item) {
+        super(PREFIX_ITEM, NS_ITEM, item);
+        if (! (item instanceof ContentItem))
+            throw new IllegalArgumentException("item " + item.getUid() + " not a content item");
     }
 
     /**
@@ -52,6 +51,8 @@ public class ContentItemGenerator extends BaseItemGenerator
      * record.
      */
     public List<EimRecord> generateRecords() {
+        ContentItem contentItem = (ContentItem) getItem();
+
         EimRecord record = new EimRecord(getPrefix(), getNamespace());
 
         record.addKeyField(new TextField(FIELD_UUID, contentItem.getUid()));

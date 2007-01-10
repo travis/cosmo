@@ -166,7 +166,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      *
      * @param uid the uid of the collection to subscribe to
      *
-     * @returns a <code>SyncRecords</code> describing the current
+     * @returns a <code>SubRecords</code> describing the current
      * state of the collection
      * @throws UnknownCollectionException if the specified collection
      * is not found
@@ -197,7 +197,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      * @param token the sync token describing the last known state of
      * the collection
      *
-     * @returns a <code>SyncRecords</code> describing the current
+     * @returns a <code>SubRecords</code> describing the current
      * state of the changed items
      * @throws UnknownCollectionException if the specified collection
      * is not found
@@ -205,8 +205,8 @@ public class StandardMorseCodeController implements MorseCodeController {
      * collection
      * @throws MorseCodeException if an unknown error occurs
      */
-    public SyncRecords synchronizeCollection(String uid,
-                                             SyncToken token) {
+    public SubRecords synchronizeCollection(String uid,
+                                            SyncToken token) {
         if (log.isDebugEnabled())
             log.debug("synchronizing collection " + uid + " with token " +
                       token.serialize());
@@ -218,7 +218,7 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new NotCollectionException(uid);
         CollectionItem collection = (CollectionItem) item;
 
-        return new SyncRecords(collection, token);
+        return new SubRecords(collection, token);
     }
 
     /**

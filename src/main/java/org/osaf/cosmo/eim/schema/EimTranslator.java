@@ -125,12 +125,24 @@ public class EimTranslator implements EimSchemaConstants {
     }
 
     /**
-     * Generates a recordset from the item and its stamps.
+     * Generates a recordset from the item and all of its stamps.
      *
      * If the item is not active, simply marks the recordset deleted
      * and returns.
      */
     public EimRecordSet generateRecords() {
+        return generateRecords(-1);
+    }
+
+    /**
+     * Generates a recordset from the item and its stamps, including
+     * records for only those stamps that have been modified since the
+     * given timestamp.
+     *
+     * If the item is not active, simply marks the recordset deleted
+     * and returns.
+     */
+    public EimRecordSet generateRecords(long timestamp) {
         EimRecordSet recordset = new EimRecordSet();
         recordset.setUuid(item.getUid());
 
@@ -141,9 +153,9 @@ public class EimTranslator implements EimSchemaConstants {
 
         recordset.addRecords(contentItemGenerator.generateRecords());
         recordset.addRecords(noteGenerator.generateRecords());
-        recordset.addRecords(eventGenerator.generateRecords());
-        recordset.addRecords(taskGenerator.generateRecords());
-        recordset.addRecords(messageGenerator.generateRecords());
+        recordset.addRecords(eventGenerator.generateRecords(timestamp));
+        recordset.addRecords(taskGenerator.generateRecords(timestamp));
+        recordset.addRecords(messageGenerator.generateRecords(timestamp));
         recordset.addRecords(unknownGenerator.generateRecords());
 
         return recordset;

@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.eim.schema;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.osaf.cosmo.eim.EimRecord;
@@ -45,7 +46,23 @@ public abstract class BaseStampGenerator extends BaseGenerator {
     }
 
     /**
-     * Copies the data from a stamp into one or more EIM records.
+     * Copies the data from a stamp into one or more EIM records if
+     * the stamp has been modified since the given timestamp.
+     *
+     * @param timestamp the number of milliseconds since the epoch, or
+     * <code>-1</code> to ignore modification state
+     */
+    public List<EimRecord> generateRecords(long timestamp) {
+        if (timestamp != -1 &&
+            stamp != null &&
+            stamp.getModifiedDate().getTime() < timestamp)
+            return new ArrayList<EimRecord>(0);
+        return generateRecords();
+    }
+
+    /**
+     * Copies the data from a stamp into one or more EIM records
+     * regardless of when the stamp was last modified.
      */
     public abstract List<EimRecord> generateRecords();
 

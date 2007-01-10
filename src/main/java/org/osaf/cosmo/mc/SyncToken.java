@@ -57,7 +57,11 @@ public class SyncToken {
      * @return true or false
      */
     public boolean isValid(CollectionItem collection) {
-        return hashcode == collection.generateHash();
+        boolean isValid = hashcode == collection.generateHash();
+        if (log.isDebugEnabled())
+            log.debug("token valid for collection " + collection.getUid() +
+                      "? " + isValid);
+        return isValid;
     }
 
     /**
@@ -67,7 +71,11 @@ public class SyncToken {
      * @return true or false
      */
     public boolean hasItemChanged(Item item) {
-        return item.getModifiedDate().getTime() > timestamp;
+        boolean hasChanged = item.getModifiedDate().getTime() > timestamp;
+        if (log.isDebugEnabled())
+            log.debug("item " + item.getUid() + " changed since " +
+                      item.getModifiedDate() + "? " + hasChanged);
+        return hasChanged;
     }
 
     /**
@@ -110,6 +118,16 @@ public class SyncToken {
         return new SyncToken(timestamp, hashcode);
     }
 
+    /** */
+    public int getHash() {
+        return hashcode;
+    }
+
+    /** */
+    public long getTimestamp() {
+        return timestamp;
+    }
+
     /**
      * Computes a new sync token based on the current state of the
      * given collection.
@@ -118,6 +136,6 @@ public class SyncToken {
      */
     public static SyncToken generate(CollectionItem collection) {
         return new SyncToken(System.currentTimeMillis(),
-                             collection.hashCode());
+                             collection.generateHash());
     }
 }

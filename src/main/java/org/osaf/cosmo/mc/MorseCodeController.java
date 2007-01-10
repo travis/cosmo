@@ -77,7 +77,7 @@ public interface MorseCodeController {
      *
      * @param uid the uid of the collection to subscribe to
      *
-     * @returns a <code>SyncRecords</code> describing the current
+     * @returns a <code>SubRecords</code> describing the current
      * state of the collection
      * @throws UnknownCollectionException if the specified collection
      * is not found
@@ -96,7 +96,7 @@ public interface MorseCodeController {
      * @param token the sync token describing the last known state of
      * the collection
      *
-     * @returns a <code>SyncRecords</code> describing the current
+     * @returns a <code>SubRecords</code> describing the current
      * state of the changed items
      * @throws UnknownCollectionException if the specified collection
      * is not found
@@ -104,8 +104,8 @@ public interface MorseCodeController {
      * collection
      * @throws MorseCodeException if an unknown error occurs
      */
-    public SyncRecords synchronizeCollection(String uid,
-                                             SyncToken token);
+    public SubRecords synchronizeCollection(String uid,
+                                            SyncToken token);
 
     /**
      * Updates the items within the identified collection that

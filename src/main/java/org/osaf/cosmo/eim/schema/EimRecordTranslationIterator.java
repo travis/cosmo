@@ -31,10 +31,18 @@ import org.osaf.cosmo.model.ContentItem;
 public class EimRecordTranslationIterator implements Iterator {
 
     private Iterator<ContentItem> decorated;
+    private long timestamp;
 
     /** */
     public EimRecordTranslationIterator(List<ContentItem> items) {
-        decorated = items.iterator();
+        this(items, -1);
+    }
+
+    /** */
+    public EimRecordTranslationIterator(List<ContentItem> items,
+                                        long timestamp) {
+        this.decorated = items.iterator();
+        this.timestamp = timestamp;
     }
 
     /** */
@@ -44,7 +52,7 @@ public class EimRecordTranslationIterator implements Iterator {
 
     /** */
     public EimRecordSet next() {
-        return new EimTranslator(decorated.next()).generateRecords();
+        return new EimTranslator(decorated.next()).generateRecords(timestamp);
     }
 
     /** */

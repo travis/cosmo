@@ -33,15 +33,23 @@ import org.osaf.cosmo.model.Item;
  */
 public class SubRecords {
 
-    protected SyncToken token;
+    private SyncToken token;
     private EimRecordTranslationIterator iterator;
     private CollectionItem collection;
+    private SyncToken prevToken;
 
     /** */
     public SubRecords(CollectionItem collection) {
-        this.token = SyncToken.generate(collection);
-        this.iterator = createIterator(collection);
+        this(collection, null);
+    }
+
+    /** */
+    public SubRecords(CollectionItem collection,
+                      SyncToken prevToken) {
         this.collection = collection;
+        this.prevToken = prevToken;
+        this.token = SyncToken.generate(collection);
+        this.iterator = createIterator();
     }
 
     /** */
@@ -65,15 +73,37 @@ public class SubRecords {
     }
 
     /** */
-    protected EimRecordTranslationIterator createIterator(CollectionItem collection) {
+    protected EimRecordTranslationIterator createIterator() {
         ArrayList<ContentItem> items = new ArrayList<ContentItem>();
 
+        if (prevToken != null) {
+            addModifiedContentItems(items);
+            return new EimRecordTranslationIterator(items,
+                                                    prevToken.getTimestamp());
+        }
+
+        addAllContentItems(items);
+        return new EimRecordTranslationIterator(items);
+    }
+
+    private void addModifiedContentItems(ArrayList<ContentItem> items) {
+        if (prevToken.isValid(collection))
+            return;
+
+        for (Item child : collection.getChildren()) {
+            if (! (child instanceof ContentItem))
+                continue;
+            if (prevToken.hasItemChanged(child))
+                items.add((ContentItem)child);
+        }
+
+    }
+
+    private void addAllContentItems(ArrayList<ContentItem> items) {
         for (Item child : collection.getChildren()) {
             if (! (child instanceof ContentItem))
                 continue;
             items.add((ContentItem)child);
         }
-
-        return new EimRecordTranslationIterator(items);
     }
 }

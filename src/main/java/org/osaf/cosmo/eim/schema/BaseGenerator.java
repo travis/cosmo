@@ -38,11 +38,11 @@ import org.osaf.cosmo.eim.TimeStampField;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.CalendarAttribute;
-import org.osaf.cosmo.model.DateAttribute;
 import org.osaf.cosmo.model.DecimalAttribute;
 import org.osaf.cosmo.model.IntegerAttribute;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.TextAttribute;
+import org.osaf.cosmo.model.TimestampAttribute;
 import org.osaf.cosmo.model.Item;
 
 import org.apache.commons.logging.Log;
@@ -95,8 +95,8 @@ public abstract class BaseGenerator implements EimSchemaConstants {
             } else if (attr instanceof CalendarAttribute) {
                 Calendar value = ((CalendarAttribute)attr).getValue();
                 fields.add(new DateTimeField(attr.getName(), value));
-            } else if (attr instanceof DateAttribute) {
-                Date value = ((DateAttribute)attr).getValue();
+            } else if (attr instanceof TimestampAttribute) {
+                Date value = ((TimestampAttribute)attr).getValue();
                 fields.add(new TimeStampField(attr.getName(), value));
             } else if (attr instanceof DecimalAttribute) {
                 BigDecimal value = ((DecimalAttribute)attr).getValue();

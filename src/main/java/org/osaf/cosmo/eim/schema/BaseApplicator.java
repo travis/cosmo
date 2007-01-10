@@ -31,14 +31,15 @@ import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.TextField;
+import org.osaf.cosmo.eim.TimeStampField;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.CalendarAttribute;
-import org.osaf.cosmo.model.DateAttribute;
 import org.osaf.cosmo.model.DecimalAttribute;
 import org.osaf.cosmo.model.IntegerAttribute;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.TextAttribute;
+import org.osaf.cosmo.model.TimestampAttribute;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
 
@@ -93,6 +94,9 @@ public abstract class BaseApplicator implements EimSchemaConstants {
         } else if (field instanceof DateTimeField) {
             Calendar value = ((DateTimeField)field).getCalendar();
             item.addAttribute(new CalendarAttribute(qn, value));
+        } else if (field instanceof TimeStampField) {
+            Date value = ((TimeStampField)field).getTimeStamp();
+            item.addAttribute(new TimestampAttribute(qn, value));
         } else if (field instanceof DecimalField) {
             BigDecimal value = ((DecimalField)field).getDecimal();
             item.addAttribute(new DecimalAttribute(qn, value));

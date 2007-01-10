@@ -130,12 +130,6 @@ cosmo.env.getAuthProc = function(){
 	return cosmo.env.getBaseUrl() + "/j_acegi_security_check";
 }
 
-cosmo.env.getVersion = function(){
-	if (cosmo.env._version)	return cosmo.env._version;
-	else {
-		var s = dojo.hostenv.getText(
-			cosmo.env.getBaseUrl() + "/version.jsp");
-		s = dojo.string.trim(s);
-		cosmo.env._version = s;
-	}
+cosmo.env.getVersion= function(){
+	return cosmo.env.version;
 }

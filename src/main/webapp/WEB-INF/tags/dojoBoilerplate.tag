@@ -21,6 +21,10 @@
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 <%@ attribute name="timezones"        %>
 
+<u:bind var="PRODUCT_VERSION"
+        type="org.osaf.cosmo.CosmoConstants"
+        field="PRODUCT_VERSION"/>
+
 <c:if test="${empty timezones}">
   <c:set var="timezones" value="false"/>
 </c:if>
@@ -48,6 +52,7 @@ function bootstrap(){
     dojo.require("cosmo.env");
 
     cosmo.env.setBaseUrl(djConfig['staticBaseUrl']);
+    cosmo.env.version = ${PRODUCT_VERSION};
 
     dojo.require("cosmo.ui.widget.Debug");
 

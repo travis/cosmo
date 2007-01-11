@@ -118,7 +118,7 @@ cosmo.ui.event.listeners.hookUpListeners();
             <%-- End main nav menu --%>
         </div>
         <div id="calDiv">
-            <form method="post" id="calForm" name="calForm" action="">
+            <form method="post" id="calForm" action="">
                 <div id="leftSidebarDiv">
                     <div id="calSelectNav"></div>
                     <div id="jumpToDateDiv"></div>

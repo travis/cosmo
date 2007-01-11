@@ -22,7 +22,9 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<cosmo:standardLayout prefix="Error.Forbidden." showNav="false">
+<cosmo:staticbaseurl var="staticBaseUrl"/>
+
+<cosmo:standardLayout prefix="Error.Forbidden." showNav="false" selfLink="${staticBaseUrl}/error/forbidden">
 <%--
     Because Acegi Security's filters don't execute for forwarded requests,
     the SecurityContextHolder for this thread has been cleared, and we

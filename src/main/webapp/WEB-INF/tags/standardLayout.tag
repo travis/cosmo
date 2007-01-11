@@ -20,6 +20,7 @@
 
 <%@ attribute name="prefix" 		%>
 <%@ attribute name="showNav"        %>
+<%@ attribute name="selfLink"        %>
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
@@ -31,7 +32,9 @@
   <cosmoui:user var="user"/>
 </c:if>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
   <head>
     <title>
@@ -41,6 +44,10 @@
         </c:forEach>
       </fmt:message>
     </title>
+    
+    <c:if test="${not empty selfLink}">
+    <link rel="self" type="text/html" href="${selfLink }"/>
+    </c:if>
 
     <cosmo:dojoBoilerplate/>
     <script type="text/javascript">
@@ -89,7 +96,7 @@
         </c:if>
       </tr>
     </table>
-    <hr noshade="noshade"/>
+    <hr/>
     <c:choose>
       <c:when test="${showNav}">
         <authz:authorize ifAllGranted="ROLE_ROOT">
@@ -101,7 +108,7 @@
             <c:choose><c:when test="${fn:endsWith(body, '/status/view.jsp')}"><strong><fmt:message key="Layout.Nav.Console.ServerStatus"/></strong></c:when><c:otherwise><a href="<c:url value="/admin/status"/>"><fmt:message key="Layout.Nav.Console.ServerStatus"/></a></c:otherwise></c:choose>
             <!-- end admin console navbar -->
           </div>
-          <hr noshade="noshade"/>
+          <hr/>
         </authz:authorize>
       </c:when>
       <c:otherwise>
@@ -112,7 +119,7 @@
         <jsp:doBody/>
       <!-- end page body -->
     </div>
-    <div id="debug"><div>
+    <div id="debug"></div>
   </body>
 </html>
 

@@ -81,11 +81,19 @@ public class CollectionBookmarkController extends AbstractController {
         
         // First try to find a ticket principal
         String ticketKey = request.getParameter("ticket");
+        
+        
 
         if (ticketKey != null) {
 
-            model.put("ticketKey", ticketKey);
-            return new ModelAndView(pimView, model);
+            if (contentService.getTicket(collection, ticketKey) != null){
+            
+                model.put("ticketKey", ticketKey);
+                return new ModelAndView(pimView, model);
+            } else {
+                return new ModelAndView("error_forbidden");
+            }
+            
 
         } else {
 

@@ -593,8 +593,9 @@ public class EventStamp extends Stamp implements
     /**
      * Initializes the Calendar with a default master event.
      * Initializes the master event using the underlying item's
-     * uid, and if the item is a Note, initializes SUMMARY and 
-     * DESCRIPTION with the Note's displayName and body.
+     * icalUid (if NoteItem) or uid, and if the item is a NoteItem,
+     * initializes SUMMARY and DESCRIPTION with the NoteItem's 
+     * displayName and body.
      */
     public void createCalendar() {
         
@@ -604,21 +605,26 @@ public class EventStamp extends Stamp implements
         cal.getProperties().add(CalScale.GREGORIAN);
         
         VEvent vevent = new VEvent();
+        Uid uid = new Uid();
+        NoteItem note = null;
+        if(getItem()!=null && getItem() instanceof NoteItem)
+            note = (NoteItem) getItem();
         
-        // VEVENT UID is the NoteItem's uid
-        if(getItem() != null) {
-            Uid uid = new Uid();
+        // VEVENT UID is the NoteItem's icalUid
+        // if it exists, or just the Item's uid
+        if(note!=null && note.getIcalUid() != null)
+            uid.setValue(note.getIcalUid());
+        else
             uid.setValue(getItem().getUid());
-            vevent.getProperties().add(uid);
-        }
-        
+            
+        vevent.getProperties().add(uid);
+       
         cal.getComponents().add(vevent);
         setCalendar(cal);
         
         // SUMMARY is NoteItem.displayName and
         // DESCRIPTION is NoteItem.body
-        if(getItem() instanceof NoteItem) {
-            NoteItem note = (NoteItem) getItem();
+        if(note!=null) {
             setSummary(note.getDisplayName());
             setDescription(note.getBody());
         }

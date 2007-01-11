@@ -25,6 +25,7 @@ import org.osaf.cosmo.eim.schema.note.NoteApplicator;
 import org.osaf.cosmo.eim.schema.note.NoteGenerator;
 import org.osaf.cosmo.eim.schema.event.EventApplicator;
 import org.osaf.cosmo.eim.schema.event.EventGenerator;
+import org.osaf.cosmo.eim.schema.event.modification.EventModificationApplicator;
 import org.osaf.cosmo.eim.schema.task.TaskApplicator;
 import org.osaf.cosmo.eim.schema.task.TaskGenerator;
 import org.osaf.cosmo.eim.schema.message.MessageApplicator;
@@ -58,6 +59,7 @@ public class EimTranslator implements EimSchemaConstants {
     private NoteGenerator noteGenerator;
     private EventApplicator eventApplicator;
     private EventGenerator eventGenerator;
+    private EventModificationApplicator eventModApplicator;
     private TaskApplicator taskApplicator; 
     private TaskGenerator taskGenerator;
     private MessageApplicator messageApplicator;
@@ -77,7 +79,8 @@ public class EimTranslator implements EimSchemaConstants {
 
         eventApplicator = new EventApplicator(item);
         eventGenerator = new EventGenerator(item);
-
+        eventModApplicator = new EventModificationApplicator(item);
+        
         taskApplicator = new TaskApplicator(item);
         taskGenerator = new TaskGenerator(item);
 
@@ -115,6 +118,8 @@ public class EimTranslator implements EimSchemaConstants {
                 noteApplicator.applyRecord(record);
             else if (record.getNamespace().equals(NS_EVENT))
                 eventApplicator.applyRecord(record);
+            else if(record.getNamespace().equals(NS_EVENT_MODIFICATION))
+                eventModApplicator.applyRecord(record);
             else if (record.getNamespace().equals(NS_TASK))
                 taskApplicator.applyRecord(record);
             else if (record.getNamespace().equals(NS_MESSAGE))

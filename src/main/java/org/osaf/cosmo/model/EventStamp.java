@@ -17,6 +17,7 @@ package org.osaf.cosmo.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Property;
@@ -107,7 +109,7 @@ public class EventStamp extends Stamp implements
     }
     
     @OneToMany(mappedBy = "eventStamp", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
+    @Cascade( {CascadeType.SAVE_UPDATE, CascadeType.DELETE_ORPHAN })
     @OnDelete(action=OnDeleteAction.CASCADE)
     public Set<CalendarTimeRangeIndex> getTimeRangeIndexes() {
         return timeRangeIndexes;
@@ -118,7 +120,7 @@ public class EventStamp extends Stamp implements
     }
     
     @OneToMany(mappedBy = "eventStamp", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
+    @Cascade( {CascadeType.SAVE_UPDATE, CascadeType.DELETE_ORPHAN })
     @OnDelete(action=OnDeleteAction.CASCADE)
     public Set<CalendarPropertyIndex> getPropertyIndexes() {
         return propertyIndexes;
@@ -272,7 +274,7 @@ public class EventStamp extends Stamp implements
         }
         location.setValue(text);
     }
-
+    
     /**
      * Returns a list of copies of the iCalendar RRULE property values
      * of the master event (can be empty).
@@ -454,7 +456,97 @@ public class EventStamp extends Stamp implements
         }
         status.setValue(text);
     }
-
+    
+    /**
+     * Returns override instance.
+     * @param date recurrence override date
+     */
+    @Transient
+    public VEvent getModification(Date date) {
+        
+        // require override date
+        if(date==null)
+            throw new IllegalArgumentException("override date required");
+        
+        ComponentList vevents = calendar.getComponents().getComponents(
+                Component.VEVENT);
+        
+        // find instance with RECURRENCE-ID that matches given date
+        for(Iterator it = vevents.iterator(); it.hasNext();) {
+            VEvent event = (VEvent) it.next();
+            RecurrenceId recurrenceId = event.getReccurrenceId();
+            if(recurrenceId!=null && recurrenceId.getDate().equals(date))
+                return event;
+        }
+        
+        // didn't find it
+        return null;
+    }
+    
+    @Transient
+    public List<VEvent> getModifications() {
+        List<VEvent> overrides = new ArrayList();
+        
+        ComponentList vevents = calendar.getComponents().getComponents(
+                Component.VEVENT);
+        
+        // find instance with RECURRENCE-ID that matches given date
+        for(Iterator it = vevents.iterator(); it.hasNext();) {
+            VEvent event = (VEvent) it.next();
+            if(event.getReccurrenceId()!=null)
+                overrides.add(event);
+        }
+        
+        return overrides;
+    }
+    
+    /**
+     * Remove override instance.
+     * @param date override instance date to remove
+     */
+    public void removeModification(Date date) {
+        if(date==null)
+            throw new IllegalArgumentException("instance must have recurrence-id");
+        
+        ComponentList vevents = calendar.getComponents().getComponents(
+                Component.VEVENT);
+        
+        // find instance with RECURRENCE-ID that matches given date
+        for(Iterator it = vevents.iterator(); it.hasNext();) {
+            VEvent event = (VEvent) it.next();
+            RecurrenceId recurrenceId = event.getReccurrenceId();
+            if(recurrenceId!=null && recurrenceId.getDate().equals(date)) {
+                it.remove();
+                break;
+            }
+        }
+    }
+    
+    /**
+     * Add override instance
+     * @param instance override instance to add
+     */
+    public void addModification(VEvent override) {
+        
+        // override requires RECURRENCE-ID
+        if(override.getReccurrenceId()==null)
+            throw new IllegalArgumentException("date cannot be null");
+        
+        ComponentList vevents = calendar.getComponents().getComponents(
+                Component.VEVENT);
+        
+        // verify RECURRENCE-ID is unique
+        for(Iterator it = vevents.iterator(); it.hasNext();) {
+            VEvent event = (VEvent) it.next();
+            RecurrenceId recurrId = event.getReccurrenceId();
+            if(recurrId!=null && recurrId.getDate().equals(override.getReccurrenceId().getDate()));
+                throw new ModelValidationException("duplicate recurrence id");
+        }
+        
+        calendar.getComponents().add(override);
+    }
+    
+    
     /**
      * Return EventStamp from Item
      * @param item

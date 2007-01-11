@@ -32,6 +32,11 @@ public interface EimSchemaConstants {
         "http://osafoundation.org/eim/event"; 
     /** */
     public static final String PREFIX_EVENT = "event";
+    /** */
+    public static final String NS_EVENT_MODIFICATION =
+        "http://osafoundation.org/eim/eventModification"; 
+    /** */
+    public static final String PREFIX_EVENT_MODIFICATION = "eventModification";
    /** */
     public static final String NS_TASK =
         "http://osafoundation.org/eim/task";

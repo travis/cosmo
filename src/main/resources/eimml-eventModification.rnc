@@ -1,0 +1,60 @@
+# -*- rnc -*-
+# RELAX NG Compact Syntax Grammar for the
+# EIMML override record type Version 1
+
+namespace eventModification = "http://osafoundation.org/eim/eventModification"
+
+include "eimml-core.rnc"
+
+eimEventModificationRecord =
+   element eventModification:record {
+      (eimDeleted,
+         eventModificationUuid
+       & eventModificationRecurrenceId
+       & eventModificationDtStart?
+       & eventModificationDtend?
+       & eventModificationDisplayName?
+       & eventModificationBody?
+       & eventModificationLocation?
+       & eventModificationStatus? )
+   }
+
+eventModificationUuid =
+   element eventModification:uuid {
+      eimTextFieldContent
+   }
+
+eventModificationRecurrenceId =
+   element eventModification:recurrenceId {
+      eimTextFieldContent
+   }
+
+eventModificationDtStart =
+   element eventModification:dtstart {
+      eimTextFieldContent
+   }
+
+eventModificationDtend =
+   element eventModification:dtend {
+      eimTextFieldContent
+   }
+
+eventModificationLocation =
+   element eventModification:location {
+      eimTextFieldContent
+   }
+
+eventModificationStatus =
+   element eventModification:status {
+      eimTextFieldContent
+   }
+   
+eventModificationDisplayName =
+   element eventModification:displayName {
+      eimTextFieldContent
+   }
+   
+eventModificationBody =
+   element eventModification:body {
+      eimLobFieldContent
+   }

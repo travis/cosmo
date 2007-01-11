@@ -17,7 +17,6 @@ eimEventRecord =
        & eventExRule?
        & eventRDate?
        & eventExDate?
-       & eventRecurrenceId?
        & eventStatus?
        & anyEventField*)
    }
@@ -59,11 +58,6 @@ eventRDate =
 
 eventExDate =
    element event:exdate {
-      eimTextFieldContent
-   }
-
-eventRecurrenceId =
-   element event:recurrenceId {
       eimTextFieldContent
    }
 

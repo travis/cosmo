@@ -15,18 +15,17 @@
  */
 package org.osaf.cosmo.eim.schema.event;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecordField;
-import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
+import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Stamp;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Applies EIM records to event stamps.
@@ -89,10 +88,6 @@ public class EventApplicator extends BaseStampApplicator
         } else if (field.getName().equals(FIELD_EXDATE)) {
             String value = EimFieldValidator.validateText(field, MAXLEN_EXDATE);
             event.setExceptionDates(EimValueConverter.toICalDates(value));
-        } else if (field.getName().equals(FIELD_RECURRENCE_ID)) {
-            String value =
-                EimFieldValidator.validateText(field, MAXLEN_RECURRENCE_ID);
-            event.setRecurrenceId(EimValueConverter.toICalDate(value));
         } else if (field.getName().equals(FIELD_STATUS)) {
             String value = EimFieldValidator.validateText(field, MAXLEN_STATUS);
             event.setStatus(value);

@@ -15,19 +15,22 @@
  */
 package org.osaf.cosmo.eim.schema.event;
 
-import java.util.List;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 
+import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.component.VEvent;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.Stamp;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Generates EIM records from event stamps.
@@ -80,16 +83,44 @@ public class EventGenerator extends BaseStampGenerator
         value = EimValueConverter.fromICalDates(event.getExceptionDates());
         master.addField(new TextField(FIELD_EXDATE, value));
 
-        value = EimValueConverter.fromICalDate(event.getRecurrenceId());
-        master.addField(new TextField(FIELD_RECURRENCE_ID, value));
-
         master.addField(new TextField(FIELD_STATUS, event.getStatus()));
 
         master.addFields(generateUnknownFields());
 
         records.add(master);
 
-        // XXX: exception instance records
+        // generate modification records
+        for(VEvent override: event.getModifications()) {
+            EimRecord overrideRec = new EimRecord(PREFIX_EVENT_MODIFICATION, NS_EVENT_MODIFICATION);
+            overrideRec.addKeyField(new TextField(FIELD_UUID, event.getItem().getUid()));
+
+            value = EimValueConverter.fromICalDate(override.getReccurrenceId().getDate());
+            overrideRec.addKeyField(new TextField(FIELD_RECURRENCE_ID, value));
+            
+            value = EimValueConverter.fromICalDate(override.getStartDate().getDate());
+            overrideRec.addField(new TextField(FIELD_DTSTART, value));
+                                          
+            value = EimValueConverter.fromICalDate(override.getEndDate().getDate());
+            overrideRec.addField(new TextField(FIELD_DTEND, value));
+
+            Property prop = override.getProperties().getProperty(Property.LOCATION);
+            value = (prop==null) ? null : prop.getValue();
+            overrideRec.addField(new TextField(FIELD_LOCATION, value));
+            
+            prop = override.getProperties().getProperty(Property.STATUS);
+            value = (prop==null) ? null : prop.getValue();
+            overrideRec.addField(new TextField(FIELD_STATUS, value));
+            
+            prop = override.getProperties().getProperty(Property.SUMMARY);
+            value = (prop==null) ? null : prop.getValue();
+            overrideRec.addField(new TextField(FIELD_DISPLAY_NAME, value));
+            
+            prop = override.getProperties().getProperty(Property.DESCRIPTION);
+            value = (prop==null) ? null : prop.getValue();
+            overrideRec.addField(new ClobField(FIELD_BODY, new StringReader(value)));
+            
+            records.add(overrideRec);
+        }
 
         return records;
     }

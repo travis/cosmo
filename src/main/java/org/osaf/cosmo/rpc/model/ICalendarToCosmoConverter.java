@@ -756,7 +756,7 @@ public class ICalendarToCosmoConverter {
         Calendar jCalendar = null;
         boolean hasTime = false;
 
-        if (tzid != null){
+        if (tzid != null && date instanceof DateTime){
             hasTime = true;
             DateTime dateTime = (DateTime) date;
             scoobyDate.setTzId(tzid);

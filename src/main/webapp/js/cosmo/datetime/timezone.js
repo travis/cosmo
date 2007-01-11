@@ -265,6 +265,8 @@ cosmo.datetime.timezone.Rule = function(){
     this.startTime = null;
     this.addMinutes = null;
     this.letter = null;
+
+    this._startDatesByYear = {};
 }
 
 cosmo.datetime.timezone.Rule.prototype.toString = function(/*boolean (optional)*/ showHeader){
@@ -304,7 +306,12 @@ cosmo.datetime.timezone.Rule.prototype._applicable = function(date){
 }
 
 cosmo.datetime.timezone.Rule.prototype._getStartDateForYear = function(year){
-    var startDate = { year: year,
+    var startDate = this._startDatesByYear[year];
+    if (startDate){
+        return startDate;    
+    }
+    
+    startDate = { year: year,
                       month: this.startMonth,
                       hours: this.startTime.hours,
                       minutes: this.startTime.minutes,
@@ -324,7 +331,8 @@ cosmo.datetime.timezone.Rule.prototype._getStartDateForYear = function(year){
     } else {
         startDate.date = this.startDate;
     }
-
+    
+    this._startDatesByYear[year] = startDate;
     return startDate;
 }
 

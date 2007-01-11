@@ -28,6 +28,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.hibernate.PropertyValueException;
 import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Attribute;
@@ -46,6 +47,7 @@ import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TimestampAttribute;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
+import org.springframework.dao.DataIntegrityViolationException;
 
 public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
@@ -141,7 +143,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         }
     }
     
-    public void testContentDaoInvalidContentMismatchLength() throws Exception {
+   /* public void testContentDaoInvalidContentMismatchLength() throws Exception {
         
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
@@ -155,13 +157,13 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         item.setContentType("text/text");
         item.setContentLength(new Long(1));
 
-//        try {
-//            contentDao.createContent(root, item);
-//            Assert.fail("able to create invalid content.");
-//        } catch (ModelValidationException e) {
-//        }
+        try {
+            contentDao.createContent(root, item);
+            Assert.fail("able to create invalid content.");
+        } catch (ModelValidationException e) {
+        }
 
-    }
+    }*/
   
     public void testContentDaoInvalidContentNullName() throws Exception {
       
@@ -174,7 +176,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         try {
             contentDao.createContent(root, item);
             Assert.fail("able to create invalid content.");
-        } catch (ModelValidationException e) {
+        } catch (DataIntegrityViolationException e) {
         }
     }
 
@@ -188,7 +190,8 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         try {
             contentDao.createContent(root, item);
             Assert.fail("able to create invalid content.");
-        } catch (ModelValidationException e) {
+        } catch (InvalidStateException e) {
+            Assert.assertEquals("name", e.getInvalidValues()[0].getPropertyName());
         }
     }
 

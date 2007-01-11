@@ -201,10 +201,6 @@ public class ContentItem extends Item {
         this.triageStatusUpdated = triageStatusUpdated;
     }
 
-    public void validate() {
-        super.validate();
-    }
-    
     /**
      */
     public String toString() {

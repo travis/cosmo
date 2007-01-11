@@ -90,8 +90,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             setBaseItemProps(collection);
             collection.setParent(parent);
             
-            // validate item
-            collection.validate();
             getSession().save(collection);
             getSession().flush();
             
@@ -134,9 +132,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
 
             setBaseItemProps(content);
             content.setParent(parent);
-            
-            // validate content
-            content.validate();
             
             boolean isEvent = content.getStamp(EventStamp.class) != null;
             
@@ -258,9 +253,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 checkForDuplicateItemNameMinusItem(collection.getOwner().getId(), 
                     collection.getParent().getId(), collection.getName(), collection.getId());
             
-            // validate item
-            collection.validate();
-            
             collection.setModifiedDate(new Date());
             
             getSession().update(collection);
@@ -286,9 +278,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             if(content.getParent()==null)
                 throw new IllegalArgumentException("parent cannot be null");
                         
-            // validate content
-            content.validate();
-            
             // In a hierarchy, can't have two items with same name with
             // same parent
             checkForDuplicateItemNameMinusItem(content.getOwner().getId(), 

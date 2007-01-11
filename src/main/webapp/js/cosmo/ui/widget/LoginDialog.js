@@ -36,7 +36,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
         _usernameFocus: false,
         _passwordFocus: false,
 
-        handleLoginResp: function (str) {
+        handleLoginResp: function (type, str, evt) {
             /*
             Login page recognition string: login-page-2ksw083judrmru58
             This is an ugly hack to allow the AJAX handler to recognize
@@ -53,14 +53,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
             }
             else {
                 var username  = this.usernameInput.value;
+                cosmo.util.auth.setUser(this.usernameInput.value,
+                    this.passwordInput.value);
+
                 if (username == cosmo.env.OVERLORD_USERNAME) {
                     location = cosmo.env.getBaseUrl() + "/account/view";
                 }
                 else {
                     location = cosmo.env.getBaseUrl() + "/pim";
                 }
-                cosmo.util.auth.setUser(this.usernameInput.value,
-                    this.passwordInput.value);
             }
         },
         doLogin: function () {
@@ -86,7 +87,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
                     url: self.authProc,
                     method: 'POST',
                     content: postData,
-                    load: function(type, data, evt) {self.handleLoginResp(data); },
+                    load: function(type, data, evt) {self.handleLoginResp(type, data, evt);},
                     error: function(type, error) { alert(error.message); }
                 });
             }

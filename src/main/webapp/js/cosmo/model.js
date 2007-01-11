@@ -243,9 +243,14 @@ cosmo.model.sortEvents = function(/*Array|cosmo.util.hash.Hash*/ events){
 
 cosmo.model._eventComparator = function (a, b) {
    // summary: used by cosmo.model.sortEvents.
+   if (a.data){
+       a = a.data;
+   }
+   if (b.data){
+       b = b.data;
+   }
     var aStart = a.__startUTC;
     var bStart = b.__startUTC;
-    
     if (aStart > bStart) {
         return 1;
     }

@@ -135,6 +135,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
 
             getSession().refresh(item);
             getSession().delete(item);
+            getSession().flush();
             
         } catch(ObjectNotFoundException onfe) {
             throw new ItemNotFoundException("item not found");
@@ -208,6 +209,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             newItem.setDisplayName(newItem.getName());
             setBaseItemProps(newItem);
             getSession().save(newItem);
+            getSession().flush();
             return newItem;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -337,6 +339,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             ticket.setCreated(new Date());
             item.addTicket(ticket);
             getSession().update(item);
+            getSession().flush();
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -432,6 +435,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             Item newItem = copyItem(item,parent,deepCopy);
             newItem.setName(copyName);
             getSession().update(newItem);
+            getSession().flush();
             
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -467,6 +471,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             item.setName(moveName);
             item.setParent(parent);
             getSession().update(item);
+            getSession().flush();
             
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);

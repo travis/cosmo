@@ -318,8 +318,8 @@ public class StandardContentService implements ContentService {
                 newCollection.getChildren().add(newItem);
             }
         }
-
-        return collection;
+        
+        return contentDao.updateCollection(collection);
     }
     
     /**

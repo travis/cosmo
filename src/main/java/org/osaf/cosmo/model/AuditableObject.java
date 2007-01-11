@@ -33,7 +33,7 @@ public abstract class AuditableObject extends BaseModelObject {
     private Date modifiedDate;
     
     /**
-     * @return date stamp was created
+     * @return date object was created
      */
     @Column(name = "createdate")
     @Type(type="long_timestamp")
@@ -46,7 +46,7 @@ public abstract class AuditableObject extends BaseModelObject {
     }
 
     /**
-     * @return date stamp was last updated
+     * @return date object was last updated
      */
     @Column(name = "modifydate")
     @Type(type="long_timestamp")

@@ -93,6 +93,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             // validate item
             collection.validate();
             getSession().save(collection);
+            getSession().flush();
             
             return collection;
         } catch (HibernateException e) {
@@ -155,6 +156,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             }
             
             getSession().save(content);
+            getSession().flush();
             return content;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -262,6 +264,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             collection.setModifiedDate(new Date());
             
             getSession().update(collection);
+            getSession().flush();
+            
             return collection;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -310,6 +314,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             content.setModifiedDate(new Date());
             
             getSession().update(content);
+            getSession().flush();
+            
             return content;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -338,6 +344,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             content.getAttributes().clear();
             content.getStamps().clear();
             getSession().update(content);
+            getSession().flush();
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }

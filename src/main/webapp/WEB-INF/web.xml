@@ -183,6 +183,10 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>default-security</filter-name>
+    <url-pattern>/loginfailed</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>default-security</filter-name>
     <url-pattern>/logout</url-pattern>
   </filter-mapping>
   <filter-mapping>

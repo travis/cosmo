@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@ dojo.provide('cosmo.account.create');
 
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.convenience");
 dojo.require("cosmo.cmp");
 dojo.require("dojo.uri");
 
 var userAccount = {};
 
 cosmo.account.create = new function () {
-   
+
     var self = this; // Stash a copy of this
     var form = null; // The form containing the signup fields
     var fieldList = []; // List of form fields

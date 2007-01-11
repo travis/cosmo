@@ -47,9 +47,19 @@ public class ServiceLocatorFactory {
      * information in the given request.
      */
     public ServiceLocator createServiceLocator(HttpServletRequest request) {
+        Ticket ticket = securityManager.getSecurityContext().getTicket();
+        return createServiceLocator(request, ticket);
+    }
+
+    /**
+     * Returns a <code>ServiceLocator</code> instance that returns
+     * URLs based on the application mount URL calculated from
+     * information in the given request and including the given ticket.
+     */
+    public ServiceLocator createServiceLocator(HttpServletRequest request,
+                                               Ticket ticket) {
         String appMountUrl = calculateAppMountUrl(request);
 
-        Ticket ticket = securityManager.getSecurityContext().getTicket();
         String ticketKey = ticket != null ? ticket.getKey() : null;
 
         return new ServiceLocator(appMountUrl, ticketKey, this);

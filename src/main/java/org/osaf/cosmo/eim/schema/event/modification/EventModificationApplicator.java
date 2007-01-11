@@ -33,6 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
+import org.osaf.cosmo.eim.EimRecordKey;
 import org.osaf.cosmo.eim.schema.BaseStampApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
@@ -60,7 +61,7 @@ public class EventModificationApplicator extends BaseStampApplicator
     @Override
     protected void applyDeletion(EimRecord record) throws EimSchemaException {
         if(getEventStamp()==null)
-            return;
+            throw new EimSchemaException("EventStamp required");
         
         getEventStamp().removeModification(getRecurrenceId(record));
     }
@@ -68,7 +69,7 @@ public class EventModificationApplicator extends BaseStampApplicator
     @Override
     public void applyRecord(EimRecord record) throws EimSchemaException {
         if(getEventStamp()==null)
-            return;
+            throw new EimSchemaException("EventStamp required");
         
         // retrieve key field (recurrenceId)
         Date recurrenceId = getRecurrenceId(record);
@@ -77,9 +78,7 @@ public class EventModificationApplicator extends BaseStampApplicator
         VEvent modification = getModification(recurrenceId);
         
         for (EimRecordField field : record.getFields()) {
-            if(field.getName().equals(FIELD_RECURRENCE_ID))
-                continue;
-            else if(field.getName().equals(FIELD_DTSTART))
+            if(field.getName().equals(FIELD_DTSTART))
                 applyStartDate(field, modification);
             else if(field.getName().equals(FIELD_DTEND))
                 applyEndDate(field,modification);
@@ -108,10 +107,18 @@ public class EventModificationApplicator extends BaseStampApplicator
     }
 
     private Date getRecurrenceId(EimRecord record) throws EimSchemaException {
-        EimRecordField field = getField(record, FIELD_RECURRENCE_ID);
-        String value = EimFieldValidator.validateText(field,
-                MAXLEN_RECURRENCE_ID);
-        return EimValueConverter.toICalDate(value);
+        // recurrenceId is a key field
+        EimRecordKey key = record.getKey();
+        for(EimRecordField keyField: key.getFields()) {
+            if(keyField.getName().equals(FIELD_RECURRENCE_ID)) {
+                String value = EimFieldValidator.validateText(keyField,
+                        MAXLEN_RECURRENCE_ID);
+                return EimValueConverter.toICalDate(value);
+            }
+        }
+        
+        throw new EimSchemaException("key field " + FIELD_RECURRENCE_ID
+                + " required");
     }
     
     //  Apply a startDate field to the event stamp
@@ -202,14 +209,6 @@ public class EventModificationApplicator extends BaseStampApplicator
         description.setValue(writer.toString()); 
     }
     
-    private EimRecordField getField(EimRecord record, String name) {
-        for (EimRecordField field : record.getFields())
-            if(field.getName().equals(name))
-                return field;
-        
-        return null;
-    }
-
     // Retrieve event modification if it exists in the event stamp,
     // or create one
     private VEvent getModification(Date date) {

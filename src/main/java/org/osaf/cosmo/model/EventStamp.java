@@ -40,16 +40,21 @@ import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.ExRule;
 import net.fortuna.ical4j.model.property.Location;
+import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RDate;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Summary;
+import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.model.property.Version;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -59,6 +64,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
+import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Event;
 
@@ -89,6 +95,10 @@ public class EventStamp extends Stamp implements
     
     /** default constructor */
     public EventStamp() {
+    }
+    
+    public EventStamp(Item item) {
+        setItem(item);
     }
     
     @Transient
@@ -194,6 +204,40 @@ public class EventStamp extends Stamp implements
             getMasterEvent().getProperties().add(summary);
         }
         summary.setValue(text);
+    }
+    
+    /**
+     * Returns a copy of the the iCalendar DESCRIPTION property value of
+     * the master event (can be null).
+     */
+    @Transient
+    public String getDescription() {
+        Property p = getMasterEvent().getProperties().
+            getProperty(Property.DESCRIPTION);
+        if (p == null)
+            return null;
+        return p.getValue();
+    }
+
+    /** 
+     * Sets the iCalendar DESCRIPTION property of the master event.
+     *
+     * @param text a text string
+     */
+    @Transient
+    public void setDescription(String text) {
+        Description description = (Description)
+            getMasterEvent().getProperties().getProperty(Property.DESCRIPTION);
+        if (text == null) {
+            if (description != null)
+                getMasterEvent().getProperties().remove(description);
+            return;
+        }                
+        if (description == null) {
+            description = new Description();
+            getMasterEvent().getProperties().add(description);
+        }
+        description.setValue(text);
     }
 
     /**
@@ -546,6 +590,39 @@ public class EventStamp extends Stamp implements
         calendar.getComponents().add(override);
     }
     
+    /**
+     * Initializes the Calendar with a default master event.
+     * Initializes the master event using the underlying item's
+     * uid, and if the item is a Note, initializes SUMMARY and 
+     * DESCRIPTION with the Note's displayName and body.
+     */
+    public void createCalendar() {
+        
+        Calendar cal = new Calendar();
+        cal.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+        cal.getProperties().add(Version.VERSION_2_0);
+        cal.getProperties().add(CalScale.GREGORIAN);
+        
+        VEvent vevent = new VEvent();
+        
+        // VEVENT UID is the NoteItem's uid
+        if(getItem() != null) {
+            Uid uid = new Uid();
+            uid.setValue(getItem().getUid());
+            vevent.getProperties().add(uid);
+        }
+        
+        cal.getComponents().add(vevent);
+        setCalendar(cal);
+        
+        // SUMMARY is NoteItem.displayName and
+        // DESCRIPTION is NoteItem.body
+        if(getItem() instanceof NoteItem) {
+            NoteItem note = (NoteItem) getItem();
+            setSummary(note.getDisplayName());
+            setDescription(note.getBody());
+        }
+    }
     
     /**
      * Return EventStamp from Item

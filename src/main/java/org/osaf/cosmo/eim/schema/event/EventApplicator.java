@@ -50,7 +50,10 @@ public class EventApplicator extends BaseStampApplicator
      * that stamp.
      */
     protected Stamp createStamp() {
-        return new EventStamp();
+        EventStamp eventStamp = new EventStamp(getItem());
+        // initialize calendar on EventStamp
+        eventStamp.createCalendar();
+        return eventStamp;
     }
 
     /**

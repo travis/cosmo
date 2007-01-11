@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -344,69 +344,7 @@ cosmo.datetime.timezone.getTzIdsForRegion = function(region){
     return this._timezoneRegistry.getTzIdsForRegion(region);
 }
 
-cosmo.datetime.timezone.SimpleTimezoneRegistry = function(timezoneFileRoot){
-    this.timezoneFileRoot = timezoneFileRoot || null;
-    this._timezones = {};
-    this._ruleSets = {};
-    this._links = {};
-    this._tzsByRegion = null;
-};
 
-cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.init = function(files){
-   dojo.lang.map(files, dojo.lang.hitch(this,this._parseUri));
-};
-
-cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addTimezone = function(timezone){
-    this._timezones[timezone.tzId] = timezone;
-};
-
-cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addRuleSet = function(ruleset){
-    this._ruleSets[ruleset.name] = ruleset;
-};
-
-cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addLink = function(oldName, newName){
-    this._links[oldName] = newName;
-}
-
-cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.getTimezone = function(tzid){
-    return tz = this._timezones[tzid] || this._timezones[this._links[tzid]];
-}
-
-cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.getRuleSet = function(ruleName){
-    return this._ruleSets[ruleName];
-}
-
-cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.getTzIdsForRegion = function(region){
-    if (!this._tzsByRegion){
-       this._initTzsByRegion();
-    }
-
-    return this._tzsByRegion[region];
-}
-
-cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype._initTzsByRegion = function(){
-    var tzsByRegion = {};
-    var regions = cosmo.datetime.timezone.REGIONS;
-    for (var x = 0; x < regions.length; x++ ){
-        var region = regions[x];
-        tzsByRegion[region] = [];
-    }
-
-    for (var tz in this._timezones){
-        var region = tz.split("/")[0];
-        var regionArray = tzsByRegion[region];
-        if (regionArray){
-            regionArray.push(tz);
-        }
-    }
-
-    this._tzsByRegion = tzsByRegion;
-}
-
-cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype._parseUri = function(uri){
-    var content = dojo.hostenv.getText(this.timezoneFileRoot + "/" + uri);
-    cosmo.datetime.timezone.parse(content, dojo.lang.hitch(this, this.addTimezone), dojo.lang.hitch(this, this.addRuleSet), dojo.lang.hitch(this, this.addLink));
-};
 
 cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback, linkCallback){
         var ruleSets = new dojo.collections.Dictionary();

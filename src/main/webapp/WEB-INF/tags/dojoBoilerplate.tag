@@ -59,9 +59,8 @@ function bootstrap(){
     dojo.require("cosmo.datetime.*");
 
     if (${timezones}){
-        var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry("${staticBaseUrl}/js/lib/olson-tzdata/");
-        registry.init(["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"]);
-        //registry.init([ "europe"]);
+        dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
+        var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry("${staticBaseUrl}/js/lib/olson-tzdata/");
         cosmo.datetime.timezone.setTimezoneRegistry(registry);
     }
     dojo.require('cosmo.ui.conf');

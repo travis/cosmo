@@ -16,10 +16,13 @@
 
 dojo.require("cosmo.datetime.*");
 dojo.require("cosmo.datetime.Date");
+dojo.require("cosmo.datetime.timezone");
+dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
 //Initialization.
 //TODO - once Dojo implements setUp() and tearDown() move this code there.
-var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry(cosmo.env.getBaseUrl() + "/js/lib/olson-tzdata/");
-registry.init(["northamerica"]);
+
+var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry(cosmo.env.getBaseUrl() + "/js/lib/olson-tzdata/");
+
 cosmo.datetime.timezone.setTimezoneRegistry(registry);
 
 function getNyTz(){
@@ -215,4 +218,90 @@ function test_getOffsetInMinutes(){
     date = new Date(2006, 3, 2, 3, 0, 0);
     offset = timezone.getOffsetInMinutes(date);
     jum.assertEquals(-240, offset);
+}
+
+function getPrefixes(){
+    var files = ["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"];
+    var prefixes = {};
+    
+    function spit(file){
+        var content = dojo.hostenv.getText(cosmo.datetime.timezone._timezoneRegistry.timezoneFileRoot + "/" + file);
+        cosmo.datetime.timezone.parse(content, 
+            function(tz){
+                var prefix = tz.tzId.split("\/")[0];
+                var prefixRecord = prefixes[prefix];
+                if (!prefixRecord){
+                   prefixes[prefix] = {};
+                   prefixes[prefix][file] = 1;
+                } else {
+                    if (!prefixRecord[file]){
+                        prefixRecord[file] = 1;
+                    } else {
+                        prefixRecord[file] = prefixRecord[file] + 1;
+                    }
+                }
+               
+            }, function(){}, function(){});
+    }
+    
+    for (var x = 0; x < files.length; x++){
+        spit(files[x]);
+    }
+    
+    return prefixes;    
+}
+
+function getPrefixToFileMap(){
+
+    function getFileNameWithMostTzids(record){
+        var winner = 0;
+        var winnerFile = "";
+        for (var file in record){
+            var num = record[file];
+            if (num > winner){
+                winner = num;
+                winnerFile = file;
+            }
+        }
+        return winnerFile;
+    }
+
+    var prefixes = getPrefixes();
+    var map = {};
+    for (var prefix in prefixes){
+        var record = prefixes[prefix];
+        map[prefix] = getFileNameWithMostTzids(record);
+    }
+    
+    return map;
+}
+
+function printPrefixes(){
+    var prefixes = getPrefixes();
+    for (var prefix in prefixes){
+        print("Prefix: '" + prefix + "'");
+        var record = prefixes[prefix];
+        for (var file in record){
+            print("    '" + file + "': " + record[file]);
+        }
+    }
+}
+
+function getExceptionMap(){
+   var prefixToFileMap = getPrefixToFileMap();
+   var files = ["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"];
+   var map = {};
+   
+   for (var x = 0; x < files.length; x++){
+       var file = files[x];
+       var content = dojo.hostenv.getText(cosmo.datetime.timezone._timezoneRegistry.timezoneFileRoot + "/" + file);
+       cosmo.datetime.timezone.parse(content, function(timezone){
+           var prefix = timezone.tzId.split("\/")[0];
+           if (prefixToFileMap[prefix] != file ){
+              map[timezone.tzId] = file;               
+           }
+       }, function(){}, function(){});
+   }
+   
+   return map;
 }

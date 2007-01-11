@@ -188,6 +188,7 @@ public class CmpServlet extends HttpServlet {
         }
         if (req.getPathInfo().equals("/users/count")){
             processGetUserCount(req, resp);
+            return;
         }
         if (req.getPathInfo().startsWith("/user/")) {
             processUserGetByUsername(req, resp);

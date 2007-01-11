@@ -189,7 +189,7 @@ cosmo.ui.minical.MiniCal = new function() {
          */
         function setContainerSize() {
             var h = document.getElementById('miniCalNavPanel').offsetHeight;
-            var c = Cal._collectionSelectContainer.offsetHeight + 36;
+            var c = Cal._collectionSelectContainer.offsetHeight + 40;
             for (var i = 0; i < self.months.length; i++) {
                 if (h + self.months[i].offsetHeight < (self.controller.height - c)) {
                     h += self.months[i].offsetHeight;

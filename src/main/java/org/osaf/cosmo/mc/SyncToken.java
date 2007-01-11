@@ -135,7 +135,7 @@ public class SyncToken {
      * @return a new <code>SyncToken</code>
      */
     public static SyncToken generate(CollectionItem collection) {
-        return new SyncToken(System.currentTimeMillis(),
+        return new SyncToken(collection.getModifiedDate().getTime(),
                              collection.generateHash());
     }
 }

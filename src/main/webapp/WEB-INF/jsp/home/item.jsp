@@ -21,7 +21,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<cosmo:standardLayout prefix="HomeDirectory.Item">
+<cosmo:standardLayout prefix="HomeDirectory.Item.">
 <div>
   <span class="hd" style="margin-top: 12px;">
     <fmt:message key="HomeDirectory.Item.Title">

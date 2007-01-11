@@ -18,6 +18,8 @@ dojo.provide("cosmo.service.json_service_impl")
 
 dojo.require("cosmo.service.service_stub");
 dojo.require("cosmo.datetime.*");
+dojo.require("cosmo.model");
+
 JSON_SERVICE_OBJECT_NAME = "scoobyService";
 
 JAVA_JSON_MAPPING = {"java.util.Date":Date,
@@ -212,22 +214,7 @@ ScoobyService.prototype.init = function() {
         }
     }
 }
-var wrapGetEventsCompareFunction  = function(a,b){
 
-           utcA = a.start.toUTC();
-           utcB = b.start.toUTC();
-
-		   return utcA - utcB;
-           if (utcA > utcB) {
-              return 1;
-           }
-
-           if (utcA < utcB) {
-               return -1;
-           }
-
-           return 0;
-        }
 /**
  * This wraps getEvents one more time, working around some problems in .1.
  *
@@ -247,7 +234,7 @@ var wrapGetEventsCompareFunction  = function(a,b){
 wrapGetEvents = function(getEventsFunction){
     var oldFunction = getEventsFunction;
     var newFunction = function(){
-		
+        
         var realRangeStart = arguments[1];
         var realRangeEnd   = arguments[2];
 
@@ -258,10 +245,10 @@ wrapGetEvents = function(getEventsFunction){
         arguments[1] = paddedRangeStart;
         arguments[2] = paddedRangeEnd;
 
-		var returnVal = oldFunction.apply(this, arguments);
+        var returnVal = oldFunction.apply(this, arguments);
 
-        returnVal.sort(wrapGetEventsCompareFunction);
-
+        cosmo.model.sortEvents(returnVal);
+        
         var filteredEvents = new Array();
         for (var x = 0; x < returnVal.length; x++){
                 var start = returnVal[x].start.toUTC();

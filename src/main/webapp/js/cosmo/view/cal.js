@@ -324,9 +324,9 @@ cosmo.view.cal = new function () {
                         // Look up the master event for the recurrence and pass the result
                         // on to function h
                         f = function () { 
-                        	var reqId = Cal.currentCollection.conduit.getEvent(
-					            Cal.currentCollection.collection.uid, ev.data.id, 
-	            				Cal.currentCollection.transportInfo, h);
+                            var reqId = Cal.currentCollection.conduit.getEvent(
+                                Cal.currentCollection.collection.uid, ev.data.id, 
+                                Cal.currentCollection.transportInfo, h);
                             };
                     }
                     break;
@@ -426,8 +426,8 @@ cosmo.view.cal = new function () {
         var requestId = null;
 
         requestId = Cal.currentCollection.conduit.saveEvent(
-			Cal.currentCollection.collection.uid, ev.data, 
-	        Cal.currentCollection.transportInfo, f);
+            Cal.currentCollection.collection.uid, ev.data, 
+            Cal.currentCollection.transportInfo, f);
         
         // Add to processing queue -- canvas will not re-render until
         // queue is empty
@@ -469,8 +469,8 @@ cosmo.view.cal = new function () {
             handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
         requestId = Cal.currentCollection.conduit.saveNewEventBreakRecurrence(
-			Cal.currentCollection.collection.uid, ev.data, origId, recurEnd,
-	        Cal.currentCollection.transportInfo, f);
+            Cal.currentCollection.collection.uid, ev.data, origId, recurEnd,
+            Cal.currentCollection.transportInfo, f);
         
         self.processingQueue.push(requestId);
         self.lastSent = null;
@@ -672,8 +672,8 @@ cosmo.view.cal = new function () {
                         };
                         f = function () { 
                             var reqId = Cal.currentCollection.conduit.getEvent(
-								Cal.currentCollection.collection.uid, ev.data.id,
-						        Cal.currentCollection.transportInfo, h);
+                                Cal.currentCollection.collection.uid, ev.data.id,
+                                Cal.currentCollection.transportInfo, h);
                         };
                     }
                     break;
@@ -713,8 +713,8 @@ cosmo.view.cal = new function () {
                         // Look up the RecurrenceRule and pass the result on to function h
                         f = function () { 
                             var reqId = Cal.currentCollection.conduit.getRecurrenceRules(
-								Cal.currentCollection.collection.uid, [ev.data.id],
-						        Cal.currentCollection.transportInfo, h);
+                                Cal.currentCollection.collection.uid, [ev.data.id],
+                                Cal.currentCollection.transportInfo, h);
                             };
                     break;
                 // Save the RecurrenceRule with a new exception added for this instance
@@ -752,8 +752,8 @@ cosmo.view.cal = new function () {
             handleRemoveResult(ev, newEvId, err, reqId, opts); };
             
         var requestId = Cal.currentCollection.conduit.removeEvent(
-			Cal.currentCollection.collection.uid, ev.data.id,
-	        Cal.currentCollection.transportInfo, f);
+            Cal.currentCollection.collection.uid, ev.data.id,
+            Cal.currentCollection.transportInfo, f);
     }
     /**
      * Handles the response from the async call when removing an event.
@@ -802,9 +802,9 @@ cosmo.view.cal = new function () {
         var f = function (ret, err, reqId) {
             handleSaveRecurrenceRuleResult(ev, err, reqId, opts); };
         var requestId = Cal.currentCollection.conduit.saveRecurrenceRule(
-        	Cal.currentCollection.collection.uid,
-			ev.data.id, rrule,
-	        Cal.currentCollection.transportInfo, f);
+            Cal.currentCollection.collection.uid,
+            ev.data.id, rrule,
+            Cal.currentCollection.transportInfo, f);
     }
     /**
      * Handles the response from the async call when saving changes
@@ -909,8 +909,8 @@ cosmo.view.cal = new function () {
         }
 
         Cal.currentCollection.conduit.expandEvents(
-        	Cal.currentCollection.collection.uid, [id], s, e,
-	        Cal.currentCollection.transportInfo, f);
+            Cal.currentCollection.collection.uid, [id], s, e,
+            Cal.currentCollection.transportInfo, f);
 
     }
     /**
@@ -1086,8 +1086,8 @@ cosmo.view.cal = new function () {
         // ======================
         try {
             eventLoadList = Cal.currentCollection.conduit.getEvents(
-	            Cal.currentCollection.collection.uid, s, e, 
-	            Cal.currentCollection.transportInfo);
+                Cal.currentCollection.collection.uid, s, e, 
+                Cal.currentCollection.transportInfo);
 
         }
         catch(e) {

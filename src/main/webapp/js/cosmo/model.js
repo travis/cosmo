@@ -210,4 +210,57 @@ cosmo.model.Ticket = function (){
     this.privileges = {}; //a Set
     this.ticketKey = null;
 }
+
 Ticket = cosmo.model.Ticket;
+
+
+cosmo.model.sortEvents = function(/*Array|cosmo.util.hash.Hash*/ events){
+// summary: Sorts a collection of events based on start date. 
+//          If the start dates are equal, longer events are  
+//          sorted first
+
+    var hash = events instanceof cosmo.util.hash.Hash;
+    for (var x = 0; x < events.length; x++){
+        var event = hash ? events.getAtPos(x) : events[x];
+        if (event.data){
+            event = event.data;
+        }
+        event.__startUTC = event.start.toUTC();
+        event.__endUTC = (event.end ? event.end.toUTC() : event.__startUTC);
+    }
+    
+    events.sort(cosmo.model._eventComparator);
+
+    for (var x = 0; x < events.length; x++){
+        var event = hash ? events.getAtPos(x) : events[x];
+        if (event.data){
+            event = event.data;
+        }
+        delete(event.__startUTC);
+        delete(event.__endUTC);
+    }
+}
+
+cosmo.model._eventComparator = function (a, b) {
+   // summary: used by cosmo.model.sortEvents.
+    var aStart = a.__startUTC;
+    var bStart = b.__startUTC;
+    
+    if (aStart > bStart) {
+        return 1;
+    }
+    else if (aStart < bStart) {
+        return -1;
+    } else {
+    // If start is equal, sort longer events first
+      var aEnd = a.__endUTC;
+      var bEnd = b.__endUTC;
+        if (aEnd < bEnd) {
+            return 1;
+        }
+        // Be sure to handle equal values
+        else if (aEnd >= bEnd) {
+            return -1;
+        }
+    }
+};

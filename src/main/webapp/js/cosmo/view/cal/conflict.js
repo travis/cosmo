@@ -75,7 +75,7 @@ cosmo.view.cal.conflict = new function() {
         };
         
         // Sort all the events by start
-        evReg.sort(comp);
+        cosmo.model.sortEvents(evReg);
         // Reset conflict properties for all the events
         evReg.each(clearProps);
         

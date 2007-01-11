@@ -847,6 +847,49 @@ td.dataDisplayLabel {
     font-size:11px;
 }
 
+/* Tab container 
+ * --------------------- */
+.tabPanel {
+    height:20px;
+    position:relative;
+}
+.tabContent {
+    position:relative;
+    margin-top:12px;
+}
+.tabSelected {
+    border-left:1px solid $uiDetailBorderColor;
+    border-top:1px solid $uiDetailBorderColor;
+    border-right:1px solid $uiDetailBorderColor;
+    height:19px;
+    line-height:20px;
+    vertical-align:middle;
+    text-align:center;
+    padding:0px 6px 0px 6px;
+    float:left;
+    cursor:pointer;
+}
+.tabUnselected {
+    border-left:1px solid $uiDetailBorderColor;
+    border-top:1px solid $uiDetailBorderColor;
+    border-right:1px solid $uiDetailBorderColor;
+    border-bottom:1px solid #666666;
+    background:#eeeeee;
+    height:18px;
+    line-height:20px;
+    vertical-align:middle;
+    text-align:center;
+    padding:0px 6px 0px 6px;
+    float:left;
+    cursor:pointer;
+}
+.tabSpacer {
+    height:19px;
+    line-height:20px;
+    border-bottom:1px solid #666666;
+    float:left;
+}
+
 /* Minical styles
  * --------------------- */
 #miniCalDiv {

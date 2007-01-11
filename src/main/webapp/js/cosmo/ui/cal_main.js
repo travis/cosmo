@@ -32,6 +32,7 @@ dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.Lozenge');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.account.create');
+dojo.require('cosmo.account.settings');
 dojo.require('cosmo.convenience');
 dojo.require('cosmo.ui.widget.CollectionSelector');
 dojo.require('cosmo.ui.widget.AuthBox');

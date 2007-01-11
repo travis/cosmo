@@ -72,21 +72,20 @@ public class CollectionBookmarkController extends AbstractController {
         }
 
         Map<String, Object> model = new HashMap<String, Object>();
-        
-        Map<String, String> relationLinks = serviceLocatorFactory.
-            createServiceLocator(request).getCollectionUrls(collection);
-        
-        model.put("relationLinks", relationLinks);
         model.put("collection", collection);
+        
         
         // First try to find a ticket principal
         String ticketKey = request.getParameter("ticket");
-        
-        
 
         if (ticketKey != null) {
+            Ticket ticket = contentService.getTicket(collection, ticketKey);
+            if (ticket != null){
 
-            if (contentService.getTicket(collection, ticketKey) != null){
+                Map<String, String> relationLinks = serviceLocatorFactory.
+                    createServiceLocator(request, ticket).getCollectionUrls(collection);
+
+                model.put("relationLinks", relationLinks);
             
                 model.put("ticketKey", ticketKey);
                 return new ModelAndView(pimView, model);

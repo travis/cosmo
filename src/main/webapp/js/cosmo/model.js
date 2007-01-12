@@ -16,6 +16,7 @@
 dojo.provide("cosmo.model");
 
 dojo.require("cosmo.util.debug");
+dojo.require("cosmo.util.hash");
 
 cosmo.model.CalEventData = function (id, title, description, start, end, allDay,
     pointInTime, anyTime, recurrenceRule, status, masterEvent, instance, instanceDate) {

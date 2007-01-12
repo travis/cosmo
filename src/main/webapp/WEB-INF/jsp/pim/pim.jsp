@@ -101,20 +101,24 @@ cosmo.ui.event.listeners.hookUpListeners();
                   Settings
                 </a>
                 <span class="menuBarDivider">|</span>
-                <c:url var="helpUrl" value="/help"/>
-                <a href="${helpUrl}"><fmt:message key="Main.Help"/></a>
-                <authz:authorize ifAnyGranted="ROLE_USER">
-                <span class="menuBarDivider">|</span>
-                <a href="${staticBaseUrl}/logout">
-                   <fmt:message key="Main.LogOut"/>
-                </a>&nbsp;&nbsp;
-                </authz:authorize>
               </c:when>
               <c:otherwise>
                 <div id="signupGraphic"></div>
                 <div id="subscribeSelector"></div>
               </c:otherwise>
             </c:choose>
+              
+            <c:url var="helpUrl" value="http://wiki.osafoundation.org/bin/view/Projects/CosmoHelpPortal"/>
+            <a href="${helpUrl}" target="_blank"><fmt:message key="Main.Help"/></a>
+                
+            <c:if test="${empty ticketKey}">
+               <authz:authorize ifAnyGranted="ROLE_USER">
+                 <span class="menuBarDivider">|</span>
+                  <a href="${staticBaseUrl}/logout">
+                    <fmt:message key="Main.LogOut"/>
+                  </a>&nbsp;&nbsp;
+               </authz:authorize>
+            </c:if>
             <%-- End main nav menu --%>
         </div>
         <div id="calDiv">

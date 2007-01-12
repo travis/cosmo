@@ -80,21 +80,14 @@ a:visited {
     color: #5555bb;
 }
 
-a:link {
-    color: #5555bb;
+a span, a{
+    color: $linkTextColor;
+    text-decoration: none;
 }
 
 a:hover {
     color: #9999cc;
 }
-
-a.cleanLink{
-    text-decoration: none;
-    color: $linkTextColor;
-}
-a.cleanLink span{
-    color: $linkTextColor;
- }
 
 /* Set default font size here
  * height of 100% ensures that IE can get an accurate measure

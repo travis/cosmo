@@ -851,36 +851,36 @@ td.dataDisplayLabel {
     margin-top:12px;
 }
 .tabSelected {
-    border-left:1px solid $uiDetailBorderColor;
-    border-top:1px solid $uiDetailBorderColor;
-    border-right:1px solid $uiDetailBorderColor;
+    border-left:1px solid #aaaaaa; 
+    border-top:1px solid #aaaaaa;
+    border-right:1px solid #aaaaaa; 
     height:19px;
     line-height:20px;
     vertical-align:middle;
     text-align:center;
     padding:0px 6px 0px 6px;
-    float:left;
+    white-space:nowrap;
     cursor:pointer;
 }
 .tabUnselected {
-    border-left:1px solid $uiDetailBorderColor;
-    border-top:1px solid $uiDetailBorderColor;
-    border-right:1px solid $uiDetailBorderColor;
-    border-bottom:1px solid #666666;
+    border-left:1px solid #aaaaaa;
+    border-top:1px solid #aaaaaa;
+    border-right:1px solid #aaaaaa;
+    border-bottom:1px solid $uiDetailBorderColor;
     background:#eeeeee;
     height:18px;
     line-height:20px;
     vertical-align:middle;
     text-align:center;
     padding:0px 6px 0px 6px;
-    float:left;
+    white-space:nowrap;
     cursor:pointer;
 }
 .tabSpacer {
     height:19px;
     line-height:20px;
-    border-bottom:1px solid #666666;
-    float:left;
+    width:1%;
+    border-bottom:1px solid $uiDetailBorderColor;
 }
 
 /* Minical styles

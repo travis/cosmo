@@ -50,17 +50,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         var self = this;
         var o = tabObj;
         var d = null;
-        var t = _createElem('div');
-        d = _createElem('div');
+        d = _createElem('td');
         d.className = sel ? 'tabSelected' : 'tabUnselected';
         d.appendChild(_createText(o.label));
         d.onclick = function () { self.showTab(index); };
         this.tabNodes.push(d);
-        t.appendChild(d);
-        d = _createElem('div');
-        d.className = 'tabSpacer';
-        d.appendChild(_createText('\u00A0'));
-        t.appendChild(d);
         
         if (typeof o.content == 'string') {
             var n = _createElem('div');
@@ -72,21 +66,27 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         n.style.position = 'absolute';
         n.style.top = '0px';
         n.style.left = '0px';
-        n.style.display =  sel ? 'block' : 'none';
+        n.style.visibility =  sel ? 'visible' : 'hidden';
         this.contentNodes.push(n);
         
-        return {tab: t, content: n };
+        return {tab: d, content: n };
     },
     showTab: function (index) {
         var tabs = this.tabs;
         for (var i = 0; i < tabs.length; i++) {
+            var tab = this.tabNodes[i];
+            var content = this.contentNodes[i];
             if (i == index) {
-                this.tabNodes[i].className = 'tabSelected'; 
-                this.contentNodes[i].style.display = 'block';
+                tab.className = 'tabSelected'; 
+                content.style.visibility = 'visible';
+                content.style.top = '0px';
+                content.style.left = '0px';
             }
             else {
-                this.tabNodes[i].className = 'tabUnselected';
-                this.contentNodes[i].style.display = 'none';
+                tab.className = 'tabUnselected';
+                content.style.visibility = 'hidden';
+                content.style.top = '-50000px';
+                content.style.left = '-50000px';
             }
         }
     },
@@ -95,36 +95,60 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
     
     // Lifecycle
     fillInTemplate: function () {
-        var node = this.domNode;
-        var tabPanel = null;
+        
+        var tabMain = null;
+        var tabPanelTable = null;
+        var tabPanelTBody = null;
+        var tabPanelTr = null;
         var tabContent = null;
-        var t = null;
+        var t = {};
+        var s = null;
         var tabs = this.tabs;
         
-        tabPanel = _createElem('div');
-        this.tabArea = tabPanel;
-        tabPanel.id = this.widgetId + '_tabPanel';
-        tabPanel.className = 'tabPanel';
+        tabMain = _createElem('div');
+        tabMain.style.visibility = 'hidden';
+        tabPanelTable = _createElem('table');
+        tabPanelTable.style.width = '100%';
+        tabPanelTable.cellPadding = '0';
+        tabPanelTable.cellSpacing = '0';
+        tabPanelTBody = _createElem('tbody');
+        tabPanelTable.appendChild(tabPanelTBody);
+        tabPanelTr = _createElem('tr');
+        tabPanelTBody.appendChild(tabPanelTr);
+        this.tabArea = tabPanelTable;
+        tabPanelTable.id = this.widgetId + '_tabPanel';
+        tabPanelTable.className = 'tabPanel';
         tabContent = _createElem('div');
         this.contentArea = tabContent;
         tabContent.id = this.widgetId + '_contentArea';
         tabContent.className = 'tabContent';
-        for (var i =0; i < tabs.length; i++) {
-            var sel = i == this.selectedTabIndex ? true : false;
-            t = this.getTab(i, tabs[i], sel);
-            tabPanel.appendChild(t.tab);
-            tabContent.appendChild(t.content);
-        }
-        var s = _createElem('div');
+        s = _createElem('td');
         s.className = 'tabSpacer';
         s.appendChild(_createText('\u00A0'));
         s.appendChild(_createText('\u00A0'));
+        tabPanelTr.appendChild(s);
+        for (var i =0; i < tabs.length; i++) {
+            var sel = i == this.selectedTabIndex ? true : false;
+            
+            t = this.getTab(i, tabs[i], sel);
+            
+            tabPanelTr.appendChild(t.tab);
+            s = _createElem('td');
+            s.className = 'tabSpacer';
+            s.appendChild(_createText('\u00A0'));
+            tabPanelTr.appendChild(s);
+            
+            tabContent.appendChild(t.content);
+        }
+        s = _createElem('td');
+        s.className = 'tabSpacer';
+        s.style.width = '99%';
         s.appendChild(_createText('\u00A0'));
-        s.appendChild(_createText('\u00A0'));
-        s.appendChild(_createText('\u00A0'));
-        tabPanel.appendChild(s);
-        node.appendChild(tabPanel);
-        node.appendChild(tabContent);
+        tabPanelTr.appendChild(s);
+        tabMain.appendChild(tabPanelTable);
+        tabMain.appendChild(tabContent);
+        this.domNode.appendChild(tabMain);
+        tabMain.style.visibility = 'visible';
     }
 } );
 

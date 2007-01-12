@@ -27,4 +27,36 @@ public interface ServerConstants {
     /** The request header containing a ticket key */
     public static final String HEADER_TICKET = "Ticket";
 
+    /**
+     * The service id for Atom
+     */
+    public static final String SVC_ATOM = "atom";
+    /**
+     * The service id for CMP
+     */
+    public static final String SVC_CMP = "cmp";
+    /**
+     * The service id for WebDAV
+     */
+    public static final String SVC_DAV = "dav";
+    /**
+     * The service id for WebDAV principals
+     */
+    public static final String SVC_DAV_PRINCIPAL = "davPrincipal";
+    /**
+     * The service id for CalDAV calendar homes
+     */
+    public static final String SVC_DAV_CALENDAR_HOME = "davCalendarHome";
+    /**
+     * The service id for Morse Code
+     */
+    public static final String SVC_MORSE_CODE = "mc";
+    /**
+     * The service id for the Pim UI
+     */
+    public static final String SVC_PIM = "pim";
+    /**
+     * The service id for webcal
+     */
+    public static final String SVC_WEBCAL = "webcal";
 }

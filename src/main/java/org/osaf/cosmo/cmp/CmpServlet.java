@@ -51,8 +51,11 @@ import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.account.ActivationContext;
+import org.osaf.cosmo.server.ServiceLocator;
+import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.server.SpaceUsageReport;
 import org.osaf.cosmo.server.StatusSnapshot;
+import org.osaf.cosmo.server.UserPath;
 import org.osaf.cosmo.util.PageCriteria;
 
 import org.springframework.beans.BeansException;
@@ -88,6 +91,8 @@ public class CmpServlet extends HttpServlet {
         "contentService";
     private static final String BEAN_USER_SERVICE =
         "userService";
+    private static final String BEAN_SERVICE_LOCATOR_FACTORY =
+        "serviceLocatorFactory";
     private static final String BEAN_SECURITY_MANAGER =
         "securityManager";
 
@@ -100,6 +105,7 @@ public class CmpServlet extends HttpServlet {
     private WebApplicationContext wac;
     private ContentService contentService;
     private UserService userService;
+    private ServiceLocatorFactory serviceLocatorFactory;
     private CosmoSecurityManager securityManager;
 
     /**
@@ -117,19 +123,19 @@ public class CmpServlet extends HttpServlet {
             getWebApplicationContext(getServletContext());
 
         if (wac != null) {
-            if (contentService == null) {
+            if (contentService == null)
                 contentService = (ContentService)
                     getBean(BEAN_CONTENT_SERVICE, ContentService.class);
-            }
-            if (userService == null) {
+            if (userService == null)
                 userService = (UserService)
                     getBean(BEAN_USER_SERVICE, UserService.class);
-            }
-            if (securityManager == null) {
+            if (securityManager == null)
                 securityManager = (CosmoSecurityManager)
                     getBean(BEAN_SECURITY_MANAGER, CosmoSecurityManager.class);
-            }
-
+            if (serviceLocatorFactory == null)
+                serviceLocatorFactory = (ServiceLocatorFactory)
+                    getBean(BEAN_SERVICE_LOCATOR_FACTORY,
+                            ServiceLocatorFactory.class);
         }
 
         if (contentService == null)
@@ -177,11 +183,15 @@ public class CmpServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp)
         throws ServletException, IOException {
+        Matcher m = null;
 
+        // /account
         if (req.getPathInfo().equals("/account")) {
             processAccountGet(req, resp);
             return;
         }
+
+        // /users
         if (req.getPathInfo().equals("/users")) {
             processUsersGet(req, resp);
             return;
@@ -190,15 +200,46 @@ public class CmpServlet extends HttpServlet {
             processGetUserCount(req, resp);
             return;
         }
-        if (req.getPathInfo().startsWith("/user/")) {
-            processUserGetByUsername(req, resp);
+
+        // /user
+        UserPath up = UserPath.parse(req.getPathInfo(), true);
+        if (up != null) {
+            User user = userService.getUser(up.getUsername());
+            if (user == null) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            if (up.getPathInfo() != null) {
+                // /user/<username>/something-else
+                if (! up.getPathInfo().equals("/service")) {
+                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+
+                // /user/<username>/service
+                ServiceLocator locator =
+                    serviceLocatorFactory.createServiceLocator(req);
+                UserServiceResource resource =
+                    new UserServiceResource(user, locator);
+                sendXmlResponse(resp, resource);
+                return;
+            }
+
+            // /user/<username>
+            UserResource resource = new UserResource(user, getUrlBase(req));
+            resp.setHeader("ETag", resource.getEntityTag());
+            sendXmlResponse(resp, resource);
             return;
         }
+
+        // /server/status
         if (req.getPathInfo().equals("/server/status")) {
             processServerStatus(req, resp);
             return;
         }
-        Matcher m = PATTERN_SPACE_USAGE.matcher(req.getPathInfo());
+
+        m = PATTERN_SPACE_USAGE.matcher(req.getPathInfo());
         if (m.matches()) {
             String username = null;
             boolean isXml = false;
@@ -235,6 +276,7 @@ public class CmpServlet extends HttpServlet {
                 return;
             }
         }
+
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
 
@@ -350,6 +392,18 @@ public class CmpServlet extends HttpServlet {
      */
     public void setSecurityManager(CosmoSecurityManager securityManager) {
         this.securityManager = securityManager;
+    }
+
+    /**
+     */
+    public ServiceLocatorFactory getServiceLocatorFactory() {
+        return serviceLocatorFactory;
+    }
+
+    /**
+     */
+    public void setServiceLocatorFactory(ServiceLocatorFactory factory) {
+        this.serviceLocatorFactory = factory;
     }
 
     // private methods
@@ -591,36 +645,6 @@ public class CmpServlet extends HttpServlet {
         }
         resp.setStatus(HttpServletResponse.SC_OK);
         sendXmlResponse(resp, new UsersResource(users, getUrlBase(req)));
-    }
-
-    private void processUserGet(User user,
-                                HttpServletRequest req,
-                                HttpServletResponse resp)
-        throws ServletException, IOException {
-        UserResource resource = new UserResource(user, getUrlBase(req));
-        resp.setHeader("ETag", resource.getEntityTag());
-        sendXmlResponse(resp, resource);
-    }
-
-    /*
-     * Delegated to by {@link #doGet} to handle user GET
-     * requests by activationId, retrieving the user account, setting the response
-     * status and headers, and writing the response content.
-     */
-    private void processUserGetByUsername(HttpServletRequest req,
-                                          HttpServletResponse resp)
-        throws ServletException, IOException {
-        String username = usernameFromPathInfo(req.getPathInfo());
-        if (username == null) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        User user = userService.getUser(username);
-        if (user == null) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        processUserGet(user, req, resp);
     }
 
     /*

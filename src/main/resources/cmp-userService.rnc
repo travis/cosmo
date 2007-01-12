@@ -1,0 +1,30 @@
+# -*- rnc -*-
+# RELAX NG Compact Syntax Grammar for the
+# CMP user service schema
+
+namespace = "http://osafoundation.org/cosmo/CMP/userService"
+
+start = cmpUserService
+
+cmpUserService =
+   element service {
+      cmpUsername,
+      (cmpProtocolLink
+       | cmpProtocolBase)*
+   }
+
+cmpUsername = element username { xsd:string }
+
+cmpProtocolLink =
+   element link {
+      attribute title { xsd:string },
+      attribute type { xsd:string },
+      attribute href { xsd:string }
+   }
+
+cmpProtocolBase =
+   element base {
+      attribute title { xsd:string },
+      attribute type { xsd:string },
+      attribute href { xsd:string }
+   }

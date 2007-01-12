@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.User;
 
 /**
  * This class encapsulates the addressing scheme for all client
@@ -49,46 +50,20 @@ import org.osaf.cosmo.model.CollectionItem;
  * Note that individual items contained within collections are not
  * addressable at this time.
  *
- * <h2>Other Addresses</h2>
+ * <h2>User Addresses</h2>
  *
- * Other entities in the Cosmo server are addressable via various
- * services (for example, users in CMP). This class does not specify
- * how those entities are addressed, leaving this job to the service
- * specifications.
- * <p>
- * Similarly, WebDAV provides hierarchical path-based access to
- * collections and items. These WebDAV URLs do not use the collection
- * addressing scheme detailed above but instead use a service-specific
- * scheme that is not interpreted by this class.
+ * Users are addressed similarly to collections. See
+ * {@link UserPath} for details on the makeup of user URLs.
  *
  * @see ServiceLocatorFactory
  * @see CollectionPath
+ * @see UserPath
  */
 public class ServiceLocator implements ServerConstants {
     private static final Log log = LogFactory.getLog(ServiceLocator.class);
 
-    /**
-     * The service id for WebDAV
-     */
-    public static final String SVC_DAV = "dav";
-    /**
-     * The service id for Atom
-     */
-    public static final String SVC_ATOM = "atom";
-    /**
-     * The service id for Morse Code
-     */
-    public static final String SVC_MORSE_CODE = "mc";
-    /**
-     * The service id for the Web UI
-     */
-    public static final String SVC_WEB = "web";
-    /**
-     * The service id for webcal
-     */
-    public static final String SVC_WEBCAL = "webcal";
-
     private static final String PATH_COLLECTION = "collection";
+    private static final String PATH_USER = "user";
 
     private String appMountUrl;
     private String ticketKey;
@@ -125,16 +100,61 @@ public class ServiceLocator implements ServerConstants {
     }
 
     /**
+     * Returns a map of base service URLs keyed by service id.
+     */
+    public Map<String,String> getBaseUrls() {
+        HashMap<String,String> urls = new HashMap<String,String>();
+        urls.put(SVC_ATOM, getAtomBase());
+        urls.put(SVC_MORSE_CODE, getMorseCodeBase());
+        urls.put(SVC_PIM, getPimBase());
+        urls.put(SVC_WEBCAL, getWebcalBase());
+        return urls;
+    }
+
+    /**
      * Returns a map of URLs for the collection keyed by service id.
      */
     public Map<String,String> getCollectionUrls(CollectionItem collection) {
         HashMap<String,String> urls = new HashMap<String,String>();
-        urls.put(SVC_DAV, getDavUrl(collection));
         urls.put(SVC_ATOM, getAtomUrl(collection));
+        urls.put(SVC_DAV, getDavUrl(collection));
         urls.put(SVC_MORSE_CODE, getMorseCodeUrl(collection));
-        urls.put(SVC_WEB, getWebUrl(collection));
+        urls.put(SVC_PIM, getPimUrl(collection));
         urls.put(SVC_WEBCAL, getWebcalUrl(collection));
         return urls;
+    }
+
+    /**
+     * Returns a map of URLs for the user keyed by service id.
+     */
+    public Map<String,String> getUserUrls(User user) {
+        HashMap<String,String> urls = new HashMap<String,String>();
+        urls.put(SVC_CMP, getCmpUrl(user));
+        urls.put(SVC_DAV, getDavUrl(user));
+        urls.put(SVC_DAV_PRINCIPAL, getDavPrincipalUrl(user));
+        urls.put(SVC_DAV_CALENDAR_HOME, getDavCalendarHomeUrl(user));
+        return urls;
+    }
+
+    /**
+     * Returns the Atom base URL.
+     */
+    public String getAtomBase() {
+        return calculateBaseUrl(factory.getAtomPrefix());
+    }
+
+    /**
+     * Returns the Atom URL of the collection.
+     */
+    public String getAtomUrl(CollectionItem collection) {
+        return calculateCollectionUrl(collection, factory.getAtomPrefix());
+    }
+
+    /**
+     * Returns the CMP URL of the user.
+     */
+    public String getCmpUrl(User user) {
+        return calculateUserUrl(user, factory.getCmpPrefix());
     }
 
     /**
@@ -145,10 +165,31 @@ public class ServiceLocator implements ServerConstants {
     }
 
     /**
-     * Returns the Atom URL of the collection.
+     * Returns the WebDAV URL of the user.
      */
-    public String getAtomUrl(CollectionItem collection) {
-        return calculateCollectionUrl(collection, factory.getAtomPrefix());
+    public String getDavUrl(User user) {
+        return calculateUserUrl(user, factory.getDavPrefix());
+    }
+
+    /**
+     * Returns the WebDAV principal URL of the user.
+     */
+    public String getDavPrincipalUrl(User user) {
+        return calculateUserUrl(user, factory.getDavPrincipalPrefix());
+    }
+
+    /**
+     * Returns the CalDAV calendar home URL of the user.
+     */
+    public String getDavCalendarHomeUrl(User user) {
+        return calculateUserUrl(user, factory.getDavCalendarHomePrefix());
+    }
+
+    /**
+     * Returns the Morse Code base URL.
+     */
+    public String getMorseCodeBase() {
+        return calculateBaseUrl(factory.getMorseCodePrefix());
     }
 
     /**
@@ -160,10 +201,24 @@ public class ServiceLocator implements ServerConstants {
     }
 
     /**
-     * Returns the Web UI URL of the collection.
+     * Returns the Pim UI base URL.
      */
-    public String getWebUrl(CollectionItem collection) {
-        return calculateCollectionUrl(collection, factory.getWebPrefix());
+    public String getPimBase() {
+        return calculateBaseUrl(factory.getPimPrefix());
+    }
+
+    /**
+     * Returns the Pim UI URL of the collection.
+     */
+    public String getPimUrl(CollectionItem collection) {
+        return calculateCollectionUrl(collection, factory.getPimPrefix());
+    }
+
+    /**
+     * Returns the webcal base URL.
+     */
+    public String getWebcalBase() {
+        return calculateBaseUrl(factory.getWebcalPrefix());
     }
 
     /**
@@ -173,6 +228,13 @@ public class ServiceLocator implements ServerConstants {
         return calculateCollectionUrl(collection, factory.getWebcalPrefix());
     }
 
+    private String calculateBaseUrl(String servicePrefix) {
+        StringBuffer buf = new StringBuffer(appMountUrl);
+
+        buf.append(servicePrefix);
+
+        return buf.toString();
+    }
     private String calculateCollectionUrl(CollectionItem collection,
                                           String servicePrefix) {
         StringBuffer buf = new StringBuffer(appMountUrl);
@@ -184,6 +246,17 @@ public class ServiceLocator implements ServerConstants {
         if (ticketKey != null)
             buf.append("?").
                 append(PARAM_TICKET).append("=").append(ticketKey);
+
+        return buf.toString();
+    }
+
+    private String calculateUserUrl(User user,
+                                    String servicePrefix) {
+        StringBuffer buf = new StringBuffer(appMountUrl);
+
+        buf.append(servicePrefix).
+            append("/").append(PATH_USER).
+            append("/").append(user.getUsername());
 
         return buf.toString();
     }

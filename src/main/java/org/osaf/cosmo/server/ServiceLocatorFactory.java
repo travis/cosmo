@@ -34,10 +34,13 @@ public class ServiceLocatorFactory {
     private static final Log log =
         LogFactory.getLog(ServiceLocatorFactory.class);
 
-    private String davPrefix;
     private String atomPrefix;
+    private String cmpPrefix;
+    private String davPrefix;
+    private String davPrincipalPrefix;
+    private String davCalendarHomePrefix;
     private String morseCodePrefix;
-    private String webPrefix;
+    private String pimPrefix;
     private String webcalPrefix;
     private CosmoSecurityManager securityManager;
 
@@ -71,11 +74,6 @@ public class ServiceLocatorFactory {
     }
 
     /** */
-    public void setDavPrefix(String prefix) {
-        davPrefix = prefix;
-    }
-
-    /** */
     public String getAtomPrefix() {
         return atomPrefix;
     }
@@ -83,6 +81,41 @@ public class ServiceLocatorFactory {
     /** */
     public void setAtomPrefix(String prefix) {
         atomPrefix = prefix;
+    }
+
+    /** */
+    public String getCmpPrefix() {
+        return cmpPrefix;
+    }
+
+    /** */
+    public void setCmpPrefix(String prefix) {
+        cmpPrefix = prefix;
+    }
+
+    /** */
+    public void setDavPrefix(String prefix) {
+        davPrefix = prefix;
+    }
+
+    /** */
+    public String getDavPrincipalPrefix() {
+        return davPrincipalPrefix;
+    }
+
+    /** */
+    public void setDavPrincipalPrefix(String prefix) {
+        davPrincipalPrefix = prefix;
+    }
+
+    /** */
+    public String getDavCalendarHomePrefix() {
+        return davCalendarHomePrefix;
+    }
+
+    /** */
+    public void setDavCalendarHomePrefix(String prefix) {
+        davCalendarHomePrefix = prefix;
     }
 
     /** */
@@ -96,13 +129,13 @@ public class ServiceLocatorFactory {
     }
 
     /** */
-    public String getWebPrefix() {
-        return webPrefix;
+    public String getPimPrefix() {
+        return pimPrefix;
     }
 
     /** */
-    public void setWebPrefix(String prefix) {
-        webPrefix = prefix;
+    public void setPimPrefix(String prefix) {
+        pimPrefix = prefix;
     }
 
     /** */
@@ -130,14 +163,20 @@ public class ServiceLocatorFactory {
      * and defaulting optional properties.
      */
     public void init() {
-        if (davPrefix == null)
-            throw new IllegalStateException("davPrefix must not be null");
         if (atomPrefix == null)
             throw new IllegalStateException("atomPrefix must not be null");
+        if (cmpPrefix == null)
+            throw new IllegalStateException("cmpPrefix must not be null");
+        if (davPrefix == null)
+            throw new IllegalStateException("davPrefix must not be null");
+        if (davPrincipalPrefix == null)
+            throw new IllegalStateException("davPrincipalPrefix must not be null");
+        if (davCalendarHomePrefix == null)
+            throw new IllegalStateException("davCalendarHomePrefix must not be null");
         if (morseCodePrefix == null)
             throw new IllegalStateException("morseCodePrefix must not be null");
-        if (webPrefix == null)
-            throw new IllegalStateException("webPrefix must not be null");
+        if (pimPrefix == null)
+            throw new IllegalStateException("pimPrefix must not be null");
         if (webcalPrefix == null)
             throw new IllegalStateException("webcalPrefix must not be null");
         if (securityManager == null)

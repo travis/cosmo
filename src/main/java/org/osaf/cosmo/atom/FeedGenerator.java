@@ -127,20 +127,20 @@ public class FeedGenerator implements AtomConstants {
         }
         feed.addLink(selfLink);
 
-        Link webLink = factory.newLink();
-        webLink.setRel(Link.REL_ALTERNATE);
+        Link pimLink = factory.newLink();
+        pimLink.setRel(Link.REL_ALTERNATE);
         try {
-            webLink.setMimeType(MEDIA_TYPE_HTML);
+            pimLink.setMimeType(MEDIA_TYPE_HTML);
         } catch (MimeTypeParseException e) {
             throw new IllegalStateException("Attempted to set invalid link mime type " + MEDIA_TYPE_HTML, e);
         }
-        String webHref = locator.getWebUrl(collection);
+        String pimHref = locator.getPimUrl(collection);
         try {
-            webLink.setHref(webHref);
+            pimLink.setHref(pimHref);
         } catch (IRISyntaxException e) {
-            throw new IllegalStateException("Attempted to set invalid link href " + webHref, e);
+            throw new IllegalStateException("Attempted to set invalid link href " + pimHref, e);
         }
-        feed.addLink(webLink);
+        feed.addLink(pimLink);
 
         return feed;
     }

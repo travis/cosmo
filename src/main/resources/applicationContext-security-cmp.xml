@@ -46,10 +46,11 @@
      </property>
      <property name="objectDefinitionSource">
        <value>
-     CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-     PATTERN_TYPE_APACHE_ANT
+         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+         PATTERN_TYPE_APACHE_ANT
          /cmp/users=ROLE_ROOT
          /cmp/user/*=ROLE_ROOT
+         /cmp/user/**/service=ROLE_ROOT,ROLE_USER
          /cmp/signup=ROLE_ANONYMOUS
          /cmp/activate/*=ROLE_ROOT
          /cmp/account=ROLE_USER

@@ -22,7 +22,7 @@ dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 dojo.require("cosmo.app");
 dojo.require("cosmo.util.i18n");
-var _ = cosmo.util.i18n.getText;
+dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.widget.ModalDialog");
@@ -234,7 +234,7 @@ dojo.widget.HtmlWidget, function(){
     if (conduit && conduit.saveDisplayName){
         var saveButton = dojo.widget.createWidget(
                         "cosmo:Button",
-                        { text: getText("Main.CollectionDetails.Save"),
+                        { text: _("Main.CollectionDetails.Save"),
                           width: "60px",
                           //TODO - Handle Errors properly!
                           handleOnClick: function(){

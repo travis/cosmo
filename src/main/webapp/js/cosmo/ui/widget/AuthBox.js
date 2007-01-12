@@ -7,6 +7,7 @@ dojo.require("cosmo.util.auth");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.widget.Button");
 
 _ = cosmo.util.i18n.getText
@@ -124,9 +125,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             return false;
         },
         fillInTemplate: function () {
-            var _ = cosmo.util.i18n.getText
-            var _createElem = function (str) { return document.createElement(str); }; 
-            var _createText = function (str) { return document.createTextNode(str); }; 
             var table = _createElem('table');
             var tbody = _createElem('tbody');
             var tr = null;

@@ -800,6 +800,12 @@ td.dataDisplayLabel {
     position:absolute;
 }
 
+/* "Email this event" link */
+#emailThisEventLink {
+	position: relative;
+	left: 14em;
+}
+
 /* Fake popup for modal dialog box
  * --------------------- */
 /* Main box for fake popup */

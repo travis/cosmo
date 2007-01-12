@@ -128,6 +128,15 @@ cosmo.ui.cal_form.CalForm = function () {
         var elem = null;
         var elemFloat = null;
         var formElem = null;
+        
+        this.mailtoLink = document.createElement("a");
+		
+		this.mailtoLink.setAttribute("href", "http://www.google.com");
+        this.mailtoLink.setAttribute("id", "emailThisEventLink");
+        
+		this.mailtoLink.appendChild(
+			document.createTextNode("Email this event"));
+        d.appendChild(this.mailtoLink);
 
         cont.id = 'eventInfoDivContent';
         cont.style.padding = '8px';
@@ -258,7 +267,7 @@ cosmo.ui.cal_form.CalForm = function () {
             _('App.PM')));
         d.appendChild(elem);
     };
-
+    
     this.createTimezoneInputs = function (d){
         var elem = null;
 
@@ -290,6 +299,34 @@ cosmo.ui.cal_form.CalForm = function () {
             });
         }
         return options;
+    };
+    
+    this.setMailtoLink = function (event) {
+		var timeFormat=_("Sidebar.Email.TimeFormat");
+
+    	var subject = _("Sidebar.Email.EventChanged") + Cal.currentCollection.displayName + ": " + event.data.title;
+    	var body = [_("Sidebar.Email.Title") , event.data.title , "%0d%0a" , 
+			 _("Sidebar.Email.Timezone")  , event.data.start.tzId , "%0d%0a" , 
+			 _("Sidebar.Email.Starts") , event.data.start.strftime(timeFormat) , "%0d%0a" , 
+			 _("Sidebar.Email.Ends") , event.data.end.strftime(timeFormat) , "%0d%0a"]
+		if (event.data.allDay) {
+			body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
+		} 
+
+		if (event.data.recurrenceRule){
+			body = body.concat([_("Sidebar.Email.Recurs") , 
+				event.data.recurrenceRule.frequency]);
+			if (event.data.recurrenceRule.endDate){
+				body = body.concat([_("Sidebar.Email.EndingOn") , 
+					event.data.recurrenceRule.endDate.strftime(timeFormat)]);
+			}
+			body.push(".%0d%0a");
+			
+		}
+		body = body.concat([_("Sidebar.Email.Status"), event.data.status ,"%0d%0a" ,
+				_("Sidebar.Email.Description") , event.data.description , "%0d%0a"]);
+
+		this.mailtoLink.setAttribute("href", "mailto:?subject=" + subject + "&body=" + body.join(""));
     };
 
     this.populateTimezoneSelector = function (region){
@@ -599,6 +636,8 @@ cosmo.ui.cal_form.CalForm = function () {
         form.startdate.value = ev.data.start.strftime('%m/%d/%Y');
         form.enddate.value = ev.data.end.strftime('%m/%d/%Y');
         form.eventallday.checked = ev.data.allDay ? true : false;
+        // Set mailto link
+        this.setMailtoLink(ev);
         if (ev.data.allDay) {
             this.setTimeElem(null, 'start');
             this.setTimeElem(null, 'end');

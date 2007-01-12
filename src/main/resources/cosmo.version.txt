@@ -1,1 +1,1 @@
-@VERSION@
+${pom.version}

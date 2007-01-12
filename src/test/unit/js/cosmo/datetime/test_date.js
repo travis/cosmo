@@ -231,4 +231,9 @@ function test_dateUTCSetters() {
     jum.assertEquals(11, dt.getHours());
 }
 
+function test_setters(){
+  var d = new D();
+  d.setMonth(1);
+  jum.assertEquals(1, d.getMonth());
+}
 

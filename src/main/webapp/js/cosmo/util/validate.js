@@ -16,11 +16,11 @@
 dojo.provide("cosmo.util.validate");
 
 dojo.require("cosmo.util.i18n");
-var _ = cosmo.util.i18n.getText;
+dojo.require("cosmo.convenience");
 
-cosmo.util.validate = new function() {
+cosmo.util.validate = new function () {
 
-    this.dateFormat = function(str) {
+    this.dateFormat = function (str) {
         // Checks for the following valid date formats:
         // MM/DD/YY MM/DD/YYYY MM-DD-YY MM-DD-YYYY MM.DD.YY MM.DD.YYYY
         // Also separates date into month, day, and year variables
@@ -62,7 +62,7 @@ cosmo.util.validate = new function() {
         }
         return errMsg;
     }
-    this.timeFormat = function(str) {
+    this.timeFormat = function (str) {
         var pat = /^(\d{1,2})(:)(\d{2})$/;
         var errMsg = '';
         
@@ -82,6 +82,59 @@ cosmo.util.validate = new function() {
             }
         }
         return errMsg;
+    }
+    /**
+     * Makes sure the given text input has a given length
+     * @return String, error message (empty if no err).
+     */
+    this.minLength = function (elem, len) {
+        err = '';
+        val = elem.value;
+        // Only bother checking length if a value is present
+        // Requiring a value should be done with 'required' method
+        if (val && (val.length < len)) {
+            err = _('Signup.Error.MinLength') + ' (' + len + ')';
+        }
+        return err;
+    }
+    /**
+     * Makes sure the given text input is not empty
+     * @return String, error message (empty if no err).
+     */
+    this.required = function (elem) {
+        err = '';
+        val = elem.value;
+        if (!val) {
+            err = _('Signup.Error.RequiredField');
+        }
+        return err;
+    }
+    /**
+     * Makes sure the given text input is a valid e-mail address
+     * @return String, error message (empty if no err).
+     */
+    this.eMail = function (elem) {
+        // Just do really basic e-mail addr validation
+        pat = /^.+@.+\..{2,3}$/;
+        err = '';
+        val = elem.value;
+        if (!pat.test(val)) {
+            err = _('Signup.Error.ValidEMail');
+        }
+        return err;
+    }
+    /**
+     * Makes sure the given password field matches the other
+     * @return String, error message (empty if no err).
+     */
+    this.confirmPass = function (elem, elemCompare) {
+        err = '';
+        val = elem.value;
+        val2 = elemCompare.value;
+        if (val != val2) {
+            err = _('Signup.Error.MatchPassword');
+        }
+        return err;
     }
 }
 

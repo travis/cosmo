@@ -31,34 +31,8 @@ cosmo.view.cal.conflict = new function() {
      * @return Boolean, true.
      */
     function sortAndClearEvents() {
-        
         var ev = null;
-        /**
-         * Comparator function used to sort events by start
-         * @return Number, 1 or -1.
-         */
-        function comp(a, b) {
-            utcA = a.data.start.toUTC();
-            utcB = b.data.start.toUTC();
-            if (utcA > utcB) {
-                return 1;
-            }
-            else if (utcA < utcB) {
-                return -1;
-            }
-            // If start is equal, sort longer events first
-            else {
-                utcA = a.data.end.toUTC();
-                utcB = b.data.end.toUTC();
-                if (utcA < utcB) {
-                    return 1;
-                }
-                // Be sure to handle equal values
-                else if (utcA >= utcB) {
-                    return -1;
-                }
-            }
-        };
+
         /**
          * Clear the conflict props on an event
          * @param key String, the Hash key for the event's entry in the Hash

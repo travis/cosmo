@@ -36,14 +36,7 @@ JAVA_JSON_MAPPING = {"java.util.Date":Date,
 JAVA_EXCEPTION_MAPPING = {"org.osaf.scooby.rpc.RPCException":ScoobyServiceRemoteException,
                           "org.osaf.scooby.rpc.NotAuthenticatedException":NotAuthenticatedException};
 
-function createSetterMethodName(propName){
-    var setterMethodName = "set";
-    setterMethodName += propName.charAt(0).toUpperCase();
-    for (var x = 1; x < propName.length; x++){
-        setterMethodName += propName.charAt(x);
-    }
-    return setterMethodName;
-}
+
 
 function convertObject(object){
     if (!object){
@@ -87,13 +80,7 @@ function convertObject(object){
                prop = convertObject(prop);
            }
 
-           //see if there is a "setter" method - important especially for Date type
-           var setterMethodName = createSetterMethodName(propName);
-           if (newObject[setterMethodName]){
-               newObject[setterMethodName](prop);
-           } else {
                newObject[propName] = prop;
-           }
        }
        return newObject
     }
@@ -261,7 +248,6 @@ wrapGetEvents = function(getEventsFunction){
                     filteredEvents[filteredEvents.length] = returnVal[x];
                 }
         }
-
         return filteredEvents;
     }
 

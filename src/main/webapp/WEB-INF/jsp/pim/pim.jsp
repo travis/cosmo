@@ -92,7 +92,6 @@ cosmo.ui.event.listeners.hookUpListeners();
                   <span class="menuBarDivider">|</span>
                 </authz:authorize>
                 <authz:authorize ifAllGranted="ROLE_ROOT">
-                  <span class="menuBarDivider">|</span>
                   <c:url var="consoleUrl" value="/admin/users"/>
                   <a href="${consoleUrl}"><fmt:message key="Main.Console"/></a>
                   <span class="menuBarDivider">|</span>

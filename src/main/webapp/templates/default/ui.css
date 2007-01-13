@@ -432,8 +432,10 @@ $smButtonHeight = 18px
 /* Add right align and padding */
 .labelTextCell {
     text-align:right;
-    vertical-align:middle;
+    vertical-align:top;
+    padding-top:4px;
     padding-right:4px;
+    white-space:nowrap;
 }
 .labelTextXL {
     font-size:$fontSizeXL;
@@ -851,12 +853,14 @@ td.dataDisplayLabel {
 .tabPanel {
     height:20px;
     position:relative;
+    margin-top:12px;
 }
 .tabContent {
     position:relative;
-    margin-top:12px;
+    margin-top:24px;
 }
 .tabSelected {
+    color:$linkTextColor; 
     border-left:1px solid #aaaaaa; 
     border-top:1px solid #aaaaaa;
     border-right:1px solid #aaaaaa; 
@@ -869,6 +873,7 @@ td.dataDisplayLabel {
     cursor:pointer;
 }
 .tabUnselected {
+    color:$linkTextColor; 
     border-left:1px solid #aaaaaa;
     border-top:1px solid #aaaaaa;
     border-right:1px solid #aaaaaa;

@@ -129,12 +129,12 @@ cosmo.account.create = new function () {
             p.style.marginBottom = '16px';
             p.style.textAlign = 'center';
             p.className = 'borderBox';
-            p.appendChild(__createText(_('Signup.Prompt.AccountActivation')));
+            p.appendChild(_createText(_('Signup.Prompt.AccountActivation')));
             dO.appendChild(p);
         }
         
         p = _createElem('div');
-        p.appendChild(__createText(_('Signup.Prompt.AccountSetup')));
+        p.appendChild(_createText(_('Signup.Prompt.AccountSetup')));
         dO.appendChild(p);
         
         // Create the table, append rows for each config value
@@ -221,7 +221,7 @@ cosmo.account.create = new function () {
     this.submitCreate = function () {
         // Validate the form input using each field's
         // attached validators
-        var err = cosmo.account.validateForm(form, fieldList, true);
+        var err = cosmo.account.validateForm(form, fieldList);
         
         if (err) {
             cosmo.app.modalDialog.setPrompt(err);

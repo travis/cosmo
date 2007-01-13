@@ -33,10 +33,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
     templateString: '<span></span>',
 
     // Props from template or set in constructor
-    tabs: [{ label: 'Tab Number One', content: 'This is the content for tab number 1.' }, 
-        { label: 'Tab Number Two', content: 'This is the content for tab number 2.'  },
-        { label: 'Tab Number Three', content: 'This is the content for tab number 3.'  }
-        ],
+    tabs: [],
     tabNodes: [],
     contentNodes: [],
     selectedTabIndex: 0,

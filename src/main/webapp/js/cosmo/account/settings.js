@@ -55,6 +55,25 @@ cosmo.account.settings = new function () {
         this.fieldList = cosmo.account.getFieldList(this.accountInfo); 
         
         form = cosmo.account.getFormTable(this.fieldList, false);
+
+        var passCell = form.password.parentNode;
+        var d = null;
+        passCell.removeChild(form.password);
+        d = _createElem('div');
+        d.className = 'floatLeft';
+        d.style.width = '40%';
+        form.password.style.width = '100%';
+        d.appendChild(form.password);
+        passCell.appendChild(d);
+        d = _createElem('div');
+        d.className = 'promptText floatLeft';
+        d.style.width = '50%';
+        d.style.paddingLeft = '10px'
+        d.innerHTML = 'Only enter password (with confirmation) if you are changing it.';
+        passCell.appendChild(d);
+        d = _createElem('div');
+        d.className = 'clearBoth';
+        passCell.appendChild(d);
         
         tabLabel = 'General';
         tabContent = _createElem('div');
@@ -66,14 +85,27 @@ cosmo.account.settings = new function () {
         tabContent.innerHTML = 'This is the content for the advanced preferences';
         tabs.push({ label: tabLabel, content: tabContent });
         
+        
         tabLabel = 'About Cosmo';
         tabContent = _createElem('div');
-        tabContent.innerHTML = 'This is the content for About Cosmo';
+        tabContent.style.textAlign = 'center';
+        tabContent.style.margin = 'auto';
+        tabContent.style.width = '100%';
+        
+        d = _createElem('div');
+        d.appendChild(_createText('Cosmo'));
+        d.className = 'labelTextXL';
+        tabContent.appendChild(d);
+        
+        d = _createElem('div');
+        d.appendChild(_createText(cosmo.env.getVersion()));
+        tabContent.appendChild(d);
+        
         tabs.push({ label: tabLabel, content: tabContent });
         
-        o.width = 540;
+        o.width = 560;
         o.height = 380;
-        o.title = '';
+        o.title = 'Settings';
         o.prompt = '';
         
         var self = this;
@@ -100,17 +132,36 @@ cosmo.account.settings = new function () {
             //cosmo.app.modalDialog.setPrompt(err);
         }
         else {
-            //var hand = { load: handleCreateResult, error: handleCreateResult };
-            var user = {};
+            var self = this;
+            var success = function (type, data, resp) { self.handleAccountSaveSuccess(type, data, resp); };
+            var error = function (type, data, resp) { self.handleAccountSaveError(type, data, resp); };
+            var hand = { load: success, error: error };
+            var account = {};
             // Create a hash from the form field values
-            for (var i = 1; i < fieldList.length; i++) {
-                f = fieldList[i];
-                user[f.elemName] = form[f.elemName].value;
+            for (var i = 0; i < fieldList.length; i++) {
+                var f = fieldList[i];
+                var val = form[f.elemName].value;
+                if (val) {
+                    account[f.elemName] = val;
+                }
             }
-            alert('Save function not implemented.');
+            delete account.confirm;
+            
+            // Only set the property at all if it's initially true
+            // 'administrator' is an empty tag -- its presence will 
+            if (this.accountInfo.administrator) {
+                account.administrator = true;
+            };
             // Hand off to CMP
-            //cosmo.cmp.cmpProxy.signup(user, hand);
+            cosmo.cmp.cmpProxy.modifyAccount(account, hand);
         }
         
+    };
+    this.handleAccountSaveSuccess = function (type, data, resp) {
+        this.accountInfo = null;
+        cosmo.app.hideDialog();
+    };
+    this.handleAccountSaveError = function (type, data, resp) {
+
     };
 };

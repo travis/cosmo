@@ -185,6 +185,8 @@ public class ServiceLocatorFactory {
 
     private String calculateAppMountUrl(HttpServletRequest request) {
         StringBuffer buf = new StringBuffer();
+        /* Commented out in case we ever decide to make this return fully qualified urls.
+         * 
         buf.append(request.getScheme()).
             append("://").
             append(request.getServerName());
@@ -192,6 +194,7 @@ public class ServiceLocatorFactory {
             (request.getServerPort() != 80)) {
             buf.append(":").append(request.getServerPort());
         }
+	*/
         if (! request.getContextPath().equals("/")) {
             buf.append(request.getContextPath());
         }

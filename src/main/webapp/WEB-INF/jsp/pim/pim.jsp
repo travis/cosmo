@@ -38,7 +38,7 @@
 <title><fmt:message key="App.Welcome"/></title>
 
 <c:if test="${not empty relationLinks}">
-<link rel="self" type="text/html" href="${relationLinks['web']}"/>
+<link rel="self" type="text/html" href="${relationLinks['pim']}"/>
 <link rel="alternate" type="application/atom+xml" href="${relationLinks['atom']}"/>
 <link rel="alternate" type="text/html" href="${relationLinks['dav']}"/>
 <link rel="alternate" type="text/xml" href="${relationLinks['mc']}"/>

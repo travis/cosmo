@@ -33,9 +33,11 @@
           <fmt:param value="${p}"/>
         </c:forEach>
       </fmt:message>
+	  <cosmo:staticbaseurl var="staticBaseUrl"/>
+      <link rel="self" type="text/html" href="${staticBaseUrl}/login"/>
+      
     </title>
 
-    <cosmo:staticbaseurl var="staticBaseUrl"/>
     <cosmo:dojoBoilerplate/>
 
     

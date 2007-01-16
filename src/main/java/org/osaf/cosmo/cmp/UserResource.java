@@ -170,10 +170,10 @@ public class UserResource implements CmpResource, OutputsXml {
         DomUtil.setText(modified, DateUtil.formatRfc3339Date(user.getDateModified()));
         e.appendChild(modified);
 
-        if (user.getAdmin()){
-            Element admin = DomUtil.createElement(doc, EL_ADMINISTRATOR, NS_CMP);
-            e.appendChild(admin);
-        }
+
+        Element admin = DomUtil.createElement(doc, EL_ADMINISTRATOR, NS_CMP);
+        DomUtil.setText(admin, user.getAdmin().toString());
+        e.appendChild(admin);
 
         Element url = DomUtil.createElement(doc, EL_URL, NS_CMP);
         DomUtil.setText(url, userUrl);
@@ -240,17 +240,6 @@ public class UserResource implements CmpResource, OutputsXml {
             throw new CmpException("root element not user");
         }
 
-        /* Set this user as NOT an administrator unless specifically changed by the XML
-         * unless user is overlord.
-         */
-
-
-        if (!(user.getUsername() != null &&
-            user.getUsername().equals(User.USERNAME_OVERLORD))
-            ){
-            user.setAdmin(false);
-        }
-
         for (ElementIterator i=DomUtil.getChildren(root); i.hasNext();) {
             Element e = i.nextElement();
 
@@ -275,17 +264,22 @@ public class UserResource implements CmpResource, OutputsXml {
             }
             else if (DomUtil.matches(e, EL_LASTNAME, NS_CMP)) {
                 if (user.getUsername() != null &&
-                    user.getUsername().equals(User.USERNAME_OVERLORD)) {
-                    throw new CmpException("root user's last name may not " +
-                                           "be changed");
-                }
-                user.setLastName(DomUtil.getTextTrim(e));
+                        user.getUsername().equals(User.USERNAME_OVERLORD)) {
+                        throw new CmpException("root user's last name may not " +
+                                               "be changed");
+                    }
+                    user.setLastName(DomUtil.getTextTrim(e));
             }
             else if (DomUtil.matches(e, EL_EMAIL, NS_CMP)) {
                 user.setEmail(DomUtil.getTextTrim(e));
             }
             else if (DomUtil.matches(e, EL_ADMINISTRATOR, NS_CMP)){
-                user.setAdmin(true);
+                if (user.getUsername() != null &&
+                        user.getUsername().equals(User.USERNAME_OVERLORD)) {
+                        throw new CmpException("root user's admin status " +
+                                               "may not be changed");
+                }
+                user.setAdmin(Boolean.parseBoolean(DomUtil.getTextTrim(e)));
             }
             else {
                 throw new CmpException("unknown user attribute element " +

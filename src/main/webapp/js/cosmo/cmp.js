@@ -15,6 +15,7 @@
 dojo.provide("cosmo.cmp");
 
 dojo.require("dojo.io.*");
+dojo.require("dojo.string");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.auth");
 
@@ -144,7 +145,8 @@ dojo.declare("cosmo.cmp.Cmp", null,
                                 '<email>' + userHash.email + '</email>'
 
                 if (userHash.administrator) {
-                    request_content += '<' + EL_ADMINISTRATOR + ' />'
+                    request_content += '<' + EL_ADMINISTRATOR + ' >true</' + 
+                    	EL_ADMINISTRATOR + '>'
                 }
 
                 request_content += '</user>'
@@ -162,11 +164,8 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
                         '<user xmlns="http://osafoundation.org/cosmo/CMP">'
                 for (propName in userHash) {
-                        if (propName == EL_ADMINISTRATOR){
-                            request_content += "<" + EL_ADMINISTRATOR + " />"
-                        } else {
-                            request_content += "<" + propName + ">" + userHash[propName] + "</" + propName + ">";
-                        }
+                     request_content += "<" + propName + ">" + userHash[propName] + "</" + propName + ">";
+
                 }
                 request_content += "</user>"
 
@@ -215,13 +214,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
                 for (propName in userHash) {
 
-                      if (propName == EL_ADMINISTRATOR){
-                        requestContent += "<" + EL_ADMINISTRATOR + " />"
-                    } else {
-
-                        requestContent += "<" + propName + ">" + userHash[propName] + "</" + propName + ">";
-                    }
-
+                    requestContent += "<" + propName + ">" + userHash[propName] + "</" + propName + ">";
                 }
                 requestContent += "</user>"
 
@@ -286,8 +279,13 @@ dojo.declare("cosmo.cmp.Cmp", null,
             obj.dateCreated = user.getElementsByTagName("created")[0].firstChild.nodeValue;
             obj.dateModified = user.getElementsByTagName("modified")[0].firstChild.nodeValue;
             obj.url = user.getElementsByTagName("url")[0].firstChild.nodeValue;
-
-            obj.administrator = (user.getElementsByTagName("administrator").length > 0);
+            
+            obj.administrator = 
+            	(
+            	dojo.string.trim(
+            		user.getElementsByTagName("administrator")[0].firstChild.nodeValue) ==
+            	"true"
+            	);
             if (user.getElementsByTagName("unactivated").length > 0){
                 obj.unactivated = true;
             }

@@ -89,6 +89,16 @@ public class UserContent implements XmlSerializable {
             e.appendChild(email);
         }
 
+        if (user.getAdmin() != null) {
+            Element admin =
+                DomUtil.createElement(doc, UserResource.EL_ADMINISTRATOR,
+                                      UserResource.NS_CMP);
+            DomUtil.setText(admin, user.getAdmin().toString());
+            e.appendChild(admin);
+        }
+
+        
+
         return e;
     }
 }

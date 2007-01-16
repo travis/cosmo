@@ -341,9 +341,9 @@ public class CmpGetTest extends BaseCmpServletTestCase {
                                          UserResource.EL_MODIFIED, 
                                          OutputsXml.NS_CMP)));
         
-        u.setAdmin(DomUtil.hasChildElement(root, 
+        u.setAdmin(Boolean.parseBoolean(DomUtil.getChildTextTrim(root, 
                         UserResource.EL_ADMINISTRATOR, 
-                        OutputsXml.NS_CMP));
+                        OutputsXml.NS_CMP)));
         
         return u;
     }

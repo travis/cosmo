@@ -768,7 +768,16 @@ public class CmpServlet extends HttpServlet {
             resp.setHeader("ETag", resource.getEntityTag());
             resource =
                 new UserResource(user, getUrlBase(req), xmldoc);
-            
+            if (user.getAdmin() == true){
+                // Non admin tried to change admin status
+                user.setAdmin(false);
+                log.warn("bad request for signup: " +
+                                "user may not signup as admin");
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN,
+                "User may not signup as admin.");
+                return;
+            }
+
             sendXmlResponse(resp, resource);
         } catch (SAXException e) {
             log.warn("error parsing request body: " + e.getMessage());
@@ -797,16 +806,28 @@ public class CmpServlet extends HttpServlet {
             String urlUsername = usernameFromPathInfo(req.getPathInfo());
             User user = getLoggedInUser();
             String oldUsername = user.getUsername();
+            Boolean oldAdmin = user.getAdmin();
             UserResource resource =
                 new UserResource(user, getUrlBase(req), xmldoc);
             if (user.isUsernameChanged()) {
                 // reset logged in user's username
                 user.setUsername(oldUsername);
                 log.warn("bad request for account update: " +
-                         "username may not be changed");
+                "username may not be changed");
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Username may not be changed");
+                "Username may not be changed");
                 return;
+            }
+            if (user.isAdminChanged() &&
+                    !oldAdmin){
+                // Non admin tried to change admin status
+                user.setAdmin(oldAdmin);
+                log.warn("bad request for account update: " +
+                "non-admin may not change own admin status");
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN,
+                "Non admin may not change own admin status.");
+                return;
+
             }
             userService.updateUser(user);
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);

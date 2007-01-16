@@ -53,6 +53,21 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         assertNotNull("null Content-Location",
                       response.getHeader("Content-Location"));
         assertNotNull("null ETag", response.getHeader("ETag"));
+        
+        // Make sure user can't sign up w/ admin privs
+        
+        User u2 = testHelper.makeDummyUser();
+        u2.setAdmin(true);
+
+        request = createMockRequest("POST", "/signup");
+        sendXmlRequest(request, new UserContent(u2));
+
+        response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        this.assertEquals("user was allowed to sign up as admin", 
+                MockHttpServletResponse.SC_FORBIDDEN ,response.getStatus());
+        
     }
 
     /**
@@ -199,6 +214,20 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         assertNotNull("null email", storedUser.getEmail());
         assertEquals("updated email doesn't match", storedUser.getEmail(),
                      cmpUser.getEmail());
+        
+        // Make sure users can't make themselves administrators
+        
+        cmpUser.setAdmin(true);
+        
+        request = createMockRequest("PUT", "/account");
+        sendXmlRequest(request, new UserContent(cmpUser));
+
+        response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        this.assertEquals("user was allowed to make himself admin", 
+                MockHttpServletResponse.SC_FORBIDDEN ,response.getStatus());
+
     }
 
     /**

@@ -145,6 +145,7 @@ public class User extends BaseModelObject {
     private String oldEmail;
     private String activationId;
     private Boolean admin;
+    private Boolean oldAdmin;
     private Date dateCreated;
     private Date dateModified;
     private Set<Item> items = new HashSet<Item>(0);
@@ -287,10 +288,23 @@ public class User extends BaseModelObject {
     public Boolean getAdmin() {
         return admin;
     }
+    
+    @Transient
+    public Boolean getOldAdmin() {
+        return oldAdmin;
+    }
+
+    /**
+     */
+    @Transient
+    public boolean isAdminChanged() {
+        return oldAdmin != null && ! oldAdmin.equals(admin);
+    }
 
     /**
      */
     public void setAdmin(Boolean admin) {
+        oldAdmin = this.admin;
         this.admin = admin;
     }
 

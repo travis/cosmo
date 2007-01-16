@@ -71,6 +71,27 @@ public class CmpPostTest extends BaseCmpServletTestCase {
         assertNotNull("null Content-Location",
                       response.getHeader("Content-Location"));
         assertNotNull("null ETag", response.getHeader("ETag"));
+        
+    }
+    
+    /**
+     * Ensure users cannot sign up as administrators.
+     */
+    public void testSignupAdmin() throws Exception{
+        // Make sure user can't sign up w/ admin privs
+        
+        User u1 = testHelper.makeDummyUser();
+        u1.setAdmin(true);
+
+        MockHttpServletRequest request = createMockRequest("POST", "/signup");
+        sendXmlRequest(request, new UserContent(u1));
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        this.assertEquals("user was allowed to sign up as admin", 
+                MockHttpServletResponse.SC_FORBIDDEN ,response.getStatus());
+        
     }
 
     /**

@@ -22,6 +22,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.User;
@@ -106,6 +107,54 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
 
         // delete user
         userDao.removeUser("user2");
+    }
+    
+    public void testUserProperties() {
+        User user1 = new User();
+        user1.setUsername("user1");
+        user1.setFirstName("User");
+        user1.setLastName("1");
+        user1.setEmail("user1@user1.com");
+        user1.setPassword("user1password");
+        user1.setAdmin(Boolean.TRUE);
+
+        user1 = userDao.createUser(user1);
+        
+        clearSession();
+
+        // find by username
+        User queryUser1 = userDao.getUser("user1");
+        Assert.assertNotNull(queryUser1);
+        Assert.assertNotNull(queryUser1.getUid());
+        verifyUser(user1, queryUser1);
+        
+        queryUser1.getPreferences().put("prop1", "value1");
+        queryUser1.getPreferences().put("prop2", "value2");
+
+        userDao.updateUser(queryUser1);
+        
+        clearSession();
+
+        // find by uid
+        queryUser1 = userDao.getUserByUid(user1.getUid());
+        Assert.assertNotNull(queryUser1);
+        Assert.assertEquals(2, queryUser1.getPreferences().size());
+        Assert.assertEquals("value1", queryUser1.getPreferences().get("prop1"));
+        Assert.assertEquals("value2", queryUser1.getPreferences().get("prop2"));
+        
+        queryUser1.getPreferences().remove("prop2");
+        queryUser1.getPreferences().put("prop1", "value1changed");
+        userDao.updateUser(queryUser1);
+
+        clearSession();
+
+        queryUser1 = userDao.getUserByUid(user1.getUid());
+        Assert.assertNotNull(queryUser1);
+        Assert.assertEquals(1, queryUser1.getPreferences().size());
+        Assert.assertEquals("value1changed", queryUser1.getPreferences().get("prop1"));
+        
+        userDao.removeUser(queryUser1);
+        clearSession();
     }
     
     public void testCreateDuplicateUserEmail() {

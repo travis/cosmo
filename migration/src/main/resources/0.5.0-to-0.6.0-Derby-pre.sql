@@ -72,11 +72,15 @@ create table message_stamp (msgsubject clob(262144), msgto clob(262144), msgcc c
 create table stamp (stamptype varchar(16) not null, id bigint not null, createdate bigint, modifydate bigint, isactive smallint not null, itemid bigint not null, primary key (id), unique (itemid, stamptype))
 create table subscription (id bigint not null, displayname varchar(255) not null, collectionuid varchar(255) not null, ticketkey varchar(255) not null, ownerid bigint not null, primary key (id), unique (ownerid, displayname))
 
+create table user_preferences (userid bigint not null, preferencevalue varchar(255), preferencename varchar(255), primary key (userid, preferencename))
+
 alter table calendar_stamp add constraint FK2B603B8280655080 foreign key (stampid) references stamp
 alter table event_stamp add constraint FK1ACFBDDE2F8DB5CC foreign key (stampid) references stamp
 alter table message_stamp add constraint FKB79DC58B8724FF3F foreign key (stampid) references stamp
 
 alter table stamp add constraint FK68AC3C35361D2A6 foreign key (itemid) references item
 alter table subscription add constraint FK1456591D5ACA52FE foreign key (ownerid) references users
+
+alter table user_preferences add constraint FK199BD08467D36616 foreign key (userid) references users
 
 create index idx_stamptype on stamp (stamptype)

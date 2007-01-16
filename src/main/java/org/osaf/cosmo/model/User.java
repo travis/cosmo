@@ -16,7 +16,9 @@
 package org.osaf.cosmo.model;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +26,8 @@ import java.util.regex.Pattern;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -35,11 +39,14 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.Index;
+import org.hibernate.annotations.MapKey;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Email;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
+import org.hibernate.validator.Size;
 
 /**
  */
@@ -141,6 +148,7 @@ public class User extends BaseModelObject {
     private Date dateCreated;
     private Date dateModified;
     private Set<Item> items = new HashSet<Item>(0);
+    private Map<String, String> preferences = new HashMap<String, String>(0);
     private Set<CollectionSubscription> subscriptions = 
         new HashSet<CollectionSubscription>(0);
 
@@ -497,6 +505,22 @@ public class User extends BaseModelObject {
 
     public void setItems(Set<Item> items) {
         this.items = items;
+    }
+    
+    @CollectionOfElements
+    @JoinTable(
+            name="user_preferences",
+            joinColumns = @JoinColumn(name="userid")
+    )
+    @MapKey(columns=@Column(name="preferencename", length=255))
+    @Column(name="preferencevalue", length=255)
+    //@Size(min=0, max=255)
+    public Map<String, String> getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(Map<String, String> preferences) {
+        this.preferences = preferences;
     }
     
     @OneToMany(mappedBy = "owner", fetch=FetchType.LAZY)

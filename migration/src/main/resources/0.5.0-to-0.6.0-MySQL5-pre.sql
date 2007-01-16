@@ -66,11 +66,15 @@ create table message_stamp (stampid bigint not null, msgsubject mediumtext, msgt
 create table stamp (stamptype varchar(16) not null, id bigint not null auto_increment, createdate bigint, modifydate bigint, isactive smallint not null, itemid bigint not null, primary key (id), unique (itemid, stamptype)) ENGINE=InnoDB
 create table subscription (id bigint not null auto_increment, displayname varchar(255) not null, collectionuid varchar(255) not null, ticketkey varchar(255) not null, ownerid bigint not null, primary key (id), unique (ownerid, displayname)) ENGINE=InnoDB
 
+create table user_preferences (userid bigint not null, preferencevalue varchar(255), preferencename varchar(255), primary key (userid, preferencename)) ENGINE=InnoDB
+
 alter table calendar_stamp add index FK2B603B8280655080 (stampid), add constraint FK2B603B8280655080 foreign key (stampid) references stamp (id);
 alter table event_stamp add index FK1ACFBDDE2F8DB5CC (stampid), add constraint FK1ACFBDDE2F8DB5CC foreign key (stampid) references stamp (id);
 alter table message_stamp add index FKB79DC58B8724FF3F (stampid), add constraint FKB79DC58B8724FF3F foreign key (stampid) references stamp (id);
 
 alter table stamp add index FK68AC3C35361D2A6 (itemid), add constraint FK68AC3C35361D2A6 foreign key (itemid) references item (id);
 alter table subscription add index FK1456591D5ACA52FE (ownerid), add constraint FK1456591D5ACA52FE foreign key (ownerid) references users (id);
+
+alter table user_preferences add index FK199BD08467D36616 (userid), add constraint FK199BD08467D36616 foreign key (userid) references users (id);
 
 create index idx_stamptype on stamp (stamptype);

@@ -34,6 +34,7 @@ dojo.require("cosmo.ui.widget.TicketWidget");
   <c:set var="feedPath" value="/atom/collection/${Collection.uid}"/>
 </c:if>
 <c:set var="davPath" value="/home${Path}"/>
+<c:set var="pimPath" value="/pim/collection/${Collection.uid}"/>
 
 <div class="hd" style="margin-top: 12px;">
   Tickets
@@ -96,6 +97,7 @@ dojo.addOnLoad(function(){
         <a href='<c:url value="${davPath}?ticket=${ticket.key}" />'>[dav]</a>
         <c:if test="${isCollection}">
           <a href='<c:url value="${feedPath}?ticket=${ticket.key}" />'>[feed]</a>
+          <a href='<c:url value="${pimPath}?ticket=${ticket.key}" />'>[pim]</a>
         </c:if>
       </td>
       <td class="smTableData" style="text-align:center;">

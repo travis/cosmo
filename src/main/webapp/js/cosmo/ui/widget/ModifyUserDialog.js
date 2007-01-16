@@ -199,9 +199,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
             // username only needed if logged in as administrator
 
             var self = this;
-
-            var handlerDict = {
-                handle: function(type, data, evt){
+            
+            var handle = function(type, data, evt){
 
                     if (evt.status == 200){
 
@@ -229,9 +228,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                     } else if (evt.status == 404){
                         alert("User does not exist");
                     }
+			}
+			
+            var handlerDict = {
+                load: handle,
+                error: handle
                 }
 
-            }
+
 
             if (populateUsername){
                    cosmo.cmp.cmpProxy.getUser(populateUsername, handlerDict);

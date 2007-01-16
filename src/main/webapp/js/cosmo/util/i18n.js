@@ -21,8 +21,8 @@
 dojo.provide("cosmo.util.i18n");
 
 cosmo.util.i18n.loadI18n = function(uri){
-	var s = dojo.hostenv.getText(uri);
-	cosmo.util.i18n._localtext = eval("(" + s + ")");
+    var s = dojo.hostenv.getText(uri);
+    cosmo.util.i18n._localtext = eval("(" + s + ")");
 }
 
 cosmo.util.i18n.init = function(uri){
@@ -34,6 +34,15 @@ function getText(str) {
 }
 
 cosmo.util.i18n.getText = getText;
+
+cosmo.util.i18n.messageExists = function(str){
+     if (cosmo.util.i18n._localtext[str]){
+         return true;
+     } else {
+         return false;
+     }
+}
+
 if (djConfig['i18nLocation']){
-	cosmo.util.i18n.init(djConfig['i18nLocation']);
+    cosmo.util.i18n.init(djConfig['i18nLocation']);
 }

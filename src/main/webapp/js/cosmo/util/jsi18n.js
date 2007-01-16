@@ -43,4 +43,13 @@ function getText(str) {
     return cosmo.util.jsi18n._localtext[str] || "[[" + str + "]]";
 }
 
+cosmo.util.i18n.messageExists = function(str){
+     if (cosmo.util.jsi18n._localtext[str]){
+         return true;
+     } else {
+         return false;
+     }
+}
+
+
 cosmo.util.i18n.getText = getText

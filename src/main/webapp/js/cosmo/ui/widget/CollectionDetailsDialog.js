@@ -82,7 +82,8 @@ dojo.widget.HtmlWidget, function(){
             help:_("Main.CollectionDetails.Help"),
             downloadHere:_("Main.CollectionDetails.DownloadHere"),
             dontHave:_("Main.CollectionDetails.DontHave"),
-            clickHere:_("Main.CollectionDetails.ClickHere")
+            clickHere:_("Main.CollectionDetails.ClickHere"),
+            helpLink:_("Main.CollectionDetails.HelpLink")
         },
         
         clientsToProtocols: {
@@ -180,9 +181,22 @@ dojo.widget.HtmlWidget, function(){
         },
         
         _setClientInstructions: function(client){
-            dojo.dom.replaceChildren(this.clientInstructions, 
-                document.createTextNode(
-                _("Main.CollectionDetails.Instructions." + client)));
+            var x = 1;
+            var d = document.createElement("div");
+            while (true){
+                var key = "Main.CollectionDetails.Instructions." + client + "." + x;
+                if (cosmo.util.i18n.messageExists(key)){
+                    var message = _(key);
+                    if (x > 1){
+                        d.appendChild(document.createElement("br"));
+                    } 
+                    d.appendChild(document.createTextNode(message));
+                } else {
+                    break; 
+                }
+                x++;
+            }
+            dojo.dom.replaceChildren(this.clientInstructions, d);
         }, 
         
         _setClientCollectionAddress: function(client){

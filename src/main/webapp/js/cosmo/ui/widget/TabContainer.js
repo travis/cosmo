@@ -33,10 +33,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
     templateString: '<span></span>',
 
     // Props from template or set in constructor
-    tabs: [],
-    tabNodes: [],
-    contentNodes: [],
     selectedTabIndex: 0,
+    
+    // Define these here so they don't end up as statics
+    initializer: function () {
+        this.tabs = [];
+        this.tabNodes = [];
+        this.contentNodes = [];
+    },
     
     // Attach points
     tabArea: null,
@@ -48,6 +52,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         var o = tabObj;
         var d = null;
         d = _createElem('td');
+        d.id = this.widgetId + '_tab' + index;
         d.className = sel ? 'tabSelected' : 'tabUnselected';
         d.appendChild(_createText(o.label));
         d.onclick = function () { self.showTab(index); };
@@ -55,6 +60,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         
         if (typeof o.content == 'string') {
             var n = _createElem('div');
+            n.id = this.widgetId + '_content' + index;
             n.innerHTML = o.content;
         }
         else {

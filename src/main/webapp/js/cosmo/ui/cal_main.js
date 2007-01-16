@@ -885,7 +885,7 @@ cosmo.ui.cal_main.Cal = new function () {
     this.isTimedOut = function () {
         var diff = 0;
         diff = new Date().getTime() - this.serv.getServiceAccessTime();
-        if (diff > (60000*TIMEOUT_MIN)) {
+        if (diff > (60000*cosmo.env.getTimeoutMinutes())) {
             return true;
         }
         else {
@@ -897,7 +897,7 @@ cosmo.ui.cal_main.Cal = new function () {
         var diff = 0;
         ts = ts.getTime();
         diff = ts - this.serv.getServiceAccessTime();
-        return (diff > (60000*(TIMEOUT_MIN-2))) ? true : false
+        return (diff > (60000*(cosmo.env.getTimeoutMinutes()-2))) ? true : false
     };
     this.checkTimeout = function () {
         // If user is client-side timed-out, kill the session cookie and redirect to login page

@@ -115,6 +115,22 @@ cosmo.env.setBaseUrl = function(baseUrl){
     cosmo.env._cosmoConfig["baseUrl"] = baseUrl;
 }
 
+/**
+ * Sets the number of seconds for server-side timeout. Provided 
+ * by the server somehow
+ * @param {Number} timeoutSeconds (note: this number may be negative)
+ * Negative number means effectively no timeout
+ */
+cosmo.env.setTimeoutSeconds = function(timeoutSeconds) {
+    var s = timeoutSeconds || -1;
+    if (s < 0) {
+        cosmo.env._cosmoConfig["timeoutSeconds"] = -1;
+    }
+    else {
+        cosmo.env._cosmoConfig["timeoutSeconds"] = s;
+    }
+}
+
 cosmo.env.getImagesUrl = function(){
 	return cosmo.env.getBaseUrl() + '/templates/default/images/';
 }
@@ -133,3 +149,24 @@ cosmo.env.getAuthProc = function(){
 cosmo.env.getVersion= function(){
 	return cosmo.env.version;
 }
+
+/**
+ * Returns the number of seconds for the server-side timeout
+ * -- -1 indicates no timeout set, infinite timeout
+ */
+cosmo.env.getTimeoutSeconds = function (){
+    return cosmo.env._cosmoConfig["timeoutSeconds"];
+}
+
+/**
+ * Convenience method to return the number of minutes 
+ * for the server-side timeout -- -1 indicates no timeout
+ * set, infinite timeout
+ */
+cosmo.env.getTimeoutMinutes = function (){
+    var s = cosmo.env._cosmoConfig["timeoutSeconds"];
+    var ret = s == -1 ? -1 : s/60;
+    return ret;
+}
+
+

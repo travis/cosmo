@@ -53,6 +53,12 @@ function bootstrap(){
 
     cosmo.env.setBaseUrl(djConfig['staticBaseUrl']);
     cosmo.env.version = "${PRODUCT_VERSION}";
+    <%-- 
+      Note: It is possible to set this value to negative numbers --
+      Setting the canonical client-side value with a function ensures
+      we end up with reasonable numbers in getTimeoutSeconds and getTimeoutMinutes
+    --%>
+    cosmo.env.setTimeoutSeconds(<%=session.getMaxInactiveInterval()%>);
 
     dojo.require("cosmo.ui.widget.Debug");
 

@@ -55,9 +55,6 @@ dojo.require('cosmo.app');
 dojo.require('cosmo.ui.cal_main');
 dojo.require('cosmo.ui.global_css');
 
-// FIXME: Need to get timeout value from server
-var TIMEOUT_MIN = 30;
-
 // Added automatically to window.onload by 
 // cosmo.ui.event.listeners.hookUpListeners
 cosmo.ui.event.handlers.init = function () {

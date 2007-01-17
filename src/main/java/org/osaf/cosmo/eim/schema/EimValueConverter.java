@@ -18,12 +18,17 @@ package org.osaf.cosmo.eim.schema;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.parameter.Related;
 import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -38,6 +43,9 @@ public class EimValueConverter implements EimSchemaConstants {
         LogFactory.getLog(EimValueConverter.class);
 
     private EimValueConverter() {}
+    
+    private static final Pattern DURATION_PATTERN = Pattern
+            .compile("[+-]?P((\\d+W)|((\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+S)?)?))");
 
     /**
      * Parses a serialized text value and returns the contained
@@ -106,6 +114,95 @@ public class EimValueConverter implements EimSchemaConstants {
         return dates;
     }
 
+    public static String fromIcalTrigger(Trigger trigger) {
+        
+        if(trigger.getDateTime()!=null)
+            return "VALUE=DATE-TIME:" + trigger.getDateTime().toString();
+        
+        Related related = (Related) trigger.getParameters().getParameter(Parameter.RELATED);
+        if(related != null)
+            return related.toString() + ":" + trigger.getDuration().toString();
+        else
+            return trigger.getDuration().toString();
+    }
+
+    /**
+     * Parses a serialized text value and returns a trigger object.
+     * <p>
+     * The text value must be in the format:
+     * <ul>
+     * <li><code>-PT15M</code> trigger will execute 15 minutes
+     * before the start date </li>
+     * <li><code>PT15M</code> trigger will execute 15 minutes
+     * after the start date </li>
+     * <li><code>RELATIVE=END:-PT15M</code> trigger will execute
+     * 15 minutes before the end date</li>
+     * <li><code>RELATIVE=END:PT15M</code> trigger will execute
+     * 15 minutes after the end date</li>
+     * <li><code>VALUE=DATE-TIME:20070101100000Z</code> represents
+     * an a trigger that will execute at an absolute time</li>
+     * </ul>
+     *
+     * @return <code>DateList</code>
+     * @throws EimConversionException
+     */
+    public static Trigger toIcalTrigger(String text)
+            throws EimConversionException {
+        Value value = null;
+        Related related = null;
+        String propVal = null;
+
+        if (text.startsWith("VALUE=DATE-TIME:")) {
+            value = Value.DATE_TIME;
+            propVal = text.substring(16);
+        } else if (text.startsWith("RELATED=END")){
+           related = Related.END;
+           propVal = text.substring(12);
+        } else {
+            propVal = text;
+        }
+        
+        Trigger trigger;
+        try {
+            trigger = new Trigger();
+            if(Related.END.equals(related)) {
+                trigger.getParameters().add(Related.END);
+                if(validateDuration(propVal)==false)
+                    throw new EimConversionException("invalid trigger: " + text);
+                trigger.setDuration(new Dur(propVal));
+            } else if(Value.DATE_TIME.equals(value)) {
+                trigger.getParameters().add(Value.DATE_TIME);
+                trigger.setDateTime(new DateTime(propVal));
+            } else {
+                if(validateDuration(propVal)==false)
+                    throw new EimConversionException("invalid trigger: " + text);
+                trigger.setDuration(new Dur(propVal));
+            }
+            trigger.validate();
+            return trigger;
+        } catch (Exception e) {
+            throw new EimConversionException("invalid trigger: " + text);
+        }
+        
+    }
+    
+    /**
+     * Parse duration text.
+     * @param value string representation of duration
+     * @return ical4j Dur object
+     * @throws EimConversionException
+     */
+    public static Dur toICalDur(String value) throws EimConversionException {
+        if(validateDuration(value)==false)
+            throw new EimConversionException("invalid duration " + value);
+        
+        return new Dur(value);
+    }
+    
+    private static boolean validateDuration(String text) {
+        return DURATION_PATTERN.matcher(text).matches();
+    }
+    
     private static Date toICalDatePreparsed(String text)
         throws EimConversionException {
         try {
@@ -211,4 +308,5 @@ public class EimValueConverter implements EimSchemaConstants {
             return text;
         }
     }
+    
 }

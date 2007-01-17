@@ -38,8 +38,10 @@ import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -416,6 +418,31 @@ public class EventStamp extends Stamp implements
             l.addAll(exdate.getDates());
         return l;
     }
+    
+    /**
+     * Return the first display alarm on an event (master or modification)
+     * @param recurrenceId modification recurrenceId (null for master event)
+     * @return first display alarm on event
+     */
+    public VAlarm getDisplayAlarm(Date recurrenceId) {
+        VEvent event = null;
+        if(recurrenceId == null)
+            event = getMasterEvent();
+        else
+            event = getModification(recurrenceId);
+        
+        if(event==null)
+            return null;
+        
+        for(Iterator it = event.getAlarms().iterator();it.hasNext();) {
+            VAlarm alarm = (VAlarm) it.next();
+            if (alarm.getProperties().getProperty(Property.ACTION).equals(
+                    Action.DISPLAY))
+                return alarm;
+        }
+        
+        return null;
+    }
 
     /**
      * Sets a single iCalendar EXDATE property of the master event,
@@ -545,8 +572,8 @@ public class EventStamp extends Stamp implements
     }
     
     /**
-     * Remove override instance.
-     * @param date override instance date to remove
+     * Remove event modification.
+     * @param date modification date to remove
      */
     public void removeModification(Date date) {
         if(date==null)
@@ -567,13 +594,13 @@ public class EventStamp extends Stamp implements
     }
     
     /**
-     * Add override instance
-     * @param instance override instance to add
+     * Add event modification 
+     * @param modification event modification to add
      */
-    public void addModification(VEvent override) {
+    public void addModification(VEvent modification) {
         
-        // override requires RECURRENCE-ID
-        if(override.getReccurrenceId()==null)
+        // modification requires RECURRENCE-ID
+        if(modification.getReccurrenceId()==null)
             throw new IllegalArgumentException("date cannot be null");
         
         ComponentList vevents = calendar.getComponents().getComponents(
@@ -583,11 +610,11 @@ public class EventStamp extends Stamp implements
         for(Iterator it = vevents.iterator(); it.hasNext();) {
             VEvent event = (VEvent) it.next();
             RecurrenceId recurrId = event.getReccurrenceId();
-            if(recurrId!=null && recurrId.getDate().equals(override.getReccurrenceId().getDate()));
+            if(recurrId!=null && recurrId.getDate().equals(modification.getReccurrenceId().getDate()));
                 throw new ModelValidationException("duplicate recurrence id");
         }
         
-        calendar.getComponents().add(override);
+        calendar.getComponents().add(modification);
     }
     
     /**

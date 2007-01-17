@@ -17,18 +17,16 @@ package org.osaf.cosmo.eim.schema.note;
 
 import java.io.Reader;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecordField;
-import org.osaf.cosmo.eim.ClobField;
-import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseItemApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
+import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Applies EIM records to note items.

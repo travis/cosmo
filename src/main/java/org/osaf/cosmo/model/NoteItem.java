@@ -16,6 +16,7 @@
 package org.osaf.cosmo.model;
 
 import java.io.Reader;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -34,6 +35,9 @@ public class NoteItem extends ContentItem {
 
     public static final QName ATTR_NOTE_BODY = new QName(
             NoteItem.class, "body");
+    
+    public static final QName ATTR_REMINDER_DATE = new QName(
+            NoteItem.class, "reminderDate");
     
     private static final long serialVersionUID = -6100568628972081120L;
     private String icalUid = null;
@@ -55,21 +59,51 @@ public class NoteItem extends ContentItem {
     public void setBody(String body) {
         // body stored as TextAttribute on Item
         TextAttribute bodyAttr = (TextAttribute) getAttribute(ATTR_NOTE_BODY);
-        if(bodyAttr!=null)
+        if(bodyAttr==null && body!=null) {
+            bodyAttr = new TextAttribute(ATTR_NOTE_BODY,body);
+            addAttribute(bodyAttr);
+        }
+        if(body==null)
+            removeAttribute(ATTR_NOTE_BODY);
+        else
             bodyAttr.setValue(body);
-        else if(body!=null) {
-            addAttribute(new TextAttribute(ATTR_NOTE_BODY,body));
-        } 
+    }
+    
+    @Transient
+    public Date getReminderDate() {
+        // reminderDate stored as TimestampAttribute on Item
+        TimestampAttribute reminderAttr = (TimestampAttribute) getAttribute(ATTR_REMINDER_DATE);
+        if(reminderAttr!=null)
+            return reminderAttr.getValue();
+        else
+            return null;
+    }
+
+    public void setReminderDate(Date reminderDate) {
+        // reminderDate stored as TimestampAttribute on Item
+        TimestampAttribute reminderAttr = (TimestampAttribute) getAttribute(ATTR_REMINDER_DATE);
+        if(reminderAttr==null && reminderDate!=null) {
+            reminderAttr = new TimestampAttribute(ATTR_REMINDER_DATE, reminderDate);
+            addAttribute(reminderAttr);
+        }
+        
+        if(reminderDate==null)
+            removeAttribute(ATTR_REMINDER_DATE);
+        else
+            reminderAttr.setValue(reminderDate);
     }
 
     public void setBody(Reader body) {
         // body stored as TextAttribute on Item
         TextAttribute bodyAttr = (TextAttribute) getAttribute(ATTR_NOTE_BODY);
-        if(bodyAttr!=null)
+        if(bodyAttr==null && body!=null) {
+            bodyAttr = new TextAttribute(ATTR_NOTE_BODY,body);
+            addAttribute(bodyAttr);
+        }
+        if(body==null)
+            removeAttribute(ATTR_NOTE_BODY);
+        else
             bodyAttr.setValue(body);
-        else if(body!=null) {
-            addAttribute(new TextAttribute(ATTR_NOTE_BODY,body));
-        } 
     }
 
     @Column(name="icaluid", length=255)

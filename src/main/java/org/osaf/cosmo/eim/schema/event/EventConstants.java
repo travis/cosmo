@@ -63,4 +63,18 @@ public interface EventConstants {
     public static final String FIELD_DISPLAY_NAME = "displayName";
     /** */
     public static final int MAXLEN_DISPLAY_NAME = 256;
+    /** */
+    public static final String FIELD_TRIGGER = "trigger";
+    /** */
+    public static final int MAXLEN_TRIGGER = 32;
+    /** */
+    public static final String FIELD_DESCRIPTION = "description";
+    /** */
+    public static final int MAXLEN_DESCRIPTION = 1024;
+    /** */
+    public static final String FIELD_DURATION = "duration";
+    /** */
+    public static final int MAXLEN_DURATION = 32;
+    /** */
+    public static final String FIELD_REPEAT = "repeat";
 }

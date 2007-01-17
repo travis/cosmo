@@ -115,9 +115,12 @@ cosmo.topics.publish = function(/*Function*/messageConstructor, /*Array*/initial
    // messageConstructor: a constructor that creates a message
    //
    // initializerArguments: arguments to pass to the constructor/initializer
-   var message = {};
-   message.__proto__ = messageConstructor.prototype;
-   messageConstructor.apply(message, initializerArguments);
-   message.constructor = messageConstructor;
+   if (!initializerArguments){
+       initializerArguments = [];
+   }
+   var message = new messageConstructor(initializerArguments[0],
+                                        initializerArguments[1],
+                                        initializerArguments[2], 
+                                        initializerArguments[3]);
    dojo.event.topic.publish(message.topicName, message);
 }

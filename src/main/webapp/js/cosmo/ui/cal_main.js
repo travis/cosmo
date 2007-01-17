@@ -945,6 +945,34 @@ cosmo.ui.cal_main.Cal = new function () {
         dojo.lang.map(this.currentCollections, updateCollection);
     }
 
+    this._shouldHideScrollBars = function(){
+            if(dojo.render.os.mac && dojo.render.html.mozilla){
+                return true;
+            }
+            
+            if (dojo.render.os.win && dojo.render.html.ie){
+                return true;
+            }
+            
+            return false;
+    }
+    this.handleModalDialogDisplayed = function(){
+       if (!this._shouldHideScrollBars()){
+         return ;
+       }
+    
+       var viewDiv = document.getElementById('timedScrollingMainDiv');
+       viewDiv.style.overflow = "hidden";
+    };
+    
+    this.handleModalDialogDismissed = function(){
+       if (!this._shouldHideScrollBars()){
+           return;
+       }
+       var viewDiv = document.getElementById('timedScrollingMainDiv');
+       viewDiv.style.overflow = "auto";
+    }
+    
     this.redirectTimeout = function () {
         location = cosmo.env.getRedirectUrl();
     };

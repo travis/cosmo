@@ -130,12 +130,12 @@ cosmo.ui.cal_form.CalForm = function () {
         var formElem = null;
         
         this.mailtoLink = document.createElement("a");
-		
-		this.mailtoLink.setAttribute("href", "http://www.google.com");
+        
+        this.mailtoLink.setAttribute("href", "http://www.google.com");
         this.mailtoLink.setAttribute("id", "emailThisEventLink");
         
-		this.mailtoLink.appendChild(
-			document.createTextNode("Email this event"));
+        this.mailtoLink.appendChild(
+            document.createTextNode("Email this event"));
         d.appendChild(this.mailtoLink);
 
         cont.id = 'eventInfoDivContent';
@@ -302,40 +302,40 @@ cosmo.ui.cal_form.CalForm = function () {
     };
     
     this.setMailtoLink = function (event) {
-		var timeFormat=_("Sidebar.Email.TimeFormat");
+        var timeFormat=_("Sidebar.Email.TimeFormat");
 
-    	var subject = _("Sidebar.Email.EventChanged") + Cal.currentCollection.displayName + ": " + event.data.title;
-    	var body = [_("Sidebar.Email.Title") , event.data.title , "%0d%0a"];
-    	
-    	if (event.data.start.tzId){
-    		body = body.concat([
-			 _("Sidebar.Email.Timezone")  , event.data.start.tzId , "%0d%0a"]);
-    	}
-	    body = body.concat([
-			 _("Sidebar.Email.Starts") , event.data.start.strftime(timeFormat) , "%0d%0a" , 
-			 _("Sidebar.Email.Ends") , event.data.end.strftime(timeFormat) , "%0d%0a"]);
-		if (event.data.allDay) {
-			body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
-		} 
+        var subject = _("Sidebar.Email.EventChanged") + Cal.currentCollection.displayName + ": " + event.data.title;
+        var body = [_("Sidebar.Email.Title") , event.data.title , "%0d%0a"];
+        
+        if (event.data.start.tzId){
+            body = body.concat([
+             _("Sidebar.Email.Timezone")  , event.data.start.tzId , "%0d%0a"]);
+        }
+        body = body.concat([
+             _("Sidebar.Email.Starts") , event.data.start.strftime(timeFormat) , "%0d%0a" , 
+             _("Sidebar.Email.Ends") , event.data.end.strftime(timeFormat) , "%0d%0a"]);
+        if (event.data.allDay) {
+            body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
+        } 
 
-		if (event.data.recurrenceRule){
-			body = body.concat([_("Sidebar.Email.Recurs") , 
-				event.data.recurrenceRule.frequency]);
-			if (event.data.recurrenceRule.endDate){
-				body = body.concat([_("Sidebar.Email.EndingOn") , 
-					event.data.recurrenceRule.endDate.strftime(timeFormat)]);
-			}
-			body.push(".%0d%0a");
-			
-		}
-		if (event.data.status){
-			body.concat([_("Sidebar.Email.Status") , event.data.status , "%0d%0a"]);
-		}
-		if (event.data.description){
-			body = body.concat([ ,
-				_("Sidebar.Email.Description") , event.data.description , "%0d%0a"]);
-		}
-		this.mailtoLink.setAttribute("href", "mailto:?subject=" + subject + "&body=" + body.join(""));
+        if (event.data.recurrenceRule){
+            body = body.concat([_("Sidebar.Email.Recurs") , 
+                event.data.recurrenceRule.frequency]);
+            if (event.data.recurrenceRule.endDate){
+                body = body.concat([_("Sidebar.Email.EndingOn") , 
+                    event.data.recurrenceRule.endDate.strftime(timeFormat)]);
+            }
+            body.push(".%0d%0a");
+            
+        }
+        if (event.data.status){
+            body.concat([_("Sidebar.Email.Status") , event.data.status , "%0d%0a"]);
+        }
+        if (event.data.description){
+            body = body.concat([ ,
+                _("Sidebar.Email.Description") , event.data.description , "%0d%0a"]);
+        }
+        this.mailtoLink.setAttribute("href", "mailto:?subject=" + subject + "&body=" + body.join(""));
     };
 
     this.populateTimezoneSelector = function (region){
@@ -838,6 +838,8 @@ cosmo.ui.cal_form.CalForm = function () {
 
         dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, Cal, Cal.handleCollectionUpdated);
         dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, Cal, Cal.handleSubscriptionUpdated);
+        dojo.event.topic.subscribe(cosmo.topics.ModalDialogDisplayed.topicName, Cal, Cal.handleModalDialogDisplayed);
+        dojo.event.topic.subscribe(cosmo.topics.ModalDialogDismissed.topicName, Cal, Cal.handleModalDialogDismissed);
 
     };
     this.addJumpToDate = function (dMain) {

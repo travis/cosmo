@@ -19,6 +19,7 @@ dojo.provide('cosmo.app');
 dojo.require('cosmo.ui.widget.ModalDialog');
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.topics");
 var _ = cosmo.util.i18n.getText;
 cosmo.app = new function () {
     var self = this;
@@ -93,6 +94,7 @@ cosmo.app = new function () {
         }
         self.setInputDisabled(true);
         self.modalDialog.show();
+        cosmo.topics.publish(cosmo.topics.ModalDialogDisplayed);
     };
     /**
      * Dismiss the faux modal dialog box -- check for queued error
@@ -102,6 +104,7 @@ cosmo.app = new function () {
     this.hideDialog = function() {
         // Hide the current error dialog
         self.modalDialog.hide();
+        cosmo.topics.publish(cosmo.topics.ModalDialogDismissed);
         // If there are error messages that have been added to the queue,
         // trigger another dialog to handle them
         if (self.errorList.length) {
@@ -113,11 +116,9 @@ cosmo.app = new function () {
     };
     this.setInputDisabled = function(isDisabled) {
         if (isDisabled) {
-            //document.getElementById('fullMaskDiv').style.display = 'block'; // Block input with full-sized mask
             this.inputDisabled = true;
         }
         else {
-            //document.getElementById('fullMaskDiv').style.display = 'none'; // Remove full-sized mask
             this.inputDisabled = false;
         }
         return this.inputDisabled;

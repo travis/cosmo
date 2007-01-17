@@ -46,6 +46,11 @@ cosmo.topics.declareMessage = function(/*string*/ className,
 
 dojo.declare("cosmo.topics.Message", null, { topicName: null});
 
+/**
+ * Data/Model level messages: These are messages that get published when data level events
+ * happen, like an item was updated or deleted.  
+ *
+ */
 cosmo.topics.declareMessage("cosmo.topics.CollectionUpdatedMessage", 
     // summary: Published after successful updating of a collection to the server
     //          has occured
@@ -73,6 +78,35 @@ cosmo.topics.declareMessage("cosmo.topics.SubscriptionUpdatedMessage",
         subscription: null
     }
 );
+
+/**
+ * Application Level messages: Messages about changing the application state are to be found here. For
+ * instance, the selected collection changed.
+ */
+
+//Nothing yet
+
+/**
+ * Lower Level UI messages: Messsages very specific to the UI - like screen resizes and whatnot
+ */
+ 
+cosmo.topics.declareMessage("cosmo.topics.ModalDialogDisplayed",
+  // summary: published when the modal dialog box is displayed
+  // description: UI elements who have parts which "shine through" floating divs
+  //              which are placed above it in certain browsers (FF on Mac OS X for 
+  //              instance) should subscribe to this message's topic so it can hide
+  //              those parts.
+  "MODAL_DIALOG_DISPLAYED",null,null,null
+);
+
+cosmo.topics.declareMessage("cosmo.topics.ModalDialogDismissed",
+  // summary: published when the modal dialog box is no longer visible
+  // description: any UI elements who were hiding certain elements (see
+  //              cosmo.topics.ModalDialogDisplayed) can now show them
+  "MODAL_DIALOG_DISMISSED",null,null,null
+);
+
+// Other handy dandy functions
 
 cosmo.topics.publish = function(/*Function*/messageConstructor, /*Array*/initializerArguments){
    // summary: create a message and publish it in one fell swoop. You don't specify a topic, because the topic

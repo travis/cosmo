@@ -43,6 +43,8 @@ dojo.declare("cosmo.cmp.Cmp", null,
             request.transport = "XMLHTTPTransport";
             request.contentType =  'text/xml';
             request.sync = sync;
+            request.headers["Cache-Control"] = "no-cache";
+            request.headers["Pragma"] = "no-cache";
             
             return request;
         },

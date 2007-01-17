@@ -9,8 +9,8 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.widget.Button");
+dojo.require("cosmo.convenience");
 
-_ = cosmo.util.i18n.getText
 
 dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
     {
@@ -180,13 +180,13 @@ cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) 
         'authAction': authAction }, s, 'last');
     s.removeChild(c.domNode); 
     var cancelButton = dojo.widget.createWidget("cosmo:Button", { 
-        text: getText("App.Button.Cancel"),
+        text: _("App.Button.Cancel"),
         width: '60px',
         handleOnClick: cosmo.app.hideDialog,
         small: true }, s, 'last');
     s.removeChild(cancelButton.domNode); 
     var submitButton = dojo.widget.createWidget("cosmo:Button", { 
-        text: getText("App.Button.Submit"),
+        text: _("App.Button.Submit"),
         width: '60px',
         handleOnClick: function () { c.doAuth.apply(c) },
         small: true }, s, 'last');
@@ -203,7 +203,7 @@ cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) 
 cosmo.ui.widget.AuthBox.getSuccessProperties = function ( /* String */ message) {
     var s = document.createElement('span');
     var closeButton = dojo.widget.createWidget("cosmo:Button", { 
-        text: getText("App.Button.Close"),
+        text: _("App.Button.Close"),
         width: '60px',
         handleOnClick: cosmo.app.hideDialog,
         small: true }, s, 'last');

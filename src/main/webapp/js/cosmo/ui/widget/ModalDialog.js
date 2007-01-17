@@ -274,7 +274,6 @@ dojo.widget.HtmlWidget, {
 
             // Clear buttons and actually take the div off the page
             this.hide = function () {
-               
                 var bDiv = this.buttonPanelNode;
 
                 // Clean up previous panel if any
@@ -285,10 +284,6 @@ dojo.widget.HtmlWidget, {
                     this.btnPanel.destroy();
                 }
  
-                if (this.content instanceof dojo.widget.HtmlWidget){
-                    this.content.destroy();
-                }
-                
                 this.title = '';
                 this.prompt = '';
                 this.content = null;
@@ -300,6 +295,9 @@ dojo.widget.HtmlWidget, {
                 this.uiFullMask.style.display = 'none';
                 this.domNode.style.display = 'none';
                 this.isDisplayed = false;
+                if (this.content instanceof dojo.widget.HtmlWidget){
+                    this.content.destroy();
+                }
                 
             };
         },

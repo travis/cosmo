@@ -45,7 +45,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
             request.sync = sync;
             request.headers["Cache-Control"] = "no-cache";
             request.headers["Pragma"] = "no-cache";
-            
+            // Fight the dark powers of IE's evil caching mechanism
+            if (document.all) {
+                request.preventCache = true;
+            }
+
             return request;
         },
 

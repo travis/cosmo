@@ -113,14 +113,14 @@ cosmo.account.settings = new function () {
         s.removeChild(c.domNode);
         o.content = c;
         b = new cosmo.ui.button.Button({ text:_('App.Button.Close'), width:60, small: true,
-            handleOnClick: function () { cosmo.app.modalDialog.hide(); } });
+            handleOnClick: function () { cosmo.app.hideDialog(); } });
         o.btnsLeft = [b];
         b = new cosmo.ui.button.Button({ text:_('App.Button.Save'), width:60, small: true,
             handleOnClick: function () { self.submitSave.apply(self); } });
         o.btnsRight = [b];
         o.defaultAction = function () { alert('Hi there'); };
         
-        cosmo.app.modalDialog.show(o);
+        cosmo.app.showDialog(o);
     }
     this.submitSave = function () {
         // Validate the form input using each field's

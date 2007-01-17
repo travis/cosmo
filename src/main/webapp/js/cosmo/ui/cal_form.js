@@ -31,10 +31,10 @@ dojo.require("dojo.string");
 dojo.require("cosmo.ui.event.handlers");
 dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.util.i18n");
-var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.model");
 dojo.require("cosmo.view.cal.canvas");
+dojo.require("cosmo.convenience");
 
 dojo.provide("cosmo.ui.cal_form");
 
@@ -577,7 +577,7 @@ cosmo.ui.cal_form.CalForm = function () {
             errMsg = errMsg.replace(/\n/g, '<br/>');
             e = new ScoobyServiceClientException();
             e.message = errMsg;
-            cosmo.app.showErr('Error in Event Detail Form input', e);
+            cosmo.app.showErr(_('Main.DetailForm.Error'), e);
             return false;
         }
         // All okey-dokey -- submit

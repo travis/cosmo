@@ -143,7 +143,7 @@ cosmo.env.getLoginRedirect = function(){
 }
 
 cosmo.env.getAuthProc = function(){
-	return cosmo.env.getBaseUrl() + "/j_acegi_security_check";
+	return cosmo.env.getBaseUrl() + "/no_redirect_security_check";
 }
 
 cosmo.env.getVersion= function(){

@@ -34,17 +34,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             cosmo.app.modalDialog.setPrompt(str, type);
         },
         _handleAuthResp: function (str) {
-            /*
-            Login page recognition string: login-page-2ksw083judrmru58
-            This is an ugly hack to allow the AJAX handler to recognize
-            this page. In previous versions of Cosmo, this was done by
-            detecting the name of the login.js file, so I'd actually
-            call this an improvment.
-           
-            Authentication in general should be rethought soon. 
-            */
+
             // Auth failed -- bad password? Reset for retry
-            if (str.indexOf('login-page-2ksw083judrmru58') > -1){
+            if (str == cosmo.env.getBaseUrl() + "/loginfailed"){
                 this._showErr(_('Login.Error.AuthFailed'));
                 this.passwordInput.value = '';
             }

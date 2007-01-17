@@ -37,31 +37,17 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
         _passwordFocus: false,
 
         handleLoginResp: function (type, str, evt) {
-            /*
-            Login page recognition string: login-page-2ksw083judrmru58
-            This is an ugly hack to allow the AJAX handler to recognize
-            this page. In previous versions of Cosmo, this was done by
-            detecting the name of the login.js file, so I'd actually
-            call this an improvment.
-           
-            Authentication in general should be rethought soon. 
-            */
-            if (str.indexOf('login-page-2ksw083judrmru58') > -1){
 
+            if (str == cosmo.env.getBaseUrl() + "/loginfailed"){
                 this.showErr(_('Login.Error.AuthFailed'));
                 this.passwordInput.value = '';
-            }
-            else {
-                var username  = this.usernameInput.value;
+            	
+            } else {
+	            var username  = this.usernameInput.value;
                 cosmo.util.auth.setUser(this.usernameInput.value,
                     this.passwordInput.value);
 
-                if (username == cosmo.env.OVERLORD_USERNAME) {
-                    location = cosmo.env.getBaseUrl() + "/account/view";
-                }
-                else {
-                    location = cosmo.env.getBaseUrl() + "/pim";
-                }
+    			location = str;
             }
         },
         doLogin: function () {

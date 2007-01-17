@@ -38,6 +38,10 @@ public class DbInitializer {
 
     private LocalSessionFactoryBean localSessionFactory;
 
+    private String loginUrlKey;
+
+    private String rootLoginUrl;
+
     /**
      * Performs initialization tasks if required.
      * 
@@ -127,6 +131,8 @@ public class DbInitializer {
         overlord.setPassword("cosmo");
         overlord.setEmail("root@localhost");
         overlord.setAdmin(Boolean.TRUE);
+        
+        overlord.setPreference(loginUrlKey, rootLoginUrl);
 
         userService.createUser(overlord);
     }
@@ -135,5 +141,21 @@ public class DbInitializer {
         serverPropertyService.setServerProperty(
                 ServerProperty.PROP_SCHEMA_VERSION,
                 CosmoConstants.PRODUCT_VERSION);
+    }
+
+    public void setLoginUrlKey(String loginUrlKey) {
+        this.loginUrlKey = loginUrlKey;
+    }
+
+    public String getLoginUrlKey() {
+        return loginUrlKey;
+    }
+
+    public void setRootLoginUrl(String rootLoginUrl) {
+        this.rootLoginUrl = rootLoginUrl;
+    }
+
+    public String getRootLoginUrl() {
+        return rootLoginUrl;
     }
 }

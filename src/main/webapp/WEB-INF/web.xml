@@ -76,6 +76,14 @@
     </init-param>
   </filter>
   <filter>
+    <filter-name>login-service-security</filter-name>
+    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <init-param>
+      <param-name>targetBean</param-name>
+      <param-value>loginServiceFilterChainProxy</param-value>
+    </init-param>
+  </filter>
+  <filter>
     <filter-name>dav-security</filter-name>
     <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
     <init-param>
@@ -192,6 +200,10 @@
   <filter-mapping>
     <filter-name>default-security</filter-name>
     <url-pattern>/j_acegi_security_check</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>login-service-security</filter-name>
+    <url-pattern>/no_redirect_security_check</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>default-security</filter-name>

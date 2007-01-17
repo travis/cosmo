@@ -330,6 +330,12 @@
     <property name="accountActivationRequired">
         <value>${cosmo.service.account.requireActivation}</value>
     </property>
+    <property name="loginUrlKey">
+    	<value>${cosmo.service.user.loginUrlKey}</value>
+    </property>
+    <property name="defaultLoginUrl">
+    	<value>${cosmo.service.user.defaultLoginUrl}</value>
+    </property>
   </bean>
 
   <bean id="contentLockManager"
@@ -502,6 +508,13 @@
     <property name="localSessionFactory">
       <ref bean="&amp;sessionFactory"/>
     </property>
+    <property name="loginUrlKey">
+      <value>${cosmo.service.user.loginUrlKey}</value>
+    </property>
+    <property name="rootLoginUrl">
+      <value>${cosmo.service.user.rootLoginUrl}</value>
+    </property>
+    
   </bean>
 
   <!-- the servlet context configurer, which is used instead of
@@ -648,6 +661,18 @@
     </property>
   </bean>
 
+   <bean id="loginServiceFilterChainProxy"
+        class="org.acegisecurity.util.FilterChainProxy">
+    <property name="filterInvocationDefinitionSource">
+      <value>
+        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+        PATTERN_TYPE_APACHE_ANT
+        /**=defaultHttpSessionContextIntegrationFilter,noRedirectFormBasedProcessingFilter,defaultAnonymousProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
+
+      </value>
+    </property>
+  </bean>
+
   <!-- filter that integrates SecurityContext into HTTP Session -->
 
   <bean id="defaultHttpSessionContextIntegrationFilter"
@@ -678,6 +703,25 @@
     </property>
     <property name="defaultTargetUrl">
       <value>/account/view</value>
+    </property>
+  </bean>
+  
+  <bean id="noRedirectFormBasedProcessingFilter"
+        class="org.osaf.cosmo.acegisecurity.ui.webapp.CosmoAuthenticationProcessingFilter">
+    <property name="authenticationManager">
+      <ref bean="authenticationManager"/>
+    </property>
+    <property name="filterProcessesUrl">
+      <value>/no_redirect_security_check</value>
+    </property>
+    <property name="authenticationFailureUrl">
+      <value>/loginfailed</value>
+    </property>
+    <property name="defaultTargetUrl">
+      <value>/account/view</value>
+    </property>
+    <property name="loginUrlKey">
+      <value>${cosmo.service.user.loginUrlKey}</value>
     </property>
   </bean>
 

@@ -126,7 +126,10 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
     table = _createElem('table');
     body = _createElem('tbody');
    
-    if (!isCreate) {
+    if (isCreate) {
+        table.style.width = '60%';
+    }
+    else {
         table.style.width = '100%';
     }
     table.style.margin = 'auto';
@@ -145,9 +148,7 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
         td.className = 'labelTextHoriz labelTextCell';
         // Label
         td.appendChild(_createText(f.label + ':'));
-        if (!isCreate) {
-            td.style.width = '1%';
-        }
+        td.style.width = '1%';
         tr.appendChild(td);
         
         // Form field cell
@@ -160,7 +161,7 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
         elem.id = f.elemName;
         elem.maxlength = type == 'text' ? 32 : 16;
         elem.size = type == 'text' ? 32 : 16;
-        elem.style.width = type == 'text' ? '60%' : '40%';
+        elem.style.width = type == 'text' ? '240px' : '140px';
         elem.className = 'inputText';
         elem.value = f.value || '';
         td.appendChild(elem);

@@ -33,6 +33,7 @@ cosmo.account.settings = new function () {
     this.accountInfo = null;
     this.fieldList = []; 
     this.fillInFieldValues = function (type, data, resp) {
+        cosmo.util.debug.dumpIntoPopup(data);
         this.accountInfo = data;
         this.showDialog();
     };
@@ -58,12 +59,11 @@ cosmo.account.settings = new function () {
 
         var passCell = form.password.parentNode;
         var d = null;
-        passCell.removeChild(form.password);
+        var pass = passCell.removeChild(form.password);
         d = _createElem('div');
         d.className = 'floatLeft';
         d.style.width = '40%';
-        form.password.style.width = '100%';
-        d.appendChild(form.password);
+        d.appendChild(pass);
         passCell.appendChild(d);
         d = _createElem('div');
         d.className = 'promptText floatLeft';
@@ -103,12 +103,13 @@ cosmo.account.settings = new function () {
         
         tabs.push({ label: tabLabel, content: tabContent });
         
-        o.width = 560;
+        o.width = 580;
         o.height = 380;
         o.title = 'Settings';
         o.prompt = '';
         
         var self = this;
+        var f = function () { self.submitSave.apply(self); };
         c = dojo.widget.createWidget("cosmo:TabContainer", { tabs: tabs }, s, 'last');
         s.removeChild(c.domNode);
         o.content = c;
@@ -116,9 +117,9 @@ cosmo.account.settings = new function () {
             handleOnClick: function () { cosmo.app.hideDialog(); } });
         o.btnsLeft = [b];
         b = new cosmo.ui.button.Button({ text:_('App.Button.Save'), width:60, small: true,
-            handleOnClick: function () { self.submitSave.apply(self); } });
+            handleOnClick: f });
         o.btnsRight = [b];
-        o.defaultAction = function () { alert('Hi there'); };
+        o.defaultAction = f;
         
         cosmo.app.showDialog(o);
     }
@@ -129,13 +130,12 @@ cosmo.account.settings = new function () {
         var err = cosmo.account.validateForm(form, fieldList, false);
         
         if (err) {
-            //cosmo.app.modalDialog.setPrompt(err);
+            // Do nothing
         }
         else {
             var self = this;
-            var success = function (type, data, resp) { self.handleAccountSaveSuccess(type, data, resp); };
-            var error = function (type, data, resp) { self.handleAccountSaveError(type, data, resp); };
-            var hand = { load: success, error: error };
+            var f = function (type, data, resp) { self.handleAccountSave(type, data, resp); };
+            var hand = { load: f, error: f };
             var account = {};
             // Create a hash from the form field values
             for (var i = 0; i < fieldList.length; i++) {
@@ -157,11 +157,14 @@ cosmo.account.settings = new function () {
         }
         
     };
-    this.handleAccountSaveSuccess = function (type, data, resp) {
+    this.handleAccountSave = function (type, data, resp) {
+        var stat = resp.status;
+            alert(stat);
+        // Add bogus 1223 HTTP status from IE6 as a success code
+        if ((stat > 199 && stat < 300) || (stat == 1223)) {
+            alert('success');
+        }
         this.accountInfo = null;
         cosmo.app.hideDialog();
-    };
-    this.handleAccountSaveError = function (type, data, resp) {
-
     };
 };

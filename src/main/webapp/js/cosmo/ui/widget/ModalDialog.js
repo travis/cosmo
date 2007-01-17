@@ -196,8 +196,11 @@ dojo.widget.HtmlWidget, {
                 m.style.width = '100%';
                 m.style.height = '100%';
                 m.style.zIndex = 1999;
-                m.style.background = '#ffffff';
-                m.style.opacity = 0.6;
+                // Don't bother in IE6
+                if (!(document.all && (navigator.appVersion.indexOf('MSIE 6') > -1))) {
+                    m.style.background = '#ffffff';
+                    m.style.opacity = 0.6;
+                }
                 this.uiFullMask = m;
                 document.body.appendChild(this.uiFullMask);
             }

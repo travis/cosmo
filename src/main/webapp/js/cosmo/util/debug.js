@@ -43,8 +43,17 @@ cosmo.util.debug.genericToString = function (){
     return str;
 };
 
-cosmo.util.debug.dumpIntoPopup = function (str) {
+cosmo.util.debug.dumpIntoPopup = function (o) {
     var errorWin;
+    var str = '';
+    if (typeof o != 'string') {
+        for (var p in o) {
+            str += p + ': ' + o[p] + ' (' + typeof o[p] + ')<br/>';
+        }
+    }
+    else {
+        str = o;
+    }
     // Create new window and display error
     try {
       errorWin = window.open('about:blank', 'errorWin');

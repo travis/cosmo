@@ -26,12 +26,18 @@ cosmo.app = new function () {
 
     // App section code to run on init
     this.initObj = {};
+    
     // warnings / confirmations
     this.modalDialog = null;
+    
     // The item in the UI being dragged
     this.dragItem = null;
+    
     // List of any queued-up error messages
     this.errorList = [];
+    
+    //select boxes to show/hide when displaying modal dialog box
+    this._selectBoxIds = {};
 
     this.init = function () {
         // Set up the modal dialog box for the app
@@ -123,12 +129,35 @@ cosmo.app = new function () {
         }
         return this.inputDisabled;
     };
+    
     /**
      * Whether or not input from the entire UI is disabled
      * Returns true when the faux modal dialog box is displayed
      */
     this.getInputDisabled = function() {
         return this.inputDisabled;
+    };
+    
+    this.registerSelectBoxId = function(id){
+       this._selectBoxIds.push(id);
+    };
+    
+    this.hideSelectBoxes= function(){
+        dojo.lang.map(this._selectBoxIds, function(id){
+            var element = $(id);
+            if (element){
+                element.style.display="hidden";
+            }
+        });
+    };
+
+    this.showSelectBoxes = function(){
+        dojo.lang.map(this._selectBoxIds, function(id){
+            var element = $(id);
+            if (element){
+                element.style.display="";
+            }
+        });
     };
 
 }

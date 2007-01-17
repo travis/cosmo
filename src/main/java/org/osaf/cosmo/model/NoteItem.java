@@ -36,8 +36,8 @@ public class NoteItem extends ContentItem {
     public static final QName ATTR_NOTE_BODY = new QName(
             NoteItem.class, "body");
     
-    public static final QName ATTR_REMINDER_DATE = new QName(
-            NoteItem.class, "reminderDate");
+    public static final QName ATTR_REMINDER_TIME = new QName(
+            NoteItem.class, "reminderTime");
     
     private static final long serialVersionUID = -6100568628972081120L;
     private String icalUid = null;
@@ -70,27 +70,27 @@ public class NoteItem extends ContentItem {
     }
     
     @Transient
-    public Date getReminderDate() {
+    public Date getReminderTime() {
         // reminderDate stored as TimestampAttribute on Item
-        TimestampAttribute reminderAttr = (TimestampAttribute) getAttribute(ATTR_REMINDER_DATE);
+        TimestampAttribute reminderAttr = (TimestampAttribute) getAttribute(ATTR_REMINDER_TIME);
         if(reminderAttr!=null)
             return reminderAttr.getValue();
         else
             return null;
     }
 
-    public void setReminderDate(Date reminderDate) {
+    public void setReminderTime(Date reminderTime) {
         // reminderDate stored as TimestampAttribute on Item
-        TimestampAttribute reminderAttr = (TimestampAttribute) getAttribute(ATTR_REMINDER_DATE);
-        if(reminderAttr==null && reminderDate!=null) {
-            reminderAttr = new TimestampAttribute(ATTR_REMINDER_DATE, reminderDate);
+        TimestampAttribute reminderAttr = (TimestampAttribute) getAttribute(ATTR_REMINDER_TIME);
+        if(reminderAttr==null && reminderTime!=null) {
+            reminderAttr = new TimestampAttribute(ATTR_REMINDER_TIME, reminderTime);
             addAttribute(reminderAttr);
         }
         
-        if(reminderDate==null)
-            removeAttribute(ATTR_REMINDER_DATE);
+        if(reminderTime==null)
+            removeAttribute(ATTR_REMINDER_TIME);
         else
-            reminderAttr.setValue(reminderDate);
+            reminderAttr.setValue(reminderTime);
     }
 
     public void setBody(Reader body) {

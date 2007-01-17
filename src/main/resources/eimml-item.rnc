@@ -44,7 +44,7 @@ itemLastModifiedBy =
 
 itemCreatedOn =
    element item:createdOn {
-      eimDateTimeFieldContent
+      eimTimeStampFieldContent
    }
 
 anyItemField =

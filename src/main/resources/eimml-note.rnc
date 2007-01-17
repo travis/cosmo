@@ -11,6 +11,7 @@ eimNoteRecord =
       (noteUuid
        & noteBody?
        & noteIcalUid?
+       & noteReminderTime?
        & anyNoteField*)
    }
 
@@ -27,6 +28,11 @@ noteBody =
 noteIcalUid =
    element note:icalUid {
       eimTextFieldContent
+   }
+   
+noteReminderTime =
+   element note:reminderTime {
+      eimTimeStampFieldContent
    }
 
 anyNoteField =

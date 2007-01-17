@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.TextField;
+import org.osaf.cosmo.eim.TimeStampField;
 import org.osaf.cosmo.eim.schema.BaseItemGenerator;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
@@ -59,6 +60,8 @@ public class NoteGenerator extends BaseItemGenerator
         record.addField(new ClobField(FIELD_BODY,
                                       new StringReader(note.getBody())));
         record.addField(new TextField(FIELD_ICALUID, note.getIcalUid()));
+        record.addField(new TimeStampField(FIELD_REMINDER_TIME,
+                note.getReminderTime()));
 
         record.addFields(generateUnknownFields());
 

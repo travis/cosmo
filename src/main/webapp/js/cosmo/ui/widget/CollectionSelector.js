@@ -206,6 +206,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     break;
                 }
             }
+            
+            if (this.currentCollection.uid == updatedCollection.uid){
+                this.currentCollection.collection = updatedCollection;
+                if (!currentCollection.transportInfo){
+                    this.currentCollection.displayName = updatedCollection.name;
+                }
+            }
             this._redraw();
         },
         

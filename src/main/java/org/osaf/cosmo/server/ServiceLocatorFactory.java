@@ -34,6 +34,8 @@ public class ServiceLocatorFactory {
     private static final Log log =
         LogFactory.getLog(ServiceLocatorFactory.class);
 
+    private static final Boolean ABSOLUTE_BY_DEFAULT = true;
+
     private String atomPrefix;
     private String cmpPrefix;
     private String davPrefix;
@@ -50,8 +52,18 @@ public class ServiceLocatorFactory {
      * information in the given request.
      */
     public ServiceLocator createServiceLocator(HttpServletRequest request) {
+        return createServiceLocator(request, ABSOLUTE_BY_DEFAULT);
+    }
+    
+    /**
+     * Returns a <code>ServiceLocator</code> instance that returns
+     * relative URLs based on the application mount URL calculated from 
+     * information in the given request.
+     */
+    public ServiceLocator createServiceLocator(HttpServletRequest request, 
+                                               Boolean absoluteUrls) {
         Ticket ticket = securityManager.getSecurityContext().getTicket();
-        return createServiceLocator(request, ticket);
+        return createServiceLocator(request, ticket, absoluteUrls);
     }
 
     /**
@@ -61,7 +73,19 @@ public class ServiceLocatorFactory {
      */
     public ServiceLocator createServiceLocator(HttpServletRequest request,
                                                Ticket ticket) {
-        String appMountUrl = calculateAppMountUrl(request);
+        return createServiceLocator(request, ticket, ABSOLUTE_BY_DEFAULT);
+    }
+    
+    /**
+     * Returns a <code>ServiceLocator</code> instance that returns
+     * relative URLs based on the application mount URL calculated from 
+     * information in the given request and including the given ticket
+     */
+    public ServiceLocator createServiceLocator(HttpServletRequest request,
+                                               Ticket ticket,
+                                               Boolean absoluteUrls){
+
+        String appMountUrl = calculateAppMountUrl(request, absoluteUrls);
 
         String ticketKey = ticket != null ? ticket.getKey() : null;
 
@@ -183,21 +207,22 @@ public class ServiceLocatorFactory {
             throw new IllegalStateException("securityManager must not be null");
     }
 
-    private String calculateAppMountUrl(HttpServletRequest request) {
+    private String calculateAppMountUrl(HttpServletRequest request, Boolean absoluteUrls) {
         StringBuffer buf = new StringBuffer();
-        /* Commented out in case we ever decide to make this return fully qualified urls.
-         * 
-        buf.append(request.getScheme()).
-            append("://").
-            append(request.getServerName());
-        if ((request.isSecure() && request.getServerPort() != 443) ||
-            (request.getServerPort() != 80)) {
-            buf.append(":").append(request.getServerPort());
+
+        if (absoluteUrls){
+            buf.append(request.getScheme()).
+            	append("://").
+            	append(request.getServerName());
+            if ((request.isSecure() && request.getServerPort() != 443) ||
+                    (request.getServerPort() != 80)) {
+                buf.append(":").append(request.getServerPort());
+            }
         }
-	*/
         if (! request.getContextPath().equals("/")) {
             buf.append(request.getContextPath());
         }
         return buf.toString();
     }
+    
 }

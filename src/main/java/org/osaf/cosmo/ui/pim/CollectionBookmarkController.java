@@ -83,7 +83,7 @@ public class CollectionBookmarkController extends AbstractController {
             if (ticket != null){
 
                 Map<String, String> relationLinks = serviceLocatorFactory.
-                    createServiceLocator(request, ticket).getCollectionUrls(collection);
+                    createServiceLocator(request, ticket, false).getCollectionUrls(collection);
 
                 model.put("relationLinks", relationLinks);
             

@@ -20,10 +20,10 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
+<fmt:setBundle basename="PimMessageResources"/>
 
 <cosmo:dialogLayout prefix="About.">
 <cosmo:staticbaseurl var="staticBaseUrl"/>
-<cosmo:dojoBoilerplate/>
 
 <u:bind var="PRODUCT_VERSION"
         type="org.osaf.cosmo.CosmoConstants"
@@ -34,13 +34,13 @@
   <div style="width:300px; margin-top:18px;">
 
     <div>
-    <a href="http://cosmo.osafoundation.org/" 
+    <a href="http://cosmo.osafoundation.org/"
                onclick="goURLMainWin('http://cosmo.osafoundation.org/'); 
                return false;"><img src="${staticBaseUrl}/cosmo_logo.gif" alt="<fmt:message 
-               key="About.LogoAltText"/>"/></a>    
+               key="About.LogoAltText"/>" style="border: 0px"/></a>    
     </div>
     <div class="smLabel"><fmt:message 
-         key="About.VersionString"/>${PRODUCT_VERSION}
+         key="About.VersionString"/> ${PRODUCT_VERSION}
     </div>
     <div style="margin-top:28px;"><fmt:message key="About.LicenseOpen"/>
     <a href="http://www.apache.org/licenses/LICENSE-2.0" 

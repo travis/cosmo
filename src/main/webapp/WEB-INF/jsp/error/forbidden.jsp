@@ -57,7 +57,7 @@
   </fmt:message>
 </p>
 <p>
-  <a href="<c:url value="/console/logout"/>">
+  <a href="<c:url value="/logout"/>">
     <fmt:message key="Error.Forbidden.ClickToLogOut"/>
   </a>
 </p>

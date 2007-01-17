@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.rpc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import net.fortuna.ical4j.model.DateTime;
@@ -270,8 +273,7 @@ public class RPCServiceImplTest extends BaseMockServletTestCase {
         return SERVLET_PATH;
     }
 
-/* XXX Uncomment once we add preferences to the Cosmo data model
- *     public void testGetPreference() throws Exception {
+    public void testGetPreference() throws Exception {
         rpcService.removePreference("testPreference");
         String result = rpcService.getPreference("testPreference");
         assertNull(result);
@@ -288,6 +290,41 @@ public class RPCServiceImplTest extends BaseMockServletTestCase {
 
     public void testRemovePreference() throws Exception {
         rpcService.removePreference("testPreference");
-    }*/
+    }
+    
+    public void testGetSetPreferences() throws Exception {
+        Map<String, String> prefs = new HashMap<String, String>();
+        
+        prefs.put("p1", "v1");
+        prefs.put("p2", "v2");
+        
+        rpcService.setPreferences(prefs);
+        
+        Map<String, String> result = rpcService.getPreferences();
+        
+        assertEquals("v1", result.get("p1"));
+        assertEquals("v2", result.get("p2"));
+    }
+
+    public void testSetMultiplePreferences() throws Exception {
+        Map<String, String> prefs = new HashMap<String, String>();
+        
+        prefs.put("p1", "v1");
+        prefs.put("p2", "v2");
+        
+        rpcService.setPreferences(prefs);
+        
+        Map<String, String> newPrefs = new HashMap<String, String>();
+
+        newPrefs.put("p3", "v3");
+
+        rpcService.setMultiplePreferences(newPrefs);
+        
+        Map<String, String> result = rpcService.getPreferences();
+        
+        assertEquals("v1", result.get("p1"));
+        assertEquals("v2", result.get("p2"));
+        assertEquals("v3", result.get("p3"));
+    }
 
 }

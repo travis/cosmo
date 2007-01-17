@@ -245,12 +245,6 @@ public class RPCServiceImpl implements RPCService {
         return doGetEvents(collection, utcStartTime, utcEndTime);
     }
 
-     public String getPreference(String preferenceName) throws RPCException {
-        if (log.isDebugEnabled())
-            log.debug("Getting preference " + preferenceName);
-       return userService.getPreference(getUsername(), preferenceName);
-    }
-
     public String getVersion() {
         return CosmoConstants.PRODUCT_VERSION;
     }
@@ -297,12 +291,6 @@ public class RPCServiceImpl implements RPCService {
 
     }
 
-    public void removePreference(String preferenceName) throws RPCException {
-        if (log.isDebugEnabled())
-            log.debug("Removing preference " + preferenceName);
-        userService.removePreference(getUsername(), preferenceName);
-    }
-
     public String saveEvent(String collectionUid, Event event)
         throws RPCException {
 
@@ -330,13 +318,36 @@ public class RPCServiceImpl implements RPCService {
         return doSaveEvent(collection, event);
     }
 
-    public void setPreference(String preferenceName, String value)
-            throws RPCException {
+    public String getPreference(String key) throws RPCException {
         if (log.isDebugEnabled())
-            log.debug("Setting preference " + preferenceName + " to " + value);
-        userService.setPreference(getUsername(),preferenceName);
+            log.debug("Getting preference " + key);
+        return getUser().getPreference(key);
     }
 
+    public void setPreference(String key, String value)
+            throws RPCException {
+        if (log.isDebugEnabled())
+            log.debug("Setting preference " + key + " to " + value);
+        getUser().setPreference(key, value);
+    }
+
+    public Map<String, String> getPreferences() throws RPCException {
+        return getUser().getPreferences();
+    }
+
+    public void setPreferences(Map<String, String> preferences) throws RPCException {
+        getUser().setMultiplePreferences(preferences);
+    }
+    
+    public void setMultiplePreferences(Map<String, String> preferences) throws RPCException {
+        getUser().setMultiplePreferences(preferences);        
+    }
+
+    public void removePreference(String key) throws RPCException {
+        if (log.isDebugEnabled())
+            log.debug("Removing preference " + key);
+        getUser().removePreference(key);
+    }
 
     public Map<String, RecurrenceRule> getRecurrenceRules(String collectionUid,
             String[] eventUids) throws RPCException {
@@ -352,6 +363,7 @@ public class RPCServiceImpl implements RPCService {
 
         return doGetRecurrenceRules(collection, eventUids);
     }
+    
     public Map<String, RecurrenceRule> getRecurrenceRules(String collectionUid,
             String[] eventUids, String ticket) throws RPCException {
 

@@ -165,6 +165,26 @@ public interface RPCService {
     public void removePreference(String preferenceName) throws RPCException;
     
     /**
+     * Replaces the current user's preferences with <code>preferences</code>. 
+     * @param preferences the new set of preferences for this user
+     */
+    public void setPreferences(Map<String, String> preferences) throws RPCException;
+    
+    /**
+     * 
+     * @return Returns all preferences for the current user
+     * @throws RPCException
+     */
+    public Map<String, String> getPreferences() throws RPCException;
+    
+    /**
+     * Sets the specified preferences for the current user.
+     * @param preferences Map of preferences to set. 
+     * @throws RPCException
+     */
+    public void setMultiplePreferences(Map<String, String> preferences) throws RPCException;
+    
+    /**
      * Returns the RecurrenceRule for a particular event
      * 
      * @param collectionUid

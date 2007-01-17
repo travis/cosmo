@@ -537,6 +537,26 @@ public class User extends BaseModelObject {
         this.preferences = preferences;
     }
     
+    @Transient
+    public void setMultiplePreferences(Map<String, String> preferences){
+        this.preferences.putAll(preferences);
+    }
+    
+    @Transient
+    public String getPreference(String key){
+        return preferences.get(key);
+    }
+    
+    @Transient
+    public void setPreference(String key, String value){
+        preferences.put(key, value);
+    }
+    
+    @Transient
+    public void removePreference(String key){
+        preferences.remove(key);
+    }
+    
     @OneToMany(mappedBy = "owner", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

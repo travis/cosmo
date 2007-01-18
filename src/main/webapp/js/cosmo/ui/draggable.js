@@ -85,15 +85,14 @@ cosmo.ui.draggable.Draggable = function (id) {
         this.rLimit = (Cal.midColWidth - cosmo.view.cal.canvas.dayUnitWidth - 
             SCROLLBAR_SPACER_WIDTH - 2); 
         
-        // FIXME: This causes a really irritating CSS bug in Mozilla/Firefox
-        // Set opacity if moving
-        //if (this.dragMode == 'drag') {
-        //    cosmo.view.cal.canvas.getSelectedEvent().lozenge.setOpacity(60);
-        //}
     };
     this.doDrag = function () {
         // Hand off to Draggable methods based on dragMode
         // Set by mouseDownHandler based on location of click
+        
+        // Set opacity effect
+        cosmo.view.cal.canvas.getSelectedEvent().lozenge.setOpacity(60);
+        
         switch (this.dragMode) {
             case 'drag':
                 this.move();
@@ -119,6 +118,7 @@ cosmo.ui.draggable.Draggable = function (id) {
         if (!cosmo.view.cal.canvas.getSelectedEvent()) {
             return false;
         }
+        
         
         // Not just a simple click
         this.dragged = true;
@@ -320,6 +320,9 @@ HasTimeDraggable.prototype.drop = function() {
     var starttime = 0;
     var endtime = 0;
     
+    // Reset opacity to normal
+    cosmo.view.cal.canvas.getSelectedEvent().lozenge.setOpacity(100);
+    
     // Abstract away getting top and bottom -- multi-day events
     // have multiple divs, treat as a composite here
     top = selEv.lozenge.getTop();
@@ -419,6 +422,9 @@ NoTimeDraggable.prototype.drop = function() {
     var selEv = cosmo.view.cal.canvas.getSelectedEvent();
     top = selEv.lozenge.getTop();
     left = selEv.lozenge.getLeft();
+    
+    // Reset opacity to normal
+    cosmo.view.cal.canvas.getSelectedEvent().lozenge.setOpacity(100);
     
     // Side-to-side snap
     if (this.dragMode == 'drag') {

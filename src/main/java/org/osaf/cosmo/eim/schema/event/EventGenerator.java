@@ -73,6 +73,8 @@ public class EventGenerator extends BaseStampGenerator
         value = EimValueConverter.fromICalDate(event.getEndDate());
         master.addField(new TextField(FIELD_DTEND, value));
 
+        master.addField(new IntegerField(FIELD_ANYTIME, event.isAnyTime() ? 1 : 0));
+        
         master.addField(new TextField(FIELD_LOCATION, event.getLocation()));
 
         value = EimValueConverter.fromICalRecurs(event.getRecurrenceRules());

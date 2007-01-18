@@ -94,6 +94,9 @@ public class EventApplicator extends BaseStampApplicator
         } else if (field.getName().equals(FIELD_STATUS)) {
             String value = EimFieldValidator.validateText(field, MAXLEN_STATUS);
             event.setStatus(value);
+        } else if (field.getName().equals(FIELD_ANYTIME)) {
+            Integer value = EimFieldValidator.validateInteger(field);
+            event.setAnyTime(value==0 ? false : true);
         } else {
             applyUnknownField(field);
         }

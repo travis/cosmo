@@ -35,12 +35,14 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.parameter.XParameter;
 import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
@@ -69,6 +71,7 @@ import org.hibernate.validator.NotNull;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Event;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 
 /**
@@ -615,6 +618,55 @@ public class EventStamp extends Stamp implements
         }
         
         calendar.getComponents().add(modification);
+    }
+    
+    /**
+     * Is the event marked as anytime.
+     * @return true if the event is an anytime event
+     */
+    @Transient
+    public boolean isAnyTime() {
+        Parameter parameter = getMasterEvent().getStartDate().getParameters()
+                .getParameter(ICalendarConstants.PARAM_X_OSAF_ANYTIME);
+        if (parameter == null) {
+            return false;
+        }
+
+        return ICalendarConstants.VALUE_TRUE.equals(parameter.getValue());
+    }
+    
+    /**
+     * Toggle the event anytime parameter.
+     * @param isAnyTime true if the event occurs anytime
+     */
+    public void setAnyTime(boolean isAnyTime) {
+        DtStart dtstart = getMasterEvent().getStartDate();
+        Parameter parameter = dtstart.getParameters().getParameter(
+                ICalendarConstants.PARAM_X_OSAF_ANYTIME);
+
+        // add X-OSAF-ANYTIME if it doesn't exist
+        if (parameter == null && isAnyTime) {
+            dtstart.getParameters().add(getAnyTimeXParam());
+            return;
+        }
+
+        // if it exists, update based on isAnyTime
+        if (parameter != null) {
+            String value = parameter.getValue();
+            boolean currIsAnyTime = ICalendarConstants.VALUE_TRUE.equals(value);
+            if (currIsAnyTime && !isAnyTime)
+                dtstart.getParameters().remove(parameter);
+            else if (!currIsAnyTime && isAnyTime) {
+                dtstart.getParameters().remove(parameter);
+                dtstart.getParameters().add(getAnyTimeXParam());
+            }
+        }
+    }
+    
+    @Transient
+    private Parameter getAnyTimeXParam() {
+        return new XParameter(ICalendarConstants.PARAM_X_OSAF_ANYTIME,
+                ICalendarConstants.VALUE_TRUE);
     }
     
     /**

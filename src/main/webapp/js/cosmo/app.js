@@ -101,10 +101,11 @@ cosmo.app = new function () {
         }
         self.setInputDisabled(true);
         // Hide the stupid IE6 select elements that ignore z-index
-        if (document.all && (navigator.appVersion.indexOf('MSIE 7') == -1)) {
+        if (dojo.render.html.ie && dojo.render.ver < 7) {
             self.showHideSelectBoxes(false);
         }
         self.modalDialog.show();
+        cosmo.topics.publish(cosmo.topics.ModalDialogDisplayed);
     };
     /**
      * Dismiss the faux modal dialog box -- check for queued error
@@ -113,10 +114,11 @@ cosmo.app = new function () {
      */
     this.hideDialog = function () {
         // Un-hide the stupid IE6 select elements that ignore z-index
-        if (document.all && (navigator.appVersion.indexOf('MSIE 7') == -1)) {
+        if (dojo.render.html.ie && dojo.render.ver < 7) {
             self.showHideSelectBoxes(true);
         }
         self.modalDialog.hide();
+        cosmo.topics.publish(cosmo.topics.ModalDialogDismissed);
         // If there are error messages that have been added to the queue,
         // trigger another dialog to handle them
         if (self.errorList.length) {

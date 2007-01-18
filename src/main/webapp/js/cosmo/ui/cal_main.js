@@ -950,10 +950,6 @@ cosmo.ui.cal_main.Cal = new function () {
                 return true;
             }
             
-            if (dojo.render.os.win && dojo.render.html.ie){
-                return true;
-            }
-            
             return false;
     }
     this.handleModalDialogDisplayed = function(){
@@ -962,7 +958,9 @@ cosmo.ui.cal_main.Cal = new function () {
        }
     
        var viewDiv = document.getElementById('timedScrollingMainDiv');
+       //overflow:auto; overflow-y:auto; overflow-x:hidden;
        viewDiv.style.overflow = "hidden";
+       
     };
     
     this.handleModalDialogDismissed = function(){
@@ -971,6 +969,8 @@ cosmo.ui.cal_main.Cal = new function () {
        }
        var viewDiv = document.getElementById('timedScrollingMainDiv');
        viewDiv.style.overflow = "auto";
+       viewDiv.style.overflowY = "auto";
+       viewDiv.style.overflowX = "hidden";
     }
     
     this.redirectTimeout = function () {

@@ -81,9 +81,19 @@
     <Engine name="Catalina" defaultHost="localhost">
       <Host name="localhost" appBase="webapps" autoDeploy="false"
             deployOnStartup="false">
+            
+<!--  
+	Access log valve uses pattern equivalent to "combined" format, with our custom
+	principal name information substituted for "remote user".
+	
+	Pattern taken from AccessLogValve javadocs here:
+	http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/org/apache/catalina/valves/AccessLogValve.html
+-->
         <Valve className="org.apache.catalina.valves.AccessLogValve"
                directory="../logs" prefix="access." suffix=".log"
-               pattern="combined" resolveHosts="false"/>
+               pattern="%h %l %{COSMO_PRINCIPAL}r %t %r %s %b %{Referer}i %{User-Agent}i" 
+               resolveHosts="false"/>
+               
         <Context path="" docBase="ROOT" reloadable="false"/>
 <!--
         <Context path="/cosmo-docs" docBase="cosmo-docs-${pom.version}.war" 

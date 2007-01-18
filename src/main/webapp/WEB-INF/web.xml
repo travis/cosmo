@@ -134,6 +134,10 @@
   	<filter-class>org.osaf.cosmo.log.HttpLoggingFilter</filter-class>
   </filter>
   <filter>
+  	<filter-name>username-request-integration</filter-name>
+  	<filter-class>org.osaf.cosmo.filters.UsernameRequestIntegrationFilter</filter-class>
+  </filter>
+  <filter>
   	<filter-name>http-override</filter-name>
   	<filter-class>org.osaf.cosmo.filters.HttpOverrideFilter</filter-class>
   </filter>
@@ -216,6 +220,10 @@
   <!-- http logging has to happen after security if we want authentication information-->
   <filter-mapping>
   	<filter-name>http-logging</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+  	<filter-name>username-request-integration</filter-name>
   	<url-pattern>/*</url-pattern>
   </filter-mapping>
   <!-- url rewriting has to happen after security -->

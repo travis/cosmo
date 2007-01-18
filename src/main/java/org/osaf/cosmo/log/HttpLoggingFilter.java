@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,11 +79,11 @@ public class HttpLoggingFilter implements Filter {
             FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-
-        log.info(this.formatRequest(httpRequest, this.format));
-
+        
+        if (log.isInfoEnabled()){
+            log.info(this.formatRequest(httpRequest, this.format));
+        }
         chain.doFilter(request, response);
-
     }
 
     public void init(FilterConfig config) throws ServletException {

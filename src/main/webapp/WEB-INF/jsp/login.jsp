@@ -45,7 +45,6 @@
         Login and account-creation stuff
         Note: button.js still needed to do preloading of button images
     --%>
-    <!-- Login failure recognition string: login-page-2ksw083judrmru58 See LoginDialog.js -->
     <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/button.js"></script>
     <script type="text/javascript">
 

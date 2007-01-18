@@ -44,7 +44,7 @@ cosmo.view.cal.Lozenge = function () {
     this.selected = false;
     // 30-min minimum height, minus a pixel at top and bottom
     // per retarded CSS spec for borders
-    this.unit = (HOUR_UNIT_HEIGHT/2)-2;
+    this.unit = (HOUR_UNIT_HEIGHT/(60/this.minimumMinutes))-2;
     // DOM elem ref to the primary div for the Lozenge 
     this.div = null;
     // DOM elem ref for inner div of the Lozenge 
@@ -56,6 +56,10 @@ cosmo.view.cal.Lozenge = function () {
     // events
     this.auxDivList = [];
 }
+
+// The minimum *visible* height of an event Lozenge
+cosmo.view.cal.Lozenge.prototype.minimumMinutes = 30;
+
 /**
  * Convenience method that does all the visual update stuff
  * for a lozenge at one time
@@ -138,7 +142,7 @@ cosmo.view.cal.Lozenge.prototype.setOpacity = function (opac) {
     //  Moz/compat uses a fractional value (e.g. 0.75)
     var nDecOpacity = opac/100;
     if (document.all) {
-        elem.filters.alpha.opacity = opac;
+        elem.style.filter = 'alpha(opacity=' + opac + ')';
     }
     elem.style.opacity = nDecOpacity;
     return true;
@@ -455,7 +459,9 @@ cosmo.view.cal.HasTimeLozenge.prototype.updateFromEvent = function (ev) {
 
         width = cosmo.view.cal.canvas.dayUnitWidth - (ev.maxDepth * 10);
 
-        // BANDAID: set min height if not multi-day event
+        // Set min height if not multi-day event
+        // Make sure when updating that this min lozenge
+        // height doesn't get applied back to the actual event
         if (!this.auxDivList.length && (height < unit)) {
             height = unit;
         }
@@ -486,13 +492,23 @@ cosmo.view.cal.HasTimeLozenge.prototype.updateEvent = function (ev, dragMode) {
     // Add +1 to height for border on background
     // Add +2 to height for border on lozenge div
     var endTime = Cal.calcTimeFromPos(this.top+(this.height + 3));
+    
+    // If the event was originally less than the minimum *visible* lozenge
+    // height, preserve the original times when editing
+    var origLengthMinutes = Date.diff('n', ev.dataOrig.start, ev.dataOrig.end);
 
     evStart.setHours(Cal.extractHourFromTime(startTime));
     evStart.setMinutes(Cal.extractMinutesFromTime(startTime));
-    evEnd.setHours(Cal.extractHourFromTime(endTime));
-    evEnd.setMinutes(Cal.extractMinutesFromTime(endTime));
-
-    // Update ScoobyDates with new UTC values
+    if (origLengthMinutes < this.minimumMinutes) {
+       evEnd.setHours(evStart.getHours());
+       // JS Dates do intelligent wraparound
+       evEnd.setMinutes(evStart.getMinutes() + origLengthMinutes);
+    }
+    else {
+        evEnd.setHours(Cal.extractHourFromTime(endTime));
+        evEnd.setMinutes(Cal.extractMinutesFromTime(endTime));
+    }
+    // Update cosmo.datetime.Date with new UTC values
     ev.data.start.updateFromUTC(evStart.getTime());
     ev.data.end.updateFromUTC(evEnd.getTime());
     return true;

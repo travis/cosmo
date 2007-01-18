@@ -23,6 +23,7 @@ dojo.require("cosmo.topics");
 var _ = cosmo.util.i18n.getText;
 cosmo.app = new function () {
     var self = this;
+    var selectBoxVisibility = {};
 
     // App section code to run on init
     this.initObj = {};
@@ -56,7 +57,7 @@ cosmo.app = new function () {
      * If new errors get spawned while this is processing, it queues the
      * messages for display after users dismisses the faux modal disalog box
      */
-    this.showErr = function(str, e) {
+    this.showErr = function (str, e) {
         var msg = '';
         var currErr = '';
         var but = null;
@@ -94,23 +95,28 @@ cosmo.app = new function () {
      * Display the current dialog box and throw up the transparent
      * full-screen div that blocks all user input to the UI
      */
-    this.showDialog = function(props) {
+    this.showDialog = function (props) {
         for (var p in props) {
             self.modalDialog[p] = props[p];
         }
         self.setInputDisabled(true);
+        // Hide the stupid IE6 select elements that ignore z-index
+        if (document.all && (navigator.appVersion.indexOf('MSIE 7') == -1)) {
+            self.showHideSelectBoxes(false);
+        }
         self.modalDialog.show();
-        cosmo.topics.publish(cosmo.topics.ModalDialogDisplayed);
     };
     /**
      * Dismiss the faux modal dialog box -- check for queued error
      * messages to display if needed
      * Put away the full-screen transparent input-blocking div
      */
-    this.hideDialog = function() {
-        // Hide the current error dialog
+    this.hideDialog = function () {
+        // Un-hide the stupid IE6 select elements that ignore z-index
+        if (document.all && (navigator.appVersion.indexOf('MSIE 7') == -1)) {
+            self.showHideSelectBoxes(true);
+        }
         self.modalDialog.hide();
-        cosmo.topics.publish(cosmo.topics.ModalDialogDismissed);
         // If there are error messages that have been added to the queue,
         // trigger another dialog to handle them
         if (self.errorList.length) {
@@ -120,7 +126,7 @@ cosmo.app = new function () {
             self.setInputDisabled(false);
         }
     };
-    this.setInputDisabled = function(isDisabled) {
+    this.setInputDisabled = function (isDisabled) {
         if (isDisabled) {
             this.inputDisabled = true;
         }
@@ -134,30 +140,39 @@ cosmo.app = new function () {
      * Whether or not input from the entire UI is disabled
      * Returns true when the faux modal dialog box is displayed
      */
-    this.getInputDisabled = function() {
+    this.getInputDisabled = function () {
         return this.inputDisabled;
     };
-    
-    this.registerSelectBoxId = function(id){
-       this._selectBoxIds.push(id);
-    };
-    
-    this.hideSelectBoxes= function(){
-        dojo.lang.map(this._selectBoxIds, function(id){
-            var element = $(id);
-            if (element){
-                element.style.display="hidden";
+    this.showHideSelectBoxes = function (show) {
+        var selects = document.body.getElementsByTagName('select');
+        var vis = show ? 'visible' : 'hidden';
+        dojo.lang.map(selects, function (sel, show){
+            if (sel.style) {
+                // Storing state, or state has been stored
+                if (sel.id && sel.style.visibility) {
+                    // Preserve styles expressly set to 'hidden'
+                    if (show) {
+                        if (typeof selectBoxVisibility[sel.id] != 'undefined') {
+                            sel.style.visibility = selectBoxVisibility[sel.id];
+                        }
+                        else {
+                            sel.style.visibility = vis;
+                        }
+                    }
+                    // Save state if necessary, and hide
+                    else {
+                        selectBoxVisibility[sel.id] = sel.style.visibility;
+                        sel.style.visibility = vis;
+                    }
+                }
+                else {
+                    sel.style.visibility = vis;
+                }
             }
         });
+        // Reset the state map when finished
+        if (show) {
+           selectBoxVisibility = {}; 
+        }
     };
-
-    this.showSelectBoxes = function(){
-        dojo.lang.map(this._selectBoxIds, function(id){
-            var element = $(id);
-            if (element){
-                element.style.display="";
-            }
-        });
-    };
-
 }

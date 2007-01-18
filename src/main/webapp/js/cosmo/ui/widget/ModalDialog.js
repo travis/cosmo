@@ -196,9 +196,12 @@ dojo.widget.HtmlWidget, {
                 m.style.width = '100%';
                 m.style.height = '100%';
                 m.style.zIndex = 1999;
-                // Don't bother in IE6
-                if (!(document.all && (navigator.appVersion.indexOf('MSIE 6') > -1))) {
-                    m.style.background = '#ffffff';
+                m.style.background = '#ffffff';
+                // In IE6 have to use special alpha filter thingie
+                if (document.all && (navigator.appVersion.indexOf('MSIE 6') > -1)) {
+                    m.style.filter = 'alpha(opacity=60)';
+                }
+                else {
                     m.style.opacity = 0.6;
                 }
                 this.uiFullMask = m;

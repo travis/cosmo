@@ -109,8 +109,7 @@ public class HomeDirectoryBrowsingController extends MultiActionController {
      */
     public ModelAndView browse(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        String path = request.getParameter(PARAM_PATH);
-
+        String path = getPath(request);
         Item item = getItem(path);
 
         addTitleParam(request, item.getDisplayName());
@@ -132,7 +131,7 @@ public class HomeDirectoryBrowsingController extends MultiActionController {
      */
     public ModelAndView remove(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        String path = request.getParameter(PARAM_PATH);
+        String path = getPath(request);
 
         if (log.isDebugEnabled()) {
             log.debug("removing item at " + path);
@@ -155,7 +154,7 @@ public class HomeDirectoryBrowsingController extends MultiActionController {
      */
     public ModelAndView view(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        String path = request.getParameter(PARAM_PATH);
+        String path = getPath(request);
 
         Item item = getItem(path);
         addTitleParam(request, item.getDisplayName());
@@ -187,7 +186,7 @@ public class HomeDirectoryBrowsingController extends MultiActionController {
      */
     public ModelAndView download(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        String path = request.getParameter(PARAM_PATH);
+        String path = getPath(request);
 
         Item item = getItem(path);
 
@@ -211,7 +210,7 @@ public class HomeDirectoryBrowsingController extends MultiActionController {
      */
     public ModelAndView revokeTicket(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        String path = request.getParameter(PARAM_PATH);
+        String path = getPath(request);
         String id = request.getParameter(PARAM_TICKET);
 
         if (log.isDebugEnabled()) {
@@ -370,6 +369,14 @@ public class HomeDirectoryBrowsingController extends MultiActionController {
 
     public void setRevokeTicketBaseView(String revokeTicketBaseView) {
         this.revokeTicketBaseView = revokeTicketBaseView;
+    }
+    
+    private String getPath(HttpServletRequest request){
+        String path = request.getParameter(PARAM_PATH);
+        if (path.endsWith("/")){
+            path = path.substring(0, path.length() - 1);
+        }
+        return path;
     }
 
 }

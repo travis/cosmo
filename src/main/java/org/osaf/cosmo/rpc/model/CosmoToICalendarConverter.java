@@ -589,12 +589,16 @@ public class CosmoToICalendarConverter {
                 setDateOrDatetime(recurrenceId,
                         modification.getInstanceDate(), dateTime);
                 modVEvent.getProperties().add(recurrenceId);
+                //UID is required
+                DtStart modStart = new DtStart(recurrenceId.getDate());
+                ICalendarUtils.addOrReplaceProperty(modVEvent, modStart);
+                modVEvent.getProperties().add(masterVEvent.getProperties().getProperty(Property.UID));
                 for (String property : modification.getModifiedProperties()) {
                     if (property.equals(ICalendarToCosmoConverter.EVENT_START)) {
-                        DtStart modStart = new DtStart();
+                        modStart = new DtStart();
                         setDateOrDatetime(modStart, modification.getEvent()
                                 .getStart(), dateTime);
-                        modVEvent.getProperties().add(modStart);
+                        ICalendarUtils.addOrReplaceProperty(modVEvent, modStart);
 
                     } else if (property
                             .equals(ICalendarToCosmoConverter.EVENT_END)) {

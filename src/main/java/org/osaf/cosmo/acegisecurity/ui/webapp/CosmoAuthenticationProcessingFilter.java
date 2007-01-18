@@ -42,14 +42,10 @@ import org.springframework.util.Assert;
 public class CosmoAuthenticationProcessingFilter extends
         AuthenticationProcessingFilter {
     
-    private static final String MEDIA_TYPE_PLAIN_TEXT = null;
-    private static final String failureCode = "/auth_failed";
-    private static final String successCode = "/auth_success";
+    private static final String MEDIA_TYPE_PLAIN_TEXT = "text/plain";
     private Boolean alwaysUseUserPreferredUrl = false;
     private CosmoSecurityManager securityManager = null;
     private String cosmoDefaultLoginUrl;
-    
-    
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -60,8 +56,6 @@ public class CosmoAuthenticationProcessingFilter extends
         
         // Ensure sendRedirect will always be called with url = true on successful auth.
         this.setAlwaysUseDefaultTargetUrl(true);
-        this.setDefaultTargetUrl(successCode);
-        this.setAuthenticationFailureUrl(failureCode);
     }
 
     /*
@@ -81,8 +75,8 @@ public class CosmoAuthenticationProcessingFilter extends
                                 String targetUrl) throws IOException {
         
         // If failure
-        if (targetUrl.equals(failureCode)){
-            this.sendResponse(request, response, getRelativeUrl(request,targetUrl));
+        if (getAuthenticationFailureUrl().equals(targetUrl)){
+            this.sendResponse(request, response, getRelativeUrl(request, getAuthenticationFailureUrl()));
             return;
         } else {
             targetUrl = alwaysUseUserPreferredUrl ? null : obtainFullRequestUrl(request);

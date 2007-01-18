@@ -29,13 +29,21 @@ cosmo.account.settings = new function () {
     var self = this; // Stash a copy of this
     var form = null; // The form containing the signup fields
     var f = null; // Temp var
-    
+    // Localized strings
+    var strings = {};
+    strings['passwordBlank'] = _('AccountSettings.Prompt.BlankPassword');
+    strings['settingsErrorLoad'] = _('AccountSettings.Error.Load');
+    strings['settingsErrorUpdate'] = _('AccountSettings.Error.Update');
+
     this.accountInfo = null;
     this.fieldList = []; 
-    this.fillInFieldValues = function (type, data, resp) {
-        cosmo.util.debug.dumpIntoPopup(data);
+    this.accountInfoLoadSuccess = function (type, data, resp) {
         this.accountInfo = data;
         this.showDialog();
+    };
+    this.accountInfoLoadError = function (type, data, resp) {
+        var err = strings['settingsErrorLoad'];
+        cosmo.app.showErr(err, data);
     };
     this.showDialog = function () {
         var o = {};
@@ -47,8 +55,9 @@ cosmo.account.settings = new function () {
 
         if (!this.accountInfo) {
             var self = this;
-            var f = function (type, data, resp) { self.fillInFieldValues(type, data, resp); };
-            var hand = { load: f, error: f };
+            var success = function (type, data, resp) { self.accountInfoLoadSuccess(type, data, resp); };
+            var error = function (type, data, resp) { self.accountInfoLoadError(type, data, resp); };
+            var hand = { load: success, error: error };
             cosmo.cmp.cmpProxy.getAccount(hand, true);
             return;
         }
@@ -67,9 +76,9 @@ cosmo.account.settings = new function () {
         passCell.appendChild(d);
         d = _createElem('div');
         d.className = 'promptText floatLeft';
-        d.style.width = '50%';
-        d.style.paddingLeft = '10px'
-        d.innerHTML = 'Only enter password (with confirmation) if you are changing it.';
+        d.style.width = '59%';
+        d.style.paddingLeft = '4px'
+        d.innerHTML = strings['passwordBlank'];
         passCell.appendChild(d);
         d = _createElem('div');
         d.className = 'clearBoth';
@@ -120,7 +129,6 @@ cosmo.account.settings = new function () {
             handleOnClick: f });
         o.btnsRight = [b];
         o.defaultAction = f;
-        
         cosmo.app.showDialog(o);
     }
     this.submitSave = function () {
@@ -159,12 +167,18 @@ cosmo.account.settings = new function () {
     };
     this.handleAccountSave = function (type, data, resp) {
         var stat = resp.status;
-            alert(stat);
-        // Add bogus 1223 HTTP status from IE6 as a success code
+        var err = '';
+        // Add bogus 1223 HTTP status from 204s in IE as a success code
         if ((stat > 199 && stat < 300) || (stat == 1223)) {
-            alert('success');
+            // Success
+        }
+        else {
+            err = strings['settingsErrorUpdate'];
         }
         this.accountInfo = null;
         cosmo.app.hideDialog();
+        if (err) {
+            cosmo.app.showErr(err, data);
+        }
     };
 };

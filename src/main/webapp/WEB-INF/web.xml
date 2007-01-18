@@ -76,11 +76,11 @@
     </init-param>
   </filter>
   <filter>
-    <filter-name>login-service-security</filter-name>
+    <filter-name>webui-security</filter-name>
     <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
     <init-param>
       <param-name>targetBean</param-name>
-      <param-value>loginServiceFilterChainProxy</param-value>
+      <param-value>webuiFilterChainProxy</param-value>
     </init-param>
   </filter>
   <filter>
@@ -198,12 +198,8 @@
     <url-pattern>/logout</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>default-security</filter-name>
-    <url-pattern>/j_acegi_security_check</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>login-service-security</filter-name>
-    <url-pattern>/no_redirect_security_check</url-pattern>
+    <filter-name>webui-security</filter-name>
+    <url-pattern>/security_check</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>default-security</filter-name>

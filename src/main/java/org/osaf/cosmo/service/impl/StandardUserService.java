@@ -56,10 +56,6 @@ public class StandardUserService implements UserService {
     private AccountActivator accountActivator;
     private boolean accountActivationRequired;
 
-    private String loginUrlKey;
-
-    private String defaultLoginUrl;
-
     // UserService methods
 
     /**
@@ -155,9 +151,6 @@ public class StandardUserService implements UserService {
 
         User newUser = userDao.getUser(user.getUsername());
         
-        if (newUser.getPreference(loginUrlKey) == null){
-            newUser.setPreference(loginUrlKey, defaultLoginUrl);
-        }
         contentDao.createRootItem(newUser);
 
         return newUser;
@@ -420,22 +413,6 @@ public class StandardUserService implements UserService {
 
     public void setAccountActivationRequired(boolean accountActivationRequired) {
         this.accountActivationRequired = accountActivationRequired;
-    }
-
-    public String getDefaultLoginUrl() {
-        return defaultLoginUrl;
-    }
-
-    public void setDefaultLoginUrl(String defaultLoginUrl) {
-        this.defaultLoginUrl = defaultLoginUrl;
-    }
-
-    public String getLoginUrlKey() {
-        return loginUrlKey;
-    }
-
-    public void setLoginUrlKey(String loginUrlKey) {
-        this.loginUrlKey = loginUrlKey;
     }
 
 }

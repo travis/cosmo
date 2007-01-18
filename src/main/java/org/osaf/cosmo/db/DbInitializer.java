@@ -22,6 +22,7 @@ import org.osaf.cosmo.model.ServerProperty;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.ServerPropertyService;
 import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.ui.UIConstants;
 import org.springframework.orm.hibernate3.HibernateJdbcException;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
@@ -37,8 +38,6 @@ public class DbInitializer {
     private ServerPropertyService serverPropertyService;
 
     private LocalSessionFactoryBean localSessionFactory;
-
-    private String loginUrlKey;
 
     private String rootLoginUrl;
 
@@ -132,7 +131,8 @@ public class DbInitializer {
         overlord.setEmail("root@localhost");
         overlord.setAdmin(Boolean.TRUE);
         
-        overlord.setPreference(loginUrlKey, rootLoginUrl);
+        overlord.setPreference(UIConstants.PREF_KEY_LOGIN_URL, 
+                               rootLoginUrl);
 
         userService.createUser(overlord);
     }
@@ -141,14 +141,6 @@ public class DbInitializer {
         serverPropertyService.setServerProperty(
                 ServerProperty.PROP_SCHEMA_VERSION,
                 CosmoConstants.PRODUCT_VERSION);
-    }
-
-    public void setLoginUrlKey(String loginUrlKey) {
-        this.loginUrlKey = loginUrlKey;
-    }
-
-    public String getLoginUrlKey() {
-        return loginUrlKey;
     }
 
     public void setRootLoginUrl(String rootLoginUrl) {

@@ -66,8 +66,7 @@
   </head>
   <body>
     <div>
-      <div dojoType="cosmo:LoginDialog" widgetId="loginDialog"
-          authProc="${staticBaseUrl}/no_redirect_security_check">
+      <div dojoType="cosmo:LoginDialog" widgetId="loginDialog">
       </div>
       <div style="padding-top:24px; text-align:center">
           <fmt:message key="Login.NoAccount"/>

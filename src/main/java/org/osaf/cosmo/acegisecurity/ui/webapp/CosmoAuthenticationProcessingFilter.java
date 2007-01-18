@@ -20,18 +20,21 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.acegisecurity.Authentication;
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.context.SecurityContextHolder;
-import org.acegisecurity.event.authentication.InteractiveAuthenticationSuccessEvent;
 import org.acegisecurity.ui.webapp.AuthenticationProcessingFilter;
-import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
+import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.ui.UIConstants;
+import org.springframework.util.Assert;
 
 /**
  * Custom authentication filter to allow users to set a preferred
  * login redirect url and to return the redirect url in the message
  * body instead of issueing an actual redirect to allow for dynamic
  * client side processing of authentication results.
+ * 
+ * Note: this class overrides the values of 
+ * <code>AbstractProcessingFilter.defaultTargetUrl</code>
+ * and
+ * <code>AbstractProcessingFilter.alwaysUseDefaultTargetUrl</code>
  * 
  * @author travis
  *
@@ -40,10 +43,31 @@ public class CosmoAuthenticationProcessingFilter extends
         AuthenticationProcessingFilter {
     
     private static final String MEDIA_TYPE_PLAIN_TEXT = null;
+    private static final String failureCode = "/auth_failed";
+    private static final String successCode = "/auth_success";
     private Boolean alwaysUseUserPreferredUrl = false;
-    private String loginUrlKey;
+    private CosmoSecurityManager securityManager = null;
+    private String cosmoDefaultLoginUrl;
+    
+    
 
-    /**
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Assert.hasLength(getFilterProcessesUrl(), "filterProcessesUrl must be specified");
+        Assert.hasLength(getAuthenticationFailureUrl(), "authenticationFailureUrl must be specified");
+        Assert.notNull(getAuthenticationManager(), "authenticationManager must be specified");
+        Assert.notNull(getRememberMeServices());
+        
+        // Ensure sendRedirect will always be called with url = true on successful auth.
+        this.setAlwaysUseDefaultTargetUrl(true);
+        this.setDefaultTargetUrl(successCode);
+        this.setAuthenticationFailureUrl(failureCode);
+    }
+
+    /*
+     * This method will be called on success or failure. In the failure case, a url will be
+     * passed. In the success case, null will be passed.
+     * 
      * On succesful authentication:
      * 1) First, try to find a url the user was attempting to visit
      * 2) If that does not exist, try to find the user's preferred login url
@@ -52,83 +76,30 @@ public class CosmoAuthenticationProcessingFilter extends
      * Finally, return the url in the message body.
      */
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, 
-            HttpServletResponse response, 
-            Authentication authResult) throws IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Authentication success: " + authResult.toString());
+    protected void sendRedirect(HttpServletRequest request, 
+                                HttpServletResponse response, 
+                                String targetUrl) throws IOException {
+        
+        // If failure
+        if (targetUrl.equals(failureCode)){
+            this.sendResponse(request, response, getRelativeUrl(request,targetUrl));
+            return;
+        } else {
+            targetUrl = alwaysUseUserPreferredUrl ? null : obtainFullRequestUrl(request);
+        } 
+        
+        if (targetUrl == null){
+            targetUrl = getRelativeUrl(request, 
+                    securityManager.getSecurityContext().
+                    getUser().getPreferences().get(
+                            UIConstants.PREF_KEY_LOGIN_URL));
         }
 
-        SecurityContextHolder.getContext().setAuthentication(authResult);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Updated SecurityContextHolder to contain the " +
-                        "following Authentication: '" + authResult + "'");
+        if (targetUrl == null) {
+            targetUrl = getRelativeUrl(request, cosmoDefaultLoginUrl);
         }
         
-        try {
-            CosmoUserDetails userDetails = (CosmoUserDetails) authResult.getPrincipal();
-
-            // Don't attempt to obtain the url from the saved request if alwaysUserPreferredUrl is set
-            String targetUrl = alwaysUseUserPreferredUrl ? null : obtainFullRequestUrl(request);
-            
-            if (targetUrl == null){
-                targetUrl = getRelativeUrl(request, userDetails.getUser().getPreferences().get(
-                        this.loginUrlKey));
-            }
-
-            if (targetUrl == null) {
-                targetUrl = getRelativeUrl(request, getDefaultTargetUrl());
-            }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Returning desired redirect url:" + targetUrl);
-            }
-
-            onSuccessfulAuthentication(request, response, authResult);
-
-            getRememberMeServices().loginSuccess(request, response, authResult);
-
-            // Fire event
-            if (this.eventPublisher != null) {
-                eventPublisher.publishEvent(
-                        new InteractiveAuthenticationSuccessEvent(authResult, this.getClass()));
-            }
-
-            sendResponse(request, response, targetUrl);
-
-        } catch (ClassCastException e) {
-            sendResponse(request, response, getRelativeUrl(request, getDefaultTargetUrl()));
-        }
-    }
-    
-    /**
-     * On unsuccessful auth, send the url {serverContext}/loginfailed
-     */
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, 
-            HttpServletResponse response, 
-            AuthenticationException failed) throws IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Updated SecurityContextHolder to contain null Authentication");
-        }
-
-        String failureUrl = getExceptionMappings().getProperty(failed.getClass().getName(), getAuthenticationFailureUrl());
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Authentication request failed: " + failed.toString());
-        }
-
-        try {
-            request.getSession().setAttribute(ACEGI_SECURITY_LAST_EXCEPTION_KEY, failed);
-        } catch (Exception ignored) {}
-
-        onUnsuccessfulAuthentication(request, response, failed);
-
-        getRememberMeServices().loginFail(request, response);
-
-        this.sendResponse(request, response, getRelativeUrl(request, failureUrl));
-
+        this.sendResponse(request, response, targetUrl);
     }
 
     private void sendResponse(HttpServletRequest req, HttpServletResponse resp, String redirectUrl) throws IOException{
@@ -149,23 +120,20 @@ public class CosmoAuthenticationProcessingFilter extends
         return alwaysUseUserPreferredUrl;
     }
 
-
-
     public void setAlwaysUseUserPreferredUrl(Boolean alwaysUseUserPreferredUrl) {
         this.alwaysUseUserPreferredUrl = alwaysUseUserPreferredUrl;
     }
 
-
-
-    public String getLoginUrlKey() {
-        return loginUrlKey;
+    public void setSecurityManager(CosmoSecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
 
-
-
-    public void setLoginUrlKey(String preferredUrlPreferenceKey) {
-        this.loginUrlKey = preferredUrlPreferenceKey;
+    public String getCosmoDefaultLoginUrl() {
+        return cosmoDefaultLoginUrl;
     }
 
+    public void setCosmoDefaultLoginUrl(String cosmoDefaultTargetUrl) {
+        this.cosmoDefaultLoginUrl = cosmoDefaultTargetUrl;
+    }
 
 }

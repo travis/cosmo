@@ -330,12 +330,6 @@
     <property name="accountActivationRequired">
         <value>${cosmo.service.account.requireActivation}</value>
     </property>
-    <property name="loginUrlKey">
-    	<value>${cosmo.service.user.loginUrlKey}</value>
-    </property>
-    <property name="defaultLoginUrl">
-    	<value>${cosmo.service.user.defaultLoginUrl}</value>
-    </property>
   </bean>
 
   <bean id="contentLockManager"
@@ -508,11 +502,8 @@
     <property name="localSessionFactory">
       <ref bean="&amp;sessionFactory"/>
     </property>
-    <property name="loginUrlKey">
-      <value>${cosmo.service.user.loginUrlKey}</value>
-    </property>
     <property name="rootLoginUrl">
-      <value>${cosmo.service.user.rootLoginUrl}</value>
+      <value>/account/view</value>
     </property>
     
   </bean>
@@ -631,7 +622,7 @@
          /account/forgot=ROLE_ANONYMOUS
          /account/remind=ROLE_ANONYMOUS
          /login=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
-         /j_acegi_security_check=ROLE_ANONYMOUS
+         /security_check=ROLE_ANONYMOUS
          /loginfailed=ROLE_ANONYMOUS
          /logout=ROLE_ROOT,ROLE_USER
          /browse/**=ROLE_USER, ROLE_ROOT
@@ -655,19 +646,19 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=defaultHttpSessionContextIntegrationFilter,defaultFormBasedProcessingFilter,defaultAnonymousProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
+        /**=defaultHttpSessionContextIntegrationFilter,defaultAnonymousProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
 
       </value>
     </property>
   </bean>
 
-   <bean id="loginServiceFilterChainProxy"
+   <bean id="webuiFilterChainProxy"
         class="org.acegisecurity.util.FilterChainProxy">
     <property name="filterInvocationDefinitionSource">
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=defaultHttpSessionContextIntegrationFilter,noRedirectFormBasedProcessingFilter,defaultAnonymousProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
+        /**=defaultHttpSessionContextIntegrationFilter,webuiFormBasedProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
 
       </value>
     </property>
@@ -690,39 +681,24 @@
     </property>
   </bean>
 
-  <bean id="defaultFormBasedProcessingFilter"
-        class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter">
-    <property name="authenticationManager">
-      <ref bean="authenticationManager"/>
-    </property>
-    <property name="filterProcessesUrl">
-      <value>/j_acegi_security_check</value>
-    </property>
-    <property name="authenticationFailureUrl">
-      <value>/loginfailed</value>
-    </property>
-    <property name="defaultTargetUrl">
-      <value>/account/view</value>
-    </property>
-  </bean>
-  
-  <bean id="noRedirectFormBasedProcessingFilter"
+  <bean id="webuiFormBasedProcessingFilter"
         class="org.osaf.cosmo.acegisecurity.ui.webapp.CosmoAuthenticationProcessingFilter">
     <property name="authenticationManager">
       <ref bean="authenticationManager"/>
     </property>
     <property name="filterProcessesUrl">
-      <value>/no_redirect_security_check</value>
+      <value>/security_check</value>
     </property>
     <property name="authenticationFailureUrl">
       <value>/loginfailed</value>
     </property>
-    <property name="defaultTargetUrl">
-      <value>/account/view</value>
+    <property name="cosmoDefaultLoginUrl">
+      <value>/pim</value>
     </property>
-    <property name="loginUrlKey">
-      <value>${cosmo.service.user.loginUrlKey}</value>
+    <property name="securityManager">
+      <ref bean="securityManager"/>
     </property>
+    
   </bean>
 
   <!-- filter that performs anonymous authentication -->

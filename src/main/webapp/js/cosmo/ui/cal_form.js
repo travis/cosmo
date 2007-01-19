@@ -516,56 +516,78 @@ cosmo.ui.cal_form.CalForm = function () {
         if (!title) {
             errMsg += '"Title" is a required field.\n'
         }
-        err = Validate.dateFormat(startDate);
+        err = cosmo.util.validate.dateFormat(startDate);
         if (err) {
-            errMsg += '"Starts" date field:\n' + err;
+            errMsg += '"Starts" date field: ' + err;
             errMsg += '\n';
         }
-        err = Validate.dateFormat(endDate);
+        err = cosmo.util.validate.dateFormat(endDate);
         if (err) {
-            errMsg += '"Ends" date field:\n' + err;
+            errMsg += '"Ends" date field: ' + err;
             errMsg += '\n';
         }
-        // Validate times for normal events
-        if (!allDay) {
-            err = Validate.timeFormat(startTime);
+        // cosmo.util.validate.times for normal events
+        // Normal events will have at least a start time
+        if (startTime) {
+            var meridian = null;
+            var basicDateValidationError = false;
+            err = cosmo.util.validate.timeFormat(startTime);
             if (err) {
-                errMsg += '"Starts" time field:\n' + err;
+                basicDateValidationError = true;
+                errMsg += '"Starts" time field: ' + err;
                 errMsg += '\n';
             }
-            err = Validate.timeFormat(endTime);
+            meridian = cosmo.util.html.getRadioButtonSetValue(
+                form.startap);
+            err = cosmo.util.validate.required(meridian); 
             if (err) {
-                errMsg += '"Ends" time field:\n' + err;
+                basicDateValidationError = true;
+                errMsg += '"Starts" AM/PM field: ' + err;
+                errMsg += '\n';
+            }
+            err = cosmo.util.validate.required(endTime) || 
+                cosmo.util.validate.timeFormat(endTime);
+            if (err) {
+                basicDateValidationError = true;
+                errMsg += '"Ends" time field: ' + err;
+                errMsg += '\n';
+            }
+            meridian = cosmo.util.html.getRadioButtonSetValue(
+                form.endap);
+            err = cosmo.util.validate.required(meridian); 
+            if (err) {
+                basicDateValidationError = true;
+                errMsg += '"Ends" AM/PM field: ' + err;
                 errMsg += '\n';
             }
         }
-        // Validate recurrence end date if it's there
+        // cosmo.util.validate.recurrence end date if it's there
         if (recur && rE) {
-            err = Validate.dateFormat(rE);
+            err = cosmo.util.validate.dateFormat(rE);
             if (err) {
-                errMsg += '"Occurs" ending date field:\n' + err;
+                errMsg += '"Occurs" ending date field: ' + err;
                 errMsg += '\n';
             }
         }
 
         // Calc military datetimes from form entries
         startDate = new Date(startDate);
-        if (!allDay) {
+        if (startTime) {
             h = Cal.extractHourFromTime(startTime);
             h = hrStd2Mil(h, form.startap[1].checked);
             m = Cal.extractMinutesFromTime(startTime);
             startDate.setHours(h, m);
         }
         endDate = new Date(endDate);
-        if (!allDay) {
+        if (endTime) {
             h = Cal.extractHourFromTime(endTime);
             h = hrStd2Mil(h, form.endap[1].checked);
             m = Cal.extractMinutesFromTime(endTime);
             endDate.setHours(h, m);
         }
         // Validate that start is before end
-        if (startDate.getTime() > endDate.getTime()) {
-            errMsg += '"Starts" and "Ends" time fields:\n';
+        if (!basicDateValidationError && (startDate.getTime() > endDate.getTime())) {
+            errMsg += '"Starts" and "Ends" time fields: ';
             errMsg += 'Event cannot end before it starts.';
             errMsg += '\n';
         }
@@ -604,8 +626,9 @@ cosmo.ui.cal_form.CalForm = function () {
             d.title = title;
             d.description = descr;
             d.allDay = allDay;
+            d.anyTime = (!startTime && !endTime && !allDay) ? true : false;
             d.status = status;
-
+            
             var rule = d.recurrenceRule;
             // Set to no recurrence
             if (!recur) {
@@ -647,7 +670,7 @@ cosmo.ui.cal_form.CalForm = function () {
         form.eventallday.checked = ev.data.allDay ? true : false;
         // Set mailto link
         this.setMailtoLink(ev);
-        if (ev.data.allDay) {
+        if (ev.data.allDay || ev.data.anyTime) {
             this.setTimeElem(null, 'start');
             this.setTimeElem(null, 'end');
         }
@@ -655,6 +678,9 @@ cosmo.ui.cal_form.CalForm = function () {
             this.setTimeElem(ev.data.start, 'start');
             this.setTimeElem(ev.data.end, 'end');
         }
+        var enable = ev.data.allDay ? false : true;
+        this.enableDisableTimeElem('start', enable);
+        this.enableDisableTimeElem('end', enable);
 
         if(status) {
             _html.setSelect(this.form.status, status);
@@ -722,9 +748,6 @@ cosmo.ui.cal_form.CalForm = function () {
         meridianElem = form[name + 'ap'];
         if (time) {
             strtime = time.strftime('%I:%M');
-            meridianElem[1].disabled = false;
-            meridianElem[0].disabled = false;
-            timeElem.disabled = false;
             // Trim leading zero if need be
             strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
             meridianElem[1].checked = false;
@@ -741,11 +764,16 @@ cosmo.ui.cal_form.CalForm = function () {
             meridianElem[1].checked = false;
             meridianElem[0].checked = false;
             timeElem.value = '';
-            meridianElem[1].disabled = true;
-            meridianElem[0].disabled = true;
-            timeElem.disabled = true;
         }
 
+    };
+    this.enableDisableTimeElem = function (name, enable) {
+        var form = this.form;
+        var timeElem = form[name + 'time'];
+        var meridianElem = form[name + 'ap'];
+        meridianElem[1].disabled = !enable;
+        meridianElem[0].disabled = !enable;
+        timeElem.disabled = !enable;
     };
     /**
      * Reloading the page in some browsers preserves form information
@@ -791,10 +819,8 @@ cosmo.ui.cal_form.CalForm = function () {
             this.setTimeElem(null, 'end');
         }
         else {
-            setDate.setHours(8);
-            this.setTimeElem(setDate, 'start');
-            setDate.setHours(9);
-            this.setTimeElem(setDate, 'end');
+            this.enableDisableTimeElem('start', true);
+            this.enableDisableTimeElem('end', true);
         }
     };
     /**
@@ -903,7 +929,7 @@ cosmo.ui.cal_form.CalForm = function () {
         var e = null;
         var err = '';
         var val = self.form.jumpto.value;
-        err = Validate.dateFormat(val);
+        err = cosmo.util.validate.dateFormat(val);
         if (err) {
             err += '\n';
         }

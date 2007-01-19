@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+dojo.provide("cosmo.account.settings");
 
 dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
@@ -21,8 +22,7 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.ui.widget.TabContainer");
-
-dojo.provide("cosmo.account.settings");
+dojo.require("cosmo.account.preferences");
 
 cosmo.account.settings = new function () {
     
@@ -91,7 +91,8 @@ cosmo.account.settings = new function () {
         
         tabLabel = 'Advanced';
         tabContent = _createElem('div');
-        tabContent.innerHTML = 'This is the content for the advanced preferences';
+        var advancedForm = this.getAdvancedForm();
+		tabContent.appendChild(advancedForm);
         tabs.push({ label: tabLabel, content: tabContent });
         
         
@@ -181,4 +182,19 @@ cosmo.account.settings = new function () {
             cosmo.app.showErr(err, data);
         }
     };
+    
+    this.getAdvancedForm = function(){
+	    var form = _createElem('form');
+		var x = window;
+				
+		form.innerHTML = '<input type="checkbox" id="homeCollection"/> Show home collection link'
+
+		var prefs = cosmo.account.preferences.getPreferences();
+
+		form.homeCollection.checked = prefs['UI.Show.HomeCollectionLink'] == "true";
+		return form;
+		
+    };
+    
+    
 };

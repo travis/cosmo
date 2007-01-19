@@ -328,19 +328,27 @@ public class RPCServiceImpl implements RPCService {
             throws RPCException {
         if (log.isDebugEnabled())
             log.debug("Setting preference " + key + " to " + value);
-        getUser().setPreference(key, value);
+        User user = getUser();
+        user.setPreference(key, value);
+        userService.updateUser(user);
     }
 
     public Map<String, String> getPreferences() throws RPCException {
-        return getUser().getPreferences();
+        HashMap<String, String> returnVal = new HashMap<String, String>();
+        returnVal.putAll(getUser().getPreferences());
+        return returnVal;
     }
 
     public void setPreferences(Map<String, String> preferences) throws RPCException {
-        getUser().setMultiplePreferences(preferences);
+        User user = getUser();
+        user.setPreferences(preferences);
+        userService.updateUser(user);
     }
     
     public void setMultiplePreferences(Map<String, String> preferences) throws RPCException {
-        getUser().setMultiplePreferences(preferences);        
+        User user = getUser();
+        user.setMultiplePreferences(preferences);
+        userService.updateUser(user);
     }
 
     public void removePreference(String key) throws RPCException {

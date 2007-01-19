@@ -128,6 +128,29 @@ ScoobyService.prototype = {
     setPreference: function(preferenceName, value){},
     
     /**
+     * Removes the preference for the given name for the current user
+     * @param preferenceName the name of the preference to be removed
+     */
+    removePreference: function(preferenceName){},
+    
+    /**
+     * Gets all preferences for the current user
+     */
+    getPreferences: function(){},
+
+	/**
+	 * Sets all preferences for the current user
+     * @param preferenceName the map of the user's new preference set
+     */
+    setPreferences: function(){},
+
+	/**
+	 * Sets the specified preferences for the current user
+     * @param preferenceName the map of preferences to be set
+     */
+    setMultiplePreferences: function(preferences){},
+    
+    /**
      * Returns the RecurrenceRules for a bunch of events
      * 
      * @param calendarPath the calendar containing the events

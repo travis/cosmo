@@ -23,6 +23,9 @@ dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.ui.widget.TabContainer");
 dojo.require("cosmo.account.preferences");
+dojo.require("cosmo.ui.widget.About");
+
+var originalAboutBox = null;
 
 cosmo.account.settings = new function () {
     
@@ -97,6 +100,12 @@ cosmo.account.settings = new function () {
         
         
         tabLabel = 'About Cosmo';
+        var tempSpan = _createElem('span');
+        var about = dojo.widget.createWidget("cosmo:About", {}, tempSpan, 'last');
+        tempSpan.removeChild(about.domNode);
+        tabContent = about;
+        originalAboutBox = about;
+        /*
         tabContent = _createElem('div');
         tabContent.style.textAlign = 'center';
         tabContent.style.margin = 'auto';
@@ -110,7 +119,8 @@ cosmo.account.settings = new function () {
         d = _createElem('div');
         d.appendChild(_createText(cosmo.env.getVersion()));
         tabContent.appendChild(d);
-        
+        */
+
         tabs.push({ label: tabLabel, content: tabContent });
         
         o.width = 580;

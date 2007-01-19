@@ -25,13 +25,22 @@
 <cosmo:dialogLayout prefix="About.">
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
+<style type="text/css">
+
+* {
+    font-family: "Lucida Grande", "Verdana", "Arial", sans-serif;
+    font-size: 12px;
+}
+
+</style>
+
 <u:bind var="PRODUCT_VERSION"
         type="org.osaf.cosmo.CosmoConstants"
         field="PRODUCT_VERSION"/>
 
 <div style="width:100%;" align="center">
 
-  <div style="width:300px; margin-top:18px;">
+  <div style="width:300px; margin-top:28px;">
 
     <div>
     <a href="http://cosmo.osafoundation.org/"
@@ -42,18 +51,18 @@
     <div class="smLabel"><fmt:message 
          key="About.VersionString"/> ${PRODUCT_VERSION}
     </div>
-    <div style="margin-top:28px;"><fmt:message key="About.LicenseOpen"/>
+    <div style="margin-top:28px;"><fmt:message key="About.LicenseOpen"/><br/>
     <a href="http://www.apache.org/licenses/LICENSE-2.0" 
                onclick="goURLMainWin('http://www.apache.org/licenses/LICENSE-2.0'); 
                return false;">
     <fmt:message key="About.LicenseLinkText"/></a><fmt:message 
                  key="About.LicenseClose"/>
     </div>
-    <div style="margin-top:8px;"><fmt:message key="About.InfoOpen"/>
+    <div style="margin-top:16px;"><fmt:message key="About.InfoOpen"/>
     <a href="http://wiki.osafoundation.org/bin/view/Projects/CosmoHome" 
                onclick="goURLMainWin('http://wiki.osafoundation.org/bin/view/Projects/CosmoHome'); 
                return false;">
-    <fmt:message key="About.InfoLinkText"/></a><fmt:message 
+    <fmt:message key="About.InfoLinkText"/></a> <fmt:message 
                  key="About.InfoClose"/></div>
     </div>
     

@@ -301,8 +301,12 @@ cosmo.view.cal.Lozenge.prototype.setLozengeAppearance = function (stateId) {
 cosmo.view.cal.Lozenge.prototype.useLightColor = function (ev) {
     var ret = false;
     switch(true) {
+        // 'FYI' events
         case (ev.data.status && ev.data.status == EventStatus.FYI):
+        // @-time events
         case (!ev.data.allDay && (ev.data.start.getTime() == ev.data.end.getTime())):
+        // Anytime events
+        case (ev.data.anyTime == true):
             ret = true;
             break;
         default:

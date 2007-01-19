@@ -193,7 +193,9 @@ cosmo.view.cal = new function () {
         // Reset the lozenge because we may be changing to the new type --
         // e.g., between all-day and normal, or between normal single
         // and normal composite
-        if (ev.dataOrig && !(ev.data.allDay && ev.dataOrig.allDay)) {
+        if (ev.dataOrig && 
+            !((ev.data.allDay || ev.data.anyTime) && 
+            (ev.dataOrig.allDay || ev.dataOrig.anyTime))) {
             ev.replaceLozenge();
         }
         // Reset the lozenge properties from the event

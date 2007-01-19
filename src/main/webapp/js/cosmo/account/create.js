@@ -213,6 +213,7 @@ cosmo.account.create = new function () {
         o.defaultAction = function () { self.submitCreate(); };
 
         cosmo.app.modalDialog.show(o);
+		form.username.focus();
     };
     /**
      * Submit the call via XHR to cosmo.cmp to sign the user 

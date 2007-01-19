@@ -55,11 +55,19 @@
         dojo.require("cosmo.convenience");
         dojo.require("cosmo.ui.widget.LoginDialog");
         dojo.require("cosmo.ui.widget.ModalDialog");
+        dojo.require("cosmo.util.uri");
         
         dojo.event.browser.addListener(window, "onload", init, false);
 
         function init() {
+        	
             cosmo.app.init();
+            if (cosmo.util.uri.parseQueryString(location.search)['signup']
+				== 'true'){
+				
+				cosmo.account.create.showForm();
+			}
+			            
         }
     </script>
   </head>

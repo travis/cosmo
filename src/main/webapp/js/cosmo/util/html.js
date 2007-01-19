@@ -163,6 +163,15 @@ cosmo.util.html.appendNbsp = function (parentNode) {
     parentNode.appendChild(document.createTextNode('\u00A0'));
 };
 
+cosmo.util.html.getRadioButtonSetValue = function (set) {
+    for (var i = 0; i < set.length; i++) {
+        if (set[i].checked) {
+            return set[i].value;
+        }
+    }
+    return null;
+}
+
 //TODO Should this be a widget, or too granular? Discuss.
 cosmo.util.html.createRollOverMouseDownImage = function(normalImageUrl){
     var i = normalImageUrl.lastIndexOf(".");

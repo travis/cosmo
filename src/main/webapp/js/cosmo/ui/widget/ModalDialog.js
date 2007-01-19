@@ -289,7 +289,6 @@ dojo.widget.HtmlWidget, {
  
                 this.title = '';
                 this.prompt = '';
-                this.content = null;
                 this.btnsLeft = [];
                 this.btnsCenter = [];
                 this.btnsRight = [];
@@ -298,9 +297,10 @@ dojo.widget.HtmlWidget, {
                 this.uiFullMask.style.display = 'none';
                 this.domNode.style.display = 'none';
                 this.isDisplayed = false;
-                if (this.content instanceof dojo.widget.HtmlWidget){
+                if (this.content instanceof dojo.widget.HtmlWidget) {
                     this.content.destroy();
                 }
+                this.content = null;
                 
             };
         },

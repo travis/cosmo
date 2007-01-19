@@ -20,22 +20,36 @@
 
 dojo.provide("cosmo.util.i18n");
 
-cosmo.util.i18n.loadI18n = function(uri){
+cosmo.util.i18n.loadI18n = function (uri){
     var s = dojo.hostenv.getText(uri);
     cosmo.util.i18n._localtext = eval("(" + s + ")");
 }
 
-cosmo.util.i18n.init = function(uri){
+cosmo.util.i18n.init = function (uri){
     cosmo.util.i18n.loadI18n(uri);
 }
 
-function getText(str) {
-    return cosmo.util.i18n._localtext[str] || "[[" + str + "]]";
-}
+cosmo.util.i18n.replacePat = /\{\d+\}/g;
 
-cosmo.util.i18n.getText = getText;
+cosmo.util.i18n.getText = function () {
+    var args = Array.prototype.slice.apply(arguments);
+    var key = args.shift();
+    var str = cosmo.util.i18n._localtext[key] || "[[" + key + "]]";
+    if (args.length) {
+        var arr = str.match(cosmo.util.i18n.replacePat);
+        if (arr) {
+            for (var i = 0; i < arr.length; i++) {
+                str = str.replace(arr[i], args[i]);
+            }
+        }
+    }
+    return str;
+};
 
-cosmo.util.i18n.messageExists = function(str){
+// Legacy
+var getText = cosmo.util.i18n.getText;
+
+cosmo.util.i18n.messageExists = function (str){
      if (cosmo.util.i18n._localtext[str]){
          return true;
      } else {

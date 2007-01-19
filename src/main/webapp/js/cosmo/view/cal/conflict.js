@@ -83,8 +83,8 @@ cosmo.view.cal.conflict = new function() {
             var evCheck = null;
             var evCheckStart = 0;
 
-            // Don't check conflicts for all day events
-            if (ev.data.allDay) {
+            // Don't check conflicts for non-timed events
+            if (ev.data.allDay || ev.data.anyTime) {
                 return;
             }
             for (var j = i+1; j < evReg.length; j++) {
@@ -95,8 +95,8 @@ cosmo.view.cal.conflict = new function() {
                 if ((evCheckStart >= evEnd) && (evCheckStart != evStart)) {
                     return;
                 }
-                // Ignore all day events
-                else if (evCheck.data.allDay) {
+                // Ignore all non-timed events
+                else if (evCheck.data.allDay || evCheck.data.anyTime) {
                     // Do nothing
                 }
                 // Record actual conflicts
@@ -223,7 +223,7 @@ cosmo.view.cal.conflict = new function() {
             var row = 0;
 
             // Only look at untimed events
-            if (ev.data.allDay) {
+            if (ev.data.allDay || ev.data.anyTime) {
                 // Calc start column and column width
                 if (ev.startsBeforeViewRange()) {
                     startCol = 0;

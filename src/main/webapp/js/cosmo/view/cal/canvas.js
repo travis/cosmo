@@ -188,7 +188,7 @@ cosmo.view.cal.canvas = new function () {
         var id = key;
         var ev = val;
         // Create the lozenge and link it to the event
-        ev.lozenge = ev.data.allDay ? new cosmo.view.cal.NoTimeLozenge(id) :
+        ev.lozenge = (ev.data.allDay || ev.data.anyTime) ? new cosmo.view.cal.NoTimeLozenge(id) :
             new cosmo.view.cal.HasTimeLozenge(id);
         ev.lozenge.insert(id);
     }

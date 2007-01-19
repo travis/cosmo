@@ -720,6 +720,16 @@ cosmo.ui.cal_form.CalForm = function () {
         } else {
             self.clearTimezone();
         }
+
+        // All-day, anytime events cannot have a timezone, normal events can
+        if (ev.data.allDay || ev.data.anyTime) {
+            this.form.tzRegion.disabled = true;
+            this.form.tzId.disabled = true;
+        }
+        else {
+            this.form.tzRegion.disabled = false;
+            this.form.tzId.disabled = false;
+        }
     };
 
     this.setRecurEnd = function () {

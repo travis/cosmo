@@ -87,7 +87,7 @@ dojo.widget.HtmlWidget, function(){
         },
         
         clientsToProtocols: {
-            Chandler: "mc",
+            Chandler: "pim",
             iCal: "webcal",
             FeedReader: "atom"
         },

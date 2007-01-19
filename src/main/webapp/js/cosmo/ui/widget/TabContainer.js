@@ -62,15 +62,24 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
             var n = _createElem('div');
             n.id = this.widgetId + '_content' + index;
             n.innerHTML = o.content;
+            this.contentNodes.push(n);
         }
         else {
-            n = o.content;
+            if (o.content instanceof dojo.widget.HtmlWidget) {
+                n = o.content.domNode;
+                // For widgets, keep the actual widget as the canonical reference
+                // We can grab the domNode of it as needed
+                this.contentNodes.push(o.content);
+            }
+            else {
+                n = o.content;
+                this.contentNodes.push(n);
+            }
         }
         n.style.position = 'absolute';
         n.style.top = '0px';
         n.style.left = '0px';
         n.style.visibility =  sel ? 'visible' : 'hidden';
-        this.contentNodes.push(n);
         
         return {tab: d, content: n };
     },
@@ -79,6 +88,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         for (var i = 0; i < tabs.length; i++) {
             var tab = this.tabNodes[i];
             var content = this.contentNodes[i];
+            // If the content is a widget, point us as the DOM node
+            if (content instanceof dojo.widget.HtmlWidget) {
+                content = content.domNode;
+            }
             if (i == index) {
                 tab.className = 'tabSelected'; 
                 content.style.visibility = 'visible';
@@ -152,6 +165,17 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         tabMain.appendChild(tabContent);
         this.domNode.appendChild(tabMain);
         tabMain.style.visibility = 'visible';
+    },
+    // Clean up any sub-widgets in any of the tabs
+    destroyChildren: function () {
+        n = this.contentNodes;
+        for (var i = 0; i < n.length; i++) {
+            var c = n[i];
+            if (c instanceof dojo.widget.HtmlWidget) {
+                c.destroy();
+            }
+        }
+        
     }
 } );
 

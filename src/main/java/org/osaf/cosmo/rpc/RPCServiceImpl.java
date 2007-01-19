@@ -173,8 +173,8 @@ public class RPCServiceImpl implements RPCService {
 
         this.checkTicketProvidesPermissions(collection, ticketKey, READ_PERM);
 
-        Calendar calendar = createCalendarFromItem(request, collection);
-
+        Calendar calendar = createCalendarFromItem(request, collection, ticketKey);
+          
         return calendar;
     }
 
@@ -769,15 +769,29 @@ public class RPCServiceImpl implements RPCService {
     }
 
     private Calendar createCalendarFromItem(HttpServletRequest request, Item item) {
+        ServiceLocator serviceLocator = serviceLocatorFactory.createServiceLocator(request);
+
+        return createCalendarFromItem(item, serviceLocator);
+    }
+
+    private Calendar createCalendarFromItem(HttpServletRequest request, Item item, String ticketKey){
+        ServiceLocator serviceLocator = serviceLocatorFactory
+                .createServiceLocator(request, ticketKey);
+
+        return createCalendarFromItem(item, serviceLocator);
+    }
+
+    private Calendar createCalendarFromItem(Item item, ServiceLocator serviceLocator) {
         Calendar calendar = new Calendar();
         calendar.setName(item.getDisplayName());
         calendar.setUid(item.getUid());
 
-        ServiceLocator serviceLocator = serviceLocatorFactory.createServiceLocator(request);
         Map<String, String> protocolUrls = serviceLocator.getCollectionUrls((CollectionItem) item);
         calendar.setProtocolUrls(protocolUrls);
         return calendar;
     }
+    
+    
     private void createCalendarHandleDuplicateName(CollectionItem collection,
             CollectionItem calendar, int i) throws RPCException {
             try {

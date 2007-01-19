@@ -63,7 +63,7 @@ public class ServiceLocatorFactory {
     public ServiceLocator createServiceLocator(HttpServletRequest request, 
                                                Boolean absoluteUrls) {
         Ticket ticket = securityManager.getSecurityContext().getTicket();
-        return createServiceLocator(request, ticket, absoluteUrls);
+        return createServiceLocator(request, ticket == null ? null : ticket.getKey(), absoluteUrls);
     }
 
     /**
@@ -73,7 +73,11 @@ public class ServiceLocatorFactory {
      */
     public ServiceLocator createServiceLocator(HttpServletRequest request,
                                                Ticket ticket) {
-        return createServiceLocator(request, ticket, ABSOLUTE_BY_DEFAULT);
+        return createServiceLocator(request, ticket.getKey(), ABSOLUTE_BY_DEFAULT);
+    }
+    
+    public ServiceLocator createServiceLocator(HttpServletRequest request, String ticketKey){
+        return createServiceLocator(request, ticketKey, ABSOLUTE_BY_DEFAULT);
     }
     
     /**
@@ -82,14 +86,20 @@ public class ServiceLocatorFactory {
      * information in the given request and including the given ticket
      */
     public ServiceLocator createServiceLocator(HttpServletRequest request,
-                                               Ticket ticket,
+                                               String  ticketKey,
                                                Boolean absoluteUrls){
 
         String appMountUrl = calculateAppMountUrl(request, absoluteUrls);
 
-        String ticketKey = ticket != null ? ticket.getKey() : null;
-
         return new ServiceLocator(appMountUrl, ticketKey, this);
+    }
+
+    public ServiceLocator createServiceLocator(HttpServletRequest request,
+            Ticket ticket, Boolean absoluteUrls) {
+
+        String appMountUrl = calculateAppMountUrl(request, absoluteUrls);
+
+        return new ServiceLocator(appMountUrl, ticket == null ? null : ticket.getKey(), this);
     }
 
     /** */
@@ -212,8 +222,8 @@ public class ServiceLocatorFactory {
 
         if (absoluteUrls){
             buf.append(request.getScheme()).
-            	append("://").
-            	append(request.getServerName());
+                append("://").
+                append(request.getServerName());
             if ((request.isSecure() && request.getServerPort() != 443) ||
                     (request.getServerPort() != 80)) {
                 buf.append(":").append(request.getServerPort());

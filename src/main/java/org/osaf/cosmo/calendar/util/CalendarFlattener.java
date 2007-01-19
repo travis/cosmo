@@ -47,15 +47,14 @@ import org.apache.commons.logging.LogFactory;
  * @author bcm
  * 
  * This class generates field/value pairs from iCalendar components
- * that are suitable for setting as JCR properties on calendar
- * resource nodes. This allows us to use XPath queries with element
- * attributes to query the iCalendar data in a way suitable for
+ * that are suitable for indexing an calendar item.
+ * This allows us to query the iCalendar data in a way suitable for
  * CalDAV.
  * 
  * For this to work the iCalendar data is coverted into a special
  * 'flat' format, and then split into key/value pairs, such that the
- * key can be used as the JCR property name and the value as the
- * (string) JCR property value.
+ * key can be used as the property name and the value as the
+ * (string) property value.
  */
 public class CalendarFlattener {
     private static final Log log = LogFactory.getLog(CalendarFlattener.class);
@@ -66,7 +65,7 @@ public class CalendarFlattener {
     static final public String TIME_RANGE_FIELD_SUFFIX_LOWERCASE =
         TIME_RANGE_FIELD_SUFFIX.toLowerCase();
 
-    static final private String MAX_TIME_RANGE = "20080101T000000Z";  // @FIX@: Hack to limit date expansions. Need to revisit later.
+    static final private String MAX_TIME_RANGE = "20090101T000000Z";  // @FIX@: Hack to limit date expansions. Need to revisit later.
 
     /**
      * Returns a <code>Map</code> of data items, one for each

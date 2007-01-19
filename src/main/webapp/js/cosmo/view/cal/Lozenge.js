@@ -497,21 +497,22 @@ cosmo.view.cal.HasTimeLozenge.prototype.updateEvent = function (ev, dragMode) {
     // Add +2 to height for border on lozenge div
     var endTime = Cal.calcTimeFromPos(this.top+(this.height + 3));
     
+    evStart.setHours(Cal.extractHourFromTime(startTime));
+    evStart.setMinutes(Cal.extractMinutesFromTime(startTime));
+    evEnd.setHours(Cal.extractHourFromTime(endTime));
+    evEnd.setMinutes(Cal.extractMinutesFromTime(endTime));
+    
     // If the event was originally less than the minimum *visible* lozenge
     // height, preserve the original times when editing
     var origLengthMinutes = Date.diff('n', ev.dataOrig.start, ev.dataOrig.end);
+    var newLengthMinutes = Date.diff('n', evStart, evEnd);
 
-    evStart.setHours(Cal.extractHourFromTime(startTime));
-    evStart.setMinutes(Cal.extractMinutesFromTime(startTime));
-    if (origLengthMinutes < this.minimumMinutes) {
+    if (origLengthMinutes < this.minimumMinutes && newLengthMinutes == this.minimumMinutes) {
        evEnd.setHours(evStart.getHours());
        // JS Dates do intelligent wraparound
        evEnd.setMinutes(evStart.getMinutes() + origLengthMinutes);
     }
-    else {
-        evEnd.setHours(Cal.extractHourFromTime(endTime));
-        evEnd.setMinutes(Cal.extractMinutesFromTime(endTime));
-    }
+    
     // Update cosmo.datetime.Date with new UTC values
     ev.data.start.updateFromUTC(evStart.getTime());
     ev.data.end.updateFromUTC(evEnd.getTime());

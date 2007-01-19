@@ -31,8 +31,6 @@ cosmo.ui.event.listeners.hookUpListeners = function (){
 	
 	dojo.event.browser.addListener(window, "onload", cosmo.ui.event.handlers.init, false);
 	dojo.event.browser.addListener(window, "onunload", cosmo.ui.event.handlers.cleanup, false);
-	// FIXME -- Just resize/re-render, don't need to reload
-	window.onresize = function() {
-	    location = location.href;
-	};
+	// FIXME -- Need to resize/re-render UI on window resize
+	//dojo.event.browser.addListener(window, "onresize", cosmo.ui.event.handlers.resize, false);
 }

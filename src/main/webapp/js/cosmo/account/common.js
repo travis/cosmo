@@ -174,10 +174,13 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
     }
     table.appendChild(body);
     form.appendChild(table);
-
-	cosmo.util.html.addInputsToForm(inputs, form);
-	
-	return form;
+    
+    // BANDAID: Hack to get the checkbox into Safari's 
+    // form elements collection
+    if (navigator.userAgent.indexOf('Safari') > -1) {
+        cosmo.util.html.addInputsToForm(inputs, form);
+    }
+    return form;
 };
 
 /**

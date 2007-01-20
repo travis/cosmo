@@ -163,6 +163,10 @@ cosmo.util.html.appendNbsp = function (parentNode) {
     parentNode.appendChild(document.createTextNode('\u00A0'));
 };
 
+cosmo.util.html.nbsp = function () {
+    return document.createTextNode('\u00A0');
+};
+
 cosmo.util.html.getRadioButtonSetValue = function (set) {
     for (var i = 0; i < set.length; i++) {
         if (set[i].checked) {

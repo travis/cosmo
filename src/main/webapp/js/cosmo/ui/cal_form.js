@@ -135,7 +135,7 @@ cosmo.ui.cal_form.CalForm = function () {
         this.mailtoLink.setAttribute("id", "emailThisEventLink");
         
         this.mailtoLink.appendChild(
-            document.createTextNode("Email this event"));
+            document.createTextNode(_('Main.DetailForm.EMail')));
         d.appendChild(this.mailtoLink);
 
         cont.id = 'eventInfoDivContent';

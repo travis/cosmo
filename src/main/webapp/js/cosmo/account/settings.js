@@ -32,46 +32,89 @@ cosmo.account.settings = new function () {
     var self = this; // Stash a copy of this
     this.detailsForm = null; // The form containing the signup fields
     this.advancedForm = null;
-    var f = null; // Temp var
     // Localized strings
-    var strings = {};
-    strings['passwordBlank'] = _('AccountSettings.Prompt.BlankPassword');
-    strings['settingsErrorLoad'] = _('AccountSettings.Error.Load');
-    strings['settingsErrorUpdate'] = _('AccountSettings.Error.Update');
-
+    var strings = {
+        title: _('AccountSettings.Title'),
+        passwordBlank: _('AccountSettings.Prompt.BlankPassword'),
+        settingsErrorLoad: _('AccountSettings.Error.Load'),
+        settingsErrorUpdate: _('AccountSettings.Error.Update'),
+        general: _('AccountSettings.General'),
+        advanced: _('AccountSettings.Advanced'),
+        about: _('AccountSettings.About'),
+        advancedAccountBrowser: _('AccountSettings.Advanced.AccountBrowser') 
+    }
+    
+    // Public memebers
+    // ==============
+    // Cache of user account data
     this.accountInfo = null;
+    // Array of form input fields for basic account data
     this.fieldList = []; 
+    
+    // Public methods
+    // ==============
+    /**
+     * Handles successful loading of the current account info from 
+     * the server -- will reload updated account info if the user
+     * edits it
+     * @param type String, should be 'load'
+     * @param data Object, a hash of account properties
+     * @param resp Object, the XHR obj 
+     */
     this.accountInfoLoadSuccess = function (type, data, resp) {
         this.accountInfo = data;
         this.showDialog();
     };
+    /**
+     * Handles errors loading the current account info from the server
+     * @param type String, should be 'error'
+     * @param data Object, error object -- 'message' prop contains
+     *     actual error message text
+     * @param resp Object, the XHR obj 
+     */
     this.accountInfoLoadError = function (type, data, resp) {
         var err = strings['settingsErrorLoad'];
         cosmo.app.showErr(err, data);
     };
+    /**
+     * Displays the multi-tab dialog with user account data and prefs
+     * Loads and caches account data on first invocation of the box
+     * Editing account info flushes the cache so it gets updated
+     * from the server when the box is invoked again
+     */
     this.showDialog = function () {
         var o = {};
-        var b = null; var c = null;
-        var s = document.createElement('span');
+        var s = document.createElement('span'); // Throwaway node to avoid doc reflow 
         var tabs = [];
         var tabLabel = '';
         var tabContent = null;
-
+        
+        o.width = 580;
+        o.height = 380;
+        o.title = strings.title;
+        o.prompt = ''; // This dialog has no prompt
+        
+        // No user account data cached -- grab it from the server 
+        // and bail out
         if (!this.accountInfo) {
             var self = this;
-            var success = function (type, data, resp) { self.accountInfoLoadSuccess(type, data, resp); };
-            var error = function (type, data, resp) { self.accountInfoLoadError(type, data, resp); };
+            var success = function (type, data, resp) { 
+                self.accountInfoLoadSuccess(type, data, resp); };
+            var error = function (type, data, resp) { 
+                self.accountInfoLoadError(type, data, resp); };
             var hand = { load: success, error: error };
             cosmo.cmp.cmpProxy.getAccount(hand, true);
             return;
         }
 
+        // Build the list of fields based on the account info
         this.fieldList = cosmo.account.getFieldList(this.accountInfo); 
-
+        // Build the form using the list of input fields
         this.detailsForm = cosmo.account.getFormTable(this.fieldList, false);
-
+        
+        // Add the notice to the right of the password field
+        // to indicate that leaving the fields blank mean 'no change'
         var passCell = this.detailsForm.password.parentNode;
-
         var d = null;
         var pass = passCell.removeChild(this.detailsForm.password);
         d = _createElem('div');
@@ -83,111 +126,111 @@ cosmo.account.settings = new function () {
         d.className = 'promptText floatLeft';
         d.style.width = '59%';
         d.style.paddingLeft = '4px'
-        d.innerHTML = strings['passwordBlank'];
+        d.appendChild(_createText(strings['passwordBlank']));
         passCell.appendChild(d);
         d = _createElem('div');
         d.className = 'clearBoth';
         passCell.appendChild(d);
         
-        tabLabel = 'General';
+        // General tab -- general account data
+        // -------
+        tabLabel = strings.general; 
         tabContent = _createElem('div');
         tabContent.appendChild(this.detailsForm);
         tabs.push({ label: tabLabel, content: tabContent });
         
-        tabLabel = 'Advanced';
+        // Advanced settings
+        // -------
+        tabLabel = strings.advanced; 
         tabContent = _createElem('div');
         this.advancedForm = this.getAdvancedForm();
-		tabContent.appendChild(this.advancedForm);
+        tabContent.appendChild(this.advancedForm);
         tabs.push({ label: tabLabel, content: tabContent });
         
-        
-        tabLabel = 'About Cosmo';
-        var tempSpan = _createElem('span');
-        var about = dojo.widget.createWidget("cosmo:About", {}, tempSpan, 'last');
-        tempSpan.removeChild(about.domNode);
+        // About Cosmo tab
+        // -------
+        tabLabel = strings.about; 
+        var about = dojo.widget.createWidget("cosmo:About", {}, s, 'last');
+        s.removeChild(about.domNode); // Detach from the throwaway node
         tabContent = about;
         originalAboutBox = about;
-        /*
-        tabContent = _createElem('div');
-        tabContent.style.textAlign = 'center';
-        tabContent.style.margin = 'auto';
-        tabContent.style.width = '100%';
-        
-        d = _createElem('div');
-        d.appendChild(_createText('Cosmo'));
-        d.className = 'labelTextXL';
-        tabContent.appendChild(d);
-        
-        d = _createElem('div');
-        d.appendChild(_createText(cosmo.env.getVersion()));
-        tabContent.appendChild(d);
-        */
-
         tabs.push({ label: tabLabel, content: tabContent });
         
-        o.width = 580;
-        o.height = 380;
-        o.title = 'Settings';
-        o.prompt = '';
-        
-        var self = this;
+        var self = this; // For callback scope
+        // Submit button and default Enter-key action
         var f = function () { self.submitSave.apply(self); };
-        c = dojo.widget.createWidget("cosmo:TabContainer", { tabs: tabs }, s, 'last');
-        s.removeChild(c.domNode);
+        
+        var b = null; // For dialog buttons
+        var c = null; // For dialog content area
+        c = dojo.widget.createWidget("cosmo:TabContainer", { 
+            tabs: tabs }, s, 'last');
+        s.removeChild(c.domNode); // Detach from the throwaway node
         o.content = c;
-        b = new cosmo.ui.button.Button({ text:_('App.Button.Close'), width:60, small: true,
-            handleOnClick: function () { cosmo.app.hideDialog(); } });
+        b = new cosmo.ui.button.Button({ text:_('App.Button.Close'), 
+            width:60, small: true, handleOnClick: function () { 
+                cosmo.app.hideDialog(); } });
         o.btnsLeft = [b];
-        b = new cosmo.ui.button.Button({ text:_('App.Button.Save'), width:60, small: true,
-            handleOnClick: f });
+        b = new cosmo.ui.button.Button({ text:_('App.Button.Save'), 
+            width:60, small: true, handleOnClick: f });
         o.btnsRight = [b];
         o.defaultAction = f;
+        
         cosmo.app.showDialog(o);
     }
+    /**
+     * Validate the form input and submit via XHR
+     */
     this.submitSave = function () {
-		// Save preferences syncronously first
-    	var prefs = {};
+        // Save preferences syncronously first
+        var prefs = {};
 
-    	prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] = 
-    		this.advancedForm.showAccountBrowser.checked.toString();
-    		
-    	cosmo.account.preferences.setMultiplePreferences(prefs);
-    	
-    	cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [prefs]);
+        prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] = 
+            this.advancedForm.showAccountBrowser.checked.toString();
+            
+        cosmo.account.preferences.setMultiplePreferences(prefs);
+        
+        cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [prefs]);
 
         // Validate the form input using each field's
         // attached validators
         var fieldList = this.fieldList;
+        // Validate fields with the attached validators 
+        // and display any inline err messages
         var err = cosmo.account.validateForm(this.detailsForm, fieldList, false);
         
-        if (err) {
-            // Do nothing
-        }
-        else {
+        // No error -- submit updated account info via CMP
+        if (!err) {
             var self = this;
-            var f = function (type, data, resp) { self.handleAccountSave(type, data, resp); };
+            // Same handler for both success and error -- IE throws a 
+            // freakish '1223' HTTP code when server returns a successful
+            // 204 'No content'. Dojo's io.bind doesn't recognize that as
+            // success, so we have to examine status codes manually
+            var f = function (type, data, resp) { 
+                self.handleAccountSave(type, data, resp); };
             var hand = { load: f, error: f };
             var account = {};
             // Create a hash from the form field values
             for (var i = 0; i < fieldList.length; i++) {
                 var f = fieldList[i];
                 var val = this.detailsForm[f.elemName].value;
-                if (val) {
+                // Only include fields with values -- throw out
+                // the 'confirm' field
+                if (val && (f.elemName != 'confirm')) {
                     account[f.elemName] = val;
                 }
             }
-            delete account.confirm;
-            
-            // Only set the property at all if it's initially true
-            // 'administrator' is an empty tag -- its presence will 
-            if (this.accountInfo.administrator) {
-                account.administrator = true;
-            };
             // Hand off to CMP
             cosmo.cmp.cmpProxy.modifyAccount(account, hand);
         }
     };
-
+    /**
+     * Handle both success and error responses from the CMP call
+     * @param type String, may be 'load' or 'error' -- if type is
+     *     'error,' this may be bogus result from weird IE 1223
+     *     HTTP response code
+     * @param data Object, May be data or error object 
+     * @param resp Object, the XHR obj 
+     */
     this.handleAccountSave = function (type, data, resp) {
         var stat = resp.status;
 
@@ -197,37 +240,49 @@ cosmo.account.settings = new function () {
             // Success
         }
         else {
-            err = strings['settingsErrorUpdate'];
+            err = strings.settingsErrorUpdate;
         }
+        // Flush the account data cache -- get the updated stuff
+        // from the server if the user invokes the box again
         this.accountInfo = null;
-        cosmo.app.hideDialog();
 
+        // Both error & success -- the dialog goes poof
+        cosmo.app.hideDialog();
+        
+        // Errors, spawn a new dialog to report the error
         if (err) {
             cosmo.app.showErr(err, data);
         }
     };
-    
+    /**
+     * The form with advanced account settings displayed in the
+     * Advanced tab
+     */
     this.getAdvancedForm = function(){
-	    var form = _createElem('form');
-		var div = _createElem('div');
-		var showAB = cosmo.util.html.createInput('checkbox', 'showAccountBrowser',
-							'showAccountBrowser',
-							null, null, null, null, div);
+        var form = _createElem('form');
+        var div = _createElem('div');
+        var nbsp = function () { return cosmo.util.html.nbsp(); };
+        var check = cosmo.util.html.createInput({ type: 'checkbox', 
+            id: 'showAccountBrowser', name: 'showAccountBrowser',  
+            value: '' });
+        var prefs = cosmo.account.preferences.getPreferences();
+        
+        div.appendChild(check);
+        div.appendChild(nbsp());
+        div.appendChild(nbsp());
+        div.appendChild(_createText(strings.advancedAccountBrowser));
+        form.appendChild(div);
 
-		div.appendChild(document.createTextNode(
-			_('AccountSettings.UI.Show.AccountBrowserLink')));
-			
-		form.appendChild(div);
+        // BANDAID: Hack to get the checkbox into Safari's 
+        // form elements collection
+        if (navigator.userAgent.indexOf('Safari') > -1) {
+            cosmo.util.html.addInputsToForm([check], form);
+        }
 
-		cosmo.util.html.addInputsToForm([showAB], form);
-
-		var prefs = cosmo.account.preferences.getPreferences();
-
-		form.showAccountBrowser.checked = 
-			(prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] == "true");
-		
-		return form;
-		
+        form.showAccountBrowser.checked = 
+            (prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] 
+            == "true");
+        return form;
     };
     
     

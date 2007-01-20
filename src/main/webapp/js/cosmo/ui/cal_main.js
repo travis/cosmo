@@ -510,7 +510,7 @@ cosmo.ui.cal_main.Cal = new function () {
         // *** Note: IE requires the body style to include'height:100%;'
         // *** to get the actual window height
         if (document.all) {
-            return document.body.clientHeight;
+            return document.documentElement.clientHeight;
         }
         // Moz/compat
         else {
@@ -520,7 +520,7 @@ cosmo.ui.cal_main.Cal = new function () {
     this.getWinWidth =  function () {
         // IE
         if (document.all) {
-            return document.body.clientWidth;
+            return document.documentElement.clientWidth;
         }
         // Moz/compat
         else {

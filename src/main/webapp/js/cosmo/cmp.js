@@ -230,7 +230,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 requestDict.headers['X-Http-Method-Override'] = "PUT"
                 requestDict.postContent = requestContent
 
-                dojo.io.bind(requestDict)
+               dojo.io.bind(requestDict);
 
         },
 

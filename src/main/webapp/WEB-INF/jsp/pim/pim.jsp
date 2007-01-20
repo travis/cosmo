@@ -23,6 +23,7 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:baseurl var="baseUrl"/>
 <cosmo:staticbaseurl var="staticBaseUrl"/>
+<c:set var="ticketedView" value="${not empty ticketKey }"/>
 <cosmoui:user var="user"/>
 
 <fmt:setBundle basename="PimMessageResources"/>
@@ -54,6 +55,9 @@
 dojo.require('cosmo.app');
 dojo.require('cosmo.ui.cal_main');
 dojo.require('cosmo.ui.global_css');
+dojo.require('cosmo.convenience');
+dojo.require('cosmo.topics');
+dojo.require('cosmo.account.preferences');
 
 // Added automatically to window.onload by 
 // cosmo.ui.event.listeners.hookUpListeners
@@ -69,10 +73,26 @@ cosmo.ui.event.handlers.init = function () {
     
     cosmo.app.initObj = Cal;
     cosmo.app.init(collectionUid, ticketKey);
+
+<c:if test="${not ticketedView}">
+    cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, 
+  						 [cosmo.account.preferences.getPreferences()]);
+</c:if>
 }
 
 dojo.require("cosmo.ui.event.listeners");
 cosmo.ui.event.listeners.hookUpListeners();
+
+function updateUIFromPrefs(/*cosmo.topics.PreferencesUpdatedMessage*/ message){
+	if (message.preferences[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] == 'true'){
+		$('accountBrowserLink').style.display = 'inline';
+	} else {
+		$('accountBrowserLink').style.display = 'none';
+	}
+}
+
+dojo.event.topic.subscribe(
+	cosmo.topics.PreferencesUpdatedMessage.topicName, this, updateUIFromPrefs);
 
 </script>
 
@@ -83,7 +103,8 @@ cosmo.ui.event.listeners.hookUpListeners();
             <div id="smallLogoDiv"></div>
             <%-- Begin main nav menu --%>
             <c:choose>
-              <c:when test="${empty ticketKey}">
+              <c:when test="${not ticketedView}">
+              	<!-- Start non-ticketed links -->
                 <authz:authorize ifAnyGranted="ROLE_USER">
                 <fmt:message key="Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
                   <span class="menuBarDivider">|</span>
@@ -97,8 +118,16 @@ cosmo.ui.event.listeners.hookUpListeners();
                   Settings
                 </a>
                 <span class="menuBarDivider">|</span>
+                <span id="accountBrowserLink" style="display: none;">
+                <a href="${staticBaseUrl}/browse/${user.username}">
+                  Account Browser
+                </a>
+                <span class="menuBarDivider">|</span>
+                </span>
+                <!-- End non-ticketed links -->
               </c:when>
               <c:otherwise>
+              	<!-- Ticketed version of links -->
                 <div id="signupGraphic"></div>
                 <div id="subscribeSelector"></div>
               </c:otherwise>
@@ -107,7 +136,7 @@ cosmo.ui.event.listeners.hookUpListeners();
             <c:url var="helpUrl" value="http://wiki.osafoundation.org/bin/view/Projects/CosmoHelpPortal"/>
             <a href="${helpUrl}" target="_blank"><fmt:message key="Main.Help"/></a>
                 
-            <c:if test="${empty ticketKey}">
+            <c:if test="${not ticketedView}">
                <authz:authorize ifAnyGranted="ROLE_USER">
                  <span class="menuBarDivider">|</span>
                   <a href="${staticBaseUrl}/logout">

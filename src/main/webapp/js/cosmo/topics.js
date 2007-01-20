@@ -79,6 +79,20 @@ cosmo.topics.declareMessage("cosmo.topics.SubscriptionUpdatedMessage",
     }
 );
 
+cosmo.topics.declareMessage("cosmo.topics.PreferencesUpdatedMessage", 
+    // summary: Published after preferences are changed
+    //          has occured
+    "PREFERENCES_UPDATED", null, 
+    //initializer
+    function(/*Object*/ preferences){
+        this.preferences = preferences;
+    },
+    //props 
+    {
+        preferences: null
+    }
+);
+
 /**
  * Application Level messages: Messages about changing the application state are to be found here. For
  * instance, the selected collection changed.

@@ -652,7 +652,7 @@ td.dataDisplayLabel {
     vertical-align:bottom;
 }
 /* The pipe character between links */
-#menuBarDiv span {
+#menuBarDiv span.menuBarDivider {
     font-weight:normal;
     color:$uiDetailBorderColor;
 }

@@ -134,6 +134,8 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
     }
     table.style.margin = 'auto';
     
+    var inputs = [];
+    
     // Table row for each form field
     for (var i = 0; i < fieldList.length; i++) {
         var f = fieldList[i];
@@ -164,14 +166,18 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
         elem.style.width = type == 'text' ? '240px' : '140px';
         elem.className = 'inputText';
         elem.value = f.value || '';
+        inputs.push(elem);
         td.appendChild(elem);
         
         tr.appendChild(td);
-        body.appendChild(tr)
+        body.appendChild(tr);
     }
     table.appendChild(body);
     form.appendChild(table);
-    return form;
+
+	cosmo.util.html.addInputsToForm(inputs, form);
+	
+	return form;
 };
 
 /**

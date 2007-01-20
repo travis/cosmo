@@ -30,7 +30,8 @@ var originalAboutBox = null;
 cosmo.account.settings = new function () {
     
     var self = this; // Stash a copy of this
-    var form = null; // The form containing the signup fields
+    this.detailsForm = null; // The form containing the signup fields
+    this.advancedForm = null;
     var f = null; // Temp var
     // Localized strings
     var strings = {};
@@ -64,14 +65,15 @@ cosmo.account.settings = new function () {
             cosmo.cmp.cmpProxy.getAccount(hand, true);
             return;
         }
-       
-        this.fieldList = cosmo.account.getFieldList(this.accountInfo); 
-        
-        form = cosmo.account.getFormTable(this.fieldList, false);
 
-        var passCell = form.password.parentNode;
+        this.fieldList = cosmo.account.getFieldList(this.accountInfo); 
+
+        this.detailsForm = cosmo.account.getFormTable(this.fieldList, false);
+
+        var passCell = this.detailsForm.password.parentNode;
+
         var d = null;
-        var pass = passCell.removeChild(form.password);
+        var pass = passCell.removeChild(this.detailsForm.password);
         d = _createElem('div');
         d.className = 'floatLeft';
         d.style.width = '40%';
@@ -89,13 +91,13 @@ cosmo.account.settings = new function () {
         
         tabLabel = 'General';
         tabContent = _createElem('div');
-        tabContent.appendChild(form);
+        tabContent.appendChild(this.detailsForm);
         tabs.push({ label: tabLabel, content: tabContent });
         
         tabLabel = 'Advanced';
         tabContent = _createElem('div');
-        var advancedForm = this.getAdvancedForm();
-		tabContent.appendChild(advancedForm);
+        this.advancedForm = this.getAdvancedForm();
+		tabContent.appendChild(this.advancedForm);
         tabs.push({ label: tabLabel, content: tabContent });
         
         
@@ -143,10 +145,20 @@ cosmo.account.settings = new function () {
         cosmo.app.showDialog(o);
     }
     this.submitSave = function () {
+		// Save preferences syncronously first
+    	var prefs = {};
+
+    	prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] = 
+    		this.advancedForm.showAccountBrowser.checked.toString();
+    		
+    	cosmo.account.preferences.setMultiplePreferences(prefs);
+    	
+    	cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [prefs]);
+
         // Validate the form input using each field's
         // attached validators
         var fieldList = this.fieldList;
-        var err = cosmo.account.validateForm(form, fieldList, false);
+        var err = cosmo.account.validateForm(this.detailsForm, fieldList, false);
         
         if (err) {
             // Do nothing
@@ -159,7 +171,7 @@ cosmo.account.settings = new function () {
             // Create a hash from the form field values
             for (var i = 0; i < fieldList.length; i++) {
                 var f = fieldList[i];
-                var val = form[f.elemName].value;
+                var val = this.detailsForm[f.elemName].value;
                 if (val) {
                     account[f.elemName] = val;
                 }
@@ -174,10 +186,11 @@ cosmo.account.settings = new function () {
             // Hand off to CMP
             cosmo.cmp.cmpProxy.modifyAccount(account, hand);
         }
-        
     };
+
     this.handleAccountSave = function (type, data, resp) {
         var stat = resp.status;
+
         var err = '';
         // Add bogus 1223 HTTP status from 204s in IE as a success code
         if ((stat > 199 && stat < 300) || (stat == 1223)) {
@@ -188,6 +201,7 @@ cosmo.account.settings = new function () {
         }
         this.accountInfo = null;
         cosmo.app.hideDialog();
+
         if (err) {
             cosmo.app.showErr(err, data);
         }
@@ -195,13 +209,23 @@ cosmo.account.settings = new function () {
     
     this.getAdvancedForm = function(){
 	    var form = _createElem('form');
-		var x = window;
-				
-		form.innerHTML = '<input type="checkbox" id="homeCollection"/> Show home collection link'
+		var div = _createElem('div');
+		var showAB = cosmo.util.html.createInput('checkbox', 'showAccountBrowser',
+							'showAccountBrowser',
+							null, null, null, null, div);
+
+		div.appendChild(document.createTextNode(
+			_('AccountSettings.UI.Show.AccountBrowserLink')));
+			
+		form.appendChild(div);
+
+		cosmo.util.html.addInputsToForm([showAB], form);
 
 		var prefs = cosmo.account.preferences.getPreferences();
 
-		form.homeCollection.checked = prefs['UI.Show.HomeCollectionLink'] == "true";
+		form.showAccountBrowser.checked = 
+			(prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] == "true");
+		
 		return form;
 		
     };

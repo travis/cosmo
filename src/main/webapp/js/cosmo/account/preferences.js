@@ -19,6 +19,8 @@ dojo.provide("cosmo.account.preferences");
 dojo.require("cosmo.ui.cal_main");
 
 cosmo.account.preferences = new function () {
+	this.SHOW_ACCOUNT_BROWSER_LINK = 'UI.Show.AccountBrowserLink';
+	this.LOGIN_URL = 'Login.Url';
 	
     this.getPreference = function(key){
 		return cosmo.ui.cal_main.Cal.serv.getPreference(key);

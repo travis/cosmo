@@ -608,20 +608,21 @@ cosmo.ui.cal_form.CalForm = function () {
             // Set event properties
             // ==============
             var d = ev.data;
+
             // cosmo.datetime.Date with timezones
             if (tzId) {
-                d.start.updateFromLocalDate(startDate);
                 d.start.tzId = tzId;
-                d.end.updateFromLocalDate(endDate);
+                d.start.updateFromLocalDate(startDate);
                 d.end.tzId = tzId;
+                d.end.updateFromLocalDate(endDate);
             }
             // Floating cosmo.datetime.Date 
             else {
-                d.start.updateFromUTC(startDate.getTime());
                 d.start.tzId = null;
+                d.start.updateFromUTC(startDate.getTime());
                 d.start.utc = false;
-                d.end.updateFromUTC(endDate.getTime());
                 d.end.tzId = null;
+                d.end.updateFromUTC(endDate.getTime());
                 d.end.utc = false;
             }
             d.title = title;

@@ -690,6 +690,7 @@ td.dataDisplayLabel {
 /* Text for single collections */
 #collectionLabelPrompt {
     color:#aaaaaa;
+    padding-bottom:2px;
 }
 /* Jump-to date box */
 #jumpToDateDiv {

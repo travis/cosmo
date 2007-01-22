@@ -291,10 +291,11 @@ cosmo.ui.cal_form.CalForm = function () {
     this.getTimezoneSelectorOptions = function (region){
         var tzIds = region ? cosmo.datetime.timezone.getTzIdsForRegion(region).sort() : null;
         var options = [{ 
-            text: _("Main.DetailForm.TimezoneSelector.Timezone"), 
+            text: _("Main.DetailForm.TimezoneSelector.None"), 
             value: "" }];
         if (tzIds){
             dojo.lang.map(tzIds, function (tzId) {
+                //Strip off the Region, turn underscores into spaces for display
                 options.push({text:tzId.substr(tzId.indexOf("/") + 1).replace(/_/g," "), value:tzId});
             });
         }

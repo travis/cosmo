@@ -28,6 +28,7 @@ cosmo.account.preferences = new function () {
 
     this.setPreference = function(key, val){
 		cosmo.ui.cal_main.Cal.serv.setPreference(key, val);
+        cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [{key:val}])
     };
 
     this.removePreference = function(key){
@@ -40,10 +41,12 @@ cosmo.account.preferences = new function () {
 
     this.setPreferences = function(prefs){
     	cosmo.ui.cal_main.Cal.serv.setPreferences({"javaClass":"java.util.HashMap", "map":prefs});
+        cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [prefs])
     };
 
     this.setMultiplePreferences = function(prefs){
     	cosmo.ui.cal_main.Cal.serv.setMultiplePreferences({"javaClass":"java.util.HashMap", "map":prefs});
+        cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [prefs]);
     };
     
 };

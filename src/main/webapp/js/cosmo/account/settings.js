@@ -189,8 +189,6 @@ cosmo.account.settings = new function () {
             
         cosmo.account.preferences.setMultiplePreferences(prefs);
         
-        cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [prefs]);
-
         // Validate the form input using each field's
         // attached validators
         var fieldList = this.fieldList;

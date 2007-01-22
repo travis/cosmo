@@ -64,7 +64,6 @@
             cosmo.app.init();
             if (cosmo.util.uri.parseQueryString(location.search)['signup']
 				== 'true'){
-				
 				cosmo.account.create.showForm();
 			}
 			            

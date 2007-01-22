@@ -17,6 +17,7 @@
 dojo.require("dojo.html.common");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.convenience");
+dojo.require("cosmo.util.html");
 
 dojo.provide('cosmo.account.common');
 

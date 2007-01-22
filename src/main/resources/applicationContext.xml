@@ -695,9 +695,6 @@
     <property name="cosmoDefaultLoginUrl">
       <value>/pim</value>
     </property>
-    <property name="securityManager">
-      <ref bean="securityManager"/>
-    </property>
     
   </bean>
 

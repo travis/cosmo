@@ -20,9 +20,13 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.acegisecurity.Authentication;
 import org.acegisecurity.ui.webapp.AuthenticationProcessingFilter;
-import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.acegisecurity.context.SecurityContextHolder;
+
+import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.ui.UIConstants;
+
 import org.springframework.util.Assert;
 
 /**
@@ -44,8 +48,12 @@ public class CosmoAuthenticationProcessingFilter extends
     
     private static final String MEDIA_TYPE_PLAIN_TEXT = "text/plain";
     private Boolean alwaysUseUserPreferredUrl = false;
-    private CosmoSecurityManager securityManager = null;
     private String cosmoDefaultLoginUrl;
+    
+    /* A place to put authentication so it will be available to
+     * sendRedirect 
+     */
+    private Authentication currentAuthentication;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -76,15 +84,17 @@ public class CosmoAuthenticationProcessingFilter extends
         
         // If failure
         if (getAuthenticationFailureUrl().equals(targetUrl)){
-            this.sendResponse(request, response, getRelativeUrl(request, getAuthenticationFailureUrl()));
+            this.sendResponse(request, response, 
+                    getRelativeUrl(request, getAuthenticationFailureUrl()));
             return;
         } else {
-            targetUrl = alwaysUseUserPreferredUrl ? null : obtainFullRequestUrl(request);
+            targetUrl = alwaysUseUserPreferredUrl ? 
+                    null : obtainFullRequestUrl(request);
         } 
         
         if (targetUrl == null){
             targetUrl = getRelativeUrl(request, 
-                    securityManager.getSecurityContext().
+                    ((CosmoUserDetails) currentAuthentication.getPrincipal()).
                     getUser().getPreferences().get(
                             UIConstants.PREF_KEY_LOGIN_URL));
         }
@@ -96,7 +106,8 @@ public class CosmoAuthenticationProcessingFilter extends
         this.sendResponse(request, response, targetUrl);
     }
 
-    private void sendResponse(HttpServletRequest req, HttpServletResponse resp, String redirectUrl) throws IOException{
+    private void sendResponse(HttpServletRequest req, 
+            HttpServletResponse resp, String redirectUrl) throws IOException{
         resp.setContentType(MEDIA_TYPE_PLAIN_TEXT);
         resp.setCharacterEncoding("UTF-8");
         resp.setContentLength(redirectUrl.length());
@@ -118,16 +129,19 @@ public class CosmoAuthenticationProcessingFilter extends
         this.alwaysUseUserPreferredUrl = alwaysUseUserPreferredUrl;
     }
 
-    public void setSecurityManager(CosmoSecurityManager securityManager) {
-        this.securityManager = securityManager;
-    }
-
     public String getCosmoDefaultLoginUrl() {
         return cosmoDefaultLoginUrl;
     }
 
     public void setCosmoDefaultLoginUrl(String cosmoDefaultTargetUrl) {
         this.cosmoDefaultLoginUrl = cosmoDefaultTargetUrl;
+    }
+
+    @Override
+    protected void onSuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authResult) throws IOException {
+        // TODO Auto-generated method stub
+        super.onSuccessfulAuthentication(request, response, authResult);
+        this.currentAuthentication = authResult;
     }
 
 }

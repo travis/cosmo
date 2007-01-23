@@ -97,6 +97,12 @@ dojo.widget.HtmlWidget, {
                 spacer += this.promptNode.offsetHeight;
             }
             this.contentNode.style.height = (this.domNode.offsetHeight - spacer) + 'px';
+            
+            // BANDAID: Hack to get Safari to render the height of the 
+            // content area properly
+            if (navigator.userAgent.indexOf('Safari') > -1) {
+                this.contentNode.style.border = '1px solid #ffffff';
+            }
         },
         setTitle: function (title) {
             this.title = title || this.title;

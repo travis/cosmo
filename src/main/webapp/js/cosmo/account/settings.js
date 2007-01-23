@@ -205,7 +205,7 @@ cosmo.account.settings = new function () {
             // success, so we have to examine status codes manually
             var f = function (type, data, resp) { 
                 self.handleAccountSave(type, data, resp); };
-            var hand = { load: f, error: f };
+            var hand = { handle: f };
             var account = {};
             // Create a hash from the form field values
             for (var i = 0; i < fieldList.length; i++) {
@@ -231,8 +231,15 @@ cosmo.account.settings = new function () {
      */
     this.handleAccountSave = function (type, data, resp) {
         var stat = resp.status;
-
         var err = '';
+        // BANDAID: Hack to get Safari a valid status code --
+        // any success codes other than 200 result in resp.status
+        // of 'undefined'
+        if (navigator.userAgent.indexOf('Safari') > -1) {
+            if (!stat) {
+                stat = 200;
+            }
+        }
         // Add bogus 1223 HTTP status from 204s in IE as a success code
         if ((stat > 199 && stat < 300) || (stat == 1223)) {
             // Success

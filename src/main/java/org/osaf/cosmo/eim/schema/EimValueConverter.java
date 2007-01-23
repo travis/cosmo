@@ -25,8 +25,13 @@ import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Parameter;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.parameter.Related;
+import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.Trigger;
 
@@ -43,7 +48,9 @@ public class EimValueConverter implements EimSchemaConstants {
         LogFactory.getLog(EimValueConverter.class);
 
     private EimValueConverter() {}
-    
+
+    private static final TimeZoneRegistry TIMEZONE_REGISTRY =
+        TimeZoneRegistryFactory.getInstance().createRegistry();
     private static final Pattern DURATION_PATTERN = Pattern
             .compile("[+-]?P((\\d+W)|((\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+S)?)?))");
 
@@ -89,29 +96,43 @@ public class EimValueConverter implements EimSchemaConstants {
      * or date-times.
      * <p>
      * Dates or date-times in the text value must be
-     * comma-separated. The text value may optionally be prepended
-     * with one of these "value strings":
+     * comma-separated.
+     * <p>
+     * The text value may optionally be prepended
+     * with one or more of these "parameter strings" separated from each
+     * other and from the text value proper by a colon:
      * <ul>
-     * <li><code>VALUE=DATE:</code>, signifying that the value
+     * <li><code>VALUE=DATE</code>, signifying that the value
      * represents a list of dates, or</li>
-     * <li><code>VALUE=DATE-TIME:</code>, signifying that the value
+     * <li><code>VALUE=DATE-TIME</code>, signifying that the value
      * represents a list of date-times</li>
+     * <li><code>TZID=&lt;timezone identifier&gt;, signifying a
+     * timezone for the dates or date-times
      * </ul>
-     * If no value string is provided, the value is assuemd to
-     * represent a list of date-times.
+     * If no parameter strings are provided, the value is assumed to
+     * represent a list of date-time values with no associated
+     * timezone.
      *
      * @return <code>DateList</code>
      * @throws EimConversionException
      */
     public static DateList toICalDates(String text)
         throws EimConversionException {
-        ICalDate d = new ICalDate(text);
-        DateList dates = d.isDate() ?
-            new DateList(Value.DATE) :
-            new DateList(Value.DATE_TIME);
-        for (String s : d.getText().split(","))
-            dates.add(d.isDate() ? toICalDatePreparsed(s) : toICalDateTimePreparsed(s));
-        return dates;
+        return new ICalDate(text).getDateList();
+    }
+
+    /**
+     * Parses a serialized text value and returns the contained
+     * date or date-time.
+     * <p>
+     * Allows a leading value string as per {@link #toICalDates(String)}.
+     *
+     * @return <code>Date</code> or <code>DateTime</code>
+     * @throws EimConversionException
+     */
+    public static Date toICalDate(String text)
+        throws EimConversionException {
+        return new ICalDate(text).getDate();
     }
 
     public static String fromIcalTrigger(Trigger trigger) {
@@ -203,43 +224,6 @@ public class EimValueConverter implements EimSchemaConstants {
         return DURATION_PATTERN.matcher(text).matches();
     }
     
-    private static Date toICalDatePreparsed(String text)
-        throws EimConversionException {
-        try {
-            return new Date(text);
-        } catch (ParseException e) {
-            throw new EimConversionException("Invalid iCalendar date " + text);
-        }
-    }
-
-    private static DateTime toICalDateTimePreparsed(String text)
-        throws EimConversionException {
-        try {
-            return new DateTime(text);
-        } catch (ParseException e) {
-            throw new EimConversionException("Invalid iCalendar date-time " + text);
-        }
-    }
-
-    /**
-     * Parses a serialized text value and returns the contained
-     * date or date-time.
-     * <p>
-     * Allows a leading value string as per {@link #toICalDates(String)}.
-     *
-     * @return <code>Date</code> or <code>DateTime</code>
-     * @throws EimConversionException
-     */
-    public static Date toICalDate(String text)
-        throws EimConversionException {
-        ICalDate d = new ICalDate(text);
-        try {
-            return d.isDate() ? new Date(text) : new DateTime(text);
-        } catch (ParseException e) {
-            throw new EimConversionException("Invalid iCalendar date " + text);
-        }
-    }
-
     /**
      * Serializes a list of iCalendar dates or date-times.
      * <p>
@@ -250,9 +234,9 @@ public class EimValueConverter implements EimSchemaConstants {
      * @throws EimConversionException
      */
     public static String fromICalDates(DateList dates) {
-        if (! dates.iterator().hasNext())
+        if (dates == null || dates.isEmpty())
             return null;
-        return dates.toString();
+        return new ICalDate(dates).toString();
     }
 
     /**
@@ -265,48 +249,156 @@ public class EimValueConverter implements EimSchemaConstants {
     public static String fromICalDate(Date date) {
         if (date == null)
             return null;
-        return date.toString();
+        return new ICalDate(date).toString();
     }
 
     private static class ICalDate {
         private Value value;
+        private TzId tzid;
         private String text;
+        private TimeZone tz;
+        private Date date;
+        private DateList dates;
 
         public ICalDate(String text)
             throws EimConversionException {
-            if (text.startsWith("VALUE=")) {
-                if (text.startsWith("VALUE=DATE:")) {
-                    this.value = Value.DATE;
-                    this.text = text.substring(11);
-                } else if (text.startsWith("VALUE=DATE-TIME:")) {
-                    this.value = Value.DATE_TIME;
-                    this.text = text.substring(16);
+            for (String param : text.split(":")) {
+                String[] parts = param.split("=");
+                if (parts.length == 2) {
+                    if (parts[0].equals("VALUE"))
+                        parseValue(parts[1]);
+                    else if (parts[0].equals("TZID"))
+                        parseTzId(parts[1]);
+                    else
+                        throw new EimConversionException("Bad parameter " + parts[0]);
                 } else {
-                    throw new EimConversionException("Invalid value parameter " + text);
+                    text = param;
+                    parseDates(param);
                 }
-            } else {
-                this.value = Value.DATE_TIME;
-                this.text = text;
             }
+            if (value == null)
+                value = Value.DATE_TIME;
         }
 
-        public ICalDate(Value value,
-                        String text) {
-            this.value = value;
-            this.text = text;
+        public ICalDate(Date date) {
+            if (date instanceof DateTime) {
+                value = Value.DATE_TIME;
+                tz = ((DateTime) date).getTimeZone();
+                if (tz != null) {
+                    String id = tz.getVTimeZone().getProperties().
+                        getProperty(Property.TZID).getValue();
+                    tzid = new TzId(id);
+                }
+            } else {
+                value = Value.DATE;
+            }
+            text = date.toString();
+            this.date = date;
+        }
+
+        public ICalDate(DateList dates) {
+            value = dates.getType();
+            tz = dates.getTimeZone();
+            if (tz != null) {
+                String id = tz.getVTimeZone().getProperties().
+                    getProperty(Property.TZID).getValue();
+                tzid = new TzId(id);
+            }
+            text = dates.toString();
+            this.dates = dates;
         }
 
         public boolean isDateTime() {
-            return value.equals(Value.DATE_TIME);
+            return value != null && value.equals(Value.DATE_TIME);
         }
 
         public boolean isDate() {
-            return value.equals(Value.DATE);
+            return value != null && value.equals(Value.DATE);
+        }
+
+        public Value getValue() {
+            return value;
         }
 
         public String getText() {
             return text;
         }
+
+        public TzId getTzId() {
+            return tzid;
+        }
+
+        public TimeZone getTimeZone() {
+            return tz;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public DateList getDateList() {
+            return dates;
+        }
+
+        public String toString() {
+            StringBuffer buf = new StringBuffer();
+            buf.append(value.toString()).append(":");
+            if (tzid != null)
+                buf.append("TZID=").append(tzid.getValue()).append(":");
+            buf.append(text);
+            return buf.toString();
+        }
+
+        private void parseValue(String str)
+            throws EimConversionException {
+            if (str.equals("DATE"))
+                value = Value.DATE;
+            else if (str.equals("DATE-TIME"))
+                value = Value.DATE_TIME;
+            else
+                throw new EimConversionException("Bad value " + str);
+        }
+
+        private void parseTzId(String str)
+            throws EimConversionException {
+            tzid = new TzId(str);
+            tz = TIMEZONE_REGISTRY.getTimeZone(str);
+            if (tz == null)
+                throw new EimConversionException("Unknown timezone " + str);
+        }
+
+        private void parseDates(String str)
+            throws EimConversionException {
+            String[] strs = str.split(",");
+            if (strs.length == 1) {
+                try {
+                    date = isDate() ? new Date(str) : new DateTime(str, tz);
+                } catch (ParseException e) {
+                    throw convertParseException(str, e);
+                }
+            }
+
+            dates = isDate() ?
+                new DateList(Value.DATE) :
+                new DateList(Value.DATE_TIME, tz);
+            for (String s : strs) {
+                try {
+                    if (isDate())
+                        dates.add(new Date(s));
+                    else
+                        dates.add(new DateTime(s, tz));
+                } catch (ParseException e) {
+                    throw convertParseException(s, e);
+                }
+            }
+        }
+
+        private EimConversionException convertParseException(String value,
+                                                             Exception e) {
+            String msg = isDate() ?
+                "Invalid iCalendar date value " :
+                "Invalid iCalendar date-time value ";
+            return new EimConversionException(msg + value, e);
+        }
     }
-    
 }

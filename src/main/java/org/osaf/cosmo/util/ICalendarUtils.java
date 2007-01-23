@@ -42,7 +42,6 @@ import net.fortuna.ical4j.model.property.TzId;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import apple.awt.CList;
 
 public class ICalendarUtils {
     private static final Log log = LogFactory.getLog(ICalendarUtils.class);

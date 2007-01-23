@@ -82,8 +82,6 @@ public class CmpServlet extends HttpServlet {
 
     private static final Pattern PATTERN_SPACE_USAGE =
         Pattern.compile("^/server/usage/space(/[^/]+)?(/xml)?$");
-    private static final Pattern PATTERN_POSTED_DELETE =
-        Pattern.compile("/user/(.+/)?delete");
 
     private static final String URL_ACTIVATE = "/activate/";
 
@@ -158,11 +156,6 @@ public class CmpServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest req,
                             HttpServletResponse resp)
         throws ServletException, IOException {
-
-        if (req.getPathInfo().startsWith("/user/delete")){
-            processMultiUserDelete(req, resp);
-            return;
-        }
 
         if (req.getPathInfo().startsWith("/user/")) {
             processUserDelete(req, resp);
@@ -304,15 +297,11 @@ public class CmpServlet extends HttpServlet {
             return;
         }
 
-        Matcher m = PATTERN_POSTED_DELETE.matcher(req.getPathInfo());
-
-        if (m.matches()){
-
-            doDelete(req, resp);
+        if (req.getPathInfo().startsWith("/user/delete")){
+            processMultiUserDelete(req, resp);
             return;
         }
-
-        doPut(req, resp);
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
 
     /**
@@ -438,8 +427,7 @@ public class CmpServlet extends HttpServlet {
 
     /*
      * Delegated to by {@link #doDelete} to handle user DELETE
-     * (and POST /user/{username}/delete) requests, removing the
-     * user and setting the response status and headers.
+     * requests, removing the user and setting the response status and headers.
      */
     private void processUserDelete(HttpServletRequest req,
                                    HttpServletResponse resp)

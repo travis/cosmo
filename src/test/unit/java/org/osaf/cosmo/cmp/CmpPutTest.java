@@ -59,7 +59,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         User u2 = testHelper.makeDummyUser();
         u2.setAdmin(true);
 
-        request = createMockRequest("POST", "/signup");
+        request = createMockRequest("PUT", "/signup");
         sendXmlRequest(request, new UserContent(u2));
 
         response = new MockHttpServletResponse();

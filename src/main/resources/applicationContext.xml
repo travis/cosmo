@@ -162,7 +162,7 @@
   <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
     <property name="beans">
       <map>
-        <entry key="hibernate:name=cosmoHibernateStats" value-ref="hibernateStatsBean"/>
+        <entry key="cosmo:name=hibernate" value-ref="hibernateStatsBean"/>
       </map>
     </property>
   </bean>

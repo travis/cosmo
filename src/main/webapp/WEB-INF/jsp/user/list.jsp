@@ -225,10 +225,16 @@ dojo.addOnLoad(function (){
             'none':'inline';
 
     }
+    deleteLink.disableIfNoneSelected = function(){
+        this.style.display = (userList.getSelectedData().length == 0)?
+            'none':'inline';
+
+    }
     deleteLink.hide = function(){this.style.display = 'none'};
 
     userList = dojo.widget.byId("userList");
     dojo.event.connect("after", userList, "renderSelections", deleteLink, "disableIfRootSelected");
+    dojo.event.connect("after", userList, "renderSelections", deleteLink, "disableIfNoneSelected");
     dojo.event.connect("after", userList, "renderSelections", modifyLink, "disableIfNotSingleSelect");
     dojo.event.connect("after", userList, "renderSelections", browseLink, "disableIfNotSingleSelect");
     dojo.event.connect("after", userList, "renderSelections", activateLink, "disableIfNotSingleSelect");

@@ -70,10 +70,18 @@ dojo.require("cosmo.ui.widget.ModifyUserDialog");
 <div id="userAdminLinkBlock">
 
 <a href="javascript:toggleNewUser()">Create New User</a>
-<a id="modifySelectedUserLink" href="javascript:showModifySelectedUser()" style="display:none;">Modify Selected User</a>
-<a id="browseSelectedUserLink" href="javascript:browseSelectedUser()" style="display:none;">Browse Selected User</a>
-<a id="activateSelectedUserLink" href="javascript:activateSelectedUser()" style="display:none;">Activate Selected User</a>
-<a id="deleteSelectedUsersLink" href="javascript:dojo.widget.byId('userList').deleteSelectedUsers()">Delete Selected Users</a>
+<a 	id="modifySelectedUserLink" 
+	href="javascript:showModifySelectedUser()" 
+	style="display:none;">Modify Selected User</a>
+<a 	id="browseSelectedUserLink" 
+	href="javascript:browseSelectedUser()" 
+	style="display:none;">Browse Selected User</a>
+<a 	id="activateSelectedUserLink" 
+	href="javascript:activateSelectedUser()" 
+	style="display:none;">Activate Selected User</a>
+<a 	id="deleteSelectedUsersLink" 
+	href="javascript:dojo.widget.byId('userList').deleteSelectedUsers()" 
+	style="display:none;">Delete Selected Users</a>
 </div>
 
 
@@ -131,31 +139,32 @@ function activateSelectedUser(){
 
 modifyHandlerDict= {
     handle : function(type, data, evt){
-        if (evt.status == 204){
-            var modifyDialog = dojo.widget.byId("modifyUserDialog")
+        var modifyDialog = dojo.widget.byId("modifyUserDialog")
 
+        if (evt.status == 204){
             modifyDialog.hide();
             modifyDialog.form.reset();
+            
             dojo.widget.byId('userList').updateUserList();
 
         }
         else if (evt.status == 431){
             //TODO: username in use stuff
-            alert("Username in use")
+            modifyDialog.usernameError.innerHTML = "Username in use";
         }
         else if (evt.status == 432){
             //TODO: email in use stuff
-            alert("Email in use")
+            createDialog.emailError.innerHTML = "Email in use";
         }
     }
 }
 
-createHandlerDict= {
+createHandlerDict = {
 
     handle : function(type, data, evt){
 
+        var createDialog = dojo.widget.byId("createUserDialog");
         if (evt.status == 201){
-            var createDialog = dojo.widget.byId("createUserDialog");
             createDialog.hide();
             createDialog.form.reset();
 
@@ -164,11 +173,11 @@ createHandlerDict= {
         }
         else if (evt.status == 431){
             //TODO: username in use stuff
-            alert("Username in use")
+            createDialog.usernameError.innerHTML = "Username in use";
         }
         else if (evt.status == 432){
             //TODO: email in use stuff
-            alert("Email in use")
+            createDialog.emailError.innerHTML = "Email in use";
         }
 
     }
@@ -202,48 +211,49 @@ dojo.addOnLoad(function (){
 
     }
     
-
-    modifyLink.disableIfNotSingleSelect = disableIfNotSingleSelect;
-    browseLink.disableIfNotSingleSelect = disableIfNotSingleSelect;
-    activateLink.disableIfNotSingleSelect = disableIfNotSingleSelect;
-    
     /*
      * Special methods for specific links
      */
-    activateLink.disableIfActivated = function(){
+    function isSelectionActivated(){
     	var selection = userList.getSelectedData()[0];
     	
-    	if (selection.userObject.unactivated == undefined){
-    		this.style.display = 'none';
-    	} else {
-    		this.style.display = 'inline';
-    	}
-    }
-
-    deleteLink.disableIfRootSelected = function(){
-        this.style.display = (userList.isValueSelected(cosmo.env.OVERLORD_USERNAME))?
-            'none':'inline';
+    	return selection.userObject.unactivated == undefined;
 
     }
-    deleteLink.disableIfNoneSelected = function(){
-        this.style.display = (userList.getSelectedData().length == 0)?
-            'none':'inline';
 
+    function isRootSelected(){
+        return userList.isValueSelected(cosmo.env.OVERLORD_USERNAME);
     }
-    deleteLink.hide = function(){this.style.display = 'none'};
 
-    userList = dojo.widget.byId("userList");
-    dojo.event.connect("after", userList, "renderSelections", deleteLink, "disableIfRootSelected");
-    dojo.event.connect("after", userList, "renderSelections", deleteLink, "disableIfNoneSelected");
-    dojo.event.connect("after", userList, "renderSelections", modifyLink, "disableIfNotSingleSelect");
-    dojo.event.connect("after", userList, "renderSelections", browseLink, "disableIfNotSingleSelect");
-    dojo.event.connect("after", userList, "renderSelections", activateLink, "disableIfNotSingleSelect");
-    dojo.event.connect("after", userList, "renderSelections", activateLink, "disableIfActivated");
-    dojo.event.connect("after", userList, "updateUserListCallback", deleteLink, "disableIfRootSelected");
-    dojo.event.connect("after", userList, "updateUserListCallback", modifyLink, "disableIfNotSingleSelect");
-    dojo.event.connect("after", userList, "updateUserListCallback", browseLink, "disableIfNotSingleSelect");
-    dojo.event.connect("after", userList, "updateUserListCallback", activateLink, "disableIfNotSingleSelect");    
-    dojo.event.connect("after", userList, "updateUserListCallback", deleteLink, "hide");
+    var getNumberSelected = function(){
+        return userList.getSelectedData().length;
+    }
+    var hide = function(){this.style.display = 'none'};
+    
+    function refreshControlLinks(){
+    	var numberSelected = getNumberSelected();
+
+		deleteLink.style.display = 
+			isRootSelected() || numberSelected == 0
+			? 'none':'inline';
+
+		modifyLink.style.display = 
+			numberSelected == 1
+			? 'inline':'none';
+
+		browseLink.style.display = 
+			numberSelected == 1
+			? 'inline':'none';
+
+		activateLink.style.display = 
+			numberSelected == 1 && !isSelectionActivated()
+			? 'inline':'none';
+    }
+
+    dojo.event.connect("after", userList, "renderSelections", refreshControlLinks);
+    dojo.event.connect("after", userList, "updateUserListCallback", refreshControlLinks);
+    
+    refreshControlLinks();
 
 })
 

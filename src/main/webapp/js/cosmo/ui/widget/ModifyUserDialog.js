@@ -435,8 +435,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
                     // A 200 means the user exists
                     } else if (evt.status == 200){
-                        //TODO: handle user already exists
-                        alert("User already exists");
+
+                        self.usernameError.innerHTML = "Username in use";
                     }
                  }
                  })

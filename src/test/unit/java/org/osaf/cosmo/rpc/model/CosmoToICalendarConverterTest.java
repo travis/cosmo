@@ -25,6 +25,7 @@ import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
@@ -47,6 +48,9 @@ public class CosmoToICalendarConverterTest extends TestCase {
     private TestHelper testHelper;
 
     private CosmoToICalendarConverter converter = new CosmoToICalendarConverter();
+    
+    public static final String NY_TZ = "America/New_York";
+    public static final String LA_TZ = "America/Los_Angeles";
 
     public void setUp(){
         testHelper = new TestHelper();
@@ -363,6 +367,65 @@ public class CosmoToICalendarConverterTest extends TestCase {
                         Property.DESCRIPTION));
             }
         }
+    }
+    
+    public void testCreateRecurringModInstanceWithDifferentTimeZone(){
+        Event event = createBaseEventTz();
+        RecurrenceRule rr = new RecurrenceRule();
+        rr.setFrequency(RecurrenceRule.FREQUENCY_DAILY);
+
+        Modification modification = new Modification();
+
+        CosmoDate instanceDate = new CosmoDate();
+        instanceDate.setYear(2005);
+        instanceDate.setMonth(CosmoDate.MONTH_JANUARY);
+        instanceDate.setDate(3);
+        instanceDate.setHours(12);
+        instanceDate.setMinutes(0);
+        instanceDate.setSeconds(0);
+        instanceDate.setUtc(false);
+        instanceDate.setTzId(NY_TZ);
+        modification.setInstanceDate(instanceDate);
+        
+
+        Event modEvent = new Event();
+        modification.setEvent(modEvent);
+        CosmoDate startDate = instanceDate.clone();
+        startDate.setTzId(LA_TZ);
+        CosmoDate endDate = instanceDate.clone();
+        endDate.setTzId(LA_TZ);
+        endDate.setHours(13);
+        endDate.setMinutes(30);
+        endDate.setSeconds(0);
+        modEvent.setStart(startDate);
+        modEvent.setEnd(endDate);
+
+        modification.setModifiedProperties(new String[] {
+                ICalendarToCosmoConverter.EVENT_START,
+                ICalendarToCosmoConverter.EVENT_END });
+        rr.setModifications(new Modification[] { modification });
+        event.setRecurrenceRule(rr);
+
+        Calendar calendar = converter.createWrappedVEvent(event);
+        
+        ComponentList vevents = calendar.getComponents().getComponents(
+                Component.VEVENT);
+
+        //One master, one instance = 2 vevents
+        assertEquals(2, vevents.size());
+        
+        for (Object o : vevents) {
+            VEvent vEvent = (VEvent) o;
+            RecurrenceId recurrenceId = vEvent.getReccurrenceId();
+            if (recurrenceId != null) {
+                // this one is the instance
+                assertEquals("20050103T120000", recurrenceId.getDate()
+                        .toString());
+                //one for RECURRENCE-ID. one for DTEND + 2 for UID and DTSTART which are always there
+                assertEquals(4, vEvent.getProperties().size());
+                assertEquals(LA_TZ, vEvent.getEndDate().getParameters().getParameter(Parameter.TZID).getValue());
+            }
+        }
 
     }
 
@@ -417,6 +480,13 @@ public class CosmoToICalendarConverterTest extends TestCase {
 
         event.setDescription("Test Description");
         event.setTitle("Test Title");
+        return event;
+    }
+    
+    protected Event createBaseEventTz(){
+        Event event = createBaseEvent();
+        event.getStart().setTzId(NY_TZ);
+        event.getEnd().setTzId(NY_TZ);
         return event;
     }
 

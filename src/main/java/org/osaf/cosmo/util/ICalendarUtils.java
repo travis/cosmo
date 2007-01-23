@@ -42,6 +42,8 @@ import net.fortuna.ical4j.model.property.TzId;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import apple.awt.CList;
+
 public class ICalendarUtils {
     private static final Log log = LogFactory.getLog(ICalendarUtils.class);
 
@@ -264,6 +266,29 @@ public class ICalendarUtils {
            return endDate.getTime() - startDate.getTime();
        }
        else return 0;
+   }
+   
+   /**
+    * Returns the VTimeZone with the given tzId from the given
+    * calendar, or null if none exists.
+    * 
+    * @param calendar
+    * @param tzId
+    * @return
+    */
+   public static VTimeZone getVTimeZone(net.fortuna.ical4j.model.Calendar calendar, String tzId){
+      ComponentList cl = calendar.getComponents().getComponents(Component.VTIMEZONE);
+
+      if (cl != null) {
+            for (Object o : cl) {
+                VTimeZone tz = (VTimeZone) o;
+                if (tz.getProperties().getProperty(Property.TZID).getValue().equals(tzId)){
+                    return tz;
+                }
+            }
+        }
+      
+      return null;
    }
 
 

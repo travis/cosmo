@@ -46,6 +46,9 @@ import org.osaf.cosmo.util.ICalendarUtils;
 
 
 public class ICalendarToCosmoConverterTest extends TestCase {
+    public static final String NY_TZ = "America/New_York";
+    public static final String LA_TZ = "America/Los_Angeles";
+
     private static final Log log = LogFactory.getLog(ICalendarToCosmoConverterTest.class);
 
     private TestHelper testHelper = new TestHelper();
@@ -335,6 +338,35 @@ public class ICalendarToCosmoConverterTest extends TestCase {
 
         Event event = events.get(0);
         assertEquals("TitleChangeStartChangeEndChange", event.getTitle());
+    }
+    
+    public void testRecurringEventWithModificationInstanceHavingADifferentTimezone() throws Exception{
+        Calendar c = testHelper.loadIcs("mod_with_different_timezone.ics");
+        VEvent vevent = ICalendarUtils.getMasterEvent(c);
+        Event e = converter.createEvent("1234556", vevent, c);
+        RecurrenceRule rr = e.getRecurrenceRule();
+        Modification modification = rr.getModifications()[0];
+        CosmoDate startDate = modification.getEvent().getStart();
+        CosmoDate endDate = modification.getEvent().getEnd();
+        assertNotNull(startDate);
+        assertNotNull(endDate);
+        assertEquals(startDate.getTzId(), LA_TZ);
+        assertEquals(endDate.getTzId(), LA_TZ);
+        assertEquals(e.getStart().getTzId(), NY_TZ);
+        assertEquals(2, modification.getModifiedProperties().length);
+        
+        //let's see if this event expands out properly
+        VTimeZone vTimeZone = ICalendarUtils.getVTimeZone(c, NY_TZ);
+        TimeZone timezone = new TimeZone (vTimeZone);
+        DateTime rangeStart = new DateTime("20050102T000000", timezone);
+        DateTime rangeEnd   = new DateTime("20050104T000000", timezone);
+        List<Event> events = converter.expandEvent(e, vevent, c, rangeStart, rangeEnd);
+
+        //The second instance is on the 3rd, where our modification with a different (LA)
+        //timezone is
+        Event event = events.get(1);
+        assertEquals(LA_TZ, event.getStart().getTzId());
+
     }
     
     protected Event loadEventIcs(String name, String id) throws Exception {

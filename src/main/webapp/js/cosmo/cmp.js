@@ -61,7 +61,8 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
         getUserXML: function (username, handlerDict, sync) {
             var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + encodeURIComponent(username);
+            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + 
+                encodeURIComponent(dojo.string.trim(username));
             requestDict.method = "GET";
 
             dojo.io.bind(requestDict);
@@ -132,7 +133,8 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
         headUser: function (username, handlerDict, sync){
                 var requestDict = this.getDefaultCMPRequest(handlerDict, true)
-                requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + encodeURIComponent(username)
+                requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + 
+                    encodeURIComponent(dojo.string.trim(username));
                 requestDict.method = "HEAD"
                 if (sync){
                     requestDict.async = false;
@@ -158,7 +160,8 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 request_content += '</user>'
 
                 requestDict = this.getDefaultCMPRequest(handlerDict, true, sync)
-                requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + encodeURIComponent(userHash.username)
+                requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + 
+                    encodeURIComponent(dojo.string.trim(userHash.username));
                 requestDict.method = "POST"
                    requestDict.headers['X-Http-Method-Override'] = "PUT"
                 requestDict.postContent = request_content
@@ -177,7 +180,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
                 var requestDict = this.getDefaultCMPRequest(handlerDict, sync)
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
-                                    encodeURIComponent(username)
+                                    encodeURIComponent(dojo.string.trim(username));
                 requestDict.method = "POST"
                    requestDict.headers['X-Http-Method-Override'] = "PUT"
                 requestDict.postContent = request_content
@@ -189,7 +192,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
         deleteUser: function (username, handlerDict, sync) {
                 var requestDict = this.getDefaultCMPRequest(handlerDict, sync)
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
-                                    encodeURIComponent(username)// + "/delete"
+                                    encodeURIComponent(dojo.string.trim(username));
                 requestDict.method = "POST"
                 requestDict.headers['X-Http-Method-Override'] = "DELETE"
                 dojo.io.bind(requestDict)
@@ -203,7 +206,8 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
 
                 for (var i = 0; i < usernames.length; i++){
-                    usernames[i] = "user=" + encodeURIComponent(usernames[i]);
+                    usernames[i] = "user=" + 
+                        encodeURIComponent(dojo.string.trim(usernames[i]));
                 }
                 var requestContent = usernames.join("&")
 

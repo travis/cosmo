@@ -273,8 +273,7 @@
 
   <bean id="calendarDao"
         class="org.osaf.cosmo.dao.hibernate.CalendarDaoImpl"
-        init-method="init"
-        destroy-method="destroy">
+        init-method="init">
     <property name="sessionFactory">
       <ref bean="sessionFactory" />
     </property>

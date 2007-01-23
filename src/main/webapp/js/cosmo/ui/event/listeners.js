@@ -25,10 +25,7 @@ cosmo.ui.event.listeners.hookUpListeners = function (){
 	document.onmousedown = cosmo.ui.event.handlers.mouseDownHandler;
 	document.onmouseup = cosmo.ui.event.handlers.mouseUpHandler;
 	document.onkeyup = cosmo.ui.event.handlers.keyUpHandler;
-	// IE and Safari -- prevent entire area and text getting selected while you drag
-	document.ondrag = function () { return false; };
-	document.onselectstart = function () { return false; };
-	
+
 	dojo.event.browser.addListener(window, "onload", cosmo.ui.event.handlers.init, false);
 	dojo.event.browser.addListener(window, "onunload", cosmo.ui.event.handlers.cleanup, false);
 	// FIXME -- Need to resize/re-render UI on window resize

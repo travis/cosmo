@@ -164,12 +164,12 @@ dojo.event.topic.subscribe(
                     </table>
                 </div>
                 <div id="dayListDiv"></div>
-                <div id="allDayResizeMainDiv">
+                <div id="allDayResizeMainDiv" onSelectStart="return false;">
                     <div id="allDayHourSpacerDiv"></div>
                     <div id="allDayContentDiv"></div>
                 </div>
                 <div id="allDayResizeHandleDiv"></div>
-                <div id="timedScrollingMainDiv">
+                <div id="timedScrollingMainDiv" onSelectStart="return false;">
                     <div id="timedHourListDiv"></div>
                     <div id="timedContentDiv"></div>
                 </div>

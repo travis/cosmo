@@ -466,15 +466,14 @@ public class ICalendarToCosmoConverter {
         public void copyProperties(VEvent source, VEvent dest,
                 net.fortuna.ical4j.model.Date d) {
 
-            //we must do DT_START, DT_END first, since DTEND relies on value of DTSTART.
+            //we must do DTSTART, DTEND first, since DTEND relies on value of DTSTART.
             DtStart dtStart = (DtStart) source.getProperties().getProperty(Property.DTSTART);
             if (dtStart != null) {
                 if (!dtStart.getDate().equals(
                         source.getReccurrenceId().getDate())) {
-                    net.fortuna.ical4j.model.Date newDate = ICalendarUtils.clone(d);
                     long delta = dtStart.getDate().getTime()
                             - source.getReccurrenceId().getDate().getTime();
-                    newDate.setTime(newDate.getTime() + delta);
+                    net.fortuna.ical4j.model.Date newDate = createDate((d.getTime() + delta), getTimeZone(dtStart.getDate()), dtStart.getDate() instanceof DateTime  ); // xxx
                     DtStart newDtStart = new DtStart(newDate);
                     ICalendarUtils.addOrReplaceProperty(dest, newDtStart);
                 }
@@ -485,17 +484,20 @@ public class ICalendarToCosmoConverter {
                 DtStart sourceDtStart = (DtStart) source.getProperties()
                         .getProperty(Property.DTSTART);
 
-                net.fortuna.ical4j.model.Date sourceStartDate = sourceDtStart != null ?
-                        sourceDtStart.getDate() : d;
+                net.fortuna.ical4j.model.Date sourceStartDate = sourceDtStart != null ? sourceDtStart
+                        .getDate()
+                        : d;
                 net.fortuna.ical4j.model.Date sourceEndDate = sourceDtEnd
                         .getDate();
                 long delta = sourceEndDate.getTime()
                         - sourceStartDate.getTime();
-                    net.fortuna.ical4j.model.Date newEndDate = ICalendarUtils
-                            .clone(dest.getStartDate()  == null ? d : dest.getStartDate().getDate());
-                    newEndDate.setTime(newEndDate.getTime() + delta);
-                    DtEnd newDtEnd = new DtEnd(newEndDate);
-                    ICalendarUtils.addOrReplaceProperty(dest, newDtEnd);
+                long startTime = dest.getStartDate() != null ? dest.getStartDate().getDate().getTime()
+                        : d.getTime();
+                net.fortuna.ical4j.model.Date newEndDate = createDate(startTime
+                        + delta, getTimeZone(sourceDtEnd.getDate()),
+                        sourceDtEnd.getDate() instanceof DateTime);
+                DtEnd newDtEnd = new DtEnd(newEndDate);
+                ICalendarUtils.addOrReplaceProperty(dest, newDtEnd);
             }
 
             for (Object o : source.getProperties()) {
@@ -512,7 +514,6 @@ public class ICalendarToCosmoConverter {
                 ICalendarUtils.addOrReplaceProperty(dest, p);
             }
         }
-
     }
     private void setSimpleProperties(String itemId, VEvent vevent, Event event) {
         event.setId(itemId);
@@ -839,5 +840,29 @@ public class ICalendarToCosmoConverter {
             dates.removeAll(exDates);
         }
         return dates;
+    }
+    
+    private static net.fortuna.ical4j.model.Date createDate(long time, TimeZone tz,
+            boolean dateTime) {
+
+        if (dateTime) {
+            DateTime dt = new DateTime();
+            if (tz != null) {
+                dt.setTimeZone(tz);
+            }
+            dt.setTime(time);
+            return dt;
+        } else {
+            net.fortuna.ical4j.model.Date d = new net.fortuna.ical4j.model.Date(time);
+            return d;
+        }
+    }
+    
+    private static TimeZone getTimeZone(net.fortuna.ical4j.model.Date date) {
+        if (date instanceof DateTime){
+            return ((DateTime) date).getTimeZone();
+        } 
+        
+        return null;
     }
 }

@@ -143,7 +143,7 @@
     </property>
     <property name="hibernateProperties">
       <props>
-        <prop key="hibernate.generate_statistics">false</prop>
+        <prop key="hibernate.generate_statistics">true</prop>
         <prop key="hibernate.cache.use_query_cache">true</prop>
         <prop key="hibernate.cache.use_second_level_cache">true</prop>
         <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
@@ -155,6 +155,22 @@
     </property>
     <property name="dataSource">
       <ref bean="jdbcDataSource"/>
+    </property>
+  </bean>
+
+  <!-- Define MBeans to export -->
+  <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
+    <property name="beans">
+      <map>
+        <entry key="hibernate:name=cosmoHibernateStats" value-ref="hibernateStatsBean"/>
+      </map>
+    </property>
+  </bean>
+
+  <!-- Hibernate statistics MBean -->
+  <bean id="hibernateStatsBean" class="org.hibernate.jmx.StatisticsService">
+    <property name="sessionFactory">
+      <ref bean="sessionFactory"/>  
     </property>
   </bean>
 

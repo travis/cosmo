@@ -40,8 +40,12 @@ cosmo.datetime.Date = function () {
     var tz = null;
     var utc = false;
 
+    // No args -- create a floating date based on the current local offset
+    if (args.length == 0) {
+        dt = new Date();
+    }
     // Date string or timestamp -- assumes floating
-    if (args.length == 1) {
+    else if (args.length == 1) {
         dt = new Date(args[0]);
     }
     // year, month, [date,] [hours,] [minutes,] [seconds,] [milliseconds,] [tzId,] [utc]

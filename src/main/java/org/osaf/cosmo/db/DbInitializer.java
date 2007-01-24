@@ -122,16 +122,16 @@ public class DbInitializer {
             ps = conn.prepareStatement("select count(*) from server_properties");
             ps.executeQuery();
             return true;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             return false;
         } finally {
             try {
                 ps.close();
-            } catch (SQLException e) {
+            } catch (Exception e) {
             }
             try {
                 conn.close();
-            } catch (SQLException e) {
+            } catch (Exception e) {
             }
         }
     }

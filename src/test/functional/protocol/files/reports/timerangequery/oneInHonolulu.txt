@@ -1,0 +1,31 @@
+REPORT /cosmo/home/test1/calendar/ HTTP/1.1
+Authorization: Basic dGVzdDE6dGVzdDE=
+Host: localhost:8080
+Content-Length: 800
+Content-Type: application/xml; charset="utf-8"
+
+<?xml version="1.0" encoding="utf-8" ?>
+<C:calendar-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">
+  <D:prop>
+    <D:getetag/>
+    <C:calendar-data/>
+    <C:timezone><![CDATA[BEGIN:VCALENDAR
+PRODID:-//Example Corp.//CalDAV Client//EN
+VERSION:2.0
+BEGIN:VTIMEZONE
+LAST-MODIFIED:20040110T032845Z
+TZID:US/Hawaii
+BEGIN:STANDARD
+DTSTART:20000101T000000
+RRULE:FREQ=YEARLY;BYMONTH=1
+TZNAME:US/Hawaii
+TZOFFSETFROM:-1000
+TZOFFSETTO:-1000
+END:STANDARD
+END:VTIMEZONE
+END:VCALENDAR
+]]>
+    </C:timezone>
+  </D:prop>
+
+</C:calendar-query>

@@ -1,5 +1,0 @@
-MKCALENDAR /cosmo/home/test1/calendar7/ HTTP/1.1
-Authorization: Basic dGVzdDE6dGVzdDE=
-Host: localhost:8080
-
-

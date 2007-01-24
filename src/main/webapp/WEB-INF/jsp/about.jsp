@@ -31,6 +31,9 @@
     font-family: "Lucida Grande", "Verdana", "Arial", sans-serif;
     font-size: 12px;
 }
+a {
+    color:#333399;
+}
 
 </style>
 
@@ -59,8 +62,8 @@
                  key="About.LicenseClose"/>
     </div>
     <div style="margin-top:16px;"><fmt:message key="About.InfoOpen"/>
-    <a href="http://wiki.osafoundation.org/bin/view/Projects/CosmoHome" 
-               onclick="goURLMainWin('http://wiki.osafoundation.org/bin/view/Projects/CosmoHome'); 
+    <a href="http://cosmo.osafoundation.org/" 
+               onclick="goURLMainWin('http://cosmo.osafoundation.org/'); 
                return false;">
     <fmt:message key="About.InfoLinkText"/></a> <fmt:message 
                  key="About.InfoClose"/></div>

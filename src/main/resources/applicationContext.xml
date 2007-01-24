@@ -517,6 +517,12 @@
     <property name="localSessionFactory">
       <ref bean="&amp;sessionFactory"/>
     </property>
+    <property name="dataSource">
+      <ref bean="jdbcDataSource"/>
+    </property>
+    <property name="validateSchema">
+      <value>true</value>
+    </property>
     <property name="rootLoginUrl">
       <value>/account/view</value>
     </property>

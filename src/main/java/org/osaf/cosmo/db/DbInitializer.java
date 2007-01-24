@@ -15,15 +15,24 @@
  */
 package org.osaf.cosmo.db;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
+import org.hibernate.tool.hbm2ddl.SchemaValidator;
 import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.hibernate.SimpleConnectionProvider;
 import org.osaf.cosmo.model.ServerProperty;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.ServerPropertyService;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.ui.UIConstants;
-import org.springframework.orm.hibernate3.HibernateJdbcException;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 /**
@@ -40,6 +49,10 @@ public class DbInitializer {
     private LocalSessionFactoryBean localSessionFactory;
 
     private String rootLoginUrl;
+    
+    private DataSource datasource;
+    
+    private boolean validateSchema = true;
 
     /**
      * Performs initialization tasks if required.
@@ -54,22 +67,22 @@ public class DbInitializer {
             log.info("Creating database");
             localSessionFactory.createDatabaseSchema();
             addServerProperties();
-        }
-
-        // Verify that db schema is supported by server
-        // TODO: here is where we will eventually put auto-update
-        // scripts. For now, the server will not start if an
-        // unsupported version is found.
-        checkSchemaVersion();
-
-        // Once schema is present, check that db is initialized
-        if (isAlreadyInitialized())
+            log.info("Initializing database");
+            addOverlord();
+            return true;
+        } else {
+            // Verify that db schema is supported by server
+            // TODO: here is where we will eventually put auto-update
+            // scripts. For now, the server will not start if an
+            // unsupported version is found.
+            checkSchemaVersion();
+            
+            // More thorough schema validation
+            if(validateSchema==true)
+                validateSchema();
+            
             return false;
-
-        log.info("Initializing database");
-        addOverlord();
-
-        return true;
+        }
     }
 
     /** */
@@ -80,6 +93,14 @@ public class DbInitializer {
     /** */
     public void setUserService(UserService dao) {
         userService = dao;
+    }
+    
+    public void setDataSource(DataSource datasource) {
+        this.datasource = datasource;
+    }
+    
+    public void setValidateSchema(boolean validateSchema) {
+        this.validateSchema = validateSchema;
     }
 
     public void setLocalSessionFactory(
@@ -93,11 +114,21 @@ public class DbInitializer {
     }
 
     private boolean isSchemaInitialized() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        
         try {
-            userService.getUser(User.USERNAME_OVERLORD);
+            conn = datasource.getConnection();
+            ps = conn.prepareStatement("select count(*) from server_properties");
+            ps.executeQuery();
             return true;
-        } catch (HibernateJdbcException e) {
+        } catch (SQLException e) {
             return false;
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+            }
         }
     }
 
@@ -113,9 +144,25 @@ public class DbInitializer {
                     "Schema version does not match server version");
         }
     }
-
-    private boolean isAlreadyInitialized() {
-        return userService.getUser(User.USERNAME_OVERLORD) != null;
+    
+    private void validateSchema() {
+        
+        try {
+            // Workaround for Spring 2.0.1 LocalSessionFactoryBean not  having
+            // access to DataSource.  Should be fixed in Spring 2.0.2.
+            SimpleConnectionProvider.setConnection(datasource.getConnection());
+            Configuration config = localSessionFactory.getConfiguration();
+            config.setProperty(Environment.CONNECTION_PROVIDER, "org.osaf.cosmo.hibernate.SimpleConnectionProvider");
+            log.info("validating schema");
+            new SchemaValidator(config).validate();
+            log.info("schema validation passed");
+        } catch (SQLException sqle) {
+            log.error("could not get database metadata", sqle);
+            throw new RuntimeException("Error retreiving database metadata");
+        } catch (RuntimeException rte) {
+            log.error("error validating schema", rte);
+            throw rte;
+        }
     }
 
     private void addOverlord() {

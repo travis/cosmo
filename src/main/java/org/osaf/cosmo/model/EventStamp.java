@@ -75,7 +75,7 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 
 /**
- * Represents an Event Stamp.
+ * Represents a calendar event.
  */
 @Entity
 @DiscriminatorValue("event")

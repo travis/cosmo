@@ -48,7 +48,8 @@ import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
 /**
- * Abstract base class for shared item on server
+ * Abstract base class for an item on server.  All
+ * content in cosmo extends from Item.
  */
 @Entity
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
@@ -82,6 +83,10 @@ public abstract class Item extends AuditableObject {
     private CollectionItem parent = null;
     private User owner;
   
+    /**
+     * Return all active stamps (isActive=true).
+     * @return active stamps
+     */
     @Transient 
     public Set<Stamp> getActiveStamps() {
         if(activeStamps!=null)

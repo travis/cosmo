@@ -97,7 +97,7 @@ public class CalendarCollectionStamp extends Stamp implements
         stamp.language = language;
         stamp.description = description;
         stamp.timezone = CalendarUtils.copyCalendar(timezone);
-        stamp.setSupportedComponents(getSupportedComponents());
+        stamp.setSupportedComponents(new HashSet<String>(getSupportedComponents()));
         return stamp;
     }
     

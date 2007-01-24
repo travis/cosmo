@@ -30,7 +30,9 @@ import org.hibernate.annotations.Type;
 
 
 /**
- * Represents an attribute with a text value.
+ * Represents an attribute with a text value.  The difference
+ * between StringAttribute and TextAttribute is that
+ * TextAttribute can store much larger values than StringAttribute.
  */
 @Entity
 @DiscriminatorValue("text")

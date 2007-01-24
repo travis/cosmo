@@ -17,7 +17,6 @@ package org.osaf.cosmo.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -81,8 +80,7 @@ public class DictionaryAttribute extends Attribute
     public Attribute copy() {
         DictionaryAttribute attr = new DictionaryAttribute();
         attr.setQName(getQName().copy());
-        Map<String, String> newVal = new HashMap<String, String>(value);
-        attr.setValue(newVal);
+        attr.setValue(new HashMap<String, String>(value));
         return attr;
     }
 

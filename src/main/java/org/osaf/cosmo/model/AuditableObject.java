@@ -41,6 +41,10 @@ public abstract class AuditableObject extends BaseModelObject {
         return creationDate;
     }
 
+    /**
+     * @param creationDate 
+     *                     date object was created
+     */
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
@@ -54,6 +58,10 @@ public abstract class AuditableObject extends BaseModelObject {
         return modifiedDate;
     }
 
+    /**
+     * @param modifiedDate
+     *                     date object was last modified
+     */
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
     }

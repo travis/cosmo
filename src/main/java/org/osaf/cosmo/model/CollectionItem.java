@@ -66,6 +66,7 @@ public class CollectionItem extends Item {
     
     /**
      * Return all children, including those with isActive=false.
+     * Rarely used.
      * @return all children items
      */
     @OneToMany(mappedBy="parent", fetch=FetchType.LAZY)

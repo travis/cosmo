@@ -16,11 +16,7 @@
 package org.osaf.cosmo.model;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -28,7 +24,6 @@ import javax.persistence.Entity;
 
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
-
 import org.osaf.cosmo.util.DateUtil;
 
 /**
@@ -108,7 +103,8 @@ public class CalendarAttribute extends Attribute implements
     public Attribute copy() {
         CalendarAttribute attr = new CalendarAttribute();
         attr.setQName(getQName().copy());
-        attr.setValue(value.clone());
+        if(attr!=null)
+            attr.setValue(value.clone());
         return attr;
     }
     

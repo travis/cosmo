@@ -55,6 +55,13 @@ public class CollectionSubscription extends BaseModelObject {
     public CollectionSubscription() {
     }
 
+    /**
+     * Return the uid of the shared collection.  
+     * Note, it is possible that the Collection with this uid is not
+     * present in the system.  This will happen if a collection is 
+     * shared and then the owner deletes the collection.
+     * @return Collection uid
+     */
     @Column(name = "collectionuid", nullable = false, length = 255)
     @NotNull
     public String getCollectionUid() {
@@ -90,6 +97,13 @@ public class CollectionSubscription extends BaseModelObject {
         this.owner = owner;
     }
 
+    /**
+     * Return the ticket key used to subscribe to the shared collection.
+     * Note, it is possible that the Ticket represented by this key
+     * is not present in the system.  This happens when a ticket is
+     * created for a shared collection, and then removed by the owner.
+     * @return
+     */
     @Column(name = "ticketkey", nullable = false, length = 255)
     @NotNull
     public String getTicketKey() {

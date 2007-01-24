@@ -24,7 +24,8 @@ import javax.persistence.Entity;
 import org.hibernate.annotations.Type;
 
 /**
- * Represents an attribute with a date value
+ * Represents an attribute with a date value with
+ * no timezone information.
  */
 @Entity
 @DiscriminatorValue("date")

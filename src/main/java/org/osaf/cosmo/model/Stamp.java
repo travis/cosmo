@@ -35,7 +35,7 @@ import org.hibernate.annotations.Type;
 
 /**
  * Represents an abstract Stamp on an Item. A Stamp is a set of related
- * properties that is associated to an item.
+ * properties and apis that is associated to an item.
  */
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

@@ -27,11 +27,11 @@ import org.hibernate.annotations.Index;
 import org.hibernate.validator.NotNull;
 
 /**
- * Represents an index for a CalendarItem.
- * In order to query CalendarItems efficiently, there has to be some
- * way to index each item.  CalendarIndex represents a time-range
- * based index for a CalendarItem.  Many CalendarIndexes can
- * be associated with a single CalendarItem.
+ * Represents an index for an item that contains an EventStamp.
+ * The index consists of a property name and value, which 
+ * represents a flatened icalendar property/value.
+ * Many CalendarPropertyIndexes can be associated with a 
+ * single Item.
  */
 @Entity
 @Table(name="cal_property_index")

@@ -36,16 +36,20 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Index;
 
 /**
- * Represents an attribute associated with an Item.  Items
- * have a map of attributes associated to them.  There
- * are many different types of attributes (String, Integer, etc.)
- * Each attribute has a single Item associated to it.
+ * Represents an attribute associated with an Item.
+ * An attribute consists of a QName (qualified name)
+ * and a value.  The QName is composed from a namespace
+ * and a localname.  The QName and Item determine
+ * attribute uniqueness.  This means for a given Item
+ * and QName, there can be only one attribute.
+ * 
+ * There are many different types of attributes 
+ * (String, Integer, Binary, Boolean, etc.)
+ * 
  */
 @Entity
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 // Define a unique constraint on item, namespace, and localname
-// because we don't want attributes with the same namespace and localname
-// to be assciated with the same item.
 @Table(name="attribute", uniqueConstraints = {
         @UniqueConstraint(columnNames={"itemid", "namespace", "localname"})})
 // Define indexes on discriminator and key fields
@@ -106,7 +110,7 @@ public abstract class Attribute extends BaseModelObject implements java.io.Seria
 
     /**
      * @param item
-     *            attribute belongs to
+     *            Item attribute belongs to
      */
     public void setItem(Item item) {
         this.item = item;

@@ -634,6 +634,17 @@ public class User extends BaseModelObject {
             subscriptions.remove(sub);
     }
 
+    /**
+     * Return true if this user is subscribed to <code>collection</code>
+     */
+    @Transient
+    public boolean isSubscribedTo(CollectionItem collection){
+        for (CollectionSubscription sub : subscriptions){
+            if (collection.getUid().equals(sub.getCollectionUid())) return true;
+        }
+        return false;
+    }
+    
 
     /*
      * I'm not sure about putting this enum here, but it seems weird in other

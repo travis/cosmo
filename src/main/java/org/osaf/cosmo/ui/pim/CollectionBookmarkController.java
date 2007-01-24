@@ -32,6 +32,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.service.UserService;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -48,6 +49,7 @@ public class CollectionBookmarkController extends AbstractController {
     private ContentService contentService;
     private CosmoSecurityManager securityManager;
     private ServiceLocatorFactory serviceLocatorFactory;
+    private UserService userService;
         
     /** 
      */
@@ -97,15 +99,17 @@ public class CollectionBookmarkController extends AbstractController {
         } else {
 
             // If we can't find a ticket principal, use the current user.
-            User currentUser = securityManager.getSecurityContext().getUser();
-            if (collection.getOwner().equals(currentUser)){
+            User currentUser = userService.getUser(
+                    securityManager.getSecurityContext().getUser().getUsername());
+            
+            if (collection.getOwner().equals(currentUser)
+                || currentUser.isSubscribedTo(collection)){
                 
                 return new ModelAndView(pimView, model);
             } else {
                 return new ModelAndView("error_forbidden");
             }
         }
-        
         
     }
 
@@ -123,6 +127,10 @@ public class CollectionBookmarkController extends AbstractController {
 
     public void setServiceLocatorFactory(ServiceLocatorFactory serviceLocatorFactory) {
         this.serviceLocatorFactory = serviceLocatorFactory;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
 }

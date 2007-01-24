@@ -126,6 +126,10 @@ public class DbInitializer {
             return false;
         } finally {
             try {
+                ps.close();
+            } catch (SQLException e) {
+            }
+            try {
                 conn.close();
             } catch (SQLException e) {
             }

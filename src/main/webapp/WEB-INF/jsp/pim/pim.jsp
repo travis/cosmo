@@ -119,7 +119,9 @@ dojo.event.topic.subscribe(
                 </a>
                 <span class="menuBarDivider">|</span>
                 <span id="accountBrowserLink" style="display: none;">
-                <a href="${staticBaseUrl}/browse/${user.username}">
+                <a href="${staticBaseUrl}/browse/${user.username}" 
+                  onclick="window.open('${staticBaseUrl}/browse/${user.username}'); 
+                  return false;">
                   Account Browser
                 </a>
                 <span class="menuBarDivider">|</span>

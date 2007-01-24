@@ -372,10 +372,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                 && this.enabledInputs.password){
                 userHash.password = form.password.value;
             }
-            if (form.admin.checked){
-                userHash.administrator = form.admin.checked;
-            }
 
+            userHash.administrator = form.admin.checked;
 
             if (this.role == cosmo.ROLE_ADMINISTRATOR){
                 this.cmpProxy.modifyUser(this.editingUser.username, userHash, this.postActionHandlerDict)
@@ -391,9 +389,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                         lastName : form.lastName.value,
                         email : form.email.value};
 
-            if (form.admin.checked){
-                userHash.administrator = form.admin.checked;
-            }
+            userHash.administrator = form.admin.checked;
 
             return userHash;
         },

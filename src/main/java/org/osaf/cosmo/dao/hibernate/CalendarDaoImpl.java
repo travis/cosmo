@@ -47,15 +47,8 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
                                              CalendarFilter filter) {
 
         try {
-            List calendarItems = calendarFilterTranslator.
+            return calendarFilterTranslator.
                 getCalendarItems(getSession(), collection, filter);
-            HashSet<ContentItem> events =
-                new HashSet<ContentItem>();
-            for (Iterator<ContentItem> i=calendarItems.iterator();
-                 i.hasNext();) {
-                events.add(i.next());
-            }
-            return events;
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }

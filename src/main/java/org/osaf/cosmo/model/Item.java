@@ -596,4 +596,27 @@ public abstract class Item extends AuditableObject {
     private void setTickets(Set<Ticket> tickets) {
         this.tickets = tickets;
     }
+
+    /**
+     * Item uid determines equality 
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if(obj==null || uid==null)
+            return false;
+        if( ! (obj instanceof Item))
+            return false;
+        
+        return uid.equals(((Item) obj).getUid());
+    }
+
+    @Override
+    public int hashCode() {
+        if(uid==null)
+            return super.hashCode();
+        else
+            return uid.hashCode();
+    }
+    
+    
 }

@@ -16,8 +16,10 @@
 package org.osaf.cosmo.dao.hibernate;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
@@ -62,7 +64,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
      *            query filter
      * @return hibernate query
      */
-    public List<ContentItem> getCalendarItems(Session session,
+    public Set<ContentItem> getCalendarItems(Session session,
             CollectionItem collection, CalendarFilter filter) {
         HashMap params = new HashMap();
         SQLQuery query = session.createSQLQuery(getQueryString(filter, params));
@@ -72,7 +74,10 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
             query.setParameter((String) entry.getKey(), entry.getValue());
         }
         query.addEntity(ContentItem.class);
-        return (List<ContentItem>) query.list();
+        List<ContentItem> allItems = query.list();
+        HashSet<ContentItem> returnedItems = new HashSet<ContentItem>();
+        returnedItems.addAll(allItems);
+        return returnedItems;
     }
 
     /**

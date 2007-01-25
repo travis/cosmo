@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
-import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Session;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
@@ -39,8 +39,8 @@ public interface CalendarFilterTranslator {
      * @param session Hibernate session obejct
      * @param collection parent collection to search
      * @param filter query filter
-     * @return list of matching ContentItems
+     * @return set of matching ContentItems
      */
-    public List<ContentItem> getCalendarItems(Session session,
+    public Set<ContentItem> getCalendarItems(Session session,
             CollectionItem collection, CalendarFilter filter);
 }

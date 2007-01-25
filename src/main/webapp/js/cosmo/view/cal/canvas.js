@@ -1032,7 +1032,9 @@ cosmo.view.cal.canvas = new function () {
     this.cleanup = function () {
         // Let's be tidy
         self.eventRegistry = null;
-        allDayArea.cleanup();
+        if (allDayArea){
+            allDayArea.cleanup();
+        }
     };
 }
 cosmo.view.cal.canvas.constructor = null;

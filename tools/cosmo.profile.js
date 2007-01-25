@@ -6,8 +6,8 @@ var dependencies = [
 	"dojo.debug.console",
 	"dojo.logging.ConsoleLogger",
 	"dojo.logging.Logger",
-	"cosmo.ui.widget.Debug"
-
+	"cosmo.ui.widget.Debug",
+    "cosmo.datetime.timezone.LazyCachingTimezoneRegistry"
 ];
 
 dependencies.prefixes = [

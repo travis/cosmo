@@ -21,8 +21,11 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<cosmo:staticbaseurl var="staticBaseUrl"/>
+
 <cosmo:standardLayout prefix="User.List.">
 
+<link rel="stylesheet" href="${staticBaseUrl}/templates/default/admin.css"/>
 
 <script type="text/javascript">
 
@@ -30,8 +33,6 @@ dojo.require("dojo.widget.*");
 dojo.require("dojo.widget.Button");
 dojo.require("cosmo.env");
 </script>
-
-<script type="text/javascript" src="${staticBaseUrl}/js/cosmo/cmp/cmp.js"></script>
 
 <script language="JavaScript">
 
@@ -185,6 +186,8 @@ createHandlerDict = {
 
 
 dojo.addOnLoad(function (){
+	dojo.widget.byId("modifyUserDialog").hide();
+	dojo.widget.byId("createUserDialog").hide();
 
     var userList = dojo.widget.byId("userList");
     var modifyLink = document.getElementById("modifySelectedUserLink");
@@ -278,8 +281,8 @@ dojo.addOnLoad(function (){
         role="cosmo.ROLE_ADMINISTRATOR"
         cancelButtonText='<fmt:message key="User.Form.Button.Cancel"/>'
         submitButtonText='<fmt:message key="User.Form.Button.Create"/>'
-
-        isHidden="true"
+		classes='floating'
+		title='<fmt:message key="User.List.NewUser"/>'
         > </div>
 
 <div 	dojoType="cosmo:ModifyUserDialog" widgetId="modifyUserDialog"
@@ -295,8 +298,8 @@ dojo.addOnLoad(function (){
         role="cosmo.ROLE_ADMINISTRATOR"
         cancelButtonText='<fmt:message key="User.Form.Button.Cancel"/>'
         submitButtonText='<fmt:message key="User.Form.Button.Update"/>'
-
-        isHidden="true"
+		classes='floating'
+		title='<fmt:message key="User.List.ModifyUser"/>'
         > </div>
 </cosmo:standardLayout>
 

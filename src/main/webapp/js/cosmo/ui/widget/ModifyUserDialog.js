@@ -59,7 +59,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         passwordError : null,
         confirmError : null,
         
-        style: "",
+        classes: "",
+        title: "",
 
         cancelButtonText : "Cancel",
         submitButtonText : "Submit",
@@ -153,13 +154,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
             }
 
         },
-
+        
         fillInTemplate: function(){
-
-            // Hide ourselves if specified
-            if (this.isHidden){
-                this.hide()
-            }
 
             // Hook up the specified callbacks
             if (this.postActionHandler != ""){

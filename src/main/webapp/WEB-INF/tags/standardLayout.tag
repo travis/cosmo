@@ -45,6 +45,10 @@
       </fmt:message>
     </title>
     
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="${staticBaseUrl}/templates/default/global.css"/>
+    
+    
     <c:if test="${not empty selfLink}">
     <link rel="self" type="text/html" href="${selfLink }"/>
     </c:if>

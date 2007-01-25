@@ -1,6 +1,8 @@
-<div class="modifyUserForm" style="${this.style}">
+<div class="dialog ${this.classes}">
+<div class="dialogTitleBar">${this.title}</div>
+<div class="outerDialog">
 <form dojoAttachPoint="form">
-
+  <div class="innerDialog">
   <div style="margin-bottom:4px;">${this.header}</div>
 
   <table cellpadding="3" cellspacing="1" border="0">
@@ -68,7 +70,7 @@
       <td class="mdLabel" style="text-align:right;">
         &nbsp;
       </td>
-      <td class="labelTextCell">
+      <td >
         <span class="sm">${this.passwordBlurb}</span>
       </td>
     </tr>
@@ -102,14 +104,15 @@
      <td class="labelTextCell">&nbsp;</td>
       <td>
         <div style="margin-top:8px;">
-          <input type="checkbox" property="admin" id="admin"/>
+          <input type="checkbox" id="admin"/>
              ${this.adminLabel}
         </div>
       </td>
     </tr>
 
   </table>
-
+  </div>
+  
   <div class="cancelButtonContainer" style="margin-top:12px;">
     <div style="float:left;" >
         <button dojoType="cosmo:Button" dojoAttachPoint="cancelButton"
@@ -126,6 +129,7 @@
       <br style="clear:both;"/>
   </div>
 </form>
+</div>
 </div>
 
 

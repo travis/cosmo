@@ -1,0 +1,114 @@
+/* User list styling
+ * ------------------- */
+table#userList {
+    width:100%;
+
+}
+
+* html div.tableContainer {	/* IE only hack */
+    width:95%;
+
+}
+
+table#userList td,
+table#userList th{
+    border-right:1px solid #999;
+    padding:2px;
+    font-weight:normal;
+    cursor: pointer;
+
+}
+table#userList thead td, table#userList thead th {
+    font-size: 11px;
+    color: snow;
+    font-weight:bold;
+    text-align:center;
+    background: url(images/title_bar_background.png);
+
+    border:1px solid #cccccc;
+    white-space:nowrap;
+}
+
+* html div.tableContainer table thead tr td,
+* html div.tableContainer table thead tr th{
+    /* IE Only hacks */
+    position:relative;
+    top:expression(dojo.html.getFirstAncestorByTag(this,'table').parentNode.scrollTop-2);
+}
+
+html>body tbody.userListBody {
+
+}
+
+tbody.userListBody td, tbody.userListBody tr td {
+    font-size: 11px;
+    border:1px solid #cccccc;
+
+}
+
+tbody.userListBody tr.alternateRow td {
+    background: #e3edfa;
+    padding: 2px;
+}
+
+tbody.userListBody tr.selected td {
+    background: yellow;
+    padding: 2px;
+}
+tbody.userListBody tr:hover td {
+    background: #a6c2e7;
+    padding: 2px;
+}
+tbody.userListBody tr.selected:hover td {
+    background: #ff3;
+    padding: 2px;
+}
+
+a.userListPagingLink {
+    text-decoration: none;
+    color: blue;
+}
+
+span#pageNumberChooser {
+    position: absolute;
+    left: 2em;
+}
+
+span#pageSizeChooser {
+    position: absolute;
+    right: 2em;
+}
+
+span#userCountIndicatorSpan {
+	position: absolute;
+   left: 45%;
+}
+
+div#userListControls {
+    font-size: 0.9em;
+    height: 2em;
+}
+
+form.modifyUserForm {
+
+    width: 50%;
+    position: fixed;
+    left: 25%;
+    top: 25%;
+    background: white;
+
+}
+
+img#orderIndicator {
+    padding-left : 5px;
+}
+
+div#userAdminLinkBlock{
+    margin-top: 0.2em;
+}
+
+div#userAdminLinkBlock>a {
+    text-decoration: none;
+    font-size: 0.98em;
+    margin-right: 1em;
+}

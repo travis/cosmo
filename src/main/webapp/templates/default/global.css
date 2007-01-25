@@ -1,0 +1,133 @@
+/* Styles that will likely be needed app-wide (pim, admin, etc..) */
+
+/* Dialog */
+.dialog{
+	border: lightgrey solid 1px;
+}
+
+.hidden{
+	display: none;	
+}
+
+.floating{
+	top: 25%; 
+	position: absolute; 
+	width: 40%; 
+	left: 30%
+}
+
+/* Title Bar */
+.dialogTitleBar{
+    height: 20px;
+    background: blue url(images/title_bar_background.png);
+    /* Texture: Vertical gradient matches the blue calendar lozenges*/
+    padding-left: 5px;
+    text-align: center;
+    /* Cancel button - Title gutter: 20px*/
+    font-size: medium;
+    color: #ffffff;
+}
+
+/*
+Cancel button has 3 states:
+
+    * Active
+    * Rollover
+    * Mousedown 
+*/
+/* Outer Dialog */
+.outerDialog{
+    background: #f5f5f5;
+    /* Opacity: 88%*/
+    padding: 15px 10px;
+    /* Top when there are tabs: 10px */
+}
+
+/*
+Confirmation buttons
+
+    * 3 states:
+          o Active
+          o Rollover
+          o Mousedown 
+    * Font size: Medium
+    * Font color: Black #000000
+    * Font opacity: 88%
+    * Gutter between confirmation buttons: 10px 
+
+/* Inner Dialog */
+.innerDialog{
+    background: #ffffff;
+    /* Opacity: 88%*/
+    padding: 15px ;
+}
+/*
+Tabbed Inner Dialog
+
+Tabs have 7 states:
+
+    * Greyed out
+    * Active
+    * Rollover
+    * Mousedown
+    * Selected
+    * Selected Rollover
+    * Selected Mousedown 
+
+Selected
+
+    * Top margin: 12px
+    * Left-right margins: 10px
+    * Bottom margin: 5px 
+
+Unselected
+
+    * Top-bottom margins: 5px
+    * Left-right margins: 10px 
+
+Text
+
+    * Font size: Medium
+    * Font color: Black #000000
+    * Font opacity: 88% 
+
+Form Elements
+
+Gutter between labels and fields: 10px
+
+Text fields and Pulldowns:
+
+    * 5px between fields if they are part of 1 group
+    * 20px between groupings of fields 
+
+Checkboxes and icons:
+
+    * 5px if they sit to the right of a text field or pulldown 
+
+Gutter above and below Dividers: 15px
+
+Form Element Text Labels:
+
+    * Font size: Medium
+    * Font color: Black #000000 
+
+Error Text:
+
+    * Font size: Small
+    * Font color: Red #ff0000
+    * Gutter: 10px below form elements 
+
+Explanatory Text:
+
+    * Font size: Small
+    * Font color: Medium Grey #808080
+    * Gutter: 10px below form elements 
+
+Link styles
+
+    * Active style: No underline
+    * Active color: #0080ff
+    * Hover effect: Underline
+    * Mousedown effect: Underline
+    * Mousedown link color: #0066cc
+    * Visited link color: #57beff */

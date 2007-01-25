@@ -375,35 +375,24 @@ public class User extends BaseModelObject {
     }
 
     /**
+     * Username determines equality 
      */
-    public boolean equals(Object o) {
-        if (! (o instanceof User)) {
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || username == null)
             return false;
-        }
-        User it = (User) o;
-        return new EqualsBuilder().
-            append(username, it.username).
-            append(password, it.password).
-            append(firstName, it.firstName).
-            append(lastName, it.lastName).
-            append(email, it.email).
-            append(admin, it.admin).
-            append(activationId, it.activationId).
-            isEquals();
+        if (! (obj instanceof User))
+            return false;
+        
+        return username.equals(((User) obj).getUsername());
     }
 
-    /**
-     */
-    public int hashCode() {
-        return new HashCodeBuilder(3, 5).
-            append(username).
-            append(password).
-            append(firstName).
-            append(lastName).
-            append(email).
-            append(admin).
-            append(activationId).
-            toHashCode();
+    @Override
+        public int hashCode() {
+        if (username == null)
+            return super.hashCode();
+        else
+            return username.hashCode();
     }
 
     /**

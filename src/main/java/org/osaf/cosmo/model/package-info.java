@@ -73,7 +73,12 @@
     @NamedQuery(name="user.byActivationId", query="from User where activationid=:activationId"),
 
     // Event Queries
-    @NamedQuery(name="event.by.calendar.icaluid", query="select i from ContentItem i, CalendarPropertyIndex pi where pi.item.id=i.id and i.parent=:calendar and pi.name='icalendar:vcalendar-vevent_uid' and pi.value=:uid and i.isActive=true")
+    @NamedQuery(name="event.by.calendar.icaluid", query="select i from ContentItem i, CalendarPropertyIndex pi where pi.item.id=i.id and i.parent=:calendar and pi.name='icalendar:vcalendar-vevent_uid' and pi.value=:uid and i.isActive=true"),
+    
+    // Delete Queries
+    @NamedQuery(name="delete.calendarPropertyIndex", query="delete from CalendarPropertyIndex where eventStamp=:eventStamp"),
+    @NamedQuery(name="delete.calendarTimeRangeIndex", query="delete from CalendarTimeRangeIndex where eventStamp=:eventStamp")
+    
 
 })
 package org.osaf.cosmo.model;

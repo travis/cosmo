@@ -16,10 +16,9 @@
 package org.osaf.cosmo.model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -92,11 +91,11 @@ public class EventStamp extends Stamp implements
     private static final long serialVersionUID = 3992468809776886156L;
 
     private Calendar calendar = null;
-    private Set<CalendarTimeRangeIndex> timeRangeIndexes = 
-        new HashSet<CalendarTimeRangeIndex>(0);
+    private Collection<CalendarTimeRangeIndex> timeRangeIndexes = 
+        new ArrayList<CalendarTimeRangeIndex>(0);
 
-    private Set<CalendarPropertyIndex> propertyIndexes = 
-        new HashSet<CalendarPropertyIndex>(0);
+    private Collection<CalendarPropertyIndex> propertyIndexes = 
+        new ArrayList<CalendarPropertyIndex>(0);
     
     /** default constructor */
     public EventStamp() {
@@ -126,22 +125,22 @@ public class EventStamp extends Stamp implements
     @OneToMany(mappedBy = "eventStamp", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.SAVE_UPDATE, CascadeType.DELETE_ORPHAN })
     @OnDelete(action=OnDeleteAction.CASCADE)
-    public Set<CalendarTimeRangeIndex> getTimeRangeIndexes() {
+    public Collection<CalendarTimeRangeIndex> getTimeRangeIndexes() {
         return timeRangeIndexes;
     }
 
-    private void setTimeRangeIndexes(Set<CalendarTimeRangeIndex> indexes) {
+    private void setTimeRangeIndexes(Collection<CalendarTimeRangeIndex> indexes) {
         this.timeRangeIndexes = indexes;
     }
     
     @OneToMany(mappedBy = "eventStamp", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.SAVE_UPDATE, CascadeType.DELETE_ORPHAN })
     @OnDelete(action=OnDeleteAction.CASCADE)
-    public Set<CalendarPropertyIndex> getPropertyIndexes() {
+    public Collection<CalendarPropertyIndex> getPropertyIndexes() {
         return propertyIndexes;
     }
 
-    private void setPropertyIndexes(Set<CalendarPropertyIndex> propertyIndexes) {
+    private void setPropertyIndexes(Collection<CalendarPropertyIndex> propertyIndexes) {
         this.propertyIndexes = propertyIndexes;
     }
     

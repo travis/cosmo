@@ -52,8 +52,12 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
         flattener.doTimeRange(calendar, timeRangeMap);
         
         // remove previous indexes
-        event.getTimeRangeIndexes().clear();
-        event.getPropertyIndexes().clear();
+        if (event.getId() != -1) {
+            session.getNamedQuery("delete.calendarPropertyIndex").setParameter(
+                    "eventStamp", event).executeUpdate();
+            session.getNamedQuery("delete.calendarTimeRangeIndex")
+                    .setParameter("eventStamp", event).executeUpdate();
+        }
         
         for (Iterator it = propertyMap.entrySet().iterator(); it.hasNext();) {
             Entry nextEntry = (Entry) it.next();

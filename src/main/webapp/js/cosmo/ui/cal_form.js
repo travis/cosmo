@@ -310,7 +310,7 @@ cosmo.ui.cal_form.CalForm = function () {
     this.setMailtoLink = function (event) {
         var timeFormat=_("Sidebar.Email.TimeFormat");
 
-        var subject = _("Sidebar.Email.EventChanged") + Cal.currentCollection.displayName + ": " + event.data.title;
+        var subject = Cal.currentCollection.displayName + ": " + event.data.title;
         var body = [_("Sidebar.Email.Title") , event.data.title , "%0d%0a"];
         
         if (event.data.start.tzId){

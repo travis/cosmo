@@ -70,7 +70,7 @@ dojo.require("cosmo.ui.widget.ModifyUserDialog");
 
 <div id="userAdminLinkBlock">
 
-<a href="javascript:toggleNewUser()">Create New User</a>
+<a href="javascript:showNewUser()">Create New User</a>
 <a 	id="modifySelectedUserLink" 
 	href="javascript:showModifySelectedUser()" 
 	style="display:none;">Modify Selected User</a>
@@ -90,13 +90,9 @@ dojo.require("cosmo.ui.widget.ModifyUserDialog");
 <script>
 
 
-function toggleNewUser(){
+function showNewUser(){
     var createUserDialog = dojo.widget.byId("createUserDialog")
-    if (createUserDialog.isHidden) {
-        createUserDialog.show();
-    } else {
-        createUserDialog.hide();
-    };
+    createUserDialog.show();
 
     void(0);
 }

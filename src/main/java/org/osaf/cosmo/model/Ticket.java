@@ -169,6 +169,22 @@ public class Ticket extends BaseModelObject {
     }
 
     /**
+     * Determines whether or not the ticket is granted on the given
+     * item or one of its ancestors.
+     */
+    public boolean isGranted(Item item) {
+        Item test = item;
+        while (test != null) {
+            for (Ticket ticket : test.getTickets()) {
+                if (ticket.equals(this))
+                    return true;
+            }
+            test = test.getParent();
+        }
+        return false;
+    }
+
+    /**
      */
     public boolean equals(Object o) {
         if (! (o instanceof Ticket)) {

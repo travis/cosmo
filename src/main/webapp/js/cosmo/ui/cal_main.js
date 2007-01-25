@@ -411,8 +411,7 @@ cosmo.ui.cal_main.Cal = new function () {
         // Event detail form
         vOffset += calcHeight;
         // Variable height area
-        eventInfo.setSize(RIGHT_SIDEBAR_WIDTH-12, EVENT_DETAIL_FORM_HEIGHT);
-        eventInfo.setPosition(4, 8);
+        eventInfo.setPosition(0, 0);
 
         // Set cal day column width
         cosmo.view.cal.canvas.dayUnitWidth = parseInt(

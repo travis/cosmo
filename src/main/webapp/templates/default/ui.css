@@ -802,11 +802,15 @@ td.dataDisplayLabel {
 #eventInfoDiv {
     position:absolute;
 }
+#eventInfoDivContent {
+    padding-left:12px;
+    padding-right:8px;
+    padding-top:6px;
+}
 
 /* "Email this event" link */
-#emailThisEventLink {
-	position: relative;
-	left: 14em;
+#emailThisEventDiv {
+    text-align:right;
 }
 
 /* Fake popup for modal dialog box

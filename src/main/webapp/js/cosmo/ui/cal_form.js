@@ -129,17 +129,18 @@ cosmo.ui.cal_form.CalForm = function () {
         var elemFloat = null;
         var formElem = null;
         
-        this.mailtoLink = document.createElement("a");
-        
-        this.mailtoLink.setAttribute("href", "http://www.google.com");
-        this.mailtoLink.setAttribute("id", "emailThisEventLink");
-        
-        this.mailtoLink.appendChild(
-            document.createTextNode(_('Main.DetailForm.EMail')));
-        d.appendChild(this.mailtoLink);
-
         cont.id = 'eventInfoDivContent';
-        cont.style.padding = '8px';
+        
+        // 'E-mail this event' link
+        elem = document.createElement('div');
+        elem.id = 'emailThisEventDiv';
+        this.mailtoLink = _createElem("a");
+        this.mailtoLink.href = "#";
+        this.mailtoLink.id = "emailThisEventLink";
+        this.mailtoLink.appendChild(
+            _createText(_('Main.DetailForm.EMail')));
+        elem.appendChild(this.mailtoLink);
+        d.appendChild(elem);
 
         // Event title
         this.createLabel(_(
@@ -279,13 +280,17 @@ cosmo.ui.cal_form.CalForm = function () {
         elem.style.whiteSpace = 'nowrap';
 
         //create the region selector
-        _html.createSelect('tzRegion', 'tzRegion', null, 
-            false, this.getTimezoneOptions(), 'selectElem', elem);
+        var sel = _html.createSelect('tzRegion', 'tzRegion', null, 
+            false, this.getTimezoneOptions(), 'selectElem');
+        sel.style.width = '90px';
+        elem.appendChild(sel);
         _html.appendNbsp(elem);
-        _html.createSelect('tzId', 'tzId', null, 
-            false, this.getTimezoneSelectorOptions(null), 'selectElem', elem);
+        sel = _html.createSelect('tzId', 'tzId', null, 
+            false, this.getTimezoneSelectorOptions(null), 'selectElem');
+        // Limit width -- these options can be very long
+        sel.style.width = '144px';
+        elem.appendChild(sel);
         d.appendChild(elem);
-
     };
 
     this.getTimezoneSelectorOptions = function (region){

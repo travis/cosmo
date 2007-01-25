@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.osaf.cosmo.security;
+
+import org.osaf.cosmo.model.Item;
 
 /**
  * Rrepresents a server-wide security controller for Cosmo. It
@@ -42,4 +44,15 @@ public interface CosmoSecurityManager {
     public CosmoSecurityContext initiateSecurityContext(String username,
                                                         String password)
         throws CosmoSecurityException;
+
+    /**
+     * Validates that the current security context has the requested
+     * permission for the given item.
+     *
+     * @throws PermissionDeniedException if the security context does
+     * not have the required permission
+     */
+    public void checkPermission(Item item,
+                                int permission)
+        throws PermissionDeniedException;
 }

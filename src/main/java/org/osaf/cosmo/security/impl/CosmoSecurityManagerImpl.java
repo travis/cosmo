@@ -15,9 +15,14 @@
  */
 package org.osaf.cosmo.security.impl;
 
+import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.security.Permission;
+import org.osaf.cosmo.security.PermissionDeniedException;
 
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
@@ -80,6 +85,58 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
         } catch (AuthenticationException e) {
             throw new CosmoSecurityException("can't establish security context",
                                              e);
+        }
+    }
+
+    /**
+     * Validates that the current security context has the requested
+     * permission for the given item.
+     *
+     * @throws PermissionDeniedException if the security context does
+     * not have the required permission
+     */
+    public void checkPermission(Item item,
+                                int permission)
+        throws PermissionDeniedException, CosmoSecurityException {
+        CosmoSecurityContext ctx = getSecurityContext();
+
+        if (ctx.isAnonymous()) {
+            log.warn("Anonymous access attempted to item " + item.getUid());
+            throw new PermissionDeniedException("Anonymous principals have no permissions");
+        }
+
+        // administrators can do anything to any item
+        if (ctx.isAdmin())
+            return;
+
+        User user = ctx.getUser();
+        if (user != null) {
+            // an item's owner can do anything to an item he owns
+            if (user.equals(item.getOwner()))
+                return;
+            log.warn("User " + user.getUsername() + " attempted access to item " + item.getUid() + " owned by " + item.getOwner().getUsername());
+            throw new PermissionDeniedException("User does not have appropriate permissions on item " + item.getUid());
+        }
+
+        Ticket ticket = ctx.getTicket();
+        if (ticket != null) {
+            if (! ticket.isGranted(item)) {
+                log.warn("Non-granted ticket " + ticket.getKey() + " attempted access to item " + item.getUid());
+                throw new PermissionDeniedException("Ticket " + ticket.getKey() + " is not granted on item " + item.getUid());
+            }
+            // assume that when the security context was initiated the
+            // ticket's expiration date was checked
+            if (permission == Permission.READ &&
+                ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
+                return;
+            if (permission == Permission.WRITE &&
+                ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE))
+                return;
+            if (permission == Permission.FREEBUSY &&
+                ticket.getPrivileges().contains(Ticket.PRIVILEGE_FREEBUSY))
+                return;
+            log.warn("Granted ticket " + ticket.getKey() + " attempted access to item " + item.getUid());
+            throw new PermissionDeniedException("Ticket " + ticket.getKey() + " does not have appropriate permissions on item " + item.getUid());
         }
     }
 

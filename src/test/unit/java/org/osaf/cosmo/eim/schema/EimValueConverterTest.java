@@ -37,7 +37,7 @@ public class EimValueConverterTest extends TestCase {
         TimeZoneRegistryFactory.getInstance().createRegistry();
 
     public void testToICalDatesAsDateTime() throws Exception {
-        String str = "VALUE=DATE-TIME:TZID=America/Los_Angeles:20021010T120000";
+        String str = "VALUE=DATE-TIME;TZID=America/Los_Angeles;20021010T120000";
 
         DateList dl = EimValueConverter.toICalDates(str);
         assertNotNull("null date list", dl);
@@ -58,7 +58,7 @@ public class EimValueConverterTest extends TestCase {
     }
     
     public void testToICalDatesAsDate() throws Exception {
-        String str = "VALUE=DATE:20021010T";
+        String str = "VALUE=DATE;20021010T";
 
         DateList dl = EimValueConverter.toICalDates(str);
         assertNotNull("null date list", dl);
@@ -71,7 +71,7 @@ public class EimValueConverterTest extends TestCase {
     }
     
     public void testToICalDatesMultiple() throws Exception {
-        String str = "VALUE=DATE:20021010,20021011,20021012";
+        String str = "VALUE=DATE;20021010,20021011,20021012";
 
         DateList dl = EimValueConverter.toICalDates(str);
         assertNotNull("null date list", dl);
@@ -87,7 +87,7 @@ public class EimValueConverterTest extends TestCase {
     }
     
     public void testToICalDateAsDateTime() throws Exception {
-        String str = "VALUE=DATE-TIME:TZID=America/Los_Angeles:20021010T120000";
+        String str = "VALUE=DATE-TIME;TZID=America/Los_Angeles;20021010T120000";
 
         Date d = EimValueConverter.toICalDate(str);
         assertNotNull("null date", d);
@@ -102,7 +102,7 @@ public class EimValueConverterTest extends TestCase {
     }
     
     public void testToICalDateAsDate() throws Exception {
-        String str = "VALUE=DATE:20021010";
+        String str = "VALUE=DATE;20021010";
 
         Date d = EimValueConverter.toICalDate(str);
         assertNotNull("null date", d);
@@ -116,20 +116,33 @@ public class EimValueConverterTest extends TestCase {
         assertNull("timezone where none should be", dl.getTimeZone());
     }
 
+    public void testToICalDateQuotedParam() throws Exception {
+        try {
+            EimValueConverter.toICalDate("VALUE=\"DATE-TIME\";20021010T120000");
+        } catch (Exception e) {
+            fail("double-quoted param failure: " + e.getMessage());
+        }
+    }
+
     public void testToICalDateParseErrors() throws Exception {
         try {
-            EimValueConverter.toICalDate("FOO=bar:20021010T120000");
+            EimValueConverter.toICalDate("FOO=bar;20021010T120000");
             fail("converted with bad param FOO");
         } catch (EimConversionException e) {}
 
         try {
-            EimValueConverter.toICalDate("TZID=deadbeef:20021010T120000");
+            EimValueConverter.toICalDate("TZID=deadbeef;20021010T120000");
             fail("converted with bad TZID deadbeef");
         } catch (EimConversionException e) {}
 
         try {
-            EimValueConverter.toICalDate("VALUE=deadbeef:20021010T120000");
+            EimValueConverter.toICalDate("VALUE=deadbeef;20021010T120000");
             fail("converted with bad VALUE deadbeef");
+        } catch (EimConversionException e) {}
+
+        try {
+            EimValueConverter.toICalDate("VALUE=\"DATE-TIME;20021010T120000");
+            fail("converted with unclosed doublequotes");
         } catch (EimConversionException e) {}
 
         try {
@@ -143,7 +156,7 @@ public class EimValueConverterTest extends TestCase {
         DateList dl = new DateList(Value.DATE_TIME, tz);
         dl.add(new DateTime("20021010T120000", tz));
 
-        String test = "VALUE=DATE-TIME:TZID=America/Los_Angeles:20021010T120000";
+        String test = "VALUE=DATE-TIME;TZID=America/Los_Angeles;20021010T120000";
         String result = EimValueConverter.fromICalDates(dl);
         assertNotNull("null result", result);
         assertEquals(test, result);
@@ -153,7 +166,7 @@ public class EimValueConverterTest extends TestCase {
         DateList dl = new DateList(Value.DATE);
         dl.add(new Date("20021010"));
 
-        String test = "VALUE=DATE:20021010";
+        String test = "VALUE=DATE;20021010";
         String result = EimValueConverter.fromICalDates(dl);
         assertNotNull("null result", result);
         assertEquals(test, result);
@@ -165,14 +178,14 @@ public class EimValueConverterTest extends TestCase {
         dl.add(new Date("20021011"));
         dl.add(new Date("20021012"));
 
-        String str = "VALUE=DATE:20021010,20021011,20021012";
+        String str = "VALUE=DATE;20021010,20021011,20021012";
     }
     
     public void testFromICalDateAsDateTime() throws Exception {
         TimeZone tz = TIMEZONE_REGISTRY.getTimeZone("America/Los_Angeles");
         DateTime dt = new DateTime("20021010T120000", tz);
 
-        String test = "VALUE=DATE-TIME:TZID=America/Los_Angeles:20021010T120000";
+        String test = "VALUE=DATE-TIME;TZID=America/Los_Angeles;20021010T120000";
         String result = EimValueConverter.fromICalDate(dt);
         assertNotNull("null result", result);
         assertEquals(test, result);
@@ -181,14 +194,14 @@ public class EimValueConverterTest extends TestCase {
     public void testFromICalDateAsDate() throws Exception {
         Date d = new Date("20021010");
 
-        String test = "VALUE=DATE:20021010";
+        String test = "VALUE=DATE;20021010";
         String result = EimValueConverter.fromICalDate(d);
         assertNotNull("null result", result);
         assertEquals(test, result);
     }
     
     public void testToIcalTrigger() throws Exception {
-        String strTrigger = "RELATED=END:P7W";
+        String strTrigger = "RELATED=END;P7W";
         Trigger trigger = EimValueConverter.toIcalTrigger(strTrigger);
         Assert.assertEquals(strTrigger, EimValueConverter.fromIcalTrigger(trigger));
         
@@ -200,7 +213,7 @@ public class EimValueConverterTest extends TestCase {
         trigger = EimValueConverter.toIcalTrigger(strTrigger);
         Assert.assertEquals(strTrigger, EimValueConverter.fromIcalTrigger(trigger));
     
-        strTrigger = "VALUE=DATE-TIME:19970317T133000Z";
+        strTrigger = "VALUE=DATE-TIME;19970317T133000Z";
         trigger = EimValueConverter.toIcalTrigger(strTrigger);
         Assert.assertEquals(strTrigger, EimValueConverter.fromIcalTrigger(trigger));
         
@@ -212,7 +225,7 @@ public class EimValueConverterTest extends TestCase {
         trigger = EimValueConverter.toIcalTrigger(strTrigger);
         Assert.assertEquals(strTrigger, EimValueConverter.fromIcalTrigger(trigger));
         
-        strTrigger = "RELATED=END:19970317T133000Z";
+        strTrigger = "RELATED=END;19970317T133000Z";
         try {
             trigger = EimValueConverter.toIcalTrigger(strTrigger);
             Assert.fail("able to convert invalid trigger");

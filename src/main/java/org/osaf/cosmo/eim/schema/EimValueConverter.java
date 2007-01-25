@@ -42,6 +42,17 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Converts between EIM field values and model values (mainly
  * iCalendar values used for events and tasks).
+ *
+ * EIM text fields are often used to represented iCalendar property
+ * values. Sometimes iCalendar properties are parameterized (for
+ * example
+ * <code>DTSTART:TZID=America/Los_Angeles;VALUE=DATE_TIME;20060120T120000</code>).
+ * When parameters are included with a property value, they are
+ * serialized as an EIM text value exactly according to iCalendar,
+ * with properties separated by semicolons and with optional
+ * doublequotes surrounding property values. Parameter and property
+ * values are NOT wrapped according to iCalendar; any whitespace in
+ * these values is considered to be significant.
  */
 public class EimValueConverter implements EimSchemaConstants {
     private static final Log log =
@@ -92,24 +103,22 @@ public class EimValueConverter implements EimSchemaConstants {
     }
 
     /**
-     * Parses a serialized text value and returns the contained dates
-     * or date-times.
+     * Parses a serialized text value and returns the
+     * contained dates or date-times.
      * <p>
      * Dates or date-times in the text value must be
      * comma-separated.
      * <p>
-     * The text value may optionally be prepended
-     * with one or more of these "parameter strings" separated from each
-     * other and from the text value proper by a colon:
+     * These parameters are supported:
      * <ul>
      * <li><code>VALUE=DATE</code>, signifying that the value
      * represents a list of dates, or</li>
      * <li><code>VALUE=DATE-TIME</code>, signifying that the value
      * represents a list of date-times</li>
-     * <li><code>TZID=&lt;timezone identifier&gt;, signifying a
+     * <li><code>TZID=&lt;timezone identifier&gt;</code>, signifying a
      * timezone for the dates or date-times
      * </ul>
-     * If no parameter strings are provided, the value is assumed to
+     * If no parameters are provided, the value is assumed to
      * represent a list of date-time values with no associated
      * timezone.
      *
@@ -122,10 +131,25 @@ public class EimValueConverter implements EimSchemaConstants {
     }
 
     /**
+     * Serializes a list of iCalendar dates or date-times.
+     * <p>
+     * Dates or date-times in the returned value are separated with
+     * commas.
+     *
+     * @return <code>String</code>
+     * @throws EimConversionException
+     */
+    public static String fromICalDates(DateList dates) {
+        if (dates == null || dates.isEmpty())
+            return null;
+        return new ICalDate(dates).toString();
+    }
+
+    /**
      * Parses a serialized text value and returns the contained
      * date or date-time.
      * <p>
-     * Allows a leading value string as per {@link #toICalDates(String)}.
+     * Supports parameters as per {@link #toICalDates(String)}.
      *
      * @return <code>Date</code> or <code>DateTime</code>
      * @throws EimConversionException
@@ -135,14 +159,27 @@ public class EimValueConverter implements EimSchemaConstants {
         return new ICalDate(text).getDate();
     }
 
+    /**
+     * Returns the text representation of an iCalendar date or
+     * date-time.
+     *
+     * @return <code>String</code>
+     * @throws EimConversionException
+     */
+    public static String fromICalDate(Date date) {
+        if (date == null)
+            return null;
+        return new ICalDate(date).toString();
+    }
+
     public static String fromIcalTrigger(Trigger trigger) {
         
         if(trigger.getDateTime()!=null)
-            return "VALUE=DATE-TIME:" + trigger.getDateTime().toString();
+            return "VALUE=DATE-TIME;" + trigger.getDateTime().toString();
         
         Related related = (Related) trigger.getParameters().getParameter(Parameter.RELATED);
         if(related != null)
-            return related.toString() + ":" + trigger.getDuration().toString();
+            return related.toString() + ";" + trigger.getDuration().toString();
         else
             return trigger.getDuration().toString();
     }
@@ -156,11 +193,11 @@ public class EimValueConverter implements EimSchemaConstants {
      * before the start date </li>
      * <li><code>PT15M</code> trigger will execute 15 minutes
      * after the start date </li>
-     * <li><code>RELATIVE=END:-PT15M</code> trigger will execute
+     * <li><code>RELATIVE=END;-PT15M</code> trigger will execute
      * 15 minutes before the end date</li>
-     * <li><code>RELATIVE=END:PT15M</code> trigger will execute
+     * <li><code>RELATIVE=END;PT15M</code> trigger will execute
      * 15 minutes after the end date</li>
-     * <li><code>VALUE=DATE-TIME:20070101100000Z</code> represents
+     * <li><code>VALUE=DATE-TIME;20070101100000Z</code> represents
      * an a trigger that will execute at an absolute time</li>
      * </ul>
      *
@@ -173,7 +210,7 @@ public class EimValueConverter implements EimSchemaConstants {
         Related related = null;
         String propVal = null;
 
-        if (text.startsWith("VALUE=DATE-TIME:")) {
+        if (text.startsWith("VALUE=DATE-TIME;")) {
             value = Value.DATE_TIME;
             propVal = text.substring(16);
         } else if (text.startsWith("RELATED=END")){
@@ -224,34 +261,6 @@ public class EimValueConverter implements EimSchemaConstants {
         return DURATION_PATTERN.matcher(text).matches();
     }
     
-    /**
-     * Serializes a list of iCalendar dates or date-times.
-     * <p>
-     * Dates or date-times in the returned value are separated with
-     * commas.
-     *
-     * @return <code>String</code>
-     * @throws EimConversionException
-     */
-    public static String fromICalDates(DateList dates) {
-        if (dates == null || dates.isEmpty())
-            return null;
-        return new ICalDate(dates).toString();
-    }
-
-    /**
-     * Returns the text representation of an iCalendar date or
-     * date-time.
-     *
-     * @return <code>String</code>
-     * @throws EimConversionException
-     */
-    public static String fromICalDate(Date date) {
-        if (date == null)
-            return null;
-        return new ICalDate(date).toString();
-    }
-
     private static class ICalDate {
         private Value value;
         private TzId tzid;
@@ -262,13 +271,20 @@ public class EimValueConverter implements EimSchemaConstants {
 
         public ICalDate(String text)
             throws EimConversionException {
-            for (String param : text.split(":")) {
+            for (String param : text.split(";")) {
                 String[] parts = param.split("=");
                 if (parts.length == 2) {
+                    String value = parts[1];
+                    // trim doublequotes
+                    if (value.startsWith("\"")) {
+                        if (! value.endsWith("\""))
+                            throw new EimConversionException("Unbalanced quotes around value for parameter " + parts[0]);
+                        value = value.substring(1, value.length()-1);
+                    }
                     if (parts[0].equals("VALUE"))
-                        parseValue(parts[1]);
+                        parseValue(value);
                     else if (parts[0].equals("TZID"))
-                        parseTzId(parts[1]);
+                        parseTzId(value);
                     else
                         throw new EimConversionException("Bad parameter " + parts[0]);
                 } else {
@@ -342,9 +358,9 @@ public class EimValueConverter implements EimSchemaConstants {
 
         public String toString() {
             StringBuffer buf = new StringBuffer();
-            buf.append(value.toString()).append(":");
+            buf.append(value.toString()).append(";");
             if (tzid != null)
-                buf.append("TZID=").append(tzid.getValue()).append(":");
+                buf.append("TZID=").append(tzid.getValue()).append(";");
             buf.append(text);
             return buf.toString();
         }

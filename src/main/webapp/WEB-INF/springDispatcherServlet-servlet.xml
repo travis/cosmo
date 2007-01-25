@@ -46,6 +46,7 @@
   class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
     <property name="exceptionMappings">
        <value>
+          org.osaf.cosmo.security.PermissionDeniedException=error_forbidden
           java.lang.Exception=error_exception
        </value>
     </property>
@@ -65,7 +66,7 @@
 	        /admin/status/*=statusController
         	/logout=logoutController
         	/login=loginController
-           	/browse/**=homeDirectoryBrowsingController
+           	/browse/**=accountBrowsingController
     	    /i18n.js=i18nController
     	    /js/cosmo/util/i18n.js=i18nController
     	    /account/activate=accountActivationController
@@ -130,36 +131,29 @@
 	<property name="gcView"><value>redirect:/admin/status/view</value></property>
 </bean>
 
-<!-- 
+<!-- Account browser -->
 
-	Controller for home directory browser
-
- -->
-
-<bean id="homeDirectoryBrowsingController" class="org.osaf.cosmo.spring.mvc.controllers.HomeDirectoryBrowsingController">
-	<property name="methodNameResolver"><ref bean="homeDirectoryBrowsingMethodNameResolver"/></property>
-	<property name="browseCollectionView"><value>browse_collection</value></property>
-	<property name="browseItemView"><value>browse_item</value></property>
-	<property name="eventView"><value>browse_event</value></property>
-	<property name="calendarView"><value>browse_calendar</value></property>
-	<property name="removeViewBase"><value>redirect:/browse</value></property>
-	<property name="revokeTicketBaseView"><value>redirect:/browse</value></property>
-	<property name="contentService"><ref bean="contentService" /></property>
+<bean id="accountBrowsingController" class="org.osaf.cosmo.ui.account.AccountBrowsingController">
+  <property name="methodNameResolver"><ref bean="accountBrowsingMethodNameResolver"/></property>
+  <property name="browseCollectionView"><value>browse_collection</value></property>
+  <property name="browseItemView"><value>browse_item</value></property>
+  <property name="eventView"><value>browse_event</value></property>
+  <property name="calendarView"><value>browse_calendar</value></property>
+  <property name="removeViewBase"><value>redirect:/browse</value></property>
+  <property name="revokeTicketBaseView"><value>redirect:/browse</value></property>
+  <property name="contentService"><ref bean="contentService" /></property>
+  <property name="securityManager"><ref bean="securityManager" /></property>
 </bean>
 
-<bean id="homeDirectoryBrowsingMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
-	<property name="alwaysUseFullPath">
-		<value>true</value>
-    </property>
-	<property name="mappings">
-		<value>
-		   	/browse=browse
-    		/browse/remove=remove
-    		/browse/view=view
-			/browse/download=download
-			/browse/ticket/revoke=revokeTicket
-		</value>	
-	</property>
+<bean id="accountBrowsingMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
+  <property name="alwaysUseFullPath"><value>true</value></property>
+  <property name="mappings"><value>
+    /browse=browse
+    /browse/remove=remove
+    /browse/view=view
+    /browse/download=download
+    /browse/ticket/revoke=revokeTicket
+  </value></property>
 </bean>
 
 <!-- 

@@ -15,9 +15,14 @@
  */
 package org.osaf.cosmo.eim.schema;
 
+import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import net.fortuna.ical4j.model.Date;
@@ -42,17 +47,31 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Converts between EIM field values and model values (mainly
  * iCalendar values used for events and tasks).
- *
+ * <p>
  * EIM text fields are often used to represented iCalendar property
- * values. Sometimes iCalendar properties are parameterized (for
- * example
- * <code>DTSTART:TZID=America/Los_Angeles;VALUE=DATE_TIME;20060120T120000</code>).
- * When parameters are included with a property value, they are
- * serialized as an EIM text value exactly according to iCalendar,
- * with properties separated by semicolons and with optional
- * doublequotes surrounding property values. Parameter and property
- * values are NOT wrapped according to iCalendar; any whitespace in
- * these values is considered to be significant.
+ * values. Sometimes iCalendar properties are parameterized. By
+ * convention, when parameters are included with a property value,
+ * they are serialized as an EIM text value using the same process as
+ * iCalendar. The resulting value looks like the equivalent iCalendar
+ * property without the leading property name. When parameters are
+ * present, the text value begins with a colon, each property
+ * name/value pair is separated by semicolons, and the last property
+ * is separated from the text value by a colon. When no parameters are
+ * present, the text value contains only the property value string
+ * itself. Parameter values may optionally be surrounded with double
+ * quotes. Parameter and property values are <em>not</em> wrapped
+ * according to iCalendar; any whitespace in these values is
+ * considered to be significant.
+ * <p>
+ * Examples:
+ * <dl>
+ * <dt><code>:TZID="America/Los_Angeles";VALUE=DATE_TIME:20060120T120000</code></dt>
+ * <dd>A value for an event record's <code>dtstart</code> field
+ * including properties, one with a double quoted value.</dd>
+ * <dt><code>20060120T120000</code></dt>
+ * <dd>A value for an event record's <code>dtstart</code> field
+ * without properties.
+ * </dl>
  */
 public class EimValueConverter implements EimSchemaConstants {
     private static final Log log =
@@ -175,11 +194,11 @@ public class EimValueConverter implements EimSchemaConstants {
     public static String fromIcalTrigger(Trigger trigger) {
         
         if(trigger.getDateTime()!=null)
-            return "VALUE=DATE-TIME;" + trigger.getDateTime().toString();
+            return ":VALUE=DATE-TIME:" + trigger.getDateTime().toString();
         
         Related related = (Related) trigger.getParameters().getParameter(Parameter.RELATED);
         if(related != null)
-            return related.toString() + ";" + trigger.getDuration().toString();
+            return ":" + related.toString() + ":" + trigger.getDuration().toString();
         else
             return trigger.getDuration().toString();
     }
@@ -210,12 +229,12 @@ public class EimValueConverter implements EimSchemaConstants {
         Related related = null;
         String propVal = null;
 
-        if (text.startsWith("VALUE=DATE-TIME;")) {
+        if (text.startsWith(":VALUE=DATE-TIME:")) {
             value = Value.DATE_TIME;
-            propVal = text.substring(16);
-        } else if (text.startsWith("RELATED=END")){
+            propVal = text.substring(17);
+        } else if (text.startsWith(":RELATED=END:")){
            related = Related.END;
-           propVal = text.substring(12);
+           propVal = text.substring(13);
         } else {
             propVal = text;
         }
@@ -260,7 +279,7 @@ public class EimValueConverter implements EimSchemaConstants {
     private static boolean validateDuration(String text) {
         return DURATION_PATTERN.matcher(text).matches();
     }
-    
+
     private static class ICalDate {
         private Value value;
         private TzId tzid;
@@ -271,29 +290,24 @@ public class EimValueConverter implements EimSchemaConstants {
 
         public ICalDate(String text)
             throws EimConversionException {
-            for (String param : text.split(";")) {
-                String[] parts = param.split("=");
-                if (parts.length == 2) {
-                    String value = parts[1];
-                    // trim doublequotes
-                    if (value.startsWith("\"")) {
-                        if (! value.endsWith("\""))
-                            throw new EimConversionException("Unbalanced quotes around value for parameter " + parts[0]);
-                        value = value.substring(1, value.length()-1);
-                    }
-                    if (parts[0].equals("VALUE"))
-                        parseValue(value);
-                    else if (parts[0].equals("TZID"))
-                        parseTzId(value);
-                    else
-                        throw new EimConversionException("Bad parameter " + parts[0]);
-                } else {
-                    text = param;
-                    parseDates(param);
-                }
+            ICalParser parser = new ICalParser(text);
+            parser.parse();
+
+            text = parser.getValue();
+
+            for (Entry<String, String> entry : parser.getParams().entrySet()) {
+                if (entry.getKey().equals("VALUE"))
+                    parseValue(entry.getValue());
+                else if (entry.getKey().equals("TZID"))
+                    parseTzId(entry.getValue());
+                else throw new EimConversionException("Unknown parameter " + entry.getKey());
             }
+
             if (value == null)
                 value = Value.DATE_TIME;
+
+            // requires parameters to be set
+            parseDates(text);
         }
 
         public ICalDate(Date date) {
@@ -357,11 +371,11 @@ public class EimValueConverter implements EimSchemaConstants {
         }
 
         public String toString() {
-            StringBuffer buf = new StringBuffer();
-            buf.append(value.toString()).append(";");
+            StringBuffer buf = new StringBuffer(":");
+            buf.append(value.toString());
             if (tzid != null)
-                buf.append("TZID=").append(tzid.getValue()).append(";");
-            buf.append(text);
+                buf.append(";").append("TZID=").append(tzid.getValue());
+            buf.append(":").append(text);
             return buf.toString();
         }
 
@@ -415,6 +429,93 @@ public class EimValueConverter implements EimSchemaConstants {
                 "Invalid iCalendar date value " :
                 "Invalid iCalendar date-time value ";
             return new EimConversionException(msg + value, e);
+        }
+    }
+
+    private static class ICalParser {
+        private StreamTokenizer tokenizer;
+        private String value;
+        private HashMap<String, String> params;
+
+        // tokenizer code based on ical4j's CalendarParserImpl
+
+        public ICalParser(String text) {
+            tokenizer = new StreamTokenizer(new StringReader(text));
+            value = text;
+            params = new HashMap<String, String>();
+
+            tokenizer.resetSyntax();
+            tokenizer.wordChars(32, 126);
+            tokenizer.whitespaceChars(0, 20);
+            tokenizer.ordinaryChar(':');
+            tokenizer.ordinaryChar(';');
+            tokenizer.ordinaryChar('=');
+            tokenizer.eolIsSignificant(false);
+            tokenizer.whitespaceChars(0, 0);
+            tokenizer.quoteChar('"');
+        }
+
+        public void parse()
+            throws EimConversionException {
+            try {
+                int nextToken = tokenizer.nextToken();
+                // log.debug("starting token: " + tokenizer);
+                if (nextToken != ':')
+                    return;
+
+                nextToken = tokenizer.nextToken();
+                while (nextToken != ':' &&
+                       nextToken != StreamTokenizer.TT_EOF) {
+                    // log.debug("param name token: " + tokenizer);
+                    if (nextToken != StreamTokenizer.TT_WORD)
+                        throw new EimConversionException("expected word, read " + tokenizer.ttype);
+                    String name = tokenizer.sval;
+
+                    nextToken = tokenizer.nextToken();
+                    // log.debug("param = token: " + tokenizer);
+                    if (nextToken != '=')
+                        throw new EimConversionException("expected =, read " + tokenizer.ttype);
+
+                    nextToken = tokenizer.nextToken();
+                    // log.debug("param val token: " + tokenizer);
+                    if (! (nextToken == StreamTokenizer.TT_WORD ||
+                           nextToken == '"'))
+                        throw new EimConversionException("expected word, read " + tokenizer.ttype);
+                    String value = tokenizer.sval;
+
+                    // log.debug("parameter " + name + ": " + value);
+
+                    params.put(name, value);
+
+                    nextToken = tokenizer.nextToken();
+                    // log.debug("post param token: " + tokenizer);
+
+                    if (nextToken == ':')
+                        break;
+                    else if (nextToken == ';')
+                        nextToken = tokenizer.nextToken();
+                    else
+                        throw new EimConversionException("expected either : or ;, read " + tokenizer.ttype);
+                }
+
+                nextToken = tokenizer.nextToken();
+                // log.debug("prop val token: " + tokenizer);
+                if (nextToken != StreamTokenizer.TT_WORD)
+                    throw new EimConversionException("expected " + StreamTokenizer.TT_WORD + ", read " + tokenizer.ttype);
+                value = tokenizer.sval;
+
+                // log.debug("property: " + value + ", params: " + params);
+            } catch (IOException e) {
+                throw new EimConversionException("Error reading ical string", e);
+            }
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public HashMap<String, String> getParams() {
+            return params;
         }
     }
 }

@@ -26,16 +26,13 @@ dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
 dojo.require("dojo.dom");
 dojo.require("dojo.date.serialize");
+dojo.require("dojo.uri.Uri");
 
 dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
 
 dojo.require("dojo.widget.FilteringTable");
 
-ASCENDING = "ascending";
-DESCENDING = "descending";
-DEFAULT_SORT_TYPE = "username";
-DEFAULT_SORT_ORDER = "ascending";
 
 dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringTable,
     {
@@ -54,6 +51,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         userCountIndicator: null,
 
         orderIndicator : null,
+        
+        ASCENDING : "ascending",
+        DESCENDING : "descending",
+        DEFAULT_SORT_TYPE : "username",
+        DEFAULT_SORT_ORDER : "ascending",
 
         createOrderIndicator : function(){
             var node = document.createElement("img")
@@ -76,10 +78,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         },
         
         setSortOrder : function(order){
-            if (order == DESCENDING){
+            if (order == this.DESCENDING){
                 this.sortOrder = order;
                 this.orderIndicator.setDescending();
-            } else if (order == ASCENDING){
+            } else if (order == this.ASCENDING){
                 this.sortOrder = order;
                 this.orderIndicator.setAscending();
             }
@@ -116,16 +118,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             cosmo.cmp.deleteUsers(usernames,
                 {load: function(type, data, evt){self.updateUserList()},
-                 error: function(type, error){alert("delete" + error)}
+                 error: function(type, error){alert("Could not delete user:" + error)}
                 }
                 );
         },
 
         loadCMPPage:function(cmpUrl){
-            var documentAddress = document.createElement("a");
-            documentAddress.setAttribute("href", cmpUrl)
-
-            var query = documentAddress.search.substring(1);
+            var documentAddress = new dojo.uri.Uri(cmpUrl);
+            
+            var query = documentAddress.query.substring(1);
             var vars = query.split("&");
 
             for (i=0; i < vars.length; i++){
@@ -244,7 +245,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         	cosmo.cmp.getUserCount({
         		load: setCountCallback,
         		error: function(type, error){
-        			alert(error.message);
+        			alert('Could not get user count: ' + error.message);
         		}
         	});
         	
@@ -256,6 +257,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         },
 
         onPageSizeChooserChange : function (evt){
+            if (evt.target.value == 0){
+                alert("Page size cannot be 0.");
+                evt.target.value = this.pageSize;
+                return;
+            }
             this.pageSize = evt.target.value;
             this.pageNumber = 1;
             this.updateUserList();
@@ -404,7 +410,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             cosmo.cmp.getUsers({
                 load: function(type, data, evt){self.updateUserListCallback(data, evt)},
-                 error: function(type, error){alert("update " + error.message)}
+                 error: function(type, error){alert("Could not update user list:" + error.message)}
                  },
                  this.pageNumber,
                  this.pageSize,
@@ -421,10 +427,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             var sortType = e.currentTarget.getAttribute("field");
 
             if (this.sortType == sortType){
-                if (this.sortOrder == ASCENDING){
-                    this.setSortOrder(DESCENDING);
+                if (this.sortOrder == this.ASCENDING){
+                    this.setSortOrder(this.DESCENDING);
                 } else {
-                    this.setSortOrder(ASCENDING);
+                    this.setSortOrder(this.ASCENDING);
                 }
             } else if (sortType) {
                 this.setSortType(sortType);
@@ -451,8 +457,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             //this.sortableTablePostCreate();
 
-            this.setSortType(DEFAULT_SORT_TYPE);
-            this.setSortOrder(DEFAULT_SORT_ORDER);
+            this.setSortType(this.DEFAULT_SORT_TYPE);
+            this.setSortOrder(this.DEFAULT_SORT_ORDER);
 
             var table = this.domNode;
 
@@ -464,7 +470,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             controls.appendChild(this.createUserCountIndicator());
 
             table.parentNode.insertBefore(controls, table);
-
+            
             dojo.event.topic.registerPublisher("/userListSelectionChanged", this, "renderSelections");
 
             this.updateUserList()

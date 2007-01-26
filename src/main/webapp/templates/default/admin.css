@@ -87,6 +87,7 @@ span#userCountIndicatorSpan {
 div#userListControls {
     font-size: 0.9em;
     height: 2em;
+    margin-top: 5px;
 }
 
 form.modifyUserForm {

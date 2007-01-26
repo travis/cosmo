@@ -37,6 +37,8 @@ public class CosmoDate implements Cloneable{
     private int hours = 0;
     private int minutes = 0;
     private int seconds = 0;
+    private int milliseconds = 0;
+    
     private boolean utc = false;
     private String tzId = null;
 
@@ -74,6 +76,14 @@ public class CosmoDate implements Cloneable{
 
     public void setSeconds(int seconds) {
         this.seconds = seconds;
+    }
+
+    public int getMilliseconds() {
+        return milliseconds;
+    }
+
+    public void setMilliseconds(int milliseconds) {
+        this.milliseconds = milliseconds;
     }
 
     public int getYear() {

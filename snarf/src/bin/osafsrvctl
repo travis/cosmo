@@ -55,7 +55,7 @@ CATALINA_BINDIR="$CATALINA_HOME"/bin
 TOMCAT_SCRIPT=catalina.sh
 
 # temp work-around until the maven 2 assembly plugin bug is fixed
-mkdir logs > /dev/null
+[ -d "logs" ] || mkdir logs
 chmod +x "$CATALINA_BINDIR"/*.sh
 
 # check that the tomcat control script exists

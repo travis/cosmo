@@ -21,9 +21,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.security.PermissionDeniedException;
 
 /**
  * A mock implementation of the {@link CosmoSecurityManager}
@@ -123,10 +125,16 @@ public class MockSecurityManager implements CosmoSecurityManager {
         }
         contexts.set(null);
     }
+    
+    public void checkPermission(Item item, int permission) throws PermissionDeniedException {
+        return; //TODO does this Mock need more?
+    }
 
     /**
      */
     protected CosmoSecurityContext createSecurityContext(Principal principal) {
         return new MockSecurityContext(principal);
     }
+
+
 }

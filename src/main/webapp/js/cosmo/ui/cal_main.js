@@ -16,26 +16,34 @@
 
 dojo.provide("cosmo.ui.cal_main");
 
-dojo.require("cosmo.util.date");
-dojo.require("cosmo.conduits");
+// -- Create global vars, do not remove despite lack of refs in code
 dojo.require("cosmo.ui.conf");
-dojo.require("cosmo.ui.minical");
-dojo.require("cosmo.ui.button");
 dojo.require("cosmo.util.i18n");
-dojo.require("cosmo.model");
-dojo.require("cosmo.ui.cal_form");
-dojo.require("cosmo.ui.contentcontainer");
+dojo.require('cosmo.convenience');
+// --
+
+// -- Weirdness that should be fixed
 dojo.require("cosmo.facade.pref");
 dojo.require("cosmo.service.json_service_impl");
 dojo.require("cosmo.legacy.cal_event");
+// -- 
+
+// -- Widget includes, may not always find proper namespaced refs
+// -- ie, cosmo:CollectionSelector 
+dojo.require("cosmo.ui.widget.CollectionSelector");
+// --
+
+dojo.require("cosmo.conduits");
+dojo.require("cosmo.model");
+dojo.require("cosmo.ui.cal_form");
+dojo.require("cosmo.ui.minical");
+dojo.require("cosmo.ui.button");
+dojo.require("cosmo.ui.contentcontainer");
 dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.Lozenge');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.account.create');
-dojo.require('cosmo.account.settings');
-dojo.require('cosmo.convenience');
-dojo.require('cosmo.ui.widget.CollectionSelector');
-dojo.require('cosmo.ui.widget.AuthBox');
+
 
 // Global variables for X and Y position for mouse
 xPos = 0;
@@ -245,7 +253,7 @@ cosmo.ui.cal_main.Cal = new function () {
         var mcDiv = document.getElementById('miniCalDiv');
         var jpDiv = document.getElementById('jumpToDateDiv');
         // Place jump-to date based on mini-cal pos
-        if (MiniCal.init(Cal, mcDiv)) {
+        if (cosmo.ui.minical.MiniCal.init(Cal, mcDiv)) {
            this.calForm.addJumpToDate(jpDiv);
         }
         
@@ -289,6 +297,7 @@ cosmo.ui.cal_main.Cal = new function () {
      * on the client window size
      */
     this.placeUI = function () {
+        var ContentContainer = cosmo.ui.contentcontainer.ContentContainer;
         var uiMain = new ContentContainer('calDiv');
         var uiMask = new ContentContainer('maskDiv');
         var uiProcessing = new ContentContainer('processingDiv');
@@ -667,7 +676,7 @@ cosmo.ui.cal_main.Cal = new function () {
         var rightClick = null;
         leftClick = function () { Cal.uiMask.show(); setTimeout('Cal.goView("back");', 300); }
         rightClick = function () { Cal.uiMask.show(); setTimeout('Cal.goView("next");', 300); }
-        navButtons = new NavButtonSet('viewNav', leftClick, rightClick);
+        navButtons = new cosmo.ui.button.NavButtonSet('viewNav', leftClick, rightClick);
         document.getElementById('viewNavButtons').appendChild(navButtons.domNode);
     };
     /**
@@ -685,7 +694,7 @@ cosmo.ui.cal_main.Cal = new function () {
         cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
         // Load and display events
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
-        MiniCal.render();
+        cosmo.ui.minical.MiniCal.render();
         Cal.uiMask.hide();
     };
     /**

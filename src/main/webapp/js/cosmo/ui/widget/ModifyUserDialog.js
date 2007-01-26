@@ -92,8 +92,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         editingUser : null,
         postActionHandlerDict : {handle: function(){}},
 
-        cmpProxy : cosmo.cmp.cmpProxy,
-
         hideInputs : function(){
             var inputs = this.removeInputs.split(",");
 
@@ -234,9 +232,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
 
             if (populateUsername){
-                   cosmo.cmp.cmpProxy.getUser(populateUsername, handlerDict);
+                   cosmo.cmp.getUser(populateUsername, handlerDict);
             } else {
-                cosmo.cmp.cmpProxy.getAccount(handlerDict);
+                cosmo.cmp.getAccount(handlerDict);
             }
         },
         
@@ -372,9 +370,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
             userHash.administrator = form.admin.checked;
 
             if (this.role == cosmo.ROLE_ADMINISTRATOR){
-                this.cmpProxy.modifyUser(this.editingUser.username, userHash, this.postActionHandlerDict)
+                cosmo.cmp.modifyUser(this.editingUser.username, userHash, this.postActionHandlerDict)
             } else if (this.role == cosmo.ROLE_AUTHENTICATED){
-                this.cmpProxy.modifyAccount(userHash, this.postActionHandlerDict)
+                cosmo.cmp.modifyAccount(userHash, this.postActionHandlerDict)
             }
         },
 
@@ -397,7 +395,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         	
             userHash = this.userHashFromForm(this.form)
 
-            cosmo.cmp.cmpProxy.signup(
+            cosmo.cmp.signup(
                         userHash,
                         this.postActionHandlerDict
                         )
@@ -412,7 +410,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
             var self = this
 
             //Check if user exists
-            cosmo.cmp.cmpProxy.headUser(this.form.username.value,
+            cosmo.cmp.headUser(this.form.username.value,
                 {handle : function(type, data, evt){
 
                     // a 404 means the user does not exist, so let's create it
@@ -420,7 +418,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
                         userHash = self.userHashFromForm(self.form)
 
-                        cosmo.cmp.cmpProxy.createUser(
+                        cosmo.cmp.createUser(
                                     userHash,
                                     self.postActionHandlerDict
                                     )

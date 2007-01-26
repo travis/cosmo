@@ -96,14 +96,14 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * These functions are sugar for getting the XML information and parsing
          * into a nice javascript object.
          */
-        _wrapXMLHandlerFunctions: function (handlerDict, newFunc){
+        _wrapXMLHandlerFunctions: function (handlerDict, xmlParseFunc){
             var self = this;
 
             if (handlerDict.load != undefined){
                 handlerDict.old_load = handlerDict.load
                 handlerDict.load = function(type, data, evt){
-
-                    handlerDict.old_load(type, self[newFunc](evt.responseXML, self), evt);
+                    var parsedCMPXML = xmlParseFunc.apply(self, [evt.responseXML])
+                    handlerDict.old_load(type, parsedCMPXML, evt);
                 }
             }
 			// Don't mess with "error". These responses shouldn't be XML.
@@ -111,22 +111,19 @@ dojo.declare("cosmo.cmp.Cmp", null,
         },
 
         getUser: function(username, handlerDict, sync) {
-            var self = this;
-            this._wrapXMLHandlerFunctions(handlerDict, '_cmpUserXMLToJSON');
+            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
 
             this.getUserXML(username, handlerDict, sync);
         },
 
         getUsers: function (handlerDict, pageNumber, pageSize, sortOrder, sortType, sync) {
-            var self = this;
-            this._wrapXMLHandlerFunctions(handlerDict, '_cmpUsersXMLToJSON');
+            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUsersXMLToJSON);
 
             this.getUsersXML(handlerDict, pageNumber, pageSize, sortOrder, sortType, sync);
         },
 
         getAccount: function (handlerDict, sync) {
-            var self = this;
-            this._wrapXMLHandlerFunctions(handlerDict, '_cmpUserXMLToJSON');
+            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
 
             this.getAccountXML(handlerDict, sync);
         },
@@ -259,7 +256,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
         signup: function (userHash, handlerDict, sync) {
             var self = this;
-            this._wrapXMLHandlerFunctions(handlerDict, '_cmpUserXMLToJSON');
+            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
 
             this.getSignupXML(userHash, handlerDict, sync);
         },
@@ -279,7 +276,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 			dojo.io.bind(requestDict);
         },
 
-        _cmpUserXMLToJSON: function (cmpUserXml){
+        cmpUserXMLToJSON: function (cmpUserXml){
             var user = cmpUserXml;
             var obj = {};
             obj.firstName = user.getElementsByTagName("firstName")[0].firstChild.nodeValue;
@@ -307,13 +304,13 @@ dojo.declare("cosmo.cmp.Cmp", null,
             return obj;
         },
 
-        _cmpUsersXMLToJSON: function (cmpUsersXml){
+        cmpUsersXMLToJSON: function (cmpUsersXml){
 
             var users = cmpUsersXml.getElementsByTagName("user");
             var userList = [];
 
             for (i = 0; i < users.length; i++){
-                userList[i] = this._cmpUserXMLToJSON(users[i]);
+                userList[i] = this.cmpUserXMLToJSON(users[i]);
             }
 
             return userList;
@@ -324,7 +321,4 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
 )
 
-cosmo.cmp.cmpProxy = new cosmo.cmp.Cmp();
-
-//Cmp is a singleton
-cosmo.cmp.Cmp = null;
+cosmo.cmp = new cosmo.cmp.Cmp();

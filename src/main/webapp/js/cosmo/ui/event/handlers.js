@@ -31,7 +31,7 @@
  */
 
 dojo.provide('cosmo.ui.event.handlers');
- 
+dojo.require('dojo.event.topic');
 /**
  * Generic function to get the source elem of a UI event
  * that has the desired attribute (e.g., id or some custom

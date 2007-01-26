@@ -90,7 +90,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWid
                 }
             }
 
-            cosmo.cmp.cmpProxy.getUserByActivationId(id, setActivationIdHandlerDict);
+            cosmo.cmp.getUserByActivationId(id, setActivationIdHandlerDict);
 
 
         },
@@ -110,7 +110,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWid
             if (activationId == "" || activationId == undefined){
                 throw new Error("Activation id not specified");
             } else {
-                cosmo.cmp.cmpProxy.activate(activationId, activateHandlerDict);
+                cosmo.cmp.activate(activationId, activateHandlerDict);
             }
         }
 

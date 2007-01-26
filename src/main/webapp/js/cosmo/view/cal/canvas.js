@@ -971,7 +971,8 @@ cosmo.view.cal.canvas = new function () {
         if (!initRender) {
             // Make the all-day event area resizeable
             // --------------
-            allDayArea = new ResizeArea('allDayResizeMainDiv', 'allDayResizeHandleDiv');
+            allDayArea = new cosmo.ui.resize_area.ResizeArea(
+                'allDayResizeMainDiv', 'allDayResizeHandleDiv');
             allDayArea.init('down');
             allDayArea.addAdjacent('timedScrollingMainDiv');
             allDayArea.setDragLimit();

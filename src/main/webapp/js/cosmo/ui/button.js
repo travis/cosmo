@@ -21,6 +21,7 @@
  */
 dojo.provide("cosmo.ui.button");
 dojo.require("cosmo.ui.conf");
+dojo.require("dojo.widget.*");
 
 function buttonPreload() {
     var btnSizes = ['', '_sm'];
@@ -173,6 +174,3 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
         document.getElementById(this.id + 'ButtonDivider').style.background = dividerColor;
     };
 }
-
-// FIXME: legacy, remove soon.
-NavButtonSet = cosmo.ui.button.NavButtonSet;

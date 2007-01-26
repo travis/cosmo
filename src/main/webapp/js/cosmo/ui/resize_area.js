@@ -16,6 +16,8 @@
 
 dojo.provide("cosmo.ui.resize_area");
 
+dojo.require("cosmo.app");
+
 cosmo.ui.resize_area.ResizeAreaAdjacent = function (div, origPos, origSize) {
     this.div = div;
     this.origPos = origPos;
@@ -100,4 +102,4 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
         }
     };
 }
-ResizeArea = cosmo.ui.resize_area.ResizeArea;
+

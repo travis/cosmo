@@ -25,9 +25,9 @@
  */
 dojo.provide("cosmo.ui.login");
 
+dojo.require("dojo.io.*");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
-var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.util.cookie");
 
 var Login = new function () {
@@ -78,7 +78,7 @@ var Login = new function () {
             self.showErr(err);
         }
         else {
-            Cookie.set('username', un);
+            cosmo.util.cookie.set('username', un);
             postData = { 'j_username': un, 'j_password': pw };
             dojo.io.bind({
                 url: self.authProc,

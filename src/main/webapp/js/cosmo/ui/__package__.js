@@ -22,12 +22,10 @@ dojo.kwCompoundRequire({
 		"cosmo.ui.cal_main",		
 		"cosmo.ui.conf",		
 		"cosmo.ui.contentcontainer",		
-		"cosmo.ui.dialog",		
 		"cosmo.ui.draggable",		
 		"cosmo.ui.login",		
 		"cosmo.ui.minical",		
 		"cosmo.ui.resize_area",		
-		"cosmo.ui.styler",		
 		]
 });
 

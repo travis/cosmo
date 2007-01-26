@@ -30,8 +30,8 @@
  * vert offset when area scrolls.
  */
  
- dojo.provide("cosmo.ui.draggable");
-
+dojo.provide("cosmo.ui.draggable");
+dojo.require("dojo.event.topic");
 /**
  * @object An event lozenge being dragged or resized
  */

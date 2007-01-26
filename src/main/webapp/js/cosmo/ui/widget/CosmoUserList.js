@@ -53,8 +53,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         cmpLast : null,
         userCountIndicator: null,
 
-        cmpProxy : cosmo.cmp.cmpProxy,
-
         orderIndicator : null,
 
         createOrderIndicator : function(){
@@ -116,7 +114,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             }
             self = this;
 
-            this.cmpProxy.deleteUsers(usernames,
+            cosmo.cmp.deleteUsers(usernames,
                 {load: function(type, data, evt){self.updateUserList()},
                  error: function(type, error){alert("delete" + error)}
                 }
@@ -243,7 +241,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 				self.userCountIndicator.innerHTML = data;
     	   	}
         	
-        	cosmo.cmp.cmpProxy.getUserCount({
+        	cosmo.cmp.getUserCount({
         		load: setCountCallback,
         		error: function(type, error){
         			alert(error.message);
@@ -404,7 +402,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             var self = this;
 
 
-            this.cmpProxy.getUsers({
+            cosmo.cmp.getUsers({
                 load: function(type, data, evt){self.updateUserListCallback(data, evt)},
                  error: function(type, error){alert("update " + error.message)}
                  },

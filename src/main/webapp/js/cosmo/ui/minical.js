@@ -620,5 +620,3 @@ cosmo.ui.minical.MiniCal = new function() {
         }
     };
 }
-
-MiniCal = cosmo.ui.minical.MiniCal;

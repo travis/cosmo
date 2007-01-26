@@ -17,7 +17,7 @@
 dojo.provide('cosmo.account.create');
 
 dojo.require("dojo.uri");
-dojo.require("dojo.html.common");
+dojo.require("dojo.widget.*");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
@@ -236,7 +236,7 @@ cosmo.account.create = new function () {
                 user[f.elemName] = form[f.elemName].value;
             }
             // Hand off to CMP
-            cosmo.cmp.cmpProxy.signup(user, hand);
+            cosmo.cmp.signup(user, hand);
         }
     };
     /**

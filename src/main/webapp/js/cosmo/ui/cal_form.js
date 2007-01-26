@@ -25,16 +25,18 @@
  * @object The form for all UI-form-elements on the page
  */
  
-dojo.require("cosmo.util.html");
-dojo.require("cosmo.util.date");
 dojo.require("dojo.string");
+dojo.require("dojo.lang");
+dojo.require("dojo.event.common");
+dojo.require("dojo.event.topic");
+dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.event.handlers");
-dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.model");
 dojo.require("cosmo.view.cal.canvas");
 dojo.require("cosmo.convenience");
+dojo.require("cosmo.ui.minical");
 
 dojo.provide("cosmo.ui.cal_form");
 
@@ -886,7 +888,7 @@ cosmo.ui.cal_form.CalForm = function () {
 
     };
     this.addJumpToDate = function (dMain) {
-        var top = parseInt(MiniCal.displayContext.style.top);
+        var top = parseInt(cosmo.ui.minical.MiniCal.displayContext.style.top);
         var d = null;
 
         // place the div just above minical

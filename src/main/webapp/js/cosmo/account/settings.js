@@ -15,7 +15,7 @@
 */
 dojo.provide("cosmo.account.settings");
 
-dojo.require("dojo.html.common");
+dojo.require("dojo.widget.*");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
@@ -103,7 +103,7 @@ cosmo.account.settings = new function () {
             var error = function (type, data, resp) { 
                 self.accountInfoLoadError(type, data, resp); };
             var hand = { load: success, error: error };
-            cosmo.cmp.cmpProxy.getAccount(hand, true);
+            cosmo.cmp.getAccount(hand, true);
             return;
         }
 
@@ -218,7 +218,7 @@ cosmo.account.settings = new function () {
                 }
             }
             // Hand off to CMP
-            cosmo.cmp.cmpProxy.modifyAccount(account, hand);
+            cosmo.cmp.modifyAccount(account, hand);
         }
     };
     /**

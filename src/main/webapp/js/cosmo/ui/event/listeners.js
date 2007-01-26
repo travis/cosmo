@@ -15,6 +15,7 @@
  */
 dojo.provide('cosmo.ui.event.listeners');
 
+dojo.require('dojo.event.browser');
 dojo.require('cosmo.ui.event.handlers');
 
 // Event listeners

@@ -58,6 +58,7 @@ dojo.require('cosmo.ui.global_css');
 dojo.require('cosmo.convenience');
 dojo.require('cosmo.topics');
 dojo.require('cosmo.account.preferences');
+dojo.require('cosmo.account.settings');
 
 // Added automatically to window.onload by 
 // cosmo.ui.event.listeners.hookUpListeners

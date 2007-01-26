@@ -22,6 +22,9 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.topics");
+dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
+dojo.require("cosmo.ui.widget.AuthBox");
+
 
 dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector", 
     dojo.widget.HtmlWidget,

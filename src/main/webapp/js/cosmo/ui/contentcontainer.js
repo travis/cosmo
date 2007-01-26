@@ -75,4 +75,3 @@ cosmo.ui.contentcontainer.ContentContainer = function(id) {
         elem.appendChild(elemInput);
     };
 }
-ContentContainer = cosmo.ui.contentcontainer.ContentContainer;

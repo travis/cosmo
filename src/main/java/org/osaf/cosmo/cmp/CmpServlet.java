@@ -211,6 +211,12 @@ public class CmpServlet extends HttpServlet {
                 }
 
                 // /user/<username>/service
+                if (! (securityManager.getSecurityContext().isAdmin() ||
+                       securityManager.getSecurityContext().getUser().equals(user))) {
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    return;
+                }
+
                 ServiceLocator locator =
                     serviceLocatorFactory.createServiceLocator(req);
                 UserServiceResource resource =

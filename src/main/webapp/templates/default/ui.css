@@ -382,6 +382,10 @@ $smButtonHeight = 18px
     clear:both;
     font-size:0px;
 }
+.clearBoth {
+    clear:both;
+    font-size:0px;
+}
 
 /* Tables, data display */
 table.dataDisplay {
@@ -694,11 +698,6 @@ td.dataDisplayLabel {
     padding-left:12px;
     padding-right:8px;
     padding-top:6px;
-}
-
-/* "Email this event" link */
-#emailThisEventDiv {
-    text-align:right;
 }
 
 /* Fake popup for modal dialog box

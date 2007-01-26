@@ -221,7 +221,16 @@ cosmo.ui.cal_main.Cal = new function () {
         
         // Sort the collections, for Pete's sake
         var f = function (a, b) {
-            return (a.displayName.toLowerCase() >= b.displayName.toLowerCase()) ? 1 : -1;
+            var aName = a.displayName.toLowerCase();
+            var bName = b.displayName.toLowerCase();
+            var r = 0;
+            if (aName == bName) {
+                r = (a.collection.uid > b.collection.uid) ? 1 : -1;
+            }
+            else {
+                r = (aName > bName) ? 1 : -1;
+            }
+            return r;
         };
         this.currentCollections.sort(f); 
 

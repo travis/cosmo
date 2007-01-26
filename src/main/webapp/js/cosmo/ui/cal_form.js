@@ -46,6 +46,7 @@ cosmo.ui.cal_form.CalForm = function () {
     var saveButton = null;
     var removeButton = null;
     var _html = cosmo.util.html;
+    var topBarHeight = 18;
 
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
 
@@ -81,6 +82,7 @@ cosmo.ui.cal_form.CalForm = function () {
             case 'eventsDisplaySuccess':
                 self.updateFromEvent(ev);
                 self.setButtons(true, true);
+                toggleReadOnlyIcon();
                 break;
             case 'saveFromForm':
                 saveCalEvent(ev);
@@ -110,10 +112,20 @@ cosmo.ui.cal_form.CalForm = function () {
                 break;
         }
     };
-
+    
+    function toggleReadOnlyIcon() {
+        var icon = $('readOnlyIcon');
+        if (Cal.currentCollection.privileges.write) {
+            icon.style.display = 'none'; 
+        }
+        else {
+            icon.style.display = 'block'; 
+        }
+    }
+    
     // The actual form DOM elem -- form.form is redundant, so
     // changing this to formElem would be a Good Thing
-    this.form = document.getElementById('calForm');
+    this.form = $('calForm');
 
     /**
      * Holdover from when we used object-literal notation
@@ -124,17 +136,32 @@ cosmo.ui.cal_form.CalForm = function () {
         this.createButtons(true, true);
     };
     this.appendElements = function () {
-        var info = document.getElementById('eventInfoDiv');
-        var cont = document.createElement('div');
-        var d = document.createElement('div');
+        var info = $('eventInfoDiv');
+        var cont = _createElem('div');
+        var d = _createElem('div');
+        var topBar = _createElem('div');
         var elem = null;
         var elemFloat = null;
         var formElem = null;
         
         cont.id = 'eventInfoDivContent';
+        topBar.style.height = topBarHeight + 'px';
+
+        // Read-only item icon
+        elem = _createElem('div');
+        elem.id = 'readOnlyIcon';
+        elem.appendChild(_html.nbsp());
+        var i = _createElem('img');
+        i.src = cosmo.env.getImagesUrl() + 'read_only_item.png';
+        i.alt = _('Main.DetailForm.ReadOnly');
+        i.title = _('Main.DetailForm.ReadOnly');
+        elem.appendChild(i);
+        elem.className = 'floatRight';
+        elem.style.display = 'none';
+        topBar.appendChild(elem);
         
         // 'E-mail this event' link
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.id = 'emailThisEventDiv';
         this.mailtoLink = _createElem("a");
         this.mailtoLink.href = "#";
@@ -142,25 +169,35 @@ cosmo.ui.cal_form.CalForm = function () {
         this.mailtoLink.appendChild(
             _createText(_('Main.DetailForm.EMail')));
         elem.appendChild(this.mailtoLink);
-        d.appendChild(elem);
+        elem.className = 'floatRight';
+        elem.style.height =  topBarHeight + 'px';
+        elem.style.lineHeight =  topBarHeight + 'px';
+        elem.style.verticalAlign = 'middle';
+        topBar.appendChild(elem);
+        
+        elem = _createElem('div');
+        elem.className = 'clearBoth';
+        topBar.appendChild(elem);
+        
+        d.appendChild(topBar);
 
         // Event title
         this.createLabel(_(
             'Main.DetailForm.Title'), d);
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.className = 'formElem';
         _html.createInput('text', 'eventtitle', 'eventtitle',
             28, 100, null, 'inputText', elem);
         d.appendChild(elem);
 
         // All-day checkbox
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.className = 'formElem';
         _html.createInput('checkbox', 'eventallday', 'eventallday',
             null, null, 'true', null, elem);
         _html.appendNbsp(elem);
         _html.appendNbsp(elem);
-        elem.appendChild(document.createTextNode('All day'));
+        elem.appendChild(_createText('All day'));
         d.appendChild(elem);
 
         // Start
@@ -174,7 +211,7 @@ cosmo.ui.cal_form.CalForm = function () {
 
         // Event status
         this.createLabel('Status', d);
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.className = 'formElem';
         _html.createSelect('status', 'status', null, null,
             this.getStatusOpt(), 'selectElem', elem);
@@ -184,13 +221,13 @@ cosmo.ui.cal_form.CalForm = function () {
         // ------------------------
         // Recurrence date
         this.createLabel('Occurs', d);
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.className = 'formElem';
         _html.createSelect('recurrence', 'recurrence', null, null,
             this.getRecurOpt(), 'selectElem', elem);
 
         _html.appendNbsp(elem);
-        elem.appendChild(document.createTextNode('ending'));
+        elem.appendChild(_createText('ending'));
         _html.appendNbsp(elem);
 
         // Recurrence ending
@@ -202,9 +239,9 @@ cosmo.ui.cal_form.CalForm = function () {
         // Details textarea
         this.createLabel(_(
             'Main.DetailForm.Description'), d);
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.className = 'formElem';
-        formElem = document.createElement('textarea');
+        formElem = _createElem('textarea');
         formElem.className = 'inputText';
         formElem.id = 'eventdescr';
         formElem.name = 'eventdescr';
@@ -215,22 +252,22 @@ cosmo.ui.cal_form.CalForm = function () {
         d.appendChild(elem);
 
         // Div elements for Remove and Save buttons
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.id = 'eventDetailSave';
         elem.className = 'floatRight';
         d.appendChild(elem);
 
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.className = 'floatRight';
         _html.appendNbsp(elem);
         d.appendChild(elem);
 
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.id = 'eventDetailRemove';
         elem.className = 'floatRight';
         d.appendChild(elem);
 
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.className = 'clearAll';
         d.appendChild(elem);
 
@@ -243,13 +280,13 @@ cosmo.ui.cal_form.CalForm = function () {
         var elem = null;
         this.createLabel(_(
             'Main.DetailForm.' + label), d);
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.className = 'formElem';
         elem.style.whiteSpace = 'nowrap';
         _html.createInput('text', name + 'date', name + 'date',
             10, 10, null, 'inputText', elem);
         _html.appendNbsp(elem);
-        elem.appendChild(document.createTextNode(
+        elem.appendChild(_createText(
             _('Main.DetailForm.At')));
         _html.appendNbsp(elem);
         _html.createInput('text', name + 'time', name + 'time',
@@ -259,14 +296,14 @@ cosmo.ui.cal_form.CalForm = function () {
         _html.createInput('radio', name + 'ap', name + 'ap', null,
             null, 1, null, elem);
         _html.appendNbsp(elem);
-        elem.appendChild(document.createTextNode(
+        elem.appendChild(_createText(
             _('App.AM')));
         _html.appendNbsp(elem);
         _html.appendNbsp(elem);
         _html.createInput('radio', name + 'ap', name + 'ap', null,
             null, 2, null, elem);
         _html.appendNbsp(elem);
-        elem.appendChild(document.createTextNode(
+        elem.appendChild(_createText(
             _('App.PM')));
         d.appendChild(elem);
     };
@@ -277,7 +314,7 @@ cosmo.ui.cal_form.CalForm = function () {
         //create the main label
         this.createLabel(_(
             'Main.DetailForm.Timezone'), d);
-        elem = document.createElement('div');
+        elem = _createElem('div');
         elem.className = 'formElem';
         elem.style.whiteSpace = 'nowrap';
 
@@ -356,9 +393,9 @@ cosmo.ui.cal_form.CalForm = function () {
     };
 
     this.createLabel = function (str, d) {
-        var elem = document.createElement('div');
+        var elem = _createElem('div');
         elem.className = 'labelTextVert';
-        elem.appendChild(document.createTextNode((str)));
+        elem.appendChild(_createText((str)));
         if (d) {
             d.appendChild(elem);
             return true;
@@ -403,16 +440,16 @@ cosmo.ui.cal_form.CalForm = function () {
         saveButton = new Button('savebutton', 74,
             f, _('App.Button.Save'));
 
-        checkElem = document.getElementById('removeButton');
+        checkElem = $('removeButton');
         if (checkElem) {
             checkElem.parentNode.removeChild(checkElem);
         }
-        checkElem = document.getElementById('savebutton');
+        checkElem = $('savebutton');
         if (checkElem) {
             checkElem.parentNode.removeChild(checkElem);
         }
-        document.getElementById('eventDetailRemove').appendChild(removeButton.domNode);
-        document.getElementById('eventDetailSave').appendChild(saveButton.domNode);
+        $('eventDetailRemove').appendChild(removeButton.domNode);
+        $('eventDetailSave').appendChild(saveButton.domNode);
     };
     /**
      *
@@ -851,8 +888,8 @@ cosmo.ui.cal_form.CalForm = function () {
      */
     this.setEventListeners = function () {
         var inputs = document.getElementsByTagName('input');
-        var descrTxt = document.getElementById('eventdescr');
-        var allDayCheck = document.getElementById('eventallday');
+        var descrTxt = $('eventdescr');
+        var allDayCheck = $('eventallday');
         var form = Cal.calForm.form;
 
         // Add dummy function event listener so form doesn't
@@ -878,7 +915,7 @@ cosmo.ui.cal_form.CalForm = function () {
         // All-day event / normal event toggling
         allDayCheck.onclick = function () { Cal.calForm.toggleLozengeType() };
 
-        var regionSelectorElement = document.getElementById("tzRegion");
+        var regionSelectorElement = $("tzRegion");
         dojo.event.connect(regionSelectorElement, "onchange", this.handleRegionChanged);
 
         dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, Cal, Cal.handleCollectionUpdated);
@@ -894,21 +931,21 @@ cosmo.ui.cal_form.CalForm = function () {
         // place the div just above minical
         top -= 28;
         dMain.style.top = top + 'px';
-        var dc = document.createElement('div');
+        var dc = _createElem('div');
         dMain.appendChild(dc);
 
-        d = document.createElement('div');
+        d = _createElem('div');
         d.className = 'floatLeft';
         d.style.paddingTop = '3px';
-        d.appendChild(document.createTextNode(_('Main.GoTo')));
+        d.appendChild(_createText(_('Main.GoTo')));
         dc.appendChild(d);
 
-        d = document.createElement('div');
+        d = _createElem('div');
         d.className = 'floatLeft';
         _html.appendNbsp(d);
         dc.appendChild(d);
 
-        d = document.createElement('div');
+        d = _createElem('div');
         d.className = 'formElem floatLeft';
         dc.appendChild(d);
         _html.createInput('text', 'jumpto', 'jumpto',
@@ -916,20 +953,20 @@ cosmo.ui.cal_form.CalForm = function () {
         self.setTextInput(self.form.jumpto, 'mm/dd/yyyy', true, false);
         self.form.jumpto.onclick = Cal.calForm.emptyTextInput;
         
-        d = document.createElement('div');
+        d = _createElem('div');
         d.className = 'floatLeft';
         _html.appendNbsp(d);
         _html.appendNbsp(d);
         dc.appendChild(d);
 
-        d = document.createElement('div');
+        d = _createElem('div');
         d.className = 'floatLeft';
         dc.appendChild(d);
         butJump = new Button('jumpToButton', 32, Cal.calForm.goJumpToDate,
                 _('App.Button.Go'), true);
         d.appendChild(butJump.domNode);
 
-        d = document.createElement('div');
+        d = _createElem('div');
         d.className = 'clearAll';
         dc.appendChild(d);
 

@@ -145,6 +145,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 var collIcon = cosmo.util.html.createRollOverMouseDownImage(
                     cosmo.env.getImagesUrl() + 'collection_' + imgPath + ".png");
                 collIcon.style.cursor = 'pointer';
+                collIcon.alt = imgTitle;
                 collIcon.title = imgTitle;
                 dojo.event.connect(collIcon, 'onclick', f);
                 // Img is an actual DOM element, so you set the vertical-align

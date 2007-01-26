@@ -157,18 +157,6 @@ public class CosmoToICalendarConverter {
         dateProp.getParameters().add(Value.DATE);
     }
 
-/*   protected void setDateAndTimezone(DateProperty destDateProp,
-            CosmoDate sourceDate, DateProperty sourceForTimeZone,
-            boolean dateTime) {
-        if (dateTime){
-            setDateTime(destDateProp, sourceDate);
-            copyTimeZone(sourceForTimeZone, destDateProp);
-        } else {
-            setDate(destDateProp, sourceDate);
-        }
-
-    }*/
-
     protected void setDateOrDatetime(DateProperty destProp,
             CosmoDate sourceDate, boolean dateTime) {
         if (dateTime){
@@ -286,15 +274,6 @@ public class CosmoToICalendarConverter {
             status = new Status();
             status.setValue(event.getStatus());
         }
-
-        /*if (dateTime) {
-            if (dtStartOld != null && dtStart != null) {
-                copyTimeZone(dtStartOld, dtStart);
-            }
-            if (dtEndOld != null && dtEnd != null) {
-                copyTimeZone(dtEndHasDuration ? dtStartOld : dtEndOld, dtEnd);
-            }
-        }*/
 
         addOrReplaceProperty(vevent, description);
         addOrReplaceProperty(vevent, summary);

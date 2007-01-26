@@ -309,8 +309,10 @@ cosmo.view.cal.canvas = new function () {
             else if (cmd.qualifier.offCanvas) {
                 removeEvent(ev);
             }
+            // Neither off-canvas nor on-canvas flag set
             else {
-                throw 'cmd.qualifier is not properly set.';
+                // Event has one of either start or end date
+                // off-canvas, but not both
             }
         }
         // Don't re-render when requests are still processing

@@ -531,11 +531,15 @@ public class CmpServlet extends HttpServlet {
         try {
             if (pagingParameterMap.containsKey(
                     PageCriteria.PAGE_SIZE_URL_KEY)) {
-
-                pageCriteria.setPageSize(
-                        Integer.parseInt(
-                                pagingParameterMap.get(
-                                        PageCriteria.PAGE_SIZE_URL_KEY)[0]));
+                
+                int pageSize = Integer.parseInt(
+                        pagingParameterMap.get(
+                                PageCriteria.PAGE_SIZE_URL_KEY)[0]);
+                                
+                if (pageSize == 0){
+                    throw new CmpException("Page size cannot be 0.");
+                }
+                pageCriteria.setPageSize(pageSize);
             }
         } catch (NumberFormatException e){
             throw new CmpException(

@@ -48,24 +48,30 @@ buttonPreload();
  * for endcaps and a stretchable, tiling middle section. Comes in
  * two sizes, normal and small.
  */
-cosmo.ui.button.Button = function(elemId, width, onClickHandler, displayText, isSmall) {
-    //if you don't do this dummyDom business, the page reflows and scrollbars
-    //are reset
+cosmo.ui.button.Button = function(elemId, width, onClickHandler, 
+    displayText, isSmall, isDisabled) {
+
+    // If you don't do this dummyDom business, the page reflows and 
+    // scrollbars are reset
     var dummyDom = document.createElement('span');
     var widget = null;
+    var enabled = isDisabled == true ? false : true;
     
     // Allow instantiation from obj/keyword param
     if (typeof arguments[0] == 'object') {
-        widget =  dojo.widget.createWidget("cosmo:Button", arguments[0], dummyDom, 'last');
+        widget =  dojo.widget.createWidget("cosmo:Button", 
+            arguments[0], dummyDom, 'last');
     }
     // Normal params in order
     else {
-        // Note: This throws away elemId in favor of the incremented widget ID
-        widget =  dojo.widget.createWidget("cosmo:Button", { text: displayText, 'width':width,
-            handleOnClick: onClickHandler, small: isSmall }, dummyDom, 'last');
+        // Note: This throws away elemId in favor of the 
+        // incremented widget ID
+        widget =  dojo.widget.createWidget("cosmo:Button", { 
+            text: displayText, 'width':width, 
+            handleOnClick: onClickHandler, small: isSmall, 
+            enabled: enabled }, dummyDom, 'last');
     }
     dummyDom.removeChild(widget.domNode);
-
     return widget;
 }
 

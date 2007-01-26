@@ -65,12 +65,12 @@ cosmo.view.cal.dialog = new function() {
         
         'allEventsDisabled': function(){
             return new Button('allButtonDialog', btnWideWidth, 
-                null, allEventsMsg, true);
+                null, allEventsMsg, true, true);
         },
         
         'futureEventsDisabled': function(){
             return new Button('allFutureButtonDialog', btnWiderWidth, 
-                null, AllFutureMsg, true);
+                null, AllFutureMsg, true, true);
         }
     };
     

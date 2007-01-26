@@ -89,7 +89,8 @@ dojo.widget.HtmlWidget, function(){
         clientsToProtocols: {
             Chandler: "pim",
             iCal: "webcal",
-            FeedReader: "atom"
+            FeedReader: "atom",
+            Download: "webcal"
         },
 
         // Lifecycle functions
@@ -146,10 +147,11 @@ dojo.widget.HtmlWidget, function(){
         //handles when the user selects a client
         _handleClientChanged: function(){
             var client = this._getClientChoice();
-            if (client =="Download"){
+            if (client == "Download"){
+                this._setClientCollectionAddress(client);
                 this._showClientInstructionsAndAddress(true, true);
                 this._setClientInstructions(client);
-            } else if (client =="Other"){
+            } else if (client == "Other"){
                 this._showClientInstructionsAndAddress(false, false);
                 this._showProtocolRows(true);
             } else {

@@ -28,6 +28,7 @@
 dojo.provide('cosmo.view.cal.Lozenge');
 
 dojo.require("cosmo.view.cal");
+dojo.require("cosmo.view.cal.canvas");
 
 /**
  * @object A visual lozenge to represent the span of time of a calendar
@@ -197,36 +198,37 @@ cosmo.view.cal.Lozenge.prototype.setLozengeAppearance = function (stateId) {
         Cal.ID_SEPARATOR + ev.id);
     var titleDiv = document.getElementById(this.divId + 'Title' +
         Cal.ID_SEPARATOR + ev.id);
+    colors = cosmo.view.cal.canvas.colors;
 
     // If this lozenge is processing, change to 'processing' color
     switch (stateId) {
         // Selected
         case 1:
             if (useLightColor) {
-                textColor = '#0064cb';
-                borderColor = '#3398ff';
-                lozengeColor = '#bedeff';
+                textColor = colors['darkSel'];
+                borderColor = colors['darkUnsel'];
+                lozengeColor = colors['lightSel'];
                 imgPath = '';
             }
             else {
                 textColor = '#ffffff';
                 borderColor = '#ffffff';
-                lozengeColor = '#0064cb';
+                lozengeColor = colors['darkSel'];
                 imgPath = cosmo.env.getImagesUrl() + 'block_gradient_dark.png';
             }
             break;
         // Unselected
         case 2:
             if (useLightColor) {
-                textColor = '#0064cb';
-                borderColor = '#3398ff';
-                lozengeColor = '#e6f2ff';
+                textColor = colors['darkSel'];
+                borderColor = colors['darkUnsel'];
+                lozengeColor = colors['lightUnsel'];
                 imgPath = '';
             }
             else {
                 textColor = '#ffffff';
                 borderColor = '#ffffff';
-                lozengeColor = '#3398ff';
+                lozengeColor = colors['darkUnsel'];
                 imgPath = cosmo.env.getImagesUrl() + 'block_gradient_light.png';
             }
             break;
@@ -234,7 +236,7 @@ cosmo.view.cal.Lozenge.prototype.setLozengeAppearance = function (stateId) {
         case 3:
             textColor = '#ffffff';
             borderColor = '#ffffff';
-            lozengeColor = '#9fd1fc';
+            lozengeColor = colors['proc'];
             imgPath = '';
             break;
         default:

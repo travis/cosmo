@@ -17,6 +17,7 @@
 dojo.provide('cosmo.view.cal.canvas');
 
 dojo.require('dojo.event.*');
+dojo.require("dojo.gfx.color.hsv");
 dojo.require("cosmo.util.date");
 dojo.require('cosmo.ui.event.handlers');
 dojo.require('cosmo.ui.draggable');
@@ -37,7 +38,9 @@ cosmo.view.cal.canvas = new function () {
     var initRender = false; 
     // Resizeable area for all-day events -- a ResizeArea obj
     var allDayArea = null; 
-    
+    // Blue, green, red, orange, gold, plum, turquoise, fuschia, indigo
+    var hues = [210, 120, 0, 30, 50, 300, 170, 330, 270];
+
     // Avoid RSI
     function $(id) {
         return document.getElementById(id);
@@ -660,6 +663,7 @@ cosmo.view.cal.canvas = new function () {
     this.eventRegistry = new Hash();
     // Currently selected event
     this.selectedEvent = null;
+    this.colors = {};
     
     // Public methods
     // ****************
@@ -1026,6 +1030,29 @@ cosmo.view.cal.canvas = new function () {
      */
     this.getSelectedEvent = function () {
         return self.selectedEvent;
+    };
+    this.calcColors = function () {
+        var getRGB = function (h, s, v) {
+            var rgb = dojo.gfx.color.hsv2rgb(h, s, v, { 
+                inputRange: [360, 100, 100], outputRange: 255 });
+            return 'rgb(' + rgb.join() + ')';
+        }
+        var lozengeColors = {};
+        var sel = cosmo.ui.cal_main.Cal.calForm.form.calSelectElem;
+        var index = sel ? sel.selectedIndex : 0;
+        var hue = hues[index];
+        
+        var o = {
+            darkSel: [100, 80],
+            darkUnsel: [100, 80],
+            lightSel: [25, 100], 
+            lightUnsel: [10, 100],
+            proc: [30, 90]
+        };
+        for (var p in o) {
+            lozengeColors[p] = getRGB(hue, o[p][0], o[p][1]);
+        }
+        this.colors = lozengeColors;
     };
     /**
      * Clean up event listeners and DOM refs

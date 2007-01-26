@@ -246,7 +246,10 @@ cosmo.ui.cal_main.Cal = new function () {
                 'collections': this.currentCollections, 
                 'currentCollection': this.currentCollection,
                 'ticketKey': ticketKey,
-                'selectFunction': function(){var f = Cal.goSelCal; Cal.showMaskDelayNav(f); }
+                'selectFunction': function () {
+                    cosmo.view.cal.canvas.calcColors();
+                    var f = Cal.goSelCal; 
+                    Cal.showMaskDelayNav(f); }
             }, this._collectionSelectContainer, 'last');
 
         // Load minical and jump-to date
@@ -257,6 +260,9 @@ cosmo.ui.cal_main.Cal = new function () {
            this.calForm.addJumpToDate(jpDiv);
         }
         
+        // Initialize the color set for the cal lozenges
+        cosmo.view.cal.canvas.calcColors();
+
         // Load and display events
         // --------------
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);

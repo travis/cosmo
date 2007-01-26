@@ -178,12 +178,16 @@ public class ICalendarUtils {
     }
 
     public static void addOrReplaceProperty(Component component, Property property){
-        Property oldProp = component.getProperties().getProperty(property.getName());
+        removeProperty(component, property.getName());
+
+        component.getProperties().add(property);
+    }
+
+    public static void removeProperty(Component component, String propertyName) {
+        Property oldProp = component.getProperties().getProperty(propertyName);
         if (oldProp != null){
             component.getProperties().remove(oldProp);
         }
-
-        component.getProperties().add(property);
     }
 
     /**

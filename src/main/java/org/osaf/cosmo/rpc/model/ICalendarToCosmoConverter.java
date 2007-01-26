@@ -70,6 +70,7 @@ public class ICalendarToCosmoConverter {
     public static final String EVENT_END = "end";
     public static final String EVENT_TITLE = "title";
     public static final String EVENT_STATUS = "status";
+    public static final String EVENT_ANYTIME = "anyTime";
 
     /**
      * Garden variety no-arg contructor
@@ -239,46 +240,46 @@ public class ICalendarToCosmoConverter {
         return (Event[]) events.toArray(new Event[events.size()]);
     }
 
-    public List<Event> expandEvent(Event event, VEvent vevent,
+    public List<Event> expandEvent(Event masterEvent, VEvent masterVEvent,
             net.fortuna.ical4j.model.Calendar calendar, DateTime rangeStart,
             DateTime rangeEnd) {
         OverridingInstanceFetcher fetcher = new OverridingInstanceFetcher(calendar);
-        Date masterStartDate = vevent.getStartDate().getDate();
+        Date masterStartDate = masterVEvent.getStartDate().getDate();
 
         List<Event> events = new ArrayList<Event>();
 
         // first let's see if the master event should go in the list.
-        if (isEventInRange(vevent, rangeStart, rangeEnd)) {
-            events.add(event);
+        if (isEventInRange(masterVEvent, rangeStart, rangeEnd)) {
+            events.add(masterEvent);
         }
 
         // let's recur!
-        RRule rrule = (RRule) vevent.getProperties()
+        RRule masterRRule = (RRule) masterVEvent.getProperties()
                 .getProperty(Property.RRULE);
-        Recur recur = rrule.getRecur();
+        Recur recur = masterRRule.getRecur();
 
         Value dateOrDateTime = null;
-        if (event.isAllDay() || event.isAnyTime()) {
+        if (masterEvent.isAllDay() || masterEvent.isAnyTime()) {
             dateOrDateTime = Value.DATE;
         } else {
             dateOrDateTime = Value.DATE_TIME;
         }
 
-        ExDate exDate =  (ExDate)vevent.getProperties().getProperty(Property.EXDATE);
+        ExDate exDate =  (ExDate)masterVEvent.getProperties().getProperty(Property.EXDATE);
         DateList exDates = exDate != null ? exDate.getDates() : null;
-        DateList startDateList = getExpandedDates(recur, exDates, vevent
+        DateList startDateList = getExpandedDates(recur, exDates, masterVEvent
                 .getStartDate().getDate(), rangeStart, rangeEnd, dateOrDateTime);
 
         long duration = -1;
-        if (event.isPointInTime()){
+        if (masterEvent.isPointInTime()){
             duration = 0;
-        } else if (event.getEnd() != null) {
-            long startTime = vevent.getStartDate().getDate().getTime();
-            long endTime = vevent.getEndDate().getDate().getTime();
+        } else if (masterEvent.getEnd() != null) {
+            long startTime = masterVEvent.getStartDate().getDate().getTime();
+            long endTime = masterVEvent.getEndDate().getDate().getTime();
             duration = endTime - startTime;
         }
 
-        String tzid = getParameterValue(vevent.getStartDate(),
+        String tzid = getParameterValue(masterVEvent.getStartDate(),
                 Parameter.TZID);
         TimeZone masterTimezone = null;
         if (masterStartDate instanceof DateTime) {
@@ -286,93 +287,57 @@ public class ICalendarToCosmoConverter {
             masterTimezone = masterStartDateTime.getTimeZone();
         }
         for (int x = 0; x < startDateList.size(); x++) {
-            net.fortuna.ical4j.model.Date instanceStartDate = (net.fortuna.ical4j.model.Date)
-            startDateList.get(x);
+            net.fortuna.ical4j.model.Date instanceStartDate = (net.fortuna.ical4j.model.Date) startDateList
+                    .get(x);
 
             if (instanceStartDate instanceof DateTime && masterTimezone != null) {
                 DateTime instanceStartDateTime = (DateTime) instanceStartDate;
                 instanceStartDateTime.setTimeZone(masterTimezone);
             }
 
-                Event instance = new Event();
-                instance.setId(event.getId());
-                instance.setTitle(event.getTitle());
-                instance.setDescription(event.getDescription());
-                instance.setAllDay(event.isAllDay());
-                instance.setAnyTime(event.isAnyTime());
-                instance.setStatus(event.getStatus());
+            VEvent vInstance = (VEvent) masterVEvent.copy();
+
+            // deal with DTSTART
+            vInstance.getStartDate().setDate(instanceStartDate);
+
+            if (vInstance.getEndDate() != null) {
+                long startTime = vInstance.getStartDate().getDate().getTime();
+                vInstance.getEndDate().getDate().setTime(startTime + duration);
+            }
+
+            // let's add any individual instance modifications that may exist
+            VEvent modificationVEvent = fetcher.getInstance(instanceStartDate);
+            if (modificationVEvent != null) {
+                copyModifiedProperties(modificationVEvent, vInstance, calendar);
+                if (!ICalendarUtils.hasProperty(modificationVEvent, Property.RRULE)){
+                    ICalendarUtils.removeProperty(vInstance, Property.RRULE);
+                }
+            }
+            Event instance = createEvent(masterEvent.getId(), vInstance,
+                    calendar);
+            if (instance.getRecurrenceRule() == null){
+                instance.setRecurrenceRule(masterEvent.getRecurrenceRule());
+            }
+            if (instanceStartDate.equals(masterStartDate)) {
+                instance.setMasterEvent(true);
+                events.set(0, instance);
+            } else {
+                instance.setInstanceDate(createCosmoDate(instanceStartDate,
+                        calendar, tzid));
                 instance.setInstance(true);
-                instance.setRecurrenceRule(event.getRecurrenceRule());
-                instance.setStart(createCosmoDate(instanceStartDate, calendar,
-                        tzid));
-                instance.setInstanceDate(instance.getStart());
-                if (event.getEnd() != null) {
-                    if (event.isAllDay()) {
-                        Calendar endCalendar = Calendar.getInstance();
-                        DateTime instanceEndDateTime = new DateTime(
-                                instanceStartDate.getTime() + duration);
-                        endCalendar.setTime(instanceEndDateTime);
-                        endCalendar.add(Calendar.DATE, -1);
-                        net.fortuna.ical4j.model.Date instanceEndDate = new net.fortuna.ical4j.model.Date(
-                                endCalendar.getTimeInMillis());
-                        instance.setEnd(createCosmoDate(instanceEndDate,
-                                calendar, null));
-
-                    } else {
-                        if (dateOrDateTime.equals(Value.DATE_TIME)) {
-                            DateTime endTime = new DateTime(instanceStartDate
-                                    .getTime()
-                                    + duration);
-
-                            if (masterTimezone != null) {
-                                endTime.setTimeZone(masterTimezone);
-                            }
-                            instance.setEnd(createCosmoDate(endTime, calendar,
-                                    tzid));
-                        }
-                    }
-
-                //let's add any individual instance modifications that may exist
-                VEvent modificationVEvent = fetcher.getInstance(instanceStartDate);
-                if (modificationVEvent != null) {
-                    copyModifiedProperties(modificationVEvent, instance,
-                            calendar);
-                }
-                if (instanceStartDate.equals(masterStartDate)) {
-                    instance.setMasterEvent(true);
-                    events.set(0, instance);
-                } else {
-                    events.add(instance);
-                }
+                instance.setMasterEvent(false);
+                events.add(instance);
             }
         }
         return events;
     }
 
     private void copyModifiedProperties(VEvent modificationVEvent,
-            Event instance, net.fortuna.ical4j.model.Calendar calendar) {
-
-        //have to do DTSTART first, since others depend on it.
-        DtStart dtStart = (DtStart) modificationVEvent.getProperties().getProperty(Property.DTSTART);
-        if (dtStart != null){
-            instance.setStart(createCosmoDate(dtStart, calendar));
-        }
+            VEvent vInstance, net.fortuna.ical4j.model.Calendar calendar) {
         for (Object o : modificationVEvent.getProperties()) {
             Property property = (Property) o;
-            if (property.getName().equals(Property.DTSTART)) {
-                continue;
-            } else if (property.getName().equals(Property.DTEND)) {
-                instance.setEnd(createCosmoDate((DtEnd) property, calendar));
-            } else if (property.getName().equals(Property.SUMMARY)) {
-                instance.setTitle(getPropertyValue(modificationVEvent,
-                        Property.SUMMARY));
-            } else if (property.getName().equals(Property.STATUS)){
-                instance.setStatus(getPropertyValue(modificationVEvent, Property.STATUS));
-            } else if (property.getName().equals(Property.DESCRIPTION)){
-                instance.setStatus(getPropertyValue(modificationVEvent, Property.DESCRIPTION));
-            } else if (property.getName().equals(Property.DURATION)){
-
-            }
+            ICalendarUtils.addOrReplaceProperty(vInstance, property);
+            
         }
     }
 

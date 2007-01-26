@@ -34,6 +34,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
     {
     
         templateString: '<span></span>',
+        verticalHeight: 18,
         collections: [],
         currentCollection: {},
         selectFunction: null,
@@ -69,6 +70,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             // Collection selector / label and 'add'/'info' icons
             var selectorNode = _createElem('div');
             selectorNode.id = 'collectionSelectorOrLabel';
+            selectorNode.style.height = this.verticalHeight + 'px';
             
             // 'Add' or 'info' icons, with attached actions 
             function renderButton() {
@@ -149,14 +151,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 // Image
                 var d = _createElem("div");
                 d.className = 'floatLeft';
-                d.style.height = '18px';
-                d.style.linHeight = '18px';
-                // Danger, Will Robinson:
-                // IE needs a font-size set to the same as the line-height
-                // for images to valign properly -- however this will
-                // actually *break* vertical alignment in FF and Safari :)
+                var h = self.verticalHeight;
+                d.style.height = h + 'px';
+                d.style.linHeight = h + 'px';
+                // Use margin prop to do this in IE -- CSS vertical align
+                // is b0rken
                 if (document.all) {
-                    d.style.fontSize = '18px';
+                    var m = parseInt((h - collIcon.height)/2);
+                    d.style.marginTop = m + 'px';
                 }
                 d.style.verticalAlign = 'middle';
                 d.appendChild(collIcon);
@@ -190,9 +192,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     var textNode = _createText(displ);
                 }
                 d.appendChild(textNode);
-                d.style.height = '18px';
-                d.style.lineHeight = '18px';
+                d.style.height = self.verticalHeight + 'px';
+                d.style.lineHeight = self.verticalHeight + 'px';
                 d.style.verticalAlign = 'middle';
+                // Shave off a couple of px in IE because its
+                // valign middle for text is wonky
+                if (document.all) {
+                    d.style.marginTop = '-2px';
+                }
                 selectorNode.appendChild(d);
                 self.displayNameText = textNode;
             }

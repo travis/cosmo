@@ -528,16 +528,19 @@ td.dataDisplayLabel {
 #menuBarDiv {
     position:absolute;
     background:#ffffff;
+    border-bottom:1px solid #dddddd;
+    visibility: hidden;
+}
+#menuNavItems {
+    position: absolute;
+    width: 100%;
     color:#333333;
     font-size:$fontSizeS;
     font-weight:bold;
-    line-height:68px;
     text-align:right;
-    border-bottom:1px solid #dddddd;
-    vertical-align:bottom;
 }
 /* The pipe character between links */
-#menuBarDiv span.menuBarDivider {
+#menuNavItems span.menuBarDivider {
     font-weight:normal;
     color:$uiDetailBorderColor;
 }

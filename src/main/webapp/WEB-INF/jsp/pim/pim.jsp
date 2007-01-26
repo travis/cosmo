@@ -100,11 +100,12 @@ dojo.event.topic.subscribe(
 
 <body id="body">
         <div id="menuBarDiv">
-            <div id="smallLogoDiv"></div>
+          <div id="smallLogoDiv"></div>
             <%-- Begin main nav menu --%>
+            <div id="menuNavItems">
             <c:choose>
               <c:when test="${not ticketedView}">
-              	<!-- Start non-ticketed links -->
+              	<%-- Start non-ticketed links --%>
                 <authz:authorize ifAnyGranted="ROLE_USER">
                 <fmt:message key="Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
                   <span class="menuBarDivider">|</span>
@@ -126,27 +127,33 @@ dojo.event.topic.subscribe(
                 </a>
                 <span class="menuBarDivider">|</span>
                 </span>
-                <!-- End non-ticketed links -->
+                <%-- End non-ticketed links --%>
               </c:when>
               <c:otherwise>
-              	<!-- Ticketed version of links -->
-                <div id="signupGraphic"></div>
-                <div id="subscribeSelector"></div>
+              	<%-- 
+                    Ticketed version of links
+                    Add divs for subscribeSelector, signupGraphic via JavaScript DOM
+                    so we can get accurate offsetWidth as code executes
+                --%>
               </c:otherwise>
             </c:choose>
               
-            <c:url var="helpUrl" value="http://wiki.osafoundation.org/bin/view/Projects/CosmoHelpPortal"/>
-            <a href="${helpUrl}" target="_blank"><fmt:message key="Main.Help"/></a>
+            <c:url var="helpUrl" 
+                value="http://wiki.osafoundation.org/bin/view/Projects/CosmoHelpPortal"/>
+            <a href="${helpUrl}" 
+                onclick="window.open('${helpUrl}'); 
+                return false;"><fmt:message key="Main.Help"/></a>
                 
             <c:if test="${not ticketedView}">
                <authz:authorize ifAnyGranted="ROLE_USER">
                  <span class="menuBarDivider">|</span>
                   <a href="${staticBaseUrl}/logout">
                     <fmt:message key="Main.LogOut"/>
-                  </a>&nbsp;&nbsp;
+                  </a>
                </authz:authorize>
-            </c:if>
-            <%-- End main nav menu --%>
+            </c:if>&nbsp;&nbsp;
+          </div>
+          <%-- End main nav menu --%>
         </div>
         <div id="calDiv">
             <form method="post" id="calForm" action="">

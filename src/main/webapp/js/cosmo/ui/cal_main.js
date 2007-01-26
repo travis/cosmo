@@ -249,35 +249,6 @@ cosmo.ui.cal_main.Cal = new function () {
            this.calForm.addJumpToDate(jpDiv);
         }
         
-        // Add the collection subscription selector in ticket view
-        if (ticketKey) {
-            var s = $('subscribeSelector');
-            var clientOpts = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
-            clientOpts.unshift({ text: 'Subscribe with ...', value: '' });
-            var selOpts = { name: 'subscriptionSelect', id: 'subscriptionSelect',
-               options: clientOpts, className: 'selectElem' }; 
-            var subscrSel = cosmo.util.html.createSelect(selOpts);
-            var f = function (e) {
-                // Show the subcription dialog if the empty "Subscribe with ..."
-                // option is not the one selected
-                var sel = e.target;
-                if (sel.selectedIndex != 0) {
-                cosmo.app.showDialog(
-                    cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                        Cal.currentCollection.collection,
-                        Cal.currentCollection.displayName,
-                        Cal.currentCollection.conduit,
-                        Cal.currentCollection.transportInfo,
-                        sel.options[sel.selectedIndex].value));
-                }
-            };
-
-            dojo.event.connect(subscrSel, 'onchange', f);
-            s.style.position = 'absolute';
-            s.style.left = (LEFT_SIDEBAR_WIDTH + this.midColWidth) + 'px'; 
-            s.appendChild(subscrSel);
-        }
-        
         // Load and display events
         // --------------
         cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
@@ -289,7 +260,7 @@ cosmo.ui.cal_main.Cal = new function () {
         // seems to reset the scrollTop in Safari
         viewDiv.scrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
         
-        // BANDAID for IE -- dummy element to force 100% height to render
+        // BANDAID for IE6 -- dummy element to force 100% height to render
         if (document.all) {
             var dummyElem = document.createElement('div');
             allDayDiv.appendChild(dummyElem);
@@ -297,6 +268,16 @@ cosmo.ui.cal_main.Cal = new function () {
         
         // Add event listeners for form-element behaviors
         this.calForm.setEventListeners();
+
+        // Top menubar setup and positioning
+        if (this.setUpMenubar(ticketKey)) {
+            // Force async execution so we can get accurate
+            // offsetWidth/offsetHeight for positioning
+            var f = function () {
+               self.positionMenubarElements(ticketKey);
+            }
+            setTimeout(f, 0);
+        }
     };
 
     // ==========================
@@ -430,12 +411,81 @@ cosmo.ui.cal_main.Cal = new function () {
         allDayMain.cleanup(); allDayMain = null;
         allDayResize.cleanup(); allDayResize = null;
     };
+    this.setUpMenubar = function (ticketKey) {
+        // Logged-in view -- nothing to do
+        if (!ticketKey) {
+            return true;
+        }
+        // Add the collection subscription selector in ticket view
+        else {
+            var menuBarDiv = $('menuBarDiv');
+            var s = _createElem('div');
+            s.id = 'subscribeSelector';
+            var clientOpts = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
+            clientOpts.unshift({ text: 'Subscribe with ...', value: '' });
+            var selOpts = { name: 'subscriptionSelect', id: 'subscriptionSelect',
+               options: clientOpts, className: 'selectElem' }; 
+            var subscrSel = cosmo.util.html.createSelect(selOpts);
+            var f = function (e) {
+                // Show the subcription dialog if the empty "Subscribe with ..."
+                // option is not the one selected
+                var sel = e.target;
+                if (sel.selectedIndex != 0) {
+                cosmo.app.showDialog(
+                    cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
+                        Cal.currentCollection.collection,
+                        Cal.currentCollection.displayName,
+                        Cal.currentCollection.conduit,
+                        Cal.currentCollection.transportInfo,
+                        sel.options[sel.selectedIndex].value));
+                }
+            };
+            dojo.event.connect(subscrSel, 'onchange', f);
+            s.appendChild(subscrSel);
+            menuBarDiv.appendChild(s);
+            
+            var signupDiv = _createElem('div');
+            signupDiv.id = 'signupGraphic';
+
+            var w = 0;
+            var p = 0;
+            signupDiv.style.position = 'absolute';
+            var i = cosmo.util.html.createRollOverMouseDownImage(
+                    cosmo.env.getImagesUrl() + "signup.png");
+            i.style.cursor = 'pointer';
+            dojo.event.connect(i, 'onclick', cosmo.account.create.showForm);
+            signupDiv.appendChild(i);
+            menuBarDiv.appendChild(signupDiv);
+        }
+        return true; 
+    };
+    this.positionMenubarElements = function (ticketKey) {
+        var menuNav = $('menuNavItems')
+        // Ticket view only
+        if (ticketKey) {
+            // Signup graphic
+            // position right side of center col, and bottom align
+            var signupDiv = $('signupGraphic');
+            var w = signupDiv.offsetWidth + 24;
+            var p = Cal.midColWidth  + LEFT_SIDEBAR_WIDTH - w;
+            signupDiv.style.left = p + 'px';
+            signupDiv.style.top = (TOP_MENU_HEIGHT - signupDiv.offsetHeight - 5) + 'px';
+            // Subscription select box
+            var subscribeSelector = $('subscribeSelector');
+            subscribeSelector.style.position = 'absolute';
+            subscribeSelector.style.left = (LEFT_SIDEBAR_WIDTH + this.midColWidth) + 'px'; 
+            subscribeSelector.style.top = (TOP_MENU_HEIGHT - subscribeSelector.offsetHeight - 5) + 'px';
+
+        }
+        // Bottom-align menu text
+        menuNav.style.top = (TOP_MENU_HEIGHT - menuNav.offsetHeight - 5) + 'px';
+        $('menuBarDiv').style.visibility = 'visible';
+    };
     /**
      * Set skin-specific images
      */
     this.setImagesForSkin =  function () {
         var logoDiv = $('smallLogoDiv');
-        var signupDiv = $('signupGraphic');
         
         // Resize handle for all-day area
         var i = _createElem('img');
@@ -450,22 +500,6 @@ cosmo.ui.cal_main.Cal = new function () {
             logoDiv.style.backgroundRepeat = 'no-repeat';
         }
         
-        // Signup graphic div is only on the page in ticket mode
-        if (signupDiv) {
-            var w = 0;
-            var p = 0;
-            signupDiv.style.position = 'absolute';
-            signupDiv.style.visibility = 'hidden';
-            var i = cosmo.util.html.createRollOverMouseDownImage(
-                    cosmo.env.getImagesUrl() + "signup.png");
-            i.style.cursor = 'pointer';
-            dojo.event.connect(i, 'onclick', cosmo.account.create.showForm);
-            signupDiv.appendChild(i);
-            w = signupDiv.offsetWidth + 24;
-            p = Cal.midColWidth  + LEFT_SIDEBAR_WIDTH - w;
-            signupDiv.style.left = p + 'px';
-            signupDiv.style.visibility = 'visible';
-        }
     };
     /**
      * Loads localized Date information into the arrays in date.js

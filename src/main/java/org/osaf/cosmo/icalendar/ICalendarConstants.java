@@ -50,4 +50,6 @@ public interface ICalendarConstants {
      * iCalendar value for "TRUE"
      */
     public static final String VALUE_TRUE = "TRUE";
+    
+    public static final String VALUE_FALSE = "FALSE";
 }

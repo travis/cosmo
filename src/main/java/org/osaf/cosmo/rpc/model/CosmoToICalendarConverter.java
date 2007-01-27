@@ -18,12 +18,18 @@ package org.osaf.cosmo.rpc.model;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.PARAM_X_OSAF_ANYTIME;
 import static org.osaf.cosmo.icalendar.ICalendarConstants.VALUE_TRUE;
+import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_ALLDAY;
+import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_DESCRIPTION;
+import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_END;
+import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_START;
+import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_STATUS;
+import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_TITLE;
+import static org.osaf.cosmo.util.CollectionUtils.createSetFromArray;
 import static org.osaf.cosmo.util.ICalendarUtils.getMasterEvent;
 
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
@@ -564,6 +570,7 @@ public class CosmoToICalendarConverter {
         if (modifications != null && modifications.length > 0) {
             for (Modification modification : modifications) {
                 VEvent modVEvent = new VEvent();
+                Event modEvent = modification.getEvent();
                 RecurrenceId recurrenceId = new RecurrenceId();
                 setDateOrDatetime(recurrenceId,
                         modification.getInstanceDate(), dateTime);
@@ -572,40 +579,80 @@ public class CosmoToICalendarConverter {
                 DtStart modStart = new DtStart(recurrenceId.getDate());
                 ICalendarUtils.addOrReplaceProperty(modVEvent, modStart);
                 modVEvent.getProperties().add(masterVEvent.getProperties().getProperty(Property.UID));
-                for (String property : modification.getModifiedProperties()) {
-                    if (property.equals(ICalendarToCosmoConverter.EVENT_START)) {
+                
+                //convert properties into a set so we can handle one at a time.
+                Set<String> modifiedProperties = createSetFromArray(modification.getModifiedProperties());
+                
+                
+                if (modifiedProperties.contains(EVENT_ALLDAY)){
+                    if (modEvent.isAllDay()){
+                        //this means that the master event must NOT be all day, 
+                        //but the instance is
+                        
+                        //strip the time from the start time
+                        modStart = new DtStart();
+                        //we can assume that the modification has a modified Start property
+                        setDateOrDatetime(modStart, modification.getEvent().getStart(), false);
+                        ICalendarUtils.addOrReplaceProperty(modVEvent, modStart);
+                        
+                        //strip the time from the end time, add one day
+                        DtEnd modEnd = new DtEnd();
+
+                        //we can also assume that the modification has a modified Start property
+                        setDateOrDatetime(modEnd, modification.getEvent().getEnd(), false);
+                        modEnd.getDate().setTime(modEnd.getDate().getTime() + (1000 * 60 * 60 * 24));
+                        ICalendarUtils.addOrReplaceProperty(modVEvent, modEnd);
+                    } else {
+                        //so the master event USED to be all day but no longer is 
+                        modStart = new DtStart();
+                        setDateOrDatetime(modStart, modification.getEvent()
+                                .getStart(), true);
+                        ICalendarUtils.addOrReplaceProperty(modVEvent, modStart);
+
+                        DtEnd modEnd = new DtEnd();
+                        setDateOrDatetime(modEnd, modification.getEvent()
+                                .getEnd(), true);
+                        modVEvent.getProperties().add(modEnd);
+                    }
+                    
+                } else {
+                    if (modifiedProperties.contains(EVENT_START)) {
                         modStart = new DtStart();
                         setDateOrDatetime(modStart, modification.getEvent()
                                 .getStart(), dateTime);
                         ICalendarUtils.addOrReplaceProperty(modVEvent, modStart);
-
-                    } else if (property
-                            .equals(ICalendarToCosmoConverter.EVENT_END)) {
+                    }
+                    
+                    if (modifiedProperties.contains(EVENT_END)) {
                         DtEnd modEnd = new DtEnd();
                         setDateOrDatetime(modEnd, modification.getEvent()
                                 .getEnd(), dateTime);
                         modVEvent.getProperties().add(modEnd);
-
-                    } else if (property
-                            .equals(ICalendarToCosmoConverter.EVENT_DESCRIPTION)) {
-                        Description description = new Description();
-                        description.setValue(modification.getEvent()
-                                .getDescription());
-                        modVEvent.getProperties().add(description);
-                    } else if (property
-                            .equals(ICalendarToCosmoConverter.EVENT_TITLE)) {
-                        Summary summary = new Summary();
-                        summary.setValue(modification.getEvent().getTitle());
-                        modVEvent.getProperties().add(summary);
-                    } else if (property
-                            .equals(ICalendarToCosmoConverter.EVENT_STATUS)) {
-                        Status status = new Status();
-                        status.setValue(modification.getEvent().getStatus());
-                        modVEvent.getProperties().add(status);
                     }
                 }
+                
+                if (modifiedProperties.contains(EVENT_DESCRIPTION)) {
+                    Description description = new Description();
+                    description.setValue(modification.getEvent()
+                            .getDescription());
+                    modVEvent.getProperties().add(description);
+                } 
+                
+                if (modifiedProperties.contains(EVENT_TITLE)) {
+                    Summary summary = new Summary();
+                    summary.setValue(modification.getEvent().getTitle());
+                    modVEvent.getProperties().add(summary);
+                }
+                
+                if (modifiedProperties.contains(EVENT_STATUS)) {
+                    Status status = new Status();
+                    status.setValue(modification.getEvent().getStatus());
+                    modVEvent.getProperties().add(status);
+                }
+                
                 calendar.getComponents().add(modVEvent);
             }
         }
     }
+    
 }

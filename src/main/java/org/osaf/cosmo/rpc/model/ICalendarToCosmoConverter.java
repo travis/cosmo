@@ -22,6 +22,7 @@ import static org.osaf.cosmo.util.ICalendarUtils.getDuration;
 import static org.osaf.cosmo.util.ICalendarUtils.getMasterEvent;
 import static org.osaf.cosmo.util.ICalendarUtils.getVTimeZone;
 import static org.osaf.cosmo.util.ICalendarUtils.hasProperty;
+import static org.osaf.cosmo.util.CollectionUtils.createSetFromArray;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,8 +30,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
@@ -40,7 +43,6 @@ import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
-import net.fortuna.ical4j.model.component.Observance;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.parameter.Range;
@@ -53,6 +55,7 @@ import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
+import net.fortuna.ical4j.util.Dates;
 
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
@@ -70,8 +73,21 @@ public class ICalendarToCosmoConverter {
     public static final String EVENT_END = "end";
     public static final String EVENT_TITLE = "title";
     public static final String EVENT_STATUS = "status";
+    public static final String EVENT_ALLDAY = "allDay";
     public static final String EVENT_ANYTIME = "anyTime";
+    public static final String EVENT_POINTINTIME = "pointInTime";
 
+    private enum EventType { NORMAL, ANYTIME, ALLDAY, ATTIME};
+    
+    private static Map<EventType, String[]> eventTypesToEventProperties = new HashMap<EventType, String[]>();
+    
+    static{
+        eventTypesToEventProperties.put(EventType.NORMAL, new String[]{});
+        eventTypesToEventProperties.put(EventType.ANYTIME, new String[]{EVENT_ANYTIME, EVENT_START, EVENT_END});
+        eventTypesToEventProperties.put(EventType.ALLDAY, new String[]{EVENT_ALLDAY, EVENT_START, EVENT_END});
+        eventTypesToEventProperties.put(EventType.ATTIME, new String[]{EVENT_POINTINTIME, EVENT_START, EVENT_END});
+    }
+    
     /**
      * Garden variety no-arg contructor
      */
@@ -92,7 +108,6 @@ public class ICalendarToCosmoConverter {
                 Property.DTSTART);
         Duration duration = (Duration) vevent.getProperties().getProperty(
                 Property.DURATION);
-        boolean startDateHasTime = dtStart.getDate() instanceof DateTime;
 
         RRule rrule = (RRule) vevent.getProperties()
             .getProperty(Property.RRULE);
@@ -102,106 +117,130 @@ public class ICalendarToCosmoConverter {
             event.setRecurrenceRule(recurrenceRule);
             event.setMasterEvent(true);
         }
-
-        if (dtEnd == null && duration == null) {
-            // must be an All Day, an Any Time, or a Point in Time
-
-            // let's check for the X-OSAF-ANYTIME param first
-            if (VALUE_TRUE.equals(getParameterValue(dtStart, PARAM_X_OSAF_ANYTIME))) {
-                event.setAnyTime(true);
-                event.setStart(createCosmoDate(dtStart, calendar));
-            } else if (!startDateHasTime ) {
-                // the start is a DATE (not a DATE_TIME) so this must be an All
-                // Day event
+        
+        setDateTime(dtStart, dtEnd, vevent.getEndDate() != null ? vevent
+                .getEndDate().getDate() : null, duration, calendar, event);
+        return event;
+    }
+    
+    private void setDateTime(DtStart dtStart, DtEnd dtEnd,
+            net.fortuna.ical4j.model.Date endDate, Duration duration, net.fortuna.ical4j.model.Calendar calendar,
+            Event event) {
+        EventType eventType = getEventType(dtStart, dtEnd, duration);
+        boolean hasNoEnd = dtEnd == null && duration == null;
+        switch (eventType) {
+            case ALLDAY:  
                 event.setAllDay(true);
                 event.setStart(createCosmoDate(dtStart, calendar));
-            } else {
-             // the start is a DATE_TIME (not a DATE) so this must be a
-                // "point in time"
+                if (!hasNoEnd){
+                    Calendar endCalendar = Calendar.getInstance();
+                    endCalendar.setTime(endDate);
+                    endCalendar.add(Calendar.DATE, -1);
+                    endDate = new net.fortuna.ical4j.model.Date(endCalendar.getTimeInMillis());
+                    event.setEnd(createCosmoDate((net.fortuna.ical4j.model.Date)endDate, calendar, null));
+                }
+                break;
+            case ANYTIME:
+                event.setAnyTime(true);
+                event.setStart(createCosmoDate(dtStart, calendar));
+                break;
+            case ATTIME:
                 event.setPointInTime(true);
                 CosmoDate startAndEnd = createCosmoDate(dtStart, calendar);
                 event.setStart(startAndEnd);
                 event.setEnd(startAndEnd);
-            }
-        } else {
-            Date startDate = null;
-            Date endDate = null;
-            // we have a start and end (or a start and a duration)
-            if (!startDateHasTime){
-                //must be an ALL DAY event
-
-                //since it's an all-day event let's use a Date as opposed to a DateTime
-                startDate = new net.fortuna.ical4j.model.Date(vevent
-                        .getStartDate().getDate().getTime());
-                event.setAllDay(true);
-
-                Calendar endCalendar = Calendar.getInstance();
-                endCalendar.setTime(vevent.getEndDate().getDate());
-                endCalendar.add(Calendar.DATE, -1);
-                endDate = new net.fortuna.ical4j.model.Date(endCalendar.getTimeInMillis());
-                event.setStart(createCosmoDate(dtStart, calendar));
-                event.setEnd(createCosmoDate((net.fortuna.ical4j.model.Date)endDate, calendar, null));
-
-            } else {
-                startDate = new DateTime(dtStart.getDate());
+                break;
+            case NORMAL:
                 if (dtEnd == null) {
-                    dtEnd = vevent.getEndDate();
                     DateTime dateTime = (DateTime) dtStart.getDate();
                     TimeZone tz = dateTime.getTimeZone();
                     TzId tzid= (TzId) dtStart.getParameters().getParameter(Parameter.TZID);
+                    DateTime endDateTime = (DateTime) endDate;
                     if (tz != null){
-                        dtEnd.setTimeZone(tz);
-                        dtEnd.getParameters().add(tzid);
+                        endDateTime.setTimeZone(tz);
                     }
+                    event.setEnd(createCosmoDate(endDateTime, calendar, tzid != null ? tzid.getValue() : ""));
+                } else {
+                    event.setStart(createCosmoDate(dtStart, calendar));
+                    event.setEnd(createCosmoDate(dtEnd, calendar));
                 }
-                endDate = new DateTime(dtEnd.getDate());
-                event.setStart(createCosmoDate(dtStart, calendar));
-                event.setEnd(createCosmoDate(dtEnd, calendar));
-            }
+                break;
         }
-        return event;
+    }
+    
+    private EventType getEventType(DtStart dtStart, DtEnd dtEnd, Duration duration){
+       net.fortuna.ical4j.model.Date startDate = dtStart.getDate(); 
+                
+       boolean startDateHasTime = startDate instanceof DateTime;
+
+       // check for anytime
+       if (VALUE_TRUE.equals(getParameterValue(dtStart,
+               PARAM_X_OSAF_ANYTIME))) {
+           return EventType.ANYTIME;
+       }
+
+       if (!startDateHasTime){
+           return EventType.ALLDAY;
+       }
+       
+       if (dtEnd == null && duration == null) {
+           return EventType.ATTIME;
+       }
+       
+        return EventType.NORMAL;
     }
 
-
-    public Event createModEvent(VEvent vevent,
-            VEvent masterEvent, net.fortuna.ical4j.model.Date instanceDate, net.fortuna.ical4j.model.Calendar calendar) {
-        Event event = new Event();
-        setSimpleProperties(null, vevent, event);
-
-        DtStart masterDtStart = (DtStart) masterEvent.getProperties()
-                .getProperty(Property.DTSTART);
-        boolean startDateHasTime = masterDtStart.getDate() instanceof DateTime;
-
-        DtStart dtStart = (DtStart) vevent.getProperties().getProperty(
-                Property.DTSTART);
-
-        if (dtStart != null){
-            event.setStart(createCosmoDate(dtStart, calendar));
-        }
-
+    private EventType getEventType(VEvent vevent){
         DtEnd dtEnd = (DtEnd) vevent.getProperties()
-                .getProperty(Property.DTEND);
+        .getProperty(Property.DTEND);
+        DtStart dtStart = (DtStart) vevent.getProperties().getProperty(
+        Property.DTSTART);
+        Duration duration = (Duration) vevent.getProperties().getProperty(
+                Property.DURATION);
+        return getEventType(dtStart, dtEnd, duration);
+    }
+    
+    public Event createModEvent(VEvent vInstance, VEvent vMaster,
+            net.fortuna.ical4j.model.Date instanceDate,
+            net.fortuna.ical4j.model.Calendar calendar) {
+        Event event = new Event();
+        setSimpleProperties(null, vInstance, event);
+        
+        DtStart dtStartInstance = (DtStart) vInstance.getProperties().getProperty(Property.DTSTART);
+        DtStart dtStartMaster = (DtStart) vMaster.getProperties().getProperty(Property.DTSTART);
+        
+        DtEnd dtEndInstance = (DtEnd) vInstance.getProperties().getProperty(Property.DTEND);
+        DtEnd dtEndMaster = (DtEnd) vMaster.getProperties().getProperty(Property.DTEND);
 
-        if (dtEnd != null){
-            if (!startDateHasTime){
-                //must be an ALL DAY event
+        Duration durationInstance = (Duration) vInstance.getProperties().getProperty(Property.DURATION);
+        Duration durationMaster = (Duration) vMaster.getProperties().getProperty(Property.DURATION);
+        
+        DtStart dtStart = dtStartInstance != null ? dtStartInstance : dtStartMaster;
 
-                // since it's an all-day event let's use a Date as opposed to a
-                // DateTime
-                event.setAllDay(true);
-
-                Calendar endCalendar = Calendar.getInstance();
-                endCalendar.setTime(vevent.getEndDate().getDate());
-                endCalendar.add(Calendar.DATE, -1);
-                net.fortuna.ical4j.model.Date endDate = new net.fortuna.ical4j.model.Date(endCalendar.getTimeInMillis());
-                event.setEnd(createCosmoDate((net.fortuna.ical4j.model.Date)endDate, calendar, null));
-            } else {
-                event.setEnd(createCosmoDate(dtEnd, calendar));
-            }
+        DtEnd dtEnd = null;
+        Duration duration = null;
+        net.fortuna.ical4j.model.Date endDate = null;
+        if (durationInstance != null){
+            dtEnd = null;
+            duration = durationInstance;
+            endDate = Dates.getInstance(duration.getDuration().getTime(dtStart.getDate()),dtStart.getDate());
+        } else if (dtEndInstance != null){
+            dtEnd = dtEndInstance;
+            duration = null;
+            endDate = dtEnd.getDate();
+        } else if (durationMaster != null){
+            dtEnd = null;
+            duration = durationMaster;
+            endDate = Dates.getInstance(duration.getDuration().getTime(dtStart.getDate()),dtStart.getDate());
+        } else if (dtEndMaster != null){
+            duration = null;
+            dtEnd = dtEndMaster;
+            endDate = dtEnd.getDate();
         }
+
+        setDateTime(dtStart, dtEnd, endDate, duration, calendar, event);
 
         return event;
-
     }
     
     
@@ -337,7 +376,6 @@ public class ICalendarToCosmoConverter {
         for (Object o : modificationVEvent.getProperties()) {
             Property property = (Property) o;
             ICalendarUtils.addOrReplaceProperty(vInstance, property);
-            
         }
     }
 
@@ -438,7 +476,7 @@ public class ICalendarToCosmoConverter {
                         source.getReccurrenceId().getDate())) {
                     long delta = dtStart.getDate().getTime()
                             - source.getReccurrenceId().getDate().getTime();
-                    net.fortuna.ical4j.model.Date newDate = createDate((d.getTime() + delta), getTimeZone(dtStart.getDate()), dtStart.getDate() instanceof DateTime  ); // xxx
+                    net.fortuna.ical4j.model.Date newDate = createDate((d.getTime() + delta), getTimeZone(dtStart.getDate()), dtStart.getDate() instanceof DateTime  );
                     DtStart newDtStart = new DtStart(newDate);
                     ICalendarUtils.addOrReplaceProperty(dest, newDtStart);
                 }
@@ -570,7 +608,8 @@ public class ICalendarToCosmoConverter {
                     Event modEvent = createModEvent(curVEvent, ICalendarUtils
                             .getMasterEvent(calendar), recurrenceId.getDate(),
                             calendar);
-                    String[] modifiedProperties = getModifiedProprties(curVEvent, vevent);
+                    EventType modEventType = getEventType(modEvent);
+                    String[] modifiedProperties = getModifiedProprties(curVEvent, vevent, modEventType);
                     modification.setModifiedProperties(modifiedProperties);
                     modification.setEvent(modEvent);
                     mods.add(modification);
@@ -583,17 +622,23 @@ public class ICalendarToCosmoConverter {
         return recurrenceRule;
     }
 
-    private String[] getModifiedProprties(VEvent modifiedEvent, VEvent originalEvent) {
-        List<String> props = new ArrayList<String>();
-        addIfHasProperty(modifiedEvent, props, Property.DESCRIPTION, EVENT_DESCRIPTION);
-        addIfHasProperty(modifiedEvent, props, Property.SUMMARY, EVENT_TITLE);
-        addIfHasProperty(modifiedEvent, props, Property.STATUS, EVENT_STATUS);
+    private EventType getEventType(Event modEvent) {
+        return modEvent.isAllDay() ? EventType.ALLDAY : 
+                modEvent.isAnyTime() ? EventType.ANYTIME :
+                    modEvent.isPointInTime() ? EventType.ATTIME : EventType.NORMAL;
+    }
 
-        RecurrenceId recurrenceId = modifiedEvent.getReccurrenceId();
+    private String[] getModifiedProprties(VEvent modificationEvent, VEvent masterEvent, EventType modEventType) {
+        Set<String> props = new HashSet<String>();
+        addIfHasProperty(modificationEvent, props, Property.DESCRIPTION, EVENT_DESCRIPTION);
+        addIfHasProperty(modificationEvent, props, Property.SUMMARY, EVENT_TITLE);
+        addIfHasProperty(modificationEvent, props, Property.STATUS, EVENT_STATUS);
+
+        RecurrenceId recurrenceId = modificationEvent.getReccurrenceId();
         net.fortuna.ical4j.model.Date origStartDate = recurrenceId.getDate();
 
-        if (modifiedEvent.getStartDate() != null) {
-            net.fortuna.ical4j.model.Date modStartDate = modifiedEvent
+        if (modificationEvent.getStartDate() != null) {
+            net.fortuna.ical4j.model.Date modStartDate = modificationEvent
                     .getStartDate().getDate();
             if (!origStartDate.equals(modStartDate)) {
                 props.add(EVENT_START);
@@ -601,23 +646,29 @@ public class ICalendarToCosmoConverter {
 
         }
 
-        long duration = getDuration(originalEvent);
+        long duration = getDuration(masterEvent);
         net.fortuna.ical4j.model.Date origEndDate = (net.fortuna.ical4j.model.Date) ICalendarUtils
                 .clone(origStartDate);
         origEndDate.setTime(origEndDate.getTime() + duration);
 
-        if (modifiedEvent.getProperties().getProperty(Property.DTEND) != null) {
-            net.fortuna.ical4j.model.Date modEndDate = modifiedEvent
+        if (modificationEvent.getProperties().getProperty(Property.DTEND) != null) {
+            net.fortuna.ical4j.model.Date modEndDate = modificationEvent
                     .getEndDate().getDate();
             if (!origEndDate.equals(modEndDate)) {
                 props.add(EVENT_END);
             }
         }
+        
+        EventType masterEventType = getEventType(masterEvent);
+        if (masterEventType != modEventType){
+            props.addAll(createSetFromArray(eventTypesToEventProperties.get(masterEventType)));
+            props.addAll(createSetFromArray(eventTypesToEventProperties.get(modEventType)));
+        }
 
         return props.toArray(new String[0]);
     }
 
-    private void addIfHasProperty(VEvent vEvent, List<String> propList, String iCalPropName,
+    private void addIfHasProperty(VEvent vEvent, Collection<String> propList, String iCalPropName,
             String cosmoPropName) {
         if (hasProperty(vEvent, iCalPropName)){
             propList.add(cosmoPropName);

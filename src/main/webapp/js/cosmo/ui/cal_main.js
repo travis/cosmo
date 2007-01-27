@@ -84,13 +84,12 @@ cosmo.ui.cal_main.Cal = new function () {
     this.viewEnd = null;
     // Current date for highlighting in the interface
     this.currDate = null;
-    
     // The path to the currently selected collection
     this.currentCollection = null;
-    
     //The list of calendars available to the current user
     this.currentCollections = [];
-
+    // Anonymous ticket view, no client-side timeout
+    this.ticketView = false;
     // Create the 'Welcome to Cosmo' event?
     this.createWelcomeItem = false;
 
@@ -149,7 +148,8 @@ cosmo.ui.cal_main.Cal = new function () {
         // Load/create calendar to view
         // --------------
         // If we received a ticket, just grab the specified collection
-        if (ticketKey){
+        if (ticketKey) {
+            this.ticketView = true;
             var collection = this.serv.getCalendar(collectionUid, ticketKey);
             var ticket = this.serv.getTicket(ticketKey, collectionUid);
             this.currentCollections.push(
@@ -293,11 +293,11 @@ cosmo.ui.cal_main.Cal = new function () {
         this.calForm.setEventListeners();
 
         // Top menubar setup and positioning
-        if (this.setUpMenubar(ticketKey)) {
+        if (this.setUpMenubar()) {
             // Force async execution so we can get accurate
             // offsetWidth/offsetHeight for positioning
             var f = function () {
-               self.positionMenubarElements(ticketKey);
+               self.positionMenubarElements.apply(self);
             }
             setTimeout(f, 0);
         }
@@ -437,7 +437,7 @@ cosmo.ui.cal_main.Cal = new function () {
     };
     this.setUpMenubar = function (ticketKey) {
         // Logged-in view -- nothing to do
-        if (!ticketKey) {
+        if (!this.ticketView) {
             return true;
         }
         // Add the collection subscription selector in ticket view
@@ -483,10 +483,10 @@ cosmo.ui.cal_main.Cal = new function () {
         }
         return true; 
     };
-    this.positionMenubarElements = function (ticketKey) {
+    this.positionMenubarElements = function () {
         var menuNav = $('menuNavItems')
         // Ticket view only
-        if (ticketKey) {
+        if (this.ticketView) {
             // Signup graphic
             // position right side of center col, and bottom align
             var signupDiv = $('signupGraphic');
@@ -940,13 +940,19 @@ cosmo.ui.cal_main.Cal = new function () {
     // Timeout and keepalive
     // ==========================
     this.isTimedOut = function () {
-        var diff = 0;
-        diff = new Date().getTime() - this.serv.getServiceAccessTime();
-        if (diff > (60000*cosmo.env.getTimeoutMinutes())) {
-            return true;
+        // Logged in or not, there's no client-side timeout for ticket view
+        if (this.ticketView) {
+            return false;
         }
         else {
-            return false;
+            var diff = 0;
+            diff = new Date().getTime() - this.serv.getServiceAccessTime();
+            if (diff > (60000*cosmo.env.getTimeoutMinutes())) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     };
     this.isServerTimeoutSoon = function () {

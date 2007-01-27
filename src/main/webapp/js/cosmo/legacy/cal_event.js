@@ -132,12 +132,18 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
                 return true;
             }
         }
+        var compareDescription = function (curr, orig) {
+            var a = curr || null;
+            var b = orig || null;
+            return (a != b); 
+        }
+        
         // Comparator function mappings
         var compareList = {
             'start': compareDateTime,
             'end': compareDateTime,
             'title': null,
-            'description': null,
+            'description': compareDescription,
             'allDay': null,
             'pointInTime': null,
             'anyTime': null,

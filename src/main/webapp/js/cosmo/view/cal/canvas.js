@@ -1046,7 +1046,7 @@ cosmo.view.cal.canvas = new function () {
         
         var o = {
             darkSel: [100, 80],
-            darkUnsel: [100, 80],
+            darkUnsel: [80, 90],
             lightSel: [25, 100], 
             lightUnsel: [10, 100],
             proc: [30, 90]

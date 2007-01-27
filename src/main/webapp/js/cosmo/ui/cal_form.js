@@ -102,6 +102,15 @@ cosmo.ui.cal_form.CalForm = function () {
                 else {
                     self.updateFromEvent(ev);
                     self.setButtons(true, true);
+                    // If event title is 'New Event', auto-focus/select
+                    // title field to make it easy to give it a real title
+                    if (ev.data.title == _('Main.NewEvent')) {
+                        var f = function () {
+                            self.form.eventtitle.select();
+                            self.form.eventtitle.focus();
+                        }
+                        setTimeout(f, 10);
+                    }
                 }
                 break;
             case 'saveFailed':
@@ -404,19 +413,6 @@ cosmo.ui.cal_form.CalForm = function () {
             return elem;
         }
     };
-    this.emptyTextInput = function (param) {
-        if (!param || !param.id) {
-            param = param || window.event;
-            textbox = cosmo.ui.event.handlers.getSrcElemByProp(param, 'id');
-        }
-        else {
-            textbox = param;
-        }
-        if (textbox.className == 'inputTextDim') {
-            textbox.className = 'inputText';
-            textbox.value = '';
-        }
-    };
     this.setTextInput = function (textbox,
         setText, prompt, disabled) {
         textbox.className = prompt? 'inputTextDim' : 'inputText';
@@ -670,7 +666,7 @@ cosmo.ui.cal_form.CalForm = function () {
                 d.end.utc = false;
             }
             d.title = title;
-            d.description = descr;
+            d.description = descr || null;
             d.allDay = allDay;
             d.anyTime = (!startTime && !endTime && !allDay) ? true : false;
             d.status = status;
@@ -887,37 +883,31 @@ cosmo.ui.cal_form.CalForm = function () {
      * event type
      */
     this.setEventListeners = function () {
-        var inputs = document.getElementsByTagName('input');
-        var descrTxt = $('eventdescr');
+        var self = this;
         var allDayCheck = $('eventallday');
         var form = Cal.calForm.form;
-
+        
         // Add dummy function event listener so form doesn't
         // submit on Enter keypress in Safari
         form.onsubmit = function () { return false; };
-
+        
+        // Focus handlers for text entry
+        dojo.event.connect(form.eventtitle, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
+        dojo.event.connect(form.startdate, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
+        dojo.event.connect(form.starttime, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
+        dojo.event.connect(form.enddate, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
+        dojo.event.connect(form.endtime, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
+        
         // Recurrence
-        form.recurrence.onchange = Cal.calForm.setRecurEnd;
-        form.recurend.onclick = Cal.calForm.emptyTextInput;
-
-        // Description textarea
-        descrTxt.onfocus = function () {
-            Cal.calForm.detailTextInputHasFocus = true;
-            Cal.calForm.textAreaHasFocus = true;
-        };
-        descrTxt.onblur = function () {
-            Cal.calForm.detailTextInputHasFocus = false;
-            Cal.calForm.textAreaHasFocus = false;
-        };
-
-        descrTxt = null; // Set DOM-node-ref to null to avoid IE memleak
-
+        dojo.event.connect(form.recurrence, 'onchange', self, 'setRecurEnd');
+        dojo.event.connect(form.recurend, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
+        
         // All-day event / normal event toggling
-        allDayCheck.onclick = function () { Cal.calForm.toggleLozengeType() };
-
+        dojo.event.connect(allDayCheck, 'onclick', cosmo.ui.cal_main.Cal.calForm, 'toggleLozengeType');
+        
         var regionSelectorElement = $("tzRegion");
         dojo.event.connect(regionSelectorElement, "onchange", this.handleRegionChanged);
-
+        
         dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, Cal, Cal.handleCollectionUpdated);
         dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, Cal, Cal.handleSubscriptionUpdated);
         dojo.event.topic.subscribe(cosmo.topics.ModalDialogDisplayed.topicName, Cal, Cal.handleModalDialogDisplayed);
@@ -951,7 +941,7 @@ cosmo.ui.cal_form.CalForm = function () {
         _html.createInput('text', 'jumpto', 'jumpto',
             10, 10, null, 'inputText', d);
         self.setTextInput(self.form.jumpto, 'mm/dd/yyyy', true, false);
-        self.form.jumpto.onclick = Cal.calForm.emptyTextInput;
+        dojo.event.connect(self.form.jumpto, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
         
         d = _createElem('div');
         d.className = 'floatLeft';

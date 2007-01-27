@@ -174,7 +174,7 @@ cosmo.util.html.getRadioButtonSetValue = function (set) {
         }
     }
     return null;
-}
+};
 
 //TODO Should this be a widget, or too granular? Discuss.
 cosmo.util.html.createRollOverMouseDownImage = function(normalImageUrl){
@@ -197,11 +197,23 @@ cosmo.util.html.createRollOverMouseDownImage = function(normalImageUrl){
     });
     return img;
 
-}
+};
 
 // Fix bug where safari does not put form inputs into form.elements.
 cosmo.util.html.addInputsToForm = function(inputs, form){
 	for (i=0; i < inputs.length; i++){
 		form[inputs[i].id] = inputs[i];
 	}
+};
+
+cosmo.util.html.handleTextInputFocus = function (e) {
+    var t = e.target;
+    if (t.className == 'inputTextDim') {
+        t.className = 'inputText';
+        t.value = '';
+    }
+    else {
+        t.select();
+    }
 }
+

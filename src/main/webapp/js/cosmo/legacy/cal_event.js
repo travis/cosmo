@@ -153,16 +153,17 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
          */
         function compareVals(prop, curr, orig, f) {
             var diff
-            var a = curr || null;
-            var b = orig || null;
+            // Don't try to compare vs. undefined vals
+            var a = (typeof curr == 'undefined') ? null : curr;
+            var b = (typeof orig == 'undefined') ? null : orig;
             if (f) {
                 if (f(a, b)) {
-                    ret.push([prop, a, b])
+                    ret.push([prop, curr, orig])
                 }
             }
             else {
                 if (a != b) {
-                    ret.push([prop, a, b])
+                    ret.push([prop, curr, orig])
                 }
             }
         }

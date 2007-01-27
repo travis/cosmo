@@ -19,15 +19,6 @@ from xml.etree import ElementTree
 
 from cosmo_test_lib import *
 
-SERVER_URL = 'http://qacosmo.osafoundation.org:8080'
-ADMIN_USER = 'root'
-ADMIN_PASS = 'cosmo'
-
-TEST_USER = 'test_user_report%s' % str(random.random()).strip('.')
-TEST_PASS = 'test_pass'
-TEST_FIRST_NAME = 'Test'
-TEST_LAST_NAME = 'User'
-TEST_EMAIL = TEST_USER+'@osafoundation.org'
 CALENDAR = 'calendar'
 FILES_DIR =  os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))+'/files/'
 TIMEZONE_CALENDAR = 'tzcalendar'

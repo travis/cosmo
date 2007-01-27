@@ -13,20 +13,40 @@
 #   limitations under the License.
 
 import cosmoclient
+import random
 
-def setup_module(module):
+SERVER_URL = 'http://qacosmo.osafoundation.org:8080'
+ADMIN_USER = 'root'
+ADMIN_PASS = 'cosmo'
+
+TEST_USER_PREFIX = 'test_user_'
+
+def setup_module(module, server_url=SERVER_URL, admin_user=ADMIN_USER, admin_pass=ADMIN_PASS, user_prefix=TEST_USER_PREFIX):
+    # Set module vars
+    module.SERVER_URL = server_url
+    module.ADMIN_USER = admin_user
+    module.ADMIN_PASS = admin_pass
+    module.TEST_USER = '%s%s' % (user_prefix, str(random.random()).strip('.'))
+    module.TEST_PASS = 'test_pass'
+    module.TEST_FIRST_NAME = 'Test'
+    module.TEST_LAST_NAME = 'User'
+    module.TEST_EMAIL = module.TEST_USER+'@osafoundation.org'
+    
+    #Setup client and users
     client = cosmoclient.CosmoClient(module.SERVER_URL)
     client.set_basic_auth(module.ADMIN_USER, module.ADMIN_PASS)
     module.client = client
     client.add_user(module.TEST_USER, module.TEST_PASS, module.TEST_FIRST_NAME, module.TEST_LAST_NAME, module.TEST_EMAIL)
     client.set_basic_auth(module.TEST_USER, module.TEST_PASS)
-    client._request('MKCALENDAR', '/cosmo/home/%s/%s' % (module.TEST_USER, module.CALENDAR))
-    assert client.response.status == 201
-    for i in range(1, 8):
-        ics_name = str(i)+'.ics'
-        body = open(module.FILES_DIR+'/reports/put/'+ics_name).read()
-        client.put('/cosmo/home/%s/%s/%s' % (module.TEST_USER, module.CALENDAR, ics_name), body=body, headers={'content-type':'text/calendar'})
+    
+    if hasattr(module, 'CALENDAR'):
+        client._request('MKCALENDAR', '/cosmo/home/%s/%s' % (module.TEST_USER, module.CALENDAR))
         assert client.response.status == 201
+        for i in range(1, 8):
+            ics_name = str(i)+'.ics'
+            body = open(module.FILES_DIR+'/reports/put/'+ics_name).read()
+            client.put('/cosmo/home/%s/%s/%s' % (module.TEST_USER, module.CALENDAR, ics_name), body=body, headers={'content-type':'text/calendar'})
+            assert client.response.status == 201
         
 def teardown_module(module):
     module.client.set_basic_auth(module.ADMIN_USER, module.ADMIN_PASS)

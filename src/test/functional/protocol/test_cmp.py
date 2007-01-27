@@ -15,19 +15,12 @@
 import cosmoclient
 import random
 
-SERVER_URL = 'http://qacosmo.osafoundation.org:8080'
-ADMIN_USER = 'root'
-ADMIN_PASS = 'cosmo'
-
-TEST_USER = 'test_user_%s' % str(random.random()).strip('.')
-TEST_PASS = 'test_pass'
-TEST_FIRST_NAME = 'Test'
-TEST_LAST_NAME = 'User'
-TEST_EMAIL = TEST_USER+'@osafoundation.org'
+import cosmo_test_lib
 
 def setup_module(module):
-    client = cosmoclient.CosmoClient(SERVER_URL)
-    client.set_basic_auth(ADMIN_USER, ADMIN_PASS)
+    cosmo_test_lib.setup_module(module)
+    client = cosmoclient.CosmoClient(module.SERVER_URL)
+    client.set_basic_auth(module.ADMIN_USER, module.ADMIN_PASS)
     module.client = client
 
 def test_list_users():

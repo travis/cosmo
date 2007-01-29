@@ -208,6 +208,13 @@ function test_dateSetters() {
     dt.setMonth(14);
     jum.assertEquals(2007, dt.getYear());
     jum.assertEquals(2, dt.getMonth());
+    
+    // Date wraparoud -- Set month to Feb with date of 31st
+    // should wrap date to March 3rd
+    dt = new D(2006, 0, 31);
+    dt.setMonth(1);
+    jum.assertEquals(2, dt.getMonth());
+    jum.assertEquals(3, dt.getDate());
 }
 
 function test_dateUTCSetters() {
@@ -229,11 +236,5 @@ function test_dateUTCSetters() {
     jum.assertEquals(25, dt.getDate());
     jum.assertEquals(6, dt.getUTCHours());
     jum.assertEquals(11, dt.getHours());
-}
-
-function test_setters(){
-  var d = new D();
-  d.setMonth(1);
-  jum.assertEquals(1, d.getMonth());
 }
 

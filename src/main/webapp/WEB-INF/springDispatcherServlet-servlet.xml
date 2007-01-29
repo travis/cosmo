@@ -164,7 +164,6 @@
 
 <bean id="appEntryController" class="org.osaf.cosmo.ui.ApplicationEntryController"> 
     <property name="loginView" value="login" />
-    <property name="messageSource"><ref bean="messageSource"/></property>
     <property name="securityManager"><ref bean="securityManager"/></property>
     <property name="defaultWelcomeUrl"><value>/pim</value></property>
 </bean> 

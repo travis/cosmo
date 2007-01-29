@@ -643,6 +643,7 @@
          /account/forgot=ROLE_ANONYMOUS
          /account/remind=ROLE_ANONYMOUS
          /login=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
+         /welcome=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /security_check=ROLE_ANONYMOUS
          /loginfailed=ROLE_ANONYMOUS
          /logout=ROLE_ROOT,ROLE_USER

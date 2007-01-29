@@ -20,5 +20,5 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
 <script type="text/javascript">
-	location = 'login';
+	location = 'welcome';
 </script>

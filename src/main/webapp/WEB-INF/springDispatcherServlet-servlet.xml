@@ -64,11 +64,11 @@
     <property name="mappings"> 
 		<value>
 	        /admin/status/*=statusController
-        	/logout=logoutController
-        	/login=loginController
+        	/login=appEntryController
+        	/logout=appEntryController
+        	/welcome=appEntryController
            	/browse/**=accountBrowsingController
     	    /i18n.js=i18nController
-    	    /js/cosmo/util/i18n.js=i18nController
     	    /account/activate=accountActivationController
     	    /account/view=accountViewController
     	    /pim/collection/*=collectionBookmarkController
@@ -158,18 +158,15 @@
 
 <!-- 
 
-	Controllers for login and logout
+	Controller for login, logout, and welcome page
 	
  -->
 
-<bean id="logoutController" class="org.osaf.cosmo.ui.account.LogoutController"> 
-    <property name="forwardPath" value="logout" />
-</bean> 
-
-<bean id="loginController" class="org.osaf.cosmo.ui.account.LoginController"> 
+<bean id="appEntryController" class="org.osaf.cosmo.ui.ApplicationEntryController"> 
     <property name="loginView" value="login" />
     <property name="messageSource"><ref bean="messageSource"/></property>
-    <property name="securityManager"><ref bean="securityManager" /></property>
+    <property name="securityManager"><ref bean="securityManager"/></property>
+    <property name="defaultWelcomeUrl"><value>/pim</value></property>
 </bean> 
 
 <!-- 

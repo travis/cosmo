@@ -142,6 +142,8 @@ body.adminPage {
     background: #ffffff;
     color:#222222;
     padding:8px;
+	height: 100%;
+	position: absolute;
 }
 
 

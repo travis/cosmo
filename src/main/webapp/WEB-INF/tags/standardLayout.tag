@@ -118,7 +118,7 @@
       <c:otherwise>
       </c:otherwise>
     </c:choose>
-    <div class="md">
+    <div class="md" id="contentDiv">
       <!-- page body -->
         <jsp:doBody/>
       <!-- end page body -->

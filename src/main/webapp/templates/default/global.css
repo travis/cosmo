@@ -131,3 +131,32 @@ Link styles
     * Mousedown effect: Underline
     * Mousedown link color: #0066cc
     * Visited link color: #57beff */
+
+/*
+ * A style for the center box of the kind of page layout found here:
+ * http://twiki-new.osafoundation.org/Journal/CosmoSignUpWorkflow
+ */
+.mainInfoBox{
+	position: relative;
+
+	border-left:1px solid lightgrey;
+	border-right:1px solid lightgrey;
+	border-bottom:0px;
+	border-top:0px;
+	bottom: 0;
+	left: 30%;
+	width: 40%;
+	height: 100%;
+	padding-right: 15px;		
+	padding-left: 15px;		
+	padding-top: 20px;
+	text-align: center;
+}
+
+p.mainInfoBoxText{
+	padding-bottom: 20px;	
+}
+
+#contentDiv{
+	height: 100%;	
+}

@@ -195,6 +195,10 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>default-security</filter-name>
+    <url-pattern>/welcome</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>default-security</filter-name>
     <url-pattern>/loginfailed</url-pattern>
   </filter-mapping>
   <filter-mapping>
@@ -304,6 +308,10 @@
   <servlet-mapping>
     <servlet-name>springDispatcherServlet</servlet-name>
     <url-pattern>/login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
+    <url-pattern>/welcome</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>springDispatcherServlet</servlet-name>

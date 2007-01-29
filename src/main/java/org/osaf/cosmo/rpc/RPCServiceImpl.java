@@ -499,17 +499,39 @@ public class RPCServiceImpl implements RPCService {
         //first see if that subscription exists
         sub = user.getSubscription(collectionUid, ticketKey);
         if (sub == null){
+            //new subscription
             sub = new CollectionSubscription();
             sub.setCollectionUid(collectionUid);
             sub.setDisplayName(displayName);
+            
+            //check to see if that display name is in use
+            //and if so get a new one
+            Set<String> displayNames = getSubscriptionDisplayNames(user);
+            int x = 1;
+            while (displayNames.contains(sub.getDisplayName())){
+                sub.setDisplayName(displayName + " (" + x + ")");
+                x++;
+            }
+            
             sub.setOwner(user);
             sub.setTicketKey(ticketKey);
             user.addSubscription(sub);
         } else {
+            //updating old subscription
             sub.setDisplayName(displayName);
         }
 
         userService.updateUser(user);
+    }
+
+    private Set<String> getSubscriptionDisplayNames(User user) {
+        Set<CollectionSubscription> collectionSubscriptions = user
+                .getCollectionSubscriptions();
+        Set<String> displayNames = new HashSet<String>();
+        for (CollectionSubscription sub : collectionSubscriptions){
+            displayNames.add(sub.getDisplayName());
+        }
+        return displayNames;
     }
 
     public void deleteSubscription(String collectionUid, String ticketKey) throws RPCException{
@@ -632,6 +654,7 @@ public class RPCServiceImpl implements RPCService {
         }
         return collection;
     }
+    
     private Iterator<String> availableNameIterator(VEvent vevent) {
         String  baseName = new StringBuffer(vevent.getUid()
                 .getValue()).append(".ics").toString();

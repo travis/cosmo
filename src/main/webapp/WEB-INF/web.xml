@@ -277,6 +277,13 @@
       <param-value>0</param-value>
     </init-param>
   </servlet>
+  <welcome-file-list>
+    <welcome-file>root</welcome-file>
+  </welcome-file-list>
+  <servlet-mapping>
+    <servlet-name>springDispatcherServlet</servlet-name>
+    <url-pattern>/root</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>dav</servlet-name>
     <url-pattern>/home/*</url-pattern>

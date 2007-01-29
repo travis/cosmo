@@ -66,7 +66,8 @@
 	        /admin/status/*=statusController
         	/login=appEntryController
         	/logout=appEntryController
-        	/welcome=appEntryController
+        	/=appEntryController
+			/welcome=appEntryController
            	/browse/**=accountBrowsingController
     	    /i18n.js=i18nController
     	    /account/activate=accountActivationController
@@ -163,11 +164,24 @@
  -->
 
 <bean id="appEntryController" class="org.osaf.cosmo.ui.ApplicationEntryController"> 
+	<property name="methodNameResolver"><ref bean="appEntryMethodNameResolver"/></property>
+
     <property name="loginView" value="login" />
     <property name="securityManager"><ref bean="securityManager"/></property>
-    <property name="defaultWelcomeUrl"><value>/pim</value></property>
+    <property name="defaultLoggedInRedirect"><value>/pim</value></property>
+    <property name="welcomePageUrl"><value>/welcome</value></property>
     <property name="userService"><ref bean="userService"/></property>
 </bean> 
+
+<bean id="appEntryMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
+  <property name="alwaysUseFullPath"><value>true</value></property>
+  <property name="mappings"><value>
+    /login=login
+    /logout=logout
+    /welcome=welcome
+	/=root
+  </value></property>
+</bean>
 
 <!-- 
 

@@ -141,9 +141,12 @@ body.adminPage {
     font-size: $fontSizeL;
     background: #ffffff;
     color:#222222;
-    padding:8px;
-	height: 100%;
-	position: absolute;
+    padding-left:1%;
+    padding-right:1%;
+    padding-top:1%;
+    height: 99%;
+	width: 98%;
+
 }
 
 

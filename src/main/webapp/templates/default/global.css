@@ -158,5 +158,11 @@ p.mainInfoBoxText{
 }
 
 #contentDiv{
-	height: 100%;	
+	height: 50em;
+	width: 100%;	
+
+}
+
+hr {
+	color: lightgrey;	
 }

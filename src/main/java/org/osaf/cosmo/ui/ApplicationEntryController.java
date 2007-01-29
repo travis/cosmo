@@ -27,9 +27,10 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 public class ApplicationEntryController extends MultiActionController {
 
     private String loginView;
-    private String defaultWelcomeUrl; 
+    private String defaultLoggedInRedirect; 
     private CosmoSecurityManager securityManager;
     private UserService userService;
+    private String welcomePageUrl;
 
     public ModelAndView login(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
@@ -51,20 +52,26 @@ public class ApplicationEntryController extends MultiActionController {
     public ModelAndView welcome(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         
-        User user = userService.getUser( 
-            securityManager.getSecurityContext().getUser().getUsername());
+        User user = securityManager.getSecurityContext().getUser();
         
         if (user == null){
             return new ModelAndView(loginView);
         } else {
+            user =  userService.getUser(user.getUsername());
+                
             String redirectUrl =  
                 user.getPreference(UIConstants.PREF_KEY_LOGIN_URL);
         
             if (redirectUrl == null){
-                redirectUrl = defaultWelcomeUrl;
+                redirectUrl = defaultLoggedInRedirect;
             }
             return new ModelAndView("redirect:" + redirectUrl);
         }
+    }
+    
+    public ModelAndView root(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        return new ModelAndView("redirect:" + welcomePageUrl);
     }
 
     public void setSecurityManager(CosmoSecurityManager securityManager) {
@@ -75,16 +82,24 @@ public class ApplicationEntryController extends MultiActionController {
         this.loginView = loginView;
     }
 
-    public String getDefaultWelcomeUrl() {
-        return defaultWelcomeUrl;
+    public String getDefaultLoggedInRedirect() {
+        return defaultLoggedInRedirect;
     }
 
-    public void setDefaultWelcomeUrl(String defaultLoginUrl) {
-        this.defaultWelcomeUrl = defaultLoginUrl;
+    public void setDefaultLoggedInRedirect(String defaultLoginUrl) {
+        this.defaultLoggedInRedirect = defaultLoginUrl;
     }
 
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    public String getWelcomePageUrl() {
+        return welcomePageUrl;
+    }
+
+    public void setWelcomePageUrl(String welcomePageUrl) {
+        this.welcomePageUrl = welcomePageUrl;
     }
 
 

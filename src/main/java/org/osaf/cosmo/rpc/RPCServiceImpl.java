@@ -815,6 +815,7 @@ public class RPCServiceImpl implements RPCService {
             CosmoDate originalEventEndDate) throws RPCException {
 
         //first save the new event
+        event.setId(null);
         ContentItem calendarEventItem = saveNewEvent(event, collection);
 
         //get the old event's recurrence rule

@@ -166,6 +166,7 @@
     <property name="loginView" value="login" />
     <property name="securityManager"><ref bean="securityManager"/></property>
     <property name="defaultWelcomeUrl"><value>/pim</value></property>
+    <property name="userService"><ref bean="userService"/></property>
 </bean> 
 
 <!-- 

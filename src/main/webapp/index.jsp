@@ -18,7 +18,13 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-
+<html>
+<head>
 <script type="text/javascript">
 	location = 'welcome';
 </script>
+</head>
+<body>
+Redirecting...
+</body>
+</html>

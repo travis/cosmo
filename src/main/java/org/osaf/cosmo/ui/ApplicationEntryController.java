@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.service.UserService;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
@@ -28,6 +29,7 @@ public class ApplicationEntryController extends MultiActionController {
     private String loginView;
     private String defaultWelcomeUrl; 
     private CosmoSecurityManager securityManager;
+    private UserService userService;
 
     public ModelAndView login(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
@@ -49,7 +51,8 @@ public class ApplicationEntryController extends MultiActionController {
     public ModelAndView welcome(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         
-        User user = securityManager.getSecurityContext().getUser();
+        User user = userService.getUser( 
+            securityManager.getSecurityContext().getUser().getUsername());
         
         if (user == null){
             return new ModelAndView(loginView);
@@ -78,6 +81,10 @@ public class ApplicationEntryController extends MultiActionController {
 
     public void setDefaultWelcomeUrl(String defaultLoginUrl) {
         this.defaultWelcomeUrl = defaultLoginUrl;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
 

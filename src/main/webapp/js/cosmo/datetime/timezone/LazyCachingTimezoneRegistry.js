@@ -37,8 +37,7 @@ dojo.declare("cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
     _loadedRegions: {},
     
     getTimezone: function(tzid){
-        var tz = this._timezones[tzid] || this._timezones[this._links[tzid]];
-        
+        var tz = this._timezones[tzid];
         if (tz){
             return tz;
         }
@@ -48,15 +47,17 @@ dojo.declare("cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
         if (!file){
             file = this._prefixToFileMap[tzid.split("/")[0]];
         }
-        
-        if (!file){
-            return null;
-        }
-        
-        if (this.loadFile(file)){
+              
+        if (file && this.loadFile(file)){
             return this.getTimezone(tzid);
         }
         
+        var link = this.getLink(tzid);
+        
+        if (link){
+            return this.getTimezone(link);
+        }
+                
         return null;
     },
     
@@ -85,6 +86,12 @@ dojo.declare("cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
             this._loadedRegions[region] = true;
         }
         return this._tzsByRegion[region];
+    }, 
+    
+    getLink: function(tzid){
+        this.loadFile("backward");
+        return this._links[tzid];
     }
+    
     
 });

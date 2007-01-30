@@ -179,6 +179,33 @@ cosmo.ui.cal_main.Cal = new function () {
                 );
             }
             
+            // No cals for this user
+            if (this.currentCollections.length == 0){
+                // Create initial cal
+                try {
+                    var uid = this.serv.createCalendar('Cosmo');
+                }
+                catch(e) {
+                    cosmo.app.showErr(_('Main.Error.InitCalCreateFailed'), e);
+                    return false;
+                }
+                var collection = this.serv.getCalendar(uid);
+                var newCollectionItem = {
+                    collection: collection,
+                    transportInfo: null,
+                    conduit: cosmo.conduits.OwnedCollectionConduit,
+                    displayName: collection.name,
+                    privileges: {'read':'read', 'write':'write'}
+                    }
+
+                this.currentCollections.push(newCollectionItem);
+                   
+                newCollectionItem.conduit.saveEvent(
+                   newCollectionItem.collection.uid, 
+                   this.createWelcomeEvent(), 
+                   newCollectionItem.transportInfo, f)
+            }
+            
             var subscriptions = this.serv.getSubscriptions();
             for (var i = 0; i < subscriptions.length; i++){
                 var subscription = subscriptions[i];
@@ -191,31 +218,6 @@ cosmo.ui.cal_main.Cal = new function () {
                     privileges: subscription.ticket.privileges
                     }
                 );
-            }
-            
-            // No cals for this user
-            if (this.currentCollections.length == 0){
-                // Create initial cal
-                try {
-                    var uid = this.serv.createCalendar('Cosmo');
-                }
-                catch(e) {
-                    cosmo.app.showErr(_('Main.Error.InitCalCreateFailed'), e);
-                    return false;
-                }
-                var collection = this.serv.getCalendar(uid);
-                this.currentCollections.push(
-                    {
-                    collection: collection,
-                    transportInfo: null,
-                    conduit: cosmo.conduits.OwnedCollectionConduit,
-                    displayName: collection.name,
-                    privileges: {'read':'read', 'write':'write'}
-                    }
-                );
-                
-                // Add 'Welcome to Cosmo' Event
-                this.createWelcomeItem = true;
             }
         }
         
@@ -591,15 +593,11 @@ cosmo.ui.cal_main.Cal = new function () {
     
     
     /**
-     * Insert a new calendar event -- can be called two ways:
-     * (1) Double-clicking on the cal canvas
-     * (2) When the user has no calendar, Cosmo creates a new calendar
-     *     and adds the 'Welcome to Cosmo' event with this method
+     * Insert a new calendar event -- called when 
+     * the user double-clicks on the cal canvas
      * @param id A string, the id of the div on the cal canvas double-clicked
-     * @param newCal Boolean, whether or not this is a 'Welcome' event
-     * for a newly created calendar
      */
-    this.insertCalEventNew = function (evParam, newCal) {
+    this.insertCalEventNew = function (evParam) {
         var ev = null; // New event
         var evSource = '';
         var evType = '';
@@ -660,8 +658,8 @@ cosmo.ui.cal_main.Cal = new function () {
         
         // Set CalEventData start and end calculated from click position
         // --------
-        evTitle = newCal ? 'Welcome to Cosmo!' : _('Main.NewEvent');
-        evDesc = newCal ? 'Welcome to Cosmo!' : '';
+        evTitle = _('Main.NewEvent');
+        evDesc = '';
         ev.data = new CalEventData(null, evTitle, evDesc,
             start, end, allDay);
         
@@ -1039,6 +1037,23 @@ cosmo.ui.cal_main.Cal = new function () {
     this.redirectTimeout = function () {
         location = cosmo.env.getRedirectUrl();
     };
+    
+    this.createWelcomeEvent = function (){
+        var startstr = Cal.getIndexFromHourDiv('hourDiv3-900');
+        var dayind = Cal.extractDayIndexFromId(startstr);
+        var evdate = Cal.calcDateFromIndex(dayind);
+        var yea = evdate.getFullYear();
+        var mon = evdate.getMonth();
+        var dat = evdate.getDate();
+        var startstr = Cal.extractTimeFromId(startstr);
+        var hou = parseInt(Cal.extractHourFromTime(startstr));
+        var min = parseInt(Cal.extractMinutesFromTime(startstr));
+        var start = new cosmo.datetime.Date(yea, mon, dat, hou, min);
+        var end = cosmo.datetime.Date.add(start, 'n', 60);
+        
+        return new cosmo.model.CalEventData(null, "Welcome to Cosmo", "Welcome to Cosmo",
+           start, end, false);
+    }
 
 
     // ==========================

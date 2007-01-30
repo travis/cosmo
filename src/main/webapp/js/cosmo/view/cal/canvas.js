@@ -264,16 +264,7 @@ cosmo.view.cal.canvas = new function () {
     function loadSuccess(ev) {
         removeAllEvents();
         self.eventRegistry = ev;
-        // FIXME: This is a hack to get the 'Welcome to Cosmo'
-        // event on the canvas -- has to happen here so you
-        // don't wipe it with the 'removeAllEvents' call above
-        if (Cal.createWelcomeItem) { 
-            Cal.insertCalEventNew('hourDiv3-900', true); 
-            Cal.createWelcomeItem = false;
-        }
-        else {
-            self.eventRegistry.each(appendLozenge);
-        }
+        self.eventRegistry.each(appendLozenge);
         // Update the view
         updateEventsDisplay();
     }

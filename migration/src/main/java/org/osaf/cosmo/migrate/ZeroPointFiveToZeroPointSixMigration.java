@@ -74,26 +74,37 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
     private void migrateUsers(Connection conn) throws Exception {
         PreparedStatement stmt = null;
         PreparedStatement updateStmt = null;
+        PreparedStatement insertStmt = null;
         ResultSet rs =  null;
         long count = 0;
         log.debug("starting migrateUsers()");
         
         try {
-            stmt = conn.prepareStatement("select id, datecreated, datemodified from users");
+            stmt = conn.prepareStatement("select id, datecreated, datemodified, admin from users");
             updateStmt = conn.prepareStatement("update users set createdate=?, modifydate=? where id=?");
+            insertStmt = conn.prepareStatement("insert into user_preferences (userid, preferencename, preferencevalue) values (?, ?, ?)");
+            insertStmt.setString(2, "Login.Url");
+            
             rs = stmt.executeQuery();
             
             while(rs.next()) {
                 count++;
-                long itemId = rs.getLong(1);
+                long userId = rs.getLong(1);
                 Timestamp createTs = rs.getTimestamp(2);
                 Timestamp modifyTs = rs.getTimestamp(3);
+                boolean isAdmin = rs.getBoolean(4);
                 
+                // update user timestamps
                 updateStmt.setLong(1, createTs.getTime());
                 updateStmt.setLong(2, modifyTs.getTime());
-                updateStmt.setLong(3, itemId);
+                updateStmt.setLong(3, userId);
 
                 updateStmt.executeUpdate();
+                
+                // insert account preference
+                insertStmt.setLong(1, userId);
+                insertStmt.setString(3, isAdmin ? "/account/view" : "/pim");
+                insertStmt.executeUpdate();    
             }
         } finally {
             if(rs!=null)
@@ -102,6 +113,8 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                 stmt.close();
             if(updateStmt!=null)
                 updateStmt.close();
+            if(insertStmt!=null)
+                insertStmt.close();
         }
         
         log.debug("processed " + count + " users");

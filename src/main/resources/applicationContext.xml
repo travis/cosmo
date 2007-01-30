@@ -474,7 +474,7 @@
   <bean id="davLocatorFactory"
         class="org.osaf.cosmo.dav.impl.StandardLocatorFactory">
     <constructor-arg>
-      <value>/home</value>
+      <value>/dav</value>
     </constructor-arg>
     <constructor-arg>
       <value>/feed/atom/1.0</value>

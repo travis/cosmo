@@ -159,7 +159,7 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>dav-security</filter-name>
-    <url-pattern>/home/*</url-pattern>
+    <url-pattern>/dav/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>dav-security</filter-name>
@@ -286,7 +286,7 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>dav</servlet-name>
-    <url-pattern>/home/*</url-pattern>
+    <url-pattern>/dav/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>cmp</servlet-name>

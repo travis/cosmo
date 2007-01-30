@@ -98,9 +98,8 @@ public class DavCalendarCollection extends DavCollection
         registerLiveProperty(MAXRESOURCESIZE);
 
         int cc = ResourceType.registerResourceType(ELEMENT_CALDAV_CALENDAR,
-                                              NAMESPACE_CALDAV);
+                                                   NAMESPACE_CALDAV);
         RESOURCE_TYPES = new int[] { ResourceType.COLLECTION, cc };
-
         
         DEAD_PROPERTY_FILTER.add(CalendarCollectionStamp.class.getName());
     }

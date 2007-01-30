@@ -257,8 +257,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         },
 
         onPageSizeChooserChange : function (evt){
-            if (evt.target.value == 0){
-                alert("Page size cannot be 0.");
+            if (evt.target.value <= 0 || 
+                evt.target.value % 1 != 1){
+                alert("Page size cannot be " + evt.target.value + ".");
                 evt.target.value = this.pageSize;
                 return;
             }

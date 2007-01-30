@@ -136,7 +136,7 @@ cosmo.env.getImagesUrl = function(){
 }
 
 cosmo.env.getRedirectUrl = function(){
-	return cosmo.env.getBaseUrl() + '/redirect_login.jsp';}
+	return cosmo.env.getBaseUrl() + '/logout';}
 
 cosmo.env.getLoginRedirect = function(){
 	return cosmo.env.getBaseUrl() + "/login";

@@ -60,7 +60,11 @@
         dojo.event.browser.addListener(window, "onload", init, false);
 
         function init() {
-        	
+            cosmo.util.cookie.destroy('JSESSIONID', '/cosmo');
+            cosmo.util.cookie.destroy('inputTimestamp');
+            cosmo.util.cookie.destroy('username');
+		    cosmo.util.auth.clearAuth();
+		    
             cosmo.app.init();
             if (cosmo.util.uri.parseQueryString(location.search)['signup']
 				== 'true'){

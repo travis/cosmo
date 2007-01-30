@@ -104,18 +104,20 @@ dojo.widget.HtmlWidget, function(){
                this.collectionNameText.style.display = "";
            }
            
-           this.linkSpan.appendChild(
-                cosmo.util.html.createRollOverMouseDownImage(
-                cosmo.env.getImagesUrl() + "link.png"));
+           var linkImg = cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImagesUrl() + "link.png");
+           var toolTip = _("Main.CollectionDetails.LinkImageToolTip", this.displayName);         
+           linkImg.title = toolTip;
+           linkImg.alt = toolTip;
+           this.linkSpan.appendChild(linkImg);
            
            // Show the selection choice if passed from the selector in 
            // ticket view -- otherwise default to 'Chandler'
-           var selI =0
+           var selectedIndex =0
            if (this.displayedSelection) {
-               selI = cosmo.ui.widget.CollectionDetailsDialog.clientMappings[
+               selectedIndex = cosmo.ui.widget.CollectionDetailsDialog.clientMappings[
                    this.displayedSelection];
            }
-           this.clientSelector.selectedIndex = selI;
+           this.clientSelector.selectedIndex = selectedIndex;
            
            this._handleClientChanged();
         },

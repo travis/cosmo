@@ -15,7 +15,7 @@
 import cosmoclient
 import random
 
-SERVER_URL = 'http://qacosmo.osafoundation.org:8080'
+SERVER_URL = 'http://qacosmo.osafoundation.org:80'
 ADMIN_USER = 'root'
 ADMIN_PASS = 'cosmo'
 

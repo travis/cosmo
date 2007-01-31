@@ -367,7 +367,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                 userHash.password = form.password.value;
             }
 
-            userHash.administrator = form.admin.checked;
+            if (user.administrator != form.admin.checked
+            	&& this.enabledInputs.admin){
+            	userHash.administrator = form.admin.checked;
+          	}
 
             if (this.role == cosmo.ROLE_ADMINISTRATOR){
                 cosmo.cmp.modifyUser(this.editingUser.username, userHash, this.postActionHandlerDict)

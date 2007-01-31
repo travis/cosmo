@@ -275,9 +275,10 @@ public class UserResource implements CmpResource, OutputsXml {
             }
             else if (DomUtil.matches(e, EL_ADMINISTRATOR, NS_CMP)){
                 if (user.getUsername() != null &&
-                        user.getUsername().equals(User.USERNAME_OVERLORD)) {
+                    user.getUsername().equals(User.USERNAME_OVERLORD) &&
+                    !DomUtil.getTextTrim(e).toLowerCase().equals("true")) {
                         throw new CmpException("root user's admin status " +
-                                               "may not be changed");
+                                               "must be true");
                 }
                 user.setAdmin(Boolean.parseBoolean(DomUtil.getTextTrim(e)));
             }

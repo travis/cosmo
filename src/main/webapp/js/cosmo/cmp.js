@@ -11,6 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+ /**
+ * summary:
+ *      This module provides wrappers around dojo.io.bind to simplify using
+ *      the Cosmo Management Protocol (CMP) from javascript.
+ * description:
+ *      For more information about CMP, please see:
+ *      http://wiki.osafoundation.org/Projects/CosmoManagementProtocol
+ * 
+ *      Most methods take handlerDicts identical to those required
+ *      by dojo.io.bind.
+ */
 
 dojo.provide("cosmo.cmp");
 
@@ -32,8 +44,11 @@ cosmo.ROLE_AUTHENTICATED = "authenticated"
 
 dojo.declare("cosmo.cmp.Cmp", null,
     {
-
-        getDefaultCMPRequest: function (handlerDict, sync){
+        /**
+         * summary: Return request populated with attributes common to all CMP calls.
+         */
+        getDefaultCMPRequest: function (/*Object*/ handlerDict, 
+                                        /*boolean?*/ sync){
 			
             var request = cosmo.util.auth.getAuthorizedRequest()
 
@@ -52,23 +67,48 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
             return request;
         },
-
-
-        /**
-         * All of these methods use handlerDicts. handlerDicts should specify handlers
-         * identical to those used by dojo.io.bind
+        
+        /*
+         * Administrator operations: 
+         *     administrator user credentials must be provided with the 
+         *     request for these operations
+         * 
          */
+        /**
+         * summary: Get a list of the users on this Cosmo instance
+         * description: Get an Array of Objects representing a list of 
+         *              users on this Cosmo instance. The composition of
+         *              this list can be specified with the server side
+         *              paging parameters <code>pageNumber</code>, 
+         *              <code>pageSize</code>, <code>sortOrder</code> and
+         *              <code>sortType</code>.
+         */ 
+        getUsers: function (/*Object*/ handlerDict, 
+                            /*int*/ pageNumber, 
+                            /*int*/ pageSize, 
+                            /*String*/ sortOrder, 
+                            /*String*/ sortType, 
+                            /*boolean?*/ sync) {
+            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUsersXMLToJSON);
 
-        getUserXML: function (username, handlerDict, sync) {
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + 
-                encodeURIComponent(dojo.string.trim(username));
-            requestDict.method = "GET";
-
-            dojo.io.bind(requestDict);
+            this.getUsersXML(handlerDict, pageNumber, pageSize, sortOrder, sortType, sync);
         },
 
-        getUsersXML: function (handlerDict, pageNumber, pageSize, sortOrder, sortType, sync) {
+        /**
+         * summary: Get a list of the users on this Cosmo instance
+         * description: Get an XML representation of a list of 
+         *              users on this Cosmo instance. The composition of
+         *              this list can be specified with the server side
+         *              paging parameters <code>pageNumber</code>, 
+         *              <code>pageSize</code>, <code>sortOrder</code> and
+         *              <code>sortType</code>.
+         */ 
+        getUsersXML: function (/*Object*/ handlerDict, 
+                               /*int*/ pageNumber, 
+                               /*int*/ pageSize, 
+                               /*String*/ sortOrder, 
+                               /*String*/ sortType, 
+                               /*boolean?*/ sync) {
             var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
             requestDict.url = cosmo.env.getBaseUrl() + "/cmp/users";
 
@@ -83,63 +123,39 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
             dojo.io.bind(requestDict);
         },
-
-        getAccountXML: function(handlerDict, sync) {
-                var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-                requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account";
-                requestDict.method = "GET";
-
-                dojo.io.bind(requestDict);
-        },
-
+        
         /**
-         * These functions are sugar for getting the XML information and parsing
-         * into a nice javascript object.
+         * summary: Get the user representation for <code>username</code>
+         * description: Return an Object representation of <code>username</code>.
          */
-        _wrapXMLHandlerFunctions: function (handlerDict, xmlParseFunc){
-            var self = this;
-
-            if (handlerDict.load != undefined){
-                handlerDict.old_load = handlerDict.load
-                handlerDict.load = function(type, data, evt){
-                    var parsedCMPXML = xmlParseFunc.apply(self, [evt.responseXML])
-                    handlerDict.old_load(type, parsedCMPXML, evt);
-                }
-            }
-			// Don't mess with "error". These responses shouldn't be XML.
-			// Don't mess with "handle". This is a "don't mess with my stuff" handler.
-        },
-
-        getUser: function(username, handlerDict, sync) {
+        getUser: function(/*String*/ username, 
+                          /*Object*/ handlerDict, 
+                          /*boolean?*/ sync) {
             this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
 
             this.getUserXML(username, handlerDict, sync);
         },
 
-        getUsers: function (handlerDict, pageNumber, pageSize, sortOrder, sortType, sync) {
-            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUsersXMLToJSON);
+        /**
+         * summary: Get the user representation for <code>username</code>
+         * description: Return an XML representation of <code>username</code>.
+         */
+        getUserXML: function (/*String*/ username,
+                              /*Object*/ handlerDict, 
+                              /*boolean?*/ sync) {
+            
+            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + 
+                encodeURIComponent(dojo.string.trim(username));
+            requestDict.method = "GET";
 
-            this.getUsersXML(handlerDict, pageNumber, pageSize, sortOrder, sortType, sync);
+            dojo.io.bind(requestDict);
         },
-
-        getAccount: function (handlerDict, sync) {
-            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
-
-            this.getAccountXML(handlerDict, sync);
-        },
-
-        headUser: function (username, handlerDict, sync){
-                var requestDict = this.getDefaultCMPRequest(handlerDict, true)
-                requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + 
-                    encodeURIComponent(dojo.string.trim(username));
-                requestDict.method = "HEAD"
-                if (sync){
-                    requestDict.async = false;
-                }
-
-                dojo.io.bind(requestDict);
-        },
-
+        
+        /**
+         * summary: Create the user described by <code>userHash</code>
+         * description: Create the user described by <code>userHash</code>.
+         */
         createUser: function (userHash, handlerDict, sync) {
                 var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
                                 '<user xmlns="http://osafoundation.org/cosmo/CMP">' +
@@ -166,6 +182,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 dojo.io.bind(requestDict);
         },
 
+        /**
+         * summary: Modify <code>username</code>'s account
+         * description: Update <code>username</code>'s account with
+         *              the values in <code>userHash</code>
+         */
         modifyUser: function (username, userHash, handlerDict, sync) {
                 var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
                         '<user xmlns="http://osafoundation.org/cosmo/CMP">';
@@ -181,12 +202,19 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 requestDict.method = "POST";
                 requestDict.headers['X-Http-Method-Override'] = "PUT";
                 requestDict.postContent = request_content;
-
+                
                 dojo.io.bind(requestDict);
 
         },
-
-        deleteUser: function (username, handlerDict, sync) {
+        
+        /**
+         * summary: Delete <code>username</code>
+         * description: Delete <code>username</code>
+         * 
+         */
+        deleteUser: function (/*String*/ username, 
+                              /*Object*/ handlerDict, 
+                              /*boolean?*/ sync) {
                 var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
                                     encodeURIComponent(dojo.string.trim(username));
@@ -195,8 +223,16 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 dojo.io.bind(requestDict);
 
         },
-
-        deleteUsers: function (usernames, handlerDict, sync) {
+        
+        /**
+         * summary: Delete the all users in <code>usernames</code>
+         * description: Delete all the users whose usernames appear in
+         *              <code>usernames</code>
+         * 
+         */
+        deleteUsers: function (/*String[]*/ usernames, 
+                               /*Object*/ handlerDict, 
+                               /*boolean?*/ sync) {
                 var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/delete";
                 requestDict.method = "POST";
@@ -214,8 +250,86 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 dojo.io.bind(requestDict);
 
         },
+        
+        /**
+         * summary: Activate <code>username</code>'s account
+         * description: Activate <code>username</code>'s account
+         */
+        activate: function (/*String*/ username, 
+                            /*Object*/ handlerDict, 
+                            /*boolean?*/ sync) {
+            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/activate/" + username;
+            requestDict.method = "POST";
+            requestDict.postContent = "id="+username;
+            dojo.io.bind(requestDict);
+        },
+        
+        /**
+         * summary: Return the number of users on this server.
+         * description: Return the number of users on this server.
+         */
+        getUserCount: function (/*Object*/ handlerDict, 
+                                /*boolean?*/ sync){
+        	var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+        	requestDict.url = cosmo.env.getBaseUrl() + "/cmp/users/count";
+        	requestDict.method = "GET";
+			dojo.io.bind(requestDict);
+        },
 
-        modifyAccount: function (userHash, handlerDict, sync) {
+        /**
+         * summary: Perform a HEAD request for <code>username</code>.
+         * description: Perform a HEAD request for <code>username</code>. Will return 
+         *              a 404 if the user does not exist, and a 200
+         *              if it does.
+         */
+        headUser: function (/*String*/ username, 
+                            /*Object*/ handlerDict, 
+                            /*boolean?*/ sync){
+                var requestDict = this.getDefaultCMPRequest(handlerDict, true)
+                requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" + 
+                    encodeURIComponent(dojo.string.trim(username));
+                requestDict.method = "HEAD"
+                if (sync){
+                    requestDict.async = false;
+                }
+
+                dojo.io.bind(requestDict);
+        },
+
+        /*
+         * Authenticated operations: 
+         *     user credentials must be provided with the request for 
+         *     these operations
+         * 
+         */
+        getAccount: function (/*Object*/ handlerDict, 
+                              /*boolean?*/ sync) {
+            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
+
+            this.getAccountXML(handlerDict, sync);
+        },
+
+        /**
+         * summary: Get the user representation for the current user.
+         * description: Return an XML representation of the current user.
+         */
+        getAccountXML: function(/*Object*/ handlerDict, 
+                                /*boolean?*/ sync) {
+                var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+                requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account";
+                requestDict.method = "GET";
+
+                dojo.io.bind(requestDict);
+        },
+
+        /**
+         * summary: Get the user representation for the current user.
+         * description: Return an Object representation of the current user.
+         */
+        modifyAccount: function (/*Object*/ userHash, 
+                                 /*Object*/ handlerDict, 
+                                 /*boolean?*/ sync) {
                 var requestContent = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
                         '<user xmlns="http://osafoundation.org/cosmo/CMP">';
 
@@ -234,8 +348,33 @@ dojo.declare("cosmo.cmp.Cmp", null,
                dojo.io.bind(requestDict);
 
         },
+        
+        /*
+         * Anonymous operations:
+         *      Credentials should not be provided with this request
+         */
+        /**
+         * summary: Sign up the user represented by <code>userHash</code> 
+         * description: Sign up the user represented by <code>userHash</code>
+         *              and return an Object representation of that user.
+         */         
+        signup: function (/*Object*/ userHash, 
+                          /*Object*/ handlerDict, 
+                          /*boolean?*/ sync) {
+            var self = this;
+            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
 
-        getSignupXML: function(userHash, handlerDict, sync) {
+            this.getSignupXML(userHash, handlerDict, sync);
+        },
+
+        /**
+         * summary: Sign up the user represented by <code>userHash</code> 
+         * description: Sign up the user represented by <code>userHash</code>
+         *              and return an XML representation of that user.
+         */
+        getSignupXML: function(/*Object*/ userHash, 
+                               /*Object*/ handlerDict, 
+                               /*boolean?*/ sync) {
             var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
                             '<user xmlns="http://osafoundation.org/cosmo/CMP">' +
                             '<username>' + userHash.username + '</username>' +
@@ -254,29 +393,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             dojo.io.bind(requestDict);
         },
 
-        signup: function (userHash, handlerDict, sync) {
-            var self = this;
-            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
-
-            this.getSignupXML(userHash, handlerDict, sync);
-        },
-
-        activate: function (username, handlerDict, sync) {
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/activate/" + username;
-            requestDict.method = "POST";
-            requestDict.postContent = "id="+username;
-            dojo.io.bind(requestDict);
-        },
-        
-        getUserCount: function (handlerDict, sync){
-        	var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-        	requestDict.url = cosmo.env.getBaseUrl() + "/cmp/users/count";
-        	requestDict.method = "GET";
-			dojo.io.bind(requestDict);
-        },
-
-        cmpUserXMLToJSON: function (cmpUserXml){
+        cmpUserXMLToJSON: function (/*Element*/ cmpUserXml){
             var user = cmpUserXml;
             var obj = {};
             obj.firstName = user.getElementsByTagName("firstName")[0].firstChild.nodeValue;
@@ -314,11 +431,23 @@ dojo.declare("cosmo.cmp.Cmp", null,
             }
 
             return userList;
+        },
+
+        _wrapXMLHandlerFunctions: function (/*Object*/ handlerDict, 
+                                            /*function*/ xmlParseFunc){
+            var self = this;
+
+            if (handlerDict.load != undefined){
+                handlerDict.old_load = handlerDict.load
+                handlerDict.load = function(type, data, evt){
+                    var parsedCMPXML = xmlParseFunc.apply(self, [evt.responseXML])
+                    handlerDict.old_load(type, parsedCMPXML, evt);
+                }
+            }
+			// Don't mess with "error". These responses shouldn't be XML.
+			// Don't mess with "handle". This is a "don't mess with my stuff" handler.
         }
-
-
     }
-
-)
+);
 
 cosmo.cmp = new cosmo.cmp.Cmp();

@@ -202,6 +202,15 @@ cosmo.ui.cal_form.CalForm = function () {
             28, 100, null, 'inputText', elem);
         d.appendChild(elem);
 
+        // Event location
+        this.createLabel(_(
+            'Main.DetailForm.Location'), d);
+        elem = _createElem('div');
+        elem.className = 'formElem';
+        _html.createInput('text', 'eventlocation', 'eventlocation',
+            28, 100, null, 'inputText', elem);
+        d.appendChild(elem);
+
         // All-day checkbox
         elem = _createElem('div');
         elem.className = 'formElem';
@@ -530,6 +539,7 @@ cosmo.ui.cal_form.CalForm = function () {
         var startTime = '';
         var endTime = '';
         var title = '';
+        var evtLocation = '';
         var descr = '';
         var status = '';
         var allDay = false;
@@ -547,6 +557,7 @@ cosmo.ui.cal_form.CalForm = function () {
         startTime = form.starttime.value;
         endTime = form.endtime.value;
         title = form.eventtitle.value;
+        evtLocation = form.eventlocation.value;
         descr = form.eventdescr.value;
         status = form.status.value;
         allDay = form.eventallday.checked ? true : false;
@@ -669,6 +680,7 @@ cosmo.ui.cal_form.CalForm = function () {
                 d.end.utc = false;
             }
             d.title = title;
+            d.location = evtLocation;
             d.description = descr || null;
             d.allDay = allDay;
             d.anyTime = (!startTime && !endTime && !allDay) ? true : false;
@@ -707,6 +719,7 @@ cosmo.ui.cal_form.CalForm = function () {
         var recur = ev.data.recurrenceRule;
         var status = ev.data.status;
         form.eventtitle.value = ev.data.title;
+        form.eventlocation.value = ev.data.location;
         form.eventdescr.value = ev.data.description ?
             ev.data.description : '';
         form.status.value = ev.data.statusBar ? ev.data.status : '';
@@ -838,6 +851,7 @@ cosmo.ui.cal_form.CalForm = function () {
         var form = this.form;
         // Update info in event form
         form.eventtitle.value = '';
+        form.eventlocation.value = '';
         form.eventdescr.value = '';
         form.startdate.value = '';
         form.starttime.value = '';
@@ -896,6 +910,7 @@ cosmo.ui.cal_form.CalForm = function () {
         
         // Focus handlers for text entry
         dojo.event.connect(form.eventtitle, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
+        dojo.event.connect(form.eventlocation, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
         dojo.event.connect(form.startdate, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
         dojo.event.connect(form.starttime, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
         dojo.event.connect(form.enddate, 'onfocus', cosmo.util.html, 'handleTextInputFocus');

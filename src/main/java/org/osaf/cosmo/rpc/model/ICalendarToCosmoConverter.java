@@ -72,6 +72,7 @@ public class ICalendarToCosmoConverter {
     public static final String EVENT_START = "start";
     public static final String EVENT_END = "end";
     public static final String EVENT_TITLE = "title";
+    public static final String EVENT_LOCATION = "location";
     public static final String EVENT_STATUS = "status";
     public static final String EVENT_ALLDAY = "allDay";
     public static final String EVENT_ANYTIME = "anyTime";
@@ -522,6 +523,7 @@ public class ICalendarToCosmoConverter {
         event.setId(itemId);
         event.setDescription(getPropertyValue(vevent, Property.DESCRIPTION));
         event.setTitle(getPropertyValue(vevent, Property.SUMMARY));
+        event.setLocation(getPropertyValue(vevent, Property.LOCATION));
         event.setStatus(getPropertyValue(vevent, Property.STATUS));
     }
 
@@ -609,7 +611,7 @@ public class ICalendarToCosmoConverter {
                             .getMasterEvent(calendar), recurrenceId.getDate(),
                             calendar);
                     EventType modEventType = getEventType(modEvent);
-                    String[] modifiedProperties = getModifiedProprties(curVEvent, vevent, modEventType);
+                    String[] modifiedProperties = getModifiedProperties(curVEvent, vevent, modEventType);
                     modification.setModifiedProperties(modifiedProperties);
                     modification.setEvent(modEvent);
                     mods.add(modification);
@@ -628,10 +630,11 @@ public class ICalendarToCosmoConverter {
                     modEvent.isPointInTime() ? EventType.ATTIME : EventType.NORMAL;
     }
 
-    private String[] getModifiedProprties(VEvent modificationEvent, VEvent masterEvent, EventType modEventType) {
+    private String[] getModifiedProperties(VEvent modificationEvent, VEvent masterEvent, EventType modEventType) {
         Set<String> props = new HashSet<String>();
         addIfHasProperty(modificationEvent, props, Property.DESCRIPTION, EVENT_DESCRIPTION);
         addIfHasProperty(modificationEvent, props, Property.SUMMARY, EVENT_TITLE);
+        addIfHasProperty(modificationEvent, props, Property.LOCATION, EVENT_LOCATION);
         addIfHasProperty(modificationEvent, props, Property.STATUS, EVENT_STATUS);
 
         RecurrenceId recurrenceId = modificationEvent.getReccurrenceId();

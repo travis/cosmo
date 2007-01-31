@@ -143,6 +143,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
             'start': compareDateTime,
             'end': compareDateTime,
             'title': null,
+            'location':null,
             'description': compareDescription,
             'allDay': null,
             'pointInTime': null,

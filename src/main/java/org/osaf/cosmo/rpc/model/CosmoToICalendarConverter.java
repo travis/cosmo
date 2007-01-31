@@ -24,6 +24,7 @@ import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_END;
 import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_START;
 import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_STATUS;
 import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_TITLE;
+import static org.osaf.cosmo.rpc.model.ICalendarToCosmoConverter.EVENT_LOCATION;
 import static org.osaf.cosmo.util.CollectionUtils.createSetFromArray;
 import static org.osaf.cosmo.util.ICalendarUtils.getMasterEvent;
 
@@ -61,6 +62,7 @@ import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Summary;
+import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
@@ -271,6 +273,9 @@ public class CosmoToICalendarConverter {
 
         Summary summary = new Summary();
         summary.setValue(event.getTitle());
+        
+        Location location = new Location();
+        location.setValue(event.getLocation());
 
         Description description = new Description();
         description.setValue(event.getDescription());
@@ -283,6 +288,7 @@ public class CosmoToICalendarConverter {
 
         addOrReplaceProperty(vevent, description);
         addOrReplaceProperty(vevent, summary);
+        addOrReplaceProperty(vevent, location);
         if (status != null) {
             addOrReplaceProperty(vevent, status);
         } else {
@@ -642,6 +648,12 @@ public class CosmoToICalendarConverter {
                     Summary summary = new Summary();
                     summary.setValue(modification.getEvent().getTitle());
                     modVEvent.getProperties().add(summary);
+                }
+                
+                if (modifiedProperties.contains(EVENT_LOCATION)) {
+                    Location location = new Location();
+                    location.setValue(modification.getEvent().getLocation());
+                    modVEvent.getProperties().add(location);
                 }
                 
                 if (modifiedProperties.contains(EVENT_STATUS)) {

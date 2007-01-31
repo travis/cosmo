@@ -22,11 +22,12 @@ package org.osaf.cosmo.rpc.model;
  */
 public class Event {
 	
-	private String id = null;
+    private String id = null;
     private String description = null;
     private CosmoDate start = null;
     private CosmoDate end = null;
     private String title  = null;
+    private String location = null;
     private String status = null;
     private RecurrenceRule recurrenceRule = null;
     private boolean isAllDay = false;
@@ -36,13 +37,21 @@ public class Event {
     private boolean instance = false;
     private CosmoDate instanceDate = null;
     
-	public String getTitle() {
-		return title;
-	}
+        public String getTitle() {
+                return title;
+        }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+        public void setTitle(String title) {
+                this.title = title;
+        }
+
+        public String getLocation() {
+                return location;
+        }
+
+        public void setLocation(String location) {
+                this.location = location;
+        }
 
     /**
      * When the event ends. For all day events this value represents the last day of the all
@@ -169,7 +178,8 @@ public class Event {
 		result = PRIME * result + ((recurrenceRule == null) ? 0 : recurrenceRule.hashCode());
 		result = PRIME * result + ((start == null) ? 0 : start.hashCode());
 		result = PRIME * result + ((status == null) ? 0 : status.hashCode());
-		result = PRIME * result + ((title == null) ? 0 : title.hashCode());
+                result = PRIME * result + ((title == null) ? 0 : title.hashCode());
+                result = PRIME * result + ((location == null) ? 0 : location.hashCode());
 		return result;
 	}
 
@@ -222,11 +232,16 @@ public class Event {
 				return false;
 		} else if (!status.equals(other.status))
 			return false;
-		if (title == null) {
-			if (other.title != null)
-				return false;
-		} else if (!title.equals(other.title))
-			return false;
+                if (title == null) {
+                        if (other.title != null)
+                                return false;
+                } else if (!title.equals(other.title))
+                        return false;
+                if (location == null) {
+                        if (other.location != null)
+                                return false;
+                } else if (!location.equals(other.location))
+                        return false;
 		return true;
 	}
     

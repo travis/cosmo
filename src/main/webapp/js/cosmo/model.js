@@ -19,10 +19,11 @@ dojo.require("cosmo.util.debug");
 dojo.require("cosmo.util.hash");
 
 cosmo.model.CalEventData = function (id, title, description, start, end, allDay,
-    pointInTime, anyTime, recurrenceRule, status, masterEvent, instance, instanceDate) {
+    pointInTime, anyTime, recurrenceRule, status, masterEvent, instance, instanceDate, loc) {
 
     this.id = id;
     this.title = title;
+    this.location = loc ? loc : null;
     this.description = description ? description : null;
     this.start = start;
     this.end = end;
@@ -56,7 +57,9 @@ CalEventData.clone = function(data) {
         data.masterEvent,
         data.instance,
         data.instanceDate,
-        data.javaClass);
+        data.location,
+        data.javaClass
+        );
     return ret;
 }
 

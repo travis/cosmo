@@ -385,13 +385,23 @@ cosmo.view.cal = new function () {
                         mod.modifiedProperties.push(propName);
                         modEv[propName] = changedProps[i][1];
                     }
-                    mod.event = modEv;
                     for (var i = 0; i < rrule.modifications.length; i++) {
                         var m = rrule.modifications[i];
+                        // Is there already an existing mod?
                         if (m.instanceDate.toUTC() == mod.instanceDate.toUTC()) {
+                            // Copy over any previous changes, but overwrite
+                            // if it's also a current edited prop
+                            for (var p in m) {
+                                if (typeof changedProps[p] == 'undefined') {
+                                    mod.modifiedProperties.push(p);
+                                    modEv[p] = m[p];
+                                }
+                            }
+                            // Throw out the old mod
                             rrule.modifications.splice(i, 1);
                         }
                     }
+                    mod.event = modEv;
                     rrule.modifications.push(mod);
 
                     f = function () { doSaveRecurrenceRule(ev, rrule, { 'saveAction': 'save',

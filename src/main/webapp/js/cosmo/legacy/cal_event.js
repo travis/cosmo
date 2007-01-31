@@ -132,7 +132,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
                 return true;
             }
         }
-        var compareDescription = function (curr, orig) {
+        var compareOptional = function (curr, orig) {
             var a = curr || null;
             var b = orig || null;
             return (a != b); 
@@ -143,8 +143,8 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
             'start': compareDateTime,
             'end': compareDateTime,
             'title': null,
-            'location':null,
-            'description': compareDescription,
+            'location': compareOptional,
+            'description': compareOptional,
             'allDay': null,
             'pointInTime': null,
             'anyTime': null,

@@ -25,7 +25,7 @@ FILES_DIR =  os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))+'/
     
 def test_basic_query_1():
     body = open(FILES_DIR+'reports/basicquery/1.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     positive = [ 'BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 
                   'VERSION:2.0','BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID',
@@ -39,7 +39,7 @@ def test_basic_query_1():
     
 def test_basic_query_2():
     body = open(FILES_DIR+'reports/basicquery/2.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     positive = [ 'BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
                  'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT', 
@@ -52,7 +52,7 @@ def test_basic_query_2():
     
 def test_basic_query_3():
     body = open(FILES_DIR+'reports/basicquery/3.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     positive = [ 'BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
                  'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT', 
@@ -64,28 +64,28 @@ def test_basic_query_3():
     
 def test_basic_query_4():
     body = open(FILES_DIR+'reports/basicquery/4.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     ics_list = ['3.ics']
     validate_response_tree(client.response.tree, ics_list)
     
 def test_basic_query_5():
     body = open(FILES_DIR+'reports/basicquery/5.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     ics_list = ['3.ics', '2.ics']
     validate_response_tree(client.response.tree, ics_list)
     
 def test_basic_query_6():
     body = open(FILES_DIR+'reports/basicquery/6.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     ics_list = ['1.ics', '2.ics', '4.ics', '5.ics', '6.ics', '7.ics']
     validate_response_tree(client.response.tree, ics_list)
     
 def test_freebusy():
     body = open(FILES_DIR+'reports/freebusy/1.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     positive = ['FREEBUSY:', '20060101T150000Z/20060101T160000Z',   
                 #'20060101T180000Z/20060101T190000Z', 
                 '20060101T210000Z/20060101T220000Z', 
@@ -101,12 +101,12 @@ def test_freebusy():
 
 def test_invalid_nosubcomp():
     body = open(FILES_DIR+'reports/invalid/noSubComp.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 400
     
 def test_limitexpand_1():
     body = open(FILES_DIR+'reports/limitexpand/1.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:', 'VERSION:2.0',
                 'BEGIN:VTIMEZONE', 'LAST-MODIFIED:','TZID:', 'BEGIN:DAYLIGHT', 
@@ -121,7 +121,7 @@ def test_limitexpand_1():
     
 def test_limitexpand_2():
     body = open(FILES_DIR+'reports/limitexpand/2.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:', 'VERSION:2.0',      
                 'BEGIN:VTIMEZONE', 'LAST-MODIFIED:','TZID:', 'BEGIN:DAYLIGHT', 
@@ -138,8 +138,8 @@ def test_limitexpand_2():
     
 def test_multiget_basic_vevent_summary():
     body = open(FILES_DIR+'reports/multiget/1.xml').read()
-    body = body.replace('USER/CALENDAR', TEST_USER+'/'+CALENDAR)
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    body = body.replace('/cosmo/home/USER/CALENDAR', PRINCIPAL_DAV_PATH+'/'+CALENDAR)
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     validate_response_tree(client.response.tree, ['1.ics', '2.ics', '3.ics', '4.ics'], positive=['UID'])
     
@@ -151,8 +151,8 @@ def test_multiget_basic_vevent_summary():
     
 def test_multiget_four_resources_etag_vcal_only():
     body = open(FILES_DIR+'reports/multiget/2.xml').read()
-    body = body.replace('USER/CALENDAR', TEST_USER+'/'+CALENDAR)
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    body = body.replace('/cosmo/home/USER/CALENDAR', PRINCIPAL_DAV_PATH+'/'+CALENDAR)
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:-//Cyrusoft International\, Inc.//Mulberry v4.0//EN', 'VERSION:2.0', 'END:VCALENDAR']
@@ -161,8 +161,8 @@ def test_multiget_four_resources_etag_vcal_only():
     
 def test_multiget_four_resources_etag_vtimezone_only():
     body = open(FILES_DIR+'reports/multiget/3.xml').read()
-    body = body.replace('USER/CALENDAR', TEST_USER+'/'+CALENDAR)
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    body = body.replace('/cosmo/home/USER/CALENDAR', PRINCIPAL_DAV_PATH+'/'+CALENDAR)
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -176,8 +176,8 @@ def test_multiget_four_resources_etag_vtimezone_only():
     
 def test_multiget_four_resources_etag_summary_uid_vevent_valarm_only():
     body = open(FILES_DIR+'reports/multiget/4.xml').read()
-    body = body.replace('USER/CALENDAR', TEST_USER+'/'+CALENDAR)
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    body = body.replace('/cosmo/home/USER/CALENDAR', PRINCIPAL_DAV_PATH+'/'+CALENDAR)
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -197,8 +197,8 @@ def test_multiget_four_resources_etag_summary_uid_vevent_valarm_only():
 
 def test_multiget_no_summary():
     body = open(FILES_DIR+'reports/multiget/5.xml').read()
-    body = body.replace('USER/CALENDAR', TEST_USER+'/'+CALENDAR)
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    body = body.replace('/cosmo/home/USER/CALENDAR', PRINCIPAL_DAV_PATH+'/'+CALENDAR)
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',

@@ -15,7 +15,7 @@ FILES_DIR =  os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))+'/
 
 def setup_module(module):
     cosmo_test_lib.setup_module(module)
-    client.mkcol('/cosmo/home/%s/applesdataset' % module.TEST_USER)
+    client.mkcol('%s/applesdataset' % module.PRINCIPAL_DAV_PATH)
     assert client.response.status == 201
 
 def test_all_apple_dataset():
@@ -37,4 +37,4 @@ def test_all_apple_dataset():
                 client.put('%s/%s' % (collection, up_name), f=open(full_path+'/'+filename))
                 assert client.response.status == 201
     
-    recursive_upload(FILES_DIR+'/ApplesResource', '/cosmo/home/%s/applesdataset' % TEST_USER)
+    recursive_upload(FILES_DIR+'/ApplesResource', '%s/applesdataset' % PRINCIPAL_DAV_PATH)

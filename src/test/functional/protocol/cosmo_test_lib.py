@@ -18,6 +18,7 @@ import random
 SERVER_URL = 'http://qacosmo.osafoundation.org:80'
 ADMIN_USER = 'root'
 ADMIN_PASS = 'cosmo'
+PRINCIPAL_ROOT = '/cosmo/dav'
 
 TEST_USER_PREFIX = 'test_user_'
 
@@ -31,6 +32,8 @@ def setup_module(module, server_url=SERVER_URL, admin_user=ADMIN_USER, admin_pas
     module.TEST_FIRST_NAME = 'Test'
     module.TEST_LAST_NAME = 'User'
     module.TEST_EMAIL = module.TEST_USER+'@osafoundation.org'
+    module.PRINCIPAL_ROOT = PRINCIPAL_ROOT
+    module.PRINCIPAL_DAV_PATH = '%s/%s' % (PRINCIPAL_ROOT, module.TEST_USER)
     
     #Setup client and users
     client = cosmoclient.CosmoClient(module.SERVER_URL)
@@ -40,12 +43,12 @@ def setup_module(module, server_url=SERVER_URL, admin_user=ADMIN_USER, admin_pas
     client.set_basic_auth(module.TEST_USER, module.TEST_PASS)
     
     if hasattr(module, 'CALENDAR'):
-        client._request('MKCALENDAR', '/cosmo/home/%s/%s' % (module.TEST_USER, module.CALENDAR))
+        client._request('MKCALENDAR', '%s/%s' % (module.PRINCIPAL_DAV_PATH, module.CALENDAR))
         assert client.response.status == 201
         for i in range(1, 8):
             ics_name = str(i)+'.ics'
             body = open(module.FILES_DIR+'/reports/put/'+ics_name).read()
-            client.put('/cosmo/home/%s/%s/%s' % (module.TEST_USER, module.CALENDAR, ics_name), body=body, headers={'content-type':'text/calendar'})
+            client.put('%s/%s/%s' % (module.PRINCIPAL_DAV_PATH, module.CALENDAR, ics_name), body=body, headers={'content-type':'text/calendar'})
             assert client.response.status == 201
         
 def teardown_module(module):

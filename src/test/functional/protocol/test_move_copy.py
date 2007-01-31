@@ -10,16 +10,16 @@ CALENDAR = 'calendar'
 FILES_DIR =  os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))+'/files/'
 
 def test_move_text_data():
-    client.mkcol('/cosmo/home/%s/testcollection1' % TEST_USER)
+    client.mkcol('%s/testcollection1' % PRINCIPAL_DAV_PATH)
     assert client.response.status == 201
-    client.mkcol('/cosmo/home/%s/testcollection2' % TEST_USER)
+    client.mkcol('%s/testcollection2' % PRINCIPAL_DAV_PATH)
     assert client.response.status == 201
-    client.put('/cosmo/home/%s/testcollection1/blah.txt' % TEST_USER, body='BALHALAHLAHLALH')
+    client.put('%s/testcollection1/blah.txt' % PRINCIPAL_DAV_PATH, body='BALHALAHLAHLALH')
     assert client.response.status == 201
-    client.move('/cosmo/home/%s/testcollection1/blah.txt' % TEST_USER, '/cosmo/%s/testcollection2/blah.txt' % TEST_USER)
+    client.move('%s/testcollection1/blah.txt' % PRINCIPAL_DAV_PATH, '%s/testcollection2/blah.txt' % PRINCIPAL_DAV_PATH)
     assert client.response.status == 201
-    client.propfind('/cosmo/home/%s/testcollection1/' % TEST_USER)
-    client.propfind('/cosmo/home/%s/testcollection2/' % TEST_USER)
+    client.propfind('%s/testcollection1/' % PRINCIPAL_DAV_PATH)
+    client.propfind('%s/testcollection2/' % PRINCIPAL_DAV_PATH)
     
     ### More to write but cosmo is failing already at this point
     

@@ -29,28 +29,28 @@ def setup_module(module):
     for i in range(1, 4):
         ics_name = 'float'+str(i)+'.ics'
         body = open(module.FILES_DIR+'/reports/put/'+ics_name).read()
-        client.put('/cosmo/home/%s/%s/%s' % (module.TEST_USER, module.CALENDAR, ics_name), body=body, headers={'content-type':'text/calendar'})
+        client.put('%s/%s/%s' % (module.PRINCIPAL_DAV_PATH, module.CALENDAR, ics_name), body=body, headers={'content-type':'text/calendar'})
         assert client.response.status == 201
 
     body = open(FILES_DIR+'mkcalendar/validFullBody.xml').read()
-    client._request('MKCALENDAR', '/cosmo/home/%s/%s' % (TEST_USER, TIMEZONE_CALENDAR), body=body)
+    client._request('MKCALENDAR', '%s/%s' % (PRINCIPAL_DAV_PATH, TIMEZONE_CALENDAR), body=body)
     
     for i in range(1, 4):
         ics_name = 'float'+str(i)+'.ics'
         body = open(module.FILES_DIR+'/reports/put/'+ics_name).read()
-        client.put('/cosmo/home/%s/%s/%s' % (module.TEST_USER, module.TIMEZONE_CALENDAR, ics_name), body=body, headers={'content-type':'text/calendar'})
+        client.put('%s/%s/%s' % (module.PRINCIPAL_DAV_PATH, module.TIMEZONE_CALENDAR, ics_name), body=body, headers={'content-type':'text/calendar'})
         assert client.response.status == 201
     
     assert client.response.status == 201
     
 def test_basic_query_1():
     body = open(FILES_DIR+'reports/basicquery/1.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207    
     
 def test_timerangequery_vevents_in_timerange_1():
     body = open(FILES_DIR+'reports/timerangequery/1.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -63,7 +63,7 @@ def test_timerangequery_vevents_in_timerange_1():
 
 def test_timerangequery_vevents_in_timerange_2():
     body = open(FILES_DIR+'reports/timerangequery/2.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -76,7 +76,7 @@ def test_timerangequery_vevents_in_timerange_2():
 
 def test_timerangequery_vevents_in_timerange_3():
     body = open(FILES_DIR+'reports/timerangequery/3.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -89,7 +89,7 @@ def test_timerangequery_vevents_in_timerange_3():
 
 def test_timerangequery_vevents_in_timerange_4():
     body = open(FILES_DIR+'reports/timerangequery/4.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -102,7 +102,7 @@ def test_timerangequery_vevents_in_timerange_4():
 
 def test_timerangequery_vevents_in_timerange_5():
     body = open(FILES_DIR+'reports/timerangequery/5.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
@@ -115,7 +115,7 @@ def test_timerangequery_vevents_in_timerange_5():
     
 def test_timerangequery_one_in_honolulu():
     body = open(FILES_DIR+'reports/timerangequery/oneInHonolulu.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, TIMEZONE_CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, TIMEZONE_CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 
@@ -133,7 +133,7 @@ def test_timerangequery_one_in_honolulu():
     
 def test_timerangequery_two_in_mountain():
     body = open(FILES_DIR+'reports/timerangequery/twoInMountain.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, TIMEZONE_CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, TIMEZONE_CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 
@@ -149,7 +149,7 @@ def test_timerangequery_two_in_mountain():
     
 def test_timerangequery_three_in_eastern():
     body = open(FILES_DIR+'reports/timerangequery/threeInEastern.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, TIMEZONE_CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, TIMEZONE_CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 
@@ -167,47 +167,47 @@ def test_timerangequery_three_in_eastern():
 
 def test_timerangequery_invalid_not_utc_1():
     body = open(FILES_DIR+'reports/timerangequery/invalid_nonUTC1.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 400
     
 def test_timerangequery_invalid_not_utc_2():
     body = open(FILES_DIR+'reports/timerangequery/invalid_nonUTC2.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 400
 
 def test_timerangequery_invalid_not_utc_3():
     body = open(FILES_DIR+'reports/timerangequery/invalid_nonUTC3.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 400
 
 def test_timerangequery_invalid_not_utc_4():
     body = open(FILES_DIR+'reports/timerangequery/invalid_nonUTC4.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 400
 
 def test_timerangequery_invalid_not_utc_5():
     body = open(FILES_DIR+'reports/timerangequery/invalid_nonUTC5.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 400
 
 def test_timerangequery_invalid_not_utc_6():
     body = open(FILES_DIR+'reports/timerangequery/invalid_nonUTC6.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 400
 
 def test_timerangequery_01():
     body = open(FILES_DIR+'reports/timerangequery/timerange_01.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     
 def test_timerangequery_02():
     body = open(FILES_DIR+'reports/timerangequery/timerange_02.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     
 def test_timerangequery_03():
     body = open(FILES_DIR+'reports/timerangequery/timerange_03.xml').read()
-    client._request('REPORT', '/cosmo/home/%s/%s' % (TEST_USER, CALENDAR), body=body, headers={ 'Depth': '1' })
+    client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     
     

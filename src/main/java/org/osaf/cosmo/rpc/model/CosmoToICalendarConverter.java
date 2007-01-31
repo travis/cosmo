@@ -583,6 +583,10 @@ public class CosmoToICalendarConverter {
                 modVEvent.getProperties().add(recurrenceId);
                 //UID is required
                 DtStart modStart = new DtStart(recurrenceId.getDate());
+                if (!(recurrenceId.getDate() instanceof DateTime)){
+                    //ical4j doesn't automatically add this value.
+                    modStart.getParameters().add(Value.DATE);
+                }
                 ICalendarUtils.addOrReplaceProperty(modVEvent, modStart);
                 modVEvent.getProperties().add(masterVEvent.getProperties().getProperty(Property.UID));
                 

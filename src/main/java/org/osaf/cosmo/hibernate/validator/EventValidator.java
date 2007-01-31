@@ -15,14 +15,17 @@
  */
 package org.osaf.cosmo.hibernate.validator;
 
+import java.io.IOException;
 import java.io.Serializable;
 
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 
 import org.hibernate.validator.Validator;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
 
 /**
  * Check if a Calendar object contains a valid VEvent
@@ -39,12 +42,19 @@ public class EventValidator implements Validator<Event>, Serializable {
             // validate entire icalendar object
             calendar.validate(true);
             
+            // additional check to prevent bad .ics
+            CalendarUtils.parseCalendar(calendar.toString());
+            
             // make sure we have a VEVENT
             VEvent event = (VEvent) calendar.getComponents().getComponents(Component.VEVENT).get(0);
             return(event!=null);
         } catch(ValidationException ve) {
             return false;
         } catch (RuntimeException e) {
+            return false;
+        } catch (IOException e) {
+            return false;
+        } catch(ParserException e) {
             return false;
         }
     }

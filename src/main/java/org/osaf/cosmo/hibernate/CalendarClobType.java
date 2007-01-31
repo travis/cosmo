@@ -84,6 +84,7 @@ public class CalendarClobType
         try {
             calendar = CalendarUtils.parseCalendar(reader);
         } catch (ParserException e) {
+            log.error("error parsing icalendar from db", e);
             // shouldn't happen because we always persist valid data
             throw new HibernateException("cannot parse icalendar stream");
         } catch(IOException ioe) {

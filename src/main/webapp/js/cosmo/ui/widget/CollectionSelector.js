@@ -35,13 +35,26 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
         dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, this, this.handleSubscriptionUpdated);
     },
     {
-    
         templateString: '<span></span>',
         verticalHeight: 18,
         collections: [],
         currentCollection: {},
-        selectFunction: null,
         ticketKey: '',
+
+        // Function for onchange of collection selector
+        // sets local currentCollection and passes the selected
+        // collection to Cal.loadCollectionItems 
+        // --------
+        selectFunction: function (e) {
+            var t = e.target;
+            // Set local currentCollection var
+            var c = this.collections[t.selectedIndex];
+            this.currentCollection = c;
+            dojo.event.topic.publish('/calEvent', { 
+                action: 'loadCollection', data: { collection: c } 
+            }); 
+        },
+
         strings: {
             mainCollectionPrompt: _('Main.Collection.Prompt'),
             imgTitleAdd: _('Main.CollectionAdd.Tooltip'),
@@ -231,10 +244,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 // Set the select to the current collection
                 cosmo.util.html.setSelect(sel, c);
                 self.selector = sel;
-                dojo.event.connect(sel, "onchange", function(){
-                    self.selectFunction();
-                    self.currentCollection = self.collections[sel.selectedIndex];
-                });
+                dojo.event.connect(sel, "onchange", self, 'selectFunction');
                 selectorNode.appendChild(d);
                 
                 // Spacer

@@ -83,11 +83,20 @@ cosmo.ui.minical.MiniCal = new function() {
     this.handlePub = function(cmd) {
         var act = cmd.action;
         var qual = cmd.qualifier || null;
+        var opts = cmd.opts || {};
         var ev = cmd.data;
         switch (act) {
             case 'eventsLoadSuccess':
-                // Set selection
-                self.renderSelection();
+                // If the update originated here at minical,
+                // just update the selection, don't re-render
+                if (opts.source == 'minical') {
+                    // Set selection
+                    self.renderSelection();
+                }
+                // Otherwise do a full re-render
+                else {
+                    self.render();
+                }
                 break;
             default:
                 // Do nothing
@@ -566,8 +575,9 @@ cosmo.ui.minical.MiniCal = new function() {
      * topics and pub/sub
      */
     this.goToday = function() {
-        f = function() { self.controller.goViewQueryDate(self.currDate); };
-        self.controller.showMaskDelayNav(f);
+        dojo.event.topic.publish('/calEvent', { 
+            action: 'loadCollection', data: { goTo: self.currDate } 
+        }); 
     }
     /**
      * Handle clicks on normal dates within minical
@@ -585,12 +595,11 @@ cosmo.ui.minical.MiniCal = new function() {
         // Convert to int because FF saves attributes as strings
         dt = new Date(parseInt(dt));
         
-        // Main calendar view -- go to selected week
-        // FIXME: Unify mask-display/nav methods
-        // ==================
-        f = function() { self.controller.goViewQueryDate(dt); };
-        self.controller.showMaskDelayNav(f);
-        
+        dojo.event.topic.publish('/calEvent', {
+            action: 'loadCollection', 
+            data: { goTo: dt }, 
+            opts: { source: 'minical' }
+        }); 
     };
     /**
      * Synchronize minical viewStart property with the

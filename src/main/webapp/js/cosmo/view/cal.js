@@ -991,19 +991,28 @@ cosmo.view.cal = new function () {
     this.handlePub_calEvent = function (cmd) {
         var act = cmd.action;
         var qual = cmd.qualifier || null;
-        var ev = cmd.data;
+        var data = cmd.data || {};
+        var opts = cmd.opts;
         switch (act) {
+            case 'eventsLoad':
+                // Load and display events
+                self.loadEvents(data, opts);
+                break;
             case 'saveConfirm':
-                saveEventChangesConfirm(ev);
+                var confirmEv = cmd.data;
+                saveEventChangesConfirm(confirmEv);
                 break;
             case 'save':
-                saveEventChanges(ev, qual);
+                var saveEv = cmd.data;
+                saveEventChanges(saveEv, qual);
                 break;
             case 'removeConfirm':
-                removeEventConfirm(ev);
+                var confirmEv = cmd.data;
+                removeEventConfirm(confirmEv);
                 break;
             case 'remove':
-                removeEvent(ev, qual);
+                var removeEv = cmd.data;
+                removeEvent(removeEv, qual);
                 break;
             default:
                 // Do nothing
@@ -1072,7 +1081,10 @@ cosmo.view.cal = new function () {
      * period
      * @return Boolean, true
      */
-    this.loadEvents = function (start, end) {
+    this.loadEvents = function (data, opts) {
+        var collection = data.collection;
+        var start = data.startDate;
+        var end = data.endDate;
         var s = start.getTime();
         var e = end.getTime();
         var eventLoadList = null;
@@ -1083,13 +1095,13 @@ cosmo.view.cal = new function () {
         var id = '';
         var ev = null;
 
-        dojo.event.topic.publish('/calEvent', { 'action': 'eventsLoadStart' });
+        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadStart', opts: opts });
         // Load the array of events
         // ======================
         try {
-            eventLoadList = Cal.currentCollection.conduit.getEvents(
-                Cal.currentCollection.collection.uid, s, e, 
-                Cal.currentCollection.transportInfo);
+            eventLoadList = collection.conduit.getEvents(
+                collection.collection.uid, s, e, 
+                collection.transportInfo);
 
         }
         catch(e) {
@@ -1098,8 +1110,8 @@ cosmo.view.cal = new function () {
         }
 
         var eventLoadHash = createEventRegistry(eventLoadList);
-        dojo.event.topic.publish('/calEvent', { 'action': 'eventsLoadSuccess',
-            'data': eventLoadHash });
+        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
+            data: eventLoadHash, opts: opts });
         return true;
     };
 };

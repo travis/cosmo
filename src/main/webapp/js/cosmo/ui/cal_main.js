@@ -136,7 +136,7 @@ cosmo.ui.cal_main.Cal = new function () {
 
         // Load and display date info, render cal canvas
         // --------------
-        if (this.loadLocaleDateInfo() && this.getQuerySpan(this.currDate)) {
+        if (this.loadLocaleDateInfo() && this.setQuerySpan(this.currDate)) {
             cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, 
                 this.currDate);
         }
@@ -256,11 +256,7 @@ cosmo.ui.cal_main.Cal = new function () {
             'cosmo:CollectionSelector', { 
                 'collections': this.currentCollections, 
                 'currentCollection': this.currentCollection,
-                'ticketKey': ticketKey,
-                'selectFunction': function () {
-                    cosmo.view.cal.canvas.calcColors();
-                    var f = Cal.goSelCal; 
-                    Cal.showMaskDelayNav(f); }
+                'ticketKey': ticketKey
             }, this._collectionSelectContainer, 'last');
 
         // Load minical and jump-to date
@@ -275,8 +271,11 @@ cosmo.ui.cal_main.Cal = new function () {
         cosmo.view.cal.canvas.calcColors();
 
         // Load and display events
+        // FIXME: This stuff should eventually participate in
+        // the normal topic-based prepare-load-render lifecycle
         // --------------
-        cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
+        cosmo.view.cal.loadEvents({ collection: self.currentCollection, 
+            startDate: self.viewStart, endDate: self.viewEnd });
 
         this.uiMask.hide();
         
@@ -305,6 +304,33 @@ cosmo.ui.cal_main.Cal = new function () {
         }
     };
 
+    // ==========================
+    // Handle published events 
+    // ==========================
+    
+    // Subscribe to the '/calEvent' channel
+    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
+    this.handlePub_calEvent = function (cmd) {
+        var act = cmd.action;
+        var data = cmd.data || {};
+        var opts = cmd.opts || {};
+        switch (act) {
+            case 'loadCollection':
+                var f = function () { self.loadCollectionItems(data, opts); };
+                self.uiMask.show();
+                // Give processing message a brief instant to show
+                setTimeout(f, 100);
+                break;
+            case 'eventsLoadSuccess':
+                self.uiMask.hide();
+                break;
+            default:
+                // Do nothing
+                break;
+        }
+    };
+
+    
     // ==========================
     // GUI element display
     // ==========================
@@ -679,58 +705,71 @@ cosmo.ui.cal_main.Cal = new function () {
     // ==========================
     // Navigating and changing calendars
     // ==========================
-    // *** FIXME: Unify mask-display/nav methods ***
     /**
      * Set up the week-to-week navigation button panel 
      */
     this.setUpNavButtons = function () {
-        var navButtons = null;
-        var leftClick =  null;
-        var rightClick = null;
-        leftClick = function () { Cal.uiMask.show(); setTimeout('Cal.goView("back");', 300); }
-        rightClick = function () { Cal.uiMask.show(); setTimeout('Cal.goView("next");', 300); }
-        navButtons = new cosmo.ui.button.NavButtonSet('viewNav', leftClick, rightClick);
+        var back = function () {
+            dojo.event.topic.publish('/calEvent', { 
+                action: 'loadCollection', data: { goTo: 'back' } 
+            }); 
+        }
+        var next = function () {
+            dojo.event.topic.publish('/calEvent', { 
+                action: 'loadCollection', data: { goTo: 'next' } 
+            }); 
+        }
+        var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
         document.getElementById('viewNavButtons').appendChild(navButtons.domNode);
     };
-    /**
-     * Used to navigate from view span to view span, e.g., week-to-week
-     */
-    this.goView = function (id) {
-        var key = id.toLowerCase();
-        var queryDate = Cal.getNewViewStart(key);
-        this.goViewQueryDate(queryDate);
-    };
-    this.goViewQueryDate = function (queryDate) {
-        Cal.calForm.clear();
-        Cal.getQuerySpan(new Date(queryDate)); // Get the new query span week
-        // Draw the calendar canvas
-        cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
+    
+    this.loadCollectionItems = function (data, opts) {
+        var self = this;
+        var collection = data.collection;
+        var goTo = data.goTo;
+        var data = {};
+        
+        // Changing collection
+        // --------
+        if (collection) {
+            // Update pointer to currently selected collection
+            self.currentCollection = collection;
+        }
+        // Changing dates
+        // --------
+        if (goTo) {
+            // param is 'back' or 'next'
+            if (typeof goTo == 'string') {
+                var key = goTo.toLowerCase();
+                var incr = key.indexOf('back') > -1 ? -1 : 1;
+                queryDate = Date.add('ww', incr, this.viewStart);
+            }
+            // param is actual Date
+            else {
+                queryDate = goTo;
+            }
+            // Update Cal.viewStart and Cal.viewEnd with new dates
+            self.setQuerySpan(queryDate); 
+        }
+        
+        // Data obj to pass to topic publishing
+        data = {
+            collection: self.currentCollection,
+            startDate: self.viewStart, 
+            endDate: self.viewEnd, 
+            currDate: self.currDate 
+        } 
+       
+        // If we're looking at different dates, have to re-render
+        // the base canvas with the new date range
+        if (goTo) {
+            dojo.event.topic.publish('/calEvent', {
+                action: 'eventsLoadPrepare', data: data, opts: opts }); 
+        }
         // Load and display events
-        cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
-        cosmo.ui.minical.MiniCal.render();
-        Cal.uiMask.hide();
-    };
-    /**
-     * Used to ensure the 'processing' text shows briefly
-     * Prevent seizure-inducing flashes of the mask div
-     * Execute whatever function is passed after showing the mask
-     */
-    this.showMaskDelayNav = function (f) {
-        self.uiMask.show();
-        setTimeout(f, 200);
+        dojo.event.topic.publish('/calEvent', {
+            action: 'eventsLoad', data: data, opts: opts }); 
     }
-    /**
-     * Change to a new selected calendar
-     * from setTimeout, so use Cal object reference
-     */
-    this.goSelCal = function () {
-        var selectElement = Cal.calForm.form.calSelectElem;
-        var index = selectElement.options[selectElement.selectedIndex].value;
-        Cal.currentCollection = Cal.currentCollections[index];
-        // Load and display events
-        cosmo.view.cal.loadEvents(self.viewStart, self.viewEnd);
-        Cal.uiMask.hide();
-    };
 
     // ==========================
     // Time/position calculations
@@ -889,7 +928,7 @@ cosmo.ui.cal_main.Cal = new function () {
      * Get the start and end for the span of time to view in the cal
      * Eventually this will change depending on what type of view is selected
      */
-    this.getQuerySpan = function (dt) {
+    this.setQuerySpan = function (dt) {
         this.viewStart = this.getWeekStart(dt);
         this.viewEnd = this.getWeekEnd(dt);
         return true;

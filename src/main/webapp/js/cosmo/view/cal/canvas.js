@@ -601,25 +601,32 @@ cosmo.view.cal.canvas = new function () {
      */
     this.handlePub = function (cmd) {
         var act = cmd.action;
-        var ev = cmd.data;
         var opts = cmd.opts;
+        var data = cmd.data;
         switch (act) {
+            case 'eventsLoadPrepare':
+                self.render(data.startDate, data.endDate, data.currDate);
+                break;
             case 'eventsLoadStart':
+                self.calcColors();
                 wipe();
                 break;
             case 'eventsLoadSuccess':
+                var ev = cmd.data;
                 loadSuccess(ev);
                 break;
             case 'eventsAddSuccess':
                 addSuccess(cmd.data);
                 break;
             case 'setSelected':
+                var ev = cmd.data;
                 setSelectedEvent(ev);
                 break;
             case 'save':
                 // Do nothing
                 break; 
             case 'saveFailed':
+                var ev = cmd.data;
                 // If the failure was a new event, remove
                 // the placeholder lozenge
                 if (cmd.qualifier.newEvent) {
@@ -636,6 +643,7 @@ cosmo.view.cal.canvas = new function () {
                 saveSuccess(cmd);
                 break;
             case 'removeSuccess':
+                var ev = cmd.data;
                 removeSuccess(ev, opts)
                 break;
             default:

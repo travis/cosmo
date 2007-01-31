@@ -79,6 +79,9 @@ cosmo.ui.cal_form.CalForm = function () {
         var act = cmd.action;
         var ev = cmd.data;
         switch (act) {
+            case 'eventsLoadPrepare':
+                self.clear();
+                break;
             case 'eventsDisplaySuccess':
                 self.updateFromEvent(ev);
                 self.setButtons(true, true);
@@ -991,8 +994,10 @@ cosmo.ui.cal_form.CalForm = function () {
         }
         // All okey-dokey -- submit
         else {
-            f = function () { Cal.goViewQueryDate(val); };
-            Cal.showMaskDelayNav(f);
+            var d = new Date(val);
+            dojo.event.topic.publish('/calEvent', { 
+                action: 'loadCollection', data: { goTo: d } 
+            }); 
         }
     };
     

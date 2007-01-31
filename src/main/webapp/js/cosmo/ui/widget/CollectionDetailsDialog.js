@@ -153,6 +153,7 @@ dojo.widget.HtmlWidget, function(){
                 this._setClientCollectionAddress(client);
                 this._showClientInstructionsAndAddress(true, true);
                 this._setClientInstructions(client);
+                this._showProtocolRows(false);
             } else if (client == "Other"){
                 this._showClientInstructionsAndAddress(false, false);
                 this._showProtocolRows(true);

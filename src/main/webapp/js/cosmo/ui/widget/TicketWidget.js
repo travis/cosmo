@@ -92,7 +92,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TicketWidget", dojo.widget.HtmlWidget,
 			method:  "POST",
 
 
-            url: cosmo.env.getBaseUrl() + "/home" + this.itemId 
+            url: cosmo.env.getBaseUrl() + "/dav" + this.itemId 
             
         	}
         );

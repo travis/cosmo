@@ -570,7 +570,7 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
         
         // copy stamps
         for(Stamp stamp: item.getActiveStamps())
-            item2.addStamp(stamp.copy());
+            item2.addStamp(stamp.copy(item2));
         
         // copy content
         if(item instanceof ContentItem) {
@@ -578,11 +578,13 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             ContentItem newContentItem = (ContentItem) item2;
             try {
                 InputStream contentStream = contentItem.getContentInputStream();
-                newContentItem.setContent(contentStream);
+                if(contentStream!=null) {
+                    newContentItem.setContent(contentStream);
+                    contentStream.close();
+                }
                 newContentItem.setContentEncoding(contentItem.getContentEncoding());
                 newContentItem.setContentLanguage(contentItem.getContentLanguage());
                 newContentItem.setContentType(contentItem.getContentType());
-                contentStream.close();
             } catch (IOException e) {
                 throw new RuntimeException("Error copying content");
             }
@@ -594,10 +596,12 @@ public class ItemDaoImpl extends HibernateDaoSupport implements ItemDao {
             NoteItem newNoteItem = (NoteItem) item2;
             newNoteItem.setBody(noteItem.getBody());
             newNoteItem.setIcalUid(noteItem.getIcalUid());
+            newNoteItem.setContentLength(noteItem.getContentLength());
         }
             
         // save Item before attempting deep copy
         getSession().save(item2);
+        getSession().flush();
         
         // copy children if collection and deepCopy = true
         if(deepCopy==true && (item instanceof CollectionItem) ) {

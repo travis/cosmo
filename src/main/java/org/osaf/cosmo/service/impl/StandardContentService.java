@@ -27,6 +27,7 @@ import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.ContentService;
@@ -179,9 +180,9 @@ public class StandardContentService implements ContentService {
      */
     public void moveItem(Item item, String path) {
         
-        // handle case of moving ContentItem 
+        // handle case of moving NoteItem 
         // (need to synch on src and dest collections)
-        if(item != null && item instanceof ContentItem) {
+        if(item != null && item instanceof NoteItem) {
             
             // need to get exclusive lock to source and destination parent
             CollectionItem destParent = 
@@ -208,14 +209,9 @@ public class StandardContentService implements ContentService {
                 try {
                     // copy Item to destination collection
                     contentDao.copyItem(item, path, false);
-                    ContentItem copy = (ContentItem) contentDao.findItemByPath(path);
                     
-                    // delete item from source collection
+                    // remove item from source collection
                     contentDao.removeContent((ContentItem) item);
-                    
-                    // update uid on copy, so that copy uid matches original
-                    copy.setUid(item.getUid());
-                    contentDao.updateContent(copy);
                     
                 } finally {
                     lockManager.unlockCollection(srcParent);

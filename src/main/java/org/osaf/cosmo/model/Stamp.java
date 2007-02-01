@@ -100,12 +100,13 @@ public abstract class Stamp extends AuditableObject implements
     @Transient
     public abstract String getType();
 
+   
     /**
-     * Return a new instance of Attribute containing a copy of the Attribute
-     * 
-     * @return copy of Attribute
+     * Return a new instance of Stamp containing a copy of the Stamp
+     * @param item Item stamp is copied to
+     * @return copy of Stamp
      */
-    public abstract Stamp copy();
+    public abstract Stamp copy(Item item);
     
     /**
      * Prepare stamp for removal

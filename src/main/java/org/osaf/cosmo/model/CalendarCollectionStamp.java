@@ -92,7 +92,7 @@ public class CalendarCollectionStamp extends Stamp implements
         setSupportedComponents(getDefaultSupportedComponentSet());
     }
 
-    public Stamp copy() {
+    public Stamp copy(Item item) {
         CalendarCollectionStamp stamp = new CalendarCollectionStamp();
         stamp.language = language;
         stamp.description = description;

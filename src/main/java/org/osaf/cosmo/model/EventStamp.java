@@ -720,17 +720,19 @@ public class EventStamp extends Stamp implements
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.Stamp#copy()
      */
-    public Stamp copy() {
-        EventStamp stamp = new EventStamp();
+    public Stamp copy(Item item) {
+        EventStamp stamp = new EventStamp(item);
         
         // Need to copy Calendar, and indexes
         stamp.calendar = CalendarUtils.copyCalendar(calendar);
         
-        for(CalendarTimeRangeIndex index : timeRangeIndexes)
+        for(CalendarTimeRangeIndex index : timeRangeIndexes) {
             stamp.addTimeRangeIndex(index.copy());
+        }
         
-        for(CalendarPropertyIndex index : propertyIndexes)
+        for(CalendarPropertyIndex index : propertyIndexes) {
             stamp.addPropertyIndex(index.copy());
+        }
         
         return stamp;
     }

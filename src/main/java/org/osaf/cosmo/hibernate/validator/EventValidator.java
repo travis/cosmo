@@ -21,9 +21,12 @@ import java.io.Serializable;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.validator.Validator;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
 
@@ -34,10 +37,13 @@ import org.osaf.cosmo.calendar.util.CalendarUtils;
  */
 public class EventValidator implements Validator<Event>, Serializable {
 
+    private static final Log log = LogFactory.getLog(EventValidator.class);
+    
     public boolean isValid(Object value) {
         
+        Calendar calendar = null;
         try {
-            Calendar calendar = (Calendar) value;
+            calendar = (Calendar) value;
             
             // validate entire icalendar object
             calendar.validate(true);
@@ -46,15 +52,41 @@ public class EventValidator implements Validator<Event>, Serializable {
             CalendarUtils.parseCalendar(calendar.toString());
             
             // make sure we have a VEVENT
-            VEvent event = (VEvent) calendar.getComponents().getComponents(Component.VEVENT).get(0);
-            return(event!=null);
+            ComponentList comps = calendar.getComponents();
+            if(comps==null) {
+                log.warn("error validating event: " + calendar.toString());
+                return false;
+            }
+            
+            comps = comps.getComponents(Component.VEVENT);
+            if(comps==null || comps.size()==0) {
+                log.warn("error validating event: " + calendar.toString());
+                return false;
+            }
+            
+            VEvent event = (VEvent) comps.get(0);
+            if(event ==null) {
+                log.warn("error validating event: " + calendar.toString());
+                return false;
+            }
+                
+            return true;
+            
         } catch(ValidationException ve) {
+            log.warn("event validation error", ve);
+            if(calendar!=null) {
+                log.warn("error validating event: " + calendar.toString() );
+            }
             return false;
         } catch (RuntimeException e) {
             return false;
         } catch (IOException e) {
             return false;
         } catch(ParserException e) {
+            log.warn("parse error", e);
+            if(calendar!=null) {
+                log.warn("error parsing event: " + calendar.toString() );
+            }
             return false;
         }
     }

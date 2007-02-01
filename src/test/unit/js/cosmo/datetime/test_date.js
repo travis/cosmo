@@ -204,17 +204,23 @@ function test_dateSetters() {
     jum.assertEquals(2, dt.getMonth());
     jum.assertEquals(1, dt.getDate());
     
-    dt = new D(2006, 9, 23, 22, 12, 55, 6);
-    dt.setMonth(14);
-    jum.assertEquals(2007, dt.getYear());
-    jum.assertEquals(2, dt.getMonth());
-    
-    // Date wraparoud -- Set month to Feb with date of 31st
-    // should wrap date to March 3rd
-    dt = new D(2006, 0, 31);
-    dt.setMonth(1);
-    jum.assertEquals(2, dt.getMonth());
-    jum.assertEquals(3, dt.getDate());
+    // Wraparound broken in Safari 2, see WebKit bug 4892
+    // http://bugs.webkit.org/show_bug.cgi?id=489
+    // Safari 2 == Safari/412 to Safari/419.3
+    // http://developer.apple.com/internet/safari/uamatrix.html
+    if (navigator.userAgent.indexOf('Safari/41') == -1) {
+        dt = new D(2006, 9, 23, 22, 12, 55, 6);
+        dt.setMonth(14);
+        jum.assertEquals(2007, dt.getYear());
+        jum.assertEquals(2, dt.getMonth());
+        
+        // Date wraparoud -- Set month to Feb with date of 31st
+        // should wrap date to March 3rd
+        dt = new D(2006, 0, 31);
+        dt.setMonth(1);
+        jum.assertEquals(2, dt.getMonth());
+        jum.assertEquals(3, dt.getDate());
+    }
 }
 
 function test_dateUTCSetters() {
@@ -229,12 +235,18 @@ function test_dateUTCSetters() {
     jum.assertEquals(6, dt.getUTCHours());
     jum.assertEquals(6, dt.getHours());
     
-    dt = new D(2006, 9, 23, 22, 12, 55, 6, 'America/Chicago');
-    dt.setUTCHours(54);
-    // Should all be the same -- zero offset
-    jum.assertEquals(25, dt.getUTCDate());
-    jum.assertEquals(25, dt.getDate());
-    jum.assertEquals(6, dt.getUTCHours());
-    jum.assertEquals(11, dt.getHours());
+    // Wraparound broken in Safari 2, see WebKit bug 4892
+    // http://bugs.webkit.org/show_bug.cgi?id=489
+    // Safari 2 == Safari/412 to Safari/419.3
+    // http://developer.apple.com/internet/safari/uamatrix.html
+    if (navigator.userAgent.indexOf('Safari/41') == -1) {
+        dt = new D(2006, 9, 23, 22, 12, 55, 6, 'America/Chicago');
+        dt.setUTCHours(54);
+        // Should all be the same -- zero offset
+        jum.assertEquals(25, dt.getUTCDate());
+        jum.assertEquals(25, dt.getDate());
+        jum.assertEquals(6, dt.getUTCHours());
+        jum.assertEquals(11, dt.getHours());
+    }
 }
 

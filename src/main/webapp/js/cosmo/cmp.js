@@ -89,7 +89,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                             /*String*/ sortOrder, 
                             /*String*/ sortType, 
                             /*boolean?*/ sync) {
-            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUsersXMLToJSON);
+            handlerDict = this._wrapXMLHandlerFunctions(handlerDict, this.cmpUsersXMLToJSON);
 
             this.getUsersXML(handlerDict, pageNumber, pageSize, sortOrder, sortType, sync);
         },
@@ -131,7 +131,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
         getUser: function(/*String*/ username, 
                           /*Object*/ handlerDict, 
                           /*boolean?*/ sync) {
-            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
+            handlerDict = this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
 
             this.getUserXML(username, handlerDict, sync);
         },
@@ -188,6 +188,31 @@ dojo.declare("cosmo.cmp.Cmp", null,
          *              the values in <code>userHash</code>
          */
         modifyUser: function (username, userHash, handlerDict, sync) {
+                // If the user to be modified is the current user and
+                // we're changing username or password, make
+                // sure the current credentials will be changed on success
+
+                if (username == cosmo.util.auth.getUsername() &&
+                    (userHash.password || userHash.username)){
+                    
+                    var newCred = {};
+                    if (userHash.password){
+                        newCred.password = userHash.password;
+                    }
+                    if (userHash.username){
+                        newCred.username = userHash.username;
+                    }
+                    
+                    handlerDict = this._wrapChangeCredentialFunctions(
+                        handlerDict, [204], newCred);
+                }
+
+                // Safari and IE don't understand 204s. Boo.
+                if (navigator.userAgent.indexOf('Safari') > -1 ||
+                    document.all){
+                    handlerDict = this._wrap204Bandaid(handlerDict);
+                }
+                
                 var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
                         '<user xmlns="http://osafoundation.org/cosmo/CMP">';
                 for (propName in userHash) {
@@ -215,7 +240,15 @@ dojo.declare("cosmo.cmp.Cmp", null,
         deleteUser: function (/*String*/ username, 
                               /*Object*/ handlerDict, 
                               /*boolean?*/ sync) {
+                
+                // Safari and IE don't understand 204s. Boo.
+                if (navigator.userAgent.indexOf('Safari') > -1 ||
+                    document.all){
+                    handlerDict = this._wrap204Bandaid(handlerDict);
+                }
+                
                 var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
                                     encodeURIComponent(dojo.string.trim(username));
                 requestDict.method = "POST";
@@ -233,6 +266,12 @@ dojo.declare("cosmo.cmp.Cmp", null,
         deleteUsers: function (/*String[]*/ usernames, 
                                /*Object*/ handlerDict, 
                                /*boolean?*/ sync) {
+                            // Safari and IE don't understand 204s. Boo.
+                if (navigator.userAgent.indexOf('Safari') > -1 ||
+                    document.all){
+                    handlerDict = this._wrap204Bandaid(handlerDict);
+                }
+            
                 var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/delete";
                 requestDict.method = "POST";
@@ -246,7 +285,6 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
                 requestDict.postContent = requestContent;
                 requestDict.contentType = "application/x-www-form-urlencoded";
-
                 dojo.io.bind(requestDict);
 
         },
@@ -258,7 +296,15 @@ dojo.declare("cosmo.cmp.Cmp", null,
         activate: function (/*String*/ username, 
                             /*Object*/ handlerDict, 
                             /*boolean?*/ sync) {
+
+            // Safari and IE don't understand 204s. Boo.
+            if (navigator.userAgent.indexOf('Safari') > -1 ||
+                document.all){
+                handlerDict = this._wrap204Bandaid(handlerDict);
+            }
+                
             var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+
             requestDict.url = cosmo.env.getBaseUrl() + "/cmp/activate/" + username;
             requestDict.method = "POST";
             requestDict.postContent = "id="+username;
@@ -305,7 +351,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
          */
         getAccount: function (/*Object*/ handlerDict, 
                               /*boolean?*/ sync) {
-            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
+            handlerDict = this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
 
             this.getAccountXML(handlerDict, sync);
         },
@@ -330,6 +376,21 @@ dojo.declare("cosmo.cmp.Cmp", null,
         modifyAccount: function (/*Object*/ userHash, 
                                  /*Object*/ handlerDict, 
                                  /*boolean?*/ sync) {
+                // If the user is changing his password,
+                // make sure to wrap this in the credential
+                // change-on-success function
+                if (userHash.password){
+                    handlerDict = this._wrapChangeCredentialFunctions(handlerDict,
+                                                        [204],
+                                                        {password:userHash.password});
+                }
+                
+                // Safari and IE don't understand 204s. Boo.
+                if (navigator.userAgent.indexOf('Safari') > -1 ||
+                    document.all){
+                    handlerDict = this._wrap204Bandaid(handlerDict);
+                }
+
                 var requestContent = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
                         '<user xmlns="http://osafoundation.org/cosmo/CMP">';
 
@@ -338,14 +399,14 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     requestContent += "<" + propName + ">" + userHash[propName] + "</" + propName + ">";
                 }
                 requestContent += "</user>";
-
                 var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account";
                 requestDict.method = "POST";
                 requestDict.headers['X-Http-Method-Override'] = "PUT";
                 requestDict.postContent = requestContent;
-
-               dojo.io.bind(requestDict);
+                
+                
+                dojo.io.bind(requestDict);
 
         },
         
@@ -362,7 +423,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                           /*Object*/ handlerDict, 
                           /*boolean?*/ sync) {
             var self = this;
-            this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
+            handlerDict = this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
 
             this.getSignupXML(userHash, handlerDict, sync);
         },
@@ -433,19 +494,111 @@ dojo.declare("cosmo.cmp.Cmp", null,
             return userList;
         },
 
-        _wrapXMLHandlerFunctions: function (/*Object*/ handlerDict, 
+        _wrapXMLHandlerFunctions: function (/*Object*/ hDict, 
                                             /*function*/ xmlParseFunc){
             var self = this;
-
-            if (handlerDict.load != undefined){
-                handlerDict.old_load = handlerDict.load
+            var handlerDict = dojo.lang.shallowCopy(hDict);
+            if (handlerDict.load){
+                var old_load = handlerDict.load;
                 handlerDict.load = function(type, data, evt){
+
                     var parsedCMPXML = xmlParseFunc.apply(self, [evt.responseXML])
-                    handlerDict.old_load(type, parsedCMPXML, evt);
+
+                    old_load(type, parsedCMPXML, evt);
                 }
             }
 			// Don't mess with "error". These responses shouldn't be XML.
 			// Don't mess with "handle". This is a "don't mess with my stuff" handler.
+			return handlerDict;
+        },
+        
+        /*
+         * statusCodes is a list of status codes to 
+         * call the cred change function on.
+         */
+        _wrapChangeCredentialFunctions: function(/*Object*/ hDict, 
+                                                 /*int[]*/ statusCodes, 
+                                                 /*Object*/ newCred){
+            var self = this;
+            var handlerDict = dojo.lang.shallowCopy(hDict);
+            if (handlerDict.load){
+                var oldLoad = handlerDict.load;
+                handlerDict.load = function(type, data, evt){
+                    self._changeCredIfStatusMatches(
+                        evt.status, statusCodes, newCred);
+                    oldLoad(type, data, evt);        
+                }
+            }
+            
+            if (handlerDict.handle){
+                var oldHandle = handlerDict.handle;
+                handlerDict.handle = function(type, data, evt){
+                    self._changeCredIfStatusMatches(
+                        evt.status, statusCodes, newCred);
+                    oldHandle(type, data, evt);        
+                }
+                
+            }
+            
+            return handlerDict;
+            
+        },
+        
+        _wrap204Bandaid: function(hDict){
+            var handlerDict = dojo.lang.shallowCopy(hDict);
+            
+            if (handlerDict.load){
+                handlerDict.load = this._204Bandaid(handlerDict.load);
+            }
+            if (handlerDict.error){
+                handlerDict.error = this._204Bandaid(
+                    handlerDict.error, handlerDict.load);
+            }
+            if (handlerDict.handle){
+                handlerDict.handle = this._204Bandaid(handlerDict.handle);
+            }
+            
+            return handlerDict;
+        },
+        
+        _204Bandaid: function(originalFunc, handle204Func){
+            // Use original function if handle204Func is not specified.
+            handle204Func = handle204Func? handle204Func: originalFunc;
+            return function(type, data, evt){
+                if (navigator.userAgent.indexOf('Safari') > -1 && 
+                    !evt.status) {
+                    
+                    var newEvt = dojo.lang.shallowCopy(evt);
+                    newEvt.status = 204;
+                    newEvt.statusText = "No Content";
+                    handle204Func('load', '', newEvt);
+                    
+                }
+        
+                // If we're Internet Explorer
+                else if (document.all && 
+                         evt.status == 1223){
+                    // apparently, shallow copying the XHR object in ie
+                    // causes problems. 
+                    var newEvt = {};
+                    newEvt.status = 204;
+                    newEvt.statusText = "No Content";
+                    handle204Func('load', '', newEvt);
+                } else {
+                    originalFunc(type, data, evt);
+                }
+            }
+        },
+        
+        _changeCredIfStatusMatches: function (stat, statusCodes, newCred){
+            for (var i = 0; i < statusCodes.length; i++){
+                if (newCred.username){
+                    cosmo.util.auth.setUsername(newCred.username);
+                }
+                if (newCred.password){
+                    cosmo.util.auth.setPassword(newCred.password);
+                }
+            }
         }
     }
 );

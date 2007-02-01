@@ -114,10 +114,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
                 usernames.push(users[i].username)
             }
-            self = this;
-
+            var self = this;
+            
             cosmo.cmp.deleteUsers(usernames,
-                {load: function(type, data, evt){self.updateUserList()},
+                {load: function(type, data, evt){self.updateUserList();},
                  error: function(type, error){alert("Could not delete user:" + error)}
                 }
                 );
@@ -332,7 +332,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
                 row.email = user.email;
                 row.name = user.firstName + " " + user.lastName;
                 row.username = user.username;
-
 
                 row.created = dojo.date.fromRfc3339(user.dateCreated);
 

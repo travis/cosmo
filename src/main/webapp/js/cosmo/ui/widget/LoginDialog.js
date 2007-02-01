@@ -44,7 +44,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
             	
             } else {
 	            var username  = this.usernameInput.value;
-                cosmo.util.auth.setUser(this.usernameInput.value,
+                cosmo.util.auth.setCred(this.usernameInput.value,
                     this.passwordInput.value);
 
     			location = str;

@@ -42,7 +42,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             // Auth successful -- try to do whatever action
             // was contingent on the auth
             else {
-                cosmo.util.auth.setUser(this.usernameInput.value, 
+                cosmo.util.auth.setCred(this.usernameInput.value, 
                                         this.passwordInput.value);
                                         
                 this.attemptAuthAction(this.authAction.attemptParams);

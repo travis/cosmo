@@ -134,11 +134,10 @@ function activateSelectedUser(){
 
 
 
-modifyHandlerDict= {
+var modifyHandlerDict= {
     handle : function(type, data, evt){
         var modifyDialog = dojo.widget.byId("modifyUserDialog")
-
-        if (evt.status == 204){
+	    if (evt.status == 204){
             modifyDialog.hide();
             modifyDialog.form.reset();
             
@@ -151,12 +150,14 @@ modifyHandlerDict= {
         }
         else if (evt.status == 432){
             //TODO: email in use stuff
-            createDialog.emailError.innerHTML = "Email in use";
+            modifyDialog.emailError.innerHTML = "Email in use";
+        } else {
+        	alert("Problem handling modify result: " + evt.status);
         }
     }
 }
 
-createHandlerDict = {
+var createHandlerDict = {
 
     handle : function(type, data, evt){
 
@@ -175,7 +176,10 @@ createHandlerDict = {
         else if (evt.status == 432){
             //TODO: email in use stuff
             createDialog.emailError.innerHTML = "Email in use";
+        } else {
+        	alert("Problem handling create result: " + evt.status);
         }
+        
 
     }
 }

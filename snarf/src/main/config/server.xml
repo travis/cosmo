@@ -42,7 +42,7 @@
              password="[pass]"
              defaultAutoCommit="false"
              driverClassName="com.mysql.jdbc.Driver"
-             url="jdbc:mysql://[server]:3306/[db]"/>
+             url="jdbc:mysql://[server]:3306/[db]?useUnicode=true&amp;characterEncoding=UTF-8"/>
     -->
     <!-- PostgreSQL configuration 
          Comment the above Resource and uncomment the following

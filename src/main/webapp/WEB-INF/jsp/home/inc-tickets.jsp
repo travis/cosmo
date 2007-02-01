@@ -33,19 +33,12 @@ dojo.require("cosmo.ui.widget.TicketWidget");
   <c:set var="Item" value="${Collection}"/>
   <c:set var="feedPath" value="/atom/collection/${Collection.uid}"/>
 </c:if>
-<c:set var="davPath" value="/home${Path}"/>
+<c:set var="davPath" value="/dav${Path}"/>
 <c:set var="pimPath" value="/pim/collection/${Collection.uid}"/>
 
 <div class="hd" style="margin-top: 12px;">
   Tickets
 </div>
-<!-- 
-<div style="margin-top:12px;">
-
- <a href='javascript:dojo.widget.byId("newTicketWidget").show()'>
-  [new ticket]
-</a>
-</div>-->
 
 <div dojoType="cosmo:TicketWidget" widgetId = "newTicketWidget"  itemId="${Path}"></div>
 <script type="text/javascript">

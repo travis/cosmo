@@ -93,6 +93,17 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
     }
 
     /** */
+    public void writeDeleted()
+        throws EimmlStreamException {
+        try {
+            xmlWriter.writeAttribute(NS_CORE, ATTR_DELETED, "true");
+        } catch (XMLStreamException e) {
+            close();
+            throw new EimmlStreamException("Error writing recordset", e);
+        }
+    }
+
+    /** */
     public void writeRecordSet(EimRecordSet recordset)
         throws EimmlStreamException {
         try {
@@ -155,8 +166,12 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         xmlWriter.writeStartElement(NS_CORE, EL_RECORDSET);
         xmlWriter.writeAttribute(ATTR_UUID, recordset.getUuid());
 
-        for (EimRecord record : recordset.getRecords())
-            writeRecord(record);
+        if (recordset.isDeleted()) {
+            xmlWriter.writeAttribute(NS_CORE, ATTR_DELETED, "true");
+        } else {
+            for (EimRecord record : recordset.getRecords())
+                writeRecord(record);
+        }
 
         xmlWriter.writeEndElement();
     }

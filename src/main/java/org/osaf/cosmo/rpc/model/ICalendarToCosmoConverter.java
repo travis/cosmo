@@ -362,6 +362,8 @@ public class ICalendarToCosmoConverter {
             }
             if (instanceStartDate.equals(masterStartDate)) {
                 instance.setMasterEvent(true);
+                instance.setInstanceDate(createCosmoDate(instanceStartDate,
+                        calendar, tzid));
                 events.set(0, instance);
             } else {
                 instance.setInstanceDate(createCosmoDate(instanceStartDate,
@@ -912,5 +914,6 @@ public class ICalendarToCosmoConverter {
         } 
         
         return null;
-    }
+    }   
+
 }

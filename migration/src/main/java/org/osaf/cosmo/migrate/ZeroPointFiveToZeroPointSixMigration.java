@@ -27,6 +27,7 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Uid;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -459,7 +460,17 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                     
                     // Now that we parsed, lets get the UID, DESCRIPTION, and
                     // SUMMARY so we can update NoteItem, ContentItem
-                    icalUid = event.getUid().getValue();
+                    Uid uid = event.getUid();
+                    
+                    // Handle the case where events don't have a UID (should be rare)
+                    if(uid!=null)
+                        icalUid = event.getUid().getValue();
+                    else
+                        icalUid = "UNKNOWN";
+                    
+                    if(uid==null || "".equals(uid))
+                        icalUid = "UNKNOWN";
+                    
                     Property p = event.getProperties().getProperty(Property.DESCRIPTION);
                     if(p!=null)
                         eventDesc = p.getValue();

@@ -54,7 +54,7 @@ import org.apache.commons.logging.LogFactory;
  * they are serialized as an EIM text value using the same process as
  * iCalendar. The resulting value looks like the equivalent iCalendar
  * property without the leading property name. When parameters are
- * present, the text value begins with a colon, each property
+ * present, the text value begins with a semicolon, each property
  * name/value pair is separated by semicolons, and the last property
  * is separated from the text value by a colon. When no parameters are
  * present, the text value contains only the property value string
@@ -194,11 +194,11 @@ public class EimValueConverter implements EimSchemaConstants {
     public static String fromIcalTrigger(Trigger trigger) {
         
         if(trigger.getDateTime()!=null)
-            return ":VALUE=DATE-TIME:" + trigger.getDateTime().toString();
+            return ";VALUE=DATE-TIME:" + trigger.getDateTime().toString();
         
         Related related = (Related) trigger.getParameters().getParameter(Parameter.RELATED);
         if(related != null)
-            return ":" + related.toString() + ":" + trigger.getDuration().toString();
+            return ";" + related.toString() + ":" + trigger.getDuration().toString();
         else
             return trigger.getDuration().toString();
     }
@@ -229,10 +229,10 @@ public class EimValueConverter implements EimSchemaConstants {
         Related related = null;
         String propVal = null;
 
-        if (text.startsWith(":VALUE=DATE-TIME:")) {
+        if (text.startsWith(";VALUE=DATE-TIME:")) {
             value = Value.DATE_TIME;
             propVal = text.substring(17);
-        } else if (text.startsWith(":RELATED=END:")){
+        } else if (text.startsWith(";RELATED=END:")){
            related = Related.END;
            propVal = text.substring(13);
         } else {
@@ -371,7 +371,7 @@ public class EimValueConverter implements EimSchemaConstants {
         }
 
         public String toString() {
-            StringBuffer buf = new StringBuffer(":");
+            StringBuffer buf = new StringBuffer(";");
             buf.append(value.toString());
             if (tzid != null)
                 buf.append(";").append("TZID=").append(tzid.getValue());
@@ -460,7 +460,7 @@ public class EimValueConverter implements EimSchemaConstants {
             try {
                 int nextToken = tokenizer.nextToken();
                 // log.debug("starting token: " + tokenizer);
-                if (nextToken != ':')
+                if (nextToken != ';')
                     return;
 
                 nextToken = tokenizer.nextToken();

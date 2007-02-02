@@ -310,6 +310,8 @@ public class ICalendarToCosmoConverter {
         DateList startDateList = getExpandedDates(recur, exDates, masterVEvent
                 .getStartDate().getDate(), rangeStart, rangeEnd, dateOrDateTime);
 
+        fetcher.addOutOfRangeModificationInstanceDates(rangeStart, rangeEnd, startDateList);
+
         long duration = -1;
         if (masterEvent.isPointInTime()){
             duration = 0;
@@ -518,6 +520,24 @@ public class ICalendarToCosmoConverter {
                 ICalendarUtils.addOrReplaceProperty(dest, p);
             }
         }
+        
+        public void addOutOfRangeModificationInstanceDates(DateTime rangeStart, DateTime rangeEnd, DateList startDateList) {
+            for (long instanaceDate : overrideMap.keySet()){
+                if (!isTimeInRange(instanaceDate, rangeStart, rangeEnd)){
+                    VEvent event = overrideMap.get(instanaceDate);
+                    if (isDateInRange(event.getStartDate().getDate(), rangeStart, rangeEnd)){
+                        startDateList.add(event.getReccurrenceId().getDate());
+                    } else {
+                        if (hasProperty(event, Property.DTEND) || hasProperty(event, Property.DURATION)){
+                            if (isDateInRange(event.getEndDate().getDate(), rangeStart, rangeEnd)){
+                                startDateList.add(event.getReccurrenceId().getDate());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
     private void setSimpleProperties(String itemId, VEvent vevent, Event event) {
         event.setId(itemId);
@@ -820,18 +840,27 @@ public class ICalendarToCosmoConverter {
         return false;
     }
 
-    private boolean isDateInRange (Date d,  Date rangeBegin, Date rangeEnd){
+    private static boolean isDateInRange (Date d,  Date rangeBegin, Date rangeEnd){
         return ((d.after(rangeBegin) || d.equals(rangeBegin)) && (d
                 .before(rangeEnd) || d.equals(rangeEnd)));
     }
+    
+    private static boolean isTimeInRange(long time, long rangeBegin, long rangeEnd){
+        return ((time > rangeBegin) || (time == rangeBegin)) && 
+               ((time <   rangeEnd) || (time == rangeEnd));
+    }
+    
+    private static boolean isTimeInRange(long time, Date rangeBegin, Date rangeEnd){
+        return isTimeInRange(time, rangeBegin.getTime(), rangeEnd.getTime());
+    }
 
-    private boolean isEventInRange(Date eventStartDate, Date eventEndDate,
+    private static boolean isEventInRange(Date eventStartDate, Date eventEndDate,
             Date rangeStart, Date rangeEnd) {
         return (isDateInRange(eventStartDate, rangeStart, rangeEnd) || (eventEndDate != null && isDateInRange(
                 eventEndDate, rangeStart, rangeEnd)));
     }
 
-    private boolean isEventInRange(VEvent vevent, Date rangeStart, Date rangeEnd) {
+    private static boolean isEventInRange(VEvent vevent, Date rangeStart, Date rangeEnd) {
         Date startDate = vevent.getStartDate().getDate();
         Date endDate = null;
         DtEnd dtEnd = (DtEnd) vevent.getProperties()
@@ -841,7 +870,7 @@ public class ICalendarToCosmoConverter {
         if (dtEnd != null || duration != null){
             endDate = vevent.getEndDate().getDate();
         }
-        return isEventInRange(startDate, endDate, rangeStart, rangeEnd);
+        return  isEventInRange(startDate, endDate, rangeStart, rangeEnd);
     }
 
     private boolean isEmpty(Collection coll){

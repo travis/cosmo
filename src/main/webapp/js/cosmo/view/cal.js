@@ -391,10 +391,12 @@ cosmo.view.cal = new function () {
                         if (m.instanceDate.toUTC() == mod.instanceDate.toUTC()) {
                             // Copy over any previous changes, but overwrite
                             // if it's also a current edited prop
-                            for (var p in m) {
+                            var mods = m.modifiedProperties;
+                            for (var j = 0; j < mods.length; j++) {
+                                var p = mods[j];
                                 if (typeof changedProps[p] == 'undefined') {
                                     mod.modifiedProperties.push(p);
-                                    modEv[p] = m[p];
+                                    modEv[p] = m.event[p];
                                 }
                             }
                             // Throw out the old mod

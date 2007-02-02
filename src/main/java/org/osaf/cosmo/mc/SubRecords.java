@@ -73,6 +73,11 @@ public class SubRecords {
     }
 
     /** */
+    public boolean isDeleted() {
+        return ! collection.getIsActive();
+    }
+
+    /** */
     protected EimRecordTranslationIterator createIterator() {
         ArrayList<ContentItem> items = new ArrayList<ContentItem>();
 

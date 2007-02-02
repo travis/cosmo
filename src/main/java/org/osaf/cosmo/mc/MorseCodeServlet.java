@@ -161,9 +161,15 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                     new EimmlStreamWriter(resp.getOutputStream(),
                                           records.getUid(),
                                           records.getName());
-                Iterator<EimRecordSet> i = records.getRecordSets();
-                while (i.hasNext())
-                    writer.writeRecordSet(i.next());
+
+                if (records.isDeleted()) {
+                    writer.writeDeleted();
+                } else {
+                    Iterator<EimRecordSet> i = records.getRecordSets();
+                    while (i.hasNext())
+                        writer.writeRecordSet(i.next());
+                }
+
                 writer.close();
 
                 return;

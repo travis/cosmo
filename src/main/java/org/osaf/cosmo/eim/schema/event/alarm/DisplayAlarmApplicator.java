@@ -115,7 +115,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
             if(keyField.getName().equals(FIELD_RECURRENCE_ID)) {
                 String value = EimFieldValidator.validateText(keyField,
                         MAXLEN_RECURRENCE_ID);
-                return EimValueConverter.toICalDate(value);
+                return EimValueConverter.toICalDate(value).getDate();
             }
         }
         return null;

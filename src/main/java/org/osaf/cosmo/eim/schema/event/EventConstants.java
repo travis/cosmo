@@ -58,8 +58,6 @@ public interface EventConstants {
     /** */
     public static final int MAXLEN_STATUS = 256;
     /** */
-    public static final String FIELD_ANYTIME = "anytime";
-    /** */
     public static final String FIELD_BODY = "body";
     /** */
     public static final String FIELD_DISPLAY_NAME = "displayName";

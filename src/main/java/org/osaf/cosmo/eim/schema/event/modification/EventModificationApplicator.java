@@ -113,7 +113,7 @@ public class EventModificationApplicator extends BaseStampApplicator
             if(keyField.getName().equals(FIELD_RECURRENCE_ID)) {
                 String value = EimFieldValidator.validateText(keyField,
                         MAXLEN_RECURRENCE_ID);
-                return EimValueConverter.toICalDate(value);
+                return EimValueConverter.toICalDate(value).getDate();
             }
         }
         
@@ -124,13 +124,13 @@ public class EventModificationApplicator extends BaseStampApplicator
     //  Apply a startDate field to the event stamp
     private void applyStartDate(EimRecordField field, VEvent modification) throws EimSchemaException {
         String value = EimFieldValidator.validateText(field, MAXLEN_DTSTART);
-        modification.getStartDate().setDate(EimValueConverter.toICalDate(value));
+        modification.getStartDate().setDate(EimValueConverter.toICalDate(value).getDate());
     }
     
     //  Apply an endDate field to the event stamp
     private void applyEndDate(EimRecordField field, VEvent modification) throws EimSchemaException {
         String value = EimFieldValidator.validateText(field, MAXLEN_DTEND);
-        modification.getEndDate().setDate(EimValueConverter.toICalDate(value));
+        modification.getEndDate().setDate(EimValueConverter.toICalDate(value).getDate());
     }
     
     //  Apply a status field to the event stamp

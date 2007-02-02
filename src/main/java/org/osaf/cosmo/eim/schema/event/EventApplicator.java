@@ -23,6 +23,7 @@ import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
+import org.osaf.cosmo.eim.schema.ICalDate;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Stamp;
@@ -71,10 +72,12 @@ public class EventApplicator extends BaseStampApplicator
         if (field.getName().equals(FIELD_DTSTART)) {
             String value =
                 EimFieldValidator.validateText(field, MAXLEN_DTSTART);
-            event.setStartDate(EimValueConverter.toICalDate(value));
+            ICalDate icd = EimValueConverter.toICalDate(value);
+            event.setStartDate(icd.getDate());
+            event.setAnyTime(icd.isAnyTime());
         } else if (field.getName().equals(FIELD_DTEND)) {
             String value = EimFieldValidator.validateText(field, MAXLEN_DTEND);
-            event.setEndDate(EimValueConverter.toICalDate(value));
+            event.setEndDate(EimValueConverter.toICalDate(value).getDate());
         } else if (field.getName().equals(FIELD_LOCATION)) {
             String value =
                 EimFieldValidator.validateText(field, MAXLEN_LOCATION);
@@ -87,16 +90,15 @@ public class EventApplicator extends BaseStampApplicator
             event.setExceptionRules(EimValueConverter.toICalRecurs(value));
         } else if (field.getName().equals(FIELD_RDATE)) {
             String value = EimFieldValidator.validateText(field, MAXLEN_RDATE);
-            event.setRecurrenceDates(EimValueConverter.toICalDates(value));
+            event.setRecurrenceDates(EimValueConverter.toICalDate(value).
+                                     getDateList());
         } else if (field.getName().equals(FIELD_EXDATE)) {
             String value = EimFieldValidator.validateText(field, MAXLEN_EXDATE);
-            event.setExceptionDates(EimValueConverter.toICalDates(value));
+            event.setExceptionDates(EimValueConverter.toICalDate(value).
+                                    getDateList());
         } else if (field.getName().equals(FIELD_STATUS)) {
             String value = EimFieldValidator.validateText(field, MAXLEN_STATUS);
             event.setStatus(value);
-        } else if (field.getName().equals(FIELD_ANYTIME)) {
-            Integer value = EimFieldValidator.validateInteger(field);
-            event.setAnyTime(value==0 ? false : true);
         } else {
             applyUnknownField(field);
         }

@@ -67,14 +67,13 @@ public class EventGenerator extends BaseStampGenerator
 
         master.addKeyField(new TextField(FIELD_UUID, event.getItem().getUid()));
 
-        value = EimValueConverter.fromICalDate(event.getStartDate());
+        value = EimValueConverter.fromICalDate(event.getStartDate(),
+                                               event.isAnyTime());
         master.addField(new TextField(FIELD_DTSTART, value));
                                       
         value = EimValueConverter.fromICalDate(event.getEndDate());
         master.addField(new TextField(FIELD_DTEND, value));
 
-        master.addField(new IntegerField(FIELD_ANYTIME, event.isAnyTime() ? 1 : 0));
-        
         master.addField(new TextField(FIELD_LOCATION, event.getLocation()));
 
         value = EimValueConverter.fromICalRecurs(event.getRecurrenceRules());

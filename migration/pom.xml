@@ -121,6 +121,11 @@
             <version>1.2.9</version>
         </dependency>
         <dependency>
+            <groupId>ical4j</groupId>
+            <artifactId>ical4j-osaf</artifactId>
+            <version>0.9.18-20070118</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <version>10.2.1.6</version>

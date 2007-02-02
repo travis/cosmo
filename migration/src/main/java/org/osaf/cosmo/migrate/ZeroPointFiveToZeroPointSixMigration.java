@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 package org.osaf.cosmo.migrate;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.Types;
+
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.model.Calendar;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -369,6 +374,9 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
         ResultSet rs =  null;
         long count=0;
         
+        System.setProperty("ical4j.unfolding.relaxed", "true");
+        CalendarBuilder calBuilder = new CalendarBuilder();
+        
         log.debug("begin migrateEvents()");
         
         try {
@@ -383,7 +391,7 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
             deleteContentDataStmt = conn.prepareStatement("delete from content_data where id=?");
             selectContentDataStmt = conn.prepareStatement("select content from content_data where id=?");
             
-            updateEventStmt = conn.prepareStatement("update item set itemtype=?, contentdataid=? where id=?");
+            updateEventStmt = conn.prepareStatement("update item set itemtype=?, contentdataid=?, contentlength=? where id=?");
             updateEventStmt.setString(1, "note");
             updateEventStmt.setNull(2, Types.BIGINT);
             
@@ -398,9 +406,6 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                 long itemId = rs.getLong(1);
                 long contentDataId = rs.getLong(2);
                 long stampId = 0;
-                
-                updateEventStmt.setLong(3, itemId);
-                updateEventStmt.executeUpdate();
                 
                 if("MySQL5".equals(dialect)) {
                     insertStampStmt1.setLong(2, itemId);
@@ -421,18 +426,25 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
           
                 selectContentDataStmt.setLong(1, contentDataId);
                 
-                String icaldata = null;
+                Calendar calendar = null;
+                long icalLength = 0;
                 ResultSet contentDataRs = selectContentDataStmt.executeQuery();
                 if(contentDataRs.next()) {
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    IOUtils.copy(contentDataRs.getBinaryStream(1), bos);
-                    icaldata = new String(bos.toByteArray(),"UTF-8");
+                    log.error("itemid=" + itemId);
+                    Blob icalBlob = contentDataRs.getBlob(1);
+                    byte[] icalBytes = icalBlob.getBytes(1, (int) icalBlob.length());
+                    calendar = calBuilder.build(new ByteArrayInputStream(icalBytes));
+                    icalLength = calendar.toString().getBytes("UTF-8").length;
                 }
                 
                 contentDataRs.close();
                 
+                updateEventStmt.setLong(3, icalLength);
+                updateEventStmt.setLong(4, itemId);
+                updateEventStmt.executeUpdate();
+                
                 insertEventStmt.setLong(1, stampId);
-                insertEventStmt.setString(2, icaldata);
+                insertEventStmt.setString(2, calendar.toString());
                 
                 insertEventStmt.executeUpdate();
                 

@@ -70,6 +70,7 @@ eimClobFieldContent = {
 eimCollection =
    element eim:collection {
       (eimDeleted,
+         attribute uuid { xsd:string },
          attribute name { xsd:string }?,
          eimRecordSet*)
    }

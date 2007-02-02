@@ -33,7 +33,15 @@ cosmo.datetime.timezone._RULE_OP_GTR = "GTR";
 cosmo.datetime.timezone._RULE_OP_LESS = "LSS";
 
 cosmo.datetime.timezone.Timezone = function(tzId, zoneItems){
+    // summary: Represents a single olson timezone
+    // description: Basically consists of a bunch ZoneItems and the tzId
+
+    // tzId : String
+    //    the time zone ID (eg. "America/Los_Angeles")
     this.tzId = tzId;
+    
+    // zoneItems: Array
+    //    An array with teh ZoneItems for this timezone
     this.zoneItems = zoneItems || [];
 };
 
@@ -50,6 +58,9 @@ cosmo.datetime.timezone.Timezone.prototype.addZoneItem = function(zoneItem){
 };
 
 cosmo.datetime.timezone.Timezone.prototype.getOffsetInMinutes = function(/*Date*/ date){
+    // summary: returns the offset from GMT in minutes for this timezone
+    // for the given date.
+
     //first get the right ZoneItem
     var zoneItem = this._getZoneItemForDate(date);
     var originalOffset = zoneItem.offsetInMinutes;
@@ -71,6 +82,9 @@ cosmo.datetime.timezone.Timezone.prototype.getOffsetInMinutes = function(/*Date*
 };
 
 cosmo.datetime.timezone.Timezone.prototype.getAbbreviatedName = function(/*Date*/ date){
+    // summary: gets the short name for this timezone during the given date.
+    // description: The short name can be dependent on the date, eg. EST vs. EDT,
+    // standard time versus daylight-savings
     var zoneItem = this._getZoneItemForDate(date);
     if (!zoneItem.ruleName){
         return zoneItem.format;
@@ -88,6 +102,7 @@ cosmo.datetime.timezone.Timezone.prototype.getAbbreviatedName = function(/*Date*
 }
 
 cosmo.datetime.timezone.Timezone.prototype._getZoneItemForDate = function(/*Date*/ date){
+    // summary: retruns the correct zoneItem for the given date
     var compareDates = cosmo.datetime.timezone._compareDates;
     for (var x = 0; x < this.zoneItems.length; x++){
         var zoneItem = this.zoneItems[x];
@@ -103,6 +118,9 @@ cosmo.datetime.timezone.Timezone.prototype._getZoneItemForDate = function(/*Date
 };
 
 cosmo.datetime.timezone._compareDates = function(d1, d2){
+    // summary: comparator ("compare function" in JS parlance) for comparing dates
+    // or things that look like dates - works with cosmo.datetime.Date, native JS dates
+    // and raw objects with similarlry named properties.
     var getDateField = cosmo.datetime.timezone._getDateField;
     var fields = ["year", "month", "date", "hours", "minutes", "seconds"];
 
@@ -118,6 +136,8 @@ cosmo.datetime.timezone._compareDates = function(d1, d2){
 };
 
 cosmo.datetime.timezone._getLastDayForMonthAndYear = function(day, month, year){
+    // summary: returns the day of the month of the last time the given day of the week occurs in a 
+    // given month and year.
     var lastDayOfMonth = new Date(year, month + 1,1, -24);
     var lastDayDay = lastDayOfMonth.getDay();
     var diff = (day > lastDayDay) ? (day - lastDayDay - 7) : (day - lastDayDay);
@@ -125,6 +145,10 @@ cosmo.datetime.timezone._getLastDayForMonthAndYear = function(day, month, year){
 };
 
 cosmo.datetime.timezone._getDayGreaterThanNForMonthAndYear = function(n, day, month, year){
+    // summary: returns the first date (day of month) after (or on) the given date "n" in the 
+    // given month and year for which the given day occurs
+    // description: Confusing eh? Here's some help: if there params were "10, 1, 0, 2007" this
+    // function would return the first Monday (1) that occurs after the 10th, in January(0), 2007
     var startingDate = new Date(year, month, n);
     var date = startingDate.getDate();
     var startingDay = startingDate.getDay();
@@ -133,6 +157,10 @@ cosmo.datetime.timezone._getDayGreaterThanNForMonthAndYear = function(n, day, mo
 };
 
 cosmo.datetime.timezone._getDayLessThanNForMonthAndYear = function(n, day, month, year){
+    // summary: returns the first date (day of month) before (or on) the given date "n" in the 
+    // given month and year for which the given day occurs
+    // description: Example: if there params were "10, 1, 0, 2007" this
+    // function would return the first Monday (1) that occurs before (or on) the 10th, in January(0), 2007
     var startingDate = new Date(year, month, n);
     var date = startingDate.getDate();
     var startingDay = startingDate.getDay();
@@ -167,6 +195,8 @@ cosmo.datetime.timezone._getDateField = function(date, field){
 }
 
 cosmo.datetime.timezone.ZoneItem = function(){
+    // summary: represents one Zone line in a olson timezone
+    
     this.offsetInMinutes = null;
     this.ruleName = null;
     this.format = null;
@@ -203,6 +233,7 @@ cosmo.datetime.timezone.ZoneItem.prototype.toString = function(/*boolean (option
 }
 
 cosmo.datetime.timezone.RuleSet = function(name, rules){
+  // summary: holds all the Rules with the same name
     this.name = name;
     this.rules = rules || [];
 
@@ -221,6 +252,7 @@ cosmo.datetime.timezone.RuleSet.prototype.addRule = function(rule){
 };
 
 cosmo.datetime.timezone.RuleSet.prototype._getRulesForYear = function(year){
+    // summary: returns all the rules that are used in a given year
      var result = [];
      var rules = this.rules;
      for (var x = 0; x < this.rules.length;x++){
@@ -233,6 +265,7 @@ cosmo.datetime.timezone.RuleSet.prototype._getRulesForYear = function(year){
 };
 
 cosmo.datetime.timezone.RuleSet.prototype._getRuleForDate = function(date){
+    // summary: returns the appropriate Rule given the date
     var rules = this._getRulesForYear(date.getFullYear());
     if (!rules || !rules.length){
         return null;
@@ -255,6 +288,7 @@ cosmo.datetime.timezone.RuleSet.prototype._getRuleForDate = function(date){
 }
 
 cosmo.datetime.timezone.Rule = function(){
+    // summary: one rule line in an olson timezone
     this.startYear = null;
     this.endYear = null;
     this.type = null;
@@ -301,21 +335,29 @@ cosmo.datetime.timezone.Rule.prototype.toString = function(/*boolean (optional)*
 }
 
 cosmo.datetime.timezone.Rule.prototype._applicable = function(date){
+    // summary: returns whether or not this rule might be applicable for the given date
+    // description: this does NOT return whether or not this is the right rule to use, just whether
+    // or not the date is after this rules start date (hence "might")
+    
     var ruleStartDate  = this._getStartDateForYear(date.getFullYear());
     return cosmo.datetime.timezone._compareDates(date, ruleStartDate) >= 0 ;
 }
 
 cosmo.datetime.timezone.Rule.prototype._getStartDateForYear = function(year){
+    // summary: returns the date (naked object with date props not a "real" date) when this rule becomes 
+    // active 
+    // description: this is sort of an expensive call, so once it is calculated, it is cached.
+    
     var startDate = this._startDatesByYear[year];
     if (startDate){
         return startDate;    
     }
     
     startDate = { year: year,
-                      month: this.startMonth,
-                      hours: this.startTime.hours,
-                      minutes: this.startTime.minutes,
-                      seconds: this.startTime.seconds };
+                  month: this.startMonth,
+                  hours: this.startTime.hours,
+                  minutes: this.startTime.minutes,
+                  seconds: this.startTime.seconds };
 
     if (this.startDay != null){
         if (this.startOperator == cosmo.datetime.timezone._RULE_OP_LAST){
@@ -336,25 +378,30 @@ cosmo.datetime.timezone.Rule.prototype._getStartDateForYear = function(year){
     return startDate;
 }
 
-cosmo.datetime.timezone.setTimezoneRegistry =  function(timezoneRegistry){
+cosmo.datetime.timezone.setTimezoneRegistry =  function(/*cosmo.datetime.timezone.SimpleTimezoneRegistry*/timezoneRegistry){
+    // summary: sets the timezone registry to use for retrieving timezones
     cosmo.datetime.timezone._timezoneRegistry = timezoneRegistry;
 }
 
 cosmo.datetime.timezone.getTimezone = function(tzId){
+    // summary: returns the timezone with the given id
     return this._timezoneRegistry.getTimezone(tzId);
 }
 
 cosmo.datetime.timezone.getRuleSet = function(ruleName){
+    // summary: returns the ruleset with the given rule name
     return this._timezoneRegistry.getRuleSet(ruleName);
 }
 
 cosmo.datetime.timezone.getTzIdsForRegion = function(region){
+    // summary: returns all the tzIds in a given region
     return this._timezoneRegistry.getTzIdsForRegion(region);
 }
 
-
-
 cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback, linkCallback){
+        // summary: parses the given string as olson data, creating ZoneItems, Rules and link entries
+        // passing them to the appropriate given call back
+        
         var ruleSets = new dojo.collections.Dictionary();
         var zones = new dojo.collections.Dictionary();
         var links = {};
@@ -435,6 +482,7 @@ cosmo.datetime.timezone._arrayPrinter = function(starter, arrayToPrint){
 };
 
 cosmo.datetime.timezone._parseZoneLine = function(array){
+    // summary: parses a olson 'Zone' line into a ZoneItem
     var zoneItem = new cosmo.datetime.timezone.ZoneItem();
 
     //The Format: zoneLine --> 0->'-10:30' 1->'-' 2->'HST' 3->'1933' 4->'Apr' 5->'30' 6->'2:00'
@@ -478,6 +526,8 @@ cosmo.datetime.timezone._parseZoneLine = function(array){
 };
 
 cosmo.datetime.timezone._parseRuleLine = function(array){
+    // sumamry: parses an olson 'Rule' line into a Rule object
+    
     var rule = new cosmo.datetime.timezone.Rule();
 
     //The Format: DEBUG: Rule --> 0->'1942' 1->'only' 2->'-' 3->'Feb' 4->'9' 5->'2:00' 6->'1:00' 7->'W' 8->''
@@ -529,6 +579,7 @@ cosmo.datetime.timezone._parseRuleLine = function(array){
 };
 
 cosmo.datetime.timezone._parseTimeString = function(str) {
+    // summary: parses an olsom time string into an object with time properties
     var pat = /(\d+)(?::0*(\d*))?(?::0*(\d*))?([wsugz])?$/;
     var matchArray =  str.match(pat);
     var result = {};
@@ -540,6 +591,7 @@ cosmo.datetime.timezone._parseTimeString = function(str) {
 };
 
  cosmo.datetime.timezone._parseTimeIntoMinutes = function(str){
+    // summary: returns the time in minutes of an olson time string
     var hms = this._parseTimeString(str);
     var millis = ((((hms.hours * cosmo.datetime.MINUTES_IN_HOUR) + hms.minutes) * cosmo.datetime.SECONDS_IN_MINUTE) + hms.seconds) * 1000;
     var minutes = millis/1000/cosmo.datetime.SECONDS_IN_MINUTE;

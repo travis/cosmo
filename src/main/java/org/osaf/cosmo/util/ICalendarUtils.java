@@ -36,6 +36,8 @@ import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DateListProperty;
 import net.fortuna.ical4j.model.property.DateProperty;
+import net.fortuna.ical4j.model.property.DtEnd;
+import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.TzId;
 
@@ -256,20 +258,23 @@ public class ICalendarUtils {
         return null;
     }
 
-   public static long getDuration(VEvent vevent){
-       Date startDate = vevent.getStartDate().getDate();
-       Duration d = (Duration) vevent.getProperties().getProperty(Property.DURATION);
-       if (d != null){
-           Dur dur = d.getDuration();
-           long endTime = dur.getTime(startDate).getTime();
-           return endTime - startDate.getTime();
-       }
-       Date endDate = vevent.getEndDate().getDate();
-       if (endDate != null){
-           return endDate.getTime() - startDate.getTime();
-       }
-       else return 0;
-   }
+   public static long getDuration(VEvent vevent) {
+        Date startDate = vevent.getStartDate().getDate();
+        Duration d = (Duration) vevent.getProperties().getProperty(
+                Property.DURATION);
+        if (d != null) {
+            Dur dur = d.getDuration();
+            long endTime = dur.getTime(startDate).getTime();
+            return endTime - startDate.getTime();
+        }
+        DtEnd dtEnd = (DtEnd) vevent.getProperties()
+                .getProperty(Property.DTEND);
+        if (dtEnd != null) {
+            Date endDate = dtEnd.getDate();
+            return endDate.getTime() - startDate.getTime();
+        } else
+            return 0;
+    }
    
    /**
     * Returns the VTimeZone with the given tzId from the given

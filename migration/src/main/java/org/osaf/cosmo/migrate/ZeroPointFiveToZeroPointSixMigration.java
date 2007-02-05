@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.migrate;
 import java.io.ByteArrayInputStream;
+import java.rmi.server.UID;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,6 +30,7 @@ import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Uid;
 
+import org.apache.commons.id.uuid.VersionFourGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -381,6 +383,8 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
         System.setProperty("ical4j.unfolding.relaxed", "true");
         CalendarBuilder calBuilder = new CalendarBuilder();
         
+        VersionFourGenerator uidGenerator = new VersionFourGenerator();
+        
         log.debug("begin migrateEvents()");
         
         try {
@@ -454,7 +458,6 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                     byte[] icalBytes = icalBlob.getBytes(1, (int) icalBlob.length());
                     // have to parse data into Calendar to get right contentlength
                     calendar = calBuilder.build(new ByteArrayInputStream(icalBytes));
-                    icalLength = calendar.toString().getBytes("UTF-8").length;
                     VEvent event = (VEvent) calendar.getComponents().getComponents(
                             Component.VEVENT).get(0);
                     
@@ -465,11 +468,18 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                     // Handle the case where events don't have a UID (should be rare)
                     if(uid!=null)
                         icalUid = event.getUid().getValue();
-                    else
-                        icalUid = "UNKNOWN";
                     
-                    if(uid==null || "".equals(uid))
-                        icalUid = "UNKNOWN";
+                    if(icalUid==null || "".equals(icalUid))
+                        icalUid = null;
+                    
+                    // If there is no UID, create a new one
+                    if(icalUid==null) {
+                        icalUid = uidGenerator.nextIdentifier().toString();
+                        if(uid!=null)
+                            uid.setValue(icalUid);
+                        else
+                            event.getProperties().add(new Uid(icalUid));
+                    }
                     
                     Property p = event.getProperties().getProperty(Property.DESCRIPTION);
                     if(p!=null)
@@ -488,6 +498,9 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
                     // Make sure we can fit summary in displayname column
                     if(eventSummary!=null && eventSummary.length()>=255)
                         eventSummary = eventSummary.substring(0,254);
+                    
+                    // Calculate new length
+                    icalLength = calendar.toString().getBytes("UTF-8").length;
                 }
                 
                 contentDataRs.close();

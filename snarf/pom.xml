@@ -15,74 +15,21 @@
 -->
 
 <project>
+    <parent>
+        <groupId>org.osaf.cosmo</groupId>
+        <artifactId>osaf-server</artifactId>
+        <version>0.6-SNAPSHOT</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>OSAF Server Bundle</name>
-    <groupId>org.osaf.server</groupId>
     <artifactId>osaf-server-bundle</artifactId>
-    <version>0.6-SNAPSHOT</version>
-    <url>http://cosmo.osafoundation.org</url>
-    <repositories>
-        <repository>
-            <id>osafoundation.org</id>
-            <name>OSAF's repository</name>
-            <layout>default</layout>
-            <url>http://builds.osafoundation.org/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>osafoundation.org</id>
-            <name>OSAF's plugin repository</name>
-            <layout>default</layout>
-            <url>http://builds.osafoundation.org/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>people.apache.org</id>
-            <name>people.apache plugin repository</name>
-            <layout>default</layout>
-            <url>http://people.apache.org/repo/m2-shapshot-repository</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
+    <name>OSAF Server Bundle</name>
     <dependencies>
-<!--
-        <dependency>
-          <groupId>org.osaf.cosmo</groupId>
-          <artifactId>cosmo</artifactId>
- -->
-          <!-- when you update this version, you must also update it in
-               src/main/config/server.xml -->
-<!--
-          <version>${pom.version}</version>
-          <type>war</type>
-        </dependency>
- -->
         <dependency>
           <groupId>org.osaf</groupId>
           <artifactId>apache-tomcat</artifactId>
           <version>5.5.17</version>
           <type>zip</type>
         </dependency>
-<!--
-        <dependency>
-          <groupId>org.osaf.cosmo</groupId>
-          <artifactId>cosmo-docs</artifactId>
- -->
-          <!-- when you update this version, you must also update it in
-               src/main/config/server.xml -->
-<!--
-          <version>0.6-SNAPSHOT</version>
-          <type>war</type>
-        </dependency>
- -->
         <dependency>
           <groupId>javax.activation</groupId>
           <artifactId>activation</artifactId>
@@ -145,7 +92,7 @@
         </dependency>
     </dependencies>
     <build>
-        <pluginManagement>
+<!--        <pluginManagement> -->
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -155,15 +102,41 @@
                             <descriptor>src/main/assembly/snarf.xml</descriptor>
                         </descriptors>
                         <filters>
-                            <filter>config/snarf.properties</filter>
+                            <filter>${basedir}/config/snarf.properties</filter>
                         </filters>
                         <finalName>osaf-server-bundle-${pom.version}</finalName>
                         <outputDirectory>dist</outputDirectory>
-                        <workDirectory>target/assembly/work</workDirectory>
+                        <workDirectory>${basedir}/target/assembly/work</workDirectory>
+                        <appendAssemblyId>False</appendAssemblyId>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>make-assembly</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>attached</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+<!--
+                <plugin>
+                    <groupId>org.codehaus.cargo.maven2</groupId>
+                    <artifactId>cargo-maven2-plugin</artifactId>
+                    <configuration>
+                        <container>
+                            <containerId>tomcat5x</containerId>
+                        </container>
+                        <configuration>
+                            <properties>
+                                <cargo.servlet.port>8080</cargo.servlet.port>
+                            </properties>
+                        </configuration>
                     </configuration>
                 </plugin>
+ -->
             </plugins>
-        </pluginManagement>
+<!--        </pluginManagement> -->
     </build>
 </project>
 

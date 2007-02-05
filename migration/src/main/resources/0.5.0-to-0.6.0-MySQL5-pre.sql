@@ -10,10 +10,17 @@ alter table attribute add column textvalue longtext;
 alter table attribute add column decvalue numeric(19,6);
 alter table attribute add column tzvalue varchar(32);
 alter table attribute modify column itemid bigint(20) not null;
+alter table attribute modify column stringvalue varchar(2048);
 alter table attribute drop index attrname_idx;
 alter table attribute add index idx_attrns (namespace);
 alter table attribute add index idx_attrtype (attributetype);
 alter table attribute add index idx_attrname (localname);
+
+# migrate dictionary_values table
+alter table dictionary_values modify column stringvalue varchar(2048);
+
+# migrate multistring_values table
+alter table multistring_values modify column stringvalue varchar(2048);
 
 # migrate server_properties table
 # - increase maximum size of propertyvalue to 2048
@@ -41,6 +48,9 @@ alter table item add column lastmodifiedby varchar(255);
 alter table item add column triagestatus varchar(64);
 alter table item add column triagestatusupdated numeric(19,6);
 alter table item add column icaluid varchar(255);
+alter table item modify column ownerid bigint(20) not null;
+create index idx_itemtype on item (itemtype);
+create index idx_itemisactive on item (isactive);
 
 # migrate users table
 # - add createdate, modifydate
@@ -55,7 +65,7 @@ create index idx_activationid on users (activationid);
 # - fix typo in ticketid name
 # - change primary key to be combination of ticketid, privilege
 alter table ticket_privilege change column tickedid ticketid bigint not null, add primary key(ticketid, privilege), drop index FKE492FD3E41A1E708, drop foreign key FKE492FD3E41A1E708;
-alter table ticket_privilege add constraint FKE492FD3E41A22318 foreign key FKE492FD3E41A22318 (ticketid) references tickets (id) on delete restrict on update restrict;
+alter table ticket_privilege add index FKE492FD3E41A22318 (ticketid), add constraint FKE492FD3E41A22318 foreign key (ticketid) references tickets (id);
 
 
 # add new tables
@@ -78,3 +88,4 @@ alter table subscription add index FK1456591D5ACA52FE (ownerid), add constraint 
 alter table user_preferences add index FK199BD08467D36616 (userid), add constraint FK199BD08467D36616 foreign key (userid) references users (id);
 
 create index idx_stamptype on stamp (stamptype);
+create index idx_stampisactive on stamp (isactive);

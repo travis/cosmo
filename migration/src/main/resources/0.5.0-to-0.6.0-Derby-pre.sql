@@ -10,6 +10,7 @@ alter table attribute add column textvalue clob(102400000)
 alter table attribute add column decvalue numeric(19,6)
 alter table attribute add column tzvalue varchar(32)
 alter table attribute alter column itemid not null
+alter table attribute alter column stringvalue set data type varchar(2048)
 # do this because in Derby we can't drop a column
 alter table attribute alter column attributename null
 
@@ -18,6 +19,12 @@ drop index attrname_idx
 create index idx_attrns on attribute (namespace)
 create index idx_attrtype on attribute (attributetype)
 create index idx_attrname on attribute (localname)
+
+# migrate dictionary_values table
+alter table dictionary_values alter column stringvalue set data type varchar(2048)
+
+# migrate multistring_values table
+alter table multistring_values alter column stringvalue set data type varchar(2048)
 
 # migrate server_properties table
 # - increase maximum size of propertyvalue to 2048
@@ -43,6 +50,9 @@ alter table item add column icaluid varchar(255)
 alter table item add column createdate bigint
 alter table item add column modifydate bigint
 alter table item add column clientcreatedate bigint
+alter table item alter column ownerid not null
+create index idx_itemtype on item (itemtype)
+create index idx_itemisactive on item (isactive)
 
 # migrate users table
 # - add createdate, modifydate
@@ -84,3 +94,4 @@ alter table subscription add constraint FK1456591D5ACA52FE foreign key (ownerid)
 alter table user_preferences add constraint FK199BD08467D36616 foreign key (userid) references users
 
 create index idx_stamptype on stamp (stamptype)
+create index idx_stampisactive on stamp (isactive)

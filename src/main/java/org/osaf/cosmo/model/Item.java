@@ -555,7 +555,7 @@ public abstract class Item extends AuditableObject {
     }
 
     @Version
-    @Column(name="version")
+    @Column(name="version", nullable = false)
     public Integer getVersion() {
         return version;
     }

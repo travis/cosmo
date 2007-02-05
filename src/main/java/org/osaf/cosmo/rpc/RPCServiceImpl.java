@@ -30,6 +30,7 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
 
@@ -195,11 +196,7 @@ public class RPCServiceImpl implements RPCService {
 
         CollectionItem collection =
             getCollectionItem(collectionUid);
-        try{
             this.checkCurrentUserOwnsCollection(collection);
-        } catch (RPCException e){
-            throw new RPCException("Could not get event: " + e.getMessage());
-        }
 
         return this.doGetEvent(collection, eventUid);
     }
@@ -209,38 +206,25 @@ public class RPCServiceImpl implements RPCService {
 
         CollectionItem collection =
             getCollectionItem(collectionUid);
-        try{
             this.checkTicketProvidesPermissions(collection, ticket, READ_PERM);
-        } catch (RPCException e){
-            throw new RPCException("Could not get event: " + e.getMessage());
-        }
         return doGetEvent(collection, eventUid);
     }
 
     public Event[] getEvents(String collectionUid, long utcStartTime,
             long utcEndTime) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            this.checkCurrentUserOwnsCollection(collection);
-        } catch (RPCException e){
-            throw new RPCException("Could not get events: " + e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        this.checkCurrentUserOwnsCollection(collection);
 
 
         return doGetEvents(collection, utcStartTime, utcEndTime);
     }
+    
     public Event[] getEvents(String collectionUid, long utcStartTime,
             long utcEndTime, String ticket) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            this.checkTicketProvidesPermissions(collection, ticket, READ_PERM);
-        } catch (RPCException e){
-            throw new RPCException("Could not get events: " + e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        this.checkTicketProvidesPermissions(collection, ticket, READ_PERM);
 
         return doGetEvents(collection, utcStartTime, utcEndTime);
     }
@@ -279,13 +263,8 @@ public class RPCServiceImpl implements RPCService {
 
     public void removeEvent(String collectionUid, String eventUid, String ticket) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            this.checkTicketProvidesPermissions(collection, ticket, WRITE_PERM);
-        } catch (RPCException e){
-            throw new RPCException("Could not remove event: " + e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        this.checkTicketProvidesPermissions(collection, ticket, WRITE_PERM);
 
         doRemoveEvent(collection, eventUid);
 
@@ -294,26 +273,16 @@ public class RPCServiceImpl implements RPCService {
     public String saveEvent(String collectionUid, Event event)
         throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            checkCurrentUserOwnsCollection(collection);
-        } catch (RPCException e){
-            throw new RPCException("Could not save event: " + e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        checkCurrentUserOwnsCollection(collection);
 
         return doSaveEvent(collection, event);
     }
 
     public String saveEvent(String collectionUid, Event event, String ticket) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            checkTicketProvidesPermissions(collection, ticket, WRITE_PERM);
-        } catch (RPCException e){
-            throw new RPCException("Could not save event: " + e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        checkTicketProvidesPermissions(collection, ticket, WRITE_PERM);
 
         return doSaveEvent(collection, event);
     }
@@ -360,14 +329,8 @@ public class RPCServiceImpl implements RPCService {
     public Map<String, RecurrenceRule> getRecurrenceRules(String collectionUid,
             String[] eventUids) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            checkCurrentUserOwnsCollection(collection);
-        } catch (RPCException e){
-            throw new RPCException("Could not get recurrence rules: " +
-                    e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        checkCurrentUserOwnsCollection(collection);
 
         return doGetRecurrenceRules(collection, eventUids);
     }
@@ -375,14 +338,8 @@ public class RPCServiceImpl implements RPCService {
     public Map<String, RecurrenceRule> getRecurrenceRules(String collectionUid,
             String[] eventUids, String ticket) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            checkTicketProvidesPermissions(collection, ticket, READ_PERM);
-        } catch (RPCException e){
-            throw new RPCException("Could not get recurrence rules: " +
-                    e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        checkTicketProvidesPermissions(collection, ticket, READ_PERM);
 
         return doGetRecurrenceRules(collection, eventUids);
     }
@@ -390,14 +347,8 @@ public class RPCServiceImpl implements RPCService {
     public void saveRecurrenceRule(String collectionUid, String eventUid,
             RecurrenceRule recurrenceRule) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            this.checkCurrentUserOwnsCollection(collection);
-        } catch (RPCException e){
-            throw new RPCException("Could not save recurrence rule: " +
-                    e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        this.checkCurrentUserOwnsCollection(collection);
 
         doSaveRecurrenceRule(collection, eventUid, recurrenceRule);
     }
@@ -405,15 +356,9 @@ public class RPCServiceImpl implements RPCService {
     public void saveRecurrenceRule(String collectionUid, String eventUid,
             RecurrenceRule recurrenceRule, String ticket) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            checkTicketProvidesPermissions(collection, ticket, WRITE_PERM);
+        CollectionItem collection = getCollectionItem(collectionUid);
+        checkTicketProvidesPermissions(collection, ticket, WRITE_PERM);
 
-        } catch (RPCException e){
-            throw new RPCException("Could not save recurrence rule: " +
-                    e.getMessage());
-        }
 
         doSaveRecurrenceRule(collection, eventUid, recurrenceRule);
 
@@ -423,14 +368,8 @@ public class RPCServiceImpl implements RPCService {
             String[] eventUids, long utcStartTime,
             long utcEndTime) throws RPCException{
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            checkCurrentUserOwnsCollection(collection);
-        } catch (RPCException e){
-            throw new RPCException("Could not get expanded events: " +
-                    e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        checkCurrentUserOwnsCollection(collection);
 
         return doExpandEvents(collection, eventUids, utcStartTime, utcEndTime);
     }
@@ -439,13 +378,8 @@ public class RPCServiceImpl implements RPCService {
             String[] eventUids, long utcStartTime, long utcEndTime,
             String ticket) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            checkTicketProvidesPermissions(collection, ticket, READ_PERM);
-        } catch (RPCException e){
-            throw new RPCException("Could not get expanded events: " + e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        checkTicketProvidesPermissions(collection, ticket, READ_PERM);
 
         return doExpandEvents(collection, eventUids, utcStartTime, utcEndTime);
     }
@@ -454,14 +388,8 @@ public class RPCServiceImpl implements RPCService {
             Event event, String originalEventUid,
             CosmoDate originalEventEndDate) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            checkCurrentUserOwnsCollection(collection);
-        } catch (RPCException e){
-            throw new RPCException("Could not save and break: " +
-                    e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        checkCurrentUserOwnsCollection(collection);
 
         return doSaveNewEventBreakRecurrence(collection, event,
                 originalEventUid, originalEventEndDate);
@@ -471,14 +399,8 @@ public class RPCServiceImpl implements RPCService {
             String originalEventUid, CosmoDate originalEventEndDate,
             String ticket) throws RPCException {
 
-        CollectionItem collection =
-            getCollectionItem(collectionUid);
-        try{
-            checkTicketProvidesPermissions(collection, ticket, READ_WRITE_PERM);
-        } catch (RPCException e){
-            throw new RPCException("Could not get save and break: " +
-                    e.getMessage());
-        }
+        CollectionItem collection = getCollectionItem(collectionUid);
+        checkTicketProvidesPermissions(collection, ticket, READ_WRITE_PERM);
 
         return doSaveNewEventBreakRecurrence(collection, event,
                 originalEventUid, originalEventEndDate);
@@ -1030,5 +952,4 @@ public class RPCServiceImpl implements RPCService {
         }
         return map;
     }
-
 }

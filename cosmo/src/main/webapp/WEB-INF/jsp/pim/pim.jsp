@@ -28,6 +28,10 @@
 
 <fmt:setBundle basename="PimMessageResources"/>
 
+<u:bind var="PRODUCT_VERSION"
+        type="org.osaf.cosmo.CosmoConstants"
+        field="PRODUCT_VERSION"/>
+
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -48,7 +52,7 @@
 
 <cosmo:dojoBoilerplate timezones="true"/>
 
-<script type="text/javascript" src="${staticBaseUrl}/js/lib/jsonrpc-java-js/jsonrpc.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/lib-${PRODUCT_VERSION}/jsonrpc-java-js/jsonrpc.js"></script>
 
 <script type="text/javascript">
 // Dojo requires

@@ -1,0 +1,4 @@
+{"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "tester47"}}
+{"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "tester"}}
+{"method": "click", "params": {"id" : "loginSubmitButtonText"}}
+{"method": "wait", "params": {"seconds" : 3000}}

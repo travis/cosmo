@@ -482,7 +482,7 @@
                                       <type>jar</type>
                                     </artifactItem>
                                 </artifactItems>
-                              <outputDirectory>{project.build.directory}/${project.build.finalName}/js/lib-${pom.version}</outputDirectory>
+                              <outputDirectory>${project.build.directory}/${project.build.finalName}/js/lib-${pom.version}</outputDirectory>
                            </configuration>
                          </execution>
                        </executions>

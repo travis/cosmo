@@ -44,7 +44,7 @@
             <outputDirectory>tomcat/webapps/ROOT/</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>../target/</directory>
+            <directory>../cosmo/target/</directory>
             <outputDirectory>tomcat/webapps/</outputDirectory>
             <includes>
                 <include>cosmo-${pom.version}.war</include>

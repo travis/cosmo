@@ -39,7 +39,7 @@
                     i18nLocation: "${staticBaseUrl}/i18n.js"};
 </script>
 
-<script type="text/javascript" src="${staticBaseUrl}/js/lib-${PRODUCT_VERSION}/dojo-event_and_io/dojo.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js/lib-${PRODUCT_VERSION}/dojo/dojo.js"></script>
 <script type="text/javascript">
 
 function bootstrap(){

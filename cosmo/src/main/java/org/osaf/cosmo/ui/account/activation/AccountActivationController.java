@@ -48,6 +48,7 @@ public class AccountActivationController extends AbstractController {
         
         if (user != null){
             user.activate();
+            userService.updateUser(user);
             return new ModelAndView(accountActivationView);    
         } else {
             return new ModelAndView(notFoundView);

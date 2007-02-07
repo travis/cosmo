@@ -37,15 +37,17 @@ class CosmoClient(davclient.DAVClient):
     def set_cosmo_path(self, path):
         _cosmo_path = path
         
-    def add_user(self, username, password, first_name, last_name, email, request_method=None):
+    def add_user(self, username, password, first_name, last_name, email, headers={}, request_method=None):
         if request_method is None:
             request_method = self.put 
         
         root = ElementTree.Element('{http://osafoundation.org/cosmo/CMP}user')
         vals = {'username':username, 'password':password, 'firstName':first_name, 'lastName':last_name, 'email':email}
         dict_to_elem(root, vals, namespace='http://osafoundation.org/cosmo/CMP')
+        add_user_headers = {'content-type': 'text/xml; charset=utf-8'}
+        add_user_headers.update(headers)
         request_method(self._cmp_path+'/user/%s'%username, body=unicode(ElementTree.tostring(root), 'utf-8'),
-                       headers={'content-type': 'text/xml; charset=utf-8'})
+                       headers=add_user_headers)
         
     def modify_user(self, user_dict, headers={}, request_method=None):
         if request_method is None:

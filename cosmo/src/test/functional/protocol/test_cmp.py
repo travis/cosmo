@@ -13,12 +13,26 @@
 #   limitations under the License.
 
 import cosmoclient
-import random
+import random, uuid
 
 import cosmo_test_lib
 
+SERVER_URL = 'http://qacosmo.osafoundation.org:80'
+ADMIN_USER = 'root'
+ADMIN_PASS = 'cosmo'
+PRINCIPAL_ROOT = '/cosmo/dav'
+
+TEST_USER_PREFIX = 'test_user_'
+
 def setup_module(module):
-    cosmo_test_lib.setup_module(module)
+    module.TEST_USER = uuid.uuid1().__str__().replace('-', '')
+    module.TEST_PASS = 'test_pass'
+    module.TEST_FIRST_NAME = 'Test'
+    module.TEST_LAST_NAME = 'User'
+    module.TEST_EMAIL = module.TEST_USER+'@osafoundation.org'
+    module.PRINCIPAL_ROOT = PRINCIPAL_ROOT
+    module.PRINCIPAL_DAV_PATH = '%s/%s' % (PRINCIPAL_ROOT, module.TEST_USER)
+    module.TEST_USER_2 = uuid.uuid1().__str__().replace('-', '')
     client = cosmoclient.CosmoClient(module.SERVER_URL)
     client.set_basic_auth(module.ADMIN_USER, module.ADMIN_PASS)
     module.client = client
@@ -36,7 +50,8 @@ def test_view_user():
 def test_create_user():
     client.add_user(TEST_USER, TEST_PASS, TEST_FIRST_NAME, TEST_LAST_NAME, TEST_EMAIL)
     assert client.response.status == 201
-    client.add_user(TEST_USER+"-2", TEST_PASS, TEST_FIRST_NAME, TEST_LAST_NAME, TEST_USER+"-2@osafoundation.org", headers={'x-http-method-override':'PUT'}, request_method=client.post)
+
+    client.add_user(TEST_USER_2, TEST_PASS, TEST_FIRST_NAME, TEST_LAST_NAME, TEST_USER_2+"@osafoundation.org", headers={'x-http-method-override':'PUT'}, request_method=client.post)
     assert client.response.status == 201
     
 def test_modify_user():
@@ -64,7 +79,7 @@ def teardown_module(module):
     assert client.response.status == 204
     client.remove_user(TEST_USER)
     assert client.response.status == 204  
-    client.remove_user(TEST_USER+'-2')
+    client.remove_user(TEST_USER_2)
     assert client.response.status == 204  
     
         

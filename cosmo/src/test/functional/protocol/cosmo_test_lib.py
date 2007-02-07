@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 import cosmoclient
-import random
+import random, uuid
 
 SERVER_URL = 'http://qacosmo.osafoundation.org:80'
 ADMIN_USER = 'root'
@@ -27,7 +27,7 @@ def setup_module(module, server_url=SERVER_URL, admin_user=ADMIN_USER, admin_pas
     module.SERVER_URL = server_url
     module.ADMIN_USER = admin_user
     module.ADMIN_PASS = admin_pass
-    module.TEST_USER = '%s%s' % (user_prefix, str(random.random()).strip('.'))
+    module.TEST_USER = uuid.uuid1().__str__().replace('-', '')
     module.TEST_PASS = 'test_pass'
     module.TEST_FIRST_NAME = 'Test'
     module.TEST_LAST_NAME = 'User'

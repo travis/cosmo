@@ -47,14 +47,15 @@ class CosmoClient(davclient.DAVClient):
         request_method(self._cmp_path+'/user/%s'%username, body=unicode(ElementTree.tostring(root), 'utf-8'),
                        headers={'content-type': 'text/xml; charset=utf-8'})
         
-    def modify_user(self, user_dict, request_method=None):
+    def modify_user(self, user_dict, headers={}, request_method=None):
         if request_method is None:
             request_method = self.put
             
         root = ElementTree.Element('{http://osafoundation.org/cosmo/CMP}user')
         dict_to_elem(root, user_dict, namespace='http://osafoundation.org/cosmo/CMP')
-        print unicode(ElementTree.tostring(root), 'utf-8')
-        request_method(self._cmp_path+'/user/%s'%user_dict['username'], body=unicode(ElementTree.tostring(root), 'utf-8'), headers={'content-type': 'text/xml; charset=utf-8'})
+        put_headers={'content-type': 'text/xml; charset=utf-8'}
+        put_headers.update(headers)
+        request_method(self._cmp_path+'/user/%s'%user_dict['username'], body=unicode(ElementTree.tostring(root), 'utf-8'), headers=put_headers)
         
     def mkcalendar(self, username=None):
         if username is None:

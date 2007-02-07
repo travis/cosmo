@@ -36,7 +36,7 @@ def test_view_user():
 def test_create_user():
     client.add_user(TEST_USER, TEST_PASS, TEST_FIRST_NAME, TEST_LAST_NAME, TEST_EMAIL)
     assert client.response.status == 201
-    client.add_user(TEST_USER+"-2", TEST_PASS, TEST_FIRST_NAME, TEST_LAST_NAME, TEST_USER+"-2@osafoundation.org", request_method=client.post)
+    client.add_user(TEST_USER+"-2", TEST_PASS, TEST_FIRST_NAME, TEST_LAST_NAME, TEST_USER+"-2@osafoundation.org", headers={'x-http-method-override':'PUT'}, request_method=client.post)
     assert client.response.status == 201
     
 def test_modify_user():
@@ -46,7 +46,9 @@ def test_modify_user():
     assert client.response.status == 204
     client.get(client._cmp_path+'/user/test_modify_user')
     assert client.response.body.find('new_email@fake.com') is not -1
-    client.modify_user({'username':'test_modify_user', 'email':'new_new_email@fake.com'}, request_method=client.post)
+    client.modify_user({'username':'test_modify_user', 
+                        'email':'new_new_email@fake.com'}, 
+                        headers={'x-http-method-override':'PUT'}, request_method=client.post)
     assert client.response.status == 204
     client.get(client._cmp_path+'/user/test_modify_user')
     assert client.response.body.find('new_new_email@fake.com') is not -1

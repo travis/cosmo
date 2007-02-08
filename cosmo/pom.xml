@@ -418,7 +418,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.0.1</version>
+                <version>2.0.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -426,14 +426,22 @@
                         </manifest>
                     </archive>
                     <filters>
-                        <filter>${basedir}/config/cosmo.properties</filter>
+                        <filter>../config/cosmo.properties</filter>
                     </filters>
                     <webResources>
                         <resource>
                             <directory>${basedir}/src/main/resources</directory>
-                            <filtering>True</filtering>
+                            <filtering>true</filtering>
                             <includes>
                                 <include>cosmo.version.txt</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <directory>${basedir}/src/main/resources</directory>
+                            <targetPath>WEB-INF</targetPath>
+                            <filtering>true</filtering>
+                            <includes>
+                                <include>urlrewrite.xml</include>
                             </includes>
                         </resource>
                     </webResources>
@@ -482,7 +490,7 @@
                                       <type>jar</type>
                                     </artifactItem>
                                 </artifactItems>
-                              <outputDirectory>${project.build.directory}/${project.build.finalName}/js/lib-${pom.version}</outputDirectory>
+                              <outputDirectory>${project.build.directory}/${project.build.finalName}/js/lib</outputDirectory>
                            </configuration>
                          </execution>
                        </executions>
@@ -528,7 +536,7 @@
                                       <type>jar</type>
                                     </artifactItem>
                                 </artifactItems>
-                              <outputDirectory>${basedir}/src/main/webapp/js/lib-${pom.version}</outputDirectory>
+                              <outputDirectory>${basedir}/src/main/webapp/js/lib</outputDirectory>
                            </configuration>
                          </execution>
                        </executions>

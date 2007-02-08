@@ -20,6 +20,9 @@
 
 <urlrewrite>
   <rule>
+    <from>/js-${pom.version}/</from>
+    <to>/js/</to>
+  <rule>
     <from>^/loginfailed$</from>
     <to>/login?login_failed=1</to>
   </rule>

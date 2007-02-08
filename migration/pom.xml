@@ -74,6 +74,11 @@
             <version>1.2</version>
         </dependency>
         <dependency>
+            <groupId>commons-id</groupId>
+            <artifactId>commons-id</artifactId>
+            <version>0.1-dev</version>
+        </dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.9</version>
@@ -123,6 +128,9 @@
                                     <mainClass>org.osaf.cosmo.migrate.Main</mainClass>
                                 </manifest>
                            </archive>
+                           <filters>
+                               <filter>${basedir}/config/cosmo.properties</filter>
+                           </filters>
                         </configuration>
                         <goals>
                             <goal>assembly</goal>

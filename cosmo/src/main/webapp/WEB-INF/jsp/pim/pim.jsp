@@ -52,7 +52,7 @@
 
 <cosmo:dojoBoilerplate timezones="true"/>
 
-<script type="text/javascript" src="${staticBaseUrl}/js/lib-${PRODUCT_VERSION}/jsonrpc-java-js/jsonrpc.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js-${PRODUCT_VERSION}/lib/jsonrpc-java-js/jsonrpc.js"></script>
 
 <script type="text/javascript">
 // Dojo requires

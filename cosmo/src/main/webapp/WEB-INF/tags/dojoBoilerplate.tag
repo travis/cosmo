@@ -39,7 +39,7 @@
                     i18nLocation: "${staticBaseUrl}/i18n.js"};
 </script>
 
-<script type="text/javascript" src="${staticBaseUrl}/js/lib-${PRODUCT_VERSION}/dojo/dojo.js"></script>
+<script type="text/javascript" src="${staticBaseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo.js"></script>
 <script type="text/javascript">
 
 function bootstrap(){
@@ -66,7 +66,7 @@ function bootstrap(){
 
     if (${timezones}){
         dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
-        var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry("${staticBaseUrl}/js/lib-${PRODUCT_VERSION}/olson-tzdata/");
+        var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry("${staticBaseUrl}/js-${PRODUCT_VERSION}/lib/olson-tzdata/");
         cosmo.datetime.timezone.setTimezoneRegistry(registry);
     }
     dojo.require('cosmo.ui.conf');

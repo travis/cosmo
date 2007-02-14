@@ -31,8 +31,22 @@ def test_move_text_data():
     assert client.response.status == 201
     client.move('%s/testcollection1/blah.txt' % PRINCIPAL_DAV_PATH, '%s/testcollection2/blah.txt' % PRINCIPAL_DAV_PATH)
     assert client.response.status == 201
-    client.propfind('%s/testcollection1/' % PRINCIPAL_DAV_PATH)
-    client.propfind('%s/testcollection2/' % PRINCIPAL_DAV_PATH)
+    assert len(client.propfind('%s/testcollection1/' % PRINCIPAL_DAV_PATH)) is 1
+    assert len(client.propfind('%s/testcollection2/' % PRINCIPAL_DAV_PATH)) is 2
     
     ### More to write but cosmo is failing already at this point
+def test_copy_text_data():
+    client.mkcol('%s/testcollection3' % PRINCIPAL_DAV_PATH)
+    assert client.response.status == 201
+    client.mkcol('%s/testcollection4' % PRINCIPAL_DAV_PATH)
+    assert client.response.status == 201
+    client.put('%s/testcollection3/blah.txt' % PRINCIPAL_DAV_PATH, body='BALHALAHLAHLALH')
+    assert client.response.status == 201
+    client.copy('%s/testcollection3/blah.txt' % PRINCIPAL_DAV_PATH, '%s/testcollection4/blah.txt' % PRINCIPAL_DAV_PATH)
+    assert client.response.status == 201
+    assert len(client.propfind('%s/testcollection3/' % PRINCIPAL_DAV_PATH)) is 2
+    assert len(client.propfind('%s/testcollection4/' % PRINCIPAL_DAV_PATH)) is 2
+    
+    
+    
     

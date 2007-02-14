@@ -13,12 +13,13 @@
 #   limitations under the License.
 
 import cosmoclient
-import random, uuid
+import random, uuid, os, sys
 
-SERVER_URL = 'http://qacosmo.osafoundation.org:80'
+SERVER_URL = 'http://qacosmo.osafoundation.org'
 ADMIN_USER = 'root'
 ADMIN_PASS = 'cosmo'
 PRINCIPAL_ROOT = '/cosmo/dav'
+FILES_DIR =  os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))+'/files/'
 
 TEST_USER_PREFIX = 'test_user_'
 
@@ -34,6 +35,7 @@ def setup_module(module, server_url=SERVER_URL, admin_user=ADMIN_USER, admin_pas
     module.TEST_EMAIL = module.TEST_USER+'@osafoundation.org'
     module.PRINCIPAL_ROOT = PRINCIPAL_ROOT
     module.PRINCIPAL_DAV_PATH = '%s/%s' % (PRINCIPAL_ROOT, module.TEST_USER)
+    module.FILES_DIR = FILES_DIR
     
     #Setup client and users
     client = cosmoclient.CosmoClient(module.SERVER_URL)

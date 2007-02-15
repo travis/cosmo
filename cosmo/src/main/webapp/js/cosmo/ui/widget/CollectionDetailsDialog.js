@@ -77,13 +77,12 @@ dojo.widget.HtmlWidget, function(){
             atom:_("Main.CollectionDetails.atom"),
             protocolInstructions:_("Main.CollectionDetails.protocolInstructions"),
             helpLink:_("Main.CollectionDetails.HelpUrl"),
-            chandlerLink:_("Main.CollectionDetails.ChandlerUrl"),
-            chandlerDownloadLink:_("Main.CollectionDetails.ChandlerDownloadUrl"),
             help:_("Main.CollectionDetails.Help"),
-            downloadHere:_("Main.CollectionDetails.DownloadHere"),
-            dontHave:_("Main.CollectionDetails.DontHave"),
             clickHere:_("Main.CollectionDetails.ClickHere"),
-            helpLink:_("Main.CollectionDetails.HelpLink")
+            helpLink:_("Main.CollectionDetails.HelpLink"),
+            chandlerPlug: _('Main.CollectionDetails.ChandlerPlug', 
+                '<span style="font-variant:small-caps;"><a href="http://chandler.osafoundation.org/">', 
+                '</a></span>')
         },
         
         clientsToProtocols: {
@@ -119,6 +118,11 @@ dojo.widget.HtmlWidget, function(){
            }
            this.clientSelector.selectedIndex = selectedIndex;
            
+           // Chandler plug contains a URL path with quotes. The Dojo widget
+           // template variable substitution 'helpfully' escapes these into
+           // two quotes each
+           this.chandlerPlug.innerHTML = '| ' + this.strings.chandlerPlug;
+
            this._handleClientChanged();
         },
         

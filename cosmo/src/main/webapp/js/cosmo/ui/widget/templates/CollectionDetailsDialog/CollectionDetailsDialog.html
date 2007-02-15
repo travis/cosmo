@@ -111,12 +111,11 @@
     </table>
     <div dojoAttachPoint="helpText" style="visibility: hidden; position:absolute; top:0px; left:0px">
          <a href="${this.strings.helpLink}">${this.strings.help}</a>
-    <span dojoAttachPoint="chandlerPlug" style="display:none">| ${this.strings.dontHave}
-        <a href="${this.strings.chandlerLink}">Chandler</a>? 
-        <a href="${this.strings.chandlerDownloadLink}"> 
-            <span style="font-size: 9px">${this.strings.downloadHere}</span>
-        </a>
-    </span>
+        <span dojoAttachPoint="chandlerPlug" style="display:none"><!-- 
+            Don't use Dojo widget string substitution with anchor tags -
+            it 'helpfully' escapes the quotes in the href prop
+            Have to insert as innerHTML during fillInTemplate
+            --></span>
     </div>
 </div>
 

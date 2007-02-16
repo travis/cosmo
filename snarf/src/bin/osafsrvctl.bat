@@ -22,12 +22,16 @@ echo This environment variable is needed to run this program
 goto end
 :okHome
 
+if not exist "%OSAFSRV_HOME%\logs" md "%OSAFSRV_HOME%\logs"
+
 rem tomcat is found one level above this directory
 set CATALINA_HOME=%OSAFSRV_HOME%\tomcat
 set CATALINA_BIN=%CATALINA_HOME%\bin
 set TOMCAT_SCRIPT=catalina.bat
 
 set EXECUTABLE=%CATALINA_BIN%\%TOMCAT_SCRIPT%
+
+if not exist "%CATALINA_HOME%\temp" md "%CATALINA_HOME%\temp"
 
 rem Check that target executable exists
 if exist "%EXECUTABLE%" goto okExec

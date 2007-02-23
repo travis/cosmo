@@ -17,8 +17,7 @@
 /**
  * @fileoverview Button - creates a push button that can be enabled or disabled, small or 
  *                        normal size.
- *                        Adapated from mde's button.js code.
- * @author Bobby Rullo br@osafoundation.org
+ * @authors: Matthew Eernisse (mde@osafoundation.org), Bobby Rullo (br@osafoundation.org)
  * @license Apache License 2.0
  */
 
@@ -30,132 +29,90 @@ dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 
 dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
-    //Constants
-    DISABLED_TABLE_OPACITY : 0.6,
+    
+    // Constants
+    DISABLED_OPACITY : 0.8,
+    templateString: '<input type="button" />',
 
-    buttonDirectory: cosmo.env.getImagesUrl(), 
-    templatePath: dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/Button/Button.html"),
-    
-    //attach points
-    leftContainer: null,
-    centerContainer: null,
-    rightContainer: null,
-    buttonTextContainer : null,
-    tableContainer : null,
-    
-    //properties to be set by tag or constructor
+    // Properties to be set by tag or constructor
     enabled: true,
     small: false,
     text: "",
     width: 0,
     handleOnClick: "",
-    
+
     fillInTemplate: function() {
-         if (typeof(this.handleOnClick) == "string") {
-             eval("this.handleOnClick = function() {" + this.handleOnClick + ";}");
-         }
-         this.setText(this.text);
-         this.setWidth(this.width);
-         this.setEnabled(this.enabled);
+        if (typeof(this.handleOnClick) == "string") {
+         eval("this.handleOnClick = function() {" + this.handleOnClick + ";}");
+        }
+        // Mouse effects and onclick
+        this._attachHandlers();
+        // DOM handles
+        this.domNode.id = this.widgetId;
+        this.domNode.name = this.widgetId;
+        // Finish setting up
+        this.setText(this.text);
+        this.setWidth(this.width);
+        this.setEnabled(this.enabled);
     },
     setText: function(text) {
         this.text = text;
-        var textNode = document.createTextNode(text);
-        if (this.buttonTextContainer.hasChildNodes) {
-		    dojo.dom.removeChildren(this.buttonTextContainer);
-		}
-		this.buttonTextContainer.appendChild(textNode);
+        this.domNode.value = this.text;
     },
+    // Default width already set in CSS -- this overrides it
     setWidth: function(width) {
         this.width = width;
-		if (width) {
-        	this.tableContainer.style.width = parseInt(width) + "px";
-        } else {
-        	this.tableContainer.style.width = null;
-        }
+        if (this.width) {
+            this.domNode.style.width = parseInt(width) + "px";
+        } 
     },
     setEnabled: function(enabled) {
+        var suf = this.small ? 'Sm' : '';
         this.enabled = enabled;
-        if (enabled) {
+        if (this.enabled) {
             if (this.handleOnClickOrig) {
                 this.handleOnClick = this.handleOnClickOrig;
             }
-            this.leftContainer.style.cursor = 'pointer';
-            this.centerContainer.style.cursor = 'pointer';
-            this.rightContainer.style.cursor = 'pointer';
-            this._setTableOpacity(1.0) 
+            this.domNode.className = 'btnElemBase' + suf;
+            this._setOpacity(1.0) 
             
         } 
         else {
             this.handleOnClickOrig = this.handleOnClick;
             this.handleClick = null;
-            this.leftContainer.style.cursor = 'default';
-            this.centerContainer.style.cursor = 'default';
-            this.rightContainer.style.cursor = 'default';
-            this._setTableOpacity(this.DISABLED_TABLE_OPACITY);
+            this.domNode.className = 'btnElemBase' + suf + ' btnElemDisabled' + suf;
+            this._setOpacity(this.DISABLED_OPACITY);
         }
-        
-        this._setButtonImages();
-        
     },
-    getButtonHeight: function() {
-        return this.small ? 18 : 24;
+    _attachHandlers: function () {
+        dojo.event.connect(this.domNode, 'onmouseover', this, '_morphButton');
+        dojo.event.connect(this.domNode, 'onmouseout', this, '_morphButton');
+        dojo.event.connect(this.domNode, 'onmousedown', this, '_morphButton');
+        dojo.event.connect(this.domNode, 'onmouseup', this, '_morphButton');
+        dojo.event.connect(this.domNode, 'onclick', this, '_handleOnClick');
     },
-    getCapWidth: function() {
-        return this.small ? 9 : 10;
-    },
-    getStyleForSize: function () {
-        var s = 'buttonText';
-        if (!this.enabled) {
-            s += 'Disabled'
+    _morphButton: function(e) {
+        if (this.enabled) {
+            var s = e.type;
+            var suf = this.small ? 'Sm' : '';
+            var states = {
+                mouseover: 'btnElemBase' + suf + ' btnElemMouseover' + suf,
+                mouseout: 'btnElemBase' + suf,
+                mousedown: 'btnElemBase' + suf + ' btnElemMousedown' + suf,
+                mouseup: 'btnElemBase' + suf
+            }
+            this.domNode.className = states[s]; 
         }
-        if (this.small) {
-            s += 'Sm';
-        }
-        return s;
-    },
-    _setButtonImages: function(lit) {
-        this.leftContainer.style.background="url('"+this._getLeftButtonImagePath(this.enabled, this.small, lit)+"')";
-        this.centerContainer.style.background="url('"+this._getCenterButtonImagePath(this.enabled, this.small, lit)+"')";
-        this.rightContainer.style.background="url('"+this._getRightButtonImagePath(this.enabled, this.small, lit)+"')";
-    },
-    _getCenterButtonImagePath: function(enabled, small, lit) {
-		return this._getButtonPath("center", enabled, small, lit);
-    },
-    _getLeftButtonImagePath : function(enabled, small, lit) {
-		return this._getButtonPath("left", enabled, small, lit);
-    },
-    _getRightButtonImagePath: function(enabled, small, lit) {
-		return this._getButtonPath("right", enabled, small, lit);
-    },
-    _getButtonPath: function(leftRightCenter, enabled, small, lit) {
-        var path = this.buttonDirectory + "button_" + leftRightCenter;
-        if (!enabled) { path += "_dim"; }
-        if (lit) { path += "_lit"; }
-        if (small) { path += "_sm"; }
-        path += ".gif";
-        return path;
-    },
-    _handleMouseOver: function() {
-         if (this.enabled) {
-             this._setButtonImages(true);
-         }
-    },
-    _handleMouseOut: function() {
-         if (this.enabled) {
-             this._setButtonImages();
-         }
     },
     _handleOnClick: function() {
         if (this.enabled) {
            this.handleOnClick();
         }
     },
-    _setTableOpacity: function(tableOpacity) {
-	    this.tableContainer.style.opacity = tableOpacity;
-	    if (document.all) {
-	        this.tableContainer.style.filter = "alpha(opacity="+ tableOpacity * 100 +")";
-	    }
+    _setOpacity: function(opac) {
+        this.domNode.style.opacity = opac;
+        if (document.all) {
+            this.domNode.style.filter = "alpha(opacity="+ opac * 100 +")";
+        }
     }
-    
   } );

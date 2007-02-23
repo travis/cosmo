@@ -256,37 +256,65 @@ body.adminPage {
 
 /* Buttons
  * --------------------- */
-/* Normal-sized buttons */
-$buttonHeight = 24px
-.buttonText {
-    font-size:$fontSizeM;
-    color:$linkTextColor;
-    height:$buttonHeight;
-    line-height:$buttonHeight;
-    vertical-align:middle;
+.btnElemBase {
+    width: 76px;
+    margin: auto;
+    text-align: center;
+    font-size: 11px;
+    color: #333399;
+    border-style: solid;
+    border-color: #ccc #777 #777 #ccc;
+    border-width: 1px;
+    height: 24px;
+    padding: 0 0 2px 0;
+    cursor: pointer;
+    background-image: url(templates/default/images/button_bgs.gif);
+    background-repeat: repeat-x;
+    background-position: 0px 0px;
 }
-.buttonTextDisabled {
-    font-size:$fontSizeM;
-    color:$linkTextDisabledColor;
-    height:$buttonHeight;
-    line-height:$buttonHeight;
-    vertical-align:middle;
+.btnElemMouseover {
+    color: #3333aa;
+    background-position: 0px -24px;
 }
-/* Small-sized buttons */
-$smButtonHeight = 18px
-.buttonTextSm {
-    font-size:$fontSizeS;
-    color:$linkTextColor;
-    height:$smButtonHeight;
-    line-height:$smButtonHeight;
-    vertical-align:middle;
+.btnElemMousedown {
+    color: #3333aa;
+    border-color: #555 #bbb #bbb #555;
+    background-position: 0px -24px;
 }
-.buttonTextDisabledSm {
-    font-size:$fontSizeS;
-    color:$linkTextDisabledColor;
-    height:$smButtonHeight;
-    line-height:$smButtonHeight;
-    vertical-align:middle;
+.btnElemDisabled {
+    color: #999;
+    border-color: #ddd #888 #888 #ddd;
+    cursor: default;
+}
+.btnElemBaseSm {
+    width: 60px;
+    margin: auto;
+    text-align: center;
+    font-size: 9px;
+    color: #333399;
+    border-style: solid;
+    border-color: #ccc #777 #777 #ccc;
+    border-width: 1px;
+    height: 18px;
+    padding: 0 0 1px 0;
+    cursor: pointer;
+    background-image: url(templates/default/images/button_bgs_sm.gif);
+    background-repeat: repeat-x;
+    background-position: 0px 0px;
+}
+.btnElemMouseoverSm {
+    color: #3333aa;
+    background-position: 0px -18px;
+}
+.btnElemMousedownSm {
+    color: #3333aa;
+    border-color: #555 #bbb #bbb #555;
+    background-position: 0px -18px;
+}
+.btnElemDisabledSm {
+    color: #999;
+    border-color: #ddd #888 #888 #ddd;
+    cursor: default;
 }
 
 /* General widget/UI

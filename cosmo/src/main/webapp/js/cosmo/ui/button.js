@@ -23,26 +23,6 @@ dojo.provide("cosmo.ui.button");
 dojo.require("cosmo.ui.conf");
 dojo.require("dojo.widget.*");
 
-function buttonPreload() {
-    var btnSizes = ['', '_sm'];
-    var btnSides = ['left', 'center', 'right'];
-    var btnTypes = ['', '_dim', '_lit'];
-    var btnPreload = {};
-    var f = function(base, suffix, size) {
-        var p = 'button_' + base + suffix + size;
-        btnPreload[p] = new Image();
-        btnPreload[p].src = BUTTON_DIR_PATH + p + '.gif';
-    }
-    for (var h in btnSizes) {
-        for (var i in btnSides) {
-            for (var j in btnTypes) {
-                f(btnSides[i], btnTypes[j], btnSizes[h]);
-            }
-        }
-    }
-}
-buttonPreload();
-
 /**
  * @object Button -- creates a button with a text label, and images
  * for endcaps and a stretchable, tiling middle section. Comes in

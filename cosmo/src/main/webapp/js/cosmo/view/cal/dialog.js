@@ -128,10 +128,9 @@ cosmo.view.cal.dialog = new function() {
     this.getProps = function(key, optsParam) {
         var p = props[key]();
         var opts = optsParam || {};
-        var instanceOnly = opts.instanceOnly || false;
         if (key == 'saveRecurConfirm') {
             p.btnsRight = [];
-            if (instanceOnly) {
+            if (opts.instanceOnly || opts.recurrenceMod) {
                 p.btnsRight.push(buttons.allEventsDisabled());
                 p.btnsRight.push(buttons.saveFutureEvents());
             }

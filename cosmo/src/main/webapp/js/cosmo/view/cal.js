@@ -121,6 +121,7 @@ cosmo.view.cal = new function () {
                 var opts = {};
                 opts.instanceOnly = false;
                 opts.masterEvent = false;
+                opts.recurrenceMod = false;
 
                 // Check to see if editing a recurrence instance to go
                 // beyond the recurrence interval -- in that case, the
@@ -138,6 +139,26 @@ cosmo.view.cal = new function () {
                     ret = (diff >= bound || diff <= (bound * -1)) ? true : false;
                     return ret;
                 }
+                // There ought to be a better way to do this -- figure out if
+                // this event is a recurrence mod by poking through the 
+                // modifications array and seeing if its start date matches
+                // any of the existing mods' instanceDates
+                function isRecurrenceMod() {
+                    var ret = false;
+                    var mods = recur.modifications;
+                    var evDt = ev.data.instanceDate.getTime();
+                    if (mods && mods.length) {
+                        for (var i = 0; i < mods.length; i++) {
+                            var modDt = mods[i].instanceDate.getTime();
+                            if (modDt == evDt) {
+                                ret = true;
+                                break;
+                            }
+                        }
+                    }
+                    return ret;
+                }
+                
                 // Change to master event in recurrence
                 if (ev.data.masterEvent) {
                     opts.masterEvent = true;
@@ -146,6 +167,9 @@ cosmo.view.cal = new function () {
                 else {
                     opts.instanceOnly = isOutOfIntervalRange();
                 }
+                
+                opts.recurrenceMod = isRecurrenceMod();
+
                 // Show the confirmation dialog
                 cosmo.app.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', opts));
             }

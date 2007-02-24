@@ -267,10 +267,11 @@ cosmo.account.settings = new function () {
         var form = _createElem('form');
         var div = _createElem('div');
         var nbsp = function () { return cosmo.util.html.nbsp(); };
+        var prefs = cosmo.account.preferences.getPreferences();
+        var checkedDefault = (prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] == 'true');
         var check = cosmo.util.html.createInput({ type: 'checkbox', 
             id: 'showAccountBrowser', name: 'showAccountBrowser',  
-            value: '' });
-        var prefs = cosmo.account.preferences.getPreferences();
+            value: '', checked: checkedDefault });
         
         div.appendChild(check);
         div.appendChild(nbsp());
@@ -284,9 +285,6 @@ cosmo.account.settings = new function () {
             cosmo.util.html.addInputsToForm([check], form);
         }
 
-        form.showAccountBrowser.checked = 
-            (prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] 
-            == "true");
         return form;
     };
     

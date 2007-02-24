@@ -120,12 +120,12 @@ cosmo.util.html.createInput = function (type, id, name,
         }
         appendElem = parentNode;
     }
-
+    
     // IE falls down on DOM-method-generated
     // radio buttons and checkboxes
     // Old-skool with conditional branching and innerHTML
-    if (document.all && (type == 'radio' || type == 'checkbox')) {
-        str = '<input type="' + type + '"' +
+    if (document.all && (o.type == 'radio' || o.type == 'checkbox')) {
+        str = '<input type="' + o.type + '"' +
             ' name="' + o.name + '"' +
             ' id ="' + o.id + '"';
         if (o.size) {
@@ -134,10 +134,14 @@ cosmo.util.html.createInput = function (type, id, name,
         if (o.maxlength) {
             str += ' maxlength="' + o.maxlength + '"';
         }
+        if (o.checked) {
+            str += ' checked="checked"';
+        }
         if (o.className) {
             str += ' class="' + o.className + '"';
         }
-        str += '>';
+        str += '/>';
+        
         var s = document.createElement('span');
         s.innerHTML = str;
         input = s.firstChild;

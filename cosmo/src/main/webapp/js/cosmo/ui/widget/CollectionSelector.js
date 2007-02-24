@@ -106,34 +106,26 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                         // Action to take after successful auth -- try to add the
                         // collection subscription
                         attemptFunc: function () {
-                            // Special Doug Henning section -- some closure to get the
-                            // callback from the async response to exec in the AuthBox
-                            // scope. Here I'm going back into the AuthBox to call
-                            // the response handler, which just executes successFunc below
-                            // I could just set up an anon function here to handle the
-                            // response, but I think it's clearer having a success handler 
-                            // specifically defined
-                            var self = this; // Reference to the AuthBox
-                            var n = function (a, b, c) {
-                                self.handleAuthActionResp.apply(self, [a, b, c]) 
+                            var self = this; // 'self' is CollectionSelector
+                            // Handler function for attempt to add collection
+                            // If it's added successfully, log the user in to look at it
+                            var n = function (nothingParam, err, requestId) {
+                                var msg = self.authAction.successPrompt;
+                                if (err) {
+                                    cosmo.app.hideDialog();
+                                    cosmo.app.showErr(self.strings.collectionAddError, err);
+                                    return false;
+                                }
+                                else {
+                                    // Log the user into Cosmo and display the current collection
+                                    self._showPrompt(msg);
+                                    location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.collection.uid;
+                                }
                             };
                             Cal.serv.saveSubscription(n, curr.collection.uid, passedKey, 
                                 curr.displayName)
                         },
                         attemptPrompt: strings.attemptPrompt, 
-                        successFunc: function (whatIsThisParam, err, requestId) {
-                            var msg = this.authAction.successPrompt; // 'this' is the AuthBox
-                            if (err) {
-                                cosmo.app.hideDialog();
-                                cosmo.app.showErr(strings.collectionAddError, err);
-                                return false;
-                            }
-                            else {
-                                // Log the user into Cosmo and display the current collection
-                                this._showPrompt(msg);
-                                location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.collection.uid;
-                            }
-                        },
                         successPrompt: strings.successPrompt };
                     f = function () {
                         var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties(authAction);

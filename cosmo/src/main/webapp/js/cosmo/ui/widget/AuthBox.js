@@ -32,41 +32,51 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
         _showPrompt: function (str, type) {
             cosmo.app.modalDialog.setPrompt(str, type);
         },
-        _handleAuthResp: function (str) {
-
-            // Auth failed -- bad password? Reset for retry
-            if (str == cosmo.env.getBaseUrl() + "/loginfailed"){
-                this._showErr(_('Login.Error.AuthFailed'));
-                this.passwordInput.value = '';
+        _handleAuthResp: function (type, data, obj) {
+            var str = data;
+            // Transport error
+            if (type == 'error') {
+                cosmo.app.hideDialog();
+                cosmo.app.showErr(data.message);
+                return false;
             }
-            // Auth successful -- try to do whatever action
-            // was contingent on the auth
+            // Request succeeded
             else {
-                cosmo.util.auth.setCred(this.usernameInput.value, 
-                                        this.passwordInput.value);
-                                        
-                this.attemptAuthAction(this.authAction.attemptParams);
+                // Auth failed -- bad password? Reset for retry
+                if (str == cosmo.env.getBaseUrl() + "/loginfailed"){
+                    this._showErr(_('Login.Error.AuthFailed'));
+                    this.passwordInput.value = '';
+                }
+                // Auth successful -- try to do whatever action
+                // was contingent on the auth
+                else {
+                    cosmo.util.auth.setCred(this.usernameInput.value, 
+                                            this.passwordInput.value);
+                                            
+                    this.attemptAuthAction(this.authAction.attemptParams);
+                }
             }
         },
         _attemptOrHandle: function (type, args) {
             var res = null;
-            // If this is just a plain ol' function, execute it inline here
+            var f = this.authAction[type + 'Func'];
+            var a = args || []; // Can't pass args to IE6 if it's undefined
+            var context = null;
+            // If this is just a plain ol' function, execute in window context 
             if (this.authAction.execInline) {
-                res = this.authAction[type + 'Func'].apply(null, args);
+                context = window;
             }
-            // Otherwise it's a method to execute in an obj context 
+            // If execution context got passed in, apply the method
+            // to that object
+            else if (this.authAction.execContext) {
+                context = this.authAction.execContext;
+            }
+            // No execution context -- execute the method in the
+            // context of the AuthBox itself
             else {
-                // If execution context got passed in, apply the method
-                // to that object
-                if (this.authAction.execContext) {
-                    res = this.authAction[type + 'Func'].apply(this.authAction.execContext, args);
-                }
-                // No execution context -- execute the method in the
-                // context of the AuthBox itself
-                else {
-                    res = this.authAction[type + 'Func'].apply(this, args);
-                }
+                context = this;
             }
+            res = f.apply(context, a);
             return res;
         },
         attemptAuthAction: function (args) {
@@ -112,8 +122,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
                     url: self.authProc,
                     method: 'POST',
                     content: postData,
-                    load: function(type, data, obj) { self._handleAuthResp(data); },
-                    error: function(type, error) { alert(error.message); }
+                    load: function(type, data, obj) { self._handleAuthResp(type, data, obj); },
+                    error: function(type, data, obj) { self._handleAuthResp(type, data, obj); }
                 });
             }
             return false;

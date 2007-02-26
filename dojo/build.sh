@@ -11,3 +11,5 @@ if [ "$1" == "release" ]; then
 else
     ant -Ddocless=true -Dprofile=core clean release
 fi
+gzip -c ../release/dojo/dojo.js > ../release/dojo/dojo.js.gzip-compressed
+

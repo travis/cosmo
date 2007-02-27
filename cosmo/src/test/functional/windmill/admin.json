@@ -1,0 +1,34 @@
+{"method": "click", "params": {"link" : "Log in to Cosmo"}}
+{"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "root"}}
+{"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "cosmo"}}
+{"method": "click", "params": {"id" : "loginSubmitButtonText"}}
+{"method": "wait", "params": {"seconds" : 2000}}
+{"method": "click", "params": {"link" : "Users"}}
+{"method": "wait", "params": {"seconds" : 2000}}
+{"method": "click", "params": {"link" : "Create New User"}}
+{"method": "type", "params": {"id" : "username", "text": "test_admin_user"}}
+{"method": "type", "params": {"id" : "firstName", "text": "test_admin_user"}}
+{"method": "type", "params": {"id" : "lastName", "text": "test_admin_user"}}
+{"method": "type", "params": {"id" : "email", "text": "test_admin_user@osaf.us"}}
+{"method": "type", "params": {"id" : "password", "text": "test_admin_user"}}
+{"method": "type", "params": {"id" : "confirm", "text": "test_admin_user"}}
+{"method": "click", "params": {"id" : "createUserDialogSubmitButtonText"}}
+{"method": "click", "params": {"link" : "Create New User"}}
+{"method": "type", "params": {"id" : "username", "text": "admin_admin_user"}}
+{"method": "type", "params": {"id" : "firstName", "text": "admin_admin_user"}}
+{"method": "type", "params": {"id" : "lastName", "text": "admin_admin_user"}}
+{"method": "type", "params": {"id" : "email", "text": "admin_admin_user@osaf.us"}}
+{"method": "type", "params": {"id" : "password", "text": "admin_admin_user"}}
+{"method": "type", "params": {"id" : "confirm", "text": "admin_admin_user"}}
+{"method": "click", "params": {"id" : "admin"}}
+{"method": "click", "params": {"id" : "createUserDialogSubmitButtonText"}}
+{"method": "click", "params": {"id" : "test_admin_userRow"}}
+{"method": "click", "params": {"link" : "Browse Selected User"}}
+{"method": "click", "params": {"link" : "Users"}}
+{"method": "click", "params": {"link" : "Modify Selected User"}}
+{"method": "click", "params": {"id" : "modifyUserDialogCancelButtonText"}}
+{"method": "click", "params": {"id" : "admin_admin_userRow"}}
+{"method": "click", "params": {"link" : "Delete Selected Users"}}
+{"method": "click", "params": {"link" : "Server Status"}}
+{"method": "click", "params": {"link" : "Run garbage collector"}}
+{"method": "click", "params": {"link" : "Log Out"}}

@@ -2,24 +2,51 @@
 {"method": "wait", "params": {"seconds" : 3000}}
 {"method": "click", "params": {"link" : "Click here to create one."}}
 {"method": "click", "params": {"jsid" : "parent.frames[1].cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-{"method": "type", "params": {"id" : "username", "text": "tester99"}}
-{"method": "type", "params": {"id" : "firstName", "text": "tester99"}}
-{"method": "type", "params": {"id" : "lastName", "text": "tester99"}}
-{"method": "type", "params": {"id" : "email", "text": "tester99@osafoundation.org"}}
+{"method": "type", "params": {"id" : "username", "text": "tester240"}}
+{"method": "type", "params": {"id" : "firstName", "text": "tester240"}}
+{"method": "type", "params": {"id" : "lastName", "text": "tester240"}}
+{"method": "type", "params": {"id" : "email", "text": "tester240@osafoundation.org"}}
 {"method": "type", "params": {"id" : "password", "text": "tester"}}
 {"method": "type", "params": {"id" : "confirm", "text": "tester"}}
 {"method": "click", "params": {"jsid" : "parent.frames[1].cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
 {"method": "wait", "params": {"seconds" : 3000}}
+{"method": "verify", "params": {"id" : "modalDialogPrompt", "validator" : "You have successfully created your Cosmo account."}}
 {"method": "click", "params": {"jsid" : "parent.frames[1].cosmo.app.modalDialog.btnsCenter[0].domNode.id"}}
-{"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "tester99"}}
+{"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "tester240"}}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "tester"}}
 {"method": "click", "params": {"id" : "loginSubmitButtonText"}}
-{"method": "wait", "params": {"seconds" : 3000}}
-{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "wait", "params": {"seconds" : 2000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
+{"method": "doubleClick", "params": {"id" : "hourDiv4-1000"}}
+{"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
+{"method": "doubleClick", "params": {"id" : "hourDiv2-1300"}}
+{"method": "click", "params": {"id" : "viewNavRight"}}
+{"method": "wait", "params": {"seconds" : 2000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "wait", "params": {"seconds" : 2000}}
-{"method": "doubleClick", "params": {"id" : "hourDiv2-0900"}}
+{"method": "type", "params": {"id" : "eventtitle", "text": "Properties Test"}}
+{"method": "type", "params": {"id" : "startdate", "text": "02/09/2007"}}
+{"method": "type", "params": {"id" : "enddate", "text": "02/09/2007"}}
+{"method": "type", "params": {"id" : "starttime", "text": "6:00"}}
+{"method": "type", "params": {"id" : "endtime", "text": "11:30"}}
+{"method": "click", "params": {"id" : "startap"}}
+{"method": "click", "params": {"id" : "endap"}}
+{"method": "select", "params": {"id" : "status", "option": "Tentative"}}
+{"method": "type", "params": {"id" : "eventdescr", "text": "A description for the properties test"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
 {"method": "wait", "params": {"seconds" : 2000}}
-{"method": "doubleClick", "params": {"id" : "hourDiv4-1000"}}
-{"method": "wait", "params": {"seconds" : 2000}}
+{"method": "click", "params": {"link" : "Settings"}}
+{"method": "click", "params": {"id" : "cosmo_TabContainer_0_tab1"}}
+{"method": "click", "params": {"id" : "showAccountBrowser"}}
+{"method": "click", "params": {"id" : "cosmo_Button_4Text"}}
+{"method": "type", "params": {"id" : "jumpto", "text": "02/11/2008"}}
+{"method": "click", "params": {"id" : "cosmo_Button_2Text"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
+{"method": "wait", "params": {"seconds" : 2000}}
+{"method": "click", "params": {"id" : "miniCal_month1_day19"}}
+{"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
+{"method": "wait", "params": {"seconds" : 2000}}
+{"method": "click", "params": {"xpath" : "/html/body/div[2]/form/div/div/span/div[2]/div[3]/img"}}
+{"method": "select", "params": {"xpath" : "/html/body/div[4]/div/div[4]/div/table/tbody/tr[3]/td[2]/div/select","option": "Other..."}}
+{"method": "click", "params": {"jsid" : "parent.frames[1].cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+{"method": "click", "params": {"link" : "Log Out"}}

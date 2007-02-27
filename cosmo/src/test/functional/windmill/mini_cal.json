@@ -1,0 +1,35 @@
+{"method": "click", "params": {"id" : "miniCal_month0_day3"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month0_day12"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month0_day23"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month0_day28"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month1_day3"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month1_day12"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month1_day23"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month1_day28"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month2_day3"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month2_day12"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month2_day23"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "click", "params": {"id" : "miniCal_month2_day28"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "type", "params": {"id" : "jumpto", "text": "05/08/2002"}}
+{"method": "click", "params": {"id" : "cosmo_Button_2Text"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "type", "params": {"id" : "jumpto", "text": "03/10/2008"}}
+{"method": "click", "params": {"id" : "cosmo_Button_2Text"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "type", "params": {"id" : "jumpto", "text": "01/07/2018"}}
+{"method": "click", "params": {"id" : "cosmo_Button_2Text"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "type", "params": {"id" : "jumpto", "text": "07/17/2027"}}
+{"method": "click", "params": {"id" : "cosmo_Button_2Text"}}

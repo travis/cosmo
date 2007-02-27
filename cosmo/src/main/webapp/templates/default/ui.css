@@ -316,6 +316,18 @@ body.adminPage {
     border-color: #ddd #888 #888 #ddd;
     cursor: default;
 }
+.btnSetDividerBase {
+    border: 0px;
+    background-color: #aaa;
+}
+.btnSetDividerLeftPress {
+    border: 0px;
+    background-color: #bbb;
+}
+.btnSetDividerRightPress {
+    border: 0px;
+    background-color: #555;
+}
 
 /* General widget/UI
  * --------------------- */
@@ -737,15 +749,15 @@ td.dataDisplayLabel {
  * --------------------- */
 /* Main box for fake popup */
 #modalDialog {
-    background:$mainUIColor;
     position:absolute;
+    /* background:$mainUIColor;
     background:$mainUIColor;
-    border:1px solid $uiDetailBorderColor;
+    border:1px solid $uiDetailBorderColor; */
     z-index:2000;
     display:none;
 }
 /* Fake popup center content area -- inside padding */
-#modalDialogContainer {
+#modalDialogContent {
     padding:18px;
     padding-bottom:0px;
 }
@@ -771,6 +783,89 @@ td.dataDisplayLabel {
     vertical-align:middle;
     font-size:11px;
 }
+.dialogButtonPanel {
+    padding: 0 8px;
+}
+.dropShadowTable {
+  /* 
+  Requires a specific width & height set -- some of the cells in
+  this type of table also require a specific height or width
+  set relative to the overall size of this table for cell
+  sizing and bg image tiling to work.  These will be noted in
+  the specific class
+  This is *not* a simple nine-cell table -- set border = 1
+  on the table to see the composition
+  */
+  position: absolute;
+}
+.dropShadowTop {
+  /* 
+  Empty top row -- makes sure there's an even 16px all the
+  way around the box the drop shadow is on
+  */
+  height: 16px; 
+  font-size: 1px;
+}
+.dropShadowLeft {
+  /*
+  Empty left column -- same as above
+  */
+  width: 16px;
+}
+.dropShadowTopRightCorner {
+  width: 16px; 
+  height: 16px;
+  font-size: 1px;
+  background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
+  background-position: 0px 0px;
+}
+.dropShadowCenter {
+  /*
+  Inner box with borders -- darker color for border on 
+  right and bottom where drop shadow appears. Any content
+  should sit inside this box
+  */
+  background-color: #fff;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ccc #888 #888 #ccc;
+  vertical-align: top;
+}
+.dropShadowRight {
+  /*
+  This cell needs a height specified of total
+  dropShadowTable's height minus 32px
+  */
+  opacity: 0.8; 
+  background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
+  background-repeat: repeat-y; background-position:-16px 0px; 
+  font-size: 1px; 
+}
+.dropShadowBottomLeft {
+  width: 16px; 
+  height: 16px; 
+  background-image: url(templates/default/images/drop_shadow_bottom_imgs.png); 
+  background-position: 0px 0px; 
+  font-size: 1px;
+}
+.dropShadowBottom {
+  /*
+  Requires a specific width set of total dropShadowTable's
+  width minus 48px
+  */
+  opacity: 0.8; 
+  background-image: url(templates/default/images/drop_shadow_bottom_imgs.png); 
+  background-repeat: repeat-x; 
+  background-position: 0px -16px; 
+  font-size: 1px;
+}
+.dropShadowBottomRightCorner {
+  width: 16px; 
+  background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
+  background-position: -32px 0px; 
+  font-size:1px;
+}
+
 
 /* Tab container 
  * --------------------- */

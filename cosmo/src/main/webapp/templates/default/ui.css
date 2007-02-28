@@ -758,8 +758,9 @@ td.dataDisplayLabel {
 }
 /* Fake popup center content area -- inside padding */
 #modalDialogContent {
-    padding:18px;
-    padding-bottom:0px;
+    padding: 18px;
+    padding-bottom: 0px;
+    line-height: 12px;
 }
 /* Only set if the dialog title exists */
 .dialogTitle {
@@ -768,7 +769,7 @@ td.dataDisplayLabel {
     height:24px;
     line-height:26px;
     vertical-align:middle;
-    border:1px solid #dfdfdf;
+    border-bottom:1px solid #dfdfdf;
     padding-left:6px;
     font-size:13px;
     font-weight:bold;
@@ -777,7 +778,7 @@ td.dataDisplayLabel {
 /* Only set if the dialog prompt exists */
 .dialogPrompt {
     text-align:left;
-    padding-top:4px;
+    padding: 4px 0 0 8px;
     height:32px;
     line-height:16px;
     vertical-align:middle;
@@ -830,6 +831,7 @@ td.dataDisplayLabel {
   border-width: 1px;
   border-color: #ccc #888 #888 #ccc;
   vertical-align: top;
+  line-height: 0px;
 }
 .dropShadowRight {
   /*

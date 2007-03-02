@@ -2,10 +2,10 @@
 {"method": "wait", "params": {"seconds" : 3000}}
 {"method": "click", "params": {"link" : "Click here to create one."}}
 {"method": "click", "params": {"jsid" : "parent.frames[1].cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-{"method": "type", "params": {"id" : "username", "text": "tester47"}}
-{"method": "type", "params": {"id" : "firstName", "text": "tester47"}}
-{"method": "type", "params": {"id" : "lastName", "text": "tester47"}}
-{"method": "type", "params": {"id" : "email", "text": "tester47@osafoundation.org"}}
+{"method": "type", "params": {"id" : "username", "text": "tester"}}
+{"method": "type", "params": {"id" : "firstName", "text": "tester"}}
+{"method": "type", "params": {"id" : "lastName", "text": "tester"}}
+{"method": "type", "params": {"id" : "email", "text": "tester@osafoundation.org"}}
 {"method": "type", "params": {"id" : "password", "text": "tester"}}
 {"method": "type", "params": {"id" : "confirm", "text": "tester"}}
 {"method": "click", "params": {"jsid" : "parent.frames[1].cosmo.app.modalDialog.btnsRight[0].domNode.id"}}

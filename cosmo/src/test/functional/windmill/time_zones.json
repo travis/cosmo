@@ -8,7 +8,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Los Angeles"}}
 {"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones LA."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv2-930"}}
@@ -18,7 +18,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "New York"}}
 {"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones NY."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv3-1000"}}
@@ -28,7 +28,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "El Salvador"}}
 {"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones El Salvador."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv4-1030"}}
@@ -38,7 +38,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Cancun"}}
 {"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones Cancun."}}	
-{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
@@ -48,4 +48,6 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Boise"}}
 {"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones Boise."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "wait", "params": {"seconds" : 3000}}

@@ -7,7 +7,7 @@
 {"method": "type", "params": {"id" : "eventtitle", "text": "Testing Daily Recurrence"}}
 {"method": "select", "params": {"id" : "recurrence", "option": "Daily"}}
 {"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of daily recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-930"}}
@@ -16,7 +16,7 @@
 {"method": "type", "params": {"id" : "eventtitle", "text": "Testing Weekly Recurrence"}}
 {"method": "select", "params": {"id" : "recurrence", "option": "Weekly"}}
 {"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of weekly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1000"}}
@@ -25,7 +25,7 @@
 {"method": "type", "params": {"id" : "eventtitle", "text": "Testing bi-weekly Recurrence"}}
 {"method": "select", "params": {"id" : "recurrence", "option": "Biweekly"}}
 {"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of bi-weekly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1030"}}
@@ -34,7 +34,7 @@
 {"method": "type", "params": {"id" : "eventtitle", "text": "Testing monthly Recurrence"}}
 {"method": "select", "params": {"id" : "recurrence", "option": "Monthly"}}
 {"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of monthly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "wait", "params": {"seconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1100"}}
@@ -43,4 +43,6 @@
 {"method": "type", "params": {"id" : "eventtitle", "text": "Testing yearly Recurrence"}}
 {"method": "select", "params": {"id" : "recurrence", "option": "Yearly"}}
 {"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of yearly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "wait", "params": {"seconds" : 3000}}

@@ -1,4 +1,4 @@
-{"method": "click", "params": {"id" : "viewNavRight"}}
+{"method": "click", "params": {"id" : "viewNavCenterRight"}}
 {"method": "wait", "params": {"seconds" : 2000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "wait", "params": {"seconds" : 2000}}

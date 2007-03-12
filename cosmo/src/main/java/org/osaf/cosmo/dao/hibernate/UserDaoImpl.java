@@ -302,6 +302,8 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
                 orders.add(createOrder(pageCriteria, "dateCreated"));
             else if (sort.equals(User.SortType.LAST_MODIFIED))
                 orders.add(createOrder(pageCriteria, "dateModified"));
+            else if (sort.equals(User.SortType.ACTIVATED))
+                orders.add(createOrder(pageCriteria, "activationId"));
             else
                 orders.add(createOrder(pageCriteria, "username"));
 

@@ -13,13 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.spring.mvc.controllers;
+package org.osaf.cosmo.ui;
 
 import org.springframework.web.servlet.mvc.UrlFilenameViewController;
 
+/**
+ * Default controller that attempts to find a jsp at a path specified
+ * by transforming _ characters in the view name to /
+ * 
+ * For example, the view x_y_z would resolve to a file at x/y/z
+ * 
+ * @author Travis Vachon travis@osafoundation.org
+ *
+ */
 public class CosmoUrlFilenameViewController extends UrlFilenameViewController {
-	
-	
 	
     private String COSMO_VIEW_PATH_SEPARATOR = "_";
 

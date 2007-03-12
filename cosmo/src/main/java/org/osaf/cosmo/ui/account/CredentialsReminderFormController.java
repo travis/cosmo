@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.spring.mvc.controllers;
+package org.osaf.cosmo.ui.account;
 
 import java.util.Locale;
 import javax.mail.MessagingException;
@@ -32,6 +32,7 @@ import org.osaf.cosmo.ui.UIConstants;
 
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -66,6 +67,8 @@ public class CredentialsReminderFormController extends SimpleFormController {
         "Email.PasswordReset.Subject";
     private static final String MSG_PASSWORD_RESET_TEXT =
         "Email.PasswordReset.Text";
+    
+    private ResourceBundleMessageSource messageSource;
 
     private JavaMailSender mailSender;
     private UserService userService;
@@ -95,10 +98,9 @@ public class CredentialsReminderFormController extends SimpleFormController {
      *
      * @see UIConstants#FWD_OK
      *
-    public ActionForward execute(ActionMapping mapping,
-                                 ActionForm form,
-                                 HttpServletRequest request,
-                                 HttpServletResponse response)
+    public ModelAndView handleRequestInternal(HttpServletRequest request,
+                                              HttpServletResponse response) throws Exception {
+
         throws Exception {
         BeanValidatorForm forgotForm = (BeanValidatorForm) form;
         String email = (String) forgotForm.get(FORM_EMAIL);
@@ -169,7 +171,7 @@ public class CredentialsReminderFormController extends SimpleFormController {
                 }
             });
     }
-
+*/
     private void sendPasswordResetMessage(final HttpServletRequest request,
                                           final HttpServletResponse response,
                                           final User user,
@@ -177,26 +179,22 @@ public class CredentialsReminderFormController extends SimpleFormController {
         mailSender.send(new MimeMessagePreparator() {
                 public void prepare(MimeMessage mimeMessage)
                     throws MessagingException {
-                    MessageResources resources = getResources(request);
-                    Locale locale = getLocale(request);
+                    Locale locale = request.getLocale();
 
                     User rootUser = userService.getUser(User.USERNAME_OVERLORD);
-                    String fromAddr = (String) getServlet().getServletContext().
-                        getAttribute(CosmoConstants.SC_ATTR_SERVER_ADMIN);
+                    String fromAddr = rootUser.getEmail();
                     String fromHandle =
-                        resources.getMessage(locale,
-                                             MSG_PASSWORD_RESET_FROMHANDLE);
+                        messageSource.getMessage(
+                                             MSG_PASSWORD_RESET_FROMHANDLE, new Object[]{}, locale);
+                    
                     String subject =
-                        resources.getMessage(locale,
-                                             MSG_PASSWORD_RESET_SUBJECT);
+                        messageSource.getMessage(MSG_PASSWORD_RESET_SUBJECT, new Object[]{},locale);
                     String text =
-                        resources.getMessage(locale,
-                                             MSG_PASSWORD_RESET_TEXT,
-                                             newPassword,
-                                             getContextRelativeURL(request,
-                                                                   "/"),
-                                             rootUser.getEmail());
-
+                        messageSource.getMessage(MSG_PASSWORD_RESET_TEXT,
+                                new Object[] {newPassword,
+                                              request.getContextPath(),
+                                              rootUser.getEmail()},
+                                locale);
                     MimeMessageHelper message =
                         new MimeMessageHelper(mimeMessage);
                     message.setFrom("\"" + fromHandle + "\" <" + fromAddr +
@@ -206,5 +204,5 @@ public class CredentialsReminderFormController extends SimpleFormController {
                     message.setText(text);
                 }
             });
-    }*/
+    }
 }

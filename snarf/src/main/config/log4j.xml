@@ -40,6 +40,10 @@
   <logger name="org.osaf">
     <level value="DEBUG"/>
   </logger>
+  
+  <logger name="org.osaf.cosmo.ui">
+    <level value="INFO"/>
+  </logger>
 
   <logger name="org.osaf.cosmo.acegisecurity.context.HttpRequestContextIntegrationFilter">
     <level value="WARN"/>

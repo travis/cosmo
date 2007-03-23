@@ -1,6 +1,6 @@
 {"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "tester"}}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "tester"}}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
-{"method": "wait", "params": {"seconds" : 3000}}
-{"method": "wait", "params": {"seconds" : 3000}}
-{"method": "wait", "params": {"seconds" : 3000}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "wait", "params": {"milliseconds" : 3000}}

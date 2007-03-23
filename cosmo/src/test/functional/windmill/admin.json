@@ -1,13 +1,13 @@
 {"method": "click", "params": {"link" : "Log Out"}}
-{"method": "wait", "params": {"seconds" : 2000}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "root"}}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "cosmo"}}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
-{"method": "wait", "params": {"seconds" : 5000}}
-{"method": "wait", "params": {"seconds" : 5000}}
+{"method": "wait", "params": {"milliseconds" : 5000}}
+{"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "click", "params": {"link" : "Users"}}
-{"method": "wait", "params": {"seconds" : 5000}}
-{"method": "wait", "params": {"seconds" : 5000}}
+{"method": "wait", "params": {"milliseconds" : 5000}}
+{"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "click", "params": {"id" : "testerRow"}}
 {"method": "click", "params": {"link" : "Delete Selected Users"}}
 {"method": "click", "params": {"link" : "Log Out"}}

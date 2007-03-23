@@ -1,7 +1,7 @@
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
-{"method": "wait", "params": {"seconds" : 2000}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
-{"method": "wait", "params": {"seconds" : 2000}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "type", "params": {"id" : "eventtitle", "text": "Properties Test"}}
 {"method": "type", "params": {"id" : "starttime", "text": "9:00"}}
 {"method": "type", "params": {"id" : "endtime", "text": "4:00"}}

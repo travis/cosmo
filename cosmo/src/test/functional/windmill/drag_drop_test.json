@@ -2,57 +2,59 @@
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv4-1300"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv4-1300"}}}
 {"method": "doubleClick", "params": {"id" : "hourDiv3-900"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv0-900"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv0-900"}}}
 {"method": "doubleClick", "params": {"id" : "hourDiv4-1000"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-1100"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-1100"}}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv3-1200"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv3-1200"}}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv2-1200"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv2-1200"}}}
 {"method": "doubleClick", "params": {"id" : "hourDiv2-1100"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv4-800"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv4-800"}}}
 {"method": "doubleClick", "params": {"id" : "hourDiv4-1000"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv2-1530"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv2-1530"}}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv5-1130"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv5-1130"}}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-900"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-900"}}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1230"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-900"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-900"}}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1130"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-900"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-900"}}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-900"}}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv5-1300"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-900"}}}
 {"method": "wait", "params": {"seconds" : 5000}}
 {"method": "wait", "params": {"seconds" : 5000}}
-{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "parent.frames['webapp'].cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv0-1130"}}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv5-1300"}}}
+{"method": "wait", "params": {"seconds" : 5000}}
+{"method": "wait", "params": {"seconds" : 5000}}
+{"method": "cosmoDragDrop", "params": {"dragged" : {"jsid": "Windmill.TestingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv0-1130"}}}

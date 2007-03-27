@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.UserService;
@@ -176,8 +177,6 @@ public class StandardUserService implements UserService {
             accountActivator.sendActivationMessage(newUser, activationContext);
         }
 
-
-        // TODO Auto-generated method stub
         return newUser;
     }
 
@@ -413,6 +412,31 @@ public class StandardUserService implements UserService {
 
     public void setAccountActivationRequired(boolean accountActivationRequired) {
         this.accountActivationRequired = accountActivationRequired;
+    }
+
+    public PasswordRecovery getPasswordRecovery(String key) {
+        PasswordRecovery passwordRecovery = userDao.getPasswordRecovery(key);
+        
+        if (passwordRecovery != null){
+            if (passwordRecovery.hasExpired()){
+                userDao.deletePasswordRecovery(passwordRecovery);
+            } else {
+                return passwordRecovery;
+            }
+        }
+        return null;
+    }
+    
+    public PasswordRecovery createPasswordRecovery(
+                PasswordRecovery passwordRecovery){
+        
+        userDao.createPasswordRecovery(passwordRecovery);
+        
+        return userDao.getPasswordRecovery(passwordRecovery.getKey());
+    }
+    
+    public void deletePasswordRecovery(PasswordRecovery passwordRecovery){
+        userDao.deletePasswordRecovery(passwordRecovery);
     }
 
 }

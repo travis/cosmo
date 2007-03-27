@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
+import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
@@ -47,6 +48,7 @@ public class MockUserDao implements UserDao {
     private HashMap emailIdx;
     private HashMap uidIdx;
     private HashMap activationIdIdx;
+    private HashMap<String, PasswordRecovery> passwordRecoveryIdx;
 
     private VersionFourGenerator idGenerator = new VersionFourGenerator();
 
@@ -57,6 +59,7 @@ public class MockUserDao implements UserDao {
         emailIdx = new HashMap();
         uidIdx = new HashMap();
         activationIdIdx = new HashMap();
+        passwordRecoveryIdx = new HashMap<String, PasswordRecovery>();
 
         // add overlord user
         User overlord = new User();
@@ -222,4 +225,19 @@ public class MockUserDao implements UserDao {
      */
     public void destroy() {
     }
+
+    public void createPasswordRecovery(PasswordRecovery passwordRecovery) {
+        passwordRecoveryIdx.put(passwordRecovery.getKey(), passwordRecovery);
+        
+    }
+
+    public void deletePasswordRecovery(PasswordRecovery passwordRecovery) {
+        passwordRecoveryIdx.remove(passwordRecovery.getKey());
+        
+    }
+
+    public PasswordRecovery getPasswordRecovery(String key) {
+        return passwordRecoveryIdx.get(key);
+    }
+
 }

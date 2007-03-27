@@ -90,6 +90,7 @@
             <value>org.osaf.cosmo.model.Ticket</value>
             <value>org.osaf.cosmo.model.TimestampAttribute</value>
             <value>org.osaf.cosmo.model.User</value>
+            <value>org.osaf.cosmo.model.PasswordRecovery</value>
         </list>
     </property>
     <property name="entityInterceptor">

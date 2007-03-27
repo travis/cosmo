@@ -33,6 +33,7 @@ import org.hibernate.criterion.Order;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
+import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.ArrayPagedList;
 import org.osaf.cosmo.util.PageCriteria;
@@ -196,6 +197,30 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
     }
+    
+    public void createPasswordRecovery(PasswordRecovery passwordRecovery){
+        
+        getSession().save(passwordRecovery);
+    }
+    
+    public PasswordRecovery getPasswordRecovery(String key){
+        try {
+            Query hibQuery = getSession().getNamedQuery("passwordRecovery.byKey")
+                    .setParameter("key", key);
+            hibQuery.setCacheable(true);
+            return (PasswordRecovery) hibQuery.uniqueResult();
+        } catch (HibernateException e) {
+            throw SessionFactoryUtils.convertHibernateAccessException(e);
+        }
+    }
+    
+    public void deletePasswordRecovery(PasswordRecovery passwordRecovery) {
+        try {
+            getSession().delete(passwordRecovery);
+        } catch (HibernateException e) {
+            throw SessionFactoryUtils.convertHibernateAccessException(e);
+        }
+    }
 
     public void destroy() {
         // TODO Auto-generated method stub
@@ -316,5 +341,4 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
                    Order.desc(property);
         }
     }
-
 }

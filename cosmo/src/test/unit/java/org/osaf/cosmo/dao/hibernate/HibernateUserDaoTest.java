@@ -25,6 +25,7 @@ import junit.framework.Assert;
 import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
+import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
@@ -370,6 +371,39 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertNull(queryUser1);
     }
     
+    public void testCreatePasswordRecovery() throws Exception {
+        User user1 = new User();
+        user1.setUsername("user1");
+        user1.setFirstName("User");
+        user1.setLastName("1");
+        user1.setEmail("user1@user1.com");
+        user1.setPassword("user1password");
+        user1.setAdmin(Boolean.TRUE);
+
+        user1 = userDao.createUser(user1);
+        
+        PasswordRecovery passwordRecovery = new PasswordRecovery(user1, "1");
+        
+        userDao.createPasswordRecovery(passwordRecovery);
+        
+        String passwordRecoveryKey = passwordRecovery.getKey();
+        
+        clearSession();
+        
+        PasswordRecovery queryPasswordRecovery = 
+            userDao.getPasswordRecovery(passwordRecoveryKey);
+        
+        Assert.assertNotNull(queryPasswordRecovery);
+        Assert.assertEquals(passwordRecovery, queryPasswordRecovery);
+        
+        // Test delete
+        userDao.deletePasswordRecovery(queryPasswordRecovery);
+        queryPasswordRecovery = 
+            userDao.getPasswordRecovery(passwordRecoveryKey);
+        
+        Assert.assertNull(queryPasswordRecovery);
+    }
+    
     private void verifyUser(User user1, User user2) {
         Assert.assertEquals(user1.getUid(), user2.getUid());
         Assert.assertEquals(user1.getUsername(), user2.getUsername());
@@ -392,4 +426,5 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         Assert.fail("specified User doesn't exist in Set: "
                 + user.getUsername());
     }
+
 }

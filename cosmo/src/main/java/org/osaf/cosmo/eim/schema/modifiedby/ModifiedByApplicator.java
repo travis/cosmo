@@ -98,11 +98,11 @@ public class ModifiedByApplicator extends BaseItemApplicator
         }
 
         if (timestamp == null)
-            throw new EimValidationException("Timestamp required");
+            throw new EimValidationException(FIELD_TIMESTAMP + " field required for " + getNamespace() + " record");
         if (userid == null)
-            throw new EimValidationException("Userid required");
+            throw new EimValidationException(FIELD_USERID + " field required for " + getNamespace() + " record");
         if (action == null)
-            throw new EimValidationException("Action required");
+            throw new EimValidationException(FIELD_ACTION + " field required for " + getNamespace() + " record");
 
         ContentItem contentItem = (ContentItem) getItem();
         //        log.debug("checking client timestamp " + timestamp + " against item client modified date " + contentItem.getClientModifiedDate());

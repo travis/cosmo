@@ -282,6 +282,8 @@ public class ContentItem extends Item {
         public static final int CREATED = 500;
 
         public static boolean validate(Integer action) {
+            if (action == null)
+                return false;
             return (action.intValue() == EDITED ||
                     action.intValue() == QUEUED ||
                     action.intValue() == SENT ||

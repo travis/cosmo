@@ -161,8 +161,7 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
             // Check whether floating or fixed test required
             boolean fixed = (testStart.indexOf('Z') != -1);
 
-            indices
-                    .add(createIndex(key, testStart, testEnd, !fixed, recurring));
+            indices.add(createIndex(key, testStart, testEnd, !fixed, recurring));
         }
     }
 

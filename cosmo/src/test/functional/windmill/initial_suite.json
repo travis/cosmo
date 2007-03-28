@@ -1,20 +1,17 @@
 {"method": "click", "params": {"link" : "Log in to Cosmo"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"link" : "Click here to create one."}}
-{"method": "click", "params": {"jsid" : "{"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+{"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
 {"method": "type", "params": {"id" : "username", "text": "tester240"}}
 {"method": "type", "params": {"id" : "firstName", "text": "tester240"}}
 {"method": "type", "params": {"id" : "lastName", "text": "tester240"}}
 {"method": "type", "params": {"id" : "email", "text": "tester240@osafoundation.org"}}
 {"method": "type", "params": {"id" : "password", "text": "tester"}}
 {"method": "type", "params": {"id" : "confirm", "text": "tester"}}
-{"method": "click", "params": {"jsid" : "{"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+{"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "verify", "params": {"id" : "modalDialogPrompt", "validator" : "You have successfully created your Cosmo account."}}
-{"method": "click", "params": {"jsid" : "{"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-Windmill.TestingApp.cosmo.app.modalDialog.btnsCenter[0].domNode.id"}}
+{"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsCenter[0].domNode.id"}}
 {"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "tester240"}}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "tester"}}
 {"method": "click", "params": {"id" : "loginSubmitButtonText"}}
@@ -51,6 +48,5 @@ Windmill.TestingApp.cosmo.app.modalDialog.btnsCenter[0].domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "click", "params": {"xpath" : "/html/body/div[2]/form/div/div/span/div[2]/div[3]/img"}}
 {"method": "select", "params": {"xpath" : "/html/body/div[4]/div/div[4]/div/table/tbody/tr[3]/td[2]/div/select","option": "Other..."}}
-{"method": "click", "params": {"jsid" : "{"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+{"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
 {"method": "click", "params": {"link" : "Log Out"}}

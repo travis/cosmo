@@ -2,7 +2,7 @@
 
 <%--
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,13 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<c:set var="ccstamp" value="${Collection.stampMap['calendar']}"/>
+<c:if test="${ccstamp != null}">
+  <c:url var="webcalUrl" value="/webcal/collection/${Collection.uid}/${Collection.displayName}.ics" />
+  <c:url var="htmlUrl" value="/browse/view${Path}" />
+</c:if>
+<c:url var="feedUrl" value="/atom/collection/${Collection.uid}" />
+
 <cosmo:standardLayout prefix="HomeDirectory.Collection.">
 
 <div>
@@ -33,20 +40,17 @@
 </div>
 
 <div style="margin-top:12px;">
-<c:if test="${Collection.stampMap['calendar'] != null}">
-<a href='<c:url value="/browse/download${Path}" />'>
-  [download as iCalendar]
-</a>
-<a href='<c:url value="/browse/view${Path}" />'>
-  [view as HTML]
-</a>
+<c:if test="${ccstamp != null}">
+<a href="${webcalUrl}">[download as iCalendar]</a>
+<a href="${htmlUrl}">[view as HTML]</a>
 </c:if>
-<a href='<c:url value="/atom/collection/${Collection.uid}" />'>
-  [subscribe to feed]
-</a>
+<a href="${feedUrl}">[subscribe to feed]</a>
 </div>
 
-<c:if test="${Path != '/'}">
+<div class="hd" style="margin-top: 12px;">
+  Collection Properties
+</div>
+
 <div style="margin-top:12px;">
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>
@@ -57,13 +61,38 @@
         ${Collection.uid}
       </td>
     </tr>
-    <c:if test="${Collection.stampMap['calendar'] != null}">
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Created on Server:
+      </td>
+      <td class="mdData">
+        <fmt:formatDate value="${Collection.creationDate}" type="both"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Last Modified on Server:
+      </td>
+      <td class="mdData">
+        <fmt:formatDate value="${Collection.modifiedDate}" type="both"/>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<c:if test="${ccstamp != null}">
+<div class="hd" style="margin-top: 12px;">
+  Calendar Properties
+</div>
+
+<div style="margin-top:12px;">
+  <table cellpadding="3" cellspacing="1" border="0">
     <tr>
       <td class="mdLabel" style="text-align:right;">
         Description
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Collection.stampMap['calendar'].description != null}">${Collection.stampMap['calendar'].description}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${ccstamp.description != null}">${ccstamp.description}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -71,7 +100,15 @@
         Language
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Collection.stampMap['calendar'].language != null}">${Collection.stampMap['calendar'].language}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${ccstamp.language != null}">${ccstamp.language}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Timezone
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${ccstamp.timezoneName != null}">${ccstamp.timezoneName}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -79,18 +116,9 @@
         <fmt:message key="HomeDirectory.Collection.Attributes.SupportedCalendarItems"/>
       </td>
       <td class="mdData">
-        <c:forEach var="type" items="${Collection.stampMap['calendar'].supportedComponents}">
+        <c:forEach var="type" items="${ccstamp.supportedComponents}">
           <fmt:message key="HomeDirectory.Collection.Attributes.SupportedCalendarItem.${type}"/>
         </c:forEach>
-      </td>
-    </tr>
-    </c:if>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        Created
-      </td>
-      <td class="mdData">
-        <fmt:formatDate value="${Collection.creationDate}" type="both"/>
       </td>
     </tr>
   </table>
@@ -133,7 +161,7 @@
         ${item.displayName}
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${item.parent == null}">Home</c:when><c:when test="${item.stampMap['calendar'] != null}">Calendar</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CollectionItem'}">Folder</c:when><c:when test="${item.stampMap['event'] != null}">Event</c:when><c:otherwise>File</c:otherwise></c:choose>
+        <c:choose><c:when test="${item.parent == null}">Home</c:when><c:when test="${item.stampMap['calendar'] != null}">Calendar</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CollectionItem'}">Folder</c:when><c:when test="${item.stampMap['event'] != null}">Event</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.ContentItem'}">File</c:when><c:otherwise>Item</c:otherwise></c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">         
         <fmt:formatDate value="${item.creationDate}" type="both"/>
@@ -149,14 +177,12 @@
   </table>
 </div>
 
-
 <c:set var="item" value="${Collection}" scope="request"/>
 <c:set var="path" value="${Path}" scope="request"/>
 <c:set var="isCollection" value="true" scope="request"/>
 
 <jsp:include page="inc-tickets.jsp" />
 
-<jsp:include page="inc-properties.jsp" />
-
+<jsp:include page="inc-attributes.jsp" />
 
 </cosmo:standardLayout>

@@ -65,7 +65,7 @@
             <value>org.osaf.cosmo.model.BinaryAttribute</value>
             <value>org.osaf.cosmo.model.BooleanAttribute</value>
             <value>org.osaf.cosmo.model.CalendarAttribute</value>
-            <value>org.osaf.cosmo.model.CalendarCollectionStamp</value>
+            <value>org.osaf.cosmo.model.CalendarCollectionStamp</value>			
             <value>org.osaf.cosmo.model.CalendarPropertyIndex</value>
             <value>org.osaf.cosmo.model.CalendarTimeRangeIndex</value>
             <value>org.osaf.cosmo.model.CollectionItem</value>
@@ -75,22 +75,25 @@
             <value>org.osaf.cosmo.model.DateAttribute</value>
             <value>org.osaf.cosmo.model.DecimalAttribute</value>
             <value>org.osaf.cosmo.model.DictionaryAttribute</value>
+            <value>org.osaf.cosmo.model.EventExceptionStamp</value>
             <value>org.osaf.cosmo.model.EventStamp</value>
             <value>org.osaf.cosmo.model.HomeCollectionItem</value>
             <value>org.osaf.cosmo.model.IntegerAttribute</value>
             <value>org.osaf.cosmo.model.Item</value>
+            <value>org.osaf.cosmo.model.ItemTombstone</value>
             <value>org.osaf.cosmo.model.MessageStamp</value>
             <value>org.osaf.cosmo.model.MultiValueStringAttribute</value>
             <value>org.osaf.cosmo.model.NoteItem</value>
             <value>org.osaf.cosmo.model.ServerProperty</value>
             <value>org.osaf.cosmo.model.StringAttribute</value>
             <value>org.osaf.cosmo.model.Stamp</value>
+            <value>org.osaf.cosmo.model.StampTombstone</value>
             <value>org.osaf.cosmo.model.TaskStamp</value>
             <value>org.osaf.cosmo.model.TextAttribute</value>
             <value>org.osaf.cosmo.model.Ticket</value>
             <value>org.osaf.cosmo.model.TimestampAttribute</value>
+            <value>org.osaf.cosmo.model.Tombstone</value>
             <value>org.osaf.cosmo.model.User</value>
-            <value>org.osaf.cosmo.model.PasswordRecovery</value>
         </list>
     </property>
     <property name="entityInterceptor">

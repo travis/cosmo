@@ -35,6 +35,8 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.server.CollectionPath;
+import org.osaf.cosmo.server.ItemPath;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.util.PathUtil;
 
@@ -77,6 +79,10 @@ public class StandardDavResourceFactory implements DavResourceFactory {
             }
         }
 
+        if (log.isDebugEnabled())
+            log.debug("instantiating resource for new item at path " +
+                      locator.getResourcePath());
+
         if (CosmoDavMethods.DAV_MKCALENDAR == methodCode)
             return new DavCalendarCollection(locator, this,
                                              request.getDavSession());
@@ -104,13 +110,32 @@ public class StandardDavResourceFactory implements DavResourceFactory {
     public DavResource createResource(DavResourceLocator locator,
                                       DavSession session)
         throws DavException {
-        Item item = contentService.findItemByPath(locator.getResourcePath());
+        String path = locator.getResourcePath();
+        Item item = null;
+
+        CollectionPath cp = CollectionPath.parse(path, true);
+        if (cp != null)
+            item = cp.getPathInfo() != null ?
+                contentService.findItemByPath(cp.getPathInfo(), cp.getUid()) :
+                contentService.findItemByUid(cp.getUid());
+
         if (item == null) {
+            ItemPath ip = ItemPath.parse(path, true);
+            if (ip != null)
+                item = ip.getPathInfo() != null ?
+                    contentService.findItemByPath(ip.getPathInfo(),
+                                                  ip.getUid()) :
+                    contentService.findItemByUid(ip.getUid());
+        }
+
+        if (item == null)
+            item = contentService.findItemByPath(path);
+
+        if (item == null)
             // this means the item doesn't exist in storage -
             // either it's about to be created, or the request will
             // result in a not found error
             return null;
-        }
 
         return createResource(locator, session, item);
     }
@@ -126,8 +151,8 @@ public class StandardDavResourceFactory implements DavResourceFactory {
             throw new IllegalArgumentException("item cannot be null");
 
         if (log.isDebugEnabled())
-            log.debug("instantiating dav resource at path " +
-                      locator.getResourcePath());
+            log.debug("instantiating dav resource for item " + item.getUid() +
+                      " at path " + locator.getResourcePath());
 
         if (item instanceof HomeCollectionItem)
             return new DavHomeCollection((HomeCollectionItem) item, locator,

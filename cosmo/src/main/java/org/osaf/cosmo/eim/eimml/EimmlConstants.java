@@ -27,7 +27,7 @@ public interface EimmlConstants {
 
     /** */
     public static final String NS_CORE =
-        "http://osafoundation.org/eim";
+        "http://osafoundation.org/eim/0";
     /** */
     public static final String PRE_CORE = "eim";
 
@@ -45,10 +45,12 @@ public interface EimmlConstants {
 
     /** */
     public static final String ATTR_NAME = "name";
-    // no namespace for name, which is only valid on collection
+    /** */
+    public static final QName QN_NAME = new QName(ATTR_NAME);
     /** */
     public static final String ATTR_UUID = "uuid";
-    // no namespace for uuid, which is only valid on recordset
+    /** */
+    public static final QName QN_UUID = new QName(ATTR_UUID);
     /** */
     public static final String ATTR_DELETED = "deleted";
     /** */
@@ -61,6 +63,14 @@ public interface EimmlConstants {
     public static final String ATTR_KEY = "key";
     /** */
     public static final QName QN_KEY = new QName(NS_CORE, ATTR_KEY);
+    /** */
+    public static final String ATTR_EMPTY = "empty";
+    /** */
+    public static final QName QN_EMPTY = new QName(ATTR_EMPTY);
+    /** */
+    public static final String ATTR_MISSING = "missing";
+    /** */
+    public static final QName QN_MISSING = new QName(ATTR_MISSING);
 
     /** */
     public static final String TYPE_BYTES = "bytes";

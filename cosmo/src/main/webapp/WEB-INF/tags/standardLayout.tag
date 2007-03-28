@@ -79,17 +79,11 @@
                 <c:url var="homeUrl" value="/browse/${user.username}"/>
                 <a href="${homeUrl}"><fmt:message key="Layout.Nav.Main.Home"/></a>
                 |
-                <c:url var="accountUrl" value="/account/view"/>
-                <a href="${accountUrl}"><fmt:message key="Layout.Nav.Main.Account"/></a>
-                |
                 <c:url var="calendarUrl" value="/pim"/>
                 <a href="${calendarUrl}"><fmt:message key="Layout.Nav.Main.Calendar"/></a>
               </authz:authorize>
               |
-              <c:choose><c:when test="${fn:endsWith(body, '/help.jsp')}"><strong><fmt:message key="Layout.Nav.Main.Help"/></strong></c:when><c:otherwise><a href="<c:url value="/help"/>"><fmt:message key="Layout.Nav.Main.Help"/></a></c:otherwise></c:choose>
-              |
-              <c:url var="aboutUrl" value="/help/about"/>
-              <a href="${aboutUrl}" onclick="simplePopUp('${aboutUrl}', 340, 280, false); return false;"><fmt:message key="Layout.Nav.Main.About"/></a>
+              <a href="<c:url value="http://wiki.osafoundation.org/bin/view/Projects/CosmoHelpPortal"/>"><fmt:message key="Layout.Nav.Main.Help"/></a>
               |
               <a href="<c:url value="/logout"/>">
                 <fmt:message key="Layout.Nav.Main.LogOut"/>

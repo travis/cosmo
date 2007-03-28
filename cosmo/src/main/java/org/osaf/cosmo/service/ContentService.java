@@ -18,11 +18,14 @@ package org.osaf.cosmo.service;
 import java.util.Collection;
 import java.util.Set;
 
+import net.fortuna.ical4j.model.Calendar;
+
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
@@ -58,6 +61,16 @@ public interface ContentService extends Service {
     public Item findItemByPath(String path);
     
     /**
+     * Find content item by path relative to the identified parent
+     * item.
+     *
+     * @throws NoSuchItemException if a item does not exist at
+     * the specified path
+     */
+    public Item findItemByPath(String path,
+                               String parentUid);
+    
+    /**
      * Find content item's parent by path. Path is of the format:
      * /username/parent1/parent2/itemname.  In this example,
      * the item at /username/parent1/parent2 would be returned.
@@ -91,14 +104,14 @@ public interface ContentService extends Service {
   
     /**
      * Move item to the given path
-     * @param item item to move
-     * @param path path to move item to
+     * @param fromPath path of item to move
+     * @param toPath path of item to move
      * @throws org.osaf.cosmo.model.ItemNotFoundException
      *         if parent item specified by path does not exist
      * @throws org.osaf.cosmo.model.DuplicateItemNameException
      *         if path points to an item with the same path
      */
-    public void moveItem(Item item, String path);
+    public void moveItem(String fromPath, String toPath);
     
     /**
      * Remove an item.
@@ -129,7 +142,11 @@ public interface ContentService extends Service {
                                            CollectionItem collection);
 
     /**
-     * Create a new collection.
+     * Create a new collection with an initial set of items.
+     * The initial set of items can include new items and
+     * existing items.  New items will be created and associated
+     * to the new collection and existing items will be updated
+     * and associated to the new collection.
      * 
      * @param parent
      *            parent of collection.
@@ -144,11 +161,14 @@ public interface ContentService extends Service {
                                            Set<Item> children);
     
     /**
-     * Update a collection and set of children.  The set of
-     * children to be updated can include updates to existing
+     * Update a collection and set child items.  The set of
+     * child items to be updated can include updates to existing
      * children, new children, and removed children.  A removal
      * of a child Item is accomplished by setting Item.isActive
-     * to false to an existing Item.
+     * to false to an existing Item.  When an item is marked
+     * for removal, it is removed from the collection and
+     * removed from the server only if the item has no parent
+     * collections.
      * 
      * @param collection
      *             collection to update
@@ -159,17 +179,6 @@ public interface ContentService extends Service {
     public CollectionItem updateCollection(CollectionItem collection,
                                            Set<Item> children);
     
-    /**
-     * Find all children for collection. Children can consist of ContentItem and
-     * CollectionItem objects.
-     * 
-     * @param collection
-     *            collection to find children for
-     * @return collection of child objects for parent collection. Child objects
-     *         can be either CollectionItem or ContentItem.
-     */
-    public Collection findChildren(CollectionItem collection);
-
     /**
      * Remove collection item
      * 
@@ -300,4 +309,29 @@ public interface ContentService extends Service {
      */
     public void removeTicket(String path,
                              String key);
+    
+    /**
+     * Create a new event based on an ical4j Calendar.  This will 
+     * create the master NoteItem and any modification NoteItem's 
+     * for each VEVENT modification.
+     * 
+     * @param parent parent collection
+     * @param masterNote master note item
+     * @param calendar Calendar containing master/override VEVENTs
+     * @return newly created master note item
+     */
+    public NoteItem createEvent(CollectionItem parent, NoteItem masterNote,
+            Calendar calendar);
+    
+    /**
+     * Update existing event (NoteItem with EventStamp) based on 
+     * an ical4j Calendar.  This will update the master NoteItem and 
+     * any modification NoteItem's for each VEVENT modification, including
+     * removing/adding modification NoteItems.
+     * 
+     * @param note master note item to update
+     * @param calendar Calendar containing master/override VEVENTs
+     * @return updated master note item
+     */
+    public NoteItem updateEvent(NoteItem note, Calendar calendar);
 }

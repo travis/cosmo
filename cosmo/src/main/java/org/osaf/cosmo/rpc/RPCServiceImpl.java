@@ -30,7 +30,6 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
 
@@ -41,6 +40,7 @@ import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
@@ -51,6 +51,7 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.rpc.model.Calendar;
 import org.osaf.cosmo.rpc.model.CosmoDate;
@@ -65,7 +66,7 @@ import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
 
-public class RPCServiceImpl implements RPCService {
+public class RPCServiceImpl implements RPCService, ICalendarConstants {
     private static final Log log =
         LogFactory.getLog(RPCServiceImpl.class);
 
@@ -681,8 +682,29 @@ public class RPCServiceImpl implements RPCService {
         calendar.getProperties().add(Version.VERSION_2_0);
         calendar.getProperties().add(CalScale.GREGORIAN);
 
+        User owner = getUser();
+        if (owner == null){
+            owner = calendarItem.getOwner();
+        }
+
         calendarEventItem = new NoteItem();
+        calendarEventItem.setOwner(owner);
         calendarEventItem.setDisplayName(event.getTitle());
+        calendarEventItem.
+            setClientCreationDate(java.util.Calendar.getInstance().getTime());
+        calendarEventItem.
+            setClientModifiedDate(calendarEventItem.getClientCreationDate());
+        calendarEventItem.setContentType(ICALENDAR_MEDIA_TYPE);
+        calendarEventItem.setContentEncoding("UTF-8");
+        calendarEventItem.
+            setLastModifiedBy(getUser() != null ? getUser().getEmail() : "");
+        calendarEventItem.setTriageStatus(TriageStatus.createInitialized());
+        calendarEventItem.setLastModification(ContentItem.Action.CREATED);
+        calendarEventItem.setSent(Boolean.FALSE);
+        calendarEventItem.setNeedsReply(Boolean.FALSE);
+        // content length and content data are handled internally by
+        // setting the calendar on EventStamp
+
         VEvent vevent = cosmoToICalendarConverter.createVEvent(event);
         calendar.getComponents().add(vevent);
         cosmoToICalendarConverter.updateVTimeZones(calendar);
@@ -691,18 +713,7 @@ public class RPCServiceImpl implements RPCService {
         eventStamp.setCalendar(calendar);
         calendarEventItem.addStamp(eventStamp);
 
-        // set NoteItem attributes
-        calendarEventItem.setIcalUid(eventStamp.getIcalUid());
-        calendarEventItem.setBody(event.getDescription());
-
         Iterator<String> availableNameIterator = availableNameIterator(vevent);
-
-        User owner = getUser();
-        if (owner == null){
-            owner = calendarItem.getOwner();
-        }
-
-        calendarEventItem.setOwner(owner);
 
         boolean added = false;
         do {
@@ -712,8 +723,7 @@ public class RPCServiceImpl implements RPCService {
                 calendarEventItem.setDisplayName(name);
             try{
                 added = true;
-                calendarEventItem = (NoteItem) contentService.createContent(calendarItem,
-                            calendarEventItem);
+                calendarEventItem = (NoteItem) contentService.createEvent(calendarItem, calendarEventItem, calendar);
             } catch (DuplicateItemNameException dupe){
                 added = false;
             }
@@ -893,31 +903,34 @@ public class RPCServiceImpl implements RPCService {
     private String doSaveEvent(CollectionItem collection, Event event)
             throws RPCException {
 
-        ContentItem calendarEventItem = null;
+        NoteItem calendarEventItem = null;
 
         // Check to see if this is a new event
         if (StringUtils.isEmpty(event.getId())) {
             calendarEventItem = saveNewEvent(event, collection);
 
         } else {
-            calendarEventItem = (ContentItem) contentService
+            calendarEventItem = (NoteItem) contentService
                     .findItemByUid(event.getId());
             calendarEventItem.setDisplayName(event.getTitle());
+
+            User user = cosmoSecurityManager.getSecurityContext().getUser();
+            calendarEventItem.
+                setLastModifiedBy(user != null ? user.getEmail() : "");
+            calendarEventItem.setLastModification(ContentItem.Action.EDITED);
 
             EventStamp eventStamp = EventStamp.getStamp(calendarEventItem);
             net.fortuna.ical4j.model.Calendar calendar = eventStamp
                     .getCalendar();
             cosmoToICalendarConverter.updateEvent(event, calendar);
             cosmoToICalendarConverter.updateVTimeZones(calendar);
-            eventStamp.setCalendar(calendar);
-
+            
             // update NoteItem attributes
-            if (calendarEventItem instanceof NoteItem) {
-                ((NoteItem) calendarEventItem).setIcalUid(eventStamp
-                        .getIcalUid());
-                ((NoteItem) calendarEventItem).setBody(event.getDescription());
-            }
-            contentService.updateContent(calendarEventItem);
+            calendarEventItem.setIcalUid(eventStamp
+                    .getIcalUid());
+            calendarEventItem.setBody(event.getDescription());
+            
+            contentService.updateEvent(calendarEventItem, calendar);
         }
 
         return calendarEventItem.getUid();
@@ -926,7 +939,12 @@ public class RPCServiceImpl implements RPCService {
     private void doSaveRecurrenceRule(CollectionItem collection, String eventUid,
             RecurrenceRule recurrenceRule) throws RPCException {
 
-        ContentItem calItem = (ContentItem) contentService.findItemByUid(eventUid);
+        NoteItem calItem = (NoteItem) contentService.findItemByUid(eventUid);
+
+        User user = cosmoSecurityManager.getSecurityContext().getUser();
+        calItem.setLastModifiedBy(user != null ? user.getEmail() : "");
+        calItem.setLastModification(ContentItem.Action.EDITED);
+
         EventStamp eventStamp = EventStamp.getStamp(calItem);
         net.fortuna.ical4j.model.Calendar calendar = eventStamp.getCalendar();
 
@@ -935,8 +953,7 @@ public class RPCServiceImpl implements RPCService {
         event.setRecurrenceRule(recurrenceRule);
         cosmoToICalendarConverter.updateEvent(event, calendar);
         cosmoToICalendarConverter.updateVTimeZones(calendar);
-        eventStamp.setCalendar(calendar);
-        contentService.updateContent(calItem);
+        contentService.updateEvent(calItem, calendar);
     }
     private Map<String, RecurrenceRule> doGetRecurrenceRules(CollectionItem collection,
             String[] eventUids) throws RPCException {

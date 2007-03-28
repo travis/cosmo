@@ -21,6 +21,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,8 +29,8 @@ import org.osaf.cosmo.eim.DecimalField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.EimRecordKey;
+import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
-import org.osaf.cosmo.eim.TimeStampField;
 
 /**
  * Base class for record generator tests.
@@ -96,15 +97,32 @@ public class BaseGeneratorTestCase extends TestCase
         assertEquals("incorrect field name", expectedName, tf.getName());
         assertEquals("incorrect field value", expectedValue, tf.getText());
     }
+    
+    /** */
+    protected void checkIntegerField(EimRecordField field,
+                                  String expectedName,
+                                  Integer expectedValue) {
+        assertTrue("not an integer field", field instanceof IntegerField);
+        IntegerField intF = (IntegerField) field;
+        assertEquals("incorrect field name", expectedName, intF.getName());
+        assertEquals("incorrect field value", expectedValue, intF.getInteger());
+    }
+
+    /** */
+    protected void checkBooleanField(EimRecordField field,
+                                     String expectedName,
+                                     Boolean expectedValue) {
+        Integer i = BooleanUtils.isTrue(expectedValue) ?
+            new Integer(1) : new Integer(0);
+        checkIntegerField(field, expectedName, i);
+    }
 
     /** */
     protected void checkTimeStampField(EimRecordField field,
                                        String expectedName,
                                        Date expectedValue) {
-        assertTrue("not a timestamp field", field instanceof TimeStampField);
-        TimeStampField tsf = (TimeStampField) field;
-        assertEquals("incorrect field name", expectedName, tsf.getName());
-        assertEquals("incorrect field value", expectedValue,
-                     tsf.getTimeStamp());
+        BigDecimal bd = new BigDecimal(expectedValue.getTime() / 1000);
+        checkDecimalField(field, expectedName, bd, DIGITS_TIMESTAMP,
+                          DEC_TIMESTAMP);
     }
 }

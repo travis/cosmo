@@ -1,0 +1,332 @@
+#!/usr/bin/perl -w
+# -*- Mode: Perl; indent-tabs-mode: nil; -*-
+# 
+# Copyright 2007 Open Source Applications Foundation
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+use strict;
+
+use Cosmo::MC ();
+use File::Basename ();
+use Getopt::Long ();
+
+BEGIN { $0 = File::Basename::basename($0) }
+
+use constant VERSION => '0.02';
+use constant PROGRAM => $0;
+use constant USAGE => <<EOT;
+Usage: $0 [OPTIONS...] -u [username] -p [password]
+
+An interactive command shell for interacting with Cosmo over Morse Code.
+
+Options:
+  -s [url]         server root URL (defaults to http://localhost:8080)
+  -u [username]    username of user making the request
+  -p [password]    password of user making the request
+  -i [uuid]         uuid of the working collection
+  -d               print debugging information to STDOUT
+  -h               list available command line options (this page)
+  -v               print version information and exit
+
+Report bugs to cosmo-dev\@osafoundation.org
+EOT
+
+use constant DEFAULT_SERVER_URL => 'http://localhost:8080/cosmo';
+
+my ($ServerUrl, $Username, $Password, $Ticket, $Uuid, $Debug);
+my ($opt_help, $opt_version);
+
+# process command line options
+Getopt::Long::GetOptions(
+    "s=s" => \$ServerUrl,
+    "u=s" => \$Username,
+    "p=s" => \$Password,
+    "t=s" => \$Ticket,
+    "i=s" => \$Uuid,
+    "d"   => \$Debug,
+    "h"   => \$opt_help,
+    "v"   => \$opt_version,
+    );
+(print USAGE and exit) if $opt_help;
+(print sprintf("%s/%s\n", PROGRAM, VERSION) and exit) if $opt_version;
+
+(print USAGE and exit) unless $Ticket || ($Username && $Password);
+
+$ServerUrl ||= DEFAULT_SERVER_URL;
+chop($ServerUrl) if $ServerUrl =~ m|/$|;
+
+Cosmo::MC::Shell->new($ServerUrl, $Ticket, $Username, $Password, $Uuid,
+                      $Debug)->cmdloop();
+
+exit;
+
+package Cosmo::MC::Shell;
+
+use IO::File ();
+use Term::Shell ();
+use XML::XPath ();
+
+use base qw(Term::Shell);
+
+sub init {
+    my $self = shift;
+
+    my $serverUrl = $self->{API}{args}[0];
+    my $ticket = $self->{API}{args}[1];
+    my $username = $self->{API}{args}[2];
+    my $password = $self->{API}{args}[3];
+    my $uuid = $self->{API}{args}[4];
+    my $debug = $self->{API}{args}[5];
+
+    print "Morse Code command shell v", main::VERSION, "\n";
+    print "Debugging enabled.\n" if $debug;
+
+    $self->{mc} =
+        Cosmo::MC->new($serverUrl, $ticket, $username, $password, $debug);
+    $self->{debug} = $debug;
+    $self->{uuid} = $uuid;
+    $self->{token} = undef;
+
+    $self->{mc}->agent(main::PROGRAM . "/" . main::VERSION);
+
+    eval {
+        $self->{mc}->check_server_availability();
+        print "Connected to $serverUrl";
+        if ($self->{mc}->ticket()) {
+            print " with ticket " , $self->{mc}->ticket();
+        } else {
+            print " as ", $self->{mc}->username();
+        }
+        print "\n";
+    };
+    if ($@) {
+        print "Error: $@" if $self->{debug};
+        print "Failed to connect to $serverUrl. Exiting.\n";
+        exit 1;
+    }
+}
+
+sub prompt_str { "mc> " }
+sub alias_exit { ("quit") }
+
+sub run_uuid {
+    my $self = shift;
+    my $uuid = shift;
+
+    if ($uuid) {
+        if ($uuid eq "clear") {
+            $self->{uuid} = undef;
+            $self->{token} = undef;
+        } else {
+            $self->{uuid} = $uuid;
+        }
+    }
+
+    print "Working uuid: $self->{uuid}\n" if $self->{uuid};
+    print "No working uuid set.\n" unless $self->{uuid};
+}
+sub help_uuid { "Displays the working collection uuid. If an argument is provided, sets the working uuid, unless the argument is 'clear', which unsets the working uuid..\n" }
+sub smry_uuid { "get/set the working collection uuid" }
+
+sub run_token {
+    my $self = shift;
+
+    print "Working token: $self->{token}\n" if $self->{token};
+    print "No working token set.\n" unless $self->{token};
+}
+sub help_token { "Displays the working sync token.\n" }
+sub smry_token { "get the working sync token" }
+
+sub run_subscribe {
+    my $self = shift;
+
+    do {
+        print "Working collection uuid not set.\n";
+        return;
+    } unless $self->{uuid};
+
+    warn "Subscribing to collection $self->{uuid}.\n" if $self->{debug};
+    my $response = eval { $self->{mc}->subscribe($self->{uuid}); };
+    if ($@) {
+        print "Failed: $@\n";
+        return;
+    }
+
+    $self->print_summary($response->collection());
+
+    $self->{token} = $response->token();
+    print "Received token $self->{token}.\n";
+
+    if ($response->ticket_type()) {
+        print sprintf("Ticket %s is %s.\n", $self->{mc}->ticket(),
+                      $response->{ticket_type});
+    }
+}
+sub help_subscribe { "Subscribes to the wrrking collection.\n" }
+sub smry_subscribe { "subscribe to the working collection" }
+
+sub run_synchronize {
+    my $self = shift;
+
+    do {
+        print "Working collection uuid not set.\n";
+        return;
+    } unless $self->{uuid};
+
+    do {
+        print "Working sync token not set - use subscribe instead.\n";
+        return;
+    } unless $self->{token};
+
+    warn "Synchronizing collection $self->{uuid}.\n" if $self->{debug};
+    my $response = eval {
+        $self->{mc}->synchronize($self->{uuid}, $self->{token});
+    };
+    if ($@) {
+        print "Failed: $@\n";
+        return;
+    }
+
+    $self->print_summary($response->collection());
+
+    $self->{token} = $response->token();
+    print "Received token $self->{token}.\n";
+
+    if ($response->ticket_type()) {
+        $self->{ticket_type} = $response->ticket_type();
+        print sprintf("Ticket %s is %s.\n", $self->{mc}->ticket(),
+                      $response->{ticket_type});
+    }
+}
+sub help_synchronize { "Synchronizes the working collection.\n" }
+sub smry_synchronize { "synchronize the working collection" }
+
+sub run_publish {
+    my $self = shift;
+    my $filename = shift or do {
+        print "Name of EIMML file must be specified.\n";
+        return;
+    };
+    my @ticket_types = @_;
+
+    do {
+        print "Working collection uuid not set.\n";
+        return;
+    } unless $self->{uuid};
+
+    my $fh = IO::File->new($filename) or do {
+        print "Cannot open $filename: $!\n";
+        return;
+    };
+
+    warn "Publishing collection $self->{uuid} from $filename.\n"
+        if $self->{debug};
+    my $response = eval {
+        $self->{mc}->publish($self->{uuid}, $fh, undef, \@ticket_types);
+    };
+    if ($@) {
+        print "Failed: $@\n";
+        return;
+    }
+
+    $fh->close();
+
+    $self->{token} = $response->token();
+    print "Received token $self->{token}.\n";
+
+    for my $id (keys %{$response->tickets()}) {
+        print "Received $id ticket ", $response->ticket($id), ".\n";
+    }
+}
+sub help_publish { "Publishes the working collection based on the contents of an EIMML file. The file's location is given as an argument.\n" }
+sub smry_publish { "publish a collection" }
+
+sub run_update {
+    my $self = shift;
+    my $filename = shift or do {
+        print "Name of EIMML file must be specified.\n";
+        return;
+    };
+
+    do {
+        print "Working collection uuid not set.\n";
+        return;
+    } unless $self->{uuid};
+
+    do {
+        print "Working sync token not set - subscribe to the collection first.\n";
+        return;
+    } unless $self->{token};
+
+    my $fh = IO::File->new($filename) or do {
+        print "Cannot open $filename: $!\n";
+        return;
+    };
+
+    warn "Updating collection $self->{uuid} from $filename.\n"
+        if $self->{debug};
+    my $token =
+        eval { $self->{mc}->update($self->{uuid}, $fh, $self->{token}); };
+    if ($@) {
+        print "Failed: $@\n";
+        return;
+    }
+
+    $fh->close();
+
+    $self->{token} = $token;
+    print "Received token $token.\n";
+}
+sub help_update { "Updates the working collection based on the contents of an EIMML file. The file's location is given as an argument.\n" }
+sub smry_update { "update a collection" }
+
+sub run_delete {
+    my $self = shift;
+
+    do {
+        print "Working collection uuid not set.\n";
+        return;
+    } unless $self->{uuid};
+
+    warn "Deleting collection $self->{uuid}.\n" if $self->{debug};
+    eval { $self->{mc}->delete($self->{uuid}); };
+    if ($@) {
+        print "Failed: $@\n";
+        return;
+    }
+
+    $self->{uuid} = undef;
+    $self->{token} = undef;
+}
+sub help_delete { "Deletes the working collection. This unsets the working uuid and token.\n" }
+sub smry_delete { "delete a collection" }
+
+sub print_summary {
+    my $self = shift;
+    my $xml = shift;
+
+    my $xpath = XML::XPath->new(xml => $xml);
+    my $recordsets = $xpath->findnodes('/eim:collection/eim:recordset');
+
+    my $deleted = 0;
+    for my $recordset ($recordsets->get_nodelist) {
+        $deleted++ if $recordset->getAttribute('eim:deleted');
+    }
+
+    print "Found ",
+    ($recordsets->size() == 1 ? "1 recordset ($deleted deleted).\n" :
+     $recordsets->size() . " recordsets ($deleted deleted).\n");
+}
+
+1;

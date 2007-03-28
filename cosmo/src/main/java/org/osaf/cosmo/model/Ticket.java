@@ -27,6 +27,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -79,6 +80,13 @@ public class Ticket extends BaseModelObject {
         privileges = new HashSet<String>();
     }
 
+    /**
+     */
+    public Ticket(Ticket.Type type) {
+        this();
+        setTypePrivileges(type);
+    }
+
     @Column(name = "ticketkey", unique = true, nullable = false, length = 255)
     @NotNull
     @Index(name = "idx_ticketkey")
@@ -129,9 +137,33 @@ public class Ticket extends BaseModelObject {
     }
 
     /**
+     * Returns the ticket type if the ticket's privileges match up
+     * with one of the predefined types, or <code>null</code>
+     * otherwise.
+     */
+    @Transient
+    public Ticket.Type getType() {
+        if (privileges.contains(PRIVILEGE_READ)) {
+            if (privileges.contains(PRIVILEGE_WRITE))
+                return Ticket.Type.READ_WRITE;
+            else
+                return Ticket.Type.READ_ONLY;
+        }
+        if (privileges.contains(PRIVILEGE_FREEBUSY))
+            return Ticket.Type.FREE_BUSY;
+        return null;
+    }
+
+    @Transient
+    private void setTypePrivileges(Ticket.Type type) {
+        for (String p : type.getPrivileges())
+            privileges.add(p);
+    }
+
+    /**
      */
     @Column(name = "creationdate")
-    @Type(type="timestamp")
+    @org.hibernate.annotations.Type(type="timestamp")
     public Date getCreated() {
         return created;
     }
@@ -173,14 +205,20 @@ public class Ticket extends BaseModelObject {
      * item or one of its ancestors.
      */
     public boolean isGranted(Item item) {
-        Item test = item;
-        while (test != null) {
-            for (Ticket ticket : test.getTickets()) {
-                if (ticket.equals(this))
-                    return true;
-            }
-            test = test.getParent();
+        
+        if(item==null)
+            return false;
+        
+        for (Ticket ticket : item.getTickets()) {
+            if (ticket.equals(this))
+                return true;
         }
+        
+        for(Item parent: item.getParents()) {
+            if(isGranted(parent))
+                return true;
+        }
+            
         return false;
     }
 
@@ -227,5 +265,72 @@ public class Ticket extends BaseModelObject {
 
     public void setItem(Item item) {
         this.item = item;
+    }
+
+    /**
+     * Represents the security classification of a ticket. A ticket is
+     * typed according to its privileges. There are three predefined
+     * ticket types: read-only, read-write and free-busy.
+     */
+    public static class Type {
+        public static final String ID_READ_ONLY = "read-only";
+        public static final Type READ_ONLY =
+            new Type(ID_READ_ONLY, new String[] { PRIVILEGE_READ });
+        public static final String ID_READ_WRITE = "read-write";
+        public static final Type READ_WRITE =
+            new Type(ID_READ_WRITE,
+                     new String[] { PRIVILEGE_READ, PRIVILEGE_WRITE });
+        public static final String ID_FREE_BUSY = "free-busy";
+        public static final Type FREE_BUSY =
+            new Type(ID_FREE_BUSY, new String[] { PRIVILEGE_FREEBUSY });
+
+        private String id;
+        private Set<String> privileges;
+
+        public Type(String id) {
+            this.id = id;
+            this.privileges = new HashSet<String>();
+        }
+
+        public Type(String id,
+                    String[] privileges) {
+            this(id);
+            for (String p : privileges)
+                this.privileges.add(p);
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public Set<String> getPrivileges() {
+            return privileges;
+        }
+
+        public String toString() {
+            return id;
+        }
+
+        public boolean equals(Object o) {
+            if (! (o instanceof Type))
+                return false;
+            return id.equals(((Type)o).id);
+        }
+
+        public static Ticket.Type createInstance(String id) {
+            if (id.equals(ID_READ_ONLY))
+                return READ_ONLY;
+            if (id.equals(ID_READ_WRITE))
+                return READ_WRITE;
+            if (id.equals(ID_FREE_BUSY))
+                return FREE_BUSY;
+            return new Type(id);
+        }
+
+        public static boolean isKnownType(String id) {
+            return (id.equals(ID_READ_ONLY) ||
+                    id.equals(ID_READ_WRITE) ||
+                    id.equals(ID_FREE_BUSY));
+        }
     }
 }

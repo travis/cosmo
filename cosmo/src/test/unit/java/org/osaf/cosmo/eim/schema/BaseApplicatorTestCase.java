@@ -20,13 +20,15 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.eim.DecimalField;
+import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
+import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
-import org.osaf.cosmo.eim.TimeStampField;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
@@ -47,6 +49,21 @@ public class BaseApplicatorTestCase extends TestCase
     }
 
     /** */
+    protected void checkIntegerValue(EimRecordField field,
+                                     Integer value) {
+        Integer expected = ((IntegerField)field).getInteger();
+        assertEquals("incorrect integer value", expected, value);
+    }
+
+    /** */
+    protected void checkBooleanValue(EimRecordField field,
+                                     Boolean value) {
+        Integer v = BooleanUtils.isTrue(value) ?
+            new Integer(1) : new Integer(0);
+        checkIntegerValue(field, v);
+    }
+
+    /** */
     protected void checkTextValue(EimRecordField field,
                                   String value) {
         String expected = ((TextField)field).getText();
@@ -56,7 +73,8 @@ public class BaseApplicatorTestCase extends TestCase
     /** */
     protected void checkTimeStampValue(EimRecordField field,
                                        Date value) {
-        Date expected = ((TimeStampField)field).getTimeStamp();
+        Date expected =
+            new Date(((DecimalField)field).getDecimal().longValue() * 1000);
         assertEquals("incorrect timestamp value", expected, value);
     }
 
@@ -69,5 +87,17 @@ public class BaseApplicatorTestCase extends TestCase
         assertNotNull("attribute " + qname + " not found", attr);
         assertEquals("incorrect attribute value", field.getValue(),
                      attr.getValue());
+    }
+    
+    protected void addMissingTextField(String fieldName, EimRecord record) {
+        TextField tf = new TextField(fieldName, null);
+        tf.setMissing(true);
+        record.addField(tf);
+    }
+    
+    protected void addMissingIntegerField(String fieldName, EimRecord record) {
+        IntegerField intF = new IntegerField(fieldName, 0);
+        intF.setMissing(true);
+        record.addField(intF);
     }
 }

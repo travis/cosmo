@@ -16,31 +16,32 @@
 
 package org.osaf.cosmo.calendar.util;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Instance;
-import net.fortuna.ical4j.model.InstanceList;
+import net.fortuna.ical4j.model.Escapable;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DateProperty;
+import net.fortuna.ical4j.util.Strings;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.calendar.Instance;
+import org.osaf.cosmo.calendar.InstanceList;
 
 /**
  * @author cyrusdaboo
@@ -69,41 +70,24 @@ public class CalendarFlattener {
 
     /**
      * Returns a <code>Map</code> of data items, one for each
-     * flattened iCalendar property and parameter, and ones for
-     * various time ranges and subcomponents.
+     * flattened iCalendar component, property and parameter.
      */
     public Map flattenCalendarObject(Calendar calendar)
     {
-        String calendarData = "";
-        try {
-            // Get the flattened string version of the calendar
-            StringWriter out = new StringWriter();
-            CalendarOutputter outputer = new CalendarOutputter();
-            outputer.outputFlat(calendar, out);
-            calendarData = out.toString();
-            out.close();
-        } catch (IOException e) {
-           
-        } catch (ValidationException e) {
-            
-        }
-
-        // NB ical4j's outputter generates \r\n line ends but we
-        // need only \n, so remove all \r's from the string
-        calendarData = calendarData.replaceAll("\r", "");
+        StringBuffer buffer = new StringBuffer();
+        flattenCalendar(calendar, buffer);
 
         // Tokenise the flat calendar data and add results for each
         // property and parameter
-        StringTokenizer tokenizer = new StringTokenizer(calendarData, "\n");
+        StringTokenizer tokenizer =
+            new StringTokenizer(buffer.toString(), "\n");
         Map result = new HashMap();
         while (tokenizer.hasMoreTokens()) {
             String line = tokenizer.nextToken();
             int colon = line.indexOf(':');
             String rawKey = line.substring(0, colon).toLowerCase();
 
-            // do not store attachments as jcr properties; they
-            // don't need to be indexed for reports and we don't allow
-            // independent access to them
+            // skip indexing of binary properties such as ATTACH
             if (rawKey.startsWith(Property.ATTACH.toLowerCase())) {
                 continue;
             }
@@ -115,9 +99,6 @@ public class CalendarFlattener {
 
             result.put(key, value);
         }
-
-        // Now add results for all relevant time ranges
-        //doTimeRange(calendar, result);
 
         return result;
     }
@@ -159,7 +140,7 @@ public class CalendarFlattener {
                 }
 
                 // See if this is the master instance
-                if (vcomp.getReccurrenceId() == null) {
+                if (vcomp.getRecurrenceId() == null) {
                     addMasterInstances(vcomp, instances);
                 } else {
                     overrides.add(vcomp);
@@ -326,5 +307,58 @@ public class CalendarFlattener {
             }
         }
         return dt;
+    }
+
+    private void flattenCalendar(Calendar calendar,
+                                 StringBuffer buffer) {
+        buffer.append(Calendar.VCALENDAR).
+            append(":").
+            append(Calendar.BEGIN).
+            append("\n");
+
+        for (Property property : (List<Property>) calendar.getProperties())
+            flattenProperty(property, buffer, Calendar.VCALENDAR);
+
+        for (Component component : (List<Component>) calendar.getComponents())
+            flattenComponent(component, buffer, Calendar.VCALENDAR);
+    }
+
+    private void flattenProperty(Property property,
+                                 StringBuffer buffer,
+                                 String prefix) {
+        String flatName = prefix + "_" + property.getName();
+
+        buffer.append(flatName).
+            append(':');
+        if (property instanceof Escapable)
+            buffer.append(Strings.escape(Strings.valueOf(property.getValue())));
+        else
+            buffer.append(Strings.valueOf(property.getValue()));
+        buffer.append("\n");
+
+        Iterator<Parameter> i =
+            (Iterator<Parameter>) property.getParameters().iterator();
+        while (i.hasNext()) {
+            Parameter parameter = i.next();
+            buffer.append(flatName).
+                append('_').
+                append(parameter.getName()).
+                append(':').
+                append(parameter.getValue()).
+                append("\n");
+        }
+    }
+
+    private void flattenComponent(Component component,
+                                  StringBuffer buffer,
+                                  String prefix) {
+        String newPrefix = prefix + "-" + component.getName();
+        buffer.append(newPrefix).
+            append(':').
+            append(Component.BEGIN).
+            append("\n");
+
+        for (Property property : (List<Property>) component.getProperties())
+            flattenProperty(property, buffer, newPrefix);
     }
 }

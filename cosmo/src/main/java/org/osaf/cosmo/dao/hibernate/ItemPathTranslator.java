@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 
 /**
@@ -22,7 +23,7 @@ import org.osaf.cosmo.model.Item;
  */
 public interface ItemPathTranslator {
     public Item findItemByPath(String path);
-    public String getItemPath(Item item);
+    public Item findItemByPath(String path, CollectionItem root);
     public String getItemName(String path);
     public Item findItemParent(String path);
 }

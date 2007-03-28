@@ -111,22 +111,25 @@
             <value>org.osaf.cosmo.model.DateAttribute</value>
             <value>org.osaf.cosmo.model.DecimalAttribute</value>
             <value>org.osaf.cosmo.model.DictionaryAttribute</value>
+            <value>org.osaf.cosmo.model.EventExceptionStamp</value>
             <value>org.osaf.cosmo.model.EventStamp</value>
             <value>org.osaf.cosmo.model.HomeCollectionItem</value>
             <value>org.osaf.cosmo.model.IntegerAttribute</value>
             <value>org.osaf.cosmo.model.Item</value>
+            <value>org.osaf.cosmo.model.ItemTombstone</value>
             <value>org.osaf.cosmo.model.MessageStamp</value>
             <value>org.osaf.cosmo.model.MultiValueStringAttribute</value>
             <value>org.osaf.cosmo.model.NoteItem</value>
             <value>org.osaf.cosmo.model.ServerProperty</value>
             <value>org.osaf.cosmo.model.StringAttribute</value>
             <value>org.osaf.cosmo.model.Stamp</value>
+            <value>org.osaf.cosmo.model.StampTombstone</value>
             <value>org.osaf.cosmo.model.TaskStamp</value>
             <value>org.osaf.cosmo.model.TextAttribute</value>
             <value>org.osaf.cosmo.model.Ticket</value>
             <value>org.osaf.cosmo.model.TimestampAttribute</value>
+            <value>org.osaf.cosmo.model.Tombstone</value>
             <value>org.osaf.cosmo.model.User</value>
-            <value>org.osaf.cosmo.model.PasswordRecovery</value>
         </list>
     </property>
     <property name="entityInterceptor">
@@ -163,13 +166,13 @@
   <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
     <property name="beans">
       <map>
-        <entry key="cosmo:name=hibernate" value-ref="hibernateStatsBean"/>
+        <entry key="cosmo:name=hibernateStatistics" value-ref="hibernateStatsBean"/>
       </map>
     </property>
   </bean>
 
   <!-- Hibernate statistics MBean -->
-  <bean id="hibernateStatsBean" class="org.hibernate.jmx.StatisticsService">
+  <bean id="hibernateStatsBean" class="org.osaf.cosmo.hibernate.jmx.CosmoHibernateService">
     <property name="sessionFactory">
       <ref bean="sessionFactory"/>  
     </property>
@@ -261,9 +264,6 @@
     <property name="ticketKeyGenerator">
       <ref local="ticketKeyGenerator" />
     </property>
-    <property name="calendarIndexer">
-      <ref bean="calendarIndexer" />
-    </property>
   </bean>
 
   <bean id="userDao"
@@ -296,6 +296,9 @@
     </property>
     <property name="calendarFilterTranslator">
       <ref bean="calendarFilterTranslator" />
+    </property>
+    <property name="calendarIndexer">
+      <ref bean="calendarIndexer" />
     </property>
   </bean>
 

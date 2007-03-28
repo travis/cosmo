@@ -652,9 +652,7 @@ cosmo.ui.cal_form.CalForm = function () {
         // Err condition
         if (errMsg) {
             errMsg = errMsg.replace(/\n/g, '<br/>');
-            e = new ScoobyServiceClientException();
-            e.message = errMsg;
-            cosmo.app.showErr(_('Main.DetailForm.Error'), e);
+            cosmo.app.showErr(_('Main.DetailForm.Error'), errMsg);
             return false;
         }
         // All okey-dokey -- submit

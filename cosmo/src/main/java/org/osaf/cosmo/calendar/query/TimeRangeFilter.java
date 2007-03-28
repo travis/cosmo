@@ -26,6 +26,7 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.util.Dates;
 
 /**
@@ -162,12 +163,16 @@ public class TimeRangeFilter implements CaldavConstants {
     
     private void updateFloatingTimes() {
         if(dstart!=null) {
-            fstart = (DateTime) Dates.getInstance(dstart, dstart);
+            Value v = dstart instanceof DateTime ?
+                Value.DATE_TIME : Value.DATE;
+            fstart = (DateTime) Dates.getInstance(dstart, v);
             // if the timezone is null then default system timezone is used
             fstart.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
         }
         if(dend!=null) {
-            fend = (DateTime) Dates.getInstance(dend, dend);
+            Value v = dend instanceof DateTime ?
+                Value.DATE_TIME : Value.DATE;
+            fend = (DateTime) Dates.getInstance(dend, v);
             // if the timezone is null then default system timezone is used
             fend.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
         }

@@ -32,7 +32,6 @@ import net.fortuna.ical4j.model.component.VTimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
@@ -40,7 +39,6 @@ import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.io.InputContext;
-import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
@@ -63,6 +61,7 @@ import org.osaf.cosmo.model.DuplicateEventUidException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Extends <code>DavCollection</code> to adapt the Cosmo
@@ -389,7 +388,7 @@ public class DavCalendarCollection extends DavCollection
                 log.debug("updating event " + member.getResourcePath());
 
             try {
-                content = getContentService().updateContent(content);
+                content = getContentService().updateEvent((NoteItem) content, event.getMasterCalendar());
             } catch (DuplicateEventUidException e) {
                 throw new DavException(DavServletResponse.SC_CONFLICT, "Uid already in use");
             } catch (CollectionLockedException e) {
@@ -400,7 +399,7 @@ public class DavCalendarCollection extends DavCollection
                 log.debug("creating event " + member.getResourcePath());
 
             try {
-                content = getContentService().createContent(collection, content);
+                content = getContentService().createEvent(collection, (NoteItem) content, event.getMasterCalendar());
             } catch (DuplicateEventUidException e) {
                 throw new DavException(DavServletResponse.SC_CONFLICT, "Uid already in use");
             } catch (CollectionLockedException e) {

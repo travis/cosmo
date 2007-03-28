@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -72,11 +73,12 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
             xmlReader = XML_INPUT_FACTORY.createXMLStreamReader(in);
             if (! xmlReader.hasNext())
                 throw new EimmlStreamException("Input stream has no data");
-            readDocumentHeader();
 
             documentEncoding = xmlReader.getCharacterEncodingScheme();
             if (documentEncoding == null)
                 documentEncoding = "UTF-8";
+
+            readCollection();
         } catch (XMLStreamException e) {
             throw new EimmlStreamException("Unable to read EIM records", e);
         }
@@ -99,12 +101,13 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
     /** */
     public boolean hasNext()
         throws EimmlStreamException {
-        try {
-            return xmlReader.hasNext();
-        } catch (XMLStreamException e) { 
-            close();
-            throw new EimmlStreamException("Error checking hasNext", e);
-        }
+        if (xmlReader.isEndElement() &&
+            xmlReader.getName().equals(QN_COLLECTION))
+            return false;
+        if (xmlReader.isStartElement() &&
+            xmlReader.getName().equals(QN_RECORDSET))
+            return true;
+        throw new EimmlStreamException("hasNext called at illegal cursor position " + xmlReader.getName());
     }
 
     /**
@@ -121,20 +124,6 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
         }
     }
 
-    /**
-     * Returns the next record in the stream. Returns null if the
-     * stream has no more data.
-     */
-    public EimRecord nextRecord()
-        throws EimmlStreamException {
-        try {
-            return readNextRecord();
-        } catch (XMLStreamException e) {
-            close();
-            throw new EimmlStreamException("Error reading next record", e);
-        }
-    }
-
     /** */
     public void close() {
         try {
@@ -144,153 +133,200 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
         }
     }
 
-    private void readDocumentHeader()
-        throws XMLStreamException, EimmlStreamException {
-        while (xmlReader.hasNext()) {
-            xmlReader.nextTag();
-            if (xmlReader.next() != START_DOCUMENT)
-                continue;
-
-            xmlReader.nextTag();
-            if (! xmlReader.isStartElement() &&
-                xmlReader.getName().equals(QN_COLLECTION))
-                throw new EimmlStreamException("Outermost element must be " + QN_COLLECTION);
-
-            uuid = xmlReader.getAttributeValue(null, ATTR_UUID);
-
-            name = xmlReader.getAttributeValue(null, ATTR_NAME);
-            if (StringUtils.isBlank(name))
-                name = null;
-
-            return;
-        }
+    private int nextTag()
+        throws XMLStreamException {
+        int rc = xmlReader.nextTag();
+//         if (log.isDebugEnabled()) {
+//             if (xmlReader.isStartElement())
+//                 log.debug("read start tag: " + xmlReader.getName());
+//             else
+//                 log.debug("read end tag: " + xmlReader.getName());
+//         }
+        return rc;
     }
 
-    private EimRecordSet readNextRecordSet()
-        throws EimmlStreamException, XMLStreamException {
-        if (! xmlReader.hasNext())
-            return null;
+    // leaves the cursor positioned at the first recordset element
+    private void readCollection()
+        throws XMLStreamException, EimmlStreamException {
+        // move to <collection>
+        nextTag();
+        if (! xmlReader.isStartElement() &&
+            xmlReader.getName().equals(QN_COLLECTION))
+            throw new EimmlStreamException("Outermost element must be " + QN_COLLECTION);
 
-        boolean found = false;
-        while (xmlReader.hasNext()) {
-            xmlReader.nextTag();
-            if (xmlReader.isStartElement() &&
-                xmlReader.getName().equals(QN_RECORDSET)) {
-                found = true;
-                break;
+        for (int i=0; i<xmlReader.getAttributeCount(); i++) {
+            QName attr = xmlReader.getAttributeName(i);
+//             if (log.isDebugEnabled())
+//                 log.debug("read attr: " + attr);
+            String value = xmlReader.getAttributeValue(i);
+            if (attr.equals(QN_UUID)) {
+                if (StringUtils.isBlank(value))
+                    throw new EimmlStreamException("Collection element requires " + ATTR_UUID + " attribute");
+                uuid = value;
+            } else if (attr.equals(QN_NAME)) {
+                name = ! StringUtils.isBlank(value) ? value : null;
+            } else {
+                log.warn("skipped unrecognized collection attribute " + attr);
             }
         }
-        if (! found)
+
+        // move to first <recordset> or </collection>
+        nextTag();
+    }
+
+    // leaves the cursor positioned at either the next recordset
+    // element or the collection end element
+    private EimRecordSet readNextRecordSet()
+        throws EimmlStreamException, XMLStreamException {
+        // finish stream on </collection>
+        if (xmlReader.isEndElement() &&
+            xmlReader.getName().equals(QN_COLLECTION))
             return null;
+
+        // begin at <recordset>
+        if (! (xmlReader.isStartElement() &&
+               xmlReader.getName().equals(QN_RECORDSET)))
+            throw new EimmlStreamException("Expected start element " + QN_RECORDSET + " but got " + xmlReader.getName());
 
         EimRecordSet recordset = new EimRecordSet();
 
-        while (xmlReader.hasNext()) {
-            xmlReader.nextTag();
-
-            if (xmlReader.isStartElement()) {
-                String uuid = xmlReader.getAttributeValue(null, ATTR_UUID);
-                if (StringUtils.isBlank(uuid))
+        for (int i=0; i<xmlReader.getAttributeCount(); i++) {
+            QName attr = xmlReader.getAttributeName(i);
+//             if (log.isDebugEnabled())
+//                 log.debug("read attr: " + attr);
+            String value = xmlReader.getAttributeValue(i);
+            if (attr.equals(QN_UUID)) {
+                if (StringUtils.isBlank(value))
                     throw new EimmlStreamException("Recordset element requires " + ATTR_UUID + " attribute");
-                recordset.setUuid(uuid);
-
-                if (! xmlReader.getLocalName().equals(EL_RECORD))
-                    throw new EimmlStreamException("Recordset element may only contain " + EL_RECORD + " elements");
-
-                EimRecord record = nextRecord();
-                if (record == null)
-                    throw new EimmlStreamException("Premature end of stream");
-
-                recordset.addRecord(record);
-                continue;
+                recordset.setUuid(value);
+            } else if (attr.equals(QN_DELETED)) {
+                if (BooleanUtils.toBoolean(value))
+                    recordset.setDeleted(true);
+            } else {
+                log.warn("skipped unrecognized recordset attribute " + attr);
             }
-
-            if (! xmlReader.getName().equals(QN_RECORDSET))
-                throw new EimmlStreamException("Mismatched end element " + xmlReader.getName());
         }
+
+        // move to next <record> or </recordset>
+        nextTag();
+
+        while (xmlReader.hasNext()) {
+            // complete on </recordset>
+            if (xmlReader.isEndElement() &&
+                xmlReader.getName().equals(QN_RECORDSET))
+                break;
+
+            EimRecord record = readNextRecord();
+            if (record == null)
+                throw new EimmlStreamException("Premature end of stream");
+
+            recordset.addRecord(record);
+
+            // move to next <record> or </recordset>
+            nextTag();
+        }
+
+        // move to next <recordset> or </collection>
+        nextTag();
 
         return recordset;
     }
 
+    // leaves cursor on </record>
     private EimRecord readNextRecord()
         throws EimmlStreamException, XMLStreamException {
-        if (! xmlReader.hasNext())
-            return null;
-
-        boolean found = false;
-        while (xmlReader.hasNext()) {
-            xmlReader.nextTag();
-            if (xmlReader.isStartElement() &&
-                xmlReader.getLocalName().equals(EL_RECORD)) {
-                found = true;
-                break;
-            }
-        }
-        if (! found)
-            return null;
+        // begin at <record>
+        if (! (xmlReader.isStartElement() &&
+               xmlReader.getLocalName().equals(EL_RECORD)))
+            throw new EimmlStreamException("Expected start element " + EL_RECORD + " but got " + xmlReader.getName());
 
         EimRecord record = new EimRecord();
+
         record.setPrefix(xmlReader.getPrefix());
         record.setNamespace(xmlReader.getNamespaceURI());
 
         for (int i=0; i<xmlReader.getAttributeCount(); i++) {
-            if (xmlReader.getAttributeName(i).equals(QN_DELETED))
+            QName attr = xmlReader.getAttributeName(i);
+//             if (log.isDebugEnabled())
+//                 log.debug("read attr: " + attr);
+            if (attr.equals(QN_DELETED))
                 record.setDeleted(true);
             else
-                log.warn("skipped unrecognized record attribute " +
-                         xmlReader.getAttributeName(i));
+                log.warn("skipped unrecognized record attribute " + attr);
         }
 
-        while (xmlReader.hasNext()) {
-            xmlReader.nextTag();
+        // move to next field element or </record>
+        nextTag();
 
-            if (xmlReader.isEndElement())
+        while (xmlReader.hasNext()) {
+            // complete on </record>
+            if (xmlReader.isEndElement() &&
+                xmlReader.getLocalName().equals(EL_RECORD))
                 break;
 
-            String name = xmlReader.getLocalName();
-            EimRecordField field = null;
+            if (! xmlReader.isStartElement())
+                throw new EimmlStreamException("Expected field element but got " + xmlReader.getName());
 
+            String name = xmlReader.getLocalName();
+
+            boolean isKey = BooleanUtils.
+                toBoolean(xmlReader.getAttributeValue(NS_CORE, ATTR_KEY));
+            boolean isEmpty = BooleanUtils.
+                toBoolean(xmlReader.getAttributeValue(null, ATTR_EMPTY));
+            boolean isMissing = BooleanUtils.
+                toBoolean(xmlReader.getAttributeValue(null, ATTR_MISSING));
             String type = xmlReader.getAttributeValue(NS_CORE, ATTR_TYPE);
             if (StringUtils.isBlank(type))
                 throw new EimmlStreamException(xmlReader.getName() + " element requires " + ATTR_TYPE + " attribute");
+
+            String text = xmlReader.getElementText();
+            if (isEmpty) {
+                if (! (type.equals(TYPE_TEXT) || type.equals(TYPE_CLOB) ||
+                       type.equals(TYPE_BLOB)))
+                    throw new EimmlStreamException("Invalid empty attribute on field element " + xmlReader.getName());
+                if (text != null)
+//                     if (log.isDebugEnabled())
+//                         log.debug("emptying non-null text for field " + xmlReader.getName());
+                text = "";
+            } else if (text.equals(""))
+                text = null;
+
+            EimRecordField field = null;
             if (type.equals(TYPE_BYTES)) {
-                byte[] value = EimmlTypeConverter.
-                    toBytes(xmlReader.getElementText());
+                byte[] value = EimmlTypeConverter.toBytes(text);
                 field = new BytesField(name, value);
             } else if (type.equals(TYPE_TEXT)) {
-                String value = EimmlTypeConverter.
-                    toText(xmlReader.getElementText(), documentEncoding);
+                String value = EimmlTypeConverter.toText(text,
+                                                         documentEncoding);
                 field = new TextField(name, value);
             } else if (type.equals(TYPE_BLOB)) {
-                InputStream value = EimmlTypeConverter.
-                    toBlob(xmlReader.getElementText());
+                InputStream value = EimmlTypeConverter.toBlob(text);
                 field = new BlobField(name, value);
             } else if (type.equals(TYPE_CLOB)) {
-                Reader value = EimmlTypeConverter.
-                    toClob(xmlReader.getElementText());
+                Reader value = EimmlTypeConverter.toClob(text);
                 field = new ClobField(name, value);
             } else if (type.equals(TYPE_INTEGER)) {
-                Integer value = EimmlTypeConverter.
-                    toInteger(xmlReader.getElementText());
+                Integer value = EimmlTypeConverter.toInteger(text);
                 field = new IntegerField(name, value);
             } else if (type.equals(TYPE_DATETIME)) {
-                Calendar value = EimmlTypeConverter.
-                    toDateTime(xmlReader.getElementText());
+                Calendar value = EimmlTypeConverter.toDateTime(text);
                 field = new DateTimeField(name, value);
             } else if (type.equals(TYPE_DECIMAL)) {
-                BigDecimal value = EimmlTypeConverter.
-                    toDecimal(xmlReader.getElementText());
+                BigDecimal value = EimmlTypeConverter.toDecimal(text);
                 field = new DecimalField(name, value);
             } else {
                 throw new EimmlStreamException("Unrecognized field type");
             }
 
-            boolean isKey = BooleanUtils.
-                toBoolean(xmlReader.getAttributeValue(NS_CORE, ATTR_TYPE));
+            field.setMissing(isMissing);
+            
             if (isKey)
                 record.addKeyField(field);
             else
                 record.addField(field);
+
+            // move to next field element or </record>
+            nextTag();
         }
 
         return record;

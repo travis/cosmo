@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,10 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
         if (log.isDebugEnabled())
             log.debug("handling GET for " + req.getPathInfo());
 
-        CollectionPath cp = CollectionPath.parse(req.getPathInfo());
+        // requests will usually come in with the collection's display
+        // name appended to the collection path so that clients will
+        // save the file with that name
+        CollectionPath cp = CollectionPath.parse(req.getPathInfo(), true);
         if (cp == null) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -96,6 +99,13 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType(ICALENDAR_MEDIA_TYPE);
         resp.setCharacterEncoding("UTF-8");
+
+        // send Content-Disposition to provide another hint to clients
+        // on how to save and name the downloaded file
+        String filename =
+            collection.getDisplayName() + "." + ICALENDAR_FILE_EXTENSION;
+        resp.setHeader("Content-Disposition",
+                       "attachment; filename=\"" + filename + "\"");
 
         ICalendarOutputter.output(collection, resp.getOutputStream());
     }

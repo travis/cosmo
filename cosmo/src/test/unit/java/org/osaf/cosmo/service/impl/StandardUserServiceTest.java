@@ -23,15 +23,11 @@ import junit.framework.TestCase;
 import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
-import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.service.account.AutomaticAccountActivator;
-
 import org.springframework.dao.DataRetrievalFailureException;
 
 /**
@@ -155,7 +151,7 @@ public class StandardUserServiceTest extends TestCase {
      */
     public void testRemoveUser() throws Exception {
         User u1 = testHelper.makeDummyUser();
-        userDao.createUser(u1);
+        service.createUser(u1);
 
         service.removeUser(u1);
 
@@ -166,7 +162,7 @@ public class StandardUserServiceTest extends TestCase {
      */
     public void testRemoveUserByUsername() throws Exception {
         User u1 = testHelper.makeDummyUser();
-        userDao.createUser(u1);
+        service.createUser(u1);
 
         service.removeUser(u1.getUsername());
 
@@ -224,61 +220,5 @@ public class StandardUserServiceTest extends TestCase {
 
         // tests hex
         assertTrue("Digest not hex encoded", digested.matches("^[0-9a-f]+$"));
-    }
-    
-    public void testCreatePasswordRecovery(){
-        User user = testHelper.makeDummyUser();
-        user = userDao.createUser(user);
-        
-        PasswordRecovery passwordRecovery = 
-            new PasswordRecovery(user, "pwrecovery1");
-        
-        passwordRecovery = service.createPasswordRecovery(passwordRecovery);
-
-        PasswordRecovery storedPasswordRecovery = 
-            service.getPasswordRecovery(passwordRecovery.getKey());
-
-        assertEquals(passwordRecovery, storedPasswordRecovery);
-        
-        service.deletePasswordRecovery(storedPasswordRecovery);
-        
-        storedPasswordRecovery = 
-            service.getPasswordRecovery(storedPasswordRecovery.getKey());
-        
-        assertNull(storedPasswordRecovery);
-    }
-    
-    public void testRecoverPassword(){
-        User user = testHelper.makeDummyUser();
-        
-        userDao.createUser(user);
-
-        PasswordRecovery passwordRecovery = new PasswordRecovery(user, "pwrecovery2");
-        
-        passwordRecovery = service.createPasswordRecovery(passwordRecovery);
-        
-        assertEquals(user, passwordRecovery.getUser());
-        
-        // Recover password
-        
-        PasswordRecovery storedPasswordRecovery = 
-            service.getPasswordRecovery(passwordRecovery.getKey());
-        
-        User changingUser = storedPasswordRecovery.getUser();
-        
-        String newPassword = service.generatePassword();
-
-        changingUser.setPassword(newPassword);
-        
-        changingUser = service.updateUser(changingUser);
-        
-        String changedPassword = changingUser.getPassword();
-        
-        User changedUser = service.getUser(changingUser.getUsername());
-        
-        assertEquals(changedUser, changingUser);
-        
-        assertEquals(changedPassword, changedUser.getPassword());
-       
     }
 }

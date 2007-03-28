@@ -150,7 +150,12 @@ cosmo.ui.cal_main.Cal = new function () {
         // If we received a ticket, just grab the specified collection
         if (ticketKey) {
             this.ticketView = true;
-            var collection = this.serv.getCalendar(collectionUid, ticketKey);
+            try{
+               var collection = this.serv.getCalendar(collectionUid, ticketKey);
+            }catch(e){
+                cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), e);
+                return false;
+            }
             var ticket = this.serv.getTicket(ticketKey, collectionUid);
             this.currentCollections.push(
                 {

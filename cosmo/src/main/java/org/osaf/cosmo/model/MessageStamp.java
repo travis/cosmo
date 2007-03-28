@@ -15,16 +15,12 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SecondaryTable;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Type;
 
 
 /**
@@ -32,8 +28,6 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @DiscriminatorValue("message")
-@SecondaryTable(name="message_stamp", pkJoinColumns={
-        @PrimaryKeyJoinColumn(name="stampid", referencedColumnName="id")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MessageStamp extends Stamp implements
         java.io.Serializable {
@@ -42,13 +36,40 @@ public class MessageStamp extends Stamp implements
      * 
      */
     private static final long serialVersionUID = -6100568628972081120L;
-    private String subject = null;
-    private String to = null;
-    private String cc = null;
-    private String bcc = null;
+    
+    public static final QName ATTR_MESSAGE_SUBJECT = new QName(
+            MessageStamp.class, "subject");
+    
+    public static final QName ATTR_MESSAGE_TO = new QName(
+            MessageStamp.class, "to");
+    
+    public static final QName ATTR_MESSAGE_CC = new QName(
+            MessageStamp.class, "cc");
+    
+    public static final QName ATTR_MESSAGE_BCC = new QName(
+            MessageStamp.class, "bcc");
+    
+    public static final QName ATTR_MESSAGE_WHO_FROM = new QName(
+            MessageStamp.class, "whoFrom");
+    
+    public static final QName ATTR_MESSAGE_SENDER = new QName(
+            MessageStamp.class, "sender");
+    
+    public static final QName ATTR_MESSAGE_DATE_SENT = new QName(
+            MessageStamp.class, "dateSent");
+    
+    public static final QName ATTR_MESSAGE_IN_REPLY_TO = new QName(
+            MessageStamp.class, "inReplyTo");
+    
+    public static final QName ATTR_MESSAGE_REFERENCES = new QName(
+            MessageStamp.class, "references");
     
     /** default constructor */
     public MessageStamp() {
+    }
+    
+    public MessageStamp(Item item) {
+        setItem(item);
     }
     
     @Transient
@@ -57,44 +78,103 @@ public class MessageStamp extends Stamp implements
     }
     
     // Property accessors
-    @Column(table="message_stamp", name="msgbcc", length=262144)
-    @Type(type="text")
+    @Transient
     public String getBcc() {
-        return bcc;
+        // bcc stored as TextAttribute on Item
+        return TextAttribute.getValue(getItem(), ATTR_MESSAGE_BCC);
     }
 
     public void setBcc(String bcc) {
-        this.bcc = bcc;
+        //bcc stored as TextAttribute on Item
+        TextAttribute.setValue(getItem(), ATTR_MESSAGE_BCC, bcc);
     }
 
-    @Column(table="message_stamp", name="msgcc", length=262144)
-    @Type(type="text")
+    @Transient
     public String getCc() {
-        return cc;
+        // cc stored as TextAttribute on Item
+        return TextAttribute.getValue(getItem(), ATTR_MESSAGE_CC);
     }
 
     public void setCc(String cc) {
-        this.cc = cc;
+        // cc stored as TextAttribute on Item
+        TextAttribute.setValue(getItem(), ATTR_MESSAGE_CC, cc);
     }
 
-    @Column(table="message_stamp", name="msgsubject", length=262144)
-    @Type(type="text")
+    @Transient
     public String getSubject() {
-        return subject;
+        // subject stored as TextAttribute on Item
+        return TextAttribute.getValue(getItem(), ATTR_MESSAGE_SUBJECT);
     }
 
     public void setSubject(String subject) {
-        this.subject = subject;
+        // subject stored as TextAttribute on Item
+        TextAttribute.setValue(getItem(), ATTR_MESSAGE_SUBJECT, subject);
     }
 
-    @Column(table="message_stamp", name="msgto", length=262144)
-    @Type(type="text")
+    @Transient
     public String getTo() {
-        return to;
+        // to stored as TextAttribute on Item
+        return TextAttribute.getValue(getItem(), ATTR_MESSAGE_TO);
     }
 
     public void setTo(String to) {
-        this.to = to;
+        // to stored as TextAttribute on Item
+        TextAttribute.setValue(getItem(), ATTR_MESSAGE_TO, to);
+    }
+    
+    @Transient
+    public String getWhoFrom() {
+        // whoFrom stored as StringAttribute on Item
+        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_WHO_FROM);
+    }
+
+    public void setWhoFrom(String whoFrom) {
+        // whoFrom stored as TextAttribute on Item
+        StringAttribute.setValue(getItem(), ATTR_MESSAGE_WHO_FROM, whoFrom);
+    }
+    
+    @Transient
+    public String getSender() {
+        // sender stored as StringAttribute on Item
+        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_SENDER);
+    }
+
+    public void setSender(String sender) {
+        // sender stored as TextAttribute on Item
+        StringAttribute.setValue(getItem(), ATTR_MESSAGE_SENDER, sender);
+    }
+    
+    @Transient
+    public String getInReplyTo() {
+        // inReployTo stored as StringAttribute on Item
+        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_IN_REPLY_TO);
+    }
+
+    public void setInReplyTo(String inReplyTo) {
+        // inReployTo stored as TextAttribute on Item
+        StringAttribute.setValue(getItem(), ATTR_MESSAGE_IN_REPLY_TO, inReplyTo);
+    }
+    
+    @Transient
+    public String getDateSent() {
+        // inReployTo stored as StringAttribute on Item
+        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_DATE_SENT);
+    }
+
+    public void setDateSent(String dateSent) {
+        // inReployTo stored as TextAttribute on Item
+        StringAttribute.setValue(getItem(), ATTR_MESSAGE_DATE_SENT, dateSent);
+    }
+    
+    @Transient
+    public String getReferences() {
+        // references stored as TextAttribute on Item
+        return TextAttribute.getValue(getItem(), ATTR_MESSAGE_REFERENCES);
+    }
+
+    public void setReferences(String references) {
+        // references stored as TextAttribute on Item
+        TextAttribute.setValue(getItem(), ATTR_MESSAGE_REFERENCES, references);
     }
 
     /**
@@ -108,10 +188,15 @@ public class MessageStamp extends Stamp implements
     
     public Stamp copy(Item item) {
         MessageStamp stamp = new MessageStamp();
-        stamp.subject = subject;
-        stamp.to = to;
-        stamp.bcc = bcc;
-        stamp.cc = cc;
+        stamp.setSubject(getSubject());
+        stamp.setTo(getTo());
+        stamp.setBcc(getBcc());
+        stamp.setCc(getCc());
+        stamp.setInReplyTo(getInReplyTo());
+        stamp.setReferences(getReferences());
+        stamp.setSender(getSender());
+        stamp.setWhoFrom(getWhoFrom());
+        stamp.setDateSent(getDateSent());
         return stamp;
     }
 }

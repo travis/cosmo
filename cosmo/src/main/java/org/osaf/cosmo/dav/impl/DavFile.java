@@ -46,6 +46,8 @@ import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.User;
 
 /**
  * Extends <code>DavResourceBase</code> to adapt the Cosmo
@@ -95,11 +97,6 @@ public class DavFile extends DavResourceBase {
                    DavResourceFactory factory,
                    DavSession session) {
         super(item, locator, factory, session);
-
-        // pre-emptively calculate etag, which will not change until
-        // the item content changes
-        if (exists())
-            this.etag = calculateEtag();
     }
 
     /** */
@@ -127,10 +124,9 @@ public class DavFile extends DavResourceBase {
 
     /** */
     public String getETag() {
-        if (etag == null) {
-            etag = calculateEtag();
-        }
-        return etag;
+        if (getItem() == null)
+            return null;
+        return calculateEtag();
     }
 
     /** */
@@ -253,6 +249,18 @@ public class DavFile extends DavResourceBase {
                 content.setContentEncoding(contentEncoding);
         } catch (DataSizeException e) {
             throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource attribute: " + e.getMessage());
+        }
+
+        User user = getSecurityManager().getSecurityContext().getUser();
+        content.setLastModifiedBy(user != null ? user.getEmail() : "");
+
+        if (content.getUid() == null) {
+            content.setTriageStatus(TriageStatus.createInitialized());
+            content.setLastModification(ContentItem.Action.CREATED);
+            content.setSent(Boolean.FALSE);
+            content.setNeedsReply(Boolean.FALSE);
+        } else {
+            content.setLastModification(ContentItem.Action.EDITED);
         }
     }
 

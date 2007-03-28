@@ -3,7 +3,7 @@
           "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
-    Copyright 2005-2006 Open Source Applications Foundation
+    Copyright 2005-2007 Open Source Applications Foundation
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,9 +18,19 @@
     limitations under the License.
 -->
 
-<!-- Security configuration for WebDAV and Atom -->
+<!-- Security configuration for WebDAV -->
 
 <beans>
+
+  <bean id="davOwnerVoter"
+        class="org.osaf.cosmo.acegisecurity.providers.owner.OwnerVoter">
+    <property name="contentService">
+      <ref bean="contentService"/>
+    </property>
+    <property name="indirectlyAddressable">
+      <value>true</value>
+    </property>
+  </bean>
 
   <bean id="davAccessDecisionManager"
         class="org.acegisecurity.vote.AffirmativeBased">
@@ -30,7 +40,7 @@
     <property name="decisionVoters">
       <list>
         <ref bean="ticketVoter"/>
-        <ref bean="ownerVoter"/>
+        <ref bean="davOwnerVoter"/>
         <ref bean="roleVoter"/>
       </list>
     </property>

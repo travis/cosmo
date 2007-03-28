@@ -22,6 +22,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockContentItem;
@@ -62,7 +63,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (collection == null)
             throw new IllegalArgumentException("collection cannot be null");
 
-        collection.setParent(parent);
+        collection.getParents().add(parent);
 
         getStorage().storeItem((Item) collection);
 
@@ -159,7 +160,31 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if(THROW_CONCURRENT_EXCEPTION)
             throw new ConcurrencyFailureException("fail!");
         
-        content.setParent(parent);
+        content.getParents().add(parent);
+          
+        // Set mock id
+        if(content instanceof MockContentItem)
+            ((MockContentItem) content).setMockId(System.currentTimeMillis());
+        getStorage().storeItem((Item)content);
+
+        return content;
+    }
+    
+    /**
+     * Create new content item. A content item represents a piece of content or
+     * file.
+     *
+     * @param content
+     *            content to create
+     * @return newly created content
+     */
+    public ContentItem createContent(ContentItem content) {
+       
+        if (content == null)
+            throw new IllegalArgumentException("collection cannot be null");
+
+        if(THROW_CONCURRENT_EXCEPTION)
+            throw new ConcurrencyFailureException("fail!");
         
         // Set mock id
         if(content instanceof MockContentItem)
@@ -208,7 +233,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (item == null)
             throw new IllegalArgumentException("item cannot be null");
 
-        item.setParent(parent);
+        item.getParents().add(parent);
         getStorage().updateItem(item);
     }
 
@@ -253,5 +278,24 @@ public class MockContentDao extends MockItemDao implements ContentDao {
      */
     public void removeCollection(CollectionItem collection) {
         removeItem(collection);
+    }
+
+    public ContentItem createContent(Set<CollectionItem> parents, ContentItem content) {
+        if (parents == null || parents.size()==0)
+            throw new IllegalArgumentException("parents cannot be null or empty");
+        if (content == null)
+            throw new IllegalArgumentException("collection cannot be null");
+
+        if(THROW_CONCURRENT_EXCEPTION)
+            throw new ConcurrencyFailureException("fail!");
+        
+        content.getParents().addAll(parents);
+          
+        // Set mock id
+        if(content instanceof MockContentItem)
+            ((MockContentItem) content).setMockId(System.currentTimeMillis());
+        getStorage().storeItem((Item)content);
+
+        return content;
     }
 }

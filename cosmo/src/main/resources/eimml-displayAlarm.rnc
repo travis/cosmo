@@ -1,8 +1,8 @@
 # -*- rnc -*-
 # RELAX NG Compact Syntax Grammar for the
-# EIMML override record type Version 1
+# EIMML override record type Version 0
 
-namespace displayAlarm = "http://osafoundation.org/eim/displayAlarm"
+namespace displayAlarm = "http://osafoundation.org/eim/displayAlarm/0"
 
 include "eimml-core.rnc"
 
@@ -10,7 +10,6 @@ eimDisplayAlarm =
    element displayAlarm:record {
       (eimDeleted,
          displayAlarmUuid
-       & displayAlarmRecurrenceId?
        & displayAlarmDescription
        & displayAlarmTrigger
        & displayAlarmDuration?
@@ -22,11 +21,6 @@ displayAlarmUuid =
       eimTextFieldContent
    }
    
-displayAlarmRecurrenceId =
-   element displayAlarm:recurrenceId {
-      eimTextFieldContent
-   }
-
 displayAlarmDescription =
    element displayAlarm:description {
       eimTextFieldContent

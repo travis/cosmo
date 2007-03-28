@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
@@ -31,7 +30,6 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Index;
-import org.hibernate.annotations.Type;
 
 /**
  * Represents an abstract Stamp on an Item. A Stamp is a set of related
@@ -54,7 +52,7 @@ public abstract class Stamp extends AuditableObject implements
 
     // Fields
     private Item item;
-    private Boolean isActive = Boolean.TRUE;
+    private boolean dirty = false;
 
     // Constructors
     /** default constructor */
@@ -77,22 +75,6 @@ public abstract class Stamp extends AuditableObject implements
     public void setItem(Item item) {
         this.item = item;
     }
-    
-    
-    
-    /**
-     * @return stamp status
-     */
-    @Column(name="isactive", nullable=false)
-    @Type(type="boolean_integer")
-    @Index(name="idx_stampisactive")
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
 
     /**
      * @return Stamp type
@@ -108,10 +90,13 @@ public abstract class Stamp extends AuditableObject implements
      */
     public abstract Stamp copy(Item item);
     
-    /**
-     * Prepare stamp for removal
-     */
-    public void remove() {
-        setIsActive(false);
+    
+    @Transient
+    public boolean isDirty() {
+        return dirty;
+    }
+    
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 }

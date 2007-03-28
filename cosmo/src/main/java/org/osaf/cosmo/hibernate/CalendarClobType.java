@@ -17,9 +17,11 @@ package org.osaf.cosmo.hibernate;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 
 import javax.transaction.TransactionManager;
 
@@ -117,8 +119,17 @@ public class CalendarClobType
 
     @Override
     public Object deepCopy(Object value) throws HibernateException {
-        Calendar calendar = (Calendar) value;
-        return CalendarUtils.copyCalendar(calendar);
+        if (value == null)
+            return null;
+        try {
+            return new Calendar((Calendar) value);
+        } catch (IOException e) {
+            throw new HibernateException("Unable to read original calendar", e);
+        } catch (ParseException e) {
+            throw new HibernateException("Unable to parse original calendar", e);
+        } catch (URISyntaxException e) {
+            throw new HibernateException("Unknown syntax exception", e);
+        }
     }
 
     public Class returnedClass() {

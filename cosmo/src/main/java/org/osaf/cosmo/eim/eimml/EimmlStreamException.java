@@ -15,10 +15,12 @@
  */
 package org.osaf.cosmo.eim.eimml;
 
+import org.osaf.cosmo.eim.EimException;
+
 /**
  * The base exception for unexpected EIMML processing errors.
  */
-public class EimmlStreamException extends Exception {
+public class EimmlStreamException extends EimException {
 
     /**
      */

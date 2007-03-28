@@ -20,7 +20,6 @@ import java.text.ParseException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.filter.OutputFilter;
 
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
@@ -29,25 +28,17 @@ import org.apache.jackrabbit.webdav.xml.ElementIterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.calendar.data.OutputFilter;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 
 import org.w3c.dom.Element;
 
 /**
- * Extends iCal4J's
- * {@link net.fortuna.ical4j.model.filter.OutputFilter} to provide
- * methods for creating instances from CalDAV report XML.
- *
- * Based on code originally written by Cyrus Daboo.
+ * A utility for parsing an {@link OutputFilter} from XML.
  */
-public class CaldavOutputFilter extends OutputFilter
+public class CaldavOutputFilter
     implements DavConstants, CaldavConstants {
     private static final Log log = LogFactory.getLog(CaldavOutputFilter.class);
-
-    /** */
-    public CaldavOutputFilter(String name) {
-        super(name);
-    }
 
     /**
      * Returns an <code>OutputFilter</code> representing the given

@@ -33,8 +33,8 @@ JAVA_JSON_MAPPING = {"java.util.Date":Date,
                      "org.osaf.cosmo.rpc.model.Subscription" : Subscription,
                      "org.osaf.cosmo.rpc.model.Ticket" : Ticket };
 
-JAVA_EXCEPTION_MAPPING = {"org.osaf.scooby.rpc.RPCException":ScoobyServiceRemoteException,
-                          "org.osaf.scooby.rpc.NotAuthenticatedException":NotAuthenticatedException};
+JAVA_EXCEPTION_MAPPING = {"org.springframework.dao.ConcurrencyFailureException": cosmo.service.exception.ConcurrencyException,
+                          "org.osaf.cosmo.model.CollectionLockedException": cosmo.service.exception.ConcurrencyException};
 
 
 
@@ -140,7 +140,7 @@ function wrapMethod(jsonRemoteObject, jsonRemoteMethod){
 
 function wrapException(exception){
     if (exception.name == "JSONRpcClientException"){
-        var wrappedException = new ScoobyServiceClientException();
+        var wrappedException = new Error();
         wrappedException.stack = exception.stack;
         wrappedException.message = exception.message;
         return wrappedException;

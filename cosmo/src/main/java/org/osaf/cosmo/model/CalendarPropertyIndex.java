@@ -91,6 +91,7 @@ public class CalendarPropertyIndex extends BaseModelObject implements
 
 
     @Column(name = "propertyvalue", length=20000)
+    @Index(name="idx_calpropvalue")
     public String getValue() {
         return value;
     }

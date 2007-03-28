@@ -1,8 +1,8 @@
 # -*- rnc -*-
 # RELAX NG Compact Syntax Grammar for the
-# EIMML note record type Version 1
+# EIMML note record type Version 0
 
-namespace note = "http://osafoundation.org/eim/note"
+namespace note = "http://osafoundation.org/eim/note/0"
 
 include "eimml-core.rnc"
 
@@ -11,7 +11,6 @@ eimNoteRecord =
       (noteUuid
        & noteBody?
        & noteIcalUid?
-       & noteReminderTime?
        & anyNoteField*)
    }
 
@@ -19,7 +18,7 @@ noteUuid =
    element note:uuid {
       eimTextFieldContent
    }
-
+   
 noteBody =
    element note:body {
       eimLobFieldContent
@@ -29,11 +28,6 @@ noteIcalUid =
    element note:icalUid {
       eimTextFieldContent
    }
-   
-noteReminderTime =
-   element note:reminderTime {
-      eimTimeStampFieldContent
-   }
 
 anyNoteField =
    element note:* {
@@ -41,7 +35,6 @@ anyNoteField =
        | eimDecimalFieldContent
        | eimIntegerFieldContent
        | eimDateTimeFieldContent
-       | eimTimeStampFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent
        | eimClobFieldContent)*

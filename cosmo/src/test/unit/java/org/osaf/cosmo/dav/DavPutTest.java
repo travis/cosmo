@@ -54,7 +54,7 @@ public class DavPutTest extends BaseDavServletTestCase {
         assertEquals("Content name incorrect.","testContent", content.getName());
         assertEquals("Content content incorrect","test!",new String(content.getContent()));
         assertEquals("Content parent not home collection", home, content
-                .getParent());
+                .getParents().iterator().next());
     }
     
     /** */

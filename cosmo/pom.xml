@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.osaf.cosmo</groupId>
         <artifactId>osaf-server</artifactId>
-        <version>0.7-SNAPSHOT</version>
+        <version>0.6.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cosmo</artifactId>
@@ -63,9 +63,14 @@
             <version>0.1-dev</version>
         </dependency>
         <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+        <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.2</version>
+            <version>2.3</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -74,9 +79,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>ical4j</groupId>
-            <artifactId>ical4j-osaf</artifactId>
-            <version>0.9.18-20070118</version>
+            <groupId>net.fortuna</groupId>
+            <artifactId>ical4j</artifactId>
+            <version>1.0-beta3-SNAPSHOT</version>
         </dependency>
         <!-- required by jcr-server -->
         <!-- XXX: should be 1.0 release version -->
@@ -240,7 +245,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate</artifactId>
-            <version>3.2.1.ga</version>
+            <version>3.2.2.ga</version>
             <exclusions>
                 <exclusion>
                     <groupId>ehcache</groupId>
@@ -334,7 +339,7 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <version>10.2.1.6</version>
+            <version>10.2.2.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

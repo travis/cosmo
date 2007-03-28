@@ -18,7 +18,6 @@ package org.osaf.cosmo.eim.schema;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
@@ -34,6 +33,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.eim.schema.text.DurationFormat;
+
 /**
  * Converts between EIM field values and model values (mainly
  * iCalendar values used for events and tasks).
@@ -43,9 +44,6 @@ public class EimValueConverter implements EimSchemaConstants {
         LogFactory.getLog(EimValueConverter.class);
 
     private EimValueConverter() {}
-
-    private static final Pattern DURATION_PATTERN = Pattern
-            .compile("[+-]?P((\\d+W)|((\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+S)?)?))");
 
     /**
      * Parses a serialized text value and returns the contained
@@ -59,11 +57,13 @@ public class EimValueConverter implements EimSchemaConstants {
     public static List<Recur> toICalRecurs(String text)
         throws EimConversionException {
         ArrayList<Recur> recurs = new ArrayList<Recur>();
-        for (String s : text.split(":")) {
-            try {
-                recurs.add(new Recur(s));
-            } catch (ParseException e) {
-                throw new EimConversionException("Invalid iCalendar recurrence rule " + s);
+        if (text != null) {
+            for (String s : text.split(":")) {
+                try {
+                    recurs.add(new Recur(s));
+                } catch (ParseException e) {
+                    throw new EimConversionException("Invalid iCalendar recurrence rule " + s);
+                }
             }
         }
         return recurs;
@@ -92,6 +92,8 @@ public class EimValueConverter implements EimSchemaConstants {
      */
     public static ICalDate toICalDate(String text)
         throws EimConversionException {
+        if (text == null)
+            return null;
         return new ICalDate(text);
     }
 
@@ -148,6 +150,18 @@ public class EimValueConverter implements EimSchemaConstants {
         else
             return trigger.getDuration().toString();
     }
+    
+    /**
+     * Generate an icalendar TRIGGER value representation for an absolute trigger
+     * with the given absolute trigger time.
+     * @param dateTime absolute trigger time
+     * @return icalendar TRIGGER value string
+     */
+    public static String formatTriggerFromDateTime(DateTime dateTime) {
+        if(!dateTime.isUtc())
+            throw new IllegalArgumentException("date must be UTC");
+        return ";VALUE=DATE-TIME:" + dateTime.toString();
+    }
 
     /**
      * Parses a serialized text value and returns a trigger object.
@@ -171,6 +185,9 @@ public class EimValueConverter implements EimSchemaConstants {
      */
     public static Trigger toIcalTrigger(String text)
             throws EimConversionException {
+        if (text == null)
+            return null;
+
         Value value = null;
         Related related = null;
         String propVal = null;
@@ -190,16 +207,14 @@ public class EimValueConverter implements EimSchemaConstants {
             trigger = new Trigger();
             if(Related.END.equals(related)) {
                 trigger.getParameters().add(Related.END);
-                if(validateDuration(propVal)==false)
-                    throw new EimConversionException("invalid trigger: " + text);
-                trigger.setDuration(new Dur(propVal));
+                Dur dur = DurationFormat.getInstance().parse(propVal);
+                trigger.setDuration(dur);
             } else if(Value.DATE_TIME.equals(value)) {
                 trigger.getParameters().add(Value.DATE_TIME);
                 trigger.setDateTime(new DateTime(propVal));
             } else {
-                if(validateDuration(propVal)==false)
-                    throw new EimConversionException("invalid trigger: " + text);
-                trigger.setDuration(new Dur(propVal));
+                Dur dur = DurationFormat.getInstance().parse(propVal);
+                trigger.setDuration(dur);
             }
             trigger.validate();
             return trigger;
@@ -207,22 +222,5 @@ public class EimValueConverter implements EimSchemaConstants {
             throw new EimConversionException("invalid trigger: " + text);
         }
         
-    }
-    
-    /**
-     * Parse duration text.
-     * @param value string representation of duration
-     * @return ical4j Dur object
-     * @throws EimConversionException
-     */
-    public static Dur toICalDur(String value) throws EimConversionException {
-        if(validateDuration(value)==false)
-            throw new EimConversionException("invalid duration " + value);
-        
-        return new Dur(value);
-    }
-    
-    private static boolean validateDuration(String text) {
-        return DURATION_PATTERN.matcher(text).matches();
     }
 }

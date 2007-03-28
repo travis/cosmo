@@ -15,11 +15,13 @@
  */
 package org.osaf.cosmo.eim.schema;
 
+import org.osaf.cosmo.eim.EimException;
+
 /**
  * The base exception for errors involving EIM schemas (translation
  * problems, invalid data, etc).
  */
-public class EimSchemaException extends Exception {
+public class EimSchemaException extends EimException {
 
     /**
      */

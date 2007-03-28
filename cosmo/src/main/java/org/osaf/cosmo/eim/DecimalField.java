@@ -32,7 +32,9 @@ public class DecimalField extends EimRecordField {
     /** */
     public DecimalField(String name,
                         BigDecimal value) {
-        this(name, value, -1, -1);
+        this(name, value,
+             value != null ? value.precision() : -1,
+             value != null ? value.scale() : -1);
     }
 
     /** */

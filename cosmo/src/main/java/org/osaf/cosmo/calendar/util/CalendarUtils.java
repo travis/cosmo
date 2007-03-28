@@ -21,14 +21,11 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Iterator;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.ValidationException;
 
 /**
@@ -104,27 +101,4 @@ public class CalendarUtils {
                 .build(is);
         return calendar;
     }
-
-    /**
-     * Copy Calendar object.
-     * @param calendar Calendar to copy
-     * @return copy of Calendar object
-     */
-    public static Calendar copyCalendar(Calendar calendar) {
-        if (calendar == null)
-            return null;
-
-        Calendar result = new Calendar();
-
-        for (Iterator<Property> it = calendar.getProperties().iterator(); it
-                .hasNext();)
-            result.getProperties().add(it.next().copy());
-
-        for (Iterator<Component> it = calendar.getComponents().iterator(); it
-                .hasNext();)
-            result.getComponents().add(it.next().copy());
-
-        return result;
-    }
-
 }

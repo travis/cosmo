@@ -26,7 +26,9 @@ public interface NoteConstants {
     /** */
     public static final String FIELD_ICALUID = "icalUid";
     /** */
+    public static final String FIELD_PARENTUUID = "parentUuid";
+    /** */
     public static final int MAXLEN_ICALUID = 256;
     /** */
-    public static final String FIELD_REMINDER_TIME = "reminderTime";
+    public static final int MAXLEN_PARENTUUID = 256;
 }

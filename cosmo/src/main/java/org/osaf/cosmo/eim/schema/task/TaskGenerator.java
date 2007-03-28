@@ -15,18 +15,17 @@
  */
 package org.osaf.cosmo.eim.schema.task;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.TaskStamp;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Generates EIM records from task stamps.
@@ -37,30 +36,45 @@ public class TaskGenerator extends BaseStampGenerator {
     private static final Log log =
         LogFactory.getLog(TaskGenerator.class);
 
+    private static final HashSet<String> STAMP_TYPES = new HashSet<String>(2);
+    
+    static {
+        STAMP_TYPES.add("task");
+    }
+    
     /** */
     public TaskGenerator(Item item) {
         super(PREFIX_TASK, NS_TASK, item);
         setStamp(TaskStamp.getStamp(item));
     }
 
-    /**
-     * Copies task properties and attributes into a task record.
-     */
-    public List<EimRecord> generateRecords() {
-        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+    @Override
+    protected Set<String> getStampTypes() {
+        return STAMP_TYPES;
+    }
 
-        TaskStamp task = (TaskStamp) getStamp();
-        if (task == null)
-            return records;
+    /**
+     * Adds a record for the task.
+     */
+    protected void addRecords(List<EimRecord> records) {
+        TaskStamp stamp = (TaskStamp) getStamp();
+        if (stamp == null)
+            return;
 
         EimRecord record = new EimRecord(getPrefix(), getNamespace());
-
-        record.addKeyField(new TextField(FIELD_UUID, task.getItem().getUid()));
-
-        record.addFields(generateUnknownFields());
-
+        addKeyFields(record);
+        addFields(record);
         records.add(record);
+    }
 
-        return records;
+    /**
+     * Adds a key field for uuid.
+     */
+    protected void addKeyFields(EimRecord record) {
+        record.addKeyField(new TextField(FIELD_UUID, getItem().getUid()));
+    }
+
+    private void addFields(EimRecord record) {
+        record.addFields(generateUnknownFields());
     }
 }

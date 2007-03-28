@@ -39,6 +39,26 @@
     <bean id="zeroPointFiveToZeroPointSix"
         class="org.osaf.cosmo.migrate.ZeroPointFiveToZeroPointSixMigration">
     </bean>
+	
+    <bean id="zeroPointSixToZeroPointSixZeroOne"
+        class="org.osaf.cosmo.migrate.BasicSqlScriptMigration">
+        <property name="fromVersion">
+            <value>0.6.0</value>
+        </property>
+        <property name="toVersion">
+            <value>0.6.0.1</value>
+        </property>
+        <property name="supportedDialects">
+            <list>
+                <value>Derby</value>
+                <value>MySQL5</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="zeroPointSixZeroOneToZeroPointSixOne"
+        class="org.osaf.cosmo.migrate.ZeroPointSixZeroOneToZeroPointSixOneMigration">
+    </bean>
 
     <bean id="propertyPlaceHolderConfigurer"
         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -54,6 +74,8 @@
         <property name="migrations">
             <list>
                 <ref local="zeroPointFiveToZeroPointSix"/>
+                <ref local="zeroPointSixToZeroPointSixZeroOne"/>
+                <ref local="zeroPointSixZeroOneToZeroPointSixOne"/>
             </list>
         </property>
     </bean>

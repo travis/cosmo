@@ -27,7 +27,7 @@ public interface ExtendedDavConstants {
     public static final Namespace NAMESPACE_COSMO =
         Namespace.getNamespace("cosmo", "http://osafoundation.org/cosmo/DAV");
 
-    /** The Cosmo property name <code>:exclude-free-busy-rollup</code> */
+    /** The Cosmo property name <code>exclude-free-busy-rollup</code> */
     public static final String PROPERTY_EXCLUDE_FREE_BUSY_ROLLUP =
         "exclude-free-busy-rollup";
 
@@ -35,4 +35,11 @@ public interface ExtendedDavConstants {
     public static final DavPropertyName EXCLUDEFREEBUSYROLLUP =
         DavPropertyName.create(PROPERTY_EXCLUDE_FREE_BUSY_ROLLUP,
                                NAMESPACE_COSMO);
+
+    /** The Cosmo property name <code>uuid</code> */
+    public static final String PROPERTY_UUID = "uuid";
+
+    /** The Cosmo property <code>cosmo:uuid</code> */
+    public static final DavPropertyName UUID =
+        DavPropertyName.create(PROPERTY_UUID, NAMESPACE_COSMO);
 }

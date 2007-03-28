@@ -18,8 +18,6 @@ package org.osaf.cosmo.dav.impl;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,7 +57,7 @@ import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
-import org.osaf.cosmo.util.PathUtil;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Extends <code>DavResourceBase</code> to adapt the Cosmo
@@ -403,6 +401,11 @@ public class DavCollection extends DavResourceBase
         for (Iterator i=((CollectionItem)getItem()).getChildren().iterator();
              i.hasNext();) {
             Item memberItem = (Item) i.next();
+            
+            // ignore modifications
+            if(memberItem instanceof NoteItem && ((NoteItem) memberItem).getModifies()!=null)
+                continue;
+            
             String memberPath = getResourcePath() + "/" + memberItem.getName();
             try {
                 DavResourceLocator memberLocator =
@@ -470,7 +473,6 @@ public class DavCollection extends DavResourceBase
         String title = getItem().getDisplayName();
         if (title == null)
             title = getItem().getUid();
-        title = title + " (" + getResourcePath() + ")";
 
         writer.write("<html><head><title>");
         writer.write(StringEscapeUtils.escapeHtml(title));
@@ -480,23 +482,17 @@ public class DavCollection extends DavResourceBase
         writer.write(StringEscapeUtils.escapeHtml(title));
         writer.write("</h1>");
         writer.write("<ul>");
-        if (! getLocator().getResourcePath().equals("/")) {
-            writer.write("<li><a href=\"../\">..</a></li>");
-        }
+        if (! isHomeCollection()) {
+            DavResource parent = getCollection();
+            writer.write("<li><a href=\"");
+            writer.write(parent.getLocator().getHref(true));
+            writer.write("\">..</a></li>");
+        };
         for (DavResourceIterator i=getMembers(); i.hasNext();) {
             DavResourceBase child = (DavResourceBase) i.nextResource();
-            String name =
-                PathUtil.getBasename(child.getLocator().getResourcePath()); 
             String displayName = child.getItem().getDisplayName();
             writer.write("<li><a href=\"");
-            try {
-                writer.write(URLEncoder.encode(name, "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("UTF-8 not supported", e);
-            }
-            if (child.isCollection()) {
-                writer.write("/");
-            }
+            writer.write(child.getLocator().getHref(child.isCollection()));
             writer.write("\">");
             writer.write(StringEscapeUtils.escapeHtml(displayName));
             writer.write("</a></li>");

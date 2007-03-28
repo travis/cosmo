@@ -131,7 +131,6 @@ Jar file list:
     Note: the following are located in our Maven 1 repository
 
     unstandard-20050518.jar
-    ical4j-osaf-0.9.18-20061008.jar
 
     Since the above jars all come with POM files, use the following to deploy:
 
@@ -181,4 +180,3 @@ Jar file list:
                                -Dversion=1.0-osaf-20061023 \
                                -Dpackaging=jar \
                                -Dfile=jackrabbit-server-1.0-osaf-20061023.jar
-

@@ -46,6 +46,9 @@ public class FreeBusyReportTest extends BaseDavTestCase
         FreeBusyReport report = new FreeBusyReport();
         report.init(home, makeReportInfo("freebusy1.xml", DEPTH_1));
 
+        // XXX: currently erroring out because ical4j requires a
+        // vfreebusy to contain a uid and a dtstamp, and we don't
+        // generate those.
         report.runQuery();
     }
 

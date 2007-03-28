@@ -15,21 +15,18 @@
  */
 package org.osaf.cosmo.dao.mock;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.dao.ItemDao;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -42,6 +39,7 @@ import org.osaf.cosmo.util.PathUtil;
  * @see Item
  */
 public class MockItemDao implements ItemDao {
+   
     private static final Log log = LogFactory.getLog(MockItemDao.class);
 
     private MockDaoStorage storage;
@@ -141,7 +139,7 @@ public class MockItemDao implements ItemDao {
             log.debug("getting root item for user " + user.getUsername());
         }
 
-        return getStorage().getRootItem(user.getId());
+        return getStorage().getRootItem(user.getUid());
     }
 
     /**
@@ -209,7 +207,7 @@ public class MockItemDao implements ItemDao {
         if (copyName == null)
             copyName = item.getName();
         copy.setName(copyName);
-        copy.setParent(parent);
+        copy.getParents().add(parent);
         copy.setOwner(item.getOwner());
 
         for(Map.Entry<QName, Attribute> entry :
@@ -232,15 +230,15 @@ public class MockItemDao implements ItemDao {
   
     /**
      * Move item to the given path
-     * @param item item to move
-     * @param path path to move item to
+     * @param fromPath item to move
+     * @param toPath path to move item to
      * @throws org.osaf.cosmo.model.ItemNotFoundException
      *         if parent item specified by path does not exist
      * @throws org.osaf.cosmo.model.DuplicateItemNameException
      *         if path points to an item with the same path
      */
-    public void moveItem(Item item,
-                         String path) {
+    public void moveItem(String fromPath,
+                         String toPath) {
         throw new UnsupportedOperationException();
     }
     
@@ -251,11 +249,19 @@ public class MockItemDao implements ItemDao {
      *            item to remove
      */
     public void removeItem(Item item) {
-        item.getParent().getChildren().remove(item);
+        if(item.getParent()!=null)
+            item.getParent().getChildren().remove(item);
+        
+        // update modifications
+        if(item instanceof NoteItem) {
+            NoteItem note = (NoteItem) item;
+            if(note.getModifies()!=null)
+                note.getModifies().getModifications().remove(note);
+        }
 
         storage.removeItemByUid(item.getUid());
         storage.removeItemByPath(getItemPath(item));
-        if (storage.getRootUid(item.getOwner().getId()).
+        if (storage.getRootUid(item.getOwner().getUid()).
             equals(item.getUid())) {
             storage.removeRootUid(item.getOwner().getId());
         }
@@ -331,6 +337,12 @@ public class MockItemDao implements ItemDao {
         return;
     }
 
+    
+    public Item findItemByPath(String path, String parentUid) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     public void removeItemByPath(String path) {
         removeItem(findItemByPath(path));
     }
@@ -339,8 +351,24 @@ public class MockItemDao implements ItemDao {
         removeItem(findItemByUid(uid));
     }
     
+    public void addItemToCollection(Item item, CollectionItem collection) {
+        item.getParents().add(collection);
+    }
+    
+    public void removeItemFromCollection(Item item, CollectionItem collection) {
+        item.getParents().remove(collection);
+        collection.getChildren().remove(item);
+        if(item.getParents().size()==0)
+            removeItem(item);
+    }
+    
+    public void refreshItem(Item item) {
+        // do nothing
+    }
+
     // Dao methods
 
+   
     /**
      * Initializes the DAO, sanity checking required properties
      * and defaulting optional properties.
@@ -364,6 +392,6 @@ public class MockItemDao implements ItemDao {
 
     /** */
     protected Set findRootChildren(User user) {
-        return storage.findItemChildren(storage.getRootItem(user.getId()));
+        return storage.findItemChildren(storage.getRootItem(user.getUid()));
     }
 }

@@ -18,14 +18,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.osaf.cosmo</groupId>
     <artifactId>osaf-server</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>OSAF Server</name>
     <url>http://cosmo.osafoundation.org</url>
     <modules>
         <module>cosmo</module>
-        <module>migration</module>
         <module>snarf</module>
+        <module>migration</module>
     </modules>
     <repositories>
         <repository>
@@ -44,6 +44,18 @@
             <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
             <snapshots>
                 <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>modularity snapshots</id>
+            <name>Modularity Snapshot Repository</name>
+            <url>http://m2.modularity.net.au/snapshots</url>
+            <releases>
+              <enabled>false</enabled>
+            </releases>
+            <snapshots>
+              <enabled>true</enabled>
+              <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
     </repositories>
@@ -89,12 +101,12 @@
             </dependency>
             <dependency>
                 <groupId>org.osaf.cosmo</groupId>
-                <artifactId>migration</artifactId>
+                <artifactId>snarf</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.osaf.cosmo</groupId>
-                <artifactId>snarf</artifactId>
+                <artifactId>migration</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

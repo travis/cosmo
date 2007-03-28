@@ -57,33 +57,43 @@ cosmo.app = new function () {
      * If new errors get spawned while this is processing, it queues the
      * messages for display after users dismisses the faux modal disalog box
      */
-    this.showErr = function (str, e) {
+    this.showErr = function (pri, sec) {
         var msg = '';
-        var currErr = '';
-        var but = null;
-
+        var secondaryMessage = null; // Secondary message, if any
+        
+        // Secondary message passed 
+        if (sec) {
+            if (typeof sec == 'string') {
+                secondaryMessage = sec;
+            }
+            else if (sec instanceof Error && sec.message) {
+                secondaryMessage = sec.message;
+            }
+        }
+        
         // If the error dialog is already showing, add this message to the error queue
         if (this.modalDialog.isDisplayed) {
-            this.errorList.push(str);
+            this.errorList.push(pri);
         }
         // Otherwise display the error dialog
         else {
             // If there are errors waiting in the queue, prepend them to the error msg
             if (this.errorList.length) {
+                var currErr = '';
                 while (currErr = this.errorList.shift()) {
                     msg += '<div class="errText">' + currErr + '</div>';
                 }
-                msg += str;
+                msg += pri;
             }
             // Otherwise just display the current message
             else {
-                msg = '<div class="errText">' + str + '</div>';
-                if (e) {
-                    msg += '<div>' + e.message + '</div>'
+                msg = '<div class="errText">' + pri + '</div>';
+                if (secondaryMessage) {
+                    msg += '<div>' + secondaryMessage + '</div>'
                 }
             }
             this.modalDialog.type = this.modalDialog.ERROR;
-            but = new Button('okButton', 64, self.hideDialog,
+            var but = new Button('okButton', 64, self.hideDialog,
                 _('App.Button.OK'), true);
             this.modalDialog.btnsCenter[0] = but;
             this.modalDialog.defaultAction = self.hideDialog;

@@ -1,0 +1,41 @@
+# -*- rnc -*-
+# RELAX NG Compact Syntax Grammar for the
+# EIMML modifiedBy record type Version 1
+
+namespace modby = "http://osafoundation.org/eim/modifiedBy/0"
+
+include "eimml-core.rnc"
+
+eimModifiedByRecord =
+   element modby:record {
+      (modUuid
+       & modUserid?
+       & modTimestamp?
+       & modAction?)
+   }
+
+modUuid =
+   element modby:uuid {
+      eimTextFieldContent
+   }
+
+modUserid =
+   element modby:userid {
+      eimTextFieldContent
+   }
+
+# digits=12, decimal_places=2, negative signed
+modTimestamp =
+   element modby:timestamp {
+      eimDecimalFieldContent
+   }
+
+# 100: edited
+# 200: queued
+# 300: sent
+# 400: updated
+# 500: created
+modAction =
+   element modby:action {
+      eimIntegerFieldContent
+   }

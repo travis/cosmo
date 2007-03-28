@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.osaf.cosmo.mc;
 
-import java.util.Iterator;
+import java.util.Set;
 
-import org.osaf.cosmo.eim.EimRecordSet;
+import org.osaf.cosmo.model.Ticket;
 
 /**
  * Interface for controllers that implement the operations specified
@@ -41,9 +41,10 @@ public interface MorseCodeController {
 
     /**
      * Creates a collection identified by the given uid and populates
-     * the collection with items with the provided states. The publish
-     * is atomic; the entire publish fails if the collection or any
-     * contained item cannot be created.
+     * the collection with items with the provided states. If ticket
+     * types are provided, creates one ticket of each type on the
+     * collection. The publish is atomic; the entire publish fails if
+     * the collection or any contained item cannot be created.
      *
      * If a parent uid is provided, the associated collection becomes
      * the parent of the new collection.
@@ -53,6 +54,8 @@ public interface MorseCodeController {
      * the parent for the published collection
      * @param records the EIM records with which the published
      * collection is initially populated
+     * @param ticketTypes a set of ticket types to create on the
+     * collection, one per type
      *
      * @returns the initial <code>SyncToken</code> for the collection
      * @throws IllegalArgumentException if the authenticated principal
@@ -67,9 +70,10 @@ public interface MorseCodeController {
      * data according to the records' schemas
      * @throws MorseCodeException if an unknown error occurs
      */
-    public SyncToken publishCollection(String uid,
-                                       String parentUid,
-                                       PubRecords records);
+    public PubCollection publishCollection(String uid,
+                                           String parentUid,
+                                           PubRecords records,
+                                           Set<Ticket.Type> ticketTypes);
    
     /**
      * Retrieves the current state of every item contained within the
@@ -141,7 +145,7 @@ public interface MorseCodeController {
      * data according to the records' schemas
      * @throws MorseCodeException if an unknown error occurs
      */
-    public SyncToken updateCollection(String uid,
-                                      SyncToken token,
-                                      PubRecords records);
+    public PubCollection updateCollection(String uid,
+                                          SyncToken token,
+                                          PubRecords records);
 }

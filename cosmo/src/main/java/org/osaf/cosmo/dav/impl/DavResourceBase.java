@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.xml.Namespace;
+import org.osaf.cosmo.dav.ExtendedDavConstants;
 import org.osaf.cosmo.dav.ExtendedDavResource;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.dav.ticket.property.TicketDiscovery;
@@ -80,6 +82,7 @@ import org.osaf.cosmo.util.PathUtil;
  * <li><code>DAV:iscollection</code> (protected)</li>
  * <li><code>DAV:resourcetype</code> (protected)</li>
  * <li><code>ticket:ticketdiscovery</code> (protected)</li>
+ * <li><code>cosmo:uuid</code> (protected)</li>
  * </ul>
  *
  * Note that all of these properties are protected and cannot be
@@ -91,7 +94,7 @@ import org.osaf.cosmo.util.PathUtil;
  * @see ExtendedDavResource
  */
 public abstract class DavResourceBase
-    implements ExtendedDavResource, TicketConstants {
+    implements ExtendedDavConstants, ExtendedDavResource, TicketConstants {
     private static final Log log =
         LogFactory.getLog(DavResourceBase.class);
 
@@ -110,6 +113,7 @@ public abstract class DavResourceBase
         registerLiveProperty(DavPropertyName.DISPLAYNAME);
         registerLiveProperty(DavPropertyName.ISCOLLECTION);
         registerLiveProperty(DavPropertyName.RESOURCETYPE);
+        registerLiveProperty(UUID);
         registerLiveProperty(TICKETDISCOVERY);
     }
 
@@ -349,7 +353,7 @@ public abstract class DavResourceBase
                       destination.getResourcePath());
 
         try {
-            getContentService().moveItem(item, destination.getResourcePath());
+            getContentService().moveItem(getResourcePath(), destination.getResourcePath());
         } catch (ItemNotFoundException e) {
             throw new DavException(DavServletResponse.SC_CONFLICT);
         } catch (DuplicateItemNameException e) {
@@ -613,6 +617,11 @@ public abstract class DavResourceBase
             owner = ticket.getOwner();
         }
         item.setOwner(owner);
+
+        if (item.getUid() == null) {
+            item.setClientCreationDate(Calendar.getInstance().getTime());
+            item.setClientModifiedDate(item.getClientCreationDate());
+        }
     }
 
     /**
@@ -702,6 +711,8 @@ public abstract class DavResourceBase
                                               isCollection() ? "1" : "0"));
 
         properties.add(new TicketDiscovery(this));
+
+        properties.add(new DefaultDavProperty(UUID, item.getUid()));
     }
 
     /**
@@ -728,7 +739,8 @@ public abstract class DavResourceBase
             throw new ModelValidationException("null value for property " + name);
         String value = property.getValue().toString();
 
-        if (name.equals(TICKETDISCOVERY))
+        if (name.equals(TICKETDISCOVERY) ||
+            name.equals(UUID))
             throw new ModelValidationException("cannot set protected property " + name);
 
         if (name.equals(DavPropertyName.DISPLAYNAME))
@@ -753,6 +765,7 @@ public abstract class DavResourceBase
             return;
 
         if (name.equals(TICKETDISCOVERY) ||
+            name.equals(UUID) ||
             name.equals(DavPropertyName.DISPLAYNAME))
             throw new ModelValidationException("cannot remove protected property " + name);
     }

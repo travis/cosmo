@@ -65,5 +65,40 @@ public class IntegerAttribute extends Attribute implements java.io.Serializable 
                     "attempted to set non Long value on attribute");
         setValue((Long) value);
     }
+    
+    /**
+     * Convienence method for returning a Long value on a IntegerAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch IntegerAttribute from
+     * @param qname QName of attribute
+     * @return Long value of IntegerAttribute
+     */
+    public static Long getValue(Item item, QName qname) {
+        IntegerAttribute ia = (IntegerAttribute) item.getAttribute(qname);
+        if(ia==null)
+            return null;
+        else
+            return ia.getValue();
+    }
+    
+    /**
+     * Convienence method for setting a Long value on a IntegerAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch IntegerAttribute from
+     * @param qname QName of attribute
+     * @param value value to set on IntegerAttribute
+     */
+    public static void setValue(Item item, QName qname, Long value) {
+        IntegerAttribute attr = (IntegerAttribute) item.getAttribute(qname);
+        if(attr==null && value!=null) {
+            attr = new IntegerAttribute(qname,value);
+            item.addAttribute(attr);
+            return;
+        }
+        if(value==null)
+            item.removeAttribute(qname);
+        else
+            attr.setValue(value);
+    }
 
 }

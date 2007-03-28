@@ -1,8 +1,8 @@
 # -*- rnc -*-
 # RELAX NG Compact Syntax Grammar for the
-# EIMML message record type Version 1
+# EIMML message record type Version 0
 
-namespace message = "http://osafoundation.org/eim/message"
+namespace message = "http://osafoundation.org/eim/mail/0"
 
 include "eimml-core.rnc"
 
@@ -10,10 +10,16 @@ eimMessageRecord =
    element message:record {
       (eimDeleted,
          messageUuid
-       & messageSubject?
+       & messageId?
+       & messageHeaders?
        & messageTo?
        & messageCc?
        & messageBcc?
+       & messageWhoFrom?
+       & messageSender?
+       & messageDateSent?
+       & messageInReplyTo?
+       & messageReferences?
        & anyMessageField*)
    }
 
@@ -23,23 +29,56 @@ messageUuid =
    }
 
 messageSubject =
-   element message:subject {
-      eimTextFieldContent
+   element message:id {
+      eimTextFieldContent # length 256
+   }
+
+messageSubject =
+   element message:headers {
+      eimClobFieldContent
    }
 
 messageTo =
    element message:to {
-      eimTextFieldContent
+      eimTextFieldContent # length 1024
    }
 
 messageCc =
    element message:cc {
-      eimTextFieldContent
+      eimTextFieldContent # length 1024
    }
 
 messageBcc =
    element message:bcc {
-      eimTextFieldContent
+      eimTextFieldContent # length 1024
+   }
+
+# can contain text or email addresses
+messageWhoFrom =
+   element message:whoFrom {
+      eimTextFieldContent # length 512
+   }
+
+# the RFC822 From address
+messageSender =
+   element message:sender {
+      eimTextFieldContent # length 256
+   }
+
+messageDateSent =
+   element message:dateSent {
+      eimTextFieldContent # length 256
+   }
+
+messageInReplyTo =
+   element message:inReplyTo {
+      eimTextFieldContent # length 256
+   }
+
+# comma-separated list of message ids that this message references
+messageReferences =
+   element message:references {
+      eimClobFieldContent
    }
 
 anyMessageField =
@@ -48,7 +87,6 @@ anyMessageField =
        | eimDecimalFieldContent
        | eimIntegerFieldContent
        | eimDateTimeFieldContent
-       | eimTimeStampFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent
        | eimClobFieldContent)*

@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.eim.schema.contentitem;
 
-import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -25,9 +25,11 @@ import org.osaf.cosmo.eim.schema.BaseItemApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValidationException;
+import org.osaf.cosmo.eim.schema.text.TriageStatusFormat;
+import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.TriageStatus;
 
 /**
  * Applies EIM records to content items.
@@ -59,33 +61,58 @@ public class ContentItemApplicator extends BaseItemApplicator
         ContentItem contentItem = (ContentItem) getItem();
 
         if (field.getName().equals(FIELD_TITLE)) {
-            String value = EimFieldValidator.validateText(field, MAXLEN_TITLE);
-            contentItem.setDisplayName(value);
             
-            // ContentItem.displayName == EventStamp.getSummary()
+            if(field.isMissing()) {
+                handleMissingAttribute("displayName");
+            }
+            else {
+                String value = EimFieldValidator.validateText(field, MAXLEN_TITLE);
+                contentItem.setDisplayName(value);
+            }
+            
+            // ContentItem.displayName == BaseEventStamp.getSummary()
             // For now, we have to keep the ContentItem and
             // EventStamp in sync, otherwise an update by morsecode
             // to ContentItem will not propogate to a CalDAV client.
-            EventStamp eventStamp = EventStamp.getStamp(contentItem);
-            if(eventStamp!=null)
-                eventStamp.setSummary(value);
-        } else if (field.getName().equals(FIELD_TRIAGE_STATUS)) {
-            String value =
-                EimFieldValidator.validateText(field, MAXLEN_TRIAGE_STATUS);
-            contentItem.setTriageStatus(value);
-        } else if (field.getName().equals(FIELD_TRIAGE_STATUS_CHANGED)) {
-            BigDecimal value =
-                EimFieldValidator.validateDecimal(field,
-                                                  DIGITS_TRIAGE_STATUS_CHANGED,
-                                                  DEC_TRIAGE_STATUS_CHANGED);
-            contentItem.setTriageStatusUpdated(value);
-        } else if (field.getName().equals(FIELD_LAST_MODIFIED_BY)) {
-            String value =
-                EimFieldValidator.validateText(field, MAXLEN_LAST_MODIFIED_BY);
-            contentItem.setLastModifiedBy(value);
+            BaseEventStamp eventStamp = BaseEventStamp.getStamp(contentItem);
+            if(eventStamp!=null) {
+                eventStamp.setSummary(contentItem.getDisplayName());
+            }
+        } else if (field.getName().equals(FIELD_TRIAGE)) {
+            if(field.isMissing()) {
+                handleMissingAttribute("triageStatus");
+            } else {
+                String value =
+                    EimFieldValidator.validateText(field, MAXLEN_TRIAGE);
+                try {
+                    TriageStatus ts =
+                        TriageStatusFormat.getInstance().parse(value);
+                    contentItem.setTriageStatus(ts);
+                } catch (ParseException e) {
+                    throw new EimValidationException("Illegal triage status", e);
+                }
+            }
+        } else if (field.getName().equals(FIELD_HAS_BEEN_SENT)) {
+            if (field.isMissing())
+                handleMissingAttribute("sent");
+            else {
+                Boolean value = EimFieldValidator.validateBoolean(field);
+                contentItem.setSent(value);
+            }
+        } else if (field.getName().equals(FIELD_NEEDS_REPLY)) {
+            if (field.isMissing())
+                handleMissingAttribute("needsReply");
+            else {
+                Boolean value = EimFieldValidator.validateBoolean(field);
+                contentItem.setNeedsReply(value);
+            }
         } else if (field.getName().equals(FIELD_CREATED_ON)) {
-            Date value = EimFieldValidator.validateTimeStamp(field);
-            contentItem.setClientCreationDate(value);
+            if(field.isMissing()) {
+                handleMissingAttribute("clientCreationDate");
+            } else {
+                Date value = EimFieldValidator.validateTimeStamp(field);
+                contentItem.setClientCreationDate(value);
+            }
         } else {
             applyUnknownField(field);
         }

@@ -18,6 +18,7 @@ package org.osaf.cosmo.model;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -30,6 +31,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -71,34 +74,19 @@ public abstract class Item extends AuditableObject {
     private String name;
     private String displayName;
     private Date clientCreationDate;
+    private Date clientModifiedDate;
     private Integer version;
     private Boolean isActive = Boolean.TRUE;
     
     private Map<QName, Attribute> attributes = new HashMap<QName, Attribute>(0);
     private Set<Ticket> tickets = new HashSet<Ticket>(0);
     private Set<Stamp> stamps = new HashSet<Stamp>(0);
-    private Set<Stamp> activeStamps = null;
+    private Set<Tombstone> tombstones = new HashSet<Tombstone>(0);
     private Map<String, Stamp> stampMap = null;
     
-    private CollectionItem parent = null;
+    private Set<CollectionItem> parents = new HashSet<CollectionItem>(0);
     private User owner;
   
-    /**
-     * Return all active stamps (isActive=true).
-     * @return active stamps
-     */
-    @Transient 
-    public Set<Stamp> getActiveStamps() {
-        if(activeStamps!=null)
-            return activeStamps;
-        
-        activeStamps = new HashSet<Stamp>(stamps.size());
-        for(Stamp s: stamps)
-            if(s.getIsActive())
-                activeStamps.add(s);
-        
-        return activeStamps;
-    }
     
     /**
      * Return all stamps associated with Item.  This set includes
@@ -127,11 +115,8 @@ public abstract class Item extends AuditableObject {
     public Map<String, Stamp> getStampMap() {
         if(stampMap==null) {
             stampMap = new HashMap<String, Stamp>();
-            for(Stamp stamp : stamps) {
-                // Only care about active stamps
-                if(stamp.getIsActive())
-                    stampMap.put(stamp.getType(), stamp);
-            }
+            for(Stamp stamp : stamps)
+                stampMap.put(stamp.getType(), stamp);
         }
         
         return stampMap;
@@ -145,17 +130,12 @@ public abstract class Item extends AuditableObject {
         if (stamp == null)
             throw new IllegalArgumentException("stamp cannot be null");
 
-        for (Stamp s : stamps) {
-            if (s.getClass() == stamp.getClass()) {
-                // If there is already an active stamp of this type,
-                // throw an exception, otherwise remove inactive stamp
-                // to make way for a new active one
-                if(s.getIsActive())
-                    throw new ModelValidationException(
-                        "Item already has stamp of type " + s.getClass());
-                else
-                    stamps.remove(s);
-            }
+        // remove old tombstone if exists
+        for(Iterator<Tombstone> it=tombstones.iterator();it.hasNext();) {
+            Tombstone ts = it.next();
+            if(ts instanceof StampTombstone)
+                if(((StampTombstone) ts).getStampType().equals(stamp.getType()))
+                    it.remove();
         }
         
         stamp.setItem(this);
@@ -172,25 +152,9 @@ public abstract class Item extends AuditableObject {
         if(!stamps.contains(stamp))
             return;
         
-        stamp.remove();
+        stamps.remove(stamp);
         
-        // remove from activeStamps if it has been initialized
-        if(activeStamps!=null)
-            activeStamps.remove(stamp);
-    }
-    
-    /**
-     * Get the stamp that corresponds to the specified class
-     * @param clazz stamp class to return
-     * @return stamp
-     */
-    public Stamp getStamp(Class clazz) {
-        for(Stamp stamp : stamps)
-            // only return stamp if it matches class and is active
-            if(clazz.isInstance(stamp) && stamp.getIsActive())
-                return stamp;
-        
-        return null;
+        tombstones.add(new StampTombstone(this, stamp));
     }
     
     /**
@@ -201,7 +165,21 @@ public abstract class Item extends AuditableObject {
     public Stamp getStamp(String type) {
         for(Stamp stamp : stamps)
             // only return stamp if it matches class and is active
-            if(stamp.getType().equals(type) && stamp.getIsActive())
+            if(stamp.getType().equals(type))
+                return stamp;
+        
+        return null;
+    }
+    
+    /**
+     * Get the stamp that coresponds to the specified class
+     * @param clazz class of stamp to return
+     * @return stamp
+     */
+    public Stamp getStamp(Class clazz) {
+        for(Stamp stamp : stamps)
+            // only return stamp if it is an instance of the specified class
+            if(clazz.isInstance(stamp))
                 return stamp;
         
         return null;
@@ -504,6 +482,16 @@ public abstract class Item extends AuditableObject {
         this.clientCreationDate = clientCreationDate;
     }
     
+    @Column(name = "clientmodifieddate")
+    @Type(type="long_timestamp")
+    public Date getClientModifiedDate() {
+        return clientModifiedDate;
+    }
+
+    public void setClientModifiedDate(Date clientModifiedDate) {
+        this.clientModifiedDate = clientModifiedDate;
+    }
+    
     @Column(name = "itemname", nullable = false, length=255)
     @NotNull
     @Length(min=1, max=255)
@@ -565,14 +553,27 @@ public abstract class Item extends AuditableObject {
         this.version = version;
     }
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="parentid")
-    public CollectionItem getParent() {
-        return parent;
+    @ManyToMany(fetch=FetchType.LAZY) 
+    @JoinTable(
+        name="collection_item",
+        joinColumns={@JoinColumn(name="itemid")},
+        inverseJoinColumns={@JoinColumn(name="collectionid")}
+    )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    public Set<CollectionItem> getParents() {
+        return parents;
     }
 
-    public void setParent(CollectionItem parent) {
-        this.parent = parent;
+    public void setParents(Set<CollectionItem> parents) {
+        this.parents = parents;
+    }
+    
+    @Transient
+    public CollectionItem getParent() {
+        if(parents.size()==0)
+            return null;
+        
+        return parents.iterator().next();
     }
 
     @Column(name="isactive", nullable=false)
@@ -597,6 +598,21 @@ public abstract class Item extends AuditableObject {
         this.tickets = tickets;
     }
 
+    @OneToMany(mappedBy="item", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
+    public Set<Tombstone> getTombstones() {
+        return tombstones;
+    }
+
+    private void setTombstones(Set<Tombstone> tombstones) {
+        this.tombstones = tombstones;
+    }
+
+    public void addTombstone(Tombstone tombstone) {
+        tombstone.setItem(this);
+        tombstones.add(tombstone);
+    }
+    
     /**
      * Item uid determines equality 
      */
@@ -618,5 +634,19 @@ public abstract class Item extends AuditableObject {
             return uid.hashCode();
     }
     
+    public abstract Item copy();
     
+    protected void copyToItem(Item item) {
+        item.setOwner(getOwner());
+        item.setName(getName());
+        item.setDisplayName(getDisplayName());
+        
+        // copy attributes
+        for(Entry<QName, Attribute> entry: getAttributes().entrySet())
+            item.addAttribute(entry.getValue().copy());
+        
+        // copy stamps
+        for(Stamp stamp: getStamps())
+            item.addStamp(stamp.copy(item));
+    }
 }

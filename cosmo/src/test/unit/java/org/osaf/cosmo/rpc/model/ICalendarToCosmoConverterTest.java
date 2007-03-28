@@ -190,7 +190,7 @@ public class ICalendarToCosmoConverterTest extends TestCase {
         assertNotNull("Should have endate", endDate);
         assertEquals(endDate.getMonth(), 0);
         assertEquals(endDate.getYear(), 2006);
-        assertEquals(endDate.getDate(), 30);
+        assertEquals(endDate.getDate(), 31);
         assertTrue("Recurrence Rule should be Daily", rrule.getFrequency()
                 .equals(RecurrenceRule.FREQUENCY_DAILY));
     }
@@ -367,6 +367,24 @@ public class ICalendarToCosmoConverterTest extends TestCase {
         Event event = events.get(1);
         assertEquals(LA_TZ, event.getStart().getTzId());
 
+    }
+
+    public void testConvertChandlerAnyTimeEventBug8217() throws Exception{
+        Event e = loadEventIcs("bug8217-weirdAnytime.ics", "12345");
+        assertTrue(e.isAnyTime());
+        
+        //let's try converting it, and then converting back
+        CosmoToICalendarConverter scoobyConverter = new CosmoToICalendarConverter();
+        Calendar c = scoobyConverter.createWrappedVEvent(e);
+        VEvent ve = getFirstEvent(c);
+        e = converter.createEvent("111",ve, c);
+        assertTrue(e.isAnyTime());
+    }
+
+    public void testBug84161EventsWithDurationInsteadOfEndDate() throws Exception{
+        Event e = loadEventIcs("bug8416-noEndDate.ics", "12345");
+        assertNotNull(e.getStart());
+        assertNotNull(e.getEnd());
     }
     
     protected Event loadEventIcs(String name, String id) throws Exception {

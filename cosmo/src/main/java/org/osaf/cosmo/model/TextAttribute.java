@@ -26,6 +26,9 @@ import javax.persistence.Entity;
 import javax.persistence.Transient;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.hibernate.annotations.Type;
 
 
@@ -38,6 +41,7 @@ import org.hibernate.annotations.Type;
 @DiscriminatorValue("text")
 public class TextAttribute extends Attribute implements
         java.io.Serializable {
+    private static final Log log = LogFactory.getLog(TextAttribute.class);
     
     /**
      * 
@@ -62,6 +66,7 @@ public class TextAttribute extends Attribute implements
      * @param reader
      */
     public TextAttribute(QName qname, Reader reader) {
+        setQName(qname);
         this.value = read(reader);
     }
 
@@ -125,5 +130,40 @@ public class TextAttribute extends Attribute implements
             throw new RuntimeException("error reading stream");
         }
         return writer.toString();
+    }
+    
+    /**
+     * Convienence method for returning a String value on a TextAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch TextAttribute from
+     * @param qname QName of attribute
+     * @return String value of TextAttribute
+     */
+    public static String getValue(Item item, QName qname) {
+        TextAttribute ta = (TextAttribute) item.getAttribute(qname);
+        if(ta==null)
+            return null;
+        else
+            return ta.getValue();
+    }
+    
+    /**
+     * Convienence method for setting a String value on a TextAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch TextAttribute from
+     * @param qname QName of attribute
+     * @param value value to set on TextAttribute
+     */
+    public static void setValue(Item item, QName qname, String value) {
+        TextAttribute attr = (TextAttribute) item.getAttribute(qname);
+        if(attr==null && value!=null) {
+            attr = new TextAttribute(qname,value);
+            item.addAttribute(attr);
+            return;
+        }
+        if(value==null)
+            item.removeAttribute(qname);
+        else
+            attr.setValue(value);
     }
 }

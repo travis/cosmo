@@ -305,12 +305,44 @@ public class CosmoToICalendarConverter {
             String rule = getFrequency(recurrenceRule.getFrequency())
                     + ";";
             if (recurrenceRule.getEndDate() != null) {
-                java.util.Calendar rruleEndDateCalendar = createCalendar(recurrenceRule.getEndDate());
-                rruleEndDateCalendar.add(java.util.Calendar.DATE,1);
-                String dateString = getDateTimeString(rruleEndDateCalendar, false,
-                        false);
-                rule += "UNTIL="
-                        + dateString;
+                CosmoDate rruleEndDate = recurrenceRule.getEndDate();
+                if (event.isAllDay() || event.isAnyTime()) {
+                    java.util.Calendar rruleEndDateCalendar = createCalendar(recurrenceRule
+                            .getEndDate());
+                    String dateString = getDateTimeString(rruleEndDateCalendar,
+                            false, false);
+                    rule += "UNTIL=" + dateString;
+                } else {
+                    if (!StringUtils.isEmpty(event.getStart().getTzId())){
+                        java.util.Calendar endDateCalendar = getCalendar(((DateTime) dtStart
+                                .getDate()).getTimeZone());
+                        endDateCalendar.set(java.util.Calendar.YEAR, rruleEndDate.getYear());
+                        endDateCalendar.set(java.util.Calendar.MONTH, rruleEndDate.getMonth());
+                        endDateCalendar.set(java.util.Calendar.DATE, rruleEndDate.getDate());
+                        endDateCalendar.set(java.util.Calendar.HOUR_OF_DAY, 23);
+                        endDateCalendar.set(java.util.Calendar.MINUTE, 59);
+                        endDateCalendar.set(java.util.Calendar.SECOND, 59);
+                        long timeInMillis = endDateCalendar.getTimeInMillis();
+                        endDateCalendar = java.util.Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                        endDateCalendar.setTimeInMillis(timeInMillis);
+                        String dateString = getDateTimeString(endDateCalendar, true, true);
+                        rule += "UNTIL=" + dateString;
+                    } else {
+                        // a floating recurring event
+                        java.util.Calendar endDateCalendar = java.util.Calendar.getInstance();
+                        endDateCalendar.set(java.util.Calendar.YEAR,
+                                rruleEndDate.getYear());
+                        endDateCalendar.set(java.util.Calendar.MONTH,
+                                rruleEndDate.getMonth());
+                        endDateCalendar.set(java.util.Calendar.DATE,
+                                rruleEndDate.getDate());
+                        endDateCalendar.set(java.util.Calendar.HOUR_OF_DAY, 23);
+                        endDateCalendar.set(java.util.Calendar.MINUTE, 59);
+                        endDateCalendar.set(java.util.Calendar.SECOND, 59);
+                        String dateString = getDateTimeString(endDateCalendar, true,false);
+                        rule += "UNTIL=" + dateString;
+                    }
+                }
             }
             try {
                 RRule rrule = new RRule(new Recur(rule));
@@ -670,5 +702,13 @@ public class CosmoToICalendarConverter {
             }
         }
     }
+    
+   private java.util.Calendar getCalendar(java.util.TimeZone tz){
+       if (tz == null){
+           return java.util.Calendar.getInstance();
+       } else {
+           return java.util.Calendar.getInstance(tz);
+       }
+   }
     
 }

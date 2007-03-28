@@ -15,166 +15,128 @@
  */
 package org.osaf.cosmo.eim.schema.event;
 
-import java.io.StringReader;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
-import net.fortuna.ical4j.model.Date;
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.component.VAlarm;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.Trigger;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.EimRecord;
-import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
-import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.eim.schema.text.DurationFormat;
+import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.Stamp;
 
 /**
  * Generates EIM records from event stamps.
  *
- * @see EventStamp
+ * @see BaseEventStamp
  */
 public class EventGenerator extends BaseStampGenerator
     implements EventConstants {
     private static final Log log =
         LogFactory.getLog(EventGenerator.class);
 
+    private static final HashSet<String> STAMP_TYPES = new HashSet<String>(2);
+    
+    static {
+        STAMP_TYPES.add("event");
+        STAMP_TYPES.add("eventexception");
+    }
+   
     /** */
     public EventGenerator(Item item) {
         super(PREFIX_EVENT, NS_EVENT, item);
-        setStamp(EventStamp.getStamp(item));
+        setStamp(BaseEventStamp.getStamp(item));
+    }
+    
+    @Override
+    protected Set<String> getStampTypes() {
+        return STAMP_TYPES;
     }
 
     /**
-     * Copies event properties and attributes into a event record.
+     * Adds records representing the master event and its display
+     * alarm (if one exists).
      */
-    public List<EimRecord> generateRecords() {
-        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+    protected void addRecords(List<EimRecord> records) {
+        BaseEventStamp stamp = (BaseEventStamp) getStamp();
+        if (stamp == null)
+            return;
 
-        EventStamp event = (EventStamp) getStamp();
-        if (event == null)
-            return records;
+        EimRecord record = new EimRecord(getPrefix(), getNamespace());
+        addKeyFields(record);
+        addFields(record);
+        records.add(record);
+    }
+    
+    /**
+     * Adds a key field for uuid.
+     */
+    protected void addKeyFields(EimRecord record) {
+        record.addKeyField(new TextField(FIELD_UUID, getItem().getUid()));
+    }
 
-        EimRecord master = new EimRecord(getPrefix(), getNamespace());
+    private void addFields(EimRecord record) {
+        BaseEventStamp stamp = (BaseEventStamp) getStamp();
+
         String value = null;
 
-        master.addKeyField(new TextField(FIELD_UUID, event.getItem().getUid()));
-
-        value = EimValueConverter.fromICalDate(event.getStartDate(),
-                                               event.isAnyTime());
-        master.addField(new TextField(FIELD_DTSTART, value));
-                                      
-        value = EimValueConverter.fromICalDate(event.getEndDate());
-        master.addField(new TextField(FIELD_DTEND, value));
-
-        master.addField(new TextField(FIELD_LOCATION, event.getLocation()));
-
-        value = EimValueConverter.fromICalRecurs(event.getRecurrenceRules());
-        master.addField(new TextField(FIELD_RRULE, value));
-
-        value = EimValueConverter.fromICalRecurs(event.getExceptionRules());
-        master.addField(new TextField(FIELD_EXRULE, value));
-
-        value = EimValueConverter.fromICalDates(event.getRecurrenceDates());
-        master.addField(new TextField(FIELD_RDATE, value));
-
-        value = EimValueConverter.fromICalDates(event.getExceptionDates());
-        master.addField(new TextField(FIELD_EXDATE, value));
-
-        master.addField(new TextField(FIELD_STATUS, event.getStatus()));
-
-        master.addFields(generateUnknownFields());
-
-        records.add(master);
+        if(isMissingAttribute("startDate") && isMissingAttribute("anyTime")) {
+            record.addField(generateMissingField(new TextField(FIELD_DTSTART, null)));
+        } else {
         
-        // generate alarm record;
-        VAlarm alarm = event.getDisplayAlarm(null);
-        if(alarm != null)
-            records.add(generateAlarmRecord(alarm, null));
-
-        // generate modification records
-        for (VEvent override : event.getModifications()) {
-            EimRecord overrideRec = new EimRecord(PREFIX_EVENT_MODIFICATION,
-                    NS_EVENT_MODIFICATION);
-            overrideRec.addKeyField(new TextField(FIELD_UUID, event.getItem()
-                    .getUid()));
-
-            value = EimValueConverter.fromICalDate(override.getReccurrenceId()
-                    .getDate());
-            overrideRec.addKeyField(new TextField(FIELD_RECURRENCE_ID, value));
-
-            value = EimValueConverter.fromICalDate(override.getStartDate()
-                    .getDate());
-            overrideRec.addField(new TextField(FIELD_DTSTART, value));
-
-            value = EimValueConverter.fromICalDate(override.getEndDate()
-                    .getDate());
-            overrideRec.addField(new TextField(FIELD_DTEND, value));
-
-            Property prop = override.getProperties().getProperty(
-                    Property.LOCATION);
-            value = (prop == null) ? null : prop.getValue();
-            overrideRec.addField(new TextField(FIELD_LOCATION, value));
-
-            prop = override.getProperties().getProperty(Property.STATUS);
-            value = (prop == null) ? null : prop.getValue();
-            overrideRec.addField(new TextField(FIELD_STATUS, value));
-
-            prop = override.getProperties().getProperty(Property.SUMMARY);
-            value = (prop == null) ? null : prop.getValue();
-            overrideRec.addField(new TextField(FIELD_DISPLAY_NAME, value));
-
-            prop = override.getProperties().getProperty(Property.DESCRIPTION);
-            value = (prop == null) ? null : prop.getValue();
-            overrideRec.addField(new ClobField(FIELD_BODY, new StringReader(
-                    value)));
-
-            records.add(overrideRec);
-            Date recurrenceId = override.getReccurrenceId().getDate();
-            alarm = event.getDisplayAlarm(recurrenceId);
-            
-            if (alarm != null)
-                records.add(generateAlarmRecord(alarm, recurrenceId));
+            value = EimValueConverter.fromICalDate(stamp.getStartDate(),
+                                                   stamp.isAnyTime());
+            record.addField(new TextField(FIELD_DTSTART, value));
         }
+         
+        if(isMissingAttribute("duration")) {
+            record.addField(generateMissingField(new TextField(FIELD_DURATION, null)));
+        } else {
+            value = DurationFormat.getInstance().format(stamp.getDuration());
+            record.addField(new TextField(FIELD_DURATION, value));
+        }
+        
+        if(isMissingAttribute("location")) {
+            record.addField(generateMissingField(new TextField(FIELD_LOCATION, null)));
+        } else {
+            record.addField(new TextField(FIELD_LOCATION, stamp.getLocation()));
+        }
+        
+        value = EimValueConverter.fromICalRecurs(stamp.getRecurrenceRules());
+        record.addField(new TextField(FIELD_RRULE, value));
 
-        return records;
+        value = EimValueConverter.fromICalRecurs(stamp.getExceptionRules());
+        record.addField(new TextField(FIELD_EXRULE, value));
+
+        value = EimValueConverter.fromICalDates(stamp.getRecurrenceDates());
+        record.addField(new TextField(FIELD_RDATE, value));
+
+        value = EimValueConverter.fromICalDates(stamp.getExceptionDates());
+        record.addField(new TextField(FIELD_EXDATE, value));
+
+        if(isMissingAttribute("status")) {
+            record.addField(generateMissingField(new TextField(FIELD_STATUS, null)));
+        } else {
+            record.addField(new TextField(FIELD_STATUS, stamp.getStatus()));
+        }
+        
+        record.addFields(generateUnknownFields());
     }
     
-    /**
-     * Create display alarm eim record.
-     */
-    private EimRecord generateAlarmRecord(VAlarm alarm, Date recurrenceId) {
-        EventStamp event = (EventStamp) getStamp();
+    @Override
+    protected Stamp getParentStamp() {
+        NoteItem noteMod = (NoteItem) getItem();
+        NoteItem parentNote = noteMod.getModifies();
         
-        EimRecord alarmRec = new EimRecord(PREFIX_DISPLAY_ALARM, NS_DISPLAY_ALARM);
-        alarmRec.addKeyField(new TextField(FIELD_UUID, event.getItem().getUid()));
-
-        if(recurrenceId!=null)
-            alarmRec.addKeyField(new TextField(FIELD_RECURRENCE_ID, EimValueConverter.fromICalDate(recurrenceId)));
-        
-        Property prop = alarm.getProperties().getProperty(Property.DESCRIPTION);
-        String value = (prop==null) ? null : prop.getValue();
-        alarmRec.addField(new TextField(FIELD_DESCRIPTION, value));
-        
-        value = EimValueConverter.fromIcalTrigger((Trigger) alarm.getProperties().getProperty(Property.TRIGGER));
-        alarmRec.addField(new TextField(FIELD_TRIGGER, value));
-        
-        prop = alarm.getProperties().getProperty(Property.DURATION);
-        value = (prop==null) ? null : prop.getValue();
-        alarmRec.addField(new TextField(FIELD_DURATION, value));
-        
-        prop = alarm.getProperties().getProperty(Property.REPEAT);
-        value = (prop==null) ? null : prop.getValue();
-        alarmRec.addField(new IntegerField(FIELD_REPEAT, new Integer(value))); 
-        
-        return alarmRec;
+        if(parentNote!=null)
+            return parentNote.getStamp(BaseEventStamp.class);
+        else
+            return null;
     }
-    
 }

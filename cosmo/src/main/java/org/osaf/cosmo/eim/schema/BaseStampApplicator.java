@@ -15,15 +15,13 @@
  */
 package org.osaf.cosmo.eim.schema;
 
-import java.util.List;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for schema applicators that map to <code>Stamp</code>s.
@@ -51,11 +49,12 @@ public abstract class BaseStampApplicator extends BaseApplicator {
      * If the record is marked deleted, then
      * {@link #applyDeletion(EimRecord)} is called.
      * <p>
+     * Otherwise:
+     * <p>
      * If the stamp corresponding to this record does not already
      * exist, then {@link #createStamp()} is called.
      * <p>
-     * If the record is not marked deleted, then
-     * {@link #applyField(EimRecordField)} is called for each
+     * Finally, {@link #applyField(EimRecordField)} is called for each
      * non-key record field.
      * 
      * @throws IllegalArgumentException if the record's namespace does
@@ -67,18 +66,23 @@ public abstract class BaseStampApplicator extends BaseApplicator {
      */
     public void applyRecord(EimRecord record)
         throws EimSchemaException {
-        if (getNamespace() != null &&
-            ! record.getNamespace().equals(getNamespace()))
+        if (! (getNamespace() != null &&
+               record.getNamespace() != null &&
+               record.getNamespace().equals(getNamespace())))
             throw new IllegalArgumentException("Record namespace " + record.getNamespace() + " does not match " + getNamespace());
-        
+
+        if (log.isDebugEnabled())
+            log.debug("applying record " + getNamespace());
+
         if (record.isDeleted()) {
             applyDeletion(record);
             return;
         }
 
         if (stamp == null) {
-            stamp = createStamp();
-            getItem().addStamp(stamp);
+            stamp = createStamp(record);
+            if (getItem() != null)
+                getItem().addStamp(stamp);
         }
 
         for (EimRecordField field : record.getFields()) {
@@ -92,7 +96,7 @@ public abstract class BaseStampApplicator extends BaseApplicator {
      * stamp record is applied to an item that does not already have
      * that stamp.
      */
-    protected abstract Stamp createStamp();
+    protected abstract Stamp createStamp(EimRecord record) throws EimSchemaException;
 
     /**
      * Deletes the stamp.
@@ -102,7 +106,7 @@ public abstract class BaseStampApplicator extends BaseApplicator {
      */
     protected void applyDeletion(EimRecord record)
         throws EimSchemaException {
-        if (stamp != null)
+        if (stamp != null && getItem() != null)
             getItem().removeStamp(stamp);
     }
 
@@ -129,4 +133,36 @@ public abstract class BaseStampApplicator extends BaseApplicator {
     protected void setStamp(Stamp stamp) {
         this.stamp = stamp;
     }
+
+    
+    /**
+     * Need to override to handle copying attribute from stamp to parent stamp.
+     */
+    @Override
+    protected void handleMissingAttribute(String attribute) throws EimSchemaException {
+        if (!isModification())
+            throw new EimSchemaException(
+                    "missing attributes not support on non-modification items");
+
+        Stamp modStamp = getStamp();
+        Stamp parentStamp = getParentStamp();
+        
+        if(parentStamp==null)
+            throw new EimSchemaException("no parent to inherit missing attribute from");
+        
+        handleMissingAttribute(attribute, modStamp, parentStamp);
+    }
+    
+    /**
+     * Get the parent stamp from the current stamp.
+     * @return parent stamp
+     */
+    protected Stamp getParentStamp() {
+        NoteItem noteMod = (NoteItem) getItem();
+        NoteItem parentNote = noteMod.getModifies();
+        
+        Stamp modStamp = getStamp();
+        return parentNote.getStamp(modStamp.getClass());
+    }
+    
 }

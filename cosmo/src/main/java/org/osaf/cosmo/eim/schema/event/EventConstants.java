@@ -24,11 +24,11 @@ public interface EventConstants {
     /** */
     public static final String FIELD_DTSTART = "dtstart";
     /** */
-    public static final int MAXLEN_DTSTART = 20;
+    public static final int MAXLEN_DTSTART = 256;
     /** */
-    public static final String FIELD_DTEND = "dtend";
+    public static final String FIELD_DURATION = "duration";
     /** */
-    public static final int MAXLEN_DTEND = 20;
+    public static final int MAXLEN_DURATION = 40;
     /** */
     public static final String FIELD_LOCATION = "location";
     /** */
@@ -50,10 +50,6 @@ public interface EventConstants {
     /** */
     public static final int MAXLEN_EXDATE = 1024;
     /** */
-    public static final String FIELD_RECURRENCE_ID = "recurrenceId";
-    /** */
-    public static final int MAXLEN_RECURRENCE_ID = 20;
-    /** */
     public static final String FIELD_STATUS = "status";
     /** */
     public static final int MAXLEN_STATUS = 256;
@@ -63,18 +59,4 @@ public interface EventConstants {
     public static final String FIELD_DISPLAY_NAME = "displayName";
     /** */
     public static final int MAXLEN_DISPLAY_NAME = 256;
-    /** */
-    public static final String FIELD_TRIGGER = "trigger";
-    /** */
-    public static final int MAXLEN_TRIGGER = 32;
-    /** */
-    public static final String FIELD_DESCRIPTION = "description";
-    /** */
-    public static final int MAXLEN_DESCRIPTION = 1024;
-    /** */
-    public static final String FIELD_DURATION = "duration";
-    /** */
-    public static final int MAXLEN_DURATION = 32;
-    /** */
-    public static final String FIELD_REPEAT = "repeat";
 }

@@ -22,6 +22,7 @@ import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
 
 /**
  * Mock implementation of <code>CalendarDao</code> useful for testing.
@@ -76,5 +77,11 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
         // TODO implement
         return null;
     }
+
+    public void indexEvent(EventStamp eventStamp) {
+        // TODO implement
+    }
+    
+    
     
 }

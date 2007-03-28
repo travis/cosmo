@@ -53,6 +53,7 @@ public class HibernateTestHelper {
         Assert.assertEquals(item1.getName(), item2.getName());
         Assert.assertEquals(item1.getCreationDate(), item2.getCreationDate());
         Assert.assertEquals(item1.getClientCreationDate(), item2.getClientCreationDate());
+        Assert.assertEquals(item1.getClientModifiedDate(), item2.getClientModifiedDate());
         Assert.assertEquals(item1.getModifiedDate(), item2.getModifiedDate());
         Assert.assertEquals(item1.getDisplayName(), item2.getDisplayName());
         Assert.assertEquals(item1.getId(), item2.getId());

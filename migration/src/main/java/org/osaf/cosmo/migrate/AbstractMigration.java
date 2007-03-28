@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,6 +51,10 @@ public abstract class AbstractMigration implements Migration {
     private String toVersion = null;
     
     public void migrate(Connection conn, String dialect) throws Exception {
+        
+        if(getSupportedDialects().contains(dialect)==false)
+            throw new UnsupportedDialectException("Unsupported dialect " + dialect);
+        
         migrateSchema(conn, dialect);
         migrateData(conn, dialect);
         migrateSchemaCleanup(conn, dialect);
@@ -109,6 +114,11 @@ public abstract class AbstractMigration implements Migration {
      */
     protected abstract void migrateData(Connection conn, String dialect) throws Exception;
     
+    /**
+     * @return supported dialects
+     */
+    public abstract List<String> getSupportedDialects();
+    
     protected void migrateSchemaCleanup(Connection conn, String dialect) throws Exception {
         
         String resourceName = "/" + getPostMigrationUpdateFileName(dialect);
@@ -149,5 +159,4 @@ public abstract class AbstractMigration implements Migration {
     private String getPostMigrationUpdateFileName(String dialect) {
         return getBaseFileName(dialect) + "-post.sql";
     }
-
 }

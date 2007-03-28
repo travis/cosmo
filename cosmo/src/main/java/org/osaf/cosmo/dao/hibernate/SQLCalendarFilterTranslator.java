@@ -357,7 +357,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
     private String generateSQL(String timeRangeWhere, int timeRangeJoins,
             String attributeWhere, int attributeJoins) {
         StringBuffer buf = new StringBuffer();
-        buf.append("select distinct i.* from item i");
+        buf.append("select distinct i.* from item i, collection_item ci");
 
         for (int i = 1; i <= attributeJoins; i++)
             buf.append(", cal_property_index cpi" + i);
@@ -365,7 +365,7 @@ public class SQLCalendarFilterTranslator implements CalendarFilterTranslator {
         for (int i = 1; i <= timeRangeJoins; i++)
             buf.append(", cal_timerange_index ctri" + i);
 
-        buf.append(" where i.parentid=:parentid and i.isactive=1");
+        buf.append(" where ci.itemid=i.id and ci.collectionid=:parentid and i.isactive=1");
 
         for (int i = 1; i <= attributeJoins; i++)
             buf.append(" and cpi" + i + ".itemid=i.id");

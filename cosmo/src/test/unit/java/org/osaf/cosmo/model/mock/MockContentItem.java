@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.model.mock;
 
-import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.NoteItem;
 
 
 
@@ -24,7 +24,7 @@ import org.osaf.cosmo.model.ContentItem;
  * This is useful for tests that depend on this id 
  * being set.
  */
-public class MockContentItem extends ContentItem {
+public class MockContentItem extends NoteItem {
     Long mockId = new Long(-1);
     Integer mockVersion = new Integer(0);
     

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.CollectionPath;
+import org.osaf.cosmo.server.ItemPath;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.util.PathUtil;
 
@@ -41,6 +43,7 @@ public class OwnerVoter implements AccessDecisionVoter {
     private static final Log log = LogFactory.getLog(OwnerVoter.class);
 
     private ContentService contentService;
+    private boolean indirectlyAddressable = false;
 
     /**
      * Votes affirmatively if the authenticated principal is a user
@@ -76,17 +79,128 @@ public class OwnerVoter implements AccessDecisionVoter {
         CosmoUserDetails details =
             (CosmoUserDetails) authentication.getPrincipal();
 
-        Item item = findItem(path, true);
-        if (item == null) {
-            log.warn("Item at " + path + " not found; abstaining");
-            return ACCESS_ABSTAIN;
+        // an item is said to be "directly addressed" if the path
+        // addresses a collection or item but does not have additional
+        // path info.
+        //
+        // a collection or item is said to be "indirectly addressed"
+        // if the path addresses a collection and includes additional
+        // path info addressing a descendent collection or item.
+        //
+        // the possible outcomes of path resolution are:
+        //
+        // 1) a directly addressed item exists - proceed to owner check
+        // 2) a directly addressed item does not exist - granted, as
+        //    the protocol layer will interpret this as a request to
+        //    create the directly addressed item or will return a "not
+        //    found" response
+        // 3) an indirectly addressed item exists - proceed to owner check
+        // 4) an indirectly addressed item does not exist, but its
+        //    parent exists - proceed to owner check, as the protocol
+        //    layer will interpret this as a request to create the
+        //    indirectly addressed child item or will return a "not
+        //    found" response
+        // 5) an indirectly addressed item does not exist, and its
+        //    parent does not exist - causes abstention, as we can't
+        //    find enough information to make a decision
+
+        Item item = null;
+
+        CollectionPath cp = CollectionPath.parse(path, true);
+        if (cp != null) {
+            if (cp.getPathInfo() != null) {
+                if (indirectlyAddressable) {
+                    // find indirectly addressed item
+                    item = contentService.
+                        findItemByPath(cp.getPathInfo(), cp.getUid());
+                    if (item == null) {
+                        // find indirectly addressed item's parent
+                        String parentPath =
+                            PathUtil.getParentPath(cp.getPathInfo());
+                        item = contentService.
+                            findItemByPath(parentPath, cp.getUid());
+                        if (item == null) {
+                            // case 5
+                            if (log.isDebugEnabled())
+                                log.debug("Indirectly addressed item at " + path + " not found and parent not found; abstaining");
+                            return ACCESS_ABSTAIN;
+                        }
+                        // case 4
+                        if (log.isDebugEnabled())
+                            log.debug("Indirectly addressed item at " + path + " not found but parent found; proceeding to owner check");
+                        return checkOwnership(details.getUser(), item);
+                    }
+                    // case 3
+                    if (log.isDebugEnabled())
+                        log.debug("Indirectly addressed item at " + path + " found; proceeding to owner check");
+                    return checkOwnership(details.getUser(), item);
+                }
+                if (log.isDebugEnabled())
+                    log.debug("Ignoring extra path info found since indirect addressing is not allowed");
+            }
+
+            // find directly addressed collection
+            item = contentService.findItemByUid(cp.getUid());
+            if (item == null) {
+                // case 2
+                if (log.isDebugEnabled())
+                    log.debug("Directly addressed item at " + path + " not found; allowing");
+                return ACCESS_GRANTED;
+            }
+            // case 1
+            if (log.isDebugEnabled())
+                log.debug("Directly addressed item at " + path + " found; proceeding to owner check");
+            return checkOwnership(details.getUser(), item);
         }
 
-        if (log.isDebugEnabled())
-            log.debug("Checking ownership of item at " + path +
-                      " by user " + details.getUser().getUsername());
+        ItemPath ip = ItemPath.parse(path);
+        if (ip != null) {
+            // find directly addressed item
+            item = contentService.findItemByUid(ip.getUid());
+            if (item == null) {
+                // case 2
+                if (log.isDebugEnabled())
+                    log.debug("Directly addressed item at " + path + " not found; allowing");
+                return ACCESS_GRANTED;
+            }
+            // case 1
+            if (log.isDebugEnabled())
+                log.debug("Directly addressed item at " + path + " found; proceeding to owner check");
+            return checkOwnership(details.getUser(), item);
+        }
 
-        if (! item.getOwner().equals(details.getUser())) {
+        // fall back to old-school hierarchical path resolution. these
+        // paths are treated just like indirect addressing except that
+        // items are looked up relative to the user's root collection.
+
+        item = contentService.findItemByPath(path);
+        if (item == null) {
+            String parentPath = PathUtil.getParentPath(path);
+            item = contentService.findItemByPath(parentPath);
+            if (item == null) {
+                // case 5
+                if (log.isDebugEnabled())
+                    log.debug("Hierarchically addressed item at " + path + " not found and parent not found; abstaining");
+                return ACCESS_ABSTAIN;
+            }
+            // case 4
+            if (log.isDebugEnabled())
+                log.debug("Hierarchically addressed item at " + path + " not found but parent found; proceeding to owner check");
+            return checkOwnership(details.getUser(), item);
+        }
+        // case 3
+        if (log.isDebugEnabled())
+            log.debug("Hierarchically addressed item at " + path + " found; proceeding to owner check");
+        return checkOwnership(details.getUser(), item);
+    }
+
+    private int checkOwnership(User principal,
+                               Item item) {
+        if (log.isDebugEnabled())
+            log.debug("Checking ownership of item " + item.getUid() +
+                      " by user " + principal.getUsername());
+
+        if (! item.getOwner().equals(principal)) {
             if (log.isDebugEnabled())
                 log.debug("User not owner - access denied");
             return ACCESS_DENIED;
@@ -123,19 +237,13 @@ public class OwnerVoter implements AccessDecisionVoter {
         contentService = service;
     }
 
-    private Item findItem(String path,
-                          boolean checkParent) {
-        CollectionPath cp = CollectionPath.parse(path);
-        if (cp != null) {
-            return contentService.findItemByUid(cp.getUid());
-        } else {
-            Item item = contentService.findItemByPath(path);
-            if (item == null)
-                // this might be a PUT - if so, check to see if there
-                // is a parent that the user owns
-                if (checkParent)
-                    return findItem(PathUtil.getParentPath(path), false);
-            return item;
-        }
+    /** */
+    public boolean isIndirectlyAddressable() {
+        return indirectlyAddressable;
+    }
+
+    /** */
+    public void setIndirectlyAddressable(boolean indirectlyAddressable) {
+        this.indirectlyAddressable = indirectlyAddressable;
     }
 }

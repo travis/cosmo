@@ -28,10 +28,12 @@ import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.ValidationException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dao.NoSuchResourceException;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
@@ -40,6 +42,8 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.Permission;
+import org.osaf.cosmo.server.CollectionPath;
+import org.osaf.cosmo.server.ItemPath;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.ui.bean.CalendarBean;
 import org.osaf.cosmo.ui.bean.EventBean;
@@ -59,7 +63,8 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
  * <code>TitleParam</code> request attribute which can be used by
  * views to render dynamic page titles.
  */
-public class AccountBrowsingController extends MultiActionController {
+public class AccountBrowsingController extends MultiActionController
+    implements ICalendarConstants {
     private static final Log log =
         LogFactory.getLog(AccountBrowsingController.class);
 
@@ -226,12 +231,14 @@ public class AccountBrowsingController extends MultiActionController {
 
         if (item.getStamp(EventStamp.class) != null) {
             spoolEvent(EventStamp.getStamp(item), request,
-                    response);
+                       response);
+            return null;
         } else if (item instanceof ContentItem) {
             spoolItem((ContentItem) item, request, response);
             return null;
         } else if (item.getStamp(CalendarCollectionStamp.class) != null) {
-            spoolCalendar(CalendarCollectionStamp.getStamp(item), request, response);
+            spoolCalendar(CalendarCollectionStamp.getStamp(item), request,
+                          response);
             return null;
         }
         throw new ServletException("item of type " + item.getClass().getName()
@@ -316,10 +323,22 @@ public class AccountBrowsingController extends MultiActionController {
     }
 
     private Item getItem(String path) {
+        // download paths look like /collection/<uid>/<filename>
+        // other paths look like /foo/bar/baz
+
+        CollectionPath cp = CollectionPath.parse(path, true);
+        if (cp != null)
+            return contentService.findItemByUid(cp.getUid());
+
+        ItemPath ip = ItemPath.parse(path, true);
+        if (ip != null)
+            return contentService.findItemByUid(ip.getUid());
+
         Item item = contentService.findItemByPath(path);
-        if (item == null)
-            throw new NoSuchResourceException(path);
-        return item;
+        if (item != null)
+            return item;
+
+        throw new NoSuchResourceException(path);
     }
 
     private void addTitleParam(HttpServletRequest request, String param) {
@@ -331,72 +350,71 @@ public class AccountBrowsingController extends MultiActionController {
         params.add(param);
     }
 
-    private void spoolItem(ContentItem item, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    private void spoolItem(ContentItem item,
+                           HttpServletRequest request,
+                           HttpServletResponse response)
+        throws IOException {
+        if (log.isDebugEnabled())
+            log.debug("spooling item " + item.getUid());
+
         // set headers
         response.setStatus(HttpServletResponse.SC_OK);
-        if (item.getContentType() != null) {
+        if (item.getContentType() != null)
             response.setContentType(item.getContentType());
-        } else {
+        else
             response.setContentType("application/octet-stream");
-        }
-        if (item.getContentLength() != null) {
+        if (item.getContentLength() != null)
             response.setContentLength(item.getContentLength().intValue());
-        }
-        if (item.getContentEncoding() != null) {
+        if (item.getContentEncoding() != null)
             response.setCharacterEncoding(item.getContentEncoding());
-        }
-        if (item.getContentLanguage() != null) {
+        if (item.getContentLanguage() != null)
             response.setHeader("Content-Language", item.getContentLanguage());
-        }
+        response.setHeader("Content-Disposition",
+                           makeContentDisposition(item));
 
         // spool data
-        OutputStream out = response.getOutputStream();
-        // XXX no stram api on ContentItem
-        out.write(item.getContent());
-        // InputStream in = item.getContent();
-        // try {
-        // byte[] buffer = new byte[8192];
-        // int read;
-        // while ((read = in.read(buffer)) >= 0) {
-        // out.write(buffer, 0, read);
-        // }
-        // } finally {
-        // in.close();
-        // }
+        if (item.getContentLength() > 0)
+            IOUtils.copy(item.getContentInputStream(),
+                         response.getOutputStream());
         response.flushBuffer();
     }
 
-    private void spoolEvent(EventStamp event, HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ParserException {
+    private void spoolEvent(EventStamp event,
+                            HttpServletRequest request,
+                            HttpServletResponse response)
+        throws IOException, ParserException, ValidationException {
+        if (log.isDebugEnabled())
+            log.debug("spooling event " + event.getItem().getUid());
+
         response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("text/calendar");
+        response.setContentType(ICALENDAR_MEDIA_TYPE);
         response.setCharacterEncoding("UTF-8");
-        
+        response.setHeader("Content-Disposition",
+                           makeCalendarContentDisposition(event.getItem()));
+
         // spool data
         CalendarOutputter outputter = new CalendarOutputter();
              
         // since the content was validated when the event item was
         // imported, there's no need to do it here
         outputter.setValidating(false);
-        try {
-            outputter.output(event.getCalendar(), response
-                    .getOutputStream());
-        } catch (ValidationException e) {
-            log.error("invalid output calendar?!", e);
-        }
+        outputter.output(event.getCalendar(), response.getOutputStream());
         response.flushBuffer();
     }
     
     private void spoolCalendar(CalendarCollectionStamp calendar,
-            HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ParserException {
+                               HttpServletRequest request,
+                               HttpServletResponse response)
+        throws IOException, ParserException, ValidationException {
+        if (log.isDebugEnabled())
+            log.debug("spooling calendar " + calendar.getItem().getUid());
+
         // set headers
         response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("text/calendar");
+        response.setContentType(ICALENDAR_MEDIA_TYPE);
         response.setCharacterEncoding("UTF-8");
-        // XXX we can't know content length unless we write to a temp
-        // item and then spool that
+        response.setHeader("Content-Disposition",
+                           makeCalendarContentDisposition(calendar.getItem()));
 
         // spool data
         CalendarOutputter outputter = new CalendarOutputter();
@@ -404,12 +422,20 @@ public class AccountBrowsingController extends MultiActionController {
         // since the content was validated when the event item was
         // imported, there's no need to do it here
         outputter.setValidating(false);
-        try {
-            outputter.output(calendar.getCalendar(), response
-                    .getOutputStream());
-        } catch (ValidationException e) {
-            log.error("invalid output calendar?!", e);
-        }
+        outputter.output(calendar.getCalendar(), response.getOutputStream());
         response.flushBuffer();
+    }
+
+    private String makeContentDisposition(String filename) {
+        return "attachment; filename=\"" + filename + "\"";
+    }
+
+    private String makeContentDisposition(Item item) {
+        return makeContentDisposition(item.getDisplayName());
+    }
+
+    private String makeCalendarContentDisposition(Item item) {
+        return makeContentDisposition(item.getDisplayName() + "." +
+                                      ICALENDAR_FILE_EXTENSION);
     }
 }

@@ -40,7 +40,6 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Timezone;
 
 
@@ -93,10 +92,17 @@ public class CalendarCollectionStamp extends Stamp implements
     }
 
     public Stamp copy(Item item) {
+        Calendar tz = null;
+        try {
+            tz = new Calendar(timezone);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot copy timezone calendar", e);
+        }
+
         CalendarCollectionStamp stamp = new CalendarCollectionStamp();
         stamp.language = language;
         stamp.description = description;
-        stamp.timezone = CalendarUtils.copyCalendar(timezone);
+        stamp.timezone = tz;
         stamp.setSupportedComponents(new HashSet<String>(getSupportedComponents()));
         return stamp;
     }
@@ -160,6 +166,17 @@ public class CalendarCollectionStamp extends Stamp implements
     @Timezone
     public Calendar getTimezone() {
         return timezone;
+    }
+
+    /**
+     * @return name of timezone if one is set
+     */
+    @Transient
+    public String getTimezoneName() {
+        if (timezone == null)
+            return null;
+        return timezone.getComponents().getComponent(Component.VTIMEZONE).
+            getProperties().getProperty(Property.TZID).getValue();
     }
 
     /**

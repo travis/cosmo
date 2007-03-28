@@ -16,7 +16,6 @@
 package org.osaf.cosmo.eim.schema.note;
 
 import java.io.Reader;
-import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,7 +24,7 @@ import org.osaf.cosmo.eim.schema.BaseItemApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValidationException;
-import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 
@@ -59,23 +58,32 @@ public class NoteApplicator extends BaseItemApplicator
         NoteItem note = (NoteItem) getItem();
 
         if (field.getName().equals(FIELD_BODY)) {
-            Reader value = EimFieldValidator.validateClob(field);
-            note.setBody(value);
-            
-            // NoteItem.body == EventStamp.getDescription()
+            if(field.isMissing()) {
+                handleMissingAttribute("body");
+            }
+            else {
+                Reader value = EimFieldValidator.validateClob(field);
+                note.setBody(value);
+            }
+
+            // NoteItem.body == BaseEventStamp.getDescription()
             // For now, we have to keep the NoteItem and
-            // EventStamp in sync, otherwise an update by Chander
+            // BaseEventStamp in sync, otherwise an update by Chander
             // to NoteItem will not propogate to a CalDAV client.
-            EventStamp eventStamp = EventStamp.getStamp(note);
-            if(eventStamp!=null)
+            BaseEventStamp eventStamp = BaseEventStamp.getStamp(note);
+            if(eventStamp!=null) {
                 eventStamp.setDescription(note.getBody());
+            }
+            
         } else if (field.getName().equals(FIELD_ICALUID)) {
-            String value =
-                EimFieldValidator.validateText(field, MAXLEN_ICALUID);
-            note.setIcalUid(value);
-        } else if(field.getName().equals(FIELD_REMINDER_TIME)) {
-            Date value = EimFieldValidator.validateTimeStamp(field);
-            note.setReminderTime(value);
+            if(field.isMissing()) {
+                handleMissingAttribute("icalUid");
+            }
+            else {
+                String value =
+                    EimFieldValidator.validateText(field, MAXLEN_ICALUID);
+                note.setIcalUid(value);
+            }
         } else {
             applyUnknownField(field);
         }

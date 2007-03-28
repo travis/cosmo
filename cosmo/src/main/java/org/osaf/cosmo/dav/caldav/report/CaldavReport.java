@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,8 @@ import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ValidationException;
-import net.fortuna.ical4j.model.filter.OutputFilter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,6 +34,7 @@ import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
+import org.osaf.cosmo.calendar.data.OutputFilter;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dav.ExtendedDavResource;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
@@ -205,33 +204,12 @@ public abstract class CaldavReport
      */
     protected String readCalendarData(DavCalendarResource resource)
         throws DavException {
-        
-        Calendar calendar = resource.getCalendar();
-        String calendarData = calendar.toString();
-        
-        if (outputFilter != null) {
-            try {
-                
-                // filter the output
-                StringWriter out = new StringWriter();
-                CalendarOutputter outputter = new CalendarOutputter();
-                outputter.output(calendar, out, outputFilter);
-                calendarData = out.toString();
-                out.close();
-
-                // NB ical4j's outputter may generate \r\n line
-                // ends but we need \n only
-                calendarData = calendarData.replaceAll("\r", "");
-            } catch (IOException e) {
-                log.error("cannot read or filter calendar data for resource " + resource.getResourcePath(), e);
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot read or filter calendar data: " + e.getMessage());
-            } catch (ValidationException e) {
-                log.error("invalid calendar data for resource " + resource.getResourcePath(), e);
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "invalid calendar data: " + e.getMessage());
-            }
-        }
-
-        return calendarData;
+        StringBuffer buffer = new StringBuffer();
+        if (outputFilter != null)
+            outputFilter.filter(resource.getCalendar(), buffer);
+        else
+            buffer.append(resource.getCalendar().toString());
+        return buffer.toString();
     }
 
     /**

@@ -15,17 +15,16 @@
  */
 package org.osaf.cosmo.eim.schema.task;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
-import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampApplicator;
-import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
+import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.TaskStamp;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Applies EIM records to task stamps.
@@ -43,7 +42,7 @@ public class TaskApplicator extends BaseStampApplicator {
     }
 
     /** */
-    protected Stamp createStamp() {
+    protected Stamp createStamp(EimRecord record) throws EimSchemaException {
         return new TaskStamp();
     }
 

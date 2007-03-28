@@ -21,6 +21,7 @@ import cosmo_test_lib
 from cosmo_test_lib import *
 
 CALENDAR = 'calendar'
+FILES_DIR =  os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))+'/files/'
 
 def test_attachment():
     ics = """BEGIN:VCALENDAR
@@ -158,44 +159,6 @@ END:VCALENDAR"""
     client.put('%s/%s/3.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics)
     assert client.response.status == 201
     
-def test_sunbird_allday():
-    
-    ics = """BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Mozilla.org/NONSGML Mozilla Calendar V1.1//EN
-BEGIN:VEVENT
-CREATED:20061027T190852Z
-LAST-MODIFIED:20061027T190852Z
-DTSTAMP:20061027T190852Z
-UID:b83bee1f-0a20-418b-af3f-e8d49b80ddb9
-SUMMARY:test
-CLASS:PUBLIC
-DTSTART;VALUE=DATE;TZID=/mozilla.org/20050126_1/America/Cancun:20061114
-DTEND;VALUE=DATE;TZID=/mozilla.org/20050126_1/America/Cancun:20061115
-LOCATION:test
-END:VEVENT
-BEGIN:VTIMEZONE
-TZID:/mozilla.org/20050126_1/America/Cancun
-X-LIC-LOCATION:America/Cancun
-BEGIN:DAYLIGHT
-TZOFFSETFROM:-0600
-TZOFFSETTO:-0500
-TZNAME:CDT
-DTSTART:19700405T020000
-RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=1SU;BYMONTH=4
-END:DAYLIGHT
-BEGIN:STANDARD
-TZOFFSETFROM:-0500
-TZOFFSETTO:-0600
-TZNAME:CST
-DTSTART:19701025T020000
-RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=10
-END:STANDARD
-END:VTIMEZONE
-END:VCALENDAR"""
-    
-    client.put('%s/%s/sunbird.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics)
-    assert client.response.status == 201
     
     
     

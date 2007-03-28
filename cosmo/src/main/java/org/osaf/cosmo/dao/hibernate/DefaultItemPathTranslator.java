@@ -15,11 +15,11 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -54,6 +54,17 @@ public class DefaultItemPathTranslator implements ItemPathTranslator {
         
     }
     
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.dao.hibernate.ItemPathTranslator#findItemByPath(java.lang.String, org.osaf.cosmo.model.CollectionItem)
+     */
+    public Item findItemByPath(final String path, final CollectionItem root) {
+        return (Item) template.execute(new HibernateCallback() {
+            public Object doInHibernate(Session session){
+                return findItemByPath(session, path, root);
+            }
+        });
+    }
+
     public Item findItemParent(String path) {
         if(path==null)
             return null;
@@ -84,23 +95,6 @@ public class DefaultItemPathTranslator implements ItemPathTranslator {
         return path.substring(lastIndex+1);
     }
 
-    public String getItemPath(Item dbItem) {
-        StringBuffer path = new StringBuffer();
-        LinkedList<String> hierarchy = new LinkedList<String>();
-        hierarchy.addFirst(dbItem.getName());
-        Item currentDbItem = dbItem;
-        while (currentDbItem.getParent() != null) {
-            currentDbItem = currentDbItem.getParent();
-            hierarchy.addFirst(currentDbItem.getName());
-        }
-
-        // hierarchy
-        for (String part : hierarchy)
-            path.append("/" + part);
-
-        return path.toString();
-    }
-
     protected Item findItemByPath(Session session, String path) {
         
         if(path==null || "".equals(path))
@@ -125,6 +119,32 @@ public class DefaultItemPathTranslator implements ItemPathTranslator {
 
         Item parentItem = rootItem;
         for (int i = 1; i < segments.length; i++) {
+            Item nextItem = findItemByParentAndName(session, parentItem,
+                    segments[i]);
+            parentItem = nextItem;
+            // if any parent item doesn't exist then bail now
+            if (parentItem == null)
+                return null;
+        }
+
+        return parentItem;
+    }
+    
+    protected Item findItemByPath(Session session, String path, CollectionItem root) {
+        
+        if(path==null || "".equals(path))
+            return null;
+        
+        if (path.charAt(0) == '/')
+            path = path.substring(1, path.length());
+
+        String[] segments = path.split("/");
+        
+        if (segments.length == 0)
+            return null;
+
+        Item parentItem = root;
+        for (int i = 0; i < segments.length; i++) {
             Item nextItem = findItemByParentAndName(session, parentItem,
                     segments[i]);
             parentItem = nextItem;

@@ -30,8 +30,6 @@
         </c:forEach>
       </fmt:message>
     </title>
-    <link rel="stylesheet" type="text/css"
-          href="<c:url value="/cosmo.css"/>"/>
     <script type="text/javascript"
             src="<c:url value="/cosmo.js"/>"></script>
   </head>

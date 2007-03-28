@@ -1,8 +1,8 @@
 # -*- rnc -*-
 # RELAX NG Compact Syntax Grammar for the
-# EIMML task record type Version 1
+# EIMML task record type Version 0
 
-namespace task = "http://osafoundation.org/eim/task"
+namespace task = "http://osafoundation.org/eim/task/0"
 
 include "eimml-core.rnc"
 
@@ -24,7 +24,6 @@ anyTaskField =
        | eimDecimalFieldContent
        | eimIntegerFieldContent
        | eimDateTimeFieldContent
-       | eimTimeStampFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent
        | eimClobFieldContent)*

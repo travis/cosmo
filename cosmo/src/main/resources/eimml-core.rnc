@@ -1,8 +1,8 @@
 # -*- rnc -*-
 # RELAX NG Compact Syntax Grammar for the
-# EIMML core schema Version 1
+# EIMML core schema Version 0
 
-namespace eim = "http://osafoundation.org/eim"
+namespace eim = "http://osafoundation.org/eim/0"
 
 start = eimCollection
 
@@ -12,12 +12,16 @@ eimKey =
 eimDeleted =
    attribute eim:deleted { xsd:boolean }?
 
+eimEmpty =
+   attribute empty { xsd:boolean }?
+
 # These patterns define the allowable content of the elements
 # representing EIM record fields. Field types not defined in this
 # schema are not permitted in EIMML.
 
 eimTextFieldContent = {
    eimKey,
+   eimEmpty,
    attribute eim:type { "text" },
    xsd:string { maxLength = "1024" }
 }
@@ -40,13 +44,6 @@ eimDateTimeFieldContent = {
    xsd:dateTime
 }
 
-eimTimeStampFieldContent = {
-   eimKey,
-   attribute eim:type { "timestamp" },
-   # the number of milliseconds since the epoch
-   xsd:decimal { totalDigits = "20", fractionDigits = "0" }
-}
-
 eimBytesFieldContent = {
    eimKey,
    attribute eim:type { "bytes" },
@@ -55,12 +52,14 @@ eimBytesFieldContent = {
 
 eimBlobFieldContent = {
    eimKey,
+   eimEmpty,
    attribute eim:type { "blob" },
    xsd:base64Binary
 }
 
 eimClobFieldContent = {
    eimKey,
+   eimEmpty,
    attribute eim:type { "clob" },
    xsd:string
 }
@@ -69,8 +68,7 @@ eimClobFieldContent = {
 
 eimCollection =
    element eim:collection {
-      (eimDeleted,
-         attribute uuid { xsd:string },
+      (attribute uuid { xsd:string },
          attribute name { xsd:string }?,
          eimRecordSet*)
    }
@@ -100,7 +98,6 @@ anyField =
        | eimDecimalFieldContent
        | eimIntegerFieldContent
        | eimDateTimeFieldContent
-       | eimTimeStampFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent
        | eimClobFieldContent)*

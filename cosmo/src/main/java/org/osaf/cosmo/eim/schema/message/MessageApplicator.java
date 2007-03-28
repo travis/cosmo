@@ -15,17 +15,17 @@
  */
 package org.osaf.cosmo.eim.schema.message;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
-import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
+import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.MessageStamp;
 import org.osaf.cosmo.model.Stamp;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Applies EIM records to message stamps.
@@ -49,7 +49,7 @@ public class MessageApplicator extends BaseStampApplicator
      * stamp record is applied to an item that does not already have
      * that stamp.
      */
-    protected Stamp createStamp() {
+    protected Stamp createStamp(EimRecord record) throws EimSchemaException {
         return new MessageStamp();
     }
 
@@ -66,18 +66,38 @@ public class MessageApplicator extends BaseStampApplicator
         MessageStamp message = (MessageStamp) getStamp();
 
         if (field.getName().equals(FIELD_SUBJECT)) {
-            String value =
-                EimFieldValidator.validateText(field, MAXLEN_SUBJECT);
-            message.setSubject(value);
+            if(field.isMissing()) {
+                handleMissingAttribute("subject");
+            }
+            else {
+                String value =
+                    EimFieldValidator.validateText(field, MAXLEN_SUBJECT);
+                message.setSubject(value);
+            }
         } else if (field.getName().equals(FIELD_TO)) {
-            String value = EimFieldValidator.validateText(field, MAXLEN_TO);
-            message.setTo(value);
+            if(field.isMissing()) {
+                handleMissingAttribute("to");
+            }
+            else {
+                String value = EimFieldValidator.validateText(field, MAXLEN_TO);
+                message.setTo(value);
+            }
         } else if (field.getName().equals(FIELD_CC)) {
-            String value = EimFieldValidator.validateText(field, MAXLEN_CC);
-            message.setCc(value);
+            if(field.isMissing()) {
+                handleMissingAttribute("cc");
+            }
+            else {
+                String value = EimFieldValidator.validateText(field, MAXLEN_CC);
+                message.setCc(value);
+            }
         } else if (field.getName().equals(FIELD_BCC)) {
-            String value = EimFieldValidator.validateText(field, MAXLEN_BCC);
-            message.setBcc(value);
+            if(field.isMissing()) {
+                handleMissingAttribute("bcc");
+            }
+            else {
+                String value = EimFieldValidator.validateText(field, MAXLEN_BCC);
+                message.setBcc(value);
+            }
         } else {
             applyUnknownField(field);
         }

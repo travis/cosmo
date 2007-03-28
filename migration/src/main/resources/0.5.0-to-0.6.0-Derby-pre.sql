@@ -95,3 +95,6 @@ alter table user_preferences add constraint FK199BD08467D36616 foreign key (user
 
 create index idx_stamptype on stamp (stamptype)
 create index idx_stampisactive on stamp (isactive)
+
+# create index on cal_property_index propertyvalue
+create index idx_calpropvalue on cal_property_index (propertyvalue)

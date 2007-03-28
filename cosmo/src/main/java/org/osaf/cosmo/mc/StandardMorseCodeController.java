@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,20 @@ package org.osaf.cosmo.mc;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.eim.EimException;
 import org.osaf.cosmo.eim.EimRecordSet;
-import org.osaf.cosmo.eim.schema.EimSchemaException;
-import org.osaf.cosmo.eim.schema.EimTranslator;
+import org.osaf.cosmo.eim.EimRecordSetIterator;
+import org.osaf.cosmo.eim.schema.ItemTranslator;
 import org.osaf.cosmo.eim.schema.EimValidationException;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
@@ -76,9 +79,10 @@ public class StandardMorseCodeController implements MorseCodeController {
 
     /**
      * Creates a collection identified by the given uid and populates
-     * the collection with items with the provided states. The publish
-     * is atomic; the entire publish fails if the collection or any
-     * contained item cannot be created.
+     * the collection with items with the provided states. If ticket
+     * types are provided, creates one ticket of each type on the
+     * collection. The publish is atomic; the entire publish fails if
+     * the collection or any contained item cannot be created.
      *
      * If a parent uid is provided, the associated collection becomes
      * the parent of the new collection.
@@ -88,6 +92,8 @@ public class StandardMorseCodeController implements MorseCodeController {
      * the parent for the published collection
      * @param records the EIM record sets describing the collection
      * and the items with which it is initially populated
+     * @param ticketTypes a set of ticket types to create on the
+     * collection, one per type
      *
      * @returns the initial <code>SyncToken</code> for the collection
      * @throws IllegalArgumentException if the authenticated principal
@@ -102,12 +108,14 @@ public class StandardMorseCodeController implements MorseCodeController {
      * data according to the records' schemas
      * @throws MorseCodeException if an unknown error occurs
      */
-    public SyncToken publishCollection(String uid,
-                                       String parentUid,
-                                       PubRecords records) {
+    public PubCollection publishCollection(String uid,
+                                           String parentUid,
+                                           PubRecords records,
+                                           Set<Ticket.Type> ticketTypes) {
         if (log.isDebugEnabled()) {
             if (parentUid != null)
-                log.debug("publishing collection " + uid + " with parent " + parentUid);
+                log.debug("publishing collection " + uid +
+                          " with parent " + parentUid);
             else
                 log.debug("publishing collection " + uid);
         }
@@ -118,14 +126,12 @@ public class StandardMorseCodeController implements MorseCodeController {
             if (user == null)
                 throw new IllegalArgumentException("Parent uid must be provided if authentication principal is not a user");
             parent = contentService.getRootItem(user);
-            log.debug("parent is root item for " + user.getUsername());
         }
         else {
             Item parentItem = contentService.findItemByUid(parentUid);
             if (! (parentItem instanceof CollectionItem))
                 throw new NotCollectionException("Parent item not a collection");
             parent = (CollectionItem) parentItem;
-            log.debug("parent is collection " + parent.getName());
         }
 
         CollectionItem collection = new CollectionItem();
@@ -138,28 +144,23 @@ public class StandardMorseCodeController implements MorseCodeController {
         else
             collection.setDisplayName(uid);
 
-        HashSet<Item> children = new HashSet<Item>();
-        EimTranslator translator = null;
-        while (records.getRecordSets().hasNext()) {
-            EimRecordSet recordset = records.getRecordSets().next();
-            try {
-                ContentItem child = createChildItem(collection, recordset);
-                translator = new EimTranslator(child);
-                translator.applyRecords(recordset);
-            } catch (EimValidationException e) {
-                throw new ValidationException("could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
-            } catch (EimSchemaException e) {
-                throw new MorseCodeException("unknown EIM schema problem", e);
-            }
-        }
+        // stamp it as a calendar
+        CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
+        collection.addStamp(ccs);
+
+        Set<Item> children = recordsToItems(records.getRecordSets(),
+                                            collection);
+
+        for (Ticket.Type type : ticketTypes)
+            collection.addTicket(new Ticket(type));
 
         // throws UidinUseException
         collection =
             contentService.createCollection(parent, collection, children);
 
-        return SyncToken.generate(collection);
+        return new PubCollection(collection);
     }
-   
+
     /**
      * Retrieves the current state of every item contained within the
      * identified collection.
@@ -255,9 +256,9 @@ public class StandardMorseCodeController implements MorseCodeController {
      * data according to the records' schemas
      * @throws MorseCodeException if an unknown error occurs
      */
-    public SyncToken updateCollection(String uid,
-                                      SyncToken token,
-                                      PubRecords records) {
+    public PubCollection updateCollection(String uid,
+                                          SyncToken token,
+                                          PubRecords records) {
         if (log.isDebugEnabled()) {
             log.debug("updating collection " + uid);
         }
@@ -278,30 +279,13 @@ public class StandardMorseCodeController implements MorseCodeController {
         if (records.getName() != null)
             collection.setDisplayName(records.getName());
 
-        HashSet<Item> children = new HashSet<Item>();
-        EimTranslator translator = null;
-        while (records.getRecordSets().hasNext()) {
-            EimRecordSet recordset = records.getRecordSets().next();
-            try {
-                Item child = collection.getChild(recordset.getUuid());
-                if (child == null)
-                    child = createChildItem(collection, recordset);
-                else
-                    if (! (child instanceof ContentItem))
-                        throw new ValidationException("Child item " + recordset.getUuid() + " is not a content item");
-                translator = new EimTranslator((ContentItem)child);
-                translator.applyRecords(recordset);
-            } catch (EimValidationException e) {
-                throw new ValidationException("could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
-            } catch (EimSchemaException e) {
-                throw new MorseCodeException("unknown EIM schema problem", e);
-            }
-        }
+        Set<Item> children = recordsToItems(records.getRecordSets(),
+                                            collection);
 
         // throws CollectionLockedException
         collection = contentService.updateCollection(collection, children);
 
-        return SyncToken.generate(collection);
+        return new PubCollection(collection);
     }
 
     // our methods
@@ -344,6 +328,36 @@ public class StandardMorseCodeController implements MorseCodeController {
         throw new MorseCodeException("authenticated principal neither user nor ticket");
     }
 
+    private Set<Item> recordsToItems(EimRecordSetIterator i,
+                                     CollectionItem collection) {
+        HashSet<Item> children = new HashSet<Item>();
+
+        try {
+            while (i.hasNext()) {
+                EimRecordSet recordset = i.next();
+                try {
+                    Item item =
+                        contentService.findItemByUid(recordset.getUuid());
+                    if (item != null && ! (item instanceof ContentItem))
+                        throw new ValidationException("Child item " + recordset.getUuid() + " is not a content item");
+                    ContentItem child = item != null ?
+                        (ContentItem) item :
+                        createChildItem(collection, recordset);
+                    children.add(child);
+                    // TODO: delay applyRecords until all child  
+                    // items have been looked up/created.  This assures
+                    // we can handle out of order note modifications
+                    new ItemTranslator(child).applyRecords(recordset);
+                } catch (EimValidationException e) {
+                    throw new ValidationException("could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
+                }
+            }
+        } catch (EimException e) {
+            throw new MorseCodeException("unknown EIM translation problem", e);
+        }
+
+        return children;
+    }
 
     // creates a new item and adds it as a child of the collection
     private ContentItem createChildItem(CollectionItem collection,
@@ -353,7 +367,29 @@ public class StandardMorseCodeController implements MorseCodeController {
         child.setDisplayName(recordset.getUuid());
         child.setUid(recordset.getUuid());
         child.setOwner(collection.getOwner());
+        
+        if(child.getUid().indexOf(EventExceptionStamp.RECURRENCEID_DELIMITER)>0)
+            handleModificationItem(child, collection);
+        
+        // Add reference to parent collection so that applicator can
+        // access parent (and children) if necessary
+        child.getParents().add(collection);
         collection.getChildren().add(child);
         return child;
+    }
+    
+    private void handleModificationItem(NoteItem noteMod, CollectionItem collection) {
+        String parentUid = noteMod.getUid().split(
+                EventExceptionStamp.RECURRENCEID_DELIMITER)[0];
+        
+        // Find parent note item by looking through collection's children.
+        for (Item child : collection.getChildren()) {
+            if (child.getUid().equals(parentUid) && child instanceof NoteItem) {
+                noteMod.setModifies((NoteItem) child);
+                return;
+            }
+        }
+        
+        throw new ValidationException("no parent found for " + noteMod.getUid());
     }
 }

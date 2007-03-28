@@ -53,7 +53,7 @@ cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.getTzIdsForRegion = fun
        this._initTzsByRegion();
     }
 
-    return this._tzsByRegion[region];
+    return this._tzsByRegion[region] || [];
 }
 
 cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype._addTzToTzsByRegion = function(tzId){

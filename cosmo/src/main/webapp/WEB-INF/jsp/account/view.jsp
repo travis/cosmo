@@ -24,31 +24,6 @@
 <cosmo:standardLayout prefix="Account.View.">
 
 
-<script type="text/javascript">
-
-dojo.require("cosmo.ui.widget.ModifyUserDialog");
-
-modifyHandlerDict= {
-    handle : function(type, data, evt){
-
-        if (evt.status == 204){
-            dojo.widget.byId("modifyUserDialog").populateFields();
-
-        }
-        else if (evt.status == 431){
-            //TODO: username in use stuff
-            alert("Username in use")
-        }
-        else if (evt.status == 432){
-            //TODO: email in use stuff
-            alert("Email in use")
-        }
-
-    }
-}
-
-</script>
-
 <div style="width:500px;">
 
 <p>
@@ -56,49 +31,6 @@ modifyHandlerDict= {
     <fmt:param value="${pageContext.request.serverName}"/>
   </fmt:message>
 </p>
-
-<authz:authorize ifAllGranted="ROLE_USER">
-  <cosmoui:user var="user"/>
-  <cosmo:homedir var="homedir" user="${user}"/>
-  <cosmo:baseurl var="baseurl"/>
-
-  <p class="hd">
-    <fmt:message key="Account.View.HomeDirectory.Header"/>
-  </p>
-
-  <p style="line-height:18px;">
-    <fmt:message key="Account.View.HomeDirectory.YourHomeDirectoryIs"/>
-  </p>
-
-  <p style="line-height:18px;">
-    <fmt:message key="Account.View.HomeDirectory.FullURLIs"/><br/>
-    <strong>${relationLinks['dav']}</strong>
-  </p>
-
-  <p>
-    <a href="<c:url value="/browse/${user.username}"/>">
-      <fmt:message key="Account.View.BrowseHomeDirectory"/>
-    </a>
-  </p>
-
-<div 	dojoType="cosmo:ModifyUserDialog" widgetId="modifyUserDialog"
-        role="cosmo.ROLE_AUTHENTICATED"
-        header='<fmt:message key="Account.View.AccountDetails.Header"/>'
-        firstNameLabel='<fmt:message key="Account.Form.FirstName"/>'
-        lastNameLabel='<fmt:message key="Account.Form.LastName"/>'
-        emailLabel='<fmt:message key="Account.Form.Email"/>'
-        passwordBlurb='<fmt:message key="Account.Form.PasswordBlurb"/>'
-        passwordLabel='<fmt:message key="Account.Form.Password"/>'
-        confirmLabel='<fmt:message key="Account.Form.Confirm"/>'
-        postActionHandler="modifyHandlerDict"
-        removeInputs="username,admin"
-        disableCancel="true"
-        submitButtonText='<fmt:message key="Account.Form.Button.Update"/>'
-        populateOnLoad="true"
-		style="position: static; margin-top: 1em"
-        > </div>
-
-</authz:authorize>
 
 </div>
 </cosmo:standardLayout>

@@ -17,6 +17,7 @@ package org.osaf.cosmo.dao;
 
 import java.util.Set;
 
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
@@ -61,6 +62,19 @@ public interface ItemDao extends Dao {
     public Item findItemByPath(String path);
     
     /**
+     * Find an item with the specified path, relative to a parent collection.
+     * The return type will be one of
+     * ContentItem, NoteItem, CollectionItem.
+     *
+     * @param path
+     *            path of item to find
+     * @param parentUid
+     *            uid of parent that path is relative to
+     * @return item represented by path
+     */
+    public Item findItemByPath(String path, String parentUid);
+    
+    /**
      * Find the parent item of the item with the specified path. 
      * The return type will be of type CollectionItem.
      *
@@ -69,26 +83,6 @@ public interface ItemDao extends Dao {
      * @return parent item of item represented by path
      */
     public Item findItemParentByPath(String path);
-
-    /**
-     * Return the path to an item. The path has the format:
-     * /username/parent1/parent2/itemname
-     *
-     * @param item
-     *            the item to calculate the path for
-     * @return hierarchical path to item
-     */
-    public String getItemPath(Item item);
-
-    /**
-     * Return the path to an item. The path has the format:
-     * /username/parent1/parent2/itemname
-     *
-     * @param uid
-     *            the uid of the item to calculate the path for
-     * @return hierarchical path to item
-     */
-    public String getItemPath(String uid);
 
     /**
      * Get the root item for a user
@@ -119,14 +113,14 @@ public interface ItemDao extends Dao {
   
     /**
      * Move item to the given path
-     * @param item item to move
-     * @param path path to move item to
+     * @param fromPath path of item to move
+     * @param toPath path to move item to
      * @throws org.osaf.cosmo.model.ItemNotFoundException
      *         if parent item specified by path does not exist
      * @throws org.osaf.cosmo.model.DuplicateItemNameException
      *         if path points to an item with the same path
      */
-    public void moveItem(Item item, String path);
+    public void moveItem(String fromPath, String toPath);
     
     /**
      * Remove an item.
@@ -184,4 +178,26 @@ public interface ItemDao extends Dao {
      */
     public void removeTicket(Item item,
                              Ticket ticket);
+    /**
+     * Adds item to a collection.
+     *
+     * @param item the item
+     * @param collection the collection to add to
+     */
+    public void addItemToCollection(Item item, CollectionItem collection);
+    
+    /**
+     * Remove item from a collection.
+     *
+     * @param item the item
+     * @param collection the collection to remove from
+     */
+    public void removeItemFromCollection(Item item, CollectionItem collection);
+    
+    /**
+     * Refresh item.
+     *
+     * @param item the item
+     */
+    public void refreshItem(Item item);
 }

@@ -50,6 +50,7 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
     private static final XMLOutputFactory XML_OUTPUT_FACTORY =
         XMLOutputFactory.newInstance();
 
+    private boolean writeCharacterData = false;
     private XMLStreamWriter xmlWriter;
 
     /**
@@ -145,6 +146,14 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
             close();
             throw new EimmlStreamException("Error writing field", e);
         }
+    }
+
+    public boolean getWriteCharacterData() {
+        return writeCharacterData;
+    }
+
+    public void setWriteCharacterData(boolean flag) {
+        writeCharacterData = flag;
     }
 
     /**
@@ -253,10 +262,27 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
         xmlWriter.writeAttribute(NS_CORE, ATTR_TYPE, type);
         if (isKey)
             xmlWriter.writeAttribute(NS_CORE, ATTR_KEY, "true");
-
-        if (value != null)
-            xmlWriter.writeCData(value);
+        
+        if(field.isMissing())
+            xmlWriter.writeAttribute(NS_CORE, ATTR_MISSING, "true");
+        
+        if (value != null) {
+            if (isEmptyableType(type) && value.equals(""))
+                xmlWriter.writeAttribute(ATTR_EMPTY, "true");
+            else {
+                if (writeCharacterData)
+                    xmlWriter.writeCData(value);
+                else
+                    xmlWriter.writeCharacters(value);
+            }
+        }
 
         xmlWriter.writeEndElement();
+    }
+
+    private boolean isEmptyableType(String type) {
+        return (type.equals(TYPE_TEXT) ||
+                type.equals(TYPE_CLOB) ||
+                type.equals(TYPE_BLOB));
     }
 }

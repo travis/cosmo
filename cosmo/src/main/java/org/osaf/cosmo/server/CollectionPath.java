@@ -24,36 +24,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This class represents the portion of a collection URL that
- * identifies the collection by UID as well as any metadata that
- * provides extra information to the service providing access to the
- * collection.
+ * This class represents a URL that addresses a collection by uid.
  * <p>
  * Collections in the Cosmo database are addressed similarly
- * regardless of which service is used to access the data. A
+ * regardless of which protocol is used to access the data. An
  * collection URL includes the service mount URL, the literal path
- * component <code>collection</code>, and the UID of the collection.
+ * component <code>collection</code>, the uid of the collection, and any
+ * extra path information used by the protocol handler.
  * <p>
  * For example, the URL
- * <code>http://localhost:8080/cosmo/dav/collection/8501de14-1dc9-40d4-a7d4-f289feff8214</code>
- * is the WebDAV service address for the collection with the specified
- * UID.
- *
- * <h2>Path Selectors</h2>
- *
- * Collection URLs may contain <em>path selectors</em> which indicate
- * particular (usually protocol- or data format-specific)
- * semantics. Each component of the URL trailing the collection's UID
- * is interpreted as a separate path selector.
- * <p>
- * For example, including the selector <code>xcal</code> in a
- * collection URL (e.g. one with the path
- * <code>/collection/&lt;uid&gt;/xcal&gt;</code>) might indicate that
- * the client wishes to receive the WebDAV response data in the
- * xCalendar data format.
- * <p>
- * This class does not attempt to interpret path selectors; it simply
- * determines what selectors are included in the path.
+ * <code>http://localhost:8080/cosmo/dav/collection/cafebebe-deadbeef</code>
+ * is the WebDAV home collection address for the collection with the
+ * specified uid.
  */
 public class CollectionPath {
     private static final Log log = LogFactory.getLog(CollectionPath.class);
@@ -63,7 +45,7 @@ public class CollectionPath {
 
     private String urlPath;
     private String uid;
-    private HashSet<String> selectors;
+    private String pathInfo;
 
     /**
      * Constructs a <code>CollectionPath</code> instance based on the
@@ -87,14 +69,7 @@ public class CollectionPath {
         if (! collectionMatcher.matches())
             throw new IllegalStateException("urlPath is not a collection path");
         this.uid = collectionMatcher.group(1);
-
-        this.selectors = new HashSet<String>();
-        String extra = collectionMatcher.group(2);
-        if (extra != null && extra != "/") {
-            String [] chunks = extra.split("/");
-            for (String chunk : chunks)
-                selectors.add(chunk);
-        }
+        this.pathInfo = collectionMatcher.group(2);
     }
 
     /** */
@@ -108,25 +83,13 @@ public class CollectionPath {
     }
 
     /** */
-    public Set<String> getSelectors() {
-        return selectors;
-    }
-
-    /**
-     * Determines whether or not the named path selector is present in
-     * the url.
-     *
-     * @return <code>true</code> if the url address an item by uid and
-     * the path selector is present in the url, <code>false</code>
-     * otherwise
-     */
-    public boolean getSelector(String name) {
-        return selectors.contains(name);
+    public String getPathInfo() {
+        return pathInfo;
     }
 
     /**
      * Parses the given url-path, returning an instance of
-     * <code>CollectionPath</code>. Path selectors are disallowed.
+     * <code>CollectionPath</code>. Extra path info is disallowed.
      *
      * @param urlPath the servlet-relative url-path
      * @return an instance of <code>CollectionPath</code> if the
@@ -135,7 +98,7 @@ public class CollectionPath {
      *
      * @throws IllegalArgumentException if the given url-path is not
      * servlet-relative (starts with a "/") or if disallowed path
-     * selectors are present
+     * info is present
      */
     public static CollectionPath parse(String urlPath) {
         return parse(urlPath, false);
@@ -146,8 +109,8 @@ public class CollectionPath {
      * <code>CollectionPath</code>.
      *
      * @param urlPath the servlet-relative url-path
-     * @param allowSelectors determines whether or not path selectors
-     * are allowed in the path
+     * @param allowPathInfo determines whether or not extra path info
+     * is allowed
      * @return an instance of <code>CollectionPath</code> if the
      * url-path represents a collection path, or <code>null</code>
      * otherwise.
@@ -156,12 +119,12 @@ public class CollectionPath {
      * servlet-relative (starts with a "/")
      */
     public static CollectionPath parse(String urlPath,
-                                       boolean allowSelectors) {
+                                       boolean allowPathInfo) {
         if (urlPath == null)
             return null;
         try {
             CollectionPath cp = new CollectionPath(urlPath);
-            if (! allowSelectors && ! cp.getSelectors().isEmpty())
+            if (! allowPathInfo && cp.getPathInfo() != null)
                 return null;
             return cp;
         } catch (IllegalStateException e) {

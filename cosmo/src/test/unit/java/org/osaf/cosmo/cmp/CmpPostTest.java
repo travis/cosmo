@@ -15,22 +15,11 @@
  */
 package org.osaf.cosmo.cmp;
 
-import java.net.URLEncoder;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.jackrabbit.webdav.xml.DomUtil;
-
-import org.osaf.cosmo.cmp.CmpConstants;
-import org.osaf.cosmo.cmp.UserResource;
 import org.osaf.cosmo.model.User;
-
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Test Case for CMP <code>POST</code> operations.

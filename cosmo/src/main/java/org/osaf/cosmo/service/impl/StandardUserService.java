@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.PasswordRecovery;
+import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.UserService;
@@ -177,6 +177,8 @@ public class StandardUserService implements UserService {
             accountActivator.sendActivationMessage(newUser, activationContext);
         }
 
+
+        // TODO Auto-generated method stub
         return newUser;
     }
 
@@ -232,8 +234,8 @@ public class StandardUserService implements UserService {
     public void removeUser(String username) {
         if (log.isDebugEnabled())
             log.debug("removing user " + username);
-        // seems to automatically remove the user's root item
-        userDao.removeUser(username);
+        User user = userDao.getUser(username);
+        removeUserAndItems(user);
     }
 
     /**
@@ -244,8 +246,7 @@ public class StandardUserService implements UserService {
     public void removeUser(User user) {
         if (log.isDebugEnabled())
             log.debug("removing user " + user.getUsername());
-        // seems to automatically remove the user's root item
-        userDao.removeUser(user);
+        removeUserAndItems(user);
     }
 
     /**
@@ -257,7 +258,7 @@ public class StandardUserService implements UserService {
         for (User user : users){
             if (user.isOverlord())
                 throw new OverlordDeletionException();
-            userDao.removeUser(user);
+            removeUserAndItems(user);
         }
         // Only log if all removes were successful
         if (log.isDebugEnabled()) {
@@ -278,7 +279,8 @@ public class StandardUserService implements UserService {
         for (String username : usernames){
             if (username.equals(User.USERNAME_OVERLORD))
                     throw new OverlordDeletionException();
-            userDao.removeUser(username);
+            User user = userDao.getUser(username);
+            removeUserAndItems(user);
         }
         // Only log if all removes were successful
         if (log.isDebugEnabled()) {
@@ -414,29 +416,16 @@ public class StandardUserService implements UserService {
         this.accountActivationRequired = accountActivationRequired;
     }
 
-    public PasswordRecovery getPasswordRecovery(String key) {
-        PasswordRecovery passwordRecovery = userDao.getPasswordRecovery(key);
-        
-        if (passwordRecovery != null){
-            if (passwordRecovery.hasExpired()){
-                userDao.deletePasswordRecovery(passwordRecovery);
-            } else {
-                return passwordRecovery;
-            }
-        }
-        return null;
+    /**
+     * Remove all Items associated to User.
+     * This is done by removing the HomeCollectionItem, which is the root
+     * collection of all the user's items.
+     */
+    private void removeUserAndItems(User user) {
+        if(user==null)
+            return;
+        HomeCollectionItem home = contentDao.getRootItem(user);
+        contentDao.removeCollection(home);
+        userDao.removeUser(user);
     }
-    
-    public PasswordRecovery createPasswordRecovery(
-                PasswordRecovery passwordRecovery){
-        
-        userDao.createPasswordRecovery(passwordRecovery);
-        
-        return userDao.getPasswordRecovery(passwordRecovery.getKey());
-    }
-    
-    public void deletePasswordRecovery(PasswordRecovery passwordRecovery){
-        userDao.deletePasswordRecovery(passwordRecovery);
-    }
-
 }

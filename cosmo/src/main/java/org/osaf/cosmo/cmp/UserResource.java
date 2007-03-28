@@ -298,6 +298,6 @@ public class UserResource implements CmpResource, OutputsXml {
     /**
      */
     protected void calculateHomedirUrl() {
-        homedirUrl = urlBase + "/home/" + user.getUsername();
+        homedirUrl = urlBase + "/dav/" + user.getUsername();
     }
 }

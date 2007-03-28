@@ -17,34 +17,31 @@ package org.osaf.cosmo.eim.schema;
 
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.Date;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.BlobField;
 import org.osaf.cosmo.eim.BytesField;
 import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.DateTimeField;
 import org.osaf.cosmo.eim.DecimalField;
-import org.osaf.cosmo.eim.IntegerField;
-import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
+import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
-import org.osaf.cosmo.eim.TimeStampField;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.DecimalAttribute;
 import org.osaf.cosmo.model.IntegerAttribute;
+import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.TextAttribute;
-import org.osaf.cosmo.model.TimestampAttribute;
-import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.QName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for classes that apply EIM records to items and stamps.
@@ -81,31 +78,56 @@ public abstract class BaseApplicator implements EimSchemaConstants {
      */
     protected void applyUnknownField(EimRecordField field)
         throws EimSchemaException {
-        QName qn = new QName(field.getRecord().getNamespace(), field.getName());
+        QName qn =
+            new QName(field.getRecord().getNamespace(), field.getName());
+        if (log.isDebugEnabled())
+            log.debug("applying unknown field " + qn);
+        
+        // get existing attribute
+        Attribute attribute = item.getAttribute(qn);
+
         if (field instanceof BlobField) {
             InputStream value = ((BlobField)field).getBlob();
-            item.addAttribute(new BinaryAttribute(qn, value));
+            if(attribute!=null)
+                attribute.setValue(value);
+            else
+                item.addAttribute(new BinaryAttribute(qn, value));
         } else if (field instanceof BytesField) {
             byte[] value = ((BytesField)field).getBytes();
-            item.addAttribute(new BinaryAttribute(qn, value));
+            if(attribute!=null)
+                attribute.setValue(value);
+            else
+                item.addAttribute(new BinaryAttribute(qn, value));
         } else if (field instanceof ClobField) {
             Reader value = ((ClobField)field).getClob();
-            item.addAttribute(new TextAttribute(qn, value));
+            if(attribute!=null)
+                attribute.setValue(value);
+            else
+                item.addAttribute(new TextAttribute(qn, value));
         } else if (field instanceof DateTimeField) {
             Calendar value = ((DateTimeField)field).getCalendar();
-            item.addAttribute(new CalendarAttribute(qn, value));
-        } else if (field instanceof TimeStampField) {
-            Date value = ((TimeStampField)field).getTimeStamp();
-            item.addAttribute(new TimestampAttribute(qn, value));
+            if(attribute!=null)
+                attribute.setValue(value);
+            else
+                item.addAttribute(new CalendarAttribute(qn, value));
         } else if (field instanceof DecimalField) {
             BigDecimal value = ((DecimalField)field).getDecimal();
-            item.addAttribute(new DecimalAttribute(qn, value));
+            if(attribute!=null)
+                attribute.setValue(value);
+            else
+                item.addAttribute(new DecimalAttribute(qn, value));
         } else if (field instanceof IntegerField) {
             Integer value = ((IntegerField)field).getInteger();
-            item.addAttribute(new IntegerAttribute(qn, new Long(value.longValue())));
+            if(attribute!=null)
+                attribute.setValue(value);
+            else
+                item.addAttribute(new IntegerAttribute(qn, new Long(value.longValue())));
         } else if (field instanceof TextField) {
             String value = ((TextField)field).getText();
-            item.addAttribute(new StringAttribute(qn, value));
+            if(attribute!=null)
+                attribute.setValue(value);
+            else
+                item.addAttribute(new StringAttribute(qn, value));
         } else {
             throw new EimSchemaException("Field " + field.getName() + " is of unknown type " + field.getClass().getName());
         }
@@ -125,5 +147,61 @@ public abstract class BaseApplicator implements EimSchemaConstants {
     /** */
     public Item getItem() {
         return item;
+    }
+    
+    /**
+     * Determine if current item is a NoteItem that modifies another NoteItem
+     * 
+     * @return true if item is a NoteItem and modifies another NoteItem
+     */
+    protected boolean isModification() {
+        if(getItem() instanceof NoteItem) {
+            NoteItem note = (NoteItem) getItem();
+            if(note.getModifies()!=null)
+                return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Copy an attribute from one object to another.
+     * 
+     * @param attribute attribute to copy
+     * @param modification object to copy attribute to
+     * @param master object to copy attribute from
+     */
+    protected void handleMissingAttribute(String attribute,
+            Object modification, Object master) {
+        try {
+            Object value = PropertyUtils.getProperty(master, attribute);
+            PropertyUtils.setProperty(modification, attribute, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("error copying attribute " + attribute);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("error copying attribute " + attribute);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("error copying attribute " + attribute);
+        }
+    }
+    
+    /**
+     * Handle missing attribute for a NoteItem.  This involves copying an 
+     * attribute value from the master NoteItem to the modification NoteItem.
+     * 
+     * @param attribute atttribute to copy
+     * @throws EimSchemaException
+     */
+    protected void handleMissingAttribute(String attribute)
+            throws EimSchemaException {
+
+        if (!isModification())
+            throw new EimSchemaException(
+                    "missing attributes not support on non-modification items");
+
+        NoteItem modification = (NoteItem) getItem();
+        NoteItem parent = modification.getModifies();
+        
+        handleMissingAttribute(attribute, modification, parent);
     }
 }

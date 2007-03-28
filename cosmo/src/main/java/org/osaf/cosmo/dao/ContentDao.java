@@ -20,7 +20,6 @@ import java.util.Set;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.User;
 
 /**
@@ -73,28 +72,6 @@ public interface ContentDao extends ItemDao {
     public CollectionItem findCollectionByUid(String uid);
 
     /**
-     * Find all children for collection. Children can consist of ContentItem and
-     * CollectionItem objects.
-     * 
-     * @param collection
-     *            collection to find children for
-     * @return collection of child objects for parent collection. Child objects
-     *         can be either CollectionItem or ContentItem.
-     */
-    public Set<Item> findChildren(CollectionItem collection);
-
-    /**
-     * Find all top level children for user. Children can consist of ContentItem
-     * and CollectionItem objects.
-     * 
-     * @param user
-     *            user to find children for
-     * @return collection of child objects for parent collection. Child objects
-     *         can be either CollectionItem or ContentItem.
-     */
-    public Set<Item> findChildren(User user);
-
-    /**
      * Create new content item. A content item represents a piece of content or
      * file.
      * 
@@ -106,6 +83,28 @@ public interface ContentDao extends ItemDao {
      * @return newly created content
      */
     public ContentItem createContent(CollectionItem parent, ContentItem content);
+    
+    
+    /**
+     * Create new content item. A content item represents a piece of content or
+     * file.
+     *
+     * @param content
+     *            content to create
+     * @return newly created content
+     */
+    public ContentItem createContent(ContentItem content);
+    
+    /**
+     * Create new content item and associate with multiple parent collections.
+     * 
+     * @param parents
+     *            parent collections of content. 
+     * @param content
+     *            content to create
+     * @return newly created content
+     */
+    public ContentItem createContent(Set<CollectionItem> parents, ContentItem content);
 
     /**
      * Update an existing content item.
@@ -116,18 +115,7 @@ public interface ContentDao extends ItemDao {
      */
     public ContentItem updateContent(ContentItem content);
 
-    /**
-     * Move an Item to a different collection
-     * 
-     * @param parent
-     *            collection to add item to
-     * @param item
-     *            item to move
-     * @throws ModelValidationException
-     *             if parent is invalid
-     */
-    public void moveContent(CollectionItem parent, Item item);
-
+   
     /**
      * Find content item by path. Path is of the format:
      * /username/parent1/parent2/itemname.

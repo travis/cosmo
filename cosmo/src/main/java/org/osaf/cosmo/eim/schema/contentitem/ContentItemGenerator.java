@@ -15,19 +15,23 @@
  */
 package org.osaf.cosmo.eim.schema.contentitem;
 
-import java.util.List;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import org.osaf.cosmo.eim.EimRecord;
-import org.osaf.cosmo.eim.DecimalField;
-import org.osaf.cosmo.eim.TextField;
-import org.osaf.cosmo.eim.TimeStampField;
-import org.osaf.cosmo.eim.schema.BaseItemGenerator;
-import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.Item;
-
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.eim.DecimalField;
+import org.osaf.cosmo.eim.EimRecord;
+import org.osaf.cosmo.eim.IntegerField;
+import org.osaf.cosmo.eim.TextField;
+import org.osaf.cosmo.eim.schema.BaseItemGenerator;
+import org.osaf.cosmo.eim.schema.text.TriageStatusFormat;
+import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.Item;
 
 /**
  * Generates EIM records from content items.
@@ -57,18 +61,29 @@ public class ContentItemGenerator extends BaseItemGenerator
 
         record.addKeyField(new TextField(FIELD_UUID, contentItem.getUid()));
 
-        record.addField(new TextField(FIELD_TITLE,
-                                      contentItem.getDisplayName()));
-        record.addField(new TextField(FIELD_TRIAGE_STATUS,
-                                      contentItem.getTriageStatus()));
-        record.addField(new DecimalField(FIELD_TRIAGE_STATUS_CHANGED,
-                                         contentItem.getTriageStatusUpdated(),
-                                         DIGITS_TRIAGE_STATUS_CHANGED,
-                                         DEC_TRIAGE_STATUS_CHANGED));
-        record.addField(new TextField(FIELD_LAST_MODIFIED_BY,
-                                      contentItem.getLastModifiedBy()));
-        record.addField(new TimeStampField(FIELD_CREATED_ON,
-                                           contentItem.getClientCreationDate()));
+        if(isMissingAttribute("displayName")) {
+            record.addField(generateMissingField(new TextField(FIELD_TITLE, null)));
+        } else {
+            record.addField(new TextField(FIELD_TITLE,
+                    contentItem.getDisplayName()));
+        }
+
+        String ts = TriageStatusFormat.getInstance().
+            format(contentItem.getTriageStatus());
+        record.addField(new TextField(FIELD_TRIAGE, ts));
+
+        boolean sent = BooleanUtils.isTrue(contentItem.getSent());
+        record.addField(new IntegerField(FIELD_HAS_BEEN_SENT, sent));
+
+        boolean needsReply = BooleanUtils.isTrue(contentItem.getNeedsReply());
+        record.addField(new IntegerField(FIELD_NEEDS_REPLY, needsReply));
+
+        Date d = contentItem.getClientCreationDate();
+        BigDecimal createdOn = d != null ?
+            new BigDecimal(d.getTime() / 1000) :
+            null;
+        record.addField(new DecimalField(FIELD_CREATED_ON, createdOn,
+                                         DIGITS_TIMESTAMP, DEC_TIMESTAMP));
 
         record.addFields(generateUnknownFields());
 

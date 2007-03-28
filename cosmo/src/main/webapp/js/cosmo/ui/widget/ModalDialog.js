@@ -39,12 +39,10 @@ dojo.require("cosmo.ui.widget.Button");
 dojo.widget.defineWidget("cosmo.ui.widget.ModalDialog", 
 dojo.widget.HtmlWidget, {
         // Template stuff
-        templateString: '<div id="modalDialog"></div>',
+        templatePath:dojo.uri.dojoUri(
+            '../../cosmo/ui/widget/templates/ModalDialog/ModalDialog.html'),
         
         // Attach points
-        dropShadowOuterNode: null,
-        dropShadowRightNode: null,
-        dropShadowBottomNode: null,
         containerNode: null,
         titleNode: null,
         promptNode: null,
@@ -57,7 +55,6 @@ dojo.widget.HtmlWidget, {
         CONFIRM: 'confirm',
         width: null,
         height: null,
-        _containerHeight: null,
         title: '',
         prompt: '',
         content: null,
@@ -81,45 +78,14 @@ dojo.widget.HtmlWidget, {
             this.domNode.style.left = s;
         },
         setWidth: function (n) {
-            if (n) { this.width = n; }
-            var s = this.width.toString();
-            s = this._rationalizeUnits(s);
-            this.dropShadowOuterNode.style.width = s;
-            var s = this.dropShadowOuterNode.offsetWidth;
-            this.containerNode.style.width = s + 'px';
-            s += 16;
-            this.dropShadowOuterNode.style.width = s + 'px';
-            this.dropShadowBottomNode.style.width = (s - 48) + 'px';
-            return true;
+            var s = n.toString();
+            s = s.indexOf('%') > -1 ? s : parseInt(s) + 'px';
+            this.domNode.style.width = s;
         },
         setHeight: function (n) {
-            if (n) { this.height = n; }
-            var s = this.height.toString();
-            s = this._rationalizeUnits(s);
-            this.dropShadowOuterNode.style.height = s;
-            var s = this.dropShadowOuterNode.offsetHeight;
-            // Stash container height since Safari's DOM lookups
-            // don't seem to happen in any particular order
-            this._containerHeight = s; 
-            this.containerNode.style.height = s + 'px';
-            s += 16;
-            this.dropShadowOuterNode.style.height = s + 'px';
-            this.dropShadowRightNode.style.height = (s - 32) + 'px';
-            return true;
-        },
-        _rationalizeUnits: function (s) {
-            if (s.indexOf('%') > -1) {
-                return s;
-            }
-            else if (s.indexOf('px') > -1) {
-                return s;
-            }
-            else if (s.indexOf('em') > -1) {
-                return s;
-            }
-            else {
-                return parseInt(s) + 'px';
-            }
+            var s = n.toString();
+            s = s.indexOf('%') > -1 ? s : parseInt(s) + 'px';
+            this.domNode.style.height = s; 
         },
         setContentAreaHeight: function () {
             var spacer = this.buttonPanelNode.offsetHeight;
@@ -130,14 +96,12 @@ dojo.widget.HtmlWidget, {
             if (this.prompt) {
                 spacer += this.promptNode.offsetHeight;
             }
-            var o = this._containerHeight;
-            this.contentNode.style.height = (o - spacer) + 'px';
+            this.contentNode.style.height = (this.domNode.offsetHeight - spacer) + 'px';
             
             // BANDAID: Hack to get Safari to render the height of the 
             // content area properly
             if (navigator.userAgent.indexOf('Safari') > -1) {
                 this.contentNode.style.border = '1px solid #ffffff';
-                this.contentNode.style.overflow = 'auto';
             }
         },
         setTitle: function (title) {
@@ -168,6 +132,11 @@ dojo.widget.HtmlWidget, {
                 this.promptNode.innerHTML = '';
             }
             return true;
+        },
+        _removeChildren: function(node){
+            while(node.firstChild) {
+                node.removeChild(node.firstChild);
+            }
         },
         setContent: function (content) {
             this.content = content || this.content;
@@ -236,126 +205,16 @@ dojo.widget.HtmlWidget, {
                 m.style.background = '#ffffff';
                 // In IE6 have to use special alpha filter thingie
                 if (document.all) {
-                    m.style.filter = 'alpha(opacity=80)';
+                    m.style.filter = 'alpha(opacity=60)';
                 }
                 else {
-                    m.style.opacity = 0.8;
+                    m.style.opacity = 0.6;
                 }
                 this.uiFullMask = m;
                 document.body.appendChild(this.uiFullMask);
             }
             this.uiFullMask.style.display = 'block';
             return true;
-        },
-        _removeChildren: function(node){
-            while(node.firstChild) {
-                node.removeChild(node.firstChild);
-            }
-        },
-        _setUpDialog: function () {
-            var table = _createElem('table');
-            var body = _createElem('tbody');
-            var row = null; // Temp for row
-            var td = null; // Temp for cells
-            table.cellPadding = '0';
-            table.cellSpacing = '0';
-            table.className = 'dropShadowTable';
-
-            row = _createElem('tr');
-            
-            cell = _createElem('td');
-            cell.colSpan = 4;
-            cell.className = 'dropShadowTop';
-            cell.innerHTML = '&nbsp;';
-            row.appendChild(cell);
-            
-            body.appendChild(row);
-            
-            row = _createElem('tr');
-            
-            cell = _createElem('td');
-            cell.rowSpan = 3;
-            cell.className = 'dropShadowLeft';
-            cell.innerHTML = '&nbsp;';
-            row.appendChild(cell);
-            
-            cell = _createElem('td');
-            cell.rowSpan = 2;
-            cell.colSpan = 2;
-            cell.id = 'dialogCenterContent';
-            cell.className = 'dropShadowCenter';
-            cell.innerHTML = '&nbsp;';
-            row.appendChild(cell);
-            
-            this.containerNode = cell;
-            
-            var d = _createElem('div');
-            d.id = "modalDialogTitle";
-            this.titleNode = d;
-            cell.appendChild(d);
-
-            var d = _createElem('div');
-            d.id = "modalDialogPrompt";
-            this.promptNode = d;
-            cell.appendChild(d);
-            
-            var d = _createElem('div');
-            d.id = "modalDialogImage";
-            this.imageNode = d;
-            cell.appendChild(d);
-            
-            var d = _createElem('div');
-            d.id = "modalDialogContent";
-            this.contentNode = d;
-            cell.appendChild(d);
-            
-            var d = _createElem('div');
-            d.id = "modalDialogButtonPanel";
-            d.className = 'dialogButtonPanel';
-            this.buttonPanelNode = d;
-            cell.appendChild(d);
-
-            cell = _createElem('td');
-            cell.className = 'dropShadowTopRightCorner';
-            cell.innerHTML = '&nbsp;';
-            row.appendChild(cell);
-            
-            body.appendChild(row);
-
-            row = _createElem('tr');
-            
-            cell = _createElem('td');
-            cell.className = 'dropShadowRight';
-            cell.innerHTML = '&nbsp;';
-            this.dropShadowRightNode = cell;
-            row.appendChild(cell);
-            
-            body.appendChild(row);
-
-            row = _createElem('tr');
-            
-            cell = _createElem('td');
-            cell.className = 'dropShadowBottomLeft';
-            cell.innerHTML = '&nbsp;';
-            row.appendChild(cell);
-            
-            cell = _createElem('td');
-            cell.className = 'dropShadowBottom';
-            //cell.style.width = (w - 48) + 'px';
-            cell.innerHTML = '&nbsp;';
-            this.dropShadowBottomNode = cell;
-            row.appendChild(cell);
-            
-            cell = _createElem('td');
-            cell.className = 'dropShadowBottomRightCorner';
-            cell.innerHTML = '&nbsp;';
-            row.appendChild(cell);
-            
-            body.appendChild(row);
-            table.appendChild(body);
-            this.dropShadowOuterNode = table;
-            
-            this.domNode.appendChild(table);
         },
         
         // Lifecycle functions
@@ -395,11 +254,12 @@ dojo.widget.HtmlWidget, {
                     this.title = title || this.title;
                     this.prompt = prompt || this.prompt;
                 }
+
                 // Sizing
                 this.width = this.width || DIALOG_BOX_WIDTH;
-                this.height = this.height || DIALOG_BOX_HEIGHT;                
-                
-                this._setUpDialog();
+                this.height = this.height || DIALOG_BOX_HEIGHT;
+                this.setWidth(this.width);
+                this.setHeight(this.height);
                 
                 var waitForIt = this.render() && this.center();
                 this.renderUiMask();
@@ -407,10 +267,8 @@ dojo.widget.HtmlWidget, {
                 this.domNode.style.zIndex = 2000;
 
                 // Have to measure for content area height once div is actually on the page
-                if (this.setWidth() &&
-                this.setHeight()) {
                 this.setContentAreaHeight();
-                }
+                
                 if (this.content instanceof dojo.widget.HtmlWidget 
                     && this.content.appendedToParent){
                     this.content.appendedToParent(this);
@@ -449,8 +307,6 @@ dojo.widget.HtmlWidget, {
                     this.content.destroy();
                 }
                 this.content = null;
-                // Cleanup -- wipe DOM inside container
-                this.domNode.innerHTML = '';
                 
             };
         },

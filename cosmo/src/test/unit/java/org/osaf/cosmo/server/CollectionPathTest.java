@@ -33,36 +33,36 @@ public class CollectionPathTest extends TestCase {
 
     /** */
     public void testSuccessfulParse() throws Exception {
-        String urlPath = "/collection/deadbeef-cafebebe";
+        String urlPath = "/collection/deadbeef";
         CollectionPath cp = CollectionPath.parse(urlPath);
         assertNotNull("path did not parse successfully", cp);
     }
 
     /** */
     public void testUnsuccessfulParse() throws Exception {
-        String urlPath = "/bcm/stuff/deadbeef-cafebebe";
+        String urlPath = "/bcm/stuff/deadbeef";
         CollectionPath cp = CollectionPath.parse(urlPath);
         assertNull("non-collection path parsed successfuly", cp);
     }
 
     /** */
-    public void testParseNoSelectors() throws Exception {
-        String urlPath = "/collection/deadbeef-cafebebe/foobar";
+    public void testParseNoPathInfo() throws Exception {
+        String urlPath = "/collection/deadbeef/foobar";
         CollectionPath cp = CollectionPath.parse(urlPath);
-        assertNull("path with disallowed selectors parsed successfully", cp);
+        assertNull("path with disallowed pathInfo parsed successfully", cp);
     }
 
     /** */
-    public void testParseWithSelectors() throws Exception {
-        String urlPath = "/collection/deadbeef-cafebebe/foobar";
+    public void testParseWithPathInfo() throws Exception {
+        String urlPath = "/collection/deadbeef/foobar";
         CollectionPath cp = CollectionPath.parse(urlPath, true);
-        assertNotNull("path with allowed selectors did not parse successfully",
+        assertNotNull("path with allowed pathInfo did not parse successfully",
                       cp);
     }
 
     /** */
     public void testGetUid() throws Exception {
-        String uid = "deadbeef-cafebebe";
+        String uid = "deadbeef";
         String urlPath = "/collection/" + uid;
         CollectionPath cp = CollectionPath.parse(urlPath);
         assertNotNull("path did not parse successfully", cp);
@@ -71,39 +71,15 @@ public class CollectionPathTest extends TestCase {
     }
 
     /** */
-    public void testGetUidWithSelectors() throws Exception {
-        String uid = "deadbeef-cafebebe";
-        String urlPath = "/collection/" + uid + "/foobar";
+    public void testGetUidWithPathInfo() throws Exception {
+        String uid = "deadbeef";
+        String pathInfo = "/foobar";
+        String urlPath = "/collection/" + uid + pathInfo;
         CollectionPath cp = CollectionPath.parse(urlPath, true);
         assertNotNull("path did not parse successfully", cp);
         assertNotNull("uid not found", cp.getUid());
         assertEquals("found incorrect uid", uid, cp.getUid());
-    }
-
-    /** */
-    public void testGetSelector() throws Exception {
-        String selector1 = "foobar";
-        String selector2 = "bazquux";
-        String urlPath =
-            "/collection/deadbeef-cafebebe/" + selector1 + "/" + selector2;
-        CollectionPath cp = CollectionPath.parse(urlPath, true);
-        assertNotNull("path did not parse successfully", cp);
-        assertTrue("path selector 1 not found", cp.getSelector(selector1));
-        assertTrue("path selector 2 not found", cp.getSelector(selector2));
-        assertFalse("bad path selector found", cp.getSelector("not there"));
-    }
-
-    /** */
-    public void testNoPathSelectors() throws Exception {
-        String urlPath = "/collection/deadbeef-cafebebe";
-        CollectionPath cp = CollectionPath.parse(urlPath);
-        assertFalse("bad path selector found", cp.getSelector("not there"));
-    }
-
-    /** */
-    public void testNoPathSelectorsTrailingSlash() throws Exception {
-        String urlPath = "/collection/deadbeef-cafebebe/";
-        CollectionPath cp = CollectionPath.parse(urlPath);
-        assertFalse("bad path selector found", cp.getSelector("not there"));
+        assertNotNull("path info not found", cp.getPathInfo());
+        assertEquals("found incorrect path info", pathInfo, cp.getPathInfo());
     }
 }

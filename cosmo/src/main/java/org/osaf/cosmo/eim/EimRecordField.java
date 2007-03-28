@@ -47,6 +47,7 @@ public abstract class EimRecordField {
 
     private String name;
     private Object value;
+    private boolean missing = false;
 
     /** */
     public EimRecordField(String name) {
@@ -78,6 +79,16 @@ public abstract class EimRecordField {
     /** */
     public void setRecord(EimRecord record) {
         this.record = record;
+    }
+    
+    /** */
+    public boolean isMissing() {
+        return missing;
+    }
+
+    /** */
+    public void setMissing(boolean missing) {
+        this.missing = missing;
     }
 
     /** */

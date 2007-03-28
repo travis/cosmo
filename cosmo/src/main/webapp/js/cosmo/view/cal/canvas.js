@@ -360,7 +360,7 @@ cosmo.view.cal.canvas = new function () {
             // 'All Future Events' 
             if (opts.saveType == 'instanceAllFuture') {
                 // Master recurrence event id
-                idArr.push(opts.originalEvent.data.id);
+                idArr.push(opts.instanceEvent.data.id);
                 // id for first event in new recurrence
                 idArr.push(ev.data.id);
             }
@@ -391,7 +391,7 @@ cosmo.view.cal.canvas = new function () {
             // ----------------------
             if (opts.saveType == 'instanceAllFuture' || 
                 opts.saveType == 'singleEventAddRecurrence') {
-                h.removeItem(opts.originalEvent.id);
+                h.removeItem(opts.instanceEvent.id);
             }
             // Append the new recurrence expansions from the server
             // onto the eventRegistry
@@ -635,8 +635,25 @@ cosmo.view.cal.canvas = new function () {
                 // Otherwise put it back where it was and
                 // restore to non-processing state
                 else {
-                    restoreEvent(ev);
-                    ev.setInputDisabled(false);
+                    var rEv = null;
+                    // Recurrence, 'All events'
+                    if (opts.saveType == 'recurrenceMaster' || 
+                        opts.saveType == 'instanceAllFuture') {
+                        // Edit ocurring from one of the instances
+                        if (opts.instanceEvent) {
+                            rEv = opts.instanceEvent
+                        }
+                        // Edit occurring from the actual master
+                        else {
+                            rEv = ev;
+                        }
+                    }
+                    // Single event
+                    else {
+                        var rEv = ev;
+                    }
+                    restoreEvent(rEv);
+                    rEv.setInputDisabled(false);
                 }
                 break;
             case 'saveSuccess':
@@ -645,6 +662,10 @@ cosmo.view.cal.canvas = new function () {
             case 'removeSuccess':
                 var ev = cmd.data;
                 removeSuccess(ev, opts)
+                break;
+            case 'removeFailed':
+                var ev = cmd.data;
+                
                 break;
             default:
                 // Do nothing

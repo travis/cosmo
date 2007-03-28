@@ -31,6 +31,12 @@ public class IntegerField extends EimRecordField {
     }
 
     /** */
+    public IntegerField(String name,
+                        boolean value) {
+        super(name, value ? new Integer(1) : new Integer(0));
+    }
+
+    /** */
     public Integer getInteger() {
         return (Integer) getValue();
     }

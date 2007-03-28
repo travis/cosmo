@@ -138,7 +138,7 @@ public class ICalendarToCosmoConverter {
                     endCalendar.setTime(endDate);
                     endCalendar.add(Calendar.DATE, -1);
                     endDate = new net.fortuna.ical4j.model.Date(endCalendar.getTimeInMillis());
-                    event.setEnd(createCosmoDate((net.fortuna.ical4j.model.Date)endDate, calendar, null));
+                    event.setEnd(createCosmoDate(endDate, calendar, null));
                 }
                 break;
             case ANYTIME:
@@ -160,11 +160,11 @@ public class ICalendarToCosmoConverter {
                     if (tz != null){
                         endDateTime.setTimeZone(tz);
                     }
-                    event.setEnd(createCosmoDate(endDateTime, calendar, tzid != null ? tzid.getValue() : ""));
+                    event.setEnd(createCosmoDate(endDateTime, calendar, tzid != null ? tzid.getValue() : null));
                 } else {
-                    event.setStart(createCosmoDate(dtStart, calendar));
                     event.setEnd(createCosmoDate(dtEnd, calendar));
                 }
+                event.setStart(createCosmoDate(dtStart, calendar));
                 break;
         }
     }
@@ -175,8 +175,9 @@ public class ICalendarToCosmoConverter {
        boolean startDateHasTime = startDate instanceof DateTime;
 
        // check for anytime
-       if (VALUE_TRUE.equals(getParameterValue(dtStart,
-               PARAM_X_OSAF_ANYTIME))) {
+       String anytime = getParameterValue(dtStart,
+               PARAM_X_OSAF_ANYTIME);
+       if(anytime != null && anytime.startsWith(VALUE_TRUE)) {
            return EventType.ANYTIME;
        }
 
@@ -221,10 +222,12 @@ public class ICalendarToCosmoConverter {
         DtEnd dtEnd = null;
         Duration duration = null;
         net.fortuna.ical4j.model.Date endDate = null;
+        Value v = dtStart.getDate() instanceof DateTime ?
+            Value.DATE_TIME : Value.DATE;
         if (durationInstance != null){
             dtEnd = null;
             duration = durationInstance;
-            endDate = Dates.getInstance(duration.getDuration().getTime(dtStart.getDate()),dtStart.getDate());
+            endDate = Dates.getInstance(duration.getDuration().getTime(dtStart.getDate()), v);
         } else if (dtEndInstance != null){
             dtEnd = dtEndInstance;
             duration = null;
@@ -232,7 +235,7 @@ public class ICalendarToCosmoConverter {
         } else if (durationMaster != null){
             dtEnd = null;
             duration = durationMaster;
-            endDate = Dates.getInstance(duration.getDuration().getTime(dtStart.getDate()),dtStart.getDate());
+            endDate = Dates.getInstance(duration.getDuration().getTime(dtStart.getDate()), v );
         } else if (dtEndMaster != null){
             duration = null;
             dtEnd = dtEndMaster;
@@ -337,7 +340,12 @@ public class ICalendarToCosmoConverter {
                 instanceStartDateTime.setTimeZone(masterTimezone);
             }
 
-            VEvent vInstance = (VEvent) masterVEvent.copy();
+            VEvent vInstance = null;
+            try {
+                vInstance = (VEvent) masterVEvent.copy();
+            } catch (Exception e) {
+                throw new RuntimeException("Cannot copy event", e);
+            }
 
             // deal with DTSTART
             vInstance.getStartDate().setDate(instanceStartDate);
@@ -399,7 +407,7 @@ public class ICalendarToCosmoConverter {
                     Component.VEVENT);
             for (Object o : vevents) {
                 VEvent vEvent = (VEvent) o;
-                RecurrenceId recurrenceId = vEvent.getReccurrenceId();
+                RecurrenceId recurrenceId = vEvent.getRecurrenceId();
                 if (recurrenceId != null) {
                     Range range = (Range) recurrenceId.getParameters()
                             .getParameter(Parameter.RANGE);
@@ -426,7 +434,7 @@ public class ICalendarToCosmoConverter {
 
             for (int x = thisAndPriors.size() - 1; x >=0; x--){
                 VEvent curInstance = thisAndPriors.get(x);
-                net.fortuna.ical4j.model.Date insDate = curInstance.getReccurrenceId().getDate();
+                net.fortuna.ical4j.model.Date insDate = curInstance.getRecurrenceId().getDate();
 
                 if (insDate.equals(date)){
                     copyProperties(curInstance, instance, date);
@@ -443,7 +451,7 @@ public class ICalendarToCosmoConverter {
 
             for (int x = 0; x < thisAndFutures.size();x++){
                 VEvent curInstance = thisAndPriors.get(x);
-                net.fortuna.ical4j.model.Date insDate = curInstance.getReccurrenceId().getDate();
+                net.fortuna.ical4j.model.Date insDate = curInstance.getRecurrenceId().getDate();
 
                 if (insDate.equals(date)){
                     copyProperties(curInstance, instance, date);
@@ -478,9 +486,9 @@ public class ICalendarToCosmoConverter {
             DtStart dtStart = (DtStart) source.getProperties().getProperty(Property.DTSTART);
             if (dtStart != null) {
                 if (!dtStart.getDate().equals(
-                        source.getReccurrenceId().getDate())) {
+                        source.getRecurrenceId().getDate())) {
                     long delta = dtStart.getDate().getTime()
-                            - source.getReccurrenceId().getDate().getTime();
+                            - source.getRecurrenceId().getDate().getTime();
                     net.fortuna.ical4j.model.Date newDate = createDate((d.getTime() + delta), getTimeZone(dtStart.getDate()), dtStart.getDate() instanceof DateTime  );
                     DtStart newDtStart = new DtStart(newDate);
                     ICalendarUtils.addOrReplaceProperty(dest, newDtStart);
@@ -528,11 +536,11 @@ public class ICalendarToCosmoConverter {
                 if (!isTimeInRange(instanaceDate, rangeStart, rangeEnd)){
                     VEvent event = overrideMap.get(instanaceDate);
                     if (isDateInRange(event.getStartDate().getDate(), rangeStart, rangeEnd)){
-                        startDateList.add(event.getReccurrenceId().getDate());
+                        startDateList.add(event.getRecurrenceId().getDate());
                     } else {
                         if (hasProperty(event, Property.DTEND) || hasProperty(event, Property.DURATION)){
                             if (isDateInRange(event.getEndDate().getDate(), rangeStart, rangeEnd)){
-                                startDateList.add(event.getReccurrenceId().getDate());
+                                startDateList.add(event.getRecurrenceId().getDate());
                             }
                         }
                     }
@@ -589,12 +597,54 @@ public class ICalendarToCosmoConverter {
         // If this is a datetime, we must convert from UTC to the appropriate
         // timezone
         if (until != null) {
-            Calendar untilCalendar = Calendar.getInstance();
-            untilCalendar.setTime(until);
-            untilCalendar.add(Calendar.DATE, -1);
-            net.fortuna.ical4j.model.Date date = new net.fortuna.ical4j.model.Date(untilCalendar.getTimeInMillis());
-            CosmoDate scoobyDate = createCosmoDate(date , calendar, null);
-            recurrenceRule.setEndDate(scoobyDate);
+            until = ICalendarUtils.clone(until);
+            if (startDate instanceof DateTime){            
+                DateTime startDateTime = (DateTime) startDate;
+                DateTime untilDateTime = until instanceof DateTime ? (DateTime) until : new DateTime(until.getTime()); 
+                
+                //the until is normally in UTC, but we need it in local time for our purposes.
+                if (startDateTime.getTimeZone() != null){
+                    untilDateTime.setTimeZone(startDateTime.getTimeZone());
+                }
+                
+                Calendar untilCalendar = untilDateTime.getTimeZone() != null ? Calendar
+                        .getInstance(untilDateTime.getTimeZone())
+                        : Calendar.getInstance();
+                untilCalendar.setTimeInMillis(untilDateTime.getTime());
+                
+                Calendar startDateCalendar = startDateTime.getTimeZone() != null ? Calendar
+                        .getInstance(startDateTime.getTimeZone())
+                        : Calendar.getInstance();
+                startDateCalendar.setTimeInMillis(startDateTime.getTime());
+
+                //make a new date that takes the date component of the until date, and the time component
+                //of the start date
+                Calendar tempCalendar = startDateTime.getTimeZone() != null ? Calendar
+                        .getInstance(startDateTime.getTimeZone())
+                        : Calendar.getInstance();
+                tempCalendar.clear();
+                tempCalendar.set(Calendar.MONTH, untilCalendar.get(Calendar.MONTH));
+                tempCalendar.set(Calendar.DATE, untilCalendar.get(Calendar.DATE));
+                tempCalendar.set(Calendar.YEAR, untilCalendar.get(Calendar.YEAR));
+                tempCalendar.set(Calendar.HOUR_OF_DAY, startDateCalendar.get(Calendar.HOUR_OF_DAY));
+                tempCalendar.set(Calendar.MINUTE, startDateCalendar.get(Calendar.MINUTE));
+                tempCalendar.set(Calendar.SECOND, startDateCalendar.get(Calendar.SECOND));
+                
+                if (untilCalendar.getTimeInMillis() < tempCalendar.getTimeInMillis()){
+                    untilCalendar.add(Calendar.DATE, -1);
+                }
+                CosmoDate cosmoRecurEndDate = createCosmoDate(untilCalendar,null, false, false);
+                cosmoRecurEndDate.setHours(0);
+                cosmoRecurEndDate.setMinutes(0);
+                cosmoRecurEndDate.setSeconds(0);
+                recurrenceRule.setEndDate(cosmoRecurEndDate);
+            } else {
+                Calendar untilCalendar = Calendar.getInstance();
+                untilCalendar.setTime(until);
+                net.fortuna.ical4j.model.Date date = new net.fortuna.ical4j.model.Date(untilCalendar.getTimeInMillis());
+                CosmoDate scoobyDate = createCosmoDate(date , calendar, null);
+                recurrenceRule.setEndDate(scoobyDate);
+            }
         } else {
             recurrenceRule.setEndDate(null);
         }
@@ -624,7 +674,7 @@ public class ICalendarToCosmoConverter {
         if (vevents != null){
             for (int x = 0; x < vevents.size();x++){
                 VEvent curVEvent = (VEvent) vevents.get(x);
-                RecurrenceId recurrenceId = curVEvent.getReccurrenceId();
+                RecurrenceId recurrenceId = curVEvent.getRecurrenceId();
                 if (recurrenceId != null){
                     Modification modification = new Modification();
                     CosmoDate instanceDate = createCosmoDate(recurrenceId,  calendar);
@@ -659,7 +709,7 @@ public class ICalendarToCosmoConverter {
         addIfHasProperty(modificationEvent, props, Property.LOCATION, EVENT_LOCATION);
         addIfHasProperty(modificationEvent, props, Property.STATUS, EVENT_STATUS);
 
-        RecurrenceId recurrenceId = modificationEvent.getReccurrenceId();
+        RecurrenceId recurrenceId = modificationEvent.getRecurrenceId();
         net.fortuna.ical4j.model.Date origStartDate = recurrenceId.getDate();
 
         if (modificationEvent.getStartDate() != null) {
@@ -794,38 +844,38 @@ public class ICalendarToCosmoConverter {
     private CosmoDate createCosmoDate(net.fortuna.ical4j.model.Date date,
             net.fortuna.ical4j.model.Calendar calendar, String tzid) {
 
-        CosmoDate scoobyDate = new CosmoDate();
         Calendar jCalendar = null;
-        boolean hasTime = false;
-
+        boolean isUtc = false;
         if (tzid != null && date instanceof DateTime){
-            hasTime = true;
-            DateTime dateTime = (DateTime) date;
-            scoobyDate.setTzId(tzid);
             VTimeZone vtimeZone = getVTimeZone(tzid, calendar);
             jCalendar = Calendar.getInstance(new TimeZone(vtimeZone));
-            jCalendar.setTime(dateTime);
         } else if (isUtc(date)) {
-            hasTime = true;
-            DateTime dateTime = (DateTime) date;
-            scoobyDate.setUtc(true);
+            isUtc = true;
             jCalendar = Calendar.getInstance(java.util.TimeZone.getTimeZone("GMT"));
-            jCalendar.setTime(dateTime);
         } else {
-            hasTime = date instanceof DateTime;
             jCalendar = Calendar.getInstance();
-            jCalendar.setTime(date);
         }
+        
+        jCalendar.setTime(date);
 
-        scoobyDate.setYear(jCalendar.get(Calendar.YEAR));
-        scoobyDate.setMonth(jCalendar.get(Calendar.MONTH));
-        scoobyDate.setDate(jCalendar.get(Calendar.DATE));
+        return createCosmoDate(jCalendar, tzid, isUtc, date instanceof DateTime);
+    }
+    
+    private CosmoDate createCosmoDate(Calendar calendar, String tzId,
+            boolean utc, boolean hasTime) {
+        CosmoDate cosmoDate = new CosmoDate();
+
+        cosmoDate.setUtc(utc);
+        cosmoDate.setTzId(tzId);
+        cosmoDate.setYear(calendar.get(Calendar.YEAR));
+        cosmoDate.setMonth(calendar.get(Calendar.MONTH));
+        cosmoDate.setDate(calendar.get(Calendar.DATE));
         if (hasTime) {
-            scoobyDate.setHours(jCalendar.get(Calendar.HOUR_OF_DAY));
-            scoobyDate.setMinutes(jCalendar.get(Calendar.MINUTE));
-            scoobyDate.setSeconds(jCalendar.get(Calendar.SECOND));
+            cosmoDate.setHours(calendar.get(Calendar.HOUR_OF_DAY));
+            cosmoDate.setMinutes(calendar.get(Calendar.MINUTE));
+            cosmoDate.setSeconds(calendar.get(Calendar.SECOND));
         }
-        return scoobyDate;
+        return cosmoDate;
     }
 
     private CosmoDate createCosmoDate(DateProperty dateProperty,

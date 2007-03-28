@@ -85,7 +85,7 @@ dojo.declare("cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
             }
             this._loadedRegions[region] = true;
         }
-        return this._tzsByRegion[region];
+        return this._tzsByRegion[region] || [];
     }, 
     
     getLink: function(tzid){

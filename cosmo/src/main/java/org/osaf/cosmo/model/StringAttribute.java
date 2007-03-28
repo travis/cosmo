@@ -73,4 +73,39 @@ public class StringAttribute extends Attribute implements
         attr.setValue(getValue());
         return attr;
     }
+    
+    /**
+     * Convienence method for returning a String value on a StringAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch StringAttribute from
+     * @param qname QName of attribute
+     * @return String value of StringAttribute
+     */
+    public static String getValue(Item item, QName qname) {
+        StringAttribute ta = (StringAttribute) item.getAttribute(qname);
+        if(ta==null)
+            return null;
+        else
+            return ta.getValue();
+    }
+    
+    /**
+     * Convienence method for setting a String value on a StringAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch StringAttribute from
+     * @param qname QName of attribute
+     * @param value value to set on StringAttribute
+     */
+    public static void setValue(Item item, QName qname, String value) {
+        StringAttribute attr = (StringAttribute) item.getAttribute(qname);
+        if(attr==null && value!=null) {
+            attr = new StringAttribute(qname,value);
+            item.addAttribute(attr);
+            return;
+        }
+        if(value==null)
+            item.removeAttribute(qname);
+        else
+            attr.setValue(value);
+    }
 }

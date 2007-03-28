@@ -33,16 +33,20 @@
     <level value="OFF"/>
   </logger>
 
+  <logger name="org.hibernate.cache.ReadWriteCache">
+    <level value="OFF"/>
+  </logger>
+
+  <logger name="org.osaf.cosmo.hibernate.CosmoLobHandler">
+    <level value="OFF"/>
+  </logger>
+
   <logger name="org.apache.catalina.startup.Catalina">
     <level value="INFO"/>
   </logger>
 
   <logger name="org.osaf">
     <level value="DEBUG"/>
-  </logger>
-  
-  <logger name="org.osaf.cosmo.ui">
-    <level value="INFO"/>
   </logger>
 
   <logger name="org.osaf.cosmo.acegisecurity.context.HttpRequestContextIntegrationFilter">

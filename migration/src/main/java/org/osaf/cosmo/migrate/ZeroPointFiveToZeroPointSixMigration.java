@@ -15,13 +15,14 @@
  */
 package org.osaf.cosmo.migrate;
 import java.io.ByteArrayInputStream;
-import java.rmi.server.UID;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
@@ -56,15 +57,19 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
     public String getToVersion() {
         return "0.6.0";
     }
+    
+    @Override
+    public List<String> getSupportedDialects() {
+        ArrayList<String> dialects = new ArrayList<String>();
+        dialects.add("Derby");
+        dialects.add("MySQL5");
+        return dialects;
+    }
 
     public void migrateData(Connection conn, String dialect) throws Exception {
         
         log.debug("starting migrateData()");
-        
-        if(!"MySQL5".equals(dialect) && !"Derby".equals(dialect))
-            throw new UnsupportedDialectException("Unsupported dialect " + dialect);
-        
-        
+         
         // set isActive=true for all items
         PreparedStatement stmt = conn.prepareStatement("update item set isactive=?");
         stmt.setBoolean(1, true);

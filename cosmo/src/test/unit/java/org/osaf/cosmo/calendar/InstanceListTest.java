@@ -25,8 +25,6 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Instance;
-import net.fortuna.ical4j.model.InstanceList;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
@@ -52,7 +50,7 @@ public class InstanceListTest extends TestCase {
         boolean addedMaster = false;
         while(it.hasNext()) {
             VEvent event = it.next();
-            if(event.getReccurrenceId()==null) {
+            if(event.getRecurrenceId()==null) {
                 addedMaster = true;
                 instances.addComponent(event, start, end);
             }
@@ -126,7 +124,7 @@ public class InstanceListTest extends TestCase {
         boolean addedMaster = false;
         while(it.hasNext()) {
             VEvent event = it.next();
-            if(event.getReccurrenceId()==null) {
+            if(event.getRecurrenceId()==null) {
                 addedMaster = true;
                 instances.addComponent(event, start, end);
             }

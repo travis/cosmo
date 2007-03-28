@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # -*- Mode: Perl; indent-tabs-mode: nil; -*-
 # 
-# Copyright 2005-2006 Open Source Applications Foundation
+# Copyright 2005-2007 Open Source Applications Foundation
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ use strict;
 
 use constant URL_NS_CMP => "/cmp";
 use constant URL_NS_CMP_USER => URL_NS_CMP . "/user";
+use constant URL_NS_MC => "/mc";
 use constant URL_NS_REPOSITORY => "/home";
 use constant REALM => "Cosmo Sharing Server";
+use constant MEDIA_TYPE_EIMML => "application/eim+xml";
 
 1;

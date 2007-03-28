@@ -1,8 +1,8 @@
 # -*- rnc -*-
 # RELAX NG Compact Syntax Grammar for the
-# EIMML item record type Version 1
+# EIMML item record type Version 0
 
-namespace item = "http://osafoundation.org/eim/item"
+namespace item = "http://osafoundation.org/eim/item/0"
 
 include "eimml-core.rnc"
 
@@ -10,10 +10,10 @@ eimItemRecord =
    element item:record {
       (itemUuid
        & itemTitle?
-       & itemTriageStatus?
-       & itemTriageStatusChanged?
-       & itemLastModifiedBy?
+       & itemTriage?
        & itemCreatedOn?
+       & itemHasBeenSent?
+       & itemNeedsReply?
        & anyItemField*)
    }
 
@@ -27,24 +27,27 @@ itemTitle =
       eimTextFieldContent
    }
 
-itemTriageStatus =
-   element item:triageStatus {
+itemTriage =
+   element item:triage {
       eimTextFieldContent
    }
 
-itemTriageStatusChanged =
-   element item:triageStatusChanged {
+# digits=20, decimal_places=0
+itemCreatedOn =
+   element item:createdOn {
       eimDecimalFieldContent
    }
 
-itemLastModifiedBy =
-   element item:lastModifiedBy {
-      eimTextFieldContent
+# either 1 or 0
+itemHasBeenSent =
+   element item:hasBeenSent {
+      eimIntegerFieldContent
    }
 
-itemCreatedOn =
-   element item:createdOn {
-      eimTimeStampFieldContent
+# either 1 or 0
+itemNeedsReply =
+   element item:needsReply {
+      eimIntegerFieldContent
    }
 
 anyItemField =
@@ -53,7 +56,6 @@ anyItemField =
        | eimDecimalFieldContent
        | eimIntegerFieldContent
        | eimDateTimeFieldContent
-       | eimTimeStampFieldContent
        | eimBytesFieldContent
        | eimBlobFieldContent
        | eimClobFieldContent)*

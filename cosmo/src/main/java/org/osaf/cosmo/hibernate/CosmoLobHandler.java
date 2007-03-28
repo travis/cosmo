@@ -49,10 +49,9 @@ public class CosmoLobHandler extends DefaultLobHandler {
                 throws SQLException {
 
             ps.setBlob(paramIndex, Hibernate.createBlob(content));
-            if (logger.isDebugEnabled()) {
-                logger.debug(content != null ? "Set bytes for BLOB with length " + content.length :
-                        "Set BLOB to null");
-            }
+            //            if (logger.isDebugEnabled()) {
+            //                logger.debug(content != null ? "Set bytes for BLOB with length " + content.length : "Set BLOB to null");
+            //            }
         }
     }
 

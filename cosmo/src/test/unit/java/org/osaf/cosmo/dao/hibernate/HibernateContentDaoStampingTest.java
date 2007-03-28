@@ -24,13 +24,15 @@ import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.MessageStamp;
-import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
+import org.osaf.cosmo.model.StampTombstone;
 import org.osaf.cosmo.model.StringAttribute;
+import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.User;
 
 public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCase {
@@ -51,7 +53,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         item.setIcalUid("icaluid");
         item.setBody("this is a body");
         
-        MessageStamp message = new MessageStamp();
+        MessageStamp message = new MessageStamp(item);
         message.setBcc("bcc");
         message.setTo("to");
         message.setSubject("subject");
@@ -68,7 +70,6 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         Assert.assertEquals(2, queryItem.getStamps().size());
-        Assert.assertEquals(2, queryItem.getActiveStamps().size());
         
         Stamp stamp = queryItem.getStamp(EventStamp.class);
         Assert.assertNotNull(stamp.getCreationDate());
@@ -102,7 +103,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         ((NoteItem) item).setBody("this is a body");
         ((NoteItem) item).setIcalUid("icaluid");
         
-        MessageStamp message = new MessageStamp();
+        MessageStamp message = new MessageStamp(item);
         message.setBcc("bcc");
         message.setTo("to");
         message.setSubject("subject");
@@ -119,7 +120,6 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         Assert.assertEquals(2, queryItem.getStamps().size());
-        Assert.assertEquals(2, queryItem.getActiveStamps().size());
         
         Stamp stamp = queryItem.getStamp(MessageStamp.class);
         queryItem.removeStamp(stamp);
@@ -133,8 +133,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         clearSession();
         queryItem = contentDao.findContentByUid(newItem.getUid());
-        Assert.assertEquals(2, queryItem.getStamps().size());
-        Assert.assertEquals(1, queryItem.getActiveStamps().size());
+        Assert.assertEquals(1, queryItem.getStamps().size());
         Assert.assertNull(queryItem.getStamp(MessageStamp.class));
         stamp = queryItem.getStamp(EventStamp.class);
         es = (EventStamp) stamp;
@@ -157,7 +156,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
             contentDao.createContent(root, item);
             clearSession();
             Assert.fail("able to create invalid event!");
-        } catch (ModelValidationException e) {}
+        } catch (InvalidStateException e) {}
     }
     
     public void testRemoveStamp() throws Exception {
@@ -179,8 +178,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         Assert.assertEquals(1, queryItem.getStamps().size());
-        Assert.assertEquals(1, queryItem.getActiveStamps().size());
-        
+       
         Stamp stamp = queryItem.getStamp(EventStamp.class);
         queryItem.removeStamp(stamp);
         contentDao.updateContent(queryItem);
@@ -188,11 +186,22 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         queryItem = contentDao.findContentByUid(newItem.getUid());
         Assert.assertNotNull(queryItem);
-        Assert.assertEquals(queryItem.getStamps().size(),1);
-        Assert.assertEquals(queryItem.getActiveStamps().size(),0);
-        Assert.assertTrue(
-                queryItem.getStamps().iterator().next() instanceof EventStamp);
+        Assert.assertEquals(queryItem.getStamps().size(),0);
+        Assert.assertEquals(1, queryItem.getTombstones().size());
         
+        Tombstone ts = queryItem.getTombstones().iterator().next();
+        Assert.assertTrue(ts instanceof StampTombstone);
+        Assert.assertEquals(((StampTombstone)ts).getStampType(),stamp.getType());
+        
+        event = new EventStamp();
+        event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        queryItem.addStamp(event);
+        
+        contentDao.updateContent(queryItem);
+        clearSession();
+        
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        Assert.assertEquals(1, queryItem.getStamps().size());
     }
     
     public void testCalendarCollectionStamp() throws Exception {
@@ -224,7 +233,6 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         CollectionItem queryCol = contentDao.findCollectionByUid(root.getUid());
         Assert.assertEquals(1, queryCol.getStamps().size());
-        Assert.assertEquals(1, queryCol.getActiveStamps().size());
         Stamp stamp = queryCol.getStamp(CalendarCollectionStamp.class);
         Assert.assertTrue(stamp instanceof CalendarCollectionStamp);
         Assert.assertEquals("calendar", stamp.getType());
@@ -256,6 +264,59 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         } catch (InvalidStateException ise) {
             
         } 
+    }
+    
+    public void testEventExceptionStamp() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        NoteItem item = generateTestContent();
+        
+        item.setIcalUid("icaluid");
+        item.setBody("this is a body");
+        
+        EventExceptionStamp eventex = new EventExceptionStamp();
+        eventex.setExceptionCalendar(helper.getCalendar(baseDir + "/exception.ics"));
+        
+        item.addStamp(eventex);
+        
+        ContentItem newItem = contentDao.createContent(root, item);
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        Assert.assertEquals(1, queryItem.getStamps().size());
+       
+        Stamp stamp = queryItem.getStamp(EventExceptionStamp.class);
+        Assert.assertNotNull(stamp.getCreationDate());
+        Assert.assertNotNull(stamp.getModifiedDate());
+        Assert.assertTrue(stamp.getCreationDate().equals(stamp.getModifiedDate()));
+        Assert.assertTrue(stamp instanceof EventExceptionStamp);
+        Assert.assertEquals("eventexception", stamp.getType());
+        EventExceptionStamp ees = (EventExceptionStamp) stamp;
+        Assert.assertEquals(ees.getExceptionCalendar().toString(), eventex.getExceptionCalendar()
+                .toString());
+    }
+    
+    public void testEventExceptionStampValidation() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        NoteItem item = generateTestContent();
+        
+        item.setIcalUid("icaluid");
+        item.setBody("this is a body");
+        
+        EventExceptionStamp eventex = new EventExceptionStamp();
+        eventex.setExceptionCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        
+        item.addStamp(eventex);
+        
+        try {
+            ContentItem newItem = contentDao.createContent(root, item);
+            clearSession();
+            Assert.fail("able to save invalid exception event");
+        } catch (InvalidStateException e) {
+        }
     }
 
     private User getUser(UserDao userDao, String username) {

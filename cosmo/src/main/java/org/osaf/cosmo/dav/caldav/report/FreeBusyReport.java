@@ -27,8 +27,6 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Instance;
-import net.fortuna.ical4j.model.InstanceList;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.PeriodList;
@@ -40,14 +38,17 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VFreeBusy;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.parameter.FbType;
+import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.FreeBusy;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Version;
+import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.Dates;
 
+import org.apache.commons.id.uuid.VersionFourGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.DavException;
@@ -57,6 +58,8 @@ import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.calendar.Instance;
+import org.osaf.cosmo.calendar.InstanceList;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
@@ -79,6 +82,8 @@ import org.w3c.dom.Element;
  */
 public class FreeBusyReport extends CaldavSingleResourceReport {
     private static final Log log = LogFactory.getLog(FreeBusyReport.class);
+    private static final VersionFourGenerator uuidGenerator =
+        new VersionFourGenerator();
 
     private VTimeZone tz = null;
     
@@ -181,6 +186,8 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
 
         VFreeBusy vfb =
             new VFreeBusy(freeBusyRange.getStart(), freeBusyRange.getEnd());
+        String uid = uuidGenerator.nextIdentifier().toString();
+        vfb.getProperties().add(new Uid(uid));
         calendar.getComponents().add(vfb);
 
         // Add all periods to the VFREEBUSY
@@ -211,7 +218,6 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
             log.error("cannot generate freebusy", e);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot generate freebusy: " + e.getMessage());
         } catch (ValidationException e) {
-            log.error("invalid freebusy generated", e);
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "invalid freebusy generated: " + e.getMessage());
         }
 
@@ -305,7 +311,7 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
             if (comp instanceof VEvent) {
                 VEvent vcomp = (VEvent) comp;
                 // See if this is the master instance
-                if (vcomp.getReccurrenceId() == null) {
+                if (vcomp.getRecurrenceId() == null) {
                     instances.addComponent(vcomp, freeBusyRange.getStart(),
                                            freeBusyRange.getEnd());
                 } else {
@@ -362,16 +368,18 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
             if (instance.getStart() instanceof DateTime) {
                 DateTime start = (DateTime) instance.getStart();
                 DateTime end = (DateTime) instance.getEnd();
+                Value sv = freeBusyRange.getStart() instanceof DateTime ?
+                    Value.DATE_TIME : Value.DATE;
+                Value se = freeBusyRange.getEnd() instanceof DateTime ?
+                    Value.DATE_TIME : Value.DATE;
 
                 if (start.compareTo(freeBusyRange.getStart()) < 0) {
                     start = (DateTime)
-                        Dates.getInstance(freeBusyRange.getStart(),
-                                          freeBusyRange.getStart());
+                        Dates.getInstance(freeBusyRange.getStart(), sv);
                 }
                 if (end.compareTo(freeBusyRange.getEnd()) > 0) {
                     end = (DateTime)
-                        Dates.getInstance(freeBusyRange.getEnd(),
-                                          freeBusyRange.getEnd());
+                        Dates.getInstance(freeBusyRange.getEnd(), se);
                 }
                 if (Status.VEVENT_TENTATIVE.equals(instance.getComp()
                                                    .getProperties().

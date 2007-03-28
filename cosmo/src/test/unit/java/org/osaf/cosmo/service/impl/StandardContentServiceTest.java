@@ -15,10 +15,19 @@
  */
 package org.osaf.cosmo.service.impl;
 
+import java.io.FileInputStream;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
+
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.ComponentList;
+import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,9 +35,12 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
+import org.osaf.cosmo.model.EventExceptionStamp;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockContentItem;
@@ -52,6 +64,8 @@ public class StandardContentServiceTest extends TestCase {
     private MockDaoStorage storage;
     private SingleVMLockManager lockManager;
     private TestHelper testHelper;
+    
+    protected String baseDir = "src/test/unit/resources/testdata/";
 
     /** */
     protected void setUp() throws Exception {
@@ -156,7 +170,7 @@ public class StandardContentServiceTest extends TestCase {
         dummyCollection.setName("foo");
         dummyCollection.setOwner(user);
         
-        ContentItem dummyContent = new ContentItem();
+        NoteItem dummyContent = new NoteItem();
         dummyContent.setName("bar");
         dummyContent.setOwner(user);
         
@@ -263,6 +277,73 @@ public class StandardContentServiceTest extends TestCase {
     }
     
     /** */
+    public void testUpdateEvent() throws Exception {
+        User user = testHelper.makeDummyUser();
+        CollectionItem rootCollection = contentDao.createRootItem(user);
+        NoteItem masterNote = new NoteItem();
+        masterNote.setName("foo");
+        masterNote.setOwner(user);
+        
+        Calendar calendar = getCalendar("event_with_exceptions1.ics"); 
+        
+        EventStamp eventStamp = new EventStamp(masterNote);
+        masterNote.addStamp(eventStamp);
+        contentDao.createContent(rootCollection, masterNote);
+        
+        service.updateEvent(masterNote, calendar);
+        
+        Calendar masterCal = eventStamp.getMasterCalendar();
+        VEvent masterEvent = eventStamp.getMasterEvent();
+        
+        Assert.assertEquals(1, masterCal.getComponents().getComponents(Component.VEVENT).size());
+        Assert.assertNull(eventStamp.getMasterEvent().getRecurrenceId());
+        Assert.assertTrue(masterNote.getContentLength().equals( new Long(calendar.toString().getBytes("UTF-8").length)));
+        
+        Assert.assertEquals(masterNote.getModifications().size(), 4);
+        for(NoteItem mod : masterNote.getModifications()) {
+            EventExceptionStamp eventException = EventExceptionStamp.getStamp(mod);
+            VEvent exceptionEvent = eventException.getExceptionEvent();
+            Assert.assertEquals(mod.getModifies(), masterNote);
+            Assert.assertEquals(masterEvent.getUid().getValue(), exceptionEvent.getUid().getValue());
+        }
+        
+        Assert.assertNotNull(getEvent("20060104T140000", eventStamp.getCalendar()));
+        Assert.assertNotNull(getEvent("20060105T140000", eventStamp.getCalendar()));
+        Assert.assertNotNull(getEvent("20060106T140000", eventStamp.getCalendar()));
+        Assert.assertNotNull(getEvent("20060107T140000", eventStamp.getCalendar()));
+        
+        Assert.assertNotNull(getEventException("20060104T140000", masterNote.getModifications()));
+        Assert.assertNotNull(getEventException("20060105T140000", masterNote.getModifications()));
+        Assert.assertNotNull(getEventException("20060106T140000", masterNote.getModifications()));
+        Assert.assertNotNull(getEventException("20060107T140000", masterNote.getModifications()));
+        
+        
+        Calendar fullCal = eventStamp.getCalendar();
+        Assert.assertEquals(fullCal.getComponents().getComponents(Component.VEVENT).size(), 5);
+        
+        // now update
+        calendar = getCalendar("event_with_exceptions2.ics"); 
+        service.updateEvent(masterNote, calendar);
+        
+        // should have removed 1, added 2 so that makes 4-1+2=5
+        Assert.assertEquals(masterNote.getModifications().size(), 5);
+        Assert.assertNotNull(getEventException("20060104T140000", masterNote.getModifications()));
+        Assert.assertNotNull(getEventException("20060105T140000", masterNote.getModifications()));
+        Assert.assertNotNull(getEventException("20060106T140000", masterNote.getModifications()));
+        Assert.assertNull(getEventException("20060107T140000", masterNote.getModifications()));
+        Assert.assertNotNull(getEventException("20060108T140000", masterNote.getModifications()));
+        Assert.assertNotNull(getEventException("20060109T140000", masterNote.getModifications()));
+        
+        Assert.assertNotNull(getEvent("20060104T140000", eventStamp.getCalendar()));
+        Assert.assertNotNull(getEvent("20060105T140000", eventStamp.getCalendar()));
+        Assert.assertNotNull(getEvent("20060106T140000", eventStamp.getCalendar()));
+        Assert.assertNull(getEvent("20060107T140000", eventStamp.getCalendar()));
+        Assert.assertNotNull(getEvent("20060108T140000", eventStamp.getCalendar()));
+        Assert.assertNotNull(getEvent("20060109T140000", eventStamp.getCalendar()));
+    }
+    
+    
+    /** */
     public void testNullContentDao() throws Exception {
         service.setContentDao(null);
         try {
@@ -277,6 +358,32 @@ public class StandardContentServiceTest extends TestCase {
         for(Item item : items)
             if(item.getName().equals(name))
                 return (ContentItem) item;
+        return null;
+    }
+    
+    private EventExceptionStamp getEventException(String recurrenceId, Set<NoteItem> items) {
+        for(NoteItem mod : items) {
+            EventExceptionStamp ees = EventExceptionStamp.getStamp(mod);
+            if(ees.getRecurrenceId().toString().equals(recurrenceId))
+                return ees;
+        }
+        return null;
+    }
+    
+    private Calendar getCalendar(String filename) throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + filename);
+        Calendar calendar = cb.build(fis);
+        return calendar;
+    }
+    
+    private VEvent getEvent(String recurrenceId, Calendar calendar) {
+        ComponentList events = calendar.getComponents().getComponents(Component.VEVENT);
+        for(Iterator<VEvent> it = events.iterator(); it.hasNext();) {
+            VEvent event = it.next();
+            if(event.getRecurrenceId()!=null && event.getRecurrenceId().getDate().toString().equals(recurrenceId))
+                return event;
+        }
         return null;
     }
 }

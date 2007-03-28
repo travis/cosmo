@@ -20,6 +20,8 @@ import java.util.Set;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Interface for DAO that provides query apis for finding 
@@ -54,5 +56,11 @@ public interface CalendarDao {
      */
     public Set<ContentItem> findEvents(CollectionItem collection,
                                              CalendarFilter filter);
+    
+    /**
+     * Index calendar event
+     * @param eventStamp event stamp to index
+     */
+    public void indexEvent(EventStamp eventStamp);
 
 }

@@ -15,35 +15,28 @@
  */
 package org.osaf.cosmo.mc;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.osaf.cosmo.eim.EimRecordSet;
-import org.osaf.cosmo.eim.schema.EimRecordTranslationIterator;
-import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.eim.EimRecordSetIterator;
 
 /**
  * Bean class that provides access to the EIM records in a publish
  * request.
  *
- * @see EimRecord
- * @see SyncToken
+ * @see EimRecordSet
  */
 public class PubRecords {
 
-    private Iterator<EimRecordSet> iterator;
+    private EimRecordSetIterator iterator;
     private String name;
 
     /** */
-    public PubRecords(Iterator<EimRecordSet> iterator,
+    public PubRecords(EimRecordSetIterator iterator,
                       String name) {
         this.iterator = iterator;
         this.name = name;
     }
 
     /** */
-    public Iterator<EimRecordSet> getRecordSets() {
+    public EimRecordSetIterator getRecordSets() {
         return iterator;
     }
 

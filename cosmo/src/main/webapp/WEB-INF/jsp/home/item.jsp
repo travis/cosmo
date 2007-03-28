@@ -2,7 +2,7 @@
 
 <%--
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,15 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<c:set var="eventstamp" value="${Item.stampMap['event']}" />
+<c:set var="taskstamp" value="${Item.stampMap['task']}" />
+<c:set var="messagestamp" value="${Item.stampMap['message']}" />
+
+<c:if test="${eventstamp != null}">
+  <c:url var="webcalUrl" value="/browse/download/item/${Item.uid}/${Item.displayName}.ics" />
+</c:if>
+<c:url var="downloadUrl" value="/browse/download${Path}" />
+
 <cosmo:standardLayout prefix="HomeDirectory.Item.">
 <div>
   <span class="hd" style="margin-top: 12px;">
@@ -29,32 +38,30 @@
     </fmt:message>
   </span>
   - <span class="md">${Path}</span>
-
 </div>
 
+<c:if test="${Item.class.name == 'org.osaf.cosmo.model.ContentItem' || eventstamp!=null}">
 <div style="margin-top:12px;">
 <c:choose>
-<c:when test="${Item.stampMap['event'] != null}">
-<a href='<c:url value="/browse/download${Path}" />'>
-  [download as iCalendar]
-</a>
-<a href='<c:url value="/browse/view${Path}" />'>
-  [view as HTML]
-</a>
+<c:when test="${eventstamp != null}">
+<a href="${webcalUrl}">[download as iCalendar]</a>
 </c:when>
 <c:otherwise>
-<a href='<c:url value="/browse/download${Path}" />'>
-  [download]
-</a>
+<a href="${downloadUrl}">[download]</a>
 </c:otherwise>
 </c:choose>
+</div>
+</c:if>
+
+<div class="hd" style="margin-top: 12px;">
+  Item Properties
 </div>
 
 <div style="margin-top:12px;">
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        UID
+        UUID
       </td>
       <td class="mdData">
         ${Item.uid}
@@ -94,7 +101,31 @@
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        Created
+        Last Modified By:
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${Item.lastModifiedBy != null}">${Item.lastModifiedBy}</c:when><c:otherwise><span class="disabled">(anonymous)</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Created on Client:
+      </td>
+      <td class="mdData">
+        <fmt:formatDate value="${Item.clientCreationDate}" type="both"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Last Modified on Client:
+      </td>
+      <td class="mdData">
+        <fmt:formatDate value="${Item.clientModifiedDate}" type="both"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Created on Server:
       </td>
       <td class="mdData">
         <fmt:formatDate value="${Item.creationDate}" type="both"/>
@@ -102,7 +133,7 @@
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        Last Modified
+        Last Modified on Server:
       </td>
       <td class="mdData">
         <fmt:formatDate value="${Item.modifiedDate}" type="both"/>
@@ -111,17 +142,100 @@
   </table>
 </div>
 
+<c:if test="${eventstamp != null}">
+<div class="hd" style="margin-top: 12px;">
+  Event Properties
+</div>
+
+<div style="margin-top:12px;">
+  <table cellpadding="3" cellspacing="1" border="0">
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        UID
+      </td>
+      <td class="mdData">
+        ${eventstamp.icalUid}
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Summary
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${eventstamp.summary != null}">${eventstamp.summary}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Description
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${eventstamp.description != null}">${eventstamp.description}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Starts At
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${eventstamp.startDate != null}"><fmt:formatDate value="${eventstamp.startDate}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Ends At
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${eventstamp.endDate != null}"><fmt:formatDate value="${eventstamp.endDate}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Anytime?
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${eventstamp.anyTime}">Yes</c:when><c:otherwise>No</c:otherwise></c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Location
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${not empty eventstamp.location}">${eventstamp.location}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Status
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${not empty eventstamp.status}">${eventstamp.status}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+  </table>
+</div>
+</c:if>
+
 <c:set var="item" value="${Collection}" scope="request"/>
 <c:set var="path" value="${Path}" scope="request"/>
 
 <jsp:include page="inc-tickets.jsp" />
 
+<jsp:include page="inc-attributes.jsp" />
 
-<jsp:include page="inc-properties.jsp" />
+<c:if test="${eventstamp != null}">
+<div class="hd" style="margin-top: 12px;">
+  Original iCalendar
+</div>
 
+<pre>
 
+${eventstamp.calendar}
+</pre>
 
 <jsp:include page="inc-indexes.jsp" />
 
+</c:if>
 
 </cosmo:standardLayout>

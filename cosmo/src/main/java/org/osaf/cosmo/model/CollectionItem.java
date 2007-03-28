@@ -16,16 +16,15 @@
 package org.osaf.cosmo.model;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Where;
 
 /**
@@ -46,6 +45,7 @@ public class CollectionItem extends Item {
 
     private Set<Item> children = new HashSet<Item>(0);
     private Set<Item> allChildren = new HashSet<Item>(0);
+    private Set<Tombstone> tombstones = new HashSet<Tombstone>(0);
     
     public CollectionItem() {
     };
@@ -54,7 +54,7 @@ public class CollectionItem extends Item {
      * Return active children items (those with isActive=true).
      * @return active children items
      */
-    @OneToMany(mappedBy="parent", fetch=FetchType.LAZY)
+    @ManyToMany(mappedBy="parents",fetch=FetchType.LAZY)
     @Where(clause = "isactive=1")
     public Set<Item> getChildren() {
         return children;
@@ -69,8 +69,7 @@ public class CollectionItem extends Item {
      * Rarely used.
      * @return all children items
      */
-    @OneToMany(mappedBy="parent", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.DELETE }) 
+    @ManyToMany(mappedBy="parents",fetch=FetchType.LAZY) 
     public Set<Item> getAllChildren() {
         return allChildren;
     }
@@ -79,7 +78,9 @@ public class CollectionItem extends Item {
     private void setAllChildren(Set<Item> allChildren) {
         this.allChildren = allChildren;
     }
-
+    
+    
+    
     /**
      * Return child item with matching uid
      * @return identified child item, or null if no child with that
@@ -107,6 +108,24 @@ public class CollectionItem extends Item {
     }
     
     /**
+     * Remove ItemTombstone with an itemUid equal to a given Item's uid
+     * @param item
+     * @return true if a tombstone was removed
+     */
+    public boolean removeTombstone(Item item) {
+        for(Iterator<Tombstone> it = getTombstones().iterator();it.hasNext();) {
+            Tombstone ts = it.next();
+            if(ts instanceof ItemTombstone) {
+                if(((ItemTombstone) ts).getItemUid().equals(item.getUid())) {
+                    it.remove();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
      * Generate alternative hash code for collection.
      * This hash code will return a different value if
      * collection or any child items in the collection
@@ -114,11 +133,12 @@ public class CollectionItem extends Item {
      * @return
      */
     public int generateHash() {
-        int hash = getVersion();
-        for(Item item : getAllChildren()) {
-            // account for version starting with 0
-            hash += (item.getVersion() + 1);
-        }
-        return hash;
+        return getVersion();
+    }
+    
+    public Item copy() {
+        CollectionItem copy = new CollectionItem();
+        copyToItem(copy);
+        return copy;
     }
 }

@@ -17,6 +17,8 @@
 dojo.provide('cosmo.view.cal.dialog');
 
 dojo.require("cosmo.util.i18n");
+
+dojo.require("cosmo.convenience");
 var _ = cosmo.util.i18n.getText;
 
 cosmo.view.cal.dialog = new function() {
@@ -94,7 +96,7 @@ cosmo.view.cal.dialog = new function() {
             'btnsRight': [],
             'defaultAction': function() {},
             'width': 480,
-            'content': 'This is a recurring event. Which occurrences do you wish to remove?'
+            'content': _('Main.Prompt.RecurRemoveConfirm')
         };
     };
     
@@ -107,7 +109,7 @@ cosmo.view.cal.dialog = new function() {
             'btnsRight': [],
             'defaultAction': function() {},
             'width': 480,
-            'content': 'This is a recurring event. Which occurrences do you wish to change?'
+            'content': _('Main.Prompt.RecurSaveConfirm')
         };
     };
     
@@ -155,6 +157,3 @@ cosmo.view.cal.dialog = new function() {
     };
 };
 cosmo.view.cal.dialog.constructor = null;
-
-
-

@@ -26,20 +26,13 @@ public interface ContentItemConstants {
     /** */
     public static final int MAXLEN_TITLE = 256;
     /** */
-    public static final String FIELD_TRIAGE_STATUS = "triageStatus";
+    public static final String FIELD_TRIAGE = "triage";
     /** */
-    public static final int MAXLEN_TRIAGE_STATUS = 256;
+    public static final int MAXLEN_TRIAGE = 256;
     /** */
-    public static final String FIELD_TRIAGE_STATUS_CHANGED =
-        "triageStatusChanged";
+    public static final String FIELD_HAS_BEEN_SENT = "hasBeenSent";
     /** */
-    public static final int DIGITS_TRIAGE_STATUS_CHANGED = 11;
-    /** */
-    public static final int DEC_TRIAGE_STATUS_CHANGED = 2;
-    /** */
-    public static final String FIELD_LAST_MODIFIED_BY = "lastModifiedBy";
-    /** */
-    public static final int MAXLEN_LAST_MODIFIED_BY = 256;
+    public static final String FIELD_NEEDS_REPLY = "needsReply";
     /** */
     public static final String FIELD_CREATED_ON = "createdOn";
 }

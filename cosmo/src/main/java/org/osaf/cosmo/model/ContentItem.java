@@ -19,10 +19,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -33,10 +33,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
-import org.hibernate.validator.Min;
-import org.hibernate.validator.NotNull;
 
 /**
  * Extends {@link Item} to represent an item containing binary content
@@ -59,8 +56,10 @@ public class ContentItem extends Item {
     private String contentLanguage = null;
     private String contentEncoding = null;
     private String lastModifiedBy = null;
-    private String triageStatus = null;
-    private BigDecimal triageStatusUpdated = null;
+    private Integer lastModification = null;
+    private TriageStatus triageStatus = new TriageStatus();
+    private Boolean sent = null;
+    private Boolean needsReply = null;
     private Long contentLength = null;
     private ContentData contentData = null;
     
@@ -151,8 +150,6 @@ public class ContentItem extends Item {
     }
 
     @Column(name = "contentLength")
-    @NotNull
-    @Min(value=0)
     public Long getContentLength() {
         return contentLength;
     }
@@ -182,23 +179,75 @@ public class ContentItem extends Item {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    @Column(name = "triagestatus", length=64)
-    public String getTriageStatus() {
+    @Column(name = "lastmodification")
+    public Integer getLastModification() {
+        return lastModification;
+    }
+
+    public void setLastModification(Integer lastModification) {
+        this.lastModification = lastModification;
+    }
+
+    @Embedded
+    public TriageStatus getTriageStatus() {
         return triageStatus;
     }
-
-    public void setTriageStatus(String triageStatus) {
-        this.triageStatus = triageStatus;
+  
+    public void setTriageStatus(TriageStatus ts) {
+        triageStatus = ts;
     }
 
-    @Column(name = "triagestatusupdated", precision = 19, scale = 6)
-    @Type(type="org.hibernate.type.BigDecimalType")
-    public BigDecimal getTriageStatusUpdated() {
-        return triageStatusUpdated;
+    @Column(name = "sent")
+    public Boolean getSent() {
+        return sent;
     }
 
-    public void setTriageStatusUpdated(BigDecimal triageStatusUpdated) {
-        this.triageStatusUpdated = triageStatusUpdated;
+    public void setSent(Boolean sent) {
+        this.sent = sent;
+    }
+
+    @Column(name = "needsreply")
+    public Boolean getNeedsReply() {
+        return needsReply;
+    }
+
+    public void setNeedsReply(Boolean needsReply) {
+        this.needsReply = needsReply;
+    }
+        
+    public Item copy() {
+        ContentItem copy = new ContentItem();
+        copyToItem(copy);
+        return copy;
+    }
+    
+    @Override
+    protected void copyToItem(Item item) {
+        if(!(item instanceof ContentItem))
+            return;
+        
+        super.copyToItem(item);
+        
+        ContentItem contentItem = (ContentItem) item;
+        
+        try {
+            InputStream contentStream = getContentInputStream();
+            if(contentStream!=null) {
+                contentItem.setContent(contentStream);
+                contentStream.close();
+            }
+            contentItem.setContentEncoding(getContentEncoding());
+            contentItem.setContentLanguage(getContentLanguage());
+            contentItem.setContentType(getContentType());
+            contentItem.setContentLength(getContentLength());
+            contentItem.setLastModifiedBy(getLastModifiedBy());
+            contentItem.setLastModification(getLastModification());
+            contentItem.setTriageStatus(getTriageStatus());
+            contentItem.setSent(getSent());
+            contentItem.setNeedsReply(getNeedsReply());
+        } catch (IOException e) {
+            throw new RuntimeException("Error copying content");
+        }
     }
 
     /**
@@ -210,7 +259,7 @@ public class ContentItem extends Item {
                 getContentEncoding()).append("contentLanguage",
                 getContentLanguage()).toString();
     }
-    
+
     // For hibernate use only
     @OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="contentdataid")
@@ -224,4 +273,20 @@ public class ContentItem extends Item {
         this.contentData = contentFile;
     }
 
+    public static class Action {
+
+        public static final int EDITED = 100;
+        public static final int QUEUED = 200;
+        public static final int SENT = 300;
+        public static final int UPDATED = 400;
+        public static final int CREATED = 500;
+
+        public static boolean validate(Integer action) {
+            return (action.intValue() == EDITED ||
+                    action.intValue() == QUEUED ||
+                    action.intValue() == SENT ||
+                    action.intValue() == UPDATED ||
+                    action.intValue() == CREATED);
+        }
+    }
 }

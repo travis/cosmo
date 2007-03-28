@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!--
-    Copyright 2005-2006 Open Source Applications Foundation
+    Copyright 2005-2007 Open Source Applications Foundation
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@
       classpath:applicationContext.xml
       classpath:applicationContext-security-cmp.xml
       classpath:applicationContext-security-dav.xml
+      classpath:applicationContext-security-webcal.xml
+      classpath:applicationContext-security-feed.xml
       classpath:applicationContext-security-pim.xml
       classpath:applicationContext-security-json.xml
     </param-value>
@@ -92,6 +94,22 @@
     </init-param>
   </filter>
   <filter>
+    <filter-name>webcal-security</filter-name>
+    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <init-param>
+      <param-name>targetBean</param-name>
+      <param-value>webcalFilterChainProxy</param-value>
+    </init-param>
+  </filter>
+  <filter>
+    <filter-name>feed-security</filter-name>
+    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <init-param>
+      <param-name>targetBean</param-name>
+      <param-value>feedFilterChainProxy</param-value>
+    </init-param>
+  </filter>
+  <filter>
     <filter-name>cmp-security</filter-name>
     <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
     <init-param>
@@ -122,7 +140,7 @@
     </filter-class>
     <init-param>
       <param-name>logLevel</param-name>
-      <param-value>WARN</param-value>
+      <param-value>commons</param-value>
     </init-param>
     <init-param>
       <param-name>statusEnabled</param-name>
@@ -142,8 +160,8 @@
   	<filter-class>org.osaf.cosmo.filters.HttpOverrideFilter</filter-class>
   </filter>
   <filter-mapping>
-  	<filter-name>http-override</filter-name>
-  	<url-pattern>/*</url-pattern>
+    <filter-name>http-override</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>version-header</filter-name>
@@ -162,7 +180,7 @@
     <url-pattern>/dav/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>dav-security</filter-name>
+    <filter-name>feed-security</filter-name>
     <url-pattern>/atom/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
@@ -170,7 +188,7 @@
     <url-pattern>/mc/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>dav-security</filter-name>
+    <filter-name>webcal-security</filter-name>
     <url-pattern>/webcal/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
@@ -221,19 +239,14 @@
     <filter-name>json-security</filter-name>
     <url-pattern>/JSON-RPC/*</url-pattern>
   </filter-mapping>
-  <!-- http logging has to happen after security if we want authentication information-->
+  <!-- these filters require security to have already been checked -->
   <filter-mapping>
-  	<filter-name>http-logging</filter-name>
-  	<url-pattern>/*</url-pattern>
+    <filter-name>http-logging</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-  	<filter-name>username-request-integration</filter-name>
-  	<url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <!-- url rewriting has to happen after security -->
-  <filter-mapping>
-    <filter-name>url-rewrite</filter-name>
-    <url-pattern>/atom/*</url-pattern>
+    <filter-name>username-request-integration</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>url-rewrite</filter-name>
@@ -349,7 +362,7 @@
 
   <resource-env-ref>
     <resource-env-ref-name>jdbc/cosmo</resource-env-ref-name>
-    <resource-env-ref-type>javax.sql.DataSouurce</resource-env-ref-type>
+    <resource-env-ref-type>javax.sql.DataSource</resource-env-ref-type>
   </resource-env-ref>
   <resource-env-ref>
     <resource-env-ref-name>mail/cosmo</resource-env-ref-name>

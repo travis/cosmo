@@ -25,17 +25,13 @@ import java.util.Set;
 import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.dao.ItemDao;
-import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.ItemNotFoundException;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.util.PathUtil;
 
 /**
  * Simple in-memory storage system for mock data access objects.
@@ -45,7 +41,7 @@ public class MockDaoStorage {
 
     private HashMap<String, Item> itemsByPath;
     private HashMap<String, Item> itemsByUid;
-    private HashMap<Long, String> rootUids;
+    private HashMap<String, String> rootUids;
     private HashMap<String, Set> tickets;
     private SessionIdGenerator idGenerator;
 
@@ -53,7 +49,7 @@ public class MockDaoStorage {
     public MockDaoStorage() {
         itemsByPath = new HashMap<String, Item>();
         itemsByUid = new HashMap<String, Item>();
-        rootUids = new HashMap<Long, String>();
+        rootUids = new HashMap<String, String>();
         tickets = new HashMap<String, Set>();
         idGenerator = new SessionIdGenerator();
     }
@@ -90,12 +86,12 @@ public class MockDaoStorage {
     }
 
     /** */
-    public String getRootUid(Long userId) {
+    public String getRootUid(String userId) {
         return rootUids.get(userId);
     }
 
     /** */
-    public void setRootUid(Long userId, String uid) {
+    public void setRootUid(String userId, String uid) {
         rootUids.put(userId, uid);
     }
 
@@ -105,7 +101,7 @@ public class MockDaoStorage {
     }
 
     /** */
-    public HomeCollectionItem getRootItem(Long userId) {
+    public HomeCollectionItem getRootItem(String userId) {
         String rootUid = rootUids.get(userId);
         if (rootUid == null) {
             throw new IllegalStateException("user does not have a root item");
@@ -124,7 +120,7 @@ public class MockDaoStorage {
 
         itemsByUid.put(rootCollection.getUid(), rootCollection);
         itemsByPath.put("/" + rootCollection.getName(), rootCollection);
-        rootUids.put(user.getId(), rootCollection.getUid());
+        rootUids.put(user.getUid(), rootCollection.getUid());
 
         return rootCollection;
     }
@@ -133,8 +129,7 @@ public class MockDaoStorage {
     public void storeItem(Item item) {
         if (item.getName() == null)
             throw new IllegalArgumentException("name cannot be null");
-        if (item.getParent() == null)
-            throw new IllegalArgumentException("parent cannot be null");
+       
         Item parentItem = item.getParent();
         
         if (item.getOwner() == null)
@@ -144,17 +139,26 @@ public class MockDaoStorage {
         item.setCreationDate(new Date());
         item.setModifiedDate(item.getCreationDate());
 
-        for (Item sibling : item.getParent().getChildren()) {
-            if (sibling.getName().equals(item.getName()))
-                throw new DuplicateItemNameException();
+        if(item.getParent()!=null) {
+            for (Item sibling : item.getParent().getChildren()) {
+                if (sibling.getName().equals(item.getName()))
+                    throw new DuplicateItemNameException();
+            }
+            
+            item.getParent().getChildren().add(item);
+            item.getParent().getAllChildren().add(item);
+            itemsByPath.put(getItemPath(item.getParent()) + "/" + item.getName(),
+                    item);
         }
-
-        item.getParent().getChildren().add(item);
-        item.getParent().getAllChildren().add(item);
-
+        
+        // handle NoteItem modifications
+        if(item instanceof NoteItem) {
+            NoteItem note = (NoteItem) item;
+            if(note.getModifies()!=null)
+                note.getModifies().getModifications().add(note);
+        }
+        
         itemsByUid.put(item.getUid(), item);
-        itemsByPath.put(getItemPath(item.getParent()) + "/" + item.getName(),
-                        item);
     }
 
     /** */

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-dojo.provide("cosmo.service.service_stub")
+dojo.provide("cosmo.service.service_stub");
+
+dojo.require("cosmo.service.exception");
 /**
  * The ScoobyService is the place where all client/server communcations are
  * brokered. The methods here are all empty because the intent is that you
@@ -138,14 +140,14 @@ ScoobyService.prototype = {
      */
     getPreferences: function(){},
 
-	/**
-	 * Sets all preferences for the current user
+    /**
+     * Sets all preferences for the current user
      * @param preferenceName the map of the user's new preference set
      */
     setPreferences: function(){},
 
-	/**
-	 * Sets the specified preferences for the current user
+    /**
+     * Sets the specified preferences for the current user
      * @param preferenceName the map of preferences to be set
      */
     setMultiplePreferences: function(preferences){},
@@ -235,33 +237,6 @@ ScoobyService.prototype = {
      * Changes the display name for a collection. Must be a collection
      * owned by the user
      */
-    saveDisplayName: function(cid, displayName){}
+    saveDisplayName: function(cid, displayName){} 
+    
 }
-
-/**
- * This is the root of all exceptions thrown by the ScoobyService
- */
-ScoobyServiceException = function(){};
-ScoobyServiceException.prototype = new Error();
-
-
-//TODO This is not how to do inheritance. 
-
-/**
- * This exception is the root for all exceptions that occur on the client side
- */
-ScoobyServiceClientException = function(){};
-ScoobyServiceClientException.prototype = new ScoobyServiceException();
-
-/**
- * This exception is the root for all exceptions that occur on the server side
- */
-ScoobyServiceRemoteException = function(){};
-ScoobyServiceRemoteException.prototype = new ScoobyServiceException();
-
-/**
- * This exception is thrown when the client makes a call on the server side but is not
- * authenticated.
- */
-NotAuthenticatedException = function(){};
-NotAuthenticatedException.prototype = new ScoobyServiceRemoteException();

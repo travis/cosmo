@@ -21,8 +21,19 @@
 <urlrewrite>
   <rule>
     <from>/js-${pom.version}/</from>
-    <to>/js/</to>
+     <to last="false">/js/</to>
   </rule>
+  
+  <rule enabled="true">
+  <condition name="accept-encoding" operator="equal" next="and">.*gzip.*</condition>
+  <condition name="user-agent" operator="notequal">.*MSIE 6.0.*</condition>
+  <from>dojo.js</from>
+  <to>dojo.js.gzip-compressed</to>
+  <set type="response-header" name="Vary">Accept-Encoding</set>
+  <set type="response-header" name="Content-Encoding">gzip</set>
+  <set type="content-type">text/javascript</set>
+  </rule>
+  
   <rule>
     <from>^/loginfailed$</from>
     <to>/login?login_failed=1</to>
@@ -63,6 +74,4 @@
     <from>^/admin/users/?$</from>
     <to>/admin/user/list</to>
   </rule>
-
-
 </urlrewrite>

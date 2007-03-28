@@ -15,18 +15,17 @@
  */
 package org.osaf.cosmo.eim.schema.message;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.MessageStamp;
-import org.osaf.cosmo.model.Stamp;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Generates EIM records from message stamps.
@@ -38,6 +37,12 @@ public class MessageGenerator extends BaseStampGenerator
     private static final Log log =
         LogFactory.getLog(MessageGenerator.class);
 
+    private static final HashSet<String> STAMP_TYPES = new HashSet<String>(2);
+    
+    static {
+        STAMP_TYPES.add("message");
+    }
+    
     private MessageStamp message;
 
     /** */
@@ -46,30 +51,38 @@ public class MessageGenerator extends BaseStampGenerator
         setStamp(MessageStamp.getStamp(item));
     }
 
-    /**
-     * Copies message properties and attributes into a message record.
-     */
-    public List<EimRecord> generateRecords() {
-        ArrayList<EimRecord> records = new ArrayList<EimRecord>();
+    @Override
+    protected Set<String> getStampTypes() {
+        return STAMP_TYPES;
+    }
 
-        MessageStamp message = (MessageStamp) getStamp();
-        if (message == null)
-            return records;
+    /**
+     * Adds a record for the message.
+     */
+    protected void addRecords(List<EimRecord> records) {
+        MessageStamp stamp = (MessageStamp) getStamp();
+        if (stamp == null)
+            return;
 
         EimRecord record = new EimRecord(getPrefix(), getNamespace());
-
-        record.addKeyField(new TextField(FIELD_UUID,
-                                         message.getItem().getUid()));
-
-        record.addField(new TextField(FIELD_SUBJECT, message.getSubject()));
-        record.addField(new TextField(FIELD_TO, message.getTo()));
-        record.addField(new TextField(FIELD_CC, message.getCc()));
-        record.addField(new TextField(FIELD_BCC, message.getBcc()));
-
-        record.addFields(generateUnknownFields());
-
+        addKeyFields(record);
+        addFields(record);
         records.add(record);
+    }
 
-        return records;
+    /**
+     * Adds key field for uuid.
+     */
+    protected void addKeyFields(EimRecord record) {
+        record.addKeyField(new TextField(FIELD_UUID, getItem().getUid()));
+    }
+
+    private void addFields(EimRecord record) {
+        MessageStamp stamp = (MessageStamp) getStamp();
+        record.addField(new TextField(FIELD_SUBJECT, stamp.getSubject()));
+        record.addField(new TextField(FIELD_TO, stamp.getTo()));
+        record.addField(new TextField(FIELD_CC, stamp.getCc()));
+        record.addField(new TextField(FIELD_BCC, stamp.getBcc()));
+        record.addFields(generateUnknownFields());
     }
 }

@@ -15,30 +15,30 @@
  */
 package org.osaf.cosmo.eim.schema.event.alarm;
 
+import java.text.ParseException;
 import java.util.Iterator;
 
-import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Action;
-import net.fortuna.ical4j.model.property.Description;
-import net.fortuna.ical4j.model.property.Duration;
-import net.fortuna.ical4j.model.property.Repeat;
 import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
-import org.osaf.cosmo.eim.EimRecordKey;
 import org.osaf.cosmo.eim.schema.BaseStampApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
+import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
-import org.osaf.cosmo.eim.schema.event.EventConstants;
+import org.osaf.cosmo.eim.schema.text.DurationFormat;
+import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
 
 /**
@@ -47,21 +47,23 @@ import org.osaf.cosmo.model.Stamp;
  * @see EventStamp
  */
 public class DisplayAlarmApplicator extends BaseStampApplicator
-    implements EventConstants {
+    implements DisplayAlarmConstants {
     private static final Log log =
         LogFactory.getLog(DisplayAlarmApplicator.class);
 
     /** */
     public DisplayAlarmApplicator(Item item) {
         super(PREFIX_DISPLAY_ALARM, NS_DISPLAY_ALARM, item);
+        setStamp(BaseEventStamp.getStamp(item));
     }
     
     @Override
     protected void applyDeletion(EimRecord record) throws EimSchemaException {
-        VEvent event = getEvent(record);
+        VEvent event = getEvent(record);    
         
+        // Require event to continue
         if(event==null)
-            throw new EimSchemaException("no event found for alarm");
+            throw new EimSchemaException("No event to delete");
         
         VAlarm alarm = getDisplayAlarm(event);
         
@@ -69,25 +71,115 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
         if(alarm != null)
             event.getAlarms().remove(alarm);
     }
+    
+    protected void applyDeletionNonEvent(EimRecord record) throws EimSchemaException {
+        NoteItem note = (NoteItem) getItem();
+        note.setReminderTime(null);
+    }
 
     @Override
     public void applyRecord(EimRecord record) throws EimSchemaException {
+        
+        // If item is not an event, then process differently
+        if(getEventStamp()==null) {
+            applyRecordNonEvent(record);
+            return;
+        }
+        
+        // handle deletion
+        if (record.isDeleted()) {
+            applyDeletion(record);
+            return;
+        }
+        
+        BaseEventStamp eventStamp = getEventStamp();
         VEvent event = getEvent(record);
         
-        if(event==null)
-            throw new EimSchemaException("no event found for alarm");
-        
-        VAlarm alarm = getOrCreateDisplayAlarm(event);
+        getOrCreateDisplayAlarm(event);
             
         for (EimRecordField field : record.getFields()) {
-            if(field.getName().equals(FIELD_DESCRIPTION))
-                applyDescription(field, alarm);
-            else if(field.getName().equals(FIELD_TRIGGER))
-                applyTrigger(field,alarm);
-            else if (field.getName().equals(FIELD_DURATION))
-                applyDuration(field, alarm);
-            else if(field.getName().equals(FIELD_REPEAT))
-                applyRepeat(field, alarm);
+            if(field.getName().equals(FIELD_DESCRIPTION)) {
+                if(field.isMissing()) {
+                    handleMissingAttribute("displayAlarmDescription");
+                }
+                else {
+                    String value = EimFieldValidator.validateText(field, MAXLEN_DESCRIPTION);
+                    eventStamp.setDisplayAlarmDescription(value);
+                }
+            }
+            else if(field.getName().equals(FIELD_TRIGGER)) {
+                if(field.isMissing()) {
+                    handleMissingAttribute("displayAlarmTrigger");
+                }
+                else {
+                    String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
+                    Trigger newTrigger = EimValueConverter.toIcalTrigger(value);
+                    eventStamp.setDisplayAlarmTrigger(newTrigger);
+                }
+            }
+            else if (field.getName().equals(FIELD_DURATION)) {
+                if(field.isMissing()) {
+                    handleMissingAttribute("displayAlarmDuration");
+                }
+                else {
+                    String value = EimFieldValidator.validateText(field, MAXLEN_DURATION);
+                    try {
+                        Dur dur = DurationFormat.getInstance().parse(value);
+                        eventStamp.setDisplayAlarmDuration(dur);
+                    } catch (ParseException e) {
+                        throw new EimValidationException("Illegal duration", e);
+                    }
+                }
+            }
+            else if(field.getName().equals(FIELD_REPEAT)) {
+                if(field.isMissing()) {
+                    handleMissingAttribute("displayAlarmRepeat");
+                }
+                else {
+                    Integer value = EimFieldValidator.validateInteger(field);
+                    eventStamp.setDisplayAlarmRepeat(value);
+                }
+            }
+            else
+                log.warn("usupported eim field " + field.getName()
+                        + " found in " + record.getNamespace());
+        }
+    }
+    
+    public void applyRecordNonEvent(EimRecord record) throws EimSchemaException {
+        
+        // handle deletion
+        if (record.isDeleted()) {
+            applyDeletionNonEvent(record);
+            return;
+        }
+        
+        NoteItem note = (NoteItem) getItem();
+            
+        for (EimRecordField field : record.getFields()) {
+            if(field.getName().equals(FIELD_DESCRIPTION)) {
+                // ignore, don't support
+            }
+            else if(field.getName().equals(FIELD_TRIGGER)) {
+                if(field.isMissing()) {
+                    handleMissingAttribute("reminderTime");
+                }
+                else {
+                    String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
+                    Trigger trigger = EimValueConverter.toIcalTrigger(value);
+                    
+                    // for non-events, the trigger has to be absolute
+                    if(trigger.getDuration()!=null)
+                        throw new EimSchemaException("non-absolute triggers not supported on non-events");
+                    note.setReminderTime(trigger.getDate());
+                }
+            }
+            else if (field.getName().equals(FIELD_DURATION)) {
+                // ignore, don't support
+            }
+            else if(field.getName().equals(FIELD_REPEAT)) {
+                // ignore, don't support
+            }
             else
                 log.warn("usupported eim field " + field.getName()
                         + " found in " + record.getNamespace());
@@ -100,109 +192,19 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
     }
     
     @Override
-    protected Stamp createStamp() {
+    protected Stamp createStamp(EimRecord record) throws EimSchemaException {
         // do nothing as the stamp should already be created
         return null;
     }
-
-    /**
-     * get the recurrenceId key field from the eim record
-     */
-    private Date getRecurrenceId(EimRecord record) throws EimSchemaException {
-        // recurrenceId is a key field
-        EimRecordKey key = record.getKey();
-        for(EimRecordField keyField: key.getFields()) {
-            if(keyField.getName().equals(FIELD_RECURRENCE_ID)) {
-                String value = EimFieldValidator.validateText(keyField,
-                        MAXLEN_RECURRENCE_ID);
-                return EimValueConverter.toICalDate(value).getDate();
-            }
-        }
-        return null;
-    }
         
-    /**
-     * Apply a description field to the alarm
-     */
-    private void applyDescription(EimRecordField field, VAlarm alarm) throws EimSchemaException {
-        String value = EimFieldValidator.validateText(field, MAXLEN_DESCRIPTION);
-        
-        Description description = (Description) alarm.getProperties()
-                .getProperty(Property.DESCRIPTION);
-        if (value == null) {
-            if (description != null)
-                alarm.getProperties().remove(description);
-        }
-        if (description == null) {
-            description = new Description();
-            alarm.getProperties().add(description);
-        }
-        
-        description.setValue(value);
-    }
-     
-    /**
-     * Apply a trigger field to the alarm
-     */
-    private void applyTrigger(EimRecordField field, VAlarm alarm) throws EimSchemaException {
-        String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
-        Trigger newTrigger = EimValueConverter.toIcalTrigger(value);
-        
-        Trigger oldTrigger = (Trigger) alarm.getProperties()
-                .getProperty(Property.TRIGGER);
-        if (oldTrigger != null)
-            alarm.getProperties().remove(oldTrigger);
-        
-        alarm.getProperties().add(newTrigger);
-    }
-    
-    /**
-     * Apply a duration field to the alarm
-     */
-    private void applyDuration(EimRecordField field, VAlarm alarm) throws EimSchemaException {
-        String value = EimFieldValidator.validateText(field, MAXLEN_DURATION);
-       
-        Duration duration = (Duration) alarm.getProperties()
-                .getProperty(Property.DURATION);
-        if (value == null) {
-            if (duration != null)
-                alarm.getProperties().remove(duration);
-        }
-        if (duration == null) {
-            duration = new Duration();
-            alarm.getProperties().add(duration);
-        }
-        
-        duration.setDuration(EimValueConverter.toICalDur(value));
-    }
-    
-    /**
-     * Apply a repeat field to the alarm
-     */
-    private void applyRepeat(EimRecordField field, VAlarm alarm) throws EimSchemaException {
-        Integer value = EimFieldValidator.validateInteger(field);
-       
-        Repeat repeat = (Repeat) alarm.getProperties()
-                .getProperty(Property.REPEAT);
-        if (value == null) {
-            if (repeat != null)
-                alarm.getProperties().remove(repeat);
-        }
-        if (repeat == null) {
-            repeat = new Repeat();
-            alarm.getProperties().add(repeat);
-        }
-     
-        repeat.setCount(value.intValue());
-    }
-    
+   
     /**
      * get the current display alarm, or create a new one
      */
     private VAlarm getOrCreateDisplayAlarm(VEvent event) {
         VAlarm alarm = getDisplayAlarm(event);
         if(alarm==null)
-            alarm =  creatDisplayAlarm(event);
+            alarm = creatDisplayAlarm(event);
         return alarm;
     }
     
@@ -235,24 +237,29 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
     
     /**
      * Get the event associated with the displayAlarm record.
-     * This is either the master event (no recurrenceId present)
-     * or a modification (recurrenceId present).
      */
     private VEvent getEvent(EimRecord record) throws EimSchemaException {
-        if(getEventStamp()==null)
+        
+        BaseEventStamp eventStamp = getEventStamp();
+        
+        if(eventStamp==null)
             throw new EimSchemaException("EventStamp required");
         
-        // retrieve key field (recurrenceId)
-        Date recurrenceId = getRecurrenceId(record);
-        
-        if(recurrenceId==null)
-            return getEventStamp().getMasterEvent();
-        else
-            return getEventStamp().getModification(recurrenceId);
-        
+        return eventStamp.getEvent();
     }
     
-    private EventStamp getEventStamp() {
-        return EventStamp.getStamp(getItem());
+    private BaseEventStamp getEventStamp() {
+        return BaseEventStamp.getStamp(getItem());
+    }
+    
+    @Override
+    protected Stamp getParentStamp() {
+        NoteItem noteMod = (NoteItem) getItem();
+        NoteItem parentNote = noteMod.getModifies();
+        
+        if(parentNote!=null)
+            return parentNote.getStamp(BaseEventStamp.class);
+        else
+            return null;
     }
 }

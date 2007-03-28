@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.eim.schema;
+package org.osaf.cosmo.calendar;
 
 import java.text.ParseException;
 

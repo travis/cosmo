@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.eim.schema;
+package org.osaf.cosmo.calendar;
 
 import java.io.IOException;
 import java.io.StreamTokenizer;
@@ -25,8 +25,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Simplified parser for serialized iCalendar property values
- * communicated in EIM text values.
+ * Parser for a simplified iCalendar property value serialization
+ * scheme used in circumstances where iCalendar itself is too
+ * heavyweight.
  * <p>
  * When parameters are included with a property value, they are
  * serialized using iCalendar syntax. The resulting string looks like

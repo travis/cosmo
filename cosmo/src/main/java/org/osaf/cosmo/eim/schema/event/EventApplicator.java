@@ -20,6 +20,7 @@ import java.text.ParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.calendar.ICalDate;
 import org.osaf.cosmo.calendar.UnknownTimeZoneException;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
@@ -28,7 +29,6 @@ import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
-import org.osaf.cosmo.eim.schema.ICalDate;
 import org.osaf.cosmo.eim.schema.text.DurationFormat;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.EventExceptionStamp;

@@ -21,7 +21,7 @@ import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 
-import org.osaf.cosmo.eim.schema.ICalDate;
+import org.osaf.cosmo.calendar.ICalDate;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.eim.schema;
+package org.osaf.cosmo.calendar;
 
 import java.text.ParseException;
 import java.util.Map.Entry;
@@ -38,7 +38,7 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 /**
  * Represents an iCalendar date or datetime property value, or a list
- * of them, with associated parameters like timezone and anytime.x
+ * of them, with associated parameters like timezone and anytime.
  */
 public class ICalDate implements ICalendarConstants {
     private static final Log log = LogFactory.getLog(ICalDate.class);

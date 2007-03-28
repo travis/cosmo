@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.calendar.ICalDate;
 import org.osaf.cosmo.calendar.UnknownTimeZoneException;
 import org.osaf.cosmo.eim.schema.text.DurationFormat;
 

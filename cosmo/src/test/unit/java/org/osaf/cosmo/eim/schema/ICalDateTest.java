@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.eim.schema;
 
+import java.text.ParseException;
+
 import junit.framework.TestCase;
 
 import net.fortuna.ical4j.model.Date;
@@ -27,6 +29,8 @@ import net.fortuna.ical4j.model.parameter.Value;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.calendar.UnknownTimeZoneException;
 
 public class ICalDateTest extends TestCase {
     private static final Log log = LogFactory.getLog(ICalDateTest.class);
@@ -82,17 +86,17 @@ public class ICalDateTest extends TestCase {
         try {
             new ICalDate(";TZID=deadbeef:20021010T120000");
             fail("converted with bad TZID deadbeef");
-        } catch (EimConversionException e) {}
+        } catch (UnknownTimeZoneException e) {}
 
         try {
             new ICalDate(";VALUE=deadbeef:20021010T120000");
             fail("converted with bad VALUE deadbeef");
-        } catch (EimConversionException e) {}
+        } catch (IllegalArgumentException e) {}
 
         try {
             new ICalDate("deadbeef");
             fail("converted with bad text deadbeef");
-        } catch (EimConversionException e) {}
+        } catch (ParseException e) {}
     }
     
     public void testDateTimeToString() throws Exception {

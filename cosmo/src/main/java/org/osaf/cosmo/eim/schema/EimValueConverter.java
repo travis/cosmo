@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.calendar.UnknownTimeZoneException;
 import org.osaf.cosmo.eim.schema.text.DurationFormat;
 
 /**
@@ -52,17 +53,17 @@ public class EimValueConverter implements EimSchemaConstants {
      * Recurrence rules in the text value must be colon-separated.
      *
      * @return <code>List<Recur></code>
-     * @throws EimConversionException
+     * @throws EimValidationException
      */
     public static List<Recur> toICalRecurs(String text)
-        throws EimConversionException {
+        throws EimValidationException {
         ArrayList<Recur> recurs = new ArrayList<Recur>();
         if (text != null) {
             for (String s : text.split(":")) {
                 try {
                     recurs.add(new Recur(s));
                 } catch (ParseException e) {
-                    throw new EimConversionException("Invalid iCalendar recurrence rule " + s);
+                    throw new EimValidationException("Invalid iCalendar recurrence rule " + s);
                 }
             }
         }
@@ -75,7 +76,6 @@ public class EimValueConverter implements EimSchemaConstants {
      * Recurrence rules in the returned value are colon-separated.
      *
      * @return <code>String</code>
-     * @throws EimConversionException
      */
     public static String fromICalRecurs(List<Recur> recurs) {
         if (! recurs.iterator().hasNext())
@@ -88,13 +88,19 @@ public class EimValueConverter implements EimSchemaConstants {
      * date or date-time.
      *
      * @return <code>ICalDate</code>
-     * @throws EimConversionException
+     * @throws EimValidationException
      */
     public static ICalDate toICalDate(String text)
-        throws EimConversionException {
+        throws EimValidationException {
         if (text == null)
             return null;
-        return new ICalDate(text);
+        try {
+            return new ICalDate(text);
+        } catch (ParseException e) {
+            throw new EimValidationException("Invalid date value " + text, e);
+        } catch (UnknownTimeZoneException e) {
+            throw new EimValidationException("Unknown timezone " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -102,7 +108,6 @@ public class EimValueConverter implements EimSchemaConstants {
      * date-time.
      *
      * @return <code>String</code>
-     * @throws EimConversionException
      */
     public static String fromICalDate(Date date) {
         return fromICalDate(date, false);
@@ -115,13 +120,16 @@ public class EimValueConverter implements EimSchemaConstants {
      * @param anytime a flag determining whether or not this
      * represents an anytime date
      * @return <code>String</code>
-     * @throws EimConversionException
      */
     public static String fromICalDate(Date date,
                                       boolean anytime) {
         if (date == null)
             return null;
-        return new ICalDate(date, anytime).toString();
+        try {
+            return new ICalDate(date, anytime).toString();
+        } catch (UnknownTimeZoneException e) {
+            throw new IllegalArgumentException("Unknown timezone", e);
+        }
     }
 
     /**
@@ -136,7 +144,11 @@ public class EimValueConverter implements EimSchemaConstants {
     public static String fromICalDates(DateList dates) {
         if (dates == null || dates.isEmpty())
             return null;
-        return new ICalDate(dates).toString();
+        try {
+            return new ICalDate(dates).toString();
+        } catch (UnknownTimeZoneException e) {
+            throw new IllegalArgumentException("Unknown timezone", e);
+        }
     }
 
     public static String fromIcalTrigger(Trigger trigger) {

@@ -33,6 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.calendar.TimeZoneTranslator;
+import org.osaf.cosmo.calendar.UnknownTimeZoneException;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 /**
@@ -72,14 +73,9 @@ public class ICalDate implements ICalendarConstants {
      * </ul>
      */
     public ICalDate(String text)
-        throws EimConversionException {
+        throws ParseException, UnknownTimeZoneException {
         ICalValueParser parser = new ICalValueParser(text);
-        try {
-            parser.parse();
-        } catch (ParseException e) {
-            throw new EimConversionException("Error parsing iCalendar property value", e);
-        }
-
+        parser.parse();
         text = parser.getValue();
 
         for (Entry<String, String> entry : parser.getParams().entrySet()) {
@@ -103,22 +99,16 @@ public class ICalDate implements ICalendarConstants {
     /**
      * Constructs an <code>ICalDate</code> from an iCalendar date.
      */
-    public ICalDate(Date date) {
+    public ICalDate(Date date)
+        throws UnknownTimeZoneException {
         if (date instanceof DateTime) {
             value = Value.DATE_TIME;
             tz = ((DateTime) date).getTimeZone();
-            
-            // Make sure timezone is Olson.  If the translator can't
-            // translate the timezon to an Olson timezone, then
-            // the event will essentially be floating.
             if (tz != null) {
                 String origId = tz.getID();
                 tz = tzTranslator.translateToOlsonTz(tz);
-                if(tz==null)
-                    log.warn("no Olson timezone found for " + origId);
-            }
-            
-            if(tz != null) {
+                if (tz == null)
+                    throw new UnknownTimeZoneException(origId); 
                 String id = tz.getVTimeZone().getProperties().
                     getProperty(Property.TZID).getValue();
                 tzid = new TzId(id);
@@ -136,7 +126,8 @@ public class ICalDate implements ICalendarConstants {
      * optionally setting the anytime property.
      */
     public ICalDate(Date date,
-                    boolean anytime) {
+                    boolean anytime)
+        throws UnknownTimeZoneException {
         this(date);
         this.anytime = anytime;
     }
@@ -145,21 +136,15 @@ public class ICalDate implements ICalendarConstants {
      * Constructs an <code>ICalDate</code> from an iCalendar date
      * list. Date lists cannot be anytime.
      */
-    public ICalDate(DateList dates) {
+    public ICalDate(DateList dates)
+        throws UnknownTimeZoneException {
         value = dates.getType();
         tz = dates.getTimeZone();
-        
-        // Make sure timezone is Olson.  If the translator can't
-        // translate the timezon to an Olson timezone, then
-        // the event will essentially be floating.
         if (tz != null) {
             String origId = tz.getID();
             tz = tzTranslator.translateToOlsonTz(tz);
-            if(tz==null)
-                log.warn("no Olson timezone found for " + origId);
-        }
-        
-        if (tz != null) {
+            if (tz == null)
+                throw new UnknownTimeZoneException(origId);
             String id = tz.getVTimeZone().getProperties().
                 getProperty(Property.TZID).getValue();
             tzid = new TzId(id);
@@ -222,60 +207,41 @@ public class ICalDate implements ICalendarConstants {
         return buf.toString();
     }
 
-    private void parseValue(String str)
-        throws EimConversionException {
+    private void parseValue(String str) {
         if (str.equals("DATE"))
             value = Value.DATE;
         else if (str.equals("DATE-TIME"))
             value = Value.DATE_TIME;
         else
-            throw new EimConversionException("Bad value " + str);
+            throw new IllegalArgumentException("Bad value " + str);
     }
 
     private void parseTzId(String str)
-        throws EimConversionException {
+        throws UnknownTimeZoneException {
         tzid = new TzId(str);
         tz = tzTranslator.translateToOlsonTz(str);
         if (tz == null)
-            throw new EimConversionException("Unknown timezone " + str);
+            throw new UnknownTimeZoneException(str);
     }
 
-    private void parseAnyTime(String str)
-        throws EimConversionException {
+    private void parseAnyTime(String str) {
         anytime = BooleanUtils.toBoolean(str);
     }
 
     private void parseDates(String str)
-        throws EimConversionException {
+        throws ParseException {
         String[] strs = str.split(",");
-        if (strs.length == 1) {
-            try {
-                date = isDate() ? new Date(str) : new DateTime(str, tz);
-            } catch (ParseException e) {
-                throw convertParseException(str, e);
-            }
-        }
+        if (strs.length == 1)
+            date = isDate() ? new Date(str) : new DateTime(str, tz);
 
         dates = isDate() ?
             new DateList(Value.DATE) :
             new DateList(Value.DATE_TIME, tz);
         for (String s : strs) {
-            try {
-                if (isDate())
-                    dates.add(new Date(s));
-                else
-                    dates.add(new DateTime(s, tz));
-            } catch (ParseException e) {
-                throw convertParseException(s, e);
-            }
+            if (isDate())
+                dates.add(new Date(s));
+            else
+                dates.add(new DateTime(s, tz));
         }
-    }
-
-    private EimConversionException convertParseException(String value,
-                                                         Exception e) {
-        String msg = isDate() ?
-            "Invalid iCalendar date value " :
-            "Invalid iCalendar date-time value ";
-        return new EimConversionException(msg + value, e);
     }
 }

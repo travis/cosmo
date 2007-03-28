@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
@@ -89,7 +90,6 @@ public class EventGenerator extends BaseStampGenerator
         if(isMissingAttribute("startDate") && isMissingAttribute("anyTime")) {
             record.addField(generateMissingField(new TextField(FIELD_DTSTART, null)));
         } else {
-        
             value = EimValueConverter.fromICalDate(stamp.getStartDate(),
                                                    stamp.isAnyTime());
             record.addField(new TextField(FIELD_DTSTART, value));

@@ -20,6 +20,7 @@ import java.text.ParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.calendar.UnknownTimeZoneException;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.schema.BaseStampApplicator;
@@ -72,8 +73,8 @@ public class EventApplicator extends BaseStampApplicator
             eventStamp.createCalendar();
             String recurrenceId = note.getUid().split(
                     EventExceptionStamp.RECURRENCEID_DELIMITER)[1];
-            eventStamp.setRecurrenceId(EimValueConverter.toICalDate(
-                    recurrenceId).getDate());
+            ICalDate icd = EimValueConverter.toICalDate(recurrenceId);
+            eventStamp.setRecurrenceId(icd.getDate());
         }
         
         return eventStamp;

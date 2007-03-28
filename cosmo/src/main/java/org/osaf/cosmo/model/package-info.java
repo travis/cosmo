@@ -71,6 +71,9 @@
     @NamedQuery(name="user.byUid", query="from User where uid=:uid"),
     @NamedQuery(name="user.byActivationId", query="from User where activationid=:activationId"),
 
+    // Password Recovery entity query
+    @NamedQuery(name="passwordRecovery.byKey", query="from PasswordRecovery where key=:key"),
+
     // Event Queries
     @NamedQuery(name="event.by.calendar.icaluid", query="select i from ContentItem i join i.parents parent, CalendarPropertyIndex pi where pi.item.id=i.id and parent=:calendar and pi.name='icalendar:vcalendar-vevent_uid' and pi.value=:uid and i.isActive=true"),
     

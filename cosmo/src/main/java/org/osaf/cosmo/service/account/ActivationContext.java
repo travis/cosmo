@@ -27,7 +27,7 @@ public class ActivationContext {
     private boolean activationRequired = true;
     private User sender;
     private String activationLinkTemplate;
-    private String serverName;
+    private String hostname;
     
     /**
      * Creates new <code>ActivationContext</code>.
@@ -99,11 +99,11 @@ public class ActivationContext {
                 activationId);
     }
 
-    public String getServerName() {
-        return this.serverName;
+    public String getHostname() {
+        return this.hostname;
     }
 
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
+    public void setHostname(String serverName) {
+        this.hostname = serverName;
     }
 }

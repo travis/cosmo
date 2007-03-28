@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao;
 
+import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
@@ -127,4 +128,27 @@ public interface UserDao extends Dao {
      * @param user the user to remove
      */
     public void removeUser(User user);
+    
+    /**
+     * Creates a password recovery entity in the repository. Returns a new
+     * instance of <code>PasswordRecovery</code> after saving the original one.
+     *
+     * @param passwordRecovery the password recovery entity to save
+     */
+    public void createPasswordRecovery(PasswordRecovery passwordRecovery);
+    
+    /**
+     * Returns the password recovery entity identified by the given key.
+     * 
+     * @param key
+     * @return the passsword recovery entity identified by key
+     */
+    public PasswordRecovery getPasswordRecovery(String key);
+    
+    /**
+     * Delete <code>passwordRecovery</code> from the database.
+     * 
+     * @param passwordRecovery the password recovery entity to delete
+     */
+    public void deletePasswordRecovery(PasswordRecovery passwordRecovery);
 }

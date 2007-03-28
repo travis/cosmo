@@ -45,12 +45,15 @@ import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.account.ActivationContext;
+import org.osaf.cosmo.service.account.PasswordRecoveryMessageContext;
+import org.osaf.cosmo.service.account.PasswordRecoverer;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.server.SpaceUsageReport;
@@ -89,6 +92,8 @@ public class CmpServlet extends HttpServlet {
         "contentService";
     private static final String BEAN_USER_SERVICE =
         "userService";
+    private static final String BEAN_PASSWORD_RECOVERER = 
+        "passwordRecoverer";
     private static final String BEAN_SERVICE_LOCATOR_FACTORY =
         "serviceLocatorFactory";
     private static final String BEAN_SECURITY_MANAGER =
@@ -105,7 +110,7 @@ public class CmpServlet extends HttpServlet {
     private UserService userService;
     private ServiceLocatorFactory serviceLocatorFactory;
     private CosmoSecurityManager securityManager;
-
+    private PasswordRecoverer passwordRecoverer;
     /**
      * Loads the servlet context's <code>WebApplicationContext</code>
      * and wires up dependencies. If no
@@ -134,6 +139,10 @@ public class CmpServlet extends HttpServlet {
                 serviceLocatorFactory = (ServiceLocatorFactory)
                     getBean(BEAN_SERVICE_LOCATOR_FACTORY,
                             ServiceLocatorFactory.class);
+            if (passwordRecoverer == null)
+                passwordRecoverer = (PasswordRecoverer)
+                    getBean(BEAN_PASSWORD_RECOVERER,
+                            PasswordRecoverer.class);
         }
 
         if (contentService == null)
@@ -142,6 +151,8 @@ public class CmpServlet extends HttpServlet {
             throw new ServletException("user service must not be null");
         if (securityManager == null)
             throw new ServletException("security manager must not be null");
+        if (passwordRecoverer == null)
+            throw new ServletException("password recoverer must not be null");
     }
 
     // HttpServlet methods
@@ -307,6 +318,11 @@ public class CmpServlet extends HttpServlet {
             processMultiUserDelete(req, resp);
             return;
         }
+        
+        if (req.getPathInfo().startsWith("/account/password/recover")){
+            processRecoverPassword(req, resp);
+            return;
+        }
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
 
@@ -400,6 +416,15 @@ public class CmpServlet extends HttpServlet {
     public void setServiceLocatorFactory(ServiceLocatorFactory factory) {
         this.serviceLocatorFactory = factory;
     }
+    
+    public PasswordRecoverer getPasswordRecoverer() {
+        return passwordRecoverer;
+    }
+
+    public void setPasswordRecoverer(PasswordRecoverer passwordRecoverer) {
+        this.passwordRecoverer = passwordRecoverer;
+    }
+
 
     // private methods
 
@@ -843,7 +868,7 @@ public class CmpServlet extends HttpServlet {
             handleModelValidationError(resp, e);
         }
     }
-
+    
     /*
      * Delegated to by {@link #doPut} to handle account creation
      * requests, creating the user account and setting the response
@@ -918,6 +943,55 @@ public class CmpServlet extends HttpServlet {
         } catch (InvalidStateException ise) {
             handleInvalidStateException(resp, ise);
         }
+    }
+    
+    /*
+     * Delegated to by {@link #doPost} to handle password
+     * recovery requests. 
+     * 
+     */
+    private void processRecoverPassword(final HttpServletRequest req, 
+            final HttpServletResponse resp) 
+        throws IOException {
+        
+        String username = req.getParameter("username");
+        String email = req.getParameter("email");
+        
+        User user = null;
+        
+        if (username != null){
+            user = this.userService.getUser(username);
+        } else if (email != null){
+            user = this.userService.getUserByEmail(email);
+        }
+        
+        if (user != null) {
+            
+            String passwordRecoveryKey = 
+                passwordRecoverer.createRecoveryKey();
+            
+            final PasswordRecovery passwordRecovery = 
+                new PasswordRecovery(user, passwordRecoveryKey);
+            
+            userService.createPasswordRecovery(passwordRecovery);
+            
+            PasswordRecoveryMessageContext context = 
+                createPasswordRecoveryMessageContext(req, passwordRecovery);
+         
+            passwordRecoverer.sendRecovery(passwordRecovery, context);
+            
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+        
+            
+    }
+    
+    private void processResetPassword(HttpServletRequest req, 
+                                      HttpServletResponse resp){
+        String path = req.getPathInfo();
+        String passwordResetKey = path.substring("/account/password/reset/".length());
     }
 
     private void handleInvalidStateException(HttpServletResponse resp,
@@ -1070,7 +1144,25 @@ public class CmpServlet extends HttpServlet {
         activationContext.setActivationLinkTemplate(
                 urlBase+ "/account/activate/" + "{" + 
                 ActivationContext.LINK_TEMPLATE_VAR_ACTIVATION_ID + "}");
-        activationContext.setServerName(urlBase);
+        activationContext.setHostname(urlBase);
         return activationContext;
+    }
+    
+    private PasswordRecoveryMessageContext 
+        createPasswordRecoveryMessageContext(HttpServletRequest req, 
+                PasswordRecovery recovery){
+        PasswordRecoveryMessageContext context = 
+            new PasswordRecoveryMessageContext();
+        
+        String urlBase = getUrlBase(req);
+        
+        context.setSender(userService.getUser(User.USERNAME_OVERLORD));
+        context.setLocale(req.getLocale());
+        context.setRecoveryLink(
+                urlBase + "/account/password/reset/" + recovery.getKey());
+        
+        context.setHostname(urlBase);
+        
+        return context;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.service.account.AutomaticAccountActivator;
+import org.osaf.cosmo.service.account.MockPasswordRecoverer;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
@@ -56,6 +57,8 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         MockContentDao contentDao = new MockContentDao(storage);
         MockUserDao userDao = new MockUserDao();
         SingleVMLockManager lockManager = new SingleVMLockManager();
+        MockPasswordRecoverer passwordRecoverer = 
+            new MockPasswordRecoverer();
 
         contentService = new StandardContentService();
         contentService.setCalendarDao(calendarDao);
@@ -75,6 +78,7 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         servlet.setContentService(contentService);
         servlet.setUserService(userService);
         servlet.setSecurityManager(getSecurityManager());
+        servlet.setPasswordRecoverer(passwordRecoverer);
         servlet.init(getServletConfig());
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.service.account;
 
-
 import java.util.Locale;
 
 import javax.mail.MessagingException;
@@ -24,60 +23,56 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.id.IdentifierGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.osaf.cosmo.service.UserService;
+import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 
-public class EmailAccountActivator extends AbstractCosmoAccountActivator {
-    private static final Log log =
-        LogFactory.getLog(EmailAccountActivator.class);
-
+public class EmailPasswordRecoverer implements PasswordRecoverer {
     private IdentifierGenerator idGenerator;
     private JavaMailSender mailSender;
-    private ResourceBundleMessageSource messageSource;
-
-    private static final String MSG_ACTIVATION_SUBJECT =
-        "Email.Activation.Subject";
-    private static final String MSG_ACTIVATION_HANDLE =
-        "Email.Activation.FromHandle";
-    private static final String MSG_ACTIVATION_TEXT =
-        "Email.Activation.Text";
-
-
-    public String generateActivationToken() {
-
-        return this.getIdGenerator().nextIdentifier().toString();
-    }
-
-    public void sendActivationMessage(final User user,
-            final ActivationContext activationContext) {
+    private MessageSource messageSource;
+    
+    private static final String MSG_PASSWORD_RECOVERY_TEXT = 
+        "Email.PasswordReset.Text";
+    private static final String MSG_PASSWORD_RECOVERY_SUBJECT = 
+        "Email.PasswordReset.Subject";
+    private static final String MSG_PASSWORD_RECOVERY_HANDLE = 
+        "Email.PasswordReset.FromHandle";
+    
+    private static final Log log = LogFactory.getLog(EmailPasswordRecoverer.class);
+    
+    public void sendRecovery(final PasswordRecovery passwordRecovery,
+                             final PasswordRecoveryMessageContext context) {
+        // Create final variable so it is available in message preparator below 
+        final User user = passwordRecovery.getUser();
 
         mailSender.send(new MimeMessagePreparator() {
             public void prepare(MimeMessage mimeMessage)
             throws MessagingException {
+                
+                Locale locale = context.getLocale();
 
-                Locale locale = activationContext.getLocale();
-
-                User sender = activationContext.getSender();
+                User sender = context.getSender();
                 String fromAddr = sender.getEmail();
                 String fromHandle =
-                    messageSource.getMessage(MSG_ACTIVATION_HANDLE,
+                    messageSource.getMessage(MSG_PASSWORD_RECOVERY_HANDLE,
                             new Object[] {},
                             locale);
 
                 String subject =
-                    messageSource.getMessage(MSG_ACTIVATION_SUBJECT,
+                    messageSource.getMessage(MSG_PASSWORD_RECOVERY_SUBJECT,
                         new Object[] {user.getUsername()},
                         locale);
 
                 String text =
-                    messageSource.getMessage(MSG_ACTIVATION_TEXT,
+                    messageSource.getMessage(MSG_PASSWORD_RECOVERY_TEXT,
                         new Object[] {user.getUsername(),
-                                      activationContext.getHostname(),
-                                      activationContext.getActivationLink(
-                                              user.getActivationId())},
+                                      context.getHostname(),
+                                      context.getRecoveryLink()},
                         locale);
 
 
@@ -90,18 +85,13 @@ public class EmailAccountActivator extends AbstractCosmoAccountActivator {
                 message.setText(text);
             }
         });
-        log.info("Account activation link sent to " + user.getEmail());
+        log.info("Password recovery link sent to " + user.getEmail());
 
     }
-
-    public void destroy() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void init() {
-        // TODO Auto-generated method stub
-
+    
+    public String createRecoveryKey() {
+    
+        return idGenerator.nextIdentifier().toString();
     }
 
     public IdentifierGenerator getIdGenerator() {
@@ -120,11 +110,11 @@ public class EmailAccountActivator extends AbstractCosmoAccountActivator {
         this.mailSender = mailSender;
     }
 
-    public ResourceBundleMessageSource getMessageSource() {
+    public MessageSource getMessageSource() {
         return messageSource;
     }
 
-    public void setMessageSource(ResourceBundleMessageSource messageSource) {
+    public void setMessageSource(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 

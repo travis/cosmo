@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,5 +77,48 @@ public class CmpPostTest extends BaseCmpServletTestCase {
         User test3 = userService.getUser(u3.getUsername());
         assertNull(test3);
         
+    }
+    
+    public void testRecoverPassword() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        userService.createUser(u1);
+
+        // test with username
+        MockHttpServletRequest request =
+            createMockRequest("POST", "/account/password/recover");
+        request.setContentType("application/x-www-form-urlencoded");
+        request.addParameter("username", u1.getUsername());
+                
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        assertEquals(MockHttpServletResponse.SC_OK, 
+                response.getStatus());
+        
+        // test with email
+        request =
+            createMockRequest("POST", "/account/password/recover");
+        request.setContentType("application/x-www-form-urlencoded");
+        request.addParameter("username", u1.getUsername());
+                
+        response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        assertEquals(MockHttpServletResponse.SC_OK, 
+                response.getStatus());
+
+        // test with nothing
+        request =
+            createMockRequest("POST", "/account/password/recover");
+        request.setContentType("application/x-www-form-urlencoded");
+                        
+        response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        assertEquals(MockHttpServletResponse.SC_NOT_FOUND, 
+                response.getStatus());
+
+        
+
     }
 }

@@ -130,6 +130,7 @@
             <value>org.osaf.cosmo.model.TimestampAttribute</value>
             <value>org.osaf.cosmo.model.Tombstone</value>
             <value>org.osaf.cosmo.model.User</value>
+            <value>org.osaf.cosmo.model.PasswordRecovery</value>
         </list>
     </property>
     <property name="entityInterceptor">
@@ -319,6 +320,20 @@
       <ref local="messageSource" />
     </property>
 
+  </bean>
+  
+  <bean id="passwordRecoverer"
+  		class="org.osaf.cosmo.service.account.EmailPasswordRecoverer">
+  		
+    <property name="idGenerator">
+      <ref local="idGenerator" />
+    </property>
+    <property name="mailSender">
+      <ref local="mailSender" />
+    </property>
+    <property name="messageSource">
+      <ref local="messageSource" />
+    </property>
   </bean>
 
   <bean id="userService" parent="txProxyTemplate">

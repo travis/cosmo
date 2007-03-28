@@ -307,7 +307,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                "Collection contains more recently updated items");
                 return;
             } catch (ValidationException e) {
-                log.warn("Recordset contains invalid data", e);
+                //                log.warn("Recordset contains invalid data", e);
                 Throwable cause = e.getCause();
                 String msg = cause != null ? ": " + cause.getMessage() : "";
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
@@ -411,7 +411,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                "Parent item not a collection");
                 return;
             } catch (ValidationException e) {
-                log.warn("Recordset contains invalid data", e);
+                //                log.warn("Recordset contains invalid data", e);
                 Throwable cause = e.getCause();
                 String msg = cause != null ? ": " + cause.getMessage() : "";
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,

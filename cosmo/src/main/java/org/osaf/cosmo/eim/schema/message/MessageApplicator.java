@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.eim.schema.message;
 
+import java.io.Reader;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
@@ -65,14 +67,30 @@ public class MessageApplicator extends BaseStampApplicator
         throws EimSchemaException {
         MessageStamp message = (MessageStamp) getStamp();
 
-        if (field.getName().equals(FIELD_SUBJECT)) {
+        if (field.getName().equals(FIELD_MESSAGE_ID)) {
             if(field.isMissing()) {
-                handleMissingAttribute("subject");
+                handleMissingAttribute("messageId");
             }
             else {
                 String value =
-                    EimFieldValidator.validateText(field, MAXLEN_SUBJECT);
-                message.setSubject(value);
+                    EimFieldValidator.validateText(field, MAXLEN_MESSAGE_ID);
+                message.setMessageId(value);
+            }
+        } else if (field.getName().equals(FIELD_HEADERS)) {
+            if(field.isMissing()) {
+                handleMissingAttribute("headers");
+            }
+            else {
+                Reader value = EimFieldValidator.validateClob(field);
+                message.setHeaders(value);
+            }
+        } else if (field.getName().equals(FIELD_FROM)) {
+            if(field.isMissing()) {
+                handleMissingAttribute("from");
+            }
+            else {
+                String value = EimFieldValidator.validateText(field, MAXLEN_FROM);
+                message.setFrom(value);
             }
         } else if (field.getName().equals(FIELD_TO)) {
             if(field.isMissing()) {
@@ -97,6 +115,38 @@ public class MessageApplicator extends BaseStampApplicator
             else {
                 String value = EimFieldValidator.validateText(field, MAXLEN_BCC);
                 message.setBcc(value);
+            }
+        } else if (field.getName().equals(FIELD_ORIGINATORS)) {
+            if(field.isMissing()) {
+                handleMissingAttribute("originators");
+            }
+            else {
+                String value = EimFieldValidator.validateText(field, MAXLEN_ORIGINATORS);
+                message.setOriginators(value);
+            }
+        } else if (field.getName().equals(FIELD_DATE_SENT)) {
+            if(field.isMissing()) {
+                handleMissingAttribute("dateSent");
+            }
+            else {
+                String value = EimFieldValidator.validateText(field, MAXLEN_DATE_SENT);
+                message.setDateSent(value);
+            }
+        } else if (field.getName().equals(FIELD_IN_REPLY_TO)) {
+            if(field.isMissing()) {
+                handleMissingAttribute("inReplyto");
+            }
+            else {
+                String value = EimFieldValidator.validateText(field, MAXLEN_IN_REPLY_TO);
+                message.setInReplyTo(value);
+            }
+        } else if (field.getName().equals(FIELD_REFERENCES)) {
+            if(field.isMissing()) {
+                handleMissingAttribute("references");
+            }
+            else {
+                Reader value = EimFieldValidator.validateClob(field);
+                message.setReferences(value);
             }
         } else {
             applyUnknownField(field);

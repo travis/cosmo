@@ -166,4 +166,24 @@ public class TextAttribute extends Attribute implements
         else
             attr.setValue(value);
     }
+    
+    /**
+     * Convienence method for setting a Reader value on a TextAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch TextAttribute from
+     * @param qname QName of attribute
+     * @param value value to set on TextAttribute
+     */
+    public static void setValue(Item item, QName qname, Reader value) {
+        TextAttribute attr = (TextAttribute) item.getAttribute(qname);
+        if(attr==null && value!=null) {
+            attr = new TextAttribute(qname,value);
+            item.addAttribute(attr);
+            return;
+        }
+        if(value==null)
+            item.removeAttribute(qname);
+        else
+            attr.setValue(value);
+    }
 }

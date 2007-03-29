@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.eim.schema;
 
-import java.text.DecimalFormat;
 
 /**
  * Defines constants for EIM record types.
@@ -49,9 +48,9 @@ public interface EimSchemaConstants {
     public static final String PREFIX_TASK = "task";
     /** */
     public static final String NS_MESSAGE =
-        "http://osafoundation.org/eim/message";
+        "http://osafoundation.org/eim/mail/0";
     /** */
-    public static final String PREFIX_MESSAGE = "message";
+    public static final String PREFIX_MESSAGE = "mail";
     /** */
     public static final String NS_NOTE =
         "http://osafoundation.org/eim/note/0";

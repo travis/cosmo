@@ -56,7 +56,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         MessageStamp message = new MessageStamp(item);
         message.setBcc("bcc");
         message.setTo("to");
-        message.setSubject("subject");
+        message.setFrom("from");
         message.setCc("cc");
         
         EventStamp event = new EventStamp();
@@ -91,7 +91,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Assert.assertEquals(ms.getBcc(), message.getBcc());
         Assert.assertEquals(ms.getCc(), message.getCc());
         Assert.assertEquals(ms.getTo(), message.getTo());
-        Assert.assertEquals(ms.getSubject(), message.getSubject());
+        Assert.assertEquals(ms.getFrom(), message.getFrom());
     }
     
     public void testStampsUpdate() throws Exception {
@@ -106,7 +106,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         MessageStamp message = new MessageStamp(item);
         message.setBcc("bcc");
         message.setTo("to");
-        message.setSubject("subject");
+        message.setFrom("from");
         message.setCc("cc");
         
         EventStamp event = new EventStamp();

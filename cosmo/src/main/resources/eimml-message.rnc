@@ -12,11 +12,11 @@ eimMessageRecord =
          messageUuid
        & messageId?
        & messageHeaders?
+       & messageFrom?
        & messageTo?
        & messageCc?
        & messageBcc?
-       & messageWhoFrom?
-       & messageSender?
+       & messageOriginators?
        & messageDateSent?
        & messageInReplyTo?
        & messageReferences?
@@ -28,14 +28,19 @@ messageUuid =
       eimTextFieldContent
    }
 
-messageSubject =
-   element message:id {
+messageId =
+   element message:messageId {
       eimTextFieldContent # length 256
    }
 
-messageSubject =
+messageHeaders =
    element message:headers {
       eimClobFieldContent
+   }
+
+messageFrom =
+   element message:fromAddress {
+      eimTextFieldContent # length 1024
    }
 
 messageTo =
@@ -54,15 +59,9 @@ messageBcc =
    }
 
 # can contain text or email addresses
-messageWhoFrom =
-   element message:whoFrom {
-      eimTextFieldContent # length 512
-   }
-
-# the RFC822 From address
-messageSender =
-   element message:sender {
-      eimTextFieldContent # length 256
+messageOriginators =
+   element message:originators {
+      eimTextFieldContent # length 1024
    }
 
 messageDateSent =

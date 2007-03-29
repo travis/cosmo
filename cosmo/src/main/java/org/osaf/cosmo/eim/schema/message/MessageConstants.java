@@ -22,19 +22,39 @@ package org.osaf.cosmo.eim.schema.message;
  */
 public interface MessageConstants {
     /** */
-    public static final String FIELD_SUBJECT = "subject";
+    public static final String FIELD_MESSAGE_ID = "messageId";
     /** */
-    public static final int MAXLEN_SUBJECT = 256;
+    public static final int MAXLEN_MESSAGE_ID = 256;
+    /** */
+    public static final String FIELD_HEADERS = "headers";
+    /** */
+    public static final String FIELD_FROM = "fromAddress";
+    /** */
+    public static final int MAXLEN_FROM = 256;
     /** */
     public static final String FIELD_TO = "to";
     /** */
-    public static final int MAXLEN_TO = 256;
+    public static final int MAXLEN_TO = 1024;
     /** */
     public static final String FIELD_CC = "cc";
     /** */
-    public static final int MAXLEN_CC = 256;
+    public static final int MAXLEN_CC = 1024;
     /** */
     public static final String FIELD_BCC = "bcc";
     /** */
-    public static final int MAXLEN_BCC = 256;
+    public static final int MAXLEN_BCC = 1024;
+    /** */
+    public static final String FIELD_ORIGINATORS = "originators";
+    /** */
+    public static final int MAXLEN_ORIGINATORS = 1024; 
+    /** */
+    public static final String FIELD_DATE_SENT = "dateSent";
+    /** */
+    public static final int MAXLEN_DATE_SENT = 256;
+    /** */
+    public static final String FIELD_IN_REPLY_TO = "inReplyTo";
+    /** */
+    public static final int MAXLEN_IN_REPLY_TO = 256;
+    /** */
+    public static final String FIELD_REFERENCES = "references";
 }

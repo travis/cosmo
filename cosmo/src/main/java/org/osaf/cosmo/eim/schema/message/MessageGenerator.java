@@ -15,12 +15,14 @@
  */
 package org.osaf.cosmo.eim.schema.message;
 
+import java.io.StringReader;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
@@ -79,10 +81,23 @@ public class MessageGenerator extends BaseStampGenerator
 
     private void addFields(EimRecord record) {
         MessageStamp stamp = (MessageStamp) getStamp();
-        record.addField(new TextField(FIELD_SUBJECT, stamp.getSubject()));
+        record.addField(new TextField(FIELD_MESSAGE_ID, stamp.getMessageId()));
+        StringReader headers = stamp.getHeaders() != null ?
+                new StringReader(stamp.getHeaders()) :
+                null;
+        record.addField(new ClobField(FIELD_HEADERS, headers));
+        record.addField(new TextField(FIELD_FROM, stamp.getFrom()));
         record.addField(new TextField(FIELD_TO, stamp.getTo()));
         record.addField(new TextField(FIELD_CC, stamp.getCc()));
         record.addField(new TextField(FIELD_BCC, stamp.getBcc()));
+        record.addField(new TextField(FIELD_ORIGINATORS, stamp.getOriginators()));
+        record.addField(new TextField(FIELD_DATE_SENT, stamp.getDateSent()));
+        record.addField(new TextField(FIELD_IN_REPLY_TO, stamp.getInReplyTo()));
+        
+        StringReader refs = stamp.getReferences() != null ?
+                new StringReader(stamp.getReferences()) :
+                null;
+        record.addField(new ClobField(FIELD_REFERENCES, refs));
         record.addFields(generateUnknownFields());
     }
 }

@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.OverlordDeletionException;

@@ -23,3 +23,28 @@
 {"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[5]/span/table/tbody/tr/td[3]/div/table/tbody/tr/td[3]/input"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "click", "params": {"link" : "Settings"}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/span/div/table/tbody/tr/td[4]"}}
+{"method": "check", "params": {"id" : "showAccountBrowser"}}
+{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/span/div/table/tbody/tr/td[6]"}}
+{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[5]/span/table/tbody/tr/td[3]/div/table/tbody/tr/td/input"}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "click", "params": {"link" : "Settings"}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/span/div/table/tbody/tr/td[4]"}}
+{"method": "check", "params": {"id" : "showAccountBrowser"}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[5]/span/table/tbody/tr/td[3]/div/table/tbody/tr/td/input"}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "click", "params": {"xpath" : "/html/body/div[2]/form/div/div/span/div[2]/div[3]/img"}}
+{"method": "select", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/div/table/tbody/tr[3]/td[2]/div/select", "option": "Apple iCal v2.x"}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
+{"method": "select", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/div/table/tbody/tr[3]/td[2]/div/select", "option": "Feed Reader"}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
+{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[5]/span/table/tbody/tr/td[3]/div/table/tbody/tr/td[3]/input"}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "wait", "params": {"milliseconds" : 3000}}

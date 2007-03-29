@@ -256,37 +256,77 @@ body.adminPage {
 
 /* Buttons
  * --------------------- */
-/* Normal-sized buttons */
-$buttonHeight = 24px
-.buttonText {
-    font-size:$fontSizeM;
-    color:$linkTextColor;
-    height:$buttonHeight;
-    line-height:$buttonHeight;
-    vertical-align:middle;
+.btnElemBase {
+    width: 76px;
+    margin: auto;
+    text-align: center;
+    font-size: 11px;
+    color: #333399;
+    border-style: solid;
+    border-color: #ccc #777 #777 #ccc;
+    border-width: 1px;
+    height: 24px;
+    padding: 0 0 2px 0;
+    cursor: pointer;
+    background-image: url(templates/default/images/button_bgs.gif);
+    background-repeat: repeat-x;
+    background-position: 0px 0px;
 }
-.buttonTextDisabled {
-    font-size:$fontSizeM;
-    color:$linkTextDisabledColor;
-    height:$buttonHeight;
-    line-height:$buttonHeight;
-    vertical-align:middle;
+.btnElemMouseover {
+    color: #3333aa;
+    background-position: 0px -24px;
 }
-/* Small-sized buttons */
-$smButtonHeight = 18px
-.buttonTextSm {
-    font-size:$fontSizeS;
-    color:$linkTextColor;
-    height:$smButtonHeight;
-    line-height:$smButtonHeight;
-    vertical-align:middle;
+.btnElemMousedown {
+    color: #3333aa;
+    border-color: #555 #bbb #bbb #555;
+    background-position: 0px -24px;
 }
-.buttonTextDisabledSm {
-    font-size:$fontSizeS;
-    color:$linkTextDisabledColor;
-    height:$smButtonHeight;
-    line-height:$smButtonHeight;
-    vertical-align:middle;
+.btnElemDisabled {
+    color: #999;
+    border-color: #ddd #888 #888 #ddd;
+    cursor: default;
+}
+.btnElemBaseSm {
+    width: 60px;
+    margin: auto;
+    text-align: center;
+    font-size: 9px;
+    color: #333399;
+    border-style: solid;
+    border-color: #ccc #777 #777 #ccc;
+    border-width: 1px;
+    height: 18px;
+    padding: 0 0 1px 0;
+    cursor: pointer;
+    background-image: url(templates/default/images/button_bgs_sm.gif);
+    background-repeat: repeat-x;
+    background-position: 0px 0px;
+}
+.btnElemMouseoverSm {
+    color: #3333aa;
+    background-position: 0px -18px;
+}
+.btnElemMousedownSm {
+    color: #3333aa;
+    border-color: #555 #bbb #bbb #555;
+    background-position: 0px -18px;
+}
+.btnElemDisabledSm {
+    color: #999;
+    border-color: #ddd #888 #888 #ddd;
+    cursor: default;
+}
+.btnSetDividerBase {
+    border: 0px;
+    background-color: #aaa;
+}
+.btnSetDividerLeftPress {
+    border: 0px;
+    background-color: #bbb;
+}
+.btnSetDividerRightPress {
+    border: 0px;
+    background-color: #555;
 }
 
 /* General widget/UI
@@ -709,17 +749,18 @@ td.dataDisplayLabel {
  * --------------------- */
 /* Main box for fake popup */
 #modalDialog {
-    background:$mainUIColor;
     position:absolute;
+    /* background:$mainUIColor;
     background:$mainUIColor;
-    border:1px solid $uiDetailBorderColor;
+    border:1px solid $uiDetailBorderColor; */
     z-index:2000;
     display:none;
 }
 /* Fake popup center content area -- inside padding */
-#modalDialogContainer {
-    padding:18px;
-    padding-bottom:0px;
+#modalDialogContent {
+    padding: 18px;
+    padding-bottom: 0px;
+    line-height: 12px;
 }
 /* Only set if the dialog title exists */
 .dialogTitle {
@@ -728,7 +769,7 @@ td.dataDisplayLabel {
     height:24px;
     line-height:26px;
     vertical-align:middle;
-    border:1px solid #dfdfdf;
+    border-bottom:1px solid #dfdfdf;
     padding-left:6px;
     font-size:13px;
     font-weight:bold;
@@ -737,12 +778,96 @@ td.dataDisplayLabel {
 /* Only set if the dialog prompt exists */
 .dialogPrompt {
     text-align:left;
-    padding-top:4px;
+    padding: 4px 0 0 8px;
     height:32px;
     line-height:16px;
     vertical-align:middle;
     font-size:11px;
 }
+.dialogButtonPanel {
+    padding: 0 8px;
+}
+.dropShadowTable {
+  /* 
+  Requires a specific width & height set -- some of the cells in
+  this type of table also require a specific height or width
+  set relative to the overall size of this table for cell
+  sizing and bg image tiling to work.  These will be noted in
+  the specific class
+  This is *not* a simple nine-cell table -- set border = 1
+  on the table to see the composition
+  */
+  position: absolute;
+}
+.dropShadowTop {
+  /* 
+  Empty top row -- makes sure there's an even 16px all the
+  way around the box the drop shadow is on
+  */
+  height: 16px; 
+  font-size: 1px;
+}
+.dropShadowLeft {
+  /*
+  Empty left column -- same as above
+  */
+  width: 16px;
+}
+.dropShadowTopRightCorner {
+  width: 16px; 
+  height: 16px;
+  font-size: 1px;
+  background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
+  background-position: 0px 0px;
+}
+.dropShadowCenter {
+  /*
+  Inner box with borders -- darker color for border on 
+  right and bottom where drop shadow appears. Any content
+  should sit inside this box
+  */
+  background-color: #fff;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ccc #888 #888 #ccc;
+  vertical-align: top;
+  line-height: 0px;
+}
+.dropShadowRight {
+  /*
+  This cell needs a height specified of total
+  dropShadowTable's height minus 32px
+  */
+  opacity: 0.8; 
+  background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
+  background-repeat: repeat-y; background-position:-16px 0px; 
+  font-size: 1px; 
+}
+.dropShadowBottomLeft {
+  width: 16px; 
+  height: 16px; 
+  background-image: url(templates/default/images/drop_shadow_bottom_imgs.png); 
+  background-position: 0px 0px; 
+  font-size: 1px;
+}
+.dropShadowBottom {
+  /*
+  Requires a specific width set of total dropShadowTable's
+  width minus 48px
+  */
+  opacity: 0.8; 
+  background-image: url(templates/default/images/drop_shadow_bottom_imgs.png); 
+  background-repeat: repeat-x; 
+  background-position: 0px -16px; 
+  font-size: 1px;
+}
+.dropShadowBottomRightCorner {
+  width: 16px; 
+  background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
+  background-position: -32px 0px; 
+  font-size:1px;
+}
+
 
 /* Tab container 
  * --------------------- */

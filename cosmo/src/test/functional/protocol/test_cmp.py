@@ -56,6 +56,26 @@ def test_delete_user():
     assert client.response.status == 201
     client.remove_user('test_delete_user')
     assert client.response.status == 204
+
+def test_administrator_tag():
+    from xml.etree import ElementTree
+    
+    client.get(client._cmp_path+'/users')
+    assert client.response.status == 200
+    assert client.response.body.find('root') is not -1
+    root_user_element = [x for x in client.response.tree.findall('{http://osafoundation.org/cosmo/CMP}user') if x.find('{http://osafoundation.org/cosmo/CMP}username').text == 'root'][0]
+    assert root_user_element.find('{http://osafoundation.org/cosmo/CMP}administrator').text == 'true'
+    test_user_element = [x for x in client.response.tree.findall('{http://osafoundation.org/cosmo/CMP}user') if x.find('{http://osafoundation.org/cosmo/CMP}username').text == TEST_USER][0]
+    assert test_user_element.find('{http://osafoundation.org/cosmo/CMP}administrator').text == 'false'
+    client.modify_user({'username':TEST_USER, 'administrator':'true'})
+    assert client.response.status == 204
+    client.get(client._cmp_path+'/users')
+    assert client.response.status == 200
+    test_user_element = [x for x in client.response.tree.findall('{http://osafoundation.org/cosmo/CMP}user') if x.find('{http://osafoundation.org/cosmo/CMP}username').text == TEST_USER][0]
+    assert test_user_element.find('{http://osafoundation.org/cosmo/CMP}administrator').text == 'true'
+    client.modify_user({'username':TEST_USER, 'administrator':'false'})
+    assert client.response.status  == 204
+    
     
 def teardown_module(module):
     client.remove_user('test_modify_user')
@@ -64,6 +84,6 @@ def teardown_module(module):
     assert client.response.status == 204  
     client.remove_user(TEST_USER+'-2')
     assert client.response.status == 204  
-    
+
         
     

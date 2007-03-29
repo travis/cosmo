@@ -82,7 +82,7 @@
 <!-- TODO set cache settings here.... -->
 <bean id="i18nController" class="org.osaf.cosmo.spring.mvc.InternationalizationController" />
 
-<bean id="jspViewController" class="org.osaf.cosmo.spring.mvc.controllers.CosmoUrlFilenameViewController"> 
+<bean id="jspViewController" class="org.osaf.cosmo.ui.CosmoUrlFilenameViewController"> 
 	<property name="alwaysUseFullPath">
 		<value>true</value>
     </property>
@@ -125,7 +125,7 @@
 <bean id="internalPathMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver">
 </bean>
 
-<bean id="statusController" class="org.osaf.cosmo.spring.mvc.controllers.StatusController">
+<bean id="statusController" class="org.osaf.cosmo.ui.admin.StatusController">
 	<property name="methodNameResolver"><ref bean="internalPathMethodNameResolver"/></property>
 	<property name="dumpView"><value>admin_status_dump</value></property>
 	<property name="viewView"><value>admin_status_view</value></property>

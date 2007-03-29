@@ -21,27 +21,8 @@
  */
 dojo.provide("cosmo.ui.button");
 dojo.require("cosmo.ui.conf");
+dojo.require("dojo.event");
 dojo.require("dojo.widget.*");
-
-function buttonPreload() {
-    var btnSizes = ['', '_sm'];
-    var btnSides = ['left', 'center', 'right'];
-    var btnTypes = ['', '_dim', '_lit'];
-    var btnPreload = {};
-    var f = function(base, suffix, size) {
-        var p = 'button_' + base + suffix + size;
-        btnPreload[p] = new Image();
-        btnPreload[p].src = BUTTON_DIR_PATH + p + '.gif';
-    }
-    for (var h in btnSizes) {
-        for (var i in btnSides) {
-            for (var j in btnTypes) {
-                f(btnSides[i], btnTypes[j], btnSizes[h]);
-            }
-        }
-    }
-}
-buttonPreload();
 
 /**
  * @object Button -- creates a button with a text label, and images
@@ -96,45 +77,24 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
         var nbDivider = null;
 
         nbTable.style.width = '45px';
-        nbTable.style.height = '18px';
+        nbTable.style.height = '16px';
         nbTable.cellPadding = '0px'; // Note camelCaps here, fun!! :)
         nbTable.cellSpacing = '0px'; // More camelCaps, yay!
         nbTable.appendChild(nbTBody);
         nbTBody.appendChild(nbRow);
-        // Left endcap
-        nbRow.appendChild(doButtonSetCap('Left', leftHandler));
         // Left arrow
         nbRow.appendChild(doButtonSetCenter('Left', leftHandler));
         // Divider cell
         nbDivider = document.createElement('td');
         nbDivider.id = id + 'ButtonDivider';
         nbDivider.style.width = '1px';
-        nbDivider.style.height = '18px';
+        nbDivider.style.height = '16px';
         nbDivider.style.lineHeight = '1px';
-        nbDivider.style.background = '#aaaaaa';
+        nbDivider.className = 'btnSetDividerBase';
         nbRow.appendChild(nbDivider);
         // Right arrow
         nbRow.appendChild(doButtonSetCenter('Right', rightHandler));
-        // Right endcap
-        nbRow.appendChild(doButtonSetCap('Right', rightHandler));
         return nbTable;
-    }
-    // Private method to make the endcaps
-    var doButtonSetCap = function(side, clickHandler) {
-        var nbData = document.createElement('td');
-        var lowerCaseSide = side.toLowerCase();
-
-        nbData.id = id + side;
-        nbData.style.width = '9px';
-        nbData.style.height = '18px';
-        nbData.style.lineHeight = '18px';
-        nbData.style.cursor = 'pointer';
-        nbData.style.background = 'url(' + BUTTON_DIR_PATH +
-            'button_' + lowerCaseSide + '_sm.gif)';
-        nbData.onmouseover = function() { self.rolloverHandler(side, 'lit'); }
-        nbData.onmouseout = function() { self.rolloverHandler(side, ''); }
-        nbData.onclick = clickHandler;
-        return nbData;
     }
     // Private method to make the center arrow cells
     var doButtonSetCenter = function(side, clickHandler) {
@@ -144,19 +104,27 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
 
         nbData.id = id + 'Center' + side;
         nbData.style.width = '13px';
-        nbData.style.height = '18px';
-        nbData.style.lineHeight = '18px';
+        nbData.style.height = '16px';
+        nbData.style.lineHeight = '16px';
         nbData.style.textAlign = lowerCaseSide;
-        nbData.style.background = 'url(' + BUTTON_DIR_PATH +
-            'button_center_sm.gif)';
-        nbData.style.backgroundRepeat = 'repeat-x';
-        nbData.style.cursor = 'pointer';
+        nbData.className = 'btnElemBaseSm';
         nbImg.src = BUTTON_DIR_PATH + 'nav_arrow_' +
             lowerCaseSide + '.gif';
+        if (side == 'Left') {
+            nbData.style.borderWidth = '1px 0 1px 1px';
+        }
+        else {
+            nbData.style.borderWidth = '1px 1px 1px 0';
+        }
+        nbImg.style.verticalAlign = 'middle';
+        nbImg.style.padding = '0 6px 0 6px';
         nbData.appendChild(nbImg);
-        nbData.onmouseover = function() { self.rolloverHandler(side, 'lit'); }
-        nbData.onmouseout = function() { self.rolloverHandler(side, ''); }
-        nbData.onclick = clickHandler;
+        
+        dojo.event.connect(nbData, 'onmouseover', self, '_morphButton');
+        dojo.event.connect(nbData, 'onmouseout', self, '_morphButton');
+        dojo.event.connect(nbData, 'onmousedown', self, '_morphButton');
+        dojo.event.connect(nbData, 'onmouseup', self, '_morphButton');
+        dojo.event.connect(nbData, 'onclick', clickHandler);
         return nbData;
     }
 
@@ -164,19 +132,31 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
     // ========
     this.id = id;
     this.domNode = doButtonTable();
-    this.rolloverHandler = function(side, state) {
-        // Do the rollover for the entire button set together
-        // Doing just one side at a time looks freaky
-        this.doRollover(side, state);
-    };
-    this.doRollover = function(side, state) {
-        var btnSide = side.toLowerCase();
-        var btnState = state ? '_' + state : '';
-        var dividerColor = state == 'lit' ? '#000000' : '#aaaaaa';
-        document.getElementById(this.id + 'Center' + side).style.background =
-            'url(' + BUTTON_DIR_PATH + 'button_center' + btnState + '_sm.gif)';
-        document.getElementById(this.id + side).style.background =
-            'url(' + BUTTON_DIR_PATH + 'button_' + btnSide + btnState + '_sm.gif)';
-        document.getElementById(this.id + 'ButtonDivider').style.background = dividerColor;
+    this._morphButton = function(e) {
+        var s = e.type;
+        var t = e.currentTarget;
+        var center = $(this.id + 'ButtonDivider');
+        if (!t.id) { return false; }
+        var states = {
+            mouseover: 'btnElemBaseSm' + ' btnElemMouseoverSm',
+            mouseout: 'btnElemBaseSm',
+            mousedown: 'btnElemBaseSm' + ' btnElemMousedownSm',
+            mouseup: 'btnElemBaseSm'
+        }
+        // On mousedown the separator div may be serving as the
+        // right-border of the left button, or vice-versa
+        if (s == 'mousedown') {
+            if (t.id.indexOf('Left') > -1) {
+                center.className = 'btnSetDividerLeftPress';
+            }
+            else {
+                center.className = 'btnSetDividerRightPress';
+            }
+        }
+        else {
+            center.className = 'btnSetDividerBase';
+        }
+        t.className = states[s]; 
+    
     };
 }

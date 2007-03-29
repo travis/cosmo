@@ -1,0 +1,92 @@
+Index: cosmo/src/test/functional/protocol/cosmo_test_lib.py
+===================================================================
+--- cosmo/src/test/functional/protocol/cosmo_test_lib.py	(revision 3653)
++++ cosmo/src/test/functional/protocol/cosmo_test_lib.py	(working copy)
+@@ -13,12 +13,13 @@
+ #   limitations under the License.
+ 
+ import cosmoclient
+-import random, uuid
++import random, uuid, os, sys
+ 
+-SERVER_URL = 'http://qacosmo.osafoundation.org:80'
++SERVER_URL = 'http://qacosmo.osafoundation.org'
+ ADMIN_USER = 'root'
+ ADMIN_PASS = 'cosmo'
+ PRINCIPAL_ROOT = '/cosmo/dav'
++FILES_DIR =  os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))+'/files/'
+ 
+ TEST_USER_PREFIX = 'test_user_'
+ 
+@@ -34,6 +35,7 @@
+     module.TEST_EMAIL = module.TEST_USER+'@osafoundation.org'
+     module.PRINCIPAL_ROOT = PRINCIPAL_ROOT
+     module.PRINCIPAL_DAV_PATH = '%s/%s' % (PRINCIPAL_ROOT, module.TEST_USER)
++    module.FILES_DIR = FILES_DIR
+     
+     #Setup client and users
+     client = cosmoclient.CosmoClient(module.SERVER_URL)
+Index: cosmo/src/main/java/org/osaf/cosmo/service/impl/StandardUserService.java
+===================================================================
+--- cosmo/src/main/java/org/osaf/cosmo/service/impl/StandardUserService.java	(revision 3653)
++++ cosmo/src/main/java/org/osaf/cosmo/service/impl/StandardUserService.java	(working copy)
+@@ -28,6 +28,7 @@
+ import org.osaf.cosmo.dao.ContentDao;
+ import org.osaf.cosmo.dao.UserDao;
+ import org.osaf.cosmo.model.CollectionItem;
++import org.osaf.cosmo.model.PasswordRecovery;
+ import org.osaf.cosmo.model.User;
+ import org.osaf.cosmo.service.OverlordDeletionException;
+ import org.osaf.cosmo.service.UserService;
+@@ -176,8 +177,6 @@
+             accountActivator.sendActivationMessage(newUser, activationContext);
+         }
+ 
+-
+-        // TODO Auto-generated method stub
+         return newUser;
+     }
+ 
+@@ -415,4 +414,29 @@
+         this.accountActivationRequired = accountActivationRequired;
+     }
+ 
++    public PasswordRecovery getPasswordRecovery(String key) {
++        PasswordRecovery passwordRecovery = userDao.getPasswordRecovery(key);
++        
++        if (passwordRecovery != null){
++            if (passwordRecovery.hasExpired()){
++                userDao.deletePasswordRecovery(passwordRecovery);
++            } else {
++                return passwordRecovery;
++            }
++        }
++        return null;
++    }
++    
++    public PasswordRecovery createPasswordRecovery(
++                PasswordRecovery passwordRecovery){
++        
++        userDao.createPasswordRecovery(passwordRecovery);
++        
++        return userDao.getPasswordRecovery(passwordRecovery.getKey());
++    }
++    
++    public void deletePasswordRecovery(PasswordRecovery passwordRecovery){
++        userDao.deletePasswordRecovery(passwordRecovery);
++    }
++
+ }
+Index: dojo/build.sh
+===================================================================
+--- dojo/build.sh	(revision 3653)
++++ dojo/build.sh	(working copy)
+@@ -10,4 +10,6 @@
+     ant -Ddocless=true -Dprofile=../../../cosmo clean release
+ else
+     ant -Ddocless=true -Dprofile=core clean release
+-fi
+\ No newline at end of file
++fi
++gzip -c ../release/dojo/dojo.js > ../release/dojo/dojo.js.gzip-compressed
++

@@ -124,11 +124,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                 else {
                     String value = EimFieldValidator.validateText(field, MAXLEN_DURATION);
                     try {
-                        Dur dur = null;
-                        if("".equals(value))
-                            value = null;
-                        if(value!=null)
-                            dur = DurationFormat.getInstance().parse(value);
+                        Dur dur = DurationFormat.getInstance().parse(value);
                         eventStamp.setDisplayAlarmDuration(dur);
                     } catch (ParseException e) {
                         throw new EimValidationException("Illegal duration", e);

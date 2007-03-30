@@ -846,15 +846,17 @@ cosmo.view.cal.canvas = new function () {
             // Subtract one px for border per asinine CSS spec
             var halfHourHeight = (HOUR_UNIT_HEIGHT/2) - 1;
             
-            var w = '';
-            // Working/non-working hours line
-            w += '<div class="';
-            w += (j < 8 || j > 17) ? 'nonWorkingHours' : 'workingHours';
-            w += '" style="width:' + workingHoursBarWidth + 
-                'px; height:' + (halfHourHeight+1) + 
-                'px; float:left; font-size:1px;">&nbsp;</div>';
-            var workingHoursLine = '';
-
+            function workingHoursLine() {
+                var r = '';
+                // Working/non-working hours line
+                r += '<div class="';
+                r += (j < 8 || j > 17) ? 'nonWorkingHours' : 'workingHours';
+                r += '" style="width:' + workingHoursBarWidth + 
+                    'px; height:' + (halfHourHeight+1) + 
+                    'px; float:left; font-size:1px;">&nbsp;</div>';
+                return r;
+            }
+            
             str = '';
             viewDiv = timelineNode; 
             timeLineWidth = parseInt(viewDiv.offsetWidth);
@@ -878,7 +880,7 @@ cosmo.view.cal.canvas = new function () {
                 row += '<div class="hourDivSubLeft">' + hour + 
                     meridian + '</div>';
                 row += '</div>\n';
-                row += workingHoursLine;
+                row += workingHoursLine();
                 row += '<br class="clearAll"/>'
                 
                 idstr = i + '-' + j + '30';
@@ -896,7 +898,7 @@ cosmo.view.cal.canvas = new function () {
                 }
                 row += ' width:' + timeLineWidth + 
                     'px; float:left;">&nbsp;</div>\n';
-                row += workingHoursLine;
+                row += workingHoursLine();
                 row += '<br class="clearAll"/>'
                 
                 str += row;
@@ -1010,6 +1012,7 @@ cosmo.view.cal.canvas = new function () {
         showMonthHeader();
         showDayNameHeaders();
         showAllDayCols();
+        showHours();
         
         // Create event listeners
         if (!initRender) {
@@ -1017,8 +1020,6 @@ cosmo.view.cal.canvas = new function () {
             dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
             dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
             dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
-            
-            showHours();
         }
 
         initRender = true;

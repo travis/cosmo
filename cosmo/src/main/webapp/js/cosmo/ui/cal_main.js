@@ -289,6 +289,12 @@ cosmo.ui.cal_main.Cal = new function () {
         // seems to reset the scrollTop in Safari
         viewDiv.scrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
         
+        // BANDAID for IE6 -- dummy element to force 100% height to render
+        if (document.all) {
+            var dummyElem = document.createElement('div');
+            allDayDiv.appendChild(dummyElem);
+        }
+        
         // Add event listeners for form-element behaviors
         this.calForm.setEventListeners();
 

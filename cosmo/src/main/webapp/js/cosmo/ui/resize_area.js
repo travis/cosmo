@@ -26,9 +26,9 @@ cosmo.ui.resize_area.ResizeAreaAdjacent = function (div, origPos, origSize) {
 ResizeAreaAdjacent = cosmo.ui.resize_area.ResizeAreaAdjacent;
 
 cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
-
+    
     var self = this;
-
+    
     this.id = id;
     this.handleId = handleId;
     this.contentDiv = null;
@@ -45,12 +45,10 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
         self.handleDiv = document.getElementById(this.handleId);
         self.handleDiv.onmousedown = function() { cosmo.app.dragItem = self };
         self.direction = dir ? dir : this.direction;
-        self.origSize = this.getHeight(this.contentDiv) +
+        self.origSize = this.getHeight(this.contentDiv) + 
             self.getHeight(this.handleDiv);
         self.dragSize = self.origSize;
-        if (navigator.appVersion.indexOf('MSIE 6') > -1) {
-            self.contentDiv.style.height = this.dragSize + 'px';
-        }
+        
     };
     this.addAdjacent = function(id) {
         var div = document.getElementById(id);
@@ -59,22 +57,19 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
             div, this.getAbsTop(div), this.getHeight(div));
     };
     this.setDragLimit = function() {
-        this.dragLimit = this.adjacentArea[0].origPos +
-            this.adjacentArea[0].origSize - TOP_MENU_HEIGHT -
+        this.dragLimit = this.adjacentArea[0].origPos + 
+            this.adjacentArea[0].origSize - TOP_MENU_HEIGHT - 
             ALL_DAY_RESIZE_HANDLE_HEIGHT;
     };
     this.compareNumbers = function(a, b) { return a - b };
     this.doDrag = function () {
-        this.resize();
+        this.resize();  
     };
     this.resize = function() {
         var offset = this.contentDiv.offsetTop;
         var pos = yPos - TOP_MENU_HEIGHT;
         var size = (pos - offset);
         var div = null;
-        if (navigator.appVersion.indexOf('MSIE 6') > -1) {
-            self.contentDiv.style.display = 'none';
-        }
         if (pos > offset && pos < this.dragLimit) {
             this.contentDiv.style.height = size + 'px';
             this.dragSize = (size + ALL_DAY_RESIZE_HANDLE_HEIGHT);
@@ -82,18 +77,15 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
             for (var i = 0; i < this.adjacentArea.length; i++) {
                 div = this.adjacentArea[i].div;
                 div.style.top = (pos+8) + 'px';
-                div.style.height = (((this.adjacentArea[i].origPos-yPos) +
+                div.style.height = (((this.adjacentArea[i].origPos-yPos) + 
                     this.adjacentArea[i].origSize) - 8) + 'px';
             }
         }
     };
     this.drop = function() {
-        // IE6 -- workaround z-index issue by actually truncating
-        // inner content div height to visible height of area
-        if (navigator.appVersion.indexOf('MSIE 6') > -1) {
-            self.contentDiv.style.height = this.dragSize + 'px';
-            self.contentDiv.style.display= 'block';
-        }
+        // Do nothing
+        // This function is called when ResizeArea is the draggable
+        // So drop method must be defined here
     };
     this.getAbsTop = function(div) {
         return div.offsetTop + Cal.top;

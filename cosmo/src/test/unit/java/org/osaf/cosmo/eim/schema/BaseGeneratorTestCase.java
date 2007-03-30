@@ -15,16 +15,22 @@
  */
 package org.osaf.cosmo.eim.schema;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.DecimalField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
@@ -99,6 +105,16 @@ public class BaseGeneratorTestCase extends TestCase
     }
     
     /** */
+    protected void checkClobField(EimRecordField field,
+                                  String expectedName,
+                                  String expectedValue) {
+        assertTrue("not a clob field", field instanceof ClobField);
+        ClobField cf = (ClobField) field;
+        assertEquals("incorrect field name", expectedName, cf.getName());
+        assertEquals("incorrect field value", expectedValue, read(cf.getClob()));
+    }
+    
+    /** */
     protected void checkIntegerField(EimRecordField field,
                                   String expectedName,
                                   Integer expectedValue) {
@@ -124,5 +140,15 @@ public class BaseGeneratorTestCase extends TestCase
         BigDecimal bd = new BigDecimal(expectedValue.getTime() / 1000);
         checkDecimalField(field, expectedName, bd, DIGITS_TIMESTAMP,
                           DEC_TIMESTAMP);
+    }
+    
+    private String read(Reader reader) {
+        StringWriter writer = new StringWriter();
+        try {
+            IOUtils.copy(reader, writer);
+        } catch (IOException e) {
+            throw new RuntimeException("error reading stream");
+        }
+        return writer.toString();
     }
 }

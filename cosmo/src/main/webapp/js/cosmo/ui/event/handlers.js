@@ -86,11 +86,24 @@ cosmo.ui.event.handlers.mouseDownHandler = function (e) {
 cosmo.ui.event.handlers.mouseMoveHandler = function (e) {
     var d = cosmo.app.dragItem;
     // Set global x-y coords
-    xPos = e ? e.pageX : window.event.x;
-    yPos = e ? e.pageY : (window.event.y + document.body.scrollTop);
+    if (e) {
+        xPos = e.pageX;
+        yPos = e.pageY;
+    }
+    else {
+        xPos = window.event.x;
+        yPos = window.event.y;
+        if (document.body) {
+            yPos += document.body.scrollTop;
+        }
+    }
+    
     // Drag the app's draggable if there is one
     if (d) {
-       d.doDrag(); 
+        // Prevent text selection on drag in IE
+        // Must turn it back on after drag operation completes
+        document.body.onselectstart = function () { return false; }; 
+        d.doDrag(); 
     }
 }
 
@@ -100,8 +113,11 @@ cosmo.ui.event.handlers.mouseMoveHandler = function (e) {
  */
 cosmo.ui.event.handlers.mouseUpHandler = function (e) {
     // Drop anything the user is dragging
-    if (cosmo.app.dragItem) {
-        cosmo.app.dragItem.drop();
+    var d = cosmo.app.dragItem;
+    if (d) {
+        d.drop();
+        // Allow text selection again after Draggable is dropped
+        document.body.onselectstart = null;
         // Clear out the app draggable
         cosmo.app.dragItem = null;
     }

@@ -527,6 +527,28 @@ public abstract class BaseEventStamp extends Stamp
     }
     
     /**
+     * Set the trigger property of the first display alarm on the event 
+     * to be a absolute trigger.
+     * @param triggerDate date display alarm triggers
+     */
+    public void setDisplayAlarmTriggerDate(DateTime triggerDate) {
+        VAlarm alarm = getDisplayAlarm();
+        if(alarm==null)
+            return;
+
+        Trigger oldTrigger = (Trigger) alarm.getProperties().getProperty(
+                Property.TRIGGER);
+        if (oldTrigger != null)
+            alarm.getProperties().remove(oldTrigger);
+        
+        Trigger newTrigger = new Trigger();
+        newTrigger.getParameters().add(Value.DATE_TIME);
+        newTrigger.setDateTime(triggerDate);
+        
+        alarm.getProperties().add(newTrigger);
+    }
+    
+    /**
      * Return the duration of the first display alarm on the event
      * @return duration of the first display alarm
      */

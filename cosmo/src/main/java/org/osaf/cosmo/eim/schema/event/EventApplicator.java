@@ -17,6 +17,8 @@ package org.osaf.cosmo.eim.schema.event;
 
 import java.text.ParseException;
 
+import net.fortuna.ical4j.model.DateTime;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -24,6 +26,7 @@ import org.osaf.cosmo.calendar.ICalDate;
 import org.osaf.cosmo.calendar.UnknownTimeZoneException;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
+import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
@@ -75,6 +78,15 @@ public class EventApplicator extends BaseStampApplicator
                     EventExceptionStamp.RECURRENCEID_DELIMITER)[1];
             ICalDate icd = EimValueConverter.toICalDate(recurrenceId);
             eventStamp.setRecurrenceId(icd.getDate());
+        }
+        
+        // need to copy reminderTime to alarm in event
+        if(note.getReminderTime()!=null) {
+            eventStamp.creatDisplayAlarm();
+            eventStamp.setDisplayAlarmDescription("display alarm");
+            DateTime dt = new DateTime(true);
+            dt.setTime(note.getReminderTime().getTime());
+            eventStamp.setDisplayAlarmTriggerDate(dt);
         }
         
         return eventStamp;

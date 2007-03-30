@@ -16,13 +16,9 @@
 package org.osaf.cosmo.eim.schema.event.alarm;
 
 import java.text.ParseException;
-import java.util.Iterator;
 
 import net.fortuna.ical4j.model.Dur;
-import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VAlarm;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.logging.Log;
@@ -59,17 +55,21 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
     
     @Override
     protected void applyDeletion(EimRecord record) throws EimSchemaException {
-        VEvent event = getEvent(record);    
+        BaseEventStamp eventStamp = getEventStamp();    
         
         // Require event to continue
-        if(event==null)
-            throw new EimSchemaException("No event to delete");
+        if(eventStamp==null)
+            throw new EimSchemaException("No alarm to delete");
         
-        VAlarm alarm = getDisplayAlarm(event);
+        VAlarm alarm = eventStamp.getDisplayAlarm();
         
         // remove alarm
-        if(alarm != null)
-            event.getAlarms().remove(alarm);
+        if(alarm != null) {
+            eventStamp.getEvent().getAlarms().remove(alarm);
+        }
+        
+        // remove reminder on NoteItem
+        applyDeletionNonEvent(record);
     }
     
     protected void applyDeletionNonEvent(EimRecord record) throws EimSchemaException {
@@ -93,9 +93,10 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
         }
         
         BaseEventStamp eventStamp = getEventStamp();
-        VEvent event = getEvent(record);
         
-        getOrCreateDisplayAlarm(event);
+        // create display alarm if it doesn't exist
+        if(eventStamp.getDisplayAlarm()==null)
+            eventStamp.creatDisplayAlarm();
             
         for (EimRecordField field : record.getFields()) {
             if(field.getName().equals(FIELD_DESCRIPTION)) {
@@ -199,56 +200,6 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
         return null;
     }
         
-   
-    /**
-     * get the current display alarm, or create a new one
-     */
-    private VAlarm getOrCreateDisplayAlarm(VEvent event) {
-        VAlarm alarm = getDisplayAlarm(event);
-        if(alarm==null)
-            alarm = creatDisplayAlarm(event);
-        return alarm;
-    }
-    
-    /**
-     * create new display alarm and add to event
-     */
-    private VAlarm creatDisplayAlarm(VEvent event) {
-        VAlarm alarm = new VAlarm();
-        alarm.getProperties().add(Action.DISPLAY);
-        event.getAlarms().add(alarm);
-        return alarm;
-    }
-    
-    /**
-     * Get the first display alarm from an event, or create one
-     */
-    private VAlarm getDisplayAlarm(VEvent event) {
-        VAlarm alarm = null;
-        
-        // Find the first display alarm
-        for(Iterator it = event.getAlarms().iterator();it.hasNext();) {
-            VAlarm currAlarm = (VAlarm) it.next();
-            if (currAlarm.getProperties().getProperty(Property.ACTION).equals(
-                    Action.DISPLAY))
-                alarm = currAlarm;
-        }
-        
-        return alarm;
-    }
-    
-    /**
-     * Get the event associated with the displayAlarm record.
-     */
-    private VEvent getEvent(EimRecord record) throws EimSchemaException {
-        
-        BaseEventStamp eventStamp = getEventStamp();
-        
-        if(eventStamp==null)
-            throw new EimSchemaException("EventStamp required");
-        
-        return eventStamp.getEvent();
-    }
     
     private BaseEventStamp getEventStamp() {
         return BaseEventStamp.getStamp(getItem());

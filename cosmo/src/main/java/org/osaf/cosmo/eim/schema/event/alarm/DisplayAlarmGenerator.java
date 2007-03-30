@@ -84,12 +84,6 @@ public class DisplayAlarmGenerator extends BaseStampGenerator
      * alarm (if one exists).
      */
     protected void addRecords(List<EimRecord> records) {
-        BaseEventStamp stamp = (BaseEventStamp) getStamp();
-        
-        VAlarm alarm = stamp.getDisplayAlarm();
-        if (alarm == null)
-            return;
-        
         EimRecord record = new EimRecord(getPrefix(), getNamespace());
         addKeyFields(record);
         addFields(record);

@@ -44,8 +44,6 @@ public class MessageGenerator extends BaseStampGenerator
     static {
         STAMP_TYPES.add("message");
     }
-    
-    private MessageStamp message;
 
     /** */
     public MessageGenerator(Item item) {

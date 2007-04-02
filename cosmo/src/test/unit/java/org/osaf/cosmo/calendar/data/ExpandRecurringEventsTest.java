@@ -142,7 +142,7 @@ public class ExpandRecurringEventsTest extends TestCase {
         verifyExpandedCalendar(filterCal);
     }
     
-    public void testExpandNonRecurringEvent() throws Exception {
+    public void REMOVEDtestExpandNonRecurringEvent() throws Exception {
         CalendarBuilder cb = new CalendarBuilder();
         FileInputStream fis = new FileInputStream(baseDir + "expand_nonrecurr_test3.ics");
         Calendar calendar = cb.build(fis);

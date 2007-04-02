@@ -31,6 +31,7 @@ import junit.framework.Assert;
 import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Attribute;
+import org.osaf.cosmo.model.AttributeTombstone;
 import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
@@ -1153,6 +1154,40 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertEquals(triageStatus.getCode(),
                             new Integer(TriageStatus.CODE_LATER));
         Assert.assertEquals(triageStatus.getRank(), rank);
+    }
+    
+    public void testContentDaoAttributeTombstones() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        ContentItem item = generateTestContent();
+
+        ContentItem newItem = contentDao.createContent(root, item);
+        
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+
+        queryItem.removeAttribute(new QName("customattribute"));
+
+        queryItem = contentDao.updateContent(queryItem);
+
+        clearSession();
+
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        Assert.assertEquals(0, queryItem.getAttributes().size());
+        Assert.assertEquals(1, queryItem.getTombstones().size());
+        
+        Tombstone ts = queryItem.getTombstones().iterator().next();
+        Assert.assertTrue(ts instanceof AttributeTombstone);
+        Assert.assertTrue(((AttributeTombstone) ts).getQName().equals(new QName("customattribute")));
+        
+        queryItem.addAttribute(new StringAttribute(new QName("customattribute"),"customattributevalue"));
+        clearSession();
+
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        Assert.assertEquals(1, queryItem.getAttributes().size());
+        Assert.assertEquals(0, queryItem.getTombstones().size());
     }
     
     private void verifyTicket(Ticket ticket1, Ticket ticket2) {

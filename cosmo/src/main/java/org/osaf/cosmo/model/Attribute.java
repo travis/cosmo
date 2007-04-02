@@ -63,7 +63,7 @@ import org.hibernate.annotations.Index;
         discriminatorType=DiscriminatorType.STRING,
         length=16)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public abstract class Attribute extends BaseModelObject implements java.io.Serializable {
+public abstract class Attribute extends AuditableObject implements java.io.Serializable {
 
     // Fields
     private QName qname;

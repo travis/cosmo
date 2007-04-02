@@ -452,6 +452,21 @@ public abstract class BaseEventStamp extends Stamp
         return null;
     }
     
+    public void removeDisplayAlarm() {
+        VEvent event = getEvent();
+        
+        if(event==null)
+            return;
+         
+        for(Iterator it = event.getAlarms().iterator();it.hasNext();) {
+            VAlarm alarm = (VAlarm) it.next();
+            if (alarm.getProperties().getProperty(Property.ACTION).equals(
+                    Action.DISPLAY)) {
+                it.remove();
+            }
+        }
+    }
+    
     /**
      * Return the description of the first display alarm on the event.
      * @return alarm description

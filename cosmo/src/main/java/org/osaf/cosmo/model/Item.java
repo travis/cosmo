@@ -199,6 +199,17 @@ public abstract class Item extends AuditableObject {
     }
 
     public void addAttribute(Attribute attribute) {
+        if (attribute == null)
+            throw new IllegalArgumentException("attribute cannot be null");
+
+        // remove old tombstone if exists
+        for(Iterator<Tombstone> it=tombstones.iterator();it.hasNext();) {
+            Tombstone ts = it.next();
+            if(ts instanceof AttributeTombstone)
+                if(((AttributeTombstone) ts).getQName().equals(attribute.getQName()))
+                    it.remove();
+        }
+        
         validateAttribute(attribute);
         attribute.setItem(this);
         attributes.put(attribute.getQName(), attribute);
@@ -219,6 +230,8 @@ public abstract class Item extends AuditableObject {
     public void removeAttribute(QName qname) {
         if(attributes.containsKey(qname))
             attributes.remove(qname);
+        
+        tombstones.add(new AttributeTombstone(this, qname));
     }
 
     /**

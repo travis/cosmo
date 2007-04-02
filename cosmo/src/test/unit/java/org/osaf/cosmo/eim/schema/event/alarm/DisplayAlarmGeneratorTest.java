@@ -122,6 +122,39 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
         checkIntegerField(repeatField, FIELD_REPEAT, 1);
     }
     
+    public void testGenerateNoRecord() throws Exception {
+        
+        NoteItem noteItem = new NoteItem();
+        noteItem.setModifiedDate(new Date());
+        noteItem.setUid("1");
+        
+        DisplayAlarmGenerator generator = new DisplayAlarmGenerator(noteItem);
+
+        List<EimRecord> records = generator.generateRecords(-1);
+        assertEquals("unexpected number of records generated", 0,
+                     records.size());
+    }
+    
+    public void testGenerateDeleteRecord() throws Exception {
+        
+        NoteItem noteItem = new NoteItem();
+        noteItem.setModifiedDate(new Date());
+        noteItem.setReminderTime(new Date());
+        noteItem.setReminderTime(null);
+        noteItem.setUid("1");
+        
+        DisplayAlarmGenerator generator = new DisplayAlarmGenerator(noteItem);
+
+        List<EimRecord> records = generator.generateRecords(1);
+        assertEquals("unexpected number of records generated", 1,
+                     records.size());
+
+        EimRecord record = records.get(0);
+        checkNamespace(record, PREFIX_DISPLAY_ALARM, NS_DISPLAY_ALARM);
+        checkUuidKey(record.getKey(), "1");
+        Assert.assertTrue(record.isDeleted());
+    }
+    
     public void testGenerateMissingRecord() throws Exception {
         
         NoteItem masterNote = new NoteItem();

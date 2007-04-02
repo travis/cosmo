@@ -17,7 +17,10 @@ package org.osaf.cosmo.eim.schema.event.alarm;
 
 import java.text.ParseException;
 
+import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.property.Trigger;
 
@@ -61,12 +64,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
         if(eventStamp==null)
             throw new EimSchemaException("No alarm to delete");
         
-        VAlarm alarm = eventStamp.getDisplayAlarm();
-        
-        // remove alarm
-        if(alarm != null) {
-            eventStamp.getEvent().getAlarms().remove(alarm);
-        }
+        eventStamp.removeDisplayAlarm();
         
         // remove reminder on NoteItem
         applyDeletionNonEvent(record);
@@ -93,6 +91,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
         }
         
         BaseEventStamp eventStamp = getEventStamp();
+        NoteItem note = (NoteItem) getItem();
         
         // create display alarm if it doesn't exist
         if(eventStamp.getDisplayAlarm()==null)
@@ -116,6 +115,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                     String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
                     Trigger newTrigger = EimValueConverter.toIcalTrigger(value);
                     eventStamp.setDisplayAlarmTrigger(newTrigger);
+                    setReminderTime(note, getEventStamp(), newTrigger);
                 }
             }
             else if (field.getName().equals(FIELD_DURATION)) {
@@ -170,11 +170,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                 else {
                     String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
                     Trigger trigger = EimValueConverter.toIcalTrigger(value);
-                    
-                    // for non-events, the trigger has to be absolute
-                    if(trigger.getDuration()!=null)
-                        throw new EimSchemaException("non-absolute triggers not supported on non-events");
-                    note.setReminderTime(trigger.getDate());
+                    setReminderTime(note, getEventStamp(), trigger);
                 }
             }
             else if (field.getName().equals(FIELD_DURATION)) {
@@ -214,5 +210,23 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
             return parentNote.getStamp(BaseEventStamp.class);
         else
             return null;
+    }
+    
+    private void setReminderTime(NoteItem note, BaseEventStamp eventStamp, Trigger trigger) {
+        
+        // If there is no duration, then reminderTime will be the
+        // trigger datetime
+        if(trigger.getDuration()==null) {
+            note.setReminderTime(trigger.getDateTime());
+            return;
+        }
+        
+        // Calculate reminderTime based on event start and trigger duration
+        Date start = eventStamp.getStartDate();
+        if(!(start instanceof DateTime))
+            start = new DateTime(start);
+            
+        Period period = new Period((DateTime) start, trigger.getDuration());
+        note.setReminderTime(period.getEnd());        
     }
 }

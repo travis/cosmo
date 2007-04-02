@@ -165,6 +165,17 @@ public abstract class BaseApplicator implements EimSchemaConstants {
     }
     
     /**
+     * Verify that current item is a modification item.  If not, 
+     * throw EimSchemaException.
+     * @throws EimSchemaException
+     */
+    protected void checkIsModification() throws EimSchemaException {
+        if (!isModification())
+            throw new EimSchemaException(
+                    "missing attributes not support on non-modification items");
+    }
+    
+    /**
      * Copy an attribute from one object to another.
      * 
      * @param attribute attribute to copy
@@ -195,9 +206,7 @@ public abstract class BaseApplicator implements EimSchemaConstants {
     protected void handleMissingAttribute(String attribute)
             throws EimSchemaException {
 
-        if (!isModification())
-            throw new EimSchemaException(
-                    "missing attributes not support on non-modification items");
+        checkIsModification();
 
         NoteItem modification = (NoteItem) getItem();
         NoteItem parent = modification.getModifies();

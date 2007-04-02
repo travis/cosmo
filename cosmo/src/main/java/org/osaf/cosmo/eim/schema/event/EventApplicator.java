@@ -106,7 +106,7 @@ public class EventApplicator extends BaseStampApplicator
 
         if (field.getName().equals(FIELD_DTSTART)) {
             if(field.isMissing()) {
-                handleMissingAttribute("startDate");
+                handleMissingDtStart();
                 handleMissingAttribute("anyTime");
             }
             else {
@@ -176,5 +176,13 @@ public class EventApplicator extends BaseStampApplicator
             return parentNote.getStamp(BaseEventStamp.class);
         else
             return null;
+    }
+    
+    private void handleMissingDtStart() throws EimSchemaException {
+        checkIsModification();
+        // A missing dtstart on a modification means that the start date
+        // is equal to the recurrenceId
+        BaseEventStamp event = (BaseEventStamp) getStamp();
+        event.setStartDate(event.getRecurrenceId());
     }
 }

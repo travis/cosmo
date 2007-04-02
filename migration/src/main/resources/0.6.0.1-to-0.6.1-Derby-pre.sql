@@ -18,6 +18,9 @@ alter table item add column needsreply smallint
 alter table item add column modifiesitemid bigint
 alter table item add index FK317B13AB2006A2 (modifiesitemid), add constraint FK317B13AB2006A2 foreign key (modifiesitemid) references item (id)
 
+alter table attribute add column createdate bigint
+alter table attribute add column modifydate bigint
+
 # migrate data
 insert into collection_item (itemid, collectionid) select id, parentid from item where parentid is not null
 update item set isautotriage=1 where itemtype='note'

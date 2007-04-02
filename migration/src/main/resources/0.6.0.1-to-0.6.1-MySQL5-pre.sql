@@ -19,6 +19,9 @@ alter table item add column needsreply bit;
 alter table item add column modifiesitemid bigint;
 alter table item add index FK317B13AB2006A2 (modifiesitemid), add constraint FK317B13AB2006A2 foreign key (modifiesitemid) references item (id);
 
+alter table attribute add column createdate bigint;
+alter table attribute add column modifydate bigint;
+
 alter table item drop column triagestatus;
 alter table item drop column triagestatusupdated;
 

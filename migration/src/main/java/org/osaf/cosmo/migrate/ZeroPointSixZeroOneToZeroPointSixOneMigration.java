@@ -84,8 +84,29 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
         log.debug("starting migrateData()");
         
         migrateEvents(conn, dialect);
+        migrateAttributes(conn);
     }
      
+    private void migrateAttributes(Connection conn) throws Exception {
+        
+        PreparedStatement updateStmt = null;
+        long count = 0;
+        log.debug("starting migrateAttributes()");
+        
+        try {
+            updateStmt = conn.prepareStatement("update attribute set createdate=?, modifydate=?");
+            long currentTime = System.currentTimeMillis();
+            updateStmt.setLong(1, currentTime);
+            updateStmt.setLong(2, currentTime);
+            count = updateStmt.executeUpdate();
+        } finally {
+            if(updateStmt!=null)
+                updateStmt.close();
+        }
+        
+        log.debug("processed " + count + " attributes");
+    }
+    
     
     private void migrateEvents(Connection conn, String dialect) throws Exception {
         PreparedStatement stmt = null;

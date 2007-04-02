@@ -117,12 +117,16 @@ public class EventApplicator extends BaseStampApplicator
                 event.setAnyTime(icd.isAnyTime());
             }
         } else if (field.getName().equals(FIELD_DURATION)) {
-            String value =
-                EimFieldValidator.validateText(field, MAXLEN_DURATION);
-            try {
-                event.setDuration(DurationFormat.getInstance().parse(value));
-            } catch (ParseException e) {
-                throw new EimValidationException("Illegal duration", e);
+            if(field.isMissing()) {
+                handleMissingAttribute("duration");
+            } else {
+                String value =
+                    EimFieldValidator.validateText(field, MAXLEN_DURATION);
+                try {
+                    event.setDuration(DurationFormat.getInstance().parse(value));
+                } catch (ParseException e) {
+                    throw new EimValidationException("Illegal duration", e);
+                }
             }
         } else if (field.getName().equals(FIELD_LOCATION)) {
             if(field.isMissing()) {

@@ -44,17 +44,17 @@ messageFrom =
    }
 
 messageTo =
-   element message:to {
+   element message:toAddress {
       eimTextFieldContent # length 1024
    }
 
 messageCc =
-   element message:cc {
+   element message:ccAddress {
       eimTextFieldContent # length 1024
    }
 
 messageBcc =
-   element message:bcc {
+   element message:bccAddress {
       eimTextFieldContent # length 1024
    }
 

@@ -32,15 +32,15 @@ public interface MessageConstants {
     /** */
     public static final int MAXLEN_FROM = 256;
     /** */
-    public static final String FIELD_TO = "to";
+    public static final String FIELD_TO = "toAddress";
     /** */
     public static final int MAXLEN_TO = 1024;
     /** */
-    public static final String FIELD_CC = "cc";
+    public static final String FIELD_CC = "ccAddress";
     /** */
     public static final int MAXLEN_CC = 1024;
     /** */
-    public static final String FIELD_BCC = "bcc";
+    public static final String FIELD_BCC = "bccAddress";
     /** */
     public static final int MAXLEN_BCC = 1024;
     /** */

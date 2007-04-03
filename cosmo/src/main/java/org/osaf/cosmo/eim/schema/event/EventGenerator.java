@@ -87,7 +87,7 @@ public class EventGenerator extends BaseStampGenerator
 
         String value = null;
 
-        if(isMissingAttribute("startDate") && isMissingAttribute("anyTime")) {
+        if(isDtStartMissing(stamp) && isMissingAttribute("anyTime")) {
             record.addField(generateMissingField(new TextField(FIELD_DTSTART, null)));
         } else {
             value = EimValueConverter.fromICalDate(stamp.getStartDate(),
@@ -138,5 +138,21 @@ public class EventGenerator extends BaseStampGenerator
             return parentNote.getStamp(BaseEventStamp.class);
         else
             return null;
+    }
+    
+    /**
+     * Determine if startDate is missing.  The startDate is missing
+     * if the startDate is equal to the reucurreceId.
+     * @param stamp BaseEventStamp to test
+     * @return
+     */
+    private boolean isDtStartMissing(BaseEventStamp stamp) {
+        if(!isModification())
+            return false;
+        
+        if(stamp.getStartDate()==null || stamp.getRecurrenceId()==null)
+            return false;
+        
+        return stamp.getStartDate().equals(stamp.getRecurrenceId());
     }
 }

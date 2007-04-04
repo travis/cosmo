@@ -25,8 +25,6 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Where;
-
 /**
  * Extends {@link Item} to represent a collection of items
  */
@@ -44,8 +42,6 @@ public class CollectionItem extends Item {
         new QName(CollectionItem.class, "excludeFreeBusyRollup");
 
     private Set<Item> children = new HashSet<Item>(0);
-    private Set<Item> allChildren = new HashSet<Item>(0);
-    private Set<Tombstone> tombstones = new HashSet<Tombstone>(0);
     
     public CollectionItem() {
     };
@@ -55,7 +51,6 @@ public class CollectionItem extends Item {
      * @return active children items
      */
     @ManyToMany(mappedBy="parents",fetch=FetchType.LAZY)
-    @Where(clause = "isactive=1")
     public Set<Item> getChildren() {
         return children;
     }
@@ -65,29 +60,12 @@ public class CollectionItem extends Item {
     }
     
     /**
-     * Return all children, including those with isActive=false.
-     * Rarely used.
-     * @return all children items
-     */
-    @ManyToMany(mappedBy="parents",fetch=FetchType.LAZY) 
-    public Set<Item> getAllChildren() {
-        return allChildren;
-    }
-
-    // Only used for cascade delete by Hibernate
-    private void setAllChildren(Set<Item> allChildren) {
-        this.allChildren = allChildren;
-    }
-    
-    
-    
-    /**
      * Return child item with matching uid
      * @return identified child item, or null if no child with that
      * uid exists
      */
     public Item getChild(String uid) {
-        for (Item child : allChildren) {
+        for (Item child : children) {
             if (child.getUid().equals(uid))
                 return child;
         }

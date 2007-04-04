@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
@@ -62,5 +63,12 @@ public interface CalendarDao {
      * @param eventStamp event stamp to index
      */
     public void indexEvent(EventStamp eventStamp);
+    
+    /**
+     * Index calendar events
+     * @param events events to index.  An event is a NoteItem stamped
+     *               with EventStamp.
+     */
+    public void indexEvents(Collection<NoteItem> events);
 
 }

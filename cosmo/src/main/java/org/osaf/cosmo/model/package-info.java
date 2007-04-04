@@ -50,18 +50,18 @@
  */
 @NamedQueries({
     // Item Queries
-    @NamedQuery(name="homeCollection.by.ownerId", query="from HomeCollectionItem where owner.id=:ownerid and isActive=true"),
-    @NamedQuery(name="item.by.ownerId.parentId.name", query="select item from Item item join item.parents parent where item.owner.id=:ownerid and parent.id=:parentid and item.name=:name and item.isActive=true"),
-    @NamedQuery(name="item.by.ownerId.nullParent.name", query="select item from Item item where item.owner.id=:ownerid and size(item.parents)=0 and item.name=:name and item.isActive=true"),
-    @NamedQuery(name="item.by.ownerId.nullParent.name.minusItem", query="select item from Item item where item.id!=:itemid and item.owner.id=:ownerid and size(item.parents)=0 and item.name=:name and item.isActive=true"),
-    @NamedQuery(name="item.by.ownerId.parentId.name.minusItem", query="select item from Item item join item.parents parent where item.id!=:itemid and item.owner.id=:ownerid and parent.id=:parentid and item.name=:name and item.isActive=true"),
-    @NamedQuery(name="item.by.uid", query="from Item i where i.uid=:uid and isActive=true"),
+    @NamedQuery(name="homeCollection.by.ownerId", query="from HomeCollectionItem where owner.id=:ownerid"),
+    @NamedQuery(name="item.by.ownerId.parentId.name", query="select item from Item item join item.parents parent where item.owner.id=:ownerid and parent.id=:parentid and item.name=:name"),
+    @NamedQuery(name="item.by.ownerId.nullParent.name", query="select item from Item item where item.owner.id=:ownerid and size(item.parents)=0 and item.name=:name"),
+    @NamedQuery(name="item.by.ownerId.nullParent.name.minusItem", query="select item from Item item where item.id!=:itemid and item.owner.id=:ownerid and size(item.parents)=0 and item.name=:name"),
+    @NamedQuery(name="item.by.ownerId.parentId.name.minusItem", query="select item from Item item join item.parents parent where item.id!=:itemid and item.owner.id=:ownerid and parent.id=:parentid and item.name=:name"),
+    @NamedQuery(name="item.by.uid", query="from Item i where i.uid=:uid"),
     @NamedQuery(name="item.any.by.uid", query="from Item i where i.uid=:uid"),
-    @NamedQuery(name="collectionItem.by.uid", query="from CollectionItem i where i.uid=:uid and isActive=true"),
-    @NamedQuery(name="contentItem.by.uid", query="from ContentItem i where i.uid=:uid and i.isActive=true"),
-    @NamedQuery(name="item.by.parent.name", query="select item from Item item join item.parents parent where parent=:parent and item.name=:name and item.isActive=true"),
-    @NamedQuery(name="item.by.ownerName.name.nullParent", query="select i from Item i, User u where i.owner=u and u.username=:username and i.name=:name and size(i.parents)=0 and i.isActive=true"),
-    @NamedQuery(name="item.by.ownerId.and.nullParent", query="select i from Item i where i.owner.id=:ownerid and size(i.parents)=0 and i.isActive=true"),
+    @NamedQuery(name="collectionItem.by.uid", query="from CollectionItem i where i.uid=:uid"),
+    @NamedQuery(name="contentItem.by.uid", query="from ContentItem i where i.uid=:uid"),
+    @NamedQuery(name="item.by.parent.name", query="select item from Item item join item.parents parent where parent=:parent and item.name=:name"),
+    @NamedQuery(name="item.by.ownerName.name.nullParent", query="select i from Item i, User u where i.owner=u and u.username=:username and i.name=:name and size(i.parents)=0"),
+    @NamedQuery(name="item.by.ownerId.and.nullParent", query="select i from Item i where i.owner.id=:ownerid and size(i.parents)=0"),
 
     // User Queries
     @NamedQuery(name="user.byUsername", query="from User where username=:username"),
@@ -75,7 +75,7 @@
     @NamedQuery(name="passwordRecovery.byKey", query="from PasswordRecovery where key=:key"),
 
     // Event Queries
-    @NamedQuery(name="event.by.calendar.icaluid", query="select i from ContentItem i join i.parents parent, CalendarPropertyIndex pi where pi.item.id=i.id and parent=:calendar and pi.name='icalendar:vcalendar-vevent_uid' and pi.value=:uid and i.isActive=true"),
+    @NamedQuery(name="event.by.calendar.icaluid", query="select i from ContentItem i join i.parents parent, CalendarPropertyIndex pi where pi.item.id=i.id and parent=:calendar and pi.name='icalendar:vcalendar-vevent_uid' and pi.value=:uid"),
     
     // Delete Queries
     @NamedQuery(name="delete.calendarPropertyIndex", query="delete from CalendarPropertyIndex where eventStamp=:eventStamp"),

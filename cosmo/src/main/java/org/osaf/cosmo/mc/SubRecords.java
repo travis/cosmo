@@ -16,9 +16,8 @@
 package org.osaf.cosmo.mc;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
-import org.osaf.cosmo.eim.EimRecordSet;
+import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordSetIterator;
 import org.osaf.cosmo.eim.schema.ItemTranslationIterator;
 import org.osaf.cosmo.eim.schema.TombstoneTranslationIterator;

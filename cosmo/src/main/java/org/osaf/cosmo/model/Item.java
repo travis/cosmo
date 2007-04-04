@@ -589,9 +589,7 @@ public abstract class Item extends AuditableObject {
         return parents.iterator().next();
     }
 
-    @Column(name="isactive", nullable=false)
-    @Type(type="boolean_integer")
-    @Index(name="idx_itemisactive")
+    @Transient
     public Boolean getIsActive() {
         return isActive;
     }

@@ -85,6 +85,50 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             throw ise;
         }
     }
+    
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.dao.ContentDao#updateCollection(org.osaf.cosmo.model.CollectionItem, java.util.Set)
+     */
+    public CollectionItem updateCollection(CollectionItem collection, Set<ContentItem> children) {
+        
+        int count = 0;
+        int batchSize = 20;
+        
+        try {
+            collection = updateCollection(collection);
+            
+            // Either create, update, or delete each item
+            for (ContentItem item : children) {
+                
+                // periodically clear the session to improve performance
+                count++;
+                if(count%batchSize==0)
+                    getSession().clear();
+                
+                // create item
+                if(item.getId()==-1) {
+                    item = createContent(collection, item);
+                }
+                // delete item
+                else if(item.getIsActive()==false) {
+                    removeItemFromCollection(item, collection);
+                }
+                // update item
+                else {
+                    if(!item.getParents().contains(collection))
+                        addItemToCollection(item, collection);
+                    updateContent(item);
+                }
+            }
+            
+            return collection;
+        } catch (HibernateException e) {
+            throw convertHibernateAccessException(e);
+        }
+    }
+
+
 
     /*
      * (non-Javadoc)
@@ -278,6 +322,17 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         }
     }
 
+    public void updateCollectionTimestamp(String collectionUid) {
+        try {
+            CollectionItem collection = findCollectionByUid(collectionUid);
+            collection.setModifiedDate(new Date());
+            getSession().flush();
+        } catch (HibernateException e) {
+            throw convertHibernateAccessException(e);
+        }
+    }
+    
+    
     /*
      * (non-Javadoc)
      * 
@@ -288,6 +343,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             if (collection == null)
                 throw new IllegalArgumentException("collection cannot be null");
+            
+            getSession().update(collection);
             
             if (collection.getOwner() == null)
                 throw new IllegalArgumentException("collection must have owner");
@@ -300,7 +357,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             collection.setModifiedDate(new Date());
             
-            getSession().update(collection);
             getSession().flush();
             
             return collection;
@@ -322,6 +378,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             if (content == null)
                 throw new IllegalArgumentException("content cannot be null");
+             
+            getSession().update(content);
             
             if (content.getOwner() == null)
                 throw new IllegalArgumentException("content must have owner");
@@ -333,7 +391,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             content.setModifiedDate(new Date());
             
-            getSession().update(content);
             getSession().flush();
             
             return content;
@@ -440,7 +497,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         // its children.  Instead, the association to all the
         // children is removed, and any children who have no
         // parent collection are then removed.
-        for(Item item: collection.getAllChildren()) {
+        for(Item item: collection.getChildren()) {
             if(item instanceof CollectionItem) {
                 removeCollectionRecursive((CollectionItem) item);
             } else if(item instanceof ContentItem) {                    

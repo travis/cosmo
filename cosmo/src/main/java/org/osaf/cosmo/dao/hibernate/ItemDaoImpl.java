@@ -22,7 +22,9 @@ import org.apache.commons.id.IdentifierGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.FlushMode;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
+import org.hibernate.LockMode;
 import org.hibernate.ObjectDeletedException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
@@ -207,10 +209,10 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     
     public void addItemToCollection(Item item, CollectionItem collection) {
         try {
+            getSession().update(item);
+            getSession().update(collection);
             collection.removeTombstone(item);
             item.getParents().add(collection);
-            getSession().save(item);
-            getSession().save(collection);
             getSession().flush();
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -219,17 +221,17 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     
     public void removeItemFromCollection(Item item, CollectionItem collection) {
         try {
-            collection.addTombstone(new ItemTombstone(collection, item));
+            
             getSession().update(collection);
-
+            getSession().update(item);
+            
+            collection.addTombstone(new ItemTombstone(collection, item));
             item.getParents().remove(collection);
             
             // If the item belongs to no collection, then it should
             // be purged.
             if(item.getParents().size()==0)
                 getSession().delete(item);
-            else
-                getSession().update(item);
             
             getSession().flush();
         } catch (HibernateException e) {
@@ -265,8 +267,8 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
                 ticket.setKey(ticketKeyGenerator.nextIdentifier().toString());
 
             ticket.setCreated(new Date());
-            item.addTicket(ticket);
             getSession().update(item);
+            item.addTicket(ticket);
             getSession().flush();
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -279,7 +281,6 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     public Ticket getTicket(Item item, String key) {
         try {
             getSession().refresh(item);
-
             return getTicketRecursive(item, key);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
@@ -288,9 +289,9 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
 
     public void removeTicket(Item item, Ticket ticket) {
         try {
+            getSession().update(item);
             getSession().refresh(item);
             item.getTickets().remove(ticket);
-            getSession().update(item);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
@@ -354,7 +355,6 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             
             Item newItem = copyItem(item,parent,deepCopy);
             newItem.setName(copyName);
-            getSession().update(newItem);
             getSession().flush();
             
         } catch (HibernateException e) {
@@ -407,10 +407,8 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
                 item.getParents().add(parent);
                 oldParent.addTombstone(new ItemTombstone(oldParent, item));
                 item.getParents().remove(oldParent);
-                getSession().update(oldParent);
-                getSession().update(parent);
             }
-            getSession().update(item);
+            
             getSession().flush();
             
         } catch (HibernateException e) {
@@ -422,18 +420,20 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     }
 
     
-    
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.ItemDao#refreshItem(org.osaf.cosmo.model.Item)
      */
     public void refreshItem(Item item) {
         try {
-            getSession().refresh(item);
+            if(!getSession().contains(item))
+                getSession().load(item, item.getId());
+            else
+                getSession().refresh(item);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
     }
-
+    
 
     /**
      * Set the unique ID generator for new items
@@ -686,6 +686,12 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         }
         
         return null;
+    }
+    
+    protected void attachToSession(Item item) {
+        if(getSession().contains(item))
+            return;
+        getSession().lock(item, LockMode.NONE);
     }
     
     protected void logInvalidStateException(InvalidStateException ise) {

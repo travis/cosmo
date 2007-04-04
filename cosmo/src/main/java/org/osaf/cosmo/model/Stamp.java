@@ -29,7 +29,11 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Index;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 
 /**
  * Represents an abstract Stamp on an Item. A Stamp is a set of related
@@ -62,7 +66,8 @@ public abstract class Stamp extends AuditableObject implements
     /**
      * @return Item attribute belongs to
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     @JoinColumn(name = "itemid", nullable = false)
     public Item getItem() {
         return item;

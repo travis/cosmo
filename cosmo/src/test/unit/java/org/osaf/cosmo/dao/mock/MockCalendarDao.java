@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.mock;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Mock implementation of <code>CalendarDao</code> useful for testing.
@@ -81,7 +83,9 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
     public void indexEvent(EventStamp eventStamp) {
         // TODO implement
     }
-    
-    
+
+    public void indexEvents(Collection<NoteItem> events) {
+        // TODO implement    
+    }
     
 }

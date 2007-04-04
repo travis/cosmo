@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -26,6 +27,7 @@ import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.NoteItem;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -76,12 +78,37 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
      */
     public void indexEvent(EventStamp eventStamp) {
         try {
-            getCalendarIndexer().indexCalendarEvent(getSession(), eventStamp);
             getSession().update(eventStamp);
+            getCalendarIndexer().indexCalendarEvent(getSession(), eventStamp);
             getSession().flush();
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
         } 
+    }
+    
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.dao.CalendarDao#indexEvents(java.util.Collection)
+     */
+    public void indexEvents(Collection<NoteItem> events) {
+        
+        int count = 0;
+        int batchSize = 20;
+        
+        for(NoteItem note: events) {
+            
+            // periodically clear the session to improve performance
+            count++;
+            if(count%batchSize==0)
+                getSession().clear();
+            
+            // because we clear the session, we may have to re-load item
+            if(!getSession().contains(note))
+                getSession().load(note, note.getId());
+            EventStamp event = EventStamp.getStamp(note);
+            indexEvent(event);
+        }
+        
     }
 
     public CalendarFilterTranslator getCalendarFilterTranslator() {

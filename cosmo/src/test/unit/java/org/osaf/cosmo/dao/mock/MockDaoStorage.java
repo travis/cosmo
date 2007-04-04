@@ -146,7 +146,6 @@ public class MockDaoStorage {
             }
             
             item.getParent().getChildren().add(item);
-            item.getParent().getAllChildren().add(item);
             itemsByPath.put(getItemPath(item.getParent()) + "/" + item.getName(),
                     item);
         }

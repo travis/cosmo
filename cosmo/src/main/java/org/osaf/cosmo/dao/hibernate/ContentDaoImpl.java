@@ -116,6 +116,15 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 }
                 // update item
                 else {
+                    // Here is the tricky part.  If the session has
+                    // been cleared, then in order to prevent Hibernate
+                    // exceptions like "found two representations of the
+                    // same collection..", we need to merge the transient
+                    // item state with the persistent state, and pass the
+                    // peristent object into updateContent().
+                    if(!getSession().contains(item)) {
+                        item = (ContentItem) getSession().merge(item);
+                    }
                     if(!item.getParents().contains(collection))
                         addItemToCollection(item, collection);
                     updateContent(item);

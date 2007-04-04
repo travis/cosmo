@@ -425,10 +425,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
      */
     public void refreshItem(Item item) {
         try {
-            if(!getSession().contains(item))
-                getSession().load(item, item.getId());
-            else
-                getSession().refresh(item);
+           getSession().refresh(item);
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }

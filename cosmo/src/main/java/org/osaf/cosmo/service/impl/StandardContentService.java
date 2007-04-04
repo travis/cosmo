@@ -382,7 +382,8 @@ public class StandardContentService implements ContentService {
                 contentDao.updateCollectionTimestamp(lockedCollection.getUid());
             }
             
-            return collection;
+            // get latest timestamp
+            return contentDao.findCollectionByUid(collection.getUid());
             
         } finally {
            releaseLocks(locks);
@@ -492,7 +493,9 @@ public class StandardContentService implements ContentService {
                 contentDao.updateCollectionTimestamp(lockedCollection.getUid());
             }
             
-            return collection;
+            // get latest timestamp
+            return contentDao.findCollectionByUid(collection.getUid());
+            
         } finally {
             releaseLocks(locks);
         }

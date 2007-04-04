@@ -125,7 +125,7 @@ public class EventApplicator extends BaseStampApplicator
                 try {
                     event.setDuration(DurationFormat.getInstance().parse(value));
                 } catch (ParseException e) {
-                    throw new EimValidationException("Illegal duration", e);
+                    throw new EimValidationException("Illegal duration " + value, e);
                 }
             }
         } else if (field.getName().equals(FIELD_LOCATION)) {

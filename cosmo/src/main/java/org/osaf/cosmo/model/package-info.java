@@ -68,9 +68,11 @@
     @NamedQuery(name="user.byUsername.ignorecase", query="from User where lower(username)=lower(:username)"),
     @NamedQuery(name="user.byEmail", query="from User where email=:email"),
     @NamedQuery(name="user.byEmail.ignorecase", query="from User where lower(email)=lower(:email)"),
+    @NamedQuery(name="user.byUsernameOrEmail.ignorecase.ingoreId", query="from User where id!=:userid and (lower(username)=lower(:username) or lower(email)=lower(:email))"),
     @NamedQuery(name="user.byUid", query="from User where uid=:uid"),
     @NamedQuery(name="user.byActivationId", query="from User where activationid=:activationId"),
 
+    
     // Password Recovery entity query
     @NamedQuery(name="passwordRecovery.byKey", query="from PasswordRecovery where key=:key"),
 

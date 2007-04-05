@@ -3,8 +3,8 @@
 # can't drop parentid column, so atleast drop the constraint
 alter table item drop foreign key FK317B137014CFFB
 
-# create updated index
-create unique index itemmid on stamp (itemid, stamptype, isactive)
+# can't drop the isactive column, so atleast drop the index
+drop index idx_itemisactive
 
 # update server version
 update server_properties SET propertyvalue='${pom.version}' WHERE propertyname='cosmo.schemaVersion'

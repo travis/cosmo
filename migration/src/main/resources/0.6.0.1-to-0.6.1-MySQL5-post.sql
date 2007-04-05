@@ -5,6 +5,8 @@ alter table item drop index FK317B137014CFFB;
 alter table item drop column parentid;
 
 alter table stamp drop column isactive;
+alter table item drop index idx_itemisactive;
+alter table item drop column isactive;
 
 # update server version
 update server_properties SET propertyvalue='${pom.version}' WHERE propertyname='cosmo.schemaVersion';

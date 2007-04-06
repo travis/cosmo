@@ -34,7 +34,7 @@
     // Set isDebug to true to get nice dojo debugging messages.
 
 
-    var djConfig = {isDebug: false, 
+    var djConfig = {isDebug: true, 
                     staticBaseUrl: "${staticBaseUrl}",
                     i18nLocation: "${staticBaseUrl}/i18n.js"};
 </script>

@@ -492,7 +492,7 @@ public class RPCServiceImpl implements RPCService, ICalendarConstants {
         org.osaf.cosmo.rpc.model.Ticket rpcTicket = new org.osaf.cosmo.rpc.model.Ticket();
         Ticket ticket = contentService.getTicket(collectionId, ticketId);
         rpcTicket.setPrivileges(new HashSet<String>(ticket.getPrivileges()));
-        rpcTicket.setTicketId(ticketId);
+        rpcTicket.setTicketKey(ticketId);
         return rpcTicket;
     }
 
@@ -532,17 +532,23 @@ public class RPCServiceImpl implements RPCService, ICalendarConstants {
             HttpServletRequest request) throws RPCException {
         Subscription subscription = new Subscription();
 
-        Calendar calendar = getCalendar(collectionSubscription
-                .getCollectionUid(), collectionSubscription.getTicketKey(),
-                request);
-                
-        subscription.setCalendar(calendar);
+        try {
+            Calendar calendar = getCalendar(collectionSubscription
+                    .getCollectionUid(), collectionSubscription.getTicketKey(),
+                    request);
+            subscription.setCalendar(calendar);
+            org.osaf.cosmo.rpc.model.Ticket ticket = getTicket(collectionSubscription.getTicketKey(),
+                    collectionSubscription.getCollectionUid());
+            subscription.setTicket(ticket);
+        } catch (ItemNotFoundException e){
+            subscription.setCalendar(null);
+            org.osaf.cosmo.rpc.model.Ticket ticket = new org.osaf.cosmo.rpc.model.Ticket();
+            ticket.setTicketKey(collectionSubscription.getTicketKey());
+            subscription.setTicket(ticket);
+        }
 
         subscription.setDisplayName(collectionSubscription.getDisplayName());
-
-        org.osaf.cosmo.rpc.model.Ticket ticket = getTicket(collectionSubscription.getTicketKey(),
-                collectionSubscription.getCollectionUid());
-        subscription.setTicket(ticket);
+        subscription.setUid(collectionSubscription.getCollectionUid());
         return subscription;
     }
 
@@ -572,8 +578,7 @@ public class RPCServiceImpl implements RPCService, ICalendarConstants {
         CollectionItem collection = (CollectionItem) contentService
                 .findItemByUid(collectionUid);
         if (collection == null){
-            throw new RPCException("Could not find collection with uid " +
-                    collectionUid);
+            throw new ItemNotFoundException(collectionUid);
         }
         return collection;
     }

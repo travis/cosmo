@@ -233,6 +233,7 @@ cosmo.model.CalendarMetadata = function (){
 CalendarMetadata = cosmo.model.CalendarMetadata;
 
 cosmo.model.Subscription = function (){
+    this.uid = null;
     this.calendar = null;
     this.displayName = null;
     this.ticket = null;

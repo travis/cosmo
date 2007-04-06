@@ -27,6 +27,7 @@ public class Subscription {
     private String displayName;
     private Calendar calendar;
     private Ticket ticket;
+    private String uid;
     
     public Calendar getCalendar() {
         return calendar;
@@ -45,5 +46,11 @@ public class Subscription {
     }
     public void setTicket(Ticket ticket) {
         this.ticket = ticket;
+    }
+    public String getUid() {
+        return uid;
+    }
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

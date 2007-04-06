@@ -210,8 +210,11 @@ cosmo.ui.cal_main.Cal = new function () {
                    this.createWelcomeEvent(), 
                    newCollectionItem.transportInfo, f)
             }
-            
             var subscriptions = this.serv.getSubscriptions();
+            var result = this.filterOutDeletedSubscriptions(subscriptions);
+            subscriptions = result[0];
+            deletedSubscriptions = result[1];
+            
             for (var i = 0; i < subscriptions.length; i++){
                 var subscription = subscriptions[i];
                 this.currentCollections.push(
@@ -306,6 +309,15 @@ cosmo.ui.cal_main.Cal = new function () {
                self.positionMenubarElements.apply(self);
             }
             setTimeout(f, 0);
+        }
+        
+        //show errors for deleted subscriptions
+        xxx= deletedSubscriptions;
+        if (deletedSubscriptions && deletedSubscriptions.length > 0){
+            for (var x = 0; x < deletedSubscriptions.length; x++){
+                cosmo.app.showErr(_("Main.Error.SubscribedCollectionDeleted",deletedSubscriptions[x].displayName));
+                
+            }
         }
     };
 
@@ -467,6 +479,7 @@ cosmo.ui.cal_main.Cal = new function () {
         eventInfo.cleanup(); eventInfo = null;
         allDayMain.cleanup(); allDayMain = null;
         allDayResize.cleanup(); allDayResize = null;
+        
     };
     this.setUpMenubar = function (ticketKey) {
         // Logged-in view -- nothing to do
@@ -1098,7 +1111,23 @@ cosmo.ui.cal_main.Cal = new function () {
         return new cosmo.model.CalEventData(null, "Welcome to Cosmo", "Welcome to Cosmo",
            start, end, false);
     }
-
+    
+    this.filterOutDeletedSubscriptions = function(subscriptions){
+        var deletedSubscriptions = [];
+        var filteredSubscriptions = dojo.lang.filter(subscriptions, 
+            function(sub){
+               if (!sub.calendar){
+                   Cal.serv.deleteSubscription(sub.uid, sub.ticket.ticketKey);
+                   deletedSubscriptions.push(sub);
+                   return false;
+               } else {
+                   return true;              
+               }
+        });
+        
+        return [filteredSubscriptions, deletedSubscriptions];
+        
+    }
 
     // ==========================
     // Cleanup

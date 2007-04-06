@@ -75,7 +75,8 @@
     
     // Password Recovery entity query
     @NamedQuery(name="passwordRecovery.byKey", query="from PasswordRecovery where key=:key"),
-
+    @NamedQuery(name="passwordRecovery.delete.byUser", query="delete from PasswordRecovery where user=:user"),
+    
     // Event Queries
     @NamedQuery(name="event.by.calendar.icaluid", query="select i from ContentItem i join i.parents parent, CalendarPropertyIndex pi where pi.item.id=i.id and parent=:calendar and pi.name='icalendar:vcalendar-vevent_uid' and pi.value=:uid"),
     

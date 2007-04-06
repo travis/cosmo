@@ -165,6 +165,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
     public void removeUser(User user) {
         try {
+            // TODO: should probably let db take care of this with
+            // cacade constaint
+            deleteAllPasswordRecoveries(user);
+            
             getSession().delete(user);
             getSession().flush();
         } catch (HibernateException e) {
@@ -311,6 +315,12 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
                 "uid", uid);
         hibQuery.setCacheable(true);
         return (User) hibQuery.uniqueResult();
+    }
+    
+    private void deleteAllPasswordRecoveries(User user) {
+        Session session = getSession();
+        session.getNamedQuery("passwordRecovery.delete.byUser").setParameter(
+                "user", user).executeUpdate();
     }
 
     private User findUserByActivationId(String id) {

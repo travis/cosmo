@@ -39,7 +39,6 @@ import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -189,18 +188,23 @@ public abstract class DavCalendarResource extends DavFile {
 
         if (content.getContentLanguage() != null)
             outputContext.setContentLanguage(content.getContentLanguage());
-
-        outputContext.setContentLength(content.getContentLength().longValue());
+        
+        // convert Calendar object to String, then to bytes (UTF-8)
+        byte[] calendarBytes = getCalendar().toString().getBytes("UTF-8");
+        outputContext.setContentLength(calendarBytes.length);
         outputContext.setModificationTime(getModificationTime());
         outputContext.setETag(getETag());
+        
+        // track mismatches
+        if(calendarBytes.length != content.getContentLength().longValue())
+            log.warn("contentLength: " + content.getContentLength() + 
+                    " does not match content: " + calendarBytes.length);
 
         if (! outputContext.hasStream())
             return;
 
-        // convert Calendar object to String, then to bytes (UTF-8), then spool
-        ByteArrayInputStream bois = 
-            new ByteArrayInputStream(getCalendar().toString().getBytes("UTF-8"));
-        
+        // spool calendar bytes
+        ByteArrayInputStream bois = new ByteArrayInputStream(calendarBytes);
         IOUtil.spool(bois, outputContext.getOutputStream());
     }
 }

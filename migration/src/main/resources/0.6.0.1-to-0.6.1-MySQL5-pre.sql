@@ -8,6 +8,10 @@ alter table collection_item add index FK3F30F8148B8DC8EF (collectionid), add con
 create table tombstones (tombstonetype varchar(16) not null, id bigint not null auto_increment, removedate bigint not null, itemuid varchar(255), stamptype varchar(255), itemid bigint not null, primary key (id)) ENGINE=InnoDB;
 alter table tombstones add index FK40CA41FE5361D2A6 (itemid), add constraint FK40CA41FE5361D2A6 foreign key (itemid) references item (id);
 
+create table pwrecovery (id bigint not null auto_increment, creationdate datetime, pwrecoverykey varchar(255) not null unique, timeout bigint, userid bigint, primary key (id)) ENGINE=InnoDB;
+create index idx_pwrecoverykey on pwrecovery (pwrecoverykey);
+alter table pwrecovery add index FK9C4F969C67D36616 (userid), add constraint FK9C4F969C67D36616 foreign key (userid) references users (id);
+
 # alter existing tables
 alter table item add column clientmodifieddate bigint;
 alter table item add column lastmodification integer;

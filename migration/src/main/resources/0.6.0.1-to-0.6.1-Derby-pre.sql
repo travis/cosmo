@@ -7,6 +7,10 @@ alter table collection_item add constraint FK3F30F8148B8DC8EF foreign key (colle
 create table tombstones (tombstonetype varchar(16) not null, id bigint not null, removedate bigint not null, itemuid varchar(255), stamptype varchar(255), itemid bigint not null, primary key (id))
 alter table tombstones add constraint FK40CA41FE5361D2A6 foreign key (itemid) references item
 
+create table pwrecovery (id bigint not null, creationdate timestamp, pwrecoverykey varchar(255) not null unique, timeout bigint, userid bigint, primary key (id))
+create index idx_pwrecoverykey on pwrecovery (pwrecoverykey)
+alter table pwrecovery add constraint FK9C4F969C67D36616 foreign key (userid) references users
+
 # alter existing tables
 alter table item add column clientmodifieddate bigint
 alter table item add column lastmodification integer

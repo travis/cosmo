@@ -145,6 +145,7 @@ cosmo.ui.cal_main.Cal = new function () {
         this.calForm = new CalForm();
         this.calForm.init();
         
+        var deletedSubscriptions = null;
         // Load/create calendar to view
         // --------------
         // If we received a ticket, just grab the specified collection

@@ -170,7 +170,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                 else {
                     String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
                     Trigger trigger = EimValueConverter.toIcalTrigger(value);
-                    setReminderTime(note, getEventStamp(), trigger);
+                    setReminderTime(note, trigger);
                 }
             }
             else if (field.getName().equals(FIELD_DURATION)) {
@@ -228,5 +228,16 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
             
         Period period = new Period((DateTime) start, trigger.getDuration());
         note.setReminderTime(period.getEnd());        
+    }
+    
+    private void setReminderTime(NoteItem note, Trigger trigger)
+            throws EimSchemaException {
+        // non events only support absolute triggers
+        if (trigger.getDateTime() != null) {
+            note.setReminderTime(trigger.getDateTime());
+        } else {
+            throw new EimSchemaException(
+                    "trigger for non event must be absolute");
+        }
     }
 }

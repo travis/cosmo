@@ -38,6 +38,7 @@ import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
+import org.springframework.dao.ConcurrencyFailureException;
 
 /**
  * The standard implementation for
@@ -282,8 +283,15 @@ public class StandardMorseCodeController implements MorseCodeController {
         Set<Item> children = recordsToItems(records.getRecordSets(),
                                             collection);
 
-        // throws CollectionLockedException
-        collection = contentService.updateCollection(collection, children);
+        try {
+            // throws CollectionLockedException, and may throw
+            // ConcurrencyFailureException
+            collection = contentService.updateCollection(collection, children);
+        } catch (ConcurrencyFailureException cfe) {
+            // This means the data has been updated since the last sync token,
+            // so a StaleCollectionException should be thrown
+            throw new StaleCollectionException(uid);
+        }
 
         return new PubCollection(collection);
     }

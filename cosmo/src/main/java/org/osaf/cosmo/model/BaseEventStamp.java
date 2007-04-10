@@ -272,6 +272,17 @@ public abstract class BaseEventStamp extends Stamp
     public void setDuration(Dur dur) {
         Duration duration = (Duration)
             getEvent().getProperties().getProperty(Property.DURATION);
+        
+        setDirty(true);
+        
+        // remove DURATION if dur is null
+        if(dur==null) {
+            if(duration != null) 
+                getEvent().getProperties().remove(duration);
+            return;
+        }
+        
+        // update dur on existing DURATION
         if (duration != null)
             duration.setDuration(dur);
         else {
@@ -282,7 +293,6 @@ public abstract class BaseEventStamp extends Stamp
             duration = new Duration(dur);
             getEvent().getProperties().add(duration);
         }
-        setDirty(true);
     }
 
     /**

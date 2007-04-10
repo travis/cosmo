@@ -95,7 +95,7 @@ public class EventGenerator extends BaseStampGenerator
             record.addField(new TextField(FIELD_DTSTART, value));
         }
          
-        if(isMissingAttribute("duration")) {
+        if(isDurationMissing(stamp)) {
             record.addField(generateMissingField(new TextField(FIELD_DURATION, null)));
         } else {
             value = DurationFormat.getInstance().format(stamp.getDuration());
@@ -154,5 +154,22 @@ public class EventGenerator extends BaseStampGenerator
             return false;
         
         return stamp.getStartDate().equals(stamp.getRecurrenceId());
+    }
+    
+    /**
+     * Determine if duration is missing.  The duration is missing
+     * if there is no duration and the event is a modification, or 
+     * if the duration is equal to the parent duration.
+     * @param stamp BaseEventStamp to test
+     * @return
+     */
+    private boolean isDurationMissing(BaseEventStamp stamp) {
+        if(!isModification())
+            return false;
+        
+        if(stamp.getDuration()==null)
+            return true;
+        else
+            return isMissingAttribute("duration");
     }
 }

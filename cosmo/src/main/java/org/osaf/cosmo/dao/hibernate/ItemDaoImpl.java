@@ -22,6 +22,7 @@ import org.apache.commons.id.IdentifierGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.FlushMode;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.ObjectDeletedException;
@@ -428,6 +429,22 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);
         }
+    }
+    
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.dao.ItemDao#initializeItem(org.osaf.cosmo.model.Item)
+     */
+    public void initializeItem(Item item) {
+        try {
+            // initialize all the proxied-associations, to prevent
+            // lazy-loading of this data
+            Hibernate.initialize(item.getAttributes());
+            Hibernate.initialize(item.getStamps());
+            Hibernate.initialize(item.getTombstones());
+         } catch (HibernateException e) {
+             throw SessionFactoryUtils.convertHibernateAccessException(e);
+         }
     }
     
 

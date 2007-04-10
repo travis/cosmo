@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.dao.ContentDao;
@@ -27,6 +28,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemTombstone;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
 
 /**
@@ -449,7 +451,26 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         }
     }
     
-    
+        
+    @Override
+    public void initializeItem(Item item) {
+        super.initializeItem(item);
+        
+        // Initialize master NoteItem if applicable
+        try {
+           if(item instanceof NoteItem) {
+               NoteItem note = (NoteItem) item;
+               if(note.getModifies()!=null) {
+                   Hibernate.initialize(note.getModifies());
+                   initializeItem(note.getModifies());
+               }
+           }
+        } catch (HibernateException e) {
+            throw convertHibernateAccessException(e);
+        }
+        
+    }
+
     @Override
     public void removeItem(Item item) {
         if(item instanceof ContentItem)

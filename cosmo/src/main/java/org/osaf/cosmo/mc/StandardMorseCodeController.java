@@ -16,24 +16,28 @@
 package org.osaf.cosmo.mc;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.eim.EimException;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.EimRecordSetIterator;
-import org.osaf.cosmo.eim.schema.ItemTranslator;
 import org.osaf.cosmo.eim.schema.EimValidationException;
+import org.osaf.cosmo.eim.schema.ItemTranslator;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -187,7 +191,22 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new NotCollectionException(uid);
         CollectionItem collection = (CollectionItem) item;
 
-        return new SubRecords(collection);
+        SubRecords subRecords = new SubRecords(collection, getAllItems(collection));
+        
+        // Ensure collection has not been modified since reading the data
+        Date lastModified = collection.getModifiedDate();
+        collection = (CollectionItem) contentService.findItemByUid(uid);
+        while(!collection.getModifiedDate().equals(lastModified)) {
+            // If it has been modified, then re-read data, otherwise we
+            // could return inconsistent data
+            if (log.isDebugEnabled())
+                log.debug("collection " + uid + " modified while subscribing, retrying");
+            subRecords = new SubRecords(collection, getAllItems(collection));
+            lastModified = collection.getModifiedDate();
+            collection = (CollectionItem) contentService.findItemByUid(uid);
+        }
+        
+        return subRecords;
     }
 
     /**
@@ -220,7 +239,24 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new NotCollectionException(uid);
         CollectionItem collection = (CollectionItem) item;
 
-        return new SubRecords(collection, token);
+        SubRecords subRecords = new SubRecords(collection, getModifiedItems(token, collection),
+                getRecentTombstones(token, collection), token);
+       
+        // ensure collection has not been modified since reading the data
+        Date lastModified = collection.getModifiedDate();
+        collection = (CollectionItem) contentService.findItemByUid(uid);
+        while(!collection.getModifiedDate().equals(lastModified)) {
+            // If it has been modified, then re-read data, otherwise we
+            // could return inconsistent data
+            if (log.isDebugEnabled())
+                log.debug("collection " + uid + " modified while syncing, retrying");
+            subRecords = new SubRecords(collection, getModifiedItems(token, collection),
+                    getRecentTombstones(token, collection), token);
+            lastModified = collection.getModifiedDate();
+            collection = (CollectionItem) contentService.findItemByUid(uid);
+        }
+        
+        return subRecords;
     }
 
     /**
@@ -431,5 +467,57 @@ public class StandardMorseCodeController implements MorseCodeController {
         }
         
         return false;
+    }
+    
+    private List<ContentItem> getAllItems(CollectionItem collection) {
+        ArrayList<ContentItem> items = new ArrayList<ContentItem>();
+        for (Item child : collection.getChildren()) {
+            if (!isShareableItem(child))
+                continue;
+            items.add((ContentItem) child);
+        }
+        
+        // force all data to be initialized (prevent lazy loading)
+        contentService.initializeItems(items);
+        return items;
+    }
+    
+    private List<ContentItem> getModifiedItems(SyncToken prevToken,
+            CollectionItem collection) {
+        ArrayList<ContentItem> items = new ArrayList<ContentItem>();
+        if (prevToken.isValid(collection))
+            return items;
+
+        for (Item child : collection.getChildren()) {
+            if (!isShareableItem(child))
+                continue;
+            if (prevToken.hasItemChanged(child))
+                items.add((ContentItem) child);
+        }
+
+        // force all data to be initialized (prevent lazy loading)
+        contentService.initializeItems(items);
+        return items;
+    }
+    
+    private List<ItemTombstone> getRecentTombstones(SyncToken prevToken,
+            CollectionItem collection) {
+        ArrayList<ItemTombstone> tombstones = new ArrayList<ItemTombstone>();
+        if (prevToken.isValid(collection))
+            return tombstones;
+
+        for (Tombstone tombstone : collection.getTombstones()) {
+            if (tombstone instanceof ItemTombstone)
+                if (prevToken.isTombstoneRecent(tombstone))
+                    tombstones.add((ItemTombstone) tombstone);
+        }
+
+        return tombstones;
+    }
+    
+    private boolean isShareableItem(Item item) {
+        // only share NoteItems until Chandler and Cosmo UI can cope
+        // with non-Note items
+        return item instanceof NoteItem;
     }
 }

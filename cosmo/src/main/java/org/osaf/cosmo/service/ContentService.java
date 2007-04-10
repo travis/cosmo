@@ -128,6 +128,12 @@ public interface ContentService extends Service {
      *            path of item to remove
      */
     public void removeItem(String path);
+    
+    /**
+     * Initialize items, ensuring any proxied associations will be loaded.
+     * @param items
+     */
+    public void initializeItems(Collection<ContentItem> items);
 
     /**
      * Create a new collection.

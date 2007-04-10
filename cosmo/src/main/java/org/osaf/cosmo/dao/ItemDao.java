@@ -200,4 +200,10 @@ public interface ItemDao extends Dao {
      * @param item the item
      */
     public void refreshItem(Item item);
+    
+    /**
+     * Initialize item, ensuring any proxied associations will be loaded.
+     * @param item
+     */
+    public void initializeItem(Item item);
 }

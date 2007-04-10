@@ -17,6 +17,7 @@ package org.osaf.cosmo.service.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -288,6 +289,15 @@ public class StandardContentService implements ContentService {
             return;
         
         removeItem(item);
+    }
+    
+    /**
+     * Initialize items, ensuring any proxied associations will be loaded.
+     * @param items
+     */
+    public void initializeItems(Collection<ContentItem> items) {
+        for(Item item: items)
+            contentDao.initializeItem(item);
     }
 
     /**

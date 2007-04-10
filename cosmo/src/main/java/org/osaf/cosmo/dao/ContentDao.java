@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao;
 
+import java.util.Date;
 import java.util.Set;
 
 import org.osaf.cosmo.model.CollectionItem;
@@ -165,5 +166,16 @@ public interface ContentDao extends ItemDao {
      * @param collectionUid collection to update
      */
     public void updateCollectionTimestamp(String collectionUid);
+    
+    /**
+     * Load all children for collection that have been updated since a
+     * given timestamp.  If no timestamp is specified, then return all 
+     * children.
+     * @param collection collection
+     * @param timestamp timestamp
+     * @return children of collection that have been updated since 
+     *         timestamp, or all children if timestamp is null
+     */
+    public Set<ContentItem> loadChildren(CollectionItem collection, Date timestamp);
 
 }

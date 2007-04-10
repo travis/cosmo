@@ -292,12 +292,19 @@ public class StandardContentService implements ContentService {
     }
     
     /**
-     * Initialize items, ensuring any proxied associations will be loaded.
-     * @param items
+     * Load all children for collection that have been updated since a given
+     * timestamp. If no timestamp is specified, then return all children.
+     * 
+     * @param collection
+     *            collection
+     * @param timestamp
+     *            timestamp
+     * @return children of collection that have been updated since timestamp, or
+     *         all children if timestamp is null
      */
-    public void initializeItems(Collection<ContentItem> items) {
-        for(Item item: items)
-            contentDao.initializeItem(item);
+    public Set<ContentItem> loadChildren(CollectionItem collection,
+            java.util.Date timestamp) {
+        return contentDao.loadChildren(collection, timestamp);
     }
 
     /**

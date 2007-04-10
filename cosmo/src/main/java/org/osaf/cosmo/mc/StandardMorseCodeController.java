@@ -470,34 +470,26 @@ public class StandardMorseCodeController implements MorseCodeController {
     }
     
     private List<ContentItem> getAllItems(CollectionItem collection) {
-        ArrayList<ContentItem> items = new ArrayList<ContentItem>();
-        for (Item child : collection.getChildren()) {
-            if (!isShareableItem(child))
-                continue;
-            items.add((ContentItem) child);
+        ArrayList<ContentItem> itemList = new ArrayList<ContentItem>();
+        Set<ContentItem> allItems = contentService.loadChildren(collection,
+                null);
+        for (ContentItem item : allItems) {
+            if (isShareableItem(item))
+                itemList.add(item);
         }
-        
-        // force all data to be initialized (prevent lazy loading)
-        contentService.initializeItems(items);
-        return items;
+        return itemList;
     }
-    
+
     private List<ContentItem> getModifiedItems(SyncToken prevToken,
             CollectionItem collection) {
-        ArrayList<ContentItem> items = new ArrayList<ContentItem>();
-        if (prevToken.isValid(collection))
-            return items;
-
-        for (Item child : collection.getChildren()) {
-            if (!isShareableItem(child))
-                continue;
-            if (prevToken.hasItemChanged(child))
-                items.add((ContentItem) child);
+        ArrayList<ContentItem> itemList = new ArrayList<ContentItem>();
+        Set<ContentItem> items = contentService.loadChildren(collection,
+                new Date(prevToken.getTimestamp()));
+        for (ContentItem item : items) {
+            if (isShareableItem(item))
+                itemList.add(item);
         }
-
-        // force all data to be initialized (prevent lazy loading)
-        contentService.initializeItems(items);
-        return items;
+        return itemList;
     }
     
     private List<ItemTombstone> getRecentTombstones(SyncToken prevToken,

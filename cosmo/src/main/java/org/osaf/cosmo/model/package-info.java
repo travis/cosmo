@@ -62,7 +62,9 @@
     @NamedQuery(name="item.by.parent.name", query="select item from Item item join item.parents parent where parent=:parent and item.name=:name"),
     @NamedQuery(name="item.by.ownerName.name.nullParent", query="select i from Item i, User u where i.owner=u and u.username=:username and i.name=:name and size(i.parents)=0"),
     @NamedQuery(name="item.by.ownerId.and.nullParent", query="select i from Item i where i.owner.id=:ownerid and size(i.parents)=0"),
-
+    @NamedQuery(name="contentItem.by.parent.timestamp", query="select item from ContentItem item join item.parents parent where parent=:parent and item.modifiedDate>:timestamp"),
+    @NamedQuery(name="contentItem.by.parent", query="select item from ContentItem item join item.parents parent where parent=:parent"),
+    
     // User Queries
     @NamedQuery(name="user.byUsername", query="from User where username=:username"),
     @NamedQuery(name="user.byUsername.ignorecase", query="from User where lower(username)=lower(:username)"),

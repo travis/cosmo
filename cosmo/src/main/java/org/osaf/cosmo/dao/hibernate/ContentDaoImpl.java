@@ -16,12 +16,16 @@
 package org.osaf.cosmo.dao.hibernate;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.CollectionItem;
@@ -451,7 +455,38 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         }
     }
     
-        
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.dao.ContentDao#loadChildren(org.osaf.cosmo.model.CollectionItem, java.util.Date)
+     */
+    public Set<ContentItem> loadChildren(CollectionItem collection, Date timestamp) {
+        try {
+            Set<ContentItem> children = new HashSet<ContentItem>();
+            Query query = null;
+
+            if (timestamp == null)
+                query = getSession().getNamedQuery("contentItem.by.parent")
+                        .setParameter("parent", collection);
+            else
+                query = getSession().getNamedQuery("contentItem.by.parent.timestamp")
+                        .setParameter("parent", collection).setParameter(
+                                "timestamp", timestamp);
+
+            List results = query.list();
+            for (Iterator it = results.iterator(); it.hasNext();) {
+                ContentItem content = (ContentItem) it.next();
+                initializeItem(content);
+                children.add(content);
+            }
+
+            return children;
+            
+        } catch (HibernateException e) {
+            throw convertHibernateAccessException(e);
+        }
+    }
+
+
     @Override
     public void initializeItem(Item item) {
         super.initializeItem(item);

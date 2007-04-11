@@ -1018,7 +1018,7 @@ public class StandardContentService implements ContentService {
         noteMod.setBody(exceptionStamp.getSummary());
         noteMod.setIcalUid(masterNote.getIcalUid());
         noteMod.setModifies(masterNote);
-        noteMod = (NoteItem) contentDao.createContent(noteMod);
+        noteMod = (NoteItem) contentDao.createContent(masterNote.getParents(), noteMod);
         noteMod.getModifications().add(noteMod);
     }
 

@@ -232,9 +232,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         if(parents==null)
             throw new IllegalArgumentException("parent cannot be null");
         
-        if(parents.size()==0)
-            throw new IllegalArgumentException("content must have at least one parent");
-        
         if (content == null)
             throw new IllegalArgumentException("content cannot be null");
 
@@ -245,6 +242,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             throw new IllegalArgumentException("content must have owner");
         
         try {
+            if(parents.size()==0)
+                throw new IllegalArgumentException("content must have at least one parent");
+            
+            
             User owner = content.getOwner();
 
             // verify uid not in use

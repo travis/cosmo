@@ -126,6 +126,7 @@ public class CalendarClobType
         } catch (IOException e) {
             throw new HibernateException("Unable to read original calendar", e);
         } catch (ParseException e) {
+            log.error("parse error with following ics:" + ((Calendar) value).toString());
             throw new HibernateException("Unable to parse original calendar", e);
         } catch (URISyntaxException e) {
             throw new HibernateException("Unknown syntax exception", e);

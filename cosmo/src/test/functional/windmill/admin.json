@@ -1,3 +1,7 @@
+{"method": "open", "params": {"url" : "http://qacosmo.osafoundation.org/cosmo/browse/tester"}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
+{"method": "click", "params": {"link" : "[browse]"}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "click", "params": {"link" : "Log Out"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "root"}}

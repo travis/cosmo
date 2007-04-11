@@ -1,13 +1,22 @@
-{"method": "click", "params": {"link" : "Log in to Cosmo"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
-{"method": "click", "params": {"link" : "Click here to create one."}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "click", "params": {"link" : "Create a new account"}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
 {"method": "type", "params": {"id" : "username", "text": "tester"}}
 {"method": "type", "params": {"id" : "firstName", "text": "tester"}}
 {"method": "type", "params": {"id" : "lastName", "text": "tester"}}
 {"method": "type", "params": {"id" : "email", "text": "tester@osafoundation.org"}}
-{"method": "type", "params": {"id" : "password", "text": "tester"}}
+{"method": "type", "params": {"id" : "password", "text": "testers"}}
 {"method": "type", "params": {"id" : "confirm", "text": "tester"}}
 {"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+{"method": "type", "params": {"id" : "password", "text": "tester"}}
+{"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsCenter[0].domNode.id"}}
+{"method": "click", "params": {"link" : "Click here to create one."}}
+{"method": "click", "params": {"jsid" : "Windmill.TestingApp.cosmo.app.modalDialog.btnsLeft[0].domNode.id"}}
+{"method": "open", "params": {"url" : "http://qacosmo.osafoundation.org"}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "click", "params": {"link" : "Log in to Cosmo"}}

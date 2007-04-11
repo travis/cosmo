@@ -1,5 +1,6 @@
 {"method": "open", "params": {"url" : "http://qacosmo.osafoundation.org/cosmo/browse/tester"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
+{"method":"reWriteAlert", "params":{}}
 {"method": "click", "params": {"link" : "[browse]"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "click", "params": {"link" : "Log Out"}}

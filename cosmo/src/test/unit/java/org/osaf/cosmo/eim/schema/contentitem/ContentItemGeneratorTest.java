@@ -122,7 +122,7 @@ public class ContentItemGeneratorTest extends BaseGeneratorTestCase
         NoteItem parent = new NoteItem();
         modification.setUid("1");
         parent.setDisplayName("test");
-        modification.setDisplayName(parent.getDisplayName());
+        modification.setDisplayName(null);
         modification.setModifies(parent);
 
         ContentItemGenerator generator = new ContentItemGenerator(modification);

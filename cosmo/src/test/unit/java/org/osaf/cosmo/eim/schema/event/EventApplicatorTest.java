@@ -67,8 +67,11 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         NoteItem modNote = new NoteItem();
         EventExceptionStamp modEvent = new EventExceptionStamp(modNote);
         modEvent.createCalendar();
+        modEvent.setLocation("blah");
+        modEvent.setStatus("blah");
         modNote.setModifies(masterNote);
         modNote.addStamp(modEvent);
+       
         
         EimRecord record = makeTestMissingRecord();
 
@@ -76,8 +79,8 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
             new EventApplicator(modNote);
         applicator.applyRecord(record);
 
-        Assert.assertEquals(modEvent.getLocation(), "here");
-        Assert.assertEquals(modEvent.getStatus(), "CONFIRMED");
+        Assert.assertNull(modEvent.getLocation());
+        Assert.assertNull(modEvent.getStatus());
     }
     
     private EimRecord makeTestRecord() {

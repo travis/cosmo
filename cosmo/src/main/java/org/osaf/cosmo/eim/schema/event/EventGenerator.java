@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
@@ -29,8 +28,6 @@ import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.eim.schema.text.DurationFormat;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.Stamp;
 
 /**
  * Generates EIM records from event stamps.
@@ -129,16 +126,6 @@ public class EventGenerator extends BaseStampGenerator
         record.addFields(generateUnknownFields());
     }
     
-    @Override
-    protected Stamp getParentStamp() {
-        NoteItem noteMod = (NoteItem) getItem();
-        NoteItem parentNote = noteMod.getModifies();
-        
-        if(parentNote!=null)
-            return parentNote.getStamp(BaseEventStamp.class);
-        else
-            return null;
-    }
     
     /**
      * Determine if startDate is missing.  The startDate is missing

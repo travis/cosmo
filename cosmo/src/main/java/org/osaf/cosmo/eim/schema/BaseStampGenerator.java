@@ -20,15 +20,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.StampTombstone;
 import org.osaf.cosmo.model.Tombstone;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for generators that map to <code>Stamp</code>s.
@@ -120,25 +118,10 @@ public abstract class BaseStampGenerator extends BaseGenerator {
             return false;
 
         Stamp modStamp = getStamp();
-        Stamp parentStamp = getParentStamp();
-        
-        if(parentStamp==null)
-           return false;
-        
-        return isMissingAttribute(attribute, modStamp, parentStamp);
+       
+        return isMissingAttribute(attribute, modStamp);
     }
     
-    /**
-     * Get the parent stamp from the current stamp.
-     * @return parent stamp
-     */
-    protected Stamp getParentStamp() {
-        NoteItem noteMod = (NoteItem) getItem();
-        NoteItem parentNote = noteMod.getModifies();
-        
-        Stamp modStamp = getStamp();
-        return parentNote.getStamp(modStamp.getClass());
-    }
     
     /**
      * Search the current Item for StampTombstones that much the

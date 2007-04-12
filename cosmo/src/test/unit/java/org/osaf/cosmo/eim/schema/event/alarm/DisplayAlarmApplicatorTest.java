@@ -101,10 +101,10 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
             new DisplayAlarmApplicator(modNote);
         applicator.applyRecord(record);
 
-        Assert.assertEquals(modEvent.getDisplayAlarmDescription(), "My alarm");
-        Assert.assertEquals(modEvent.getDisplayAlarmTrigger().getValue(), "-PT15M");
-        Assert.assertEquals(modEvent.getDisplayAlarmDuration().toString(), "P1W");
-        Assert.assertEquals(modEvent.getDisplayAlarmRepeat(), new Integer(1));
+        Assert.assertNull(modEvent.getDisplayAlarmDescription());
+        Assert.assertNull(modEvent.getDisplayAlarmTrigger());
+        Assert.assertNull(modEvent.getDisplayAlarmDuration());
+        Assert.assertNull(modEvent.getDisplayAlarmRepeat());
     }
     
     private EimRecord makeTestRecord() {

@@ -17,7 +17,6 @@ package org.osaf.cosmo.eim.schema;
 
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -26,29 +25,26 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.BlobField;
-import org.osaf.cosmo.eim.BytesField;
 import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.DateTimeField;
 import org.osaf.cosmo.eim.DecimalField;
-import org.osaf.cosmo.eim.IntegerField;
-import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
+import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.DecimalAttribute;
 import org.osaf.cosmo.model.IntegerAttribute;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.TextAttribute;
 import org.osaf.cosmo.model.TimestampAttribute;
-import org.osaf.cosmo.model.Item;
-
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for classes that generate EIM records from items and stamps.
@@ -153,24 +149,16 @@ public abstract class BaseGenerator implements EimSchemaConstants {
     
     /**
      * Determine if attribute value of modification is "missing", 
-     * meaning if it is the same as the parent attribute value.
+     * meaning if the value is null.
      * 
      * @param attribute attribute to copy
      * @param modification object to copy attribute to
-     * @param master object to copy attribute from
      */
     protected boolean isMissingAttribute(String attribute,
-            Object modification, Object master) {
+            Object modification) {
         try {
-            Object value1 = PropertyUtils.getProperty(master, attribute);
-            Object value2 = PropertyUtils.getProperty(modification, attribute);
-            if(value1==null || value2==null)
-                return false;
-            
-            if(value1 instanceof Comparable)
-                return (((Comparable) value1).compareTo(value2)==0);
-            else
-                return value1.equals(value2);
+            Object value = PropertyUtils.getProperty(modification, attribute);
+            return (value==null);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("error copying attribute " + attribute);
         } catch (InvocationTargetException e) {
@@ -182,8 +170,7 @@ public abstract class BaseGenerator implements EimSchemaConstants {
     
     /**
      * Determine if attribute value is "missing" for a note modificaiton.
-     * An attribute is "missing" if it is the same value as the parent
-     * attribute value.
+     * An attribute is "missing" if it is null.
      * 
      * @param attribute atttribute to copy
      * @throws EimSchemaException
@@ -193,10 +180,8 @@ public abstract class BaseGenerator implements EimSchemaConstants {
         if (!isModification())
             return false;
 
-        NoteItem modification = (NoteItem) getItem();
-        NoteItem parent = modification.getModifies();
-        
-        return isMissingAttribute(attribute, modification, parent);
+        NoteItem modification = (NoteItem) getItem();      
+        return isMissingAttribute(attribute, modification);
     }
     
     protected EimRecordField generateMissingField(EimRecordField field) {

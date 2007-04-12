@@ -21,12 +21,9 @@ import net.fortuna.ical4j.model.DateTime;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.calendar.ICalDate;
-import org.osaf.cosmo.calendar.UnknownTimeZoneException;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
-import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
@@ -165,17 +162,6 @@ public class EventApplicator extends BaseStampApplicator
         } else {
             applyUnknownField(field);
         }
-    }
-    
-    @Override
-    protected Stamp getParentStamp() {
-        NoteItem noteMod = (NoteItem) getItem();
-        NoteItem parentNote = noteMod.getModifies();
-        
-        if(parentNote!=null)
-            return parentNote.getStamp(BaseEventStamp.class);
-        else
-            return null;
     }
     
     private void handleMissingDtStart() throws EimSchemaException {

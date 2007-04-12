@@ -21,7 +21,6 @@ import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.logging.Log;
@@ -199,17 +198,6 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
     
     private BaseEventStamp getEventStamp() {
         return BaseEventStamp.getStamp(getItem());
-    }
-    
-    @Override
-    protected Stamp getParentStamp() {
-        NoteItem noteMod = (NoteItem) getItem();
-        NoteItem parentNote = noteMod.getModifies();
-        
-        if(parentNote!=null)
-            return parentNote.getStamp(BaseEventStamp.class);
-        else
-            return null;
     }
     
     private void setReminderTime(NoteItem note, BaseEventStamp eventStamp, Trigger trigger) {

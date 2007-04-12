@@ -548,7 +548,8 @@ public abstract class BaseEventStamp extends Stamp
         if (oldTrigger != null)
             alarm.getProperties().remove(oldTrigger);
 
-        alarm.getProperties().add(newTrigger);
+        if(newTrigger!=null)
+            alarm.getProperties().add(newTrigger);
     }
     
     /**

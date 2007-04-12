@@ -35,7 +35,6 @@ import org.osaf.cosmo.model.AttributeTombstone;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.Tombstone;
 
 /**
@@ -164,17 +163,6 @@ public class DisplayAlarmGenerator extends BaseStampGenerator
         record.addField(new IntegerField(FIELD_REPEAT, 1));
 
         record.addFields(generateUnknownFields());
-    }
- 
-    @Override
-    protected Stamp getParentStamp() {
-        NoteItem noteMod = (NoteItem) getItem();
-        NoteItem parentNote = noteMod.getModifies();
-        
-        if(parentNote!=null)
-            return parentNote.getStamp(BaseEventStamp.class);
-        else
-            return null;
     }
     
     protected void checkForAttributeTombstone(ArrayList<EimRecord> records,

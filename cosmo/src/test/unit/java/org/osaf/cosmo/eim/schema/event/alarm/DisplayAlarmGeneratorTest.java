@@ -176,10 +176,10 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
         modNote.setModifies(masterNote);
         modNote.addStamp(modEvent);
         modEvent.setModifiedDate(new Date());
-        modEvent.setDisplayAlarmDescription("My alarm");
-        modEvent.setDisplayAlarmDuration(new Dur("P1W"));
-        modEvent.setDisplayAlarmTrigger(EimValueConverter.toIcalTrigger("-PT15M"));
-        modEvent.setDisplayAlarmRepeat(1);
+        modEvent.setDisplayAlarmDescription(null);
+        modEvent.setDisplayAlarmDuration(null);
+        modEvent.setDisplayAlarmTrigger(null);
+        modEvent.setDisplayAlarmRepeat(null);
 
         DisplayAlarmGenerator generator = new DisplayAlarmGenerator(modNote);
 

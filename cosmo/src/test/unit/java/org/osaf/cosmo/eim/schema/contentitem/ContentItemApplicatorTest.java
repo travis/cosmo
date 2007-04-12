@@ -75,8 +75,7 @@ public class ContentItemApplicatorTest extends BaseApplicatorTestCase
             new ContentItemApplicator(modification);
         applicator.applyRecord(record);
 
-        Assert.assertEquals(parent.getDisplayName(),
-                            modification.getDisplayName());
+        Assert.assertNull(modification.getDisplayName());
     }
 
     private EimRecord makeTestRecord() {

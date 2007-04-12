@@ -76,6 +76,8 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
 
     @Override
     public void applyRecord(EimRecord record) throws EimSchemaException {
+        // stamp could have been added before record is processed
+        setStamp(BaseEventStamp.getStamp(getItem()));
         
         // If item is not an event, then process differently
         if(getEventStamp()==null) {

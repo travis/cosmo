@@ -750,24 +750,29 @@ public abstract class BaseEventStamp extends Stamp
      * @return true if the event is an anytime event
      */
     @Transient
-    public boolean isAnyTime() {
+    public Boolean isAnyTime() {
         DtStart dtStart = getEvent().getStartDate();
         if (dtStart == null)
-            return false;
+            return Boolean.FALSE;
         Parameter parameter = dtStart.getParameters()
             .getParameter(PARAM_X_OSAF_ANYTIME);
         if (parameter == null) {
-            return false;
+            return Boolean.FALSE;
         }
 
-        return VALUE_TRUE.equals(parameter.getValue());
+        return new Boolean(VALUE_TRUE.equals(parameter.getValue()));
+    }
+    
+    @Transient
+    public Boolean getAnyTime() {
+        return isAnyTime();
     }
     
     /**
      * Toggle the event anytime parameter.
      * @param isAnyTime true if the event occurs anytime
      */
-    public void setAnyTime(boolean isAnyTime) {
+    public void setAnyTime(Boolean isAnyTime) {
         DtStart dtStart = getEvent().getStartDate();
         if (dtStart == null)
             throw new IllegalStateException("event has no start date");
@@ -777,7 +782,7 @@ public abstract class BaseEventStamp extends Stamp
         setDirty(true);
         
         // add X-OSAF-ANYTIME if it doesn't exist
-        if (parameter == null && isAnyTime) {
+        if (parameter == null && Boolean.TRUE.equals(isAnyTime)) {
             dtStart.getParameters().add(getAnyTimeXParam());
             return;
         }
@@ -786,9 +791,9 @@ public abstract class BaseEventStamp extends Stamp
         if (parameter != null) {
             String value = parameter.getValue();
             boolean currIsAnyTime = VALUE_TRUE.equals(value);
-            if (currIsAnyTime && !isAnyTime)
+            if (currIsAnyTime && !Boolean.TRUE.equals(isAnyTime))
                 dtStart.getParameters().remove(parameter);
-            else if (!currIsAnyTime && isAnyTime) {
+            else if (!currIsAnyTime && Boolean.TRUE.equals(isAnyTime)) {
                 dtStart.getParameters().remove(parameter);
                 dtStart.getParameters().add(getAnyTimeXParam());
             }

@@ -68,16 +68,31 @@ public class ContentItemGenerator extends BaseItemGenerator
                     contentItem.getDisplayName()));
         }
 
+        
         String ts = TriageStatusFormat.getInstance().
             format(contentItem.getTriageStatus());
-        record.addField(new TextField(FIELD_TRIAGE, ts));
-
-        boolean sent = BooleanUtils.isTrue(contentItem.getSent());
-        record.addField(new IntegerField(FIELD_HAS_BEEN_SENT, sent));
-
-        boolean needsReply = BooleanUtils.isTrue(contentItem.getNeedsReply());
-        record.addField(new IntegerField(FIELD_NEEDS_REPLY, needsReply));
-
+        
+        // missing TriageStatus ends up as empty string instead of null
+        if(isModification() && "".equals(ts)) {
+            record.addField(generateMissingField(new TextField(FIELD_TRIAGE, null)));
+        } else {
+            record.addField(new TextField(FIELD_TRIAGE, ts));
+        }
+        
+        if(isMissingAttribute("sent")) {
+            record.addField(generateMissingField(new IntegerField(FIELD_HAS_BEEN_SENT, null)));
+        } else {
+            boolean sent = BooleanUtils.isTrue(contentItem.getSent());
+            record.addField(new IntegerField(FIELD_HAS_BEEN_SENT, sent)); 
+        }
+        
+        if(isMissingAttribute("needsReply")) {
+            record.addField(generateMissingField(new IntegerField(FIELD_NEEDS_REPLY, null)));
+        } else {
+            boolean needsReply = BooleanUtils.isTrue(contentItem.getNeedsReply());
+            record.addField(new IntegerField(FIELD_NEEDS_REPLY, needsReply));
+        }
+        
         Date d = contentItem.getClientCreationDate();
         BigDecimal createdOn = d != null ?
             new BigDecimal(d.getTime() / 1000) :

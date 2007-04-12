@@ -33,6 +33,7 @@ import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.eim.schema.text.DurationFormat;
+import org.osaf.cosmo.mc.ValidationException;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
@@ -116,7 +117,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                     String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
                     Trigger newTrigger = EimValueConverter.toIcalTrigger(value);
                     if(newTrigger==null)
-                        throw new EimSchemaException(FIELD_TRIGGER + " required");
+                        throw new ValidationException(FIELD_TRIGGER + " required");
                     eventStamp.setDisplayAlarmTrigger(newTrigger);
                     setReminderTime(note, getEventStamp(), newTrigger);
                 }
@@ -174,7 +175,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                     String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
                     Trigger trigger = EimValueConverter.toIcalTrigger(value);
                     if(trigger==null)
-                        throw new EimSchemaException(FIELD_TRIGGER + " required");
+                        throw new ValidationException(FIELD_TRIGGER + " required");
                     setReminderTime(note, trigger);
                 }
             }
@@ -230,7 +231,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
         if (trigger.getDateTime() != null) {
             note.setReminderTime(trigger.getDateTime());
         } else {
-            throw new EimSchemaException(
+            throw new ValidationException(
                     "trigger for non event must be absolute");
         }
     }

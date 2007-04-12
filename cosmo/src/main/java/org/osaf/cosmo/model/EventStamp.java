@@ -129,6 +129,8 @@ public class EventStamp extends BaseEventStamp implements
         TreeMap<String, VEvent> sortedMap = new TreeMap<String, VEvent>();
         for(NoteItem exception : note.getModifications()) {
             EventExceptionStamp exceptionStamp = EventExceptionStamp.getStamp(exception);
+            if(exceptionStamp==null)
+                continue;
             sortedMap.put(exceptionStamp.getRecurrenceId().toString(), exceptionStamp.getExceptionEvent());
             
             // verify that timezones are present for exceptions, and add if not

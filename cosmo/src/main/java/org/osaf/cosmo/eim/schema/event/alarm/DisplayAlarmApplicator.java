@@ -113,6 +113,8 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                 else {
                     String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
                     Trigger newTrigger = EimValueConverter.toIcalTrigger(value);
+                    if(newTrigger==null)
+                        throw new EimSchemaException(FIELD_TRIGGER + " required");
                     eventStamp.setDisplayAlarmTrigger(newTrigger);
                     setReminderTime(note, getEventStamp(), newTrigger);
                 }
@@ -169,6 +171,8 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                 else {
                     String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
                     Trigger trigger = EimValueConverter.toIcalTrigger(value);
+                    if(trigger==null)
+                        throw new EimSchemaException(FIELD_TRIGGER + " required");
                     setReminderTime(note, trigger);
                 }
             }

@@ -465,6 +465,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             Set<ContentItem> children = new HashSet<ContentItem>();
             Query query = null;
 
+            // use custom HQL query that will eager fetch all associations
             if (timestamp == null)
                 query = getSession().getNamedQuery("contentItem.by.parent")
                         .setParameter("parent", collection);

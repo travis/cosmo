@@ -32,8 +32,10 @@ alter table item drop column triagestatusupdated;
 drop table message_stamp;
 
 # migrate data
-insert into collection_item (itemid, collectionid) select id, parentid from item where parentid is not null;
 update item set isautotriage=1 where itemtype='note';
 delete from event_stamp where exists (select id from stamp where isactive=0 and id=stampid);
 delete from stamp where stamp.isactive=0;
+delete from ticket_privilege where exists (select t.id from tickets t, item i where t.id=ticketid and i.id=t.itemid and i.isactive=0);
+delete from tickets where exists (select i.id from item i where i.id=itemid and i.isactive=0);
 delete from item where isactive=0;
+insert into collection_item (itemid, collectionid) select id, parentid from item where parentid is not null;

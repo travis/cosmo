@@ -84,9 +84,6 @@ public class ICalendarToCosmoConverter {
     private enum EventType { NORMAL, ANYTIME, ALLDAY, ATTIME};
     
     private static Map<EventType, String[]> eventTypesToEventProperties = new HashMap<EventType, String[]>();
-    
-    public static TimeZoneRegistry timeZoneRegistry = TimeZoneRegistryFactory
-            .getInstance().createRegistry();
 
     static{
         eventTypesToEventProperties.put(EventType.NORMAL, new String[]{});
@@ -335,7 +332,8 @@ public class ICalendarToCosmoConverter {
         TimeZone masterTimezone = null;
         if (masterStartDate instanceof DateTime) {
             if (StringUtils.isNotBlank(tzid)) {
-                masterTimezone = timeZoneRegistry.getTimeZone(tzid);
+                VTimeZone vtz = ICalendarUtils.getVTimeZone(calendar, tzid);
+                masterTimezone = new TimeZone(vtz);
             }
         }
         for (int x = 0; x < startDateList.size(); x++) {
@@ -346,7 +344,7 @@ public class ICalendarToCosmoConverter {
                 DateTime instanceStartDateTime = (DateTime) instanceStartDate;
                 instanceStartDateTime.setTimeZone(masterTimezone);
             }
-
+            
             VEvent vInstance = null;
             try {
                 vInstance = (VEvent) masterVEvent.copy();

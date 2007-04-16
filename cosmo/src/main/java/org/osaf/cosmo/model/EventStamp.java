@@ -211,6 +211,8 @@ public class EventStamp extends BaseEventStamp implements
      */
     @Transient
     public VEvent getMasterEvent() {
+        if(getMasterCalendar()==null)
+            return null;
         return (VEvent) getMasterCalendar().getComponents().getComponents(
                 Component.VEVENT).get(0);
     }

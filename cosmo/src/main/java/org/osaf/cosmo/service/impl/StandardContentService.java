@@ -31,7 +31,9 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.DtStamp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -926,6 +928,9 @@ public class StandardContentService implements ContentService {
         // get list of exceptions (VEVENT with RECURRENCEID)
         for (Iterator<VEvent> i = vevents.iterator(); i.hasNext();) {
             VEvent event = i.next();
+            // make sure event has DTSTAMP, otherwise validation will fail
+            if(event.getDateStamp()==null)
+                event.getProperties().add(new DtStamp(new DateTime()));
             if (event.getRecurrenceId() != null)
                 exceptions.put(event.getRecurrenceId().getDate(), event);
         }
@@ -1019,7 +1024,6 @@ public class StandardContentService implements ContentService {
         noteMod.setIcalUid(masterNote.getIcalUid());
         noteMod.setModifies(masterNote);
         noteMod = (NoteItem) contentDao.createContent(masterNote.getParents(), noteMod);
-        noteMod.getModifications().add(noteMod);
     }
 
     private void updateNoteModification(NoteItem noteMod, VEvent event) {

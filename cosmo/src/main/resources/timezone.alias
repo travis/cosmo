@@ -1,14 +1,6 @@
 # known aliases
-#HST10=Pacific/Honolulu
-#AST10ADT=America/Anchorage
-#YST9YDT=America/Anchorage
-#PST8PDT=America/Los_Angeles
-#MST7MDT=America/Denver
-#MST7=America/Phoenix
-#CST6CDT=America/Chicago
-#EST5EDT=America/New_York
-#EST6CDT=America/Indiana/Indianapolis
-#AST4ADT=America/Halifax
+PST=America/Los_Angeles
+
 
 # Windows timezones
 Afghanistan=Asia/Kabul

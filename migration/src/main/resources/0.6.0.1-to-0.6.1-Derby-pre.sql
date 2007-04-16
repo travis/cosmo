@@ -4,7 +4,7 @@ create table collection_item (itemid bigint not null, collectionid bigint not nu
 alter table collection_item add constraint FK3F30F8145361D2A6 foreign key (itemid) references item
 alter table collection_item add constraint FK3F30F8148B8DC8EF foreign key (collectionid) references item
 
-create table tombstones (tombstonetype varchar(16) not null, id bigint not null, removedate bigint not null, itemuid varchar(255), stamptype varchar(255), itemid bigint not null, primary key (id))
+create table tombstones (tombstonetype varchar(16) not null, id bigint not null, removedate bigint not null, namespace varchar(255), localname varchar(255), itemuid varchar(255), stamptype varchar(255), itemid bigint not null, primary key (id))
 alter table tombstones add constraint FK40CA41FE5361D2A6 foreign key (itemid) references item
 
 create table pwrecovery (id bigint not null, creationdate timestamp, pwrecoverykey varchar(255) not null unique, timeout bigint, userid bigint, primary key (id))

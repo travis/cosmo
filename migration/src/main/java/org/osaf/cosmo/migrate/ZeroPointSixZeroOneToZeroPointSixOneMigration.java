@@ -18,12 +18,15 @@ import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
@@ -32,12 +35,17 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RecurrenceId;
+import net.fortuna.ical4j.model.property.Summary;
+import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.logging.Log;
@@ -124,6 +132,10 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
         ResultSet rs =  null;
         long count=0;
         long modCount=0;
+        long modProblemCount=0;
+        long duplicateModCount=0;
+        long badEventCount = 0;
+        long validationErrorCount = 0;
         
         System.setProperty("ical4j.unfolding.relaxed", "true");
         CalendarBuilder calBuilder = new CalendarBuilder();
@@ -177,22 +189,47 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
                 long itemId = rs.getLong(1);
                 long ownerId = rs.getLong(2);
                 String icalUid = rs.getString(3);
-                Calendar calendar = calBuilder.build(new StringReader(rs.getString(4)));
+                String icalData = rs.getString(4);
                 String displayName = rs.getString(5);
                 String parentUid = rs.getString(6);
                 long stampId = rs.getLong(7);
+                Calendar calendar = null;
+                
+                // Because we are using an updated ical4j, there might
+                // be cases where parsing will fail.  If this happens,
+                // the server will fail when loading the calendar, so
+                // we have to fix it.  For now, fix by creating a replacement
+                // calendar.
+                try {
+                    calendar = calBuilder.build(new StringReader(icalData));
+                } catch (ParserException e) {
+                    badEventCount++;
+                    log.debug("cannot parse .ics for item " + itemId);
+                    log.debug("parse error for:  " + icalData);
+                    log.debug("error: " +  e.getMessage());
+                    calendar = createReplacementCalendar(icalUid, e.getMessage());
+                    calendar.validate();
+                    updateEventStmt.setString(1, calendar.toString());
+                    updateEventStmt.setLong(2, stampId);
+                    updateEventStmt.executeUpdate();
+                    log.debug("replaced with: " + calendar.toString());
+                    continue;
+                }
+                
+                try {
+                    calendar.validate();
+                } catch(ValidationException ve) {
+                    validationErrorCount++;
+                }
                 
                 ComponentList comps = calendar.getComponents().getComponents(Component.VEVENT);
                 Vector<VEvent> mods = new Vector<VEvent>();
-                VEvent masterEvent = null;
-                
+               
                 // find event exceptions
                 for(Iterator<VEvent> it =comps.iterator(); it.hasNext(); ) {
                     VEvent event = it.next();
                     if(event.getRecurrenceId()!=null && !"".equals(event.getRecurrenceId().getValue()))
                         mods.add(event);
-                    else
-                        masterEvent = event;
                 }
                 
                 // if no event exceptions, no migration needed
@@ -200,6 +237,9 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
                     continue;
                 
                 modCount++;
+                HashMap<String, VEvent> exceptionMap = new HashMap<String, VEvent>();
+                
+                boolean hasDuplicateMods = false;
                 
                 // Add item for each event exception
                 for(VEvent mod : mods) {
@@ -213,10 +253,20 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
                     String eventDescription = null;
                     String uid = parentUid + "::" + fromDateToString(recurrenceId.getDate());
                     
+                    if(exceptionMap.containsKey(uid)) {
+                        if(!hasDuplicateMods) {
+                            hasDuplicateMods=true;
+                            modProblemCount++;
+                        }
+                        duplicateModCount++;
+                        log.debug("already processed exception " + uid + " skipping...");
+                        continue;
+                    }
+                    
+                    exceptionMap.put(uid, mod);
+                    
                     if(summary!=null)
                         eventSummary = summary.getValue();
-                    else
-                        eventSummary = displayName;
                     
                     // Make sure we can fit summary in displayname column
                     if(eventSummary!=null && eventSummary.length()>=255)
@@ -236,8 +286,13 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
                     insertItemStmt1.setString(4, itemName);
                     insertItemStmt2.setString(4, itemName);
                     
-                    insertItemStmt1.setString(5, eventSummary);
-                    insertItemStmt2.setString(5, eventSummary);
+                    if(eventSummary!=null) {
+                        insertItemStmt1.setString(5, eventSummary);
+                        insertItemStmt2.setString(5, eventSummary);
+                    } else {
+                        insertItemStmt1.setNull(5, Types.VARCHAR);
+                        insertItemStmt2.setNull(5, Types.VARCHAR);
+                    }
                     
                     insertItemStmt1.setString(6, uid);
                     insertItemStmt2.setString(6, uid);
@@ -349,6 +404,10 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
     
         log.debug("processed " + count + " events");
         log.debug(modCount + " events had event exceptions");
+        log.debug(duplicateModCount + " exceptions ignored due to duplicates");
+        log.debug(modProblemCount + " events contain duplicate exceptions");
+        log.debug(badEventCount + " bad events encountered");
+        log.debug(validationErrorCount + " events failed validation");
     }
     
     private Calendar createBaseCalendar(VEvent event) {
@@ -358,6 +417,24 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
         cal.getProperties().add(CalScale.GREGORIAN);
         cal.getComponents().add(event);
         return cal;
+    }
+    
+    /**
+     * Create a replacement calendar to use when replacing a calendar that
+     * failed parsing.
+     */
+    private Calendar createReplacementCalendar(String uid, String message) {
+        VEvent event = new VEvent();
+        DtStart dtStart = new DtStart(new Date());
+        dtStart.getParameters().add(Value.DATE);
+        event.getProperties().add(new Uid(uid));
+        event.getProperties().add(dtStart);
+        event.getProperties().add(new Description("removed by data migration"));
+        event.getProperties().add(new Summary("this event was found to contain " +
+                                              "invalid .ics data(" + message + ")" +
+                                              " and was removed by data migration on " +
+                                              new DateTime().toString()));
+        return createBaseCalendar(event);
     }
     
     public static String fromDateToString(Date date) {

@@ -40,7 +40,6 @@ cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction )
    var prop = cosmo.env._cosmoConfig[propName];
    
    if (prop){
-       dojo.debug("got a cache hit: " + prop);       
        //if we don't use these placeholders, then the preceding if statement will return 
        //false, and we'll have to recalculate.
        if (prop == cosmo.env._NULL) {
@@ -56,7 +55,6 @@ cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction )
    
    
    prop = _calcy();
-   dojo.debug("calculated property: " + prop);       
 
    if (!prop){
        if (prop == false) {
@@ -104,7 +102,7 @@ cosmo.env.getBaseUrl = function(){
     if (typeof(result) == "undefined"){
         throw new Error("You must setBaseUrl before calling this function");
     }
-	return result;
+    return result;
 }
 
 /**
@@ -132,22 +130,22 @@ cosmo.env.setTimeoutSeconds = function(timeoutSeconds) {
 }
 
 cosmo.env.getImagesUrl = function(){
-	return cosmo.env.getBaseUrl() + '/templates/default/images/';
+    return cosmo.env.getBaseUrl() + '/templates/default/images/';
 }
 
 cosmo.env.getRedirectUrl = function(){
-	return cosmo.env.getBaseUrl() + '/logout';}
+    return cosmo.env.getBaseUrl() + '/logout';}
 
 cosmo.env.getLoginRedirect = function(){
-	return cosmo.env.getBaseUrl() + "/login";
+    return cosmo.env.getBaseUrl() + "/login";
 }
 
 cosmo.env.getAuthProc = function(){
-	return cosmo.env.getBaseUrl() + "/security_check";
+    return cosmo.env.getBaseUrl() + "/security_check";
 }
 
 cosmo.env.getVersion= function(){
-	return cosmo.env.version;
+    return cosmo.env.version;
 }
 
 /**

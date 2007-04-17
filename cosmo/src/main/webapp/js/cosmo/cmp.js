@@ -453,6 +453,46 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
             dojo.io.bind(requestDict);
         },
+        
+        recoverPassword: function(username, email, handlerDict, sync){
+            // Safari and IE don't understand 204s. Boo.
+            if (navigator.userAgent.indexOf('Safari') > -1 ||
+                document.all){
+                handlerDict = this._wrap204Bandaid(handlerDict);
+            }
+             
+            var requestContent = 
+                username? "username=" + username : "" + 
+                username && email? "&" : "" +
+                email? "email=" + email : "";
+                
+            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account/password/recover";
+            requestDict.method = "POST";
+            requestDict.contentType = "application/x-www-form-urlencoded";
+            requestDict.postContent = requestContent;
+            
+            dojo.io.bind(requestDict);
+        },
+        
+        resetPassword: function(key, password, handlerDict, sync){
+           
+            var requestContent = "password=" + password;
+            
+            // Safari and IE don't understand 204s. Boo.
+            if (navigator.userAgent.indexOf('Safari') > -1 ||
+                document.all){
+                handlerDict = this._wrap204Bandaid(handlerDict);
+            }
+             
+            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account/password/reset/" + key;
+            requestDict.method = "POST";
+            requestDict.contentType = "application/x-www-form-urlencoded";
+            requestDict.postContent = requestContent;
+            
+            dojo.io.bind(requestDict);
+        },
 
         cmpUserXMLToJSON: function (/*Element*/ cmpUserXml){
             var user = cmpUserXml;

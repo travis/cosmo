@@ -39,6 +39,14 @@
     <to>/login?login_failed=1</to>
   </rule>
   <rule>
+  	<from>^/account/password/reset/(.*)$</from>
+  	<to>/account/password/reset?key=$1</to>
+  </rule>
+  <rule>
+  	<from>^/signup$</from>
+  	<to>/login?signup=true</to>
+  </rule>
+  <rule>
     <from>^/browse/remove(/.*)$</from>
     <to>/browse/remove?path=$1</to>
   </rule>

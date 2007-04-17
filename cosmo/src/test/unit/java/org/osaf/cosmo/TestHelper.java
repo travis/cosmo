@@ -15,7 +15,10 @@
  */
 package org.osaf.cosmo;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.TimeZone;
@@ -40,6 +43,7 @@ import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.XProperty;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -274,5 +278,15 @@ public class TestHelper {
             throw new IllegalStateException("resource " + name + " not found");
         }
         return in;
+    }
+
+    /** */
+    public Reader getReader(String name) {
+        try {
+            byte[] buf = IOUtils.toByteArray(getInputStream(name));
+            return new StringReader(new String(buf));
+        } catch (IOException e) {
+            throw new RuntimeException("error converting input stream to reader", e);
+        }
     }
 }

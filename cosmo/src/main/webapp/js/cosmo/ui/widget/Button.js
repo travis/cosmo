@@ -27,6 +27,7 @@ dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
 dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
+dojo.require("cosmo.convenience");
 
 dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     
@@ -38,6 +39,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     enabled: true,
     small: false,
     text: "",
+    i18nText: "",
     width: 0,
     handleOnClick: "",
 
@@ -52,14 +54,22 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
         this.domNode.name = this.widgetId;
         // Finish setting up
         this.setText(this.text);
+        if (this.i18nText != "") this.setI18nText(this.i18nText);
+        
         this.setWidth(this.width);
         this.setEnabled(this.enabled);
     },
+    
     setText: function(text) {
         this.text = text;
         this.domNode.value = this.text;
     },
-    // Default width already set in CSS -- this overrides it
+    
+    setI18nText: function(text){
+        this.i18nText = text;
+        this.setText(_(text));
+    },
+
     setWidth: function(width) {
         this.width = width;
         if (this.width) {

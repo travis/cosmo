@@ -37,9 +37,11 @@
     </title>
 	<cosmo:staticbaseurl var="staticBaseUrl"/>
 	<cosmo:dojoBoilerplate/>
+	
+	<link rel="stylesheet" href="${staticBaseUrl}/templates/default/global.css"/>
     <link rel="self" type="text/html" href="${staticBaseUrl}/login"/>
     
-    <fmt:setBundle basename="PimMessageResources"/>
+    <fmt:setBundle basename="MessageResources"/>
     
     <%--
         Login and account-creation stuff
@@ -86,9 +88,16 @@
           <fmt:message key="Login.CreateAccount"/>
         </a>
       </div>
+
+      <div style="padding-top:4px; text-align:center;">
+      	<a href="${staticBaseUrl}/account/password/recover">
+      	  <fmt:message key="Login.Forgot"/>
+      	</a>
+	  </div>
+      
       <div style="padding-top:36px; text-align:center;">
         <a href="javascript:cosmo.util.popup.open('${staticBaseUrl}/help/about', 340, 280);">
-          <fmt:message key="Login.About"/>
+          <fmt:message key="Login.AboutCosmo"/>
         </a>
       </div>
     </div>

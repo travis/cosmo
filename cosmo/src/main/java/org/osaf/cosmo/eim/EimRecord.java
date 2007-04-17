@@ -88,6 +88,10 @@ public class EimRecord {
     public EimRecordKey getKey() {
         return key;
     }
+    
+    public void setKey(EimRecordKey key){
+        this.key = key;
+    }
 
     /** */
     public List<EimRecordField> getFields() {

@@ -74,14 +74,35 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
             if (! xmlReader.hasNext())
                 throw new EimmlStreamException("Input stream has no data");
 
-            documentEncoding = xmlReader.getCharacterEncodingScheme();
-            if (documentEncoding == null)
-                documentEncoding = "UTF-8";
-
+            readEncoding();
             readCollection();
         } catch (XMLStreamException e) {
             throw new EimmlStreamException("Unable to read EIM records", e);
         }
+    }
+
+    /**
+     * Reads the document header and root element, positioning the
+     * cursor just before the first recordset.
+     */
+    public EimmlStreamReader(Reader in)
+        throws IOException, EimmlStreamException {
+        try {
+            xmlReader = XML_INPUT_FACTORY.createXMLStreamReader(in);
+            if (! xmlReader.hasNext())
+                throw new EimmlStreamException("Input stream has no data");
+
+            readEncoding();
+            readCollection();
+        } catch (XMLStreamException e) {
+            throw new EimmlStreamException("Unable to read EIM records", e);
+        }
+    }
+
+    private void readEncoding() {
+        documentEncoding = xmlReader.getCharacterEncodingScheme();
+        if (documentEncoding == null)
+            documentEncoding = "UTF-8";
     }
 
     /**
@@ -152,7 +173,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
         nextTag();
         if (! xmlReader.isStartElement() &&
             xmlReader.getName().equals(QN_COLLECTION))
-            throw new EimmlStreamException("Outermost element must be " + QN_COLLECTION);
+            throw new EimmlValidationException("Outermost element must be " + QN_COLLECTION);
 
         for (int i=0; i<xmlReader.getAttributeCount(); i++) {
             QName attr = xmlReader.getAttributeName(i);
@@ -161,7 +182,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
             String value = xmlReader.getAttributeValue(i);
             if (attr.equals(QN_UUID)) {
                 if (StringUtils.isBlank(value))
-                    throw new EimmlStreamException("Collection element requires " + ATTR_UUID + " attribute");
+                    throw new EimmlValidationException("Collection element requires " + ATTR_UUID + " attribute");
                 uuid = value;
             } else if (attr.equals(QN_NAME)) {
                 name = ! StringUtils.isBlank(value) ? value : null;
@@ -186,7 +207,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
         // begin at <recordset>
         if (! (xmlReader.isStartElement() &&
                xmlReader.getName().equals(QN_RECORDSET)))
-            throw new EimmlStreamException("Expected start element " + QN_RECORDSET + " but got " + xmlReader.getName());
+            throw new EimmlValidationException("Expected start element " + QN_RECORDSET + " but got " + xmlReader.getName());
 
         EimRecordSet recordset = new EimRecordSet();
 
@@ -197,7 +218,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
             String value = xmlReader.getAttributeValue(i);
             if (attr.equals(QN_UUID)) {
                 if (StringUtils.isBlank(value))
-                    throw new EimmlStreamException("Recordset element requires " + ATTR_UUID + " attribute");
+                    throw new EimmlValidationException("Recordset element requires " + ATTR_UUID + " attribute");
                 recordset.setUuid(value);
             } else if (attr.equals(QN_DELETED)) {
                 if (BooleanUtils.toBoolean(value))
@@ -218,7 +239,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
 
             EimRecord record = readNextRecord();
             if (record == null)
-                throw new EimmlStreamException("Premature end of stream");
+                throw new EimmlValidationException("Expected another record");
 
             recordset.addRecord(record);
 
@@ -238,7 +259,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
         // begin at <record>
         if (! (xmlReader.isStartElement() &&
                xmlReader.getLocalName().equals(EL_RECORD)))
-            throw new EimmlStreamException("Expected start element " + EL_RECORD + " but got " + xmlReader.getName());
+            throw new EimmlValidationException("Expected start element " + EL_RECORD + " but got " + xmlReader.getName());
 
         EimRecord record = new EimRecord();
 
@@ -265,7 +286,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
                 break;
 
             if (! xmlReader.isStartElement())
-                throw new EimmlStreamException("Expected field element but got " + xmlReader.getName());
+                throw new EimmlValidationException("Expected field element but got " + xmlReader.getName());
 
             String name = xmlReader.getLocalName();
 
@@ -277,13 +298,13 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
                 toBoolean(xmlReader.getAttributeValue(null, ATTR_MISSING));
             String type = xmlReader.getAttributeValue(NS_CORE, ATTR_TYPE);
             if (StringUtils.isBlank(type))
-                throw new EimmlStreamException(xmlReader.getName() + " element requires " + ATTR_TYPE + " attribute");
+                throw new EimmlValidationException(xmlReader.getName() + " element requires " + ATTR_TYPE + " attribute");
 
             String text = xmlReader.getElementText();
             if (isEmpty) {
                 if (! (type.equals(TYPE_TEXT) || type.equals(TYPE_CLOB) ||
                        type.equals(TYPE_BLOB)))
-                    throw new EimmlStreamException("Invalid empty attribute on field element " + xmlReader.getName());
+                    throw new EimmlValidationException("Invalid empty attribute on field element " + xmlReader.getName());
                 if (text != null)
 //                     if (log.isDebugEnabled())
 //                         log.debug("emptying non-null text for field " + xmlReader.getName());
@@ -315,7 +336,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
                 BigDecimal value = EimmlTypeConverter.toDecimal(text);
                 field = new DecimalField(name, value);
             } else {
-                throw new EimmlStreamException("Unrecognized field type");
+                throw new EimmlValidationException("Unrecognized field type");
             }
 
             field.setMissing(isMissing);

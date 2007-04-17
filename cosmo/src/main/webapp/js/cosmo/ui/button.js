@@ -23,6 +23,7 @@ dojo.provide("cosmo.ui.button");
 dojo.require("cosmo.ui.conf");
 dojo.require("dojo.event");
 dojo.require("dojo.widget.*");
+dojo.require("cosmo.ui.widget.Button")
 
 /**
  * @object Button -- creates a button with a text label, and images

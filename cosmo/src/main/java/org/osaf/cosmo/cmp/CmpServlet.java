@@ -85,7 +85,8 @@ public class CmpServlet extends HttpServlet {
 
     private static final Pattern PATTERN_SPACE_USAGE =
         Pattern.compile("^/server/usage/space(/[^/]+)?(/xml)?$");
-
+    
+    private static final String URL_PASSWORD_RESET = "/account/password/reset/";
     private static final String URL_ACTIVATE = "/activate/";
 
     private static final String BEAN_CONTENT_SERVICE =
@@ -321,6 +322,11 @@ public class CmpServlet extends HttpServlet {
         
         if (req.getPathInfo().startsWith("/account/password/recover")){
             processRecoverPassword(req, resp);
+            return;
+        }
+
+        if (req.getPathInfo().startsWith(URL_PASSWORD_RESET)){
+            processResetPassword(req, resp);
             return;
         }
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -633,11 +639,8 @@ public class CmpServlet extends HttpServlet {
             HttpServletResponse resp)
     throws ServletException, IOException {
         resp.setStatus(HttpServletResponse.SC_OK);
-        String text = Integer.toString(userService.getUsers().size());
-        resp.setContentType(CmpConstants.MEDIA_TYPE_PLAIN_TEXT);
-        resp.setCharacterEncoding("UTF-8");
-        resp.setContentLength(text.length());
-        resp.getWriter().write(text);
+        
+        sendPlainTextResponse(resp, Integer.toString(userService.getUsers().size()));
         return;
     }
 
@@ -952,7 +955,7 @@ public class CmpServlet extends HttpServlet {
      */
     private void processRecoverPassword(final HttpServletRequest req, 
             final HttpServletResponse resp) 
-        throws IOException {
+        throws IOException, ServletException {
         
         String username = req.getParameter("username");
         String email = req.getParameter("email");
@@ -980,7 +983,7 @@ public class CmpServlet extends HttpServlet {
          
             passwordRecoverer.sendRecovery(passwordRecovery, context);
             
-            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } else {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -988,10 +991,36 @@ public class CmpServlet extends HttpServlet {
             
     }
     
-    private void processResetPassword(HttpServletRequest req, 
-                                      HttpServletResponse resp){
+    private void processResetPassword(HttpServletRequest req,
+                                      HttpServletResponse resp) 
+        throws ServletException, IOException{
+        
         String path = req.getPathInfo();
-        String passwordResetKey = path.substring("/account/password/reset/".length());
+        String passwordResetKey = path.substring(URL_PASSWORD_RESET.length());
+        
+        PasswordRecovery passwordRecovery = 
+            userService.getPasswordRecovery(passwordResetKey);
+        
+        if (passwordRecovery != null){
+            String newPassword = req.getParameter("password");
+            
+            if (newPassword != null){
+                User user = passwordRecovery.getUser();
+
+                user.setPassword(newPassword);
+
+                userService.updateUser(user);
+
+                userService.deletePasswordRecovery(passwordRecovery);
+
+                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+
+            } else {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        } else {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 
     private void handleInvalidStateException(HttpServletResponse resp,
@@ -1109,15 +1138,20 @@ public class CmpServlet extends HttpServlet {
         resp.setContentLength(bytes.length);
         resp.getOutputStream().write(bytes);
     }
-
-    private void sendPlainTextResponse(HttpServletResponse resp,
-            OutputsPlainText resource)
+    
+    private void sendPlainTextResponse(HttpServletResponse resp, String text)
         throws ServletException, IOException {
-        String text = resource.toText();
+            
         resp.setContentType(CmpConstants.MEDIA_TYPE_PLAIN_TEXT);
         resp.setCharacterEncoding("UTF-8");
         resp.setContentLength(text.length());
         resp.getWriter().write(text);
+    }
+
+    private void sendPlainTextResponse(HttpServletResponse resp,
+            OutputsPlainText resource)
+    throws ServletException, IOException {
+        sendPlainTextResponse(resp, resource.toText());
     }
 
     private String getUrlBase(HttpServletRequest req) {
@@ -1159,7 +1193,7 @@ public class CmpServlet extends HttpServlet {
         context.setSender(userService.getUser(User.USERNAME_OVERLORD));
         context.setLocale(req.getLocale());
         context.setRecoveryLink(
-                urlBase + "/account/password/reset/" + recovery.getKey());
+                urlBase + URL_PASSWORD_RESET + recovery.getKey());
         
         context.setHostname(urlBase);
         

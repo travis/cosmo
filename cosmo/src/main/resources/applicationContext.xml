@@ -497,7 +497,7 @@
       <value>/dav</value>
     </constructor-arg>
     <constructor-arg>
-      <value>/feed/atom/1.0</value>
+      <value>/atom</value>
     </constructor-arg>
     <constructor-arg>
       <value>/cmp</value>
@@ -509,6 +509,46 @@
 
   <bean id="davSessionProvider"
         class="org.osaf.cosmo.dav.impl.NoOpDavSessionProvider"/>
+
+  <!-- atom protocol resources -->
+
+  <bean id="abdera" class="org.apache.abdera.Abdera"/>
+
+  <bean id="atomServiceContext"
+        class="org.osaf.cosmo.atom.StandardServiceContext">
+    <property name="abdera"><ref local="abdera"/></property>
+    <property name="providerManager">
+      <bean class="org.osaf.cosmo.atom.provider.StandardProviderManager">
+        <property name="provider">
+          <bean class="org.osaf.cosmo.atom.provider.StandardProvider">
+            <property name="generatorFactory">
+              <bean class="org.osaf.cosmo.atom.generator.GeneratorFactory">
+                <property name="abdera"><ref local="abdera"/></property>
+                <property name="contentFactory">
+                  <bean class="org.osaf.cosmo.atom.generator.ContentFactory"/>
+                </property>
+              </bean>
+            </property>
+            <property name="processorFactory">
+              <bean class="org.osaf.cosmo.atom.processor.ProcessorFactory"/>
+            </property>
+            <property name="contentService">
+              <ref local="contentService"/>
+            </property>
+            <property name="serviceLocatorFactory">
+              <ref local="serviceLocatorFactory"/>
+            </property>
+          </bean>
+        </property>
+      </bean>
+    </property>
+    <property name="requestHandlerManager">
+      <bean class="org.apache.abdera.protocol.server.servlet.DefaultRequestHandlerManager"/>
+    </property>
+    <property name="targetResolver">
+      <bean class="org.osaf.cosmo.atom.provider.StandardTargetResolver"/>
+    </property>
+  </bean>
 
   <!-- morse code protocol resources -->
 
@@ -660,9 +700,10 @@
          /account/view=ROLE_ROOT,ROLE_USER
          /account/update=ROLE_ROOT,ROLE_USER
          /account/activate/*=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
-         /account/forgot=ROLE_ANONYMOUS
-         /account/remind=ROLE_ANONYMOUS
+         /account/password/reset/*=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
+         /account/password/recover=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /login=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
+         /signup=ROLE_ANONYMOUS
          /welcome=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /security_check=ROLE_ANONYMOUS
          /loginfailed=ROLE_ANONYMOUS

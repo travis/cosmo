@@ -73,8 +73,9 @@ public class EimmlStreamWriterTest extends TestCase
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        EimmlStreamWriter writer =
-            new EimmlStreamWriter(out, collUuid, collName);
+        EimmlStreamWriter writer = new EimmlStreamWriter(out);
+        writer.writeStartDocument();
+        writer.writeCollection(collUuid, collName);
         writer.writeRecordSet(recordset);
         writer.close();
 

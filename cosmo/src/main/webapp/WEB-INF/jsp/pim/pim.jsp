@@ -42,6 +42,8 @@
 
 <title><fmt:message key="App.Welcome"/></title>
 
+<link rel="stylesheet" href="${staticBaseUrl}/templates/default/global.css"/>
+
 <c:if test="${not empty relationLinks}">
 <link rel="self" type="text/html" href="${relationLinks['pim']}"/>
 <link rel="alternate" type="application/atom+xml" href="${relationLinks['atom']}"/>

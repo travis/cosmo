@@ -54,32 +54,38 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
     private XMLStreamWriter xmlWriter;
 
     /**
-     * Writes the document header and opens the root element.
+     * Opens the writer. No data is actually written to the stream.
      */
-    public EimmlStreamWriter(OutputStream out,
-                             String uuid)
-        throws IOException, EimmlStreamException {
-        this(out, uuid, null);
-    }
-
-    /**
-     * Writes the document header and opens the root element,
-     * including the collection name attribute.
-     */
-    public EimmlStreamWriter(OutputStream out,
-                             String uuid,
-                             String name)
+    public EimmlStreamWriter(OutputStream out)
         throws IOException, EimmlStreamException {
         try {
             xmlWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(out);
         } catch (XMLStreamException e) {
             throw new EimmlStreamException("Error opening EIMML stream", e);
         }
+    }
 
+    /**
+     * Writes the XML document header.
+     */
+    public void writeStartDocument()
+        throws EimmlStreamException {
+        try {
+            xmlWriter.writeStartDocument();
+        } catch (XMLStreamException e) {
+            close();
+            throw new EimmlStreamException("Error writing start document", e);
+        }
+    }
+
+    /**
+     * Writes the root collection element.
+     */
+    public void writeCollection(String uuid,
+                                String name)
+        throws EimmlStreamException {
         try {
             xmlWriter.setPrefix(PRE_CORE, NS_CORE);
-
-            xmlWriter.writeStartDocument();
 
             xmlWriter.writeStartElement(NS_CORE, EL_COLLECTION);
             xmlWriter.writeNamespace(PRE_CORE, NS_CORE);
@@ -89,7 +95,7 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
             if (name != null)
                 xmlWriter.writeAttribute(ATTR_NAME, name);
         } catch (XMLStreamException e) {
-            throw new EimmlStreamException("Error writing root element", e);
+            throw new EimmlStreamException("Error writing collection", e);
         }
     }
 
@@ -157,7 +163,7 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
     }
 
     /**
-     * Closes the root element and ends the document.
+     * Closes the root collection element and ends the document.
      */
     public void close() {
         try {

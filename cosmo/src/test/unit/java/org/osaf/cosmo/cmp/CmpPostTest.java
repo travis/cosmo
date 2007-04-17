@@ -17,6 +17,7 @@ package org.osaf.cosmo.cmp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -92,7 +93,7 @@ public class CmpPostTest extends BaseCmpServletTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
         
-        assertEquals(MockHttpServletResponse.SC_OK, 
+        assertEquals(MockHttpServletResponse.SC_NO_CONTENT, 
                 response.getStatus());
         
         // test with email
@@ -104,7 +105,7 @@ public class CmpPostTest extends BaseCmpServletTestCase {
         response = new MockHttpServletResponse();
         servlet.service(request, response);
         
-        assertEquals(MockHttpServletResponse.SC_OK, 
+        assertEquals(MockHttpServletResponse.SC_NO_CONTENT, 
                 response.getStatus());
 
         // test with nothing
@@ -118,7 +119,53 @@ public class CmpPostTest extends BaseCmpServletTestCase {
         assertEquals(MockHttpServletResponse.SC_NOT_FOUND, 
                 response.getStatus());
 
+    }
+    
+    public void testResetPassword() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        String newPassword = "foobar";
+       
+        userService.createUser(u1);
         
+        PasswordRecovery passwordRecovery = new PasswordRecovery(u1, "recoverykey1");
+        
+        userService.createPasswordRecovery(passwordRecovery);
 
+        MockHttpServletRequest request =
+            createMockRequest("POST", "/account/password/reset/recoverykey1");
+        request.setContentType("application/x-www-form-urlencoded");
+        request.addParameter("password", newPassword);
+                
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        assertEquals(MockHttpServletResponse.SC_NO_CONTENT, 
+                response.getStatus());
+        
+        // Make sure the returned password matches the password that was set
+        u1 = userService.getUser(u1.getUsername());
+        
+        User u2 = testHelper.makeDummyUser();
+        u2.setPassword(newPassword);
+        userService.createUser(u2);
+        
+        u1 = userService.getUser(u1.getUsername());
+        u2 = userService.getUser(u2.getUsername());
+        
+        String p1 = u1.getPassword();
+        String p2 = u2.getPassword();
+        
+        assertEquals(p1, p2);
+        
+        request = createMockRequest("POST", 
+                "/account/password/reset/deadbeef");
+        
+        request.setContentType("application/x-www-form-urlencoded");
+                
+        response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        assertEquals(MockHttpServletResponse.SC_NOT_FOUND, 
+                response.getStatus());
     }
 }

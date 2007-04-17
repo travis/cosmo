@@ -15,21 +15,34 @@
  */
 package org.osaf.cosmo.service.account;
 
-import java.util.Locale;
-
+import org.apache.commons.id.IdentifierGenerator;
+import org.apache.commons.id.StringIdentifierGenerator;
 import org.osaf.cosmo.model.PasswordRecovery;
 
-public interface PasswordRecoverer {
+public abstract class PasswordRecoverer {
+    private IdentifierGenerator idGenerator;
+
     /**
      * 
      * @param passwordRecovery
      */
-    public void sendRecovery(PasswordRecovery passwordRecovery,
+    public abstract void sendRecovery(PasswordRecovery passwordRecovery,
                              PasswordRecoveryMessageContext context);
     
     /**
      * 
      * @return
      */
-    public String createRecoveryKey();
+    public String createRecoveryKey() {
+        return idGenerator.nextIdentifier().toString();
+    }
+
+    public IdentifierGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
+    public void setIdGenerator(IdentifierGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
+    
 }

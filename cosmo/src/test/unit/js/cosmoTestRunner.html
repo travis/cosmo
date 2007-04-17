@@ -16,7 +16,7 @@ For use with the JsUnit from www.jsunit.net
   <script src="jsunit/app/jsUnitCore.js" language="JavaScript" type="text/javascript"></script>
 
   <!-- scripts under test -->
-  <script src="../../../main/webapp/js/lib/dojo-event_and_io/dojo.js" language="JavaScript" type="text/javascript"></script>
+  <script src="../../../main/webapp/js/lib/dojo/dojo.js" language="JavaScript" type="text/javascript"></script>
   <script src="../../../main/webapp/js/cosmo/util/debug.js" language="JavaScript" type="text/javascript"></script>
 
   <!-- dojo setup stuff -->
@@ -24,6 +24,7 @@ For use with the JsUnit from www.jsunit.net
 
       dojo.require("dojo.widget.*");
       dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
+      dojo.registerNamespaceManifest("cosmo", "../../../../../test/unit/js/cosmo", "cosmoTest");
       dojo.require("cosmo.env");
       dojo.require("cosmo.datetime.timezone");
       dojo.require("cosmo.datetime.Date");
@@ -43,6 +44,7 @@ For use with the JsUnit from www.jsunit.net
   <script src="cosmo/datetime/test_date.js" language="JavaScript" type="text/javascript"></script>
   <script src="cosmo/datetime/test_7581.js" language="JavaScript" type="text/javascript"></script>
   <script src="cosmo/topics/test_topics.js" language="JavaScript" type="text/javascript"></script>
+   <script src="cosmo/service/conduits/test_conduits.js" language="JavaScript" type="text/javascript"></script>
 
   <!-- end of jusnit wrapper -->
 <!--
@@ -60,5 +62,6 @@ For use with the JsUnit from www.jsunit.net
 <!--<body onload="alert('hieatt_core.html onload, number scripts=' + document.getElementsByTagName('script').length); jum.init()">-->
 <!--<body onload="jum.init()">-->
 <body>
+
 </body>
 </html>

@@ -20,19 +20,16 @@ import java.util.Locale;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.id.IdentifierGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.service.UserService;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 
-public class EmailPasswordRecoverer implements PasswordRecoverer {
-    private IdentifierGenerator idGenerator;
+public class EmailPasswordRecoverer extends PasswordRecoverer {
     private JavaMailSender mailSender;
     private MessageSource messageSource;
     
@@ -85,23 +82,11 @@ public class EmailPasswordRecoverer implements PasswordRecoverer {
                 message.setText(text);
             }
         });
-        log.info("Password recovery link sent to " + user.getEmail());
+        log.info("Password recovery link sent to " + user.getEmail() +
+                 " with key " + passwordRecovery.getKey());
 
     }
     
-    public String createRecoveryKey() {
-    
-        return idGenerator.nextIdentifier().toString();
-    }
-
-    public IdentifierGenerator getIdGenerator() {
-        return idGenerator;
-    }
-
-    public void setIdGenerator(IdentifierGenerator idGenerator) {
-        this.idGenerator = idGenerator;
-    }
-
     public JavaMailSender getMailSender() {
         return mailSender;
     }

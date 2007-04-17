@@ -29,6 +29,10 @@
     <level value="WARN"/>
   </logger>
 
+  <logger name="org.apache.abdera.protocol.server.servlet.AbstractRequestHandler">
+    <level value="OFF"/>
+  </logger>
+
   <logger name="net.sf">
     <level value="WARN"/>
   </logger>
@@ -42,10 +46,11 @@
   </logger>
 
   <logger name="org.osaf">
-<!--
-    <level value="DEBUG"/>
--->
     <level value="ERROR"/>
+  </logger>
+
+  <logger name="org.osaf.cosmo.atom">
+    <level value="DEBUG"/>
   </logger>
 
   <root>

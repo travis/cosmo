@@ -30,7 +30,7 @@ public class EimValidationException extends EimSchemaException {
     /**
      */
     public EimValidationException(String message,
-                                   Throwable cause) {
+                                  Throwable cause) {
         super(message, cause);
     }
 }

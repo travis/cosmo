@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
 
 /**
@@ -63,6 +64,7 @@ public class ServiceLocator implements ServerConstants {
     private static final Log log = LogFactory.getLog(ServiceLocator.class);
 
     private static final String PATH_COLLECTION = "collection";
+    private static final String PATH_ITEM = "item";
     private static final String PATH_USER = "user";
 
     private String appMountUrl;
@@ -144,10 +146,10 @@ public class ServiceLocator implements ServerConstants {
     }
 
     /**
-     * Returns the Atom URL of the collection.
+     * Returns the Atom URL of the item.
      */
-    public String getAtomUrl(CollectionItem collection) {
-        return calculateCollectionUrl(collection, factory.getAtomPrefix());
+    public String getAtomUrl(Item item) {
+        return calculateItemUrl(item, factory.getAtomPrefix());
     }
 
     /**
@@ -158,10 +160,10 @@ public class ServiceLocator implements ServerConstants {
     }
 
     /**
-     * Returns the WebDAV URL of the collection.
+     * Returns the WebDAV URL of the item.
      */
-    public String getDavUrl(CollectionItem collection) {
-        return calculateCollectionUrl(collection, factory.getDavPrefix());
+    public String getDavUrl(Item item) {
+        return calculateItemUrl(item, factory.getDavPrefix());
     }
 
     /**
@@ -196,8 +198,7 @@ public class ServiceLocator implements ServerConstants {
      * Returns the Morse Code URL of the collection.
      */
     public String getMorseCodeUrl(CollectionItem collection) {
-        return calculateCollectionUrl(collection,
-                                      factory.getMorseCodePrefix());
+        return calculateItemUrl(collection, factory.getMorseCodePrefix());
     }
 
     /**
@@ -208,10 +209,10 @@ public class ServiceLocator implements ServerConstants {
     }
 
     /**
-     * Returns the Pim UI URL of the collection.
+     * Returns the Pim UI URL of the item.
      */
-    public String getPimUrl(CollectionItem collection) {
-        return calculateCollectionUrl(collection, factory.getPimPrefix());
+    public String getPimUrl(Item item) {
+        return calculateItemUrl(item, factory.getPimPrefix());
     }
 
     /**
@@ -225,7 +226,7 @@ public class ServiceLocator implements ServerConstants {
      * Returns the webcal URL of the collection.
      */
     public String getWebcalUrl(CollectionItem collection) {
-        return calculateCollectionUrl(collection, factory.getWebcalPrefix());
+        return calculateItemUrl(collection, factory.getWebcalPrefix());
     }
 
     private String calculateBaseUrl(String servicePrefix) {
@@ -235,13 +236,17 @@ public class ServiceLocator implements ServerConstants {
 
         return buf.toString();
     }
-    private String calculateCollectionUrl(CollectionItem collection,
-                                          String servicePrefix) {
+
+    private String calculateItemUrl(Item item,
+                                    String servicePrefix) {
         StringBuffer buf = new StringBuffer(appMountUrl);
 
+        String itemPrefix = item instanceof CollectionItem ?
+            PATH_COLLECTION : PATH_ITEM;
+
         buf.append(servicePrefix).
-            append("/").append(PATH_COLLECTION).
-            append("/").append(collection.getUid());
+            append("/").append(itemPrefix).
+            append("/").append(item.getUid());
 
         if (ticketKey != null)
             buf.append("?").

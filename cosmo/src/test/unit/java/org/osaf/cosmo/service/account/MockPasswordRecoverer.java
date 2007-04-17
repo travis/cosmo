@@ -17,13 +17,15 @@ package org.osaf.cosmo.service.account;
 
 import org.osaf.cosmo.model.PasswordRecovery;
 
-public class MockPasswordRecoverer implements PasswordRecoverer {
+public class MockPasswordRecoverer extends PasswordRecoverer {
 
-    private int key = 0;
+    int nextRecoveryKey = 0;
+    int nextPassword = 10000; // password must be min 5 chars
+    
+    @Override
     public String createRecoveryKey() {
-        key++;
-        return String.valueOf(key);
-        
+        nextRecoveryKey++;
+        return Integer.toString(nextRecoveryKey);
     }
 
     public void sendRecovery(PasswordRecovery passwordRecovery,

@@ -32,6 +32,19 @@ dojo.require("cosmo.datetime.timezone");
 dojo.require("cosmo.util.debug");
 dojo.require("cosmo.facade.pref");
 
+cosmo.datetime.dateParts = {
+    YEAR: "yyyy",
+    QUARTER:  "q",
+    MONTH: "m",
+    YEAR: "y",
+    DAY: "d",
+    WEEKDAY: "w",
+    WEEK: "ww",
+    HOUR: "h",
+    MINUTE: "n",
+    SECOND: "s"
+}
+
 cosmo.datetime.Date = function () {
     
     var args = Array.prototype.slice.apply(arguments);

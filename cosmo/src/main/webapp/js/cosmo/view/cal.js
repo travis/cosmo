@@ -441,10 +441,12 @@ cosmo.view.cal = new function () {
         // along with the original params passed back in from the async response
 
         var f = function (newEvId, err, reqId) {
+
             handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
 
-        requestId = Cal.currentCollection.conduit.saveEvent(
+        requestId = //cosmo.service.atom.saveEvent(ev, {load: f});
+            Cal.currentCollection.conduit.saveEvent(
             Cal.currentCollection.collection.uid, ev.data, 
             Cal.currentCollection.transportInfo, f);
         
@@ -1132,9 +1134,14 @@ cosmo.view.cal = new function () {
         // Load the array of events
         // ======================
         try {
-            eventLoadList = collection.conduit.getEvents(
-                collection.collection.uid, s, e, 
-                collection.transportInfo);
+            dojo.require("cosmo.service.atom");
+            eventLoadList = 
+//                    cosmo.service.atom.getEvents(collection.collection.uid, {sync: true});
+//            dojo.debug(eventLoadList[0])
+            
+            collection.conduit.getEvents(
+            collection.collection.uid, s, e, 
+            collection.transportInfo);
 
         }
         catch(e) {

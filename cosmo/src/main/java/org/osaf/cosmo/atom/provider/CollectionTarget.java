@@ -24,6 +24,11 @@ public class CollectionTarget extends ItemTarget {
     private String format;
 
     public CollectionTarget(RequestContext request,
+                            String uid) {
+        this(request, uid, null, null);
+    }
+
+    public CollectionTarget(RequestContext request,
                             String uid,
                             String projection,
                             String format) {

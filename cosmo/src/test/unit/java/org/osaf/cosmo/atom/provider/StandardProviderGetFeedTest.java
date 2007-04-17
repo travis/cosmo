@@ -15,8 +15,13 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import org.apache.abdera.protocol.server.provider.RequestContext;
+import org.apache.abdera.protocol.server.provider.ResponseContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.model.CollectionItem;
 
 /**
  * Test class for {@link StandardProvider#getFeed()} tests.
@@ -26,23 +31,41 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         LogFactory.getLog(StandardProviderGetFeedTest.class);
 
     public void testGetFeed() throws Exception {
-        // XXX
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET");
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 200, res.getStatus());
+        // XXX look at content?
     }
 
     public void testNotFound() throws Exception {
-        // XXX
-    }
+        RequestContext req = helper.createFeedRequestContext("deadbeef", "GET");
 
-    public void testNotCollection() throws Exception {
-        // XXX
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 404, res.getStatus());
     }
 
     public void testUnsupportedProjection() throws Exception {
-        // XXX
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", null);
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 404, res.getStatus());
     }
 
     public void testUnsupportedFormat() throws Exception {
-        // XXX
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "full", "yyz");
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 404, res.getStatus());
     }
 
     public void testGenerationError() throws Exception {

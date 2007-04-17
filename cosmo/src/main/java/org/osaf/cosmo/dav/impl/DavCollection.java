@@ -482,12 +482,12 @@ public class DavCollection extends DavResourceBase
         writer.write(StringEscapeUtils.escapeHtml(title));
         writer.write("</h1>");
         writer.write("<ul>");
-        if (! isHomeCollection()) {
-            DavResource parent = getCollection();
+        DavResource parent = getCollection();
+        if (parent != null) {
             writer.write("<li><a href=\"");
             writer.write(parent.getLocator().getHref(true));
             writer.write("\">..</a></li>");
-        };
+        }
         for (DavResourceIterator i=getMembers(); i.hasNext();) {
             DavResourceBase child = (DavResourceBase) i.nextResource();
             String displayName = child.getItem().getDisplayName();

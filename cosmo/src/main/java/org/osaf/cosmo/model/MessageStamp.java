@@ -92,6 +92,7 @@ public class MessageStamp extends Stamp implements
     public void setMessageId(String id) {
         // id stored as StringAttribute on Item
         StringAttribute.setValue(getItem(), ATTR_MESSAGE_ID, id);
+        updateTimestamp();
     }
     
     @Transient
@@ -103,11 +104,13 @@ public class MessageStamp extends Stamp implements
     public void setHeaders(String headers) {
         // headers stored as TextAttribute on Item
         TextAttribute.setValue(getItem(), ATTR_MESSAGE_HEADERS, headers);
+        updateTimestamp();
     }
     
     public void setHeaders(Reader headers) {
         // headers stored as TextAttribute on Item
         TextAttribute.setValue(getItem(), ATTR_MESSAGE_HEADERS, headers);
+        updateTimestamp();
     }
     
     @Transient
@@ -119,6 +122,7 @@ public class MessageStamp extends Stamp implements
     public void setFrom(String from) {
         // from stored as StringAttribute on Item
         StringAttribute.setValue(getItem(), ATTR_MESSAGE_FROM, from);
+        updateTimestamp();
     }
 
     @Transient
@@ -130,6 +134,7 @@ public class MessageStamp extends Stamp implements
     public void setTo(String to) {
         // to stored as StringAttribute on Item
         StringAttribute.setValue(getItem(), ATTR_MESSAGE_TO, to);
+        updateTimestamp();
     }
     
     @Transient
@@ -141,6 +146,7 @@ public class MessageStamp extends Stamp implements
     public void setBcc(String bcc) {
         //bcc stored as StringAttribute on Item
         StringAttribute.setValue(getItem(), ATTR_MESSAGE_BCC, bcc);
+        updateTimestamp();
     }
 
     @Transient
@@ -152,6 +158,7 @@ public class MessageStamp extends Stamp implements
     public void setCc(String cc) {
         // cc stored as StringAttribute on Item
         StringAttribute.setValue(getItem(), ATTR_MESSAGE_CC, cc);
+        updateTimestamp();
     }
  
     @Transient
@@ -163,6 +170,7 @@ public class MessageStamp extends Stamp implements
     public void setOriginators(String originators) {
         // originators stored as StringAttribute on Item
         StringAttribute.setValue(getItem(), ATTR_MESSAGE_ORIGINATORS, originators);
+        updateTimestamp();
     }
     
     @Transient
@@ -174,6 +182,7 @@ public class MessageStamp extends Stamp implements
     public void setDateSent(String dateSent) {
         // inReployTo stored as TextAttribute on Item
         StringAttribute.setValue(getItem(), ATTR_MESSAGE_DATE_SENT, dateSent);
+        updateTimestamp();
     }
     
     @Transient
@@ -185,6 +194,7 @@ public class MessageStamp extends Stamp implements
     public void setInReplyTo(String inReplyTo) {
         // inReployTo stored as TextAttribute on Item
         StringAttribute.setValue(getItem(), ATTR_MESSAGE_IN_REPLY_TO, inReplyTo);
+        updateTimestamp();
     }
 
     @Transient
@@ -196,11 +206,13 @@ public class MessageStamp extends Stamp implements
     public void setReferences(String references) {
         // references stored as TextAttribute on Item
         TextAttribute.setValue(getItem(), ATTR_MESSAGE_REFERENCES, references);
+        updateTimestamp();
     }
     
     public void setReferences(Reader references) {
         // references stored as TextAttribute on Item
         TextAttribute.setValue(getItem(), ATTR_MESSAGE_REFERENCES, references);
+        updateTimestamp();
     }
 
     /**

@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.model;
 
+import java.util.Date;
+
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
@@ -103,5 +105,12 @@ public abstract class Stamp extends AuditableObject implements
     
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
+    }
+    
+    /**
+     * Update stamp's timestamp
+     */
+    protected void updateTimestamp() {
+        setModifiedDate(new Date());
     }
 }

@@ -16,6 +16,8 @@
 package org.osaf.cosmo.cmp;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +27,7 @@ import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
+import org.osaf.cosmo.util.URLQuery;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,17 +47,19 @@ public class UsersResource implements CmpResource, OutputsXml {
     private static final String ATT_NEXT_PAGE_LINK = "next";
     private static final String ATT_LAST_PAGE_LINK = "last";
     
-    private static final String PAGING_QUERY_FORMAT_STRING = "?ps=%d&pn=%d&so=%s&st=%s"; 
-
     private Collection<User> users;
     private String urlBase;
+    private Map<String, String[]> parameterMap;
     
     /**
      * Constructs a resource that represents the given {@link User}s.
      */
-    public UsersResource(Collection<User> users, String urlBase) {
+    public UsersResource(Collection<User> users, String urlBase, 
+            Map<String, String[]> parameterMap) {
+        
         this.users = users;
         this.urlBase = urlBase;
+        this.parameterMap = parameterMap;
     }
 
     // CmpResource methods
@@ -90,63 +95,74 @@ public class UsersResource implements CmpResource, OutputsXml {
         Element e = DomUtil.createElement(doc, EL_USERS, NS_CMP);
         
         if (users instanceof PagedList){
+            URLQuery query = new URLQuery(parameterMap);
+            Map<String, String[]> exceptionMap = new HashMap<String, String[]>();
+            
+            
             PagedList<User, User.SortType> pagedUserList = (PagedList<User, User.SortType>) users;
             PageCriteria<User.SortType> pageCriteria = pagedUserList.getPageCriteria();
             
             Element firstPageLink = DomUtil.createElement(doc, "link", NS_CMP);
+            
             firstPageLink.setAttribute("rel", ATT_FIRST_PAGE_LINK);
+            
+            exceptionMap.put(PageCriteria.PAGE_NUMBER_URL_KEY, 
+                    new String[]{Integer.toString(PageCriteria.FIRST_PAGE)});
+            
             firstPageLink.setAttribute("href", 
                     this.urlBase + CmpConstants.USER_LIST_PATH + 
-                    String.format(PAGING_QUERY_FORMAT_STRING,
-                            
-                    pageCriteria.getPageSize(),
-                    PageCriteria.FIRST_PAGE,
-                    pageCriteria.getSortOrder(),
-                    pageCriteria.getSortType().getUrlString()
-                    ));
+                    query.toString(exceptionMap)
+                    );
             e.appendChild(firstPageLink);
             
             if (pageCriteria.getPageNumber() > 1){
+                
                 Element previousPageLink = DomUtil.createElement(doc, "link", NS_CMP);
                 previousPageLink.setAttribute("rel", ATT_PREVIOUS_PAGE_LINK);
+
+                exceptionMap.clear();
+                exceptionMap.put(PageCriteria.PAGE_NUMBER_URL_KEY, 
+                        new String[]{Integer.toString(
+                                Math.min(pageCriteria.getPageNumber() - 1, pagedUserList.getLastPageNumber())
+                        )});
+
                 previousPageLink.setAttribute("href", 
-                        this.urlBase + CmpConstants.USER_LIST_PATH + 
-                        String.format(PAGING_QUERY_FORMAT_STRING,
-                                
-                        pageCriteria.getPageSize(),
-                        Math.min(pageCriteria.getPageNumber() - 1, pagedUserList.getLastPageNumber()),
-                        pageCriteria.getSortOrder(),
-                        pageCriteria.getSortType().getUrlString()
-                ));
+                    this.urlBase + CmpConstants.USER_LIST_PATH + 
+                    query.toString(exceptionMap)
+                    );
                 e.appendChild(previousPageLink);
             }
-            
+
             if (pageCriteria.getPageNumber() < pagedUserList.getLastPageNumber()){
-            Element nextPageLink = DomUtil.createElement(doc, "link", NS_CMP);
-            nextPageLink.setAttribute("rel", ATT_NEXT_PAGE_LINK);
-            nextPageLink.setAttribute("href", 
-                    this.urlBase + CmpConstants.USER_LIST_PATH + 
-                    String.format(PAGING_QUERY_FORMAT_STRING,
-                            
-                    pageCriteria.getPageSize(),
-                    Math.max(pageCriteria.getPageNumber() + 1, 1),
-                    pageCriteria.getSortOrder(),
-                    pageCriteria.getSortType().getUrlString()
-                    ));
-            e.appendChild(nextPageLink);
+                Element nextPageLink = DomUtil.createElement(doc, "link", NS_CMP);
+                nextPageLink.setAttribute("rel", ATT_NEXT_PAGE_LINK);
+
+                exceptionMap.clear();
+                exceptionMap.put(PageCriteria.PAGE_NUMBER_URL_KEY, 
+                        new String[]{Integer.toString(
+                                Math.max(pageCriteria.getPageNumber() + 1, 1)
+                        )});
+
+                nextPageLink.setAttribute("href", 
+                        this.urlBase + CmpConstants.USER_LIST_PATH + 
+                        query.toString(exceptionMap)
+                );
+                e.appendChild(nextPageLink);
             }
           
             Element lastPageLink = DomUtil.createElement(doc, "link", NS_CMP);
             lastPageLink.setAttribute("rel", ATT_LAST_PAGE_LINK);
+
+            exceptionMap.clear();
+            exceptionMap.put(PageCriteria.PAGE_NUMBER_URL_KEY, 
+                    new String[]{Integer.toString(
+                            pagedUserList.getLastPageNumber()
+                    )});
+
             lastPageLink.setAttribute("href", 
                     this.urlBase + CmpConstants.USER_LIST_PATH + 
-                    String.format(PAGING_QUERY_FORMAT_STRING,
-                            
-                    pageCriteria.getPageSize(),
-                    pagedUserList.getLastPageNumber(),
-                    pageCriteria.getSortOrder(),
-                    pageCriteria.getSortType().getUrlString()
-                    ));
+                        query.toString(exceptionMap)
+                    );
             e.appendChild(lastPageLink);
           
         }

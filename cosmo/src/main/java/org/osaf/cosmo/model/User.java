@@ -679,5 +679,4 @@ public class User extends BaseModelObject {
             }
         }
     }
-
 }

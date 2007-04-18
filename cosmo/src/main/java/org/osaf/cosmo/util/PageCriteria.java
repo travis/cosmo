@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.util;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * This class defines the criteria for pagination. Holds the Page Number, Page
  * Size, Sort Type and Sort Order
@@ -73,12 +76,17 @@ public class PageCriteria<SortType extends Enum> {
      * Key for sort type in URLs.
      */
     public static final String SORT_TYPE_URL_KEY = "st";
+    
+    /**
+     * Key for query in URLs.
+     */
+    public static final String QUERY_URL_KEY = "q";
 
     
-	/**
-	 * Number of the Page (1 Based)
-	 */
-	private int pageNumber;
+    /**
+     * Number of the Page (1 Based)
+     */
+    private int pageNumber;
 
     /**
      * Size of each page. <code>PageCriteria.VIEW_ALL</code> holds the constant for
@@ -100,7 +108,17 @@ public class PageCriteria<SortType extends Enum> {
      * dependant on the users choice of repository it is recommended that this
      * class be extended to handle the sortType
      */
-    protected SortType sortType;
+    private SortType sortType;
+
+    private Set<String[]> orCriteria = new HashSet<String[]>();
+
+    public void addOr(String key, String value){
+        orCriteria.add(new String[]{key, value});
+    }
+    
+    public Set<String[]> getOrCriteria(){
+        return orCriteria;
+    }
 
     /**
      */
@@ -110,7 +128,8 @@ public class PageCriteria<SortType extends Enum> {
     
     /**
      */
-    public PageCriteria(Integer pageNumber, Integer pageSize, boolean sortAscending, SortType sortType) {
+    public PageCriteria(Integer pageNumber, Integer pageSize, 
+            boolean sortAscending, SortType sortType) {
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
         this.sortAscending = sortAscending;
@@ -183,4 +202,5 @@ public class PageCriteria<SortType extends Enum> {
         pageSize = DEFAULT_PAGESIZE;
         sortAscending = DEFAULT_SORTASCENDING;
     }
+
 }

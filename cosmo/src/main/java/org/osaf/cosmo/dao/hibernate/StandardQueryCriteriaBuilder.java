@@ -17,10 +17,15 @@ package org.osaf.cosmo.dao.hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import org.osaf.cosmo.util.PageCriteria;
 
@@ -65,9 +70,22 @@ public class StandardQueryCriteriaBuilder<SortType extends Enum> implements Quer
         for (Order order : buildOrders(pageCriteria))
             crit.addOrder(order);
 
+        Criterion orCriterion = null;
+        for (String[] pair: pageCriteria.getOrCriteria()){
+            if (orCriterion == null){
+                orCriterion = Restrictions.ilike(pair[0], pair[1], 
+                        MatchMode.ANYWHERE);
+            } else {
+                orCriterion = Restrictions.or(orCriterion, 
+                        Restrictions.ilike(pair[0], pair[1]));
+            }
+        }
+        if (orCriterion != null)
+            crit.add(orCriterion);
+        
         return crit;
     }
-
+    
     /**
      * Returns a <code>List</code> of <code>Order</code> criteria
      * based on the sorting  attributes of the given

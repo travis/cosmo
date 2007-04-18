@@ -548,7 +548,7 @@ public class CmpServlet extends HttpServlet {
      * Turn a paging query string into a PageCriteria object.
      */
     private PageCriteria<User.SortType>
-    buildPageCriteria(HttpServletRequest req){
+        buildPageCriteria(HttpServletRequest req){
 
         PageCriteria<User.SortType> pageCriteria =
             new PageCriteria<User.SortType>(
@@ -627,6 +627,14 @@ public class CmpServlet extends HttpServlet {
                 );
             }
         }
+        
+        if (pagingParameterMap.containsKey(PageCriteria.QUERY_URL_KEY)){
+            String searchTerm = pagingParameterMap.get(PageCriteria.QUERY_URL_KEY)[0];
+            pageCriteria.addOr("firstName", searchTerm);
+            pageCriteria.addOr("lastName", searchTerm);
+            pageCriteria.addOr("email", searchTerm);
+            pageCriteria.addOr("username", searchTerm);
+        }
 
         return pageCriteria;
     }
@@ -670,7 +678,8 @@ public class CmpServlet extends HttpServlet {
             users = userService.getUsers();
         }
         resp.setStatus(HttpServletResponse.SC_OK);
-        sendXmlResponse(resp, new UsersResource(users, getUrlBase(req)));
+        sendXmlResponse(resp, new UsersResource(users, getUrlBase(req), 
+                req.getParameterMap()));
     }
 
     /*

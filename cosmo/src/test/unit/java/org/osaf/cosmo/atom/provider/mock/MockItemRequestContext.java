@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
+import java.io.IOException;
+
+import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.ServiceContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 
@@ -35,7 +38,7 @@ public class MockItemRequestContext extends BaseMockRequestContext {
     public MockItemRequestContext(ServiceContext context,
                                   NoteItem item,
                                   String method) {
-        this(context, item.getUid(), method);
+        this(context, item, method, false);
     }
 
     public MockItemRequestContext(ServiceContext context,
@@ -65,5 +68,23 @@ public class MockItemRequestContext extends BaseMockRequestContext {
 
     private static TargetType type(boolean isMedia) {
         return isMedia ? TargetType.TYPE_MEDIA : TargetType.TYPE_ENTRY;
+    }
+
+    public void setEntryContent(NoteItem item)
+        throws IOException {
+        String content = "this is item " + item.getUid();
+        Entry entry = context.getAbdera().getFactory().newEntry();
+        entry.setContent(content);
+        String xml = (String)
+            context.getAbdera().getWriterFactory().getWriter().write(entry);
+        getMockRequest().setContentType("application/atom+xml");
+        getMockRequest().setContent(xml.getBytes());
+    }
+
+    public void setMediaContent(NoteItem item)
+        throws IOException {
+        String content = "this is item " + item.getUid();
+        getMockRequest().setContentType("text/plain");
+        getMockRequest().setContent(content.getBytes());
     }
 }

@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.atom.generator.mock.MockFeedGenerator;
+import org.osaf.cosmo.model.ContentItem;
 
 /**
  * Test class for {@link StandardProvider#getFeed()} tests.
@@ -49,6 +49,16 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 404, res.getStatus());
+    }
+
+    public void testNotCollection() throws Exception {
+        ContentItem content = helper.makeAndStoreDummyContent();
+        RequestContext req = helper.createEntryRequestContext(content.getUid(),
+                                                              "PUT");
+
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 403, res.getStatus());
     }
 
     public void testUnsupportedProjection() throws Exception {

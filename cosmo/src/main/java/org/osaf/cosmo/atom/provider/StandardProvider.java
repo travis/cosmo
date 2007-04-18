@@ -82,7 +82,7 @@ public class StandardProvider implements Provider {
         if (item == null)
             return errorResponse(404, "Requested item not found");
         if (! (item instanceof NoteItem))
-            return errorResponse(415, "Requested item is not a note");
+            return errorResponse(403, "Requested item is not a note");
         NoteItem note = (NoteItem) item;
 
         // XXX If-Match
@@ -95,7 +95,7 @@ public class StandardProvider implements Provider {
             ContentProcessor processor = createContentProcessor(entry);
             processor.processContent(entry.getContent(), note);
         } catch (UnsupportedMediaTypeException e) {
-            return errorResponse(412);
+            return errorResponse(415);
         } catch (ValidationException e) {
             String msg = "Invalid content";
             if (e.getCause() != null)
@@ -133,7 +133,7 @@ public class StandardProvider implements Provider {
         if (item == null)
             return errorResponse(404, "Requested item not found");
         if (! (item instanceof CollectionItem))
-            return errorResponse(415, "Requested item is not a collection");
+            return errorResponse(403, "Requested item is not a collection");
         CollectionItem collection = (CollectionItem) item;
 
         // XXX If-None-Match
@@ -232,8 +232,10 @@ public class StandardProvider implements Provider {
 
     protected ContentProcessor createContentProcessor(Entry entry)
         throws UnsupportedMediaTypeException {
-        return processorFactory.
-            createProcessor(entry.getContentMimeType().toString());
+        String type = entry.getContentType() != null ?
+            entry.getContentType().toString() :
+            entry.getContentMimeType().toString();
+        return processorFactory.createProcessor(type);
     }
 
     protected ServiceLocator createServiceLocator(RequestContext context) {

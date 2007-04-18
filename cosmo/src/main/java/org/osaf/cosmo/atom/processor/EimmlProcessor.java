@@ -17,7 +17,6 @@ package org.osaf.cosmo.atom.processor;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,9 +25,6 @@ import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.eimml.EimmlStreamException;
 import org.osaf.cosmo.eim.eimml.EimmlStreamReader;
 import org.osaf.cosmo.eim.eimml.EimmlValidationException;
-import org.osaf.cosmo.eim.schema.EimValidationException;
-import org.osaf.cosmo.eim.schema.ItemTranslator;
-import org.osaf.cosmo.model.NoteItem;
 
 /**
  * A class that processes content specified as EIMML-serialized EIM
@@ -36,27 +32,25 @@ import org.osaf.cosmo.model.NoteItem;
  *
  * @see NoteItem
  */
-public class EimmlProcessor implements ContentProcessor {
+public class EimmlProcessor extends BaseEimProcessor {
     private static final Log log = LogFactory.getLog(EimmlProcessor.class);
 
     /**
-     * Process an EIMML content body describing changes to an item.
+     * Converts the EIMML content body into a valid EIM record set.
      *
-     * @param content the content
-     * @param item the item which the content represents
+     * @throws ValidationException if the content does not represent a
+     * valid EIM record set
      * @throws ProcessorException
      */
-    public void processContent(Reader content,
-                               NoteItem item)
-        throws ProcessorException {
+    protected EimRecordSet readRecordSet(Reader content)
+        throws ValidationException, ProcessorException {
         EimmlStreamReader reader = null;
-        EimRecordSet recordset = null;
         try {
             reader = new EimmlStreamReader(content);
-            recordset = reader.nextRecordSet();
-            if (recordset == null) {
+            EimRecordSet recordset = reader.nextRecordSet();
+            if (recordset == null)
                 throw new ValidationException("No recordset read from stream");
-            }
+            return recordset;
         } catch (IOException e) {
             throw new ProcessorException("Unable to read stream", e);
         } catch (EimmlValidationException e) {
@@ -70,27 +64,5 @@ public class EimmlProcessor implements ContentProcessor {
                 log.warn("Unable to close eimml reader", e);
             }
         }
-
-        try {
-            ItemTranslator translator = new ItemTranslator(item);
-            translator.applyRecords(recordset);
-        } catch (EimValidationException e) {
-            throw new ValidationException("Invalid recordset", e);
-        } catch (Exception e) {
-            throw new ProcessorException("Unable to apply recordset", e);
-        }
-    }
-
-    /**
-     * Process an IMML content body describing changes to an item.
-     *
-     * @param content the content
-     * @param item the item which the content represents
-     * @throws ProcessorException
-     */
-    public void processContent(String content,
-                               NoteItem item)
-        throws ProcessorException {
-        processContent(new StringReader(content), item);
     }
 }

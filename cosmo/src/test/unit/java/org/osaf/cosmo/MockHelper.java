@@ -25,7 +25,9 @@ import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -144,5 +146,27 @@ public class MockHelper extends TestHelper {
         throws Exception {
         CollectionItem c = makeDummyCollection(user);
         return contentService.createCollection(parent, c);
+    }
+
+    public ContentItem makeAndStoreDummyContent()
+        throws Exception {
+        return makeAndStoreDummyContent(homeCollection);
+    }
+
+    public ContentItem makeAndStoreDummyContent(CollectionItem parent)
+        throws Exception {
+        ContentItem c = makeDummyContent(user);
+        return contentService.createContent(parent, c);
+    }
+
+    public NoteItem makeAndStoreDummyItem()
+        throws Exception {
+        return makeAndStoreDummyItem(homeCollection);
+    }
+
+    public NoteItem makeAndStoreDummyItem(CollectionItem parent)
+        throws Exception {
+        NoteItem i = makeDummyItem(user);
+        return (NoteItem) contentService.createContent(parent, i);
     }
 }

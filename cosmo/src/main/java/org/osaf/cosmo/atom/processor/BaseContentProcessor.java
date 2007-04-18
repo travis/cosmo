@@ -15,30 +15,21 @@
  */
 package org.osaf.cosmo.atom.processor;
 
-import java.io.Reader;
+import java.io.StringReader;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.NoteItem;
 
 /**
- * An interface for classes that process Atom content representing
- * Cosmo items.
+ * A base class for implementations of {@link ContentProcessor}.
  *
  * @see NoteItem
  */
-public interface ContentProcessor {
-
-    /**
-     * Process a content body describing changes to an item.
-     *
-     * @param content the content
-     * @param item the item which the content represents
-     * @throws ValidationException if the content is not a valid
-     * representation of an item
-     * @throws ProcessorException
-     */
-    public void processContent(Reader content,
-                               NoteItem item)
-        throws ValidationException, ProcessorException;
+public abstract class BaseContentProcessor implements ContentProcessor {
+    private static final Log log =
+        LogFactory.getLog(BaseContentProcessor.class);
 
     /**
      * Process a content body describing changes to an item.
@@ -51,5 +42,7 @@ public interface ContentProcessor {
      */
     public void processContent(String content,
                                NoteItem item)
-        throws ValidationException, ProcessorException;
+        throws ValidationException, ProcessorException {
+        processContent(new StringReader(content), item);
+    }
 }

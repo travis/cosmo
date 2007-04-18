@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import java.io.IOException;
+
 import org.apache.abdera.Abdera;
 import org.apache.abdera.protocol.server.ServiceContext;
 import org.apache.abdera.protocol.server.DefaultServiceContext;
@@ -28,6 +30,7 @@ import org.osaf.cosmo.atom.generator.ContentFactory;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.atom.generator.mock.MockGeneratorFactory;
 import org.osaf.cosmo.atom.processor.ProcessorFactory;
+import org.osaf.cosmo.atom.processor.mock.MockProcessorFactory;
 import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
 import org.osaf.cosmo.model.CollectionItem;
@@ -45,7 +48,7 @@ public class ProviderHelper extends MockHelper {
 
     private Abdera abdera;
     private MockGeneratorFactory generatorFactory;
-    private ProcessorFactory processorFactory;
+    private MockProcessorFactory processorFactory;
     private ServiceContext serviceContext;
 
     public ProviderHelper() {
@@ -58,8 +61,7 @@ public class ProviderHelper extends MockHelper {
         abdera = new Abdera();
 
         generatorFactory = new MockGeneratorFactory(abdera);
-        // XXX mock
-        processorFactory = new ProcessorFactory();
+        processorFactory = new MockProcessorFactory();
 
         serviceContext = new DefaultServiceContext();
         serviceContext.init(abdera, null);
@@ -105,22 +107,34 @@ public class ProviderHelper extends MockHelper {
     }
 
     public RequestContext createEntryRequestContext(NoteItem item,
-                                                    String method) {
-        return new MockItemRequestContext(serviceContext, item, method);
+                                                    String method)
+        throws IOException {
+        MockItemRequestContext rc =
+            new MockItemRequestContext(serviceContext, item, method);
+        if (method.equals("PUT"))
+            rc.setEntryContent(item);
+        return rc;
     }
 
     public RequestContext createEntryRequestContext(String uid,
-                                                    String method) {
+                                                    String method)
+        throws IOException {
         return new MockItemRequestContext(serviceContext, uid, method);
     }
 
     public RequestContext createMediaRequestContext(NoteItem item,
-                                                    String method) {
-        return new MockItemRequestContext(serviceContext, item, method, true);
+                                                    String method)
+        throws IOException {
+        MockItemRequestContext rc =
+            new MockItemRequestContext(serviceContext, item, method, true);
+        if (method.equals("PUT"))
+            rc.setMediaContent(item);
+        return rc;
     }
 
     public RequestContext createMediaRequestContext(String uid,
-                                                    String method) {
+                                                    String method)
+        throws IOException {
         return new MockItemRequestContext(serviceContext, uid, method, true);
     }
 
@@ -134,5 +148,17 @@ public class ProviderHelper extends MockHelper {
 
     public void enableGeneratorFailure() {
         generatorFactory.setFailureMode(true);
+    }
+
+    public void rememberMediaType(String mediaType) {
+        processorFactory.getMediaTypes().add(mediaType);
+    }
+
+    public void enableProcessorFailure() {
+        processorFactory.setFailureMode(true);
+    }
+
+    public void enableProcessorValidationError() {
+        processorFactory.setValidationErrorMode(true);
     }
 }

@@ -49,6 +49,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.mock.MockAnonymousPrincipal;
@@ -69,6 +70,7 @@ public class TestHelper {
     static int apseq = 0;
     static int cseq = 0;
     static int eseq = 0;
+    static int iseq = 0;
     static int lseq = 0;
     static int rseq = 0;
     static int tseq = 0;
@@ -244,7 +246,7 @@ public class TestHelper {
     /** */
     public ContentItem makeDummyContent(User user) {
         String serial = new Integer(++cseq).toString();
-        String name = "test item " + serial;
+        String name = "test content " + serial;
 
         ContentItem content = new ContentItem();
 
@@ -256,6 +258,25 @@ public class TestHelper {
         content.setContentType("text/plain");
 
         return content;
+    }
+
+    /** */
+    public NoteItem makeDummyItem(User user) {
+        String serial = new Integer(++iseq).toString();
+        String name = "test item " + serial;
+
+        NoteItem note = new NoteItem();
+
+        note.setName(name);
+        note.setOwner(user);
+        note.setContentEncoding("UTF-8");
+        note.setContentLanguage("en_US");
+        note.setContentType("text/plain");
+        note.setIcalUid(serial);
+        note.setBody("This is a note. I love notes.");
+        note.setContent(note.getBody().getBytes());
+
+        return note;
     }
 
     /** */

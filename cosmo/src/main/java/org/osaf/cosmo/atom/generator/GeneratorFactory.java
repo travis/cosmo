@@ -23,8 +23,6 @@ import org.osaf.cosmo.server.ServiceLocator;
 /**
  * An interface for factories that create {@link FeedGenerator}
  * instances.
- *
- * @see FeedGenerator
  */
 public interface GeneratorFactory {
 

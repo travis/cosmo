@@ -530,7 +530,7 @@
               </bean>
             </property>
             <property name="processorFactory">
-              <bean class="org.osaf.cosmo.atom.processor.ProcessorFactory"/>
+              <bean class="org.osaf.cosmo.atom.processor.StandardProcessorFactory"/>
             </property>
             <property name="contentService">
               <ref local="contentService"/>

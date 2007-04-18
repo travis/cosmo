@@ -15,44 +15,20 @@
  */
 package org.osaf.cosmo.atom.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.eim.eimml.EimmlConstants;
-import org.osaf.cosmo.eim.json.JsonConstants;
-
 /**
- * A factory that creates Atom content processor instances based on
- * the media type of the content of an entry.
- *
- * @see ContentProcessor
+ * An interface for factories that creates {@link ContentProcessor}
+ * instances.
  */
-public class ProcessorFactory implements JsonConstants, EimmlConstants {
-    private static final Log log = LogFactory.getLog(ProcessorFactory.class);
+public interface ProcessorFactory {
 
     /**
-     * Creates an instance of <code>ContentProcessor</code>. The type of
-     * processor is chosen based on one of the following media types:
-     * <dl>
-     * <dt>{@link JsonConstants#MEDIA_TYPE_EIM_JSON}</dt>
-     * <dd>{@link JsonProcessor}</dd>
-     * <dt>{@link EimmlConstants#MEDIA_TYPE_EIMML}</dt>
-     * <dd>{@link EimmlProcessor}</dd>
-     * </dl>
-     * <p>
+     * Creates an instance of <code>ContentProcessor</code> based on
+     * the given media type.
      *
      * @param mediaType the media type of the content to process
      * @return the entry processor, or null if no processor is
      * supported for the named media type
      */
     public ContentProcessor createProcessor(String mediaType)
-        throws UnsupportedMediaTypeException {
-        if (mediaType != null) {
-            if (mediaType.equals(MEDIA_TYPE_EIM_JSON))
-                return new JsonProcessor();
-            if (mediaType.equals(MEDIA_TYPE_EIMML))
-                return new EimmlProcessor();
-        }
-        throw new UnsupportedMediaTypeException(mediaType);
-    }
+        throws UnsupportedMediaTypeException;
 }

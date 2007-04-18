@@ -15,8 +15,15 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import org.apache.abdera.model.Content;
+import org.apache.abdera.protocol.server.provider.RequestContext;
+import org.apache.abdera.protocol.server.provider.ResponseContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Test class for {@link StandardProvider#updateEntry()} tests.
@@ -26,30 +33,63 @@ public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
         LogFactory.getLog(StandardProviderUpdateEntryTest.class);
 
     public void testUpdateEntry() throws Exception {
-        // XXX
+        NoteItem item = helper.makeAndStoreDummyItem();
+        RequestContext req = helper.createEntryRequestContext(item, "PUT");
+        helper.rememberMediaType(Content.Type.TEXT.toString());
+
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 204, res.getStatus());
     }
 
     public void testNotFound() throws Exception {
-        // XXX
+        RequestContext req = helper.createEntryRequestContext("deadbeef",
+                                                              "PUT");
+
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 404, res.getStatus());
     }
 
     public void testNotNote() throws Exception {
-        // XXX
+        ContentItem content = helper.makeAndStoreDummyContent();
+        RequestContext req = helper.createEntryRequestContext(content.getUid(),
+                                                              "PUT");
+
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 403, res.getStatus());
     }
 
     public void testUnsupportedMediaType() throws Exception {
-        // XXX
+        NoteItem item = helper.makeAndStoreDummyItem();
+        RequestContext req = helper.createEntryRequestContext(item, "PUT");
+        // no known projections or formats
+
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 415, res.getStatus());
     }
 
     public void testInvalidContent() throws Exception {
-        // XXX
-    }
+        NoteItem item = helper.makeAndStoreDummyItem();
+        RequestContext req = helper.createEntryRequestContext(item, "PUT");
+        helper.rememberMediaType(Content.Type.TEXT.toString());
+        helper.enableProcessorValidationError();
 
-    public void testReadError() throws Exception {
-        // XXX
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 400, res.getStatus());
     }
 
     public void testProcessingError() throws Exception {
-        // XXX
+        NoteItem item = helper.makeAndStoreDummyItem();
+        RequestContext req = helper.createEntryRequestContext(item, "PUT");
+        helper.rememberMediaType(Content.Type.TEXT.toString());
+        helper.enableProcessorFailure();
+
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 500, res.getStatus());
     }
 }

@@ -19,7 +19,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 
 import org.osaf.cosmo.util.PageCriteria;
-import org.osaf.cosmo.util.SearchCriteria;
 
 /**
  * Interface for building Hibernate query criteria.

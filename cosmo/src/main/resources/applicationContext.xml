@@ -522,7 +522,7 @@
         <property name="provider">
           <bean class="org.osaf.cosmo.atom.provider.StandardProvider">
             <property name="generatorFactory">
-              <bean class="org.osaf.cosmo.atom.generator.GeneratorFactory">
+              <bean class="org.osaf.cosmo.atom.generator.StandardGeneratorFactory">
                 <property name="abdera"><ref local="abdera"/></property>
                 <property name="contentFactory">
                   <bean class="org.osaf.cosmo.atom.generator.ContentFactory"/>

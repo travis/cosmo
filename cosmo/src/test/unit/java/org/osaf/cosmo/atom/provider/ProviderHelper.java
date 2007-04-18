@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.MockHelper;
 import org.osaf.cosmo.atom.generator.ContentFactory;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
+import org.osaf.cosmo.atom.generator.mock.MockGeneratorFactory;
 import org.osaf.cosmo.atom.processor.ProcessorFactory;
 import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
@@ -33,12 +34,17 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
+ * A utility class that provides the dependent objects required
+ * by a {@link Provider} to execute its methods. These dependencies
+ * are mock objects intended for use with unit tests. The helper also
+ * provides convenience methods for setting up test data in the mock
+ * storage layer.
  */
 public class ProviderHelper extends MockHelper {
     private static final Log log = LogFactory.getLog(ProviderHelper.class);
 
     private Abdera abdera;
-    private GeneratorFactory generatorFactory;
+    private MockGeneratorFactory generatorFactory;
     private ProcessorFactory processorFactory;
     private ServiceContext serviceContext;
 
@@ -51,13 +57,8 @@ public class ProviderHelper extends MockHelper {
 
         abdera = new Abdera();
 
-        // XXX: need mock generator factory that creates a mock
-        // generator that we can cause to throw specific exceptions
-        generatorFactory = new GeneratorFactory();
-        generatorFactory.setAbdera(abdera);
-        generatorFactory.setContentFactory(new ContentFactory());
-
-        // XXX: similarly, mock
+        generatorFactory = new MockGeneratorFactory(abdera);
+        // XXX mock
         processorFactory = new ProcessorFactory();
 
         serviceContext = new DefaultServiceContext();
@@ -121,5 +122,13 @@ public class ProviderHelper extends MockHelper {
     public RequestContext createMediaRequestContext(String uid,
                                                     String method) {
         return new MockItemRequestContext(serviceContext, uid, method, true);
+    }
+
+    public void rememberProjection(String projection) {
+        generatorFactory.getProjections().add(projection);
+    }
+
+    public void rememberFormat(String format) {
+        generatorFactory.getFormats().add(format);
     }
 }

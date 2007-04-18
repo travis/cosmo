@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.atom.generator.mock.MockFeedGenerator;
 
 /**
  * Test class for {@link StandardProvider#getFeed()} tests.
@@ -32,12 +33,14 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
 
     public void testGetFeed() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET");
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        helper.rememberProjection("yyz");
+        helper.rememberFormat("eff");
 
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
-        // XXX look at content?
     }
 
     public void testNotFound() throws Exception {
@@ -51,7 +54,8 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
     public void testUnsupportedProjection() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", null);
+                                                             "yyz", "eff");
+        // no known projections or formats
 
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
@@ -61,7 +65,9 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
     public void testUnsupportedFormat() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "full", "yyz");
+                                                             "yyz", "eff");
+        helper.rememberProjection("yyz");
+        // no known formats
 
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);

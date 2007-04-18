@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview Button - creates a push button that can be enabled or disabled, small or 
+ * @fileoverview Button - creates a push button that can be enabled or disabled, small or
  *                        normal size.
  * @authors: Matthew Eernisse (mde@osafoundation.org), Bobby Rullo (br@osafoundation.org)
  * @license Apache License 2.0
@@ -30,7 +30,7 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.convenience");
 
 dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
-    
+
     // Constants
     DISABLED_OPACITY : 0.8,
     templateString: '<input type="button" />',
@@ -79,7 +79,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
         this.width = width;
         if (this.width) {
             this.domNode.style.width = parseInt(width) + "px";
-        } 
+        }
     },
     setEnabled: function(enabled) {
         var suf = this.small ? 'Sm' : '';
@@ -89,9 +89,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
                 this.handleOnClick = this.handleOnClickOrig;
             }
             this.domNode.className = 'btnElemBase' + suf;
-            this._setOpacity(1.0) 
-            
-        } 
+            this._setOpacity(1.0)
+
+        }
         else {
             this.handleOnClickOrig = this.handleOnClick;
             this.handleClick = null;
@@ -116,7 +116,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
                 mousedown: 'btnElemBase' + suf + ' btnElemMousedown' + suf,
                 mouseup: 'btnElemBase' + suf
             }
-            this.domNode.className = states[s]; 
+            this.domNode.className = states[s];
         }
     },
     _handleOnClick: function() {

@@ -453,7 +453,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
             dojo.io.bind(requestDict);
         },
-        
+
         recoverPassword: function(username, email, handlerDict, sync){
             // Safari and IE don't understand 204s. Boo.
             if (navigator.userAgent.indexOf('Safari') > -1 ||

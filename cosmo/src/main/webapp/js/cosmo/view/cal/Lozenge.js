@@ -46,9 +46,9 @@ cosmo.view.cal.Lozenge = function () {
     // 30-min minimum height, minus a pixel at top and bottom
     // per retarded CSS spec for borders
     this.unit = (HOUR_UNIT_HEIGHT/(60/this.minimumMinutes))-2;
-    // DOM elem ref to the primary div for the Lozenge 
+    // DOM elem ref to the primary div for the Lozenge
     this.div = null;
-    // DOM elem ref for inner div of the Lozenge 
+    // DOM elem ref for inner div of the Lozenge
     this.innerDiv = null;
     // The separator plus ID -- convenience to avoid
     // concatenating the same thing over and over
@@ -159,18 +159,18 @@ cosmo.view.cal.Lozenge.prototype.getPlatonicWidth = function () {
 cosmo.view.cal.Lozenge.prototype.setOpacity = function (opac) {
     
     function setOpac(elem, o) {
-    // =============
-    // opac is a whole number to be used as the percent opacity
-    // =============
-    // IE uses a whole number as a percent (e.g. 75 for 75%)
-    //  Moz/compat uses a fractional value (e.g. 0.75)
+        // =============
+        // opac is a whole number to be used as the percent opacity
+        // =============
+        // IE uses a whole number as a percent (e.g. 75 for 75%)
+        //  Moz/compat uses a fractional value (e.g. 0.75)
         var nDecOpacity = o/100;
-    if (document.all) {
+        if (document.all) {
             elem.style.filter = 'alpha(opacity=' + o + ')';
-    }
-    elem.style.opacity = nDecOpacity;
+        }
+        elem.style.opacity = nDecOpacity;
         
-}
+    }
     setOpac(this.div, opac);
     if (this.composite()) {
         for (var i = 0; i < this.auxDivList.length; i++) {
@@ -387,7 +387,7 @@ cosmo.view.cal.Lozenge.prototype.setDeselected = function () {
 }
 
 /**
- * cosmo.view.cal.HasTimeLozenge -- sub-class of Lozenge 
+ * cosmo.view.cal.HasTimeLozenge -- sub-class of Lozenge
  * Normal events, 'at-time' events -- these sit in the scrollable
  * area of the main viewing area
  */
@@ -422,8 +422,8 @@ cosmo.view.cal.HasTimeLozenge.prototype.showProcessing = function () {
  * Change to 'default' when processing so it won't look draggable
  */
 cosmo.view.cal.HasTimeLozenge.prototype.resizeHandleCursorChange = function (isProc) {
-    var topChange = ''; 
-    var bottomChange = ''; 
+    var topChange = '';
+    var bottomChange = '';
     // Read-only collection -- clickable but not draggable/resizable
     if (!Cal.currentCollection.privileges.write) {
         topChange = 'pointer';
@@ -538,12 +538,12 @@ cosmo.view.cal.HasTimeLozenge.prototype.updateEvent = function (ev, dragMode) {
     // Add +1 to height for border on background
     // Add +2 to height for border on lozenge div
     var endTime = Cal.calcTimeFromPos(this.top+(this.height + 3));
-    
+
     evStart.setHours(Cal.extractHourFromTime(startTime));
     evStart.setMinutes(Cal.extractMinutesFromTime(startTime));
     evEnd.setHours(Cal.extractHourFromTime(endTime));
     evEnd.setMinutes(Cal.extractMinutesFromTime(endTime));
-    
+
     // If the event was originally less than the minimum *visible* lozenge
     // height, preserve the original times when editing
     var origLengthMinutes = Date.diff('n', ev.dataOrig.start, ev.dataOrig.end);
@@ -554,7 +554,7 @@ cosmo.view.cal.HasTimeLozenge.prototype.updateEvent = function (ev, dragMode) {
        // JS Dates do intelligent wraparound
        evEnd.setMinutes(evStart.getMinutes() + origLengthMinutes);
     }
-    
+
     // Update cosmo.datetime.Date with new UTC values
     ev.data.start.updateFromUTC(evStart.getTime());
     ev.data.end.updateFromUTC(evEnd.getTime());
@@ -595,7 +595,7 @@ cosmo.view.cal.HasTimeLozenge.prototype.insert = function (id) {
         endDay = ev.data.end.getLocalDay();
         if (ev.data.end.getHours() == 0) {
             endDay--;
-    }
+        }
     }
     auxDivCount = (endDay - startDay);
 
@@ -603,7 +603,7 @@ cosmo.view.cal.HasTimeLozenge.prototype.insert = function (id) {
     this.width = 1;
     this.auxDivList = [];
 
-    // Append event lozenge to appropriate screen area for the type of Lozenge 
+    // Append event lozenge to appropriate screen area for the type of Lozenge
     view = document.getElementById('timedContentDiv');
 
     lozengeDiv = document.createElement('div');
@@ -910,7 +910,7 @@ cosmo.view.cal.HasTimeLozenge.prototype.composite = function () {
 }
 
 /**
- * cosmo.view.cal.NoTimeLozenge -- sub-class of Lozenge 
+ * cosmo.view.cal.NoTimeLozenge -- sub-class of Lozenge
  * All-day events, 'any-time' events -- these sit up in the
  * resizable area at the top of the UI
  */
@@ -1020,7 +1020,7 @@ cosmo.view.cal.NoTimeLozenge.prototype.insert = function (id) {
     this.idPrefix = Cal.ID_SEPARATOR + id;
     this.width = 1;
 
-    // Append event lozenge to appropriate screen area for the type of Lozenge 
+    // Append event lozenge to appropriate screen area for the type of Lozenge
     view = document.getElementById('allDayContentDiv');
     // Event lozenge main div and components
     // -----------------------

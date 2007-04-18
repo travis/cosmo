@@ -26,10 +26,10 @@ dojo.require('cosmo.convenience');
 dojo.require("cosmo.facade.pref");
 dojo.require("cosmo.service.json_service_impl");
 dojo.require("cosmo.legacy.cal_event");
-// -- 
+// --
 
 // -- Widget includes, may not always find proper namespaced refs
-// -- ie, cosmo:CollectionSelector 
+// -- ie, cosmo:CollectionSelector
 dojo.require("cosmo.ui.widget.CollectionSelector");
 // --
 
@@ -53,12 +53,12 @@ yPos = 0;
  * @object The Cal singleton
  */
 cosmo.ui.cal_main.Cal = new function () {
-    
+
     var self = this;
-    
+
     // Constants
     this.ID_SEPARATOR = '__';
-    
+
     // The Cosmo service -- used to talk to the backend
     this.serv = null;
     // For calculating UI element positions
@@ -95,7 +95,7 @@ cosmo.ui.cal_main.Cal = new function () {
 
     //A handle to the collection selector widget
     this._collectionSelector = null;
-    
+
     // ==========================
     // Init
     // ==========================
@@ -103,21 +103,21 @@ cosmo.ui.cal_main.Cal = new function () {
      * Main function
      */
     this.init = function (collectionUid, ticketKey) {
-        
+
         // Props for confirmation dialogs
         // --------------
         dojo.require('cosmo.view.cal.dialog');
-        
+
         var viewDiv = null;
         var allDayDiv = null;
-        
+
         this.currDate = new Date();
 
         // Create and init the Cosmo service
         // --------------
         this.serv = new ScoobyService();
         // Client-side keepalive
-        this.serv.resetServiceAccessTime(); 
+        this.serv.resetServiceAccessTime();
         this.serv.init();
 
         // Load user prefs
@@ -137,14 +137,14 @@ cosmo.ui.cal_main.Cal = new function () {
         // Load and display date info, render cal canvas
         // --------------
         if (this.loadLocaleDateInfo() && this.setQuerySpan(this.currDate)) {
-            cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, 
+            cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd,
                 this.currDate);
         }
 
-        // Calendar event detail form 
+        // Calendar event detail form
         this.calForm = new CalForm();
         this.calForm.init();
-        
+
         var deletedSubscriptions = null;
         // Load/create calendar to view
         // --------------
@@ -168,7 +168,7 @@ cosmo.ui.cal_main.Cal = new function () {
                 }
                 );
         }
-        
+
         // Otherwise, get all calendars for this user
         else {
             var userCollections = this.serv.getCalendars();
@@ -184,7 +184,7 @@ cosmo.ui.cal_main.Cal = new function () {
                     }
                 );
             }
-            
+
             // No cals for this user
             if (this.currentCollections.length == 0){
                 // Create initial cal
@@ -205,17 +205,17 @@ cosmo.ui.cal_main.Cal = new function () {
                     }
 
                 this.currentCollections.push(newCollectionItem);
-                   
+
                 newCollectionItem.conduit.saveEvent(
-                   newCollectionItem.collection.uid, 
-                   this.createWelcomeEvent(), 
+                   newCollectionItem.collection.uid,
+                   this.createWelcomeEvent(),
                    newCollectionItem.transportInfo, f)
             }
             var subscriptions = this.serv.getSubscriptions();
             var result = this.filterOutDeletedSubscriptions(subscriptions);
             subscriptions = result[0];
             deletedSubscriptions = result[1];
-            
+
             for (var i = 0; i < subscriptions.length; i++){
                 var subscription = subscriptions[i];
                 this.currentCollections.push(
@@ -229,7 +229,7 @@ cosmo.ui.cal_main.Cal = new function () {
                 );
             }
         }
-        
+
         // Sort the collections, for Pete's sake
         var f = function (a, b) {
             var aName = a.displayName.toLowerCase();
@@ -243,7 +243,7 @@ cosmo.ui.cal_main.Cal = new function () {
             }
             return r;
         };
-        this.currentCollections.sort(f); 
+        this.currentCollections.sort(f);
 
         // If we received a collectionUid, select that collection
         if (collectionUid){
@@ -254,16 +254,16 @@ cosmo.ui.cal_main.Cal = new function () {
                 }
             }
         }
-        // Otherwise, use the first collection 
+        // Otherwise, use the first collection
         else {
             this.currentCollection = this.currentCollections[0];
         }
-        
+
         // Display selector or single cal name
         this._collectionSelectContainer = document.getElementById('calSelectNav');
         this._collectionSelector = dojo.widget.createWidget(
-            'cosmo:CollectionSelector', { 
-                'collections': this.currentCollections, 
+            'cosmo:CollectionSelector', {
+                'collections': this.currentCollections,
                 'currentCollection': this.currentCollection,
                 'ticketKey': ticketKey
             }, this._collectionSelectContainer, 'last');
@@ -275,7 +275,7 @@ cosmo.ui.cal_main.Cal = new function () {
         if (cosmo.ui.minical.MiniCal.init(Cal, mcDiv)) {
            this.calForm.addJumpToDate(jpDiv);
         }
-        
+
         // Initialize the color set for the cal lozenges
         cosmo.view.cal.canvas.calcColors();
 
@@ -283,16 +283,16 @@ cosmo.ui.cal_main.Cal = new function () {
         // FIXME: This stuff should eventually participate in
         // the normal topic-based prepare-load-render lifecycle
         // --------------
-        cosmo.view.cal.loadEvents({ collection: self.currentCollection, 
+        cosmo.view.cal.loadEvents({ collection: self.currentCollection,
             startDate: self.viewStart, endDate: self.viewEnd });
 
         this.uiMask.hide();
-        
+
         // Scroll to 8am for normal event
         // Have to do this dead last because appending to the div
         // seems to reset the scrollTop in Safari
         viewDiv.scrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
-        
+
         // Add event listeners for form-element behaviors
         this.calForm.setEventListeners();
 
@@ -305,21 +305,21 @@ cosmo.ui.cal_main.Cal = new function () {
             }
             setTimeout(f, 0);
         }
-        
+
         //show errors for deleted subscriptions
         xxx= deletedSubscriptions;
         if (deletedSubscriptions && deletedSubscriptions.length > 0){
             for (var x = 0; x < deletedSubscriptions.length; x++){
                 cosmo.app.showErr(_("Main.Error.SubscribedCollectionDeleted",deletedSubscriptions[x].displayName));
-                
+
             }
         }
     };
 
     // ==========================
-    // Handle published events 
+    // Handle published events
     // ==========================
-    
+
     // Subscribe to the '/calEvent' channel
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
     this.handlePub_calEvent = function (cmd) {
@@ -342,7 +342,7 @@ cosmo.ui.cal_main.Cal = new function () {
         }
     };
 
-    
+
     // ==========================
     // GUI element display
     // ==========================
@@ -399,11 +399,11 @@ cosmo.ui.cal_main.Cal = new function () {
         // Position the processing animation
         uiProcessing.setPosition(parseInt((winheight-PROCESSING_ANIM_HEIGHT)/2),
             parseInt((this.midColWidth-PROCESSING_ANIM_WIDTH)/2));
-        
+
         // Menubar
         menuBar.setPosition(0, 0);
         menuBar.setSize(this.width, TOP_MENU_HEIGHT-1);
-        
+
         // Main UI
         uiMain.setPosition(this.top, this.left);
         uiMain.setSize(this.width, this.height);
@@ -433,13 +433,13 @@ cosmo.ui.cal_main.Cal = new function () {
         vOffset += ALL_DAY_RESIZE_AREA_HEIGHT;
         allDayResize.setSize(this.midColWidth-1, ALL_DAY_RESIZE_HANDLE_HEIGHT);
         allDayResize.setPosition(vOffset, LEFT_SIDEBAR_WIDTH);
-        
+
         allDayContent.setSize((this.midColWidth - SCROLLBAR_SPACER_WIDTH - HOUR_LISTING_WIDTH), '100%');
         allDayContent.setPosition(0, (HOUR_LISTING_WIDTH + 1));
-        
+
         allDaySpacer.setSize((HOUR_LISTING_WIDTH - 1), '100%');
         allDaySpacer.setPosition(0, 0);
-        
+
         // Scrollable view area
         vOffset += ALL_DAY_RESIZE_HANDLE_HEIGHT;
         calcHeight = this.height-vOffset;
@@ -474,7 +474,7 @@ cosmo.ui.cal_main.Cal = new function () {
         eventInfo.cleanup(); eventInfo = null;
         allDayMain.cleanup(); allDayMain = null;
         allDayResize.cleanup(); allDayResize = null;
-        
+
     };
     this.setUpMenubar = function (ticketKey) {
         // Logged-in view -- nothing to do
@@ -489,7 +489,7 @@ cosmo.ui.cal_main.Cal = new function () {
             var clientOpts = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
             clientOpts.unshift({ text: 'Subscribe with ...', value: '' });
             var selOpts = { name: 'subscriptionSelect', id: 'subscriptionSelect',
-               options: clientOpts, className: 'selectElem' }; 
+               options: clientOpts, className: 'selectElem' };
             var subscrSel = cosmo.util.html.createSelect(selOpts);
             var f = function (e) {
                 // Show the subcription dialog if the empty "Subscribe with ..."
@@ -508,7 +508,7 @@ cosmo.ui.cal_main.Cal = new function () {
             dojo.event.connect(subscrSel, 'onchange', f);
             s.appendChild(subscrSel);
             menuBarDiv.appendChild(s);
-            
+
             var signupDiv = _createElem('div');
             signupDiv.id = 'signupGraphic';
 
@@ -522,7 +522,7 @@ cosmo.ui.cal_main.Cal = new function () {
             signupDiv.appendChild(i);
             menuBarDiv.appendChild(signupDiv);
         }
-        return true; 
+        return true;
     };
     this.positionMenubarElements = function () {
         var menuNav = $('menuNavItems')
@@ -538,7 +538,7 @@ cosmo.ui.cal_main.Cal = new function () {
             // Subscription select box
             var subscribeSelector = $('subscribeSelector');
             subscribeSelector.style.position = 'absolute';
-            subscribeSelector.style.left = (LEFT_SIDEBAR_WIDTH + this.midColWidth) + 'px'; 
+            subscribeSelector.style.left = (LEFT_SIDEBAR_WIDTH + this.midColWidth) + 'px';
             subscribeSelector.style.top = (TOP_MENU_HEIGHT - subscribeSelector.offsetHeight - 5) + 'px';
 
         }
@@ -551,12 +551,12 @@ cosmo.ui.cal_main.Cal = new function () {
      */
     this.setImagesForSkin =  function () {
         var logoDiv = $('smallLogoDiv');
-        
+
         // Resize handle for all-day area
         var i = _createElem('img');
         i.src = cosmo.env.getImagesUrl() + 'resize_handle_image.gif';
         document.getElementById('allDayResizeHandleDiv').appendChild(i);
-       
+
         // Cosmo logo
         logoDiv.style.background =
             'url(' + cosmo.env.getImagesUrl() + LOGO_GRAPHIC_SM + ')';
@@ -564,7 +564,7 @@ cosmo.ui.cal_main.Cal = new function () {
         if (document.all && (navigator.appVersion.indexOf('MSIE 7') == -1)) {
             logoDiv.style.backgroundRepeat = 'no-repeat';
         }
-        
+
     };
     /**
      * Loads localized Date information into the arrays in date.js
@@ -625,14 +625,14 @@ cosmo.ui.cal_main.Cal = new function () {
             return window.innerWidth;
         }
     };
-    
+
     // ==========================
     // Loading and displaying events
     // ==========================
-    
-    
+
+
     /**
-     * Insert a new calendar event -- called when 
+     * Insert a new calendar event -- called when
      * the user double-clicks on the cal canvas
      * @param id A string, the id of the div on the cal canvas double-clicked
      */
@@ -655,11 +655,11 @@ cosmo.ui.cal_main.Cal = new function () {
         var id = '';
         var evTitle = '';
         var evDesc = '';
-        
+
         // ID for the lozenge -- random strings, also used for div elem IDs
         id = Cal.generateTempId();
-        
-        // Create the CalEvent obj, attach the CalEventData obj, create the Lozenge 
+
+        // Create the CalEvent obj, attach the CalEventData obj, create the Lozenge
         // ================================
         evType = (evParam.indexOf('allDayListDiv') > -1) ? 'allDayMain' : 'normal';
         evSource = 'click';
@@ -691,21 +691,21 @@ cosmo.ui.cal_main.Cal = new function () {
             end = new ScoobyDate(start.getFullYear(),
                 start.getMonth(), start.getDate());
         }
-        
+
         // Create the CalEvent, connect it to its lozenge
         ev = new CalEvent(id, lozenge);
-        
+
         // Set CalEventData start and end calculated from click position
         // --------
         evTitle = _('Main.NewEvent');
         evDesc = '';
         ev.data = new CalEventData(null, evTitle, evDesc,
             start, end, allDay);
-        
+
         // Register the new event in the event list
         // ================================
         cosmo.view.cal.canvas.eventRegistry.setItem(id, ev);
-        
+
         // Update the lozenge
         // ================================
         if (lozenge.insert(id)) { // Insert the lozenge on the view
@@ -714,34 +714,34 @@ cosmo.ui.cal_main.Cal = new function () {
         }
         return cosmo.view.cal.canvas.eventRegistry.getItem(id);
     };
-    
+
     // ==========================
     // Navigating and changing calendars
     // ==========================
     /**
-     * Set up the week-to-week navigation button panel 
+     * Set up the week-to-week navigation button panel
      */
     this.setUpNavButtons = function () {
         var back = function () {
-            dojo.event.topic.publish('/calEvent', { 
-                action: 'loadCollection', data: { goTo: 'back' } 
-            }); 
+            dojo.event.topic.publish('/calEvent', {
+                action: 'loadCollection', data: { goTo: 'back' }
+            });
         }
         var next = function () {
-            dojo.event.topic.publish('/calEvent', { 
-                action: 'loadCollection', data: { goTo: 'next' } 
-            }); 
+            dojo.event.topic.publish('/calEvent', {
+                action: 'loadCollection', data: { goTo: 'next' }
+            });
         }
         var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
         document.getElementById('viewNavButtons').appendChild(navButtons.domNode);
     };
-    
+
     this.loadCollectionItems = function (data, opts) {
         var self = this;
         var collection = data.collection;
         var goTo = data.goTo;
         var data = {};
-        
+
         // Changing collection
         // --------
         if (collection) {
@@ -762,26 +762,26 @@ cosmo.ui.cal_main.Cal = new function () {
                 queryDate = goTo;
             }
             // Update Cal.viewStart and Cal.viewEnd with new dates
-            self.setQuerySpan(queryDate); 
+            self.setQuerySpan(queryDate);
         }
-        
+
         // Data obj to pass to topic publishing
         data = {
             collection: self.currentCollection,
-            startDate: self.viewStart, 
-            endDate: self.viewEnd, 
-            currDate: self.currDate 
-        } 
-       
+            startDate: self.viewStart,
+            endDate: self.viewEnd,
+            currDate: self.currDate
+        }
+
         // If we're looking at different dates, have to re-render
         // the base canvas with the new date range
         if (goTo) {
             dojo.event.topic.publish('/calEvent', {
-                action: 'eventsLoadPrepare', data: data, opts: opts }); 
+                action: 'eventsLoadPrepare', data: data, opts: opts });
         }
         // Load and display events
         dojo.event.topic.publish('/calEvent', {
-            action: 'eventsLoad', data: data, opts: opts }); 
+            action: 'eventsLoad', data: data, opts: opts });
     }
 
     // ==========================
@@ -1031,7 +1031,7 @@ cosmo.ui.cal_main.Cal = new function () {
             // If server-side session is about to time out, refresh it by hitting JSP page
             this.serv.refreshServerSession();
             // Reset local session timing cookie
-            this.serv.resetServiceAccessTime(); 
+            this.serv.resetServiceAccessTime();
             return false;
         }
     };
@@ -1047,10 +1047,10 @@ cosmo.ui.cal_main.Cal = new function () {
             }
         }
 
-        updateCollection(this.currentCollection);        
+        updateCollection(this.currentCollection);
         dojo.lang.map(this.currentCollections, updateCollection);
     }
-    
+
     this.handleSubscriptionUpdated = function(/*cosmo.topics.SubscriptionUpdatedMessage*/ message){
         var updatedSubscription = message.subscription;
         var updateCollection = function(collection){
@@ -1062,7 +1062,7 @@ cosmo.ui.cal_main.Cal = new function () {
                 }
             }
         }
-        updateCollection(this.currentCollection);        
+        updateCollection(this.currentCollection);
         dojo.lang.map(this.currentCollections, updateCollection);
     }
 
@@ -1070,20 +1070,20 @@ cosmo.ui.cal_main.Cal = new function () {
             if(dojo.render.os.mac && dojo.render.html.mozilla){
                 return true;
             }
-            
+
             return false;
     }
     this.handleModalDialogDisplayed = function(){
        if (!this._shouldHideScrollBars()){
          return ;
        }
-    
+
        var viewDiv = document.getElementById('timedScrollingMainDiv');
        //overflow:auto; overflow-y:auto; overflow-x:hidden;
        viewDiv.style.overflow = "hidden";
-       
+
     };
-    
+
     this.handleModalDialogDismissed = function(){
        if (!this._shouldHideScrollBars()){
            return;
@@ -1093,11 +1093,11 @@ cosmo.ui.cal_main.Cal = new function () {
        viewDiv.style.overflowY = "auto";
        viewDiv.style.overflowX = "hidden";
     }
-    
+
     this.redirectTimeout = function () {
         location = cosmo.env.getRedirectUrl();
     };
-    
+
     this.createWelcomeEvent = function (){
         var startstr = Cal.getIndexFromHourDiv('hourDiv3-900');
         var dayind = Cal.extractDayIndexFromId(startstr);
@@ -1110,26 +1110,26 @@ cosmo.ui.cal_main.Cal = new function () {
         var min = parseInt(Cal.extractMinutesFromTime(startstr));
         var start = new cosmo.datetime.Date(yea, mon, dat, hou, min);
         var end = cosmo.datetime.Date.add(start, 'n', 60);
-        
+
         return new cosmo.model.CalEventData(null, "Welcome to Cosmo", "Welcome to Cosmo",
            start, end, false);
     }
-    
+
     this.filterOutDeletedSubscriptions = function(subscriptions){
         var deletedSubscriptions = [];
-        var filteredSubscriptions = dojo.lang.filter(subscriptions, 
+        var filteredSubscriptions = dojo.lang.filter(subscriptions,
             function(sub){
                if (!sub.calendar){
                    Cal.serv.deleteSubscription(sub.uid, sub.ticket.ticketKey);
                    deletedSubscriptions.push(sub);
                    return false;
                } else {
-                   return true;              
+                   return true;
                }
         });
-        
+
         return [filteredSubscriptions, deletedSubscriptions];
-        
+
     }
 
     // ==========================

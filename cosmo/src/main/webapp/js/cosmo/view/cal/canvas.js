@@ -31,13 +31,13 @@ dojo.require('cosmo.view.cal.Lozenge');
 dojo.require("cosmo.view.cal.conflict");
 
 cosmo.view.cal.canvas = new function () {
-    
+
     // Need some closure for scope
     var self = this;
     // Rendering the first time
-    var initRender = false; 
+    var initRender = false;
     // Resizeable area for all-day events -- a ResizeArea obj
-    var allDayArea = null; 
+    var allDayArea = null;
     // Blue, green, red, orange, gold, plum, turquoise, fuschia, indigo
     var hues = [210, 120, 0, 30, 50, 300, 170, 330, 270];
     // The scrolling div for timed events
@@ -58,11 +58,11 @@ cosmo.view.cal.canvas = new function () {
         Log.print(val.id)
         Log.print(val.data.id);
         Log.print(val.data.title);
-    }    
+    }
     /**
      * Set the passed calendar event as the selected one on
      * canvas
-     * @param ev CalEvent object, the event to select 
+     * @param ev CalEvent object, the event to select
      */
     function setSelectedEvent(ev) {
         // Deselect previously selected event if any
@@ -97,7 +97,7 @@ cosmo.view.cal.canvas = new function () {
     /**
      * Remove a cal event object, usually removes the event
      * lozenge as well
-     * @param ev CalEvent object, the event to select 
+     * @param ev CalEvent object, the event to select
      * @param rem Boolean, if explicit false is passed,
      * don't remove the lozenge along with the CalEvent obj
      */
@@ -123,7 +123,7 @@ cosmo.view.cal.canvas = new function () {
         // Pull the last event off the eventRegistry list and remove it
         if (removeLozenge) {
             self.eventRegistry.each(removeEventFromDisplay);
-        } 
+        }
         self.eventRegistry = new Hash();
         return true;
     }
@@ -133,7 +133,7 @@ cosmo.view.cal.canvas = new function () {
      * groups of recurring events
      * @param arr Array of CalEventData ids for the recurrences to
      * remove
-     * @param dt A ScoobyDate,represents the end date of a 
+     * @param dt A ScoobyDate,represents the end date of a
      * recurrence -- if the dt param is present, it will remove
      * only the event instances which occur after the date
      * It will also reset the recurrence endDate for all dates
@@ -148,7 +148,7 @@ cosmo.view.cal.canvas = new function () {
         var str = ',' + arr.join() + ',';
         var h = new Hash();
         var ev = null;
-        var compDt = dt ? new ScoobyDate(dt.getFullYear(), 
+        var compDt = dt ? new ScoobyDate(dt.getFullYear(),
             dt.getMonth(), dt.getDate(), 23, 59) : null;
         while (ev = reg.pop()) {
             var removeForDate = true;
@@ -206,15 +206,15 @@ cosmo.view.cal.canvas = new function () {
         if (self.eventRegistry.length) {
             if (cosmo.view.cal.conflict.calc(self.eventRegistry) &&
                 positionLozenges()) {
-            // If no currently selected event, put selection on
-            // the final one loaded
-            if (!self.selectedEvent) {
-                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
-                    'data': self.eventRegistry.getLast() });
+                // If no currently selected event, put selection on
+                // the final one loaded
+                if (!self.selectedEvent) {
+                    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
+                        'data': self.eventRegistry.getLast() });
+                }
+                dojo.event.topic.publish('/calEvent', { 'action':
+                    'eventsDisplaySuccess', 'data': self.selectedEvent });
             }
-            dojo.event.topic.publish('/calEvent', { 'action': 
-                'eventsDisplaySuccess', 'data': self.selectedEvent });
-        }
         }
         // No items displayed in the current collection
         else {
@@ -229,7 +229,7 @@ cosmo.view.cal.canvas = new function () {
         return self.eventRegistry.each(positionLozenge);
     };
     /**
-     * Position the lozenge on the canvase based on the 
+     * Position the lozenge on the canvase based on the
      * CalEventData props -- happens after they're put on the canvas
      * with appendLozenge. Called in a loop with Hash's 'each' method
      * @param key String, the Hash key for the event in the
@@ -282,7 +282,7 @@ cosmo.view.cal.canvas = new function () {
      * (2) Removing the recurrence from a recurrence master
      *     (results in a plain, single event).
      * (3) Modifications to recurrences
-     * @param cmd JS Object, the command object passed in the 
+     * @param cmd JS Object, the command object passed in the
      * published 'success' event (contains the originally edited
      * event, cmd.data, and the update options, cmd.opts).
      */
@@ -298,7 +298,7 @@ cosmo.view.cal.canvas = new function () {
                 self.eventRegistry = h;
                 self.eventRegistry.each(appendLozenge);
             }
-            
+
             // Saved event is still in view
             if (cmd.qualifier.onCanvas) {
                 ev.lozenge.setInputDisabled(false);
@@ -316,11 +316,11 @@ cosmo.view.cal.canvas = new function () {
         }
         // Don't re-render when requests are still processing
         if (!cosmo.view.cal.processingQueue.length) {
-            if (cmd.qualifier.newEvent || 
+            if (cmd.qualifier.newEvent ||
                 (cmd.qualifier.onCanvas && opts.saveType != 'instanceOnlyThisEvent')) {
                 var sel = cosmo.view.cal.lastSent;
                 sel.lozenge.setInputDisabled(false);
-                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
+                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
                     'data': sel });
             }
             updateEventsDisplay();
@@ -331,7 +331,7 @@ cosmo.view.cal.canvas = new function () {
      * events -- for:
      * (1) Edits to an entire recurrence, 'All Events'
      * (2) Breaking a recurrence and creating a new event,
-     * 'All Future Events' -- the new event may or may not 
+     * 'All Future Events' -- the new event may or may not
      * have recurrence
      * @param data JS Object, the data passed from the published
      * 'success' event (data.idArr, the array of event ids to use
@@ -347,11 +347,11 @@ cosmo.view.cal.canvas = new function () {
         var opts = data.opts;
         var h = null;
         var idArr = [];
-        
+
         // Copy the eventRegistry to remove any recurrence
         // instances associated with the edit
         h = self.eventRegistry.clone();
-        
+
         // Splitting the recurrence, new event is set to frequency
         // of 'once' -- just remove previous recurrence instances
         // and keep original single lozenge for new event
@@ -367,7 +367,7 @@ cosmo.view.cal.canvas = new function () {
         // Normal split where original and new are both recurring, or
         // Change to master that just updates all of a single recurrence
         else {
-            // 'All Future Events' 
+            // 'All Future Events'
             if (opts.saveType == 'instanceAllFuture') {
                 // Master recurrence event id
                 idArr.push(opts.instanceEvent.data.id);
@@ -379,13 +379,13 @@ cosmo.view.cal.canvas = new function () {
                 // Master recurrence id
                 idArr.push(ev.data.id);
             }
-            
+
             // Remove some of all of the recurrence instances for re-render
             // ----------------------
             // 'All Events' -- remove all instances of the recurrence
             if (opts.saveType == 'recurrenceMaster') {
                 // Before wiping, remember the position of the currently selected
-                // event. If the canvas renders immediately after this update, 
+                // event. If the canvas renders immediately after this update,
                 // we need to keep the selection where it was.
                 var currSel = self.eventRegistry.getPos(self.selectedEvent.id);
                 h = removeEventRecurrenceGroup(h, idArr);
@@ -395,11 +395,11 @@ cosmo.view.cal.canvas = new function () {
             else if (opts.saveType == 'instanceAllFuture') {
                 h = removeEventRecurrenceGroup(h, idArr, opts.recurEnd);
             }
-            
+
             // Remove the original clicked-on event -- the new master
             // will be in the recurrence expansion from the server
             // ----------------------
-            if (opts.saveType == 'instanceAllFuture' || 
+            if (opts.saveType == 'instanceAllFuture' ||
                 opts.saveType == 'singleEventAddRecurrence') {
                 h.removeItem(opts.instanceEvent.id);
             }
@@ -413,38 +413,38 @@ cosmo.view.cal.canvas = new function () {
             // Stick all the event lozenges on the canvas
             self.eventRegistry.each(appendLozenge);
         }
-        
+
         // Repaint and restore selection if there are no
         // more requests processing
         if (!cosmo.view.cal.processingQueue.length) {
             updateEventsDisplay();
             if (!cosmo.view.cal.lastSent) {
                 // ==========================================================
-                // Nasty, tricksy selection fu -- daily recurrence can have 
+                // Nasty, tricksy selection fu -- daily recurrence can have
                 // multiple events, but can't move off of their day
                 // weekly and above can move off their day, but will only
                 // have a single instance visible on the canvas
                 // 'instanceAllFuture' creates a new event that may or may
                 // not recur
                 // ==========================================================
-                // Either a master recurring or a recurring new event after 
-                // breaking recurrence -- figuring selection is a party  
+                // Either a master recurring or a recurring new event after
+                // breaking recurrence -- figuring selection is a party
                 if (ev.data.recurrenceRule) {
                     ev = evReg.getAtPos(0);
-                    // If changing a recurrence-end results in the expansion 
-                    // ending before the start of the orignal clicked instance, 
+                    // If changing a recurrence-end results in the expansion
+                    // ending before the start of the orignal clicked instance,
                     // lozenge selection needs to go somewhere
-                    if (opts.instanceEvent && ev.data.recurrenceRule.endDate && 
-                        (ev.data.recurrenceRule.endDate.toUTC() < 
+                    if (opts.instanceEvent && ev.data.recurrenceRule.endDate &&
+                        (ev.data.recurrenceRule.endDate.toUTC() <
                             opts.instanceEvent.data.start.toUTC())) {
-                        ev =  self.eventRegistry.getLast(); 
+                        ev =  self.eventRegistry.getLast();
                     }
                     else {
                         // Daily recurrence events
                         if (ev.data.recurrenceRule.frequency == 'daily') {
-                            // Persist selection when editing an instance, and 
+                            // Persist selection when editing an instance, and
                             // selecting 'All Events'
-                            if (opts.saveType == 'recurrenceMaster' && 
+                            if (opts.saveType == 'recurrenceMaster' &&
                                 opts.instanceEvent && opts.instanceEvent.data.instance) {
                                 ev = self.eventRegistry.getAtPos(currSel);
                             }
@@ -456,18 +456,18 @@ cosmo.view.cal.canvas = new function () {
                         }
                     }
                 }
-                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
+                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
                     'data': ev });
             }
             else {
-                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
+                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
                     'data': cosmo.view.cal.lastSent });
             }
         }
     }
     /**
-     * Handles a successful removal of an event 
-     * @param ev CalEvent object, the removed event 
+     * Handles a successful removal of an event
+     * @param ev CalEvent object, the removed event
      * @param opts JS Object, options for the removal that
      * tell you what kind of remove is happening
      */
@@ -514,7 +514,7 @@ cosmo.view.cal.canvas = new function () {
             case (id.indexOf('hourDiv') > -1):
                 return false;
                 break;
-            
+
             // On event lozenge -- simple select, or move/resize
             case (id.indexOf('eventDiv') > -1):
                 // Get the clicked-on event
@@ -525,13 +525,13 @@ cosmo.view.cal.canvas = new function () {
                 if (item.lozenge.getInputDisabled()) {
                     return false;
                 }
-                
+
                 // Publish selection
                 var c = cosmo.view.cal.canvas;
                 if (c.selectedEvent && item.id != c.selectedEvent.id) {
                     dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': item });
                 }
-                
+
                 // No move/resize for read-only collections
                 if (Cal.currentCollection.privileges.write) {
                     // Set up Draggable and save dragMode -- user may be dragging
@@ -541,7 +541,7 @@ cosmo.view.cal.canvas = new function () {
                     else {
                         dragItem = new HasTimeDraggable(s);
                     }
-                    
+
                     switch(true) {
                         // Main content area -- drag entire event
                         case id.indexOf('Content') > -1:
@@ -561,7 +561,7 @@ cosmo.view.cal.canvas = new function () {
                             // Do nothing
                             break;
                     }
-                    
+
                     // Set the Cal draggable to the dragged lozenge
                     cosmo.app.dragItem = dragItem;
                 }
@@ -578,13 +578,13 @@ cosmo.view.cal.canvas = new function () {
     function dblClickHandler(e) {
         var id = '';
         var elem = null;
-        
+
         // Event creation only in write-mode
         if (Cal.currentCollection.privileges.write) {
             e = !e ? window.event : e;
             elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
             id = elem.id
-            
+
             switch (true) {
                 // On hour column -- create a new event
                 case (id.indexOf('hourDiv') > -1):
@@ -599,7 +599,7 @@ cosmo.view.cal.canvas = new function () {
             }
         }
     }
-    
+
     /**
      * Lozenge stuff
      */
@@ -642,7 +642,7 @@ cosmo.view.cal.canvas = new function () {
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
     // Subscribe to the '/app' channel
     dojo.event.topic.subscribe('/app', self, 'handlePub_app');
-    
+
     /**
      * Handle events published on the '/calEvent' channel, including
      * self-published events
@@ -675,7 +675,7 @@ cosmo.view.cal.canvas = new function () {
             case 'save':
                 setLozengeProcessing(cmd);
                 // Do nothing
-                break; 
+                break;
             case 'saveFailed':
                 var ev = cmd.data;
                 // If the failure was a new event, remove
@@ -688,7 +688,7 @@ cosmo.view.cal.canvas = new function () {
                 else {
                     var rEv = null;
                     // Recurrence, 'All events'
-                    if (opts.saveType == 'recurrenceMaster' || 
+                    if (opts.saveType == 'recurrenceMaster' ||
                         opts.saveType == 'instanceAllFuture') {
                         // Edit ocurring from one of the instances
                         if (opts.instanceEvent) {
@@ -766,7 +766,7 @@ cosmo.view.cal.canvas = new function () {
     // Currently selected event
     this.selectedEvent = null;
     this.colors = {};
-    
+
     // Public methods
     // ****************
     /**
@@ -786,9 +786,9 @@ cosmo.view.cal.canvas = new function () {
         var hoursNode = null;
         var dayNameHeadersNode = null;
         var allDayColsNode = null;
-        
+
         /**
-         * Set up key container elements 
+         * Set up key container elements
          * @return Boolean, true.
          */
         function init() {
@@ -802,7 +802,7 @@ cosmo.view.cal.canvas = new function () {
             // All done, woot
             return true;
         }
-        
+
         /**
          * Shows list of days at the head of each column in the week view
          * Uses the Date.abbrWeekday array of names in date.js
@@ -818,7 +818,7 @@ cosmo.view.cal.canvas = new function () {
             var calcDay = null;
             var cd = currDate;
             var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
-            
+
              // Returns the number of days in a specific month of a specific year --
              // the year is necessary to handle leap years' Feb. 29
              function daysInMonth(month, year){
@@ -844,7 +844,7 @@ cosmo.view.cal.canvas = new function () {
                 }
                 return days;
             }
-            
+
             // Spacer to align with the timeline that displays hours below
             // for the timed event canvas
             str += '<div id="dayListSpacer" class="dayListDayDiv"' +
@@ -862,7 +862,7 @@ cosmo.view.cal.canvas = new function () {
                     '" style="left:' + start + 'px; width:' + (self.dayUnitWidth-1) +
                     'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
                 if (calcDay.getTime() == currDay.getTime()) {
-                    str += ' background-image:url(' + cosmo.env.getImagesUrl() + 
+                    str += ' background-image:url(' + cosmo.env.getImagesUrl() +
                         'day_col_header_background.gif); background-repeat:' +
                         ' repeat-x; background-position:0px 0px;'
                 }
@@ -922,63 +922,63 @@ cosmo.view.cal.canvas = new function () {
             var viewDiv = null;
             var timeLineWidth = 0;
             var workingHoursBarWidth = 3;
-            
+
             // Subtract one px for border per asinine CSS spec
             var halfHourHeight = (HOUR_UNIT_HEIGHT/2) - 1;
-            
+
             var w = '';
-                // Working/non-working hours line
+            // Working/non-working hours line
             w += '<div class="';
             w += (j < 8 || j > 17) ? 'nonWorkingHours' : 'workingHours';
             w += '" style="width:' + workingHoursBarWidth +
-                    'px; height:' + (halfHourHeight+1) + 
-                    'px; float:left; font-size:1px;">&nbsp;</div>';
+                'px; height:' + (halfHourHeight+1) +
+                'px; float:left; font-size:1px;">&nbsp;</div>';
             var workingHoursLine = '';
-            
+
             str = '';
-            viewDiv = timelineNode; 
+            viewDiv = timelineNode;
             timeLineWidth = parseInt(viewDiv.offsetWidth);
             // Subtract 1 for 1px border
             timeLineWidth = timeLineWidth - workingHoursBarWidth - 1;
-            
+
             // Timeline of hours on left
             for (var j = 0; j < 24; j++) {
                 hour = j == 12 ? _('App.Noon') : cosmo.util.date.hrMil2Std(j);
                 meridian = j > 11 ? ' PM' : ' AM';
                 meridian = j == 12 ? '' : '<span>' + meridian + '</span>';
                 row = '';
-                
+
                 // Upper half hour
                 // ==================
                 row += '<div class="hourDivTop';
-                row += '" style="height:' + 
-                    halfHourHeight + 'px; width:' + 
+                row += '" style="height:' +
+                    halfHourHeight + 'px; width:' +
                     timeLineWidth + 'px; float:left;">';
                 // Hour plus AM/PM
-                row += '<div class="hourDivSubLeft">' + hour + 
+                row += '<div class="hourDivSubLeft">' + hour +
                     meridian + '</div>';
                 row += '</div>\n';
                 row += workingHoursLine;
                 row += '<br class="clearAll"/>'
-                
+
                 idstr = i + '-' + j + '30';
-                
+
                 // Lower half hour
                 // ==================
                 row += '<div class="hourDivBottom"';
                 // Make the noon border thicker
-                if (j == 11) { 
-                    row += ' style="height:' + (halfHourHeight-1) + 
+                if (j == 11) {
+                    row += ' style="height:' + (halfHourHeight-1) +
                         'px; border-width:2px;';
                 }
                 else {
                     row += ' style="height:' + halfHourHeight + 'px;';
                 }
-                row += ' width:' + timeLineWidth + 
+                row += ' width:' + timeLineWidth +
                     'px; float:left;">&nbsp;</div>\n';
                 row += workingHoursLine;
                 row += '<br class="clearAll"/>'
-                
+
                 str += row;
             }
             viewDiv.innerHTML = str;
@@ -995,9 +995,9 @@ cosmo.view.cal.canvas = new function () {
                     'px;"';
                 str += '>';
                 for (var j = 0; j < 24; j++) {
-                    
+
                     isCurrentDay = (calcDay.getTime() == currDay.getTime());
-                    
+
                     idstr = i + '-' + j + '00';
                     row = '';
                     row += '<div id="hourDiv' + idstr + '" class="hourDivTop';
@@ -1022,8 +1022,8 @@ cosmo.view.cal.canvas = new function () {
                         //row += ' nonWorkingHours';
                     }
                     row += '" style="';
-                    if (j == 11) { 
-                        row += 'height:' + (halfHourHeight-1) + 
+                    if (j == 11) {
+                        row += 'height:' + (halfHourHeight-1) +
                             'px; border-width:2px;';
                     }
                     else {
@@ -1047,7 +1047,7 @@ cosmo.view.cal.canvas = new function () {
             var vE = viewEnd;
             var mS = vS.getMonth();
             var mE = vE.getMonth();
-            var headerDiv = monthHeaderNode; 
+            var headerDiv = monthHeaderNode;
             var str = '';
 
             // Format like 'March-April, 2006'
@@ -1069,7 +1069,7 @@ cosmo.view.cal.canvas = new function () {
             }
             headerDiv.appendChild(document.createTextNode(str));
         }
-        
+
         // Do it!
         // -----------
         if (!initRender) {
@@ -1084,13 +1084,13 @@ cosmo.view.cal.canvas = new function () {
         else {
             removeAllEvents();
         }
-        
+
         // Init and call all the rendering functions
         init();
         showMonthHeader();
         showDayNameHeaders();
         showAllDayCols();
-        
+
         // Create event listeners
         if (!initRender) {
             dojo.event.connect(hoursNode, 'onmousedown', mouseDownHandler);
@@ -1108,7 +1108,7 @@ cosmo.view.cal.canvas = new function () {
     /**
      * Get the scroll offset for the timed canvas
      * @return Number, the pixel position of the top of the timed
-     * event canvas, including the menubar at the top, resizing of 
+     * event canvas, including the menubar at the top, resizing of
      * the all-day area, and any amount that the timed canvas
      * has scrolled.
      */
@@ -1136,7 +1136,7 @@ cosmo.view.cal.canvas = new function () {
     };
     this.calcColors = function () {
         var getRGB = function (h, s, v) {
-            var rgb = dojo.gfx.color.hsv2rgb(h, s, v, { 
+            var rgb = dojo.gfx.color.hsv2rgb(h, s, v, {
                 inputRange: [360, 100, 100], outputRange: 255 });
             return 'rgb(' + rgb.join() + ')';
         }
@@ -1144,11 +1144,11 @@ cosmo.view.cal.canvas = new function () {
         var sel = cosmo.ui.cal_main.Cal.calForm.form.calSelectElem;
         var index = sel ? sel.selectedIndex : 0;
         var hue = hues[index];
-        
+
         var o = {
             darkSel: [100, 80],
             darkUnsel: [80, 90],
-            lightSel: [25, 100], 
+            lightSel: [25, 100],
             lightUnsel: [10, 100],
             proc: [30, 90]
         };

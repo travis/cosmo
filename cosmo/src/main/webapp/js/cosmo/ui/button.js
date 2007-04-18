@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview Button -- button-related functions 
+ * @fileoverview Button -- button-related functions
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  */
@@ -31,27 +31,27 @@ dojo.require("cosmo.ui.widget.Button")
  * for endcaps and a stretchable, tiling middle section. Comes in
  * two sizes, normal and small.
  */
-cosmo.ui.button.Button = function(elemId, width, onClickHandler, 
+cosmo.ui.button.Button = function(elemId, width, onClickHandler,
     displayText, isSmall, isDisabled) {
 
-    // If you don't do this dummyDom business, the page reflows and 
+    // If you don't do this dummyDom business, the page reflows and
     // scrollbars are reset
     var dummyDom = document.createElement('span');
     var widget = null;
     var enabled = isDisabled == true ? false : true;
-    
+
     // Allow instantiation from obj/keyword param
     if (typeof arguments[0] == 'object') {
-        widget =  dojo.widget.createWidget("cosmo:Button", 
+        widget =  dojo.widget.createWidget("cosmo:Button",
             arguments[0], dummyDom, 'last');
     }
     // Normal params in order
     else {
-        // Note: This throws away elemId in favor of the 
+        // Note: This throws away elemId in favor of the
         // incremented widget ID
-        widget =  dojo.widget.createWidget("cosmo:Button", { 
-            text: displayText, 'width':width, 
-            handleOnClick: onClickHandler, small: isSmall, 
+        widget =  dojo.widget.createWidget("cosmo:Button", {
+            text: displayText, 'width':width,
+            handleOnClick: onClickHandler, small: isSmall,
             enabled: enabled }, dummyDom, 'last');
     }
     dummyDom.removeChild(widget.domNode);
@@ -122,7 +122,7 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
         nbImg.style.verticalAlign = 'middle';
         nbImg.style.padding = '0 6px 0 6px';
         nbData.appendChild(nbImg);
-        
+
         dojo.event.connect(nbData, 'onmouseover', self, '_morphButton');
         dojo.event.connect(nbData, 'onmouseout', self, '_morphButton');
         dojo.event.connect(nbData, 'onmousedown', self, '_morphButton');
@@ -159,7 +159,7 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
         else {
             center.className = 'btnSetDividerBase';
         }
-        t.className = states[s]; 
-    
+        t.className = states[s];
+
     };
 }

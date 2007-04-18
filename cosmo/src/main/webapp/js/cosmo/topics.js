@@ -22,27 +22,27 @@ dojo.provide("cosmo.topics");
 
 dojo.require("dojo.event.topic");
 
-cosmo.topics.declareMessage = function(/*string*/ className,
+cosmo.topics.declareMessage = function (/*string*/ className,
                                        /*string*/ topicName,
-                                       /*Function|Array*/ superclass, 
-                                       /*Function*/ initializer, 
+                                       /*Function|Array*/ superclass,
+                                       /*Function*/ initializer,
                                        /*Object*/ props) {
     /**
      * summary: convienience method for declaring new messages.
      * description: You call this the same way you call "dojo.declare" except
-     *              this doesn't do any argument juggling - you must specify 
-     *              the arguments in the order listed above. If you specify "null" 
+     *              this doesn't do any argument juggling - you must specify
+     *              the arguments in the order listed above. If you specify "null"
      *              as the superclass, "cosmo.topics.Message" is assumed.
-     *              
+     *
      *              The topicName property is added to the prototype as well
-     *              as the constructor object so you can easily get the topicName 
-     *              from an instance or from "cosmo.topics.MyNewMessage.topicName" 
-     */                
+     *              as the constructor object so you can easily get the topicName
+     *              from an instance or from "cosmo.topics.MyNewMessage.topicName"
+     */
     var o = {};
     // Accept keywords as an alternative to the param list
     if (arguments.length == 1) {
         o = arguments[0];
-}
+    }
     // Otherwise use normal parameter list in order
     else {
         o.className = className;
@@ -60,50 +60,50 @@ cosmo.topics.declareMessage = function(/*string*/ className,
 }
 
 
-dojo.declare("cosmo.topics.Message", null, { topicName: null});
+dojo.declare("cosmo.topics.Message", null, { topicName: null });
 
 /**
  * Data/Model level messages: These are messages that get published when data level events
- * happen, like an item was updated or deleted.  
+ * happen, like an item was updated or deleted.
  *
  */
-cosmo.topics.declareMessage("cosmo.topics.CollectionUpdatedMessage", 
+cosmo.topics.declareMessage("cosmo.topics.CollectionUpdatedMessage",
     // summary: Published after successful updating of a collection to the server
     //          has occured
-    "COLLECTION_UPDATED", null, 
+    "COLLECTION_UPDATED", null,
     //initializer
-    function(/*cosmo.model.CalendarMetadata*/ collection){
+    function (/*cosmo.model.CalendarMetadata*/ collection){
         this.collection = collection;
     },
-    //props 
+    //props
     {
         collection: null
     }
 );
 
-cosmo.topics.declareMessage("cosmo.topics.SubscriptionUpdatedMessage", 
+cosmo.topics.declareMessage("cosmo.topics.SubscriptionUpdatedMessage",
     // summary: Published after successful updating of a subscription to the server
     //          has occured
-    "SUBSCRIPTION_UPDATED", null, 
+    "SUBSCRIPTION_UPDATED", null,
     //initializer
-    function(/*cosmo.model.Subscription*/ subscription){
+    function (/*cosmo.model.Subscription*/ subscription){
         this.subscription = subscription;
     },
-    //props 
+    //props
     {
         subscription: null
     }
 );
 
-cosmo.topics.declareMessage("cosmo.topics.PreferencesUpdatedMessage", 
+cosmo.topics.declareMessage("cosmo.topics.PreferencesUpdatedMessage",
     // summary: Published after preferences are changed
     //          has occured
-    "PREFERENCES_UPDATED", null, 
+    "PREFERENCES_UPDATED", null,
     //initializer
-    function(/*Object*/ preferences){
+    function (/*Object*/ preferences){
         this.preferences = preferences;
     },
-    //props 
+    //props
     {
         preferences: null
     }
@@ -123,7 +123,7 @@ cosmo.topics.declareMessage({ className: "cosmo.topics.AppLevelMessage",
     topicName: '/app',
     props: { type: null }
 });
- 
+
 cosmo.topics.declareMessage({ className: "cosmo.topics.ModalDialogToggle",
     // summary: published when the modal dialog box is toggled on or off
     superclass: cosmo.topics.AppLevelMessage,
@@ -141,14 +141,14 @@ cosmo.topics.publish = function (/*Function*/messageConstructor,
     /*Array|Object*/initializerArg){
     // summary: create a message and publish it in one fell swoop.
     //     You don't specify a topic, because the topic
-   //          used is the "topicName" property of the message object.
-   //
-   // messageConstructor: a constructor that creates a message
-   //
-   // initializerArguments: arguments to pass to the constructor/initializer
+    //     used is the "topicName" property of the message object.
+    //
+    // messageConstructor: a constructor that creates a message
+    //
+    // initializerArguments: arguments to pass to the constructor/initializer
     if (!initializerArg){
         initializerArg = [];
-   }
+    }
     var message = null;
     // Pass an Array -- note: instanceof fails in iframe for Array
     if (initializerArg instanceof Array) {
@@ -161,5 +161,5 @@ cosmo.topics.publish = function (/*Function*/messageConstructor,
     else {
         message = new messageConstructor(initializerArg);
     }
-   dojo.event.topic.publish(message.topicName, message);
+    dojo.event.topic.publish(message.topicName, message);
 }

@@ -22,7 +22,7 @@ dojo.require("cosmo.convenience");
 var _ = cosmo.util.i18n.getText;
 
 cosmo.view.cal.dialog = new function() {
-    
+
     var self = this;
     var props = {}; // Props for each modal dialog
     var recurOpts = cosmo.view.cal.recurringEventOptions;
@@ -31,51 +31,51 @@ cosmo.view.cal.dialog = new function() {
     var OnlyThisMsg = 'Only This Event';
     var btnWideWidth = 84;
     var btnWiderWidth = 120;
-    
-    
+
+
     // All available buttons for the dialog
     var buttons = {
         'removeAllEvents': function(){
-           return new Button('allButtonDialog', btnWideWidth, 
+           return new Button('allButtonDialog', btnWideWidth,
                 function() { doPublish('remove', recurOpts.ALL_EVENTS); }, allEventsMsg, true);
         },
-         
+
         'removeFutureEvents': function(){
-            return new Button('allFutureButtonDialog', btnWiderWidth, 
+            return new Button('allFutureButtonDialog', btnWiderWidth,
                 function() { doPublish('remove', recurOpts.ALL_FUTURE_EVENTS); }, AllFutureMsg, true);
         },
 
         'removeOnlyThisEvent': function(){
-            return new Button('onlyThisButtonDialog', btnWiderWidth, 
+            return new Button('onlyThisButtonDialog', btnWiderWidth,
                 function() { doPublish('remove', recurOpts.ONLY_THIS_EVENT); }, OnlyThisMsg, true);
         },
 
         'saveAllEvents': function(){
-            return new Button('allButtonDialog', btnWideWidth, 
+            return new Button('allButtonDialog', btnWideWidth,
             function() { doPublish('save', recurOpts.ALL_EVENTS); }, allEventsMsg, true);
         },
-        
+
         'saveFutureEvents': function(){
-            return new Button('allFutureButtonDialog', btnWiderWidth, 
+            return new Button('allFutureButtonDialog', btnWiderWidth,
             function() { doPublish('save', recurOpts.ALL_FUTURE_EVENTS); }, AllFutureMsg, true);
         },
-        
+
         'saveOnlyThisEvent': function(){
-            return new Button('onlyThisButtonDialog', btnWiderWidth, 
+            return new Button('onlyThisButtonDialog', btnWiderWidth,
                 function() { doPublish('save', recurOpts.ONLY_THIS_EVENT); }, OnlyThisMsg, true);
         },
-        
+
         'allEventsDisabled': function(){
-            return new Button('allButtonDialog', btnWideWidth, 
+            return new Button('allButtonDialog', btnWideWidth,
                 null, allEventsMsg, true, true);
         },
-        
+
         'futureEventsDisabled': function(){
-            return new Button('allFutureButtonDialog', btnWiderWidth, 
+            return new Button('allFutureButtonDialog', btnWiderWidth,
                 null, AllFutureMsg, true, true);
         }
     };
-    
+
     props.removeConfirm = function(){
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
@@ -87,7 +87,7 @@ cosmo.view.cal.dialog = new function() {
             'content': _('Main.Prompt.EventRemoveConfirm')
         };
     };
-    
+
     props.removeRecurConfirm = function(){
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
@@ -99,11 +99,11 @@ cosmo.view.cal.dialog = new function() {
             'content': _('Main.Prompt.RecurRemoveConfirm')
         };
     };
-    
+
     props.saveRecurConfirm = function(){
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('cancelButtonDialog', 74, 
+            'btnsLeft': [new Button('cancelButtonDialog', 74,
                 function() { doEvMethod('cancelSave') },
                 _('App.Button.Cancel'), true)],
             'btnsRight': [],
@@ -112,7 +112,7 @@ cosmo.view.cal.dialog = new function() {
             'content': _('Main.Prompt.RecurSaveConfirm')
         };
     };
-    
+
     // Publish via topics
     function doPublish(act, qual) {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
@@ -124,7 +124,7 @@ cosmo.view.cal.dialog = new function() {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
         selEv[key]();
     }
-    
+
     // Public methods
     // ********************
     this.getProps = function(key, optsParam) {
@@ -151,7 +151,7 @@ cosmo.view.cal.dialog = new function() {
                 p.btnsRight.push(buttons.removeFutureEvents());
             }
             p.btnsRight.push(buttons.removeOnlyThisEvent());
-            
+
         }
         return p;
     };

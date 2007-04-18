@@ -26,9 +26,9 @@ cosmo.ui.resize_area.ResizeAreaAdjacent = function (div, origPos, origSize) {
 ResizeAreaAdjacent = cosmo.ui.resize_area.ResizeAreaAdjacent;
 
 cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
-    
+
     var self = this;
-    
+
     this.id = id;
     this.handleId = handleId;
     this.contentDiv = null;
@@ -45,7 +45,7 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
         self.handleDiv = document.getElementById(this.handleId);
         self.handleDiv.onmousedown = function() { cosmo.app.dragItem = self };
         self.direction = dir ? dir : this.direction;
-        self.origSize = this.getHeight(this.contentDiv) + 
+        self.origSize = this.getHeight(this.contentDiv) +
             self.getHeight(this.handleDiv);
         self.dragSize = self.origSize;
         if (navigator.appVersion.indexOf('MSIE 6') > -1) {
@@ -59,13 +59,13 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
             div, this.getAbsTop(div), this.getHeight(div));
     };
     this.setDragLimit = function() {
-        this.dragLimit = this.adjacentArea[0].origPos + 
-            this.adjacentArea[0].origSize - TOP_MENU_HEIGHT - 
+        this.dragLimit = this.adjacentArea[0].origPos +
+            this.adjacentArea[0].origSize - TOP_MENU_HEIGHT -
             ALL_DAY_RESIZE_HANDLE_HEIGHT;
     };
     this.compareNumbers = function(a, b) { return a - b };
     this.doDrag = function () {
-        this.resize();  
+        this.resize();
     };
     this.resize = function() {
         var offset = this.contentDiv.offsetTop;
@@ -82,7 +82,7 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
             for (var i = 0; i < this.adjacentArea.length; i++) {
                 div = this.adjacentArea[i].div;
                 div.style.top = (pos+8) + 'px';
-                div.style.height = (((this.adjacentArea[i].origPos-yPos) + 
+                div.style.height = (((this.adjacentArea[i].origPos-yPos) +
                     this.adjacentArea[i].origSize) - 8) + 'px';
             }
         }

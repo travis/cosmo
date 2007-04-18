@@ -24,7 +24,7 @@
 /**
  * @object The form for all UI-form-elements on the page
  */
- 
+
 dojo.require("dojo.string");
 dojo.require("dojo.lang");
 dojo.require("dojo.event.common");
@@ -128,17 +128,17 @@ cosmo.ui.cal_form.CalForm = function () {
                 break;
         }
     };
-    
+
     function toggleReadOnlyIcon() {
         var icon = $('readOnlyIcon');
         if (Cal.currentCollection.privileges.write) {
-            icon.style.display = 'none'; 
+            icon.style.display = 'none';
         }
         else {
-            icon.style.display = 'block'; 
+            icon.style.display = 'block';
         }
     }
-    
+
     // The actual form DOM elem -- form.form is redundant, so
     // changing this to formElem would be a Good Thing
     this.form = $('calForm');
@@ -159,7 +159,7 @@ cosmo.ui.cal_form.CalForm = function () {
         var elem = null;
         var elemFloat = null;
         var formElem = null;
-        
+
         cont.id = 'eventInfoDivContent';
         topBar.style.height = topBarHeight + 'px';
 
@@ -175,7 +175,7 @@ cosmo.ui.cal_form.CalForm = function () {
         elem.className = 'floatRight';
         elem.style.display = 'none';
         topBar.appendChild(elem);
-        
+
         // 'E-mail this event' link
         elem = _createElem('div');
         elem.id = 'emailThisEventDiv';
@@ -190,11 +190,11 @@ cosmo.ui.cal_form.CalForm = function () {
         elem.style.lineHeight =  topBarHeight + 'px';
         elem.style.verticalAlign = 'middle';
         topBar.appendChild(elem);
-        
+
         elem = _createElem('div');
         elem.className = 'clearBoth';
         topBar.appendChild(elem);
-        
+
         d.appendChild(topBar);
 
         // Event title
@@ -342,7 +342,7 @@ cosmo.ui.cal_form.CalForm = function () {
             _('App.PM')));
         d.appendChild(elem);
     };
-    
+
     this.createTimezoneInputs = function (d){
         var elem = null;
 
@@ -354,12 +354,12 @@ cosmo.ui.cal_form.CalForm = function () {
         elem.style.whiteSpace = 'nowrap';
 
         //create the region selector
-        var sel = _html.createSelect('tzRegion', 'tzRegion', null, 
+        var sel = _html.createSelect('tzRegion', 'tzRegion', null,
             false, this.getTimezoneOptions(), 'selectElem');
         sel.style.width = '90px';
         elem.appendChild(sel);
         _html.appendNbsp(elem);
-        sel = _html.createSelect('tzId', 'tzId', null, 
+        sel = _html.createSelect('tzId', 'tzId', null,
             false, this.getTimezoneSelectorOptions(null), 'selectElem');
         // Limit width -- these options can be very long
         sel.style.width = '144px';
@@ -369,8 +369,8 @@ cosmo.ui.cal_form.CalForm = function () {
 
     this.getTimezoneSelectorOptions = function (region){
         var tzIds = region ? cosmo.datetime.timezone.getTzIdsForRegion(region).sort() : null;
-        var options = [{ 
-            text: _("Main.DetailForm.TimezoneSelector.None"), 
+        var options = [{
+            text: _("Main.DetailForm.TimezoneSelector.None"),
             value: "" }];
         if (tzIds){
             dojo.lang.map(tzIds, function (tzId) {
@@ -380,33 +380,33 @@ cosmo.ui.cal_form.CalForm = function () {
         }
         return options;
     };
-    
+
     this.setMailtoLink = function (event) {
         var timeFormat=_("Sidebar.Email.TimeFormat");
 
         var subject = Cal.currentCollection.displayName + ": " + event.data.title;
         var body = [_("Sidebar.Email.Title") , event.data.title , "%0d%0a"];
-        
+
         if (event.data.start.tzId){
             body = body.concat([
              _("Sidebar.Email.Timezone")  , event.data.start.tzId , "%0d%0a"]);
         }
         body = body.concat([
-             _("Sidebar.Email.Starts") , event.data.start.strftime(timeFormat) , "%0d%0a" , 
+             _("Sidebar.Email.Starts") , event.data.start.strftime(timeFormat) , "%0d%0a" ,
              _("Sidebar.Email.Ends") , event.data.end.strftime(timeFormat) , "%0d%0a"]);
         if (event.data.allDay) {
             body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
-        } 
+        }
 
         if (event.data.recurrenceRule){
-            body = body.concat([_("Sidebar.Email.Recurs") , 
+            body = body.concat([_("Sidebar.Email.Recurs") ,
                 event.data.recurrenceRule.frequency]);
             if (event.data.recurrenceRule.endDate){
-                body = body.concat([_("Sidebar.Email.EndingOn") , 
+                body = body.concat([_("Sidebar.Email.EndingOn") ,
                     event.data.recurrenceRule.endDate.strftime(timeFormat)]);
             }
             body.push(".%0d%0a");
-            
+
         }
         if (event.data.status){
             body.concat([_("Sidebar.Email.Status") , event.data.status , "%0d%0a"]);
@@ -608,13 +608,13 @@ cosmo.ui.cal_form.CalForm = function () {
             }
             meridian = cosmo.util.html.getRadioButtonSetValue(
                 form.startap);
-            err = cosmo.util.validate.required(meridian); 
+            err = cosmo.util.validate.required(meridian);
             if (err) {
                 basicDateValidationError = true;
                 errMsg += '"Starts" AM/PM field: ' + err;
                 errMsg += '\n';
             }
-            err = cosmo.util.validate.required(endTime) || 
+            err = cosmo.util.validate.required(endTime) ||
                 cosmo.util.validate.timeFormat(endTime);
             if (err) {
                 basicDateValidationError = true;
@@ -623,7 +623,7 @@ cosmo.ui.cal_form.CalForm = function () {
             }
             meridian = cosmo.util.html.getRadioButtonSetValue(
                 form.endap);
-            err = cosmo.util.validate.required(meridian); 
+            err = cosmo.util.validate.required(meridian);
             if (err) {
                 basicDateValidationError = true;
                 errMsg += '"Ends" AM/PM field: ' + err;
@@ -682,7 +682,7 @@ cosmo.ui.cal_form.CalForm = function () {
                 d.end.tzId = tzId;
                 d.end.updateFromLocalDate(endDate);
             }
-            // Floating cosmo.datetime.Date 
+            // Floating cosmo.datetime.Date
             else {
                 d.start.tzId = null;
                 d.start.updateFromUTC(startDate.getTime());
@@ -697,7 +697,7 @@ cosmo.ui.cal_form.CalForm = function () {
             d.allDay = allDay;
             d.anyTime = (!startTime && !endTime && !allDay) ? true : false;
             d.status = status;
-            
+
             var rule = d.recurrenceRule;
             // Set to no recurrence
             if (!recur) {
@@ -915,11 +915,11 @@ cosmo.ui.cal_form.CalForm = function () {
         var self = this;
         var allDayCheck = $('eventallday');
         var form = Cal.calForm.form;
-        
+
         // Add dummy function event listener so form doesn't
         // submit on Enter keypress in Safari
         form.onsubmit = function () { return false; };
-        
+
         // Focus handlers for text entry
         dojo.event.connect(form.eventtitle, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
         dojo.event.connect(form.eventlocation, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
@@ -927,17 +927,17 @@ cosmo.ui.cal_form.CalForm = function () {
         dojo.event.connect(form.starttime, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
         dojo.event.connect(form.enddate, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
         dojo.event.connect(form.endtime, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
-        
+
         // Recurrence
         dojo.event.connect(form.recurrence, 'onchange', self, 'setRecurEnd');
         dojo.event.connect(form.recurend, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
-        
+
         // All-day event / normal event toggling
         dojo.event.connect(allDayCheck, 'onclick', cosmo.ui.cal_main.Cal.calForm, 'toggleLozengeType');
-        
+
         var regionSelectorElement = $("tzRegion");
         dojo.event.connect(regionSelectorElement, "onchange", this.handleRegionChanged);
-        
+
         dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, Cal, Cal.handleCollectionUpdated);
         dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, Cal, Cal.handleSubscriptionUpdated);
     };
@@ -969,7 +969,7 @@ cosmo.ui.cal_form.CalForm = function () {
             10, 10, null, 'inputText', d);
         self.setTextInput(self.form.jumpto, 'mm/dd/yyyy', true, false);
         dojo.event.connect(self.form.jumpto, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
-        
+
         d = _createElem('div');
         d.className = 'floatLeft';
         _html.appendNbsp(d);
@@ -1019,11 +1019,11 @@ cosmo.ui.cal_form.CalForm = function () {
         // All okey-dokey -- submit
         else {
             var d = new Date(val);
-            dojo.event.topic.publish('/calEvent', { 
-                action: 'loadCollection', data: { goTo: d } 
-            }); 
+            dojo.event.topic.publish('/calEvent', {
+                action: 'loadCollection', data: { goTo: d }
+            });
         }
     };
-    
+
 }
 CalForm = cosmo.ui.cal_form.CalForm;

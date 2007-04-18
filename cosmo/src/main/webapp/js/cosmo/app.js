@@ -30,16 +30,16 @@ cosmo.app = new function () {
 
     // App section code to run on init
     this.initObj = {};
-    
+
     // warnings / confirmations
     this.modalDialog = null;
-    
+
     // The item in the UI being dragged
     this.dragItem = null;
-    
+
     // List of any queued-up error messages
     this.errorList = [];
-    
+
     //select boxes to show/hide when displaying modal dialog box
     this._selectBoxIds = {};
 
@@ -64,8 +64,8 @@ cosmo.app = new function () {
         var msg = '';
         var secondaryMessage = null; // Secondary message, if any
         var trace = null; // Stack trace, if any
-        
-        // Secondary message passed 
+
+        // Secondary message passed
         if (sec) {
             if (typeof sec == 'string') {
                 secondaryMessage = sec;
@@ -75,7 +75,7 @@ cosmo.app = new function () {
                 trace = sec.javaStack;
             }
         }
-        
+
         // If the error dialog is already showing, add this message to the error queue
         if (this.modalDialog.isDisplayed) {
             this.errorList.push(pri);
@@ -117,7 +117,7 @@ cosmo.app = new function () {
                         full.appendChild(trace);
                         var f = function () {
                             cosmo.util.popup.openFullSize(full);
-                }
+                        }
                         d = _createElem('div');
                         d.style.marginTop = '8px';
                         var a = document.createElement('a');
@@ -128,7 +128,7 @@ cosmo.app = new function () {
                         a.appendChild(_createText('Click here for details ...'));
                         d.appendChild(a);
                         msg.appendChild(d);
-            }
+                    }
                 }
             }
             this.modalDialog.type = this.modalDialog.ERROR;
@@ -199,7 +199,7 @@ cosmo.app = new function () {
         }
         return this.inputDisabled;
     };
-    
+
     /**
      * Whether or not input from the entire UI is disabled
      * Returns true when the faux modal dialog box is displayed
@@ -236,7 +236,7 @@ cosmo.app = new function () {
         });
         // Reset the state map when finished
         if (show) {
-           selectBoxVisibility = {}; 
+           selectBoxVisibility = {};
         }
     };
 }

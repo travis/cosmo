@@ -18,10 +18,10 @@ dojo.provide('cosmo.view.cal.conflict');
 dojo.require("cosmo.view.cal");
 
 cosmo.view.cal.conflict = new function() {
-    
+
     var self = this; // Closure
     var evReg = null; // Event registry
-    
+
     // Clearing conflict-info, sorting
     /**
      * Sorts events by start and then end, and clears the collision
@@ -47,12 +47,12 @@ cosmo.view.cal.conflict = new function() {
             ev.maxDepth = 0;
             ev.allDayRow = 0;
         };
-        
+
         // Sort all the events by start
         cosmo.model.sortEvents(evReg);
         // Reset conflict properties for all the events
         evReg.each(clearProps);
-        
+
         return true;
     };
 
@@ -151,7 +151,7 @@ cosmo.view.cal.conflict = new function() {
          * The max indent level of all items that conflict with this
          * one -- used to adjust width of a block
          * @param key String, the Hash key for the event's entry in the Hash
-         * @param val CalEvent obj, the calendar event to calc the maximum 
+         * @param val CalEvent obj, the calendar event to calc the maximum
          * conflict depth for.
          * @return Number, the maximum depth of overlap for this event
          * considering both *before* and *after* conflicts
@@ -182,7 +182,7 @@ cosmo.view.cal.conflict = new function() {
             }
             return max;
         };
-        
+
         // Create the list of 'after' conflicts for each event
         // The event also adds itself as a 'before' conflict
         // for 'after' conflicts it finds
@@ -199,7 +199,7 @@ cosmo.view.cal.conflict = new function() {
 
         return true;
     };
-    
+
     // All-day events
     /**
      * Set matrix position for each untimed event
@@ -208,7 +208,7 @@ cosmo.view.cal.conflict = new function() {
     function stackUntimed() {
         // 'Sparse matrix' for untimed events
         var allDayMatrix = [[], [], [], [], [], [], []];
-    
+
         /**
          * Set the positions in the sparse matrix for all-day
          * event tiling
@@ -288,7 +288,7 @@ cosmo.view.cal.conflict = new function() {
         evReg.each(setMatrixPos);
         return true;
     };
-    
+
     // Public methods
     // *******************
     /**

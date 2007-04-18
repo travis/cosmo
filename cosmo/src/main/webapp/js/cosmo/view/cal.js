@@ -62,10 +62,10 @@ cosmo.view.cal = new function () {
         // basic event properties
         if (typeof changedProps.changes['recurrenceRule'] == 'undefined') {
             changedBasicProps = true;
-            }
-            else {
+        }
+        else {
             changedRecur = true;
-            }
+        }
 
         // *** Changing recurrence
         // This means all changes will have to apply either to the entire
@@ -138,7 +138,7 @@ cosmo.view.cal = new function () {
                     ret = (diff >= bound || diff <= (bound * -1)) ? true : false;
                     return ret;
                 }
-            
+
                 // Change to master event in recurrence
                 if (ev.data.masterEvent) {
                     opts.masterEvent = true;
@@ -147,7 +147,7 @@ cosmo.view.cal = new function () {
                 else {
                     opts.instanceOnly = isOutOfIntervalRange();
                 }
-                
+
                 opts.recurrenceMod = recur.getModification(ev.data.instanceDate) != null;
 
                 // Show the confirmation dialog
@@ -199,8 +199,8 @@ cosmo.view.cal = new function () {
         // Reset the lozenge because we may be changing to the new type --
         // e.g., between all-day and normal, or between normal single
         // and normal composite
-        if (ev.dataOrig && 
-            !((ev.data.allDay || ev.data.anyTime) && 
+        if (ev.dataOrig &&
+            !((ev.data.allDay || ev.data.anyTime) &&
             (ev.dataOrig.allDay || ev.dataOrig.anyTime))) {
             ev.replaceLozenge();
         }
@@ -330,9 +330,9 @@ cosmo.view.cal = new function () {
                         };
                         // Look up the master event for the recurrence and pass the result
                         // on to function h
-                        f = function () { 
+                        f = function () {
                             var reqId = Cal.currentCollection.conduit.getEvent(
-                                Cal.currentCollection.collection.uid, ev.data.id, 
+                                Cal.currentCollection.collection.uid, ev.data.id,
                                 Cal.currentCollection.transportInfo, h);
                             };
                     }
@@ -445,9 +445,9 @@ cosmo.view.cal = new function () {
 
         requestId = //cosmo.service.atom.saveEvent(ev, {load: f});
             Cal.currentCollection.conduit.saveEvent(
-            Cal.currentCollection.collection.uid, ev.data, 
+            Cal.currentCollection.collection.uid, ev.data,
             Cal.currentCollection.transportInfo, f);
-        
+
         // Add to processing queue -- canvas will not re-render until
         // queue is empty
         self.processingQueue.push(requestId);
@@ -490,7 +490,7 @@ cosmo.view.cal = new function () {
         requestId = Cal.currentCollection.conduit.saveNewEventBreakRecurrence(
             Cal.currentCollection.collection.uid, ev.data, origId, recurEnd,
             Cal.currentCollection.transportInfo, f);
-        
+
         self.processingQueue.push(requestId);
         self.lastSent = null;
     }
@@ -513,7 +513,7 @@ cosmo.view.cal = new function () {
         var errMsg = '';
         var act = '';
         var qual = {};
-        
+
         qual.saveType = opts.saveType || 'singleEvent'; // Default to single event
 
         // Failure -- display exception info
@@ -521,7 +521,7 @@ cosmo.view.cal = new function () {
         if (err) {
             act = 'saveFailed';
             // Failed update
-            if ((qual.saveType == 'singleEvent' && saveEv.dataOrig) || 
+            if ((qual.saveType == 'singleEvent' && saveEv.dataOrig) ||
                 qual.saveType == 'instanceAllFuture' ||
                 qual.saveType == 'recurrenceMaster') {
                 errMsg = _('Main.Error.EventEditSaveFailed');
@@ -691,7 +691,7 @@ cosmo.view.cal = new function () {
                                     'instanceEvent': ev });
                             }
                         };
-                        f = function () { 
+                        f = function () {
                             var reqId = Cal.currentCollection.conduit.getEvent(
                                 Cal.currentCollection.collection.uid, ev.data.id,
                                 Cal.currentCollection.transportInfo, h);
@@ -732,7 +732,7 @@ cosmo.view.cal = new function () {
                             }
                         };
                         // Look up the RecurrenceRule and pass the result on to function h
-                        f = function () { 
+                        f = function () {
                             var reqId = Cal.currentCollection.conduit.getRecurrenceRules(
                                 Cal.currentCollection.collection.uid, [ev.data.id],
                                 Cal.currentCollection.transportInfo, h);
@@ -773,7 +773,7 @@ cosmo.view.cal = new function () {
         // along with the original params passed back in from the async response
         var f = function (newEvId, err, reqId) {
             handleRemoveResult(ev, newEvId, err, reqId, opts); };
-            
+
         var requestId = Cal.currentCollection.conduit.removeEvent(
             Cal.currentCollection.collection.uid, ev.data.id,
             Cal.currentCollection.transportInfo, f);
@@ -840,7 +840,7 @@ cosmo.view.cal = new function () {
      * @param opts A JS Object, options for the save operation.
      */
     function handleSaveRecurrenceRule(ev, err, reqId, opts) {
-        
+
         var rruleEv = ev;
         // Saving the RecurrenceRule can be part of a 'remove'
         // or 'save' -- set the message for an error appropriately
@@ -1083,10 +1083,10 @@ cosmo.view.cal = new function () {
                     // FIXME -- check for custom prop that says this field belongs
                     // to the event detail form
                     else if (ev && !ev.lozenge.getInputDisabled() &&
-                        ((elem.id == 'body') || (elem.className == 'inputText' && 
+                        ((elem.id == 'body') || (elem.className == 'inputText' &&
                             elem.type == 'text')) &&
                         Cal.currentCollection.privileges.write) {
-                        dojo.event.topic.publish('/calEvent', 
+                        dojo.event.topic.publish('/calEvent',
                             { 'action': 'saveFromForm' });
                     }
                     break;
@@ -1098,7 +1098,7 @@ cosmo.view.cal = new function () {
                     //  * Write access for the current collection
                     if (ev && !ev.lozenge.getInputDisabled() && (elem.id == 'body') &&
                         Cal.currentCollection.privileges.write) {
-                        dojo.event.topic.publish('/calEvent', 
+                        dojo.event.topic.publish('/calEvent',
                             { 'action': 'removeConfirm', 'data': ev });
                     }
                     break;
@@ -1138,8 +1138,8 @@ cosmo.view.cal = new function () {
 //            dojo.debug(eventLoadList[0])
             
             collection.conduit.getEvents(
-            collection.collection.uid, s, e, 
-            collection.transportInfo);
+                collection.collection.uid, s, e,
+                collection.transportInfo);
 
         }
         catch(e) {

@@ -103,7 +103,7 @@ cosmo.ui.event.handlers.mouseMoveHandler = function (e) {
         // Prevent text selection on drag in IE
         // Must turn it back on after drag operation completes
         document.body.onselectstart = function () { return false; }; 
-       d.doDrag(); 
+        d.doDrag(); 
     }
 }
 

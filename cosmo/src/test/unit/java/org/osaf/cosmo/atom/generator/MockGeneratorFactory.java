@@ -40,13 +40,15 @@ public class MockGeneratorFactory implements GeneratorFactory {
         LogFactory.getLog(MockGeneratorFactory.class);
 
     private Abdera abdera;
-    private Set projections;
-    private Set formats;
+    private Set<String> projections;
+    private Set<String> formats;
+    private boolean failureMode;
 
     public MockGeneratorFactory(Abdera abdera) {
         this.abdera = abdera;
-        this.projections = new HashSet();
-        this.formats = new HashSet();
+        this.projections = new HashSet<String>();
+        this.formats = new HashSet<String>();
+        this.failureMode = false;
     }
 
     // GeneratorFactory methods
@@ -67,22 +69,37 @@ public class MockGeneratorFactory implements GeneratorFactory {
                                              String format,
                                              ServiceLocator serviceLocator)
         throws UnsupportedProjectionException, UnsupportedFormatException {
-        // projection is requried
+        // projection is required
         if (projection == null || ! projections.contains(projection))
             throw new UnsupportedProjectionException(projection);
         if (format != null && ! formats.contains(format))
             throw new UnsupportedFormatException(format);
-        return new MockFeedGenerator(abdera, projection, format,
-                                     serviceLocator);
+        return new MockFeedGenerator(this, projection, format, serviceLocator);
     }
 
     // our methods
 
-    public Set getProjections() {
+    public Abdera getAbdera() {
+        return abdera;
+    }
+
+    public void setAbdera(Abdera abdera) {
+        this.abdera = abdera;
+    }
+
+    public Set<String> getProjections() {
         return projections;
     }
 
-    public Set getFormats() {
+    public Set<String> getFormats() {
         return formats;
+    }
+
+    public boolean isFailureMode() {
+        return failureMode;
+    }
+
+    public void setFailureMode(boolean mode) {
+        failureMode = mode;
     }
 }

@@ -75,6 +75,15 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
     }
 
     public void testGenerationError() throws Exception {
-        // XXX
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        helper.rememberProjection("yyz");
+        helper.rememberFormat("eff");
+        helper.enableGeneratorFailure();
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 500, res.getStatus());
     }
 }

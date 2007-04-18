@@ -131,4 +131,8 @@ public class ProviderHelper extends MockHelper {
     public void rememberFormat(String format) {
         generatorFactory.getFormats().add(format);
     }
+
+    public void enableGeneratorFailure() {
+        generatorFactory.setFailureMode(true);
+    }
 }

@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.atom.generator.mock;
 
-import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Feed;
 
 import org.apache.commons.logging.Log;
@@ -30,23 +29,24 @@ import org.osaf.cosmo.server.ServiceLocator;
  * Mock implementation of {@link FeedGenerator} that generates dummy
  * feeds for use with atom unit tests.
  *
+ * @see MockGeneratorFactory
  * @see Feed
  * @see CollectionItem
  */
 public class MockFeedGenerator implements FeedGenerator {
     private static final Log log = LogFactory.getLog(MockFeedGenerator.class);
 
-    private Abdera abdera;
+    private MockGeneratorFactory factory;
     private String projection;
     private String format;
     private ServiceLocator locator;
 
     /** */
-    public MockFeedGenerator(Abdera abdera,
+    public MockFeedGenerator(MockGeneratorFactory factory,
                              String projection,
                              String format,
                              ServiceLocator locator) {
-        this.abdera = abdera;
+        this.factory = factory;
         this.projection = projection;
         this.format = format;
         this.locator = locator;
@@ -57,10 +57,13 @@ public class MockFeedGenerator implements FeedGenerator {
     /**
      * Generates a dummy feed with no content.
      *
-     * @throws GeneratorException
+     * @throws GeneratorException if the generator factory is in
+     * failure mode
      */
     public Feed generateFeed(CollectionItem item)
         throws GeneratorException {
-        return abdera.getFactory().newFeed();
+        if (factory.isFailureMode())
+            throw new GeneratorException("Failure mode");
+        return factory.getAbdera().getFactory().newFeed();
     }
 }

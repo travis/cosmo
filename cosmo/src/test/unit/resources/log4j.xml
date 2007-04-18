@@ -49,9 +49,11 @@
     <level value="ERROR"/>
   </logger>
 
+<!--
   <logger name="org.osaf.cosmo.atom">
     <level value="DEBUG"/>
   </logger>
+-->
 
   <root>
     <level value="WARN"/>

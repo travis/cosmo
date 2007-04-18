@@ -21,6 +21,7 @@
  */
 dojo.provide("cosmo.ui.button");
 dojo.require("cosmo.ui.conf");
+dojo.require("cosmo.env");
 dojo.require("dojo.event");
 dojo.require("dojo.widget.*");
 dojo.require("cosmo.ui.widget.Button")
@@ -109,6 +110,7 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
         nbData.style.lineHeight = '16px';
         nbData.style.textAlign = lowerCaseSide;
         nbData.className = 'btnElemBaseSm';
+        nbData.style.backgroundImage = 'url(' + cosmo.env.getImagesUrl() + 'button_bgs_sm.gif)';
         nbImg.src = BUTTON_DIR_PATH + 'nav_arrow_' +
             lowerCaseSide + '.gif';
         if (side == 'Left') {

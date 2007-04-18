@@ -119,6 +119,10 @@ cosmo.ui.cal_form.CalForm = function () {
             case 'saveFailed':
                 self.setButtons(true, true);
                 break;
+            case 'noItems':
+                self.setButtons(false, false);
+                self.clear();
+                break;
             default:
                 // Do nothing
                 break;
@@ -314,15 +318,25 @@ cosmo.ui.cal_form.CalForm = function () {
             5, 5, null, 'inputText', elem);
         _html.appendNbsp(elem);
         _html.appendNbsp(elem);
-        _html.createInput('radio', name + 'ap', name + 'ap', null,
-            null, 1, null, elem);
+        var o = {
+            type: 'radio',
+            id: name + 'ap0',
+            name: name + 'ap',
+            value: 1
+        }
+        _html.createInput(o, elem);
         _html.appendNbsp(elem);
         elem.appendChild(_createText(
             _('App.AM')));
         _html.appendNbsp(elem);
         _html.appendNbsp(elem);
-        _html.createInput('radio', name + 'ap', name + 'ap', null,
-            null, 2, null, elem);
+        var o = {
+            type: 'radio',
+            id: name + 'ap1',
+            name: name + 'ap',
+            value: 2
+        }
+        _html.createInput(o, elem);
         _html.appendNbsp(elem);
         elem.appendChild(_createText(
             _('App.PM')));
@@ -926,9 +940,6 @@ cosmo.ui.cal_form.CalForm = function () {
         
         dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, Cal, Cal.handleCollectionUpdated);
         dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, Cal, Cal.handleSubscriptionUpdated);
-        dojo.event.topic.subscribe(cosmo.topics.ModalDialogDisplayed.topicName, Cal, Cal.handleModalDialogDisplayed);
-        dojo.event.topic.subscribe(cosmo.topics.ModalDialogDismissed.topicName, Cal, Cal.handleModalDialogDismissed);
-
     };
     this.addJumpToDate = function (dMain) {
         var top = parseInt(cosmo.ui.minical.MiniCal.displayContext.style.top);

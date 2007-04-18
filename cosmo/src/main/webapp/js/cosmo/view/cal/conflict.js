@@ -121,6 +121,9 @@ cosmo.view.cal.conflict = new function() {
                 beforeEv = ev.beforeConflicts[i];
                 depthList.push(beforeEv.conflictDepth);
             }
+            // Sort the list of conflict depths -- use explicit numeric sort
+            var f = function (a, b) { return (a >= b) ?  1 : -1; };
+            depthList.sort(f);
             ev.conflictDepth = findFirstGapInSequence(depthList);
         };
         /**

@@ -40,9 +40,6 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
     // A backup copy (clone) of the .data property made 
     // before trying to edit
     this.dataOrig = null;
-    // If the event has a edit/remove call processing, don't allow
-    // user to move/resize
-    this.inputDisabled = false;
     // List of conflicting events that come before this event
     this.beforeConflicts = [];
     // List of conflicting events that come after this event
@@ -61,16 +58,18 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
      * properties are saved in compareList. Null values for the 
      * comparator func in that list mean comparison just uses
      * generic equality.
-     * @return Array/null, If anything has changed, returns an array
-     * of the changes -- each item in the array is an array with three
-     * items: the name of the changed property, the new value, and
-     * the original value. If nothing has changed, returns null.
-     * 
+     * @return Object with two props
+     * 'count' -- the number of changes, and 'changes' --
+     * a keyword/value obj, where the keyword is the name of the 
+     * changed property, and the value is an object with two items: 
+     * newValue (the updated value) and origValue (the original)
      */
     this.hasChanged = function () {
         var d = this.data;
         var dO = this.dataOrig;
-        var ret = [];
+        var ret = { count: 0,
+            changes: {}
+        };
         /**
          * Special func for comparing status since Design insists that
          * 'CONFIRMED' and unset should somehow be the same thing.
@@ -151,6 +150,10 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
             'recurrenceRule': compareRecurrence,
             'status': compareStatus
         }
+        function addChange(prop, curr, orig) {
+            ret.count++;
+            ret.changes[prop] = { newValue: curr, origValue: orig };
+        }
         /**
          * Base function for doing all the prop comparisons.
          * @param prop String, the name of the property to be checked.
@@ -165,12 +168,14 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
             var b = (typeof orig == 'undefined') ? null : orig;
             if (f) {
                 if (f(a, b)) {
-                    ret.push([prop, curr, orig])
+                    ret.count++;
+                    ret.changes[prop] = { newValue: curr, origValue: orig };
                 }
             }
             else {
                 if (a != b) {
-                    ret.push([prop, curr, orig])
+                    ret.count++;
+                    ret.changes[prop] = { newValue: curr, origValue: orig };
                 }
             }
         }
@@ -178,7 +183,6 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
         for (var i in compareList) {
             compareVals(i, d[i], dO[i], compareList[i]);
         }
-        ret = ret.length ? ret : null;
         return ret;
     }
     /**
@@ -226,7 +230,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
             // FIXME: Use topics
             var ev = cosmo.view.cal.canvas.getSelectedEvent();
             ev.lozenge.updateDisplayMain();
-            this.setInputDisabled(false);
+            ev.lozenge.setInputDisabled(false);
         }
     };
     /**
@@ -250,30 +254,6 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
         // ================
         this.data = CalEventData.clone(this.dataOrig);
         return true;
-    };
-    /**
-     * Enable/disable user input for this event -- should be disabled
-     * when a remote operation is processing
-     * TO-DO: Since this is just a checked property, do we really need
-     * setter/getter for this?
-     */
-    this.setInputDisabled = function (isDisabled) {
-        if (isDisabled) {
-            this.inputDisabled = true;
-        }
-        else {
-            this.inputDisabled = false;
-        }
-        return this.inputDisabled;
-    };
-    /**
-     * Whether or not input is disabled for this event -- usually
-     * because of a remote operation processing for the event
-     * TO-DO: Since this is just a checked property, do we really need
-     * setter/getter for this?
-     */
-    this.getInputDisabled = function () {
-        return this.inputDisabled;
     };
     /**
      * Whether the start and end properties of an event put it

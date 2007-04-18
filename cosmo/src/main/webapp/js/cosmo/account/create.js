@@ -212,7 +212,7 @@ cosmo.account.create = new function () {
         o.btnsRight = [b];
         o.defaultAction = function () { self.submitCreate(); };
 
-        cosmo.app.modalDialog.show(o);
+        cosmo.app.showDialog(o);
 		form.username.focus();
     };
     /**
@@ -251,7 +251,7 @@ cosmo.account.create = new function () {
         var d = cosmo.app.modalDialog;
         var btnsCenter = [dojo.widget.createWidget("cosmo:Button", 
             { text:_('App.Button.Close'), width:74, 
-            handleOnClick: function () { cosmo.app.modalDialog.hide(); } })];
+            handleOnClick: function () { cosmo.app.hideDialog(); } })];
         
         // Update dialog in place
         d.setPrompt(prompt);

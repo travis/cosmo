@@ -56,7 +56,7 @@ cosmo.util.debug.dumpIntoPopup = function (o) {
     }
     // Create new window and display error
     try {
-      errorWin = window.open('about:blank', 'errorWin');
+      errorWin = window.open('', 'errorWin');
       errorWin.document.body.innerHTML = str;
     }
     // If pop-up gets blocked, inform user

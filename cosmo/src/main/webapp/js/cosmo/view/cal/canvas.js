@@ -22,8 +22,8 @@ dojo.require("cosmo.util.date");
 dojo.require('cosmo.ui.event.handlers');
 dojo.require('cosmo.ui.draggable');
 dojo.require("cosmo.util.i18n");
-var _ = cosmo.util.i18n.getText;
 dojo.require("cosmo.util.hash");
+dojo.require("cosmo.convenience");
 dojo.require("cosmo.model");
 dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.view.cal");
@@ -40,6 +40,8 @@ cosmo.view.cal.canvas = new function () {
     var allDayArea = null; 
     // Blue, green, red, orange, gold, plum, turquoise, fuschia, indigo
     var hues = [210, 120, 0, 30, 50, 300, 170, 330, 270];
+    // The scrolling div for timed events
+    var timedScrollingMainDiv = null;
 
     // Avoid RSI
     function $(id) {
@@ -102,10 +104,10 @@ cosmo.view.cal.canvas = new function () {
     function removeEvent(ev, rem) {
         // Default behavior is to remove the lozenge
         var removeLozenge = rem != false ? true : false;
-        self.eventRegistry.removeItem(ev.id);
         if (removeLozenge) {
             removeEventFromDisplay(ev.id, ev);
         }
+        self.eventRegistry.removeItem(ev.id);
         ev = null;
     }
     /**
@@ -200,8 +202,9 @@ cosmo.view.cal.canvas = new function () {
      * @ return Boolean, true
      */
     function updateEventsDisplay() {
-        if (self.eventRegistry.length && 
-            cosmo.view.cal.conflict.calc(self.eventRegistry) && 
+        // Current collection has items
+        if (self.eventRegistry.length) {
+            if (cosmo.view.cal.conflict.calc(self.eventRegistry) &&
                 positionLozenges()) {
             // If no currently selected event, put selection on
             // the final one loaded
@@ -211,6 +214,11 @@ cosmo.view.cal.canvas = new function () {
             }
             dojo.event.topic.publish('/calEvent', { 'action': 
                 'eventsDisplaySuccess', 'data': self.selectedEvent });
+        }
+        }
+        // No items displayed in the current collection
+        else {
+            dojo.event.topic.publish('/calEvent', { 'action': 'noItems' });
         }
         return true;
     }
@@ -293,7 +301,7 @@ cosmo.view.cal.canvas = new function () {
             
             // Saved event is still in view
             if (cmd.qualifier.onCanvas) {
-                ev.setInputDisabled(false);
+                ev.lozenge.setInputDisabled(false);
                 ev.lozenge.updateDisplayMain();
             }
             // Changes have placed the saved event off-canvas
@@ -310,8 +318,10 @@ cosmo.view.cal.canvas = new function () {
         if (!cosmo.view.cal.processingQueue.length) {
             if (cmd.qualifier.newEvent || 
                 (cmd.qualifier.onCanvas && opts.saveType != 'instanceOnlyThisEvent')) {
+                var sel = cosmo.view.cal.lastSent;
+                sel.lozenge.setInputDisabled(false);
                 dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 
-                    'data': cosmo.view.cal.lastSent });
+                    'data': sel });
             }
             updateEventsDisplay();
         }
@@ -462,8 +472,8 @@ cosmo.view.cal.canvas = new function () {
      * tell you what kind of remove is happening
      */
     function removeSuccess(ev, opts) {
-        if (opts.removeType == 'recurrenceMaster' || 
-            opts.removeType == 'instanceAllFuture') {
+        if (opts && (opts.removeType == 'recurrenceMaster' ||
+            opts.removeType == 'instanceAllFuture')) {
             var h = self.eventRegistry.clone();
             var dt = null;
             if (opts.removeType == 'instanceAllFuture') {
@@ -492,7 +502,7 @@ cosmo.view.cal.canvas = new function () {
         var id = '';
         var dragItem = null;
         var elem = null;
-        var selObj = null;
+        var item = null;
         var s = '';
         var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
         var id = elem.id;
@@ -509,17 +519,17 @@ cosmo.view.cal.canvas = new function () {
             case (id.indexOf('eventDiv') > -1):
                 // Get the clicked-on event
                 s = Cal.getIndexEvent(id);
-                selObj = cosmo.view.cal.canvas.eventRegistry.getItem(s);
+                item = cosmo.view.cal.canvas.eventRegistry.getItem(s);
 
                 // If this object is currently in 'processing' state, ignore any input
-                if (selObj.getInputDisabled()) {
+                if (item.lozenge.getInputDisabled()) {
                     return false;
                 }
                 
                 // Publish selection
                 var c = cosmo.view.cal.canvas;
-                if (c.selectedEvent && selObj.id != c.selectedEvent.id) {
-                    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': selObj });
+                if (c.selectedEvent && item.id != c.selectedEvent.id) {
+                    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': item });
                 }
                 
                 // No move/resize for read-only collections
@@ -590,8 +600,48 @@ cosmo.view.cal.canvas = new function () {
         }
     }
     
+    /**
+     * Lozenge stuff
+     */
+    function setLozengeProcessing(cmd) {
+        var ev = cmd.data;
+        var qual = cmd.qualifier;
+        // Reset the lozenge because we may be changing to the new type
+        // -- e.g., between all-day and normal, or between normal single
+        // and normal composite
+        if (ev.dataOrig &&
+            !((ev.data.allDay || ev.data.anyTime) &&
+            (ev.dataOrig.allDay || ev.dataOrig.anyTime))) {
+            ev.replaceLozenge();
+        }
+        // Reset the lozenge properties from the event
+        ev.lozenge.updateFromEvent(ev, true);
+        // Do visual updates to size, position
+        ev.lozenge.updateElements();
+        
+        // Display processing animation
+        ev.lozenge.setInputDisabled(true);
+        ev.lozenge.showProcessing();
+        if (ev.data.recurrenceRule) {
+            
+            var f = function (i, e) {
+                if (e.data.id == ev.data.id) {
+                    if (qual == 'allEvents' || (qual == 'allFuture' && 
+                        (ev.data.start.toUTC() < e.data.start.toUTC()))) {
+                        e.lozenge.setInputDisabled(true);
+                        e.lozenge.showProcessing();
+                    }
+                }
+            }
+            var evReg = cosmo.view.cal.canvas.eventRegistry;
+            evReg.each(f);
+        }
+    }
+    
     // Subscribe to the '/calEvent' channel
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
+    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
+    // Subscribe to the '/app' channel
+    dojo.event.topic.subscribe('/app', self, 'handlePub_app');
     
     /**
      * Handle events published on the '/calEvent' channel, including
@@ -599,7 +649,7 @@ cosmo.view.cal.canvas = new function () {
      * @param cmd A JS Object, the command containing orders for
      * how to handle the published event.
      */
-    this.handlePub = function (cmd) {
+    this.handlePub_calEvent = function (cmd) {
         var act = cmd.action;
         var opts = cmd.opts;
         var data = cmd.data;
@@ -623,6 +673,7 @@ cosmo.view.cal.canvas = new function () {
                 setSelectedEvent(ev);
                 break;
             case 'save':
+                setLozengeProcessing(cmd);
                 // Do nothing
                 break; 
             case 'saveFailed':
@@ -653,19 +704,21 @@ cosmo.view.cal.canvas = new function () {
                         var rEv = ev;
                     }
                     restoreEvent(rEv);
-                    rEv.setInputDisabled(false);
+                    rEv.lozenge.setInputDisabled(false);
                 }
                 break;
             case 'saveSuccess':
                 saveSuccess(cmd);
+                break;
+            case 'remove':
+                // Show 'processing' state here
+                setLozengeProcessing(cmd);
                 break;
             case 'removeSuccess':
                 var ev = cmd.data;
                 removeSuccess(ev, opts)
                 break;
             case 'removeFailed':
-                var ev = cmd.data;
-                
                 break;
             default:
                 // Do nothing
@@ -673,6 +726,33 @@ cosmo.view.cal.canvas = new function () {
         }
     };
     
+    this.handlePub_app = function (cmd) {
+        var t = cmd.type;
+        switch (t) {
+            case 'modalDialogToggle':
+                // Showing the modal dialog box: remove scrolling in the timed
+                // event div below (1. Firefox Mac, the scrollbar uses a native
+                // wigdet and shows through the dialog box. 2. Firefox on all
+                // plaforms, overflow of 'auto' in underlying divs causes 
+                // carets/cursors in textboxes to disappear. This is a verified
+                // Mozilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=167801
+                if (cmd.isDisplayed) {
+                    if (dojo.render.html.mozilla) {
+                        timedScrollingMainDiv.style.overflow = "hidden";
+                    }
+                }
+                else {
+                   if (dojo.render.html.mozilla) {
+                       timedScrollingMainDiv.style.overflow = "auto";
+                       timedScrollingMainDiv.style.overflowY = "auto";
+                       timedScrollingMainDiv.style.overflowX = "hidden";
+                   } 
+                }
+                break;
+        }
+    }
+
+
     // Public props
     // ****************
     // Width of day col in week view, width of event lozenges --
@@ -846,16 +926,14 @@ cosmo.view.cal.canvas = new function () {
             // Subtract one px for border per asinine CSS spec
             var halfHourHeight = (HOUR_UNIT_HEIGHT/2) - 1;
             
-            function workingHoursLine() {
-                var r = '';
+            var w = '';
                 // Working/non-working hours line
-                r += '<div class="';
-                r += (j < 8 || j > 17) ? 'nonWorkingHours' : 'workingHours';
-                r += '" style="width:' + workingHoursBarWidth + 
+            w += '<div class="';
+            w += (j < 8 || j > 17) ? 'nonWorkingHours' : 'workingHours';
+            w += '" style="width:' + workingHoursBarWidth +
                     'px; height:' + (halfHourHeight+1) + 
                     'px; float:left; font-size:1px;">&nbsp;</div>';
-                return r;
-            }
+            var workingHoursLine = '';
             
             str = '';
             viewDiv = timelineNode; 
@@ -880,7 +958,7 @@ cosmo.view.cal.canvas = new function () {
                 row += '<div class="hourDivSubLeft">' + hour + 
                     meridian + '</div>';
                 row += '</div>\n';
-                row += workingHoursLine();
+                row += workingHoursLine;
                 row += '<br class="clearAll"/>'
                 
                 idstr = i + '-' + j + '30';
@@ -898,7 +976,7 @@ cosmo.view.cal.canvas = new function () {
                 }
                 row += ' width:' + timeLineWidth + 
                     'px; float:left;">&nbsp;</div>\n';
-                row += workingHoursLine();
+                row += workingHoursLine;
                 row += '<br class="clearAll"/>'
                 
                 str += row;
@@ -1012,7 +1090,6 @@ cosmo.view.cal.canvas = new function () {
         showMonthHeader();
         showDayNameHeaders();
         showAllDayCols();
-        showHours();
         
         // Create event listeners
         if (!initRender) {
@@ -1020,6 +1097,10 @@ cosmo.view.cal.canvas = new function () {
             dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
             dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
             dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
+            // Get a reference to the main scrolling area for timed events;
+            timedScrollingMainDiv = $('timedScrollingMainDiv');
+            // Only render the base canvas once on initial load
+            showHours();
         }
 
         initRender = true;
@@ -1034,7 +1115,7 @@ cosmo.view.cal.canvas = new function () {
     this.getTimedCanvasScrollTop = function () {
         // Has to be looked up every time, as value may change
         // either when user scrolls or resizes all-day event area
-        var top = $('timedScrollingMainDiv').scrollTop;
+        var top = timedScrollingMainDiv.scrollTop;
         // FIXME -- viewOffset is the vertical offset of the UI
         // with the top menubar added in. This should be a property
         // of render context that the canvas can look up

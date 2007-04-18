@@ -38,9 +38,25 @@ cosmo.topics.declareMessage = function(/*string*/ className,
      *              as the constructor object so you can easily get the topicName 
      *              from an instance or from "cosmo.topics.MyNewMessage.topicName" 
      */                
-    var con = dojo.declare(className, superclass || cosmo.topics.Message, initializer, props);
-    con.topicName = topicName;
-    con.prototype.topicName = topicName;                                 
+    var o = {};
+    // Accept keywords as an alternative to the param list
+    if (arguments.length == 1) {
+        o = arguments[0];
+}
+    // Otherwise use normal parameter list in order
+    else {
+        o.className = className;
+        o.topicName = topicName;
+        o.superclass = superclass;
+        o.initializer = initializer;
+        o.props = props;
+    }
+    var con = dojo.declare(o.className,
+        o.superclass || cosmo.topics.Message,
+        o.initializer || null,
+        o.props || null);
+    con.topicName = o.topicName;
+    con.prototype.topicName = o.topicName;
 }
 
 
@@ -103,38 +119,47 @@ cosmo.topics.declareMessage("cosmo.topics.PreferencesUpdatedMessage",
 /**
  * Lower Level UI messages: Messsages very specific to the UI - like screen resizes and whatnot
  */
+cosmo.topics.declareMessage({ className: "cosmo.topics.AppLevelMessage",
+    topicName: '/app',
+    props: { type: null }
+});
  
-cosmo.topics.declareMessage("cosmo.topics.ModalDialogDisplayed",
-  // summary: published when the modal dialog box is displayed
-  // description: UI elements who have parts which "shine through" floating divs
-  //              which are placed above it in certain browsers (FF on Mac OS X for 
-  //              instance) should subscribe to this message's topic so it can hide
-  //              those parts.
-  "MODAL_DIALOG_DISPLAYED",null,null,null
-);
-
-cosmo.topics.declareMessage("cosmo.topics.ModalDialogDismissed",
-  // summary: published when the modal dialog box is no longer visible
-  // description: any UI elements who were hiding certain elements (see
-  //              cosmo.topics.ModalDialogDisplayed) can now show them
-  "MODAL_DIALOG_DISMISSED",null,null,null
-);
+cosmo.topics.declareMessage({ className: "cosmo.topics.ModalDialogToggle",
+    // summary: published when the modal dialog box is toggled on or off
+    superclass: cosmo.topics.AppLevelMessage,
+    initializer: function (opts) {
+        this.topicName = this.constructor.superclass.topicName;
+        this.isDisplayed = opts.isDisplayed || false;
+    },
+    props: { isDisplayed: false,
+        type: 'modalDialogToggle'  }
+} );
 
 // Other handy dandy functions
 
-cosmo.topics.publish = function(/*Function*/messageConstructor, /*Array*/initializerArguments){
-   // summary: create a message and publish it in one fell swoop. You don't specify a topic, because the topic
+cosmo.topics.publish = function (/*Function*/messageConstructor,
+    /*Array|Object*/initializerArg){
+    // summary: create a message and publish it in one fell swoop.
+    //     You don't specify a topic, because the topic
    //          used is the "topicName" property of the message object.
    //
    // messageConstructor: a constructor that creates a message
    //
    // initializerArguments: arguments to pass to the constructor/initializer
-   if (!initializerArguments){
-       initializerArguments = [];
+    if (!initializerArg){
+        initializerArg = [];
    }
-   var message = new messageConstructor(initializerArguments[0],
-                                        initializerArguments[1],
-                                        initializerArguments[2], 
-                                        initializerArguments[3]);
+    var message = null;
+    // Pass an Array -- note: instanceof fails in iframe for Array
+    if (initializerArg instanceof Array) {
+        message = new messageConstructor(initializerArg[0],
+            initializerArg[1],
+            initializerArg[2],
+            initializerArg[3]);
+    }
+    // Pass an Object
+    else {
+        message = new messageConstructor(initializerArg);
+    }
    dojo.event.topic.publish(message.topicName, message);
 }

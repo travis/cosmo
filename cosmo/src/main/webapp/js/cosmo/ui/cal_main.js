@@ -293,12 +293,6 @@ cosmo.ui.cal_main.Cal = new function () {
         // seems to reset the scrollTop in Safari
         viewDiv.scrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
         
-        // BANDAID for IE6 -- dummy element to force 100% height to render
-        if (document.all) {
-            var dummyElem = document.createElement('div');
-            allDayDiv.appendChild(dummyElem);
-        }
-        
         // Add event listeners for form-element behaviors
         this.calForm.setEventListeners();
 
@@ -823,14 +817,22 @@ cosmo.ui.cal_main.Cal = new function () {
     /**
      * Figures out the X-position for the top or bottom edge of an event lozenge
      * based on a military time.
-     * @param miltime time string in military time format
+     * @param milTime time string in military time format
+     * @param posOrientation string ('start' or 'end'), whether the position
+     *    in question is for the start or end of the lozenge. This is for handling
+     *    the special case of 12am being both the start and end of the day.
      * @return An integer of the X-position for the top/bottom edge of an event lozenge
      */
-    this.calcPosFromTime = function (miltime) {
-        var h = this.extractHourFromTime(miltime);
-        var m = this.extractMinutesFromTime(miltime);
+    this.calcPosFromTime = function (milTime, posOrientation) {
+        var h = this.extractHourFromTime(milTime);
+        var m = this.extractMinutesFromTime(milTime);
         var pos = 0;
-
+        // Handle cases where midnight is the end of the timeline
+        // instead of the beginning
+        // In those cases, it's logically 24:00 instead of 0:00
+        if (h == 0 && posOrientation == 'end') {
+            h = 24;
+        }
         pos += (h*HOUR_UNIT_HEIGHT);
         pos += ((m/60)*HOUR_UNIT_HEIGHT);
         pos = parseInt(pos);

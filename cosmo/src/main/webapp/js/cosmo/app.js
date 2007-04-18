@@ -16,11 +16,14 @@
 
 dojo.provide('cosmo.app');
 
+dojo.require("dojo.event.*");;
 dojo.require('cosmo.ui.widget.ModalDialog');
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.topics");
-var _ = cosmo.util.i18n.getText;
+dojo.require("cosmo.convenience");
+dojo.require("cosmo.util.popup");
+
 cosmo.app = new function () {
     var self = this;
     var selectBoxVisibility = {};
@@ -60,6 +63,7 @@ cosmo.app = new function () {
     this.showErr = function (pri, sec) {
         var msg = '';
         var secondaryMessage = null; // Secondary message, if any
+        var trace = null; // Stack trace, if any
         
         // Secondary message passed 
         if (sec) {
@@ -68,6 +72,7 @@ cosmo.app = new function () {
             }
             else if (sec instanceof Error && sec.message) {
                 secondaryMessage = sec.message;
+                trace = sec.javaStack;
             }
         }
         
@@ -87,9 +92,43 @@ cosmo.app = new function () {
             }
             // Otherwise just display the current message
             else {
-                msg = '<div class="errText">' + pri + '</div>';
+                msg = _createElem('div');
+                // Primary error message -- simple message
+                var d = _createElem('div');
+                d.className = 'errText';
+                d.innerHTML = pri;
+                pri = d;
+                msg.appendChild(pri);
+                // Secondary message -- some details or string from the server
                 if (secondaryMessage) {
-                    msg += '<div>' + secondaryMessage + '</div>'
+                    d = _createElem('div');
+                    d.innerHTML = secondaryMessage;
+                    secondaryMessage = d;
+                    msg.appendChild(secondaryMessage);
+                    // If we have a trace, give the user the option of seeing it
+                    // in a pop-up window
+                    if (trace) {
+                        d = _createElem('div');
+                        d.innerHTML = '<pre>' + trace + '</pre>';
+                        trace = d;
+                        var full = _createElem('div');
+                        // Use a clone of the secondary message node
+                        full.appendChild(secondaryMessage.cloneNode(true));
+                        full.appendChild(trace);
+                        var f = function () {
+                            cosmo.util.popup.openFullSize(full);
+                }
+                        d = _createElem('div');
+                        d.style.marginTop = '8px';
+                        var a = document.createElement('a');
+                        // Avoid use of the ugly hack of '#' href prop 
+                        // Give the anchor some help to act like a real link
+                        a.className = 'jsLink'; 
+                        dojo.event.connect(a, 'onclick', f);
+                        a.appendChild(_createText('Click here for details ...'));
+                        d.appendChild(a);
+                        msg.appendChild(d);
+            }
                 }
             }
             this.modalDialog.type = this.modalDialog.ERROR;
@@ -102,8 +141,8 @@ cosmo.app = new function () {
         }
     };
     /**
-     * Display the current dialog box and throw up the transparent
-     * full-screen div that blocks all user input to the UI
+     * Display the modal dialog box with whatever set of attributes
+     * is passed to it
      */
     this.showDialog = function (props) {
         for (var p in props) {
@@ -111,24 +150,37 @@ cosmo.app = new function () {
         }
         self.setInputDisabled(true);
         // Hide the stupid IE6 select elements that ignore z-index
+        // This is done app-wide right here instead of delegating
+        // to individual widgets since select elements can be grabbed
+        // for the entire DOM tree at one time
         if (dojo.render.html.ie && dojo.render.ver < 7) {
             self.showHideSelectBoxes(false);
         }
+        // Publish message to individual widgets as well -- allow
+        // UI components to run any browser-specific hacks needed --
+        // e.g., hide scrollbars, turn off overflow to avoid
+        // disappearing cursor, etc.
+        cosmo.topics.publish(cosmo.topics.ModalDialogToggle, { isDisplayed: true });
         self.modalDialog.show();
-        cosmo.topics.publish(cosmo.topics.ModalDialogDisplayed);
     };
     /**
      * Dismiss the faux modal dialog box -- check for queued error
      * messages to display if needed
-     * Put away the full-screen transparent input-blocking div
      */
     this.hideDialog = function () {
+        self.modalDialog.hide();
         // Un-hide the stupid IE6 select elements that ignore z-index
+        // This is done app-wide right here instead of delegating
+        // to individual widgets since select elements can be grabbed
+        // for the entire DOM tree at one time
         if (dojo.render.html.ie && dojo.render.ver < 7) {
             self.showHideSelectBoxes(true);
         }
-        self.modalDialog.hide();
-        cosmo.topics.publish(cosmo.topics.ModalDialogDismissed);
+        // Publish to individual widgets as well -- allow
+        // UI components to shut off any browser-specific hacks needed
+        // in the display of the dialog box -- e.g., turning overflow
+        // back on, etc.
+        cosmo.topics.publish(cosmo.topics.ModalDialogToggle, { isDisplayed: false });
         // If there are error messages that have been added to the queue,
         // trigger another dialog to handle them
         if (self.errorList.length) {

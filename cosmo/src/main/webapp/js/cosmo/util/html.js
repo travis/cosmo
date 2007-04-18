@@ -121,13 +121,18 @@ cosmo.util.html.createInput = function (type, id, name,
         appendElem = parentNode;
     }
     
-    // IE falls down on DOM-method-generated
-    // radio buttons and checkboxes
-    // Old-skool with conditional branching and innerHTML
-    if (document.all && (o.type == 'radio' || o.type == 'checkbox')) {
+    // Neither IE nor Safari can handle DOM-generated radio
+    // or checkbox inputs -- they stupidly assume name and id
+    // attributes should be identical. The solution: kick it
+    // old-skool with conditional branching and innerHTML
+    if ((document.all || navigator.userAgent.indexOf('Safari') > -1) && 
+        (o.type == 'radio' || o.type == 'checkbox')) {
         str = '<input type="' + o.type + '"' +
             ' name="' + o.name + '"' +
             ' id ="' + o.id + '"';
+        if (o.value) {
+            str += ' value="' + o.value + '"';
+        }
         if (o.size) {
             str += ' size="' + o.size + '"';
         }

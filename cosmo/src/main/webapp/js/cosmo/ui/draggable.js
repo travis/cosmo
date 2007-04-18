@@ -52,6 +52,12 @@ cosmo.ui.draggable.Draggable = function (id) {
     // from the location of the pointer while dragging
     this.clickOffsetX = 0;
     this.clickOffsetY = 0;
+    // Used for dragging multi-day timed events
+    this.composite = false;
+    this.clickOffsetLozengeTop = 0;
+    this.clickOffsetLozengeBottom = 0;
+    // Scroll offset for timed calendar canvas
+    this.scrollOffset = 0;
     // Dragging vs. resizing -- 'drag', 'resizetop', or 'resizebottom'
     this.dragMode = null;
     // 30 min. increment size -- subtract 2px for stupid CSS borders
@@ -84,6 +90,15 @@ cosmo.ui.draggable.Draggable = function (id) {
         this.clickOffsetY = yPos - div.offsetTop;
         this.rLimit = (Cal.midColWidth - cosmo.view.cal.canvas.dayUnitWidth - 
             SCROLLBAR_SPACER_WIDTH - 2); 
+        this.scrollOffset = cosmo.view.cal.canvas.getTimedCanvasScrollTop();
+        if (lozenge.composite()) {
+            this.composite = true;
+            var list = lozenge.auxDivList;
+            var last = list[list.length-1];
+            var offsetBottom = last.offsetTop + last.offsetHeight;
+            this.clickOffsetLozengeTop = this.getLocalMouseYPos(yPos) - div.offsetTop;
+            this.clickOffsetLozengeBottom = this.getLocalMouseYPos(yPos) - offsetBottom;
+        }
         
     };
     this.doDrag = function () {
@@ -91,7 +106,7 @@ cosmo.ui.draggable.Draggable = function (id) {
         // Set by mouseDownHandler based on location of click
         
         // Set opacity effect
-        cosmo.view.cal.canvas.getSelectedEvent().lozenge.setOpacity(60);
+        this.doDragEffect('on');
         
         switch (this.dragMode) {
             case 'drag':
@@ -118,32 +133,38 @@ cosmo.ui.draggable.Draggable = function (id) {
         if (!cosmo.view.cal.canvas.getSelectedEvent()) {
             return false;
         }
-        
-        
         // Not just a simple click
         this.dragged = true;
-        
         // Lozenge associated with this Draggable
         var moveLozenge = cosmo.view.cal.canvas.getSelectedEvent().lozenge;
         // Subtract the offset to get where the left/top
         // of the lozenge should be
         var moveX = (xPos - this.clickOffsetX);
-        var moveY = (yPos - this.clickOffsetY);
         // Right-hand move constraint
         var rLimit = this.rLimit;
-        // Bottom move constraint -- need to know height of lozenge
-        var bLimit = this.getBLimit(moveLozenge);
         // Add drag constraints
         // -----------------------------
         moveX = moveX < 0 ? 0 : moveX; // Left bound
         moveX = moveX > rLimit ? rLimit : moveX; // Right bound
-        moveY = moveY < 0 ? 0 : moveY; // Top bound
-        moveY = moveY > bLimit ? bLimit : moveY; // bottom bound
         // Move the lozenge -- don't actually reset lozenge properties
         // until drop
         moveLozenge.setLeft(moveX);
-        // Don't move multi-day events vertically yet
-        if (!moveLozenge.auxDivList.length) {
+        // Multi-day timed events -- special drag behavior where
+        // top of first div and bottom of last div both move
+        // relative to the position of the original click
+        if (this.composite) {
+            var p = 0;
+            p = yPos - this.clickOffsetLozengeBottom;
+            this.resizeBottom(p);
+            p = yPos - this.clickOffsetLozengeTop;
+            this.resizeTop(p);
+        }
+        else {
+            var moveY = (yPos - this.clickOffsetY);
+            // Bottom move constraint -- need to know height of lozenge
+            var bLimit = this.getBLimit(moveLozenge);
+            moveY = moveY < 0 ? 0 : moveY; // Top bound
+            moveY = moveY > bLimit ? bLimit : moveY; // bottom bound
             moveLozenge.setTop(moveY);
         }
     };
@@ -178,8 +199,8 @@ cosmo.ui.draggable.Draggable = function (id) {
         if (selEv.lozenge.updateEvent(selEv, this.dragMode)) {
             // Check against the backup to make sure the event has
             // actually been edited
-            if (selEv.hasChanged()) {
-                selEv.setInputDisabled(true); // Disable input while processing
+            if (selEv.hasChanged().count > 0) {
+                //selEv.setInputDisabled(true); // Disable input while processing
                 // Save the changes
                 // ==========================
                 dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'data': selEv });
@@ -197,15 +218,21 @@ cosmo.ui.draggable.Draggable = function (id) {
      * or doesn't have a valid dragMode
      */
     this.paranoia = function() {
-        if (!cosmo.view.cal.canvas.getSelectedEvent() || !cosmo.app.dragItem.dragMode || 
-            cosmo.view.cal.canvas.getSelectedEvent().getInputDisabled()) {
+        var ev = cosmo.view.cal.canvas.getSelectedEvent();
+        if (!ev || !cosmo.app.dragItem.dragMode ||
+            ev.lozenge.getInputDisabled()) {
             return false;
         }
         else {
             return true;
         }
     };
+    this.doDragEffect = function (dragState) {
+        var o = dragState == 'on' ? 60 : 100;
+        cosmo.view.cal.canvas.getSelectedEvent().lozenge.setOpacity(o);
+    };
 }
+
 
 Draggable = cosmo.ui.draggable.Draggable;
 
@@ -263,16 +290,15 @@ HasTimeDraggable.prototype.resizeTop = function(y) {
     // Where the top edge of the lozenge should go, given any offset for the
     // top of the calendar, and any scrolling in the scrollable area
     // Used when resizing up
-    var t = (y-Cal.top)+cosmo.view.cal.canvas.getTimedCanvasScrollTop();
-    var size = 0;
+    var t = this.getLocalMouseYPos(y);
     
     t = t > this.min ? this.min : t;
     t = t < 0 ? 0 : t;
-    selEv.lozenge.setTop(t);
-    size = this.getSize((this.absTop-yPos-cosmo.view.cal.canvas.getTimedCanvasScrollTop())
+    var size = this.getSize((this.absTop - yPos - this.scrollOffset)
         + this.height);
     
     selEv.lozenge.setHeight(size, true);
+    selEv.lozenge.setTop(t);
 }
 
 /**
@@ -284,10 +310,10 @@ HasTimeDraggable.prototype.resizeBottom = function(y) {
     var selEv = cosmo.view.cal.canvas.getSelectedEvent();
     // Where the bottom edge of the lozenge should go -- this is a
     // relative measurement based on pos on the scrollable area
-    var b = (y-this.absTop)+cosmo.view.cal.canvas.getTimedCanvasScrollTop();
-    var max = (VIEW_DIV_HEIGHT - this.absTop);
+    var b = (y - this.absTop) + this.scrollOffset;
+    var max = ((VIEW_DIV_HEIGHT + TOP_MENU_HEIGHT) - this.absTop);
     b = b > max ? max : b;
-    size = this.getSize(b);
+    var size = this.getSize(b);
     selEv.lozenge.setHeight(size);
 
 }
@@ -321,7 +347,7 @@ HasTimeDraggable.prototype.drop = function() {
     var endtime = 0;
     
     // Reset opacity to normal
-    cosmo.view.cal.canvas.getSelectedEvent().lozenge.setOpacity(100);
+    this.doDragEffect('off');
     
     // Abstract away getting top and bottom -- multi-day events
     // have multiple divs, treat as a composite here
@@ -390,6 +416,11 @@ HasTimeDraggable.prototype.getBLimit = function(movelozenge) {
 
 HasTimeDraggable.prototype.setDragWidth = function() {}
 
+HasTimeDraggable.prototype.getLocalMouseYPos = function (y) {
+    var localY = (y - Cal.top) + this.scrollOffset;
+    return localY;
+};
+
 /**
  * NoTimeDraggable -- sub-class of Draggable
  * All-day events, 'any-time' events -- these sit up in the 
@@ -454,4 +485,5 @@ NoTimeDraggable.prototype.getBLimit = function(movelozenge) {
     return 10000000;
 
 }
+
 

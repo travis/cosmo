@@ -16,7 +16,7 @@
 
 dojo.provide('cosmo.view.cal');
 dojo.require("cosmo.util.i18n");
-var _ = cosmo.util.i18n.getText;
+dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
 
@@ -54,20 +54,18 @@ cosmo.view.cal = new function () {
 
         // Don't bother going through the edit process if nothing
         // has actually changed
-        if (!changedProps) {
+        if (changedProps.count == 0) {
             return false;
         }
 
         // Has the recurrence rule changed, or just
         // basic event properties
-        for (var i = 0; i < changedProps.length; i++) {
-            if (changedProps[i][0] == 'recurrenceRule') {
-                changedRecur = true;
+        if (typeof changedProps.changes['recurrenceRule'] == 'undefined') {
+            changedBasicProps = true;
             }
             else {
-                changedBasicProps = true;
+            changedRecur = true;
             }
-        }
 
         // *** Changing recurrence
         // This means all changes will have to apply either to the entire
@@ -106,7 +104,8 @@ cosmo.view.cal = new function () {
             //
             // -------
             else {
-                saveEventChanges(ev, 'singleEventAddRecurrence');
+                dojo.event.topic.publish('/calEvent', { action: 'save',
+                    qualifier: 'singleEventAddRecurrence', data: ev });
             }
         }
         // *** No recurrence change, editing normal event properties
@@ -157,7 +156,8 @@ cosmo.view.cal = new function () {
             // One-shot event -- this is easy, just save the event
             // -------
             else {
-                saveEventChanges(ev);
+                dojo.event.topic.publish('/calEvent', { action: 'save',
+                    qualifier: null, data: ev });
             }
         }
     }
@@ -192,6 +192,7 @@ cosmo.view.cal = new function () {
 
         var opts = self.recurringEventOptions;
 
+        /*
         // Lozenge stuff
         // FIXME: Actually this stuff should be oWnZ0Rd by view.cal.canvas
         // ---------
@@ -209,6 +210,7 @@ cosmo.view.cal = new function () {
         ev.lozenge.updateElements();
         // Display processing animation
         ev.lozenge.showProcessing();
+        */
 
         // Recurring event
         if (qual) {
@@ -239,7 +241,8 @@ cosmo.view.cal = new function () {
                     else {
                         h = function (evData, err) {
                             if (err) {
-                                cosmo.app.showErr('Could not retrieve master event for this recurrence.', getErrDetailMessage(err));
+                                cosmo.app.showErr('Could not retrieve master event for this recurrence.',
+                                    getErrDetailMessage(err));
                                 // Broadcast failure
                                 dojo.event.topic.publish('/calEvent', { 'action': 'saveFailed',
                                     'qualifier': 'editExisting', 'data': ev });
@@ -249,17 +252,14 @@ cosmo.view.cal = new function () {
                                 // ----------------------
                                 var changedProps = ev.hasChanged(); // Get the list of changed properties
                                 var startOrEndChange = false; // Did the start or end of the event change
-                                for (var i = 0; i < changedProps.length; i++) {
-                                    var propName = changedProps[i][0];
-                                    var propVal = changedProps[i][1];
-
+                                for (var p in changedProps.changes) {
                                     // Changes for start and end have to be calculated relative to
                                     // the date they're on -- other prop changes can just be copied
-                                    if (propName == 'start' || propName == 'end') {
+                                    if (p == 'start' || p == 'end') {
                                         startOrEndChange = true;
                                     }
                                     else {
-                                        evData[propName] = propVal;
+                                        evData[p] = changedProps.changes[p].newValue;
                                     }
                                 }
                                 // Start and end
@@ -382,33 +382,31 @@ cosmo.view.cal = new function () {
                     var rrule = ev.data.recurrenceRule;
                     var changedProps = ev.hasChanged(); // The list of what has changed
                     var mod = new Modification(); // New Modification obj to append to the list
-                    var modEv = new CalEventData(); // Empty CalEventData to use for saving
+                    mod.event = new CalEventData(); // Empty CalEventData to use for saving
                     // instanceDate of the mod serves as the recurrenceId
                     mod.instanceDate = ScoobyDate.clone(ev.data.instanceDate);
-                    for (var i = 0; i < changedProps.length; i++) {
-                        var propName = changedProps[i][0];
-                        mod.modifiedProperties.push(propName);
-                        modEv[propName] = changedProps[i][1];
+                    for (var p in changedProps.changes) {
+                        mod.modifiedProperties.push(p);
+                        mod.event[p] = changedProps.changes[p].newValue;
                     }
                     for (var i = 0; i < rrule.modifications.length; i++) {
                         var m = rrule.modifications[i];
                         // Is there already an existing mod?
                         if (m.instanceDate.toUTC() == mod.instanceDate.toUTC()) {
-                            // Copy over any previous changes, but overwrite
-                            // if it's also a current edited prop
+                            // Copy over any previous changes
+                            // Overwrite if it's also a current edited prop
                             var mods = m.modifiedProperties;
                             for (var j = 0; j < mods.length; j++) {
                                 var p = mods[j];
-                                if (typeof changedProps[p] == 'undefined') {
+                                if (typeof changedProps.changes[p] == 'undefined') {
                                     mod.modifiedProperties.push(p);
-                                    modEv[p] = m.event[p];
+                                    mod.event[p] = m.event[p];
                                 }
                             }
                             // Throw out the old mod
                             rrule.modifications.splice(i, 1);
                         }
                     }
-                    mod.event = modEv;
                     rrule.modifications.push(mod);
 
                     f = function () { doSaveRecurrenceRule(ev, rrule, { 'saveAction': 'save',
@@ -760,7 +758,8 @@ cosmo.view.cal = new function () {
         else {
             f = function () { doRemoveEvent(ev, { 'removeType': 'singleEvent' }) }
         }
-        f();
+        // Give a sec for the processing state to show
+        setTimeout(f, 500);
     }
     /**
      * Call the service to do event removal -- creates an anonymous
@@ -913,7 +912,7 @@ cosmo.view.cal = new function () {
                 msg = _('Main.Error.Concurrency');
                 break;
             default:
-               msg = err.message;
+               msg = err;
                break;
         }
         return msg;
@@ -1063,11 +1062,10 @@ cosmo.view.cal = new function () {
     this.handlePub_app = function (cmd) {
         var e = cmd.appEvent;
         var t = cmd.type;
-        // Grab any elem above the click that has an id --
-        // the source of the click
-        var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
         // Handle keyboard input
         if (t == 'keyboardInput') {
+            // Grab any elem above the event that has an id
+            var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
             var ev = cosmo.view.cal.canvas.getSelectedEvent();
             switch (e.keyCode) {
                 // Enter key
@@ -1084,7 +1082,7 @@ cosmo.view.cal = new function () {
                     // Currently all other text inputs belong to the event detail form
                     // FIXME -- check for custom prop that says this field belongs
                     // to the event detail form
-                    else if (ev && !ev.getInputDisabled() && 
+                    else if (ev && !ev.lozenge.getInputDisabled() &&
                         ((elem.id == 'body') || (elem.className == 'inputText' && 
                             elem.type == 'text')) &&
                         Cal.currentCollection.privileges.write) {
@@ -1098,7 +1096,7 @@ cosmo.view.cal = new function () {
                     //  * A selected event, not in 'processing' state
                     //  * Enter key input must be from the document body
                     //  * Write access for the current collection
-                    if (ev && !ev.getInputDisabled() && (elem.id == 'body') &&
+                    if (ev && !ev.lozenge.getInputDisabled() && (elem.id == 'body') &&
                         Cal.currentCollection.privileges.write) {
                         dojo.event.topic.publish('/calEvent', 
                             { 'action': 'removeConfirm', 'data': ev });

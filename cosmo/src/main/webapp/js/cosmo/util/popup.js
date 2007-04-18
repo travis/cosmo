@@ -37,6 +37,24 @@ cosmo.util.popup = new function () {
             self.win.document.location = url;
         }
     };
+    this.openFullSize = function (c) {
+        // Create new window and display error
+        try {
+            var fullWin = window.open('', 'fullWin');
+            if (typeof c == 'string') {
+                fullWin.document.body.innerHTML = c;
+            }
+            else {
+                fullWin.document.body.innerHTML = c.innerHTML;
+            }
+        }
+        // If pop-up gets blocked, inform user
+        catch(e) {
+          alert('An error occurred, but the error message cannot be' +
+          ' displayed because of your browser\'s pop-up blocker.\n' +
+          'Please allow pop-ups from this Web site.');
+        }
+    }
     /**
      * Sends the opener of the window to a new location
      * and closes the pop up.     

@@ -48,7 +48,9 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
         self.origSize = this.getHeight(this.contentDiv) + 
             self.getHeight(this.handleDiv);
         self.dragSize = self.origSize;
-        
+        if (navigator.appVersion.indexOf('MSIE 6') > -1) {
+            self.contentDiv.style.height = this.dragSize + 'px';
+        }
     };
     this.addAdjacent = function(id) {
         var div = document.getElementById(id);
@@ -70,6 +72,9 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
         var pos = yPos - TOP_MENU_HEIGHT;
         var size = (pos - offset);
         var div = null;
+        if (navigator.appVersion.indexOf('MSIE 6') > -1) {
+            self.contentDiv.style.display = 'none';
+        }
         if (pos > offset && pos < this.dragLimit) {
             this.contentDiv.style.height = size + 'px';
             this.dragSize = (size + ALL_DAY_RESIZE_HANDLE_HEIGHT);
@@ -83,9 +88,12 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
         }
     };
     this.drop = function() {
-        // Do nothing
-        // This function is called when ResizeArea is the draggable
-        // So drop method must be defined here
+        // IE6 -- workaround z-index issue by actually truncating
+        // inner content div height to visible height of area
+        if (navigator.appVersion.indexOf('MSIE 6') > -1) {
+            self.contentDiv.style.height = this.dragSize + 'px';
+            self.contentDiv.style.display= 'block';
+        }
     };
     this.getAbsTop = function(div) {
         return div.offsetTop + Cal.top;

@@ -41,7 +41,7 @@ cosmo.view.cal.Lozenge = function () {
     this.height = 0;
     this.width = 0;
     // Whether or not this particular Lozenge is selected.
-    // TO-DO: Figure out if this is still used ... ?
+    // FIXME: Figure out if this is still used ... ?
     this.selected = false;
     // 30-min minimum height, minus a pixel at top and bottom
     // per retarded CSS spec for borders
@@ -56,11 +56,33 @@ cosmo.view.cal.Lozenge = function () {
     // Array of div elems appearing to the side on multi-day normal
     // events
     this.auxDivList = [];
+    // If the event has a edit/remove call processing, don't allow
+    // user to move/resize
+    this.inputDisabled = false;
 }
 
 // The minimum *visible* height of an event Lozenge
 cosmo.view.cal.Lozenge.prototype.minimumMinutes = 30;
-
+/**
+ * Enable/disable user input for this event -- should be disabled
+ * when a remote operation is processing
+ */
+cosmo.view.cal.Lozenge.prototype.setInputDisabled = function (isDisabled) {
+    if (isDisabled) {
+        this.inputDisabled = true;
+    }
+    else {
+        this.inputDisabled = false;
+    }
+    return this.inputDisabled;
+};
+/**
+ * Whether or not input is disabled for this event -- usually
+ * because of a remote operation processing for the event
+ */
+cosmo.view.cal.Lozenge.prototype.getInputDisabled = function () {
+    return this.inputDisabled;
+};
 /**
  * Convenience method that does all the visual update stuff
  * for a lozenge at one time
@@ -94,7 +116,7 @@ cosmo.view.cal.Lozenge.prototype.updateText = function () {
 };
 /**
  * A bit of a misnomer -- just static text at the moment
- * TO-DO: Add animation -- either GIF or using CSS effects
+ * FIXME: Add animation -- either GIF or using CSS effects
  */
 cosmo.view.cal.Lozenge.prototype.showStatusAnim = function () {
     var titleDiv = document.getElementById(this.divId + 'Title' +
@@ -135,18 +157,26 @@ cosmo.view.cal.Lozenge.prototype.getPlatonicWidth = function () {
  * workaround for the weird scrolling-div-breakage it causes
  */
 cosmo.view.cal.Lozenge.prototype.setOpacity = function (opac) {
-    elem = this.div;
+    
+    function setOpac(elem, o) {
     // =============
     // opac is a whole number to be used as the percent opacity
     // =============
     // IE uses a whole number as a percent (e.g. 75 for 75%)
     //  Moz/compat uses a fractional value (e.g. 0.75)
-    var nDecOpacity = opac/100;
+        var nDecOpacity = o/100;
     if (document.all) {
-        elem.style.filter = 'alpha(opacity=' + opac + ')';
+            elem.style.filter = 'alpha(opacity=' + o + ')';
     }
     elem.style.opacity = nDecOpacity;
-    return true;
+        
+}
+    setOpac(this.div, opac);
+    if (this.composite()) {
+        for (var i = 0; i < this.auxDivList.length; i++) {
+            setOpac(this.auxDivList[i], opac);
+        }
+    }
 }
 /**
  * Use DOM to set text inside a node
@@ -454,16 +484,26 @@ cosmo.view.cal.HasTimeLozenge.prototype.updateFromEvent = function (ev) {
             left = 0;
         }
         else {
-            startPos = Cal.calcPosFromTime(Date.strftime('%H:%M',
-            ev.data.start.getTime()));
+            var formatStartTime = Date.strftime('%H:%M', ev.data.start.getTime());
+            startPos = Cal.calcPosFromTime(formatStartTime, 'start');
             left = (ev.data.start.getLocalDay())*cosmo.view.cal.canvas.dayUnitWidth;
         }
-        endPos = Cal.calcPosFromTime(Date.strftime('%H:%M',
-            ev.data.end.getTime()));
-        height = endPos - startPos;
-        left += (ev.conflictDepth * 10);
+        var formatEndTime = Date.strftime('%H:%M', ev.data.end.getTime());
+        endPos = Cal.calcPosFromTime(formatEndTime, 'end');
 
-        width = cosmo.view.cal.canvas.dayUnitWidth - (ev.maxDepth * 10);
+
+        var w = cosmo.view.cal.canvas.dayUnitWidth;
+        // Available indention space is 20% of the day width
+        var g = w * 0.2;
+        // Divide the available indention space among the
+        // lozenges in this contiguous set of overlapping events
+        g = ev.maxDepth ? (g / ev.maxDepth) : g;
+
+        height = endPos - startPos;
+        left += (ev.conflictDepth * g);
+        left = parseInt(left);
+        width = w - (ev.maxDepth * g);
+        width = parseInt(width);
 
         // Set min height if not multi-day event
         // Make sure when updating that this min lozenge
@@ -553,6 +593,9 @@ cosmo.view.cal.HasTimeLozenge.prototype.insert = function (id) {
     }
     else {
         endDay = ev.data.end.getLocalDay();
+        if (ev.data.end.getHours() == 0) {
+            endDay--;
+    }
     }
     auxDivCount = (endDay - startDay);
 
@@ -860,6 +903,13 @@ cosmo.view.cal.HasTimeLozenge.prototype.getLeft = function () {
 }
 
 /**
+ * Is this a timed even that spans multiple days?
+ */
+cosmo.view.cal.HasTimeLozenge.prototype.composite = function () {
+    return this.auxDivList.length ? true : false;
+}
+
+/**
  * cosmo.view.cal.NoTimeLozenge -- sub-class of Lozenge 
  * All-day events, 'any-time' events -- these sit up in the
  * resizable area at the top of the UI
@@ -936,7 +986,7 @@ cosmo.view.cal.NoTimeLozenge.prototype.updateEvent = function (ev, dragMode) {
  * have an end past the current view span, make sure the width truncates
  * at the end of the view span properly -- this is currently hard-coded
  * to Saturday.
- * TO-DO: Check the view type to figure out the end of the view span
+ * FIXME: Check the view type to figure out the end of the view span
  */
 cosmo.view.cal.NoTimeLozenge.prototype.calcWidth = function (startDay, ev) {
 
@@ -1049,7 +1099,7 @@ cosmo.view.cal.NoTimeLozenge.prototype.setWidth = function (width) {
 }
 
 /**
- * TO-DO: Figure out if this is needed anymore -- aren't these
+ * FIXME: Figure out if this is needed anymore -- aren't these
  * a fixed height?
  */
 cosmo.view.cal.NoTimeLozenge.prototype.setHeight = function (size) {
@@ -1074,7 +1124,7 @@ cosmo.view.cal.NoTimeLozenge.prototype.makeVisible = function () {
 }
 
 /**
- * TO-DO: Figure out if this is needed anymore
+ * FIXME: Figure out if this is needed anymore
  */
 cosmo.view.cal.NoTimeLozenge.prototype.getTop = function () {
     var t = this.div.offsetTop;
@@ -1082,7 +1132,7 @@ cosmo.view.cal.NoTimeLozenge.prototype.getTop = function () {
 }
 
 /**
- * TO-DO: Figure out if this is needed anymore
+ * FIXME: Figure out if this is needed anymore
  */
 cosmo.view.cal.NoTimeLozenge.prototype.getBottom = function () {
     var t = this.div.offsetTop;
@@ -1091,10 +1141,17 @@ cosmo.view.cal.NoTimeLozenge.prototype.getBottom = function () {
 }
 
 /**
- * TO-DO: Figure out if this is needed anymore
+ * FIXME: Figure out if this is needed anymore
  */
 cosmo.view.cal.NoTimeLozenge.prototype.getLeft = function () {
     var l = this.div.offsetLeft;
     return parseInt(l);
+}
+
+/**
+ * Non-timed events are never composed of multiple divs 
+ */
+cosmo.view.cal.NoTimeLozenge.prototype.composite = function () {
+    return false;
 }
 

@@ -121,6 +121,9 @@ div {
 a {
     color:$linkTextColor;
 }
+.jsLink {
+    cursor: pointer;
+}
 /* Invisible elements */
 .invisible {
     display:none;
@@ -252,6 +255,79 @@ body.adminPage {
 .smTableData {
     font-size: 11px;
     border:1px solid #cccccc;
+}
+
+/* Buttons
+ * --------------------- */
+.btnElemBase {
+    width: 76px;
+    margin: auto;
+    text-align: center;
+    font-size: 11px;
+    color: #333399;
+    border-style: solid;
+    border-color: #ccc #777 #777 #ccc;
+    border-width: 1px;
+    height: 24px;
+    padding: 0 0 2px 0;
+    cursor: pointer;
+    background-repeat: repeat-x;
+    background-position: 0px 0px;
+}
+.btnElemMouseover {
+    color: #3333aa;
+    background-position: 0px -24px;
+}
+.btnElemMousedown {
+    color: #3333aa;
+    border-color: #555 #bbb #bbb #555;
+    background-position: 0px -24px;
+}
+.btnElemDisabled {
+    color: #999;
+    border-color: #ddd #888 #888 #ddd;
+    cursor: default;
+}
+.btnElemBaseSm {
+    width: 60px;
+    margin: auto;
+    text-align: center;
+    font-size: 9px;
+    color: #333399;
+    border-style: solid;
+    border-color: #ccc #777 #777 #ccc;
+    border-width: 1px;
+    height: 18px;
+    padding: 0 0 1px 0;
+    cursor: pointer;
+    background-repeat: repeat-x;
+    background-position: 0px 0px;
+}
+.btnElemMouseoverSm {
+    color: #3333aa;
+    background-position: 0px -18px;
+}
+.btnElemMousedownSm {
+    color: #3333aa;
+    border-color: #555 #bbb #bbb #555;
+    background-position: 0px -18px;
+}
+.btnElemDisabledSm {
+    color: #999;
+    border-color: #ddd #888 #888 #ddd;
+    cursor: default;
+}
+.btnSetDividerBase {
+    border: 0px;
+    background-color: #aaa;
+}
+.btnSetDividerLeftPress {
+    border: 0px;
+    background-color: #bbb;
+}
+.btnSetDividerRightPress {
+    border: 0px;
+    background-color: #555;
 }
 
 /* General widget/UI
@@ -395,6 +471,10 @@ td.dataDisplayLabel {
     height:100%;
     position:absolute;
     border-right:1px solid #dfdfdf;
+}
+/* The div containing lozenges for timed cal events */
+#timedContentDiv {
+    overflow: hidden;
 }
 /* Day columns for timed event canvas */
 .dayDiv {

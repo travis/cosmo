@@ -44,6 +44,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     handleOnClick: "",
 
     fillInTemplate: function() {
+        var smFlag = this.small ? '_sm' : '';
+        var backgroundPath = cosmo.env.getImagesUrl() +
+            'button_bgs' + smFlag + '.gif';
         if (typeof(this.handleOnClick) == "string") {
          eval("this.handleOnClick = function() {" + this.handleOnClick + ";}");
         }
@@ -52,6 +55,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
         // DOM handles
         this.domNode.id = this.widgetId;
         this.domNode.name = this.widgetId;
+
+        this.domNode.style.backgroundImage = 'url(' + backgroundPath + ')';;
         // Finish setting up
         this.setText(this.text);
         if (this.i18nText != "") this.setI18nText(this.i18nText);

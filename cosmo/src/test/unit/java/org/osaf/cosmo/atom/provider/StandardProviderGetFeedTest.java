@@ -44,6 +44,84 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         assertNotNull("Null etag", res.getEntityTag());
     }
 
+    public void testIfMatchAll() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        helper.rememberProjection("yyz");
+        helper.rememberFormat("eff");
+        helper.setIfMatch(req, "*");
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 200, res.getStatus());
+    }
+
+    public void testIfMatchOk() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        helper.rememberProjection("yyz");
+        helper.rememberFormat("eff");
+        helper.setIfMatch(req, collection);
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 200, res.getStatus());
+    }
+
+    public void testIfMatchNotOk() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        helper.rememberProjection("yyz");
+        helper.rememberFormat("eff");
+        helper.setIfMatch(req, "aeiou");
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 412, res.getStatus());
+    }
+
+    public void testIfNoneMatchAll() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        helper.rememberProjection("yyz");
+        helper.rememberFormat("eff");
+        helper.setIfNoneMatch(req, "*");
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 412, res.getStatus());
+    }
+
+    public void testIfNoneMatchNotOk() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        helper.rememberProjection("yyz");
+        helper.rememberFormat("eff");
+        helper.setIfNoneMatch(req, collection);
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 412, res.getStatus());
+    }
+
+    public void testIfNoneMatchOk() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        helper.rememberProjection("yyz");
+        helper.rememberFormat("eff");
+        helper.setIfNoneMatch(req, "aeiou");
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 200, res.getStatus());
+    }
+
     public void testUnsupportedProjection() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = helper.createFeedRequestContext(collection, "GET",

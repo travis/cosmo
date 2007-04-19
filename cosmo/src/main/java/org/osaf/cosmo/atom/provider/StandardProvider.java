@@ -36,6 +36,8 @@ import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.http.IfMatch;
+import org.osaf.cosmo.http.IfNoneMatch;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.atom.generator.FeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
@@ -51,7 +53,6 @@ import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
-import org.osaf.cosmo.server.ServerUtils;
 import org.osaf.cosmo.service.ContentService;
 
 public class StandardProvider extends AbstractProvider {
@@ -76,14 +77,16 @@ public class StandardProvider extends AbstractProvider {
     public ResponseContext deleteMedia(RequestContext request) {
         return null;
     }
-  
+
     public ResponseContext updateEntry(RequestContext request) {
         ItemTarget target = (ItemTarget) request.getTarget();
         NoteItem item = target.getItem();
         if (log.isDebugEnabled())
             log.debug("updating entry for item " + item.getUid());
 
-        // XXX If-Match
+        ResponseContext crc = checkConditionals(request, item);
+        if (crc != null)
+            return crc;
 
         // XXX: check write preconditions?
 
@@ -114,7 +117,7 @@ public class StandardProvider extends AbstractProvider {
         contentService.updateItem(item);
 
         AbstractResponseContext rc = new EmptyResponseContext(204);
-        rc.setEntityTag(new EntityTag(ServerUtils.calculateEtag(item)));
+        rc.setEntityTag(new EntityTag(item.getEntityTag()));
         return rc;
     }
   
@@ -132,7 +135,9 @@ public class StandardProvider extends AbstractProvider {
         if (log.isDebugEnabled())
             log.debug("getting feed for collection " + collection.getUid());
 
-        // XXX If-None-Match
+        ResponseContext crc = checkConditionals(request, collection);
+        if (crc != null)
+            return crc;
 
         try {
             ServiceLocator locator = createServiceLocator(request);
@@ -141,7 +146,7 @@ public class StandardProvider extends AbstractProvider {
 
             AbstractResponseContext rc =
                 new BaseResponseContext<Document<Element>>(feed.getDocument());
-            rc.setEntityTag(new EntityTag(ServerUtils.calculateEtag(collection)));
+            rc.setEntityTag(new EntityTag(collection.getEntityTag()));
             return rc;
         } catch (UnsupportedProjectionException e) {
             String reason = "Projection " + target.getProjection() + " not supported";
@@ -258,5 +263,27 @@ public class StandardProvider extends AbstractProvider {
         HttpServletRequest request =
             ((HttpServletRequestContext)context).getRequest();
         return serviceLocatorFactory.createServiceLocator(request);
+    }
+
+    protected ResponseContext preconditionfailed(Abdera abdera,
+                                                 RequestContext request,
+                                                 String reason) {
+        return returnBase(createErrorDocument(abdera, 412, reason, null),
+                          412, null);
+    }
+
+    protected ResponseContext checkConditionals(RequestContext request,
+                                                Item item) {
+        if (! IfMatch.allowMethod(request.getIfMatch(), item)) {
+            String reason = "If-Match disallows conditional request";
+            return preconditionfailed(abdera, request, reason);
+        }
+        
+        if (! IfNoneMatch.allowMethod(request.getIfNoneMatch(), item)) {
+            String reason = "If-None-Match disallows conditional request";
+            return preconditionfailed(abdera, request, reason);
+        }
+
+        return null;
     }
 }

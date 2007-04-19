@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.model;
 
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,6 +40,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+
+import org.apache.commons.codec.binary.Base64;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -67,6 +70,17 @@ import org.hibernate.validator.NotNull;
         length=16)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public abstract class Item extends AuditableObject {
+
+    private static final MessageDigest etagDigest;
+    private static final Base64 etagEncoder = new Base64();
+
+    static {
+        try {
+            etagDigest = MessageDigest.getInstance("sha1");
+        } catch (Exception e) {
+            throw new RuntimeException("Platform does not support sha1?", e);
+        }
+    }
 
     public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
     public static final long MAX_STRING_ATTR_SIZE = 1 * 1024;
@@ -653,6 +667,16 @@ public abstract class Item extends AuditableObject {
     }
     
     public abstract Item copy();
+
+    @Transient
+    public String getEntityTag() {
+        String uid = getUid() != null ? getUid() : "-";
+        String modTime = getModifiedDate() != null ?
+            new Long(getModifiedDate().getTime()).toString() : "-";
+        String etag = uid + ":" + modTime;
+        byte[] digest = etagDigest.digest(etag.getBytes());
+        return new String(etagEncoder.encode(digest));
+    }
     
     protected void copyToItem(Item item) {
         item.setOwner(getOwner());

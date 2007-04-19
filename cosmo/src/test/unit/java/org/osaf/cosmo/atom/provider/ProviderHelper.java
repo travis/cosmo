@@ -33,10 +33,14 @@ import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.atom.generator.mock.MockGeneratorFactory;
 import org.osaf.cosmo.atom.processor.ProcessorFactory;
 import org.osaf.cosmo.atom.processor.mock.MockProcessorFactory;
+import org.osaf.cosmo.atom.provider.mock.BaseMockRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+
+import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * A utility class that provides the dependent objects required
@@ -138,6 +142,36 @@ public class ProviderHelper extends MockHelper {
                                                     String method)
         throws IOException {
         return new MockItemRequestContext(serviceContext, uid, method, true);
+    }
+
+    public void setIfMatch(RequestContext context,
+                           Item item) {
+        setIfMatch(context, item.getEntityTag());
+    }
+
+    public void setIfMatch(RequestContext context,
+                           String etag) {
+        if (! etag.equals("*") &&
+            ! etag.startsWith("\""))
+            etag = "\"" + etag + "\"";
+        ((MockHttpServletRequest)
+         ((BaseMockRequestContext)context).getRequest()).
+            addHeader("If-Match", etag);
+    }
+
+    public void setIfNoneMatch(RequestContext context,
+                               Item item) {
+        setIfNoneMatch(context, item.getEntityTag());
+    }
+
+    public void setIfNoneMatch(RequestContext context,
+                               String etag) {
+        if (! etag.equals("*") &&
+            ! etag.startsWith("\""))
+            etag = "\"" + etag + "\"";
+        ((MockHttpServletRequest)
+         ((BaseMockRequestContext)context).getRequest()).
+            addHeader("If-None-Match", etag);
     }
 
     public void rememberProjection(String projection) {

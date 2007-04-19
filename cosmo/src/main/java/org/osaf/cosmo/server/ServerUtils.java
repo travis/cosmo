@@ -15,14 +15,11 @@
  */
 package org.osaf.cosmo.server;
 
-import java.security.MessageDigest;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.codec.binary.Base64;
 
 import org.osaf.cosmo.model.Item;
 
@@ -31,17 +28,6 @@ import org.osaf.cosmo.model.Item;
  * to clients.
  */
 public class ServerUtils implements ServerConstants {
-
-    private static final MessageDigest etagDigest;
-    private static final Base64 etagEncoder = new Base64();
-
-    static {
-        try {
-            etagDigest = MessageDigest.getInstance("sha1");
-        } catch (Exception e) {
-            throw new RuntimeException("Platform does not support sha1?", e);
-        }
-    }
 
     /**
      * Returns all ticket keys found in the request, both in the
@@ -71,17 +57,4 @@ public class ServerUtils implements ServerConstants {
 
         return keys;
     }
-
-    /**
-     * Calculates the HTTP entity tag for an item based on its uid and
-     * last modification time.
-     */
-    public static String calculateEtag(Item item) {
-        String uid= item.getUid() != null ? item.getUid() : "-";
-        String modTime = item.getModifiedDate() != null ?
-            new Long(item.getModifiedDate().getTime()).toString() : "-";
-        String etag = uid + ":" + modTime;
-        byte[] digest = etagDigest.digest(etag.getBytes());
-        return new String(etagEncoder.encode(digest));
-   }
 }

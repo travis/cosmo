@@ -35,6 +35,7 @@ public class BaseProviderTestCase extends TestCase {
         helper.setUp();
 
         provider = new StandardProvider();
+        provider.setAbdera(helper.getAbdera());
         provider.setGeneratorFactory(helper.getGeneratorFactory());
         provider.setProcessorFactory(helper.getProcessorFactory());
         provider.setContentService(helper.getContentService());

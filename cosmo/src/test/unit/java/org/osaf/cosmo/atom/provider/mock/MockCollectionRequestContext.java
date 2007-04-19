@@ -33,7 +33,7 @@ public class MockCollectionRequestContext extends BaseMockRequestContext {
     public MockCollectionRequestContext(ServiceContext context,
                                         CollectionItem collection,
                                         String method) {
-        this(context, collection.getUid(), method, null, null);
+        this(context, collection, method, null, null);
     }
 
     public MockCollectionRequestContext(ServiceContext context,
@@ -41,7 +41,9 @@ public class MockCollectionRequestContext extends BaseMockRequestContext {
                                         String method,
                                         String projection,
                                         String format) {
-        this(context, collection.getUid(), method, projection, format);
+        super(context, method, toRequestUri(collection.getUid()));
+        this.target = new CollectionTarget(this, collection, projection,
+                                           format);
     }
 
     public MockCollectionRequestContext(ServiceContext context,
@@ -55,11 +57,16 @@ public class MockCollectionRequestContext extends BaseMockRequestContext {
                                         String method,
                                         String projection,
                                         String format) {
-        super(context, method, toRequestUri(uid));
-        this.target = new CollectionTarget(this, uid, projection, format);
+        this(context, makeCollection(uid), method, projection, format);
     }
 
     private static String toRequestUri(String uid) {
         return "/collection/" + uid;
+    }
+
+    private static CollectionItem makeCollection(String uid) {
+        CollectionItem collection = new CollectionItem();
+        collection.setUid(uid);
+        return collection;
     }
 }

@@ -27,11 +27,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.provider.CollectionTarget;
+import org.osaf.cosmo.atom.provider.ItemTarget;
 
 public class MockProvider implements Provider {
     private static final Log log = LogFactory.getLog(MockProvider.class);
 
-    private Set collections = new HashSet();
+    private Set<String> collections = new HashSet<String>();
+    private Set<String> items = new HashSet<String>();
     private boolean failureMode;
 
     public ResponseContext createEntry(RequestContext request) {
@@ -47,7 +49,17 @@ public class MockProvider implements Provider {
     }
   
     public ResponseContext updateEntry(RequestContext request) {
-        return null;
+        if (failureMode)
+            throw new RuntimeException("failure mode engaged");
+
+        if (! (request.getTarget() instanceof ItemTarget))
+            return new EmptyResponseContext(404);
+        ItemTarget target = (ItemTarget) request.getTarget();
+
+        if (! items.contains(target.getItem().getUid()))
+            return new EmptyResponseContext(404);
+
+        return new EmptyResponseContext(204);
     }
   
     public ResponseContext updateMedia(RequestContext request) {
@@ -75,7 +87,7 @@ public class MockProvider implements Provider {
             return new EmptyResponseContext(404);
         CollectionTarget target = (CollectionTarget) request.getTarget();
 
-        if (! collections.contains(target.getUid()))
+        if (! collections.contains(target.getCollection().getUid()))
             return new EmptyResponseContext(404);
 
         return new EmptyResponseContext(200);
@@ -105,8 +117,16 @@ public class MockProvider implements Provider {
         collections.add(uid);
     }
 
-    public Set getCollections() {
+    public Set<String> getCollections() {
         return collections;
+    }
+
+    public void addItem(String uid) {
+        items.add(uid);
+    }
+
+    public Set<String> getItems() {
+        return items;
     }
 
     public boolean isFailureMode() {

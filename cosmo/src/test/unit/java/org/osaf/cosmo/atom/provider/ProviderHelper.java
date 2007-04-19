@@ -16,11 +16,13 @@
 package org.osaf.cosmo.atom.provider;
 
 import java.io.IOException;
+import java.io.StringWriter;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.protocol.server.ServiceContext;
 import org.apache.abdera.protocol.server.DefaultServiceContext;
 import org.apache.abdera.protocol.server.provider.RequestContext;
+import org.apache.abdera.protocol.server.provider.ResponseContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -160,5 +162,17 @@ public class ProviderHelper extends MockHelper {
 
     public void enableProcessorValidationError() {
         processorFactory.setValidationErrorMode(true);
+    }
+
+    public String getContent(ResponseContext response) {
+        if (! response.hasEntity())
+            return null;
+        try {
+            StringWriter writer = new StringWriter();
+            response.writeTo(writer);
+            return writer.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Can't output response content");
+        }
     }
 }

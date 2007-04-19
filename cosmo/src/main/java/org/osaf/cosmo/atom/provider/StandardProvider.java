@@ -19,15 +19,16 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.EntityTag;
+import org.apache.abdera.protocol.server.provider.AbstractProvider;
 import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
 import org.apache.abdera.protocol.server.provider.BaseResponseContext;
 import org.apache.abdera.protocol.server.provider.EmptyResponseContext;
-import org.apache.abdera.protocol.server.provider.Provider;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
@@ -53,9 +54,10 @@ import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.server.ServerUtils;
 import org.osaf.cosmo.service.ContentService;
 
-public class StandardProvider implements Provider {
+public class StandardProvider extends AbstractProvider {
     private static final Log log = LogFactory.getLog(StandardProvider.class);
 
+    private Abdera abdera;
     private GeneratorFactory generatorFactory;
     private ProcessorFactory processorFactory;
     private ContentService contentService;
@@ -77,15 +79,9 @@ public class StandardProvider implements Provider {
   
     public ResponseContext updateEntry(RequestContext request) {
         ItemTarget target = (ItemTarget) request.getTarget();
+        NoteItem item = target.getItem();
         if (log.isDebugEnabled())
-            log.debug("updating entry for item " + target.getUid());
-
-        Item item = contentService.findItemByUid(target.getUid());
-        if (item == null)
-            return errorResponse(404, "Requested item not found");
-        if (! (item instanceof NoteItem))
-            return errorResponse(403, "Requested item is not a note");
-        NoteItem note = (NoteItem) item;
+            log.debug("updating entry for item " + item.getUid());
 
         // XXX If-Match
 
@@ -95,26 +91,30 @@ public class StandardProvider implements Provider {
             // XXX: does abdera automatically resolve external content?
             Entry entry = (Entry) request.getDocument().getRoot();
             ContentProcessor processor = createContentProcessor(entry);
-            processor.processContent(entry.getContent(), note);
+            processor.processContent(entry.getContent(), item);
         } catch (UnsupportedMediaTypeException e) {
-            return errorResponse(415);
+            return notsupported(abdera, request, "invalid content type " + e.getMediaType());
         } catch (ValidationException e) {
-            String msg = "Invalid content";
+            String reason = "Invalid content: ";
             if (e.getCause() != null)
-                msg = msg + ": " + e.getCause().getMessage();
-            return errorResponse(400, msg);
+                reason = reason + e.getCause().getMessage();
+            else
+                reason = reason + e.getMessage();
+            return badrequest(abdera, request, reason);
         } catch (IOException e) {
-            log.error("Unable to read request content", e);
-            return errorResponse(500, "Unable to read request content: " + e.getMessage());
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
         } catch (ProcessorException e) {
-            log.error("Unknown content processing error", e);
-            return errorResponse(500, "Unknown content processing error: " + e.getMessage());
+            String reason = "Unknown content processing error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
         }
 
-        contentService.updateItem(note);
+        contentService.updateItem(item);
 
         AbstractResponseContext rc = new EmptyResponseContext(204);
-        rc.setEntityTag(new EntityTag(ServerUtils.calculateEtag(note)));
+        rc.setEntityTag(new EntityTag(ServerUtils.calculateEtag(item)));
         return rc;
     }
   
@@ -128,15 +128,9 @@ public class StandardProvider implements Provider {
   
     public ResponseContext getFeed(RequestContext request) {
         CollectionTarget target = (CollectionTarget) request.getTarget();
+        CollectionItem collection = target.getCollection();
         if (log.isDebugEnabled())
-            log.debug("getting feed for collection " + target.getUid());
-
-        Item item = contentService.findItemByUid(target.getUid());
-        if (item == null)
-            return errorResponse(404, "Requested item not found");
-        if (! (item instanceof CollectionItem))
-            return errorResponse(403, "Requested item is not a collection");
-        CollectionItem collection = (CollectionItem) item;
+            log.debug("getting feed for collection " + collection.getUid());
 
         // XXX If-None-Match
 
@@ -150,12 +144,15 @@ public class StandardProvider implements Provider {
             rc.setEntityTag(new EntityTag(ServerUtils.calculateEtag(collection)));
             return rc;
         } catch (UnsupportedProjectionException e) {
-            return errorResponse(404, "Projection " + target.getProjection() + " not supported");
+            String reason = "Projection " + target.getProjection() + " not supported";
+            return badrequest(abdera, request, reason);
         } catch (UnsupportedFormatException e) {
-            return errorResponse(404, "Format " + target.getFormat() + " not supported");
+            String reason = "Format " + target.getFormat() + " not supported";
+            return badrequest(abdera, request, reason);
         } catch (GeneratorException e) {
-            log.error("Unknown feed generation error", e);
-            return errorResponse(500, "Unknown feed generation error: " + e.getMessage());
+            String reason = "Unknown feed generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
         }
     }
   
@@ -179,7 +176,22 @@ public class StandardProvider implements Provider {
         return null;
     }
 
+    // AbstractProvider methods
+
+    protected int getDefaultPageSize() {
+        // XXX
+        return 25;
+    }
+
     // our methods
+
+    public Abdera getAbdera() {
+        return abdera;
+    }
+
+    public void setAbdera(Abdera abdera) {
+        this.abdera = abdera;
+    }
 
     public GeneratorFactory getGeneratorFactory() {
         return generatorFactory;
@@ -214,6 +226,8 @@ public class StandardProvider implements Provider {
     }
 
     public void init() {
+        if (abdera == null)
+            throw new IllegalStateException("abdera is required");
         if (generatorFactory == null)
             throw new IllegalStateException("generatorFactory is required");
         if (processorFactory == null)
@@ -244,17 +258,5 @@ public class StandardProvider implements Provider {
         HttpServletRequest request =
             ((HttpServletRequestContext)context).getRequest();
         return serviceLocatorFactory.createServiceLocator(request);
-    }
-
-    protected AbstractResponseContext errorResponse(int status) {
-        return errorResponse(status, null);
-    }
-
-    protected AbstractResponseContext errorResponse(int status,
-                                                    String message) {
-        AbstractResponseContext rc = new EmptyResponseContext(status);
-        if (message != null)
-            rc.setStatusText(message);
-        return rc;
     }
 }

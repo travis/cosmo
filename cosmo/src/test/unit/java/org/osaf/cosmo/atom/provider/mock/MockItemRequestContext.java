@@ -51,15 +51,15 @@ public class MockItemRequestContext extends BaseMockRequestContext {
                                   NoteItem item,
                                   String method,
                                   boolean isMedia) {
-        this(context, item.getUid(), method, isMedia);
+        super(context, method, toRequestUri(item.getUid()));
+        this.target = new ItemTarget(type(isMedia), this, item);
     }
 
     public MockItemRequestContext(ServiceContext context,
                                   String uid,
                                   String method,
                                   boolean isMedia) {
-        super(context, method, toRequestUri(uid));
-        this.target = new ItemTarget(type(isMedia), this, uid);
+        this(context, makeItem(uid), method, isMedia);
     }
 
     private static String toRequestUri(String uid) {
@@ -68,6 +68,12 @@ public class MockItemRequestContext extends BaseMockRequestContext {
 
     private static TargetType type(boolean isMedia) {
         return isMedia ? TargetType.TYPE_MEDIA : TargetType.TYPE_ENTRY;
+    }
+
+    private static NoteItem makeItem(String uid) {
+        NoteItem item = new NoteItem();
+        item.setUid(uid);
+        return item;
     }
 
     public void setEntryContent(NoteItem item)

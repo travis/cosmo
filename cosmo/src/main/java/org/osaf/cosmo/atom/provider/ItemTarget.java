@@ -19,18 +19,20 @@ import org.apache.abdera.protocol.server.provider.AbstractTarget;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 
+import org.osaf.cosmo.model.NoteItem;
+
 public class ItemTarget extends AbstractTarget {
 
-    private String uid;
+    private NoteItem item;
 
     public ItemTarget(TargetType type,
                       RequestContext request,
-                      String uid) {
+                      NoteItem item) {
         super(type, request);
-        this.uid = uid;
+        this.item = item;
     }
 
-    public String getUid() {
-        return uid;
+    public NoteItem getItem() {
+        return item;
     }
 }

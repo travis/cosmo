@@ -521,6 +521,7 @@
       <bean class="org.osaf.cosmo.atom.provider.StandardProviderManager">
         <property name="provider">
           <bean class="org.osaf.cosmo.atom.provider.StandardProvider">
+            <property name="abdera"><ref local="abdera"/></property>
             <property name="generatorFactory">
               <bean class="org.osaf.cosmo.atom.generator.StandardGeneratorFactory">
                 <property name="abdera"><ref local="abdera"/></property>
@@ -546,7 +547,11 @@
       <bean class="org.apache.abdera.protocol.server.servlet.DefaultRequestHandlerManager"/>
     </property>
     <property name="targetResolver">
-      <bean class="org.osaf.cosmo.atom.provider.StandardTargetResolver"/>
+      <bean class="org.osaf.cosmo.atom.provider.StandardTargetResolver">
+        <property name="contentService">
+          <ref local="contentService"/>
+        </property>
+      </bean>
     </property>
   </bean>
 

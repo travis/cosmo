@@ -43,25 +43,6 @@ public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
         assertNotNull("Null etag", res.getEntityTag());
     }
 
-    public void testNotFound() throws Exception {
-        RequestContext req = helper.createEntryRequestContext("deadbeef",
-                                                              "PUT");
-
-        ResponseContext res = provider.updateEntry(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 404, res.getStatus());
-    }
-
-    public void testNotNote() throws Exception {
-        ContentItem content = helper.makeAndStoreDummyContent();
-        RequestContext req = helper.createEntryRequestContext(content.getUid(),
-                                                              "PUT");
-
-        ResponseContext res = provider.updateEntry(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 403, res.getStatus());
-    }
-
     public void testUnsupportedMediaType() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "PUT");

@@ -24,8 +24,12 @@ import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.server.ItemPath;
+import org.osaf.cosmo.service.ContentService;
 
 /**
  * Resolves the request to a resource target. The request URI can
@@ -34,6 +38,10 @@ import org.osaf.cosmo.server.ItemPath;
 public class StandardTargetResolver implements TargetResolver {
     private static final Log log =
         LogFactory.getLog(StandardTargetResolver.class);
+
+    private ContentService contentService;
+
+    // TargetResolver methods
 
     /**
      * Returns a target representing the type of item addressed by the
@@ -74,12 +82,20 @@ public class StandardTargetResolver implements TargetResolver {
         throw new UnsupportedOperationException();
     }
 
+    // our methods
+
     /**
      * Creates a target representing a collection. All targets are of
      * type {@ink TargetType.COLLECTION}.
      */
     protected Target createCollectionTarget(RequestContext context,
                                             CollectionPath path) {
+        Item item = contentService.findItemByUid(path.getUid());
+        if (item == null)
+            return null;
+        if (! (item instanceof CollectionItem))
+            return null;
+
         String projection = null;
         String format = null;
         if (path.getPathInfo() != null &&
@@ -89,7 +105,9 @@ public class StandardTargetResolver implements TargetResolver {
             if (segments.length > 1)
                 format = segments[1];
         }
-        return new CollectionTarget(context, path.getUid(), projection, format);
+
+        return new CollectionTarget(context, (CollectionItem) item, projection,
+                                    format);
     }
 
     /**
@@ -98,7 +116,26 @@ public class StandardTargetResolver implements TargetResolver {
      */
     protected Target createItemTarget(RequestContext context,
                                       ItemPath path) {
+        Item item = contentService.findItemByUid(path.getUid());
+        if (item == null)
+            return null;
+        if (! (item instanceof NoteItem))
+            return null;
+
         // XXX check content type - could be media
-        return new ItemTarget(TargetType.TYPE_ENTRY, context, path.getUid());
+        return new ItemTarget(TargetType.TYPE_ENTRY, context, (NoteItem) item);
+    }
+
+    public ContentService getContentService() {
+        return contentService;
+    }
+
+    public void setContentService(ContentService contentService) {
+        this.contentService = contentService;
+    }
+
+    public void init() {
+        if (contentService == null)
+            throw new IllegalStateException("contentService is required");
     }
 }

@@ -44,24 +44,6 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         assertNotNull("Null etag", res.getEntityTag());
     }
 
-    public void testNotFound() throws Exception {
-        RequestContext req = helper.createFeedRequestContext("deadbeef", "GET");
-
-        ResponseContext res = provider.getFeed(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 404, res.getStatus());
-    }
-
-    public void testNotCollection() throws Exception {
-        ContentItem content = helper.makeAndStoreDummyContent();
-        RequestContext req = helper.createEntryRequestContext(content.getUid(),
-                                                              "PUT");
-
-        ResponseContext res = provider.updateEntry(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 403, res.getStatus());
-    }
-
     public void testUnsupportedProjection() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = helper.createFeedRequestContext(collection, "GET",
@@ -70,7 +52,8 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
 
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 404, res.getStatus());
+        assertEquals("Incorrect response status", 400, res.getStatus());
+        log.error(helper.getContent(res));
     }
 
     public void testUnsupportedFormat() throws Exception {
@@ -82,7 +65,8 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
 
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 404, res.getStatus());
+        assertEquals("Incorrect response status", 400, res.getStatus());
+        log.error(helper.getContent(res));
     }
 
     public void testGenerationError() throws Exception {
@@ -96,5 +80,6 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
+        log.error(helper.getContent(res));
     }
 }

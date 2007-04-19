@@ -21,17 +21,25 @@ cosmo.model.util._upperFirstChar = function(str){
 
 cosmo.model.util.BasePropertyApplicator = function(){}   
 cosmo.model.util.BasePropertyApplicator.prototype = {
+    
+    enhanceClass: function(ctr, propertyArray, kwArgs){
+        this.initializeClass(ctr, kwArgs);
+        for (var x = 0; x < propertyArray.length; x++){
+            this.addProperty.apply(this, [ctr, propertyArray[x][0], propertyArray[x][1]]);
+        }
+    },
+    
     addProperty: function(ctr, propertyName, kwArgs){
+        kwArgs = kwArgs || {};
         var upProp = cosmo.model.util._upperFirstChar(propertyName);
         var setterName = "set" + upProp;
         var getterName = "get" + upProp;
         
-        this.initializeObject(ctr, propertyName, kwArgs);
         ctr.prototype[setterName] = this.getSetter(ctr, propertyName, kwArgs);
         ctr.prototype[getterName] = this.getGetter(ctr, propertyName, kwArgs);
     },
     
-    initializeObject: function(ctr, propertyName, kwArgs){
+    initializeClass: function(ctr, kwArgs){
         //implementers should override this.
     },
     
@@ -46,42 +54,108 @@ cosmo.model.util.BasePropertyApplicator.prototype = {
     }
 }
 
-cosmo.model.util.simplePropertyApplicator = new cosmo.model.util.BasePropertyApplicator();
-cosmo.model.util.simplePropertyApplicator._NULL = {};
-cosmo.model.util.simplePropertyApplicator._FALSE_OR_ZERO = {};
-cosmo.model.util.simplePropertyApplicator.getGetter = function(ctr, propertyName, kwArgs){
-    var self = this;
-    return function(){        
-        var privateName = "_" + propertyName;
-        var result = this[privateName];
-        if (result){
-            return result == self._NULL ? null : self._FALSE_OR_ZERO ? 0 : result;
+//TODO Make a clone() function
+dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BasePropertyApplicator, {
+    addProperty: function(ctr, propertyName, kwArgs){
+        kwArgs = kwArgs || {};
+        this._inherited("addProperty", arguments);
+        ctr.prototype.__propertyNames.push(propertyName);
+        ctr.prototype.__defaults[propertyName] = kwArgs["default"];
+    },
+    
+    getGetter: function(ctr, propertyName, kwArgs){
+        return function(){        
+            return this.__getProperty(propertyName);
         }
-        if (typeof(kwArgs["default"]) == "function"){
-            this[privateName] = kwArgs["default"]();
-            return this[privateName];
-        }
-        return kwArgs["default"];
-    }
-}
+    },
 
-cosmo.model.util.simplePropertyApplicator.getSetter = function(ctr, propertyName, kwArgs){
-    var self = this;
-    return function(value){
-        var privateName = "_" + propertyName;
-        if (value == null){
-            this[privateName] = self._NULL;
-        } else if (value == 0){
-            this[privateName] = self._FALSE_OR_ZERO;
+    getSetter: function(ctr, propertyName, kwArgs){
+        return function(value){
+            this.__setProperty(propertyName, value);
+        }
+    },
+
+    initializeClass: function(ctr, kwArgs){
+        if (!kwArgs){
+            kwArgs = {};
+        }
+
+        ctr.prototype.__getProperty = this._genericGetter;
+        ctr.prototype.__setProperty = this._genericSetter;
+        ctr.prototype.__getDefault = this._getDefault;
+        ctr.prototype.__propertyNames = [];
+        ctr.prototype.__defaults = {};
+        ctr.prototype.initializeProperties = this._initializeProperties;
+        
+        if (kwArgs["enhanceInitializer"]){
+            var oldInitter = ctr.prototype.initializer;
+            var when = kwArgs["enhanceInitializer"];
+            //TODO use dojo AOP
+            function newInitializer(){
+                if (when == "before"){
+                    this.initializeProperties(arguments);
+                }
+                
+                oldInitter.apply(this,arguments);
+                
+                if (when != "before"){
+                    this.initializeProperties(arguments);
+                }
+            }
+            ctr.prototype.initializer = newInitializer;
+        }    
+    },
+    
+    //These functions are "protected" - in other words they should only be used by this class, 
+    //or other classes in this package.
+    _initializeProperties: function(kwProps){
+        for (var x = 0; x < this.__propertyNames.length; x++){
+            var propertyName = this.__propertyNames[x];
+            if (dojo.lang.has(kwProps, propertyName)){
+                this.__setProperty(propertyName, kwProps[propertyName]);
+            } else {
+                this.__setProperty(propertyName, this.__getDefault(propertyName));
+            }
+        }
+    }, 
+    
+    _genericGetter: function(propertyName){
+        return this["_"+propertyName];
+    },
+    
+    _genericSetter: function(propertyName, value){
+        this["_"+propertyName] = value;
+    },
+    
+    _getDefault: function(propertyName){
+        var propDefault = this.__defaults[propertyName];
+                    
+        if (typeof(propDefault) == "function"){
+            return propDefault();
         } else {
-            this["_" + propertyName] = value;
+            return propDefault;
         }
+        
+        return propDefault;
     }
-}
+});
 
-cosmo.model.util.applyMultiplePropertiesWithPropertyInitializer = function(ctr, properties, propertyApplicator){
-    for (var x = 0; x < properties.length; x++){
-        var propertyDescriptor = properties[x];
-        propertyApplicator.addProperty(ctr,propertyDescriptor["name"]);
+//instantiate the singleton 
+cosmo.model.util.simplePropertyApplicator = new cosmo.model.util.SimplePropertyApplicator();
+
+dojo.declare("cosmo.model.util.InheritingSubclassCreator", null, {
+    createSubClass: function(parentConstructor, childConstructorName,kwArgs, propertyArgsMap){
+        dojo.declare(childConstructorName, parentConstructor, {
+        });
+    },
+    
+    //default functions
+    _getParentDefault: function(){
+       return this.parent;  
+    }, 
+    
+    _getterDefault: function(){
+        
     }
-}
+    
+});    

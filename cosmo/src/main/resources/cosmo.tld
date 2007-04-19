@@ -53,4 +53,9 @@
       <rtexprvalue>false</rtexprvalue>
     </attribute>
   </tag>
+  <function>
+    <name>triageStatusLabel</name>
+    <function-class>org.osaf.cosmo.model.TriageStatus</function-class>
+    <function-signature>java.lang.String label(java.lang.Integer)</function-signature>
+  </function>
 </taglib>

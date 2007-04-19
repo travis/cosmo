@@ -21,6 +21,7 @@ import java.text.Format;
 import java.text.ParseException;
 import java.text.ParsePosition;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -99,7 +100,7 @@ public class TriageStatusFormat extends Format {
         
         toAppendTo.append(" ");
 
-        String autoTriage = ts.isAutoTriage() != null && ts.isAutoTriage() ?
+        String autoTriage = BooleanUtils.isTrue(ts.getAutoTriage()) ?
             AUTOTRIAGE_ON : AUTOTRIAGE_OFF;
 
         if (pos.getField() == AUTOTRIAGE_FIELD)

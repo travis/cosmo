@@ -69,34 +69,42 @@
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        Size
+        Triage Status
       </td>
       <td class="mdData">
-        <fmt:formatNumber value="${Item.contentLength}"/> b
+        <cosmo:triagestatus property="code" value="${Item.triageStatus}"/>
       </td>
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        Media Type
+        Triage Rank
       </td>
       <td class="mdData">
-        ${Item.contentType}
+        <cosmo:triagestatus property="rank" value="${Item.triageStatus}"/>
       </td>
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        Encoding
+        Auto Triage?
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Item.contentEncoding != null}">${Item.contentEncoding}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <cosmo:triagestatus property="auto" value="${Item.triageStatus}"/>
       </td>
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        Language
+        Sent?
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Item.contentLanguage != null}">${Item.contentLanguage}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <cosmo:yesno value="${Item.sent}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Needs Reply?
+      </td>
+      <td class="mdData">
+        <cosmo:yesno value="${Item.needsReply}"/>
       </td>
     </tr>
     <tr>
@@ -137,6 +145,47 @@
       </td>
       <td class="mdData">
         <fmt:formatDate value="${Item.modifiedDate}" type="both"/>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="hd" style="margin-top: 12px;">
+  Content Properties
+</div>
+
+<div style="margin-top:12px;">
+  <table cellpadding="3" cellspacing="1" border="0">
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Size
+      </td>
+      <td class="mdData">
+        <fmt:formatNumber value="${Item.contentLength}"/> b
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Media Type
+      </td>
+      <td class="mdData">
+        ${Item.contentType}
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Encoding
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${Item.contentEncoding != null}">${Item.contentEncoding}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Language
+      </td>
+      <td class="mdData">
+        <c:choose><c:when test="${Item.contentLanguage != null}">${Item.contentLanguage}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
   </table>
@@ -194,7 +243,7 @@
         Anytime?
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${eventstamp.anyTime}">Yes</c:when><c:otherwise>No</c:otherwise></c:choose>
+        <cosmo:yesno value="${eventstamp.anyTime}"/>
       </td>
     </tr>
     <tr>

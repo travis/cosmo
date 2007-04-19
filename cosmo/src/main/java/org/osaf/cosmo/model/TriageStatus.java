@@ -70,7 +70,7 @@ public class TriageStatus {
     }
 
     @Column(name = "isautotriage")
-    public Boolean isAutoTriage() {
+    public Boolean getAutoTriage() {
         return autoTriage;
     }
 

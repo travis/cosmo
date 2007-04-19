@@ -1174,7 +1174,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         queryItem = contentDao.findContentByUid(newItem.getUid());
         triageStatus = queryItem.getTriageStatus();
-        Assert.assertEquals(triageStatus.isAutoTriage(), Boolean.FALSE);
+        Assert.assertEquals(triageStatus.getAutoTriage(), Boolean.FALSE);
         Assert.assertEquals(triageStatus.getCode(),
                             new Integer(TriageStatus.CODE_LATER));
         Assert.assertEquals(triageStatus.getRank(), rank);

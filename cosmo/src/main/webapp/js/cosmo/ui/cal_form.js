@@ -642,16 +642,16 @@ cosmo.ui.cal_form.CalForm = function () {
         // Calc military datetimes from form entries
         startDate = new Date(startDate);
         if (startTime) {
-            h = Cal.extractHourFromTime(startTime);
-            h = hrStd2Mil(h, form.startap[1].checked);
-            m = Cal.extractMinutesFromTime(startTime);
+            var t = cosmo.datetime.parse.parseTimeString(startTime);
+            h = hrStd2Mil(t.hours, form.startap[1].checked);
+            m = t.minutes; 
             startDate.setHours(h, m);
         }
         endDate = new Date(endDate);
         if (endTime) {
-            h = Cal.extractHourFromTime(endTime);
-            h = hrStd2Mil(h, form.endap[1].checked);
-            m = Cal.extractMinutesFromTime(endTime);
+            var t = cosmo.datetime.parse.parseTimeString(endTime);
+            h = hrStd2Mil(t.hours, form.endap[1].checked);
+            m = t.minutes; 
             endDate.setHours(h, m);
         }
         // Validate that start is before end

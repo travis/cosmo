@@ -485,11 +485,11 @@ cosmo.view.cal.HasTimeLozenge.prototype.updateFromEvent = function (ev) {
         }
         else {
             var formatStartTime = Date.strftime('%H:%M', ev.data.start.getTime());
-            startPos = Cal.calcPosFromTime(formatStartTime, 'start');
+            startPos = cosmo.view.cal.canvas.calcPosFromTime(formatStartTime, 'start');
             left = (ev.data.start.getLocalDay())*cosmo.view.cal.canvas.dayUnitWidth;
         }
         var formatEndTime = Date.strftime('%H:%M', ev.data.end.getTime());
-        endPos = Cal.calcPosFromTime(formatEndTime, 'end');
+        endPos = cosmo.view.cal.canvas.calcPosFromTime(formatEndTime, 'end');
 
 
         var w = cosmo.view.cal.canvas.dayUnitWidth;
@@ -531,18 +531,20 @@ cosmo.view.cal.HasTimeLozenge.prototype.updateFromEvent = function (ev) {
  */
 cosmo.view.cal.HasTimeLozenge.prototype.updateEvent = function (ev, dragMode) {
 
-    var evStart = Cal.calcDateFromPos(this.left);
+    var evStart = cosmo.view.cal.canvas.calcDateFromPos(this.left);
     var diff = this.auxDivList.length;
     var evEnd = Date.add('d', diff, evStart);
-    var startTime = Cal.calcTimeFromPos(this.top);
+    var startTime = cosmo.view.cal.canvas.calcTimeFromPos(this.top);
     // Add +1 to height for border on background
     // Add +2 to height for border on lozenge div
-    var endTime = Cal.calcTimeFromPos(this.top+(this.height + 3));
-
-    evStart.setHours(Cal.extractHourFromTime(startTime));
-    evStart.setMinutes(Cal.extractMinutesFromTime(startTime));
-    evEnd.setHours(Cal.extractHourFromTime(endTime));
-    evEnd.setMinutes(Cal.extractMinutesFromTime(endTime));
+    var endTime = cosmo.view.cal.canvas.calcTimeFromPos(this.top+(this.height + 3));
+    
+    var t = cosmo.datetime.parse.parseTimeString(startTime);
+    evStart.setHours(t.hours);
+    evStart.setMinutes(t.minutes);
+    var t = cosmo.datetime.parse.parseTimeString(endTime);
+    evEnd.setHours(t.hours);
+    evEnd.setMinutes(t.minutes);
 
     // If the event was originally less than the minimum *visible* lozenge
     // height, preserve the original times when editing
@@ -970,7 +972,7 @@ cosmo.view.cal.NoTimeLozenge.prototype.updateFromEvent = function (ev, temp) {
  */
 cosmo.view.cal.NoTimeLozenge.prototype.updateEvent = function (ev, dragMode) {
     // Dragged-to date
-    var evDate = Cal.calcDateFromPos(this.left);
+    var evDate = cosmo.view.cal.canvas.calcDateFromPos(this.left);
     // Difference in days
     var diff = Date.diff('d', ev.data.start.getTime(), evDate.getTime());
     // Increment start and end by number of days

@@ -29,6 +29,7 @@ dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.view.cal");
 dojo.require('cosmo.view.cal.Lozenge');
 dojo.require("cosmo.view.cal.conflict");
+dojo.require("cosmo.ui.cal_main");
 
 cosmo.view.cal.canvas = new function () {
 
@@ -43,22 +44,592 @@ cosmo.view.cal.canvas = new function () {
     // The scrolling div for timed events
     var timedScrollingMainDiv = null;
 
-    // Avoid RSI
-    function $(id) {
-        return document.getElementById(id);
-    }
+    // Public props
+    // ****************
+    // Width of day col in week view, width of event lozenges --
+    // Calc'd based on client window size
+    // Other pieces of the app use this, so make it public
+    this.dayUnitWidth = 0;
+    // The list currently displayed events
+    // on the calendar -- key is the CalEvent obj's id prop,
+    // value is the CalEvent
+    this.eventRegistry = new Hash();
+    // Currently selected event
+    this.selectedEvent = null;
+    this.colors = {};
+
+    // Public methods
+    // ****************
     /**
-     * Diagnostic function -- dump the content of an event
-     * @param key String, the Hash key for the eventRegistry
-     * @param val CalEvent object, the event whose data you
-     * want to dump
+     * Main rendering function for the calendar canvas called
+     * on init load, and week-to-week nav
+     * @param vS Date, start of the view range
+     * @param vE Date, end of the view range
+     * @param cD Date, the current date on the client
      */
-    function dumpEvData(key, val) {
-        Log.print(key);
-        Log.print(val.id)
-        Log.print(val.data.id);
-        Log.print(val.data.title);
-    }
+    this.render = function (vS, vE, cD) {
+        var viewStart = vS;
+        var viewEnd = vE;
+        var currDate = cD;
+        // Key container elements
+        var monthHeaderNode = null;
+        var timelineNode = null;
+        var hoursNode = null;
+        var dayNameHeadersNode = null;
+        var allDayColsNode = null;
+
+        /**
+         * Set up key container elements
+         * @return Boolean, true.
+         */
+        function init() {
+            // Link local variables to DOM nodes
+            monthHeaderNode = $('monthHeaderDiv');
+            timelineNode = $('timedHourListDiv');
+            dayNameHeadersNode = $('dayListDiv');
+            hoursNode = $('timedContentDiv');
+            allDayColsNode = $('allDayContentDiv');
+
+            // All done, woot
+            return true;
+        }
+
+        /**
+         * Shows list of days at the head of each column in the week view
+         * Uses the Date.abbrWeekday array of names in date.js
+         * @return Boolean, true.
+         */
+        function showDayNameHeaders() {
+            var str = '';
+            var start = HOUR_LISTING_WIDTH + 1;
+            var idstr = '';
+            var startdate = viewStart.getDate();
+            var startmon = viewStart.getMonth();
+            var daymax = daysInMonth(startmon+1);
+            var calcDay = null;
+            var cd = currDate;
+            var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
+
+             // Returns the number of days in a specific month of a specific year --
+             // the year is necessary to handle leap years' Feb. 29
+             function daysInMonth(month, year){
+                var days = 0;
+                switch (month) {
+                    case 4:
+                    case 6:
+                    case 9:
+                    case 11:
+                        days = 30;
+                        break;
+                    case 2:
+                        if (year % 4 == 0){
+                               days = 29;
+                           }
+                           else{
+                               days = 28;
+                          }
+                          break;
+                      default:
+                          days = 31;
+                          break;
+                }
+                return days;
+            }
+
+            // Spacer to align with the timeline that displays hours below
+            // for the timed event canvas
+            str += '<div id="dayListSpacer" class="dayListDayDiv"' +
+                ' style="left:0px; width:' +
+                (HOUR_LISTING_WIDTH - 1) + 'px; height:' +
+                (DAY_LIST_DIV_HEIGHT-1) +
+                'px;">&nbsp;</div>';
+
+            // Do a week's worth of day cols with day name and date
+            for (var i = 0; i < 7; i++) {
+                calcDay = Date.add('d', i, viewStart);
+                startdate = startdate > daymax ? 1 : startdate;
+                // Subtract one pixel of height for 1px border per retarded CSS spec
+                str += '<div class="dayListDayDiv" id="dayListDiv' + i +
+                    '" style="left:' + start + 'px; width:' + (self.dayUnitWidth-1) +
+                    'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
+                if (calcDay.getTime() == currDay.getTime()) {
+                    str += ' background-image:url(' + cosmo.env.getImagesUrl() +
+                        'day_col_header_background.gif); background-repeat:' +
+                        ' repeat-x; background-position:0px 0px;'
+                }
+                str += '">';
+                str += Date.abbrWeekday[i] + '&nbsp;' + startdate;
+                str += '</div>\n';
+                start += self.dayUnitWidth;
+                startdate++;
+            }
+            dayNameHeadersNode.innerHTML = str;
+            return true;
+        }
+
+        /**
+         * Draws the day columns in the resizeable all-day area
+         * @return Boolean, true.
+         */
+        function showAllDayCols() {
+            var str = '';
+            var start = 0;
+            var idstr = ''
+            var calcDay = null;
+            var cd = currDate;
+            var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
+
+            for (var i = 0; i < 7; i++) {
+                calcDay = Date.add('d', i, viewStart);
+                str += '<div class="allDayListDayDiv';
+                if (calcDay.getTime() == currDay.getTime()) {
+                    str += ' currentDayDay'
+                }
+                str +='" id="allDayListDiv' + i +
+                '" style="left:' + start + 'px; width:' +
+                (cosmo.view.cal.canvas.dayUnitWidth-1) + 'px;">&nbsp;</div>';
+                start += cosmo.view.cal.canvas.dayUnitWidth;
+            }
+            str += '<br style="clear:both;"/>';
+            allDayColsNode.innerHTML = str;
+            return true;
+        }
+
+        /**
+         * Draws the 12 AM to 11 PM hour-range in each day column
+         * @return Boolean, true.
+         */
+        function showHours() {
+            var str = '';
+            var row = '';
+            var start = 0;
+            var idstr = '';
+            var hour = 0;
+            var meridian = '';
+            var calcDay = null;
+            var cd = currDate;
+            var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
+            var isCurrentDay = false;
+            var viewDiv = null;
+            var timeLineWidth = 0;
+            var workingHoursBarWidth = 3;
+
+            // Subtract one px for border per asinine CSS spec
+            var halfHourHeight = (HOUR_UNIT_HEIGHT/2) - 1;
+
+            var w = '';
+            // Working/non-working hours line
+            w += '<div class="';
+            w += (j < 8 || j > 17) ? 'nonWorkingHours' : 'workingHours';
+            w += '" style="width:' + workingHoursBarWidth +
+                'px; height:' + (halfHourHeight+1) +
+                'px; float:left; font-size:1px;">&nbsp;</div>';
+            var workingHoursLine = '';
+
+            str = '';
+            viewDiv = timelineNode;
+            timeLineWidth = parseInt(viewDiv.offsetWidth);
+            // Subtract 1 for 1px border
+            timeLineWidth = timeLineWidth - workingHoursBarWidth - 1;
+
+            // Timeline of hours on left
+            for (var j = 0; j < 24; j++) {
+                hour = j == 12 ? _('App.Noon') : cosmo.util.date.hrMil2Std(j);
+                meridian = j > 11 ? ' PM' : ' AM';
+                meridian = j == 12 ? '' : '<span>' + meridian + '</span>';
+                row = '';
+
+                // Upper half hour
+                // ==================
+                row += '<div class="hourDivTop';
+                row += '" style="height:' +
+                    halfHourHeight + 'px; width:' +
+                    timeLineWidth + 'px; float:left;">';
+                // Hour plus AM/PM
+                row += '<div class="hourDivSubLeft">' + hour +
+                    meridian + '</div>';
+                row += '</div>\n';
+                row += workingHoursLine;
+                row += '<br class="clearAll"/>'
+
+                idstr = i + '-' + j + '30';
+
+                // Lower half hour
+                // ==================
+                row += '<div class="hourDivBottom"';
+                // Make the noon border thicker
+                if (j == 11) {
+                    row += ' style="height:' + (halfHourHeight-1) +
+                        'px; border-width:2px;';
+                }
+                else {
+                    row += ' style="height:' + halfHourHeight + 'px;';
+                }
+                row += ' width:' + timeLineWidth +
+                    'px; float:left;">&nbsp;</div>\n';
+                row += workingHoursLine;
+                row += '<br class="clearAll"/>'
+
+                str += row;
+            }
+            viewDiv.innerHTML = str;
+
+            str = '';
+            viewDiv = hoursNode;
+
+            // Do a week's worth of day cols with hours
+            for (var i = 0; i < 7; i++) {
+                calcDay = Date.add('d', i, viewStart);
+                str += '<div class="dayDiv" id="dayDiv' + i +
+                    '" style="left:' + start + 'px; width:' +
+                    (cosmo.view.cal.canvas.dayUnitWidth-1) +
+                    'px;"';
+                str += '>';
+                for (var j = 0; j < 24; j++) {
+
+                    isCurrentDay = (calcDay.getTime() == currDay.getTime());
+
+                    idstr = i + '-' + j + '00';
+                    row = '';
+                    row += '<div id="hourDiv' + idstr + '" class="hourDivTop';
+                    // Highlight the current day
+                    if (isCurrentDay) {
+                        row += ' currentDayDay'
+                    }
+                    // Non-working hours are gray
+                    else if (j < 8 || j > 18) {
+                        //row += ' nonWorkingHours';
+                    }
+                    row += '" style="height:' + halfHourHeight + 'px;">';
+                    row += '</div>\n';
+                    idstr = i + '-' + j + '30';
+                    row += '<div id="hourDiv' + idstr + '" class="hourDivBottom';
+                    // Highlight the current day
+                    if (isCurrentDay) {
+                        row += ' currentDayDay'
+                    }
+                    // Non-working hours are gray
+                    else if (j < 8 || j > 18) {
+                        //row += ' nonWorkingHours';
+                    }
+                    row += '" style="';
+                    if (j == 11) {
+                        row += 'height:' + (halfHourHeight-1) +
+                            'px; border-width:2px;';
+                    }
+                    else {
+                        row += 'height:' + halfHourHeight + 'px;';
+                    }
+                    row += '">&nbsp;</div>';
+                    str += row;
+                }
+                str += '</div>\n';
+                start += cosmo.view.cal.canvas.dayUnitWidth;
+            }
+
+            viewDiv.innerHTML = str;
+            return true;
+        }
+        /**
+         * Displays the month name at the top
+         */
+        function showMonthHeader() {
+            var vS = viewStart;
+            var vE = viewEnd;
+            var mS = vS.getMonth();
+            var mE = vE.getMonth();
+            var headerDiv = monthHeaderNode;
+            var str = '';
+
+            // Format like 'March-April, 2006'
+            if (mS < mE) {
+                str += vS.strftime('%B-');
+                str += vE.strftime('%B %Y');
+            }
+            // Format like 'December 2006-January 2007'
+            else if (mS > mE) {
+                str += vS.strftime('%B %Y-');
+                str += vE.strftime('%B %Y');
+            }
+            // Format like 'April 2-8, 2006'
+            else {
+                str += vS.strftime('%B %Y');
+            }
+            if (headerDiv.firstChild) {
+                headerDiv.removeChild(headerDiv.firstChild);
+            }
+            headerDiv.appendChild(document.createTextNode(str));
+        }
+
+        // Do it!
+        // -----------
+        if (!initRender) {
+            // Make the all-day event area resizeable
+            // --------------
+            allDayArea = new cosmo.ui.resize_area.ResizeArea(
+                'allDayResizeMainDiv', 'allDayResizeHandleDiv');
+            allDayArea.init('down');
+            allDayArea.addAdjacent('timedScrollingMainDiv');
+            allDayArea.setDragLimit();
+        }
+        else {
+            removeAllEvents();
+        }
+
+        // Init and call all the rendering functions
+        init();
+        showMonthHeader();
+        showDayNameHeaders();
+        showAllDayCols();
+
+        // Create event listeners
+        if (!initRender) {
+            dojo.event.connect(hoursNode, 'onmousedown', mouseDownHandler);
+            dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
+            dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
+            dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
+            // Get a reference to the main scrolling area for timed events;
+            timedScrollingMainDiv = $('timedScrollingMainDiv');
+            // Only render the base canvas once on initial load
+            showHours();
+        }
+
+        initRender = true;
+    };
+    /**
+     * Get the scroll offset for the timed canvas
+     * @return Number, the pixel position of the top of the timed
+     * event canvas, including the menubar at the top, resizing of
+     * the all-day area, and any amount that the timed canvas
+     * has scrolled.
+     */
+    this.getTimedCanvasScrollTop = function () {
+        // Has to be looked up every time, as value may change
+        // either when user scrolls or resizes all-day event area
+        var top = timedScrollingMainDiv.scrollTop;
+        // FIXME -- viewOffset is the vertical offset of the UI
+        // with the top menubar added in. This should be a property
+        // of render context that the canvas can look up
+        top -= Cal.viewOffset;
+        // Subtract change in resized all-day event area
+        top -= (allDayArea.dragSize - allDayArea.origSize);
+        return top;
+    };
+    /**
+     * Get the currently selected event -- might be okay to allow
+     * direct access to the property itself, but with a getter
+     * you could trigger certain events if neeeded whenever something
+     * grabs the selected event
+     * @return CalEvent object, the currently selected event
+     */
+    this.getSelectedEvent = function () {
+        return self.selectedEvent;
+    };
+    this.calcColors = function () {
+        var getRGB = function (h, s, v) {
+            var rgb = dojo.gfx.color.hsv2rgb(h, s, v, {
+                inputRange: [360, 100, 100], outputRange: 255 });
+            return 'rgb(' + rgb.join() + ')';
+        }
+        var lozengeColors = {};
+        var sel = cosmo.ui.cal_main.Cal.calForm.form.calSelectElem;
+        var index = sel ? sel.selectedIndex : 0;
+        var hue = hues[index];
+
+        var o = {
+            darkSel: [100, 80],
+            darkUnsel: [80, 90],
+            lightSel: [25, 100],
+            lightUnsel: [10, 100],
+            proc: [30, 90]
+        };
+        for (var p in o) {
+            lozengeColors[p] = getRGB(hue, o[p][0], o[p][1]);
+        }
+        this.colors = lozengeColors;
+    };
+    /**
+     * Figures out the date based on Y-pos of left edge of event lozenge
+     * with respect to canvas (scrollable div 'timedScrollingMainDiv').
+     * @param point Left edge of dragged event lozenge after snap-to.
+     * @return A Date object
+     */
+    this.calcDateFromPos = function (point) {
+        var col = parseInt(point/cosmo.view.cal.canvas.dayUnitWidth); // Number 0-6 -- day in the week
+        var posdate = calcDateFromIndex(col);
+        return posdate;
+    };
+    /**
+     * Figures out the hour based on X-pos of top and bottom edges of event lozenge
+     * with respect to canvas (scrollable div 'timedScrollingMainDiv').
+     * @param point top or bottom edge of dragged event lozenge after snap-to.
+     * @return A time string in in military time format
+     */
+    this.calcTimeFromPos = function (point) {
+        var h = 0;
+        var m = 0;
+        h = parseInt(point/HOUR_UNIT_HEIGHT);
+        h = h.toString();
+        m = (((point % HOUR_UNIT_HEIGHT)/HOUR_UNIT_HEIGHT)*60);
+        h = h.length < 2 ? '0' + h : h;
+        m = m == 0 ? '00' : m.toString();
+        return h + ':' + m;
+    };
+    /**
+     * Figures out the X-position for the top or bottom edge of an event lozenge
+     * based on a military time.
+     * @param milTime time string in military time format
+     * @param posOrientation string ('start' or 'end'), whether the position
+     *    in question is for the start or end of the lozenge. This is for handling
+     *    the special case of 12am being both the start and end of the day.
+     * @return An integer of the X-position for the top/bottom edge of an event lozenge
+     */
+    this.calcPosFromTime = function (milTime, posOrientation) {
+        var t = cosmo.datetime.parse.parseTimeString(milTime,
+            { returnStrings: true });
+        var h = t.hours;
+        var m = t.minutes;
+        var pos = 0;
+        // Handle cases where midnight is the end of the timeline
+        // instead of the beginning
+        // In those cases, it's logically 24:00 instead of 0:00
+        if (h == 0 && posOrientation == 'end') {
+            h = 24;
+        }
+        pos += (h*HOUR_UNIT_HEIGHT);
+        pos += ((m/60)*HOUR_UNIT_HEIGHT);
+        pos = parseInt(pos);
+        return pos;
+    };
+    /**
+     * Clean up event listeners and DOM refs
+     */
+    this.cleanup = function () {
+        // Let's be tidy
+        self.eventRegistry = null;
+        if (allDayArea){
+            allDayArea.cleanup();
+        }
+    };
+   
+    // Topic subscriptions
+    // ****************
+    // Subscribe to the '/calEvent' channel
+    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
+    // Subscribe to the '/app' channel
+    dojo.event.topic.subscribe('/app', self, 'handlePub_app');
+
+    /**
+     * Handle events published on the '/calEvent' channel, including
+     * self-published events
+     * @param cmd A JS Object, the command containing orders for
+     * how to handle the published event.
+     */
+    this.handlePub_calEvent = function (cmd) {
+        var act = cmd.action;
+        var opts = cmd.opts;
+        var data = cmd.data;
+        switch (act) {
+            case 'eventsLoadPrepare':
+                self.render(data.startDate, data.endDate, data.currDate);
+                break;
+            case 'eventsLoadStart':
+                self.calcColors();
+                wipe();
+                break;
+            case 'eventsLoadSuccess':
+                var ev = cmd.data;
+                loadSuccess(ev);
+                break;
+            case 'eventsAddSuccess':
+                addSuccess(cmd.data);
+                break;
+            case 'setSelected':
+                var ev = cmd.data;
+                setSelectedEvent(ev);
+                break;
+            case 'save':
+                setLozengeProcessing(cmd);
+                // Do nothing
+                break;
+            case 'saveFailed':
+                var ev = cmd.data;
+                // If the failure was a new event, remove
+                // the placeholder lozenge
+                if (cmd.qualifier.newEvent) {
+                    removeEvent(ev);
+                }
+                // Otherwise put it back where it was and
+                // restore to non-processing state
+                else {
+                    var rEv = null;
+                    // Recurrence, 'All events'
+                    if (opts.saveType == 'recurrenceMaster' ||
+                        opts.saveType == 'instanceAllFuture') {
+                        // Edit ocurring from one of the instances
+                        if (opts.instanceEvent) {
+                            rEv = opts.instanceEvent
+                        }
+                        // Edit occurring from the actual master
+                        else {
+                            rEv = ev;
+                        }
+                    }
+                    // Single event
+                    else {
+                        var rEv = ev;
+                    }
+                    restoreEvent(rEv);
+                    rEv.lozenge.setInputDisabled(false);
+                }
+                break;
+            case 'saveSuccess':
+                saveSuccess(cmd);
+                break;
+            case 'remove':
+                // Show 'processing' state here
+                setLozengeProcessing(cmd);
+                break;
+            case 'removeSuccess':
+                var ev = cmd.data;
+                removeSuccess(ev, opts)
+                break;
+            case 'removeFailed':
+                break;
+            default:
+                // Do nothing
+                break;
+        }
+    };
+    
+    this.handlePub_app = function (cmd) {
+        var t = cmd.type;
+        switch (t) {
+            case 'modalDialogToggle':
+                // Showing the modal dialog box: remove scrolling in the timed
+                // event div below (1. Firefox Mac, the scrollbar uses a native
+                // wigdet and shows through the dialog box. 2. Firefox on all
+                // plaforms, overflow of 'auto' in underlying divs causes 
+                // carets/cursors in textboxes to disappear. This is a verified
+                // Mozilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=167801
+                if (cmd.isDisplayed) {
+                    if (dojo.render.html.mozilla) {
+                        timedScrollingMainDiv.style.overflow = "hidden";
+                    }
+                }
+                else {
+                   if (dojo.render.html.mozilla) {
+                       timedScrollingMainDiv.style.overflow = "auto";
+                       timedScrollingMainDiv.style.overflowY = "auto";
+                       timedScrollingMainDiv.style.overflowX = "hidden";
+                   } 
+                }
+                break;
+        }
+    };
+
+    // Private methods
+    // ****************
     /**
      * Set the passed calendar event as the selected one on
      * canvas
@@ -518,7 +1089,7 @@ cosmo.view.cal.canvas = new function () {
             // On event lozenge -- simple select, or move/resize
             case (id.indexOf('eventDiv') > -1):
                 // Get the clicked-on event
-                s = Cal.getIndexEvent(id);
+                s = getIndexEvent(id);
                 item = cosmo.view.cal.canvas.eventRegistry.getItem(s);
 
                 // If this object is currently in 'processing' state, ignore any input
@@ -590,7 +1161,7 @@ cosmo.view.cal.canvas = new function () {
                 case (id.indexOf('hourDiv') > -1):
                 // On all-day column -- create new all-day event
                 case (id.indexOf('allDayListDiv') > -1):
-                    Cal.insertCalEventNew(id);
+                    insertCalEventNew(id);
                     break;
                 // On event title -- edit-in-place
                 case (id.indexOf('eventDiv') > -1):
@@ -638,537 +1209,177 @@ cosmo.view.cal.canvas = new function () {
         }
     }
     
-    // Subscribe to the '/calEvent' channel
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
-    // Subscribe to the '/app' channel
-    dojo.event.topic.subscribe('/app', self, 'handlePub_app');
-
     /**
-     * Handle events published on the '/calEvent' channel, including
-     * self-published events
-     * @param cmd A JS Object, the command containing orders for
-     * how to handle the published event.
+     * Insert a new calendar event -- called when
+     * the user double-clicks on the cal canvas
+     * @param id A string, the id of the div on the cal canvas double-clicked
      */
-    this.handlePub_calEvent = function (cmd) {
-        var act = cmd.action;
-        var opts = cmd.opts;
-        var data = cmd.data;
-        switch (act) {
-            case 'eventsLoadPrepare':
-                self.render(data.startDate, data.endDate, data.currDate);
-                break;
-            case 'eventsLoadStart':
-                self.calcColors();
-                wipe();
-                break;
-            case 'eventsLoadSuccess':
-                var ev = cmd.data;
-                loadSuccess(ev);
-                break;
-            case 'eventsAddSuccess':
-                addSuccess(cmd.data);
-                break;
-            case 'setSelected':
-                var ev = cmd.data;
-                setSelectedEvent(ev);
-                break;
-            case 'save':
-                setLozengeProcessing(cmd);
-                // Do nothing
-                break;
-            case 'saveFailed':
-                var ev = cmd.data;
-                // If the failure was a new event, remove
-                // the placeholder lozenge
-                if (cmd.qualifier.newEvent) {
-                    removeEvent(ev);
-                }
-                // Otherwise put it back where it was and
-                // restore to non-processing state
-                else {
-                    var rEv = null;
-                    // Recurrence, 'All events'
-                    if (opts.saveType == 'recurrenceMaster' ||
-                        opts.saveType == 'instanceAllFuture') {
-                        // Edit ocurring from one of the instances
-                        if (opts.instanceEvent) {
-                            rEv = opts.instanceEvent
-                        }
-                        // Edit occurring from the actual master
-                        else {
-                            rEv = ev;
-                        }
-                    }
-                    // Single event
-                    else {
-                        var rEv = ev;
-                    }
-                    restoreEvent(rEv);
-                    rEv.lozenge.setInputDisabled(false);
-                }
-                break;
-            case 'saveSuccess':
-                saveSuccess(cmd);
-                break;
-            case 'remove':
-                // Show 'processing' state here
-                setLozengeProcessing(cmd);
-                break;
-            case 'removeSuccess':
-                var ev = cmd.data;
-                removeSuccess(ev, opts)
-                break;
-            case 'removeFailed':
-                break;
-            default:
-                // Do nothing
-                break;
+    function insertCalEventNew(evParam) {
+        var ev = null; // New event
+        var evSource = '';
+        var evType = '';
+        var allDay = false;
+        var lozenge = null; // New blank lozenge
+        var startstr = '';
+        var evdate = '';
+        var dayind = 0;
+        var yea = 0;
+        var mon = 0;
+        var dat = 0;
+        var hou = 0;
+        var min = 0;
+        var start = null;
+        var end = null;
+        var id = '';
+        var evTitle = '';
+        var evDesc = '';
+
+        // ID for the lozenge -- random strings, also used for div elem IDs
+        id = cosmo.view.cal.generateTempId();
+
+        // Create the CalEvent obj, attach the CalEventData obj, create the Lozenge
+        // ================================
+        evType = (evParam.indexOf('allDayListDiv') > -1) ? 'allDayMain' : 'normal';
+        evSource = 'click';
+        // Create the lozenge
+        if (evType =='normal') {
+            lozenge = new cosmo.view.cal.HasTimeLozenge(id);
+            allDay = false;
+            startstr = getIndexFromHourDiv(evParam);
+            dayind = extractDayIndexFromId(startstr);
+            evdate = calcDateFromIndex(dayind);
+            yea = evdate.getFullYear();
+            mon = evdate.getMonth();
+            dat = evdate.getDate();
+            startstr = extractTimeFromId(startstr);
+            var t = cosmo.datetime.parse.parseTimeString(startstr);
+            hou = t.hours;
+            min = t.minutes;
+            start = new ScoobyDate(yea, mon, dat, hou, min);
+            end = ScoobyDate.add(start, 'n', 60);
         }
+        else if (evType == 'allDayMain') {
+            lozenge = new cosmo.view.cal.NoTimeLozenge(id);
+            allDay = true;
+            dayind = getIndexFromAllDayDiv(evParam);
+            start = calcDateFromIndex(dayind);
+            start = new ScoobyDate(start.getFullYear(),
+                start.getMonth(), start.getDate());
+            start.hours = 0;
+            start.minutes = 0;
+            end = new ScoobyDate(start.getFullYear(),
+                start.getMonth(), start.getDate());
+        }
+
+        // Create the CalEvent, connect it to its lozenge
+        ev = new CalEvent(id, lozenge);
+
+        // Set CalEventData start and end calculated from click position
+        // --------
+        evTitle = _('Main.NewEvent');
+        evDesc = '';
+        ev.data = new CalEventData(null, evTitle, evDesc,
+            start, end, allDay);
+
+        // Register the new event in the event list
+        // ================================
+        cosmo.view.cal.canvas.eventRegistry.setItem(id, ev);
+
+        // Update the lozenge
+        // ================================
+        if (lozenge.insert(id)) { // Insert the lozenge on the view
+            // Save new event
+            dojo.event.topic.publish('/calEvent', { 'action': 'save', 'data': ev })
+        }
+        return cosmo.view.cal.canvas.eventRegistry.getItem(id);
     };
-    
-    this.handlePub_app = function (cmd) {
-        var t = cmd.type;
-        switch (t) {
-            case 'modalDialogToggle':
-                // Showing the modal dialog box: remove scrolling in the timed
-                // event div below (1. Firefox Mac, the scrollbar uses a native
-                // wigdet and shows through the dialog box. 2. Firefox on all
-                // plaforms, overflow of 'auto' in underlying divs causes 
-                // carets/cursors in textboxes to disappear. This is a verified
-                // Mozilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=167801
-                if (cmd.isDisplayed) {
-                    if (dojo.render.html.mozilla) {
-                        timedScrollingMainDiv.style.overflow = "hidden";
-                    }
-                }
-                else {
-                   if (dojo.render.html.mozilla) {
-                       timedScrollingMainDiv.style.overflow = "auto";
-                       timedScrollingMainDiv.style.overflowY = "auto";
-                       timedScrollingMainDiv.style.overflowX = "hidden";
-                   } 
-                }
-                break;
-        }
+    /**
+     * Takes the ID of any of the component DOM elements that collectively make up
+     * an event lozenge, and look up which event the lozenge belongs to.
+     * Event lozenge components are all similarly named, beginning with 'eventDiv',
+     * then followed by some indentifying text, a separator, and then the ID.
+     * (e.g., 'eventDivBottom__12' or 'eventDivContent__8').
+     * @return A string representing the event identifier for the event lozenge clicked on
+     */
+    function getIndexEvent(strId) {
+        // Use regex to pull out the actual ID number
+        var pat = new RegExp('^eventDiv[\\D]*' + Cal.ID_SEPARATOR);
+        var id = strId.replace(pat, '');
+        return id;
     }
-
-
-    // Public props
-    // ****************
-    // Width of day col in week view, width of event lozenges --
-    // Calc'd based on client window size
-    // Other pieces of the app use this, so make it public
-    this.dayUnitWidth = 0;
-    // The list currently displayed events
-    // on the calendar -- key is the CalEvent obj's id prop,
-    // value is the CalEvent
-    this.eventRegistry = new Hash();
-    // Currently selected event
-    this.selectedEvent = null;
-    this.colors = {};
-
-    // Public methods
-    // ****************
     /**
-     * Main rendering function for the calendar canvas called
-     * on init load, and week-to-week nav
-     * @param vS Date, start of the view range
-     * @param vE Date, end of the view range
-     * @param cD Date, the current date on the client
+     * Takes the ID of any of the component DOM elements that collectively make up
+     * an hour container, and look up which date/time the div belongs to.
+     * Hour-div components are all similarly named, beginning with 'hourDiv',
+     * then followed by some indentifying text, and then the date and hour
+     * separated by a hyphen (e.g., 'hourDiv20051223-13' or 'hourDivSub20051016-2').
+     * @return A string representing the date/time of the div clicked on
      */
-    this.render = function (vS, vE, cD) {
-        var viewStart = vS;
-        var viewEnd = vE;
-        var currDate = cD;
-        // Key container elements
-        var monthHeaderNode = null;
-        var timelineNode = null;
-        var hoursNode = null;
-        var dayNameHeadersNode = null;
-        var allDayColsNode = null;
-
-        /**
-         * Set up key container elements
-         * @return Boolean, true.
-         */
-        function init() {
-            // Link local variables to DOM nodes
-            monthHeaderNode = $('monthHeaderDiv');
-            timelineNode = $('timedHourListDiv');
-            dayNameHeadersNode = $('dayListDiv');
-            hoursNode = $('timedContentDiv');
-            allDayColsNode = $('allDayContentDiv');
-
-            // All done, woot
-            return true;
-        }
-
-        /**
-         * Shows list of days at the head of each column in the week view
-         * Uses the Date.abbrWeekday array of names in date.js
-         * @return Boolean, true.
-         */
-        function showDayNameHeaders() {
-            var str = '';
-            var start = HOUR_LISTING_WIDTH + 1;
-            var idstr = '';
-            var startdate = viewStart.getDate();
-            var startmon = viewStart.getMonth();
-            var daymax = daysInMonth(startmon+1);
-            var calcDay = null;
-            var cd = currDate;
-            var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
-
-             // Returns the number of days in a specific month of a specific year --
-             // the year is necessary to handle leap years' Feb. 29
-             function daysInMonth(month, year){
-                var days = 0;
-                switch (month) {
-                    case 4:
-                    case 6:
-                    case 9:
-                    case 11:
-                        days = 30;
-                        break;
-                    case 2:
-                        if (year % 4 == 0){
-                               days = 29;
-                           }
-                           else{
-                               days = 28;
-                          }
-                          break;
-                      default:
-                          days = 31;
-                          break;
-                }
-                return days;
-            }
-
-            // Spacer to align with the timeline that displays hours below
-            // for the timed event canvas
-            str += '<div id="dayListSpacer" class="dayListDayDiv"' +
-                ' style="left:0px; width:' +
-                (HOUR_LISTING_WIDTH - 1) + 'px; height:' +
-                (DAY_LIST_DIV_HEIGHT-1) +
-                'px;">&nbsp;</div>';
-
-            // Do a week's worth of day cols with day name and date
-            for (var i = 0; i < 7; i++) {
-                calcDay = Date.add('d', i, viewStart);
-                startdate = startdate > daymax ? 1 : startdate;
-                // Subtract one pixel of height for 1px border per retarded CSS spec
-                str += '<div class="dayListDayDiv" id="dayListDiv' + i +
-                    '" style="left:' + start + 'px; width:' + (self.dayUnitWidth-1) +
-                    'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
-                if (calcDay.getTime() == currDay.getTime()) {
-                    str += ' background-image:url(' + cosmo.env.getImagesUrl() +
-                        'day_col_header_background.gif); background-repeat:' +
-                        ' repeat-x; background-position:0px 0px;'
-                }
-                str += '">';
-                str += Date.abbrWeekday[i] + '&nbsp;' + startdate;
-                str += '</div>\n';
-                start += self.dayUnitWidth;
-                startdate++;
-            }
-            dayNameHeadersNode.innerHTML = str;
-            return true;
-        }
-
-        /**
-         * Draws the day columns in the resizeable all-day area
-         * @return Boolean, true.
-         */
-        function showAllDayCols() {
-            var str = '';
-            var start = 0;
-            var idstr = ''
-            var calcDay = null;
-            var cd = currDate;
-            var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
-
-            for (var i = 0; i < 7; i++) {
-                calcDay = Date.add('d', i, viewStart);
-                str += '<div class="allDayListDayDiv';
-                if (calcDay.getTime() == currDay.getTime()) {
-                    str += ' currentDayDay'
-                }
-                str +='" id="allDayListDiv' + i +
-                '" style="left:' + start + 'px; width:' +
-                (cosmo.view.cal.canvas.dayUnitWidth-1) + 'px;">&nbsp;</div>';
-                start += cosmo.view.cal.canvas.dayUnitWidth;
-            }
-            str += '<br style="clear:both;"/>';
-            allDayColsNode.innerHTML = str;
-            return true;
-        }
-
-        /**
-         * Draws the 12 AM to 11 PM hour-range in each day column
-         * @return Boolean, true.
-         */
-        function showHours() {
-            var str = '';
-            var row = '';
-            var start = 0;
-            var idstr = '';
-            var hour = 0;
-            var meridian = '';
-            var calcDay = null;
-            var cd = currDate;
-            var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
-            var isCurrentDay = false;
-            var viewDiv = null;
-            var timeLineWidth = 0;
-            var workingHoursBarWidth = 3;
-
-            // Subtract one px for border per asinine CSS spec
-            var halfHourHeight = (HOUR_UNIT_HEIGHT/2) - 1;
-
-            var w = '';
-            // Working/non-working hours line
-            w += '<div class="';
-            w += (j < 8 || j > 17) ? 'nonWorkingHours' : 'workingHours';
-            w += '" style="width:' + workingHoursBarWidth +
-                'px; height:' + (halfHourHeight+1) +
-                'px; float:left; font-size:1px;">&nbsp;</div>';
-            var workingHoursLine = '';
-
-            str = '';
-            viewDiv = timelineNode;
-            timeLineWidth = parseInt(viewDiv.offsetWidth);
-            // Subtract 1 for 1px border
-            timeLineWidth = timeLineWidth - workingHoursBarWidth - 1;
-
-            // Timeline of hours on left
-            for (var j = 0; j < 24; j++) {
-                hour = j == 12 ? _('App.Noon') : cosmo.util.date.hrMil2Std(j);
-                meridian = j > 11 ? ' PM' : ' AM';
-                meridian = j == 12 ? '' : '<span>' + meridian + '</span>';
-                row = '';
-
-                // Upper half hour
-                // ==================
-                row += '<div class="hourDivTop';
-                row += '" style="height:' +
-                    halfHourHeight + 'px; width:' +
-                    timeLineWidth + 'px; float:left;">';
-                // Hour plus AM/PM
-                row += '<div class="hourDivSubLeft">' + hour +
-                    meridian + '</div>';
-                row += '</div>\n';
-                row += workingHoursLine;
-                row += '<br class="clearAll"/>'
-
-                idstr = i + '-' + j + '30';
-
-                // Lower half hour
-                // ==================
-                row += '<div class="hourDivBottom"';
-                // Make the noon border thicker
-                if (j == 11) {
-                    row += ' style="height:' + (halfHourHeight-1) +
-                        'px; border-width:2px;';
-                }
-                else {
-                    row += ' style="height:' + halfHourHeight + 'px;';
-                }
-                row += ' width:' + timeLineWidth +
-                    'px; float:left;">&nbsp;</div>\n';
-                row += workingHoursLine;
-                row += '<br class="clearAll"/>'
-
-                str += row;
-            }
-            viewDiv.innerHTML = str;
-
-            str = '';
-            viewDiv = hoursNode;
-
-            // Do a week's worth of day cols with hours
-            for (var i = 0; i < 7; i++) {
-                calcDay = Date.add('d', i, viewStart);
-                str += '<div class="dayDiv" id="dayDiv' + i +
-                    '" style="left:' + start + 'px; width:' +
-                    (cosmo.view.cal.canvas.dayUnitWidth-1) +
-                    'px;"';
-                str += '>';
-                for (var j = 0; j < 24; j++) {
-
-                    isCurrentDay = (calcDay.getTime() == currDay.getTime());
-
-                    idstr = i + '-' + j + '00';
-                    row = '';
-                    row += '<div id="hourDiv' + idstr + '" class="hourDivTop';
-                    // Highlight the current day
-                    if (isCurrentDay) {
-                        row += ' currentDayDay'
-                    }
-                    // Non-working hours are gray
-                    else if (j < 8 || j > 18) {
-                        //row += ' nonWorkingHours';
-                    }
-                    row += '" style="height:' + halfHourHeight + 'px;">';
-                    row += '</div>\n';
-                    idstr = i + '-' + j + '30';
-                    row += '<div id="hourDiv' + idstr + '" class="hourDivBottom';
-                    // Highlight the current day
-                    if (isCurrentDay) {
-                        row += ' currentDayDay'
-                    }
-                    // Non-working hours are gray
-                    else if (j < 8 || j > 18) {
-                        //row += ' nonWorkingHours';
-                    }
-                    row += '" style="';
-                    if (j == 11) {
-                        row += 'height:' + (halfHourHeight-1) +
-                            'px; border-width:2px;';
-                    }
-                    else {
-                        row += 'height:' + halfHourHeight + 'px;';
-                    }
-                    row += '">&nbsp;</div>';
-                    str += row;
-                }
-                str += '</div>\n';
-                start += cosmo.view.cal.canvas.dayUnitWidth;
-            }
-
-            viewDiv.innerHTML = str;
-            return true;
-        }
-        /**
-         * Displays the month name at the top
-         */
-        function showMonthHeader() {
-            var vS = viewStart;
-            var vE = viewEnd;
-            var mS = vS.getMonth();
-            var mE = vE.getMonth();
-            var headerDiv = monthHeaderNode;
-            var str = '';
-
-            // Format like 'March-April, 2006'
-            if (mS < mE) {
-                str += vS.strftime('%B-');
-                str += vE.strftime('%B %Y');
-            }
-            // Format like 'December 2006-January 2007'
-            else if (mS > mE) {
-                str += vS.strftime('%B %Y-');
-                str += vE.strftime('%B %Y');
-            }
-            // Format like 'April 2-8, 2006'
-            else {
-                str += vS.strftime('%B %Y');
-            }
-            if (headerDiv.firstChild) {
-                headerDiv.removeChild(headerDiv.firstChild);
-            }
-            headerDiv.appendChild(document.createTextNode(str));
-        }
-
-        // Do it!
-        // -----------
-        if (!initRender) {
-            // Make the all-day event area resizeable
-            // --------------
-            allDayArea = new cosmo.ui.resize_area.ResizeArea(
-                'allDayResizeMainDiv', 'allDayResizeHandleDiv');
-            allDayArea.init('down');
-            allDayArea.addAdjacent('timedScrollingMainDiv');
-            allDayArea.setDragLimit();
-        }
-        else {
-            removeAllEvents();
-        }
-
-        // Init and call all the rendering functions
-        init();
-        showMonthHeader();
-        showDayNameHeaders();
-        showAllDayCols();
-
-        // Create event listeners
-        if (!initRender) {
-            dojo.event.connect(hoursNode, 'onmousedown', mouseDownHandler);
-            dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
-            dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
-            dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
-            // Get a reference to the main scrolling area for timed events;
-            timedScrollingMainDiv = $('timedScrollingMainDiv');
-            // Only render the base canvas once on initial load
-            showHours();
-        }
-
-        initRender = true;
+    function getIndexFromHourDiv(strId) {
+        var ind = strId.replace(/^hourDiv[\D]*/i, '');
+        return ind;
+    }
+    /**
+     * Takes the ID of any of the component DOM elements that collectively make up
+     * an all-day event container, and look up which date the div belongs to.
+     * All-day-div components are all similarly named, beginning with 'allDayListDiv',
+     * then followed by some indentifying text, and then the date
+     * (e.g., 'allDayListDiv20051223' or 'allDayListDivSub20051016').
+     * @return A string representing the date/time of the div clicked on
+     */
+    function getIndexFromAllDayDiv(strId) {
+        var ind = strId.replace(/^allDayListDiv[\D]*/i, '');
+        return ind;
+    }
+    /**
+     * Get the time from hyphen-separated string on a clicked-on hour div
+     * @return A string of the time in military 'hh:mm' format
+     */
+    function extractTimeFromId(str) {
+        var dt = str.split('-');
+        var pat = /(00|30)$/
+        var ret = dt[1].replace(pat, ':$1');
+        return ret;
+    }
+    /**
+     * Get the hour from a time-formatted string such as '23:56'
+     * @return A string of the hour number
+     */
+    function extractHourFromTime(str) {
+        arr = str.split(':');
+        return arr[0];
     };
     /**
-     * Get the scroll offset for the timed canvas
-     * @return Number, the pixel position of the top of the timed
-     * event canvas, including the menubar at the top, resizing of
-     * the all-day area, and any amount that the timed canvas
-     * has scrolled.
+     * Get the minutes from a time-formatted string such as '23:56'
+     * @return A string of the minutes
      */
-    this.getTimedCanvasScrollTop = function () {
-        // Has to be looked up every time, as value may change
-        // either when user scrolls or resizes all-day event area
-        var top = timedScrollingMainDiv.scrollTop;
-        // FIXME -- viewOffset is the vertical offset of the UI
-        // with the top menubar added in. This should be a property
-        // of render context that the canvas can look up
-        top -= Cal.viewOffset;
-        // Subtract change in resized all-day event area
-        top -= (allDayArea.dragSize - allDayArea.origSize);
-        return top;
+    function extractMinutesFromTime(str) {
+        arr = str.split(':');
+        return arr[1];
+    }
+    /**
+     * Get the date from hyphen-separated string on a clicked-on hour div
+     * @return A string of the date, e.g., 20051223
+     */
+    function extractDayIndexFromId(str) {
+        var dt = str.split('-');
+        return parseInt(dt[0]);
     };
     /**
-     * Get the currently selected event -- might be okay to allow
-     * direct access to the property itself, but with a getter
-     * you could trigger certain events if neeeded whenever something
-     * grabs the selected event
-     * @return CalEvent object, the currently selected event
+     * Calculate the date based on the day position clicked on
+     * @param n Number representing day of the week
+     * @return A date object representing the date clicked on
      */
-    this.getSelectedEvent = function () {
-        return self.selectedEvent;
-    };
-    this.calcColors = function () {
-        var getRGB = function (h, s, v) {
-            var rgb = dojo.gfx.color.hsv2rgb(h, s, v, {
-                inputRange: [360, 100, 100], outputRange: 255 });
-            return 'rgb(' + rgb.join() + ')';
-        }
-        var lozengeColors = {};
-        var sel = cosmo.ui.cal_main.Cal.calForm.form.calSelectElem;
-        var index = sel ? sel.selectedIndex : 0;
-        var hue = hues[index];
-
-        var o = {
-            darkSel: [100, 80],
-            darkUnsel: [80, 90],
-            lightSel: [25, 100],
-            lightUnsel: [10, 100],
-            proc: [30, 90]
-        };
-        for (var p in o) {
-            lozengeColors[p] = getRGB(hue, o[p][0], o[p][1]);
-        }
-        this.colors = lozengeColors;
-    };
-    /**
-     * Clean up event listeners and DOM refs
-     */
-    this.cleanup = function () {
-        // Let's be tidy
-        self.eventRegistry = null;
-        if (allDayArea){
-            allDayArea.cleanup();
-        }
+    function calcDateFromIndex(n) {
+        var incr = parseInt(n);
+        var viewStart = cosmo.ui.cal_main.Cal.viewStart;
+        var st = viewStart.getDate();
+        var ret = null;
+        st += incr;
+        ret = new Date(viewStart.getFullYear(), viewStart.getMonth(), st);
+        return ret;
     };
 }
-cosmo.view.cal.canvas.constructor = null;
 
 // Cleanup
 dojo.event.browser.addListener(window, "onunload", cosmo.view.cal.canvas.cleanup, false);

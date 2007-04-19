@@ -990,7 +990,7 @@ cosmo.view.cal = new function () {
             if (evData.recurrenceRule && !evData.recurrenceRule.exceptionDates) {
                 evData.recurrenceRule.exceptionDates = [];
             }
-            var id = Cal.generateTempId();
+            var id = self.generateTempId();
             ev = new CalEvent(id, null);
             ev.data = evData;
             h.setItem(id, ev);
@@ -1151,6 +1151,20 @@ cosmo.view.cal = new function () {
         dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
             data: eventLoadHash, opts: opts });
         return true;
+    };
+    /**
+     * Generate a scratch ID to use for events in the UI
+     * @return A random string to use as an ID for a CalEvent obj
+     */
+    this.generateTempId = function () {
+        var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+        var len = 12;
+        var randomString = '';
+        for (var i = 0; i < len; i++) {
+            var rnum = Math.floor(Math.random() * chars.length);
+            randomString += chars.substring(rnum,rnum+1);
+        }
+        return 'ev' + randomString;
     };
 };
 

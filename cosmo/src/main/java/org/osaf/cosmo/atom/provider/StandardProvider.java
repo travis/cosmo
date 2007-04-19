@@ -23,6 +23,7 @@ import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
 import org.apache.abdera.protocol.server.provider.BaseResponseContext;
 import org.apache.abdera.protocol.server.provider.EmptyResponseContext;
@@ -49,6 +50,7 @@ import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
+import org.osaf.cosmo.server.ServerUtils;
 import org.osaf.cosmo.service.ContentService;
 
 public class StandardProvider implements Provider {
@@ -112,7 +114,7 @@ public class StandardProvider implements Provider {
         contentService.updateItem(note);
 
         AbstractResponseContext rc = new EmptyResponseContext(204);
-        // XXX ETag
+        rc.setEntityTag(new EntityTag(ServerUtils.calculateEtag(note)));
         return rc;
     }
   
@@ -145,7 +147,7 @@ public class StandardProvider implements Provider {
 
             AbstractResponseContext rc =
                 new BaseResponseContext<Document<Element>>(feed.getDocument());
-            // XXX set etag
+            rc.setEntityTag(new EntityTag(ServerUtils.calculateEtag(collection)));
             return rc;
         } catch (UnsupportedProjectionException e) {
             return errorResponse(404, "Projection " + target.getProjection() + " not supported");

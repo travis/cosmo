@@ -41,6 +41,7 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
+        assertNotNull("Null etag", res.getEntityTag());
     }
 
     public void testNotFound() throws Exception {

@@ -40,6 +40,7 @@ public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
         ResponseContext res = provider.updateEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
+        assertNotNull("Null etag", res.getEntityTag());
     }
 
     public void testNotFound() throws Exception {

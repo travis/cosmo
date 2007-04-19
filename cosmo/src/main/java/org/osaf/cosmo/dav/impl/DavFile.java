@@ -48,6 +48,7 @@ import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.server.ServerUtils;
 
 /**
  * Extends <code>DavResourceBase</code> to adapt the Cosmo
@@ -126,7 +127,7 @@ public class DavFile extends DavResourceBase {
     public String getETag() {
         if (getItem() == null)
             return null;
-        return calculateEtag();
+        return "\"" + ServerUtils.calculateEtag(getItem()) + "\"";
     }
 
     /** */
@@ -354,13 +355,4 @@ public class DavFile extends DavResourceBase {
     protected Set<String> getDeadPropertyFilter() {
         return DEAD_PROPERTY_FILTER;
     }
-
-    private String calculateEtag() {
-        ContentItem content = (ContentItem) getItem();
-        String length = content.getContentLength() != null ?
-            content.getContentLength().toString() : "-";
-        String modTime = content.getModifiedDate() != null ?
-            new Long(content.getModifiedDate().getTime()).toString() : "-";
-        return "\"" + length + "-" + modTime + "\"";
-   }
 }

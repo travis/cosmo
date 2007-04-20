@@ -17,6 +17,13 @@ dojo.provide("cosmo.model.Item");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.model.util");
 
+cosmo.model.NEW_DATESTAMP = function(){return (new Date()).getTime()};
+cosmo.model.NEW_OBJECT = function(){return {}};
+cosmo.model.NEW_ARRAY = function(){return []};
+cosmo.model.TRIAGE_NOW = 100;
+cosmo.model.TRIAGE_LATER = 200;
+cosmo.model.TRIAGE_DONE = 300;
+
 cosmo.model.declare = function(/*String*/ ctrName, /*Function*/ parentCtr, propertiesArray, otherDeclarations){
     var newCtr = dojo.declare(ctrName, parentCtr, otherDeclarations);
     cosmo.model.util.simplePropertyApplicator.enhanceClass(newCtr, propertiesArray, {enhanceInitializer: false});
@@ -37,17 +44,16 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
     return newCtr;
 }
 
-cosmo.model.NEW_DATE = function(){return (new Date()).getTime()};
-cosmo.model.NEW_OBJECT = function(){return {}};
-cosmo.model.NEW_ARRAY = function(){return []};
-
 cosmo.model.declare("cosmo.model.Item", null, 
     //declare the dynamically generated properties
    [["uid", {"default": null}],
     ["displayName", {"default": null} ],
     ["version", {"default": null} ],
-    ["creationDate", {"default":  cosmo.model.NEW_DATE}],
-    ["modifiedDate", {"default":  cosmo.model.NEW_DATE}]
+    ["creationDate", {"default": cosmo.model.NEW_DATESTAMP}],
+    ["modifiedDate", {"default": cosmo.model.NEW_DATESTAMP}],
+    ["triageStatus", {"default": 100}],
+    ["autoTriage", {"default": false}],
+    ["rank", {"default": 0}]
    ], 
    //declare other properties
   {
@@ -57,7 +63,7 @@ cosmo.model.declare("cosmo.model.Item", null,
   });
 
 cosmo.model.declare("cosmo.model.Note", cosmo.model.Item, 
-    [],
+    [  ["body", {"default": null}] ],
     {
         //TODO could be useful to use the same format as is in the UUID in EIM
          INSTANCE_FMT_STRING: "%Y-%m-%d %H:%M:%S",
@@ -118,7 +124,19 @@ dojo.declare("cosmo.model.StampMetaData", null,{
                 this.attributes.push(new cosmo.model.StampAttribute(ctrArgs[0], ctrArgs[1], ctrArgs[2]));
             }
         }
-    }   
+    },
+    
+    getAttribute: function getAttribute(name){
+        for (var x = 0; x < this.attributes.length; x++){
+            var attr = this.attributes[x];
+            if (attr.name = name){
+                return attr;
+            }
+        }
+        
+        return null;  
+    }
+       
 });
 
 dojo.declare("cosmo.model.StampAttribute", null, {
@@ -134,3 +152,27 @@ dojo.declare("cosmo.model.StampAttribute", null, {
 dojo.declare("cosmo.model.BaseStamp", null, {
     stampMetaData: null
 });
+
+cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
+    [ ["startDate", cosmo.datetime.Date, {}],
+      ["duration", Number, {}],
+      ["anytime", Boolean, {}],
+      ["location", String, {}],
+      ["rrule", cosmo.model.RecurrenceRule, {}],
+      ["exdates", [Array, cosmo.datetime.Date], {}],
+      ["status", String, {}],
+    ],
+    {
+        initializer: function(kwArgs){
+            this.initializeProperties(kwArgs);
+        }
+        
+    });
+    
+cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",
+    [ ],
+    {
+        initializer: function(kwArgs){
+            this.initializeProperties(kwArgs);
+        }
+    });

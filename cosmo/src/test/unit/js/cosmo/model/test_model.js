@@ -34,3 +34,37 @@ test_declareStamp = function(){
     assertEquals(attr.type[0], String);
     assertEquals(attr.type[1], Number);
 }
+
+test_addGetRemoveStamp = function(){
+};
+
+test_addGetRemoveModification = function(){
+};
+
+test_getEventStampGetTaskStamp = function(){
+};
+
+test_testNoteInstance = function(){
+    var note = new cosmo.model.Note({
+        body: "body",
+        uid: "123",
+        displayName: "display"
+    });
+    
+    var date = new cosmo.datetime.Date(2000,0,1);
+    var noteInstance = note.getNoteInstance(date);
+    
+    assertEquals(note.getBody(), noteInstance.getBody());
+    
+    
+};
+
+test_ = function(){
+};
+
+test_ = function(){
+};
+
+test_ = function(){
+};
+

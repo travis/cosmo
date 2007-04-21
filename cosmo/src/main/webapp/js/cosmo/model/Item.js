@@ -16,7 +16,7 @@
 dojo.provide("cosmo.model.Item");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.model.util");
-
+dojo.require("cosmo.util.date");
 cosmo.model.NEW_DATESTAMP = function(){return (new Date()).getTime()};
 cosmo.model.NEW_OBJECT = function(){return {}};
 cosmo.model.NEW_ARRAY = function(){return []};
@@ -59,11 +59,11 @@ cosmo.model.declare("cosmo.model.Item", null,
   {
       initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
-      },
+      }
   });
 
 cosmo.model.declare("cosmo.model.Note", cosmo.model.Item, 
-    [  ["body", {"default": null}] ],
+    [ ["body", {"default": null}] ],
     {
         //TODO could be useful to use the same format as is in the UUID in EIM
          INSTANCE_FMT_STRING: "%Y-%m-%d %H:%M:%S",
@@ -92,9 +92,85 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         },
         
         _formatInstanceDate: function(/*cosmo.datetime.Date*/date){
-            return date.strftime(cosmo.model.INSTANCE_FMT_STRING);dojo.lang.getType()
+            return date.strftime(cosmo.model.INSTANCE_FMT_STRING);
+        },
+      
+        isInstance: function isInstance(){
+          return false;
+        },
+      
+        getMaster: function getMaster(){
+          return this;
+        },
+        
+        addStamp: function addStamp(/*cosmo.model.BaseStamp*/stamp){
+            stamp.item = this;
+            this._stamps[stamp.stampMetaData.name] = stamp;
+        },
+        
+        removeStamp: function removeStamp(/*String*/ stampName){
+            delete this.stamps[stampName];
+        },
+        
+        getEventStamp: function getEventStamp(){
+            return this.getStamp("event");
+        },
+        
+        getTaskStamp: function getTaskStamp(){
+            return this.getStamp("task");
+        },
+        
+        getNoteInstance: function getNoteInstance(/*cosmo.datetime.Date*/ instanceDate){
+            return new cosmo.model.NoteInstance(this, instanceDate);
         }
+        
     });
+    
+dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
+    __noOverride:{uid:1,version:1},
+    
+    initializer: function noteInstanceInitializer(master, instanceDate){
+        this._master = master;
+        this.instanceDate = instanceDate;
+    },
+    
+   isInstance: function isInstance(){
+        return true;
+    },
+    
+    getMaster: function getMaster(){
+        return _master;
+    },
+    
+    __getProperty: function noteInstanceGetProperty(propertyName){
+        //get the master version
+        var master = this._master;
+        var masterProperty = master.__getProperty(propertyName);
+
+        //see if it's overridable 
+        //if it's not, just go right to the master
+        if (this.__noOverride[propertyName]){
+            return masterProperty;
+        }
+        
+        //if it is check the modificaiton
+        var modification = master.getModification(this.instanceDate);
+
+        //if no modification, return the master
+        if (!modification){
+            return masterProperty;
+        }
+        
+        //there IS a modification, so let's check to see if it has 
+        //an overridden value for this particular property
+        var modificationProperty = modification.modifiedProperties[propertyName];
+        if (typeof(modificationProperty) != "undefined"){
+            return modificationProperty;            
+        }
+        
+        return masterProperty;
+    }
+});
 
 cosmo.model.declare("cosmo.model.Modification", null,
    [["instanceDate", {"default": null}],
@@ -150,7 +226,8 @@ dojo.declare("cosmo.model.StampAttribute", null, {
 });
 
 dojo.declare("cosmo.model.BaseStamp", null, {
-    stampMetaData: null
+    stampMetaData: null,
+    item: null
 });
 
 cosmo.model.declareStamp("cosmo.model.EventStamp", "event",

@@ -115,8 +115,6 @@ cosmo.util.validate = new function () {
      * @return String, error message (empty if no err).
      */
     this.eMail = function (s) {
-        // Just do really basic e-mail addr validation
-        pat = /^.+@.+\..{2,3}$/;
         err = '';
         val = typeof s == 'object' ? s.value : s;
         if (!dojo.validate.isEmailAddress(val, {allowLocal:true})) {

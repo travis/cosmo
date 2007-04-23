@@ -128,7 +128,7 @@ function activateSelectedUser(){
 		}
 	}
 
-	cosmo.cmp.cmpProxy.activate(username, activateHandlerDict);
+	cosmo.cmp.activate(username, activateHandlerDict);
 
 }
 

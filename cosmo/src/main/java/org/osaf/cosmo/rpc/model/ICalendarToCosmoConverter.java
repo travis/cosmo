@@ -852,8 +852,12 @@ public class ICalendarToCosmoConverter {
         Calendar jCalendar = null;
         boolean isUtc = false;
         if (tzid != null && date instanceof DateTime){
-            VTimeZone vtimeZone = getVTimeZone(tzid, calendar);
-            jCalendar = Calendar.getInstance(new TimeZone(vtimeZone));
+            DateTime dt = (DateTime) date;
+            if (dt.getTimeZone() != null){
+                jCalendar = Calendar.getInstance(dt.getTimeZone());
+            } else {
+                jCalendar = Calendar.getInstance();
+            }
         } else if (isUtc(date)) {
             isUtc = true;
             jCalendar = Calendar.getInstance(java.util.TimeZone.getTimeZone("GMT"));

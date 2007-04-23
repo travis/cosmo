@@ -101,9 +101,9 @@
                         <descriptors>
                             <descriptor>src/main/assembly/snarf.xml</descriptor>
                         </descriptors>
-                        <filters>
+<!--                    <filters>
                             <filter>${basedir}/config/snarf.properties</filter>
-                        </filters>
+                        </filters> -->
                         <finalName>osaf-server-bundle-${pom.version}</finalName>
                         <outputDirectory>dist</outputDirectory>
                         <workDirectory>${basedir}/target/assembly/work</workDirectory>

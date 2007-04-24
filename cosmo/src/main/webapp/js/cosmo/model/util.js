@@ -175,3 +175,63 @@ cosmo.model.util.equals = function cosmoEquals(a,b){
     
     return a == b;
 }   
+
+  cosmo.model._instanceGetProperty =  function instanceGetProperty(propertyName){
+        //get the master version
+        var master = this.getMaster();
+        var masterProperty = this._getMasterProperty(propertyName);
+
+        //see if it's overridable 
+        //if it's not, just go right to the master
+        if (this.__noOverride[propertyName]){
+            return masterProperty;
+        }
+        
+        //if it is check the modificaiton
+        var modification = master.getModification(this.instanceDate);
+
+        //if no modification, return the master
+        if (!modification){
+            return masterProperty;
+        }
+            
+        //there IS a modification, so let's check to see if it has 
+        //an overridden value for this particular property
+        var modificationProperty = this._getModifiedProperty(propertyName);
+        if (typeof(modificationProperty) != "undefined"){
+            return modificationProperty;            
+        }
+        return masterProperty;
+}
+
+cosmo.model._instanceSetProperty = function instanceSetProperty(propertyName, value){
+        if (this.__noOverride[propertyName]){
+            throw new Error("You can not override property '" + propertyName +"'");
+        }
+
+        var master = this._master;
+        var masterProperty = master.__getProperty(propertyName);
+        
+        //is there a modification?
+        var modification = master.getModification(this.instanceDate);
+        if (modification){
+            //there already is a mod, but does it override this property?
+            if (dojo.lang.has(modification, propertyName)){
+                //simply set the property on the modification
+                modification[propertyName] = value;
+                return;                    
+            }
+        }
+        
+        //if the new value is the same as the master property, 
+        // no need to do anything
+        if (cosmo.model.util.equals(value, masterProperty)){
+            return;
+        } else {
+            var modification = new cosmo.model.Modification({
+                instanceDate: this.instanceDate
+            });
+            modification.getModifiedProperties()[propertyName] = value;
+            master.addModification(modification);
+        }
+}

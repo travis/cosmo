@@ -16,7 +16,6 @@
 dojo.provide("cosmo.model.Item");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.model.util");
-dojo.require("cosmo.util.date");
 cosmo.model.NEW_DATESTAMP = function(){return (new Date()).getTime()};
 cosmo.model.NEW_OBJECT = function(){return {}};
 cosmo.model.NEW_ARRAY = function(){return []};
@@ -39,8 +38,23 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
         var attArgs = attributesArray[x];
         propertiesArray.push([attArgs[0], attArgs[2]]);
     }
+    
     cosmo.model.util.simplePropertyApplicator.enhanceClass(newCtr, propertiesArray, 
         {enhanceInitializer: false});
+    
+    var stampInstanceCtr = dojo.declare(ctrName+"Instance", newCtr, {
+        initializer: function stampInstanceInitializer(master, instanceDate){
+           this._master = master;
+           this.instanceDate = instanceDate; 
+        },
+        
+        //it doesn't make sense to initialze properties of an instance. 
+        initializeProperties: function noop(){
+            return;
+        },
+    })
+ 
+ 
     return newCtr;
 }
 
@@ -79,7 +93,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         },
         
         getStamp: function(/*String*/ stampName){
-            return _stamps[stampName];
+            return this._stamps[stampName];
         }, 
         
         getModification: function(/*cosmo.datetime.Date*/ instanceDate){
@@ -95,7 +109,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         },
         
         _formatInstanceDate: function(/*cosmo.datetime.Date*/date){
-            return date.strftime(cosmo.model.INSTANCE_FMT_STRING);
+            return date.strftime(this.INSTANCE_FMT_STRING);
         },
       
         isInstance: function isInstance(){
@@ -108,11 +122,11 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         
         addStamp: function addStamp(/*cosmo.model.BaseStamp*/stamp){
             stamp.item = this;
-            this._stamps[stamp.stampMetaData.name] = stamp;
+            this._stamps[stamp.stampMetaData.stampName] = stamp;
         },
         
         removeStamp: function removeStamp(/*String*/ stampName){
-            delete this.stamps[stampName];
+            delete this._stamps[stampName];
         },
         
         getEventStamp: function getEventStamp(){
@@ -127,7 +141,6 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             dojo.debug("getNoteInstance");
             return new cosmo.model.NoteInstance(this, instanceDate);
         }
-        
     });
     
 dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
@@ -144,78 +157,62 @@ dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
     },
     
     getMaster: function getMaster(){
-        return _master;
+        return this._master;
     },
     
-    __getProperty: function noteInstanceGetProperty(propertyName){
-        dojo.debug("noteInstanceGetProperty");
-        //get the master version`
-        var master = this._master;
-        var masterProperty = master.__getProperty(propertyName);
-
-        //see if it's overridable 
-        //if it's not, just go right to the master
-        if (this.__noOverride[propertyName]){
-            return masterProperty;
-        }
-        
-        //if it is check the modificaiton
-        var modification = master.getModification(this.instanceDate);
-
-        //if no modification, return the master
-        if (!modification){
-            return masterProperty;
-        }
-            
-        //there IS a modification, so let's check to see if it has 
-        //an overridden value for this particular property
-        var modificationProperty = modification.getModifiedProperties()[propertyName];
-        if (typeof(modificationProperty) != "undefined"){
-            return modificationProperty;            
-        }
-        return masterProperty;
-    },  
-    
-    __setProperty: function noteInstanceSetProperty(propertyName, value){
-        dojo.debug("noteInstanceSETProperty");
-        dojo.debug(propertyName)
-        dojo.debug(value)
-        if (this.__noOverride[propertyName]){
-            throw new Error("You can not override property '" + propertyName +"'");
-        }
-
-        var master = this._master;
-        var masterProperty = master.__getProperty(propertyName);
-        
-        //is there a modification?
-        var modification = master.getModification(this.instanceDate);
-        if (modification){
-            //there already is a mod, but does it override this property?
-            if (dojo.lang.has(modification, propertyName)){
-                //simply set the property on the modification
-                modification[propertyName] = value;
-                return;                    
-            }
-        }
-        
-        //if the new value is the same as the master property, 
-        // no need to do anything
-        if (cosmo.model.util.equals(value, masterProperty)){
-            return;
-        } else {
-            var modification = new cosmo.model.Modification({
-                instanceDate: this.instanceDate
-            });
-            modification.getModifiedProperties()[propertyName] = value;
-            master.addModification(modification);
-        }
-        
+    _getMasterProperty: function noteInstanceGetMasterProperty(propertyName){
+        dojo.debug("MASTER: " +propertyName);
+        return this._master.__getProperty(propertyName);
     },
+    
+    _getModifiedProperty: function noteInstanceGetModifiedProperty(propertyName){
+        dojo.debug("INSTANCE: " +propertyName);
+        var modification = this._master.getModification(this.instanceDate);
+        dojo.debug("MOD: " + modification);
+        return modification.getModifiedProperties()[propertyName];
+    },
+    
+    __getProperty: cosmo.model._instanceGetProperty,  
+    
+    __setProperty: cosmo.model._instanceSetProperty,
+    
     
     initializeProperties: function noop(){
         return;
-    }
+    },
     
+    _throwOnlyMaster: function(){
+     throw new Error("You can only call this method on the master item");
+    },
+
+///    
+    getStamp: function(/*String*/ stampName){
+        //TODO
+    }, 
+
+    addStamp: function addStamp(/*cosmo.model.BaseStamp*/stamp){
+        //TODO
+    },
+    
+    removeStamp: function removeStamp(/*String*/ stampName){
+        //TODO
+    },
+
+    getModification: function(/*cosmo.datetime.Date*/ instanceDate){
+        this._throwOnlyMaster();
+    },
+    
+    addModification: function(/*cosmo.model.Modification*/modification){
+        this._throwOnlyMaster();
+    },
+    
+    removeModification: function(/*cosmo.model.Modification*/ instanceDate){
+        this._throwOnlyMaster();
+    },
+
+    getNoteInstance: function getNoteInstance(/*cosmo.datetime.Date*/ instanceDate){
+        this._throwOnlyMaster();
+    }
     
 });
 
@@ -290,7 +287,6 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
         initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
         }
-        
     });
     
 cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",

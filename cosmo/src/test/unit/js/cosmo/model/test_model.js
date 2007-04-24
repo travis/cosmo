@@ -36,12 +36,34 @@ test_declareStamp = function(){
 }
 
 test_addGetRemoveStamp = function(){
+    var stamp = new cosmo.model.EventStamp({location:"loco"});
+    var note = new cosmo.model.Note();
+    note.addStamp(stamp);
+    stamp = null;
+    stamp = note.getStamp("event");
+    jum.assertEquals("loco", stamp.getLocation());
+    note.removeStamp("event");
+    stamp = null;
+    stamp = note.getStamp("event");
+    jum.assertTrue(stamp == null);
+    
 };
 
 test_addGetRemoveModification = function(){
 };
 
 test_getEventStampGetTaskStamp = function(){
+    var event = new cosmo.model.EventStamp({location:"loco"});
+    var task = new cosmo.model.TaskStamp();
+    var note = new cosmo.model.Note();
+    note.addStamp(event);
+    note.addStamp(task);
+    event = null;
+    task = null;
+    event = note.getEventStamp();
+    task = note.getTaskStamp();
+    assertEquals("event", event.stampMetaData.stampName)
+    assertEquals("task", task.stampMetaData.stampName)
 };
 
 test_testNoteInstance = function(){
@@ -65,7 +87,8 @@ test_testNoteInstance = function(){
     
 };
 
-test_equals = function(){    var equals = cosmo.model.util.equals;
+test_equals = function(){    
+    var equals = cosmo.model.util.equals;
     jum.assertTrue(equals(1,1));
     var date1 = new cosmo.datetime.Date(2001,1,1);
     var date2 = new cosmo.datetime.Date(2001,1,1);

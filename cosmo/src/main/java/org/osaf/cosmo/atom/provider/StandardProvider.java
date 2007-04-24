@@ -17,6 +17,7 @@ package org.osaf.cosmo.atom.provider;
 
 import java.io.IOException;
 
+import javax.activation.MimeTypeParseException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.abdera.Abdera;
@@ -122,7 +123,47 @@ public class StandardProvider extends AbstractProvider {
     }
   
     public ResponseContext updateMedia(RequestContext request) {
-        return null;
+        ItemTarget target = (ItemTarget) request.getTarget();
+        NoteItem item = target.getItem();
+        if (log.isDebugEnabled())
+            log.debug("updating media for item " + item.getUid());
+
+        ResponseContext crc = checkConditionals(request, item);
+        if (crc != null)
+            return crc;
+
+        // XXX: check write preconditions?
+
+        try {
+            ContentProcessor processor =
+                createContentProcessor(request.getContentType().toString());
+            processor.processContent(request.getReader(), item);
+        } catch (MimeTypeParseException e) {
+            return notsupported(abdera, request, "invalid content type");
+        } catch (UnsupportedMediaTypeException e) {
+            return notsupported(abdera, request, "invalid content type " + e.getMediaType());
+        } catch (ValidationException e) {
+            String reason = "Invalid content: ";
+            if (e.getCause() != null)
+                reason = reason + e.getCause().getMessage();
+            else
+                reason = reason + e.getMessage();
+            return badrequest(abdera, request, reason);
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
+        } catch (ProcessorException e) {
+            String reason = "Unknown content processing error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
+        }
+
+        contentService.updateItem(item);
+
+        AbstractResponseContext rc = new EmptyResponseContext(204);
+        rc.setEntityTag(new EntityTag(item.getEntityTag()));
+        return rc;
     }
   
     public ResponseContext getService(RequestContext request) {
@@ -253,10 +294,15 @@ public class StandardProvider extends AbstractProvider {
 
     protected ContentProcessor createContentProcessor(Entry entry)
         throws UnsupportedMediaTypeException {
-        String type = entry.getContentType() != null ?
+        String mediaType = entry.getContentType() != null ?
             entry.getContentType().toString() :
             entry.getContentMimeType().toString();
-        return processorFactory.createProcessor(type);
+        return createContentProcessor(mediaType);
+    }
+
+    protected ContentProcessor createContentProcessor(String mediaType)
+        throws UnsupportedMediaTypeException {
+        return processorFactory.createProcessor(mediaType);
     }
 
     protected ServiceLocator createServiceLocator(RequestContext context) {

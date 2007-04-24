@@ -25,6 +25,8 @@
  * @object The form for all UI-form-elements on the page
  */
 
+dojo.provide("cosmo.ui.cal_form");
+
 dojo.require("dojo.string");
 dojo.require("dojo.lang");
 dojo.require("dojo.event.common");
@@ -37,8 +39,6 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.view.cal.canvas");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.minical");
-
-dojo.provide("cosmo.ui.cal_form");
 
 cosmo.ui.cal_form.CalForm = function () {
 

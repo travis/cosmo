@@ -24,11 +24,11 @@ cosmo.view.cal = new function () {
 
     var self = this;
     var ranges = {
-        'daily': ['d', 1],
-        'weekly': ['ww', 1],
-        'biweekly': ['ww', 2],
-        'monthly': ['m', 1],
-        'yearly': ['yyyy', 1]
+        'daily': [dojo.date.dateParts.DAY, 1],
+        'weekly': [dojo.date.dateParts.WEEK, 1],
+        'biweekly': [dojo.date.dateParts.WEEK, 2],
+        'monthly': [dojo.date.dateParts.MONTH, 1],
+        'yearly': [dojo.date.dateParts.YEAR, 1]
     }
 
     // Saving changes
@@ -134,7 +134,7 @@ cosmo.view.cal = new function () {
                     var newDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
                     var unit = ranges[freq][0];
                     var bound = ranges[freq][1];
-                    var diff = Date.diff(unit, origDate, newDate);
+                    var diff = cosmo.datetime.Date.diff(unit, origDate, newDate);
                     ret = (diff >= bound || diff <= (bound * -1)) ? true : false;
                     return ret;
                 }
@@ -270,7 +270,8 @@ cosmo.view.cal = new function () {
                                     var origStart = ev.dataOrig.start; // The pre-edit start for the edited instance
                                     var newStart = ev.data.start; // The start for the edited instance
                                     // The number of minutes between the start and end for the edited instance
-                                    var minutesToEnd = ScoobyDate.diff('n', ev.data.start, ev.data.end);
+                                    var minutesToEnd = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE, 
+                                        ev.data.start, ev.data.end);
                                     // Date parts for the edited instance start
                                     var mon = newStart.getMonth();
                                     var dat = newStart.getDate();
@@ -288,7 +289,8 @@ cosmo.view.cal = new function () {
                                         // for the instance event
                                         case 'weekly':
                                         case 'biweekly':
-                                            var diff = Date.diff('d', origStart, newStart);
+                                            var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY, 
+                                                origStart, newStart);
                                             masterStart.setDate(masterStart.getDate() + diff);
                                             break;
                                         // Set the date of the month for the master event to the
@@ -311,8 +313,9 @@ cosmo.view.cal = new function () {
 
                                     // Calculate the new end for the master -- set the end
                                     // the same minutes distance from the start as in the original
-                                    masterEnd = ScoobyDate.clone(masterStart);
-                                    masterEnd.add('n', minutesToEnd);
+                                    masterEnd = cosmo.datetime.Date.clone(masterStart);
+                                    masterEnd = cosmo.datetime.Date.add(masterEnd, 
+                                        dojo.date.dateParts.MINUTE, minutesToEnd);
                                     // Set the values in the original end for the master event
                                     evData.end.setYear(masterEnd.getFullYear());
                                     evData.end.setMonth(masterEnd.getMonth());
@@ -357,7 +360,7 @@ cosmo.view.cal = new function () {
                     // Calc the new end date for the original recurrence --
                     // go back 'one recurrence unit' (e.g., go back one day for
                     // a daily event, one week for a weekly event, etc.)
-                    recurEnd = ScoobyDate.add(startNoTime, unit, incr);
+                    recurEnd = cosmo.datetime.Date.add(startNoTime, unit, incr);
 
                     // Pass a CalEvent obj with an attached CalEventData obj
                     newEv.data = CalEventData.clone(ev.data);
@@ -368,8 +371,10 @@ cosmo.view.cal = new function () {
                     // the new event -- is this the correct behavior?
                     if (newEv.data.recurrenceRule && newEv.data.recurrenceRule.endDate) {
                         var recurEndOrig = newEv.data.recurrenceRule.endDate;
-                        var recurEndDiff = ScoobyDate.diff('d', startNoTime, recurEndOrig);
-                        newEv.data.recurrenceRule.endDate = ScoobyDate.add(newEv.data.start, 'd', recurEndDiff);
+                        var recurEndDiff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY, 
+                            startNoTime, recurEndOrig);
+                        newEv.data.recurrenceRule.endDate = cosmo.datetime.Date.add(
+                            newEv.data.start, dojo.date.dateParts.DAY, recurEndDiff);
                     }
 
                     f = function () { doSaveEventBreakRecurrence(newEv, masterEventDataId,
@@ -725,7 +730,7 @@ cosmo.view.cal = new function () {
                                 // New end should be one 'recurrence span' back -- e.g.,
                                 // the previous day for a daily recurrence, one week back
                                 // for a weekly, etc.
-                                recurEnd = ScoobyDate.add(recurEnd, unit, incr);
+                                recurEnd = cosmo.datetime.Date.add(recurEnd, unit, incr);
                                 saveRule.endDate = recurEnd;
                                 doSaveRecurrenceRule(ev, saveRule, { 'saveAction': 'remove',
                                     'removeType': 'instanceAllFuture', 'recurEnd': recurEnd });

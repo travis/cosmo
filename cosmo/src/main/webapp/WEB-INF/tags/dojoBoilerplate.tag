@@ -62,8 +62,6 @@ function bootstrap(){
 
     dojo.require("cosmo.ui.widget.Debug");
 
-    dojo.require("cosmo.datetime.*");
-
     if (${timezones}){
         dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
         var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry("${staticBaseUrl}/js-${PRODUCT_VERSION}/lib/olson-tzdata/");

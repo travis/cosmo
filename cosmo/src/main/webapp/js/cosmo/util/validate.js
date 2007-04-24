@@ -17,7 +17,6 @@ dojo.provide("cosmo.util.validate");
 
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
-dojo.require("dojo.validate.web");
 
 cosmo.util.validate = new function () {
 
@@ -115,9 +114,11 @@ cosmo.util.validate = new function () {
      * @return String, error message (empty if no err).
      */
     this.eMail = function (s) {
+        // Just do really basic e-mail addr validation
+        pat = /^.+@.+\..{2,3}$/;
         err = '';
         val = typeof s == 'object' ? s.value : s;
-        if (!dojo.validate.isEmailAddress(val, {allowLocal:true})) {
+        if (!pat.test(val)) {
             err = _('Signup.Error.ValidEMail');
         }
         return err;

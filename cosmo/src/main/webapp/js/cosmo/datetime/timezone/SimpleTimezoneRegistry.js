@@ -16,6 +16,10 @@
 
 dojo.provide("cosmo.datetime.timezone.SimpleTimezoneRegistry");
 
+dojo.require("cosmo.datetime");
+dojo.require("cosmo.datetime.Date");
+dojo.require("cosmo.datetime.timezone");
+
 cosmo.datetime.timezone.SimpleTimezoneRegistry = function(timezoneFileRoot){
     this.timezoneFileRoot = timezoneFileRoot || null;
     this._timezones = {};

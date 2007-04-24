@@ -15,6 +15,10 @@
 */
 
 dojo.provide("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
+
+dojo.require("cosmo.datetime");
+dojo.require("cosmo.datetime.Date");
+dojo.require("cosmo.datetime.timezone");
 dojo.require("cosmo.datetime.timezone.SimpleTimezoneRegistry");
 
 dojo.declare("cosmo.datetime.timezone.LazyCachingTimezoneRegistry", 

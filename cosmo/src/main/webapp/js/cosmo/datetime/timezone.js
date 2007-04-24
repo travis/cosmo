@@ -15,6 +15,9 @@
 */
 
 dojo.provide("cosmo.datetime.timezone");
+
+dojo.require("cosmo.datetime");
+dojo.require("cosmo.datetime.Date");
 dojo.require("dojo.collections.Dictionary");
 dojo.require("dojo.string.extras");
 

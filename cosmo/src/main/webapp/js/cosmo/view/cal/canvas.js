@@ -18,7 +18,11 @@ dojo.provide('cosmo.view.cal.canvas');
 
 dojo.require('dojo.event.*');
 dojo.require("dojo.gfx.color.hsv");
-dojo.require("cosmo.util.date");
+dojo.require("dojo.date.common");
+dojo.require("dojo.date.format");
+//dojo.require("cosmo.util.date");
+dojo.require("cosmo.datetime");
+dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.ui.event.handlers');
 dojo.require('cosmo.ui.draggable');
 dojo.require("cosmo.util.i18n");
@@ -146,7 +150,7 @@ cosmo.view.cal.canvas = new function () {
 
             // Do a week's worth of day cols with day name and date
             for (var i = 0; i < 7; i++) {
-                calcDay = Date.add('d', i, viewStart);
+                calcDay = cosmo.datetime.Date.add(viewStart, dojo.date.dateParts.DAY, i);
                 startdate = startdate > daymax ? 1 : startdate;
                 // Subtract one pixel of height for 1px border per retarded CSS spec
                 str += '<div class="dayListDayDiv" id="dayListDiv' + i +
@@ -158,7 +162,7 @@ cosmo.view.cal.canvas = new function () {
                         ' repeat-x; background-position:0px 0px;'
                 }
                 str += '">';
-                str += Date.abbrWeekday[i] + '&nbsp;' + startdate;
+                str += cosmo.datetime.abbrWeekday[i] + '&nbsp;' + startdate;
                 str += '</div>\n';
                 start += self.dayUnitWidth;
                 startdate++;
@@ -180,7 +184,7 @@ cosmo.view.cal.canvas = new function () {
             var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
 
             for (var i = 0; i < 7; i++) {
-                calcDay = Date.add('d', i, viewStart);
+                calcDay = cosmo.datetime.Date.add(viewStart, dojo.date.dateParts.DAY, i);
                 str += '<div class="allDayListDayDiv';
                 if (calcDay.getTime() == currDay.getTime()) {
                     str += ' currentDayDay'
@@ -234,7 +238,7 @@ cosmo.view.cal.canvas = new function () {
 
             // Timeline of hours on left
             for (var j = 0; j < 24; j++) {
-                hour = j == 12 ? _('App.Noon') : cosmo.util.date.hrMil2Std(j);
+                hour = j == 12 ? _('App.Noon') : cosmo.datetime.util.hrMil2Std(j);
                 meridian = j > 11 ? ' PM' : ' AM';
                 meridian = j == 12 ? '' : '<span>' + meridian + '</span>';
                 row = '';
@@ -279,7 +283,7 @@ cosmo.view.cal.canvas = new function () {
 
             // Do a week's worth of day cols with hours
             for (var i = 0; i < 7; i++) {
-                calcDay = Date.add('d', i, viewStart);
+                calcDay = cosmo.datetime.Date.add(viewStart, dojo.date.dateParts.DAY, i);
                 str += '<div class="dayDiv" id="dayDiv' + i +
                     '" style="left:' + start + 'px; width:' +
                     (cosmo.view.cal.canvas.dayUnitWidth-1) +
@@ -343,17 +347,17 @@ cosmo.view.cal.canvas = new function () {
 
             // Format like 'March-April, 2006'
             if (mS < mE) {
-                str += vS.strftime('%B-');
-                str += vE.strftime('%B %Y');
+                str += dojo.date.strftime(vS, '%B-');
+                str += dojo.date.strftime(vE, '%B %Y');
             }
             // Format like 'December 2006-January 2007'
             else if (mS > mE) {
-                str += vS.strftime('%B %Y-');
-                str += vE.strftime('%B %Y');
+                str += dojo.date.strftime(vS, '%B %Y-');
+                str += dojo.date.strftime(vE, '%B %Y');
             }
             // Format like 'April 2-8, 2006'
             else {
-                str += vS.strftime('%B %Y');
+                str += dojo.date.strftime(vS, '%B %Y');
             }
             if (headerDiv.firstChild) {
                 headerDiv.removeChild(headerDiv.firstChild);
@@ -485,7 +489,7 @@ cosmo.view.cal.canvas = new function () {
      * @return An integer of the X-position for the top/bottom edge of an event lozenge
      */
     this.calcPosFromTime = function (milTime, posOrientation) {
-        var t = cosmo.datetime.parse.parseTimeString(milTime,
+        var t = cosmo.datetime.util.parseTimeString(milTime,
             { returnStrings: true });
         var h = t.hours;
         var m = t.minutes;
@@ -1252,11 +1256,11 @@ cosmo.view.cal.canvas = new function () {
             mon = evdate.getMonth();
             dat = evdate.getDate();
             startstr = extractTimeFromId(startstr);
-            var t = cosmo.datetime.parse.parseTimeString(startstr);
+            var t = cosmo.datetime.util.parseTimeString(startstr);
             hou = t.hours;
             min = t.minutes;
             start = new ScoobyDate(yea, mon, dat, hou, min);
-            end = ScoobyDate.add(start, 'n', 60);
+            end = cosmo.datetime.Date.add(start, dojo.date.dateParts.MINUTE, 60);
         }
         else if (evType == 'allDayMain') {
             lozenge = new cosmo.view.cal.NoTimeLozenge(id);

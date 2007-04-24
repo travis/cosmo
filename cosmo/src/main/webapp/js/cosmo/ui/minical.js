@@ -25,6 +25,9 @@
  */
  
 dojo.provide("cosmo.ui.minical");
+dojo.require("dojo.date.common");
+dojo.require("dojo.date.format");
+dojo.require("cosmo.datetime");
  
 cosmo.ui.minical.MiniCal = new function() {
     
@@ -288,7 +291,7 @@ cosmo.ui.minical.MiniCal = new function() {
             var content = '';
             for (var i = 0; i < 7; i++)
             content += dayHeadHTML.replace(/%content%/, 
-                Date.abbrWeekday[i].substr(0, 1));
+                cosmo.datetime.abbrWeekday[i].substr(0, 1));
             monthHTML = monthHTML.replace(/%daynames%/, content);
             
             // Create days and weeks
@@ -358,7 +361,7 @@ cosmo.ui.minical.MiniCal = new function() {
                 dayOffset = dt.getDay();
                 
                 // Label month name
-                monthName = dt.strftime('%B %Y');
+                monthName = dojo.date.strftime(dt, '%B %Y');
                 monthNameDiv = document.getElementById(self.id + 
                     '_month' + i + '_monthName');
                 monthNameDiv.appendChild(document.createTextNode(monthName));
@@ -563,7 +566,8 @@ cosmo.ui.minical.MiniCal = new function() {
         var compMonthDate =  new Date(self.viewStart.getFullYear(), 
             self.viewStart.getMonth(), 1);
         
-        self.firstMonthDate.add('m', incr); // Increment the months
+        self.firstMonthDate = cosmo.datetime.Date.add(self.firstMonthDate, 
+            dojo.date.dateParts.MONTH, incr); // Increment the months
         self.renderMonths(); // Render the desired set of months
         self.renderSelection(); // Keep the selection where it was
     };

@@ -25,13 +25,14 @@
  * @object The form for all UI-form-elements on the page
  */
 
-dojo.provide("cosmo.ui.cal_form");
-
 dojo.require("dojo.string");
 dojo.require("dojo.lang");
 dojo.require("dojo.event.common");
 dojo.require("dojo.event.topic");
+dojo.require("dojo.date.common");
+dojo.require("dojo.date.format");
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.ui.event.handlers");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.validate");
@@ -39,6 +40,8 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.view.cal.canvas");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.minical");
+
+dojo.provide("cosmo.ui.cal_form");
 
 cosmo.ui.cal_form.CalForm = function () {
 
@@ -381,39 +384,39 @@ cosmo.ui.cal_form.CalForm = function () {
         return options;
     };
 
-    this.setMailtoLink = function (event) {
+    this.setMailtoLink = function (ev) {
         var timeFormat=_("Sidebar.Email.TimeFormat");
+        var d = ev.data;
+        var subject = Cal.currentCollection.displayName + ": " + d.title;
+        var body = [_("Sidebar.Email.Title") , d.title , "%0d%0a"];
 
-        var subject = Cal.currentCollection.displayName + ": " + event.data.title;
-        var body = [_("Sidebar.Email.Title") , event.data.title , "%0d%0a"];
-
-        if (event.data.start.tzId){
+        if (d.start.tzId){
             body = body.concat([
-             _("Sidebar.Email.Timezone")  , event.data.start.tzId , "%0d%0a"]);
+             _("Sidebar.Email.Timezone")  , d.start.tzId , "%0d%0a"]);
         }
         body = body.concat([
-             _("Sidebar.Email.Starts") , event.data.start.strftime(timeFormat) , "%0d%0a" ,
-             _("Sidebar.Email.Ends") , event.data.end.strftime(timeFormat) , "%0d%0a"]);
-        if (event.data.allDay) {
+             _("Sidebar.Email.Starts") , dojo.date.strftime(d.start, timeFormat) , "%0d%0a" ,
+             _("Sidebar.Email.Ends") , dojo.date.strftime(d.end, timeFormat) , "%0d%0a"]);
+        if (d.allDay) {
             body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
         }
 
-        if (event.data.recurrenceRule){
+        if (d.recurrenceRule){
             body = body.concat([_("Sidebar.Email.Recurs") ,
-                event.data.recurrenceRule.frequency]);
-            if (event.data.recurrenceRule.endDate){
+                d.recurrenceRule.frequency]);
+            if (d.recurrenceRule.endDate){
                 body = body.concat([_("Sidebar.Email.EndingOn") ,
-                    event.data.recurrenceRule.endDate.strftime(timeFormat)]);
+                    dojo.date.strftime(d.recurrenceRule.endDate, timeFormat)]);
             }
             body.push(".%0d%0a");
 
         }
-        if (event.data.status){
-            body.concat([_("Sidebar.Email.Status") , event.data.status , "%0d%0a"]);
+        if (d.status){
+            body.concat([_("Sidebar.Email.Status") , d.status , "%0d%0a"]);
         }
-        if (event.data.description){
+        if (d.description){
             body = body.concat([ ,
-                _("Sidebar.Email.Description") , event.data.description , "%0d%0a"]);
+                _("Sidebar.Email.Description") , d.description , "%0d%0a"]);
         }
         this.mailtoLink.setAttribute("href", "mailto:?subject=" + subject + "&body=" + body.join(""));
     };
@@ -642,15 +645,15 @@ cosmo.ui.cal_form.CalForm = function () {
         // Calc military datetimes from form entries
         startDate = new Date(startDate);
         if (startTime) {
-            var t = cosmo.datetime.parse.parseTimeString(startTime);
-            h = hrStd2Mil(t.hours, form.startap[1].checked);
+            var t = cosmo.datetime.util.parseTimeString(startTime);
+            h = cosmo.datetime.util.hrStd2Mil(t.hours, form.startap[1].checked);
             m = t.minutes; 
             startDate.setHours(h, m);
         }
         endDate = new Date(endDate);
         if (endTime) {
-            var t = cosmo.datetime.parse.parseTimeString(endTime);
-            h = hrStd2Mil(t.hours, form.endap[1].checked);
+            var t = cosmo.datetime.util.parseTimeString(endTime);
+            h = cosmo.datetime.util.hrStd2Mil(t.hours, form.endap[1].checked);
             m = t.minutes; 
             endDate.setHours(h, m);
         }
@@ -728,27 +731,28 @@ cosmo.ui.cal_form.CalForm = function () {
      */
     this.updateFromEvent = function (ev) {
         var form = this.form;
-        var recur = ev.data.recurrenceRule;
-        var status = ev.data.status;
-        form.eventtitle.value = ev.data.title;
-        form.eventlocation.value = ev.data.location;
-        form.eventdescr.value = ev.data.description ?
-            ev.data.description : '';
-        form.status.value = ev.data.statusBar ? ev.data.status : '';
-        form.startdate.value = ev.data.start.strftime('%m/%d/%Y');
-        form.enddate.value = ev.data.end.strftime('%m/%d/%Y');
-        form.eventallday.checked = ev.data.allDay ? true : false;
+        var d = ev.data;
+        var recur = d.recurrenceRule;
+        var status = d.status;
+        form.eventtitle.value = d.title;
+        form.eventlocation.value = d.location;
+        form.eventdescr.value = d.description ?
+            d.description : '';
+        form.status.value = d.statusBar ? d.status : '';
+        form.startdate.value = dojo.date.strftime(d.start, '%m/%d/%Y');
+        form.enddate.value = dojo.date.strftime(d.end, '%m/%d/%Y');
+        form.eventallday.checked = d.allDay ? true : false;
         // Set mailto link
         this.setMailtoLink(ev);
-        if (ev.data.allDay || ev.data.anyTime) {
+        if (d.allDay || d.anyTime) {
             this.setTimeElem(null, 'start');
             this.setTimeElem(null, 'end');
         }
         else {
-            this.setTimeElem(ev.data.start, 'start');
-            this.setTimeElem(ev.data.end, 'end');
+            this.setTimeElem(d.start, 'start');
+            this.setTimeElem(d.end, 'end');
         }
-        var enable = ev.data.allDay ? false : true;
+        var enable = d.allDay ? false : true;
         this.enableDisableTimeElem('start', enable);
         this.enableDisableTimeElem('end', enable);
 
@@ -763,7 +767,7 @@ cosmo.ui.cal_form.CalForm = function () {
             form.recurend.disabled = false;
             if (recur.endDate) {
                 this.setTextInput(form.recurend,
-                    recur.endDate.strftime('%m/%d/%Y'), false, false);
+                    dojo.date.strftime(recur.endDate, '%m/%d/%Y'), false, false);
             }
             else {
                 this.setTextInput(form.recurend, 'mm/dd/yyyy', true, false);
@@ -774,8 +778,8 @@ cosmo.ui.cal_form.CalForm = function () {
             this.setTextInput(form.recurend, 'mm/dd/yyyy', true, true);
         }
 
-        if (ev.data.start.tzId){
-            var timezone = cosmo.datetime.timezone.getTimezone(ev.data.start.tzId);
+        if (d.start.tzId){
+            var timezone = cosmo.datetime.timezone.getTimezone(d.start.tzId);
             if (!timezone){
                 self.clearTimezone();
             } else {
@@ -792,7 +796,7 @@ cosmo.ui.cal_form.CalForm = function () {
         }
 
         // All-day, anytime events cannot have a timezone, normal events can
-        if (ev.data.allDay || ev.data.anyTime) {
+        if (d.allDay || d.anyTime) {
             this.form.tzRegion.disabled = true;
             this.form.tzId.disabled = true;
         }
@@ -827,7 +831,7 @@ cosmo.ui.cal_form.CalForm = function () {
         timeElem = form[name + 'time'];
         meridianElem = form[name + 'ap'];
         if (time) {
-            strtime = time.strftime('%I:%M');
+            strtime = dojo.date.strftime(time, '%I:%M');
             // Trim leading zero if need be
             strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
             meridianElem[1].checked = false;

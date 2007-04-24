@@ -17,7 +17,8 @@
 dojo.provide("cosmo.service.json_service_impl")
 
 dojo.require("cosmo.service.service_stub");
-dojo.require("cosmo.datetime.*");
+dojo.require("cosmo.datetime.Date");
+dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.model");
 
 JSON_SERVICE_OBJECT_NAME = "scoobyService";

@@ -28,22 +28,13 @@
  * @param utc Boolean indicates that this is a utc time
  */
 dojo.provide("cosmo.datetime.Date");
+
+dojo.require("dojo.date.common");
+dojo.require("dojo.date.format");
+dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.timezone");
 dojo.require("cosmo.util.debug");
 dojo.require("cosmo.facade.pref");
-
-cosmo.datetime.dateParts = {
-    YEAR: "yyyy",
-    QUARTER:  "q",
-    MONTH: "m",
-    YEAR: "y",
-    DAY: "d",
-    WEEKDAY: "w",
-    WEEK: "ww",
-    HOUR: "h",
-    MINUTE: "n",
-    SECOND: "s"
-}
 
 cosmo.datetime.Date = function () {
     
@@ -353,7 +344,7 @@ cosmo.datetime.Date.prototype.strftime = function(formatString){
     // for this function, since all we care about is the output
     var d = new Date(this.getYear(), this.getMonth(), this.getDate(),
         this.getHours(), this.getMinutes(), this.getSeconds());
-    return Date.strftime(formatString, d);
+    return dojo.date.strftime(d, formatString);
 };
 
 /**
@@ -362,8 +353,15 @@ cosmo.datetime.Date.prototype.strftime = function(formatString){
 cosmo.datetime.Date.prototype.add = function(interv, incr) {
     var dt = null;
     var ret = null;
-    // Get incremented localtime JS Date obj
+    // Get incremented Date 
+    // 'n', 'd', etc., string keys
+    if (typeof interv == 'string') {
     dt = Date.add(interv, incr, this.toUTC());
+    }
+    // dojo.date.dateParts 
+    else {
+        dt = dojo.date.add(this.toUTC(), interv, incr);
+    }
     // Update this date based on the new UTC
     this.updateFromUTC(dt.getTime());
 };
@@ -493,7 +491,12 @@ cosmo.util.debug.aliasToDeprecatedFuncion(
  * Returns the difference in specified units between two Date
  */
 cosmo.datetime.Date.diff = function(interv, sdt1, sdt2) {
-    return Date.diff(interv, sdt1.toUTC(), sdt2.toUTC());
+    if (typeof interv == 'string') {
+        return Date.diff(interv, sdt1.getTime(), sdt2.getTime());
+}
+    else {
+        return dojo.date.diff(interv, sdt1.getTime(), sdt2.getTime());
+    }
 }
 cosmo.util.debug.aliasToDeprecatedFuncion(
     cosmo.datetime.Date.diff, "ScoobyDate.diff", "0.6");
@@ -502,10 +505,29 @@ cosmo.util.debug.aliasToDeprecatedFuncion(
 /**
  * Returns a new Date incremented the desired number of units
  */
-cosmo.datetime.Date.add = function(sdt, interv, incr) {
-    var ret = this.clone(sdt);
-    ret.add(interv, incr);
+cosmo.datetime.Date.add = function(dt, interv, incr) {
+    var d = null;
+    // 'n', 'd', etc., string keys
+    if (typeof interv == 'string') {
+        d = Date.add(interv, incr, dt.getTime());
+    }
+    // dojo.date.dateParts
+    else {
+        d = dojo.date.add(dt.getTime(), interv, incr);
+    }
+    // JS Date
+    if (dt instanceof Date) {
+        return d;
+    }
+    // cosmo.datetime.Date
+    else if (dt instanceof cosmo.datetime.Date) {
+        var ret = this.clone(dt);
+        ret.updateFromUTC(d.getTime());
     return ret;
+}
+    else {
+        throw('dt is not a usable Date object.');
+    }
 }
 cosmo.util.debug.aliasToDeprecatedFuncion(
     cosmo.datetime.Date.add, "ScoobyDate.add", "0.6");

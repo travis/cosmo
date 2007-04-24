@@ -22,7 +22,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require('cosmo.convenience');
 // --
 
-// -- Weirdness that should be fixed
+// -- FIXME: Weirdness that should be fixed
 dojo.require("cosmo.facade.pref");
 dojo.require("cosmo.service.json_service_impl");
 dojo.require("cosmo.legacy.cal_event");
@@ -35,6 +35,7 @@ dojo.require("cosmo.ui.widget.CollectionSelector");
 
 dojo.require("cosmo.conduits");
 dojo.require("cosmo.model");
+dojo.require("cosmo.datetime");
 dojo.require("cosmo.ui.cal_form");
 dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.button");
@@ -581,20 +582,20 @@ cosmo.ui.cal_main.Cal = new function () {
         // --------------------
         // Weekday abbreviations array
         // ============
-        keys = Date.abbrWeekday;
+        keys = cosmo.datetime.abbrWeekday;
         newArr = [];
         for (var i = 0; i < keys.length; i++) {
             newArr.push(_('App.' + keys[i]));
         }
-        Date.abbrWeekday = newArr;
+        cosmo.datetime.abbrWeekday = newArr;
         // Full month names array
         // ============
-        keys = Date.fullMonth;
+        keys = cosmo.datetime.fullMonth;
         newArr = [];
         for (var i = 0; i < keys.length; i++) {
             newArr.push(_('App.' + keys[i]));
         }
-        Date.fullMonth = newArr;
+        cosmo.datetime.fullMonth = newArr;
         // AM/PM
         // ============
         newArr = [];
@@ -672,7 +673,8 @@ cosmo.ui.cal_main.Cal = new function () {
             if (typeof goTo == 'string') {
                 var key = goTo.toLowerCase();
                 var incr = key.indexOf('back') > -1 ? -1 : 1;
-                queryDate = Date.add('ww', incr, this.viewStart);
+                queryDate = cosmo.datetime.Date.add(this.viewStart, 
+                    dojo.date.dateParts.WEEK, incr);
             }
             // param is actual Date
             else {
@@ -720,7 +722,7 @@ cosmo.ui.cal_main.Cal = new function () {
         var diff = dt.getDay();
         var sun = new Date(dt.getTime());
         diff = 0 - diff;
-        sun.add('d', diff);
+        sun = cosmo.datetime.Date.add(sun, dojo.date.dateParts.DAY, diff);
         var ret = new Date(sun.getFullYear(), sun.getMonth(), sun.getDate());
         return ret;
     };
@@ -731,7 +733,7 @@ cosmo.ui.cal_main.Cal = new function () {
     this.getWeekEnd = function (dt) {
         var diff = 6-dt.getDay();
         var sat = new Date(dt.getTime());
-        sat.add('d', diff);
+        sat = cosmo.datetime.Date.add(sat, dojo.date.dateParts.DAY, diff);
          // Make time of day 11:59:99 to get the entire day's events
         var ret = new Date(sat.getFullYear(), sat.getMonth(), sat.getDate(), 23, 59, 59);
         return ret;
@@ -742,13 +744,16 @@ cosmo.ui.cal_main.Cal = new function () {
      */
     this.getNewViewStart = function (key) {
         var queryDate = null;
+        var incr = 0;
         // Increment/decrement week
         if (key.indexOf('next') > -1) {
-            queryDate = Date.add('ww', 1, this.viewStart);
+            incr = 1;
         }
         else if (key.indexOf('back') > -1) {
-            queryDate = Date.add('ww', -1, this.viewStart);
+            incr = -1;
         }
+        queryDate = cosmo.datetime.Date.add(this.viewStart, 
+            dojo.date.dateParts.WEEK, incr);
         return queryDate;
     };
 
@@ -831,8 +836,8 @@ cosmo.ui.cal_main.Cal = new function () {
     this.createWelcomeEvent = function (){
         var vs = this.viewStart;
         vs = new Date(vs.getFullYear(), vs.getMonth(), vs.getDate(), 9, 0);
-        var start = cosmo.datetime.Date.add(vs, 'd', 3);
-        var end = cosmo.datetime.Date.add(start, 'n', 60);
+        var start = cosmo.datetime.Date.add(vs, dojo.date.dateParts.DAY, 3);
+        var end = cosmo.datetime.Date.add(start, dojo.date.dateParts.MINUTE, 60);
         return new cosmo.model.CalEventData(null, "Welcome to Cosmo", "Welcome to Cosmo",
            start, end, false);
     }

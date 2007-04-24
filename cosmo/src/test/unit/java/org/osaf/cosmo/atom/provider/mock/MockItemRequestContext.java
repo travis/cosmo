@@ -84,6 +84,7 @@ public class MockItemRequestContext extends BaseMockRequestContext {
         String xml = (String)
             context.getAbdera().getWriterFactory().getWriter().write(entry);
         getMockRequest().setContentType("application/atom+xml");
+        getMockRequest().addHeader("Content-Type", "application/atom+xml");
         getMockRequest().setContent(xml.getBytes());
     }
 
@@ -91,6 +92,7 @@ public class MockItemRequestContext extends BaseMockRequestContext {
         throws IOException {
         String content = "this is item " + item.getUid();
         getMockRequest().setContentType("text/plain");
+        getMockRequest().addHeader("Content-Type", "text/plain");
         getMockRequest().setContent(content.getBytes());
     }
 }

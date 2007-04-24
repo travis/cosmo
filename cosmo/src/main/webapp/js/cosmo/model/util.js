@@ -158,4 +158,20 @@ dojo.declare("cosmo.model.util.InheritingSubclassCreator", null, {
         
     }
     
-});    
+}); 
+
+cosmo.model.util.equals = function cosmoEquals(a,b){
+    var type = typeof (a);
+    if (type != typeof(b)){
+        throw new Error("Both operands must be of the same type!");
+    }
+    
+    if (type == "object"){
+       if (a == null){
+           return b == null;
+       }
+       return a.equals(b);
+    }
+    
+    return a == b;
+}   

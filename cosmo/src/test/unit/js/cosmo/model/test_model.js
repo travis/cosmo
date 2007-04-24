@@ -54,12 +54,43 @@ test_testNoteInstance = function(){
     var date = new cosmo.datetime.Date(2000,0,1);
     var noteInstance = note.getNoteInstance(date);
     
-    assertEquals(note.getBody(), noteInstance.getBody());
+    jum.assertEquals(note.getBody(), noteInstance.getBody());
     
+    noteInstance.setBody("new");
+    jum.assertEquals(noteInstance.getBody(), "new");
+    
+    var mod = note.getModification(date);
+    jum.assertTrue(mod != null);
+    jum.assertEquals(mod.getModifiedProperties()["body"] == "new");
     
 };
 
-test_ = function(){
+test_equals = function(){    var equals = cosmo.model.util.equals;
+    jum.assertTrue(equals(1,1));
+    var date1 = new cosmo.datetime.Date(2001,1,1);
+    var date2 = new cosmo.datetime.Date(2001,1,1);
+    jum.assertTrue(equals(date1,date2));
+    
+    date1.setMonth(2);
+    jum.assertFalse(equals(date1,date2));
+
+    date1 = new cosmo.datetime.Date(2001,1,1);
+    date2 = new cosmo.datetime.Date(2001,1,1);
+    
+    jum.assertTrue(equals(date1,date2));
+    date1.tzId= "blah";
+    jum.assertFalse(equals(date1,date2));
+    
+    jum.assertFalse(equals(date1, null));
+    jum.assertFalse(equals(null, date1));
+    var caught = false;
+    try {
+        equals(1, "1");
+    } catch (e){
+        caught = true;
+    }
+    jum.assertTrue(caught);
+    
 };
 
 test_ = function(){

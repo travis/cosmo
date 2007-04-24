@@ -23,7 +23,7 @@ cosmo.model.NEW_ARRAY = function(){return []};
 cosmo.model.TRIAGE_NOW = 100;
 cosmo.model.TRIAGE_LATER = 200;
 cosmo.model.TRIAGE_DONE = 300;
-
+      
 cosmo.model.declare = function(/*String*/ ctrName, /*Function*/ parentCtr, propertiesArray, otherDeclarations){
     var newCtr = dojo.declare(ctrName, parentCtr, otherDeclarations);
     cosmo.model.util.simplePropertyApplicator.enhanceClass(newCtr, propertiesArray, {enhanceInitializer: false});
@@ -58,6 +58,7 @@ cosmo.model.declare("cosmo.model.Item", null,
    //declare other properties
   {
       initializer: function(kwArgs){
+            dojo.debug("Item Initter");
             this.initializeProperties(kwArgs);
       }
   });
@@ -71,6 +72,8 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         _stamps: null,
         
         initializer: function(){
+            dojo.debug("Note Initter");
+            
             this._stamps = {};
             this._modifications = {};
         },
@@ -121,6 +124,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         },
         
         getNoteInstance: function getNoteInstance(/*cosmo.datetime.Date*/ instanceDate){
+            dojo.debug("getNoteInstance");
             return new cosmo.model.NoteInstance(this, instanceDate);
         }
         
@@ -130,6 +134,7 @@ dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
     __noOverride:{uid:1,version:1},
     
     initializer: function noteInstanceInitializer(master, instanceDate){
+        dojo.debug("noteInstanceInitializer");
         this._master = master;
         this.instanceDate = instanceDate;
     },
@@ -143,7 +148,8 @@ dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
     },
     
     __getProperty: function noteInstanceGetProperty(propertyName){
-        //get the master version
+        dojo.debug("noteInstanceGetProperty");
+        //get the master version`
         var master = this._master;
         var masterProperty = master.__getProperty(propertyName);
 
@@ -160,16 +166,57 @@ dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
         if (!modification){
             return masterProperty;
         }
-        
+            
         //there IS a modification, so let's check to see if it has 
         //an overridden value for this particular property
-        var modificationProperty = modification.modifiedProperties[propertyName];
+        var modificationProperty = modification.getModifiedProperties()[propertyName];
         if (typeof(modificationProperty) != "undefined"){
             return modificationProperty;            
         }
-        
         return masterProperty;
+    },  
+    
+    __setProperty: function noteInstanceSetProperty(propertyName, value){
+        dojo.debug("noteInstanceSETProperty");
+        dojo.debug(propertyName)
+        dojo.debug(value)
+        if (this.__noOverride[propertyName]){
+            throw new Error("You can not override property '" + propertyName +"'");
+        }
+
+        var master = this._master;
+        var masterProperty = master.__getProperty(propertyName);
+        
+        //is there a modification?
+        var modification = master.getModification(this.instanceDate);
+        if (modification){
+            //there already is a mod, but does it override this property?
+            if (dojo.lang.has(modification, propertyName)){
+                //simply set the property on the modification
+                modification[propertyName] = value;
+                return;                    
+            }
+        }
+        
+        //if the new value is the same as the master property, 
+        // no need to do anything
+        if (cosmo.model.util.equals(value, masterProperty)){
+            return;
+        } else {
+            var modification = new cosmo.model.Modification({
+                instanceDate: this.instanceDate
+            });
+            modification.getModifiedProperties()[propertyName] = value;
+            master.addModification(modification);
+        }
+        
+    },
+    
+    initializeProperties: function noop(){
+        return;
     }
+    
+    
 });
 
 cosmo.model.declare("cosmo.model.Modification", null,

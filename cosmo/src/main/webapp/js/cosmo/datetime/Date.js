@@ -491,12 +491,14 @@ cosmo.util.debug.aliasToDeprecatedFuncion(
  * Returns the difference in specified units between two Date
  */
 cosmo.datetime.Date.diff = function(interv, sdt1, sdt2) {
+    var ret = null;
     if (typeof interv == 'string') {
-        return Date.diff(interv, sdt1.getTime(), sdt2.getTime());
+        ret = Date.diff(interv, sdt1.getTime(), sdt2.getTime());
 }
     else {
-        return dojo.date.diff(interv, sdt1.getTime(), sdt2.getTime());
+        ret = dojo.date.diff(sdt1.getTime(), sdt2.getTime(), interv);
     }
+    return ret;
 }
 cosmo.util.debug.aliasToDeprecatedFuncion(
     cosmo.datetime.Date.diff, "ScoobyDate.diff", "0.6");

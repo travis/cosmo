@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-dojo.require("cosmo.datetime.*");
+dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
 //Initialization.
 //TODO - once Dojo implements setUp() and tearDown() move this code there.

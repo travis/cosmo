@@ -145,8 +145,8 @@ cosmo.view.cal.Lozenge.prototype.mainAreaCursorChange = function (isProc) {
 };
 cosmo.view.cal.Lozenge.prototype.getPlatonicLeft = function () {
     var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
-    var diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-        Cal.viewStart, ev.data.start));
+    var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
+        cosmo.ui.cal_main.Cal.viewStart, ev.data.start);
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 
 };
@@ -959,9 +959,8 @@ cosmo.view.cal.NoTimeLozenge.prototype.hideProcessing = function () {
  * the lozenge has to be updated to show the changes to the event
  */
 cosmo.view.cal.NoTimeLozenge.prototype.updateFromEvent = function (ev, temp) {
-    var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
+    var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
         ev.data.start, ev.data.end) + 1;
-
     this.left = this.getPlatonicLeft();
     this.width = (diff*cosmo.view.cal.canvas.dayUnitWidth)-3;
     if (!temp) {

@@ -56,7 +56,6 @@ public class ItemTarget extends BaseItemTarget implements Constants {
             }
             return TargetType.TYPE_MEDIA;
         }
-        // all read operations return entries
         return TargetType.TYPE_ENTRY;
     }
 }

@@ -68,15 +68,27 @@ public class StandardProvider extends AbstractProvider {
     // Provider methods
 
     public ResponseContext createEntry(RequestContext request) {
-        return null;
+        throw new UnsupportedOperationException();
     }
   
     public ResponseContext deleteEntry(RequestContext request) {
-        return null;
+        ItemTarget target = (ItemTarget) request.getTarget();
+        NoteItem item = target.getItem();
+        if (log.isDebugEnabled())
+            log.debug("deleting entry for item " + item.getUid());
+
+        ResponseContext crc = checkConditionals(request, item);
+        if (crc != null)
+            return crc;
+
+        contentService.removeItem(item);
+
+        AbstractResponseContext rc = new EmptyResponseContext(204);
+        return rc;
     }
   
     public ResponseContext deleteMedia(RequestContext request) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public ResponseContext updateEntry(RequestContext request) {
@@ -235,19 +247,19 @@ public class StandardProvider extends AbstractProvider {
     }
   
     public ResponseContext getMedia(RequestContext request) {
-        return null;
+        throw new UnsupportedOperationException();
     }
   
     public ResponseContext getCategories(RequestContext request) {
-        return null;
+        throw new UnsupportedOperationException();
     }
   
     public ResponseContext entryPost(RequestContext request) {
-        return null;
+        throw new UnsupportedOperationException();
     }
   
     public ResponseContext mediaPost(RequestContext request) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     // AbstractProvider methods

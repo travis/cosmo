@@ -27,6 +27,7 @@ import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -168,5 +169,9 @@ public class MockHelper extends TestHelper {
         throws Exception {
         NoteItem i = makeDummyItem(user);
         return (NoteItem) contentService.createContent(parent, i);
+    }
+
+    public Item findItem(String uid) {
+        return contentService.findItemByUid(uid);
     }
 }

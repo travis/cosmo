@@ -72,7 +72,7 @@ cosmo.model.declare("cosmo.model.Item", null,
    //declare other properties
   {
       initializer: function(kwArgs){
-            dojo.debug("Item Initter");
+//            dojo.debug("Item Initter");
             this.initializeProperties(kwArgs);
       }
   });
@@ -86,7 +86,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         _stamps: null,
         
         initializer: function(){
-            dojo.debug("Note Initter");
+//            dojo.debug("Note Initter");
             
             this._stamps = {};
             this._modifications = {};
@@ -96,7 +96,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             return this._stamps[stampName];
         }, 
         
-        getModification: function(/*cosmo.datetime.Date*/ instanceDate){
+        getModification: function getModification(/*cosmo.datetime.Date*/ instanceDate){
             return this._modifications[this._formatInstanceDate(instanceDate)];
         },
         
@@ -104,11 +104,11 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             this._modifications[this._formatInstanceDate(modification.getInstanceDate())] = modification;
         },
         
-        removeModification: function(/*cosmo.model.Modification*/ instanceDate){
+        removeModification: function removeModification(/*cosmo.model.Modification*/ instanceDate){
             delete(this._modifications[this._formatInstanceDate(instanceDate)]);  
         },
         
-        _formatInstanceDate: function(/*cosmo.datetime.Date*/date){
+        _formatInstanceDate: function formatInstanceDate(/*cosmo.datetime.Date*/date){
             return date.strftime(this.INSTANCE_FMT_STRING);
         },
       
@@ -138,7 +138,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         },
         
         getNoteInstance: function getNoteInstance(/*cosmo.datetime.Date*/ instanceDate){
-            dojo.debug("getNoteInstance");
+//            dojo.debug("getNoteInstance");
             return new cosmo.model.NoteInstance(this, instanceDate);
         }
     });
@@ -147,7 +147,7 @@ dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
     __noOverride:{uid:1,version:1},
     
     initializer: function noteInstanceInitializer(master, instanceDate){
-        dojo.debug("noteInstanceInitializer");
+//        dojo.debug("noteInstanceInitializer");
         this._master = master;
         this.instanceDate = instanceDate;
     },
@@ -161,15 +161,20 @@ dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
     },
     
     _getMasterProperty: function noteInstanceGetMasterProperty(propertyName){
-        dojo.debug("MASTER: " +propertyName);
+//        dojo.debug("MASTER: " +propertyName);
         return this._master.__getProperty(propertyName);
     },
     
     _getModifiedProperty: function noteInstanceGetModifiedProperty(propertyName){
-        dojo.debug("INSTANCE: " +propertyName);
+//        dojo.debug("INSTANCE: " +propertyName);
         var modification = this._master.getModification(this.instanceDate);
-        dojo.debug("MOD: " + modification);
+//        dojo.debug("MOD: " + modification);
         return modification.getModifiedProperties()[propertyName];
+    },
+    
+    _setModifiedProperty: function noteInstanceSetModifiedProperty(propertyName, value){
+        var modification = master.getModification(this.instanceDate);
+        modification[propertyName] = value;  
     },
     
     __getProperty: cosmo.model._instanceGetProperty,  

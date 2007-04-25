@@ -119,15 +119,15 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         }
     }, 
     
-    _genericGetter: function(propertyName){
+    _genericGetter: function genericGetter(propertyName){
         return this["_"+propertyName];
     },
     
-    _genericSetter: function(propertyName, value){
+    _genericSetter: function genericSetter(propertyName, value){
         this["_"+propertyName] = value;
     },
     
-    _getDefault: function(propertyName){
+    _getDefault: function getDefault(propertyName){
         var propDefault = this.__defaults[propertyName];
                     
         if (typeof(propDefault) == "function"){
@@ -209,18 +209,15 @@ cosmo.model._instanceSetProperty = function instanceSetProperty(propertyName, va
             throw new Error("You can not override property '" + propertyName +"'");
         }
 
-        var master = this._master;
-        var masterProperty = master.__getProperty(propertyName);
+        var master = this.getMaster();
+        var masterProperty = this._getMasterProperty(propertyName);
         
         //is there a modification?
         var modification = master.getModification(this.instanceDate);
         if (modification){
-            //there already is a mod, but does it override this property?
-            if (dojo.lang.has(modification, propertyName)){
-                //simply set the property on the modification
-                modification[propertyName] = value;
-                return;                    
-            }
+            //simply set the property on the modification
+            this._setModifiedProperty(propertyName, value);
+            return;                    
         }
         
         //if the new value is the same as the master property, 

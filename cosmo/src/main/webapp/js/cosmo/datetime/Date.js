@@ -230,7 +230,7 @@ cosmo.datetime.Date.prototype.setUTCAttribute = function (unit, n) {
 /**
  * Returns the time in milliseconds since January 1st, 1970 UTC.
  */
-cosmo.datetime.Date.prototype.toUTC = function() {
+cosmo.datetime.Date.prototype.toUTC = function cosmoDateToUTC() {
     var utc = Date.UTC(this.getYear(), this.getMonth(), this.getDate(),
         this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds());
     return(utc + this.getTimezoneOffsetMs());
@@ -341,17 +341,28 @@ cosmo.datetime.Date.prototype.getUserPrefTimezoneOffset = function() {
  * return no matter what your local timezone is.
  */
 cosmo.datetime.Date.prototype.strftime = function strftime(formatString){
-    if (this._strftimeCache[0] == this.hash()){
-        return this._strftimeCache[1];
+    var cached = this._getStrftimeCached(formatString);
+    if (cached){
+        return cached;
     }
-    // No need to do any mucking around with UTC offsets or anything
-    // for this function, since all we care about is the output
-    var d = new Date(this.getYear(), this.getMonth(), this.getDate(),
-        this.getHours(), this.getMinutes(), this.getSeconds());
-    var formatted = dojo.date.strftime(d, formatString);
-    this._strftimeCache = [this.hash(), formatted];
+    
+    var formatted = dojo.date.strftime(this, formatString);
+    
+    this._setStrftimeCached(formatString, formatted);
     return formatted;
 };
+
+cosmo.datetime.Date.prototype._getStrftimeCached = function(formatString){
+    if (this._strftimeCache[0] == this.hash() + ":" + formatString){
+        return this._strftimeCache[1];
+    }
+    
+    return null;
+}
+
+cosmo.datetime.Date.prototype._setStrftimeCached = function(formatString, formattedDate){
+    this._strftimeCache = [this.hash() + ":" + formatString, formattedDate];
+}
 
 /**
  * Increments by the desired number of specified units

@@ -20,18 +20,17 @@ dojo.require('dojo.event.*');
 dojo.require("dojo.gfx.color.hsv");
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
-//dojo.require("cosmo.util.date");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.ui.event.handlers');
-dojo.require('cosmo.ui.draggable');
+dojo.require('cosmo.view.cal.draggable');
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.model");
 dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.view.cal");
-dojo.require('cosmo.view.cal.Lozenge');
+dojo.require('cosmo.view.cal.lozenge');
 dojo.require("cosmo.view.cal.conflict");
 dojo.require("cosmo.ui.cal_main");
 
@@ -768,8 +767,8 @@ cosmo.view.cal.canvas = new function () {
         var id = key;
         var ev = val;
         // Create the lozenge and link it to the event
-        ev.lozenge = (ev.data.allDay || ev.data.anyTime) ? new cosmo.view.cal.NoTimeLozenge(id) :
-            new cosmo.view.cal.HasTimeLozenge(id);
+        ev.lozenge = (ev.data.allDay || ev.data.anyTime) ? new cosmo.view.cal.lozenge.NoTimeLozenge(id) :
+            new cosmo.view.cal.lozenge.HasTimeLozenge(id);
         ev.lozenge.insert(id);
     }
     /**
@@ -1111,10 +1110,10 @@ cosmo.view.cal.canvas = new function () {
                 if (Cal.currentCollection.privileges.write) {
                     // Set up Draggable and save dragMode -- user may be dragging
                     if (id.indexOf('AllDay') > -1) {
-                        dragItem = new NoTimeDraggable(s);
+                        dragItem = new cosmo.view.cal.draggable.NoTimeDraggable(s);
                     }
                     else {
-                        dragItem = new HasTimeDraggable(s);
+                        dragItem = new cosmo.view.cal.draggable.HasTimeDraggable(s);
                     }
 
                     switch(true) {
@@ -1247,7 +1246,7 @@ cosmo.view.cal.canvas = new function () {
         evSource = 'click';
         // Create the lozenge
         if (evType =='normal') {
-            lozenge = new cosmo.view.cal.HasTimeLozenge(id);
+            lozenge = new cosmo.view.cal.lozenge.HasTimeLozenge(id);
             allDay = false;
             startstr = getIndexFromHourDiv(evParam);
             dayind = extractDayIndexFromId(startstr);
@@ -1263,15 +1262,15 @@ cosmo.view.cal.canvas = new function () {
             end = cosmo.datetime.Date.add(start, dojo.date.dateParts.MINUTE, 60);
         }
         else if (evType == 'allDayMain') {
-            lozenge = new cosmo.view.cal.NoTimeLozenge(id);
+            lozenge = new cosmo.view.cal.lozenge.NoTimeLozenge(id);
             allDay = true;
             dayind = getIndexFromAllDayDiv(evParam);
             start = calcDateFromIndex(dayind);
-            start = new ScoobyDate(start.getFullYear(),
+            start = new cosmo.datetime.Date(start.getFullYear(),
                 start.getMonth(), start.getDate());
             start.hours = 0;
             start.minutes = 0;
-            end = new ScoobyDate(start.getFullYear(),
+            end = new cosmo.datetime.Date(start.getFullYear(),
                 start.getMonth(), start.getDate());
         }
 

@@ -23,7 +23,7 @@
 dojo.provide("cosmo.legacy.cal_event");
 
 dojo.require("cosmo.model");
-dojo.require('cosmo.view.cal.Lozenge');
+dojo.require('cosmo.view.cal.lozenge');
 
 /**
  * @object CalEvent -- an event on the Calendar, links to the event's
@@ -210,10 +210,10 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
         this.lozenge.remove();
         // Replace with new one
         if (this.data.allDay) {
-            this.lozenge = new cosmo.view.cal.NoTimeLozenge(this.id);
+            this.lozenge = new cosmo.view.cal.lozenge.NoTimeLozenge(this.id);
         }
         else {
-            this.lozenge = new cosmo.view.cal.HasTimeLozenge(this.id);
+            this.lozenge = new cosmo.view.cal.lozenge.HasTimeLozenge(this.id);
         }
         this.lozenge.insert(this.id);
     };

@@ -41,7 +41,7 @@ dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.contentcontainer");
 dojo.require('cosmo.view.cal');
-dojo.require('cosmo.view.cal.Lozenge');
+dojo.require('cosmo.view.cal.lozenge');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.account.create');
 

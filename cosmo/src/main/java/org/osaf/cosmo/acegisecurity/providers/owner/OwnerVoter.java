@@ -153,7 +153,7 @@ public class OwnerVoter implements AccessDecisionVoter {
             return checkOwnership(details.getUser(), item);
         }
 
-        ItemPath ip = ItemPath.parse(path);
+        ItemPath ip = ItemPath.parse(path, true);
         if (ip != null) {
             // find directly addressed item
             item = contentService.findItemByUid(ip.getUid());

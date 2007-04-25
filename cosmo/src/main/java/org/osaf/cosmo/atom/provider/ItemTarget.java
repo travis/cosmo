@@ -15,24 +15,48 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.protocol.server.provider.AbstractTarget;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
+import org.apache.abdera.protocol.server.provider.TargetType;
+import org.apache.abdera.util.Constants;
 
 import org.osaf.cosmo.model.NoteItem;
 
-public class ItemTarget extends AbstractTarget {
+public class ItemTarget extends BaseItemTarget implements Constants {
 
     private NoteItem item;
 
-    public ItemTarget(TargetType type,
-                      RequestContext request,
+    public ItemTarget(RequestContext request,
                       NoteItem item) {
-        super(type, request);
+        this(request, item, null, null);
+    }
+
+    public ItemTarget(RequestContext request,
+                      NoteItem item,
+                      String projection,
+                      String format) {
+        super(type(request), request, projection, format);
         this.item = item;
     }
 
     public NoteItem getItem() {
         return item;
+    }
+
+    private static TargetType type(RequestContext request) {
+        // on a write operation, the content type distinguishes
+        // between entry and media
+        if (request.getMethod().equals("PUT")) {
+            try {
+                if (request.getContentType() != null &&
+                    request.getContentType().match(ATOM_MEDIA_TYPE))
+                    return TargetType.TYPE_ENTRY;
+            } catch (Exception e) {
+                // missing or invalid content type - treat as media
+            }
+            return TargetType.TYPE_MEDIA;
+        }
+        // all read operations return entries
+        return TargetType.TYPE_ENTRY;
     }
 }

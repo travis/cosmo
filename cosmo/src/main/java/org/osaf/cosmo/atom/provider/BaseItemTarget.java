@@ -15,29 +15,34 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import org.apache.abdera.protocol.server.provider.AbstractTarget;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 
-import org.osaf.cosmo.model.CollectionItem;
+public class BaseItemTarget extends AbstractTarget {
 
-public class CollectionTarget extends BaseItemTarget {
+    private String projection;
+    private String format;
 
-    private CollectionItem collection;
-
-    public CollectionTarget(RequestContext request,
-                            CollectionItem collection) {
-        this(request, collection, null, null);
+    public BaseItemTarget(TargetType type,
+                          RequestContext request) {
+        this(type, request, null, null);
     }
 
-    public CollectionTarget(RequestContext request,
-                            CollectionItem collection,
-                            String projection,
-                            String format) {
-        super(TargetType.TYPE_COLLECTION, request, projection, format);
-        this.collection = collection;
+    public BaseItemTarget(TargetType type,
+                          RequestContext request,
+                          String projection,
+                          String format) {
+        super(type, request);
+        this.projection = projection;
+        this.format = format;
     }
 
-    public CollectionItem getCollection() {
-        return collection;
+    public String getProjection() {
+        return projection;
+    }
+
+    public String getFormat() {
+        return format;
     }
 }

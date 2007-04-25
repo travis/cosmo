@@ -50,6 +50,8 @@ public abstract class BaseFeedGenerator
     private ContentFactory contentFactory;
     private ServiceLocator serviceLocator;
 
+    // FeedGenerator methods
+
     /** */
     public BaseFeedGenerator(Factory abderaFactory,
                              ContentFactory contentFactory,
@@ -80,6 +82,19 @@ public abstract class BaseFeedGenerator
 
         return feed;
     }
+
+    /**
+     * Generates an Atom entry representing the item.
+     *
+     * @param item the item which the entry describes
+     * @throws GeneratorException
+     */
+    public Entry generateEntry(NoteItem item)
+        throws GeneratorException {
+        return createEntry(item);
+    }
+
+    // our methods
 
     /**
      * Creates a <code>Feed</code> with attributes set based on the

@@ -67,7 +67,7 @@ public class StandardTargetResolver implements TargetResolver {
         if (cp != null)
             return createCollectionTarget(context, cp);
 
-        ItemPath ip = ItemPath.parse(uri);
+        ItemPath ip = ItemPath.parse(uri, true);
         if (ip != null)
             return createItemTarget(context, ip);
 
@@ -96,23 +96,14 @@ public class StandardTargetResolver implements TargetResolver {
         if (! (item instanceof CollectionItem))
             return null;
 
-        String projection = null;
-        String format = null;
-        if (path.getPathInfo() != null &&
-            path.getPathInfo() != "/") {
-            String[] segments = path.getPathInfo().substring(1).split("/");
-            projection = segments[0];
-            if (segments.length > 1)
-                format = segments[1];
-        }
+        TargetPathInfo info = new TargetPathInfo(path.getPathInfo());
 
-        return new CollectionTarget(context, (CollectionItem) item, projection,
-                                    format);
+        return new CollectionTarget(context, (CollectionItem) item,
+                                    info.getProjection(), info.getFormat());
     }
 
     /**
-     * Creates a target representing a non-collection item. All
-     * targets are of type {@link TargetType.ENTRY}.
+     * Creates a target representing a non-collection item.
      */
     protected Target createItemTarget(RequestContext context,
                                       ItemPath path) {
@@ -122,8 +113,10 @@ public class StandardTargetResolver implements TargetResolver {
         if (! (item instanceof NoteItem))
             return null;
 
-        // XXX check content type - could be media
-        return new ItemTarget(TargetType.TYPE_ENTRY, context, (NoteItem) item);
+        TargetPathInfo info = new TargetPathInfo(path.getPathInfo());
+
+        return new ItemTarget(context, (NoteItem) item,
+                              info.getProjection(), info.getFormat());
     }
 
     public ContentService getContentService() {
@@ -137,5 +130,27 @@ public class StandardTargetResolver implements TargetResolver {
     public void init() {
         if (contentService == null)
             throw new IllegalStateException("contentService is required");
+    }
+
+    private class TargetPathInfo {
+        private String projection;
+        private String format;
+        
+        public TargetPathInfo(String pathInfo) {
+            if (pathInfo != null && pathInfo != "/") {
+                String[] segments = pathInfo.substring(1).split("/");
+                projection = segments[0];
+                if (segments.length > 1)
+                    format = segments[1];
+            }
+        }
+
+        public String getProjection() {
+            return projection;
+        }
+
+        public String getFormat() {
+            return format;
+        }
     }
 }

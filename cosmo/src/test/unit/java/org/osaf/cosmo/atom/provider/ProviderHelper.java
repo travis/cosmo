@@ -116,7 +116,20 @@ public class ProviderHelper extends MockHelper {
                                                     String method)
         throws IOException {
         MockItemRequestContext rc =
-            new MockItemRequestContext(serviceContext, item, method);
+            new MockItemRequestContext(serviceContext, item, method, null);
+        if (method.equals("PUT"))
+            rc.setEntryContent(item);
+        return rc;
+    }
+
+    public RequestContext createEntryRequestContext(NoteItem item,
+                                                    String method,
+                                                    String projection,
+                                                    String format)
+        throws IOException {
+        MockItemRequestContext rc =
+            new MockItemRequestContext(serviceContext, item, method, null,
+                                       projection, format);
         if (method.equals("PUT"))
             rc.setEntryContent(item);
         return rc;
@@ -125,23 +138,25 @@ public class ProviderHelper extends MockHelper {
     public RequestContext createEntryRequestContext(String uid,
                                                     String method)
         throws IOException {
-        return new MockItemRequestContext(serviceContext, uid, method);
+        return new MockItemRequestContext(serviceContext, uid, method, null);
     }
 
     public RequestContext createMediaRequestContext(NoteItem item,
                                                     String method)
         throws IOException {
         MockItemRequestContext rc =
-            new MockItemRequestContext(serviceContext, item, method, true);
+            new MockItemRequestContext(serviceContext, item, method,
+                                       "text/plain");
         if (method.equals("PUT"))
-            rc.setMediaContent(item);
+            rc.setTextContent(item);
         return rc;
     }
 
     public RequestContext createMediaRequestContext(String uid,
                                                     String method)
         throws IOException {
-        return new MockItemRequestContext(serviceContext, uid, method, true);
+        return new MockItemRequestContext(serviceContext, uid, method,
+                                          "text/plain");
     }
 
     public void setIfMatch(RequestContext context,

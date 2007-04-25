@@ -203,7 +203,35 @@ public class StandardProvider extends AbstractProvider {
     }
   
     public ResponseContext getEntry(RequestContext request) {
-        return null;
+        ItemTarget target = (ItemTarget) request.getTarget();
+        NoteItem item = target.getItem();
+        if (log.isDebugEnabled())
+            log.debug("getting feed for item " + item.getUid());
+
+        ResponseContext crc = checkConditionals(request, item);
+        if (crc != null)
+            return crc;
+
+        try {
+            ServiceLocator locator = createServiceLocator(request);
+            FeedGenerator generator = createFeedGenerator(target, locator);
+            Entry entry = generator.generateEntry(item);
+
+            AbstractResponseContext rc =
+                new BaseResponseContext<Document<Element>>(entry.getDocument());
+            rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            return rc;
+        } catch (UnsupportedProjectionException e) {
+            String reason = "Projection " + target.getProjection() + " not supported";
+            return badrequest(abdera, request, reason);
+        } catch (UnsupportedFormatException e) {
+            String reason = "Format " + target.getFormat() + " not supported";
+            return badrequest(abdera, request, reason);
+        } catch (GeneratorException e) {
+            String reason = "Unknown entry generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
+        }
     }
   
     public ResponseContext getMedia(RequestContext request) {
@@ -284,7 +312,7 @@ public class StandardProvider extends AbstractProvider {
             throw new IllegalStateException("serviceLocatorFactory is required");
     }
 
-    protected FeedGenerator createFeedGenerator(CollectionTarget target,
+    protected FeedGenerator createFeedGenerator(BaseItemTarget target,
                                                 ServiceLocator locator)
         throws UnsupportedProjectionException, UnsupportedFormatException {
         return generatorFactory.createFeedGenerator(target.getProjection(),

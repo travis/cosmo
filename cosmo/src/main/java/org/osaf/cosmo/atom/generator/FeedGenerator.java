@@ -16,15 +16,19 @@
 package org.osaf.cosmo.atom.generator;
 
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.model.Entry;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
- * An interface for classes that generates Atom feeds representing
- * Cosmo collections.
+ * An interface for classes that generate Atom feeds and entries
+ * representing Cosmo collections and items.
  *
+ * @see Entry
  * @see Feed
  * @see CollectionItem
+ * @see NoteItem
  */
 public interface FeedGenerator {
 
@@ -36,5 +40,14 @@ public interface FeedGenerator {
      * @throws GeneratorException
      */
     public Feed generateFeed(CollectionItem item)
+        throws GeneratorException;
+
+    /**
+     * Generates an Atom entry representing the item.
+     *
+     * @param item the item which the entry describes
+     * @throws GeneratorException
+     */
+    public Entry generateEntry(NoteItem item)
         throws GeneratorException;
 }

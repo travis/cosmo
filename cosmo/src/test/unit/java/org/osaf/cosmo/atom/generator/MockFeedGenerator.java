@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.atom.generator.mock;
 
+import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 
 import org.apache.commons.logging.Log;
@@ -23,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.atom.generator.FeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -65,5 +67,18 @@ public class MockFeedGenerator implements FeedGenerator {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");
         return factory.getAbdera().getFactory().newFeed();
+    }
+
+    /**
+     * Generates a dummy entry with no content.
+     *
+     * @throws GeneratorException if the generator factory is in
+     * failure mode
+     */
+    public Entry generateEntry(NoteItem item)
+        throws GeneratorException {
+        if (factory.isFailureMode())
+            throw new GeneratorException("Failure mode");
+        return factory.getAbdera().getFactory().newEntry();
     }
 }

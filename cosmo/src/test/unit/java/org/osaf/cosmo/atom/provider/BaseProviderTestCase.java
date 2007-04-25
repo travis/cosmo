@@ -20,6 +20,8 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomHelper;
+
 /**
  * Base class for for {@link StandardProvider} tests.
  */
@@ -28,10 +30,10 @@ public class BaseProviderTestCase extends TestCase {
         LogFactory.getLog(BaseProviderTestCase.class);
 
     protected StandardProvider provider;
-    protected ProviderHelper helper;
+    protected AtomHelper helper;
 
     protected void setUp() throws Exception {
-        helper = new ProviderHelper();
+        helper = new AtomHelper();
         helper.setUp();
 
         provider = new StandardProvider();

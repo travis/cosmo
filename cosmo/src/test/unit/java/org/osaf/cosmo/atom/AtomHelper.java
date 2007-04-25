@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.atom.provider;
+package org.osaf.cosmo.atom;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.protocol.server.ServiceContext;
-import org.apache.abdera.protocol.server.DefaultServiceContext;
+import org.apache.abdera.protocol.server.provider.Provider;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 
@@ -33,9 +33,12 @@ import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.atom.generator.mock.MockGeneratorFactory;
 import org.osaf.cosmo.atom.processor.ProcessorFactory;
 import org.osaf.cosmo.atom.processor.mock.MockProcessorFactory;
+import org.osaf.cosmo.atom.provider.StandardTargetResolver;
 import org.osaf.cosmo.atom.provider.mock.BaseMockRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
+import org.osaf.cosmo.atom.provider.mock.MockProviderManager;
+import org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
@@ -44,37 +47,33 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * A utility class that provides the dependent objects required
- * by a {@link Provider} to execute its methods. These dependencies
- * are mock objects intended for use with unit tests. The helper also
- * provides convenience methods for setting up test data in the mock
- * storage layer.
+ * by framework classes. These dependencies are mock objects intended
+ * for use with unit tests. The helper also provides convenience
+ * methods for setting up test data in the mock storage layer.
  */
-public class ProviderHelper extends MockHelper {
-    private static final Log log = LogFactory.getLog(ProviderHelper.class);
+public class AtomHelper extends MockHelper {
+    private static final Log log = LogFactory.getLog(AtomHelper.class);
 
     private Abdera abdera;
     private MockGeneratorFactory generatorFactory;
     private MockProcessorFactory processorFactory;
-    private ServiceContext serviceContext;
+    private StandardServiceContext serviceContext;
 
-    public ProviderHelper() {
+    public AtomHelper() {
         super();
-    }
-
-    protected void setUp() throws Exception {
-        super.setUp();
 
         abdera = new Abdera();
 
         generatorFactory = new MockGeneratorFactory(abdera);
         processorFactory = new MockProcessorFactory();
 
-        serviceContext = new DefaultServiceContext();
-        serviceContext.init(abdera, null);
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
+        serviceContext = new StandardServiceContext();
+        serviceContext.setAbdera(abdera);
+        serviceContext.setProviderManager(new MockProviderManager());
+        // XXX mock these up
+        serviceContext.setRequestHandlerManager(new StandardRequestHandlerManager());
+        serviceContext.setTargetResolver(new StandardTargetResolver());
+        serviceContext.init();
     }
 
     public Abdera getAbdera() {
@@ -91,6 +90,10 @@ public class ProviderHelper extends MockHelper {
 
     public ServiceContext getServiceContext() {
         return serviceContext;
+    }
+
+    public Provider getProvider() {
+        return serviceContext.getProviderManager().getProvider();
     }
 
     public RequestContext createFeedRequestContext(CollectionItem collection,

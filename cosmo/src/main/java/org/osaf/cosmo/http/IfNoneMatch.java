@@ -15,19 +15,19 @@
  */
 package org.osaf.cosmo.http;
 
+import java.text.ParseException;
+
 import org.apache.abdera.protocol.EntityTag;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.model.Item;
-
 /**
  * <p>
  * Models the HTTP <code>If-None-Match</code> request
  * header. Described in RFC 2616 section 14.26, this header is used to
- * make the execution of a method conditional based on the state of an
- * item.
+ * make the execution of a method conditional based on the state of a
+ * resource.
  * </p>
  */
 public class IfNoneMatch {
@@ -36,16 +36,21 @@ public class IfNoneMatch {
     private boolean all;
     private EntityTag[] etags;
 
-    public IfNoneMatch(String header) {
-        if (header == null) {
-            all = false;
-            etags = new EntityTag[0];
-        } else if (header.equals("*")) {
-            all = true;
-            etags = new EntityTag[0];
-        } else {
-            all = false;
-            etags = EntityTag.parseTags(header);
+    public IfNoneMatch(String header)
+        throws ParseException {
+        try {
+            if (header == null) {
+                all = false;
+                etags = new EntityTag[0];
+            } else if (header.equals("*")) {
+                all = true;
+                etags = new EntityTag[0];
+            } else {
+                all = false;
+                etags = EntityTag.parseTags(header);
+            }
+        } catch (IllegalArgumentException e) {
+            throw new ParseException("Invalid entity tag in If-None-Match header", 0);
         }
     }
 
@@ -75,22 +80,22 @@ public class IfNoneMatch {
      * @param etag the tag for the entity being examined
      * @return true if the server may execute the method, false if not
      */
-    public boolean allowMethod(Item item) {
+    public boolean allowMethod(EntityTag etag) {
         if (!all && etags.length == 0)
             return true;
 
         if (all)
-            return item == null;
+            return etag == null;
 
-        EntityTag itemEtag = new EntityTag(item.getEntityTag());
-        return ! EntityTag.matchesAny(itemEtag, etags);
+        return ! EntityTag.matchesAny(etag, etags);
     }
 
     /**
-     * @see allowMethod(String, String)
+     * @see allowMethod(EntityTag)
      */
     public static boolean allowMethod(String header,
-                                      Item item) {
-        return new IfNoneMatch(header).allowMethod(item);
+                                      EntityTag etag)
+        throws ParseException {
+        return new IfNoneMatch(header).allowMethod(etag);
     }
 }

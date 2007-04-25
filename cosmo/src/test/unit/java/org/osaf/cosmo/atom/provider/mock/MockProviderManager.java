@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.atom.mock;
+package org.osaf.cosmo.atom.provider.mock;
 
 import org.apache.abdera.protocol.server.provider.Provider;
 import org.apache.abdera.protocol.server.util.AbstractSingletonProviderManager;

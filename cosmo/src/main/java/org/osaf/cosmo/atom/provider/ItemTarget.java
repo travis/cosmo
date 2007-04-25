@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 import org.apache.abdera.protocol.server.provider.TargetType;
@@ -41,6 +42,10 @@ public class ItemTarget extends BaseItemTarget implements Constants {
 
     public NoteItem getItem() {
         return item;
+    }
+
+    public EntityTag getEntityTag() {
+        return item != null ? new EntityTag(item.getEntityTag()) : null;
     }
 
     private static TargetType type(RequestContext request) {

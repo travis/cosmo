@@ -37,8 +37,6 @@ import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.http.IfMatch;
-import org.osaf.cosmo.http.IfNoneMatch;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.atom.generator.FeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
@@ -77,10 +75,6 @@ public class StandardProvider extends AbstractProvider {
         if (log.isDebugEnabled())
             log.debug("deleting entry for item " + item.getUid());
 
-        ResponseContext crc = checkConditionals(request, item);
-        if (crc != null)
-            return crc;
-
         contentService.removeItem(item);
 
         AbstractResponseContext rc = new EmptyResponseContext(204);
@@ -96,10 +90,6 @@ public class StandardProvider extends AbstractProvider {
         NoteItem item = target.getItem();
         if (log.isDebugEnabled())
             log.debug("updating entry for item " + item.getUid());
-
-        ResponseContext crc = checkConditionals(request, item);
-        if (crc != null)
-            return crc;
 
         // XXX: check write preconditions?
 
@@ -139,10 +129,6 @@ public class StandardProvider extends AbstractProvider {
         NoteItem item = target.getItem();
         if (log.isDebugEnabled())
             log.debug("updating media for item " + item.getUid());
-
-        ResponseContext crc = checkConditionals(request, item);
-        if (crc != null)
-            return crc;
 
         // XXX: check write preconditions?
 
@@ -188,10 +174,6 @@ public class StandardProvider extends AbstractProvider {
         if (log.isDebugEnabled())
             log.debug("getting feed for collection " + collection.getUid());
 
-        ResponseContext crc = checkConditionals(request, collection);
-        if (crc != null)
-            return crc;
-
         try {
             ServiceLocator locator = createServiceLocator(request);
             FeedGenerator generator = createFeedGenerator(target, locator);
@@ -219,10 +201,6 @@ public class StandardProvider extends AbstractProvider {
         NoteItem item = target.getItem();
         if (log.isDebugEnabled())
             log.debug("getting feed for item " + item.getUid());
-
-        ResponseContext crc = checkConditionals(request, item);
-        if (crc != null)
-            return crc;
 
         try {
             ServiceLocator locator = createServiceLocator(request);
@@ -356,20 +334,5 @@ public class StandardProvider extends AbstractProvider {
                                                  String reason) {
         return returnBase(createErrorDocument(abdera, 412, reason, null),
                           412, null);
-    }
-
-    protected ResponseContext checkConditionals(RequestContext request,
-                                                Item item) {
-        if (! IfMatch.allowMethod(request.getIfMatch(), item)) {
-            String reason = "If-Match disallows conditional request";
-            return preconditionfailed(abdera, request, reason);
-        }
-        
-        if (! IfNoneMatch.allowMethod(request.getIfNoneMatch(), item)) {
-            String reason = "If-None-Match disallows conditional request";
-            return preconditionfailed(abdera, request, reason);
-        }
-
-        return null;
     }
 }

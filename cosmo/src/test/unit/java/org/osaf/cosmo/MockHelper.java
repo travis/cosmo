@@ -90,13 +90,13 @@ public class MockHelper extends TestHelper {
         userService.init();
     }
 
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         user = makeDummyUser();
         userService.createUser(user);
         homeCollection = contentService.getRootItem(user);
     }
 
-    protected void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         userService.removeUser(user);
         userService.destroy();
         contentService.destroy();
@@ -171,7 +171,7 @@ public class MockHelper extends TestHelper {
         return (NoteItem) contentService.createContent(parent, i);
     }
 
-    public Item findItem(String uid) {
-        return contentService.findItemByUid(uid);
+    public NoteItem findItem(String uid) {
+        return (NoteItem) contentService.findItemByUid(uid);
     }
 }

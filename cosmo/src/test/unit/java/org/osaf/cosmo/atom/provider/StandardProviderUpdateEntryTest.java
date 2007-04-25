@@ -22,7 +22,6 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -41,72 +40,6 @@ public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
-    }
-
-    public void testIfMatchAll() throws Exception {
-        NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "PUT");
-        helper.rememberMediaType(Content.Type.TEXT.toString());
-        helper.setIfMatch(req, "*");
-
-        ResponseContext res = provider.updateEntry(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 204, res.getStatus());
-    }
-
-    public void testIfMatchOk() throws Exception {
-        NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "PUT");
-        helper.rememberMediaType(Content.Type.TEXT.toString());
-        helper.setIfMatch(req, item);
-
-        ResponseContext res = provider.updateEntry(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 204, res.getStatus());
-    }
-
-    public void testIfMatchNotOk() throws Exception {
-        NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "PUT");
-        helper.rememberMediaType(Content.Type.TEXT.toString());
-        helper.setIfMatch(req, "aeiou");
-
-        ResponseContext res = provider.updateEntry(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 412, res.getStatus());
-    }
-
-    public void testIfNoneMatchAll() throws Exception {
-        NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "PUT");
-        helper.rememberMediaType(Content.Type.TEXT.toString());
-        helper.setIfNoneMatch(req, "*");
-
-        ResponseContext res = provider.updateEntry(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 412, res.getStatus());
-    }
-
-    public void testIfNoneMatchNotOk() throws Exception {
-        NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "PUT");
-        helper.rememberMediaType(Content.Type.TEXT.toString());
-        helper.setIfNoneMatch(req, item);
-
-        ResponseContext res = provider.updateEntry(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 412, res.getStatus());
-    }
-
-    public void testIfNoneMatchOk() throws Exception {
-        NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "PUT");
-        helper.rememberMediaType(Content.Type.TEXT.toString());
-        helper.setIfNoneMatch(req, "aeiou");
-
-        ResponseContext res = provider.updateEntry(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 204, res.getStatus());
     }
 
     public void testUnsupportedMediaType() throws Exception {

@@ -544,7 +544,11 @@
       </bean>
     </property>
     <property name="requestHandlerManager">
-      <bean class="org.apache.abdera.protocol.server.servlet.DefaultRequestHandlerManager"/>
+      <bean class="org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager">
+        <property name="requestHandler">
+          <bean class="org.osaf.cosmo.atom.servlet.StandardRequestHandler"/>
+        </property>
+      </bean>
     </property>
     <property name="targetResolver">
       <bean class="org.osaf.cosmo.atom.provider.StandardTargetResolver">

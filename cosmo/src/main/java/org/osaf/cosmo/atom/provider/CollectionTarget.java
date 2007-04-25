@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 
@@ -39,5 +40,10 @@ public class CollectionTarget extends BaseItemTarget {
 
     public CollectionItem getCollection() {
         return collection;
+    }
+
+    public EntityTag getEntityTag() {
+        return collection != null ?
+            new EntityTag(collection.getEntityTag()) : null;
     }
 }

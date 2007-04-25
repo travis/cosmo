@@ -15,11 +15,12 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.AbstractTarget;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 
-public class BaseItemTarget extends AbstractTarget {
+public abstract class BaseItemTarget extends AbstractTarget {
 
     private String projection;
     private String format;
@@ -45,4 +46,6 @@ public class BaseItemTarget extends AbstractTarget {
     public String getFormat() {
         return format;
     }
+
+    public abstract EntityTag getEntityTag();
 }

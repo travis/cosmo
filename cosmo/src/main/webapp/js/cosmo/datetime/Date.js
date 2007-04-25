@@ -93,6 +93,7 @@ cosmo.datetime.Date = function () {
     this.utc = utc || false;
     
     this.setFromDateObjProxy(dt);
+    this._strftimeCache = [null, null];
 }
 
 //This is just an alias from ScoobyDate to comso.datetime.Date for use while we
@@ -339,12 +340,17 @@ cosmo.datetime.Date.prototype.getUserPrefTimezoneOffset = function() {
  * Date is "1/2/2006 19:30", than that is the date that this function will
  * return no matter what your local timezone is.
  */
-cosmo.datetime.Date.prototype.strftime = function(formatString){
+cosmo.datetime.Date.prototype.strftime = function strftime(formatString){
+    if (this._strftimeCache[0] == this.hash()){
+        return this._strftimeCache[1];
+    }
     // No need to do any mucking around with UTC offsets or anything
     // for this function, since all we care about is the output
     var d = new Date(this.getYear(), this.getMonth(), this.getDate(),
         this.getHours(), this.getMinutes(), this.getSeconds());
-    return dojo.date.strftime(d, formatString);
+    var formatted = dojo.date.strftime(d, formatString);
+    this._strftimeCache = [this.hash(), formatted];
+    return formatted;
 };
 
 /**
@@ -459,6 +465,18 @@ return  that != null &&
 
 }
 
+cosmo.datetime.Date.prototype.hash = function dateHash(){
+    var hash =   this.year + ":" 
+               + this.month + ":"    
+               + this.date + ":"    
+               + this.hours + ":"    
+               + this.minutes + ":"    
+               + this.seconds + ":"    
+               + this.milliseconds + ":"
+               + this.tzId;  
+    return hash;
+}
+
 // Date static methods
 // ===========================
 cosmo.datetime.Date.clone = function(sdt) {
@@ -531,5 +549,6 @@ cosmo.datetime.Date.add = function(dt, interv, incr) {
         throw('dt is not a usable Date object.');
     }
 }
+
 cosmo.util.debug.aliasToDeprecatedFuncion(
     cosmo.datetime.Date.add, "ScoobyDate.add", "0.6");

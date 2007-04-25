@@ -179,7 +179,7 @@ public class MockDaoStorage {
             }
         }
 
-        item.setModifiedDate(item.getCreationDate());
+        item.setModifiedDate(new Date());
 
         String path = "";
         if (parentItem != null)

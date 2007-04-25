@@ -23,6 +23,9 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.ItemTranslator;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EventExceptionStamp;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -34,6 +37,36 @@ import org.osaf.cosmo.model.NoteItem;
  */
 public abstract class BaseEimProcessor extends BaseContentProcessor {
     private static final Log log = LogFactory.getLog(BaseEimProcessor.class);
+
+    // ContentProcessor methods
+
+    /**
+     * Process a content body describing an item to be added as a
+     * child of the given collection.
+     *
+     * @param content the content
+     * @param collection the parent of the new item
+     * @throws ValidationException if the content is not a valid
+     * representation of an item
+     * @throws ProcessorException
+     * @return the new item
+     */
+    public NoteItem processCreation(Reader content,
+                                    CollectionItem collection)
+        throws ValidationException, ProcessorException {
+        EimRecordSet recordset = readRecordSet(content);
+
+        try {
+            NoteItem child = createChild(collection, recordset);
+            ItemTranslator translator = new ItemTranslator(child);
+            translator.applyRecords(recordset);
+            return child;
+        } catch (EimValidationException e) {
+            throw new ValidationException("Invalid recordset", e);
+        } catch (Exception e) {
+            throw new ProcessorException("Unable to apply recordset", e);
+        }
+    }
 
     /**
      * Process an EIMML content body describing changes to an item.
@@ -60,6 +93,8 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
         }
     }
 
+    // our methods
+
     /**
      * Converts the content body into a valid EIM record set.
      *
@@ -69,4 +104,36 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
      */
     protected abstract EimRecordSet readRecordSet(Reader content)
         throws ValidationException, ProcessorException;
+
+    private NoteItem createChild(CollectionItem collection,
+                                 EimRecordSet recordset)
+        throws ValidationException {
+        NoteItem child = new NoteItem();
+
+        child.setName(recordset.getUuid());
+        child.setDisplayName(recordset.getUuid());
+        child.setUid(recordset.getUuid());
+        child.setOwner(collection.getOwner());
+
+        // if the item is a modification, relate it to the item it
+        // modifies
+        if (child.getUid().
+            indexOf(EventExceptionStamp.RECURRENCEID_DELIMITER) > 0) {
+            String masterUid = child.getUid().
+                split(EventExceptionStamp.RECURRENCEID_DELIMITER)[0];
+            for (Item sibling : collection.getChildren()) {
+                if (sibling.getUid().equals(masterUid)) {
+                    if (! (sibling instanceof NoteItem))
+                        throw new ValidationException("Modification master item " + sibling.getUid() + " is not a note item");
+                    child.setModifies((NoteItem)sibling);
+                }
+            }
+             
+        }     
+
+        child.getParents().add(collection);
+        collection.getChildren().add(child);
+
+        return child;
+    }
 }

@@ -15,7 +15,11 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
+import java.io.IOException;
+
+import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.ServiceContext;
+import org.apache.abdera.util.Constants;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,7 +30,8 @@ import org.osaf.cosmo.model.CollectionItem;
 /**
  * Mock implementation of {@link RequestContext}.
  */
-public class MockCollectionRequestContext extends BaseMockRequestContext {
+public class MockCollectionRequestContext extends BaseMockRequestContext
+    implements Constants {
     private static final Log log =
         LogFactory.getLog(MockCollectionRequestContext.class);
 
@@ -68,5 +73,23 @@ public class MockCollectionRequestContext extends BaseMockRequestContext {
         CollectionItem collection = new CollectionItem();
         collection.setUid(uid);
         return collection;
+    }
+
+    public void setEntryContent(String content)
+        throws IOException {
+        Entry entry = context.getAbdera().getFactory().newEntry();
+        entry.setContent(content);
+        String xml = (String)
+            context.getAbdera().getWriterFactory().getWriter().write(entry);
+        getMockRequest().setContent(xml.getBytes());
+        getMockRequest().setContentType(ATOM_MEDIA_TYPE);
+        getMockRequest().addHeader("Content-Type", ATOM_MEDIA_TYPE);
+    }
+
+    public void setTextContent(String content)
+        throws IOException {
+        getMockRequest().setContent(content.getBytes());
+        getMockRequest().setContentType("text/plain");
+        getMockRequest().addHeader("Content-Type", "text/plain");
     }
 }

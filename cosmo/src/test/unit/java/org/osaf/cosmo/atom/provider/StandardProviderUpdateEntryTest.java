@@ -34,7 +34,6 @@ public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
     public void testUpdateEntry() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "PUT");
-        helper.rememberMediaType(Content.Type.TEXT.toString());
 
         ResponseContext res = provider.updateEntry(req);
         assertNotNull("Null response context", res);
@@ -45,7 +44,7 @@ public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
     public void testUnsupportedMediaType() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "PUT");
-        // no known projections or formats
+        helper.forgetMediaTypes();
 
         ResponseContext res = provider.updateEntry(req);
         assertNotNull("Null response context", res);
@@ -55,7 +54,6 @@ public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
     public void testInvalidContent() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "PUT");
-        helper.rememberMediaType(Content.Type.TEXT.toString());
         helper.enableProcessorValidationError();
 
         ResponseContext res = provider.updateEntry(req);
@@ -66,11 +64,16 @@ public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
     public void testProcessingError() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "PUT");
-        helper.rememberMediaType(Content.Type.TEXT.toString());
         helper.enableProcessorFailure();
 
         ResponseContext res = provider.updateEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
+    }
+
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        helper.rememberMediaType(Content.Type.TEXT.toString());
     }
 }

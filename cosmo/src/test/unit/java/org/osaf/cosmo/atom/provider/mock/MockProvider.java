@@ -37,7 +37,10 @@ public class MockProvider implements Provider {
     private boolean failureMode;
 
     public ResponseContext createEntry(RequestContext request) {
-        return null;
+        if (failureMode)
+            throw new RuntimeException("failure mode engaged");
+
+        return new EmptyResponseContext(201);
     }
   
     public ResponseContext deleteEntry(RequestContext request) {

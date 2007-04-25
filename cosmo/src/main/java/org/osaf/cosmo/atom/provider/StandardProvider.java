@@ -37,6 +37,7 @@ import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.atom.generator.FeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
@@ -48,13 +49,15 @@ import org.osaf.cosmo.atom.processor.ProcessorFactory;
 import org.osaf.cosmo.atom.processor.UnsupportedMediaTypeException;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
 
-public class StandardProvider extends AbstractProvider {
+public class StandardProvider extends AbstractProvider
+    implements AtomConstants {
     private static final Log log = LogFactory.getLog(StandardProvider.class);
 
     private Abdera abdera;
@@ -66,9 +69,70 @@ public class StandardProvider extends AbstractProvider {
     // Provider methods
 
     public ResponseContext createEntry(RequestContext request) {
-        throw new UnsupportedOperationException();
+        CollectionTarget target = (CollectionTarget) request.getTarget();
+        CollectionItem collection = target.getCollection();
+        if (log.isDebugEnabled())
+            log.debug("creating entry in collection " + collection.getUid());
+
+        // XXX: check write preconditions?
+
+        NoteItem item = null;
+        try {
+            // XXX: does abdera automatically resolve external content?
+            Entry entry = (Entry) request.getDocument().getRoot();
+            ContentProcessor processor = createContentProcessor(entry);
+            item = processor.processCreation(entry.getContent(), collection);
+            item = (NoteItem) contentService.createContent(collection, item);
+        } catch (UnsupportedMediaTypeException e) {
+            return notsupported(abdera, request, "invalid content type " + e.getMediaType());
+        } catch (ValidationException e) {
+            String reason = "Invalid content: ";
+            if (e.getCause() != null)
+                reason = reason + e.getCause().getMessage();
+            else
+                reason = reason + e.getMessage();
+            return badrequest(abdera, request, reason);
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
+        } catch (ProcessorException e) {
+            String reason = "Unknown content processing error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
+        } catch (CollectionLockedException e) {
+            return locked(abdera, request);
+        }
+
+        ItemTarget itemTarget =
+            new ItemTarget(request, item, PROJECTION_FULL, null);
+        try {
+            ServiceLocator locator = createServiceLocator(request);
+            FeedGenerator generator = createFeedGenerator(itemTarget, locator);
+            Entry entry = generator.generateEntry(item);
+
+            AbstractResponseContext rc =
+                new BaseResponseContext<Document<Element>>(entry.getDocument());
+            rc.setStatus(201);
+            rc.setStatusText("Created");
+            rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            rc.setLocation(entry.getSelfLink().toString());
+            rc.setContentLocation(entry.getSelfLink().toString());
+
+            return rc;
+        } catch (UnsupportedProjectionException e) {
+            // won't happen
+            throw new RuntimeException(e);
+        } catch (UnsupportedFormatException e) {
+            // won't happen
+            throw new RuntimeException(e);
+        } catch (GeneratorException e) {
+            String reason = "Unknown entry generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
+        }
     }
-  
+
     public ResponseContext deleteEntry(RequestContext request) {
         ItemTarget target = (ItemTarget) request.getTarget();
         NoteItem item = target.getItem();
@@ -334,5 +398,12 @@ public class StandardProvider extends AbstractProvider {
                                                  String reason) {
         return returnBase(createErrorDocument(abdera, 412, reason, null),
                           412, null);
+    }
+
+    protected ResponseContext locked(Abdera abdera,
+                                     RequestContext request) {
+        return returnBase(createErrorDocument(abdera, 423, "Collection Locked",
+                                              null),
+                          423, null);
     }
 }

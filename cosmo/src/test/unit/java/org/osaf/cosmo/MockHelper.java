@@ -149,6 +149,10 @@ public class MockHelper extends TestHelper {
         return contentService.createCollection(parent, c);
     }
 
+    public void lockCollection(CollectionItem collection) {
+        contentService.getLockManager().lockCollection(collection);
+    }
+
     public ContentItem makeAndStoreDummyContent()
         throws Exception {
         return makeAndStoreDummyContent(homeCollection);

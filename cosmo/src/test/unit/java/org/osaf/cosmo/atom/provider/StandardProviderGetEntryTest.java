@@ -34,8 +34,6 @@ public class StandardProviderGetEntryTest extends BaseProviderTestCase {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "GET",
                                                               "yyz", "eff");
-        helper.rememberProjection("yyz");
-        helper.rememberFormat("eff");
 
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
@@ -47,7 +45,7 @@ public class StandardProviderGetEntryTest extends BaseProviderTestCase {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "GET",
                                                               "yyz", "eff");
-        // no known projections or formats
+        helper.forgetProjections();
 
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
@@ -59,8 +57,7 @@ public class StandardProviderGetEntryTest extends BaseProviderTestCase {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "GET",
                                                               "yyz", "eff");
-        helper.rememberProjection("yyz");
-        // no known formats
+        helper.forgetFormats();
 
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
@@ -72,13 +69,18 @@ public class StandardProviderGetEntryTest extends BaseProviderTestCase {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "GET",
                                                               "yyz", "eff");
-        helper.rememberProjection("yyz");
-        helper.rememberFormat("eff");
         helper.enableGeneratorFailure();
 
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
         log.error(helper.getContent(res));
+    }
+
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        helper.rememberProjection("yyz");
+        helper.rememberFormat("eff");
     }
 }

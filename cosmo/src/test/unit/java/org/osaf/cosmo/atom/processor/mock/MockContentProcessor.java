@@ -17,12 +17,14 @@ package org.osaf.cosmo.atom.processor.mock;
 
 import java.io.Reader;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.processor.BaseContentProcessor;
 import org.osaf.cosmo.atom.processor.ProcessorException;
 import org.osaf.cosmo.atom.processor.ValidationException;
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -36,6 +38,39 @@ public class MockContentProcessor extends BaseContentProcessor {
 
     public MockContentProcessor(MockProcessorFactory factory) {
         this.factory = factory;
+    }
+
+    /**
+     * Returns a dummy item. The given content is used to populate the
+     * item's name and UID.
+     *
+     * @param content the content
+     * @param collection the parent of the new item
+     * @throws ValidationException if the content is not a valid
+     * representation of an item
+     * @throws ProcessorException
+     * @return the new item
+     */
+    public NoteItem processCreation(Reader content,
+                                    CollectionItem collection)
+        throws ValidationException, ProcessorException {
+        if (factory.isValidationErrorMode())
+            throw new ValidationException("Validation error mode");
+        if (factory.isFailureMode())
+            throw new ProcessorException("Failure mode");
+
+        try {
+            String uid = IOUtils.toString(content);
+
+            NoteItem child = new NoteItem();
+            child.setUid(uid);
+            child.setName(uid);
+            child.setOwner(collection.getOwner());
+
+            return child;
+        } catch (Exception e) {
+            throw new ProcessorException("Cannot create child item", e);
+        }
     }
 
     /**

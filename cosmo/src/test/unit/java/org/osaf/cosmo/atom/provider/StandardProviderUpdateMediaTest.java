@@ -33,19 +33,17 @@ public class StandardProviderUpdateMediaTest extends BaseProviderTestCase {
     public void testUpdateMedia() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createMediaRequestContext(item, "PUT");
-        helper.rememberMediaType("text/plain");
 
         ResponseContext res = provider.updateMedia(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
-        res.writeTo(System.out);
     }
 
     public void testUnsupportedMediaType() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createMediaRequestContext(item, "PUT");
-        // no known projections or formats
+        helper.forgetMediaTypes();
 
         ResponseContext res = provider.updateMedia(req);
         assertNotNull("Null response context", res);
@@ -55,7 +53,6 @@ public class StandardProviderUpdateMediaTest extends BaseProviderTestCase {
     public void testInvalidContent() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createMediaRequestContext(item, "PUT");
-        helper.rememberMediaType("text/plain");
         helper.enableProcessorValidationError();
 
         ResponseContext res = provider.updateMedia(req);
@@ -66,11 +63,16 @@ public class StandardProviderUpdateMediaTest extends BaseProviderTestCase {
     public void testProcessingError() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createMediaRequestContext(item, "PUT");
-        helper.rememberMediaType("text/plain");
         helper.enableProcessorFailure();
 
         ResponseContext res = provider.updateMedia(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
+    }
+
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        helper.rememberMediaType("text/plain");
     }
 }

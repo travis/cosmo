@@ -17,6 +17,7 @@ package org.osaf.cosmo.atom.processor;
 
 import java.io.Reader;
 
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -26,6 +27,36 @@ import org.osaf.cosmo.model.NoteItem;
  * @see NoteItem
  */
 public interface ContentProcessor {
+
+    /**
+     * Process a content body describing an item to be added as a
+     * child of the given collection.
+     *
+     * @param content the content
+     * @param collection the parent of the new item
+     * @throws ValidationException if the content is not a valid
+     * representation of an item
+     * @throws ProcessorException
+     * @return the new item
+     */
+    public NoteItem processCreation(Reader content,
+                                    CollectionItem collection)
+        throws ValidationException, ProcessorException;
+
+    /**
+     * Process a content body describing an item to be added as a
+     * child of the given collection.
+     *
+     * @param content the content
+     * @param collection the parent of the new item
+     * @throws ValidationException if the content is not a valid
+     * representation of an item
+     * @throws ProcessorException
+     * @return the new item
+     */
+    public NoteItem processCreation(String content,
+                                    CollectionItem collection)
+        throws ValidationException, ProcessorException;
 
     /**
      * Process a content body describing changes to an item.

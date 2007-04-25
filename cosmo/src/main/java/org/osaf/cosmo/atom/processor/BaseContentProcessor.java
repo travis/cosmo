@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.CollectionItem;
 
 /**
  * A base class for implementations of {@link ContentProcessor}.
@@ -30,6 +31,23 @@ import org.osaf.cosmo.model.NoteItem;
 public abstract class BaseContentProcessor implements ContentProcessor {
     private static final Log log =
         LogFactory.getLog(BaseContentProcessor.class);
+
+    /**
+     * Process a content body describing an item to be added as a
+     * child of the given collection.
+     *
+     * @param content the content
+     * @param collection the parent of the new item
+     * @throws ValidationException if the content is not a valid
+     * representation of an item
+     * @throws ProcessorException
+     * @return the new item
+     */
+    public NoteItem processCreation(String content,
+                                    CollectionItem collection)
+        throws ValidationException, ProcessorException {
+        return processCreation(new StringReader(content), collection);
+    }
 
     /**
      * Process a content body describing changes to an item.

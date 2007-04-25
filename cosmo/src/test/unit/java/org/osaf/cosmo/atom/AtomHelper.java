@@ -97,17 +97,31 @@ public class AtomHelper extends MockHelper {
     }
 
     public RequestContext createFeedRequestContext(CollectionItem collection,
-                                                   String method) {
-        return new MockCollectionRequestContext(serviceContext, collection,
-                                                method);
+                                                   String method)
+        throws IOException {
+        MockCollectionRequestContext rc =
+            new MockCollectionRequestContext(serviceContext, collection,
+                                             method);
+        if (method.equals("POST")) {
+            NoteItem item = makeDummyItem(collection.getOwner());
+            rc.setEntryContent(item.getName());
+        }
+        return rc;
     }
 
     public RequestContext createFeedRequestContext(CollectionItem collection,
                                                    String method,
                                                    String projection,
-                                                   String format) {
-        return new MockCollectionRequestContext(serviceContext, collection,
-                                                method, projection, format);
+                                                   String format)
+        throws IOException {
+        MockCollectionRequestContext rc =
+            new MockCollectionRequestContext(serviceContext, collection,
+                                             method, projection, format);
+        if (method.equals("POST")) {
+            NoteItem item = makeDummyItem(collection.getOwner());
+            rc.setEntryContent(item.getName());            
+        }
+        return rc;
     }
 
     public RequestContext createFeedRequestContext(String uid,
@@ -196,8 +210,16 @@ public class AtomHelper extends MockHelper {
         generatorFactory.getProjections().add(projection);
     }
 
+    public void forgetProjections() {
+        generatorFactory.getProjections().clear();
+    }
+
     public void rememberFormat(String format) {
         generatorFactory.getFormats().add(format);
+    }
+
+    public void forgetFormats() {
+        generatorFactory.getFormats().clear();
     }
 
     public void enableGeneratorFailure() {
@@ -206,6 +228,10 @@ public class AtomHelper extends MockHelper {
 
     public void rememberMediaType(String mediaType) {
         processorFactory.getMediaTypes().add(mediaType);
+    }
+
+    public void forgetMediaTypes() {
+        processorFactory.getMediaTypes().clear();
     }
 
     public void enableProcessorFailure() {

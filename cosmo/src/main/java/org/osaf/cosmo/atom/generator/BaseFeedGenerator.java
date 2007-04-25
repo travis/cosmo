@@ -135,6 +135,7 @@ public abstract class BaseFeedGenerator
             entry.setTitle(item.getUid());
         entry.setUpdated(item.getClientModifiedDate());
         entry.setPublished(item.getClientCreationDate());
+        entry.addLink(newSelfLink(item));
         entry.addLink(newEditLink(item));
         setEntryContent(entry, item);
         // XXX add links for all parent collections, modified items

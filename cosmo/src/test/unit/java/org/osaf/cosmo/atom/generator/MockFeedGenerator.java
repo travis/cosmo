@@ -21,7 +21,7 @@ import org.apache.abdera.model.Feed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.atom.generator.FeedGenerator;
+import org.osaf.cosmo.atom.generator.BaseFeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
@@ -35,50 +35,51 @@ import org.osaf.cosmo.server.ServiceLocator;
  * @see Feed
  * @see CollectionItem
  */
-public class MockFeedGenerator implements FeedGenerator {
+public class MockFeedGenerator extends BaseFeedGenerator {
     private static final Log log = LogFactory.getLog(MockFeedGenerator.class);
 
     private MockGeneratorFactory factory;
     private String projection;
     private String format;
-    private ServiceLocator locator;
 
     /** */
     public MockFeedGenerator(MockGeneratorFactory factory,
                              String projection,
                              String format,
                              ServiceLocator locator) {
+        super(factory.getAbdera().getFactory(), null, locator);
         this.factory = factory;
         this.projection = projection;
         this.format = format;
-        this.locator = locator;
     }
 
     // FeedGenerator methods
 
-    /**
-     * Generates a dummy feed with no content.
-     *
-     * @throws GeneratorException if the generator factory is in
-     * failure mode
-     */
     public Feed generateFeed(CollectionItem item)
         throws GeneratorException {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");
-        return factory.getAbdera().getFactory().newFeed();
+        return super.generateFeed(item);
     }
 
-    /**
-     * Generates a dummy entry with no content.
-     *
-     * @throws GeneratorException if the generator factory is in
-     * failure mode
-     */
     public Entry generateEntry(NoteItem item)
         throws GeneratorException {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");
-        return factory.getAbdera().getFactory().newEntry();
+        return super.generateEntry(item);
+    }
+
+    // BaseFeedGenerator methods
+
+    protected String getProjection() { 
+        return "mock";
+    }
+
+    /**
+     * Does nothing.
+     */
+    protected void setEntryContent(Entry entry,
+                                   NoteItem item)
+        throws GeneratorException {
     }
 }

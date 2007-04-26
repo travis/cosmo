@@ -137,7 +137,11 @@ public class StandardProvider extends AbstractProvider
         if (log.isDebugEnabled())
             log.debug("deleting entry for item " + item.getUid());
 
-        contentService.removeItem(item);
+        try {
+            contentService.removeItem(item);
+        } catch (CollectionLockedException e) {
+            return locked(abdera, request);
+        }
 
         AbstractResponseContext rc = new EmptyResponseContext(204);
         return rc;

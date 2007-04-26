@@ -26,106 +26,56 @@
  */
 dojo.provide("cosmo.service.conduits.common")
 
-cosmo.service.conduits.AbstractConduit = {
+dojo.declare("cosmo.service.conduits.Conduit", null, {
+    
+    _transport: null,
+    
+    _translator: null,
+    
+    initializer: function (transport, translator){
+        this._transport = transport;
+        this._translator = translator;
+        this.translateResponse = dojo.lang.hitch(this, function (obj, xhr){
+            return this._translator.responseToObject(obj);
+        });
+    
+    },    
+    
     getCollection: function(collectionUid, kwArgs){
 
-        var d = this.doGetCollection(collectionUid, kwArgs);
+        var d = this._transport.getCollection(collectionUid, kwArgs);
 
-        // add object translator to callback chain
-
-        // do topic notifications
+        d.addCallback(this.translateResponse);
+    
+        //TODO: do topic notifications
         return d;
-    },
-
-    doGetCollection: function(collectionUid, kwArgs){
-        dojo.unimplemented();
     },
 
     getItems: function(collection, startTime, endTime, kwArgs){
-        var d = this.doGetItems(collection, startTime, endTime, kwArgs);
+        var d = this._transport.getItems(collection, startTime, endTime, kwArgs);
 
-        // add object translator to callback chain
-
+        d.addCallback(this.translateResponse);
+    
         // do topic notifications
         return d;
-    },
-
-    doGetItems: function(collection, startTime, endTime, kwArgs){
-        dojo.unimplemented();
     },
 
     saveItem: function(item, kwArgs){
-        var d = this.doSaveItem(item, kwArgs);
 
         // add object translator to callback chain
 
         // do topic notifications
         return d;
-    },
-
-    doSaveItem: function(item, kwArgs){
-        dojo.unimplemented();
     },
 
     removeItem: function(collection, item, kwArgs){
-        var d = this.doRemoveItem(collection, item, kwArgs);
 
         // add object translator to callback chain
 
         // do topic notifications
         return d;
-    },
-    doRemoveItem: function(collection, item, kwArgs){
-        dojo.unimplemented();
-    },
-
-    getRecurrenceRules: function(events, kwArgs){
-        var d = this.doGetRecurrenceRules(events, kwArgs);
-
-        // add object translator to callback chain
-
-        // do topic notifications
-        return d;
-        dojo.unimplemented();
-    },
-
-
-    saveRecurrenceRule: function(event, recurrenceRule, kwArgs){
-        var d = this.doSaveRecurrenceRules(event, kwArgs);
-
-        // add object translator to callback chain
-
-        // do topic notifications
-        dojo.unimplemented();
-    },
-
-    expandEvents: function(events, startTime, endTime, kwArgs){
-        var d = this.doExpandEvents(events, startTime, endTime, kwArgs);
-
-        // add object translator to callback chain
-
-        // do topic notifications
-    },
-    doExpandEvents: function(events, startTime, endTime, kwArgs){
-          dojo.unimplemeneted();
-    },
-
-    saveNewEventBreakRecurrence: function(event, originalEventUid,
-        originalEventEndDate, kwArgs){
-        var d = this.doSaveNewEventBreakRecurrence(event, originalEventUid,
-            originalEventEndDate, kwArgs);
-
-        // add object translator to callback chain
-
-        // do topic notifications
-    },
-
-    doSaveNewEventBreakRecurrence: function(event, originalEventUid,
-        originalEventEndDate, kwArgs){
-
-        dojo.unimplemented();
-    },
-}
+    }
+});
 
 dojo.declare('cosmo.service.conduits.AbstractTicketedConduit', cosmo.service.conduits.AbstractConduit,
 {
@@ -218,6 +168,14 @@ dojo.declare('cosmo.service.conduits.AbstractCurrentUserConduit', cosmo.service.
     }
 });
 
-
+cosmo.service.conduits.getAtomPlusEimConduit = function getAtomPlusEimConduit(){
+    dojo.require("cosmo.service.translators.eim");
+    dojo.require("cosmo.service.transport.Atom");
+    
+    return new cosmo.service.conduits.Conduit(
+        new cosmo.service.transport.Atom(), 
+        cosmo.service.translators.eim
+    );
+}
 
 

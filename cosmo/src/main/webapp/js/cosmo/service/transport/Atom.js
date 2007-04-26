@@ -39,13 +39,14 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     },
     
-    getItems: function (collectionUid, startTime, endTime, kwArgs){
+    getItems: function (collectionUid, searchCrit, kwArgs){
         var d = new dojo.Deferred();
         var r = this.getDefaultRequest(d, kwArgs);
         
         r.url = cosmo.env.getBaseUrl() + 
-          "/atom/collection/" +  collectionUid + "/full" +
-          this._generateQueryString(kwArgs);
+          "/atom/collection/" +  collectionUid + "/full?" +
+          this._generateAuthQueryString(kwArgs) + "&" +
+          this._generateSearchQueryString(searchCrit) ;
         
         dojo.io.bind(r);
         return d;
@@ -63,32 +64,20 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     },
 
-    getRecurrenceRules: function(events, kwArgs){
-
-    },
-
-    saveRecurrenceRules: function(event, recurrenceRule, kwArgs){
-
-
-    },
-
-    expandEvents: function(events, startTime, endTime, kwArgs){
-
-    },
-    
-    saveNewEventBreakRecurrence: function(event, originalEventUid,
-        originalEventEndDate, kwArgs){
-
-    },
-    
-    _generateQueryString: function(/*Object*/kwArgs){
+    _generateAuthQueryString: function(/*Object*/kwArgs){
         if (kwArgs && kwArgs.ticketKey)
             return "ticket=" + kwArgs.ticketKey;
         else 
             return "";
+    },
+    
+    _generateSearchQueryString: function(/*Object*/searchCrit){
+        return "";
     }
        
     
 
     }
 );
+
+cosmo.service.transport.atom = new cosmo.service.transport.Atom();

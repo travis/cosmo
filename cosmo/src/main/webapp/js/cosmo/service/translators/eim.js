@@ -20,10 +20,10 @@
  */
 dojo.provide("cosmo.service.translators.eim");
 
-dojo.require("cosmo.model");
+dojo.require("cosmo.model.Item");
 dojo.require("cosmo.service.translators.common");
 
-cosmo.service.translators.eim = {
+dojo.declare("cosmo.service.translators.Eim", null, {
     
     
     
@@ -31,7 +31,6 @@ cosmo.service.translators.eim = {
         if (!atomXml){
             throw new ParseError("Cannot parse null, undefined, or false");
         }
-        
         var entries = atomXml.getElementsByTagName("entry");
         var items = [];
         for (var i = 0; i < entries.length; i++){
@@ -180,7 +179,7 @@ cosmo.service.translators.eim = {
         }
     },
   
-    recordSetToObject: function(recordSet){
+    recordSetToObject: function (recordSet){
         //TODO
         /* We can probably optimize this by grabbing the 
          * appropriate properties from the appropriate records
@@ -188,7 +187,7 @@ cosmo.service.translators.eim = {
          * be a little less elegant, and will require the creation of
          * more local variables, so we should play with this later.
          * */
-        
+
         var note = new cosmo.model.Note(
          {
              uid: recordSet.uuid,
@@ -216,10 +215,7 @@ cosmo.service.translators.eim = {
            }
         }
     
-        return calEventData = new cosmo.model.CalEventData(
-           uid, title, description, start, end, allDay,
-           pointInTime, anyTime, recurrenceRule, status, 
-           masterEvent, instance, instanceDate, loc);
+        return note;
     
     },
     
@@ -239,7 +235,7 @@ cosmo.service.translators.eim = {
             status: record.fields.status[1]
          }
         );
-   
+        return stamp;
     },
     
     addItemRecord: function (record, object){
@@ -295,7 +291,9 @@ cosmo.service.translators.eim = {
     }
     
 
-}
+});
+
+cosmo.service.translators.eim = new cosmo.service.translators.Eim();
 
 dojo.date.addIso8601Duration = function (date, duration){
     

@@ -96,6 +96,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
     					err.id = obj.id;
     					deferredRequestHandler.errback(err, xhr);
     				} else {
+    				    obj = xhr.responseXML? xhr.responseXML : obj;
     					deferredRequestHandler.callback(obj, xhr); 
     				}
     			}

@@ -39,6 +39,9 @@ public class StandardRequestHandler extends DefaultRequestHandler {
         if (! super.preconditions(provider, request, response))
             return false;
 
+        if (! (request.getTarget() instanceof BaseItemTarget))
+            return true;
+
         BaseItemTarget target = (BaseItemTarget) request.getTarget();
 
         if (! ifMatch(request.getIfMatch(), target, response))

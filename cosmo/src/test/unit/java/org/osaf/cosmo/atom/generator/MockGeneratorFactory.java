@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.generator.FeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
+import org.osaf.cosmo.atom.generator.ServiceGenerator;
 import org.osaf.cosmo.atom.generator.UnsupportedFormatException;
 import org.osaf.cosmo.atom.generator.UnsupportedProjectionException;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -52,6 +53,18 @@ public class MockGeneratorFactory implements GeneratorFactory {
     }
 
     // GeneratorFactory methods
+
+    /**
+     * Creates an instance of <code>Generator</code>.
+     *
+     * @param serviceLocator the service locator from which service
+     * URLs are calculated
+     * @return the service generator
+     */
+    public ServiceGenerator
+        createServiceGenerator(ServiceLocator serviceLocator) {
+        return new MockServiceGenerator(this, serviceLocator);
+    }
 
     /**
      * Creates an instance of <code>MockFeedGenerator</code> based on

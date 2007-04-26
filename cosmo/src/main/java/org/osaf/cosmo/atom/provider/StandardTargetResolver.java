@@ -25,11 +25,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.server.ItemPath;
+import org.osaf.cosmo.server.UserPath;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.service.UserService;
 
 /**
  * Resolves the request to a resource target. The request URI can
@@ -40,6 +44,7 @@ public class StandardTargetResolver implements TargetResolver {
         LogFactory.getLog(StandardTargetResolver.class);
 
     private ContentService contentService;
+    private UserService userService;
 
     // TargetResolver methods
 
@@ -70,6 +75,10 @@ public class StandardTargetResolver implements TargetResolver {
         ItemPath ip = ItemPath.parse(uri, true);
         if (ip != null)
             return createItemTarget(context, ip);
+
+        UserPath up = UserPath.parse(uri);
+        if (up != null)
+            return createUserTarget(context, up);
 
         return null;
     }
@@ -119,6 +128,19 @@ public class StandardTargetResolver implements TargetResolver {
                               info.getProjection(), info.getFormat());
     }
 
+    /**
+     * Creates a target representing a user.
+     */
+    protected Target createUserTarget(RequestContext context,
+                                      UserPath path) {
+        User user = userService.getUser(path.getUsername());
+        if (user == null)
+            return null;
+        HomeCollectionItem home = contentService.getRootItem(user);
+
+        return new UserTarget(context, user, home);
+    }
+
     public ContentService getContentService() {
         return contentService;
     }
@@ -127,9 +149,19 @@ public class StandardTargetResolver implements TargetResolver {
         this.contentService = contentService;
     }
 
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
     public void init() {
         if (contentService == null)
             throw new IllegalStateException("contentService is required");
+        if (userService == null)
+            throw new IllegalStateException("userService is required");
     }
 
     private class TargetPathInfo {

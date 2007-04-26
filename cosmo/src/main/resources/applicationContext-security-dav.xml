@@ -27,6 +27,9 @@
     <property name="contentService">
       <ref bean="contentService"/>
     </property>
+    <property name="userService">
+      <ref bean="userService"/>
+    </property>
     <property name="indirectlyAddressable">
       <value>true</value>
     </property>

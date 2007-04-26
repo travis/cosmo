@@ -38,6 +38,7 @@ import org.osaf.cosmo.atom.provider.mock.BaseMockRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockProviderManager;
+import org.osaf.cosmo.atom.provider.mock.MockServiceRequestContext;
 import org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
@@ -94,6 +95,12 @@ public class AtomHelper extends MockHelper {
 
     public Provider getProvider() {
         return serviceContext.getProviderManager().getProvider();
+    }
+
+    public RequestContext createServiceRequestContext()
+        throws IOException {
+        return new MockServiceRequestContext(serviceContext, getUser(),
+                                             getHomeCollection());
     }
 
     public RequestContext createFeedRequestContext(CollectionItem collection,

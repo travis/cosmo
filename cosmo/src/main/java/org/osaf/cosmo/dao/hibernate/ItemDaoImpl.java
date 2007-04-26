@@ -177,7 +177,6 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         }
     }
 
-
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.ItemDao#createRootItem(org.osaf.cosmo.model.User)
      */

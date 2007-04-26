@@ -25,6 +25,7 @@ import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.model.Service;
 import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.AbstractProvider;
 import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
@@ -41,6 +42,7 @@ import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.atom.generator.FeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
+import org.osaf.cosmo.atom.generator.ServiceGenerator;
 import org.osaf.cosmo.atom.generator.UnsupportedFormatException;
 import org.osaf.cosmo.atom.generator.UnsupportedProjectionException;
 import org.osaf.cosmo.atom.processor.ContentProcessor;
@@ -52,6 +54,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
@@ -251,7 +254,25 @@ public class StandardProvider extends AbstractProvider
     }
   
     public ResponseContext getService(RequestContext request) {
-        return null;
+        UserTarget target = (UserTarget) request.getTarget();
+        User user = target.getUser();
+        if (log.isDebugEnabled())
+            log.debug("getting service for user " + user.getUsername());
+
+        try {
+            ServiceLocator locator = createServiceLocator(request);
+            ServiceGenerator generator = createServiceGenerator(locator);
+            Service service =
+                generator.generateService(target.getHomeCollection());
+
+            AbstractResponseContext rc =
+                new BaseResponseContext<Document<Element>>(service.getDocument());
+            return rc;
+        } catch (GeneratorException e) {
+            String reason = "Unknown feed generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
+        }
     }
   
     public ResponseContext getFeed(RequestContext request) {
@@ -386,6 +407,11 @@ public class StandardProvider extends AbstractProvider
             throw new IllegalStateException("contentService is required");
         if (serviceLocatorFactory == null)
             throw new IllegalStateException("serviceLocatorFactory is required");
+    }
+
+    protected ServiceGenerator createServiceGenerator(ServiceLocator locator)
+        throws UnsupportedProjectionException, UnsupportedFormatException {
+        return generatorFactory.createServiceGenerator(locator);
     }
 
     protected FeedGenerator createFeedGenerator(BaseItemTarget target,

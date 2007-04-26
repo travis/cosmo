@@ -518,9 +518,11 @@
         class="org.osaf.cosmo.atom.StandardServiceContext">
     <property name="abdera"><ref local="abdera"/></property>
     <property name="providerManager">
-      <bean class="org.osaf.cosmo.atom.provider.StandardProviderManager">
+      <bean class="org.osaf.cosmo.atom.provider.StandardProviderManager"
+         init-method="init">
         <property name="provider">
-          <bean class="org.osaf.cosmo.atom.provider.StandardProvider">
+          <bean class="org.osaf.cosmo.atom.provider.StandardProvider"
+                init-method="init">
             <property name="abdera"><ref local="abdera"/></property>
             <property name="generatorFactory">
               <bean class="org.osaf.cosmo.atom.generator.StandardGeneratorFactory">
@@ -544,16 +546,21 @@
       </bean>
     </property>
     <property name="requestHandlerManager">
-      <bean class="org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager">
+      <bean class="org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager"
+            init-method="init">
         <property name="requestHandler">
           <bean class="org.osaf.cosmo.atom.servlet.StandardRequestHandler"/>
         </property>
       </bean>
     </property>
     <property name="targetResolver">
-      <bean class="org.osaf.cosmo.atom.provider.StandardTargetResolver">
+      <bean class="org.osaf.cosmo.atom.provider.StandardTargetResolver"
+            init-method="init">
         <property name="contentService">
           <ref local="contentService"/>
+        </property>
+        <property name="userService">
+          <ref local="userService"/>
         </property>
       </bean>
     </property>
@@ -665,6 +672,9 @@
         class="org.osaf.cosmo.acegisecurity.providers.owner.OwnerVoter">
     <property name="contentService">
       <ref bean="contentService"/>
+    </property>
+    <property name="userService">
+      <ref bean="userService"/>
     </property>
   </bean>
 

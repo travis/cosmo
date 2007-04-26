@@ -27,6 +27,16 @@ import org.osaf.cosmo.server.ServiceLocator;
 public interface GeneratorFactory {
 
     /**
+     * Creates an instance of <code>ServiceGenerator</code>.
+     *
+     * @param serviceLocator the service locator from which collection
+     * URLs are calculated
+     * @return the service generator
+     */
+    public ServiceGenerator
+        createServiceGenerator(ServiceLocator serviceLocator);
+
+    /**
      * Creates an instance of <code>FeedGenerator</code> that can
      * service the given projection and format.
      *

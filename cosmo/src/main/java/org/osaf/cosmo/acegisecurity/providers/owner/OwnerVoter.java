@@ -30,7 +30,9 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.server.ItemPath;
+import org.osaf.cosmo.server.UserPath;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.util.PathUtil;
 
 /**
@@ -43,6 +45,7 @@ public class OwnerVoter implements AccessDecisionVoter {
     private static final Log log = LogFactory.getLog(OwnerVoter.class);
 
     private ContentService contentService;
+    private UserService userService;
     private boolean indirectlyAddressable = false;
 
     /**
@@ -169,6 +172,19 @@ public class OwnerVoter implements AccessDecisionVoter {
             return checkOwnership(details.getUser(), item);
         }
 
+        UserPath up = UserPath.parse(path);
+        if (up != null) {
+            User user = userService.getUser(up.getUsername());
+            if (user == null) {
+                if (log.isDebugEnabled())
+                    log.debug("Directly addressed user " + up.getUsername() + " not found; denying");
+                return ACCESS_DENIED;
+            }
+            if (log.isDebugEnabled())
+                log.debug("Directly addressed user " + up.getUsername() + " found; proceeding to owner check");
+            return checkOwner(details.getUser(), user);
+        }
+
         // fall back to old-school hierarchical path resolution. these
         // paths are treated just like indirect addressing except that
         // items are looked up relative to the user's root collection.
@@ -211,6 +227,23 @@ public class OwnerVoter implements AccessDecisionVoter {
         return ACCESS_GRANTED;
     }
 
+    private int checkOwner(User principal,
+                           User user) {
+        if (log.isDebugEnabled())
+            log.debug("Checking access to user " + user.getUsername() +
+                      " by user " + principal.getUsername());
+
+        if (! user.equals(principal)) {
+            if (log.isDebugEnabled())
+                log.debug("User not owner - access denied");
+            return ACCESS_DENIED;
+        }
+
+        if (log.isDebugEnabled())
+            log.debug("User is owner - access granted");
+        return ACCESS_GRANTED;
+    }
+
     /**
      * Always returns true, since this voter does not examine any
      * config attributes.
@@ -235,6 +268,16 @@ public class OwnerVoter implements AccessDecisionVoter {
     /** */
     public void setContentService(ContentService service) {
         contentService = service;
+    }
+
+    /** */
+    public UserService getUserService() {
+        return userService;
+    }
+
+    /** */
+    public void setUserService(UserService service) {
+        userService = service;
     }
 
     /** */

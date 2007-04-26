@@ -33,13 +33,6 @@ public class StandardProviderCreateEntryTest extends BaseProviderTestCase
     private static final Log log =
         LogFactory.getLog(StandardProviderCreateEntryTest.class);
 
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        helper.rememberProjection(PROJECTION_FULL);
-        helper.rememberMediaType(Content.Type.TEXT.toString());
-    }
-
     public void testCreateEntry() throws Exception {
         CollectionItem item = helper.makeAndStoreDummyCollection();
         RequestContext req = helper.createFeedRequestContext(item, "POST");
@@ -103,5 +96,12 @@ public class StandardProviderCreateEntryTest extends BaseProviderTestCase
         ResponseContext res = provider.createEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
+    }
+
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        helper.rememberProjection(PROJECTION_FULL);
+        helper.rememberMediaType(Content.Type.TEXT.toString());
     }
 }

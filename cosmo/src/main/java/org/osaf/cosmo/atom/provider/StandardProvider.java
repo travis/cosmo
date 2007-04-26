@@ -83,6 +83,22 @@ public class StandardProvider extends AbstractProvider
             ContentProcessor processor = createContentProcessor(entry);
             item = processor.processCreation(entry.getContent(), collection);
             item = (NoteItem) contentService.createContent(collection, item);
+
+            ItemTarget itemTarget =
+                new ItemTarget(request, item, PROJECTION_FULL, null);
+            ServiceLocator locator = createServiceLocator(request);
+            FeedGenerator generator = createFeedGenerator(itemTarget, locator);
+            entry = generator.generateEntry(item);
+
+            AbstractResponseContext rc =
+                new BaseResponseContext<Document<Element>>(entry.getDocument());
+            rc.setStatus(201);
+            rc.setStatusText("Created");
+            rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            rc.setLocation(entry.getSelfLink().toString());
+            rc.setContentLocation(entry.getSelfLink().toString());
+
+            return rc;
         } catch (UnsupportedMediaTypeException e) {
             return notsupported(abdera, request, "invalid content type " + e.getMediaType());
         } catch (ValidationException e) {
@@ -102,24 +118,6 @@ public class StandardProvider extends AbstractProvider
             return servererror(abdera, request, reason, e);
         } catch (CollectionLockedException e) {
             return locked(abdera, request);
-        }
-
-        ItemTarget itemTarget =
-            new ItemTarget(request, item, PROJECTION_FULL, null);
-        try {
-            ServiceLocator locator = createServiceLocator(request);
-            FeedGenerator generator = createFeedGenerator(itemTarget, locator);
-            Entry entry = generator.generateEntry(item);
-
-            AbstractResponseContext rc =
-                new BaseResponseContext<Document<Element>>(entry.getDocument());
-            rc.setStatus(201);
-            rc.setStatusText("Created");
-            rc.setEntityTag(new EntityTag(item.getEntityTag()));
-            rc.setLocation(entry.getSelfLink().toString());
-            rc.setContentLocation(entry.getSelfLink().toString());
-
-            return rc;
         } catch (UnsupportedProjectionException e) {
             // won't happen
             throw new RuntimeException(e);
@@ -162,6 +160,18 @@ public class StandardProvider extends AbstractProvider
             Entry entry = (Entry) request.getDocument().getRoot();
             ContentProcessor processor = createContentProcessor(entry);
             processor.processContent(entry.getContent(), item);
+            item = (NoteItem) contentService.updateItem(item);
+
+            target = new ItemTarget(request, item, PROJECTION_FULL, null);
+            ServiceLocator locator = createServiceLocator(request);
+            FeedGenerator generator = createFeedGenerator(target, locator);
+            entry = generator.generateEntry(item);
+
+            AbstractResponseContext rc =
+                new BaseResponseContext<Document<Element>>(entry.getDocument());
+            rc.setEntityTag(new EntityTag(item.getEntityTag()));
+
+            return rc;
         } catch (UnsupportedMediaTypeException e) {
             return notsupported(abdera, request, "invalid content type " + e.getMediaType());
         } catch (ValidationException e) {
@@ -179,13 +189,19 @@ public class StandardProvider extends AbstractProvider
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
             return servererror(abdera, request, reason, e);
+        } catch (CollectionLockedException e) {
+            return locked(abdera, request);
+        } catch (UnsupportedProjectionException e) {
+            // won't happen
+            throw new RuntimeException(e);
+        } catch (UnsupportedFormatException e) {
+            // won't happen
+            throw new RuntimeException(e);
+        } catch (GeneratorException e) {
+            String reason = "Unknown entry generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
         }
-
-        contentService.updateItem(item);
-
-        AbstractResponseContext rc = new EmptyResponseContext(204);
-        rc.setEntityTag(new EntityTag(item.getEntityTag()));
-        return rc;
     }
   
     public ResponseContext updateMedia(RequestContext request) {
@@ -200,6 +216,12 @@ public class StandardProvider extends AbstractProvider
             ContentProcessor processor =
                 createContentProcessor(request.getContentType().toString());
             processor.processContent(request.getReader(), item);
+            item = (NoteItem) contentService.updateItem(item);
+
+            AbstractResponseContext rc = new EmptyResponseContext(204);
+            rc.setEntityTag(new EntityTag(item.getEntityTag()));
+
+            return rc;
         } catch (MimeTypeParseException e) {
             return notsupported(abdera, request, "invalid content type");
         } catch (UnsupportedMediaTypeException e) {
@@ -219,13 +241,9 @@ public class StandardProvider extends AbstractProvider
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
             return servererror(abdera, request, reason, e);
+        } catch (CollectionLockedException e) {
+            return locked(abdera, request);
         }
-
-        contentService.updateItem(item);
-
-        AbstractResponseContext rc = new EmptyResponseContext(204);
-        rc.setEntityTag(new EntityTag(item.getEntityTag()));
-        return rc;
     }
   
     public ResponseContext getService(RequestContext request) {

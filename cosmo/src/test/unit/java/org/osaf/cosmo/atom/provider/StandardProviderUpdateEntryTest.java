@@ -22,12 +22,14 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Test class for {@link StandardProvider#updateEntry()} tests.
  */
-public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
+public class StandardProviderUpdateEntryTest extends BaseProviderTestCase
+    implements AtomConstants {
     private static final Log log =
         LogFactory.getLog(StandardProviderUpdateEntryTest.class);
 
@@ -37,7 +39,7 @@ public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
 
         ResponseContext res = provider.updateEntry(req);
         assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 204, res.getStatus());
+        assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
     }
 
@@ -75,5 +77,6 @@ public class StandardProviderUpdateEntryTest extends BaseProviderTestCase {
         super.setUp();
 
         helper.rememberMediaType(Content.Type.TEXT.toString());
+        helper.rememberProjection(PROJECTION_FULL);
     }
 }

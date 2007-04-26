@@ -76,10 +76,20 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
     },
 
     initializeClass: function(ctr, kwArgs){
+        if (ctr.prototype["__enhanced"]){
+            //it's already been enhanced, which usually means that this is a subclass.
+            //so let's just copy the arrays/objects to the new prototype 
+            //since we'll be adding to them and don't want to add to the parent's arrays/objects!
+            ctr.prototype.__propertyNames = ctr.prototype.__propertyNames.slice();
+            var newDefaults = {};
+            dojo.lang.mixin(ctr.prototype.__defaults, newDefaults);
+            ctr.prototype.__defaults = newDefaults;
+            return;
+        }
         if (!kwArgs){
             kwArgs = {};
         }
-
+        ctr.prototype.__enhanced = true;
         ctr.prototype.__getProperty = this._genericGetter;
         ctr.prototype.__setProperty = this._genericSetter;
         ctr.prototype.__getDefault = this._getDefault;
@@ -163,7 +173,7 @@ dojo.declare("cosmo.model.util.InheritingSubclassCreator", null, {
 cosmo.model.util.equals = function cosmoEquals(a,b){
     var type = typeof (a);
     if (type != typeof(b)){
-        throw new Error("Both operands must be of the same type!");
+        throw new Error("Both operands must be of the same type!\n You passed '" + a + "' and '" + b +"', a " + typeof(a) + " and a "+ typeof(b));
     }
     
     if (type == "object"){
@@ -215,10 +225,14 @@ cosmo.model._instanceSetProperty = function instanceSetProperty(propertyName, va
         //is there a modification?
         var modification = master.getModification(this.instanceDate);
         if (modification){
-            //simply set the property on the modification
-            this._setModifiedProperty(propertyName, value);
-            return;                    
-        }
+            if (!typeof(this._getModifiedProperty(propertyName)) == "undefined"){
+                this._setModifiedProperty(propertyName, value);
+                return;                    
+            } else if (!cosmo.model.util.equals(value, masterProperty)){
+                this._setModifiedProperty(propertyName, value);
+                return;
+            }
+        } 
         
         //if the new value is the same as the master property, 
         // no need to do anything
@@ -228,7 +242,7 @@ cosmo.model._instanceSetProperty = function instanceSetProperty(propertyName, va
             var modification = new cosmo.model.Modification({
                 instanceDate: this.instanceDate
             });
-            modification.getModifiedProperties()[propertyName] = value;
             master.addModification(modification);
+            this._setModifiedProperty(propertyName, value);
         }
 }

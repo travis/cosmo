@@ -352,7 +352,7 @@ cosmo.datetime.Date.prototype.strftime = function strftime(formatString){
     return formatted;
 };
 
-cosmo.datetime.Date.prototype._getStrftimeCached = function(formatString){
+cosmo.datetime.Date.prototype._getStrftimeCached = function getStrfTimeCached(formatString){
     if (this._strftimeCache[0] == this.hash() + ":" + formatString){
         return this._strftimeCache[1];
     }

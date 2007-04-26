@@ -83,7 +83,13 @@ test_testNoteInstance = function(){
     
     var mod = note.getModification(date);
     jum.assertTrue(mod != null);
-    jum.assertEquals(mod.getModifiedProperties()["body"] == "new");
+    jum.assertEquals(mod.getModifiedProperties()["body"],"new");
+
+    noteInstance.setDisplayName("newdis");
+    jum.assertEquals(mod.getModifiedProperties()["body"], "new");
+    jum.assertEquals(mod.getModifiedProperties()["displayName"], "newdis");
+    jum.assertEquals(noteInstance.getDisplayName(), "newdis");
+    jum.assertEquals(noteInstance.getUid(), "123");
     
 };
 

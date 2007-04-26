@@ -22,7 +22,9 @@ cosmo.model.NEW_ARRAY = function(){return []};
 cosmo.model.TRIAGE_NOW = 100;
 cosmo.model.TRIAGE_LATER = 200;
 cosmo.model.TRIAGE_DONE = 300;
-      
+
+cosmo.model._stampRegistry = {};
+   
 cosmo.model.declare = function(/*String*/ ctrName, /*Function*/ parentCtr, propertiesArray, otherDeclarations){
     var newCtr = dojo.declare(ctrName, parentCtr, otherDeclarations);
     cosmo.model.util.simplePropertyApplicator.enhanceClass(newCtr, propertiesArray, {enhanceInitializer: false});
@@ -43,18 +45,43 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
         {enhanceInitializer: false});
     
     var stampInstanceCtr = dojo.declare(ctrName+"Instance", newCtr, {
-        initializer: function stampInstanceInitializer(master, instanceDate){
-           this._master = master;
-           this.instanceDate = instanceDate; 
+        initializer: function stampInstanceInitializer(noteInstance){
+           this._master = noteInstance._master;
+           this.instanceDate = noteInstance._instanceDate; 
+           this.item = noteInstance;
         },
         
         //it doesn't make sense to initialze properties of an instance. 
         initializeProperties: function noop(){
             return;
         },
+        
+        __getProperty: cosmo.model._instanceGetProperty,  
+
+        __setProperty: cosmo.model._instanceSetProperty,
+
+        getMaster: function getMaster(){
+            return this._master;
+        },
+    
+        _getMasterProperty: function noteInstanceGetMasterProperty(propertyName){
+            return this._master._stamps[stampName].__getProperty(propertyName);
+        },
+    
+       _getModifiedProperty: function noteInstanceGetModifiedProperty(propertyName){
+            var modification = this._master.getModification(this.instanceDate);
+            return modification._modifiedStamps[stampName][propertyName];
+        },
+    
+       _setModifiedProperty: function noteInstanceSetModifiedProperty(propertyName, value){
+            var modification = master.getModification(this.instanceDate);
+            modification._modifiedStamps[stampName][propertyName] = value;
+        },
     })
- 
- 
+     
+    cosmo.model._stampRegistry[stampName] 
+        = {constructor:newCtr, instanceConstructor:stampInstanceCtr};
+    
     return newCtr;
 }
 
@@ -72,7 +99,7 @@ cosmo.model.declare("cosmo.model.Item", null,
    //declare other properties
   {
       initializer: function(kwArgs){
-//            dojo.debug("Item Initter");
+            dojo.debug("Item Initter");
             this.initializeProperties(kwArgs);
       }
   });
@@ -86,8 +113,6 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         _stamps: null,
         
         initializer: function(){
-//            dojo.debug("Note Initter");
-            
             this._stamps = {};
             this._modifications = {};
         },
@@ -161,20 +186,17 @@ dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
     },
     
     _getMasterProperty: function noteInstanceGetMasterProperty(propertyName){
-//        dojo.debug("MASTER: " +propertyName);
         return this._master.__getProperty(propertyName);
     },
     
     _getModifiedProperty: function noteInstanceGetModifiedProperty(propertyName){
-//        dojo.debug("INSTANCE: " +propertyName);
         var modification = this._master.getModification(this.instanceDate);
-//        dojo.debug("MOD: " + modification);
         return modification.getModifiedProperties()[propertyName];
     },
     
     _setModifiedProperty: function noteInstanceSetModifiedProperty(propertyName, value){
-        var modification = master.getModification(this.instanceDate);
-        modification[propertyName] = value;  
+        var modification = this._master.getModification(this.instanceDate);
+        modification._modifiedProperties[propertyName] = value;  
     },
     
     __getProperty: cosmo.model._instanceGetProperty,  

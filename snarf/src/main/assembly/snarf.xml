@@ -2,8 +2,10 @@
     <id></id>
     <formats>
         <format>tar.gz</format>
+        <!--
         <format>tar.bz2</format>
         <format>zip</format>
+        -->
     </formats>
     <fileSets>
         <fileSet>

@@ -135,7 +135,14 @@ test_stampInheritance = function(){
 
     var noteOccurrence = note.getNoteOccurrence(date);
 
-    var event
+    var occurStamp = noteOccurrence.getEventStamp();
+    
+    jum.assertEquals(occurStamp.getLocation(), "loco");
+    jum.assertEquals(eventStamp.getLocation(), "loco");
+
+    occurStamp.setLocation("Yo");
+    jum.assertEquals(occurStamp.getLocation(), "Yo");
+    
 
 };
 

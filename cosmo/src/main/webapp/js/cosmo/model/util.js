@@ -216,34 +216,35 @@ cosmo.model.util.equals = function cosmoEquals(a,b){
 }
 
 cosmo.model._occurrenceSetProperty = function occurrenceSetProperty(propertyName, value){
-        if (this.__noOverride[propertyName]){
-            throw new Error("You can not override property '" + propertyName +"'");
-        }
+    if (this.__noOverride[propertyName]){
+        throw new Error("You can not override property '" + propertyName +"'");
+    }
 
-        var master = this.getMaster();
-        var masterProperty = this._getMasterProperty(propertyName);
-        
-        //is there a modification?
-        var modification = master.getModification(this.recurrenceId);
-        if (modification){
-            if (!typeof(this._getModifiedProperty(propertyName)) == "undefined"){
-                this._setModifiedProperty(propertyName, value);
-                return;                    
-            } else if (!cosmo.model.util.equals(value, masterProperty)){
-                this._setModifiedProperty(propertyName, value);
-                return;
-            }
-        } 
-        
-        //if the new value is the same as the master property, 
-        // no need to do anything
-        if (cosmo.model.util.equals(value, masterProperty)){
-            return;
-        } else {
-            var modification = new cosmo.model.Modification({
-                recurrenceId: this.recurrenceId
-            });
-            master.addModification(modification);
+    var master = this.getMaster();
+
+    var masterProperty = this._getMasterProperty(propertyName);
+
+    //is there a modification?
+
+    var modification = master.getModification(this.recurrenceId);
+    if (modification){
+        if (!typeof(this._getModifiedProperty(propertyName)) == "undefined"){
             this._setModifiedProperty(propertyName, value);
+            return;                    
+        } else if (!cosmo.model.util.equals(value, masterProperty)){
+            this._setModifiedProperty(propertyName, value);
+            return;
         }
+    } 
+    //if the new value is the same as the master property, 
+    // no need to do anything
+    if (cosmo.model.util.equals(value, masterProperty)){
+        return;
+    } else {
+        var modification = new cosmo.model.Modification({
+            recurrenceId: this.recurrenceId
+        });
+        master.addModification(modification);
+        this._setModifiedProperty(propertyName, value);
+    }
 }

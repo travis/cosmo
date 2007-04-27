@@ -45,9 +45,11 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
         {enhanceInitializer: false});
     
     var stampOccurrenceCtr = dojo.declare(ctrName+"Occurrence", newCtr, {
+        __noOverride:{},
+
         initializer: function stampOccurrenceInitializer(noteOccurrence){
            this._master = noteOccurrence._master;
-           this.recurrenceId = noteOccurrence._recurrenceId; 
+           this.recurrenceId = noteOccurrence.recurrenceId; 
            this.item = noteOccurrence;
         },
         
@@ -68,14 +70,22 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
             return this._master._stamps[stampName].__getProperty(propertyName);
         },
     
-       _getModifiedProperty: function stampOccurrenceGetModifiedProperty(propertyName){
+	_getModifiedProperty: function stampOccurrenceGetModifiedProperty(propertyName){
             var modification = this._master.getModification(this.recurrenceId);
-            return modification._modifiedStamps[stampName][propertyName];
+            var modifiedStamp = modification._modifiedStamps[stampName];
+	    if (modifiedStamp){
+		return modifiedStamp[propertyName];
+	    }
         },
     
-       _setModifiedProperty: function stampOccurrenceSetModifiedProperty(propertyName, value){
-            var modification = master.getModification(this.recurrenceId);
-            modification._modifiedStamps[stampName][propertyName] = value;
+	_setModifiedProperty: function stampOccurrenceSetModifiedProperty(propertyName, value){
+            var modification = this._master.getModification(this.recurrenceId);
+            var modifiedStamp = modification._modifiedStamps[stampName];
+	    if (!modifiedStamp){
+		modifiedStamp = {};
+		modification._modifiedStamps[stampName] = modifiedStamp;
+	    }
+	    modifiedStamp[propertyName] = value;
         },
     })
      

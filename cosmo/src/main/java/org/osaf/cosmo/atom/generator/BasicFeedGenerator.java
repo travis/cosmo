@@ -23,6 +23,7 @@ import org.apache.abdera.model.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.server.ServiceLocator;
 
@@ -67,5 +68,14 @@ public class BasicFeedGenerator extends BaseFeedGenerator {
      */
     protected String getProjection() {
         return PROJECTION_BASIC;
+    }
+
+    /**
+     * Returns the IRI of the given item without path info.
+     *
+     * @param item the item
+     */
+    protected String selfIri(Item item) {
+        return selfIri(item, false);
     }
 }

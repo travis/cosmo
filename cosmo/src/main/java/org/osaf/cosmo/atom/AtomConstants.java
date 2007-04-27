@@ -30,6 +30,12 @@ public interface AtomConstants {
     public static final String REL_SELF = "self";
     /** */
     public static final String REL_ALTERNATE = "alternate";
+    /** */
+    public static final String REL_PARENT = "parent";
+    /** */
+    public static final String REL_MODIFIES = "modifies";
+    /** */
+    public static final String REL_MODIFICATION = "modification";
 
     /** */
     public static final String PROJECTION_BASIC = "basic";

@@ -23,6 +23,7 @@ import org.apache.abdera.model.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -52,6 +53,30 @@ public class FullFeedGenerator extends BaseFeedGenerator {
         } else {
             this.format = FORMAT_EIM_JSON;
         }
+    }
+
+    /**
+     * Extends the superclass method to add an edit link and links for
+     * the parent collection, the item modified by this item (if any),
+     * and any items modified by this item.
+     *
+     * @param item the item on which the entry is based
+     * @throws GeneratorException
+     */
+    protected Entry createEntry(NoteItem item)
+        throws GeneratorException {
+        Entry entry = super.createEntry(item);
+
+        entry.addLink(newEditLink(item));
+
+        for (CollectionItem parent : item.getParents())
+            entry.addLink(newParentLink(parent));
+        if (item.getModifies() != null)
+            entry.addLink(newModifiesLink(item.getModifies()));
+        for (NoteItem modification : item.getModifications())
+            entry.addLink(newModificationLink(modification));
+
+        return entry;
     }
 
     /**

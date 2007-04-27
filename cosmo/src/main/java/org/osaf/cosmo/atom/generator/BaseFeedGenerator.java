@@ -91,7 +91,7 @@ public abstract class BaseFeedGenerator
      */
     public Entry generateEntry(NoteItem item)
         throws GeneratorException {
-        return createEntry(item);
+        return createEntry(item, true);
     }
 
     // our methods
@@ -113,7 +113,6 @@ public abstract class BaseFeedGenerator
         feed.addAuthor(newPerson(collection.getOwner()));
         feed.addLink(newSelfLink(collection));
         feed.addLink(newPimLink(collection));
-        // XXX: add links for any parent collections
 
         return feed;
     }
@@ -127,19 +126,29 @@ public abstract class BaseFeedGenerator
      */
     protected Entry createEntry(NoteItem item)
         throws GeneratorException {
-        Entry entry = newEntry(item.getUid());
+        return createEntry(item, false);
+    }
 
-        if (item.getDisplayName() != null)
-            entry.setTitle(item.getDisplayName());
-        else
-            entry.setTitle(item.getUid());
+    /**
+     * Creates a <code>Entry</code> with attributes and content based
+     * on the given item.
+     *
+     * @param item the item on which the entry is based
+     * @param isDocument whether or not the entry represents an entire
+     * document or is attached to a feed document
+     * @throws GeneratorException
+     */
+    protected Entry createEntry(NoteItem item,
+                                boolean isDocument)
+        throws GeneratorException {
+        Entry entry = newEntry(item.getUid(), isDocument);
+
+        entry.setTitle(item.getDisplayName());
         entry.setUpdated(item.getClientModifiedDate());
         entry.setPublished(item.getClientCreationDate());
         entry.addLink(newSelfLink(item));
-        entry.addLink(newEditLink(item));
+
         setEntryContent(entry, item);
-        // XXX add links for all parent collections, modified items
-        // and modifications
 
         return entry;
     }
@@ -175,6 +184,13 @@ public abstract class BaseFeedGenerator
             feed.setId(id);
         } catch (IRISyntaxException e) {
             throw new GeneratorException("Attempted to set invalid feed id " + id, e);
+        }
+
+        String baseUri = serviceLocator.getAtomBase();
+        try {
+            feed.setBaseUri(baseUri);
+        } catch (IRISyntaxException e) {
+            throw new GeneratorException("Attempted to set invalid base URI " + baseUri, e);
         }
 
         return feed;
@@ -220,9 +236,12 @@ public abstract class BaseFeedGenerator
      * given item uuid.
      *
      * @param uuid the item uuid to use for the entry id
+     * @param isDocument whether or not the entry represents an entire
+     * document or is attached to a feed document
      * @throws GeneratorException
      */
-    protected Entry newEntry(String uuid)
+    protected Entry newEntry(String uuid,
+                             boolean isDocument)
         throws GeneratorException {
         Entry entry = abderaFactory.newEntry();
 
@@ -231,6 +250,15 @@ public abstract class BaseFeedGenerator
             entry.setId(id);
         } catch (IRISyntaxException e) {
             throw new GeneratorException("Attempted to set invalid entry id " + id, e);
+        }
+
+        if (isDocument) {
+            String baseUri = serviceLocator.getAtomBase();
+            try {
+                entry.setBaseUri(baseUri);
+            } catch (IRISyntaxException e) {
+                throw new GeneratorException("Attempted to set invalid base URI " + baseUri, e);
+            }
         }
 
         return entry;
@@ -245,7 +273,7 @@ public abstract class BaseFeedGenerator
     protected Link newPimLink(Item item)
         throws GeneratorException {
         return newLink(Link.REL_ALTERNATE, MEDIA_TYPE_HTML,
-                       serviceLocator.getPimUrl(item));
+                       serviceLocator.getPimUrl(item, true));
     }
 
     /**
@@ -268,8 +296,43 @@ public abstract class BaseFeedGenerator
      */
     protected Link newEditLink(Item item)
         throws GeneratorException {
-        return newLink(Link.REL_EDIT, MEDIA_TYPE_ATOM,
-                       serviceLocator.getAtomUrl(item));
+        return newLink(Link.REL_EDIT, MEDIA_TYPE_ATOM, selfIri(item, false));
+    }
+
+    /**
+     * Creates a <code>Link</code> for the parent IRI of the given
+     * collection.
+     *
+     * @param collection the collection to link
+     * @throws GeneratorException
+     */
+    protected Link newParentLink(CollectionItem collection)
+        throws GeneratorException {
+        return newLink(REL_PARENT, MEDIA_TYPE_ATOM, selfIri(collection));
+    }
+
+    /**
+     * Creates a <code>Link</code> for the modifies IRI of the given
+     * item.
+     *
+     * @param item the item to link
+     * @throws GeneratorException
+     */
+    protected Link newModifiesLink(NoteItem item)
+        throws GeneratorException {
+        return newLink(REL_MODIFIES, MEDIA_TYPE_ATOM, selfIri(item));
+    }
+
+    /**
+     * Creates a <code>Link</code> for the modification IRI of the given
+     * item.
+     *
+     * @param item the item to link
+     * @throws GeneratorException
+     */
+    protected Link newModificationLink(NoteItem item)
+        throws GeneratorException {
+        return newLink(REL_MODIFICATION, MEDIA_TYPE_ATOM, selfIri(item));
     }
 
     /**
@@ -299,13 +362,27 @@ public abstract class BaseFeedGenerator
     }
 
     /**
-     * Returns the IRI of the given item.
+     * Returns the IRI of the given item including path info.
      *
      * @param item the item
      */
     protected String selfIri(Item item) {
-        StringBuffer iri = new StringBuffer(serviceLocator.getAtomUrl(item));
-        if (getProjection() != null)
+        return selfIri(item, true);
+    }
+
+    /**
+     * Returns the IRI of the given item. Path info (projection, etc)
+     * can optionally be included; this is usually done for read links
+     * but not edit links.
+     *
+     * @param item the item
+     * @param withPathInfo if path info should be provided
+     */
+    protected String selfIri(Item item,
+                             boolean withPathInfo) {
+        StringBuffer iri =
+            new StringBuffer(serviceLocator.getAtomUrl(item, false));
+        if (withPathInfo && getProjection() != null)
             iri.append("/").append(getProjection());
         return iri.toString();
     }

@@ -84,7 +84,16 @@ public class ServiceGenerator {
      */
     protected Service createService(User user)
         throws GeneratorException {
-        return factory.newService();
+        Service service = factory.newService();
+
+        String baseUri = serviceLocator.getAtomBase();
+        try {
+            service.setBaseUri(baseUri);
+        } catch (IRISyntaxException e) {
+            throw new GeneratorException("Attempted to set base URI " + baseUri, e);
+        }
+
+        return service;
     }
 
     /**
@@ -112,7 +121,7 @@ public class ServiceGenerator {
     protected Collection createCollection(CollectionItem item)
         throws GeneratorException {
         Collection collection = factory.newCollection();
-        String href = serviceLocator.getAtomUrl(item);
+        String href = serviceLocator.getAtomUrl(item, false);
 
         try {
             collection.setAccept("entry");

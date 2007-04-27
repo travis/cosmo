@@ -153,6 +153,17 @@ public class ServiceLocator implements ServerConstants {
     }
 
     /**
+     * Returns the Atom URL of the item.
+     *
+     * @param the item
+     * @param absolute whether or not the URL should be absolute 
+     */
+    public String getAtomUrl(Item item,
+                             boolean absolute) {
+        return calculateItemUrl(item, factory.getAtomPrefix(), absolute);
+    }
+
+    /**
      * Returns the CMP URL of the user.
      */
     public String getCmpUrl(User user) {
@@ -216,6 +227,17 @@ public class ServiceLocator implements ServerConstants {
     }
 
     /**
+     * Returns the Pim UI URL of the item.
+     *
+     * @param the item
+     * @param absolute whether or not the URL should be absolute 
+     */
+    public String getPimUrl(Item item,
+                            boolean absolute) {
+        return calculateItemUrl(item, factory.getPimPrefix(), absolute);
+    }
+
+    /**
      * Returns the webcal base URL.
      */
     public String getWebcalBase() {
@@ -232,25 +254,30 @@ public class ServiceLocator implements ServerConstants {
     private String calculateBaseUrl(String servicePrefix) {
         StringBuffer buf = new StringBuffer(appMountUrl);
 
-        buf.append(servicePrefix);
+        buf.append(servicePrefix).append("/");
 
         return buf.toString();
     }
 
     private String calculateItemUrl(Item item,
                                     String servicePrefix) {
-        StringBuffer buf = new StringBuffer(appMountUrl);
+        return calculateItemUrl(item, servicePrefix, true);
+    }
+
+    private String calculateItemUrl(Item item,
+                                    String servicePrefix,
+                                    boolean absolute) {
+        StringBuffer buf = new StringBuffer();
+
+        if (absolute)
+            buf.append(appMountUrl).append(servicePrefix).append("/");
 
         String itemPrefix = item instanceof CollectionItem ?
             PATH_COLLECTION : PATH_ITEM;
-
-        buf.append(servicePrefix).
-            append("/").append(itemPrefix).
-            append("/").append(item.getUid());
+        buf.append(itemPrefix).append("/").append(item.getUid());
 
         if (ticketKey != null)
-            buf.append("?").
-                append(PARAM_TICKET).append("=").append(ticketKey);
+            buf.append("?").append(PARAM_TICKET).append("=").append(ticketKey);
 
         return buf.toString();
     }

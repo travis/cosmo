@@ -269,7 +269,7 @@ public class StandardProvider extends AbstractProvider
                 new BaseResponseContext<Document<Element>>(service.getDocument());
             return rc;
         } catch (GeneratorException e) {
-            String reason = "Unknown feed generation error: " + e.getMessage();
+            String reason = "Unknown service generation error: " + e.getMessage();
             log.error(reason, e);
             return servererror(abdera, request, reason, e);
         }

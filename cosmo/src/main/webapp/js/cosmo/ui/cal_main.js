@@ -16,6 +16,8 @@
 
 dojo.provide("cosmo.ui.cal_main");
 
+dojo.require("dojo.html.common");
+
 // -- Create global vars, do not remove despite lack of refs in code
 dojo.require("cosmo.ui.conf");
 dojo.require("cosmo.util.i18n");
@@ -36,6 +38,8 @@ dojo.require("cosmo.ui.widget.CollectionSelector");
 dojo.require("cosmo.conduits");
 dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
+dojo.require("cosmo.datetime.Date");
+dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.ui.cal_form");
 dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.button");
@@ -44,6 +48,9 @@ dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.account.create');
+
+// Props for confirmation dialogs
+dojo.require('cosmo.view.cal.dialog');
 
 
 // Global variables for X and Y position for mouse
@@ -56,6 +63,8 @@ yPos = 0;
 cosmo.ui.cal_main.Cal = new function () {
 
     var self = this;
+    // Private variable for the list of any deleted subscriptions
+    var deletedSubscriptions = [];
 
     // Constants
     this.ID_SEPARATOR = '__';
@@ -103,14 +112,11 @@ cosmo.ui.cal_main.Cal = new function () {
     /**
      * Main function
      */
-    this.init = function (collectionUid, ticketKey) {
+    this.init = function (p) {
 
-        // Props for confirmation dialogs
-        // --------------
-        dojo.require('cosmo.view.cal.dialog');
-
-        var viewDiv = null;
-        var allDayDiv = null;
+        var params = p || {};
+        var collectionUid = params.collectionUid;
+        var ticketKey = params.ticketKey;
 
         this.currDate = new Date();
 
@@ -125,143 +131,30 @@ cosmo.ui.cal_main.Cal = new function () {
         // --------------
         Pref.init();
 
+        // Only in logged-in view
+        if (params.authAccess) {
+            cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage,
+                [cosmo.account.preferences.getPreferences()]);
+        }
         // Place all the UI DOM elements based on window size
         // --------------
-
-        viewDiv = document.getElementById('timedScrollingMainDiv');
-        allDayDiv = document.getElementById('allDayContentDiv');
         this.placeUI();
         this.setImagesForSkin();
-        this.setUpNavButtons();
-
-
         // Load and display date info, render cal canvas
         // --------------
         if (this.loadLocaleDateInfo() && this.setQuerySpan(this.currDate)) {
             cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd,
                 this.currDate);
         }
-
         // Calendar event detail form
         this.calForm = new CalForm();
         this.calForm.init();
 
-        var deletedSubscriptions = null;
-        // Load/create calendar to view
-        // --------------
-        // If we received a ticket, just grab the specified collection
-        if (ticketKey) {
-            this.ticketView = true;
-            try{
-               var collection = this.serv.getCalendar(collectionUid, ticketKey);
-            }catch(e){
-                cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), e);
-                return false;
-            }
-            var ticket = this.serv.getTicket(ticketKey, collectionUid);
-            this.currentCollections.push(
-                {
-                    collection: collection,
-                    transportInfo: ticket,
-                    conduit: cosmo.conduits.AnonymousTicketedConduit,
-                    displayName: collection.name,
-                    privileges: ticket.privileges
-                }
-                );
-        }
-
-        // Otherwise, get all calendars for this user
-        else {
-            var userCollections = this.serv.getCalendars();
-            for (var i = 0; i < userCollections.length; i++){
-                var collection = userCollections[i];
-                this.currentCollections.push(
-                    {
-                    collection: collection,
-                    transportInfo: null,
-                    conduit: cosmo.conduits.OwnedCollectionConduit,
-                    displayName: collection.name,
-                    privileges: {'read':'read', 'write':'write'}
-                    }
-                );
-            }
-
-            // No cals for this user
-            if (this.currentCollections.length == 0){
-                // Create initial cal
-                try {
-                    var uid = this.serv.createCalendar('Cosmo');
-                }
-                catch(e) {
-                    cosmo.app.showErr(_('Main.Error.InitCalCreateFailed'), e);
-                    return false;
-                }
-                var collection = this.serv.getCalendar(uid);
-                var newCollectionItem = {
-                    collection: collection,
-                    transportInfo: null,
-                    conduit: cosmo.conduits.OwnedCollectionConduit,
-                    displayName: collection.name,
-                    privileges: {'read':'read', 'write':'write'}
-                    }
-
-                this.currentCollections.push(newCollectionItem);
-
-                newCollectionItem.conduit.saveEvent(
-                   newCollectionItem.collection.uid,
-                   this.createWelcomeEvent(),
-                   newCollectionItem.transportInfo, f)
-            }
-            var subscriptions = this.serv.getSubscriptions();
-            var result = this.filterOutDeletedSubscriptions(subscriptions);
-            subscriptions = result[0];
-            deletedSubscriptions = result[1];
-
-            for (var i = 0; i < subscriptions.length; i++){
-                var subscription = subscriptions[i];
-                this.currentCollections.push(
-                    {
-                    collection: subscription.calendar,
-                    transportInfo: subscription,
-                    conduit: cosmo.conduits.SubscriptionConduit,
-                    displayName: subscription.displayName,
-                    privileges: subscription.ticket.privileges
-                    }
-                );
-            }
-        }
-
-        // Sort the collections, for Pete's sake
-        var f = function (a, b) {
-            var aName = a.displayName.toLowerCase();
-            var bName = b.displayName.toLowerCase();
-            var r = 0;
-            if (aName == bName) {
-                r = (a.collection.uid > b.collection.uid) ? 1 : -1;
-            }
-            else {
-                r = (aName > bName) ? 1 : -1;
-            }
-            return r;
-        };
-        this.currentCollections.sort(f);
-
-        // If we received a collectionUid, select that collection
-        if (collectionUid){
-            for (var i = 0; i < this.currentCollections.length; i++){
-                if (this.currentCollections[i].collection.uid == collectionUid){
-                    this.currentCollection = this.currentCollections[i];
-                    break;
-                }
-            }
-        }
-        // Otherwise, use the first collection
-        else {
-            this.currentCollection = this.currentCollections[0];
-        }
+        // Load collections for this user
+        this.loadCollections(ticketKey, collectionUid);
 
         // Display selector or single cal name
-        this._collectionSelectContainer = document.getElementById('calSelectNav');
+        this._collectionSelectContainer = $('calSelectNav');
         this._collectionSelector = dojo.widget.createWidget(
             'cosmo:CollectionSelector', {
                 'collections': this.currentCollections,
@@ -270,8 +163,8 @@ cosmo.ui.cal_main.Cal = new function () {
             }, this._collectionSelectContainer, 'last');
 
         // Load minical and jump-to date
-        var mcDiv = document.getElementById('miniCalDiv');
-        var jpDiv = document.getElementById('jumpToDateDiv');
+        var mcDiv = $('miniCalDiv');
+        var jpDiv = $('jumpToDateDiv');
         // Place jump-to date based on mini-cal pos
         if (cosmo.ui.minical.MiniCal.init(Cal, mcDiv)) {
            this.calForm.addJumpToDate(jpDiv);
@@ -292,7 +185,7 @@ cosmo.ui.cal_main.Cal = new function () {
         // Scroll to 8am for normal event
         // Have to do this dead last because appending to the div
         // seems to reset the scrollTop in Safari
-        viewDiv.scrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
+        $('timedScrollingMainDiv').scrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
 
         // Add event listeners for form-element behaviors
         this.calForm.setEventListeners();
@@ -307,12 +200,11 @@ cosmo.ui.cal_main.Cal = new function () {
             setTimeout(f, 0);
         }
 
-        //show errors for deleted subscriptions
-        xxx= deletedSubscriptions;
+        // Show errors for deleted subscriptions -- deletedSubscriptions
+        // is a private var populated in the loadCollections method
         if (deletedSubscriptions && deletedSubscriptions.length > 0){
             for (var x = 0; x < deletedSubscriptions.length; x++){
                 cosmo.app.showErr(_("Main.Error.SubscribedCollectionDeleted",deletedSubscriptions[x].displayName));
-
             }
         }
     };
@@ -373,8 +265,9 @@ cosmo.ui.cal_main.Cal = new function () {
         var vOffset = 0;
         var calcHeight = 0;
 
-        var winwidth = this.getWinWidth();
-        var winheight = this.getWinHeight();
+        var viewport = dojo.html.getViewport();
+        var winwidth = viewport.width;
+        var winheight = viewport.height;
 
         // Pare width and height down to avoid stupid scrollbars showing up
         winwidth-=3;
@@ -556,7 +449,7 @@ cosmo.ui.cal_main.Cal = new function () {
         // Resize handle for all-day area
         var i = _createElem('img');
         i.src = cosmo.env.getImagesUrl() + 'resize_handle_image.gif';
-        document.getElementById('allDayResizeHandleDiv').appendChild(i);
+        $('allDayResizeHandleDiv').appendChild(i);
 
         // Cosmo logo
         logoDiv.style.background =
@@ -604,56 +497,125 @@ cosmo.ui.cal_main.Cal = new function () {
         Date.meridian = newArr;
         return true;
     };
-    this.getWinHeight = function () {
-        // IE
-        // *** Note: IE requires the body style to include'height:100%;'
-        // *** to get the actual window height
-        if (document.all) {
-            return document.documentElement.clientHeight;
-        }
-        // Moz/compat
-        else {
-            return window.innerHeight;
-        }
-    };
-    this.getWinWidth =  function () {
-        // IE
-        if (document.all) {
-            return document.documentElement.clientWidth;
-        }
-        // Moz/compat
-        else {
-            return window.innerWidth;
-        }
-    };
-
-    // ==========================
-    // Loading and displaying events
-    // ==========================
-
-
 
     // ==========================
     // Navigating and changing calendars
     // ==========================
-    /**
-     * Set up the week-to-week navigation button panel
-     */
-    this.setUpNavButtons = function () {
-        var back = function () {
-            dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', data: { goTo: 'back' }
-            });
+    this.loadCollections = function (ticketKey, collectionUid) {
+        // Load/create calendar to view
+        // --------------
+        // If we received a ticket, just grab the specified collection
+        if (ticketKey) {
+            this.ticketView = true;
+            try{
+               var collection = this.serv.getCalendar(collectionUid, ticketKey);
+            }catch(e){
+                cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), e);
+                return false;
         }
-        var next = function () {
-            dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', data: { goTo: 'next' }
-            });
+            var ticket = this.serv.getTicket(ticketKey, collectionUid);
+            this.currentCollections.push(
+                {
+                    collection: collection,
+                    transportInfo: ticket,
+                    conduit: cosmo.conduits.AnonymousTicketedConduit,
+                    displayName: collection.name,
+                    privileges: ticket.privileges
         }
-        var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
-        document.getElementById('viewNavButtons').appendChild(navButtons.domNode);
-    };
+                );
+        }
 
+        // Otherwise, get all collections for this user
+        else {
+            var userCollections = this.serv.getCalendars();
+            for (var i = 0; i < userCollections.length; i++){
+                var collection = userCollections[i];
+                this.currentCollections.push(
+                    {
+                    collection: collection,
+                    transportInfo: null,
+                    conduit: cosmo.conduits.OwnedCollectionConduit,
+                    displayName: collection.name,
+                    privileges: {'read':'read', 'write':'write'}
+        }
+                );
+            }
+
+            // No collections for this user
+            if (this.currentCollections.length == 0){
+                // Create initial cal
+                try {
+                    var uid = this.serv.createCalendar('Cosmo');
+                }
+                catch(e) {
+                    cosmo.app.showErr(_('Main.Error.InitCalCreateFailed'), e);
+                    return false;
+                }
+                var collection = this.serv.getCalendar(uid);
+                var newCollectionItem = {
+                    collection: collection,
+                    transportInfo: null,
+                    conduit: cosmo.conduits.OwnedCollectionConduit,
+                    displayName: collection.name,
+                    privileges: {'read':'read', 'write':'write'}
+                    }
+
+                this.currentCollections.push(newCollectionItem);
+
+                newCollectionItem.conduit.saveEvent(
+                   newCollectionItem.collection.uid,
+                   this.createWelcomeEvent(),
+                   newCollectionItem.transportInfo, f)
+            }
+            var subscriptions = this.serv.getSubscriptions();
+            var result = this.filterOutDeletedSubscriptions(subscriptions);
+            subscriptions = result[0];
+            deletedSubscriptions = result[1];
+
+            for (var i = 0; i < subscriptions.length; i++){
+                var subscription = subscriptions[i];
+                this.currentCollections.push(
+                    {
+                    collection: subscription.calendar,
+                    transportInfo: subscription,
+                    conduit: cosmo.conduits.SubscriptionConduit,
+                    displayName: subscription.displayName,
+                    privileges: subscription.ticket.privileges
+        }
+                );
+        }
+        }
+
+        // Sort the collections, for Pete's sake
+        var f = function (a, b) {
+            var aName = a.displayName.toLowerCase();
+            var bName = b.displayName.toLowerCase();
+            var r = 0;
+            if (aName == bName) {
+                r = (a.collection.uid > b.collection.uid) ? 1 : -1;
+            }
+            else {
+                r = (aName > bName) ? 1 : -1;
+            }
+            return r;
+    };
+        this.currentCollections.sort(f);
+
+        // If we received a collectionUid, select that collection
+        if (collectionUid){
+            for (var i = 0; i < this.currentCollections.length; i++){
+                if (this.currentCollections[i].collection.uid == collectionUid){
+                    this.currentCollection = this.currentCollections[i];
+                    break;
+                }
+            }
+        }
+        // Otherwise, use the first collection
+        else {
+            this.currentCollection = this.currentCollections[0];
+        }
+
+    };
     this.loadCollectionItems = function (data, opts) {
         var self = this;
         var collection = data.collection;
@@ -703,40 +665,16 @@ cosmo.ui.cal_main.Cal = new function () {
             action: 'eventsLoad', data: data, opts: opts });
     }
     // ==========================
-    // Cal-specific time manip functions
+    // PIM-specific time functions
     // ==========================
     /**
      * Get the start and end for the span of time to view in the cal
      * Eventually this will change depending on what type of view is selected
      */
     this.setQuerySpan = function (dt) {
-        this.viewStart = this.getWeekStart(dt);
-        this.viewEnd = this.getWeekEnd(dt);
+        this.viewStart = cosmo.datetime.util.getWeekStart(dt);
+        this.viewEnd = cosmo.datetime.util.getWeekEnd(dt);
         return true;
-    };
-    /**
-     * Get the datetime for midnight Sunday of a week given a date
-     * anywhere in the week
-     */
-    this.getWeekStart = function (dt) {
-        var diff = dt.getDay();
-        var sun = new Date(dt.getTime());
-        diff = 0 - diff;
-        sun = cosmo.datetime.Date.add(sun, dojo.date.dateParts.DAY, diff);
-        var ret = new Date(sun.getFullYear(), sun.getMonth(), sun.getDate());
-        return ret;
-    };
-    /**
-     * Get the datetime for 23:59:59 Saturday night of a week
-     * given a date anywhere in the week
-     */
-    this.getWeekEnd = function (dt) {
-        var diff = 6-dt.getDay();
-        var sat = new Date(dt.getTime());
-        sat = cosmo.datetime.Date.add(sat, dojo.date.dateParts.DAY, diff);
-         // Make time of day 11:59:99 to get the entire day's events
-        var ret = new Date(sat.getFullYear(), sat.getMonth(), sat.getDate(), 23, 59, 59);
-        return ret;
     };
     /**
      * Get the datetime for midnight Sunday given the current Sunday

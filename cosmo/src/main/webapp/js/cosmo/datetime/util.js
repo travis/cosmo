@@ -17,6 +17,8 @@
 dojo.provide("cosmo.datetime.util");
 
 dojo.require("cosmo.datetime");
+dojo.require("cosmo.datetime.Date");
+dojo.require("dojo.date.common");
 
 cosmo.datetime.util = new function () {
     
@@ -89,7 +91,31 @@ cosmo.datetime.util = new function () {
      */
     this.adjSun = function(d) {
         return d == 0 ? 7 : d;
-    }
+};
+    /**
+     * Get the datetime for midnight Sunday of a week given a date
+     * anywhere in the week
+     */
+    this.getWeekStart = function (dt) {
+        var diff = dt.getDay();
+        var sun = new Date(dt.getTime());
+        diff = 0 - diff;
+        sun = cosmo.datetime.Date.add(sun, dojo.date.dateParts.DAY, diff);
+        var ret = new Date(sun.getFullYear(), sun.getMonth(), sun.getDate());
+        return ret;
+    };
+    /**
+     * Get the datetime for 23:59:59 Saturday night of a week
+     * given a date anywhere in the week
+     */
+    this.getWeekEnd = function (dt) {
+        var diff = 6-dt.getDay();
+        var sat = new Date(dt.getTime());
+        sat = cosmo.datetime.Date.add(sat, dojo.date.dateParts.DAY, diff);
+         // Make time of day 11:59:99 to get the entire day's events
+        var ret = new Date(sat.getFullYear(), sat.getMonth(), sat.getDate(), 23, 59, 59);
+        return ret;
+    };
 };
 
 

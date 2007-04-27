@@ -66,40 +66,21 @@ dojo.require('cosmo.topics');
 dojo.require('cosmo.account.preferences');
 dojo.require('cosmo.account.settings');
 
-// Added automatically to window.onload by 
-// cosmo.ui.event.listeners.hookUpListeners
-cosmo.ui.event.handlers.init = function () {
-    var collectionUid = undefined;
-    var ticketKey = undefined;
+cosmo.app.initObj = cosmo.ui.cal_main.Cal;
+cosmo.app.initParams = {};
+
 <c:if test="${collection != null}">
-    collectionUid = '${collection.uid}';
+cosmo.app.initParams.collectionUid = '${collection.uid}';
 </c:if>
 <c:if test="${not empty ticketKey}">
-    ticketKey = '${ticketKey}';
+cosmo.app.initParams.ticketKey = '${ticketKey}';
 </c:if>
-    
-    cosmo.app.initObj = Cal;
-    cosmo.app.init(collectionUid, ticketKey);
-
 <c:if test="${not ticketedView}">
-    cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, 
-  						 [cosmo.account.preferences.getPreferences()]);
+cosmo.app.initParams.authAccess = true;
 </c:if>
-}
 
 dojo.require("cosmo.ui.event.listeners");
 cosmo.ui.event.listeners.hookUpListeners();
-
-function updateUIFromPrefs(/*cosmo.topics.PreferencesUpdatedMessage*/ message){
-	if (message.preferences[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] == 'true'){
-		$('accountBrowserLink').style.display = 'inline';
-	} else {
-		$('accountBrowserLink').style.display = 'none';
-	}
-}
-
-dojo.event.topic.subscribe(
-	cosmo.topics.PreferencesUpdatedMessage.topicName, this, updateUIFromPrefs);
 
 </script>
 
@@ -163,7 +144,6 @@ dojo.event.topic.subscribe(
           <%-- End main nav menu --%>
         </div>
         <div id="calDiv">
-            <form method="post" id="calForm" action="">
                 <div id="leftSidebarDiv">
                     <div id="calSelectNav"></div>
                     <div id="jumpToDateDiv"></div>
@@ -190,9 +170,10 @@ dojo.event.topic.subscribe(
                     <div id="timedContentDiv"></div>
                 </div>
                 <div id="rightSidebarDiv">
+                    <form method="post" id="calForm" action="">
                     <div id="eventInfoDiv"></div>
-                </div>
             </form>
+        </div>
         </div>
         <div id="maskDiv">
           <div id="processingDiv">

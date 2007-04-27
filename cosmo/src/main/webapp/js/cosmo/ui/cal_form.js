@@ -21,10 +21,6 @@
  * @license Apache License 2.0
  */
 
-/**
- * @object The form for all UI-form-elements on the page
- */
-
 dojo.require("dojo.string");
 dojo.require("dojo.lang");
 dojo.require("dojo.event.common");
@@ -32,7 +28,9 @@ dojo.require("dojo.event.topic");
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
+dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.ui.event.handlers");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.validate");
@@ -544,10 +542,7 @@ cosmo.ui.cal_form.CalForm = function () {
     /**
      * Update the event's CalEventData obj from the values in the form
      * Called when clicking the Save button or hitting Enter
-     * BANDAID: Currently still building native JS Date objects from
-     * the values in the form and then gettting ScoobyDates for the
-     * event based on those -- should be building ScoobyDates directly
-     * from the form
+     * FIXME: still using JS proxy Dates here
      */
     this.updateEvent = function (ev) {
         var form = this.form;
@@ -710,7 +705,7 @@ cosmo.ui.cal_form.CalForm = function () {
                 var recurEnd = null;
                 if (rE) {
                     rE = new Date(rE);
-                    recurEnd = new ScoobyDate(rE.getFullYear(), rE.getMonth(), rE.getDate());
+                    recurEnd = new cosmo.datetime.Date(rE.getFullYear(), rE.getMonth(), rE.getDate());
                 }
                 if (rule) {
                     rule.frequency = recur;
@@ -969,10 +964,14 @@ cosmo.ui.cal_form.CalForm = function () {
         d = _createElem('div');
         d.className = 'formElem floatLeft';
         dc.appendChild(d);
+        var f = _createElem('form');
+        f.id = 'jumpToForm';
+        f.onsubmit = function () { return false; };
+        d.appendChild(f);
         _html.createInput('text', 'jumpto', 'jumpto',
-            10, 10, null, 'inputText', d);
-        self.setTextInput(self.form.jumpto, 'mm/dd/yyyy', true, false);
-        dojo.event.connect(self.form.jumpto, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
+            10, 10, null, 'inputText', f);
+        self.setTextInput(f.jumpto, 'mm/dd/yyyy', true, false);
+        dojo.event.connect(f.jumpto, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
 
         d = _createElem('div');
         d.className = 'floatLeft';
@@ -1005,7 +1004,7 @@ cosmo.ui.cal_form.CalForm = function () {
     this.goJumpToDate = function () {
         var e = null;
         var err = '';
-        var val = self.form.jumpto.value;
+        var val = $('jumpToForm').jumpto.value;
         err = cosmo.util.validate.dateFormat(val);
         if (err) {
             err += '\n';

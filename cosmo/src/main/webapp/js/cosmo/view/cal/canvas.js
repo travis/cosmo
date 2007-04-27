@@ -22,6 +22,7 @@ dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
+dojo.require("cosmo.datetime.Date");
 dojo.require('cosmo.ui.event.handlers');
 dojo.require('cosmo.view.cal.draggable');
 dojo.require("cosmo.util.i18n");
@@ -155,11 +156,13 @@ cosmo.view.cal.canvas = new function () {
                 str += '<div class="dayListDayDiv" id="dayListDiv' + i +
                     '" style="left:' + start + 'px; width:' + (self.dayUnitWidth-1) +
                     'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
+                /*
                 if (calcDay.getTime() == currDay.getTime()) {
                     str += ' background-image:url(' + cosmo.env.getImagesUrl() +
                         'day_col_header_background.gif); background-repeat:' +
                         ' repeat-x; background-position:0px 0px;'
                 }
+                */
                 str += '">';
                 str += cosmo.datetime.abbrWeekday[i] + '&nbsp;' + startdate;
                 str += '</div>\n';
@@ -183,12 +186,7 @@ cosmo.view.cal.canvas = new function () {
             var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
 
             for (var i = 0; i < 7; i++) {
-                calcDay = cosmo.datetime.Date.add(viewStart, dojo.date.dateParts.DAY, i);
-                str += '<div class="allDayListDayDiv';
-                if (calcDay.getTime() == currDay.getTime()) {
-                    str += ' currentDayDay'
-                }
-                str +='" id="allDayListDiv' + i +
+                str += '<div class="allDayListDayDiv" id="allDayListDiv' + i +
                 '" style="left:' + start + 'px; width:' +
                 (cosmo.view.cal.canvas.dayUnitWidth-1) + 'px;">&nbsp;</div>';
                 start += cosmo.view.cal.canvas.dayUnitWidth;
@@ -212,7 +210,6 @@ cosmo.view.cal.canvas = new function () {
             var calcDay = null;
             var cd = currDate;
             var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
-            var isCurrentDay = false;
             var viewDiv = null;
             var timeLineWidth = 0;
             var workingHoursBarWidth = 3;
@@ -289,33 +286,12 @@ cosmo.view.cal.canvas = new function () {
                     'px;"';
                 str += '>';
                 for (var j = 0; j < 24; j++) {
-
-                    isCurrentDay = (calcDay.getTime() == currDay.getTime());
-
                     idstr = i + '-' + j + '00';
                     row = '';
-                    row += '<div id="hourDiv' + idstr + '" class="hourDivTop';
-                    // Highlight the current day
-                    if (isCurrentDay) {
-                        row += ' currentDayDay'
-                    }
-                    // Non-working hours are gray
-                    else if (j < 8 || j > 18) {
-                        //row += ' nonWorkingHours';
-                    }
-                    row += '" style="height:' + halfHourHeight + 'px;">';
+                    row += '<div id="hourDiv' + idstr + '" class="hourDivTop" style="height:' + halfHourHeight + 'px;">';
                     row += '</div>\n';
                     idstr = i + '-' + j + '30';
-                    row += '<div id="hourDiv' + idstr + '" class="hourDivBottom';
-                    // Highlight the current day
-                    if (isCurrentDay) {
-                        row += ' currentDayDay'
-                    }
-                    // Non-working hours are gray
-                    else if (j < 8 || j > 18) {
-                        //row += ' nonWorkingHours';
-                    }
-                    row += '" style="';
+                    row += '<div id="hourDiv' + idstr + '" class="hourDivBottom" style="';
                     if (j == 11) {
                         row += 'height:' + (halfHourHeight-1) +
                             'px; border-width:2px;';
@@ -363,19 +339,60 @@ cosmo.view.cal.canvas = new function () {
             }
             headerDiv.appendChild(document.createTextNode(str));
         }
+        /**
+         * Set up the week-to-week navigation button panel
+         */
+        function setUpNavButtons() {
+            var back = function back() {
+                dojo.event.topic.publish('/calEvent', {
+                    action: 'loadCollection', data: { goTo: 'back' }
+                });
+            }
+            var next = function next() {
+                dojo.event.topic.publish('/calEvent', {
+                    action: 'loadCollection', data: { goTo: 'next' }
+                });
+            }
+            var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
+            document.getElementById('viewNavButtons').appendChild(navButtons.domNode);
+        };
+        function setCurrentDayStatus() {
+            // 'Today' is in the displayed view range
+            var currDate = cosmo.ui.cal_main.Cal.currDate;
+            var currDateTime = currDate.getTime();
+            var currDateDay = currDate.getDay();
+            var currDayClass = '';
+            var currDayImg = '';
+            var currDayIdPrefix = 'hourDiv' + currDateDay + '-';
+            if (cosmo.ui.cal_main.Cal.viewStart.getTime() <= currDateTime &&
+                cosmo.ui.cal_main.Cal.viewEnd.getTime() > currDateTime) {
+                currDayClass = ' currentDayDay';
+                currDayImg = 'url(' + cosmo.env.getImagesUrl() +
+                    'day_col_header_background.gif); background-repeat:' +
+                    ' repeat-x; background-position:0px 0px;'
+            }
+            else {
+                currDayClass = '';
+                currDayImg = '';
+            }
+            // Set background image or set to flat white for day name
+            $('dayListDiv' + currDateDay).style.backgroundImage = currDayImg;
+            // Set gray or white background for all-day area
+            $('allDayListDiv' + currDateDay).className = 'allDayListDayDiv' + currDayClass;
+            // Reset the CSS class on all the rows in the 'today' col
+            // Either highlight with gray, or reset to white
+            for (var i = 0; i < 24; i++) {
+                $(currDayIdPrefix + i + '00').className = 'hourDivTop' + currDayClass;
+                $(currDayIdPrefix + i + '30').className = 'hourDivBottom' + currDayClass;
+            }
+        }
+
 
         // Do it!
         // -----------
-        if (!initRender) {
-            // Make the all-day event area resizeable
-            // --------------
-            allDayArea = new cosmo.ui.resize_area.ResizeArea(
-                'allDayResizeMainDiv', 'allDayResizeHandleDiv');
-            allDayArea.init('down');
-            allDayArea.addAdjacent('timedScrollingMainDiv');
-            allDayArea.setDragLimit();
-        }
-        else {
+        // Remove events for re-draw -- don't do on first render
+        // must happen before any rendering occurs
+        if (initRender) {
             removeAllEvents();
         }
 
@@ -385,18 +402,29 @@ cosmo.view.cal.canvas = new function () {
         showDayNameHeaders();
         showAllDayCols();
 
-        // Create event listeners
+        // On the first time rendering happens -- must happen
+        // after base render
         if (!initRender) {
+            // Make the all-day event area resizeable
+            allDayArea = new cosmo.ui.resize_area.ResizeArea(
+                'allDayResizeMainDiv', 'allDayResizeHandleDiv');
+            allDayArea.init('down');
+            allDayArea.addAdjacent('timedScrollingMainDiv');
+            allDayArea.setDragLimit();
+        // Create event listeners
             dojo.event.connect(hoursNode, 'onmousedown', mouseDownHandler);
             dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
             dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
             dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
             // Get a reference to the main scrolling area for timed events;
             timedScrollingMainDiv = $('timedScrollingMainDiv');
-            // Only render the base canvas once on initial load
+            // Render the base canvas and week-to-week nav buttons
             showHours();
+            setUpNavButtons();
         }
-
+        // Just updating the CSS to highlight the current day
+        // is faster than re-rendering the entire base cal canvas
+        setCurrentDayStatus();
         initRender = true;
     };
     /**
@@ -707,7 +735,7 @@ cosmo.view.cal.canvas = new function () {
      * groups of recurring events
      * @param arr Array of CalEventData ids for the recurrences to
      * remove
-     * @param dt A ScoobyDate,represents the end date of a
+     * @param dt A cosmo.datetime.Date,represents the end date of a
      * recurrence -- if the dt param is present, it will remove
      * only the event instances which occur after the date
      * It will also reset the recurrence endDate for all dates
@@ -722,7 +750,7 @@ cosmo.view.cal.canvas = new function () {
         var str = ',' + arr.join() + ',';
         var h = new Hash();
         var ev = null;
-        var compDt = dt ? new ScoobyDate(dt.getFullYear(),
+        var compDt = dt ? new cosmo.datetime.Date(dt.getFullYear(),
             dt.getMonth(), dt.getDate(), 23, 59) : null;
         while (ev = reg.pop()) {
             var removeForDate = true;
@@ -744,7 +772,7 @@ cosmo.view.cal.canvas = new function () {
                         keep = true;
                         // Reset the end date for the recurrence on the
                         // events not removed
-                        ev.data.recurrenceRule.endDate = new ScoobyDate(dt.getFullYear(),
+                        ev.data.recurrenceRule.endDate = new cosmo.datetime.Date(dt.getFullYear(),
                             dt.getMonth(), dt.getDate());
                     }
                     break;
@@ -1258,7 +1286,7 @@ cosmo.view.cal.canvas = new function () {
             var t = cosmo.datetime.util.parseTimeString(startstr);
             hou = t.hours;
             min = t.minutes;
-            start = new ScoobyDate(yea, mon, dat, hou, min);
+            start = new cosmo.datetime.Date(yea, mon, dat, hou, min);
             end = cosmo.datetime.Date.add(start, dojo.date.dateParts.MINUTE, 60);
         }
         else if (evType == 'allDayMain') {

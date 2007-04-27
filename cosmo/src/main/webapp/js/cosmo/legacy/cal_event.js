@@ -87,9 +87,9 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
             }
         }
         /**
-         * Compare ScoobyDate/JS Dates, use value.
-         * @param curr ScoobyDate/Date the edited date
-         * @param orig ScoobyDate/Date the original event date
+         * Compare cosmo.datetime.Date/JS Date, use value.
+         * @param curr Date/cosmo.datetime.Date the edited date
+         * @param orig Date/cosmo.datetime.Date the original event date
          * @return Boolean, true or false
          */
         var compareDateTime = function (curr, orig) {
@@ -260,7 +260,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
      * on one side or the other of the current view span
      */
     this.isOutOfViewRange = function () {
-        // Note event data dates are ScoobyDate, viewStart/viewEnd are Date
+        // Note event data dates are cosmo.datetime.Date, viewStart/viewEnd are Date
         // Return true only if both start and end are before view range
         // or both are after view range
         var ret = ((this.startsBeforeViewRange() && this.endsBeforeViewRange()) ||

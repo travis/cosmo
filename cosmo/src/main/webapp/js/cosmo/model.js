@@ -17,6 +17,8 @@ dojo.provide("cosmo.model");
 
 dojo.require("cosmo.util.debug");
 dojo.require("cosmo.util.hash");
+dojo.require("cosmo.datetime");
+dojo.require("cosmo.datetime.Date");
 
 
 cosmo.model.CalEventData = function (id, title, description, start, end, allDay,
@@ -155,7 +157,7 @@ RecurrenceRule.clone = function(rule) {
         arr = rule.exceptionDates;
         if (arr) {
             for (var i = 0; i < arr.length; i++) {
-                ret.exceptionDates.push(ScoobyDate.clone(arr[i]));
+                ret.exceptionDates.push(cosmo.datetime.Date.clone(arr[i]));
             }
         }
         ret.modifications = [];

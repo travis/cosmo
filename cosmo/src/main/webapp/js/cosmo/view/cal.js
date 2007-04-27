@@ -266,7 +266,7 @@ cosmo.view.cal = new function () {
                                 // ----------------------
                                 if (startOrEndChange) {
                                     var masterStart = evData.start; // The start for the master event
-                                    var masterEnd = new ScoobyDate(); // An empty date for the new master end
+                                    var masterEnd = null; // An empty date for the new master end
                                     var origStart = ev.dataOrig.start; // The pre-edit start for the edited instance
                                     var newStart = ev.data.start; // The start for the edited instance
                                     // The number of minutes between the start and end for the edited instance
@@ -349,7 +349,7 @@ cosmo.view.cal = new function () {
                     // The date (no time values ) of the start time for the
                     // instance being edited -- used to calculate the new end
                     // date for the current recurrence being ended
-                    var startNoTime = new ScoobyDate(start.getFullYear(),
+                    var startNoTime = new cosmo.datetime.Date(start.getFullYear(),
                         start.getMonth(), start.getDate());
                     // These values will tell us where to end the recurrence
                     var unit = ranges[freq][0];
@@ -389,7 +389,7 @@ cosmo.view.cal = new function () {
                     var mod = new Modification(); // New Modification obj to append to the list
                     mod.event = new CalEventData(); // Empty CalEventData to use for saving
                     // instanceDate of the mod serves as the recurrenceId
-                    mod.instanceDate = ScoobyDate.clone(ev.data.instanceDate);
+                    mod.instanceDate = cosmo.datetime.Date.clone(ev.data.instanceDate);
                     for (var p in changedProps.changes) {
                         mod.modifiedProperties.push(p);
                         mod.event[p] = changedProps.changes[p].newValue;
@@ -482,7 +482,7 @@ cosmo.view.cal = new function () {
      * Response to the async request is handled by handleSaveEvent.
      * @param ev A CalEvent object, the event to be saved.
      * @param origId String, the id of the event for the original recurrence.
-     * @param recurEnd A ScoobyDate, the date the original recurrence
+     * @param recurEnd A cosmo.datetime.Date, the date the original recurrence
      * should end.
      * @param opts A JS Object, options for the save operation.
      */
@@ -723,7 +723,7 @@ cosmo.view.cal = new function () {
                                 var start = ev.data.start;
                                 // Use the date of the selected event to figure the
                                 // new end date for the recurrence
-                                var recurEnd = new ScoobyDate(start.getFullYear(),
+                                var recurEnd = new cosmo.datetime.Date(start.getFullYear(),
                                     start.getMonth(), start.getDate());
                                 var unit = ranges[freq][0];
                                 var incr = (ranges[freq][1] * -1);
@@ -747,7 +747,7 @@ cosmo.view.cal = new function () {
                 case opts.ONLY_THIS_EVENT:
                     var rrule = ev.data.recurrenceRule;
                     var dates = rrule.exceptionDates;
-                    var d = ScoobyDate.clone(ev.data.instanceDate);
+                    var d = cosmo.datetime.Date.clone(ev.data.instanceDate);
                     dates.push(d);
                     rrule.removeModification(d);
 
@@ -988,7 +988,7 @@ cosmo.view.cal = new function () {
             evData = arr[i];
             // Basic paranoia checks
             if (!evData.end) {
-                evData.end = ScoobyDate.clone(evData.start);
+                evData.end = cosmo.datetime.Date.clone(evData.start);
             }
 
             // Make exceptionDates on recurrences default to empty array

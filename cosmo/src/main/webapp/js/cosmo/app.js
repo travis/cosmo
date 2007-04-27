@@ -30,6 +30,7 @@ cosmo.app = new function () {
 
     // App section code to run on init
     this.initObj = {};
+    this.initParams = {};
 
     // warnings / confirmations
     this.modalDialog = null;
@@ -45,11 +46,16 @@ cosmo.app = new function () {
 
     this.init = function () {
         // Set up the modal dialog box for the app
-        this.modalDialog = dojo.widget.createWidget(
+        self.modalDialog = dojo.widget.createWidget(
             'cosmo:ModalDialog', {}, document.body, 'last');
 
+        dojo.event.topic.subscribe(
+            cosmo.topics.PreferencesUpdatedMessage.topicName, self, 'updateUIFromPrefs');
+        
         // Initialize the default view
-        if (self.initObj.init) { self.initObj.init.apply(this.initObj, arguments)};
+        if (typeof self.initObj.init == 'function') { 
+            self.initObj.init(self.initParams);
+        };
     }
 
     // ==========================
@@ -239,4 +245,14 @@ cosmo.app = new function () {
            selectBoxVisibility = {};
         }
     };
+
+    this.updateUIFromPrefs = function (/*cosmo.topics.PreferencesUpdatedMessage*/ message){
+        if (message.preferences[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] == 'true'){
+            $('accountBrowserLink').style.display = 'inline';
+}
+        else {
+            $('accountBrowserLink').style.display = 'none';
+        }
+    };
+
 }

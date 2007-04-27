@@ -173,7 +173,8 @@ dojo.declare("cosmo.model.util.InheritingSubclassCreator", null, {
 cosmo.model.util.equals = function cosmoEquals(a,b){
     var type = typeof (a);
     if (type != typeof(b)){
-        throw new Error("Both operands must be of the same type!\n You passed '" + a + "' and '" + b +"', a " + typeof(a) + " and a "+ typeof(b));
+        throw new Error("Both operands must be of the same type!\n You passed '" 
+           + a + "' and '" + b +"', a " + typeof(a) + " and a "+ typeof(b));
     }
     
     if (type == "object"){
@@ -186,7 +187,7 @@ cosmo.model.util.equals = function cosmoEquals(a,b){
     return a == b;
 }   
 
-  cosmo.model._instanceGetProperty =  function instanceGetProperty(propertyName){
+  cosmo.model._occurrenceGetProperty =  function occurrenceGetProperty(propertyName){
         //get the master version
         var master = this.getMaster();
         var masterProperty = this._getMasterProperty(propertyName);
@@ -198,7 +199,7 @@ cosmo.model.util.equals = function cosmoEquals(a,b){
         }
         
         //if it is check the modificaiton
-        var modification = master.getModification(this.instanceDate);
+        var modification = master.getModification(this.recurrenceId);
 
         //if no modification, return the master
         if (!modification){
@@ -214,7 +215,7 @@ cosmo.model.util.equals = function cosmoEquals(a,b){
         return masterProperty;
 }
 
-cosmo.model._instanceSetProperty = function instanceSetProperty(propertyName, value){
+cosmo.model._occurrenceSetProperty = function occurrenceSetProperty(propertyName, value){
         if (this.__noOverride[propertyName]){
             throw new Error("You can not override property '" + propertyName +"'");
         }
@@ -223,7 +224,7 @@ cosmo.model._instanceSetProperty = function instanceSetProperty(propertyName, va
         var masterProperty = this._getMasterProperty(propertyName);
         
         //is there a modification?
-        var modification = master.getModification(this.instanceDate);
+        var modification = master.getModification(this.recurrenceId);
         if (modification){
             if (!typeof(this._getModifiedProperty(propertyName)) == "undefined"){
                 this._setModifiedProperty(propertyName, value);
@@ -240,7 +241,7 @@ cosmo.model._instanceSetProperty = function instanceSetProperty(propertyName, va
             return;
         } else {
             var modification = new cosmo.model.Modification({
-                instanceDate: this.instanceDate
+                recurrenceId: this.recurrenceId
             });
             master.addModification(modification);
             this._setModifiedProperty(propertyName, value);

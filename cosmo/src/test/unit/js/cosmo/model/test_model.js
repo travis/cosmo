@@ -36,9 +36,9 @@ test_declareStamp = function(){
 }
 
 test_addGetRemoveStamp = function(){
-    var stamp = new cosmo.model.EventStamp({location:"loco"});
     var note = new cosmo.model.Note();
-    note.addStamp(stamp);
+    var stamp = note.getStamp("event", true);
+    stamp.setLocation("loco");
     stamp = null;
     stamp = note.getStamp("event");
     jum.assertEquals("loco", stamp.getLocation());
@@ -53,11 +53,10 @@ test_addGetRemoveModification = function(){
 };
 
 test_getEventStampGetTaskStamp = function(){
-    var event = new cosmo.model.EventStamp({location:"loco"});
-    var task = new cosmo.model.TaskStamp();
     var note = new cosmo.model.Note();
-    note.addStamp(event);
-    note.addStamp(task);
+    var event = note.getEventStamp(true);
+    var task = note.getTaskStamp(true);
+    event.setLocation("loco");
     event = null;
     task = null;
     event = note.getEventStamp();
@@ -66,7 +65,7 @@ test_getEventStampGetTaskStamp = function(){
     assertEquals("task", task.stampMetaData.stampName)
 };
 
-test_testNoteInstance = function(){
+test_noteOccurrence = function(){
     var note = new cosmo.model.Note({
         body: "body",
         uid: "123",
@@ -74,22 +73,22 @@ test_testNoteInstance = function(){
     });
     
     var date = new cosmo.datetime.Date(2000,0,1);
-    var noteInstance = note.getNoteInstance(date);
+    var noteOccurrence = note.getNoteOccurrence(date);
     
-    jum.assertEquals(note.getBody(), noteInstance.getBody());
+    jum.assertEquals(note.getBody(), noteOccurrence.getBody());
     
-    noteInstance.setBody("new");
-    jum.assertEquals(noteInstance.getBody(), "new");
+    noteOccurrence.setBody("new");
+    jum.assertEquals(noteOccurrence.getBody(), "new");
     
     var mod = note.getModification(date);
     jum.assertTrue(mod != null);
     jum.assertEquals(mod.getModifiedProperties()["body"],"new");
 
-    noteInstance.setDisplayName("newdis");
+    noteOccurrence.setDisplayName("newdis");
     jum.assertEquals(mod.getModifiedProperties()["body"], "new");
     jum.assertEquals(mod.getModifiedProperties()["displayName"], "newdis");
-    jum.assertEquals(noteInstance.getDisplayName(), "newdis");
-    jum.assertEquals(noteInstance.getUid(), "123");
+    jum.assertEquals(noteOccurrence.getDisplayName(), "newdis");
+    jum.assertEquals(noteOccurrence.getUid(), "123");
     
 };
 
@@ -122,7 +121,22 @@ test_equals = function(){
     
 };
 
-test_ = function(){
+test_stampInheritance = function(){
+    var note = new cosmo.model.Note({
+        body: "body",
+        uid: "123",
+        displayName: "display"
+    });
+    
+    var date = new cosmo.datetime.Date(2000,0,1);
+
+    var eventStamp  = note.getEventStamp(true);
+    eventStamp.setLocation("loco");
+
+    var noteOccurrence = note.getNoteOccurrence(date);
+
+    var event
+
 };
 
 test_ = function(){

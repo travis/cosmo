@@ -44,43 +44,43 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
     cosmo.model.util.simplePropertyApplicator.enhanceClass(newCtr, propertiesArray, 
         {enhanceInitializer: false});
     
-    var stampInstanceCtr = dojo.declare(ctrName+"Instance", newCtr, {
-        initializer: function stampInstanceInitializer(noteInstance){
-           this._master = noteInstance._master;
-           this.instanceDate = noteInstance._instanceDate; 
-           this.item = noteInstance;
+    var stampOccurrenceCtr = dojo.declare(ctrName+"Occurrence", newCtr, {
+        initializer: function stampOccurrenceInitializer(noteOccurrence){
+           this._master = noteOccurrence._master;
+           this.recurrenceId = noteOccurrence._recurrenceId; 
+           this.item = noteOccurrence;
         },
         
-        //it doesn't make sense to initialze properties of an instance. 
+        //it doesn't make sense to initialze properties of an occurrence. 
         initializeProperties: function noop(){
             return;
         },
         
-        __getProperty: cosmo.model._instanceGetProperty,  
+        __getProperty: cosmo.model._occurrenceGetProperty,  
 
-        __setProperty: cosmo.model._instanceSetProperty,
+        __setProperty: cosmo.model._occurrenceSetProperty,
 
         getMaster: function getMaster(){
             return this._master;
         },
     
-        _getMasterProperty: function noteInstanceGetMasterProperty(propertyName){
+        _getMasterProperty: function noteOccurrenceGetMasterProperty(propertyName){
             return this._master._stamps[stampName].__getProperty(propertyName);
         },
     
-       _getModifiedProperty: function noteInstanceGetModifiedProperty(propertyName){
-            var modification = this._master.getModification(this.instanceDate);
+       _getModifiedProperty: function stampOccurrenceGetModifiedProperty(propertyName){
+            var modification = this._master.getModification(this.recurrenceId);
             return modification._modifiedStamps[stampName][propertyName];
         },
     
-       _setModifiedProperty: function noteInstanceSetModifiedProperty(propertyName, value){
-            var modification = master.getModification(this.instanceDate);
+       _setModifiedProperty: function stampOccurrenceSetModifiedProperty(propertyName, value){
+            var modification = master.getModification(this.recurrenceId);
             modification._modifiedStamps[stampName][propertyName] = value;
         },
     })
      
     cosmo.model._stampRegistry[stampName] 
-        = {constructor:newCtr, instanceConstructor:stampInstanceCtr};
+        = {constructor:newCtr, occurrenceConstructor:stampOccurrenceCtr};
     
     return newCtr;
 }
@@ -108,7 +108,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
     [ ["body", {"default": null}] ],
     {
         //TODO could be useful to use the same format as is in the UUID in EIM
-         INSTANCE_FMT_STRING: "%Y-%m-%d %H:%M:%S",
+         OCCURRENCE_FMT_STRING: "%Y-%m-%d %H:%M:%S",
         
         _stamps: null,
         
@@ -117,67 +117,73 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             this._modifications = {};
         },
         
-        getStamp: function(/*String*/ stampName){
-            return this._stamps[stampName];
+        getStamp: function(/*String*/ stampName, /*Boolean?*/ createIfDoesntExist) {
+           var stamp = this._stamps[stampName];
+           
+           if (stamp){
+               return stamp;
+           } 
+           
+           if (createIfDoesntExist){
+               var ctr = cosmo.model._stampRegistry[stampName]["constructor"];
+               var stamp =  new ctr({item:this});
+           this._stamps[stampName] = stamp;
+           return stamp;
+       }          
+           
         }, 
         
-        getModification: function getModification(/*cosmo.datetime.Date*/ instanceDate){
-            return this._modifications[this._formatInstanceDate(instanceDate)];
+        getModification: function getModification(/*cosmo.datetime.Date*/ recurrenceId){
+            return this._modifications[this._formatRecurrenceId(recurrenceId)];
         },
         
         addModification: function(/*cosmo.model.Modification*/modification){
-            this._modifications[this._formatInstanceDate(modification.getInstanceDate())] = modification;
+            this._modifications[this._formatRecurrenceId(modification.getRecurrenceId())] = modification;
         },
         
-        removeModification: function removeModification(/*cosmo.model.Modification*/ instanceDate){
-            delete(this._modifications[this._formatInstanceDate(instanceDate)]);  
+        removeModification: function removeModification(/*cosmo.model.Modification*/ recurrenceId){
+            delete(this._modifications[this._formatRecurrenceId(recurrenceId)]);  
         },
         
-        _formatInstanceDate: function formatInstanceDate(/*cosmo.datetime.Date*/date){
-            return date.strftime(this.INSTANCE_FMT_STRING);
+        _formatRecurrenceId: function formatRecurrenceId(/*cosmo.datetime.Date*/date){
+            return date.strftime(this.OCCURRENCE_FMT_STRING);
         },
       
-        isInstance: function isInstance(){
+        isOccurrence: function isOccurrence(){
           return false;
         },
       
         getMaster: function getMaster(){
           return this;
         },
-        
-        addStamp: function addStamp(/*cosmo.model.BaseStamp*/stamp){
-            stamp.item = this;
-            this._stamps[stamp.stampMetaData.stampName] = stamp;
-        },
-        
+
         removeStamp: function removeStamp(/*String*/ stampName){
             delete this._stamps[stampName];
         },
         
-        getEventStamp: function getEventStamp(){
-            return this.getStamp("event");
+        getEventStamp: function getEventStamp(/*Boolean?*/ createIfDoesntExist){
+            return this.getStamp("event", createIfDoesntExist);
         },
         
-        getTaskStamp: function getTaskStamp(){
-            return this.getStamp("task");
+        getTaskStamp: function getTaskStamp(/*Boolean*/ createIfDoesntExist){
+            return this.getStamp("task", createIfDoesntExist);
         },
         
-        getNoteInstance: function getNoteInstance(/*cosmo.datetime.Date*/ instanceDate){
-//            dojo.debug("getNoteInstance");
-            return new cosmo.model.NoteInstance(this, instanceDate);
+        getNoteOccurrence: function getNoteOccurrence(/*cosmo.datetime.Date*/ recurrenceId){
+            return new cosmo.model.NoteOccurrence(this, recurrenceId);
         }
     });
     
-dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
+dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     __noOverride:{uid:1,version:1},
     
-    initializer: function noteInstanceInitializer(master, instanceDate){
-//        dojo.debug("noteInstanceInitializer");
+    initializer: function noteOccurrenceInitializer(master, recurrenceId){
+//        dojo.debug("noteOccurrenceInitializer");
         this._master = master;
-        this.instanceDate = instanceDate;
+        this.recurrenceId = recurrenceId;
     },
     
-   isInstance: function isInstance(){
+   isOccurrence: function isOccurrence(){
         return true;
     },
     
@@ -185,23 +191,23 @@ dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
         return this._master;
     },
     
-    _getMasterProperty: function noteInstanceGetMasterProperty(propertyName){
+    _getMasterProperty: function noteOccurrenceGetMasterProperty(propertyName){
         return this._master.__getProperty(propertyName);
     },
     
-    _getModifiedProperty: function noteInstanceGetModifiedProperty(propertyName){
-        var modification = this._master.getModification(this.instanceDate);
+    _getModifiedProperty: function noteOccurrenceGetModifiedProperty(propertyName){
+        var modification = this._master.getModification(this.recurrenceId);
         return modification.getModifiedProperties()[propertyName];
     },
     
-    _setModifiedProperty: function noteInstanceSetModifiedProperty(propertyName, value){
-        var modification = this._master.getModification(this.instanceDate);
+    _setModifiedProperty: function noteOccurrenceSetModifiedProperty(propertyName, value){
+        var modification = this._master.getModification(this.recurrenceId);
         modification._modifiedProperties[propertyName] = value;  
     },
     
-    __getProperty: cosmo.model._instanceGetProperty,  
+    __getProperty: cosmo.model._occurrenceGetProperty,  
     
-    __setProperty: cosmo.model._instanceSetProperty,
+    __setProperty: cosmo.model._occurrenceSetProperty,
     
     
     initializeProperties: function noop(){
@@ -209,23 +215,33 @@ dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
     },
     
     _throwOnlyMaster: function(){
-     throw new Error("You can only call this method on the master item");
+        throw new Error("You can only call this method on the master item");
     },
 
-///    
-    getStamp: function(/*String*/ stampName){
-        //TODO
+    getStamp: function occurrenceGetStamp(/*String*/ stampName, /*Boolean*/createIfDoesntExist){
+           var ctr = cosmo.model._stampRegistry[stampName]["occurrenceConstructor"];
+           //does the parent have the stamp?
+           if (this.getMaster().getStamp(stampName)){
+               return new ctr(this);
+           } else {
+              var modification = master.getModification(this.recurrenceId);
+              if (modification && modification.getModifiedStamps[stampName]){
+                  return new ctr(this);
+              }                               
+           } 
+           
+           if (createIfDoesntExist){
+               return new ctr(this);
+           } else {
+               return null;
+           }
     }, 
-
-    addStamp: function addStamp(/*cosmo.model.BaseStamp*/stamp){
-        //TODO
-    },
     
     removeStamp: function removeStamp(/*String*/ stampName){
-        //TODO
+        throw new Error("remove stamp not implented yet!");
     },
 
-    getModification: function(/*cosmo.datetime.Date*/ instanceDate){
+    getModification: function(/*cosmo.datetime.Date*/ recurrenceId){
         this._throwOnlyMaster();
     },
     
@@ -233,18 +249,18 @@ dojo.declare("cosmo.model.NoteInstance", cosmo.model.Note,{
         this._throwOnlyMaster();
     },
     
-    removeModification: function(/*cosmo.model.Modification*/ instanceDate){
+    removeModification: function(/*cosmo.model.Modification*/ recurrenceId){
         this._throwOnlyMaster();
     },
 
-    getNoteInstance: function getNoteInstance(/*cosmo.datetime.Date*/ instanceDate){
+    getNoteOccurrence: function getNoteOccurrence(/*cosmo.datetime.Date*/ recurrenceId){
         this._throwOnlyMaster();
     }
     
 });
 
 cosmo.model.declare("cosmo.model.Modification", null,
-   [["instanceDate", {"default": null}],
+   [["recurrenceId", {"default": null}],
     ["modifiedProperties", {"default": cosmo.model.NEW_OBJECT}],
     ["modifiedStamps", {"default": cosmo.model.NEW_OBJECT}]],
     {

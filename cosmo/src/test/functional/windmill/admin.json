@@ -12,7 +12,4 @@
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "click", "params": {"link" : "Users"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "click", "params": {"id" : "testerRow"}}
-{"method": "click", "params": {"link" : "Delete Selected Users"}}
 {"method": "click", "params": {"link" : "Log Out"}}

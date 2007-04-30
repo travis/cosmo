@@ -16,6 +16,7 @@
 dojo.provide("cosmo.model.Item");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.model.util");
+
 cosmo.model.NEW_DATESTAMP = function(){return (new Date()).getTime()};
 cosmo.model.NEW_OBJECT = function(){return {}};
 cosmo.model.NEW_ARRAY = function(){return []};
@@ -31,7 +32,7 @@ cosmo.model.declare = function(/*String*/ ctrName, /*Function*/ parentCtr, prope
     return newCtr;
 }
 
-cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArray, otherDeclarations){
+cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArray, otherDeclarations,occurrenceDeclarations){
     var newCtr = dojo.declare(ctrName, cosmo.model.BaseStamp, otherDeclarations);
     var meta = new cosmo.model.StampMetaData(stampName, attributesArray);
     newCtr.prototype.stampMetaData = meta;
@@ -53,7 +54,7 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
            this.item = noteOccurrence;
         },
         
-        //it doesn't make sense to initialze properties of an occurrence. 
+        //it doesn't make sense to initialze properties of an occurrence.
         initializeProperties: function noop(){
             return;
         },
@@ -67,6 +68,9 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
         },
     
         _getMasterProperty: function noteOccurrenceGetMasterProperty(propertyName){
+            if (this._masterPropertyGetters && this._masterPropertyGetters[propertyName]){
+		return this._masterPropertyGetters[propertyName].apply(this);
+	    }
             return this._master._stamps[stampName].__getProperty(propertyName);
         },
     
@@ -87,8 +91,11 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
 	    }
 	    modifiedStamp[propertyName] = value;
         },
-    })
-     
+    });
+
+    dojo.lang.mixin(stampOccurrenceCtr.prototype, occurrenceDeclarations || {});
+    
+    
     cosmo.model._stampRegistry[stampName] 
         = {constructor:newCtr, occurrenceConstructor:stampOccurrenceCtr};
     
@@ -327,21 +334,6 @@ dojo.declare("cosmo.model.BaseStamp", null, {
     item: null
 });
 
-cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
-    [ ["startDate", cosmo.datetime.Date, {}],
-      ["duration", Number, {}],
-      ["anytime", Boolean, {}],
-      ["location", String, {}],
-      ["rrule", cosmo.model.RecurrenceRule, {}],
-      ["exdates", [Array, cosmo.datetime.Date], {}],
-      ["status", String, {}],
-    ],
-    {
-        initializer: function(kwArgs){
-            this.initializeProperties(kwArgs);
-        }
-    });
-    
 cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",
     [ ],
     {

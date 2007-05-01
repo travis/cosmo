@@ -489,11 +489,11 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateFromEvent = function (ev) 
             left = 0;
         }
         else {
-            var formatStartTime = dojo.date.strftime(ev.data.start, '%H:%M');
+            var formatStartTime = ev.data.start.strftimeLocalTimezone('%H:%M');
             startPos = cosmo.view.cal.canvas.calcPosFromTime(formatStartTime, 'start');
             left = (ev.data.start.getLocalDay())*cosmo.view.cal.canvas.dayUnitWidth;
         }
-        var formatEndTime = dojo.date.strftime(ev.data.end, '%H:%M');
+        var formatEndTime = ev.data.end.strftimeLocalTimezone('%H:%M');
         endPos = cosmo.view.cal.canvas.calcPosFromTime(formatEndTime, 'end');
 
 

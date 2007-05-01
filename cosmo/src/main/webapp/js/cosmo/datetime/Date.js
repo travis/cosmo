@@ -386,37 +386,21 @@ cosmo.datetime.Date.prototype.add = function(interv, incr) {
 /**
  * Formats the Date according to what time the date falls on in the user's
  * local timezone.
- *
  * For example, if this Date represents the date "1/1/2006 12am PST"
  * and your local timezone is EST, the date will be formatted as "1/1/2006 3am"
+ * FIXME: Until we implement a user timezone preference, this just cheats
+ * and uses the local browser's timezone offset
  */
-cosmo.datetime.Date.prototype.strftimeLocalTimezone = function(formatString){
-        var localDate = this.createLocalDate();
-        return localDate.strftime(formatString);
-};
-
-/**
- * Returns what the Date representing the same point in time as this Date,
- * but in the user's local timezone.
- *
- * For example, if this Date represents the date "1/1/2006 12am PST"
- * and your local timezone is EST, the returned date will be "1/1/2006 3am EST"
- */
-cosmo.datetime.Date.prototype.createLocalDate = function(){
-    //For now, we can cheat using new Date() since that gives us a local date
-    //with the given UTC
-    var utc = this.toUTC();
-    var dt = new Date(utc);
-    var tz = ScoobyTimezone.getLocalTimezone(utc);
-    var scoobDt = new cosmo.datetime.Date(dt.getFullYear(), dt.getMonth(),
-        dt.getDate(), dt.getHours(), dt.getMinutes(),
-        dt.getSeconds(), dt.getMilliseconds(), tz);
-    return scoobDt;
+cosmo.datetime.Date.prototype.strftimeLocalTimezone = function(/* String */ format){
+    var local = new Date(this.toUTC());
+    return dojo.date.strftime(local, format);
 };
 
 /**
  * Returns the day of the week occupied by a Date
  * but in the user's local timezone.
+ * FIXME: Until we implement a user timezone preference, this just cheats
+ * and uses the local browser's timezone offset
  */
 cosmo.datetime.Date.prototype.getLocalDay = function() {
     var localDt = new Date(this.toUTC());

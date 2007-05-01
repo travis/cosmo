@@ -27,6 +27,7 @@ dojo.require("dojo.event.common");
 dojo.require("dojo.event.topic");
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
+dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
@@ -54,7 +55,7 @@ cosmo.ui.cal_form.CalForm = function () {
     function saveCalEvent() {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
         // Give timeout check in onclick handler a chance to work
-        if (Cal.isTimedOut()) {
+        if (cosmo.app.pim.isTimedOut()) {
             return false;
         }
         // Make backup snapshot
@@ -70,7 +71,7 @@ cosmo.ui.cal_form.CalForm = function () {
 
     function removeCalEvent() {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
-        if (Cal.isTimedOut()) {
+        if (cosmo.app.pim.isTimedOut()) {
             return false;
         }
         dojo.event.topic.publish('/calEvent', { 'action': 'removeConfirm', 'data': selEv });
@@ -132,7 +133,7 @@ cosmo.ui.cal_form.CalForm = function () {
 
     function toggleReadOnlyIcon() {
         var icon = $('readOnlyIcon');
-        if (Cal.currentCollection.privileges.write) {
+        if (cosmo.app.pim.currentCollection.privileges.write) {
             icon.style.display = 'none';
         }
         else {
@@ -385,7 +386,7 @@ cosmo.ui.cal_form.CalForm = function () {
     this.setMailtoLink = function (ev) {
         var timeFormat=_("Sidebar.Email.TimeFormat");
         var d = ev.data;
-        var subject = Cal.currentCollection.displayName + ": " + d.title;
+        var subject = cosmo.app.pim.currentCollection.displayName + ": " + d.title;
         var body = [_("Sidebar.Email.Title") , d.title , "%0d%0a"];
 
         if (d.start.tzId){
@@ -480,7 +481,7 @@ cosmo.ui.cal_form.CalForm = function () {
     this.setButtons = function (r, s) {
         rem = r;
         sav = s;
-        if (!Cal.currentCollection.privileges.write) {
+        if (!cosmo.app.pim.currentCollection.privileges.write) {
             rem = false;
             sav = false;
         }
@@ -802,7 +803,7 @@ cosmo.ui.cal_form.CalForm = function () {
     };
 
     this.setRecurEnd = function () {
-        var self = Cal.calForm
+        var self = cosmo.app.pim.calForm
         var form = self.form;
         if (form.recurrence.selectedIndex == 0) {
             self.setTextInput(form.recurend, 'mm/dd/yyyy', true, true);
@@ -913,7 +914,7 @@ cosmo.ui.cal_form.CalForm = function () {
     this.setEventListeners = function () {
         var self = this;
         var allDayCheck = $('eventallday');
-        var form = Cal.calForm.form;
+        var form = cosmo.app.pim.calForm.form;
 
         // Add dummy function event listener so form doesn't
         // submit on Enter keypress in Safari
@@ -932,13 +933,13 @@ cosmo.ui.cal_form.CalForm = function () {
         dojo.event.connect(form.recurend, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
 
         // All-day event / normal event toggling
-        dojo.event.connect(allDayCheck, 'onclick', cosmo.ui.cal_main.Cal.calForm, 'toggleLozengeType');
+        dojo.event.connect(allDayCheck, 'onclick', cosmo.app.pim.calForm, 'toggleLozengeType');
 
         var regionSelectorElement = $("tzRegion");
         dojo.event.connect(regionSelectorElement, "onchange", this.handleRegionChanged);
 
-        dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, Cal, Cal.handleCollectionUpdated);
-        dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, Cal, Cal.handleSubscriptionUpdated);
+        dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, Cal, cosmo.app.pim.handleCollectionUpdated);
+        dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, Cal, cosmo.app.pim.handleSubscriptionUpdated);
     };
     this.addJumpToDate = function (dMain) {
         var top = parseInt(cosmo.ui.minical.MiniCal.displayContext.style.top);
@@ -982,7 +983,7 @@ cosmo.ui.cal_form.CalForm = function () {
         d = _createElem('div');
         d.className = 'floatLeft';
         dc.appendChild(d);
-        butJump = new Button('jumpToButton', 32, Cal.calForm.goJumpToDate,
+        butJump = new Button('jumpToButton', 32, cosmo.app.pim.calForm.goJumpToDate,
                 _('App.Button.Go'), true);
         d.appendChild(butJump.domNode);
 

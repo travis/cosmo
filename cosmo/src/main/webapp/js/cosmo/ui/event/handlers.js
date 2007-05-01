@@ -31,7 +31,11 @@
  */
 
 dojo.provide('cosmo.ui.event.handlers');
+
 dojo.require('dojo.event.topic');
+dojo.require('cosmo.app');
+dojo.require('cosmo.app.pim');
+
 /**
  * Generic function to get the source elem of a UI event
  * that has the desired attribute (e.g., id or some custom
@@ -76,7 +80,7 @@ cosmo.ui.event.handlers.mouseDownHandler = function (e) {
     // =================
     // Check for client-side timeout on all mouse clicks
     // =================
-    Cal.checkTimeout();
+    cosmo.app.pim.checkTimeout();
 }
 
 /**
@@ -136,7 +140,7 @@ cosmo.ui.event.handlers.keyUpHandler = function (e) {
     // Have to return false to keep event from continuing to bubble
     // otherwise it actually ends up refreshing the session before
     // we have a chance to time out
-    if (Cal.checkTimeout()) {
+    if (cosmo.app.pim.checkTimeout()) {
         return false;
     }
 
@@ -165,9 +169,8 @@ cosmo.ui.event.handlers.keyUpHandler = function (e) {
  * Do cleanup of DOM-element refs to avoid memleak in IE
  */
 cosmo.ui.event.handlers.cleanup = function () {
-	if (Cal){
-	    Cal.cleanup();
-	    Cal = null;
+	if (cosmo.app.initObj){
+	    cosmo.app.initObj.cleanup();
 	}
 }
 

@@ -17,6 +17,7 @@
 dojo.provide("cosmo.ui.resize_area");
 
 dojo.require("cosmo.app");
+dojo.require("cosmo.app.pim");
 
 cosmo.ui.resize_area.ResizeAreaAdjacent = function (div, origPos, origSize) {
     this.div = div;
@@ -96,7 +97,7 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
         }
     };
     this.getAbsTop = function(div) {
-        return div.offsetTop + Cal.top;
+        return div.offsetTop + cosmo.app.pim.top;
     };
     this.getHeight = function(div) {
         return div.offsetHeight;

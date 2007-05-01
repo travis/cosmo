@@ -15,6 +15,8 @@
 */
 dojo.provide("cosmo.conduits");
 
+dojo.require("cosmo.app.pim");
+
 cosmo.conduits.Conduit = 
 {	
     getCollection: function(collectionUid, transportInfo){},
@@ -36,81 +38,81 @@ cosmo.conduits.OwnedCollectionConduit =
 {
     getCollection: function(collectionUid, transportInfo, handlerFunc){
         if (handlerFunc){
-            return Cal.serv.getCalendar(handlerFunc, collectionUid);
+            return cosmo.app.pim.serv.getcosmo.app.pimendar(handlerFunc, collectionUid);
         } else {
-            return Cal.serv.getCalendar(collectionUid);
+            return cosmo.app.pim.serv.getcosmo.app.pimendar(collectionUid);
         }
     },
     getEvents: function(collectionUid, startTime, endTime, transportInfo, handlerFunc){
         if (handlerFunc){
-            return Cal.serv.getEvents(handlerFunc, collectionUid, startTime, endTime);
+            return cosmo.app.pim.serv.getEvents(handlerFunc, collectionUid, startTime, endTime);
         } else {
-            return Cal.serv.getEvents(collectionUid, startTime, endTime);
+            return cosmo.app.pim.serv.getEvents(collectionUid, startTime, endTime);
         }
     },
     getEvent: function(collectionUid, eventUid, transportInfo, handlerFunc){
            if (handlerFunc){
-            return Cal.serv.getEvent(handlerFunc, collectionUid, eventUid);
+            return cosmo.app.pim.serv.getEvent(handlerFunc, collectionUid, eventUid);
         } else {
-            return Cal.serv.getEvent(collectionUid, eventUid);
+            return cosmo.app.pim.serv.getEvent(collectionUid, eventUid);
         }
     },
     saveEvent: function(collectionUid, eventUid, transportInfo, handlerFunc){
         if (handlerFunc){
-            return Cal.serv.saveEvent(handlerFunc, collectionUid, eventUid);
+            return cosmo.app.pim.serv.saveEvent(handlerFunc, collectionUid, eventUid);
         } else {
-            return Cal.serv.saveEvent(collectionUid, eventUid);
+            return cosmo.app.pim.serv.saveEvent(collectionUid, eventUid);
         }
     },
     removeEvent: function(collectionUid, eventUid, transportInfo, handlerFunc){
         if (handlerFunc){
-            return Cal.serv.removeEvent(handlerFunc, collectionUid, eventUid);
+            return cosmo.app.pim.serv.removeEvent(handlerFunc, collectionUid, eventUid);
         } else {
-            return Cal.serv.removeEvent(collectionUid, eventUid);
+            return cosmo.app.pim.serv.removeEvent(collectionUid, eventUid);
         }
     },
     getRecurrenceRules: function(collectionUid, eventUids, transportInfo, handlerFunc){
         if (handlerFunc){	
-            return Cal.serv.getRecurrenceRules(handlerFunc, collectionUid, eventUids);
+            return cosmo.app.pim.serv.getRecurrenceRules(handlerFunc, collectionUid, eventUids);
         } else {
-            return Cal.serv.getRecurrenceRules(collectionUid, eventUids);    	
+            return cosmo.app.pim.serv.getRecurrenceRules(collectionUid, eventUids);    	
         }
     },
     saveRecurrenceRule: function(collectionUid, eventUid, recurrenceRule, 
         transportInfo, handlerFunc){
         if (handlerFunc){		
-            return Cal.serv.saveRecurrenceRule(handlerFunc, collectionUid, eventUid, recurrenceRule);
+            return cosmo.app.pim.serv.saveRecurrenceRule(handlerFunc, collectionUid, eventUid, recurrenceRule);
         } else {
-            return Cal.serv.saveRecurrenceRule(collectionUid, eventUid, recurrenceRule);    	
+            return cosmo.app.pim.serv.saveRecurrenceRule(collectionUid, eventUid, recurrenceRule);    	
         }
     },
     expandEvents: function(collectionUid, eventUids, startTime, endTime, 
         transportInfo, handlerFunc){
 
         if (handlerFunc){		
-            return Cal.serv.expandEvents(handlerFunc, collectionUid, eventUids, 
+            return cosmo.app.pim.serv.expandEvents(handlerFunc, collectionUid, eventUids, 
                 startTime, endTime);
            } else {
-            return Cal.serv.expandEvents(collectionUid, eventUids, 
+            return cosmo.app.pim.serv.expandEvents(collectionUid, eventUids, 
                 startTime, endTime);
            }
     },
     saveNewEventBreakRecurrence: function(collectionUid, event,
         originalEventUid, originalEventEndDate, transportInfo, handlerFunc){
         if (handlerFunc){
-            return Cal.serv.saveNewEventBreakRecurrence(handlerFunc, collectionUid, event, 
+            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(handlerFunc, collectionUid, event, 
                 originalEventUid, originalEventEndDate);
         } else {
-            return Cal.serv.saveNewEventBreakRecurrence(collectionUid, event, 
+            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(collectionUid, event, 
                 originalEventUid, originalEventEndDate);
         }
     },
     
     saveDisplayName: function(collectionUid, newDisplayName, transportInfo, handlerFunc){
         if (handlerFunc){
-            Cal.serv.saveDisplayName(handlerFunc, collectionUid, newDisplayName);
+            cosmo.app.pim.serv.saveDisplayName(handlerFunc, collectionUid, newDisplayName);
         } else {
-            Cal.serv.saveDisplayName(collectionUid, newDisplayName);
+            cosmo.app.pim.serv.saveDisplayName(collectionUid, newDisplayName);
         }
     }
 };
@@ -119,72 +121,72 @@ cosmo.conduits.TicketedConduit =
 {
     getCollection: function(collectionUid, transportInfo, handlerFunc){
         if (handlerFunc){
-            return Cal.serv.getCalendar(handlerFunc, collectionUid, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.getcosmo.app.pimendar(handlerFunc, collectionUid, this.getTicket(transportInfo));
         } else {
-            return Cal.serv.getCalendar(collectionUid, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.getcosmo.app.pimendar(collectionUid, this.getTicket(transportInfo));
         }
     },
     getEvents: function(collectionUid, startTime, endTime, transportInfo, handlerFunc){
         if (handlerFunc){
-            return Cal.serv.getEvents(handlerFunc, collectionUid, startTime, endTime, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.getEvents(handlerFunc, collectionUid, startTime, endTime, this.getTicket(transportInfo));
         } else {
-            return Cal.serv.getEvents(collectionUid, startTime, endTime, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.getEvents(collectionUid, startTime, endTime, this.getTicket(transportInfo));
         }
     },
     getEvent: function(collectionUid, eventUid, transportInfo, handlerFunc){
            if (handlerFunc){
-            return Cal.serv.getEvent(handlerFunc, collectionUid, eventUid, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.getEvent(handlerFunc, collectionUid, eventUid, this.getTicket(transportInfo));
         } else {
-            return Cal.serv.getEvent(collectionUid, eventUid, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.getEvent(collectionUid, eventUid, this.getTicket(transportInfo));
         }
     },
     saveEvent: function(collectionUid, eventUid, transportInfo, handlerFunc){
         if (handlerFunc){
-            return Cal.serv.saveEvent(handlerFunc, collectionUid, eventUid, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.saveEvent(handlerFunc, collectionUid, eventUid, this.getTicket(transportInfo));
         } else {
-            return Cal.serv.saveEvent(collectionUid, eventUid, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.saveEvent(collectionUid, eventUid, this.getTicket(transportInfo));
         }
     },
     removeEvent: function(collectionUid, eventUid, transportInfo, handlerFunc){
         if (handlerFunc){
-            return Cal.serv.removeEvent(handlerFunc, collectionUid, eventUid, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.removeEvent(handlerFunc, collectionUid, eventUid, this.getTicket(transportInfo));
         } else {
-            return Cal.serv.removeEvent(collectionUid, eventUid, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.removeEvent(collectionUid, eventUid, this.getTicket(transportInfo));
         }
     },
     getRecurrenceRules: function(collectionUid, eventUids, transportInfo, handlerFunc){
         if (handlerFunc){	
-            return Cal.serv.getRecurrenceRules(handlerFunc, collectionUid, eventUids, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.getRecurrenceRules(handlerFunc, collectionUid, eventUids, this.getTicket(transportInfo));
         } else {
-            return Cal.serv.getRecurrenceRules(collectionUid, eventUids, this.getTicket(transportInfo));    	
+            return cosmo.app.pim.serv.getRecurrenceRules(collectionUid, eventUids, this.getTicket(transportInfo));    	
         }
     },
     saveRecurrenceRule: function(collectionUid, eventUid, recurrenceRule, 
         transportInfo, handlerFunc){
         if (handlerFunc){		
-            return Cal.serv.saveRecurrenceRule(handlerFunc, collectionUid, eventUid, recurrenceRule, this.getTicket(transportInfo));
+            return cosmo.app.pim.serv.saveRecurrenceRule(handlerFunc, collectionUid, eventUid, recurrenceRule, this.getTicket(transportInfo));
         } else {
-            return Cal.serv.saveRecurrenceRule(collectionUid, eventUid, recurrenceRule, this.getTicket(transportInfo));    	
+            return cosmo.app.pim.serv.saveRecurrenceRule(collectionUid, eventUid, recurrenceRule, this.getTicket(transportInfo));    	
         }
     },
     expandEvents: function(collectionUid, eventUids, startTime, endTime, 
         transportInfo, handlerFunc){
 
         if (handlerFunc){		
-            return Cal.serv.expandEvents(handlerFunc, collectionUid, eventUids, 
+            return cosmo.app.pim.serv.expandEvents(handlerFunc, collectionUid, eventUids, 
                 startTime, endTime, this.getTicket(transportInfo));
            } else {
-            return Cal.serv.expandEvents(collectionUid, eventUids, 
+            return cosmo.app.pim.serv.expandEvents(collectionUid, eventUids, 
                 startTime, endTime, this.getTicket(transportInfo));
            }
     },
     saveNewEventBreakRecurrence: function(collectionUid, event,
         originalEventUid, originalEventEndDate, transportInfo, handlerFunc){
         if (handlerFunc){
-            return Cal.serv.saveNewEventBreakRecurrence(handlerFunc, collectionUid, event, 
+            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(handlerFunc, collectionUid, event, 
                 originalEventUid, originalEventEndDate, this.getTicket(transportInfo));
         } else {
-            return Cal.serv.saveNewEventBreakRecurrence(collectionUid, event, 
+            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(collectionUid, event, 
                 originalEventUid, originalEventEndDate, this.getTicket(transportInfo));
         }
     }
@@ -198,9 +200,9 @@ cosmo.conduits.SubscriptionConduit =
     },
     saveDisplayName: function(collectionUid, newDisplayName, transportInfo, handlerFunc){
         if (handlerFunc){
-            Cal.serv.saveSubscription(handlerFunc, collectionUid, transportInfo.ticket.ticketKey, newDisplayName);
+            cosmo.app.pim.serv.saveSubscription(handlerFunc, collectionUid, transportInfo.ticket.ticketKey, newDisplayName);
         } else {
-            Cal.serv.saveSubscription(collectionUid, transportInfo.ticket.ticketKey, newDisplayName);
+            cosmo.app.pim.serv.saveSubscription(collectionUid, transportInfo.ticket.ticketKey, newDisplayName);
         }
     }
 };

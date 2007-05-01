@@ -25,8 +25,10 @@
  */
  
 dojo.provide("cosmo.ui.minical");
+
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
+dojo.require("cosmo.app.pim");
 dojo.require("cosmo.datetime");
  
 cosmo.ui.minical.MiniCal = new function() {
@@ -201,7 +203,7 @@ cosmo.ui.minical.MiniCal = new function() {
          */
         function setContainerSize() {
             var h = document.getElementById('miniCalNavPanel').offsetHeight;
-            var c = Cal._collectionSelectContainer.offsetHeight + 40;
+            var c = cosmo.app.pim._collectionSelectContainer.offsetHeight + 40;
             for (var i = 0; i < self.months.length; i++) {
                 if (h + self.months[i].offsetHeight < (self.controller.height - c)) {
                     h += self.months[i].offsetHeight;

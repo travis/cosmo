@@ -15,6 +15,8 @@
 */
 
 dojo.provide('cosmo.view.cal');
+
+dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");
@@ -334,9 +336,9 @@ cosmo.view.cal = new function () {
                         // Look up the master event for the recurrence and pass the result
                         // on to function h
                         f = function () {
-                            var reqId = Cal.currentCollection.conduit.getEvent(
-                                Cal.currentCollection.collection.uid, ev.data.id,
-                                Cal.currentCollection.transportInfo, h);
+                            var reqId = cosmo.app.pim.currentCollection.conduit.getEvent(
+                                cosmo.app.pim.currentCollection.collection.uid, ev.data.id,
+                                cosmo.app.pim.currentCollection.transportInfo, h);
                             };
                     }
                     break;
@@ -449,9 +451,9 @@ cosmo.view.cal = new function () {
         var requestId = null;
 
         requestId = //cosmo.service.atom.saveEvent(ev, {load: f});
-            Cal.currentCollection.conduit.saveEvent(
-            Cal.currentCollection.collection.uid, ev.data,
-            Cal.currentCollection.transportInfo, f);
+            cosmo.app.pim.currentCollection.conduit.saveEvent(
+            cosmo.app.pim.currentCollection.collection.uid, ev.data,
+            cosmo.app.pim.currentCollection.transportInfo, f);
 
         // Add to processing queue -- canvas will not re-render until
         // queue is empty
@@ -492,9 +494,9 @@ cosmo.view.cal = new function () {
         var f = function (newEvId, err, reqId) {
             handleSaveEvent(ev, newEvId, err, reqId, opts); };
         var requestId = null;
-        requestId = Cal.currentCollection.conduit.saveNewEventBreakRecurrence(
-            Cal.currentCollection.collection.uid, ev.data, origId, recurEnd,
-            Cal.currentCollection.transportInfo, f);
+        requestId = cosmo.app.pim.currentCollection.conduit.saveNewEventBreakRecurrence(
+            cosmo.app.pim.currentCollection.collection.uid, ev.data, origId, recurEnd,
+            cosmo.app.pim.currentCollection.transportInfo, f);
 
         self.processingQueue.push(requestId);
         self.lastSent = null;
@@ -574,7 +576,7 @@ cosmo.view.cal = new function () {
         // ********************
         // BANDAID: need to move this into the actual Service call
         // ********************
-        Cal.serv.resetServiceAccessTime();
+        cosmo.app.pim.serv.resetServiceAccessTime();
 
         // Success for recurring events -- repaint canvas
         if (act == 'saveSuccess' &&
@@ -585,7 +587,7 @@ cosmo.view.cal = new function () {
             // master/detached-event combo where the new detached event
             // has recurrence -- we need to expand the recurrence(s) by querying the server
             if (saveEv.data.recurrenceRule) {
-                loadRecurrenceExpansion(Cal.viewStart, Cal.viewEnd, saveEv, opts);
+                loadRecurrenceExpansion(cosmo.app.pim.viewStart, cosmo.app.pim.viewEnd, saveEv, opts);
             }
             // If the 'All Future' detached event has a frequency of 'once,'
             // it's a one-shot -- so, no need to go to the server for expansion
@@ -697,9 +699,9 @@ cosmo.view.cal = new function () {
                             }
                         };
                         f = function () {
-                            var reqId = Cal.currentCollection.conduit.getEvent(
-                                Cal.currentCollection.collection.uid, ev.data.id,
-                                Cal.currentCollection.transportInfo, h);
+                            var reqId = cosmo.app.pim.currentCollection.conduit.getEvent(
+                                cosmo.app.pim.currentCollection.collection.uid, ev.data.id,
+                                cosmo.app.pim.currentCollection.transportInfo, h);
                         };
                     }
                     break;
@@ -738,9 +740,9 @@ cosmo.view.cal = new function () {
                         };
                         // Look up the RecurrenceRule and pass the result on to function h
                         f = function () {
-                            var reqId = Cal.currentCollection.conduit.getRecurrenceRules(
-                                Cal.currentCollection.collection.uid, [ev.data.id],
-                                Cal.currentCollection.transportInfo, h);
+                            var reqId = cosmo.app.pim.currentCollection.conduit.getRecurrenceRules(
+                                cosmo.app.pim.currentCollection.collection.uid, [ev.data.id],
+                                cosmo.app.pim.currentCollection.transportInfo, h);
                             };
                     break;
                 // Save the RecurrenceRule with a new exception added for this instance
@@ -779,9 +781,9 @@ cosmo.view.cal = new function () {
         var f = function (newEvId, err, reqId) {
             handleRemoveResult(ev, newEvId, err, reqId, opts); };
 
-        var requestId = Cal.currentCollection.conduit.removeEvent(
-            Cal.currentCollection.collection.uid, ev.data.id,
-            Cal.currentCollection.transportInfo, f);
+        var requestId = cosmo.app.pim.currentCollection.conduit.removeEvent(
+            cosmo.app.pim.currentCollection.collection.uid, ev.data.id,
+            cosmo.app.pim.currentCollection.transportInfo, f);
     }
     /**
      * Handles the response from the async call when removing an event.
@@ -810,7 +812,7 @@ cosmo.view.cal = new function () {
         // ********************
         // BANDAID: need to move this into the actual Service call
         // ********************
-        Cal.serv.resetServiceAccessTime();
+        cosmo.app.pim.serv.resetServiceAccessTime();
 
         // Broadcast success
         dojo.event.topic.publish('/calEvent', { 'action': act,
@@ -829,10 +831,10 @@ cosmo.view.cal = new function () {
         // along with the original params passed back in from the async response
         var f = function (ret, err, reqId) {
             handleSaveRecurrenceRule(ev, err, reqId, opts); };
-        var requestId = Cal.currentCollection.conduit.saveRecurrenceRule(
-            Cal.currentCollection.collection.uid,
+        var requestId = cosmo.app.pim.currentCollection.conduit.saveRecurrenceRule(
+            cosmo.app.pim.currentCollection.collection.uid,
             ev.data.id, rrule,
-            Cal.currentCollection.transportInfo, f);
+            cosmo.app.pim.currentCollection.transportInfo, f);
     }
     /**
      * Handles the response from the async call when saving changes
@@ -868,7 +870,7 @@ cosmo.view.cal = new function () {
         // ********************
         // BANDAID: need to move this into the actual Service call
         // ********************
-        Cal.serv.resetServiceAccessTime();
+        cosmo.app.pim.serv.resetServiceAccessTime();
 
         // If the event has been edited such that it is now out of
         // the viewable range, remove the event from display
@@ -949,9 +951,9 @@ cosmo.view.cal = new function () {
                'opts': opts } });
         }
 
-        Cal.currentCollection.conduit.expandEvents(
-            Cal.currentCollection.collection.uid, [id], s, e,
-            Cal.currentCollection.transportInfo, f);
+        cosmo.app.pim.currentCollection.conduit.expandEvents(
+            cosmo.app.pim.currentCollection.collection.uid, [id], s, e,
+            cosmo.app.pim.currentCollection.transportInfo, f);
 
     }
     /**
@@ -1077,7 +1079,7 @@ cosmo.view.cal = new function () {
                 case 13:
                     // Go-to date
                     if (elem.id.toLowerCase() == 'jumpto') {
-                        Cal.calForm.goJumpToDate();
+                        cosmo.app.pim.calForm.goJumpToDate();
                     }
                     // Save an event from the Enter key -- requires:
                     //  * a selected event, not in 'processing' state
@@ -1090,7 +1092,7 @@ cosmo.view.cal = new function () {
                     else if (ev && !ev.lozenge.getInputDisabled() &&
                         ((elem.id == 'body') || (elem.className == 'inputText' &&
                             elem.type == 'text')) &&
-                        Cal.currentCollection.privileges.write) {
+                        cosmo.app.pim.currentCollection.privileges.write) {
                         dojo.event.topic.publish('/calEvent',
                             { 'action': 'saveFromForm' });
                     }
@@ -1102,7 +1104,7 @@ cosmo.view.cal = new function () {
                     //  * Enter key input must be from the document body
                     //  * Write access for the current collection
                     if (ev && !ev.lozenge.getInputDisabled() && (elem.id == 'body') &&
-                        Cal.currentCollection.privileges.write) {
+                        cosmo.app.pim.currentCollection.privileges.write) {
                         dojo.event.topic.publish('/calEvent',
                             { 'action': 'removeConfirm', 'data': ev });
                     }

@@ -33,7 +33,7 @@ dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.view.cal");
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require("cosmo.view.cal.conflict");
-dojo.require("cosmo.ui.cal_main");
+dojo.require("cosmo.app.pim");
 
 cosmo.view.cal.canvas = new function () {
 
@@ -358,14 +358,14 @@ cosmo.view.cal.canvas = new function () {
         };
         function setCurrentDayStatus() {
             // 'Today' is in the displayed view range
-            var currDate = cosmo.ui.cal_main.Cal.currDate;
+            var currDate = cosmo.app.pim.currDate;
             var currDateTime = currDate.getTime();
             var currDateDay = currDate.getDay();
             var currDayClass = '';
             var currDayImg = '';
             var currDayIdPrefix = 'hourDiv' + currDateDay + '-';
-            if (cosmo.ui.cal_main.Cal.viewStart.getTime() <= currDateTime &&
-                cosmo.ui.cal_main.Cal.viewEnd.getTime() > currDateTime) {
+            if (cosmo.app.pim.viewStart.getTime() <= currDateTime &&
+                cosmo.app.pim.viewEnd.getTime() > currDateTime) {
                 currDayClass = ' currentDayDay';
                 currDayImg = 'url(' + cosmo.env.getImagesUrl() +
                     'day_col_header_background.gif); background-repeat:' +
@@ -441,7 +441,7 @@ cosmo.view.cal.canvas = new function () {
         // FIXME -- viewOffset is the vertical offset of the UI
         // with the top menubar added in. This should be a property
         // of render context that the canvas can look up
-        top -= Cal.viewOffset;
+        top -= cosmo.app.pim.viewOffset;
         // Subtract change in resized all-day event area
         top -= (allDayArea.dragSize - allDayArea.origSize);
         return top;
@@ -463,7 +463,7 @@ cosmo.view.cal.canvas = new function () {
             return 'rgb(' + rgb.join() + ')';
         }
         var lozengeColors = {};
-        var sel = cosmo.ui.cal_main.Cal.calForm.form.calSelectElem;
+        var sel = cosmo.app.pim.calForm.form.calSelectElem;
         var index = sel ? sel.selectedIndex : 0;
         var hue = hues[index];
 
@@ -1135,7 +1135,7 @@ cosmo.view.cal.canvas = new function () {
                 }
 
                 // No move/resize for read-only collections
-                if (Cal.currentCollection.privileges.write) {
+                if (cosmo.app.pim.currentCollection.privileges.write) {
                     // Set up Draggable and save dragMode -- user may be dragging
                     if (id.indexOf('AllDay') > -1) {
                         dragItem = new cosmo.view.cal.draggable.NoTimeDraggable(s);
@@ -1182,7 +1182,7 @@ cosmo.view.cal.canvas = new function () {
         var elem = null;
 
         // Event creation only in write-mode
-        if (Cal.currentCollection.privileges.write) {
+        if (cosmo.app.pim.currentCollection.privileges.write) {
             e = !e ? window.event : e;
             elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
             id = elem.id
@@ -1334,7 +1334,7 @@ cosmo.view.cal.canvas = new function () {
      */
     function getIndexEvent(strId) {
         // Use regex to pull out the actual ID number
-        var pat = new RegExp('^eventDiv[\\D]*' + Cal.ID_SEPARATOR);
+        var pat = new RegExp('^eventDiv[\\D]*' + cosmo.app.pim.ID_SEPARATOR);
         var id = strId.replace(pat, '');
         return id;
     }
@@ -1403,7 +1403,7 @@ cosmo.view.cal.canvas = new function () {
      */
     function calcDateFromIndex(n) {
         var incr = parseInt(n);
-        var viewStart = cosmo.ui.cal_main.Cal.viewStart;
+        var viewStart = cosmo.app.pim.viewStart;
         var st = viewStart.getDate();
         var ret = null;
         st += incr;

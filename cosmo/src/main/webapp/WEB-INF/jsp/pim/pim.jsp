@@ -59,14 +59,14 @@
 <script type="text/javascript">
 // Dojo requires
 dojo.require('cosmo.app');
-dojo.require('cosmo.ui.cal_main');
+dojo.require('cosmo.app.pim');
 dojo.require('cosmo.ui.global_css');
 dojo.require('cosmo.convenience');
 dojo.require('cosmo.topics');
 dojo.require('cosmo.account.preferences');
 dojo.require('cosmo.account.settings');
 
-cosmo.app.initObj = cosmo.ui.cal_main.Cal;
+cosmo.app.initObj = cosmo.app.pim;
 cosmo.app.initParams = {};
 
 <c:if test="${collection != null}">

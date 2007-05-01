@@ -31,7 +31,9 @@
  */
 
 dojo.provide("cosmo.view.cal.draggable");
+
 dojo.require("dojo.event.topic");
+dojo.require("cosmo.app.pim");
 /**
  * @object An event lozenge being dragged or resized
  */
@@ -45,7 +47,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
     // Used in calcluations for resizing
     this.height = 0;
     // The top of the lozenge being dragged -- essentially div.offsetTop
-    // because now Cal.top is always set to zero
+    // because now cosmo.app.pim.top is always set to zero
     this.absTop = 0;
     // The offset of the left/top edges of the dragged lozenge from the
     // mouse click position -- lets you keep the lozenge a fixed pos
@@ -83,12 +85,12 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         this.plantonicLozengeLeft = lozenge.getPlatonicLeft();
         this.platonicLozengeWidth = lozenge.getPlatonicWidth();
         this.height = div.offsetHeight;
-        this.absTop = div.offsetTop + Cal.top;
+        this.absTop = div.offsetTop + cosmo.app.pim.top;
         this.bottom = div.offsetTop + this.height;
         this.min = this.bottom-(HOUR_UNIT_HEIGHT/2)+2;
         this.clickOffsetX = xPos - this.origDivLeft;
         this.clickOffsetY = yPos - div.offsetTop;
-        this.rLimit = (Cal.midColWidth - cosmo.view.cal.canvas.dayUnitWidth -
+        this.rLimit = (cosmo.app.pim.midColWidth - cosmo.view.cal.canvas.dayUnitWidth -
             SCROLLBAR_SPACER_WIDTH - 2);
         this.scrollOffset = cosmo.view.cal.canvas.getTimedCanvasScrollTop();
         if (lozenge.composite()) {
@@ -414,7 +416,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.getBLimit = function (movelo
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.setDragWidth = function () {}
 
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.getLocalMouseYPos = function (y) {
-    var localY = (y - Cal.top) + this.scrollOffset;
+    var localY = (y - cosmo.app.pim.top) + this.scrollOffset;
     return localY;
 };
 

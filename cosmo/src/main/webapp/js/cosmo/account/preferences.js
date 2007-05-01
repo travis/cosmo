@@ -16,36 +16,36 @@
 
 dojo.provide("cosmo.account.preferences");
 
-dojo.require("cosmo.ui.cal_main");
+dojo.require("cosmo.app.pim");
 
 cosmo.account.preferences = new function () {
 	this.SHOW_ACCOUNT_BROWSER_LINK = 'UI.Show.AccountBrowserLink';
 	this.LOGIN_URL = 'Login.Url';
 	
     this.getPreference = function(key){
-		return cosmo.ui.cal_main.Cal.serv.getPreference(key);
+		return cosmo.app.pim.serv.getPreference(key);
     };
 
     this.setPreference = function(key, val){
-		cosmo.ui.cal_main.Cal.serv.setPreference(key, val);
+		cosmo.app.pim.serv.setPreference(key, val);
         cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [{key:val}])
     };
 
     this.removePreference = function(key){
-		cosmo.ui.cal_main.Cal.serv.removePreferences(key);
+		cosmo.app.pim.serv.removePreferences(key);
     };
     
     this.getPreferences = function(){
-		return cosmo.ui.cal_main.Cal.serv.getPreferences();
+		return cosmo.app.pim.serv.getPreferences();
     };
 
     this.setPreferences = function(prefs){
-    	cosmo.ui.cal_main.Cal.serv.setPreferences({"javaClass":"java.util.HashMap", "map":prefs});
+    	cosmo.app.pim.serv.setPreferences({"javaClass":"java.util.HashMap", "map":prefs});
         cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [prefs])
     };
 
     this.setMultiplePreferences = function(prefs){
-    	cosmo.ui.cal_main.Cal.serv.setMultiplePreferences({"javaClass":"java.util.HashMap", "map":prefs});
+    	cosmo.app.pim.serv.setMultiplePreferences({"javaClass":"java.util.HashMap", "map":prefs});
         cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [prefs]);
     };
     

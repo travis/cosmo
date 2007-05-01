@@ -29,6 +29,7 @@ dojo.provide('cosmo.view.cal.lozenge');
 
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
+dojo.require("cosmo.app.pim");
 dojo.require("cosmo.view.cal");
 dojo.require("cosmo.view.cal.canvas");
 
@@ -111,9 +112,9 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
         strtime += ' (' + d.start.getTimezoneAbbrName() + ')';
     }
     var timeDiv = document.getElementById(this.divId + 'Start' +
-        Cal.ID_SEPARATOR + ev.id);
+        cosmo.app.pim.ID_SEPARATOR + ev.id);
     var titleDiv = document.getElementById(this.divId + 'Title' +
-        Cal.ID_SEPARATOR + ev.id);
+        cosmo.app.pim.ID_SEPARATOR + ev.id);
     if (timeDiv) {
         this.setText(timeDiv, strtime);
     }
@@ -125,7 +126,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.showStatusAnim = function () {
     var titleDiv = document.getElementById(this.divId + 'Title' +
-        Cal.ID_SEPARATOR + this.id);
+        cosmo.app.pim.ID_SEPARATOR + this.id);
     this.setText(titleDiv, 'Processing ...');
 };
 /**
@@ -135,7 +136,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.showStatusAnim = function () {
 cosmo.view.cal.lozenge.Lozenge.prototype.mainAreaCursorChange = function (isProc) {
     var cursorChange = '';
     // Read-only collection -- clickable but not draggable/resizable
-    if (!Cal.currentCollection.privileges.write) {
+    if (!cosmo.app.pim.currentCollection.privileges.write) {
         cursorChange = 'pointer';
     }
     // Writeable collection -- drag/resize cursors
@@ -143,12 +144,12 @@ cosmo.view.cal.lozenge.Lozenge.prototype.mainAreaCursorChange = function (isProc
         cursorChange = isProc ? 'progress' : 'move';
     }
     document.getElementById(this.divId + 'Content' +
-        Cal.ID_SEPARATOR + this.id).style.cursor = cursorChange;
+        cosmo.app.pim.ID_SEPARATOR + this.id).style.cursor = cursorChange;
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicLeft = function () {
     var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
     var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-        cosmo.ui.cal_main.Cal.viewStart, ev.data.start);
+        cosmo.app.pim.viewStart, ev.data.start);
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 
 };
@@ -227,12 +228,12 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
     var borderColor = '';
     var borderStyle = 'solid';
     var lozengeColor = '';
-    var mainDiv = document.getElementById(this.divId + Cal.ID_SEPARATOR +
+    var mainDiv = document.getElementById(this.divId + cosmo.app.pim.ID_SEPARATOR +
         this.id);
     var timeDiv = document.getElementById(this.divId + 'Start' +
-        Cal.ID_SEPARATOR + ev.id);
+        cosmo.app.pim.ID_SEPARATOR + ev.id);
     var titleDiv = document.getElementById(this.divId + 'Title' +
-        Cal.ID_SEPARATOR + ev.id);
+        cosmo.app.pim.ID_SEPARATOR + ev.id);
     colors = cosmo.view.cal.canvas.colors;
 
     // If this lozenge is processing, change to 'processing' color
@@ -430,7 +431,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.resizeHandleCursorChange = funct
     var topChange = '';
     var bottomChange = '';
     // Read-only collection -- clickable but not draggable/resizable
-    if (!Cal.currentCollection.privileges.write) {
+    if (!cosmo.app.pim.currentCollection.privileges.write) {
         topChange = 'pointer';
         bottomChange = 'pointer';
     }
@@ -440,9 +441,9 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.resizeHandleCursorChange = funct
         bottomChange = isProc ? 'default' : 's-resize';
     }
     var topDiv = document.getElementById(this.divId + 'Top' +
-        Cal.ID_SEPARATOR + this.id);
+        cosmo.app.pim.ID_SEPARATOR + this.id);
     var bottomDiv = document.getElementById(this.divId + 'Bottom' +
-        Cal.ID_SEPARATOR + this.id);
+        cosmo.app.pim.ID_SEPARATOR + this.id);
     topDiv.style.cursor = topChange;
     // Timed events that extend beyond the viewable area
     // will not have a bottom resize handle
@@ -608,7 +609,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
     }
     auxDivCount = (endDay - startDay);
 
-    this.idPrefix = Cal.ID_SEPARATOR + id;
+    this.idPrefix = cosmo.app.pim.ID_SEPARATOR + id;
     this.width = 1;
     this.auxDivList = [];
 
@@ -674,7 +675,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
             view.appendChild(lozengeDiv);
 
             var lozengeDiv = document.createElement('div');
-            lozengeDiv.id = this.divId + Cal.ID_SEPARATOR +
+            lozengeDiv.id = this.divId + cosmo.app.pim.ID_SEPARATOR +
                 'aux' + (i+1) + this.idPrefix;
             lozengeDiv.className = 'eventLozenge';
             lozengeDiv.style.width = this.width + 'px';
@@ -716,7 +717,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
     if (auxDivCount) {
         for (var i = 0; i < auxDivCount; i++) {
             this.auxDivList[i] = document.getElementById(this.divId +
-                Cal.ID_SEPARATOR + 'aux' + (i+1) + this.idPrefix);
+                cosmo.app.pim.ID_SEPARATOR + 'aux' + (i+1) + this.idPrefix);
         }
     }
     // All done
@@ -1029,7 +1030,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.insert = function (id) {
     var d = null;
     var view = null;
 
-    this.idPrefix = Cal.ID_SEPARATOR + id;
+    this.idPrefix = cosmo.app.pim.ID_SEPARATOR + id;
     this.width = 1;
 
     // Append event lozenge to appropriate screen area for the type of Lozenge

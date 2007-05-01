@@ -18,6 +18,7 @@ dojo.provide("cosmo.ui.widget.CollectionSelector");
 dojo.require("dojo.widget.*");
 dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
+dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.convenience");
@@ -43,7 +44,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
 
         // Function for onchange of collection selector
         // sets local currentCollection and passes the selected
-        // collection to Cal.loadCollectionItems 
+        // collection to cosmo.app.pim.loadCollectionItems 
         // --------
         selectFunction: function (e) {
             var t = e.target;
@@ -122,7 +123,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                                     location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.collection.uid;
                                 }
                             };
-                            Cal.serv.saveSubscription(n, curr.collection.uid, passedKey, 
+                            cosmo.app.pim.serv.saveSubscription(n, curr.collection.uid, passedKey, 
                                 curr.displayName)
                         },
                         attemptPrompt: strings.attemptPrompt, 
@@ -138,12 +139,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     imgPath = 'details';
                     imgTitle = self.strings.imgTitleInfo;
                     f = function () {
+                        var _pim = cosmo.app.pim;
                         cosmo.app.showDialog(
                             cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                            Cal.currentCollection.collection,
-                            Cal.currentCollection.displayName,
-                            Cal.currentCollection.conduit,
-                            Cal.currentCollection.transportInfo));
+                            _pim.currentCollection.collection,
+                            _pim.currentCollection.displayName,
+                            _pim.currentCollection.conduit,
+                            _pim.currentCollection.transportInfo));
                     };
                 }
                 

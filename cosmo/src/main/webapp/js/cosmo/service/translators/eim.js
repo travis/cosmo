@@ -20,7 +20,11 @@
  */
 dojo.provide("cosmo.service.translators.eim");
 
+dojo.require("dojo.date.serialize");
+
+dojo.require("cosmo.service.eim");
 dojo.require("cosmo.model.Item");
+dojo.require("cosmo.model.EventStamp");
 dojo.require("cosmo.service.translators.common");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
@@ -29,14 +33,36 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     responseToObject: function atomPlusEimResponseToObject(atomXml){
         if (!atomXml){
-            throw new ParseError("Cannot parse null, undefined, or false");
+            throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
         }
         var entries = atomXml.getElementsByTagName("entry");
-        var items = [];
+        var items = {};
+        var mods = [];
         for (var i = 0; i < entries.length; i++){
-            var c = entries[i].getElementsByTagName("content")[0];
+            var entry = entries[i];
+            try {
+                var uid = entry.getElementsByTagName("id")[0];
+            } catch (e){
+                throw new cosmo.service.translators.
+                   ParseError("Could not find id element for entry " + (i+1));
+            }
+            uid = uid.firstChild.nodeValue;
+            var uidParts = uid.split("::");
+            try {
+                var c = entry.getElementsByTagName("content")[0];
+            } catch (e){
+                throw new cosmo.service.translators.
+                   ParseError("Could not find content element for entry " + (i+1));
+            }
             var content = c.firstChild.nodeValue;
-            var item = this.recordSetToObject(eval("(" + content + ")"))
+            
+            // If we have a second part to the uid, this entry is a 
+            // recurrence modification.
+            if (!uidParts[1]){
+                var item = this.recordSetToObject(eval("(" + content + ")"))
+            } else {
+                mods.push(content);
+            }
 
             var links;
             // Safari doesn't find paging links with non NS call
@@ -53,16 +79,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 };
             }
 
-            items.push(item);
+            items[uidParts[0]] = item;
         }
+        
+        for (var i = 0; i < mods.length; i++){
+            this.addModificationRecordSet(items, eval("(" + mods[i] + ")"));
+        }
+        
         return items;
     },
 
     objectToAtomEntry: function(object){
 
          var jsonObject = this.objectToRecordSet(object);
-
-
 
          return '<entry xmlns="http://www.w3.org/2005/Atom">' +
          '<title>' + object.data.title + '</title>' +
@@ -164,6 +193,24 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     },
 
+    noteToTaskRecord: function(note){
+        
+        var stamp = note.getTaskStamp();
+        
+        with (cosmo.service.eim.constants){
+            return {
+                prefix: prefix.TASK,
+                ns: ns.TASK,
+                keys: {
+                    uuid: [type.TEXT, note.getUid()]
+                },
+                fields: {}
+                
+            }
+        }
+        
+    },
+    
     noteToModbyRecord: function(note){
         with (cosmo.service.eim.constants){
             return {
@@ -179,7 +226,58 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
     },
 
-    recordSetToObject: function (recordSet){
+    /*
+     * Add modification record set to the appropriate member of the "items" hash.
+     */
+    addModificationRecordSetToItems: function(items, recordSet){
+        var uidParts = recordSet.uuid.split("::");
+        if (!items[uidParts[0]]){
+            throw new cosmo.service.translators.
+               ParseError("No item found with uid " + uidParts[0] + 
+                           ". Cannot apply modification with recurrence" +
+                           " date " + uidParts[1]);
+        }
+        
+        var item = items[uidParts[0]];
+        
+        var modifiedProperties = {};
+        var modifiedStamps = {};
+        
+        for (recordName in recordSet.records){
+        with (cosmo.service.eim.constants){
+
+           var record = recordSet.records[recordName];
+                      
+           switch(recordName){
+
+           case prefix.ITEM:
+           case prefix.NOTE:
+               for (propertyName in record.fields){
+                   modifiedProperties[propertyName] = record.fields[propertyName][1]
+               }
+               break;
+           case prefix.EVENT:
+               modifiedStamps[prefix.EVENT] = this.getEventStampProperties(record);
+               break;
+           case prefix.TASK:
+               modifiedStamps[prefix.TASK] = this.getTaskStampProperties(record);
+               break;
+           }
+        }
+        }
+
+        var mod = new cosmo.model.Modification(
+            {
+                "recurrenceId": uidParts[1],
+                "modifiedProperties": modifiedProperties,
+                "modifiedStamps": modifiedStamps
+            }
+        );
+
+        item.addModification(mod);
+    },
+  
+    recordSetToObject: function (/*Object*/ recordSet){
         //TODO
         /* We can probably optimize this by grabbing the
          * appropriate properties from the appropriate records
@@ -190,8 +288,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
         var note = new cosmo.model.Note(
          {
-             uid: recordSet.uuid,
-
+             uid: recordSet.uuid
          }
         );
 
@@ -200,63 +297,64 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
            var record = recordSet.records[recordName]
 
-           if (recordName == prefix.ITEM){
+           switch(recordName){
+
+           case prefix.ITEM:
                this.addItemRecord(record, note);
-           }
-
-           if (recordName == prefix.NOTE){
+               break;
+           case prefix.NOTE:
                this.addNoteRecord(record, note);
-               description = record.fields.body[1];
-           }
-
-           if (recordName == prefix.EVENT){
-               note.addStamp(this.eventRecordToEventStamp(record));
-           }
+               break;
+           case prefix.EVENT:
+               note.getStamp(prefix.EVENT, true, this.getEventStampProperties(record));
+               break;
+           case prefix.TASK:
+               note.getStamp(prefix.TASK, true, this.getTaskStampProperties(record));
+               break;
            }
         }
-
+        }
         return note;
 
     },
 
-
-    eventRecordToEventStamp: function (record){
+    getEventStampProperties: function getEventStampProperties(record){
 
         var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
 
-        var stamp = new cosmo.model.EventStamp(
-         {
-            startDate: this.fromEimDate(record.fields.dtstart[1]),
-            duration: record.fields.duration[1], //TODO
+         return {
+            startDate: record.fields.dtstart? this.fromEimDate(record.fields.dtstart[1]): undefined,
+            duration: record.fields.duration? record.fields.duration[1]: undefined, //TODO
             anytime: dateParams.anyTime,
-            location: record.fields.location[1],
+            location: record.fields.location? record.fields.location[1]: undefined,
             rrule: null, //TODO
             exdates: null, //TODO
-            status: record.fields.status[1]
+            status: record.fields.status? record.fields.status[1]: undefined
          }
-        );
-        return stamp;
     },
 
-    addItemRecord: function (record, object){
-        object.setDisplayName(record.fields.title[1]);
-        object.setCreationDate(record.fields.createdOn[1]);
-        //object.setModifiedDate(null) //TODO;
+    getTaskStampProperties: function getTaskStampProperties(record){
+        
+        return {};
+    },
+    
+    addItemRecord: function addItemRecord(record, object){
+        if (record.fields.title) object.setDisplayName(record.fields.title[1]);
+        if (record.fields.createdOn) object.setCreationDate(record.fields.createdOn[1]);
 
-        this.addTriage(record.fields.triage[1], object);
+        if (record.fields.triage) this.addTriage(record.fields.triage[1], object);
     },
 
-    addNoteRecord: function (record, object){
-        object.setBody(record.fields.body[1]);
+    addNoteRecord: function addNoteRecord(record, object){
+        if (record.fields.body) object.setBody(record.fields.body[1]);
     },
 
-    fromEimDate: function (dateString){
+    fromEimDate: function fromEimDate(dateString){
         var date = dateString.split(":")[1];
         return new cosmo.datetime.Date(dojo.date.fromIso8601(date));
-
     },
 
-    addTriage: function (triageString, object){
+    addTriage: function addTriage(triageString, object){
         var triageArray = triageString.split(" ");
 
         object.setTriageStatus(triageArray[0]);
@@ -269,7 +367,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         object.setAutoTriage(triageArray[2] == true);
     },
 
-    dateParamsFromEimDate: function (dateString){
+    dateParamsFromEimDate: function dateParams(dateString){
         var returnVal = {};
         var params = dateString.split(":")[0].split(";");
         for (var i = 0; i < params.length; i++){

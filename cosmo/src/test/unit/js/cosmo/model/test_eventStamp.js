@@ -14,12 +14,14 @@
  * limitations under the License.
 */
 
+dojo.provide("cosmotest.model.test_eventStamp")
 dojo.require("cosmo.model.util");
 dojo.require("cosmo.model.Item");
 dojo.require("cosmo.model.EventStamp");
 
-test_getSetEndDate = function(){
-    var note = getSimpleEventNote();
+cosmotest.model.test_eventStamp = {
+getSetEndDate: function(){
+    var note = cosmotest.model.test_eventStamp.getSimpleEventNote();
     var stamp = note.getEventStamp();
     var startDate = new cosmo.datetime.Date(2007,0,1);
     var endDate = new cosmo.datetime.Date(2007,0,2);
@@ -40,10 +42,10 @@ test_getSetEndDate = function(){
     stamp.setEndDate(endDate); 
     jum.assertTrue(endDate.equals(stamp.getEndDate()));
     jum.assertEquals(60 * 60, stamp.getDuration()); 
-}
+},
 
-test_occurenceInheritance = function(){
-    var note = getSimpleEventNote();
+test_eventStamp_occurenceInheritance: function(){
+    var note = cosmotest.model.test_eventStamp.getSimpleEventNote();
     var startDate = new cosmo.datetime.Date(2007,0,1,13,0);
     var endDate = new cosmo.datetime.Date(2007,0,1,14,0);
     var stamp = note.getEventStamp(true);
@@ -58,9 +60,9 @@ test_occurenceInheritance = function(){
     jum.assertTrue(occurrenceDate.equals(occurStamp.getStartDate()));
 
     //TODO - test overriding start, end etc.
-}
+},
 
-getSimpleEventNote = function(){
+getSimpleEventNote: function(){
     var note = new cosmo.model.Note({
         body: "body",
         uid: "123",
@@ -70,6 +72,6 @@ getSimpleEventNote = function(){
     var eventStamp = note.getEventStamp(true);
     return note;
 }
-
+}
 
 

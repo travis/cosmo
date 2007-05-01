@@ -23,8 +23,10 @@ For use with the JsUnit from www.jsunit.net
   <script language="JavaScript" type="text/javascript">
 
       dojo.require("dojo.widget.*");
-      dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
+      dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);      
+      dojo.registerModulePath("cosmotest", "../../../../../test/unit/js/cosmo")
       dojo.require("cosmo.env");
+      dojo.require("cosmotest.testutils");
       cosmo.env.setBaseUrl("../../../main/webapp/");
 
   </script>
@@ -32,12 +34,6 @@ For use with the JsUnit from www.jsunit.net
   <!-- jsunit api wrapper -->
   <script src="testtools/JsTestManager/jsunit_wrap.js" language="JavaScript" type="text/javascript"></script>
 
-  <!-- test scripts -->
-  <script src="cosmo/test_Test.js" language="JavaScript" type="text/javascript"></script>
-  <script src="cosmo/datetime/test_timezone.js" language="JavaScript" type="text/javascript"></script>
-  <script src="cosmo/model/util/test_util.js" language="JavaScript" type="text/javascript"></script>
-  <script src="cosmo/model/test_model.js" language="JavaScript" type="text/javascript"></script>
-  <script src="cosmo/model/test_eventStamp.js" language="JavaScript" type="text/javascript"></script>
 
   <!-- end of jusnit wrapper -->
 <!--
@@ -48,7 +44,14 @@ For use with the JsUnit from www.jsunit.net
   <script language="JavaScript" type="text/javascript">
     var bu_alert = dojo.hostenv.println;
     print = dojo.hostenv.println;
-    jum.init();
+    cosmotest.testutils.init(
+        ["cosmotest.model.test_model",
+        "cosmotest.model.test_eventStamp",
+        "cosmotest.model.util.test_util",
+        "cosmotest.datetime.test_7581",
+        "cosmotest.datetime.test_date",
+        "cosmotest.datetime.test_timezone"]
+     );
   </script>
 </head>
 <!--<body onload="alert('hieatt_core.html onload, number scripts=' + document.getElementsByTagName('script').length); jum.init()">-->

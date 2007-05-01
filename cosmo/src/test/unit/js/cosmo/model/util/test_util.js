@@ -14,9 +14,11 @@
  * limitations under the License.
 */
 
+dojo.provide("cosmotest.model.util.test_util");
 dojo.require("cosmo.model.util");
 
-test_simplePropertyApplicator = function(){
+cosmotest.model.util.test_util = {
+test_simplePropertyApplicator: function test_simplePropertyApplicator(){
     var app  = cosmo.model.util.simplePropertyApplicator;
     NewClass = null;
     dojo.declare("NewClass", null, {});
@@ -65,9 +67,9 @@ test_simplePropertyApplicator = function(){
     var instance3 = new NewClass();
     jum.assertEquals("bye", instance2.getObjProp()["prop"]);
     jum.assertEquals("hello", instance3.getObjProp()["prop"]);
-}
+},
 
-test_enhanceclass = function(){
+test_enhanceclass: function(){
     EnhancedClass = null;
     dojo.declare("EnhancedClass", null, {});
     var app  = cosmo.model.util.simplePropertyApplicator;
@@ -87,4 +89,5 @@ test_enhanceclass = function(){
     jum.assertEquals("default", instance.getStringProp());
     jum.assertEquals("hello", instance.getObjProp()["prop"]);
     
+}
 }

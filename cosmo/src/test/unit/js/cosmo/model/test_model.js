@@ -14,10 +14,13 @@
  * limitations under the License.
 */
 
+dojo.provide("cosmotest.model.test_model");
 dojo.require("cosmo.model.util");
 dojo.require("cosmo.model.Item");
+dojo.require("cosmo.model.EventStamp");
 
-test_declareStamp = function(){
+dojo.lang.mixin(cosmotest.model.test_model,{
+test_declareStamp : function(){
     cosmo.model.declareStamp("TestStamp", "test",
         [["testString", String, {"default" : "def"}],
          ["testArrayOfNumbers", [Array, Number], {"default" : function(){return [1,2,3]}}]],
@@ -33,9 +36,9 @@ test_declareStamp = function(){
     var attr = s.stampMetaData.getAttribute("testArrayOfNumbers");
     assertEquals(attr.type[0], String);
     assertEquals(attr.type[1], Number);
-}
+},
 
-test_addGetRemoveStamp = function(){
+test_addGetRemoveStamp : function(){
     var note = new cosmo.model.Note();
     var stamp = note.getStamp("event", true);
     stamp.setLocation("loco");
@@ -47,12 +50,12 @@ test_addGetRemoveStamp = function(){
     stamp = note.getStamp("event");
     jum.assertTrue(stamp == null);
     
-};
+},
 
-test_addGetRemoveModification = function(){
-};
+test_addGetRemoveModification : function(){
+},
 
-test_getEventStampGetTaskStamp = function(){
+test_getEventStampGetTaskStamp : function(){
     var note = new cosmo.model.Note();
     var event = note.getEventStamp(true);
     var task = note.getTaskStamp(true);
@@ -63,9 +66,9 @@ test_getEventStampGetTaskStamp = function(){
     task = note.getTaskStamp();
     assertEquals("event", event.stampMetaData.stampName)
     assertEquals("task", task.stampMetaData.stampName)
-};
+},
 
-test_noteOccurrence = function(){
+test_noteOccurrence : function(){
     var note = new cosmo.model.Note({
         body: "body",
         uid: "123",
@@ -90,9 +93,9 @@ test_noteOccurrence = function(){
     jum.assertEquals(noteOccurrence.getDisplayName(), "newdis");
     jum.assertEquals(noteOccurrence.getUid(), "123");
     
-};
+},
 
-test_equals = function(){    
+test_equals : function(){    
     var equals = cosmo.model.util.equals;
     jum.assertTrue(equals(1,1));
     var date1 = new cosmo.datetime.Date(2001,1,1);
@@ -119,9 +122,9 @@ test_equals = function(){
     }
     jum.assertTrue(caught);
     
-};
+},
 
-test_stampInheritance = function(){
+test_stampInheritance : function(){
     var note = new cosmo.model.Note({
         body: "body",
         uid: "123",
@@ -144,8 +147,8 @@ test_stampInheritance = function(){
     jum.assertEquals(occurStamp.getLocation(), "Yo");
     
     
-};
+},
 
-test_ = function(){
-};
-
+test_ : function(){
+}
+});

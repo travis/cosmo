@@ -370,7 +370,7 @@ JUM.prototype.callAsync = function(funcname, func, asyncObj) {
     catch(e) {
       threw = true;
       if (this.isFailureException(e)) {
-	 jum.debug("ASYNC FAILED" + suffix + ': ' + jum_except_string(e));
+     jum.debug("ASYNC FAILED" + suffix + ': ' + jum_except_string(e));
          ++this.failed_async_count_;
          asyncObj.status_ = JUM.STATUS_FAILED;
          bu_alert("got async failure in " + funcname + ": " + jum_except_string(e));
@@ -728,7 +728,7 @@ You can access arguments from the testRunner.html query string by <code>top.jsUn
   // copied and modified from burst.BurstError.js
   function JUMAssertFailure(msg) {
     if(!(this instanceof JUMAssertFailure)){
-    	return new JUMAssertFailure(msg);
+        return new JUMAssertFailure(msg);
     }
     this.isJumError = 1;
     this.message = (new String(msg)) || '';
@@ -747,27 +747,27 @@ You can access arguments from the testRunner.html query string by <code>top.jsUn
     if (eval(cond)) throw JUMAssertFailure("assertFalse('" + cond + "') failed" + (msg ? ': ' + msg : ''));
   }
   function jum_assertEquals(msg, expected, actual) {
-	 if (arguments.length == 2) {actual = expected; expected = msg; msg = null;} 
-	 if (expected == actual) return ;
-	 var expected_u = expected;
-	 var actual_u = actual;
-	 if(jum_uneval){
-		 expected_u = jum_uneval(expected); 
-		 actual_u = jum_uneval(actual); 
-		 if(expected_u == actual_u){ return ; }
-	 }
-	var es = ("assertEquals" + (msg ? '(' + msg + ')' : '') + 
-				" failed: expected |" + expected_u + "| (typeof=" + (typeof expected) + ")" +
-				  ", but got |" + actual_u + "| (typeof=" + (typeof actual) + ")");
-	throw new JUMAssertFailure(es);
+     if (arguments.length == 2) {actual = expected; expected = msg; msg = null;} 
+     if (expected == actual) return ;
+     var expected_u = expected;
+     var actual_u = actual;
+     if(jum_uneval){
+         expected_u = jum_uneval(expected); 
+         actual_u = jum_uneval(actual); 
+         if(expected_u == actual_u){ return ; }
+     }
+    var es = ("assertEquals" + (msg ? '(' + msg + ')' : '') + 
+                " failed: expected |" + expected_u + "| (typeof=" + (typeof expected) + ")" +
+                  ", but got |" + actual_u + "| (typeof=" + (typeof actual) + ")");
+    throw new JUMAssertFailure(es);
 
-	// jum.debug(JUMAssertFailure("foo!"));
-	/*
-	 throw JUMAssertFailure("assertEquals" + 
-				(msg ? '(' + msg + ')' : '') + 
-				" failed: expected |" + expected_u + "| (typeof=" + (typeof expected) + ")" +
-				  ", but got |" + actual_u + "| (typeof=" + (typeof actual) + ")");
-	*/
+    // jum.debug(JUMAssertFailure("foo!"));
+    /*
+     throw JUMAssertFailure("assertEquals" + 
+                (msg ? '(' + msg + ')' : '') + 
+                " failed: expected |" + expected_u + "| (typeof=" + (typeof expected) + ")" +
+                  ", but got |" + actual_u + "| (typeof=" + (typeof actual) + ")");
+    */
   }
 
   /*
@@ -777,7 +777,7 @@ You can access arguments from the testRunner.html query string by <code>top.jsUn
   jum.name = 'mda';
   jum.debug = function(line){
     if(jum.verbose){
-    	jum.my_output_('DEBUG', line);
+        jum.my_output_('DEBUG', line);
     }
   };
   jum.info = function(line){
@@ -807,8 +807,8 @@ You can access arguments from the testRunner.html query string by <code>top.jsUn
     }
     var groupnames = jum_get_groupnames(this.alltests_);
     jum.report_("\n\n=============================================\n"
-    			+"There are " + groupnames.length + " test groups...\n"
-    			+ "=============================================");
+                +"There are " + groupnames.length + " test groups...\n"
+                + "=============================================");
     for(var i=0;i<groupnames.length;++i) {
       jum.runOneGroup_(groupnames[i]);
     }
@@ -835,7 +835,7 @@ You can access arguments from the testRunner.html query string by <code>top.jsUn
   jum.my_println_ = function(line) {
     jum.initOutput_();
     if (jum.my_println_ != arguments.callee) {
-    	jum.my_println_(line);
+        jum.my_println_(line);
     }
   };
 
@@ -868,32 +868,32 @@ You can access arguments from the testRunner.html query string by <code>top.jsUn
             print(line)
         };
      }else if (typeof window != 'undefined'){
-     	jum.set_output_window_(jum.create_output_window_());
+         jum.set_output_window_(jum.create_output_window_());
         jum.my_println_ = function(line) {
-			// break up multiple lines
-			var lines = line.split(/\n/);
-			if (lines.length > 1) {
-			    //alert('(jsunit_wrap.js) splitting multi-line: ' + line);
-			    for(var i=0;i<lines.length;++i) jum.my_println_(lines[i]);
-			    return;
-			}
-		  	if (this.output_win_.closed) {
-	             alert("(jsunit_wrap.js) output window is closed; can't output: " + line);
-		     alert('(jsunit_wrap.js) throwing exception since no test output window');
-		     throw Error('(jsunit_wrap.js) no test output window');
-		     //return;
-	          }
-	          this.output_win_.focus();
-	          // on Moz, a Text child is enough.
-		  	// on IE, the \n does nothing and it is a long run-on line.
-		  	var doc = this.output_win_.document;
-	          var text_node = doc.createTextNode(line/* + "\n"*/);
-	          var div_node = doc.createElement('div');
-		  		div_node.appendChild(text_node);
-	          this.output_element_.appendChild(div_node);
+            // break up multiple lines
+            var lines = line.split(/\n/);
+            if (lines.length > 1) {
+                //alert('(jsunit_wrap.js) splitting multi-line: ' + line);
+                for(var i=0;i<lines.length;++i) jum.my_println_(lines[i]);
+                return;
+            }
+              if (this.output_win_.closed) {
+                 alert("(jsunit_wrap.js) output window is closed; can't output: " + line);
+             alert('(jsunit_wrap.js) throwing exception since no test output window');
+             throw Error('(jsunit_wrap.js) no test output window');
+             //return;
+              }
+              this.output_win_.focus();
+              // on Moz, a Text child is enough.
+              // on IE, the \n does nothing and it is a long run-on line.
+              var doc = this.output_win_.document;
+              var text_node = doc.createTextNode(line/* + "\n"*/);
+              var div_node = doc.createElement('div');
+                  div_node.appendChild(text_node);
+              this.output_element_.appendChild(div_node);
         };
      } else {
-     	throw Error("(jsunit_wrap.js) no way to display test debug output: no global 'window' or 'print' symbols");
+         throw Error("(jsunit_wrap.js) no way to display test debug output: no global 'window' or 'print' symbols");
      }
   };
 
@@ -939,29 +939,29 @@ You can access arguments from the testRunner.html query string by <code>top.jsUn
 
        if (JUM_CATCH_EXCEPTIONS) {
        try{ 
-	 	func();
-	 }catch(e){
+         func();
+     }catch(e){
          threw = true;
          if(e instanceof JUMAssertFailure) {
-         	var str='';
-         	if(e["fileName"]){str+=e.fileName+':';}
-			if (e["lineNumber"]){str+=e.lineNumber+' ';}
-			str+=e.message;
+             var str='';
+             if(e["fileName"]){str+=e.fileName+':';}
+            if (e["lineNumber"]){str+=e.lineNumber+' ';}
+            str+=e.message;
             jum.report_(prefix + 'FAILED' + suffix + ': ' + str);
             ++this.failed_count_;
          }else{
-         	var str='';
-         	if(e["fileName"]){str+=e.fileName+':';}
-			if (e["lineNumber"]){str+=e.lineNumber+' ';}
-			str+=e.message;
-	     	jum.report_(prefix + 'ERROR' + suffix + ' toString: ' + e.toString() + ' message: ' + e.message + 
-			 (typeof e.description != 'undefined' ? ' description: ' + e.description : '')
-			 + str);
+             var str='';
+             if(e["fileName"]){str+=e.fileName+':';}
+            if (e["lineNumber"]){str+=e.lineNumber+' ';}
+            str+=e.message;
+             jum.report_(prefix + 'ERROR' + suffix + ' toString: ' + e.toString() + ' message: ' + e.message + 
+             (typeof e.description != 'undefined' ? ' description: ' + e.description : '')
+             + str);
 
-		 // FIXME: this shouldn't be necessaray, but seems to be in rhino to get any reasonable info
-		 for(var x in e){
-		 	jum.debug(x+": "+e[x]);
-		 }
+         // FIXME: this shouldn't be necessaray, but seems to be in rhino to get any reasonable info
+         for(var x in e){
+             jum.debug(x+": "+e[x]);
+         }
             ++this.error_count_;
          }
        }
@@ -1130,11 +1130,11 @@ function jum_parse_window_scripts() {
     if (matches) {
       for(var j=0;j<matches.length;++j) {
          var funcname = matches[j];
-	 var matches2 = funcname.match(/function\s+([-_$\w]+)/);
-	 funcname = matches2[1];
+     var matches2 = funcname.match(/function\s+([-_$\w]+)/);
+     funcname = matches2[1];
          if (typeof jum_global[funcname] == 'function') a.push(funcname);
          else {
-	      //if (script.src.indexOf('test') != -1) alert("found function named '" + funcname + "' by parsing but not a global function, so skipping");
+          //if (script.src.indexOf('test') != -1) alert("found function named '" + funcname + "' by parsing but not a global function, so skipping");
          }
         //source_text = source_text.substring(re.lastIndex);
       }
@@ -1156,19 +1156,19 @@ function jum_get_object_function_names(scopeobj) {
   var count = 0;
   for(var k in scopeobj) {
     count++;
-	
+    
     // if (k.indexOf("jum") == -1 && k.indexOf("JUM") == -1) alert("examining: " + k);
     // Safari 1.2 will crash on typeof window[k] for a bunch of symbols.
     if (k == 'removeEventListener' || k == 'history' || k == 'name' || k == 'onselect') {continue;}
     // sigh, in Mozilla even this will cause an exception: typeof window['fullScreen']
     if (k == 'fullScreen' || k == 'scrollMaxX' || k == 'scrollMaxY') {continue;}
-	// Sigh, I'm not even going to try to find all the dangerous symbols.
-	// just apply the symbol test function now.
+    // Sigh, I'm not even going to try to find all the dangerous symbols.
+    // just apply the symbol test function now.
     
     if (!jum_is_test_function(k)) {continue;}
     
     if (typeof scopeobj[k] == 'function') {
-    	a.push(k);
+        a.push(k);
     }
   }
   jum_debug("returning all function members in object: " + a); 
@@ -1182,7 +1182,7 @@ function jum_is_test_function(funcname, re) {
   if (!parts) {
      //warn in some cases
      if (funcname.indexOf('jum_')==-1 && funcname.indexOf('test')!=-1)
-	jum_debug("global function named '" + funcname + "' has 'test' but did not match pattern, so skipping");
+    jum_debug("global function named '" + funcname + "' has 'test' but did not match pattern, so skipping");
      return false;
   }
   return true;
@@ -1248,11 +1248,13 @@ function jum_choose_tests(scopeobj) {
      if (removed.length > 0) bu_alert("removed " + removed.length + " non-existent test function names: " + removed.join(','));
      test_func_names = filtered;
   } else {
-  	
+      
      if (jum_are_global_functions_enumerable()) {
+     alert("enum!");
        test_func_names = jum_get_object_function_names(scopeobj);
      }
      else if (jum_are_scripts_parseable()) {
+     alert("parse!");
        test_func_names = jum_parse_window_scripts();
      }
      else {throw new Error("no way to determine test functions");}
@@ -1291,15 +1293,15 @@ function jum_choose_tests(scopeobj) {
 }
 
 function jum_get_groupdef(alltests, groupname) {
-	return alltests.groups_by_name_[groupname];
+    return alltests.groups_by_name_[groupname];
 }
 
 //function jum_get_groupdef_testnames(groupdef) {return groupdef.test_names_}
 function jum_get_testdefs(groupdef) {
-	return groupdef.tests_array_;
+    return groupdef.tests_array_;
 }
 function jum_get_groupnames(alltests) {
-	return alltests.group_names_;
+    return alltests.group_names_;
 }
 
 // get a flat Array of all function names in the alltests object
@@ -1334,10 +1336,10 @@ function jum_get_all_function_names(alltests) {
 */
 function jum_initialize_alltests(alltests, scopeobj, test_func_names, re, default_groupname) {
   if (!re) {
-  	re = jum.TEST_FUNCTION_REGEXP;
+      re = jum.TEST_FUNCTION_REGEXP;
   }
   if (!default_groupname) {
-  	default_groupname = jum.DEFAULT_GROUPNAME;
+      default_groupname = jum.DEFAULT_GROUPNAME;
   }
   if (!scopeobj) { scopeobj = jum_global;}
   
@@ -1345,22 +1347,23 @@ function jum_initialize_alltests(alltests, scopeobj, test_func_names, re, defaul
     var funcname = test_func_names[i];
     var parts = funcname.match(re);
     if (!parts) {
-    	throw Error("function name '" + funcname + "' does not match regexp " + re);
+        throw Error("function name '" + funcname + "' does not match regexp " + re);
     }
     
     var groupname,testname=null;
     if (parts.length == 2) {
-    	testname = parts[1]; 
-    	groupname = default_groupname;
+        testname = parts[1]; 
+        groupname = default_groupname;
     } else {
-    	groupname = parts[1];
-    	testname = parts[2];
+        groupname = parts[1];
+        testname = parts[2];
     }
     
     var funcobj = scopeobj[funcname];
+   
     jum_add_test(alltests, groupname, testname, funcname, funcobj);
   }
-	
+    
   return alltests;
 }
 
@@ -1380,12 +1383,12 @@ function jum_add_test(alltests, groupname, testname, funcname, funcobj) {
     groupdef = alltests.groups_by_name_[groupname];
   } else {
     groupdef = alltests.groups_by_name_[groupname] = {
-		groupname: groupname, 
-		tests_by_testname_: {}, 
-		tests_array_ : [], 
-		test_names_ : [],
-		function_names_ : []
-	};
+        groupname: groupname, 
+        tests_by_testname_: {}, 
+        tests_array_ : [], 
+        test_names_ : [],
+        function_names_ : []
+    };
     alltests.groups_array_.push(groupdef);
     alltests.group_names_.push(groupname);
   }

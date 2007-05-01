@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
+dojo.provide("cosmotest.datetime.test_date");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
+dojo.require("cosmo.datetime.timezone.SimpleTimezoneRegistry");
 //Initialization.
 //TODO - once Dojo implements setUp() and tearDown() move this code there.
 var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry(cosmo.env.getBaseUrl() + "/js/lib/olson-tzdata/");
@@ -24,8 +25,8 @@ var D = cosmo.datetime.Date;
 registry.init(["northamerica"]);
 cosmo.datetime.timezone.setTimezoneRegistry(registry);
 
-
-function test_dateConstructor() {
+cosmotest.datetime.test_date = {
+test_dateConstructor: function test_dateConstructor() {
     var dt = null;
     var dtComp = new Date(2006, 9, 23);
     
@@ -152,9 +153,9 @@ function test_dateConstructor() {
     jum.assertEquals(null, dt.tzId);
     jum.assertEquals(true, dt.utc);
     jum.assertEquals(0, dt.getTimezoneOffset());
-}
+},
 
-function test_dateGetOffset() {
+test_dateGetOffset: function test_dateGetOffset() {
     var dt = null;
     
     dt = new D(2006, 9, 29, 1, 59, 'America/Los_Angeles');
@@ -162,9 +163,9 @@ function test_dateGetOffset() {
     
     dt = new D(2006, 9, 29, 2, 0, 'America/Los_Angeles');
     jum.assertEquals(480, dt.getTimezoneOffset());
-}
+},
 
-function test_dateSetters() {
+test_dateSetters: function test_dateSetters() {
     var dt = null;
     
     dt = new D(2006, 9, 23, 22, 12, 55, 6);
@@ -221,9 +222,9 @@ function test_dateSetters() {
         jum.assertEquals(2, dt.getMonth());
         jum.assertEquals(3, dt.getDate());
     }
-}
+},
 
-function test_dateUTCSetters() {
+test_dateUTCSetters: function test_dateUTCSetters() {
     var dt = null;
     
     // UTC date
@@ -250,3 +251,4 @@ function test_dateUTCSetters() {
     }
 }
 
+}

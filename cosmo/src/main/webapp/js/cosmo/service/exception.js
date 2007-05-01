@@ -16,10 +16,10 @@
 
 dojo.provide("cosmo.service.exception");
 
-dojo.declare("cosmo.service.exception.ServiceException", Error, 
+dojo.declare("cosmo.service.exception.ServiceException", Error,
     // summary: The root of all service exceptions. If your error is not an instance
 function(){}, {});
 
-dojo.declare("cosmo.service.exception.ConcurrencyException", cosmo.service.exception.ServiceException, 
+dojo.declare("cosmo.service.exception.ConcurrencyException", cosmo.service.exception.ServiceException,
     // summary: Thrown when another client is trying to update the item on the server
 function(){}, {});

@@ -38,7 +38,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
     this.lozenge = lozenge;
     // Points to this event's CalEventData obj
     this.data = null;
-    // A backup copy (clone) of the .data property made 
+    // A backup copy (clone) of the .data property made
     // before trying to edit
     this.dataOrig = null;
     // List of conflicting events that come before this event
@@ -51,18 +51,18 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
     this.maxDepth = 0;
     // Row occupied for an untimed event
     this.allDayRow = 0;
-    
+
     /**
      * Indicates if an event has actually been edited or not --
      * used when dragging or moving to make sure event has really
      * changed before saving. Mapping of comparator functions to
-     * properties are saved in compareList. Null values for the 
+     * properties are saved in compareList. Null values for the
      * comparator func in that list mean comparison just uses
      * generic equality.
      * @return Object with two props
      * 'count' -- the number of changes, and 'changes' --
-     * a keyword/value obj, where the keyword is the name of the 
-     * changed property, and the value is an object with two items: 
+     * a keyword/value obj, where the keyword is the name of the
+     * changed property, and the value is an object with two items:
      * newValue (the updated value) and origValue (the original)
      */
     this.hasChanged = function () {
@@ -79,7 +79,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
          * @return Boolean, true or false
          */
         var compareStatus = function (curr, orig) {
-            if ((!curr && orig == EventStatus.CONFIRMED) || 
+            if ((!curr && orig == EventStatus.CONFIRMED) ||
                 (curr == EventStatus.CONFIRMED && !orig)) {
                 return false;
             }
@@ -119,7 +119,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
                 if ((curr.frequency != orig.frequency) ||
                     (curr.endDate && !orig.endDate) ||
                     (!curr.endDate && orig.endDate) ||
-                    ((curr.endDate && orig.endDate) && 
+                    ((curr.endDate && orig.endDate) &&
                         curr.endDate.getTime() != orig.endDate.getTime())) {
                     return true;
                 }
@@ -135,9 +135,9 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
         var compareOptional = function (curr, orig) {
             var a = curr || null;
             var b = orig || null;
-            return (a != b); 
+            return (a != b);
         }
-        
+
         // Comparator function mappings
         var compareList = {
             'start': compareDateTime,
@@ -180,7 +180,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
                 }
             }
         }
-        
+
         for (var i in compareList) {
             compareVals(i, d[i], dO[i], compareList[i]);
         }
@@ -235,7 +235,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
         }
     };
     /**
-     * Makes a clone backup of the CalEventData for the event to 
+     * Makes a clone backup of the CalEventData for the event to
      * store in the dataOrig property. This is used to back out of
      * a cancelled/failed save operation or failed remove operation.
      */
@@ -246,7 +246,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
         return true;
     };
     /**
-     * Makes a clone backup of the CalEventData for the event to 
+     * Makes a clone backup of the CalEventData for the event to
      * store in the dataOrig property. This is used to back out of
      * a cancelled/failed save operation or failed remove operation.
      */

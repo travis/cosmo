@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview PasswordResetter - a widget takes a username and/or email address and 
+ * @fileoverview PasswordResetter - a widget takes a username and/or email address and
  *                                  asks the server to send a password recovery email to
  *                                  the corresponding user.
  *
@@ -49,7 +49,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordResetter", dojo.widget.HtmlWid
         widgetsInTemplate: true,
         displayDefaultInfo: false,
         i18nPrefix: "Account.PasswordReset",
-        
+
         recoveryKey: "",
 
         //attach points
@@ -59,23 +59,23 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordResetter", dojo.widget.HtmlWid
         passwordInput: null,
         confirmLabel: null,
         confirmInput: null,
-                
+
         sendButtonContainer: null,
         sendButton: null,
-        
+
         setError: function(message){
-            this.errorBox.innerHTML = message;  
+            this.errorBox.innerHTML = message;
         },
-        
+
         setInfo: function(message){
-            this.infoBox.innerHTML = message;  
+            this.infoBox.innerHTML = message;
         },
 
         resetPassword: function(){
             var self = this;
             self.setError("");
             if (this.passwordInput.value == this.confirmInput.value){
-                cosmo.cmp.resetPassword(this.recoveryKey, this.passwordInput.value, 
+                cosmo.cmp.resetPassword(this.recoveryKey, this.passwordInput.value,
                   {error: function(type, data, xhr){
                        if (xhr.status == "404"){
                            self.setError(_(self.i18nPrefix + ".Error.404", self.recoveryKey));
@@ -92,7 +92,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordResetter", dojo.widget.HtmlWid
                 this.setError(_(this.i18nPrefix + ".Error.PasswordMatch"));
             }
         },
-        
+
         fillInTemplate: function(){
            if (this.displayDefaultInfo){
                this.setInfo(_(this.i18nPrefix + ".InitialInfo"));
@@ -101,6 +101,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordResetter", dojo.widget.HtmlWid
            this.passwordLabel.innerHTML = _(this.i18nPrefix + ".Password");
            this.confirmLabel.innerHTML = _(this.i18nPrefix + ".Confirm");
         }
-        
+
     }
 );

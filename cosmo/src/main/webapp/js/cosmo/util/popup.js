@@ -27,13 +27,13 @@ cosmo.util.popup = new function () {
     this.open = function (url, w, h, scroller) {
         var scr = scroller ? 1 : 0;
         if(!self.win || self.win.closed) {
-            self.win = null;    
-            self.win = window.open(url, 'thePopupWin', 'width=' + w + ',height=' + 
-                h + ',location=0,menubar=0,resizable=1,scrollbars=' + scr + 
+            self.win = null;
+            self.win = window.open(url, 'thePopupWin', 'width=' + w + ',height=' +
+                h + ',location=0,menubar=0,resizable=1,scrollbars=' + scr +
                 ',status=0,titlebar=1,toolbar=0');
         }
-        else {	    
-            self.win.focus(); 
+        else {
+            self.win.focus();
             self.win.document.location = url;
         }
     };
@@ -57,7 +57,7 @@ cosmo.util.popup = new function () {
     }
     /**
      * Sends the opener of the window to a new location
-     * and closes the pop up.     
+     * and closes the pop up.
      */
     this.goURLMainWin = function (url) {
         location = url;

@@ -27,12 +27,12 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
       ["exdates", [Array, cosmo.datetime.Date], {}],
       ["status", String, {}],
     ],
-    //mixins for master item stamps		 
+    //mixins for master item stamps
     {
         initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
         },
-	
+
 	getEndDate: function getEndDate(){
             var duration = this.getDuration();
 	    var endDate = this.getStartDate().clone();
@@ -41,7 +41,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
 	},
 
 	setEndDate: function setEndDate(/*CosmoDate*/ endDate){
-	    var duration = dojo.date.diff(this.getStartDate().toUTC(), endDate.toUTC(), 
+	    var duration = dojo.date.diff(this.getStartDate().toUTC(), endDate.toUTC(),
 		dojo.date.dateParts.SECOND);
 	    this.setDuration(duration);
 	}
@@ -62,6 +62,6 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
 	    }
 	    return this.recurrenceId;
 	}*/
-	
+
     }
 );

@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview TabContainer.js -- panel of buttons allowing three 
+ * @fileoverview TabContainer.js -- panel of buttons allowing three
  *      clusters of buttons: left, center, right.
  * @author Matthew Eernisse mde@osafoundation.org
  * @license Apache License 2.0
@@ -34,18 +34,18 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
 
     // Props from template or set in constructor
     selectedTabIndex: 0,
-    
+
     // Define these here so they don't end up as statics
     initializer: function () {
         this.tabs = [];
         this.tabNodes = [];
         this.contentNodes = [];
     },
-    
+
     // Attach points
     tabArea: null,
     contentArea: null,
-    
+
     // Public methods
     getTab: function (index, tabObj, sel) {
         var self = this;
@@ -57,7 +57,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         d.appendChild(_createText(o.label));
         d.onclick = function () { self.showTab(index); };
         this.tabNodes.push(d);
-        
+
         if (typeof o.content == 'string') {
             var n = _createElem('div');
             n.id = this.widgetId + '_content' + index;
@@ -80,7 +80,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         n.style.top = '0px';
         n.style.left = '0px';
         n.style.visibility =  sel ? 'visible' : 'hidden';
-        
+
         return {tab: d, content: n };
     },
     showTab: function (index) {
@@ -93,7 +93,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
                 content = content.domNode;
             }
             if (i == index) {
-                tab.className = 'tabSelected'; 
+                tab.className = 'tabSelected';
                 content.style.visibility = 'visible';
                 content.style.top = '0px';
                 content.style.left = '0px';
@@ -106,12 +106,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
             }
         }
     },
-    
+
     // Private methods
-    
+
     // Lifecycle
     fillInTemplate: function () {
-        
+
         var tabMain = null;
         var tabPanelTable = null;
         var tabPanelTBody = null;
@@ -120,7 +120,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         var t = {};
         var s = null;
         var tabs = this.tabs;
-        
+
         tabMain = _createElem('div');
         tabMain.style.visibility = 'hidden';
         tabPanelTable = _createElem('table');
@@ -145,15 +145,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         tabPanelTr.appendChild(s);
         for (var i =0; i < tabs.length; i++) {
             var sel = i == this.selectedTabIndex ? true : false;
-            
+
             t = this.getTab(i, tabs[i], sel);
-            
+
             tabPanelTr.appendChild(t.tab);
             s = _createElem('td');
             s.className = 'tabSpacer';
             s.appendChild(_createText('\u00A0'));
             tabPanelTr.appendChild(s);
-            
+
             tabContent.appendChild(t.content);
         }
         s = _createElem('td');
@@ -175,7 +175,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
                 c.destroy();
             }
         }
-        
+
     }
 } );
 

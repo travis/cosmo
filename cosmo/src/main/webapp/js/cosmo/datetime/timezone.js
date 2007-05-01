@@ -42,7 +42,7 @@ cosmo.datetime.timezone.Timezone = function(tzId, zoneItems){
     // tzId : String
     //    the time zone ID (eg. "America/Los_Angeles")
     this.tzId = tzId;
-    
+
     // zoneItems: Array
     //    An array with teh ZoneItems for this timezone
     this.zoneItems = zoneItems || [];
@@ -139,7 +139,7 @@ cosmo.datetime.timezone._compareDates = function(d1, d2){
 };
 
 cosmo.datetime.timezone._getLastDayForMonthAndYear = function(day, month, year){
-    // summary: returns the day of the month of the last time the given day of the week occurs in a 
+    // summary: returns the day of the month of the last time the given day of the week occurs in a
     // given month and year.
     var lastDayOfMonth = new Date(year, month + 1,1, -24);
     var lastDayDay = lastDayOfMonth.getDay();
@@ -148,7 +148,7 @@ cosmo.datetime.timezone._getLastDayForMonthAndYear = function(day, month, year){
 };
 
 cosmo.datetime.timezone._getDayGreaterThanNForMonthAndYear = function(n, day, month, year){
-    // summary: returns the first date (day of month) after (or on) the given date "n" in the 
+    // summary: returns the first date (day of month) after (or on) the given date "n" in the
     // given month and year for which the given day occurs
     // description: Confusing eh? Here's some help: if there params were "10, 1, 0, 2007" this
     // function would return the first Monday (1) that occurs after the 10th, in January(0), 2007
@@ -160,7 +160,7 @@ cosmo.datetime.timezone._getDayGreaterThanNForMonthAndYear = function(n, day, mo
 };
 
 cosmo.datetime.timezone._getDayLessThanNForMonthAndYear = function(n, day, month, year){
-    // summary: returns the first date (day of month) before (or on) the given date "n" in the 
+    // summary: returns the first date (day of month) before (or on) the given date "n" in the
     // given month and year for which the given day occurs
     // description: Example: if there params were "10, 1, 0, 2007" this
     // function would return the first Monday (1) that occurs before (or on) the 10th, in January(0), 2007
@@ -199,7 +199,7 @@ cosmo.datetime.timezone._getDateField = function(date, field){
 
 cosmo.datetime.timezone.ZoneItem = function(){
     // summary: represents one Zone line in a olson timezone
-    
+
     this.offsetInMinutes = null;
     this.ruleName = null;
     this.format = null;
@@ -341,21 +341,21 @@ cosmo.datetime.timezone.Rule.prototype._applicable = function(date){
     // summary: returns whether or not this rule might be applicable for the given date
     // description: this does NOT return whether or not this is the right rule to use, just whether
     // or not the date is after this rules start date (hence "might")
-    
+
     var ruleStartDate  = this._getStartDateForYear(date.getFullYear());
     return cosmo.datetime.timezone._compareDates(date, ruleStartDate) >= 0 ;
 }
 
 cosmo.datetime.timezone.Rule.prototype._getStartDateForYear = function(year){
-    // summary: returns the date (naked object with date props not a "real" date) when this rule becomes 
-    // active 
+    // summary: returns the date (naked object with date props not a "real" date) when this rule becomes
+    // active
     // description: this is sort of an expensive call, so once it is calculated, it is cached.
-    
+
     var startDate = this._startDatesByYear[year];
     if (startDate){
-        return startDate;    
+        return startDate;
     }
-    
+
     startDate = { year: year,
                   month: this.startMonth,
                   hours: this.startTime.hours,
@@ -376,7 +376,7 @@ cosmo.datetime.timezone.Rule.prototype._getStartDateForYear = function(year){
     } else {
         startDate.date = this.startDate;
     }
-    
+
     this._startDatesByYear[year] = startDate;
     return startDate;
 }
@@ -404,7 +404,7 @@ cosmo.datetime.timezone.getTzIdsForRegion = function(region){
 cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback, linkCallback){
         // summary: parses the given string as olson data, creating ZoneItems, Rules and link entries
         // passing them to the appropriate given call back
-        
+
         var ruleSets = new dojo.collections.Dictionary();
         var zones = new dojo.collections.Dictionary();
         var links = {};
@@ -530,7 +530,7 @@ cosmo.datetime.timezone._parseZoneLine = function(array){
 
 cosmo.datetime.timezone._parseRuleLine = function(array){
     // sumamry: parses an olson 'Rule' line into a Rule object
-    
+
     var rule = new cosmo.datetime.timezone.Rule();
 
     //The Format: DEBUG: Rule --> 0->'1942' 1->'only' 2->'-' 3->'Feb' 4->'9' 5->'2:00' 6->'1:00' 7->'W' 8->''

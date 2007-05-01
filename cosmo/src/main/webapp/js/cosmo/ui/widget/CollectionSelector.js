@@ -27,9 +27,9 @@ dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.ui.widget.AuthBox");
 
 
-dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector", 
+dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
     dojo.widget.HtmlWidget,
-    
+
     //initializer
     function () {
         dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, this, this.handleCollectionUpdated);
@@ -44,16 +44,16 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
 
         // Function for onchange of collection selector
         // sets local currentCollection and passes the selected
-        // collection to cosmo.app.pim.loadCollectionItems 
+        // collection to cosmo.app.pim.loadCollectionItems
         // --------
         selectFunction: function (e) {
             var t = e.target;
             // Set local currentCollection var
             var c = this.collections[t.selectedIndex];
             this.currentCollection = c;
-            dojo.event.topic.publish('/calEvent', { 
-                action: 'loadCollection', data: { collection: c } 
-            }); 
+            dojo.event.topic.publish('/calEvent', {
+                action: 'loadCollection', data: { collection: c }
+            });
         },
 
         strings: {
@@ -64,22 +64,22 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             collectionAddError: _('Main.CollectionAdd.ErrorPrompt'),
             successPrompt: _('Main.CollectionAdd.SuccessPrompt')
         },
-        
+
         //references to various DOM nodes
         selector: null,  //the actual select element, if there are >1 collections
         displayNameText: null, //the display name if there is just one collection
-        
+
         /**
          * Inserts the select box for choosing from multiple collections
          * Only actually called if multiple collections exist
          */
         fillInTemplate: function () {
-            var self = this; 
+            var self = this;
             var col = this.collections;
             var curr = this.currentCollection;
             var passedKey = this.ticketKey; // Indicates we're in ticket view
-            
-            // The 'currently viewing' prompt above the 
+
+            // The 'currently viewing' prompt above the
             // collection selector / label
             var promptNode = _createElem('div');
             promptNode.id = 'collectionLabelPrompt';
@@ -88,8 +88,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var selectorNode = _createElem('div');
             selectorNode.id = 'collectionSelectorOrLabel';
             selectorNode.style.height = this.verticalHeight + 'px';
-            
-            // 'Add' or 'info' icons, with attached actions 
+
+            // 'Add' or 'info' icons, with attached actions
             function renderButton() {
                 var strings = self.strings;
                 var imgPath = '';
@@ -100,7 +100,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     imgTitle = strings.imgTitleAdd;
                     // Set up the authAction obj for the AuthBox -- this tells it
                     // what to do if the user auths successfully
-                    var authAction = { 
+                    var authAction = {
                         execInline: false,
                         authInitPrompt: 'Please enter the login information for your Cosmo account.',
                         authProcessingPrompt: null, // Use the default
@@ -123,10 +123,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                                     location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.collection.uid;
                                 }
                             };
-                            cosmo.app.pim.serv.saveSubscription(n, curr.collection.uid, passedKey, 
+                            cosmo.app.pim.serv.saveSubscription(n, curr.collection.uid, passedKey,
                                 curr.displayName)
                         },
-                        attemptPrompt: strings.attemptPrompt, 
+                        attemptPrompt: strings.attemptPrompt,
                         successPrompt: strings.successPrompt };
                     f = function () {
                         var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties(authAction);
@@ -148,7 +148,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                             _pim.currentCollection.transportInfo));
                     };
                 }
-                
+
                 var collIcon = cosmo.util.html.createRollOverMouseDownImage(
                     cosmo.env.getImagesUrl() + 'collection_' + imgPath + ".png");
                 collIcon.style.cursor = 'pointer';
@@ -158,7 +158,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 // Img is an actual DOM element, so you set the vertical-align
                 // prop on the image, not on the enclosing div
                 collIcon.style.verticalAlign = 'middle';
-                
+
                 // Image
                 var d = _createElem("div");
                 d.className = 'floatLeft';
@@ -175,20 +175,20 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 d.appendChild(collIcon);
                 selectorNode.appendChild(d);
             }
-            
+
             // Ticket view
             function renderSingleCollectionName() {
                 // Add the 'add this collection button on the left
                 // ---
                 renderButton();
-                
+
                 // Spacer
                 // ---
                 var d = _createElem("div");
                 d.className = 'floatLeft';
                 d.appendChild(cosmo.util.html.nbsp());
                 selectorNode.appendChild(d);
-                
+
                 // Collection name label
                 // ---
                 var displ = curr.displayName;
@@ -197,7 +197,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 d.className = 'floatLeft labelTextHoriz';
                 if (displ.length > 13) {
                     var textNode = _createText(displ.substr(0, 12) + '\u2026');
-                    d.title = curr.displayName; 
+                    d.title = curr.displayName;
                 }
                 else {
                     var textNode = _createText(displ);
@@ -214,7 +214,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 selectorNode.appendChild(d);
                 self.displayNameText = textNode;
             }
-            
+
             // Logged-in view
             function renderSelector() {
                 var o = [];
@@ -231,7 +231,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 // ---
                 var d = _createElem('div');
                 d.className = 'floatLeft';
-                var sel = cosmo.util.html.createSelect({ id: 'calSelectElem', 
+                var sel = cosmo.util.html.createSelect({ id: 'calSelectElem',
                     name: 'calSelectElem',
                     options: o, className: 'selectElem' }, d);
                 sel.style.width = '120px';
@@ -240,23 +240,23 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 self.selector = sel;
                 dojo.event.connect(sel, "onchange", self, 'selectFunction');
                 selectorNode.appendChild(d);
-                
+
                 // Spacer
                 // ---
                 var d = _createElem("div");
                 d.className = 'floatLeft';
                 d.appendChild(cosmo.util.html.nbsp());
                 selectorNode.appendChild(d);
-                
+
                 // Add the 'collection info' button on the right
                 // ---
                 renderButton();
             }
-            
+
             // Set up promptNode
             // -----
             promptNode.appendChild(_createText(this.strings.mainCollectionPrompt));
-            
+
             // Set up selectorNode
             // -----
             // The content is several left-floated
@@ -275,12 +275,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var d = _createElem("div");
             d.className = 'clearBoth';
             selectorNode.appendChild(d);
-            
+
             // Append to widget domNode
             this.domNode.appendChild(promptNode);
             this.domNode.appendChild(selectorNode);
         },
-        
+
         handleCollectionUpdated: function(/*cosmo.topics.CollectionUpdatedMessage*/ message){
             var updatedCollection = message.collection;
             for (var x = 0; x < this.collections.length;x++){
@@ -292,7 +292,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     break;
                 }
             }
-            
+
             if (this.currentCollection.uid == updatedCollection.uid){
                 this.currentCollection.collection = updatedCollection;
                 if (!currentCollection.transportInfo){
@@ -301,12 +301,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             }
             this._redraw();
         },
-        
+
         handleSubscriptionUpdated: function(/*cosmo.topics.SubscriptionUpdatedMessage*/ message){
             var updatedSubscription = message.subscription;
             for (var x = 0; x < this.collections.length;x++){
                 var col = this.collections[x];
-                if (col.transportInfo && 
+                if (col.transportInfo &&
                     col.transportInfo instanceof cosmo.model.Subscription &&
                     col.transportInfo.calendar.uid == updatedSubscription.calendar.uid &&
                     col.transportInfo.ticketKey == updatedSubscription.ticketKey){
@@ -315,8 +315,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     break;
                 }
             }
-            
-            if (this.currentCollection.transportInfo 
+
+            if (this.currentCollection.transportInfo
                    && this.currentCollection.transportInfo.calendar.uid == updatedSubscription.calendar.uid
                    && this.currentCollection.transportInfo.ticketKey == updatedSubscription.ticketKey ){
                 this.currentCollection.displayName = updatedSubscription.displayName;
@@ -324,7 +324,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             }
             this._redraw();
         } ,
-        
+
         _redraw: function(){
             while (this.domNode.firstChild){
                 this.domNode.removeChild(this.domNode.firstChild);

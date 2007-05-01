@@ -26,17 +26,17 @@ cosmo.service.conduits.jsonrpc.eventListToUids = function(events){
     return eventUids;
 }
 
-dojo.declare('cosmo.service.conduits.jsonrpc.TicketedConduit', 
+dojo.declare('cosmo.service.conduits.jsonrpc.TicketedConduit',
     cosmo.service.conduits.AbstractTicketedConduit,
 {
     initializer: function(jsonService){
        this.jsonService = jsonService? jsonService : cosmo.rpc.JsonService.getDefaultService();
-    },    
-    
+    },
+
     jsonService: null,
 
 	_translator: cosmo.service.translators.jsonrpc,
-    
+
     eventListToUids: cosmo.service.conduits.jsonrpc.eventListToUids,
 
     doGetCollection: function(collectionUid){
@@ -96,14 +96,14 @@ dojo.declare("cosmo.service.conduits.jsonrpc.CurrentUserConduit",
 {
     initializer: function(jsonService){
        this.jsonService = jsonService? jsonService : cosmo.rpc.JsonService.getDefaultService();
-    },    
+    },
 
     jsonService: null,
-    
+
 	_translator: cosmo.service.translators.jsonrpc,
-    
+
     eventListToUids: cosmo.service.conduits.jsonrpc.eventListToUids,
-    
+
     doGetCollections: function(kwArgs){
          return this.jsonService.getCalendars(kwArgs);
     },

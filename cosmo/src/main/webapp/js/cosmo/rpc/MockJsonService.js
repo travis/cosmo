@@ -19,7 +19,7 @@ dojo.declare("cosmo.rpc.MockJsonService", [cosmo.rpc.JsonService],
                     '66b16d6b","dav":"http:\/\/localhost:8080\/cosmo\/dav\/collection\/b6c2ac' +
                     '54-38b0-42c1-a874-d77b66b16d6b"}}}],"id":2})');
         },
-        
+
         getSubscriptions: function(){
             return eval('({"result":[{"calendar":{"javaClass":"org.osaf.cosmo.rpc.model.Ca' +
                     'lendar","uid":"010dcd9a-178d-4e0c-8d66-8e0ec43fe9ff","name":"Ellen\'s' +
@@ -37,12 +37,12 @@ dojo.declare("cosmo.rpc.MockJsonService", [cosmo.rpc.JsonService],
                     'read"}}},"javaClass":"org.osaf.cosmo.rpc.model.Subscription","displayNam' +
                     'e":"Ellen\'s Cal"}],"id":3})');
         },
-        
+
         getPreferences: function(){
             return eval('("result":{"javaClass":"java.util.HashMap","map":{"UI.Show.AccountBro' +
                     'wserLink":"true"}},"id":5})');
         },
-        
+
         getEvents: function(){
             return eval(
 '({"result":[{"pointInTime":false,"javaClass":"org.osaf.cosmo.rpc.model.Event",' +
@@ -155,33 +155,33 @@ dojo.declare("cosmo.rpc.MockJsonService", [cosmo.rpc.JsonService],
 'se}],"id":6})'
             );
         }
-                    
-                    
+
+
     },
-    
+
 	bind: function(method, parameters, deferredRequestHandler, url, kwArgs){
 		//summary
 		//JSON-RPC bind method. Takes remote method, parameters, deferred,
 		//and a url, calls createRequest to make a JSON-RPC envelope and
 		//passes that off with bind.
-		
+
 		var result = this.bindResponse[method].apply(parameters);
-        
-        kwArgs.sync? 
+
+        kwArgs.sync?
     		this.resultCallback(deferredRequestHandler)('load', result, {}):
     		dojo.lang.setTimeout(this, this.resultCallback(deferredRequestHandler), 47, 'load', result, {});
-		
+
 	}
 }
 
 );
-    
-    
+
+
 
 /*
 cosmo.rpc.MockJsonervice = {
     getCalendars: function(){
-     
+
         var result = eval('({"result":[{"javaClass":"org.osaf.cosmo.rpc.model.Calendar","uid":"b6c2ac54-38b0-42c1-a874-d77b66b16d6b","name":"Travis\'s Cal","protocolUrls":{"javaClass":"java.util.HashMap","map":{"webcal":"http:\/\/localhost:8080\/cosmo\/webcal\/collection\/b6c2ac54-38b0-42c1-a874-d77b66b16d6b","mc":"http:\/\/localhost:8080\/cosmo\/mc\/collection\/b6c2ac54-38b0-42c1-a874-d77b66b16d6b","atom":"http:\/\/localhost:8080\/cosmo\/atom\/collection\/b6c2ac54-38b0-42c1-a874-d77b66b16d6b","pim":"http:\/\/localhost:8080\/cosmo\/pim\/collection\/b6c2ac54-38b0-42c1-a874-d77b66b16d6b","dav":"http:\/\/localhost:8080\/cosmo\/dav\/collection\/b6c2ac54-38b0-42c1-a874-d77b66b16d6b"}}}],"id":2}")');
         var d = new dojo.Deferred();
         d.results = [x, null];

@@ -30,12 +30,12 @@ cosmo.datetime = new function () {
         MINUTE: "n",
         SECOND: "s"
     };
-    this.fullWeekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 
+    this.fullWeekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
         'Friday', 'Saturday'];
     this.abbrWeekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    this.fullMonth = ['January', 'February', 'March', 'April', 'May', 'June', 
+    this.fullMonth = ['January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];
-    this.abbrMonth = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 
+    this.abbrMonth = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
         'Sep', 'Oct', 'Nov', 'Dec'];
     this.meridian = {
         AM: 'AM',

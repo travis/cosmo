@@ -21,7 +21,7 @@ dojo.require("cosmo.datetime.Date");
 dojo.require("dojo.date.common");
 
 cosmo.datetime.util = new function () {
-    
+
     var stripZeroPat = /^0/;
     this.parseTimeString = function (str, opts) {
         var stripLeadingZero = function (s) {
@@ -43,7 +43,7 @@ cosmo.datetime.util = new function () {
             h = parseInt(stripLeadingZero(h));
             m = parseInt(stripLeadingZero(m));
         }
-        return { hours: h, minutes: m }; 
+        return { hours: h, minutes: m };
     };
     /**
      * Convert a 24-hour formatted hour to 12-hour format

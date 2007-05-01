@@ -13,14 +13,14 @@
                         <span dojoAttachPoint="collectionNameText" style="display: none">
                             '${this.displayName}' ${this.strings.calendarLabel}
                         </span>
-                    </div>                   
+                    </div>
                     <div class="floatLeft">
                         &nbsp;
                     </div>
                     <div class="floatLeft">
                         <span dojoAttachPoint="collectionNameInputSpan" style="display: none">
-                           <input dojoAttachPoint="collectionNameInput" 
-                                  type="text" 
+                           <input dojoAttachPoint="collectionNameInput"
+                                  type="text"
                                   value="${this.displayName}" />
                         </span>
                     </div>
@@ -32,11 +32,11 @@
             </td>
 
         </tr>
-        
+
         <tr>
             <td>&nbsp;
         </tr>
-        
+
         <tr>
 
             <td class="labelTextVert">
@@ -45,7 +45,7 @@
 
             <td>
                 <div>
-                    <select style="width:100px" dojoAttachPoint="clientSelector" 
+                    <select style="width:100px" dojoAttachPoint="clientSelector"
                             dojoAttachEvent="onChange: _handleClientChanged;"/>
                     </select>
                 </div>
@@ -58,12 +58,12 @@
          <tbody dojoAttachPoint="clientInstructionRows" style="display: none">
              <tr>
                  <td colspan="3">
-                     <span dojoAttachPoint="clientInstructions"> </span>   
+                     <span dojoAttachPoint="clientInstructions"> </span>
                  </td>
              </tr>
-    
+
              <tr><td>&nbsp;&nbsp;</td></tr>
-    
+
              <tr>
                 <td class="labelTextVert">
                    ${this.strings.collectionAddress}:
@@ -71,9 +71,9 @@
                 <td >
                      <input style="display: none" size="40" type="text" dojoAttachPoint="clientCollectionAddress" value=""/>
                      <a style="display: none" dojoAttachPoint="clientCollectionLink" href="">${this.strings.clickHere}</a>
-                </td>                 
+                </td>
              </tr>
-         </tbody>  
+         </tbody>
 
          <tbody dojoAttachPoint="protocolRows" style="display: none">
              <tr><td>&nbsp;&nbsp;</td></tr>
@@ -89,7 +89,7 @@
                 </td>
                 <td>
                      <input size="40" type="text" value="${this.calendar.protocolUrls.dav}"/>
-                </td>                 
+                </td>
              </tr>
              <tr>
                 <td class="labelTextVert">
@@ -97,7 +97,7 @@
                 </td>
                 <td>
                      <input size="40" type="text" value="${this.calendar.protocolUrls.webcal}"/>
-                </td>                 
+                </td>
              </tr>
              <tr>
                 <td class="labelTextVert">
@@ -105,13 +105,13 @@
                 </td>
                 <td>
                      <input size="40" type="text" value="${this.calendar.protocolUrls.atom}"/>
-                </td>                 
+                </td>
              </tr>
          </tbody>
     </table>
     <div dojoAttachPoint="helpText" style="visibility: hidden; position:absolute; top:0px; left:0px">
          <a href="${this.strings.helpLink}">${this.strings.help}</a>
-        <span dojoAttachPoint="chandlerPlug" style="display:none"><!-- 
+        <span dojoAttachPoint="chandlerPlug" style="display:none"><!--
             Don't use Dojo widget string substitution with anchor tags -
             it 'helpfully' escapes the quotes in the href prop
             Have to insert as innerHTML during fillInTemplate

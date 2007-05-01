@@ -24,84 +24,84 @@ cosmo.account.getFieldList = function (accountInfo) {
     var list = [];
     var f = {};
     var a = accountInfo || {}; // If account info passed, set input values
-    
+
     // Don't include username when editing account settings
     if (!accountInfo) {
-        f = { label:_('Signup.Form.Username'), 
+        f = { label:_('Signup.Form.Username'),
             elemName: 'username',
             elemType: 'text'
         };
-        f.validators = function (elem) { 
-            return (cosmo.util.validate.required(elem) || 
+        f.validators = function (elem) {
+            return (cosmo.util.validate.required(elem) ||
             cosmo.util.validate.minLength(elem, 3)); };
         f.value = a[f.elemName];
         list.push(f);
     }
-    
+
     f = { label: _('Signup.Form.FirstName'),
         elemName: 'firstName',
         elemType: 'text'
     };
-    f.validators = function (elem) { 
+    f.validators = function (elem) {
         return cosmo.util.validate.required(elem); };
     f.value = a[f.elemName];
     list.push(f);
-    
-    f = { label: _('Signup.Form.LastName'), 
+
+    f = { label: _('Signup.Form.LastName'),
         elemName: 'lastName',
         elemType: 'text'
     };
-    f.validators = function (elem) { 
+    f.validators = function (elem) {
         return cosmo.util.validate.required(elem); };
     f.value = a[f.elemName];
     list.push(f);
-    
-    f = { label: _('Signup.Form.EMailAddress'), 
+
+    f = { label: _('Signup.Form.EMailAddress'),
         elemName: 'email',
         elemType: 'text'
     };
-    f.validators = function (elem) { 
-        return (cosmo.util.validate.required(elem) || 
+    f.validators = function (elem) {
+        return (cosmo.util.validate.required(elem) ||
         cosmo.util.validate.eMail(elem)); };
     f.value = a[f.elemName];
     list.push(f);
-    
-    f = { label: _('Signup.Form.Password'), 
-        elemName: 'password', 
+
+    f = { label: _('Signup.Form.Password'),
+        elemName: 'password',
         elemType: 'password'
     };
     // User editing own account -- blank password means no change
     if (accountInfo) {
-        f.validators = function (elem) { 
+        f.validators = function (elem) {
             return cosmo.util.validate.minLength(elem, 5); };
 
     }
-    // Creating a new account -- require password field 
+    // Creating a new account -- require password field
     else {
-        f.validators = function (elem) { 
-            return (cosmo.util.validate.required(elem) || 
+        f.validators = function (elem) {
+            return (cosmo.util.validate.required(elem) ||
             cosmo.util.validate.minLength(elem, 5)); };
     }
     f.value = a[f.elemName];
     list.push(f);
-    
-    f = { label: _('Signup.Form.ConfirmPassword'), 
-        elemName: 'confirm', 
+
+    f = { label: _('Signup.Form.ConfirmPassword'),
+        elemName: 'confirm',
         elemType: 'password' };
     // User editing own account -- blank password means no change
     if (accountInfo) {
-        f.validators = function (elem1, elem2) { 
+        f.validators = function (elem1, elem2) {
             return cosmo.util.validate.confirmPass(elem1, elem2); };
     }
-    // Creating a new account -- require password field 
+    // Creating a new account -- require password field
     else {
-        f.validators = function (elem1, elem2) { 
-            return (cosmo.util.validate.required(elem1) || 
+        f.validators = function (elem1, elem2) {
+            return (cosmo.util.validate.required(elem1) ||
             cosmo.util.validate.confirmPass(elem1, elem2)); };
     }
     f.value = a[f.elemName];
     list.push(f);
-    
+
     return list;
 };
 
@@ -109,7 +109,7 @@ cosmo.account.getFieldList = function (accountInfo) {
  * Programmatically creates the table of form elements
  * used for signup. Loops through fieldList for all the
  * form fields.
- * @return Object (HtmlFormElement), form to append to the 
+ * @return Object (HtmlFormElement), form to append to the
  *     content area of the modal dialog box.
  */
 cosmo.account.getFormTable = function (fieldList, isCreate) {
@@ -119,13 +119,13 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
     var td = null;
     var elem = null;
     var form = _createElem('form');
-    
+
     form.id = 'accountSignupForm';
     form.onsubmit = function () { return false; };
-    
+
     table = _createElem('table');
     body = _createElem('tbody');
-   
+
     if (isCreate) {
         table.style.width = '60%';
     }
@@ -133,17 +133,17 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
         table.style.width = '100%';
     }
     table.style.margin = 'auto';
-    
+
     var inputs = [];
-    
+
     // Table row for each form field
     for (var i = 0; i < fieldList.length; i++) {
         var f = fieldList[i];
         var type = f.elemType;
-        
+
         // Create row
         tr = _createElem('tr');
-        
+
         // Label cell
         td = _createElem('td');
         td.id = f.elemName + 'LabelCell';
@@ -152,7 +152,7 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
         td.appendChild(_createText(f.label + ':'));
         td.style.width = '1%';
         tr.appendChild(td);
-        
+
         // Form field cell
         td = _createElem('td');
         td.id = f.elemName + 'ElemCell';
@@ -168,14 +168,14 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
         elem.value = f.value || '';
         inputs.push(elem);
         td.appendChild(elem);
-        
+
         tr.appendChild(td);
         body.appendChild(tr);
     }
     table.appendChild(body);
     form.appendChild(table);
-    
-    // BANDAID: Hack to get the checkbox into Safari's 
+
+    // BANDAID: Hack to get the checkbox into Safari's
     // form elements collection
     if (navigator.userAgent.indexOf('Safari') > -1) {
         cosmo.util.html.addInputsToForm(inputs, form);
@@ -196,8 +196,8 @@ cosmo.account.validateForm = function (form, fieldList) {
     var errRet = '';
     for (var i = 0; i < fieldList.length; i++) {
         var field = fieldList[i];
-        cell = document.getElementById(field.elemName + 
-            'ElemCell');  
+        cell = document.getElementById(field.elemName +
+            'ElemCell');
         err = field.validators(form[field.elemName], form['password'], false);
         // Remove any previous err msg div
         child = cell.firstChild;
@@ -208,7 +208,7 @@ cosmo.account.validateForm = function (form, fieldList) {
         // At least one err msg string returned from chain of methods
         if (err) {
             // Set master err msg for return
-            errRet = _('Signup.Error.Main'); 
+            errRet = _('Signup.Error.Main');
             // Insert err msg div before text input
             div = _createElem('div');
             div.className = 'inputError';

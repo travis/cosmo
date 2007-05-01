@@ -113,14 +113,14 @@ ScoobyService.prototype = {
      * @param calendarName
      */
     createCalendar: function(calendarName, calendarPath){},
-    
+
     /**
      * Gets the preference for the given name for the current user.
      * @param preferenceName the name of the preference to retrieve
      * @return the preference
      */
     getPreference: function(preferenceName){},
-    
+
     /**
      * Sets the preference for the given name for the current user
      * with the value specified.
@@ -128,13 +128,13 @@ ScoobyService.prototype = {
      * @param value the value to set it to
      */
     setPreference: function(preferenceName, value){},
-    
+
     /**
      * Removes the preference for the given name for the current user
      * @param preferenceName the name of the preference to be removed
      */
     removePreference: function(preferenceName){},
-    
+
     /**
      * Gets all preferences for the current user
      */
@@ -151,21 +151,21 @@ ScoobyService.prototype = {
      * @param preferenceName the map of preferences to be set
      */
     setMultiplePreferences: function(preferences){},
-    
+
     /**
      * Returns the RecurrenceRules for a bunch of events
-     * 
+     *
      * @param calendarPath the calendar containing the events
      * @param eventIds an array of the id's of the events
      *                 for which you want the RecurrenceRules of
      * @return a map of ids --> RecurrenceRules
      */
      getRecurrenceRules: function(calendarPath, eventIds){},
-     
-         
+
+
     /**
      * Saves the RecurrenceRule for a particular event
-     * 
+     *
      * @param calendarPath
      * @param eventId
      * @param recurrenceRule
@@ -173,19 +173,19 @@ ScoobyService.prototype = {
      saveRecurrenceRule: function(calendarPath, eventId, recurrenceRule){},
 
     /**
-     * Expands the events with the given eventIds for the specified time range. 
+     * Expands the events with the given eventIds for the specified time range.
      * @param calendarPath the calendar in which the events are located
      * @param eventIds an array of the id of the events to be expanded
      * @param utcStartTime the time range start  in UTC
      * @param utcEndTime the time range end in UTC
-     * @return a map with the event id's as keys, and the array of expanded Events 
+     * @return a map with the event id's as keys, and the array of expanded Events
      *         as values
      */
     expandEvents: function(calendarPath, eventIds, utcStartTime, utcEndTime){},
 
     /**
      * Saves the specified new event and updates the event with the specified id
-     * with the new recurrence end date   
+     * with the new recurrence end date
      * @param calendarPath the calendar where the event is.
      * @param event the new event to be saved
      * @param originalEventId the id of the original event
@@ -194,49 +194,49 @@ ScoobyService.prototype = {
      */
     saveNewEventBreakRecurrence: function(calendarPath, event,
         originalEventId, originalEventEndDate){},
-    
+
     /**
      * Get the calendar with the specified uid.
      * @param collectionId the uid of the collection to get
      */
     getCalendar: function(collectionId){},
-    
+
     /**
      * Get the subscription identified with the specified collectionId and ticketKey
      */
     getSubscription: function(collectionId, ticketKey){},
-    
+
     /**
      * Get the ticket identified with the specified collectionId and ticketKey
      */
     getTicket: function(ticketKey, collectionId){},
-    
+
     /**
      * Deletes the subscription with the specified collectionId and ticketKey
      */
     deleteSubscription: function(collectionId, ticketKey){},
-    
+
     /**
      * Creates or updates a subscription for the current user with the specified collectionId
      * and ticketKey.
      */
     saveSubscription: function(cid, ticketKey, displayName){},
-    
+
     /**
      * Gets all the subscriptions for the current user
      */
     getSubscriptions: function(){},
-    
+
 
     /**
      * Returns the version of Cosmo
      */
     getVersion: function(){},
-    
+
     /**
      * Changes the display name for a collection. Must be a collection
      * owned by the user
      */
-    saveDisplayName: function(cid, displayName){} 
-    
+    saveDisplayName: function(cid, displayName){}
+
 }

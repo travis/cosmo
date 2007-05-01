@@ -31,29 +31,29 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.cookie");
 
 var Login = new function () {
-    
+
     var self = this;
-    
+
     this.loginFocus = false;
     this.loginReq = null;
-    this.loginForm = null; 
+    this.loginForm = null;
     this.authProc = '';
 
     this.init = function() {
-        var but = new Button('submitButton', 74, Login.doLogin, 
+        var but = new Button('submitButton', 74, Login.doLogin,
             _('App.Button.Submit'));
         self.loginForm = document.getElementById('loginForm');
         self.authProc = AUTH_PROC;
         self.loginForm.j_username.focus();
         // Add logo and button
-        //document.getElementById('logoDiv').innerHTML = 
+        //document.getElementById('logoDiv').innerHTML =
         //    '<img src="' + cosmo.env.getImagesUrl() + LOGO_GRAPHIC + '" alt="">';
         document.getElementById('submitButtonDiv').appendChild(but.domNode);
     }
     this.handleLoginResp = function(str) {
         if (str.indexOf('login.js') > -1) {
             self.showErr(_('Login.Error.AuthFailed'));
-            self.loginForm.j_password.value = ''; 
+            self.loginForm.j_password.value = '';
         }
         else {
             self.showPrompt('normal', 'Logging you on. Please wait ...');

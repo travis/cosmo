@@ -21,17 +21,17 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
         },
 
         // Attach points
-        
+
         fillInTemplate: function () {
             var node = this.domNode
             var main = null;
             var d = null;
-           
+
             node.id = this.widgetId;
             node.style.textAlign = 'center';
             node.style.margin = 'auto';
             node.style.width = '100%';
-            
+
             // Image
             d = _createElem('div');
             d.style.paddingTop = '16px';
@@ -39,7 +39,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
             img.src = cosmo.env.getBaseUrl() + '/cosmo_logo.gif';
             d.appendChild(img);
             node.appendChild(d);
-            // Version 
+            // Version
             d = _createElem('div');
             d.style.marginTop = '-4px';
             d.innerHTML = this.strings.version;
@@ -47,12 +47,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
             // License text
             d = _createElem('div');
             d.style.marginTop = '24px';
-            d.innerHTML = this.strings.license; 
+            d.innerHTML = this.strings.license;
             node.appendChild(d);
             // Info text
             d = _createElem('div');
             d.style.marginTop = '12px';
-            d.innerHTML = this.strings.info; 
+            d.innerHTML = this.strings.info;
             node.appendChild(d);
         },
         postCreate: function () {

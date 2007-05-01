@@ -52,7 +52,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         userCountIndicator: null,
 
         orderIndicator : null,
-        
+
         ASCENDING : "ascending",
         DESCENDING : "descending",
         DEFAULT_SORT_TYPE : "username",
@@ -77,7 +77,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             return node;
         },
-        
+
         setSortOrder : function(order){
             if (order == this.DESCENDING){
                 this.sortOrder = order;
@@ -116,7 +116,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
                 usernames.push(users[i].username)
             }
             var self = this;
-            
+
             cosmo.cmp.deleteUsers(usernames,
                 {load: function(type, data, evt){self.updateUserList();},
                  error: function(type, error){alert("Could not delete user:" + error)}
@@ -129,7 +129,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             var documentAddress = new dojo.uri.Uri(cmpUrl);
 
             var query = documentAddress.query.substring(1);
-            
+
             var vars = query.split("&");
 
             for (i=0; i < vars.length; i++){
@@ -168,7 +168,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         },
 
         createPageSizeChooser:function(){
-            
+
             var s = document.createElement("span");
 
             s.appendChild(document.createTextNode(_("UserList.UsersPerPage")));
@@ -181,9 +181,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             i.setAttribute("value", this.pageSize);
             i.setAttribute("align", "middle");
 
-            dojo.event.connect(i,"onchange", dojo.lang.hitch(this,    
+            dojo.event.connect(i,"onchange", dojo.lang.hitch(this,
                     function (){
-                        if (i.value <= 0 || 
+                        if (i.value <= 0 ||
                             i.value % 1 != 0){
                             alert("Page size cannot be " + i.value + ".");
                             i.value = this.pageSize;
@@ -202,7 +202,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             b.setAttribute("maxlength", "4");
             b.setAttribute("value", _("UserList.Control.ApplyPageSize"));
             b.setAttribute("align", "middle");
-            
+
             b.onclick = function(){i.value = i.value; return false};
 
             s.appendChild(b);
@@ -211,9 +211,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         },
 
         createPageNumberChooser:function(){
-            
+
             var s = document.createElement("span");
-            
+
             s.setAttribute("id", "pageNumberChooser");
             s.style.visibility = "hidden";
 
@@ -229,7 +229,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             i.setAttribute("value", this.pageNumber);
             i.setAttribute("align", "middle");
 
-            dojo.event.connect(i, "onchange", dojo.lang.hitch(this, 
+            dojo.event.connect(i, "onchange", dojo.lang.hitch(this,
                function (){
                   this.pageNumber = i.value;
                   this.updateUserList();
@@ -237,14 +237,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             );
 
             s.appendChild(i);
-            
+
             var b = document.createElement("input");
             b.setAttribute("type", "button");
             b.setAttribute("size", "4");
             b.setAttribute("maxlength", "4");
             b.setAttribute("value", _("UserList.Control.ApplyPageNumber"));
             b.setAttribute("align", "middle");
-            
+
             b.onclick = function(){i.value = i.value; return false};
 
             s.appendChild(b);
@@ -255,37 +255,37 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             return s;
         },
 
-      
+
         createUserCountIndicator: function(){
         	var s = document.createElement("span");
         	s.setAttribute("id", "userCountIndicatorSpan");
-        	
+
 			var count = document.createElement("span");
-			
+
 			this.userCountIndicator = count;
-			
+
 			s.appendChild(document.createTextNode("Total Users: "));
 			s.appendChild(count);
-			
+
 			this.updateTotalUserCount();
         	return s;
         },
-        
+
         updateTotalUserCount: function(){
         	var self = this;
 	       	var setCountCallback = function (type, data, evt){
 				self.userCountIndicator.innerHTML = data;
     	   	}
-        	
+
         	cosmo.cmp.getUserCount({
         		load: setCountCallback,
         		error: function(type, error){
         			alert('Could not get user count: ' + error.message);
         		}
         	});
-        	
+
         },
-        
+
         loadFirstPage:function(){
             if (this.cmpFirstLink){
                 this.loadCMPPage(this.cmpFirstLink);
@@ -326,7 +326,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             document.getElementById("pageNumberChooser").
                 getElementsByTagName("input")[0].value = this.pageNumber;
-                
+
            	this.updateTotalUserCount();
 
         },
@@ -353,7 +353,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
                 row.created = dojo.date.fromRfc3339(user.dateCreated);
 
                 row.modified = dojo.date.fromRfc3339(user.dateModified);
-                
+
                 if (user.unactivated) {
                 	row.activated = "No";
                 } else {
@@ -365,7 +365,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
                 } else {
                     row.admin = "No";
                 }
-                
+
                 row.userObject = user;
 
                 jsonObject.push(row);
@@ -396,7 +396,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
                 // -travis@osafoundation.org
                 var url = //link.getAttribute("href");
                 dojo.html.createNodesFromText(link.getAttribute("href"))[0].nodeValue;
-                
+
                 //url = url.replace(/&#38;/g, "&");
 
                 switch(link.getAttribute("rel")){
@@ -497,7 +497,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             controls.appendChild(this.createUserCountIndicator());
 
             table.parentNode.insertBefore(controls, table);
-            
+
             dojo.event.topic.registerPublisher("/userListSelectionChanged", this, "renderSelections");
 
             this.updateUserList()
@@ -513,6 +513,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
 		};
         dojo.event.connect("around", this, "createRow", this, "aroundCreateRow");
-        	
+
     }
 );

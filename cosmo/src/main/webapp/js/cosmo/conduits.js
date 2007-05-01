@@ -17,8 +17,8 @@ dojo.provide("cosmo.conduits");
 
 dojo.require("cosmo.app.pim");
 
-cosmo.conduits.Conduit = 
-{	
+cosmo.conduits.Conduit =
+{
     getCollection: function(collectionUid, transportInfo){},
     getEvents: function(collectionUid, startTime, endTime, transportInfo){},
     getEvent: function(eventUid, transportInfo){},
@@ -27,14 +27,14 @@ cosmo.conduits.Conduit =
     getRecurrenceRules: function(eventUids, transportInfo){},
     saveRecurrenceRule: function(eventUid, recurrenceRule, transportInfo){},
     expandEvents: function(eventUids, startTime, endTime, transportInfo){},
-    saveNewEventBreakRecurrence: function(event, originalEventUid, 
-        originalEventEndDate, transportInfo){}, 
+    saveNewEventBreakRecurrence: function(event, originalEventUid,
+        originalEventEndDate, transportInfo){},
     saveDisplayName: function(collectionUid, newDisplayName, transportInfo){}
-    
+
 };
 
 
-cosmo.conduits.OwnedCollectionConduit = 
+cosmo.conduits.OwnedCollectionConduit =
 {
     getCollection: function(collectionUid, transportInfo, handlerFunc){
         if (handlerFunc){
@@ -72,42 +72,42 @@ cosmo.conduits.OwnedCollectionConduit =
         }
     },
     getRecurrenceRules: function(collectionUid, eventUids, transportInfo, handlerFunc){
-        if (handlerFunc){	
+        if (handlerFunc){
             return cosmo.app.pim.serv.getRecurrenceRules(handlerFunc, collectionUid, eventUids);
         } else {
-            return cosmo.app.pim.serv.getRecurrenceRules(collectionUid, eventUids);    	
+            return cosmo.app.pim.serv.getRecurrenceRules(collectionUid, eventUids);
         }
     },
-    saveRecurrenceRule: function(collectionUid, eventUid, recurrenceRule, 
+    saveRecurrenceRule: function(collectionUid, eventUid, recurrenceRule,
         transportInfo, handlerFunc){
-        if (handlerFunc){		
+        if (handlerFunc){
             return cosmo.app.pim.serv.saveRecurrenceRule(handlerFunc, collectionUid, eventUid, recurrenceRule);
         } else {
-            return cosmo.app.pim.serv.saveRecurrenceRule(collectionUid, eventUid, recurrenceRule);    	
+            return cosmo.app.pim.serv.saveRecurrenceRule(collectionUid, eventUid, recurrenceRule);
         }
     },
-    expandEvents: function(collectionUid, eventUids, startTime, endTime, 
+    expandEvents: function(collectionUid, eventUids, startTime, endTime,
         transportInfo, handlerFunc){
 
-        if (handlerFunc){		
-            return cosmo.app.pim.serv.expandEvents(handlerFunc, collectionUid, eventUids, 
+        if (handlerFunc){
+            return cosmo.app.pim.serv.expandEvents(handlerFunc, collectionUid, eventUids,
                 startTime, endTime);
            } else {
-            return cosmo.app.pim.serv.expandEvents(collectionUid, eventUids, 
+            return cosmo.app.pim.serv.expandEvents(collectionUid, eventUids,
                 startTime, endTime);
            }
     },
     saveNewEventBreakRecurrence: function(collectionUid, event,
         originalEventUid, originalEventEndDate, transportInfo, handlerFunc){
         if (handlerFunc){
-            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(handlerFunc, collectionUid, event, 
+            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(handlerFunc, collectionUid, event,
                 originalEventUid, originalEventEndDate);
         } else {
-            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(collectionUid, event, 
+            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(collectionUid, event,
                 originalEventUid, originalEventEndDate);
         }
     },
-    
+
     saveDisplayName: function(collectionUid, newDisplayName, transportInfo, handlerFunc){
         if (handlerFunc){
             cosmo.app.pim.serv.saveDisplayName(handlerFunc, collectionUid, newDisplayName);
@@ -155,45 +155,45 @@ cosmo.conduits.TicketedConduit =
         }
     },
     getRecurrenceRules: function(collectionUid, eventUids, transportInfo, handlerFunc){
-        if (handlerFunc){	
+        if (handlerFunc){
             return cosmo.app.pim.serv.getRecurrenceRules(handlerFunc, collectionUid, eventUids, this.getTicket(transportInfo));
         } else {
-            return cosmo.app.pim.serv.getRecurrenceRules(collectionUid, eventUids, this.getTicket(transportInfo));    	
+            return cosmo.app.pim.serv.getRecurrenceRules(collectionUid, eventUids, this.getTicket(transportInfo));
         }
     },
-    saveRecurrenceRule: function(collectionUid, eventUid, recurrenceRule, 
+    saveRecurrenceRule: function(collectionUid, eventUid, recurrenceRule,
         transportInfo, handlerFunc){
-        if (handlerFunc){		
+        if (handlerFunc){
             return cosmo.app.pim.serv.saveRecurrenceRule(handlerFunc, collectionUid, eventUid, recurrenceRule, this.getTicket(transportInfo));
         } else {
-            return cosmo.app.pim.serv.saveRecurrenceRule(collectionUid, eventUid, recurrenceRule, this.getTicket(transportInfo));    	
+            return cosmo.app.pim.serv.saveRecurrenceRule(collectionUid, eventUid, recurrenceRule, this.getTicket(transportInfo));
         }
     },
-    expandEvents: function(collectionUid, eventUids, startTime, endTime, 
+    expandEvents: function(collectionUid, eventUids, startTime, endTime,
         transportInfo, handlerFunc){
 
-        if (handlerFunc){		
-            return cosmo.app.pim.serv.expandEvents(handlerFunc, collectionUid, eventUids, 
+        if (handlerFunc){
+            return cosmo.app.pim.serv.expandEvents(handlerFunc, collectionUid, eventUids,
                 startTime, endTime, this.getTicket(transportInfo));
            } else {
-            return cosmo.app.pim.serv.expandEvents(collectionUid, eventUids, 
+            return cosmo.app.pim.serv.expandEvents(collectionUid, eventUids,
                 startTime, endTime, this.getTicket(transportInfo));
            }
     },
     saveNewEventBreakRecurrence: function(collectionUid, event,
         originalEventUid, originalEventEndDate, transportInfo, handlerFunc){
         if (handlerFunc){
-            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(handlerFunc, collectionUid, event, 
+            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(handlerFunc, collectionUid, event,
                 originalEventUid, originalEventEndDate, this.getTicket(transportInfo));
         } else {
-            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(collectionUid, event, 
+            return cosmo.app.pim.serv.saveNewEventBreakRecurrence(collectionUid, event,
                 originalEventUid, originalEventEndDate, this.getTicket(transportInfo));
         }
     }
 
 };
 
-cosmo.conduits.SubscriptionConduit = 
+cosmo.conduits.SubscriptionConduit =
 {
     getTicket: function(transportInfo){
         return transportInfo.ticket.ticketKey;

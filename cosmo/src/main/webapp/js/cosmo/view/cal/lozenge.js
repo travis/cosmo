@@ -155,7 +155,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicLeft = function () {
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicWidth = function () {
     var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
-    var diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY, 
+    var diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
         ev.data.start, ev.data.end))+3;
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 }
@@ -163,7 +163,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicWidth = function () {
  * Cross-browser wrapper for setting CSS opacity
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.setOpacity = function (opac) {
-    
+
     function setOpac(elem, o) {
         // =============
         // opac is a whole number to be used as the percent opacity
@@ -175,7 +175,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setOpacity = function (opac) {
             elem.style.filter = 'alpha(opacity=' + o + ')';
         }
         elem.style.opacity = nDecOpacity;
-        
+
     }
     setOpac(this.div, opac);
     if (this.composite()) {
@@ -544,7 +544,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateEvent = function (ev, drag
     // Add +1 to height for border on background
     // Add +2 to height for border on lozenge div
     var endTime = cosmo.view.cal.canvas.calcTimeFromPos(this.top+(this.height + 3));
-    
+
     var t = cosmo.datetime.util.parseTimeString(startTime);
     evStart.setHours(t.hours);
     evStart.setMinutes(t.minutes);
@@ -982,13 +982,13 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateEvent = function (ev, dragM
     // Dragged-to date
     var evDate = cosmo.view.cal.canvas.calcDateFromPos(this.left);
     // Difference in days
-    var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY, 
+    var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
         ev.data.start, evDate);
     // Increment start and end by number of days
     // User can't resize all-day events
-    ev.data.start = cosmo.datetime.Date.add(ev.data.start, 
+    ev.data.start = cosmo.datetime.Date.add(ev.data.start,
         dojo.date.dateParts.DAY, diff);
-    ev.data.end = cosmo.datetime.Date.add(ev.data.end, 
+    ev.data.end = cosmo.datetime.Date.add(ev.data.end,
         dojo.date.dateParts.DAY, diff);
     return true;
 }
@@ -1006,7 +1006,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.calcWidth = function (startDay, e
     var maxDiff = (7-startDay);
     var width = 0;
 
-    diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY, 
+    diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
         ev.data.start, ev.data.end))+1;
 
     diff = (diff > maxDiff) ? maxDiff : diff;
@@ -1162,7 +1162,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getLeft = function () {
 }
 
 /**
- * Non-timed events are never composed of multiple divs 
+ * Non-timed events are never composed of multiple divs
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.composite = function () {
     return false;

@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview PasswordRecoverer - a widget takes a username and/or email address and 
+ * @fileoverview PasswordRecoverer - a widget takes a username and/or email address and
  *                                  asks the server to send a password recovery email to
  *                                  the corresponding user.
  *
@@ -49,10 +49,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordRecoverer", dojo.widget.HtmlWi
         widgetsInTemplate: true,
         displayDefaultInfo: false,
         i18nPrefix: "Account.PasswordRecover",
-        
+
         //attach points
         tableContainer: null,
-        
+
         errorBox: null,
         infoBox: null,
         usernameLabel: null,
@@ -62,19 +62,19 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordRecoverer", dojo.widget.HtmlWi
 
         sendButtonContainer: null,
         sendButton: null,
-        
+
         setError: function(message){
-            this.errorBox.innerHTML = message;  
+            this.errorBox.innerHTML = message;
         },
-        
+
         setInfo: function(message){
-            this.infoBox.innerHTML = message;  
+            this.infoBox.innerHTML = message;
         },
 
         recoverPassword: function(){
             var self = this;
             this.setError("");
-            cosmo.cmp.recoverPassword(this.usernameInput.value, this.emailInput.value, 
+            cosmo.cmp.recoverPassword(this.usernameInput.value, this.emailInput.value,
                 {error: function(type, data, xhr){
                     if (xhr.status == "404"){
                        self.setError(_(self.i18nPrefix + ".Error.404"));
@@ -88,12 +88,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordRecoverer", dojo.widget.HtmlWi
                 }
                 });
         },
-        
+
         fillInTemplate: function(){
             if (this.displayDefaultInfo){
                 this.setInfo(_(this.i18nPrefix + ".InitialInfo"));
             }
-            
+
             this.usernameLabel.innerHTML = _(this.i18nPrefix + ".Username");
             this.emailLabel.innerHTML = _(this.i18nPrefix + ".Email");
         }

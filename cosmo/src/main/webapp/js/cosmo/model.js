@@ -108,18 +108,18 @@ cosmo.model.RecurrenceRule = function(){
 RecurrenceRule = cosmo.model.RecurrenceRule;
 RecurrenceRule.prototype = {
     toString: genericToString,
-    
+
     getModification: function(/*CosmoDate*/ instanceDate, /*boolean?*/ returnIndex){
         //summary: returns the modification for the given instance date
         //desciption: if there is a modification whose instanceDate is UTC equivalent
         //            to the given date, it is returned. If no such modification exists null is returned.
         //instanceDate: the instanceDate of the desired modification
         //returnIndex: if true, returns the index of the found modification, or -1 if not found.
-        
+
         if (!this.modifications){
             return returnIndex ? -1 : null;
         }
-        
+
         for (var x = 0; x < this.modifications.length;x++){
             var modification = this.modifications[x];
             if (modification.instanceDate.getTime() == instanceDate.getTime()){
@@ -128,7 +128,7 @@ RecurrenceRule.prototype = {
         }
         return returnIndex ? -1 : null;
     },
-    
+
     removeModification: function(/*CosmoDate*/ instanceDate){
         var i = this.getModification(instanceDate, true);
         if (i > -1){
@@ -251,8 +251,8 @@ Ticket = cosmo.model.Ticket;
 
 
 cosmo.model.sortEvents = function(/*Array|cosmo.util.hash.Hash*/ events){
-// summary: Sorts a collection of events based on start date. 
-//          If the start dates are equal, longer events are  
+// summary: Sorts a collection of events based on start date.
+//          If the start dates are equal, longer events are
 //          sorted first
 
     var hash = events instanceof cosmo.util.hash.Hash;
@@ -264,7 +264,7 @@ cosmo.model.sortEvents = function(/*Array|cosmo.util.hash.Hash*/ events){
         event.__startUTC = event.start.toUTC();
         event.__endUTC = (event.end ? event.end.toUTC() : event.__startUTC);
     }
-    
+
     events.sort(cosmo.model._eventComparator);
 
     for (var x = 0; x < events.length; x++){

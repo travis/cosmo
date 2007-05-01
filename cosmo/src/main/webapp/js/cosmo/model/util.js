@@ -19,30 +19,30 @@ cosmo.model.util._upperFirstChar = function(str){
     return str.charAt(0).toUpperCase() + str.substr(1,str.length -1 );
 }
 
-cosmo.model.util.BasePropertyApplicator = function(){}   
+cosmo.model.util.BasePropertyApplicator = function(){}
 cosmo.model.util.BasePropertyApplicator.prototype = {
-    
+
     enhanceClass: function(ctr, propertyArray, kwArgs){
         this.initializeClass(ctr, kwArgs);
         for (var x = 0; x < propertyArray.length; x++){
             this.addProperty.apply(this, [ctr, propertyArray[x][0], propertyArray[x][1]]);
         }
     },
-    
+
     addProperty: function(ctr, propertyName, kwArgs){
         kwArgs = kwArgs || {};
         var upProp = cosmo.model.util._upperFirstChar(propertyName);
         var setterName = "set" + upProp;
         var getterName = "get" + upProp;
-        
+
         ctr.prototype[setterName] = this.getSetter(ctr, propertyName, kwArgs);
         ctr.prototype[getterName] = this.getGetter(ctr, propertyName, kwArgs);
     },
-    
+
     initializeClass: function(ctr, kwArgs){
         //implementers should override this.
     },
-    
+
     getSetter: function(ctr, propertyName, kwArgs){
         //implementers should override this.
         return null;
@@ -62,9 +62,9 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         ctr.prototype.__propertyNames.push(propertyName);
         ctr.prototype.__defaults[propertyName] = kwArgs["default"];
     },
-    
+
     getGetter: function(ctr, propertyName, kwArgs){
-        return function(){        
+        return function(){
             return this.__getProperty(propertyName);
         }
     },
@@ -78,7 +78,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
     initializeClass: function(ctr, kwArgs){
         if (ctr.prototype["__enhanced"]){
             //it's already been enhanced, which usually means that this is a subclass.
-            //so let's just copy the arrays/objects to the new prototype 
+            //so let's just copy the arrays/objects to the new prototype
             //since we'll be adding to them and don't want to add to the parent's arrays/objects!
             ctr.prototype.__propertyNames = ctr.prototype.__propertyNames.slice();
             var newDefaults = {};
@@ -96,7 +96,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         ctr.prototype.__propertyNames = [];
         ctr.prototype.__defaults = {};
         ctr.prototype.initializeProperties = this._initializeProperties;
-        
+
         if (kwArgs["enhanceInitializer"]){
             var oldInitter = ctr.prototype.initializer;
             var when = kwArgs["enhanceInitializer"];
@@ -105,18 +105,18 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
                 if (when == "before"){
                     this.initializeProperties(arguments);
                 }
-                
+
                 oldInitter.apply(this,arguments);
-                
+
                 if (when != "before"){
                     this.initializeProperties(arguments);
                 }
             }
             ctr.prototype.initializer = newInitializer;
-        }    
+        }
     },
-    
-    //These functions are "protected" - in other words they should only be used by this class, 
+
+    //These functions are "protected" - in other words they should only be used by this class,
     //or other classes in this package.
     _initializeProperties: function(kwProps){
         for (var x = 0; x < this.__propertyNames.length; x++){
@@ -127,30 +127,30 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
                 this.__setProperty(propertyName, this.__getDefault(propertyName));
             }
         }
-    }, 
-    
+    },
+
     _genericGetter: function genericGetter(propertyName){
         return this["_"+propertyName];
     },
-    
+
     _genericSetter: function genericSetter(propertyName, value){
         this["_"+propertyName] = value;
     },
-    
+
     _getDefault: function getDefault(propertyName){
         var propDefault = this.__defaults[propertyName];
-                    
+
         if (typeof(propDefault) == "function"){
             return propDefault();
         } else {
             return propDefault;
         }
-        
+
         return propDefault;
     }
 });
 
-//instantiate the singleton 
+//instantiate the singleton
 cosmo.model.util.simplePropertyApplicator = new cosmo.model.util.SimplePropertyApplicator();
 
 dojo.declare("cosmo.model.util.InheritingSubclassCreator", null, {
@@ -158,46 +158,46 @@ dojo.declare("cosmo.model.util.InheritingSubclassCreator", null, {
         dojo.declare(childConstructorName, parentConstructor, {
         });
     },
-    
+
     //default functions
     _getParentDefault: function(){
-       return this.parent;  
-    }, 
-    
+       return this.parent;
+    },
+
     _getterDefault: function(){
-        
+
     }
-    
-}); 
+
+});
 
 cosmo.model.util.equals = function cosmoEquals(a,b){
     var type = typeof (a);
     if (type != typeof(b)){
-        throw new Error("Both operands must be of the same type!\n You passed '" 
+        throw new Error("Both operands must be of the same type!\n You passed '"
            + a + "' and '" + b +"', a " + typeof(a) + " and a "+ typeof(b));
     }
-    
+
     if (type == "object"){
        if (a == null){
            return b == null;
        }
        return a.equals(b);
     }
-    
+
     return a == b;
-}   
+}
 
   cosmo.model._occurrenceGetProperty =  function occurrenceGetProperty(propertyName){
         //get the master version
         var master = this.getMaster();
         var masterProperty = this._getMasterProperty(propertyName);
 
-        //see if it's overridable 
+        //see if it's overridable
         //if it's not, just go right to the master
         if (this.__noOverride[propertyName]){
             return masterProperty;
         }
-        
+
         //if it is check the modificaiton
         var modification = master.getModification(this.recurrenceId);
 
@@ -205,12 +205,12 @@ cosmo.model.util.equals = function cosmoEquals(a,b){
         if (!modification){
             return masterProperty;
         }
-            
-        //there IS a modification, so let's check to see if it has 
+
+        //there IS a modification, so let's check to see if it has
         //an overridden value for this particular property
         var modificationProperty = this._getModifiedProperty(propertyName);
         if (typeof(modificationProperty) != "undefined"){
-            return modificationProperty;            
+            return modificationProperty;
         }
         return masterProperty;
 }
@@ -230,13 +230,13 @@ cosmo.model._occurrenceSetProperty = function occurrenceSetProperty(propertyName
     if (modification){
         if (!typeof(this._getModifiedProperty(propertyName)) == "undefined"){
             this._setModifiedProperty(propertyName, value);
-            return;                    
+            return;
         } else if (!cosmo.model.util.equals(value, masterProperty)){
             this._setModifiedProperty(propertyName, value);
             return;
         }
-    } 
-    //if the new value is the same as the master property, 
+    }
+    //if the new value is the same as the master property,
     // no need to do anything
     if (cosmo.model.util.equals(value, masterProperty)){
         return;

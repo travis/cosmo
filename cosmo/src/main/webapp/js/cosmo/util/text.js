@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview Text -- text-processing functions 
+ * @fileoverview Text -- text-processing functions
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  */
@@ -26,7 +26,7 @@
  */
 
 Text = new function() {
-    dojo.deprecated("cosmo.util.text", 
+    dojo.deprecated("cosmo.util.text",
     "cosmo.util.text no longer needed", "0.6");
 
     this.uppercaseFirst = function(str) {

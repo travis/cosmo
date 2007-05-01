@@ -17,17 +17,17 @@
 /**
  * To use this file, you must first provide it with the base URL for your application
  * by calling "setBaseUrl"
- * 
+ *
  * @fileoverview provides information about the Cosmo environment.
  * @author Bobby Rullo br@osafoundation.org
  * @license Apache License 2.0
  */
- 
+
 dojo.provide("cosmo.env");
 
 cosmo.env.OVERLORD_USERNAME = "root";
 
-//private variable for storing environment information. Do not access directly, 
+//private variable for storing environment information. Do not access directly,
 //use methods below.
 cosmo.env._cosmoConfig = {};
 cosmo.env._cosmoConfig["baseUrl"] = djConfig['staticBaseUrl'];
@@ -35,25 +35,25 @@ cosmo.env._NULL = {};
 cosmo.env._FALSE_OR_ZERO = {};
 cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction ){
    var _calcy = calculatorFunction;
-   
+
    return  function(){
    var prop = cosmo.env._cosmoConfig[propName];
-   
+
    if (prop){
-       //if we don't use these placeholders, then the preceding if statement will return 
+       //if we don't use these placeholders, then the preceding if statement will return
        //false, and we'll have to recalculate.
        if (prop == cosmo.env._NULL) {
-           return null; 
+           return null;
        }
-       
+
        if (prop == cosmo.env._FALSE_OR_ZERO) {
-           return false; 
+           return false;
        }
-              
+
        return prop;
    }
-   
-   
+
+
    prop = _calcy();
 
    if (!prop){
@@ -61,11 +61,11 @@ cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction )
            cosmo.env._cosmoConfig[propName] = cosmo.env._FALSE_OR_ZERO;
        } else if (prop == null) {
            cosmo.env._cosmoConfig[propName] = cosmo.env._NULL;
-       }     
+       }
    } else {
        cosmo.env._cosmoConfig[propName] = prop;
-   } 
-   
+   }
+
    return prop;
    };
 }
@@ -74,7 +74,7 @@ cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction )
  * Returns the path to the cosmo script base, relative to the document NOT dojo
  */
 cosmo.env.getCosmoBase = cosmo.env._getCachePropGetterPopulator("cosmoBase", function(){
-    // "../.." is ugly but it works. 
+    // "../.." is ugly but it works.
     var uri = dojo.hostenv.getBaseScriptUri() + "../../";
     cosmo.env._cosmoConfig["baseCosmoUri"] = uri;
     return uri;
@@ -82,7 +82,7 @@ cosmo.env.getCosmoBase = cosmo.env._getCachePropGetterPopulator("cosmoBase", fun
 
 /**
  * Returns the path to the widgets template directory , relative to the document NOT dojo.
- * In other words, not for use with dojo.uri.dojoUri(), which wants you to be relative to 
+ * In other words, not for use with dojo.uri.dojoUri(), which wants you to be relative to
  * dojo scripts. This is useful for stuff like css background urls which can't deal with
  * dojo relative uri's
  *
@@ -114,7 +114,7 @@ cosmo.env.setBaseUrl = function(baseUrl){
 }
 
 /**
- * Sets the number of seconds for server-side timeout. Provided 
+ * Sets the number of seconds for server-side timeout. Provided
  * by the server somehow
  * @param {Number} timeoutSeconds (note: this number may be negative)
  * Negative number means effectively no timeout
@@ -157,7 +157,7 @@ cosmo.env.getTimeoutSeconds = function (){
 }
 
 /**
- * Convenience method to return the number of minutes 
+ * Convenience method to return the number of minutes
  * for the server-side timeout -- -1 indicates no timeout
  * set, infinite timeout
  */

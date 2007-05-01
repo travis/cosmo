@@ -17,9 +17,9 @@
 dojo.provide("cosmo.util.hash");
 
 cosmo.util.hash.Hash = function() {
-    
+
     var self = this;
-    
+
     this.length = 0;
     this.items = []; // Hash keys and their values
     this.order = []; // Array of the order of hash keys
@@ -183,14 +183,14 @@ cosmo.util.hash.Hash = function() {
             var val = hNew.items[key];
             self.setItem(key, val);
         }
-        
+
     };
     this.sort = function(specialSort, desc) {
         var sortFunc = getSort(specialSort, desc);
         var valSort = [];
         var keySort = [];
         for (var i = 0; i < this.order.length; i++) {
-            valSort[i] = this.items[this.order[i]]; 
+            valSort[i] = this.items[this.order[i]];
         }
         // Sort values
         valSort.sort(sortFunc);

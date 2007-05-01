@@ -16,16 +16,16 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
         templateString: '<span></span>',
 
         // Props from template or set in constructor
-        authAction: null, 
+        authAction: null,
         //authProc: "",
         authProc: cosmo.env.getAuthProc(),
         usernameLabel: _("Login.Username"),
         passwordLabel: _("Login.Password"),
-        
+
         // Attach points
         usernameInput: null,
         passwordInput: null,
-        
+
         _showErr: function (str) {
             this._showPrompt(str, 'error');
         },
@@ -50,9 +50,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
                 // Auth successful -- try to do whatever action
                 // was contingent on the auth
                 else {
-                    cosmo.util.auth.setCred(this.usernameInput.value, 
+                    cosmo.util.auth.setCred(this.usernameInput.value,
                                             this.passwordInput.value);
-                                            
+
                     this.attemptAuthAction(this.authAction.attemptParams);
                 }
             }
@@ -62,7 +62,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             var f = this.authAction[type + 'Func'];
             var a = args || []; // Can't pass args to IE6 if it's undefined
             var context = null;
-            // If this is just a plain ol' function, execute in window context 
+            // If this is just a plain ol' function, execute in window context
             if (this.authAction.execInline) {
                 context = window;
             }
@@ -86,24 +86,24 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
                 this._showPrompt(this.authAction.attemptPrompt);
             }
             // Take whatever action was specified in the authAction obj
-            return this._attemptOrHandle('attempt', args);    
+            return this._attemptOrHandle('attempt', args);
         },
         handleAuthActionResp: function () {
             var args = Array.prototype.slice.apply(arguments);
             // Take whatever response (if any) to the action was specified
             // in the authAction obj
-            return this._attemptOrHandle('success', args);    
+            return this._attemptOrHandle('success', args);
         },
         doAuth: function () {
             var un = this.usernameInput.value;
             var pw = this.passwordInput.value;
             var postData = {};
             var err = '';
-            
+
             if (!un || !pw) {
                 err = _('Login.Error.RequiredFields');
             }
-            
+
             if (err) {
                 this._showErr(err);
             }
@@ -134,12 +134,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             var tr = null;
             var td = null;
             var input = null;
-            
-            table.style.width = '240px'; 
-            table.style.margin = 'auto'; 
+
+            table.style.width = '240px';
+            table.style.margin = 'auto';
             table.style.textAlign = 'center';
             table.appendChild(tbody);
-            
+
             // Username row
             tr = _createElem('tr');
             // Label
@@ -149,16 +149,16 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             tr.appendChild(td);
             // Input elem
             td = _createElem('td');
-            this.usernameInput = cosmo.util.html.createInput({ 
-                type: 'text', 
-                name: 'authBoxUsernameInput', 
-                id: 'authBoxUsernameInput', 
-                className: 'inputText', 
+            this.usernameInput = cosmo.util.html.createInput({
+                type: 'text',
+                name: 'authBoxUsernameInput',
+                id: 'authBoxUsernameInput',
+                className: 'inputText',
                 value: '' });
             td.appendChild(this.usernameInput);
             tr.appendChild(td);
             tbody.appendChild(tr);
-            
+
             // Password row
             tr = _createElem('tr');
             // Label
@@ -168,16 +168,16 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             tr.appendChild(td);
             // Input elem
             td = _createElem('td');
-            this.passwordInput = cosmo.util.html.createInput({ 
-                type: 'password', 
-                name: 'authBoxUsernameInput', 
-                id: 'authBoxUsernameInput', 
-                className: 'inputText', 
+            this.passwordInput = cosmo.util.html.createInput({
+                type: 'password',
+                name: 'authBoxUsernameInput',
+                id: 'authBoxUsernameInput',
+                className: 'inputText',
                 value: '' });
             td.appendChild(this.passwordInput);
             tr.appendChild(td);
             tbody.appendChild(tr);
-            
+
             this.domNode.appendChild(table);
         },
         postCreate: function () {
@@ -188,22 +188,22 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
 cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) {
     var initPrompt = authAction.authInitPrompt || _('Login.Prompt.Init')
     var s = document.createElement('span');
-    var c = dojo.widget.createWidget("cosmo:AuthBox", { 
+    var c = dojo.widget.createWidget("cosmo:AuthBox", {
         'authAction': authAction }, s, 'last');
-    s.removeChild(c.domNode); 
-    var cancelButton = dojo.widget.createWidget("cosmo:Button", { 
+    s.removeChild(c.domNode);
+    var cancelButton = dojo.widget.createWidget("cosmo:Button", {
         text: _("App.Button.Cancel"),
         width: '60px',
         handleOnClick: cosmo.app.hideDialog,
         small: true }, s, 'last');
-    s.removeChild(cancelButton.domNode); 
-    var submitButton = dojo.widget.createWidget("cosmo:Button", { 
+    s.removeChild(cancelButton.domNode);
+    var submitButton = dojo.widget.createWidget("cosmo:Button", {
         text: _("App.Button.Submit"),
         width: '60px',
         handleOnClick: function () { c.doAuth.apply(c) },
         small: true }, s, 'last');
-    s.removeChild(submitButton.domNode); 
-    return { prompt: initPrompt, 
+    s.removeChild(submitButton.domNode);
+    return { prompt: initPrompt,
         content: c,
         height: 200,
         width: 360,
@@ -214,13 +214,13 @@ cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) 
 
 cosmo.ui.widget.AuthBox.getSuccessProperties = function ( /* String */ message) {
     var s = document.createElement('span');
-    var closeButton = dojo.widget.createWidget("cosmo:Button", { 
+    var closeButton = dojo.widget.createWidget("cosmo:Button", {
         text: _("App.Button.Close"),
         width: '60px',
         handleOnClick: cosmo.app.hideDialog,
         small: true }, s, 'last');
-    s.removeChild(closeButton.domNode); 
-    return { prompt: '', 
+    s.removeChild(closeButton.domNode);
+    return { prompt: '',
         content: message,
         height: 200,
         width: 360,

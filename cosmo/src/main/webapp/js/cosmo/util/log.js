@@ -15,7 +15,7 @@
 */
 
 Log = new function() {
-    dojo.deprecated("cosmo.util.log", 
+    dojo.deprecated("cosmo.util.log",
     "cosmo.util.log no longer needed", "0.6");
 
 

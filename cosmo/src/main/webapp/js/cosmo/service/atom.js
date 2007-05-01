@@ -27,14 +27,14 @@ dojo.declare("ParseError", [Error]);
 
 cosmo.service.atom = {
 
-    _wrapXMLHandlerFunctions: function (/*Object*/ hDict, 
+    _wrapXMLHandlerFunctions: function (/*Object*/ hDict,
                                         /*function*/ xmlParseFunc){
             var self = this;
             var handlerDict = dojo.lang.shallowCopy(hDict);
             if (handlerDict.load){
                 var old_load = handlerDict.load;
                 handlerDict.load = function(type, data, evt){
-                    
+
                     var xmlDoc = evt.responseXML;
                     if (document.all){
                         xmlDoc=new ActiveXObject("Microsoft.XMLDOM");
@@ -49,11 +49,11 @@ cosmo.service.atom = {
 
 			return handlerDict;
         },
-    
-    
-    getDefaultEIMRequest: function (/*Object*/ handlerDict, 
+
+
+    getDefaultEIMRequest: function (/*Object*/ handlerDict,
                                     /*boolean?*/ sync){
-		
+
         var request = cosmo.util.auth.getAuthorizedRequest()
 
         request.load = handlerDict.load;
@@ -68,53 +68,53 @@ cosmo.service.atom = {
 
         return request;
     },
-    
+
     getEvents: function(uid, kwArgs){
        if (!kwArgs){
            kwArgs = {};
        }
-       
-       var returnValue;       
+
+       var returnValue;
        if (kwArgs.sync){
-           
+
            kwArgs.handle = kwArgs.load = function(type, data, xhr){
                                returnValue = data;
                            };
        }
        kwArgs = this._wrapXMLHandlerFunctions(kwArgs, this.atomToItemList);
-       
+
        var request = this.getDefaultEIMRequest(kwArgs);
        request.url = "/cosmo/atom/collection/" + uid + "/full";
        request.method = "GET";
-       
+
        dojo.io.bind(request);
        if (kwArgs.sync){
            return returnValue;
        }
     },
-    
+
     saveEvent: function(event, kwArgs){
        if (!kwArgs){
            kwArgs = {};
        }
        var requestId = Math.floor(Math.random() * 100000000000000000);
-       
+
        var oldLoad = kwArgs.load;
        kwArgs.load = function(){
            oldLoad(event.id, null, requestId)};
        kwArgs.error = function(){
            dojo.debug("save failed")
        }
-       
+
        if (navigator.userAgent.indexOf('Safari') > -1 ||
            document.all){
            kwArgs = this._wrap204Bandaid(kwArgs);
        }
-       
+
        var request = this.getDefaultEIMRequest(kwArgs);
        var content = '<?xml version="1.0" ?>' +
                        this.objectToAtomEntry(event)
-       
+
        request.url = event.data.editLink;
        request.method = "POST";
        request.contentType = "application/atom+xml";
@@ -125,19 +125,19 @@ cosmo.service.atom = {
        return requestId;
 
     },
-    
+
     atomToItemList: function(atomXml){
         if (!atomXml){
             throw new ParseError("Cannot parse null, undefined, or false");
         }
-        
+
         var entries = atomXml.getElementsByTagName("entry");
         var items = [];
         for (var i = 0; i < entries.length; i++){
             var c = entries[i].getElementsByTagName("content")[0];
             var content = c.firstChild.nodeValue;
             var item = this.recordSetToObject(eval("(" + content + ")"))
-            
+
             var links;
             // Safari doesn't find paging links with non NS call
             if (dojo.render.html.safari){
@@ -157,24 +157,24 @@ cosmo.service.atom = {
         }
         return items;
     },
-    
+
     objectToAtomEntry: function(object){
-        
+
          var jsonObject = this.objectToRecordSet(object);
-         
-         
-         
+
+
+
          return '<entry xmlns="http://www.w3.org/2005/Atom">' +
-         '<title>' + object.data.title + '</title>' + 
+         '<title>' + object.data.title + '</title>' +
          '<id>urn:uuid:' + object.data.id + '</id>' +
          '<updated>' + dojo.date.toRfc3339(new Date()) + '</updated>' +
          '<author><name>' + cosmo.util.auth.getUsername() + '</name></author>' +
          '<content type="application/eim+json">' + dojo.json.serialize(jsonObject) + '</content>' +
          '</entry>'
     },
-    
+
     objectToRecordSet: function(obj){
-        
+
         var object = obj.data;
         with (cosmo.service.eim.constants){
             return {
@@ -188,9 +188,9 @@ cosmo.service.atom = {
             }
         }
     },
-    
+
     objectToItemRecord: function(object){
-        
+
         with (cosmo.service.eim.constants){
             return {
                 prefix: prefix.ITEM,
@@ -204,7 +204,7 @@ cosmo.service.atom = {
             }
         }
     },
-    
+
     objectToNoteRecord: function(object){
 
         with (cosmo.service.eim.constants){
@@ -215,39 +215,39 @@ cosmo.service.atom = {
                     uuid: [type.TEXT, object.id]
                 },
                 fields: {
-                    
+
                     body: [type.CLOB, object.description || ""]
                 }
             }
         }
     },
-    
+
     objectToEventRecord: function(object){
-        
+
         with (cosmo.service.eim.constants){
             var fields = {
-               dtstart: [type.TEXT, ";VALUE=" + 
-                        (object.allDay || object.anyTime? "DATE" : "DATE-TIME") + 
+               dtstart: [type.TEXT, ";VALUE=" +
+                        (object.allDay || object.anyTime? "DATE" : "DATE-TIME") +
                         (object.anyTime? ";X-OSAF-ANYTIME=TRUE" : "") +
-                        ":" + 
-                        (object.allDay || object.anyTime? 
+                        ":" +
+                        (object.allDay || object.anyTime?
                          object.start.strftime("%Y%m%d"):
                          object.start.strftime("%Y%m%dT%H%M%S"))],
-                                         
+
                 //anytime: [type.INTEGER, object.anyTime? 1 : 0],
                 //rrule: [type.TEXT, ""],//FIXME
                 status: [type.TEXT, object.status || null],
                 location: [type.TEXT, object.location || null]
-                
+
             };
             if (!(object.allDay || object.anyTime)){
-                fields.duration = 
-                    [type.TEXT, 
+                fields.duration =
+                    [type.TEXT,
                      cosmo.datetime.getIso8601Duration(
                          object.start, object.end)
                     ]
             }
-        
+
 
             return {
                 prefix: prefix.EVENT,
@@ -256,12 +256,12 @@ cosmo.service.atom = {
                     uuid: [type.TEXT, object.id]
                 },
                 fields: fields
-                
+
             }
         }
-        
+
     },
-    
+
     objectToModbyRecord: function(object){
         with (cosmo.service.eim.constants){
             return {
@@ -276,9 +276,9 @@ cosmo.service.atom = {
             }
         }
     },
-  
+
     recordSetToObject: function(recordSet){
-        
+
         var uid  = recordSet.uuid;
         var title;
         var description;
@@ -298,55 +298,55 @@ cosmo.service.atom = {
         with (cosmo.service.eim.constants){
 
            var record = recordSet.records[recordName]
-                      
+
            if (recordName == prefix.ITEM){
                title = record.fields.title[1];
-           } 
-           
+           }
+
            if (recordName == prefix.NOTE){
                description = record.fields.body[1];
            }
-           
+
            if (recordName == prefix.EVENT){
                var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
 
                start = this.fromEimDate(record.fields.dtstart[1]);
-               
-               end = dojo.date.addIso8601Duration(start.clone(), 
+
+               end = dojo.date.addIso8601Duration(start.clone(),
                                                   record.fields.duration[1]);
-               
+
                anyTime = dateParams.anyTime;
-               
+
                allDay = (!anyTime) && dateParams.value== "date";
-               
+
                recurrenceRule = null; //FIXME
-               
+
                status = record.fields.status[1];
-               
+
                masterEvent = null; //FIXME
-               
+
                instance = null; //FIXME
-               
+
                instanceDate = null; //FIXME
-               
+
                loc = record.fields.location[1];
            }
            }
         }
-    
+
         return calEventData = new cosmo.model.CalEventData(
            uid, title, description, start, end, allDay,
-           pointInTime, anyTime, recurrenceRule, status, 
+           pointInTime, anyTime, recurrenceRule, status,
            masterEvent, instance, instanceDate, loc);
-    
+
     },
-    
+
     fromEimDate: function(dateString){
         var date = dateString.split(":")[1];
         return new cosmo.datetime.Date(dojo.date.fromIso8601(date));
-    
+
     },
-    
+
     dateParamsFromEimDate: function(dateString){
         var returnVal = {};
         var params = dateString.split(":")[0].split(";");
@@ -361,16 +361,16 @@ cosmo.service.atom = {
         }
         return returnVal;
     },
-    
+
     anyTimeFromEimDate: function(dateString){
-        
+
         return false;
-        
+
     },
-    
+
        _wrap204Bandaid: function(hDict){
             var handlerDict = dojo.lang.shallowCopy(hDict);
-            
+
             if (handlerDict.load){
                 handlerDict.load = this._204Bandaid(handlerDict.load);
             }
@@ -381,29 +381,29 @@ cosmo.service.atom = {
             if (handlerDict.handle){
                 handlerDict.handle = this._204Bandaid(handlerDict.handle);
             }
-            
+
             return handlerDict;
         },
-        
+
         _204Bandaid: function(originalFunc, handle204Func){
             // Use original function if handle204Func is not specified.
             handle204Func = handle204Func? handle204Func: originalFunc;
             return function(type, data, evt){
-                if (navigator.userAgent.indexOf('Safari') > -1 && 
+                if (navigator.userAgent.indexOf('Safari') > -1 &&
                     !evt.status) {
-                    
+
                     var newEvt = dojo.lang.shallowCopy(evt);
                     newEvt.status = 204;
                     newEvt.statusText = "No Content";
                     handle204Func('load', '', newEvt);
-                    
+
                 }
-        
+
                 // If we're Internet Explorer
-                else if (document.all && 
+                else if (document.all &&
                          evt.status == 1223){
                     // apparently, shallow copying the XHR object in ie
-                    // causes problems. 
+                    // causes problems.
                     var newEvt = {};
                     newEvt.status = 204;
                     newEvt.statusText = "No Content";
@@ -413,8 +413,8 @@ cosmo.service.atom = {
                 }
             }
         },
-    
-    
+
+
     test: function(){
         return this.getEvents("1ea37892-a753-403e-b641-7d19594860e7", {sync: true});
     }
@@ -424,7 +424,7 @@ cosmo.service.atom = {
 
 
 dojo.date.addIso8601Duration = function (date, duration){
-    
+
     var r = "^P(?:(?:([0-9\.]*)Y)?(?:([0-9\.]*)M)?(?:([0-9\.]*)D)?(?:T(?:([0-9\.]*)H)?(?:([0-9\.]*)M)?(?:([0-9\.]*)S)?)?)(?:([0-9/.]*)W)?$"
     var dateArray = duration.match(r).slice(1);
     with(cosmo.datetime.dateParts){
@@ -440,12 +440,12 @@ dojo.date.addIso8601Duration = function (date, duration){
 }
 
 cosmo.datetime.getIso8601Duration = function(dt1, dt2){
-   
-   return "P" +// + this.Date.diff('yyyy', dt1, dt2) + "Y" + 
+
+   return "P" +// + this.Date.diff('yyyy', dt1, dt2) + "Y" +
           //this.Date.diff('m', dt1, dt2) + "M" +
           //this.Date.diff('d', dt1, dt2) + "D" +
           'T' +
-          //this.Date.diff('h', dt1, dt2) + "H" + 
+          //this.Date.diff('h', dt1, dt2) + "H" +
           //this.Date.diff('n', dt1, dt2) + "M" +
-          this.Date.diff('s', dt1, dt2) + "S"; 
+          this.Date.diff('s', dt1, dt2) + "S";
 }

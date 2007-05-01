@@ -244,7 +244,7 @@ cosmo.view.cal.draggable.HasTimeDraggable = function (id) {
     this.id = id;
 }
 
-cosmo.view.cal.draggable.HasTimeDraggable.prototype = 
+cosmo.view.cal.draggable.HasTimeDraggable.prototype =
     new cosmo.view.cal.draggable.Draggable();
 
 /**
@@ -429,7 +429,7 @@ cosmo.view.cal.draggable.NoTimeDraggable = function (id) {
     this.id = id;
 }
 
-cosmo.view.cal.draggable.NoTimeDraggable.prototype = 
+cosmo.view.cal.draggable.NoTimeDraggable.prototype =
     new cosmo.view.cal.draggable.Draggable();
 
 /**

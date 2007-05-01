@@ -21,12 +21,12 @@
  *
  * Rather than putting event listeners directly on the DOM elements
  * themselves, Cosmo uses meaningful IDs for all clickable elements.
- * All UI input goes through these global listeners and dispatches 
- * events to the appropriate handler based on the ID of the element 
+ * All UI input goes through these global listeners and dispatches
+ * events to the appropriate handler based on the ID of the element
  * being manipulated.
- * 
- * It can become a little tricky identifying exactly what element 
- * got clicked (i.e., requiring irritating regex filtering), but 
+ *
+ * It can become a little tricky identifying exactly what element
+ * got clicked (i.e., requiring irritating regex filtering), but
  * allows more more centralized control of the event flow.
  */
 
@@ -49,7 +49,7 @@ cosmo.ui.event.handlers.getSrcElemByProp = function (e, prop) {
     var ret = null;
     if (e.srcElement) ret = e.srcElement;
     else if (e.target) ret = e.target;
-    
+
     // Disabled form elements in IE return a bogus object
     // Also return document body for props that are empty string
     if (typeof ret[prop] == 'undefined' || !ret[prop]) {
@@ -57,7 +57,7 @@ cosmo.ui.event.handlers.getSrcElemByProp = function (e, prop) {
     }
     // Look up the designated prop of the elem or its parent
     else {
-        // Look for something with an the prop in question -- 
+        // Look for something with an the prop in question --
         // not a text node
         while (!ret[prop] || ret.nodeType == 3) {
             ret = ret.parentNode;
@@ -67,14 +67,14 @@ cosmo.ui.event.handlers.getSrcElemByProp = function (e, prop) {
 };
 
 /**
- * Double clicks -- currently nothing app-wide 
+ * Double clicks -- currently nothing app-wide
  */
 cosmo.ui.event.handlers.dblClickHandler = function (e) {
     // Do nothing right now
 }
 
 /**
- * Check for client-side timeout if user clicks 
+ * Check for client-side timeout if user clicks
  */
 cosmo.ui.event.handlers.mouseDownHandler = function (e) {
     // =================
@@ -84,7 +84,7 @@ cosmo.ui.event.handlers.mouseDownHandler = function (e) {
 }
 
 /**
- * Moving the mouse -- Used for dragging event blocks, 
+ * Moving the mouse -- Used for dragging event blocks,
  * or for resizing the all-day event area.
  */
 cosmo.ui.event.handlers.mouseMoveHandler = function (e) {
@@ -101,13 +101,13 @@ cosmo.ui.event.handlers.mouseMoveHandler = function (e) {
             yPos += document.body.scrollTop;
         }
     }
-    
+
     // Drag the app's draggable if there is one
     if (d) {
         // Prevent text selection on drag in IE
         // Must turn it back on after drag operation completes
-        document.body.onselectstart = function () { return false; }; 
-        d.doDrag(); 
+        document.body.onselectstart = function () { return false; };
+        d.doDrag();
     }
 }
 
@@ -145,12 +145,12 @@ cosmo.ui.event.handlers.keyUpHandler = function (e) {
     }
 
     e = !e ? window.event : e;
-    
+
     // Modal dialog box is up -- exec default action on Enter
     // ======
     if (cosmo.app.getInputDisabled()) {
         // Execute dialog's default action if user hits Enter key
-        if (cosmo.app.modalDialog.isDisplayed && cosmo.app.modalDialog.defaultAction && 
+        if (cosmo.app.modalDialog.isDisplayed && cosmo.app.modalDialog.defaultAction &&
             e.keyCode == 13) {
             cosmo.app.modalDialog.defaultAction();
         }

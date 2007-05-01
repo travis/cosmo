@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
  /**
  * summary:
  *      This module provides wrappers around dojo.io.bind to simplify using
@@ -19,7 +19,7 @@
  * description:
  *      For more information about CMP, please see:
  *      http://wiki.osafoundation.org/Projects/CosmoManagementProtocol
- * 
+ *
  *      Most methods take handlerDicts identical to those required
  *      by dojo.io.bind.
  */
@@ -34,32 +34,32 @@ dojo.require("cosmo.service.transport.Rest");
 
 dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     {
-        
+
     getCollection: function(collectionUid, kwArgs){
 
     },
-    
+
     getItems: function (collectionUid, searchCrit, kwArgs){
         var d = new dojo.Deferred();
         var r = this.getDefaultRequest(d, kwArgs);
-        
-        r.url = cosmo.env.getBaseUrl() + 
+
+        r.url = cosmo.env.getBaseUrl() +
           "/atom/collection/" +  collectionUid + "/full?" +
           this._generateAuthQueryString(kwArgs) + "&" +
           this._generateSearchQueryString(searchCrit) ;
-        
+
         dojo.io.bind(r);
         return d;
-        
+
     },
-    
+
     saveItem: function (item, kwArgs){
 
     },
-    
+
     deleteItem: function(kwArgs){
     },
-    
+
     removeItem: function(collection, item, kwArgs){
 
     },
@@ -67,15 +67,15 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     _generateAuthQueryString: function(/*Object*/kwArgs){
         if (kwArgs && kwArgs.ticketKey)
             return "ticket=" + kwArgs.ticketKey;
-        else 
+        else
             return "";
     },
-    
+
     _generateSearchQueryString: function(/*Object*/searchCrit){
         return "";
     }
-       
-    
+
+
 
     }
 );

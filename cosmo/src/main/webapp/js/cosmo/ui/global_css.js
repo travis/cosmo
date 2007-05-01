@@ -23,7 +23,7 @@ dojo.require("dojo.html.style");
 dojo.require("dojo.io.*");
 
 var uiStyles = '';
-var uiPref = []; 
+var uiPref = [];
 var arr = [];
 var repl = null;
 var dynRules = [];
@@ -32,14 +32,14 @@ cosmo.ui.global_css = new function(){
 	this.styleSheetWritten = false;
 
 	var self = this;
-	
+
 	// FiXME: Refactor with objects
 	this.doStyles = function (type, data, evt) {
 	    var uiStyles = data;
-	
+
 	    // Remove comments
 	    uiStyles = uiStyles.replace(/\/\/.*/g, '');
-	
+
 	    pat = /(\$\S+)(\s*=\s*)(.+)\n/g;
 	    while (arr = pat.exec(uiStyles)) {
 	        repl = new Object();
@@ -53,7 +53,7 @@ cosmo.ui.global_css = new function(){
 	        uiStyles = uiStyles.replace(dynRules[i].rule, '');
 	        uiStyles = uiStyles.replace(pat, dynRules[i].val);
 	    }
-	    
+
 	    // Replace line breaks with spaces
 	    uiStyles = uiStyles.replace(/\n/g, ' ');
 	    // Replace multiple spaces with single spaces
@@ -64,13 +64,13 @@ cosmo.ui.global_css = new function(){
 	    uiStyles = uiStyles.replace(/}/g, '}\n');
 	    // Trim
 	    uiStyles = uiStyles.replace(/^\s+/g, '').replace(/\s+$/g, '');
-	    
+
 	    dojo.html.insertCssText(uiStyles);
 	    self.styleSheetWritten = true;
-	    
+
 	}
-	
-	this._doGlobalStylesheet = function(){	
+
+	this._doGlobalStylesheet = function(){
 		if (!self.styleSheetWritten){
 			dojo.io.bind({
 			    url: cosmo.env.getBaseUrl() + '/templates' + TEMPLATE_DIRECTORY + '/ui.css',
@@ -79,7 +79,7 @@ cosmo.ui.global_css = new function(){
 			    error: function(type, error) { alert(error.message); },
 			    mimetype: "text/plain"
 			});
-			
+
 			uiPrefReq = null;
 		}
 	}

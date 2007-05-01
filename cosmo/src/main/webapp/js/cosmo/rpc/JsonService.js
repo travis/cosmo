@@ -18,19 +18,19 @@ dojo.provide("cosmo.rpc.JsonService");
 dojo.require("dojo.rpc.JsonService");
 
 dojo.declare("cosmo.rpc.JsonService", dojo.rpc.JsonService,{
-    
+
     strictArgChecks: false,
 
 	createRequest: function(method, params){
          return dojo.rpc.JsonService.prototype.createRequest.apply(
              this, [this.objectName + "." + method, params]);
 	},
-	
+
 	processSmd: function(/*json*/ object){
 	     this.objectName = object.objectName;
 	     return dojo.rpc.RpcService.prototype.processSmd.apply(this, [object]);
 	},
-	
+
 	bind: function(method, parameters, deferredRequestHandler, url, kwArgs){
 	    var bindArgs = kwArgs || {};
 	    print(bindArgs.sync)
@@ -42,21 +42,21 @@ dojo.declare("cosmo.rpc.JsonService", dojo.rpc.JsonService,{
 			mimetype: "text/json",
 			load: this.resultCallback(deferredRequestHandler),
 			error: this.errorCallback(deferredRequestHandler),
-			preventCache:this.bustCache 
+			preventCache:this.bustCache
 		}, bindArgs));
 	},
-	
+
     generateMethod: function(/*string*/ method, /*array*/ parameters, /*string*/ url){
     	// summary
     	// generate the local bind methods for the remote object
     	return dojo.lang.hitch(this, function(){
-    	    
+
     	    var rpcParams = Array.prototype.slice.apply(arguments, [0, parameters.length]);
             var kwArgs = arguments[parameters.length] || {};
             if (kwArgs.ticketKey){
                 rpcParams.push(kwArgs.ticketKey);
     	    }
-    	    
+
     		var deferredRequestHandler = new dojo.Deferred();
 
   			this.bind(method, rpcParams, deferredRequestHandler, url, kwArgs);
@@ -120,14 +120,14 @@ cosmo.rpc.JsonService.defaultSMD = {
     * @param calendarName
     */
    {'name':'createCalendar', 'parameters': [{'name': 'calendarName'}, {'name': 'calendarPath'}]},
-   
+
    /**
     * Gets the preference for the given name for the current user.
     * @param preferenceName the name of the preference to retrieve
     * @return the preference
     */
    {'name':'getPreference', 'parameters': [{'name': 'preferenceName'}]},
-   
+
    /**
     * Sets the preference for the given name for the current user
     * with the value specified.
@@ -135,13 +135,13 @@ cosmo.rpc.JsonService.defaultSMD = {
     * @param value the value to set it to
     */
    {'name':'setPreference', 'parameters': [{'name': 'preferenceName'}, {'name': 'value'}]},
-   
+
    /**
     * Removes the preference for the given name for the current user
     * @param preferenceName the name of the preference to be removed
     */
    {'name':'removePreference', 'parameters': [{'name': 'preferenceName'}]},
-   
+
    /**
     * Gets all preferences for the current user
     */
@@ -156,39 +156,39 @@ cosmo.rpc.JsonService.defaultSMD = {
     * @param preferenceName the map of preferences to be set
     */
    {'name':'setMultiplePreferences', 'parameters': [{'name': 'preferences'}]},
-   
+
    /**
     * Returns the RecurrenceRules for a bunch of events
-    * 
+    *
     * @param calendarPath the calendar containing the events
     * @param eventIds an array of the id's of the events
     *                 for which you want the RecurrenceRules of
     * @return a map of ids --> RecurrenceRules
     */
    {'name':'getRecurrenceRules', 'parameters': [{'name': 'calendarPath'}, {'name': 'eventIds'}]},
-    
-        
+
+
    /**
     * Saves the RecurrenceRule for a particular event
-    * 
+    *
     * @param calendarPath
     * @param eventId
     * @param recurrenceRule
     */
    {'name':'saveRecurrenceRule', 'parameters': [{'name': 'calendarPath'}, {'name': 'eventId'}, {'name': 'recurrenceRule'}]},
     /**
-    * Expands the events with the given eventIds for the specified time range. 
+    * Expands the events with the given eventIds for the specified time range.
     * @param calendarPath the calendar in which the events are located
     * @param eventIds an array of the id of the events to be expanded
     * @param utcStartTime the time range start  in UTC
     * @param utcEndTime the time range end in UTC
-    * @return a map with the event id's as keys, and the array of expanded Events 
+    * @return a map with the event id's as keys, and the array of expanded Events
     *         as values
     */
    {'name':'expandEvents', 'parameters': [{'name': 'calendarPath'}, {'name': 'eventIds'}, {'name': 'utcStartTime'}, {'name': 'utcEndTime'}]},
     /**
     * Saves the specified new event and updates the event with the specified id
-    * with the new recurrence end date   
+    * with the new recurrence end date
     * @param calendarPath the calendar where the event is.
     * @param event the new event to be saved
     * @param originalEventId the id of the original event
@@ -196,51 +196,51 @@ cosmo.rpc.JsonService.defaultSMD = {
     * @return the id of the new event
     */
    {'name':'saveNewEventBreakRecurrence', 'parameters': [{'name': 'calendarPath'}, {'name': 'event'},
-                   {'name': 'originalEventId'}, 
+                   {'name': 'originalEventId'},
                    {'name': 'originalEventEndDate'}]},
-   
+
    /**
     * Get the calendar with the specified uid.
     * @param collectionId the uid of the collection to get
     */
    {'name':'getCalendar', 'parameters': [{'name': 'collectionId'}]},
-   
+
    /**
     * Get the subscription identified with the specified collectionId and ticketKey
     */
                {'name':'getSubscription', 'parameters': [{'name': 'collectionId'}, {'name': 'ticketKey'}]},
-   
+
    /**
     * Get the ticket identified with the specified collectionId and ticketKey
     */
    {'name':'getTicket', 'parameters': [{'name': 'ticketKey'}, {'name': 'collectionId'}]},
-   
+
    /**
     * Deletes the subscription with the specified collectionId and ticketKey
     */
    {'name':'deleteSubscription', 'parameters': [{'name': 'collectionId'}, {'name': 'ticketKey'}]},
-   
+
    /**
     * Creates or updates a subscription for the current user with the specified collectionId
     * and ticketKey.
     */
    {'name':'saveSubscription', 'parameters': [{'name': 'cid'}, {'name': 'ticketKey'}, {'name': 'displayName'}]},
-   
+
    /**
     * Gets all the subscriptions for the current user
     */
    {'name':'getSubscriptions', 'parameters': []},
-   
+
     /**
     * Returns the version of Cosmo
     */
    {'name':'getVersion', 'parameters': []},
-   
+
    /**
     * Changes the display name for a collection. Must be a collection
     * owned by the user
     */
-   {'name':'saveDisplayName', 'parameters': [{'name': 'cid'}, {'name': 'displayName'}]} 
+   {'name':'saveDisplayName', 'parameters': [{'name': 'cid'}, {'name': 'displayName'}]}
 ]}
 
 cosmo.rpc.JsonService.getDefaultService = function(){

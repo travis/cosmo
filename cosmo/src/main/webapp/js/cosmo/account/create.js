@@ -28,12 +28,12 @@ cosmo.account.create = new function () {
 
     var self = this; // Stash a copy of this
     var form = null; // The form containing the signup fields
-    var fieldList = cosmo.account.getFieldList(); 
+    var fieldList = cosmo.account.getFieldList();
     var f = null; // Temp var
-    
+
     /**
-     * Handler function for XHR call to cosmo.cmp for signup. 
-     * Sets error prompt if request fails, set up the results 
+     * Handler function for XHR call to cosmo.cmp for signup.
+     * Sets error prompt if request fails, set up the results
      * table with external client config on success.
      * @return Boolean, true on success, false on failure
      */
@@ -46,13 +46,13 @@ cosmo.account.create = new function () {
                         err = _('Signup.Error.AlreadyLoggedIn');
                         break;
                     case 431:
-                        err = _('Signup.Error.UsernameInUse'); 
+                        err = _('Signup.Error.UsernameInUse');
                         break;
                     case 432:
                         err = _('Signup.Error.EMailInUse');
                         break;
                     default:
-                        err = _('Signup.Error.Generic') + ' (error code ' + 
+                        err = _('Signup.Error.Generic') + ' (error code ' +
                             resp.status + ')';
                         break;
                 }
@@ -73,27 +73,27 @@ cosmo.account.create = new function () {
      * Sets up a hash of data for the info needed to configure an
      * external cal client to access this Cosmo account.
      * @return Object, hash of configuration data -- hash keys
-     *     are also the keys for the i18n label strings for the 
+     *     are also the keys for the i18n label strings for the
      *     data in the displayed table.
      *
      */
     function getClientConfig(user) {
-    	
+
         var cfg = {};
         var username = user.username;
         var homedirUrl = new dojo.uri.Uri(user.homedirUrl);
         // Server settings
         var isSSL = homedirUrl.scheme == 'https';
-        
+
         var portNum = homedirUrl.port;
         // Port -- if none specified use 80 (or 443 for https)
         if (portNum == undefined) {
             portNum = isSSL ? 443 : 80;
         }
-        
+
         // String to display for SSL
         isSSL = isSSL ? 'Yes' : 'No';
-        
+
         // Config settings for external client setup
         cfg['Server'] = homedirUrl.host;
         cfg['Path'] = homedirUrl.path;
@@ -120,10 +120,10 @@ cosmo.account.create = new function () {
         var a = null;
         var tr = null;
         var td = null;
-        
+
         // Outer div
         var dO = _createElem('div');
-        
+
         if (user.unactivated) {
             p = _createElem('div');
             p.style.marginBottom = '16px';
@@ -132,30 +132,30 @@ cosmo.account.create = new function () {
             p.appendChild(_createText(_('Signup.Prompt.AccountActivation')));
             dO.appendChild(p);
         }
-        
+
         p = _createElem('div');
         p.appendChild(_createText(_('Signup.Prompt.AccountSetup')));
         dO.appendChild(p);
-        
+
         // Create the table, append rows for each config value
         var table = _createElem('table');
         table.className = 'dataDisplay';
         table.style.width = '80%';
-        table.style.margin = 'auto'; 
+        table.style.margin = 'auto';
         table.style.marginTop = '12px';
-        
+
         var body = _createElem('tbody');
 
         // Create a row for each config setting
         for (var propName in cfg) {
             tr = _createElem('tr');
-            
+
             // Prop label
             td = _createElem('td');
             td.className = 'dataDisplayLabel';
             td.appendChild(_createText(_('Signup.Config.' + propName)));
             tr.appendChild(td);
-            
+
             // Prop value
             td = _createElem('td');
             td.appendChild(_createText(cfg[propName]));
@@ -164,7 +164,7 @@ cosmo.account.create = new function () {
         }
         table.appendChild(body);
         dO.appendChild(table);
-        
+
         /*
         ***** Leave this out until we can actually do auto-login *****
         // Link to begin using new account
@@ -179,11 +179,11 @@ cosmo.account.create = new function () {
             dO.appendChild(p);
         }
         */
-        
+
         // Return the div containing the content
         return dO;
     }
-    
+
     // Public methods
     // =============================
     /**
@@ -193,7 +193,7 @@ cosmo.account.create = new function () {
     this.showForm = function () {
         var o = {};
         var b = null;
-        
+
         o.width = 540;
         o.height = 480;
         o.title = 'Create an Account';
@@ -206,7 +206,7 @@ cosmo.account.create = new function () {
         o.btnsLeft = [b];
         // Have to set empty center set of buttons -- showForm will be called
         // without buttons getting cleared by 'hide.'
-        o.btnsCenter = []; 
+        o.btnsCenter = [];
         b = new cosmo.ui.button.Button({ text:_('App.Button.Submit'), width:74,
             handleOnClick: function () { self.submitCreate(); } });
         o.btnsRight = [b];
@@ -216,14 +216,14 @@ cosmo.account.create = new function () {
 		form.username.focus();
     };
     /**
-     * Submit the call via XHR to cosmo.cmp to sign the user 
+     * Submit the call via XHR to cosmo.cmp to sign the user
      * up for a new account.
      */
     this.submitCreate = function () {
         // Validate the form input using each field's
         // attached validators
         var err = cosmo.account.validateForm(form, fieldList);
-        
+
         if (err) {
             cosmo.app.modalDialog.setPrompt(err);
         }
@@ -249,10 +249,10 @@ cosmo.account.create = new function () {
         var content = getResultsTable(user, cfg);
         var prompt = _('Signup.Prompt.Success');
         var d = cosmo.app.modalDialog;
-        var btnsCenter = [dojo.widget.createWidget("cosmo:Button", 
-            { text:_('App.Button.Close'), width:74, 
+        var btnsCenter = [dojo.widget.createWidget("cosmo:Button",
+            { text:_('App.Button.Close'), width:74,
             handleOnClick: function () { cosmo.app.hideDialog(); } })];
-        
+
         // Update dialog in place
         d.setPrompt(prompt);
         d.setContent(content);

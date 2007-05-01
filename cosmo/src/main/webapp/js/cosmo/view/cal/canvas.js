@@ -542,7 +542,7 @@ cosmo.view.cal.canvas = new function () {
             allDayArea.cleanup();
         }
     };
-   
+
     // Topic subscriptions
     // ****************
     // Subscribe to the '/calEvent' channel
@@ -632,7 +632,7 @@ cosmo.view.cal.canvas = new function () {
                 break;
         }
     };
-    
+
     this.handlePub_app = function (cmd) {
         var t = cmd.type;
         switch (t) {
@@ -640,7 +640,7 @@ cosmo.view.cal.canvas = new function () {
                 // Showing the modal dialog box: remove scrolling in the timed
                 // event div below (1. Firefox Mac, the scrollbar uses a native
                 // wigdet and shows through the dialog box. 2. Firefox on all
-                // plaforms, overflow of 'auto' in underlying divs causes 
+                // plaforms, overflow of 'auto' in underlying divs causes
                 // carets/cursors in textboxes to disappear. This is a verified
                 // Mozilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=167801
                 if (cmd.isDisplayed) {
@@ -653,7 +653,7 @@ cosmo.view.cal.canvas = new function () {
                        timedScrollingMainDiv.style.overflow = "auto";
                        timedScrollingMainDiv.style.overflowY = "auto";
                        timedScrollingMainDiv.style.overflowX = "hidden";
-                   } 
+                   }
                 }
                 break;
         }
@@ -1220,15 +1220,15 @@ cosmo.view.cal.canvas = new function () {
         ev.lozenge.updateFromEvent(ev, true);
         // Do visual updates to size, position
         ev.lozenge.updateElements();
-        
+
         // Display processing animation
         ev.lozenge.setInputDisabled(true);
         ev.lozenge.showProcessing();
         if (ev.data.recurrenceRule) {
-            
+
             var f = function (i, e) {
                 if (e.data.id == ev.data.id) {
-                    if (qual == 'allEvents' || (qual == 'allFuture' && 
+                    if (qual == 'allEvents' || (qual == 'allFuture' &&
                         (ev.data.start.toUTC() < e.data.start.toUTC()))) {
                         e.lozenge.setInputDisabled(true);
                         e.lozenge.showProcessing();
@@ -1239,7 +1239,7 @@ cosmo.view.cal.canvas = new function () {
             evReg.each(f);
         }
     }
-    
+
     /**
      * Insert a new calendar event -- called when
      * the user double-clicks on the cal canvas

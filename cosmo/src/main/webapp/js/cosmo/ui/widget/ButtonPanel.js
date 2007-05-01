@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview ButtonPanel -- panel of buttons allowing three 
+ * @fileoverview ButtonPanel -- panel of buttons allowing three
  *      clusters of buttons: left, center, right.
  * @author Matthew Eernisse mde@osafoundation.org
  * @license Apache License 2.0
@@ -30,9 +30,9 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.ui.widget.Button");
 
 dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, {
-    
+
     templatePath: dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/ButtonPanel/ButtonPanel.html"),
-    
+
     // Attach points
     leftContainer: null,
     centerContainer: null,
@@ -40,10 +40,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, 
     btnsLeft: [],
     btnsCenter: [],
     btnsRight: [],
-    
+
     // Props set by tag or constructor
     width: null,
-    
+
     fillInTemplate: function () {
         function sectionCell(area, btns) {
             // Insert table of buttons for this section
@@ -95,10 +95,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, 
             this.panelContainer.style.width = '100%';
         }
     },
-    
+
     destroy: function(){
         this.destroyButtons();
     }
-    
+
 
   } );

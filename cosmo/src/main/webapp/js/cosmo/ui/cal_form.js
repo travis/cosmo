@@ -643,14 +643,14 @@ cosmo.ui.cal_form.CalForm = function () {
         if (startTime) {
             var t = cosmo.datetime.util.parseTimeString(startTime);
             h = cosmo.datetime.util.hrStd2Mil(t.hours, form.startap[1].checked);
-            m = t.minutes; 
+            m = t.minutes;
             startDate.setHours(h, m);
         }
         endDate = new Date(endDate);
         if (endTime) {
             var t = cosmo.datetime.util.parseTimeString(endTime);
             h = cosmo.datetime.util.hrStd2Mil(t.hours, form.endap[1].checked);
-            m = t.minutes; 
+            m = t.minutes;
             endDate.setHours(h, m);
         }
         // Validate that start is before end

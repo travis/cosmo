@@ -272,7 +272,7 @@ cosmo.view.cal = new function () {
                                     var origStart = ev.dataOrig.start; // The pre-edit start for the edited instance
                                     var newStart = ev.data.start; // The start for the edited instance
                                     // The number of minutes between the start and end for the edited instance
-                                    var minutesToEnd = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE, 
+                                    var minutesToEnd = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
                                         ev.data.start, ev.data.end);
                                     // Date parts for the edited instance start
                                     var mon = newStart.getMonth();
@@ -291,7 +291,7 @@ cosmo.view.cal = new function () {
                                         // for the instance event
                                         case 'weekly':
                                         case 'biweekly':
-                                            var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY, 
+                                            var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
                                                 origStart, newStart);
                                             masterStart.setDate(masterStart.getDate() + diff);
                                             break;
@@ -316,7 +316,7 @@ cosmo.view.cal = new function () {
                                     // Calculate the new end for the master -- set the end
                                     // the same minutes distance from the start as in the original
                                     masterEnd = cosmo.datetime.Date.clone(masterStart);
-                                    masterEnd = cosmo.datetime.Date.add(masterEnd, 
+                                    masterEnd = cosmo.datetime.Date.add(masterEnd,
                                         dojo.date.dateParts.MINUTE, minutesToEnd);
                                     // Set the values in the original end for the master event
                                     evData.end.setYear(masterEnd.getFullYear());
@@ -373,7 +373,7 @@ cosmo.view.cal = new function () {
                     // the new event -- is this the correct behavior?
                     if (newEv.data.recurrenceRule && newEv.data.recurrenceRule.endDate) {
                         var recurEndOrig = newEv.data.recurrenceRule.endDate;
-                        var recurEndDiff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY, 
+                        var recurEndDiff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
                             startNoTime, recurEndOrig);
                         newEv.data.recurrenceRule.endDate = cosmo.datetime.Date.add(
                             newEv.data.start, dojo.date.dateParts.DAY, recurEndDiff);
@@ -1140,10 +1140,10 @@ cosmo.view.cal = new function () {
         // ======================
         try {
             dojo.require("cosmo.service.atom");
-            eventLoadList = 
+            eventLoadList =
 //                    cosmo.service.atom.getEvents(collection.collection.uid, {sync: true});
 //            dojo.debug(eventLoadList[0])
-            
+
             collection.conduit.getEvents(
                 collection.collection.uid, s, e,
                 collection.transportInfo);

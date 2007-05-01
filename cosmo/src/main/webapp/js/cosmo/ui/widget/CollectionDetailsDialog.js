@@ -36,7 +36,7 @@ dojo.widget.HtmlWidget, function(){
 
 }
 ,
-//Prototype Properties 
+//Prototype Properties
 {
         //User supplied properties:
         calendar: /*CalendarMetadata*/ null,
@@ -44,7 +44,7 @@ dojo.widget.HtmlWidget, function(){
         transportInfo: null,
         displayName: null, //the collection display nama
         displayedSelection: '', // The selection item to display if invoked from ticket view
-        
+
         // Template stuff
         templatePath:dojo.uri.dojoUri(
             '../../cosmo/ui/widget/templates/CollectionDetailsDialog/CollectionDetailsDialog.html'),
@@ -62,9 +62,9 @@ dojo.widget.HtmlWidget, function(){
         collectionNameInput: null, //Textbox with the calendar name
         linkSpan: null, //where to put the link image
         chandlerPlug: null, //span with info about downloading chandler
-        
+
         //i18n
-        strings: { 
+        strings: {
             nameLabel: _("Main.CollectionDetails.NameLabel"),
             calendarLabel: _("Main.CollectionDetails.CalendarLabel"),
             selectYourClient: _("Main.CollectionDetails.SelectYourClient"),
@@ -80,11 +80,11 @@ dojo.widget.HtmlWidget, function(){
             help:_("Main.CollectionDetails.Help"),
             clickHere:_("Main.CollectionDetails.ClickHere"),
             helpLink:_("Main.CollectionDetails.HelpLink"),
-            chandlerPlug: _('Main.CollectionDetails.ChandlerPlug', 
-                '<span style="font-variant:small-caps;"><a href="http://chandler.osafoundation.org/">', 
+            chandlerPlug: _('Main.CollectionDetails.ChandlerPlug',
+                '<span style="font-variant:small-caps;"><a href="http://chandler.osafoundation.org/">',
                 '</a></span>')
         },
-        
+
         clientsToProtocols: {
             Chandler: "dav",
             iCal: "webcal",
@@ -96,20 +96,20 @@ dojo.widget.HtmlWidget, function(){
         fillInTemplate: function () {
            var options = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
            cosmo.util.html.setSelectOptions(this.clientSelector, options);
-           
+
            if (this.conduit != null && this.conduit.saveDisplayName){
                this.collectionNameInputSpan.style.display = "";
            } else {
                this.collectionNameText.style.display = "";
            }
-           
+
            var linkImg = cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImagesUrl() + "link.png");
-           var toolTip = _("Main.CollectionDetails.LinkImageToolTip", this.displayName);         
+           var toolTip = _("Main.CollectionDetails.LinkImageToolTip", this.displayName);
            linkImg.title = toolTip;
            linkImg.alt = toolTip;
            this.linkSpan.appendChild(linkImg);
-           
-           // Show the selection choice if passed from the selector in 
+
+           // Show the selection choice if passed from the selector in
            // ticket view -- otherwise default to 'Chandler'
            var selectedIndex =0
            if (this.displayedSelection) {
@@ -117,7 +117,7 @@ dojo.widget.HtmlWidget, function(){
                    this.displayedSelection];
            }
            this.clientSelector.selectedIndex = selectedIndex;
-           
+
            // Chandler plug contains a URL path with quotes. The Dojo widget
            // template variable substitution 'helpfully' escapes these into
            // two quotes each
@@ -125,10 +125,10 @@ dojo.widget.HtmlWidget, function(){
 
            this._handleClientChanged();
         },
-        
+
         saveDisplayName: function(){
             this.conduit.saveDisplayName(this.calendar.uid, this._getDisplayName(), this.transportInfo);
-            //TODO - This should not here. The publishing should happen at the service level, 
+            //TODO - This should not here. The publishing should happen at the service level,
             //otherwise everyone who wants to user a service level method has to publish. Hard to do right
             //now with current RPC setup
             if (this.transportInfo instanceof cosmo.model.Subscription){
@@ -139,7 +139,7 @@ dojo.widget.HtmlWidget, function(){
                  cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage,[this.calendar]);
             }
         },
-        
+
         appendedToParent: function(parent){
             //this.table.style.height = parent.contentNode.offsetHeight + "px";
             var helpHeight = this.helpText.offsetHeight;
@@ -149,7 +149,7 @@ dojo.widget.HtmlWidget, function(){
             this.helpText.style.left = "18px";
             this.helpText.style.visibility = "visible";
         },
-        
+
         //handles when the user selects a client
         _handleClientChanged: function(){
             var client = this._getClientChoice();
@@ -167,28 +167,28 @@ dojo.widget.HtmlWidget, function(){
                 this._setClientInstructions(client);
                 this._setClientCollectionAddress(client);
             }
-            
+
             this._showChandlerPlug(client == "Chandler");
         },
-                
+
         // Instance methods
         _showClientInstructionsAndAddress: function(show, showLink){
-            var hideshow = show ? "" : "none"; 
+            var hideshow = show ? "" : "none";
             this.clientInstructionRows.style.display = hideshow;
-            this.clientCollectionAddress.style.display = (showLink ? "none" : "") ;            
-            this.clientCollectionLink.style.display = (!showLink ? "none" : "");            
-        }, 
+            this.clientCollectionAddress.style.display = (showLink ? "none" : "") ;
+            this.clientCollectionLink.style.display = (!showLink ? "none" : "");
+        },
 
         _showProtocolRows: function(show){
-            var hideshow = show ? "" : "none"; 
+            var hideshow = show ? "" : "none";
             this.protocolRows.style.display = hideshow;
-        }, 
-        
+        },
+
         _getClientChoice: function(){
             var selectedIndex = this.clientSelector.selectedIndex;
             return this.clientSelector.options[selectedIndex].value;
         },
-        
+
         _setClientInstructions: function(client){
             var x = 1;
             var d = document.createElement("div");
@@ -198,49 +198,49 @@ dojo.widget.HtmlWidget, function(){
                     var message = _(key);
                     if (x > 1){
                         d.appendChild(document.createElement("br"));
-                    } 
+                    }
                     d.appendChild(document.createTextNode(message));
                 } else {
-                    break; 
+                    break;
                 }
                 x++;
             }
             dojo.dom.replaceChildren(this.clientInstructions, d);
-        }, 
-        
+        },
+
         _setClientCollectionAddress: function(client){
             var url =  this.calendar.protocolUrls[this.clientsToProtocols[client]];
             this.clientCollectionAddress.value = url;
             this.clientCollectionLink.href = url;
         },
-        
+
         _getDisplayName: function(){
             return this.collectionNameInput.value;
         },
-        
+
         _showChandlerPlug: function(show){
-            this.chandlerPlug.style.display = (show ? "" : "none");            
+            this.chandlerPlug.style.display = (show ? "" : "none");
         }
  }
  );
- 
- cosmo.ui.widget.CollectionDetailsDialog.getInitProperties = 
-    function(/*CalendarMetadata*/ calendar, 
+
+ cosmo.ui.widget.CollectionDetailsDialog.getInitProperties =
+    function(/*CalendarMetadata*/ calendar,
              /*string*/ displayName,
-             /*cosmo.conduits.Conduit*/ conduit, 
-             transportInfo, 
+             /*cosmo.conduits.Conduit*/ conduit,
+             transportInfo,
              /* string */ displayedSelection) {
-    
+
     var dummyNode = document.createElement('span');
     var contentWidget = dojo.widget.createWidget("cosmo:CollectionDetailsDialog",
-                    { calendar: calendar, 
+                    { calendar: calendar,
                       displayName: displayName,
-                      conduit: conduit, 
+                      conduit: conduit,
                       transportInfo: transportInfo,
-                      displayedSelection: displayedSelection }, 
+                      displayedSelection: displayedSelection },
                  dummyNode, 'last');
-    
-    dummyNode.removeChild(contentWidget.domNode);  
+
+    dummyNode.removeChild(contentWidget.domNode);
     var btnsRight = [];
 
     var closeButton = dojo.widget.createWidget(
@@ -250,9 +250,9 @@ dojo.widget.HtmlWidget, function(){
                       handleOnClick: cosmo.app.hideDialog,
                       small: true },
                       dummyNode, 'last');
-                      
+
     btnsRight.push(closeButton);
-    dummyNode.removeChild(closeButton.domNode);  
+    dummyNode.removeChild(closeButton.domNode);
 
     if (conduit && conduit.saveDisplayName){
         var saveButton = dojo.widget.createWidget(
@@ -261,13 +261,13 @@ dojo.widget.HtmlWidget, function(){
                           width: "60px",
                           //TODO - Handle Errors properly!
                           handleOnClick: function(){
-                                             contentWidget.saveDisplayName(); 
+                                             contentWidget.saveDisplayName();
                                              cosmo.app.hideDialog();
                                          },
                           small: true },
                           dummyNode, 'last');
         btnsRight.push(saveButton);
-        dummyNode.removeChild(saveButton.domNode);  
+        dummyNode.removeChild(saveButton.domNode);
     }
 
     return {
@@ -280,10 +280,10 @@ dojo.widget.HtmlWidget, function(){
 
 // Clients -- note: the order in which they appear here is the order in
 // they will appear in the select box
-cosmo.ui.widget.CollectionDetailsDialog.clients = 
+cosmo.ui.widget.CollectionDetailsDialog.clients =
     ["Chandler", "iCal", "FeedReader", "Download", "Other"];
 // Reverse mappings -- set up when getClientOptions is called
-cosmo.ui.widget.CollectionDetailsDialog.clientMappings = {}; 
+cosmo.ui.widget.CollectionDetailsDialog.clientMappings = {};
 
 cosmo.ui.widget.CollectionDetailsDialog.getClientOptions = function () {
     var options = [];
@@ -299,4 +299,4 @@ cosmo.ui.widget.CollectionDetailsDialog.getClientOptions = function () {
     return options;
 }
 
- 
+

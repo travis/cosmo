@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
  /**
  * summary:
  *      This module provides wrappers around dojo.io.bind to simplify using
@@ -19,7 +19,7 @@
  * description:
  *      For more information about CMP, please see:
  *      http://wiki.osafoundation.org/Projects/CosmoManagementProtocol
- * 
+ *
  *      Most methods take handlerDicts identical to those required
  *      by dojo.io.bind.
  */
@@ -35,17 +35,17 @@ dojo.require("cosmo.util.auth");
 dojo.declare("cosmo.service.transport.Rest", null,
     {
         translator: null,
-        
+
         initializer: function (translator){
-            
+
         },
-        
+
         /**
          * summary: Return request populated with attributes common to all CMP calls.
          */
-        getDefaultRequest: function (/*dojo.Deferred*/deferred, 
+        getDefaultRequest: function (/*dojo.Deferred*/deferred,
                                      /*boolean?*/ sync){
-			
+
             var request = cosmo.util.auth.getAuthorizedRequest();
 
             request.load = this.resultCallback(deferred);
@@ -62,34 +62,34 @@ dojo.declare("cosmo.service.transport.Rest", null,
 
             return request;
         },
-        
+
         errorCallback: function(/* dojo.Deferred */ deferredRequestHandler){
     		// summary
     		// create callback that calls the Deferreds errback method
     		return function(type, e, xhr){
 
-                // Workaround to not choke on 204s		    
-    		    if ((dojo.render.safari && 
-                    !xhr.status) || (dojo.render.ie && 
+                // Workaround to not choke on 204s
+    		    if ((dojo.render.safari &&
+                    !xhr.status) || (dojo.render.ie &&
                          evt.status == 1223)){
-    		        
+
     		        xhr = {};
                     xhr.status = 204;
                     xhr.statusText = "No Content";
                     xhr.responseText = "";
-                    
+
                     deferredRequestHandler.callback("", xhr);
-                    
+
                 } else {
         			deferredRequestHandler.errback(new Error(e.message), xhr);
                 }
     		}
     	},
-    
+
     	resultCallback: function(/* dojo.Deferred */ deferredRequestHandler){
     		// summary
     		// create callback that calls the Deferred's callback method
-    		var tf = dojo.lang.hitch(this, 
+    		var tf = dojo.lang.hitch(this,
     			function(type, obj, xhr){
     				if (obj["error"]!=null) {
     					var err = new Error(obj.error);
@@ -97,7 +97,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
     					deferredRequestHandler.errback(err, xhr);
     				} else {
     				    obj = xhr.responseXML? xhr.responseXML : obj;
-    					deferredRequestHandler.callback(obj, xhr); 
+    					deferredRequestHandler.callback(obj, xhr);
     				}
     			}
     		);

@@ -17,13 +17,13 @@
 dojo.provide("cosmo.ui.*");
 
 dojo.kwCompoundRequire({
-	common: ["cosmo.ui.button", 
+	common: ["cosmo.ui.button",
 		"cosmo.ui.cal_form",
-		"cosmo.ui.conf",		
-		"cosmo.ui.contentcontainer",		
-		"cosmo.ui.login",		
-		"cosmo.ui.minical",		
-		"cosmo.ui.resize_area"	
+		"cosmo.ui.conf",
+		"cosmo.ui.contentcontainer",
+		"cosmo.ui.login",
+		"cosmo.ui.minical",
+		"cosmo.ui.resize_area"
 		]
 });
 

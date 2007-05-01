@@ -49,12 +49,12 @@ cosmo.ui.contentcontainer.ContentContainer = function(id) {
     this.setWidth =  function(width) {
         var w = width.toString();
         var w = w.indexOf('%') > -1 ? w : parseInt(w) + 'px';
-        this.style.width = w; 
+        this.style.width = w;
     };
     this.setHeight =  function(height) {
         var h = height.toString();
         h = h.indexOf('%') > -1 ? h : parseInt(h) + 'px';
-        this.style.height = h; 
+        this.style.height = h;
     };
     this.hide =  function() {
         this.style.display = 'none';

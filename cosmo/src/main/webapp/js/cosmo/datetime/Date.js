@@ -37,7 +37,7 @@ dojo.require("cosmo.util.debug");
 dojo.require("cosmo.facade.pref");
 
 cosmo.datetime.Date = function () {
-    
+
     var args = Array.prototype.slice.apply(arguments);
     var t = null;
     var dt = null;
@@ -89,9 +89,9 @@ cosmo.datetime.Date = function () {
     this.minutes = 0;
     this.seconds = 0;
     this.milliseconds = 0;
-    this.tzId = tz || null; 
+    this.tzId = tz || null;
     this.utc = utc || false;
-    
+
     this.setFromDateObjProxy(dt);
     this._strftimeCache = [null, null];
 }
@@ -124,29 +124,29 @@ cosmo.datetime.Date.prototype.getSeconds = function() {
 cosmo.datetime.Date.prototype.getMilliseconds = function() {
     return this.milliseconds;
 };
-cosmo.datetime.Date.prototype.getUTCDate = function () { 
-    return this.getUTCDateProxy().getUTCDate(); 
+cosmo.datetime.Date.prototype.getUTCDate = function () {
+    return this.getUTCDateProxy().getUTCDate();
 };
-cosmo.datetime.Date.prototype.getUTCDay = function () { 
-    return this.getUTCDateProxy().getUTCDay(); 
+cosmo.datetime.Date.prototype.getUTCDay = function () {
+    return this.getUTCDateProxy().getUTCDay();
 };
-cosmo.datetime.Date.prototype.getUTCFullYear = function () { 
-    return this.getUTCDateProxy().getUTCFullYear(); 
+cosmo.datetime.Date.prototype.getUTCFullYear = function () {
+    return this.getUTCDateProxy().getUTCFullYear();
 };
-cosmo.datetime.Date.prototype.getUTCHours = function () { 
-    return this.getUTCDateProxy().getUTCHours(); 
+cosmo.datetime.Date.prototype.getUTCHours = function () {
+    return this.getUTCDateProxy().getUTCHours();
 };
-cosmo.datetime.Date.prototype.getUTCMilliseconds = function () { 
-    return this.getUTCDateProxy().getUTCMilliseconds(); 
+cosmo.datetime.Date.prototype.getUTCMilliseconds = function () {
+    return this.getUTCDateProxy().getUTCMilliseconds();
 };
-cosmo.datetime.Date.prototype.getUTCMinutes = function () { 
-    return this.getUTCDateProxy().getUTCMinutes(); 
+cosmo.datetime.Date.prototype.getUTCMinutes = function () {
+    return this.getUTCDateProxy().getUTCMinutes();
 };
-cosmo.datetime.Date.prototype.getUTCMonth = function () { 
-    return this.getUTCDateProxy().getUTCMonth(); 
+cosmo.datetime.Date.prototype.getUTCMonth = function () {
+    return this.getUTCDateProxy().getUTCMonth();
 };
-cosmo.datetime.Date.prototype.getUTCSeconds = function () { 
-    return this.getUTCDateProxy().getUTCSeconds(); 
+cosmo.datetime.Date.prototype.getUTCSeconds = function () {
+    return this.getUTCDateProxy().getUTCSeconds();
 };
 cosmo.datetime.Date.prototype.setFullYear = function(n) {
     this.setAttribute('year', n);
@@ -172,26 +172,26 @@ cosmo.datetime.Date.prototype.setSeconds = function(n) {
 cosmo.datetime.Date.prototype.setMilliseconds = function(n) {
     this.setAttribute('milliseconds', n);
 };
-cosmo.datetime.Date.prototype.setUTCDate = function (n) { 
-    this.setUTCAttribute('date', n); 
+cosmo.datetime.Date.prototype.setUTCDate = function (n) {
+    this.setUTCAttribute('date', n);
 };
-cosmo.datetime.Date.prototype.setUTCFullYear = function (n) { 
-    this.setUTCAttribute('year', n); 
+cosmo.datetime.Date.prototype.setUTCFullYear = function (n) {
+    this.setUTCAttribute('year', n);
 };
-cosmo.datetime.Date.prototype.setUTCHours = function (n) { 
-    this.setUTCAttribute('hours', n); 
+cosmo.datetime.Date.prototype.setUTCHours = function (n) {
+    this.setUTCAttribute('hours', n);
 };
-cosmo.datetime.Date.prototype.setUTCMilliseconds = function (n) { 
-    this.setUTCAttribute('milliseconds', n); 
+cosmo.datetime.Date.prototype.setUTCMilliseconds = function (n) {
+    this.setUTCAttribute('milliseconds', n);
 };
-cosmo.datetime.Date.prototype.setUTCMinutes = function (n) { 
-    this.setUTCAttribute('minutes', n); 
+cosmo.datetime.Date.prototype.setUTCMinutes = function (n) {
+    this.setUTCAttribute('minutes', n);
 };
-cosmo.datetime.Date.prototype.setUTCMonth = function (n) { 
-    this.setUTCAttribute('month', n); 
+cosmo.datetime.Date.prototype.setUTCMonth = function (n) {
+    this.setUTCAttribute('month', n);
 };
-cosmo.datetime.Date.prototype.setUTCSeconds = function (n) { 
-    this.setUTCAttribute('seconds', n); 
+cosmo.datetime.Date.prototype.setUTCSeconds = function (n) {
+    this.setUTCAttribute('seconds', n);
 };
 cosmo.datetime.Date.prototype.setFromDateObjProxy = function (dt, fromUTC) {
     this.year = fromUTC ? dt.getUTCFullYear() : dt.getFullYear();
@@ -203,7 +203,7 @@ cosmo.datetime.Date.prototype.setFromDateObjProxy = function (dt, fromUTC) {
     this.milliseconds = fromUTC ? dt.getUTCMilliseconds() : dt.getMilliseconds();
 };
 cosmo.datetime.Date.prototype.getUTCDateProxy = function () {
-    var dt = new Date(Date.UTC(this.year, this.month, this.date, 
+    var dt = new Date(Date.UTC(this.year, this.month, this.date,
         this.hours, this.minutes, this.seconds, this.milliseconds));
     dt.setUTCMinutes(dt.getUTCMinutes() - this.getTimezoneOffset());
     return dt;
@@ -288,7 +288,7 @@ cosmo.datetime.Date.prototype.getTimezoneOffset = function() {
             var timezone = cosmo.datetime.timezone.getTimezone(this.tzId);
             if (timezone){
                 return (timezone.getOffsetInMinutes(this)*-1);
-            } 
+            }
             else {
                 //couldn't find timezone just make it utc?
                 return 0;
@@ -345,9 +345,9 @@ cosmo.datetime.Date.prototype.strftime = function strftime(formatString){
     if (cached){
         return cached;
     }
-    
+
     var formatted = dojo.date.strftime(this, formatString);
-    
+
     this._setStrftimeCached(formatString, formatted);
     return formatted;
 };
@@ -356,7 +356,7 @@ cosmo.datetime.Date.prototype._getStrftimeCached = function getStrfTimeCached(fo
     if (this._strftimeCache[0] == this.hash() + ":" + formatString){
         return this._strftimeCache[1];
     }
-    
+
     return null;
 }
 
@@ -370,12 +370,12 @@ cosmo.datetime.Date.prototype._setStrftimeCached = function(formatString, format
 cosmo.datetime.Date.prototype.add = function(interv, incr) {
     var dt = null;
     var ret = null;
-    // Get incremented Date 
+    // Get incremented Date
     // 'n', 'd', etc., string keys
     if (typeof interv == 'string') {
     dt = Date.add(interv, incr, this.toUTC());
     }
-    // dojo.date.dateParts 
+    // dojo.date.dateParts
     else {
         dt = dojo.date.add(this.toUTC(), interv, incr);
     }
@@ -447,7 +447,7 @@ cosmo.datetime.Date.prototype.getTimezoneAbbrName = function(){
 }
 
 cosmo.datetime.Date.prototype.equals = function dateEquals(/*cosmo.datetime.Date*/ that){
-return  that != null && 
+return  that != null &&
         this.year == that.year &&
         this.month == that.month &&
         this.date == that.date &&
@@ -461,21 +461,21 @@ return  that != null &&
 }
 
 cosmo.datetime.Date.prototype.hash = function dateHash(){
-    var hash =   this.year + ":" 
-               + this.month + ":"    
-               + this.date + ":"    
-               + this.hours + ":"    
-               + this.minutes + ":"    
-               + this.seconds + ":"    
+    var hash =   this.year + ":"
+               + this.month + ":"
+               + this.date + ":"
+               + this.hours + ":"
+               + this.minutes + ":"
+               + this.seconds + ":"
                + this.milliseconds + ":"
-               + this.tzId;  
+               + this.tzId;
     return hash;
 }
 
 // Date static methods
 // ===========================
 cosmo.datetime.Date.clone = function(sdt) {
-    dojo.deprecated("cosmo.datetime.Date.clone", 
+    dojo.deprecated("cosmo.datetime.Date.clone",
     "Use the instance method, rather than the static version", "0.6");
     var ret = new cosmo.datetime.Date(sdt.getFullYear(), sdt.getMonth(),
             sdt.getDate(), sdt.getHours(), sdt.getMinutes(),
@@ -497,7 +497,7 @@ cosmo.datetime.Date.getBrowserTimezoneOffset = function(year, month, day, hours,
     return date.getTimezoneOffset();
 }
 cosmo.util.debug.aliasToDeprecatedFuncion(
-    cosmo.datetime.Date.getBrowserTimezoneOffset, 
+    cosmo.datetime.Date.getBrowserTimezoneOffset,
     "ScoobyDate.getBrowserTimezoneOffset", "0.6");
 
 /**

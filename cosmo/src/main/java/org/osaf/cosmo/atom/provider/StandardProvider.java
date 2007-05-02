@@ -274,7 +274,7 @@ public class StandardProvider extends AbstractProvider
             return servererror(abdera, request, reason, e);
         }
     }
-  
+
     public ResponseContext getFeed(RequestContext request) {
         CollectionTarget target = (CollectionTarget) request.getTarget();
         CollectionItem collection = target.getCollection();

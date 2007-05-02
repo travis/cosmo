@@ -15,6 +15,10 @@
  */
 package org.osaf.cosmo.atom.generator;
 
+import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import javax.activation.MimeTypeParseException;
 
 import org.apache.abdera.i18n.iri.IRISyntaxException;
@@ -72,13 +76,8 @@ public abstract class BaseFeedGenerator
         throws GeneratorException {
         Feed feed = createFeed(collection);
 
-        for (Item child : collection.getChildren()) {
-            if (child instanceof CollectionItem)
-                continue;
-            if (! (child instanceof NoteItem))
-                continue;
-            feed.addEntry(createEntry((NoteItem)child));
-        }
+        for (NoteItem item : findContents(collection))
+            feed.addEntry(createEntry(item));
 
         return feed;
     }
@@ -96,6 +95,34 @@ public abstract class BaseFeedGenerator
 
     // our methods
 
+    /**
+     * <p>
+     * Returns a sorted set of items from the given collection to
+     * include as entries in the feed.
+     * </p>
+     * <p>
+     * This implementation includes all <code>NoteItem</code>s
+     * sorted with the most recently modified item first.
+     * </p>
+     *
+     * @param the collection whose contents are to be listed
+     */
+    protected SortedSet<NoteItem> findContents(CollectionItem collection) {
+        TreeSet<NoteItem> contents =
+            new TreeSet<NoteItem>(new ItemModifiedComparator(true));
+        // XXX sort
+        // XXX page
+        // XXX query
+        for (Item child : collection.getChildren()) {
+            if (child instanceof CollectionItem)
+                continue;
+            if (! (child instanceof NoteItem))
+                continue;
+            contents.add((NoteItem)child);
+        }
+        return contents;
+    }
+  
     /**
      * Creates a <code>Feed</code> with attributes set based on the
      * given collection.
@@ -406,5 +433,35 @@ public abstract class BaseFeedGenerator
 
     public ServiceLocator getServiceLocator() {
         return serviceLocator;
+    }
+
+    private class ItemModifiedComparator implements Comparator<NoteItem> {
+        private boolean reverse;
+
+        public ItemModifiedComparator() {
+            this.reverse = false;
+        }
+
+        public ItemModifiedComparator(boolean reverse) {
+            this.reverse = reverse;
+        }
+
+        public int compare(NoteItem o1,
+                           NoteItem o2) {
+            if (o1.getModifiedDate().getTime() ==
+                o2.getModifiedDate().getTime())
+                return 0;
+            if (o1.getModifiedDate().after(o2.getModifiedDate()))
+                return reverse ? -1 : 1;
+            return reverse ? 1 : -1;
+        }
+
+        public boolean equals(Object obj) {
+            if (obj == null)
+                return false;
+            if (obj instanceof ItemModifiedComparator)
+                return true;
+            return super.equals(obj);
+        }
     }
 }

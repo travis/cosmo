@@ -50,7 +50,9 @@ For use with the JsUnit from www.jsunit.net
         "cosmotest.model.util.test_util",
         "cosmotest.datetime.test_7581",
         "cosmotest.datetime.test_date",
-        "cosmotest.datetime.test_timezone"]
+        "cosmotest.datetime.test_timezone",
+        "cosmotest.service.translators.test_eim"
+        ]
      );
   </script>
 </head>
@@ -75,7 +77,42 @@ For use with the JsUnit from www.jsunit.net
      col.appendChild(document.createTextNode(test_names[i]));
      row.appendChild(col);
    }
-
+   
+   function checkBoxesFromLocation(){
+   	   var testNames = location.search.slice(1).split("&");
+       var tests = {};
+       
+       for (var i = 0; i < testNames.length; i++){
+           var testQuery = testNames[i].split("=");
+           if (testQuery[0] == "t"){
+               tests[testQuery[1]] = true;
+           }
+       }
+       var inputs = test_menu.getElementsByTagName("input");
+       for (var i = 0; i < inputs.length; i++){
+           if (tests[inputs[i].value]){
+               inputs[i].checked = true;
+           }
+       }
+   }
+   
+   checkBoxesFromLocation();
+   
+   function getCurrentQueryString(){
+       var inputs = test_menu.getElementsByTagName("input");
+       var qs = "?";
+       var qsElements = 0;
+       for (var i = 0; i < inputs.length; i++){
+           if (inputs[i].checked) {
+           	   var and = (qsElements > 0)? "&" : "";
+               qs = qs + and + "t=" + inputs[i].value;
+               qsElements++;
+           }
+       }
+	   return qs;
+   }
+   
+   
    function run_tests() {
        var tests = []
        for (var i in test_menu.childNodes) {
@@ -86,6 +123,41 @@ For use with the JsUnit from www.jsunit.net
              jum.runGroup(test_row.childNodes[1].childNodes[0].data);
            }
        }
+   }
+   
+   function checkAll(){
+       var inputs = test_menu.getElementsByTagName("input");
+       for (var i = 0; i < inputs.length; i++){
+           inputs[i].checked = true;
+       }
+   }
+   
+   function uncheckAll(){
+       var inputs = test_menu.getElementsByTagName("input");
+       for (var i = 0; i < inputs.length; i++){
+           inputs[i].checked = false;
+       }
+   }
+   
+   /*
+   Convenience!
+   */
+   document.onkeyup = function (e){
+	   if (String.fromCharCode(e.keyCode) == 'R'){
+ 		   location = location.href.split("?")[0] + getCurrentQueryString();
+ 	   }
+
+	   if (String.fromCharCode(e.keyCode) == 'T'){
+ 		   run_tests();
+ 	   }
+
+	   if (String.fromCharCode(e.keyCode) == 'U'){
+			uncheckAll();
+ 	   }
+
+	   if (String.fromCharCode(e.keyCode) == 'C'){
+			checkAll();
+ 	   }
    }
 </script>
    <button id="run_tests" onclick="run_tests()">Run Tests</button>

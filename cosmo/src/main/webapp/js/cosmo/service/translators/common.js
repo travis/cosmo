@@ -15,3 +15,5 @@
  */
  
  dojo.provide("cosmo.service.translators.common");
+ 
+ dojo.declare("cosmo.service.translators.ParseError", Error);

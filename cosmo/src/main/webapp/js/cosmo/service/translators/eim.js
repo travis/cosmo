@@ -26,6 +26,7 @@ dojo.require("cosmo.service.eim");
 dojo.require("cosmo.model.Item");
 dojo.require("cosmo.model.EventStamp");
 dojo.require("cosmo.service.translators.common");
+dojo.require("cosmo.datetime.serialize");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
 
@@ -41,13 +42,14 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         for (var i = 0; i < entries.length; i++){
             var entry = entries[i];
             try {
-                var uid = entry.getElementsByTagName("id")[0];
+                var uuid = entry.getElementsByTagName("id")[0];
             } catch (e){
                 throw new cosmo.service.translators.
                    ParseError("Could not find id element for entry " + (i+1));
             }
-            uid = uid.firstChild.nodeValue;
-            var uidParts = uid.split("::");
+            uuid = uuid.firstChild.nodeValue;
+            var uuidParts = uuid.split("::");
+            var uidParts = uuidParts[0].split(":");
             try {
                 var c = entry.getElementsByTagName("content")[0];
             } catch (e){
@@ -58,7 +60,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             
             // If we have a second part to the uid, this entry is a 
             // recurrence modification.
-            if (!uidParts[1]){
+            if (!uuidParts[1]){
                 var item = this.recordSetToObject(eval("(" + content + ")"))
             } else {
                 mods.push(content);
@@ -79,7 +81,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 };
             }
 
-            items[uidParts[0]] = item;
+            items[uidParts[2]] = item;
         }
         
         for (var i = 0; i < mods.length; i++){
@@ -351,7 +353,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     fromEimDate: function fromEimDate(dateString){
         var date = dateString.split(":")[1];
-        return new cosmo.datetime.Date(dojo.date.fromIso8601(date));
+        return cosmo.datetime.fromIso8601(date);
     },
 
     addTriage: function addTriage(triageString, object){
@@ -393,30 +395,4 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
 cosmo.service.translators.eim = new cosmo.service.translators.Eim();
 
-dojo.date.addIso8601Duration = function (date, duration){
-
-    var r = "^P(?:(?:([0-9\.]*)Y)?(?:([0-9\.]*)M)?(?:([0-9\.]*)D)?(?:T(?:([0-9\.]*)H)?(?:([0-9\.]*)M)?(?:([0-9\.]*)S)?)?)(?:([0-9/.]*)W)?$"
-    var dateArray = duration.match(r).slice(1);
-    with(cosmo.datetime.dateParts){
-        dateArray[0]? date.add(YEAR, dateArray[0]) : null;
-        dateArray[1]? date.add(MONTH, dateArray[1]) : null;
-        dateArray[2]? date.add(DAY, dateArray[2]) : null;
-        dateArray[3]? date.add(HOUR, dateArray[3]) : null;
-        dateArray[4]? date.add(MINUTE, dateArray[4]) : null;
-        dateArray[5]? date.add(SECOND, dateArray[5]) : null;
-    }
-
-    return date;
-}
-
-cosmo.datetime.getIso8601Duration = function(dt1, dt2){
-
-   return "P" +// + this.Date.diff('yyyy', dt1, dt2) + "Y" +
-          //this.Date.diff('m', dt1, dt2) + "M" +
-          //this.Date.diff('d', dt1, dt2) + "D" +
-          'T' +
-          //this.Date.diff('h', dt1, dt2) + "H" +
-          //this.Date.diff('n', dt1, dt2) + "M" +
-          this.Date.diff('s', dt1, dt2) + "S";
-}
 

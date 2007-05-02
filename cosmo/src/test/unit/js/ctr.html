@@ -11,7 +11,7 @@ For use with the JsUnit from www.jsunit.net
   <!-- hack so we can get somewhere loading this file standalone without error -->
   <script language="JavaScript" type="text/javascript">
       var xbDEBUG = ''; xbDEBUG.on = false;
-      var djConfig = {isDebug: true};
+      var djConfig = {isDebug: true, debugContainerId:"output"};
   </script>
   <script src="jsunit/app/jsUnitCore.js" language="JavaScript" type="text/javascript"></script>
 
@@ -139,6 +139,11 @@ For use with the JsUnit from www.jsunit.net
        }
    }
    
+   function clearOutput(){
+       var out = document.getElementById(djConfig.debugContainerId);
+       out.innerHTML = "";
+   }
+   
    /*
    Convenience!
    */
@@ -155,13 +160,20 @@ For use with the JsUnit from www.jsunit.net
 			uncheckAll();
  	   }
 
-	   if (String.fromCharCode(e.keyCode) == 'C'){
+	   if (String.fromCharCode(e.keyCode) == 'A'){
 			checkAll();
+ 	   }
+
+	   if (String.fromCharCode(e.keyCode) == 'C'){
+           clearOutput();
  	   }
    }
 </script>
    <button id="run_tests" onclick="run_tests()">Run Tests</button>
   <br />
   <br />
+  <div id="output">
+  
+  </div>
 </body>
 </html>

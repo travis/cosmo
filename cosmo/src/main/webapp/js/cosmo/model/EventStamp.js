@@ -27,41 +27,62 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
       ["exdates", [Array, cosmo.datetime.Date], {}],
       ["status", String, {}],
     ],
-    //mixins for master item stamps
+    //mixins for master item stamps		 
     {
         initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
         },
-
-	getEndDate: function getEndDate(){
+    
+        getEndDate: function getEndDate(){
             var duration = this.getDuration();
-	    var endDate = this.getStartDate().clone();
-	    endDate.add(dojo.date.dateParts.SECOND, duration);
-	    return endDate;
-	},
+            var endDate = this.getStartDate().clone();
+            endDate.add(dojo.date.dateParts.SECOND, duration);
+            return endDate;
+        },
 
-	setEndDate: function setEndDate(/*CosmoDate*/ endDate){
-	    var duration = dojo.date.diff(this.getStartDate().toUTC(), endDate.toUTC(),
-		dojo.date.dateParts.SECOND);
-	    this.setDuration(duration);
-	}
+        setEndDate: function setEndDate(/*CosmoDate*/ endDate){
+            var duration = dojo.date.diff(this.getStartDate().toUTC(), endDate.toUTC(), 
+            dojo.date.dateParts.SECOND);
+            this.setDuration(duration);
+        },
+    
+        setStartDate: function setStartDate(/*cosmo.datetime.Date*/ newStartDate){
+           var oldDate = this.getStartDate();
+           this.__setProperty("startDate", newStartDate);
+           
+           //if there are modifications, we need to move the recurrenceid's for all of them
+           if (this.item && oldDate && !dojo.lang.isEmpty(this.item._modifications)){
+              var diff = dojo.date.diff(oldDate.toUTC(), newStartDate.toUTC(), dojo.date.dateParts.SECOND);
+           
+               //first copy the modifications into a new hash
+               var mods = this.item._modifications;
+               var oldMods = {};
+               dojo.lang.mixin(oldMods, mods);
+               for (var x in mods){
+                   delete mods[x];
+               }
+               for (var x in oldMods){
+                   var mod = oldMods[x];
+                   var rId = mod.getRecurrenceId();
+                   rId.add(dojo.lang.date.dateParts.SECOND, diff);
+                   this._item.addModification(mod);
+               }
+           }
+           
+        }
     },
     //mixins for occurrence stamps
     {
-
-	_masterPropertyGetters: {
-	    startDate: function eventStampOcurrenceStartDateMasterPropertyGetter(){
-		return this.recurrenceId;
-	    }
-	}
-
-/*	getStartDate:  function occurrenceGetStartDate(){
-	    var modificationProperty = this._getModifiedProperty("startDate");
-	    if (modificationProperty){
-		return modificationProperty;
-	    }
-	    return this.recurrenceId;
-	}*/
-
+        _masterPropertyGetters: {
+            startDate: function eventStampOcurrenceStartDateMasterPropertyGetter(){
+               return this.recurrenceId;
+            }
+        },
+        
+        //we don't want to inherit from the one from the master....
+        setStartDate: function setStartDate(newStartDate){
+           this.__setProperty("startDate", newStartDate);
+        }
+    
     }
 );

@@ -18,6 +18,7 @@ package org.osaf.cosmo.atom.generator;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Entry;
 
+import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
 
@@ -33,8 +34,17 @@ import org.osaf.cosmo.model.NoteItem;
 public interface FeedGenerator {
 
     /**
-     * Generates an Atom feed containing entries for each child item
-     * of the collection.
+     * Sets a query filter used by the generator to find the specific
+     * items that will be represented in the feed.
+     *
+     * @param filter the query filter
+     */
+    public void setFilter(CalendarFilter filter);
+
+    /**
+     * Generates an Atom feed containing entries for items in a
+     * collection. If a query filter has been set, it is used to
+     * determine which items are included in the feed.
      *
      * @param collection the collection on which the feed is based
      * @throws GeneratorException
@@ -43,7 +53,7 @@ public interface FeedGenerator {
         throws GeneratorException;
 
     /**
-     * Generates an Atom entry representing the item.
+     * Generates an Atom entry representing an item.
      *
      * @param item the item which the entry describes
      * @throws GeneratorException

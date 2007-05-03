@@ -17,7 +17,6 @@ package org.osaf.cosmo.atom.generator;
 
 import javax.activation.MimeTypeParseException;
 
-import org.apache.abdera.factory.Factory;
 import org.apache.abdera.model.Entry;
 
 import org.apache.commons.logging.Log;
@@ -38,10 +37,9 @@ public class BasicFeedGenerator extends BaseFeedGenerator {
     private static final Log log = LogFactory.getLog(BasicFeedGenerator.class);
 
     /** */
-    public BasicFeedGenerator(Factory abderaFactory,
-                              ContentFactory contentFactory,
-                              ServiceLocator seviceLocator) {
-        super(abderaFactory, contentFactory, seviceLocator);
+    public BasicFeedGenerator(StandardGeneratorFactory factory,
+                              ServiceLocator serviceLocator) {
+        super(factory, serviceLocator);
     }
 
     /**
@@ -52,14 +50,15 @@ public class BasicFeedGenerator extends BaseFeedGenerator {
         throws GeneratorException {
         ContentBean content = null;
         try {
-            content = getContentFactory().createContent(FORMAT_HTML, item);
+            content = getFactory().getContentFactory().
+                createContent(FORMAT_HTML, item);
             entry.setContent(content.getValue(), content.getMediaType());
         } catch (MimeTypeParseException e) {
             throw new GeneratorException("Attempted to set invalid content media type " + content.getMediaType(), e);
         }
 
-        ContentBean summary =
-            getContentFactory().createContent(FORMAT_TEXT, item);
+        ContentBean summary = getFactory().getContentFactory().
+            createContent(FORMAT_TEXT, item);
         entry.setSummary(summary.getValue());
     }
 

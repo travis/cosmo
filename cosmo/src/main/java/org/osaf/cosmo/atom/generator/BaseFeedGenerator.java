@@ -34,11 +34,14 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
+import org.osaf.cosmo.service.ContentService;
 
 /**
  * A base class for feed generators.
@@ -50,19 +53,27 @@ public abstract class BaseFeedGenerator
     implements FeedGenerator, AtomConstants {
     private static final Log log = LogFactory.getLog(BaseFeedGenerator.class);
 
-    private Factory abderaFactory;
-    private ContentFactory contentFactory;
+    private StandardGeneratorFactory factory;
     private ServiceLocator serviceLocator;
+    private CalendarFilter filter;
 
     // FeedGenerator methods
 
     /** */
-    public BaseFeedGenerator(Factory abderaFactory,
-                             ContentFactory contentFactory,
+    public BaseFeedGenerator(StandardGeneratorFactory factory,
                              ServiceLocator serviceLocator) {
-        this.abderaFactory = abderaFactory;
-        this.contentFactory = contentFactory;
+        this.factory = factory;
         this.serviceLocator = serviceLocator;
+    }
+
+    /**
+     * Sets a query filter used by the generator to find the specific
+     * items that will be represented in the feed.
+     *
+     * @param filter the query filter
+     */
+    public void setFilter(CalendarFilter filter) {
+        this.filter = filter;
     }
 
     /**
@@ -101,8 +112,13 @@ public abstract class BaseFeedGenerator
      * include as entries in the feed.
      * </p>
      * <p>
-     * This implementation includes all <code>NoteItem</code>s
-     * sorted with the most recently modified item first.
+     * If a query filter has been provided, this method finds all of
+     * the <code>NoteItem</code>s in the collection that match the
+     * query filter. Otherwise, it includes all of the *
+     * <code>NoteItem</code>s in the collection.
+     * </p>
+     * <p>
+     * The set is sorted with the most recently modified item first.
      * </p>
      *
      * @param the collection whose contents are to be listed
@@ -110,16 +126,25 @@ public abstract class BaseFeedGenerator
     protected SortedSet<NoteItem> findContents(CollectionItem collection) {
         TreeSet<NoteItem> contents =
             new TreeSet<NoteItem>(new ItemModifiedComparator(true));
+
         // XXX sort
         // XXX page
         // XXX query
-        for (Item child : collection.getChildren()) {
-            if (child instanceof CollectionItem)
-                continue;
-            if (! (child instanceof NoteItem))
-                continue;
-            contents.add((NoteItem)child);
+
+        if (filter != null) {
+            for (ContentItem item : factory.getContentService().
+                     findEvents(collection, filter))
+                contents.add((NoteItem)item);
+        } else {
+            for (Item child : collection.getChildren()) {
+                if (child instanceof CollectionItem)
+                    continue;
+                if (! (child instanceof NoteItem))
+                    continue;
+                contents.add((NoteItem)child);
+            }
         }
+
         return contents;
     }
   
@@ -204,7 +229,7 @@ public abstract class BaseFeedGenerator
      */
     protected Feed newFeed(String uuid)
         throws GeneratorException {
-        Feed feed = abderaFactory.newFeed();
+        Feed feed = factory.getAbdera().getFactory().newFeed();
 
         String id = uuid2Iri(uuid);
         try {
@@ -231,7 +256,7 @@ public abstract class BaseFeedGenerator
      */
     protected Generator newGenerator()
         throws GeneratorException {
-        Generator generator = abderaFactory.newGenerator();
+        Generator generator = factory.getAbdera().getFactory().newGenerator();
         try {
             generator.setUri(CosmoConstants.PRODUCT_URL);
             generator.setVersion(CosmoConstants.PRODUCT_VERSION);
@@ -250,7 +275,7 @@ public abstract class BaseFeedGenerator
      */
     protected Person newPerson(User user)
         throws GeneratorException {
-        Person author = abderaFactory.newAuthor();
+        Person author = factory.getAbdera().getFactory().newAuthor();
 
         author.setName(user.getUsername());
         author.setEmail(user.getEmail());
@@ -270,7 +295,7 @@ public abstract class BaseFeedGenerator
     protected Entry newEntry(String uuid,
                              boolean isDocument)
         throws GeneratorException {
-        Entry entry = abderaFactory.newEntry();
+        Entry entry = factory.getAbdera().getFactory().newEntry();
 
         String id = uuid2Iri(uuid);
         try {
@@ -376,7 +401,7 @@ public abstract class BaseFeedGenerator
                            String href)
         throws GeneratorException {
         try {
-            Link link = abderaFactory.newLink();
+            Link link = factory.getAbdera().getFactory().newLink();
             link.setRel(rel);
             link.setMimeType(mimeType);
             link.setHref(href);
@@ -423,16 +448,16 @@ public abstract class BaseFeedGenerator
         return "urn:uuid:" + uuid;
     }
 
-    public Factory getAbderaFactory() {
-        return abderaFactory;
-    }
-
-    public ContentFactory getContentFactory() {
-        return contentFactory;
+    public StandardGeneratorFactory getFactory() {
+        return factory;
     }
 
     public ServiceLocator getServiceLocator() {
         return serviceLocator;
+    }
+
+    public CalendarFilter getFilter() {
+        return filter;
     }
 
     private class ItemModifiedComparator implements Comparator<NoteItem> {

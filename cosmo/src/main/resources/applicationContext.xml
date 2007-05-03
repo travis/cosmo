@@ -525,10 +525,15 @@
                 init-method="init">
             <property name="abdera"><ref local="abdera"/></property>
             <property name="generatorFactory">
-              <bean class="org.osaf.cosmo.atom.generator.StandardGeneratorFactory">
+              <bean
+                 class="org.osaf.cosmo.atom.generator.StandardGeneratorFactory"
+                 init-method="init">
                 <property name="abdera"><ref local="abdera"/></property>
                 <property name="contentFactory">
                   <bean class="org.osaf.cosmo.atom.generator.ContentFactory"/>
+                </property>
+                <property name="contentService">
+                  <ref local="contentService"/>
                 </property>
               </bean>
             </property>

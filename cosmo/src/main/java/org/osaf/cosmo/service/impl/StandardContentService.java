@@ -677,7 +677,7 @@ public class StandardContentService implements ContentService {
      *         filter.
      */
     public Set<ContentItem> findEvents(CollectionItem calendar,
-                                             CalendarFilter filter) {
+                                       CalendarFilter filter) {
         if (log.isDebugEnabled()) {
             log.debug("finding events in calendar " + calendar.getName() +
                       " by filter " + filter);

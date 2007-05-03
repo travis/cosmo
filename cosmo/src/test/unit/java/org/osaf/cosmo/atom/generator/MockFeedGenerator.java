@@ -21,8 +21,9 @@ import org.apache.abdera.model.Feed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.atom.generator.BaseFeedGenerator;
+import org.osaf.cosmo.atom.generator.FeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
+import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -35,51 +36,54 @@ import org.osaf.cosmo.server.ServiceLocator;
  * @see Feed
  * @see CollectionItem
  */
-public class MockFeedGenerator extends BaseFeedGenerator {
+public class MockFeedGenerator implements FeedGenerator {
     private static final Log log = LogFactory.getLog(MockFeedGenerator.class);
 
     private MockGeneratorFactory factory;
     private String projection;
     private String format;
+    private ServiceLocator locator;
+    private CalendarFilter filter;
 
     /** */
     public MockFeedGenerator(MockGeneratorFactory factory,
                              String projection,
                              String format,
                              ServiceLocator locator) {
-        super(factory.getAbdera().getFactory(), null, locator);
         this.factory = factory;
         this.projection = projection;
         this.format = format;
+        this.locator = locator;
     }
 
     // FeedGenerator methods
+
+    public void setFilter(CalendarFilter filter) {
+        this.filter = filter;
+    }
 
     public Feed generateFeed(CollectionItem item)
         throws GeneratorException {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");
-        return super.generateFeed(item);
+        return factory.getAbdera().getFactory().newFeed();
     }
 
     public Entry generateEntry(NoteItem item)
         throws GeneratorException {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");
-        return super.generateEntry(item);
-    }
 
-    // BaseFeedGenerator methods
+        try {
+            Entry entry = factory.getAbdera().getFactory().newEntry();
 
-    protected String getProjection() { 
-        return "mock";
-    }
+            // when writing entries, we need self links to generate
+            // location response headers
+            entry.addLink("urn:uid:" + item.getUid(), "self");
 
-    /**
-     * Does nothing.
-     */
-    protected void setEntryContent(Entry entry,
-                                   NoteItem item)
-        throws GeneratorException {
+            return entry;
+        } catch (Exception e) {
+            throw new GeneratorException(e.getMessage(), e);
+        }
     }
 }

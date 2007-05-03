@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.server.ServiceLocator;
+import org.osaf.cosmo.service.ContentService;
 
 /**
  * Standard implementation of <code>GeneratorFactory</code>.
@@ -36,6 +37,7 @@ public class StandardGeneratorFactory
 
     private Abdera abdera;
     private ContentFactory contentFactory;
+    private ContentService contentService;
 
     // GeneratorFactory methods
 
@@ -48,7 +50,7 @@ public class StandardGeneratorFactory
      */
     public ServiceGenerator
         createServiceGenerator(ServiceLocator serviceLocator) {
-        return new ServiceGenerator(abdera.getFactory(), serviceLocator);
+        return new StandardServiceGenerator(this, serviceLocator);
     }
 
     /**
@@ -89,11 +91,9 @@ public class StandardGeneratorFactory
         throws UnsupportedProjectionException, UnsupportedFormatException {
         if (projection == null ||
             projection.equals(PROJECTION_BASIC))
-            return new BasicFeedGenerator(abdera.getFactory(), contentFactory,
-                                          serviceLocator);
+            return new BasicFeedGenerator(this, serviceLocator);
         if (projection.equals(PROJECTION_FULL))
-            return new FullFeedGenerator(abdera.getFactory(), contentFactory,
-                                         serviceLocator, format);
+            return new FullFeedGenerator(this, serviceLocator, format);
         throw new UnsupportedProjectionException(projection);
     }
 
@@ -113,5 +113,22 @@ public class StandardGeneratorFactory
 
     public void setContentFactory(ContentFactory factory) {
         contentFactory = factory;
+    }
+
+    public ContentService getContentService() {
+        return contentService;
+    }
+
+    public void setContentService(ContentService service) {
+        contentService = service;
+    }
+
+    public void init() {
+        if (abdera == null)
+            throw new IllegalStateException("abdera is required");
+        if (contentFactory == null)
+            throw new IllegalStateException("contentFactory is required");
+        if (contentService == null)
+            throw new IllegalStateException("contentService is required");
     }
 }

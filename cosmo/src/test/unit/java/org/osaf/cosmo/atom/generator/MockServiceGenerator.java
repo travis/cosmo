@@ -33,17 +33,18 @@ import org.osaf.cosmo.server.ServiceLocator;
  * @see Service
  * @see HomeCollectionItem
  */
-public class MockServiceGenerator extends ServiceGenerator {
+public class MockServiceGenerator implements ServiceGenerator {
     private static final Log log =
         LogFactory.getLog(MockServiceGenerator.class);
 
     private MockGeneratorFactory factory;
+    private ServiceLocator locator;
 
     /** */
     public MockServiceGenerator(MockGeneratorFactory factory,
                                 ServiceLocator locator) {
-        super(factory.getAbdera().getFactory(), locator);
         this.factory = factory;
+        this.locator = locator;
     }
 
     // ServiceGenerator methods
@@ -52,6 +53,6 @@ public class MockServiceGenerator extends ServiceGenerator {
         throws GeneratorException {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");
-        return super.generateService(home);
+        return factory.getAbdera().getFactory().newService();
     }
 }

@@ -284,12 +284,15 @@ public class StandardProvider extends AbstractProvider
         try {
             ServiceLocator locator = createServiceLocator(request);
             FeedGenerator generator = createFeedGenerator(target, locator);
+            generator.setFilter(QueryBuilder.buildFilter(request));
             Feed feed = generator.generateFeed(collection);
 
             AbstractResponseContext rc =
                 new BaseResponseContext<Document<Element>>(feed.getDocument());
             rc.setEntityTag(new EntityTag(collection.getEntityTag()));
             return rc;
+        } catch (InvalidQueryException e) {
+            return badrequest(abdera, request, e.getMessage());
         } catch (UnsupportedProjectionException e) {
             String reason = "Projection " + target.getProjection() + " not supported";
             return badrequest(abdera, request, reason);
@@ -302,7 +305,7 @@ public class StandardProvider extends AbstractProvider
             return servererror(abdera, request, reason, e);
         }
     }
-  
+
     public ResponseContext getEntry(RequestContext request) {
         ItemTarget target = (ItemTarget) request.getTarget();
         NoteItem item = target.getItem();

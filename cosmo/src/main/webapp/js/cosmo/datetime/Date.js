@@ -507,8 +507,7 @@ cosmo.datetime.Date.diff = function(interv, sdt1, sdt2) {
     var ret = null;
     if (typeof interv == 'string') {
         ret = Date.diff(interv, sdt1.getTime(), sdt2.getTime());
-}
-    else {
+    } else {
         ret = dojo.date.diff(sdt1.getTime(), sdt2.getTime(), interv);
     }
     return ret;

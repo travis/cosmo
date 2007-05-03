@@ -372,13 +372,7 @@ cosmo.datetime.Date.prototype.add = function(interv, incr) {
     var ret = null;
     // Get incremented Date
     // 'n', 'd', etc., string keys
-    if (typeof interv == 'string') {
-    dt = Date.add(interv, incr, this.toUTC());
-    }
-    // dojo.date.dateParts
-    else {
-        dt = dojo.date.add(this.toUTC(), interv, incr);
-    }
+    dt = dojo.date.add(this.toUTC(), interv, incr);
     // Update this date based on the new UTC
     this.updateFromUTC(dt.getTime());
 };
@@ -504,13 +498,7 @@ cosmo.util.debug.aliasToDeprecatedFuncion(
  * Returns the difference in specified units between two Date
  */
 cosmo.datetime.Date.diff = function(interv, sdt1, sdt2) {
-    var ret = null;
-    if (typeof interv == 'string') {
-        ret = Date.diff(interv, sdt1.getTime(), sdt2.getTime());
-    } else {
-        ret = dojo.date.diff(sdt1.getTime(), sdt2.getTime(), interv);
-    }
-    return ret;
+        return dojo.date.diff(sdt1.getTime(), sdt2.getTime(), interv);
 }
 cosmo.util.debug.aliasToDeprecatedFuncion(
     cosmo.datetime.Date.diff, "ScoobyDate.diff", "0.6");
@@ -520,15 +508,8 @@ cosmo.util.debug.aliasToDeprecatedFuncion(
  * Returns a new Date incremented the desired number of units
  */
 cosmo.datetime.Date.add = function(dt, interv, incr) {
-    var d = null;
-    // 'n', 'd', etc., string keys
-    if (typeof interv == 'string') {
-        d = Date.add(interv, incr, dt.getTime());
-    }
-    // dojo.date.dateParts
-    else {
-        d = dojo.date.add(dt.getTime(), interv, incr);
-    }
+    var d = dojo.date.add(dt.getTime(), interv, incr);
+
     // JS Date
     if (dt instanceof Date) {
         return d;

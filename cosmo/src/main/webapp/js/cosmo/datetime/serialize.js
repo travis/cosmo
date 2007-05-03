@@ -37,29 +37,76 @@ cosmo.datetime.fromRfc3339 = function(/*String*/rfcDate){
     return new cosmo.datetime.Date(dojo.date.fromRfc3339(rfcDate));
 }
 
-cosmo.datetime.addIso8601Duration = function (/*cosmo.datetime.date*/date, /*String*/duration){
 
-    var r = "^P(?:(?:([0-9\.]*)Y)?(?:([0-9\.]*)M)?(?:([0-9\.]*)D)?(?:T(?:([0-9\.]*)H)?(?:([0-9\.]*)M)?(?:([0-9\.]*)S)?)?)(?:([0-9/.]*)W)?$"
-    var dateArray = duration.match(r).slice(1);
-    with(cosmo.datetime.dateParts){
-        dateArray[0]? date.add(YEAR, dateArray[0]) : null;
-        dateArray[1]? date.add(MONTH, dateArray[1]) : null;
-        dateArray[2]? date.add(DAY, dateArray[2]) : null;
-        dateArray[3]? date.add(HOUR, dateArray[3]) : null;
-        dateArray[4]? date.add(MINUTE, dateArray[4]) : null;
-        dateArray[5]? date.add(SECOND, dateArray[5]) : null;
+cosmo.datetime.parseIso8601Duration = 
+function parseIso8601Duration(/*String*/duration){
+   var r = "^P(?:(?:([0-9\.]*)Y)?(?:([0-9\.]*)M)?(?:([0-9\.]*)D)?(?:T(?:([0-9\.]*)H)?(?:([0-9\.]*)M)?(?:([0-9\.]*)S)?)?)(?:([0-9/.]*)W)?$"
+   var dateArray = duration.match(r).slice(1);
+   var dateHash = {
+     year: parseFloat(dateArray[0]),
+     month: parseFloat(dateArray[1]),
+     day: parseFloat(dateArray[2]),
+     hour: parseFloat(dateArray[3]),
+     minute: parseFloat(dateArray[4]),
+     second: parseFloat(dateArray[5])
+   }
+   return dateHash
+}
+
+cosmo.datetime.addIso8601Duration = 
+function addIso8601Duration(/*cosmo.datetime.date*/date, 
+                            /*String or Object*/duration){
+    var dHash;
+    if (typeof(duration) == "string"){
+        dHash = cosmo.datetime.parseIso8601Duration(duration);
+    } else {
+        dHash = duration;
+    }
+    
+    var dateArray = duration.match(cosmo.datetime.iso8601Regex).slice(1);
+    with(dojo.date.dateParts){
+        if (dHash.year) date.add(YEAR, dHash.year);
+        if (dHash.month) date.add(MONTH, dHash.month);
+        if (dHash.day) date.add(DAY, dHash.day);
+        if (dHash.hour) date.add(HOUR, dHash.hour);
+        if (dHash.minute) date.add(MINUTE, dHash.minute);
+        if (dHash.second) date.add(SECOND, dHash.second);
     }
 
     return date;
 }
 
-cosmo.datetime.getIso8601Duration = function(dt1, dt2){
+cosmo.datetime.getDuration = function getDuration(dt1, dt2){
+    var dur = {}
+    var startDate = dt1;
+    with(dojo.date.dateParts){
+        dur.year = cosmo.datetime.Date.diff(YEAR, startDate, dt2);
+        startDate = startDate.add(YEAR, dur.year);
+        dur.month = cosmo.datetime.Date.diff(MONTH, startDate, dt2);
+        startDate = startDate.add(MONTH, dur.month);
+        dur.day = cosmo.datetime.Date.diff(DAY, startDate, dt2);
+        startDate = startDate.add(DAY, dur.day);
+        dur.hour = cosmo.datetime.Date.diff(HOUR, startDate, dt2);
+        startDate = startDate.add(HOUR, dur.hour);
+        dur.minute = cosmo.datetime.Date.diff(MINUTE, startDate, dt2);
+        startDate = startDate.add(MINUTE, dur.minute);
+        dur.second = cosmo.datetime.Date.diff(SECOND, startDate, dt2);
+        startDate = startDate.add(SECOND, dur.second);
+   }
+   return dur;
+}
 
-   return "P" +// + this.Date.diff('yyyy', dt1, dt2) + "Y" +
-          //this.Date.diff('m', dt1, dt2) + "M" +
-          //this.Date.diff('d', dt1, dt2) + "D" +
-          'T' +
-          //this.Date.diff('h', dt1, dt2) + "H" +
-          //this.Date.diff('n', dt1, dt2) + "M" +
-          this.Date.diff('s', dt1, dt2) + "S";
+cosmo.datetime.durationHashToIso8601 = 
+function durationHashToIso8601(/*Object*/dur){
+    var ret =  "P";
+    if (dur.year) ret += dur.year + "Y";
+    if (dur.month) ret += dur.month + "M";
+    if (dur.day) ret += dur.day + "D";
+    if (dur.hour || dur.minute || dur.second){
+        ret += "T";
+        if (dur.hour) ret += dur.hour + "H";
+        if (dur.minute) ret += dur.minute + "M";
+        if (dur.second) ret += dur.second + "S";
+    }
+    return ret;
 }

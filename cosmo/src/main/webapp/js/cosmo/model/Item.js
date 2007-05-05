@@ -308,7 +308,7 @@ dojo.declare("cosmo.model.StampMetaData", null,{
     getAttribute: function getAttribute(name){
         for (var x = 0; x < this.attributes.length; x++){
             var attr = this.attributes[x];
-            if (attr.name = name){
+            if (attr.name == name){
                 return attr;
             }
         }

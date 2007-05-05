@@ -143,9 +143,9 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
            if (createIfDoesntExist){
                var ctr = cosmo.model._stampRegistry[stampName]["constructor"];
                var stamp =  new ctr({item:this});
-           this._stamps[stampName] = stamp;
-           return stamp;
-       }          
+               this._stamps[stampName] = stamp;
+               return stamp;
+           }          
            
         }, 
         
@@ -330,7 +330,13 @@ dojo.declare("cosmo.model.StampAttribute", null, {
 
 dojo.declare("cosmo.model.BaseStamp", null, {
     stampMetaData: null,
-    item: null
+    item: null,
+    initializer: function baseStampInitializer(kwArgs){
+        if (kwArgs){
+            this.item = kwArgs.item;
+        }
+    }
+    
 });
 
 cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",

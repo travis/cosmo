@@ -63,9 +63,10 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
                }
                for (var x in oldMods){
                    var mod = oldMods[x];
-                   var rId = mod.getRecurrenceId();
-                   rId.add(dojo.lang.date.dateParts.SECOND, diff);
-                   this._item.addModification(mod);
+                   var rId = mod.getRecurrenceId().clone();
+                   rId.add(dojo.date.dateParts.SECOND, diff);
+                   mod.setRecurrenceId(rId);
+                   this.item.addModification(mod);
                }
            }
            

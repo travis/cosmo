@@ -177,6 +177,15 @@ dojo.declare("cosmo.model.util.InheritingSubclassCreator", null, {
 
 cosmo.model.util.equals = function cosmoEquals(a,b){
     var type = typeof (a);
+    
+    if (type == "undefined" && typeof b != "undefined"){
+        return false;
+    }
+    
+    if (typeof b == "undefined"){
+        return false;
+    }
+    
     if (type != typeof(b)){
         throw new Error("Both operands must be of the same type!\n You passed '" 
            + a + "' and '" + b +"', a " + typeof(a) + " and a "+ typeof(b));

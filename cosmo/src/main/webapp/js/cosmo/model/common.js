@@ -16,6 +16,7 @@
 dojo.provide("cosmo.model.common");
 
 dojo.require("cosmo.model.util");
+dojo.require("cosmo.datetime.serialize");
 
 /**
  * A recurrence rule specifies how to repeat a given event.
@@ -27,21 +28,21 @@ cosmo.model.declare("cosmo.model.RecurrenceRule", null,
      ["unsupportedRule", {"default": null}] ]
     ], 
     {
-    initializer: function(kwArgs){
-        this.initializeProperties(kwArgs);
-    },
-
-    clone: function(rule) {
-        //TODO
-        dojo.unimplemented();
-    },
-    equals: function(other){
-        //TODO
-        dojo.unimplemented();
-    }
+        initializer: function(kwArgs){
+            this.initializeProperties(kwArgs);
+        },
+    
+        clone: function(rule) {
+            //TODO
+            dojo.unimplemented();
+        },
+        equals: function(other){
+            //TODO
+            dojo.unimplemented();
+        }
     },
     {
-    immutable: true
+        immutable: true
     });
 
 dojo.lang.mixin(cosmo.model.RecurrenceRule, {
@@ -50,5 +51,37 @@ dojo.lang.mixin(cosmo.model.RecurrenceRule, {
     FREQUENCY_BIWEEKLY: "biweekly",
     FREQUENCY_MONTHLY: "monthly",
     FREQUENCY_YEARLY: "yearly"
-})
+});
 
+cosmo.model.declare("cosmo.model.Duration", null, 
+    [["year",   {"default":0} ],
+     ["month",  {"default":0} ],
+     ["week",   {"default":0} ],
+     ["day",    {"default":0} ],
+     ["hour",   {"default":0} ],
+     ["second", {"default":0} ],
+     ["minute", {"default":0} ]
+     ],
+    {
+        initializer:function(){
+            //summary: create a new Duration using either the difference between two dates
+            //         or kwArgs for the properties or a string with a iso8601 duration
+            var kwArgs = null;
+            if (arguments[0] instanceof cosmo.datetime.Date){
+                var date1 = arguments[0];
+                var date2 = arguments[1];
+                kwArgs = cosmo.datetime.getDuration(date1,date2);
+            } else if (typeof arguments[0] == "string"){
+                kwArgs = cosmo.datetime.parseIso8601Duration(arguments[0]);
+            } else {
+                //arg[0] had better be an object!
+                kwArgs = arguments[0];
+            }
+            
+            this.initializeProperties(kwArgs);
+            
+        }
+    }, 
+    {
+        immutable: true
+    });

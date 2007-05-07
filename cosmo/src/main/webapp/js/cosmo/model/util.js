@@ -102,6 +102,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         ctr.prototype.__defaults = {};
         ctr.prototype.initializeProperties = this._initializeProperties;
         ctr.prototype.__immutable = kwArgs["immutable"];
+        ctr.prototype.toString = this._genericToString;
         
         if (kwArgs["enhanceInitializer"]){
             var oldInitter = ctr.prototype.initializer;
@@ -159,6 +160,16 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         }
         
         return propDefault;
+    },
+    
+    _genericToString: function modelGenericToString(){
+        var s = "{";
+        for (var x = 0; x < this.__propertyNames.length; x++){
+            var propName  = this.__propertyNames[x];
+            s += "\n    " + propName + ": " +this.__getProperty(propName);
+        }
+        s += "\n}";
+        return s;
     }
 });
 

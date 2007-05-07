@@ -149,6 +149,4 @@ test_stampInheritance : function(){
     
 },
 
-test_ : function(){
-}
 });

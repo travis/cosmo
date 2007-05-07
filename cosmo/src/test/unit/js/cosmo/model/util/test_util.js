@@ -89,5 +89,24 @@ test_enhanceclass: function(){
     jum.assertEquals("default", instance.getStringProp());
     jum.assertEquals("hello", instance.getObjProp()["prop"]);
     
-}
+},
+
+    test_immutable : function(){
+        ImmutableClass = null;
+        dojo.declare("ImmutableClass", null, {});
+        var app  = cosmo.model.util.simplePropertyApplicator;
+        app.enhanceClass(ImmutableClass, 
+            [  ["stringProp", {"default": "default"}]], 
+            {"enhanceInitializer":true, "immutable": true});
+        var instance = new ImmutableClass({stringProp:"NoChanges"});
+        jum.assertEquals("NoChanges", instance.getStringProp());
+        var caught = false;
+        try {
+            instance.setStringProp("Change!");
+        } catch (e){
+            caught = true;
+        }
+        jum.assertTrue(caught);
+    }
+
 }

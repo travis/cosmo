@@ -101,6 +101,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         ctr.prototype.__propertyNames = [];
         ctr.prototype.__defaults = {};
         ctr.prototype.initializeProperties = this._initializeProperties;
+        ctr.prototype.__immutable = kwArgs["immutable"];
         
         if (kwArgs["enhanceInitializer"]){
             var oldInitter = ctr.prototype.initializer;
@@ -108,13 +109,13 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
             //TODO use dojo AOP
             function newInitializer(){
                 if (when == "before"){
-                    this.initializeProperties(arguments);
+                    this.initializeProperties(arguments[0]);
                 }
                 
                 oldInitter.apply(this,arguments);
                 
                 if (when != "before"){
-                    this.initializeProperties(arguments);
+                    this.initializeProperties(arguments[0]);
                 }
             }
             ctr.prototype.initializer = newInitializer;
@@ -130,6 +131,12 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
                 this.__setProperty(propertyName, kwProps[propertyName]);
             } else {
                 this.__setProperty(propertyName, this.__getDefault(propertyName));
+            }
+        }
+        
+        if (this.__immutable){
+            this.__setProperty = function(){
+                throw new Error (this.declaredClass + " is an immutable type! No changes are allowed.")
             }
         }
     }, 

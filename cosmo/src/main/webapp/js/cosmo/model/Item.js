@@ -26,13 +26,13 @@ cosmo.model.TRIAGE_DONE = 300;
 
 cosmo.model._stampRegistry = {};
    
-cosmo.model.declare = function(/*String*/ ctrName, /*Function*/ parentCtr, propertiesArray, otherDeclarations){
+cosmo.model.declare = function(/*String*/ ctrName, /*Function*/ parentCtr, propertiesArray, otherDeclarations, kwArgs){
     var newCtr = dojo.declare(ctrName, parentCtr, otherDeclarations);
-    cosmo.model.util.simplePropertyApplicator.enhanceClass(newCtr, propertiesArray, {enhanceInitializer: false});
+    cosmo.model.util.simplePropertyApplicator.enhanceClass(newCtr, propertiesArray, kwArgs || {});
     return newCtr;
 }
 
-cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArray, otherDeclarations,occurrenceDeclarations){
+cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArray, otherDeclarations, occurrenceDeclarations){
     var newCtr = dojo.declare(ctrName, cosmo.model.BaseStamp, otherDeclarations);
     var meta = new cosmo.model.StampMetaData(stampName, attributesArray);
     newCtr.prototype.stampMetaData = meta;

@@ -19,18 +19,18 @@ dojo.provide("cosmo.datetime.serialize");
 dojo.require("dojo.date.serialize");
 
 cosmo.datetime.fromIso8601 = function(/*String*/formattedString){
-	// summary: returns a Date object based on an ISO 8601 formatted string (uses date and time)
-	return new cosmo.datetime.Date(dojo.date.setIso8601(new Date(0, 0), formattedString));
+    // summary: returns a Date object based on an ISO 8601 formatted string (uses date and time)
+    return new cosmo.datetime.Date(dojo.date.setIso8601(new Date(0, 0), formattedString));
 };
 
 cosmo.datetime.fromIso8601Date = function(/*String*/formattedString){
-	// summary: returns a Date object based on an ISO 8601 formatted string (date only)
-	return new cosmo.datetime.Date(dojo.date.setIso8601Date(new Date(0, 0), formattedString));
+    // summary: returns a Date object based on an ISO 8601 formatted string (date only)
+    return new cosmo.datetime.Date(dojo.date.setIso8601Date(new Date(0, 0), formattedString));
 };
 
 cosmo.datetime.fromIso8601Time = function(/*String*/formattedString){
-	// summary: returns a Date object based on an ISO 8601 formatted string (date only)
-	return new cosmo.datetime.Date(dojo.date.setIso8601Time(new Date(0, 0), formattedString));
+    // summary: returns a Date object based on an ISO 8601 formatted string (date only)
+    return new cosmo.datetime.Date(dojo.date.setIso8601Time(new Date(0, 0), formattedString));
 };
 
 cosmo.datetime.fromRfc3339 = function(/*String*/rfcDate){
@@ -78,20 +78,20 @@ function addIso8601Duration(/*cosmo.datetime.date*/date,
 
 cosmo.datetime.getDuration = function getDuration(dt1, dt2){
     var dur = {}
-    var startDate = dt1;
+    var startDate = dt1.clone();
     with(dojo.date.dateParts){
         dur.year = cosmo.datetime.Date.diff(YEAR, startDate, dt2);
-        startDate = startDate.add(YEAR, dur.year);
+        startDate.add(YEAR, dur.year);
         dur.month = cosmo.datetime.Date.diff(MONTH, startDate, dt2);
-        startDate = startDate.add(MONTH, dur.month);
+        startDate.add(MONTH, dur.month);
         dur.day = cosmo.datetime.Date.diff(DAY, startDate, dt2);
-        startDate = startDate.add(DAY, dur.day);
+        startDate.add(DAY, dur.day);
         dur.hour = cosmo.datetime.Date.diff(HOUR, startDate, dt2);
-        startDate = startDate.add(HOUR, dur.hour);
-        dur.minute = cosmo.datetime.Date.diff(MINUTE, startDate, dt2);
-        startDate = startDate.add(MINUTE, dur.minute);
+        startDate.add(HOUR, dur.hour);
+        dur.minutcosme = cosmo.datetime.Date.diff(MINUTE, startDate, dt2);
+        startDate.add(MINUTE, dur.minute);
         dur.second = cosmo.datetime.Date.diff(SECOND, startDate, dt2);
-        startDate = startDate.add(SECOND, dur.second);
+        startDate.add(SECOND, dur.second);
    }
    return dur;
 }

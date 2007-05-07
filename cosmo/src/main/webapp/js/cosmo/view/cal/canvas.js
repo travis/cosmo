@@ -364,8 +364,8 @@ cosmo.view.cal.canvas = new function () {
             var currDayClass = '';
             var currDayImg = '';
             var currDayIdPrefix = 'hourDiv' + currDateDay + '-';
-            if (cosmo.app.pim.viewStart.getTime() <= currDateTime &&
-                cosmo.app.pim.viewEnd.getTime() > currDateTime) {
+            if (cosmo.view.cal.viewStart.getTime() <= currDateTime &&
+                cosmo.view.cal.viewEnd.getTime() > currDateTime) {
                 currDayClass = ' currentDayDay';
                 currDayImg = 'url(' + cosmo.env.getImagesUrl() +
                     'day_col_header_background.gif); background-repeat:' +
@@ -387,7 +387,7 @@ cosmo.view.cal.canvas = new function () {
             }
         }
 
-
+        // -----------
         // Do it!
         // -----------
         // Remove events for re-draw -- don't do on first render
@@ -1334,7 +1334,7 @@ cosmo.view.cal.canvas = new function () {
      */
     function getIndexEvent(strId) {
         // Use regex to pull out the actual ID number
-        var pat = new RegExp('^eventDiv[\\D]*' + cosmo.app.pim.ID_SEPARATOR);
+        var pat = new RegExp('^eventDiv[\\D]*__');
         var id = strId.replace(pat, '');
         return id;
     }
@@ -1403,7 +1403,7 @@ cosmo.view.cal.canvas = new function () {
      */
     function calcDateFromIndex(n) {
         var incr = parseInt(n);
-        var viewStart = cosmo.app.pim.viewStart;
+        var viewStart = cosmo.view.cal.viewStart;
         var st = viewStart.getDate();
         var ret = null;
         st += incr;

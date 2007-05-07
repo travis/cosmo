@@ -176,8 +176,8 @@ cosmo.ui.event.listeners.hookUpListeners();
         </div>
         </div>
         <div id="maskDiv">
-          <div id="processingDiv">
-              <fmt:message key="Main.Processing" />
+          <div id="appLoadingMessage">
+            Loading the app ...
           </div>
         </div>
 </body>

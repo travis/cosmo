@@ -24,6 +24,7 @@ dojo.provide("cosmo.legacy.cal_event");
 
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.model");
+dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.lozenge');
 
 /**
@@ -270,16 +271,16 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
 
     };
     this.startsBeforeViewRange = function () {
-        return (this.data.start.toUTC() < cosmo.app.pim.viewStart.getTime());
+        return (this.data.start.toUTC() < cosmo.view.cal.viewStart.getTime());
     };
     this.endsBeforeViewRange = function () {
-        return (this.data.end.toUTC() < cosmo.app.pim.viewStart.getTime());
+        return (this.data.end.toUTC() < cosmo.view.cal.viewStart.getTime());
     };
     this.startsAfterViewRange = function () {
-        return (this.data.start.toUTC() > cosmo.app.pim.viewEnd.getTime());
+        return (this.data.start.toUTC() > cosmo.view.cal.viewEnd.getTime());
     };
     this.endsAfterViewRange = function () {
-        return (this.data.end.toUTC() > cosmo.app.pim.viewEnd.getTime());
+        return (this.data.end.toUTC() > cosmo.view.cal.viewEnd.getTime());
     };
     //toString = genericToString;
 }

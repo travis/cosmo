@@ -20,7 +20,8 @@
  * the main view apropriately. It will show up to three months of time
  * and allow for the following navigation mechanisms: next month,
  * previous month, current day.
- * @author Jeremy Epstein mailto:eggfree@eggfree.net
+ * @authors Matthew Eernisse (mde@osafoudation.org), 
+ *     Jeremy Epstein (eggfree@eggfree.net)
  * @license Apache License 2.0
  */
 
@@ -34,6 +35,8 @@ dojo.require("cosmo.datetime");
 cosmo.ui.minical.MiniCal = new function() {
 
     var self = this;
+    var viewStart = null;
+    var viewEnd = null;
 
     /** helper method to pull day data. This is a cleaner implementation
      * when we start rendering busybars.
@@ -118,7 +121,7 @@ cosmo.ui.minical.MiniCal = new function() {
         self.controller = controller;
         self.displayContext = displayContext || null;
         self.id = 'miniCal';
-        self.currDate = this.controller.currDate;
+        self.currDate = cosmo.app.pim.currDate;
         hide();
         if (self.render()) {
             show();
@@ -243,8 +246,8 @@ cosmo.ui.minical.MiniCal = new function() {
         }
 
         // Init and week-to-week nav from main cal
-        var compMonthDate =  new Date(self.viewStart.getFullYear(),
-            self.viewStart.getMonth(), 1);
+        var compMonthDate =  new Date(viewStart.getFullYear(),
+            viewStart.getMonth(), 1);
         if (!self.firstMonthDate ||
             (self.firstMonthDate.getTime() != compMonthDate.getTime())) {
             self.firstMonthDate = compMonthDate;
@@ -484,12 +487,12 @@ cosmo.ui.minical.MiniCal = new function() {
 
         var selDays = self.selectedDays;
         var selDiv = null;
-        var dt = new Date(self.viewStart.getTime());
-        var viewStartMonth = self.viewStart.getMonth();
-        var viewEndMonth = self.viewEnd.getMonth();
+        var dt = new Date(viewStart.getTime());
+        var viewStartMonth = viewStart.getMonth();
+        var viewEndMonth = viewEnd.getMonth();
         var isStartDateMonthRendered = !isNaN(self.monthMappings[viewStartMonth]);
         var isEndDateMonthRendered = !isNaN(self.monthMappings[viewEndMonth]);
-        var crossMonth = dt.getDate() > self.controller.viewEnd.getDate();
+        var crossMonth = dt.getDate() > cosmo.view.cal.viewEnd.getDate();
         var monIndex =  null;
         var idPrefix = self.id + '_month';
 
@@ -513,9 +516,9 @@ cosmo.ui.minical.MiniCal = new function() {
             var datIndex = 0;
             var idStr = '';
             var selDiv = null;
-            while (dt <= self.controller.viewEnd) {
+            while (dt <= cosmo.view.cal.viewEnd) {
                 idSuffix = dt.getDate() <
-                    self.viewStart.getDate() ? suffA : suffB;
+                    viewStart.getDate() ? suffA : suffB;
                 datIndex = dt.getDate();
                 idStr = idPrefix + monIndex + '_day' + datIndex + idSuffix;
                 selDiv = document.getElementById(idStr);
@@ -547,7 +550,7 @@ cosmo.ui.minical.MiniCal = new function() {
                 // Move to the next month
                 monIndex++;
                 // Reset working date
-                dt = new Date(self.viewStart.getTime());
+                dt = new Date(viewStart.getTime());
                 selectCells(dt, idPrefix, monIndex, '', '_dim');
             }
         }
@@ -565,8 +568,8 @@ cosmo.ui.minical.MiniCal = new function() {
      */
     this.goMonth = function(dir) {
         var incr = dir;
-        var compMonthDate =  new Date(self.viewStart.getFullYear(),
-            self.viewStart.getMonth(), 1);
+        var compMonthDate =  new Date(viewStart.getFullYear(),
+            viewStart.getMonth(), 1);
 
         self.firstMonthDate = cosmo.datetime.Date.add(self.firstMonthDate,
             dojo.date.dateParts.MONTH, incr); // Increment the months
@@ -613,8 +616,8 @@ cosmo.ui.minical.MiniCal = new function() {
      * the main cal
      */
     this.syncViewStart = function() {
-        self.viewStart = self.controller.viewStart;
-        self.viewEnd = self.controller.viewEnd;
+        viewStart = cosmo.view.cal.viewStart;
+        viewEnd = cosmo.view.cal.viewEnd;
     }
     /**
      * Prevent memleak

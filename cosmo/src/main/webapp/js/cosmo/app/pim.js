@@ -25,7 +25,6 @@ dojo.require('cosmo.convenience');
 // --
 
 // -- FIXME: Weirdness that should be fixed
-dojo.require("cosmo.facade.pref");
 dojo.require("cosmo.service.json_service_impl");
 dojo.require("cosmo.legacy.cal_event");
 // --
@@ -43,7 +42,7 @@ dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.ui.cal_form");
 dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.button");
-dojo.require("cosmo.ui.contentcontainer");
+dojo.require("cosmo.ui.ContentBox");
 dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require('cosmo.view.cal.canvas');
@@ -66,9 +65,6 @@ cosmo.app.pim = new function () {
     // Private variable for the list of any deleted subscriptions
     var deletedSubscriptions = [];
 
-    // Constants
-    this.ID_SEPARATOR = '__';
-
     // The Cosmo service -- used to talk to the backend
     this.serv = null;
     // For calculating UI element positions
@@ -86,12 +82,6 @@ cosmo.app.pim = new function () {
     this.midColWidth = 0;
     // The form on the page -- a CalForm obj
     this.calForm = null;
-    // What view we're using -- currently only week view exists
-    this.viewtype = 'week';
-    // Start date for events to display
-    this.viewStart = null;
-    // End date for events to display
-    this.viewEnd = null;
     // Current date for highlighting in the interface
     this.currDate = null;
     // The path to the currently selected collection
@@ -99,7 +89,7 @@ cosmo.app.pim = new function () {
     //The list of calendars available to the current user
     this.currentCollections = [];
     // Anonymous ticket view, no client-side timeout
-    this.ticketView = false;
+    this.authAccess = true;
     // Create the 'Welcome to Cosmo' event?
     this.createWelcomeItem = false;
 
@@ -118,41 +108,55 @@ cosmo.app.pim = new function () {
         var collectionUid = params.collectionUid;
         var ticketKey = params.ticketKey;
 
+        this.authAccess = params.authAccess;
         this.currDate = new Date();
 
         // Create and init the Cosmo service
-        // --------------
+        // ===============================
         this.serv = new ScoobyService();
-        // Client-side keepalive
-        this.serv.resetServiceAccessTime();
+        this.serv.resetServiceAccessTime(); // Client-side keepalive
         this.serv.init();
 
-        // Load user prefs
-        // --------------
-        Pref.init();
-
+        // Base layout
+        // ===============================
         // Only in logged-in view
         if (params.authAccess) {
             cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage,
                 [cosmo.account.preferences.getPreferences()]);
         }
         // Place all the UI DOM elements based on window size
-        // --------------
         this.placeUI();
         this.setImagesForSkin();
+
+        // Populate base layout with UI elements
+        // ===============================
         // Load and display date info, render cal canvas
-        // --------------
-        if (this.loadLocaleDateInfo() && this.setQuerySpan(this.currDate)) {
-            cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd,
-                this.currDate);
+        if (this.loadLocaleDateInfo() && cosmo.view.cal.setQuerySpan(this.currDate)) {
+            cosmo.view.cal.canvas.render(cosmo.view.cal.viewStart,
+                cosmo.view.cal.viewEnd, this.currDate);
         }
         // Calendar event detail form
         this.calForm = new CalForm();
         this.calForm.init();
+        // Initialize the color set for the cal lozenges
+        cosmo.view.cal.canvas.calcColors();
 
+        // Load data
+        // ===============================
         // Load collections for this user
         this.loadCollections(ticketKey, collectionUid);
+        // Load and display events
 
+        // Load / render
+        // ===============================
+        // FIXME: This stuff should eventually participate in
+        // the normal topic-based prepare-load-render lifecycle
+        // --------------
+        cosmo.view.cal.loadEvents({ collection: self.currentCollection,
+            startDate: cosmo.view.cal.viewStart, endDate: cosmo.view.cal.viewEnd });
+
+        // Render UI elements
+        // ===============================
         // Display selector or single cal name
         this._collectionSelectContainer = $('calSelectNav');
         this._collectionSelector = dojo.widget.createWidget(
@@ -162,43 +166,29 @@ cosmo.app.pim = new function () {
                 'ticketKey': ticketKey
             }, this._collectionSelectContainer, 'last');
 
-        // Load minical and jump-to date
+        // Minical and jump-to date
         var mcDiv = $('miniCalDiv');
         var jpDiv = $('jumpToDateDiv');
         // Place jump-to date based on mini-cal pos
-        if (cosmo.ui.minical.MiniCal.init(Cal, mcDiv)) {
+        if (cosmo.ui.minical.MiniCal.init(cosmo.app.pim, mcDiv)) {
            this.calForm.addJumpToDate(jpDiv);
         }
+        // Top menubar setup and positioning
+        if (this.setUpMenubar()) {
+            this.positionMenubarElements.apply(this);
+        }
+        // Add event listeners for form-element behaviors
+        this.calForm.setEventListeners();
 
-        // Initialize the color set for the cal lozenges
-        cosmo.view.cal.canvas.calcColors();
-
-        // Load and display events
-        // FIXME: This stuff should eventually participate in
-        // the normal topic-based prepare-load-render lifecycle
-        // --------------
-        cosmo.view.cal.loadEvents({ collection: self.currentCollection,
-            startDate: self.viewStart, endDate: self.viewEnd });
-
-        this.uiMask.hide();
-
+        // Final stuff / cleanup
+        // ===============================
         // Scroll to 8am for normal event
         // Have to do this dead last because appending to the div
         // seems to reset the scrollTop in Safari
         $('timedScrollingMainDiv').scrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
 
-        // Add event listeners for form-element behaviors
-        this.calForm.setEventListeners();
-
-        // Top menubar setup and positioning
-        if (this.setUpMenubar()) {
-            // Force async execution so we can get accurate
-            // offsetWidth/offsetHeight for positioning
-            var f = function () {
-               self.positionMenubarElements.apply(self);
-            }
-            setTimeout(f, 0);
-        }
+        // Hide the UI mask
+        this.uiMask.hide();
 
         // Show errors for deleted subscriptions -- deletedSubscriptions
         // is a private var populated in the loadCollections method
@@ -207,74 +197,44 @@ cosmo.app.pim = new function () {
                 cosmo.app.showErr(_("Main.Error.SubscribedCollectionDeleted",deletedSubscriptions[x].displayName));
             }
         }
+
     };
-
-    // ==========================
-    // Handle published events
-    // ==========================
-
-    // Subscribe to the '/calEvent' channel
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
-    this.handlePub_calEvent = function (cmd) {
-        var act = cmd.action;
-        var data = cmd.data || {};
-        var opts = cmd.opts || {};
-        switch (act) {
-            case 'loadCollection':
-                var f = function () { self.loadCollectionItems(data, opts); };
-                self.uiMask.show();
-                // Give processing message a brief instant to show
-                setTimeout(f, 100);
-                break;
-            case 'eventsLoadSuccess':
-                self.uiMask.hide();
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-    };
-
 
     // ==========================
     // GUI element display
     // ==========================
-
     /**
      * Performs the absolute placement of the UI elements based
      * on the client window size
      */
     this.placeUI = function () {
-        var ContentContainer = cosmo.ui.contentcontainer.ContentContainer;
-        var uiMain = new ContentContainer('calDiv');
-        var uiMask = new ContentContainer('maskDiv');
-        var uiProcessing = new ContentContainer('processingDiv');
-        var menuBar = new ContentContainer('menuBarDiv');
-        var leftSidebar = new ContentContainer('leftSidebarDiv');
-        var rightSidebar = new ContentContainer('rightSidebarDiv');
-        var topNav = new ContentContainer('calTopNavDiv');
-        var dayList = new ContentContainer('dayListDiv');
-        var timedMain = new ContentContainer('timedScrollingMainDiv');
-        var timedContent = new ContentContainer('timedContentDiv');
-        var timedHourList = new ContentContainer('timedHourListDiv');
-        var eventInfo = new ContentContainer('eventInfoDiv');
-        var allDayMain = new ContentContainer('allDayResizeMainDiv');
-        var allDayResize = new ContentContainer('allDayResizeHandleDiv');
-        var allDayContent = new ContentContainer('allDayContentDiv');
-        var allDaySpacer = new ContentContainer('allDayHourSpacerDiv');
+        var _c = cosmo.ui.ContentBox;
+        var uiMain = new _c('calDiv');
+        //var uiProcessing = new _c('processingDiv');
+        var menuBar = new _c('menuBarDiv');
+        var leftSidebar = new _c('leftSidebarDiv');
+        var rightSidebar = new _c('rightSidebarDiv');
+        var topNav = new _c('calTopNavDiv');
+        var dayList = new _c('dayListDiv');
+        var timedMain = new _c('timedScrollingMainDiv');
+        var timedContent = new _c('timedContentDiv');
+        var timedHourList = new _c('timedHourListDiv');
+        var eventInfo = new _c('eventInfoDiv');
+        var allDayMain = new _c('allDayResizeMainDiv');
+        var allDayResize = new _c('allDayResizeHandleDiv');
+        var allDayContent = new _c('allDayContentDiv');
+        var allDaySpacer = new _c('allDayHourSpacerDiv');
         var vOffset = 0;
         var calcHeight = 0;
-
         var viewport = dojo.html.getViewport();
         var winwidth = viewport.width;
         var winheight = viewport.height;
 
+        this.uiMask = new _c('maskDiv');
+
         // Pare width and height down to avoid stupid scrollbars showing up
         winwidth-=3;
         winheight-=3;
-
-        // Set reference to UI mask to use later
-        this.uiMask = uiMask;
 
        // Calculate position values for main UI display, set properties
         this.height = parseInt(winheight*DISPLAY_WIDTH_PERCENT) - TOP_MENU_HEIGHT;
@@ -287,12 +247,15 @@ cosmo.app.pim = new function () {
 
         // Position UI elements
         // =========================
-        // UI Mask -- same position, in front -- hide after events load
-        this.uiMask.setPosition(this.top, LEFT_SIDEBAR_WIDTH);
-        this.uiMask.setSize(this.midColWidth-2, this.height);
+        // **** Save these coords for middle-col mask ****
+        $('appLoadingMessage').style.width = PROCESSING_ANIM_WIDTH + 'px';
+        $('appLoadingMessage').style.top = parseInt((winheight-PROCESSING_ANIM_HEIGHT)/2) + 'px';
+        $('appLoadingMessage').style.left = parseInt((winwidth-PROCESSING_ANIM_WIDTH)/2) + 'px';
+        //this.uiMask.setPosition(this.top, LEFT_SIDEBAR_WIDTH);
+        //this.uiMask.setSize(this.midColWidth-2, this.height);
         // Position the processing animation
-        uiProcessing.setPosition(parseInt((winheight-PROCESSING_ANIM_HEIGHT)/2),
-            parseInt((this.midColWidth-PROCESSING_ANIM_WIDTH)/2));
+        //uiProcessing.setPosition(parseInt((winheight-PROCESSING_ANIM_HEIGHT)/2),
+        //    parseInt((this.midColWidth-PROCESSING_ANIM_WIDTH)/2));
 
         // Menubar
         menuBar.setPosition(0, 0);
@@ -359,7 +322,7 @@ cosmo.app.pim = new function () {
         // Kill and DOM-elem references to avoid IE memleak issues --
         // leave UI Mask ref
         uiMain.cleanup(); uiMain = null;
-        uiProcessing.cleanup(); uiProcessing = null;
+        //uiProcessing.cleanup(); uiProcessing = null;
         leftSidebar.cleanup(); leftSidebar = null;
         rightSidebar.cleanup(); rightSidebar = null;
         topNav.cleanup(); topNav = null;
@@ -372,7 +335,7 @@ cosmo.app.pim = new function () {
     };
     this.setUpMenubar = function (ticketKey) {
         // Logged-in view -- nothing to do
-        if (!this.ticketView) {
+        if (this.authAccess) {
             return true;
         }
         // Add the collection subscription selector in ticket view
@@ -421,7 +384,7 @@ cosmo.app.pim = new function () {
     this.positionMenubarElements = function () {
         var menuNav = $('menuNavItems')
         // Ticket view only
-        if (this.ticketView) {
+        if (!this.authAccess) {
             // Signup graphic
             // position right side of center col, and bottom align
             var signupDiv = $('signupGraphic');
@@ -461,10 +424,7 @@ cosmo.app.pim = new function () {
 
     };
     /**
-     * Loads localized Date information into the arrays in date.js
-     * It uses the default English values in those arrays
-     * as keys to look up the localized info
-     * from the i18n.js (generated by i18n.jsp) page
+     * Loads localized datetime info for the UI
      */
     this.loadLocaleDateInfo = function () {
         var keys = null;
@@ -497,16 +457,60 @@ cosmo.app.pim = new function () {
         Date.meridian = newArr;
         return true;
     };
+    // ==========================
+    // Timeout and keepalive
+    // ==========================
+    this.isTimedOut = function () {
+        // Logged in or not, there's no client-side timeout for ticket view
+        if (!this.authAccess) {
+            return false;
+        }
+        else {
+            var diff = 0;
+            diff = new Date().getTime() - this.serv.getServiceAccessTime();
+            if (diff > (60000*cosmo.env.getTimeoutMinutes())) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    };
+    this.checkTimeout = function () {
+        function isServerTimeoutSoon() {
+            var ts = new Date();
+            var diff = 0;
+            ts = ts.getTime();
+            diff = ts - self.serv.getServiceAccessTime();
+            return !!(diff > (60000*(cosmo.env.getTimeoutMinutes()-2)));
+        }
+
+        // If user is client-side timed-out, kill the session cookie and redirect to login page
+        if (this.isTimedOut()) {
+            this.redirectTimeout();
+            return true;
+        }
+        // Otherwise check for imminent server timeout and refresh local timing cookie
+        else if (isServerTimeoutSoon()) {
+            // If server-side session is about to time out, refresh it by hitting JSP page
+            this.serv.refreshServerSession();
+            // Reset local session timing cookie
+            this.serv.resetServiceAccessTime();
+            return false;
+        }
+    };
+    this.redirectTimeout = function () {
+        location = cosmo.env.getRedirectUrl();
+    };
 
     // ==========================
-    // Navigating and changing calendars
+    // Collections
     // ==========================
     this.loadCollections = function (ticketKey, collectionUid) {
         // Load/create calendar to view
         // --------------
         // If we received a ticket, just grab the specified collection
         if (ticketKey) {
-            this.ticketView = true;
             try {
                var collection = this.serv.getCalendar(collectionUid, ticketKey);
             }
@@ -601,129 +605,7 @@ cosmo.app.pim = new function () {
         else {
             this.currentCollection = this.currentCollections[0];
         }
-
     };
-    this.loadCollectionItems = function (data, opts) {
-        var self = this;
-        var collection = data.collection;
-        var goTo = data.goTo;
-        var data = {};
-
-        // Changing collection
-        // --------
-        if (collection) {
-            // Update pointer to currently selected collection
-            self.currentCollection = collection;
-        }
-        // Changing dates
-        // --------
-        if (goTo) {
-            // param is 'back' or 'next'
-            if (typeof goTo == 'string') {
-                var key = goTo.toLowerCase();
-                var incr = key.indexOf('back') > -1 ? -1 : 1;
-                queryDate = cosmo.datetime.Date.add(this.viewStart, 
-                    dojo.date.dateParts.WEEK, incr);
-            }
-            // param is actual Date
-            else {
-                queryDate = goTo;
-            }
-            // Update self.viewStart and self.viewEnd with new dates
-            self.setQuerySpan(queryDate);
-        }
-
-        // Data obj to pass to topic publishing
-        data = {
-            collection: self.currentCollection,
-            startDate: self.viewStart,
-            endDate: self.viewEnd,
-            currDate: self.currDate
-        }
-
-        // If we're looking at different dates, have to re-render
-        // the base canvas with the new date range
-        if (goTo) {
-            dojo.event.topic.publish('/calEvent', {
-                action: 'eventsLoadPrepare', data: data, opts: opts });
-        }
-        // Load and display events
-        dojo.event.topic.publish('/calEvent', {
-            action: 'eventsLoad', data: data, opts: opts });
-    }
-    // ==========================
-    // PIM-specific time functions
-    // ==========================
-    /**
-     * Get the start and end for the span of time to view in the cal
-     * Eventually this will change depending on what type of view is selected
-     */
-    this.setQuerySpan = function (dt) {
-        this.viewStart = cosmo.datetime.util.getWeekStart(dt);
-        this.viewEnd = cosmo.datetime.util.getWeekEnd(dt);
-        return true;
-    };
-    /**
-     * Get the datetime for midnight Sunday given the current Sunday
-     * and the number of weeks to move forward or backward
-     */
-    this.getNewViewStart = function (key) {
-        var queryDate = null;
-        var incr = 0;
-        // Increment/decrement week
-        if (key.indexOf('next') > -1) {
-            incr = 1;
-        }
-        else if (key.indexOf('back') > -1) {
-            incr = -1;
-        }
-        queryDate = cosmo.datetime.Date.add(this.viewStart, 
-            dojo.date.dateParts.WEEK, incr);
-        return queryDate;
-    };
-
-    // ==========================
-    // Timeout and keepalive
-    // ==========================
-    this.isTimedOut = function () {
-        // Logged in or not, there's no client-side timeout for ticket view
-        if (this.ticketView) {
-            return false;
-        }
-        else {
-            var diff = 0;
-            diff = new Date().getTime() - this.serv.getServiceAccessTime();
-            if (diff > (60000*cosmo.env.getTimeoutMinutes())) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    };
-    this.isServerTimeoutSoon = function () {
-        var ts = new Date();
-        var diff = 0;
-        ts = ts.getTime();
-        diff = ts - this.serv.getServiceAccessTime();
-        return (diff > (60000*(cosmo.env.getTimeoutMinutes()-2))) ? true : false
-    };
-    this.checkTimeout = function () {
-        // If user is client-side timed-out, kill the session cookie and redirect to login page
-        if (this.isTimedOut()) {
-            this.redirectTimeout();
-            return true;
-        }
-        // Otherwise check for imminent server timeout and refresh local timing cookie
-        else if (this.isServerTimeoutSoon()) {
-            // If server-side session is about to time out, refresh it by hitting JSP page
-            this.serv.refreshServerSession();
-            // Reset local session timing cookie
-            this.serv.resetServiceAccessTime();
-            return false;
-        }
-    };
-
     this.handleCollectionUpdated = function(/*cosmo.topics.CollectionUpdatedMessage*/ message){
         var updatedCollection = message.collection;
         var updateCollection = function(collection){
@@ -737,8 +619,7 @@ cosmo.app.pim = new function () {
 
         updateCollection(this.currentCollection);
         dojo.lang.map(this.currentCollections, updateCollection);
-    }
-
+    };
     this.handleSubscriptionUpdated = function(/*cosmo.topics.SubscriptionUpdatedMessage*/ message){
         var updatedSubscription = message.subscription;
         var updateCollection = function(collection){
@@ -752,12 +633,7 @@ cosmo.app.pim = new function () {
         }
         updateCollection(this.currentCollection);
         dojo.lang.map(this.currentCollections, updateCollection);
-    }
-
-    this.redirectTimeout = function () {
-        location = cosmo.env.getRedirectUrl();
     };
-
     this.createWelcomeEvent = function (){
         var vs = this.viewStart;
         vs = new Date(vs.getFullYear(), vs.getMonth(), vs.getDate(), 9, 0);
@@ -765,8 +641,7 @@ cosmo.app.pim = new function () {
         var end = cosmo.datetime.Date.add(start, dojo.date.dateParts.MINUTE, 60);
         return new cosmo.model.CalEventData(null, "Welcome to Cosmo", "Welcome to Cosmo",
            start, end, false);
-    }
-
+    };
     this.filterOutDeletedSubscriptions = function(subscriptions){
         var deletedSubscriptions = [];
         var filteredSubscriptions = dojo.lang.filter(subscriptions,
@@ -779,10 +654,8 @@ cosmo.app.pim = new function () {
                    return true;
                }
         });
-
         return [filteredSubscriptions, deletedSubscriptions];
-
-    }
+    };
 
     // ==========================
     // Cleanup

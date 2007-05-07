@@ -34,7 +34,6 @@ dojo.require("dojo.date.format");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.timezone");
 dojo.require("cosmo.util.debug");
-dojo.require("cosmo.facade.pref");
 
 cosmo.datetime.Date = function () {
 
@@ -296,6 +295,7 @@ cosmo.datetime.Date.prototype.getTimezoneOffset = function() {
         }
 
         // No timezone, no UTC -- must be a floating date
+        // For now we cheat and use the local browser offset
         else {
             offsetMin = this.getUserPrefTimezoneOffset();
         }
@@ -318,17 +318,10 @@ cosmo.datetime.Date.prototype.getTimezoneOffsetMs = function() {
   */
 cosmo.datetime.Date.prototype.getUserPrefTimezoneOffset = function() {
     var offsetMin = 0;
-
-    // Try to look up user pref
-    if (typeof Pref == 'object') {
-        offsetMin = Pref.getTimezoneOffset(this);
-    }
-    // Otherwise punt and go with the browser's offset for that date
-    else {
+    // For now, punt and go with the browser's offset for that date
         offsetMin = cosmo.datetime.Date.getBrowserTimezoneOffset(
             this.getYear(), this.getMonth(), this.getDate(),
             this.getHours(), this.getMinutes(), this.getSeconds());
-    }
     return offsetMin;
 };
 

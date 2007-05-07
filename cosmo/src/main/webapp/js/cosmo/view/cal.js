@@ -21,6 +21,8 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
+dojo.require("cosmo.datetime");
+dojo.require("cosmo.datetime.util");
 
 cosmo.view.cal = new function () {
 
@@ -32,6 +34,25 @@ cosmo.view.cal = new function () {
         'monthly': [dojo.date.dateParts.MONTH, 1],
         'yearly': [dojo.date.dateParts.YEAR, 1]
     }
+    // Public attributes
+    // ********************
+    // What view we're using -- currently only week view exists
+    this.viewtype = 'week';
+    // Start date for events to display
+    this.viewStart = null;
+    // End date for events to display
+    this.viewEnd = null;
+    // Options for saving/removing recurring events
+    this.recurringEventOptions = {
+        ALL_EVENTS: 'allEvents',
+        ALL_FUTURE_EVENTS: 'allFuture',
+        ONLY_THIS_EVENT: 'onlyThis'
+    };
+    // How many updates/removals are in-flight
+    this.processingQueue = [];
+    // Last clicked cal event -- used for selection persistence.
+    this.lastSent = null;
+
 
     // Saving changes
     // =========================
@@ -587,7 +608,7 @@ cosmo.view.cal = new function () {
             // master/detached-event combo where the new detached event
             // has recurrence -- we need to expand the recurrence(s) by querying the server
             if (saveEv.data.recurrenceRule) {
-                loadRecurrenceExpansion(cosmo.app.pim.viewStart, cosmo.app.pim.viewEnd, saveEv, opts);
+                loadRecurrenceExpansion(this.viewStart, this.viewEnd, saveEv, opts);
             }
             // If the 'All Future' detached event has a frequency of 'once,'
             // it's a one-shot -- so, no need to go to the server for expansion
@@ -1005,19 +1026,6 @@ cosmo.view.cal = new function () {
         return h;
     }
 
-    // Public attributes
-    // ********************
-    // Options for saving/removing recurring events
-    this.recurringEventOptions = {
-        ALL_EVENTS: 'allEvents',
-        ALL_FUTURE_EVENTS: 'allFuture',
-        ONLY_THIS_EVENT: 'onlyThis'
-    };
-    // How many updates/removals are in-flight
-    this.processingQueue = [];
-    // Last clicked cal event -- used for selection persistence.
-    this.lastSent = null;
-
     // Subscribe to the '/calEvent' channel
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
     // Subscribe to the '/app' channel
@@ -1035,6 +1043,15 @@ cosmo.view.cal = new function () {
         var data = cmd.data || {};
         var opts = cmd.opts;
         switch (act) {
+            case 'loadCollection':
+                var f = function () { self.triggerLoadEvents(data, opts); };
+                //self.uiMask.show();
+                // Give processing message a brief instant to show
+                setTimeout(f, 100);
+                break;
+            case 'eventsLoadSuccess':
+                //self.uiMask.hide();
+                break;
             case 'eventsLoad':
                 // Load and display events
                 self.loadEvents(data, opts);
@@ -1112,6 +1129,53 @@ cosmo.view.cal = new function () {
             }
         }
     };
+    this.triggerLoadEvents = function (data, opts) {
+        var collection = data.collection;
+        var goTo = data.goTo;
+        var data = {};
+
+        // Changing collection
+        // --------
+        if (collection) {
+            // Update pointer to currently selected collection
+            self.currentCollection = collection;
+        }
+        // Changing dates
+        // --------
+        if (goTo) {
+            // param is 'back' or 'next'
+            if (typeof goTo == 'string') {
+                var key = goTo.toLowerCase();
+                var incr = key.indexOf('back') > -1 ? -1 : 1;
+                queryDate = cosmo.datetime.Date.add(cosmo.view.cal.viewStart,
+                    dojo.date.dateParts.WEEK, incr);
+            }
+            // param is actual Date
+            else {
+                queryDate = goTo;
+            }
+            // Update cosmo.view.cal.viewStart and cosmo.view.cal.viewEnd with new dates
+            cosmo.view.cal.setQuerySpan(queryDate);
+        }
+
+        // Data obj to pass to topic publishing
+        data = {
+            collection: cosmo.app.pim.currentCollection,
+            startDate: cosmo.view.cal.viewStart,
+            endDate: cosmo.view.cal.viewEnd,
+            currDate: cosmo.app.pim.currDate
+        }
+
+        // If we're looking at different dates, have to re-render
+        // the base canvas with the new date range
+        if (goTo) {
+            dojo.event.topic.publish('/calEvent', {
+                action: 'eventsLoadPrepare', data: data, opts: opts });
+        }
+        // Load and display events
+        dojo.event.topic.publish('/calEvent', {
+            action: 'eventsLoad', data: data, opts: opts });
+    };
     /**
      * Loading events in the initial app setup, and week-to-week
      * navigation.
@@ -1172,6 +1236,33 @@ cosmo.view.cal = new function () {
             randomString += chars.substring(rnum,rnum+1);
         }
         return 'ev' + randomString;
+    };
+    /**
+     * Get the start and end for the span of time to view in the cal
+     * Eventually this will change depending on what type of view is selected
+     */
+    this.setQuerySpan = function (dt) {
+        this.viewStart = cosmo.datetime.util.getWeekStart(dt);
+        this.viewEnd = cosmo.datetime.util.getWeekEnd(dt);
+        return true;
+};
+    /**
+     * Get the datetime for midnight Sunday given the current Sunday
+     * and the number of weeks to move forward or backward
+     */
+    this.getNewViewStart = function (key) {
+        var queryDate = null;
+        var incr = 0;
+        // Increment/decrement week
+        if (key.indexOf('next') > -1) {
+            incr = 1;
+        }
+        else if (key.indexOf('back') > -1) {
+            incr = -1;
+        }
+        queryDate = cosmo.datetime.Date.add(this.viewStart,
+            dojo.date.dateParts.WEEK, incr);
+        return queryDate;
     };
 };
 

@@ -15,59 +15,40 @@
 */
 dojo.provide("cosmo.model.common");
 
+dojo.require("cosmo.model.util");
+
 /**
  * A recurrence rule specifies how to repeat a given event.
  */
-dojo.declare("cosmo.model.RecurrenceRule", null, {
-    
-    initializer: function(freq, endDate, isSupported){
-       this._frequency = freq;
-       this._endDate = endDate;
-       this._isSupported = isSupported;
+cosmo.model.declare("cosmo.model.RecurrenceRule", null, 
+    [["frequency", {"default": null}],
+     ["endDate", {"default": null} ],
+     ["isSupported", {"default": true},
+     ["unsupportedRule", {"default": null}] ]
+    ], 
+    {
+    initializer: function(kwArgs){
+        this.initializeProperties(kwArgs);
     },
-    /**
-     * Specifies how often to repeat this event.
-     * Must be one of the frequency constants above.
-     */
-     _frequency: null,
-    /**
-     * The date to repeat this event until.
-     * This will only be a Date, not a DateTime -- should
-     * NOT include time info
-     */
-    _endDate: null,
-
-    _isSupported: true,
-    /**
-     * For events not created in Cosmo that have more complex rules than Cosmo
-     * allows, a text representation of the rule appears here but is not editable.
-     */
-    isSupported(): function(){
-        return _isSupported;   
-    },
-
-    toString: genericToString,
-    
-    FREQUENCY_DAILY: "daily",
-    FREQUENCY_WEEKLY: "weekly",
-    FREQUENCY_BIWEEKLY: "biweekly",
-    FREQUENCY_MONTHLY: "monthly",
-    FREQUENCY_YEARLY: "yearly",
 
     clone: function(rule) {
-        var ret = null;
-        var arr = [];
-        if (rule) {
-            ret = new RecurrenceRule();
-            ret.frequency = rule.frequency;
-            ret.endDate = rule.endDate;
-            ret.isSupported = rule.isSupported;
-        }
-        return ret;
+        //TODO
+        dojo.unimplemented();
     },
     equals: function(other){
         //TODO
         dojo.unimplemented();
     }
-});
+    },
+    {
+    immutable: true
+    });
+
+dojo.lang.mixin(cosmo.model.RecurrenceRule, {
+    FREQUENCY_DAILY: "daily",
+    FREQUENCY_WEEKLY: "weekly",
+    FREQUENCY_BIWEEKLY: "biweekly",
+    FREQUENCY_MONTHLY: "monthly",
+    FREQUENCY_YEARLY: "yearly"
+})
 

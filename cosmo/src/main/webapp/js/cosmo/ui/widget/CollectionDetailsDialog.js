@@ -42,7 +42,7 @@ dojo.widget.HtmlWidget, function(){
         calendar: /*CalendarMetadata*/ null,
         conduit: /*cosmo.conduits.Conduit*/ null,
         transportInfo: null,
-        displayName: null, //the collection display nama
+        displayName: null, //the collection display name
         displayedSelection: '', // The selection item to display if invoked from ticket view
 
         // Template stuff
@@ -86,7 +86,7 @@ dojo.widget.HtmlWidget, function(){
         },
 
         clientsToProtocols: {
-            Chandler: "dav",
+            Chandler: "mc",
             iCal: "webcal",
             FeedReader: "atom",
             Download: "webcal"

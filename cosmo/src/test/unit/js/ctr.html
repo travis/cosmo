@@ -46,6 +46,7 @@ For use with the JsUnit from www.jsunit.net
     print = dojo.hostenv.println;
     cosmotest.testutils.init(
         ["cosmotest.model.test_model",
+        "cosmotest.model.test_common",
         "cosmotest.model.test_eventStamp",
         "cosmotest.model.util.test_util",
         "cosmotest.datetime.test_7581",
@@ -80,7 +81,7 @@ For use with the JsUnit from www.jsunit.net
    }
    
    function checkBoxesFromLocation(){
-   	   var testNames = location.search.slice(1).split("&");
+          var testNames = location.search.slice(1).split("&");
        var tests = {};
        
        for (var i = 0; i < testNames.length; i++){
@@ -105,12 +106,12 @@ For use with the JsUnit from www.jsunit.net
        var qsElements = 0;
        for (var i = 0; i < inputs.length; i++){
            if (inputs[i].checked) {
-           	   var and = (qsElements > 0)? "&" : "";
+                  var and = (qsElements > 0)? "&" : "";
                qs = qs + and + "t=" + inputs[i].value;
                qsElements++;
            }
        }
-	   return qs;
+       return qs;
    }
    
    
@@ -149,25 +150,25 @@ For use with the JsUnit from www.jsunit.net
    Convenience!
    */
    document.onkeyup = function (e){
-	   if (String.fromCharCode(e.keyCode) == 'R'){
- 		   location = location.href.split("?")[0] + getCurrentQueryString();
- 	   }
+       if (String.fromCharCode(e.keyCode) == 'R'){
+            location = location.href.split("?")[0] + getCurrentQueryString();
+        }
 
-	   if (String.fromCharCode(e.keyCode) == 'T'){
- 		   run_tests();
- 	   }
+       if (String.fromCharCode(e.keyCode) == 'T'){
+            run_tests();
+        }
 
-	   if (String.fromCharCode(e.keyCode) == 'U'){
-			uncheckAll();
- 	   }
+       if (String.fromCharCode(e.keyCode) == 'U'){
+            uncheckAll();
+        }
 
-	   if (String.fromCharCode(e.keyCode) == 'A'){
-			checkAll();
- 	   }
+       if (String.fromCharCode(e.keyCode) == 'A'){
+            checkAll();
+        }
 
-	   if (String.fromCharCode(e.keyCode) == 'C'){
+       if (String.fromCharCode(e.keyCode) == 'C'){
            clearOutput();
- 	   }
+        }
    }
 </script>
    <button id="run_tests" onclick="run_tests()">Run Tests</button>

@@ -18,6 +18,12 @@ dojo.provide("cosmo.datetime.serialize");
 
 dojo.require("dojo.date.serialize");
 
+cosmo.datetime.toIso8601 = function (/*cosmo.datetime.Date*/ date){
+    // summary: returns a Date object based on an ISO 8601 formatted string (uses date and time)
+    //TODO
+    dojo.unimplemented();
+};
+
 cosmo.datetime.fromIso8601 = function(/*String*/formattedString){
     // summary: returns a Date object based on an ISO 8601 formatted string (uses date and time)
     return new cosmo.datetime.Date(dojo.date.setIso8601(new Date(0, 0), formattedString));
@@ -29,7 +35,7 @@ cosmo.datetime.fromIso8601Date = function(/*String*/formattedString){
 };
 
 cosmo.datetime.fromIso8601Time = function(/*String*/formattedString){
-    // summary: returns a Date object based on an ISO 8601 formatted string (date only)
+    // summary: returns a Date object based on an ISO 8601 formatted string (time only)
     return new cosmo.datetime.Date(dojo.date.setIso8601Time(new Date(0, 0), formattedString));
 };
 
@@ -63,8 +69,7 @@ function addIso8601Duration(/*cosmo.datetime.date*/date,
         dHash = duration;
     }
     
-    var dateArray = duration.match(cosmo.datetime.iso8601Regex).slice(1);
-    with(dojo.date.dateParts){
+    with (dojo.date.dateParts){
         if (dHash.year) date.add(YEAR, dHash.year);
         if (dHash.month) date.add(MONTH, dHash.month);
         if (dHash.day) date.add(DAY, dHash.day);
@@ -76,22 +81,25 @@ function addIso8601Duration(/*cosmo.datetime.date*/date,
     return date;
 }
 
+// Some variables for calculating durations
+cosmo.datetime.durationsInSeconds = {
+    DAY: 60*60*24,
+    HOUR: 60*60,
+    MINUTE: 60
+}
+
 cosmo.datetime.getDuration = function getDuration(dt1, dt2){
+    
     var dur = {}
-    var startDate = dt1.clone();
-    with(dojo.date.dateParts){
-        dur.year = cosmo.datetime.Date.diff(YEAR, startDate, dt2);
-        startDate.add(YEAR, dur.year);
-        dur.month = cosmo.datetime.Date.diff(MONTH, startDate, dt2);
-        startDate.add(MONTH, dur.month);
-        dur.day = cosmo.datetime.Date.diff(DAY, startDate, dt2);
-        startDate.add(DAY, dur.day);
-        dur.hour = cosmo.datetime.Date.diff(HOUR, startDate, dt2);
-        startDate.add(HOUR, dur.hour);
-        dur.minutcosme = cosmo.datetime.Date.diff(MINUTE, startDate, dt2);
-        startDate.add(MINUTE, dur.minute);
-        dur.second = cosmo.datetime.Date.diff(SECOND, startDate, dt2);
-        startDate.add(SECOND, dur.second);
+    with (cosmo.datetime.durationsInSeconds){
+        var secs = cosmo.datetime.Date.diff(dojo.date.dateParts.SECOND, dt1, dt2);
+        dur.day = Math.floor(secs / DAY);
+        secs = secs - (dur.day*DAY);
+        dur.hour = Math.floor(secs / HOUR)
+        secs = secs - (dur.hour*HOUR);
+        dur.minute = Math.floor(secs / MINUTE)
+        secs = secs - (dur.minute*MINUTE);
+        dur.second = secs;
    }
    return dur;
 }

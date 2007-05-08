@@ -170,6 +170,22 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         }
         s += "\n}";
         return s;
+    },
+    
+    _genericEquals: function modelGenericEquals(that){
+        if (that == null){
+            return false;
+        }
+
+        for (var x = 0; x < this.__propertyNames.length; x++){
+            var propName  = this.__propertyNames[x];
+            var thisProp = this.__getProperty(propName);
+            var thatProp = that.__getProperty(propName);
+            if (!cosmo.model.util.equals(thisProp, thatProp)){
+                return false;
+            }
+        }
+        return true;
     }
 });
 

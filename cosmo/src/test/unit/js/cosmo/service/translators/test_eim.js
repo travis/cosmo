@@ -57,6 +57,78 @@ cosmotest.service.translators.test_eim = {
               cosmo.datetime.fromIso8601(dtstartDateString).equals(e1.getStartDate()));
               
     },
+
+    test_parseRRuleFreq: function parseRRuleFreq(){
+        var rule = "FREQ=DAILY;UNTIL=20000131T090000Z;"
+        var rrule = cosmo.service.translators.eim.parseRRule(rule);
+        
+        jum.assertEquals("wrong frequency", 
+                         cosmo.model.RecurrenceRule.FREQUENCY_DAILY, 
+                         rrule.getFrequency());
+
+        var until = cosmo.datetime.fromIso8601("20000131T090000Z");
+        jum.assertTrue("wrong date", until.equals(rrule.getEndDate()));
+                         
+        jum.assertTrue("wrong supported value", rrule.isSupported());
+
+        rule = "FREQ=WEEKLY;UNTIL=20000131T090000Z;"
+        rrule = cosmo.service.translators.eim.parseRRule(rule);
+
+        jum.assertEquals("wrong frequency", 
+                         cosmo.model.RecurrenceRule.FREQUENCY_WEEKLY, 
+                         rrule.getFrequency());
+
+        rule = "FREQ=WEEKLY;INTERVAL=2;UNTIL=20000131T090000Z;"
+        rrule = cosmo.service.translators.eim.parseRRule(rule);
+
+        jum.assertEquals("wrong frequency", 
+                         cosmo.model.RecurrenceRule.FREQUENCY_BIWEEKLY, 
+                         rrule.getFrequency());
+
+        rule = "FREQ=MONTHLY;UNTIL=20000131T090000Z;"
+        rrule = cosmo.service.translators.eim.parseRRule(rule);
+
+        jum.assertEquals("wrong frequency", 
+                         cosmo.model.RecurrenceRule.FREQUENCY_MONTHLY, 
+                         rrule.getFrequency());
+
+        rule = "FREQ=YEARLY;UNTIL=20000131T090000Z;"
+        rrule = cosmo.service.translators.eim.parseRRule(rule);
+
+        jum.assertEquals("wrong frequency", 
+                         cosmo.model.RecurrenceRule.FREQUENCY_YEARLY, 
+                         rrule.getFrequency());
+    },
+    
+    test_parseRRuleUnsupported: function parseRRuleUnsupported(){
+        var rule = "FREQ=DAILY;UNTIL=20000131T090000Z;BYMONTH=1"
+        var rrule = cosmo.service.translators.eim.parseRRule(rule);
+        
+        jum.assertFalse("bymonth not supported", rrule.isSupported());
+        jum.assertTrue("unsupported rule not saved", !!rrule.getUnsupportedRule());
+        jum.assertEquals("bymonth wrong in unsupported rule", 1, 
+                         rrule.getUnsupportedRule().bymonth);
+                         
+        rule = "FREQ=WEEKLY;COUNT=10"
+        rrule = cosmo.service.translators.eim.parseRRule(rule);
+        
+        jum.assertFalse("count not supported", rrule.isSupported());
+        jum.assertTrue("unsupported rule not saved", !!rrule.getUnsupportedRule());
+        jum.assertEquals("count wrong in unsupported rule", 10, 
+                         rrule.getUnsupportedRule().count);
+        
+        rule = "FREQ=WEEKLY;INTERVAL=2;UNTIL=19971224T000000Z;WKST=SU;BYDAY=MO,WE,FR"
+        rrule = cosmo.service.translators.eim.parseRRule(rule);
+        
+        jum.assertFalse("byday not supported", rrule.isSupported());
+        jum.assertTrue("unsupported rule not saved", !!rrule.getUnsupportedRule());
+        jum.assertEquals("wkst wrong in unsupported rule", "SU", 
+                         rrule.getUnsupportedRule().wkst);
+        jum.assertEquals("count wrong in unsupported rule", ["MO","WE", "FR"], 
+                         rrule.getUnsupportedRule().byday);
+        
+        
+    },
   
     generateAtom: function generateAtom(/*Object*/ content){
         

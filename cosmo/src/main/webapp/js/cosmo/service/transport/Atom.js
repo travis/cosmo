@@ -42,11 +42,13 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     getItems: function (collectionUid, searchCrit, kwArgs){
         var d = new dojo.Deferred();
         var r = this.getDefaultRequest(d, kwArgs);
+        
+        var query = this._generateAuthQuery(kwArgs);
+        dojo.lang.mixin(query, this._generateSearchQuery());
 
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/collection/" +  collectionUid + "/full?" +
-          this._generateAuthQueryString(kwArgs) + "&" +
-          this._generateSearchQueryString(searchCrit) ;
+          "/atom/collection/" +  collectionUid + "/full" +
+          this.queryHashToString(query);
 
         dojo.io.bind(r);
         return d;
@@ -64,15 +66,19 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     },
 
-    _generateAuthQueryString: function(/*Object*/kwArgs){
+    _generateAuthQuery: function(/*Object*/kwArgs){
         if (kwArgs && kwArgs.ticketKey)
-            return "ticket=" + kwArgs.ticketKey;
+            return {ticket: kwArgs.ticketKey};
         else
-            return "";
+            return {};
     },
 
-    _generateSearchQueryString: function(/*Object*/searchCrit){
-        return "";
+    _generateSearchQuery: function(/*Object*/searchCrit){
+        var ret = {};
+        if (!searchCrit) return ret;
+        if (searchCrit.startMin) ret["start-min"] = searchCrit.startMin;
+        if (searchCrit.startMax) ret["start-max"] = searchCrit.startMax;
+        return ret;
     }
 
 

@@ -167,11 +167,11 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         },
       
         isOccurrence: function isOccurrence(){
-          return false;
+            return false;
         },
       
         getMaster: function getMaster(){
-          return this;
+            return this;
         },
 
         removeStamp: function removeStamp(/*String*/ stampName){

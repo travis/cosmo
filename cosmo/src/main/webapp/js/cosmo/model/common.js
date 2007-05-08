@@ -16,6 +16,7 @@
 dojo.provide("cosmo.model.common");
 
 dojo.require("cosmo.model.util");
+dojo.require("cosmo.model.Item"); //TODO: remove this if possible
 dojo.require("cosmo.datetime.serialize");
 
 /**

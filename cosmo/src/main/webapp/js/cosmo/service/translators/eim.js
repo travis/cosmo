@@ -24,7 +24,7 @@ dojo.require("dojo.date.serialize");
 dojo.require("dojo.lang.*");
 
 dojo.require("cosmo.service.eim");
-dojo.require("cosmo.model.common");
+dojo.require("cosmo.model.*");
 dojo.require("cosmo.service.translators.common");
 dojo.require("cosmo.datetime.serialize");
 
@@ -36,7 +36,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         var entries = atomXml.getElementsByTagName("entry");
         var items = {};
-        var mods = [];
+        var mods = {};
         for (var i = 0; i < entries.length; i++){
             var entry = entries[i];
             try {
@@ -45,7 +45,32 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 throw new cosmo.service.translators.
                    ParseError("Could not find id element for entry " + (i+1));
             }
-            uuid = uuid.firstChild.nodeValue;
+            uuid = uuid.firstChild.nodeValue.substring(9);
+            if (!uuid.split("::")[1]){
+                items[uuid] = this.entryToItem(entry, uuid)
+            }
+            else {
+                mods[uuid] = entry;
+            }
+        }
+
+        for (var uuid in mods){
+            var masterItem = items[uuid.split("::")[0]];
+            if (!masterItem) throw new 
+              cosmo.service.translators.ParseError(
+              "Could not find master event for modification " +
+              "with uuid " + uuid);
+              
+            items[uuid] = this.entryToItem(mods[uuid], uuid, masterItem);
+            //this.addModificationRecordSet(items, eval("(" + mods[i] + ")"));
+        }
+
+        return items;
+    },
+    
+    entryToItem: function entryToItem(/*XMLElement*/entry, /*String*/uuid, 
+        /*cosmo.model.Item*/ masterItem){
+
             var uuidParts = uuid.split("::");
             var uidParts = uuidParts[0].split(":");
             try {
@@ -56,22 +81,24 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             }
             var content = c.firstChild.nodeValue;
 
+            var item;
             // If we have a second part to the uid, this entry is a
             // recurrence modification.
-            if (!uuidParts[1]){
-                var item = this.recordSetToObject(eval("(" + content + ")"))
-            } else {
-                mods.push(content);
+            if (masterItem){
+                item = this.recordSetToModification(eval("(" + content + ")"), masterItem); 
             }
-
+            else {
+                item = this.recordSetToObject(eval("(" + content + ")"))
+            }
+            
             var links;
             // Safari doesn't find paging links with non NS call
             if (dojo.render.html.safari){
-               links = entries[i].getElementsByTagNameNS('*', "link");
+               links = entry.getElementsByTagNameNS('*', "link");
             } else {
-               links = entries[i].getElementsByTagName("link");
+               links = entry.getElementsByTagName("link");
             }
-
+    
             for (var j = 0; j < links.length; j++){
                 var link = links[j];
                 if (link.getAttribute('rel') == 'edit'){
@@ -79,14 +106,101 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 };
             }
 
-            items[uidParts[2]] = item;
-        }
+            return item;
+    },
+    
+    recordSetToObject: function recordSetToObject(/*Object*/ recordSet){
+        //TODO
+        /* We can probably optimize this by grabbing the
+         * appropriate properties from the appropriate records
+         * and passing them into the constructor. This will probably
+         * be a little less elegant, and will require the creation of
+         * more local variables, so we should play with this later.
+         */
 
-        for (var i = 0; i < mods.length; i++){
-            this.addModificationRecordSet(items, eval("(" + mods[i] + ")"));
-        }
+        var note = new cosmo.model.Note(
+         {
+             uid: recordSet.uuid
+         }
+        );
 
-        return items;
+        for (recordName in recordSet.records){
+        with (cosmo.service.eim.constants){
+
+           var record = recordSet.records[recordName]
+
+           switch(recordName){
+
+           case prefix.ITEM:
+               this.addItemRecord(record, note);
+               break;
+           case prefix.NOTE:
+               this.addNoteRecord(record, note);
+               break;
+           case prefix.EVENT:
+               note.getStamp(prefix.EVENT, true, this.getEventStampProperties(record));
+               break;
+           case prefix.TASK:
+               note.getStamp(prefix.TASK, true, this.getTaskStampProperties(record));
+               break;
+           }
+        }
+        }
+        return note;
+
+    },
+    
+    /*
+     * 
+     */
+    recordSetToModification: function recordSetToModification(recordSet, masterItem){
+        var uidParts = recordSet.uuid.split("::");
+
+        var modifiedProperties = {};
+        var modifiedStamps = {};
+        
+        for (recordName in recordSet.records){
+            with (cosmo.service.eim.constants){
+    
+               var record = recordSet.records[recordName];
+    
+               switch(recordName){
+    
+               case prefix.ITEM:
+               case prefix.NOTE:
+                   for (propertyName in record.fields){
+                       modifiedProperties[propertyName] = record.fields[propertyName][1];
+                   }
+                   break;
+               case prefix.EVENT:
+                   modifiedStamps[prefix.EVENT] = this.getEventStampProperties(record);
+                   break;
+               case prefix.TASK:
+                   modifiedStamps[prefix.TASK] = this.getTaskStampProperties(record);
+                   break;
+               }
+            }
+        }
+        
+        var recurrenceId = this.recurrenceIdToDate(uidParts[1])
+        
+        if (!dojo.lang.isEmpty(modifiedProperties)
+            || !dojo.lang.isEmpty(modifiedStamps)){
+            var mod = new cosmo.model.Modification(
+                {
+                    "recurrenceId": recurrenceId,
+                    "modifiedProperties": modifiedProperties,
+                    "modifiedStamps": modifiedStamps
+                }
+            );
+    
+            masterItem.addModification(mod);
+        }
+        return masterItem.getNoteOccurrence(recurrenceId);
+    },
+    
+    recurrenceIdToDate: function recurrenceIdToDate(/*String*/ rid){
+         return cosmo.datetime.fromIso8601(rid.split(":")[1]);
     },
 
     objectToAtomEntry: function(object){
@@ -226,98 +340,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
     },
 
-    /*
-     * Add modification record set to the appropriate member of the "items" hash.
-     */
-    addModificationRecordSetToItems: function(items, recordSet){
-        var uidParts = recordSet.uuid.split("::");
-        if (!items[uidParts[0]]){
-            throw new cosmo.service.translators.
-               ParseError("No item found with uid " + uidParts[0] +
-                           ". Cannot apply modification with recurrence" +
-                           " date " + uidParts[1]);
-        }
-
-        var item = items[uidParts[0]];
-
-        var modifiedProperties = {};
-        var modifiedStamps = {};
-
-        for (recordName in recordSet.records){
-        with (cosmo.service.eim.constants){
-
-           var record = recordSet.records[recordName];
-
-           switch(recordName){
-
-           case prefix.ITEM:
-           case prefix.NOTE:
-               for (propertyName in record.fields){
-                   modifiedProperties[propertyName] = record.fields[propertyName][1]
-               }
-               break;
-           case prefix.EVENT:
-               modifiedStamps[prefix.EVENT] = this.getEventStampProperties(record);
-               break;
-           case prefix.TASK:
-               modifiedStamps[prefix.TASK] = this.getTaskStampProperties(record);
-               break;
-           }
-        }
-        }
-
-        var mod = new cosmo.model.Modification(
-            {
-                "recurrenceId": uidParts[1],
-                "modifiedProperties": modifiedProperties,
-                "modifiedStamps": modifiedStamps
-            }
-        );
-
-        item.addModification(mod);
-    },
-
-    recordSetToObject: function (/*Object*/ recordSet){
-        //TODO
-        /* We can probably optimize this by grabbing the
-         * appropriate properties from the appropriate records
-         * and passing them into the constructor. This will probably
-         * be a little less elegant, and will require the creation of
-         * more local variables, so we should play with this later.
-         */
-
-        var note = new cosmo.model.Note(
-         {
-             uid: recordSet.uuid
-         }
-        );
-
-        for (recordName in recordSet.records){
-        with (cosmo.service.eim.constants){
-
-           var record = recordSet.records[recordName]
-
-           switch(recordName){
-
-           case prefix.ITEM:
-               this.addItemRecord(record, note);
-               break;
-           case prefix.NOTE:
-               this.addNoteRecord(record, note);
-               break;
-           case prefix.EVENT:
-               note.getStamp(prefix.EVENT, true, this.getEventStampProperties(record));
-               break;
-           case prefix.TASK:
-               note.getStamp(prefix.TASK, true, this.getTaskStampProperties(record));
-               break;
-           }
-        }
-        }
-        return note;
-
-    },
-
     getEventStampProperties: function getEventStampProperties(record){
 
         var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
@@ -328,7 +350,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 cosmo.datetime.parseIso8601Duration(record.fields.duration[1]) : undefined,
             anytime: dateParams.anyTime,
             location: record.fields.location? record.fields.location[1] : undefined,
-            rrule: record.fields.rrule? this.parseRRule(record.fields.location[1]): undefined,
+            rrule: record.fields.rrule? this.parseRRule(record.fields.rrule[1]): undefined,
             exdates: null, //TODO
             status: record.fields.status? record.fields.status[1]: undefined
          }

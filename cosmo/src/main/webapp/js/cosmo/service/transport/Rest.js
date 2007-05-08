@@ -102,6 +102,17 @@ dojo.declare("cosmo.service.transport.Rest", null,
     			}
     		);
     		return tf;
+    	},
+    	
+    	queryHashToString: function(/*Object*/ queryHash){
+    	    var queryList = [];
+    	    for (var key in queryHash){
+                queryList.push(key + "=" + queryHash[key]);
+    	    }
+    	    if (queryList.length > 0){
+    	        return "?" + queryList.join("&");
+    	    }
+    	    else return "";
     	}
     }
 );

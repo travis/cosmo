@@ -376,19 +376,19 @@ cosmo.datetime.Date.prototype.addDuration = function(/*cosmo.model.Duration*/ du
             utc = dojo.date.add(utc, YEAR, duration.getYear()).getTime();
         }
         if (duration.getMonth()){
-            utc = dojo.date.add(utc, YEAR, duration.getMonth()).getTime();
+            utc = dojo.date.add(utc, MONTH, duration.getMonth()).getTime();
         }
         if (duration.getDay()){
-            utc = dojo.date.add(utc, YEAR, duration.getDay()).getTime();
+            utc = dojo.date.add(utc, DAY, duration.getDay()).getTime();
         }
         if (duration.getHour()){
-            utc = dojo.date.add(utc, YEAR, duration.getHour()).getTime();
+            utc = dojo.date.add(utc, HOUR, duration.getHour()).getTime();
         }
         if (duration.getMinute()){
-            utc = dojo.date.add(utc, YEAR, duration.getMinute()).getTime();
+            utc = dojo.date.add(utc, MINUTE, duration.getMinute()).getTime();
         }
         if (duration.getSecond()){
-            utc = dojo.date.add(utc, YEAR, duration.getSecond()).getTime();
+            utc = dojo.date.add(utc, SECOND, duration.getSecond()).getTime();
         }
     }
     this.updateFromUTC(utc);

@@ -28,7 +28,7 @@ def test_basic_query_1():
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     positive = [ 'BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 
-                  'VERSION:2.0','BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID',
+                  'VERSION:2.0','BEGIN:VTIMEZONE','TZID', 
                   'BEGIN:DAYLIGHT', 'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 
                   'TZOFFSETTO:', 'END:', 'BEGIN:STANDARD', 'END:STANDARD',
                   'END:VTIMEZONE', 'END:VCALENDAR', 'BEGIN:VEVENT', 'SUMMARY:event', 
@@ -42,7 +42,7 @@ def test_basic_query_2():
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     positive = [ 'BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
-                 'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT', 
+                 'BEGIN:VTIMEZONE', 'TZID', 'BEGIN:DAYLIGHT', 
                  'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 
                  'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE',
                  'END:VCALENDAR', 'BEGIN:VEVENT', 'SUMMARY:event 1', 'END:VEVENT']
@@ -55,7 +55,7 @@ def test_basic_query_3():
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     positive = [ 'BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
-                 'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT', 
+                 'BEGIN:VTIMEZONE', 'TZID', 'BEGIN:DAYLIGHT', 
                  'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 'END:',
                  'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
                  'BEGIN:VEVENT', 'SUMMARY', 'END:VEVENT', 'DESCRIPTION:']
@@ -109,8 +109,8 @@ def test_limitexpand_1():
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:', 'VERSION:2.0',
-                'BEGIN:VTIMEZONE', 'LAST-MODIFIED:','TZID:', 'BEGIN:DAYLIGHT', 
-                'DTSTART:', 'RRULE:', 'TZNAME:EDT', 'TZOFFSETFROM', 'TZOFFSETTO', 
+                'BEGIN:VTIMEZONE','TZID:', 'BEGIN:DAYLIGHT', 
+                'DTSTART:', 'RRULE:', 'TZOFFSETFROM', 'TZOFFSETTO', 
                 'END:DAYLIGHT', 'BEGIN:STANDARD', 'DTSTART:', 'RRULE:',
                 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 'END:STANDARD', 
                 'END:VTIMEZONE', 'BEGIN:VEVENT', 'DTSTAMP:', 'DTSTART;', 'DURATION:',               
@@ -124,8 +124,8 @@ def test_limitexpand_2():
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID:', 'VERSION:2.0',      
-                'BEGIN:VTIMEZONE', 'LAST-MODIFIED:','TZID:', 'BEGIN:DAYLIGHT', 
-                'DTSTART:', 'RRULE:', 'TZNAME:EDT', 'TZOFFSETFROM', 'TZOFFSETTO', 
+                'BEGIN:VTIMEZONE', 'TZID:', 'BEGIN:DAYLIGHT', 
+                'DTSTART:', 'RRULE:', 'TZOFFSETFROM', 'TZOFFSETTO', 
                 'END:DAYLIGHT', 'BEGIN:STANDARD', 'DTSTART:', 'RRULE:',
                 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:', 'END:STANDARD', 
                 'END:VTIMEZONE', 'BEGIN:VEVENT', 'DTSTAMP:', 'DTSTART;', 'DURATION:', 
@@ -166,7 +166,7 @@ def test_multiget_four_resources_etag_vtimezone_only():
     assert client.response.status == 207
     
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
-                 'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
+                 'BEGIN:VTIMEZONE', 'TZID', 'BEGIN:DAYLIGHT',
                  'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                  'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 
                  'END:VCALENDAR']
@@ -183,7 +183,7 @@ def test_multiget_four_resources_etag_summary_uid_vevent_valarm_only():
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
                 'BEGIN:VEVENT', 'SUMMARY:', 'UID', 'END:VEVENT', 'END:VCALENDAR']
                   
-    negative = ['BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
+    negative = ['BEGIN:VTIMEZONE', 'TZID', 'BEGIN:DAYLIGHT',
                 'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE']
     
@@ -204,7 +204,7 @@ def test_multiget_no_summary():
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
                 'BEGIN:VEVENT', 'SUMMARY:', 'UID', 'END:VEVENT', 'END:VCALENDAR']
     
-    negative = ['BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
+    negative = ['BEGIN:VTIMEZONE', 'TZID', 'BEGIN:DAYLIGHT',
                 'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'SUMMARY:event']
 

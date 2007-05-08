@@ -14,6 +14,7 @@
 
 import davclient
 import copy
+import xmlobjects
 
 from xml.etree import ElementTree
 
@@ -30,6 +31,7 @@ class CosmoClient(davclient.DAVClient):
     
     _cosmo_path = '/cosmo/'
     _cmp_path = _cosmo_path+'cmp'
+    _collections_store = {}
     
     def set_cmp_path(self, path):
         _cmp_path = path
@@ -101,6 +103,75 @@ class CosmoClient(davclient.DAVClient):
             
         return all_events
         
-                
-                
+    def mc_get_collection(self, uuid):
+        """Get a collections xml as a string object by uuid"""
+        path = self._cosmo_path+'mc/collection/'+str(uuid)
+        return self.get(path, headers={'content-type':'application/eim+xml; charset=UTF-8'})
+        
+    def mc_publish_collection(self, xml_object, parent=None):
+        """Publish a collection over morsecode from an xmlobject"""
+        if parent is None:
+            path = self._cosmo_path+'mc/collection/'+xml_object['uuid']
+        else:
+            path = self._cosmo_path+'mc/collection/'+xml_object['uuid']+'?parent='+parent
+        
+        self.put(path, unicode(xmlobjects.tostring(xml_object)), 
+                 headers={'content-type':'application/eim+xml; charset=UTF-8'})
+        if self.response.status == 201:
+            self._collections_store[xml_object['uuid']] = {'xmlobject':xml_object, 'token':self.response.getheader('X-MorseCode-SyncToken')}
+    
+    # def mc_modify_collection(self, xml_object):
+    #     """Modify collection over morsecode from an xmlobject"""
+    #     path = self._cosmo_path+'mc/collection/'+xml_object['uuid']
+    #     
+    #     previous_xmlobject = xmlobjects.fromstring(self.mc_get_collection(xml_object['uuid']))
+    #     token = self.response.getheader('X-MorseCode-SyncToken')
+    #     
+    #     if type(xml_object.recordset) is not xmlobjects.element_list:
+    #         xml_object.recordset = []
+    #     
+    #     if type(previous_xmlobject.recordset) is not xmlobjects.element_list:
+    #         previous_xmlobject.recordset = []
+    #     
+    #     def get_recordset_uuid(recordset):
+    #         return getattr(getattr(recordset, '{http://osafoundation.org/eim/item/0}record'), 
+    #                                           '{http://osafoundation.org/eim/item/0}uuid')
+    #         
+    #     modified_objects = []
+    #     items_for_removal = []
+    #     matched_recordsets = []
+    #     
+    #     for recordset in xml_object.recordset:
+    #         if not recordset in previous_xmlobject.recordset:
+    #             recordset_uuid = get_recordset_uuid(recordset)
+    #             found = False
+    #             for previous_recordset in previous_xmlobject.recordset:
+    #                 previous_uuid = get_recordset_uuid(previous_recordset)
+    #                 if recordset_uuid == previous_uuid:
+    #                     found = True
+    #                     for record in recorset.record:
+    #                         for attribute in [getattr(record, attribute) for attribute in dir(record)]:
+    #                             if attribute is not None and attribute != '' and attribute.has_key('empty'):
+    #                                 attribute.__delitem__('empty')
+    #                                 
+    #                     modified_objects.append(recordset)
+    #             if found is not True:
+    #                 items_for_removal.append(recordset)
+    #         else:
+    #             matched_recordsets.append(recordset)
+    #             
+    #     
+    #     for recordset in matched_recordsets:
+    #         xmlobjects.recordset.remove(recordset)
+    #     
+    #     for recordset in items_for_removal:
+    #         for attribute in [attribute for attribute in dir(recordset) if not attribute.startswith('_')]:
+    #             delattr(recordset, attribute)
+    #         recordset['{http://osafoundation.org/eim/0}deleted'] = True
+    #     
+    #     request_body = xmlobjects.tostring(xml_object)
+    #     
+    #     self.post(path, request_body, headers={'content-type':'application/eim+xml; charset=UTF-8',
+    #                                            'X-MorseCode-SyncToken':token})
+
                 

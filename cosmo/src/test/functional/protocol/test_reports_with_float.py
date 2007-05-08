@@ -54,7 +54,7 @@ def test_timerangequery_vevents_in_timerange_1():
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
-                'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
+                'BEGIN:VTIMEZONE', 'TZID', 'BEGIN:DAYLIGHT',
                 'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                 'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 
                 'END:VCALENDAR', 'BEGIN:VEVENT', 'SUMMARY:event', 'END:VEVENT']
@@ -67,7 +67,7 @@ def test_timerangequery_vevents_in_timerange_2():
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
-                'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
+                'BEGIN:VTIMEZONE', 'TZID', 'BEGIN:DAYLIGHT',
                 'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                 'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 
                 'END:VCALENDAR', 'BEGIN:VEVENT', 'SUMMARY:event', 'END:VEVENT']
@@ -80,7 +80,7 @@ def test_timerangequery_vevents_in_timerange_3():
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
-                'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
+                'BEGIN:VTIMEZONE', 'TZID', 'BEGIN:DAYLIGHT',
                 'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                 'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 
                 'END:VCALENDAR', 'BEGIN:VEVENT', 'SUMMARY:event', 'END:VEVENT']
@@ -93,7 +93,7 @@ def test_timerangequery_vevents_in_timerange_4():
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
-                'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
+                'BEGIN:VTIMEZONE', 'TZID', 'BEGIN:DAYLIGHT',
                 'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                 'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 
                 'END:VCALENDAR', 'BEGIN:VEVENT', 'SUMMARY:event', 'END:VEVENT']
@@ -106,7 +106,7 @@ def test_timerangequery_vevents_in_timerange_5():
     assert client.response.status == 207
 
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',
-                'BEGIN:VTIMEZONE', 'LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT',
+                'BEGIN:VTIMEZONE', 'TZID', 'BEGIN:DAYLIGHT',
                 'DTSTART:', 'RRULE:', 'TZNAME:', 'TZOFFSETFROM:', 'TZOFFSETTO:',
                 'END:', 'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 
                 'END:VCALENDAR', 'BEGIN:VEVENT', 'SUMMARY:event', 'END:VEVENT']
@@ -126,7 +126,7 @@ def test_timerangequery_one_in_honolulu():
                 'UID:54E181BC7CCC373042B21884211@ninevah.local', 'END:VEVENT',
                 'END:VCALENDAR']
 
-    negative = ['LAST-MODIFIED:', 'TZID', 'BEGIN:DAYLIGHT','RRULE:', 'TZNAME:',
+    negative = ['TZID', 'BEGIN:DAYLIGHT','RRULE:', 'TZNAME:',
                 'TZOFFSETFROM:', 'TZOFFSETTO:']
                 
     validate_response_tree(client.response.tree, ['float1.ics'], positive=positive, negative=negative)

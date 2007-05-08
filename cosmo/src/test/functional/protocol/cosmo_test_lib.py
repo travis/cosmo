@@ -35,6 +35,7 @@ def setup_module(module, server_url=SERVER_URL, admin_user=ADMIN_USER, admin_pas
     module.TEST_EMAIL = module.TEST_USER+'@osafoundation.org'
     module.PRINCIPAL_ROOT = PRINCIPAL_ROOT
     module.PRINCIPAL_DAV_PATH = '%s/%s' % (PRINCIPAL_ROOT, module.TEST_USER)
+    module.PRINCIPAL_MS_PATH = PRINCIPAL_ROOT.replace('/dav', '/mc/collection')
     module.FILES_DIR = FILES_DIR
     
     #Setup client and users

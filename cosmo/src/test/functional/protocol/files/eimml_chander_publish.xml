@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:collection xmlns:ns0="http://osafoundation.org/eim/0" name="test" uuid="c9ce3e5e-ec5b-11db-b56e-ad9dfd2ce8f1">
+	<ns0:recordset uuid="cf2cbe16-ec5b-11db-b56e-ad9dfd2ce8f1">
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/item/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">cf2cbe16-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:title ns0:type="text">New Event</ns1:title>
+			<ns1:createdOn ns0:type="decimal">1176756499</ns1:createdOn>
+			<ns1:hasBeenSent ns0:type="integer">0</ns1:hasBeenSent>
+			<ns1:needsReply ns0:type="integer">0</ns1:needsReply>
+		</ns1:record>
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/note/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">cf2cbe16-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:body ns0:type="clob"/>
+			<ns1:icalUid ns0:type="text"/>
+		</ns1:record>
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/modifiedBy/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">cf2cbe16-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:userid empty="true" ns0:key="true" ns0:type="text"/>
+			<ns1:timestamp ns0:key="true" ns0:type="decimal">1176756503</ns1:timestamp>
+			<ns1:action ns0:key="true" ns0:type="integer">500</ns1:action>
+		</ns1:record>
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/event/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">cf2cbe16-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:dtstart ns0:type="text">;VALUE=DATE-TIME;TZID=America/New_York:20070416T061500</ns1:dtstart>
+			<ns1:duration ns0:type="text">PT1H</ns1:duration>
+			<ns1:location ns0:type="text"/>
+			<ns1:rrule ns0:type="text"/>
+			<ns1:exrule ns0:type="text"/>
+			<ns1:rdate ns0:type="text"/>
+			<ns1:exdate ns0:type="text"/>
+		</ns1:record>
+	</ns0:recordset>
+	<ns0:recordset uuid="d11b6074-ec5b-11db-b56e-ad9dfd2ce8f1">
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/item/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">d11b6074-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:title ns0:type="text">New Event</ns1:title>
+			<ns1:createdOn ns0:type="decimal">1176756503</ns1:createdOn>
+			<ns1:hasBeenSent ns0:type="integer">0</ns1:hasBeenSent>
+			<ns1:needsReply ns0:type="integer">0</ns1:needsReply>
+		</ns1:record>
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/modifiedBy/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">d11b6074-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:userid empty="true" ns0:key="true" ns0:type="text"/>
+			<ns1:timestamp ns0:key="true" ns0:type="decimal">1176756506</ns1:timestamp>
+			<ns1:action ns0:key="true" ns0:type="integer">500</ns1:action>
+		</ns1:record>
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/note/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">d11b6074-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:body ns0:type="clob"/>
+			<ns1:icalUid ns0:type="text"/>
+		</ns1:record>
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/event/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">d11b6074-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:dtstart ns0:type="text">;VALUE=DATE-TIME;TZID=America/New_York:20070418T081500</ns1:dtstart>
+			<ns1:duration ns0:type="text">PT1H</ns1:duration>
+			<ns1:location ns0:type="text"/>
+			<ns1:rrule ns0:type="text"/>
+			<ns1:exrule ns0:type="text"/>
+			<ns1:rdate ns0:type="text"/>
+			<ns1:exdate ns0:type="text"/>
+		</ns1:record>
+	</ns0:recordset>
+	<ns0:recordset uuid="d2e75f34-ec5b-11db-b56e-ad9dfd2ce8f1">
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/item/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">d2e75f34-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:title ns0:type="text">New Event</ns1:title>
+			<ns1:createdOn ns0:type="decimal">1176756506</ns1:createdOn>
+			<ns1:hasBeenSent ns0:type="integer">0</ns1:hasBeenSent>
+			<ns1:needsReply ns0:type="integer">0</ns1:needsReply>
+		</ns1:record>
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/note/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">d2e75f34-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:body ns0:type="clob"/>
+			<ns1:icalUid ns0:type="text"/>
+		</ns1:record>
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/event/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">d2e75f34-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:dtstart ns0:type="text">;VALUE=DATE-TIME;TZID=America/New_York:20070418T064500</ns1:dtstart>
+			<ns1:duration ns0:type="text">PT1H</ns1:duration>
+			<ns1:location ns0:type="text"/>
+			<ns1:rrule ns0:type="text"/>
+			<ns1:exrule ns0:type="text"/>
+			<ns1:rdate ns0:type="text"/>
+			<ns1:exdate ns0:type="text"/>
+		</ns1:record>
+		<ns1:record xmlns:ns1="http://osafoundation.org/eim/modifiedBy/0">
+			<ns1:uuid ns0:key="true" ns0:type="text">d2e75f34-ec5b-11db-b56e-ad9dfd2ce8f1</ns1:uuid>
+			<ns1:userid empty="true" ns0:key="true" ns0:type="text"/>
+			<ns1:timestamp ns0:key="true" ns0:type="decimal">1176756506</ns1:timestamp>
+			<ns1:action ns0:key="true" ns0:type="integer">500</ns1:action>
+		</ns1:record>
+	</ns0:recordset>
+</ns0:collection>

@@ -133,7 +133,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             this._modifications = {};
         },
         
-        getStamp: function(/*String*/ stampName, /*Boolean?*/ createIfDoesntExist) {
+        getStamp: function(/*String*/ stampName, /*Boolean?*/ createIfDoesntExist, /*Object*/ initialProps) {
            var stamp = this._stamps[stampName];
            
            if (stamp){
@@ -142,7 +142,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
            
            if (createIfDoesntExist){
                var ctr = cosmo.model._stampRegistry[stampName]["constructor"];
-               var stamp =  new ctr({item:this});
+               var stamp =  new ctr(dojo.lang.mixin({item:this}, initialProps));
                this._stamps[stampName] = stamp;
                return stamp;
            }          

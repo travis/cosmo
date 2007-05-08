@@ -60,7 +60,7 @@ function parseIso8601Duration(/*String*/duration){
 }
 
 cosmo.datetime.addIso8601Duration = 
-function addIso8601Duration(/*cosmo.datetime.date*/date, 
+function addIso8601Duration(/*cosmo.datetime.Date*/date, 
                             /*String or Object*/duration){
     var dHash;
     if (typeof(duration) == "string"){

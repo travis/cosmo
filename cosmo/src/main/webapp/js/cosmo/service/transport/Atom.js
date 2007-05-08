@@ -44,7 +44,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var r = this.getDefaultRequest(d, kwArgs);
         
         var query = this._generateAuthQuery(kwArgs);
-        dojo.lang.mixin(query, this._generateSearchQuery());
+        dojo.lang.mixin(query, this._generateSearchQuery(searchCrit));
 
         r.url = cosmo.env.getBaseUrl() +
           "/atom/collection/" +  collectionUid + "/full" +
@@ -76,8 +76,22 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     _generateSearchQuery: function(/*Object*/searchCrit){
         var ret = {};
         if (!searchCrit) return ret;
-        if (searchCrit.startMin) ret["start-min"] = searchCrit.startMin;
-        if (searchCrit.startMax) ret["start-max"] = searchCrit.startMax;
+        if (searchCrit.startMin) {
+            var d = searchCrit.startMin;
+            if (d instanceof cosmo.datetime.Date){
+                d = dojo.date.toRfc3339(d);
+            }
+            
+            ret["start-min"] = d;
+        }
+        if (searchCrit.startMax) {
+            var d = searchCrit.startMax;
+            if (d instanceof cosmo.datetime.Date){
+                d = dojo.date.toRfc3339(d);
+            }
+            
+            ret["start-max"] = d;
+        }
         return ret;
     }
 

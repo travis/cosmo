@@ -41,7 +41,7 @@ cosmotest.model.test_eventStamp = {
         stamp.setStartDate(startDate);
         stamp.setEndDate(endDate); 
         jum.assertTrue(endDate.equals(stamp.getEndDate()));
-        jum.assertEquals(60 * 60, stamp.getDuration()); 
+        jum.assertTrue(stamp.getDuration().equals(new cosmo.model.Duration({hour:1}))); 
     },
     
     test_occurenceInheritance: function(){

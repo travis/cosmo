@@ -20,7 +20,7 @@ dojo.require("cosmo.model.Item");
 
 cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
     [ ["startDate", cosmo.datetime.Date, {}],
-      ["duration", Number, {}],
+      ["duration", cosmo.model.Duration, {}],
       ["anytime", Boolean, {}],
       ["location", String, {}],
       ["rrule", cosmo.model.RecurrenceRule, {}],
@@ -36,13 +36,12 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
         getEndDate: function getEndDate(){
             var duration = this.getDuration();
             var endDate = this.getStartDate().clone();
-            endDate.add(dojo.date.dateParts.SECOND, duration);
+            endDate.addDuration(duration);
             return endDate;
         },
 
         setEndDate: function setEndDate(/*CosmoDate*/ endDate){
-            var duration = dojo.date.diff(this.getStartDate().toUTC(), endDate.toUTC(), 
-            dojo.date.dateParts.SECOND);
+            var duration = new cosmo.model.Duration(this.getStartDate(), endDate);
             this.setDuration(duration);
         },
     

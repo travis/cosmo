@@ -69,29 +69,29 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
     
         _getMasterProperty: function noteOccurrenceGetMasterProperty(propertyName){
             if (this._masterPropertyGetters && this._masterPropertyGetters[propertyName]){
-        return this._masterPropertyGetters[propertyName].apply(this);
-        }
+                return this._masterPropertyGetters[propertyName].apply(this);
+            }
             return this._master._stamps[stampName].__getProperty(propertyName);
         },
     
-    _getModifiedProperty: function stampOccurrenceGetModifiedProperty(propertyName){
+        _getModifiedProperty: function stampOccurrenceGetModifiedProperty(propertyName){
             var modification = this._master.getModification(this.recurrenceId);
             var modifiedStamp = modification._modifiedStamps[stampName];
-        if (modifiedStamp){
-        return modifiedStamp[propertyName];
-        }
+            if (modifiedStamp){
+                return modifiedStamp[propertyName];
+            }
         },
     
-    _setModifiedProperty: function stampOccurrenceSetModifiedProperty(propertyName, value){
+        _setModifiedProperty: function stampOccurrenceSetModifiedProperty(propertyName, value){
             var modification = this._master.getModification(this.recurrenceId);
             var modifiedStamp = modification._modifiedStamps[stampName];
-        if (!modifiedStamp){
-        modifiedStamp = {};
-        modification._modifiedStamps[stampName] = modifiedStamp;
-        }
-        modifiedStamp[propertyName] = value;
+            if (!modifiedStamp){
+                modifiedStamp = {};
+                modification._modifiedStamps[stampName] = modifiedStamp;
+            }
+            modifiedStamp[propertyName] = value;
         },
-    });
+});
 
     dojo.lang.mixin(stampOccurrenceCtr.prototype, occurrenceDeclarations || {});
     
@@ -206,6 +206,13 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
               clone._modifications = cosmo.model.clone(this._modifications);
           }
           return clone;
+      },
+      
+      getDelta: function getDelta(formValues){
+          //summary: returns a Delta object, which encapsulates the desired changes 
+          //         made to the note given the values in the form.
+          //description: for every value in formValues, this function will compare it to the 
+          //             the equivalent property in this object, be it a Note or NoteOccurrence
       }
         
     });
@@ -335,19 +342,28 @@ dojo.declare("cosmo.model.StampMetaData", null,{
         }
         
         return null;  
-    }
+    },
+    
+    clone: function(){
+        //should be treated like an immutable object.
+        return this;
+    } 
        
 });
 
 dojo.declare("cosmo.model.StampAttribute", null, {
-    __immutable:true,
     name: null,
     type: null,  /*Function*/
     
     initializer: function(name, type, kwArgs){
         this.name = name;
         this.type = type;            
-    }
+    },
+    
+    clone: function(){
+        //should be treated like an immutable object.
+        return this;
+    } 
 });
 
 dojo.declare("cosmo.model.BaseStamp", null, {
@@ -368,3 +384,51 @@ cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",
             this.initializeProperties(kwArgs);
         }
     });
+    
+dojo.declare("cosmo.model.Delta", null, {
+    initializer: function(){
+        this._stampProps = {}
+        this._propertyProps = {};
+    },
+    
+    addStampProperty: function deltaAddStampProperty(stampName, propertyName, value){
+        var stamp = this._getStamp(stampName);
+        stamp[propertyName] = value;
+    },
+    
+    addProperty: function deltaAddProperty(propertyName, value){
+        this._propertyProps[propertyName] = value;
+    },
+    
+    deltafy: function deltafy(/*cosmo.model.Note*/ note){
+        // summary: removes all properties which are the same as given note
+        // description: removes all properties from the delta which are the same
+        //              same as the properties in the given note and its stamps,
+        //              leaving you with just the delta, hence "deltafy"
+        this._filterOutEqualProperties(note, this._propertyProps);
+        //XXX
+        
+    },
+    
+    _filterOutEqualProperties: function filterOutEquals(original, changes){
+        for (var propName in changes){
+            var changeValue = changes[propName];
+            var origValue = this._getPropertyUsingGetter(original, propName);
+            if (cosmo.model.equals(changeValue, origValue)){
+                delete changes[propName];
+            } 
+        }
+    },
+    
+    _getPropertyUsingGetter: function getPropertyUsingGetter(object, propertyName){
+        
+    },
+    _getStamp: function deltaGetStamp(stampName){
+        var stamp = this._stampProps[stampName];
+        if (!stamp){
+            stamp = {};
+            this._stampProps[stampName] = stamp;
+        }
+        return stamp;        
+    }
+});

@@ -24,18 +24,18 @@ dojo.require("cosmo.datetime.serialize");
 cosmo.model.declare("cosmo.model.RecurrenceRule", null, 
     [["frequency", {"default": null}],
      ["endDate", {"default": null} ],
-     ["isSupported", {"default": true},
-     ["unsupportedRule", {"default": null}] ]
+     ["isSupported", {"default": true}],
+     ["unsupportedRule", {"default": null}]
     ], 
     {
-        initializer: function(kwArgs){
+        initializer: function (kwArgs){
             this.initializeProperties(kwArgs);
         },
-    
-        clone: function(rule) {
-            //TODO
-            dojo.unimplemented();
+        
+        isSupported: function isSupported(){
+            return this.getIsSupported();  
         },
+    
         equals: function(other){
             //TODO
             dojo.unimplemented();

@@ -29,7 +29,7 @@ cosmotest.model.test_eventStamp = {
         stamp.setEndDate(endDate);
         jum.assertTrue(endDate.equals(stamp.getEndDate()));
         //assert that the duration is one day, in seconds
-        jum.assertEquals(24 * 60 * 60, stamp.getDuration());
+        jum.assertTrue(stamp.getDuration().equals(new cosmo.model.Duration({day:1})));
         
         //let's try that again, now with timezones!
         //1/1/2007 1pm

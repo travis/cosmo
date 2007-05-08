@@ -103,6 +103,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         ctr.prototype.initializeProperties = this._initializeProperties;
         ctr.prototype.__immutable = kwArgs["immutable"];
         ctr.prototype.toString = this._genericToString;
+        ctr.prototype.equals = this._genericEquals;
         
         if (kwArgs["enhanceInitializer"]){
             var oldInitter = ctr.prototype.initializer;

@@ -30,8 +30,6 @@ dojo.require("cosmo.datetime.serialize");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
 
-
-
     responseToObject: function atomPlusEimResponseToObject(atomXml){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
@@ -393,11 +391,15 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     rruleToICal: function rruleToICal(rrule){
         if (rrule.isUnsupported()){
-            rrulePropsToICal(rrule.getUnsupportedRule())
+            return rrulePropsToICal(rrule.getUnsupportedRule());
+        } 
+        else {
+            //TODO
+            dojo.unimplemented("rrule to ical not implemented for supported rules");
         }
     },
 
-    rrulePropsToICal: function rrulePropsToICal(rProps){
+    rrlePropsToICal: function rrulePropsToICal(rProps){
         var iCalProps = [];
         for (var key in rProps){
             iCalProps.push(key);
@@ -406,7 +408,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 iCalProps.push(rProps[key].join());
             }
             else if (rProps[key] instanceof cosmo.datetime.Date){
-                dojo.unimplemented("Implement date serialization");
+                iCalProps.push(
+                    dojo.date.strftime(rProps[key].getUTCDateProxy(), "%Y%m%dT%H%M%SZ")
+                );
             }
             else {
                 iCalProps.push(rProps[key]);

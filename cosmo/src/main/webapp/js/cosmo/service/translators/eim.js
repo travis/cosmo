@@ -533,31 +533,33 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         } else {
             var RecurrenceRule = cosmo.model.RecurrenceRule;
             var Recur = this.rruleConstants;
-            var recurrenceRule = new cosmo.model.RecurrenceRule();
-
+            var recurrenceRule = {}
             // Set frequency
             if (rprops.freq == Recur.WEEKLY) {
                 if (rprops.interval == 1 || !rprops.interval){
-                    recurrenceRule.setFrequency(RecurrenceRule.FREQUENCY_WEEKLY);
+                    recurrenceRule.frequency = RecurrenceRule.FREQUENCY_WEEKLY;
                 }
                 else if (rprops.interval == 2){
-                    recurrenceRule.setFrequency(RecurrenceRule.FREQUENCY_BIWEEKLY);
+                    recurrenceRule.frequency = RecurrenceRule.FREQUENCY_BIWEEKLY;
                 }
             }
             else if (rprops.freq == Recur.MONTHLY) {
-                recurrenceRule.setFrequency(RecurrenceRule.FREQUENCY_MONTHLY);
+                recurrenceRule.frequency = RecurrenceRule.FREQUENCY_MONTHLY;
             }
             else if (rprops.freq == Recur.DAILY) {
-                recurrenceRule.setFrequency(RecurrenceRule.FREQUENCY_DAILY);
+                recurrenceRule.frequency = RecurrenceRule.FREQUENCY_DAILY;
             }
             else if (rprops.freq == Recur.YEARLY) {
-                recurrenceRule.setFrequency(RecurrenceRule.FREQUENCY_YEARLY);
+                recurrenceRule.frequency = RecurrenceRule.FREQUENCY_YEARLY;
             }
 
             // Set until date
             if (rprops.until) {
-                recurrenceRule.setEndDate(cosmo.datetime.fromIso8601(rprops.until));
+                recurrenceRule.endDate = cosmo.datetime.fromIso8601(rprops.until);
             }
+            
+            recurrenceRule = new cosmo.model.RecurrenceRule(recurrenceRule);
+            
 
             return recurrenceRule;
         }

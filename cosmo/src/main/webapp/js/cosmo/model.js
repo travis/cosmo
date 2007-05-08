@@ -14,6 +14,7 @@
  * limitations under the License.
 */
 dojo.provide("cosmo.model");
+dojo.provide("cosmo.oldmodel");
 
 dojo.require("cosmo.util.debug");
 dojo.require("cosmo.util.hash");
@@ -69,7 +70,7 @@ CalEventData.clone = function(data) {
 /**
  * A recurrence rule specifies how to repeat a given event.
  */
-cosmo.model.RecurrenceRule = function(){
+cosmo.oldmodel.RecurrenceRule = function(){
     /**
      * Specifies how often to repeat this event.
      * Must be one of the frequency constants above.
@@ -105,7 +106,7 @@ cosmo.model.RecurrenceRule = function(){
     this.modifications = [];
 }
 
-RecurrenceRule = cosmo.model.RecurrenceRule;
+RecurrenceRule = cosmo.oldmodel.RecurrenceRule;
 RecurrenceRule.prototype = {
     toString: genericToString,
     

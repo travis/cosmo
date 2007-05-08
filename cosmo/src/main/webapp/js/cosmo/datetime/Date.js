@@ -361,14 +361,38 @@ cosmo.datetime.Date.prototype._setStrftimeCached = function(formatString, format
  * Increments by the desired number of specified units
  */
 cosmo.datetime.Date.prototype.add = function(interv, incr) {
-    var dt = null;
-    var ret = null;
+    var dt = dojo.date.add(this.toUTC(), interv, incr);
     // Get incremented Date
     // 'n', 'd', etc., string keys
-    dt = dojo.date.add(this.toUTC(), interv, incr);
+    
     // Update this date based on the new UTC
     this.updateFromUTC(dt.getTime());
 };
+
+cosmo.datetime.Date.prototype.addDuration = function(/*cosmo.model.Duration*/ duration){
+    var utc = this.toUTC();
+    with(dojo.date.dateParts){
+        if (duration.getYear()){
+            utc = dojo.date.add(utc, YEAR, duration.getYear()).getTime();
+        }
+        if (duration.getMonth()){
+            utc = dojo.date.add(utc, YEAR, duration.getMonth()).getTime();
+        }
+        if (duration.getDay()){
+            utc = dojo.date.add(utc, YEAR, duration.getDay()).getTime();
+        }
+        if (duration.getHour()){
+            utc = dojo.date.add(utc, YEAR, duration.getHour()).getTime();
+        }
+        if (duration.getMinute()){
+            utc = dojo.date.add(utc, YEAR, duration.getMinute()).getTime();
+        }
+        if (duration.getSecond()){
+            utc = dojo.date.add(utc, YEAR, duration.getSecond()).getTime();
+        }
+    }
+    this.updateFromUTC(utc);
+}
 
 /**
  * Formats the Date according to what time the date falls on in the user's

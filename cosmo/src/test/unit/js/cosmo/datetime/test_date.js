@@ -17,6 +17,8 @@ dojo.provide("cosmotest.datetime.test_date");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.datetime.timezone.SimpleTimezoneRegistry");
+dojo.require("cosmo.model.common");
+
 //Initialization.
 //TODO - once Dojo implements setUp() and tearDown() move this code there.
 var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry(cosmo.env.getBaseUrl() + "/js/lib/olson-tzdata/");
@@ -249,6 +251,13 @@ test_dateUTCSetters: function test_dateUTCSetters() {
         jum.assertEquals(6, dt.getUTCHours());
         jum.assertEquals(11, dt.getHours());
     }
-}
+},
+
+   test_addDuration: function test_addDuration(){
+       var date = new cosmo.datetime.Date(2000,0,1,12,0,0);
+       var duration = new cosmo.model.Duration({year:1});
+       date.addDuration(duration);
+       jum.assertTrue(date.equals(new cosmo.datetime.Date(2001,0,1,12,0,0)));
+   }
 
 }

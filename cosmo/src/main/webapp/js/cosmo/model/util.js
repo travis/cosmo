@@ -104,6 +104,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         ctr.prototype.__immutable = kwArgs["immutable"];
         ctr.prototype.toString = this._genericToString;
         ctr.prototype.equals = this._genericEquals;
+        ctr.prototype.clone = this._genericClone;
         
         if (kwArgs["enhanceInitializer"]){
             var oldInitter = ctr.prototype.initializer;
@@ -187,6 +188,15 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
             }
         }
         return true;
+    },
+    
+    _genericClone: function modelGenericClone(){
+        var clone = new this.constructor();
+        for (var x = 0; x < this.__propertyNames.length; x++){
+            var propName  = "_" + this.__propertyNames[x];
+            clone[propName] = cosmo.model.clone(this[propName]);
+        }
+        return clone;
     }
 });
 
@@ -296,4 +306,38 @@ cosmo.model._occurrenceSetProperty = function occurrenceSetProperty(propertyName
         master.addModification(modification);
         this._setModifiedProperty(propertyName, value);
     }
+}
+
+cosmo.model.clone = function modelClone(thing){
+    var type = typeof thing;
+
+    if  (type == "undefined" ||
+         type == "number" ||
+         type == "string" ||
+         type == "boolean" ||
+         thing == null){
+        return thing;
+    }
+
+    if (dojo.lang.isArray(thing)){
+        var clone = [];
+        for (var x = 0; x < thing.length; x++){
+            clone[x] = cosmo.model.clone(thing[x]);
+        }
+        return thing;
+    }
+    
+   if (dojo.lang.isObject(thing)){
+        if (thing.clone){
+            return thing.clone();
+        }
+        
+        var clone = {};
+        for (var propName in thing){
+            clone[propName] = cosmo.model.clone(thing[propName]);
+        }
+        
+        return clone;
+   }
+   throw new Error("unclonable!?")
 }

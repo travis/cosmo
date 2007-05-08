@@ -118,6 +118,7 @@ cosmo.model.declare("cosmo.model.Item", null,
       initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
       }
+      
   });
 
 cosmo.model.declare("cosmo.model.Note", cosmo.model.Item, 
@@ -187,7 +188,26 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         
         getNoteOccurrence: function getNoteOccurrence(/*cosmo.datetime.Date*/ recurrenceId){
             return new cosmo.model.NoteOccurrence(this, recurrenceId);
-        }
+        },
+        
+        clone: function NoteClone(){
+          //summary: creates a deep copy of all the properties of this Item. 
+          //description: Copies all the properties of the Note, making copies
+          //             of all mutable objects
+          var clone = this._inherited("clone");
+          if (this._stamps){
+              clone._stamps = cosmo.model.clone(this._stamps);
+              for (var stampName in clone._stamps){
+                  var stamp = clone._stamps[stampName];
+                  stamp.item = clone;
+              }
+          }
+          if (this._modifications){
+              clone._modifications = cosmo.model.clone(this._modifications);
+          }
+          return clone;
+      }
+        
     });
     
 dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
@@ -289,6 +309,7 @@ dojo.declare("cosmo.model.Collection", cosmo.model.Item, {
 });
 
 dojo.declare("cosmo.model.StampMetaData", null,{
+    __immutable:true,
     stampName: null, 
     attributes: null,
     
@@ -319,6 +340,7 @@ dojo.declare("cosmo.model.StampMetaData", null,{
 });
 
 dojo.declare("cosmo.model.StampAttribute", null, {
+    __immutable:true,
     name: null,
     type: null,  /*Function*/
     

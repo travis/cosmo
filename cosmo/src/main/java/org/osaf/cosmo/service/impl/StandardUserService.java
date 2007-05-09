@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.HomeCollectionItem;
@@ -49,6 +50,11 @@ public class StandardUserService implements UserService {
      * The service uses MD5 if no digest algorithm is explicitly set.
      */
     public static final String DEFAULT_DIGEST_ALGORITHM = "MD5";
+    
+    /**
+     * The name for the default collection created by the server on new accounts.
+     */
+    public static final String DEFAULT_COLLECTION_NAME = "Default Collection";
 
     private MessageDigest digest;
     private String digestAlgorithm;
@@ -155,6 +161,17 @@ public class StandardUserService implements UserService {
         User newUser = userDao.getUser(user.getUsername());
         
         contentDao.createRootItem(newUser);
+        
+        CollectionItem rootItem = contentDao.getRootItem(newUser);
+        
+        CollectionItem collection = new CollectionItem();
+        collection.setName(DEFAULT_COLLECTION_NAME);
+        collection.setOwner(user);
+        collection.setDisplayName(DEFAULT_COLLECTION_NAME);
+        CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
+        collection.addStamp(ccs);
+        
+        contentDao.createCollection(rootItem, collection);
 
         return newUser;
     }

@@ -94,9 +94,7 @@ public class StandardProvider extends AbstractProvider
             entry = generator.generateEntry(item);
 
             AbstractResponseContext rc =
-                new BaseResponseContext<Document<Element>>(entry.getDocument());
-            rc.setStatus(201);
-            rc.setStatusText("Created");
+                createResponseContext(entry.getDocument(), 201, "Created");
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
             rc.setLocation(entry.getSelfLink().toString());
             rc.setContentLocation(entry.getSelfLink().toString());
@@ -146,8 +144,7 @@ public class StandardProvider extends AbstractProvider
             return locked(abdera, request);
         }
 
-        AbstractResponseContext rc = new EmptyResponseContext(204);
-        return rc;
+        return createResponseContext(204);
     }
   
     public ResponseContext deleteMedia(RequestContext request) {
@@ -175,7 +172,7 @@ public class StandardProvider extends AbstractProvider
             entry = generator.generateEntry(item);
 
             AbstractResponseContext rc =
-                new BaseResponseContext<Document<Element>>(entry.getDocument());
+                createResponseContext(entry.getDocument());
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
 
             return rc;
@@ -225,7 +222,7 @@ public class StandardProvider extends AbstractProvider
             processor.processContent(request.getReader(), item);
             item = (NoteItem) contentService.updateItem(item);
 
-            AbstractResponseContext rc = new EmptyResponseContext(204);
+            AbstractResponseContext rc = createResponseContext(204);
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
 
             return rc;
@@ -265,9 +262,7 @@ public class StandardProvider extends AbstractProvider
             Service service =
                 generator.generateService(target.getHomeCollection());
 
-            AbstractResponseContext rc =
-                new BaseResponseContext<Document<Element>>(service.getDocument());
-            return rc;
+            return createResponseContext(service.getDocument());
         } catch (GeneratorException e) {
             String reason = "Unknown service generation error: " + e.getMessage();
             log.error(reason, e);
@@ -288,7 +283,7 @@ public class StandardProvider extends AbstractProvider
             Feed feed = generator.generateFeed(collection);
 
             AbstractResponseContext rc =
-                new BaseResponseContext<Document<Element>>(feed.getDocument());
+                createResponseContext(feed.getDocument());
             rc.setEntityTag(new EntityTag(collection.getEntityTag()));
             return rc;
         } catch (InvalidQueryException e) {
@@ -318,7 +313,7 @@ public class StandardProvider extends AbstractProvider
             Entry entry = generator.generateEntry(item);
 
             AbstractResponseContext rc =
-                new BaseResponseContext<Document<Element>>(entry.getDocument());
+                createResponseContext(entry.getDocument());
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
             return rc;
         } catch (UnsupportedProjectionException e) {
@@ -456,5 +451,43 @@ public class StandardProvider extends AbstractProvider
         return returnBase(createErrorDocument(abdera, 423, "Collection Locked",
                                               null),
                           423, null);
+    }
+
+    private AbstractResponseContext
+        createResponseContext(int status) {
+        return createResponseContext(status, null);
+    }
+
+    private AbstractResponseContext
+        createResponseContext(int status,
+                              String reason) {
+        AbstractResponseContext rc = new EmptyResponseContext(status);
+
+        if (reason != null)
+            rc.setStatusText(reason);
+
+        return rc;
+    }
+
+    private AbstractResponseContext
+        createResponseContext(Document<Element> doc) {
+        return createResponseContext(doc, -1, null);
+    }
+
+    private AbstractResponseContext
+        createResponseContext(Document<Element> doc,
+                              int status,
+                              String reason) {
+        AbstractResponseContext rc =
+            new BaseResponseContext<Document<Element>>(doc);
+
+        rc.setWriter(abdera.getWriterFactory().getWriter("PrettyXML"));
+
+        if (status > 0)
+            rc.setStatus(status);
+        if (reason != null)
+            rc.setStatusText(reason);
+
+        return rc;
     }
 }

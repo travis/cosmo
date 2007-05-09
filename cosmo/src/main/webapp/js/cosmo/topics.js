@@ -72,7 +72,7 @@ cosmo.topics.declareMessage("cosmo.topics.CollectionUpdatedMessage",
     //          has occured
     "COLLECTION_UPDATED", null,
     //initializer
-    function (/*cosmo.model.CalendarMetadata*/ collection){
+    function (/*cosmo.model.Collection*/ collection){
         this.collection = collection;
     },
     //props

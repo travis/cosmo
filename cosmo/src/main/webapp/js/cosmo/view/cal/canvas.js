@@ -761,18 +761,20 @@ cosmo.view.cal.canvas = new function () {
                     keep = true;
                     break;
                 // Any that don't have matching ids -- keep these too
-                case (str.indexOf(',' + ev.data.id + ',') == -1):
+                case (str.indexOf(',' + ev.data.getUid() + ',') == -1):
                     keep = true;
                     break;
                 // Matching ids -- candidates for removal
-                case (str.indexOf(',' + ev.data.id + ',') > -1):
-                    // If also filtering by date, check the start date of
+                case (str.indexOf(',' + ev.data.getUid() + ',') > -1):
+                    var eventStamp = ev.data.getEventStamp();
+                    var startDate = eventStamp.getStartDate();
+                    var endDate = eventStamp.getEndDate();                    // If also filtering by date, check the start date of
                     // matching events as well
-                    if (compDt && (ev.data.start.toUTC() < compDt.toUTC())) {
+                    if (compDt && (startDate.toUTC() < compDt.toUTC())) {
                         keep = true;
                         // Reset the end date for the recurrence on the
                         // events not removed
-                        ev.data.recurrenceRule.endDate = new cosmo.datetime.Date(dt.getFullYear(),
+                        ev.data.getEventStamp().getRrule().getEndDate() = new cosmo.datetime.Date(dt.getFullYear(),
                             dt.getMonth(), dt.getDate());
                     }
                     break;
@@ -784,6 +786,7 @@ cosmo.view.cal.canvas = new function () {
         }
         return h;
     };
+
     /**
      * Append an calendar event lozenge to the canvas -- likely
      * called in a loop with the Hash's 'each' method
@@ -792,10 +795,13 @@ cosmo.view.cal.canvas = new function () {
      * for the event getting added to the canvas
      */
     function appendLozenge(key, val) {
+        var eventStamp = ev.data.getEventStamp();
+        var allDay = eventStamp.getAllDay();
+        var anyTime = eventStamp.getAnyTime();
         var id = key;
         var ev = val;
         // Create the lozenge and link it to the event
-        ev.lozenge = (ev.data.allDay || ev.data.anyTime) ? new cosmo.view.cal.lozenge.NoTimeLozenge(id) :
+        ev.lozenge = (allDay || anyTime) ? new cosmo.view.cal.lozenge.NoTimeLozenge(id) :
             new cosmo.view.cal.lozenge.HasTimeLozenge(id);
         ev.lozenge.insert(id);
     }
@@ -974,12 +980,12 @@ cosmo.view.cal.canvas = new function () {
                 // Master recurrence event id
                 idArr.push(opts.instanceEvent.data.id);
                 // id for first event in new recurrence
-                idArr.push(ev.data.id);
+                idArr.push(ev.data.getUid());
             }
             // 'All Events'
             else {
                 // Master recurrence id
-                idArr.push(ev.data.id);
+                idArr.push(ev.data.getUid());
             }
 
             // Remove some of all of the recurrence instances for re-render
@@ -1031,23 +1037,27 @@ cosmo.view.cal.canvas = new function () {
                 // ==========================================================
                 // Either a master recurring or a recurring new event after
                 // breaking recurrence -- figuring selection is a party
-                if (ev.data.recurrenceRule) {
+                var eventStamp = ev.data.getEventStamp();
+                var startDate = eventStamp.getStartDate();
+                var endDate = eventStamp.getEndDate();
+                var rrule = eventStamp.getRrule();
+                if (rrule) {
                     ev = evReg.getAtPos(0);
                     // If changing a recurrence-end results in the expansion
                     // ending before the start of the orignal clicked instance,
                     // lozenge selection needs to go somewhere
                     if (opts.instanceEvent && ev.data.recurrenceRule.endDate &&
-                        (ev.data.recurrenceRule.endDate.toUTC() <
-                            opts.instanceEvent.data.start.toUTC())) {
+                        (rrule.getEndDate().toUTC() <
+                            opts.instanceEvent.data.getEventStamp().getStartDate().toUTC())) {
                         ev =  self.eventRegistry.getLast();
                     }
                     else {
                         // Daily recurrence events
-                        if (ev.data.recurrenceRule.frequency == 'daily') {
+                        if (rrule.getFrequency() == 'daily') {
                             // Persist selection when editing an instance, and
                             // selecting 'All Events'
                             if (opts.saveType == 'recurrenceMaster' &&
-                                opts.instanceEvent && opts.instanceEvent.data.instance) {
+                                opts.instanceEvent && opts.instanceEvent.data.isInstance()) {
                                 ev = self.eventRegistry.getAtPos(currSel);
                             }
                             else {
@@ -1208,12 +1218,25 @@ cosmo.view.cal.canvas = new function () {
     function setLozengeProcessing(cmd) {
         var ev = cmd.data;
         var qual = cmd.qualifier;
+        var eventStamp = ev.data.getEventStamp();
+        var startDate = eventStamp.getStartDate();
+        var endDate = eventStamp.getEndDate();
+        var allDay = eventStamp.getAllDay();
+        var anyTime = eventStamp.getAnyTime();
+        var rrule = eventStamp.getRrule();
+        if (ev.dataOrig){
+            var origEventStamp = ev.dataOrig.getEventStamp();
+            var origStartDate = origEventStamp.getStartDate();
+            var origEndDate = origEventStamp.getEndDate();
+            var origAllDay = origEventStamp.getAllDay();
+            var origAnyTime = origEventStamp.getAnyTime();
+        }
         // Reset the lozenge because we may be changing to the new type
         // -- e.g., between all-day and normal, or between normal single
         // and normal composite
         if (ev.dataOrig &&
-            !((ev.data.allDay || ev.data.anyTime) &&
-            (ev.dataOrig.allDay || ev.dataOrig.anyTime))) {
+            !((allDay || anyTime) &&
+            (origAllDay || origAnyTime))) {
             ev.replaceLozenge();
         }
         // Reset the lozenge properties from the event
@@ -1224,12 +1247,12 @@ cosmo.view.cal.canvas = new function () {
         // Display processing animation
         ev.lozenge.setInputDisabled(true);
         ev.lozenge.showProcessing();
-        if (ev.data.recurrenceRule) {
+        if (rrule) {
 
             var f = function (i, e) {
                 if (e.data.id == ev.data.id) {
                     if (qual == 'allEvents' || (qual == 'allFuture' &&
-                        (ev.data.start.toUTC() < e.data.start.toUTC()))) {
+                        (startDate.toUTC() < e.data.getEventStamp().getStartDate().toUTC()))) {
                         e.lozenge.setInputDisabled(true);
                         e.lozenge.showProcessing();
                     }
@@ -1245,6 +1268,7 @@ cosmo.view.cal.canvas = new function () {
      * the user double-clicks on the cal canvas
      * @param id A string, the id of the div on the cal canvas double-clicked
      */
+    //XINT
     function insertCalEventNew(evParam) {
         var ev = null; // New event
         var evSource = '';

@@ -385,37 +385,42 @@ cosmo.ui.cal_form.CalForm = function () {
 
     this.setMailtoLink = function (ev) {
         var timeFormat=_("Sidebar.Email.TimeFormat");
-        var d = ev.data;
-        var subject = cosmo.app.pim.currentCollection.displayName + ": " + d.title;
-        var body = [_("Sidebar.Email.Title") , d.title , "%0d%0a"];
+        var note = ev.data;
+        var subject = cosmo.app.pim.currentCollection.getDisplayName() + ": " + note.getDisplayName();
+        var body = [_("Sidebar.Email.Title") , note.getDisplayName() , "%0d%0a"];
 
-        if (d.start.tzId){
+        var eventStamp = note.getEventStamp();
+        var startDate = eventStamp.getStartDate();
+        var endDate = eventStamp.getEndDate();
+        
+        if (startDate.tzId){
             body = body.concat([
-             _("Sidebar.Email.Timezone")  , d.start.tzId , "%0d%0a"]);
+             _("Sidebar.Email.Timezone"), startDate.tzId , "%0d%0a"]);
         }
         body = body.concat([
-             _("Sidebar.Email.Starts") , dojo.date.strftime(d.start, timeFormat) , "%0d%0a" ,
-             _("Sidebar.Email.Ends") , dojo.date.strftime(d.end, timeFormat) , "%0d%0a"]);
-        if (d.allDay) {
+             _("Sidebar.Email.Starts") , dojo.date.strftime(startDate, timeFormat) , "%0d%0a" ,
+             _("Sidebar.Email.Ends") , dojo.date.strftime(endDate, timeFormat) , "%0d%0a"]);
+        if (eventStamp.getAllDay()) {
             body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
         }
 
-        if (d.recurrenceRule){
+        if (eventStamp.getRrule()){
+            var rrule = eventStamp.getRrule();
             body = body.concat([_("Sidebar.Email.Recurs") ,
-                d.recurrenceRule.frequency]);
-            if (d.recurrenceRule.endDate){
+                rrule.getFrequency()]);
+            if (rrule.getEndDate()){
                 body = body.concat([_("Sidebar.Email.EndingOn") ,
-                    dojo.date.strftime(d.recurrenceRule.endDate, timeFormat)]);
+                    dojo.date.strftime(rrule.getEndDate(), timeFormat)]);
             }
             body.push(".%0d%0a");
 
         }
-        if (d.status){
-            body.concat([_("Sidebar.Email.Status") , d.status , "%0d%0a"]);
+        if (eventStamp.getStatus()){
+            body.concat([_("Sidebar.Email.Status") , eventStamp.getStatus() , "%0d%0a"]);
         }
-        if (d.description){
+        if (note.getBody()){
             body = body.concat([ ,
-                _("Sidebar.Email.Description") , d.description , "%0d%0a"]);
+                _("Sidebar.Email.Description") , note.getBody(), "%0d%0a"]);
         }
         this.mailtoLink.setAttribute("href", "mailto:?subject=" + subject + "&body=" + body.join(""));
     };
@@ -478,10 +483,8 @@ cosmo.ui.cal_form.CalForm = function () {
     /**
      *
      */
-    this.setButtons = function (r, s) {
-        rem = r;
-        sav = s;
-        if (!cosmo.app.pim.currentCollection.privileges.write) {
+    this.setButtons = function (rem, sav) {
+        if (!cosmo.app.pim.currentCollection.isWriteable()) {
             rem = false;
             sav = false;
         }
@@ -669,6 +672,7 @@ cosmo.ui.cal_form.CalForm = function () {
             return false;
         }
         // All okey-dokey -- submit
+        //XINT
         else {
             // Set event properties
             // ==============
@@ -727,28 +731,31 @@ cosmo.ui.cal_form.CalForm = function () {
      */
     this.updateFromEvent = function (ev) {
         var form = this.form;
-        var d = ev.data;
-        var recur = d.recurrenceRule;
-        var status = d.status;
-        form.eventtitle.value = d.title;
-        form.eventlocation.value = d.location;
-        form.eventdescr.value = d.description ?
-            d.description : '';
-        form.status.value = d.statusBar ? d.status : '';
-        form.startdate.value = dojo.date.strftime(d.start, '%m/%d/%Y');
-        form.enddate.value = dojo.date.strftime(d.end, '%m/%d/%Y');
-        form.eventallday.checked = d.allDay ? true : false;
+        var note = ev.data;
+        var eventStamp = note.getEventStamp();
+        var recur = eventStamp.getRrule();
+        var status = eventStamp.getStatus();
+        var startDate = eventStamp.getStartDate();
+        var endDate = eventStamp.getEndDate();
+        form.eventtitle.value = note.getDisplayName();
+        form.eventlocation.value = eventStamp.getLocation();
+        form.eventdescr.value = note.getBody() || "";
+        form.status.value = eventStamp.getStatus() || "";
+        form.startdate.value = dojo.date.strftime(starDate, '%m/%d/%Y');
+        form.enddate.value = dojo.date.strftime(endDate, '%m/%d/%Y');
+        form.eventallday.checked = eventStamp.getAllDay();
+
         // Set mailto link
         this.setMailtoLink(ev);
-        if (d.allDay || d.anyTime) {
+        if (eventStamp.getAllDay() || eventStamp.getAnyTime()) {
             this.setTimeElem(null, 'start');
             this.setTimeElem(null, 'end');
         }
         else {
-            this.setTimeElem(d.start, 'start');
-            this.setTimeElem(d.end, 'end');
+            this.setTimeElem(startDate, 'start');
+            this.setTimeElem(endDate, 'end');
         }
-        var enable = d.allDay ? false : true;
+        var enable = !eventStamp.getAllDay();
         this.enableDisableTimeElem('start', enable);
         this.enableDisableTimeElem('end', enable);
 
@@ -759,11 +766,11 @@ cosmo.ui.cal_form.CalForm = function () {
         }
 
         if (recur) {
-            _html.setSelect(this.form.recurrence, recur.frequency);
+            _html.setSelect(this.form.recurrence, recur.getFrequency());
             form.recurend.disabled = false;
-            if (recur.endDate) {
+            if (recur.getEndDate()) {
                 this.setTextInput(form.recurend,
-                    dojo.date.strftime(recur.endDate, '%m/%d/%Y'), false, false);
+                    dojo.date.strftime(recur.getEndDate(), '%m/%d/%Y'), false, false);
             }
             else {
                 this.setTextInput(form.recurend, 'mm/dd/yyyy', true, false);
@@ -774,8 +781,8 @@ cosmo.ui.cal_form.CalForm = function () {
             this.setTextInput(form.recurend, 'mm/dd/yyyy', true, true);
         }
 
-        if (d.start.tzId){
-            var timezone = cosmo.datetime.timezone.getTimezone(d.start.tzId);
+        if (startDate.tzId){
+            var timezone = cosmo.datetime.timezone.getTimezone(startDate.tzId);
             if (!timezone){
                 self.clearTimezone();
             } else {
@@ -792,7 +799,7 @@ cosmo.ui.cal_form.CalForm = function () {
         }
 
         // All-day, anytime events cannot have a timezone, normal events can
-        if (d.allDay || d.anyTime) {
+        if (eventStamp.getAllDay() || eventStamp.getAnyTime()) {
             this.form.tzRegion.disabled = true;
             this.form.tzId.disabled = true;
         }
@@ -1015,7 +1022,7 @@ cosmo.ui.cal_form.CalForm = function () {
         // Err condition
         if (err) {
             err = err.replace(/\n/g, '<br/>');
-            e = new ScoobyServiceClientException();
+            e = new cosmo.service.exception.ServiceException();
             e.message = err;
             cosmo.app.showErr(_('Main.Error.GoToDate'), e);
             return false;

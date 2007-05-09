@@ -63,6 +63,7 @@ cosmo.view.cal = new function () {
      * For normal events, this simply passes through to saveEventChanges
      * @param ev A CalEvent object, the event to be saved.
      */
+     //XINT
     function saveEventChangesConfirm(ev) {
 
         var changedProps = null;
@@ -194,6 +195,7 @@ cosmo.view.cal = new function () {
      * the two special cases of adding recurrence to a single event or
      * removing recurrence completely from a master event for a recurrence.
      */
+     //XINT
     function saveEventChanges(ev, qual) {
 
         // f is a function object gets set based on what type
@@ -462,6 +464,7 @@ cosmo.view.cal = new function () {
      * @param ev A CalEvent object, the event to be saved.
      * @param opts A JS Object, options for the save operation.
      */
+     //XINT
     function doSaveEvent(ev, opts) {
         // Pass the original event and opts object to the handler function
         // along with the original params passed back in from the async response
@@ -509,6 +512,7 @@ cosmo.view.cal = new function () {
      * should end.
      * @param opts A JS Object, options for the save operation.
      */
+     //XINT
     function doSaveEventBreakRecurrence(ev, origId, recurEnd, opts) {
         // Pass the original event and opts object to the handler function
         // along with the original params passed back in from the async response
@@ -534,6 +538,7 @@ cosmo.view.cal = new function () {
      * @param reqId Number, the id of the async request.
      * @param optsParam A JS Object, options for the save operation.
      */
+     //XINT
     function handleSaveEvent(ev, newEvId, err, reqId, optsParam) {
         var saveEv = ev;
         var opts = optsParam || {};
@@ -646,6 +651,7 @@ cosmo.view.cal = new function () {
      * confirmation dialog for recurring events.
      * @param ev A CalEvent object, the event to be removed.
      */
+     //XINT
     function removeEventConfirm(ev) {
         var str = '';
         var opts = {};
@@ -672,6 +678,7 @@ cosmo.view.cal = new function () {
      * @param qual String, flag for different variations of removing
      * recurring events. Will be one of the three recurringEventOptions.
      */
+     //XINT
     function removeEvent(ev, qual) {
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
@@ -796,6 +803,7 @@ cosmo.view.cal = new function () {
      * @param ev A CalEvent object, the event to be saved.
      * @param opts A JS Object, options for the remove operation.
      */
+     //XINT
     function doRemoveEvent(ev, opts) {
         // Pass the original event and opts object to the handler function
         // along with the original params passed back in from the async response
@@ -816,6 +824,7 @@ cosmo.view.cal = new function () {
      * @param reqId Number, the id of the async request.
      * @param optsParam A JS Object, options for the save operation.
      */
+    //XINT
     function handleRemoveResult(ev, newEvId, err, reqId, opts) {
         var removeEv = ev;
         // Simple error message to go along with details from Error obj
@@ -847,6 +856,7 @@ cosmo.view.cal = new function () {
      * @param rrule A RecurrenceRule, the updated rule for saving.
      * @param opts A JS Object, options for the remove operation.
      */
+    //XINT
     function doSaveRecurrenceRule(ev, rrule, opts) {
         // Pass the original event and opts object to the handler function
         // along with the original params passed back in from the async response
@@ -867,6 +877,7 @@ cosmo.view.cal = new function () {
      * @param reqId Number, the id of the async request.
      * @param opts A JS Object, options for the save operation.
      */
+    //XINT
     function handleSaveRecurrenceRule(ev, err, reqId, opts) {
 
         var rruleEv = ev;
@@ -911,28 +922,7 @@ cosmo.view.cal = new function () {
                 'data': rruleEv, 'opts': opts, 'qualifier': qual });
         }
     }
-    /**
-     * Propagate new modifications/exceptions to the
-     * RecurrenceRule to all the other instances of the
-     * recurrence currently on the canvas
-     * @param ev A CalEvent object, an event in the recurrence
-     * in question -- used to key off the event's id.
-     * @return Boolean, true.
-     */
-    function syncRecurrence(ev) {
-        // Propagate new modifications/exceptions to the
-        // RecurrenceRule to all the other instances of the
-        // recurrence currently on the canvas
-        var f = function (i, e) {
-            if (e.data.id == ev.data.id) {
-                e.data.recurrenceRule =
-                    RecurrenceRule.clone(ev.data.recurrenceRule);
-            }
-        }
-        var evReg = cosmo.view.cal.canvas.eventRegistry;
-        evReg.each(f);
-        return true;
-    }
+
     function getErrDetailMessage(err) {
         var msg = '';
         switch (true) {
@@ -960,6 +950,7 @@ cosmo.view.cal = new function () {
      * FIXME: The call to self.processingQueue.shift(); should
      * be moved into handleSaveEvent, which calls this function.
      */
+     //XINT
     function loadRecurrenceExpansion(start, end, ev, opts) {
         var id = ev.data.id;
         var s = start.getTime();
@@ -973,7 +964,7 @@ cosmo.view.cal = new function () {
         }
 
         cosmo.app.pim.currentCollection.conduit.expandEvents(
-            cosmo.app.pim.currentCollection.collection.uid, [id], s, e,
+            cosmo.app.pim.currentCollection.getUid(), [id], s, e,
             cosmo.app.pim.currentCollection.transportInfo, f);
 
     }
@@ -1008,19 +999,12 @@ cosmo.view.cal = new function () {
         }
 
         for (var i = 0; i < arr.length; i++) {
-            evData = arr[i];
-            // Basic paranoia checks
-            if (!evData.end) {
-                evData.end = cosmo.datetime.Date.clone(evData.start);
-            }
+            var note = arr[i];
+            var eventStamp = note.getEventStamp();
 
-            // Make exceptionDates on recurrences default to empty array
-            if (evData.recurrenceRule && !evData.recurrenceRule.exceptionDates) {
-                evData.recurrenceRule.exceptionDates = [];
-            }
             var id = self.generateTempId();
-            ev = new CalEvent(id, null);
-            ev.data = evData;
+            var ev = new CalEvent(id, null);
+            ev.data = note;
             h.setItem(id, ev);
         }
         return h;
@@ -1109,7 +1093,7 @@ cosmo.view.cal = new function () {
                     else if (ev && !ev.lozenge.getInputDisabled() &&
                         ((elem.id == 'body') || (elem.className == 'inputText' &&
                             elem.type == 'text')) &&
-                        cosmo.app.pim.currentCollection.privileges.write) {
+                        cosmo.app.pim.currentCollection.isWriteable()) {
                         dojo.event.topic.publish('/calEvent',
                             { 'action': 'saveFromForm' });
                     }
@@ -1121,7 +1105,7 @@ cosmo.view.cal = new function () {
                     //  * Enter key input must be from the document body
                     //  * Write access for the current collection
                     if (ev && !ev.lozenge.getInputDisabled() && (elem.id == 'body') &&
-                        cosmo.app.pim.currentCollection.privileges.write) {
+                        cosmo.app.pim.currentCollection.isWriteable()) {
                         dojo.event.topic.publish('/calEvent',
                             { 'action': 'removeConfirm', 'data': ev });
                     }
@@ -1129,6 +1113,7 @@ cosmo.view.cal = new function () {
             }
         }
     };
+    
     this.triggerLoadEvents = function (data, opts) {
         var collection = data.collection;
         var goTo = data.goTo;
@@ -1203,15 +1188,8 @@ cosmo.view.cal = new function () {
         // Load the array of events
         // ======================
         try {
-            dojo.require("cosmo.service.atom");
-            eventLoadList =
-//                    cosmo.service.atom.getEvents(collection.collection.uid, {sync: true});
-//            dojo.debug(eventLoadList[0])
-
-            collection.conduit.getEvents(
-                collection.collection.uid, s, e,
-                collection.transportInfo);
-
+            var deferred = cosmo.app.pim.serv.getItems(collection, {start:s, end:e});
+            eventLoadList = deferred.result;
         }
         catch(e) {
             cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), getErrDetailMessage(e));

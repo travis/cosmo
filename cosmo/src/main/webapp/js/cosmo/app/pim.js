@@ -34,7 +34,6 @@ dojo.require("cosmo.legacy.cal_event");
 dojo.require("cosmo.ui.widget.CollectionSelector");
 // --
 
-dojo.require("cosmo.conduits");
 dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
@@ -47,7 +46,7 @@ dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.account.create');
-
+dojo.require('cosmo.service.conduits.common');
 // Props for confirmation dialogs
 dojo.require('cosmo.view.cal.dialog');
 
@@ -113,9 +112,8 @@ cosmo.app.pim = new function () {
 
         // Create and init the Cosmo service
         // ===============================
-        this.serv = new ScoobyService();
+        this.serv = cosmo.service.conduits.getAtomPlusEimConduit();
         this.serv.resetServiceAccessTime(); // Client-side keepalive
-        this.serv.init();
 
         // Base layout
         // ===============================
@@ -124,6 +122,7 @@ cosmo.app.pim = new function () {
             cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage,
                 [cosmo.account.preferences.getPreferences()]);
         }
+        
         // Place all the UI DOM elements based on window size
         this.placeUI();
         this.setImagesForSkin();
@@ -353,6 +352,7 @@ cosmo.app.pim = new function () {
                 // option is not the one selected
                 var sel = e.target;
                 if (sel.selectedIndex != 0) {
+                //XINT
                 cosmo.app.showDialog(
                     cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
                         self.currentCollection.collection,
@@ -512,78 +512,47 @@ cosmo.app.pim = new function () {
         // If we received a ticket, just grab the specified collection
         if (ticketKey) {
             try {
-               var collection = this.serv.getCalendar(collectionUid, ticketKey);
+               var collection = this.serv.getCollection(collectionUid, {ticket:ticketKey});
             }
             catch(e) {
                 cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), e);
                 return false;
             }
-            var ticket = this.serv.getTicket(ticketKey, collectionUid);
-            this.currentCollections.push(
-                { collection: collection,
-                    transportInfo: ticket,
-                    conduit: cosmo.conduits.AnonymousTicketedConduit,
-                    displayName: collection.name,
-                    privileges: ticket.privileges }
-                );
+            this.currentCollections.push(collection);
         }
 
         // Otherwise, get all collections for this user
         else {
-            var userCollections = this.serv.getCalendars();
+            var userCollections = this.serv.getCollections();
             for (var i = 0; i < userCollections.length; i++){
                 var collection = userCollections[i];
-                this.currentCollections.push ({ collection: collection,
-                    transportInfo: null,
-                    conduit: cosmo.conduits.OwnedCollectionConduit,
-                    displayName: collection.name,
-                    privileges: {'read':'read', 'write':'write'} } );
+                this.currentCollections.push (collection);
             }
 
             // No collections for this user
             if (this.currentCollections.length == 0){
-                // Create initial cal
-                try {
-                    var uid = this.serv.createCalendar('Cosmo');
-                }
-                catch(e) {
-                    cosmo.app.showErr(_('Main.Error.InitCalCreateFailed'), e);
-                    return false;
-                }
-                var collection = this.serv.getCalendar(uid);
-                var newCollectionItem = { collection: collection,
-                    transportInfo: null,
-                    conduit: cosmo.conduits.OwnedCollectionConduit,
-                    displayName: collection.name,
-                    privileges: {'read':'read', 'write':'write'} }
-                this.currentCollections.push(newCollectionItem);
-                newCollectionItem.conduit.saveEvent(
-                   newCollectionItem.collection.uid,
-                   this.createWelcomeEvent(),
-                   newCollectionItem.transportInfo);
+                 //XINT
+                 throw new Error("No collections!")
             }
             var subscriptions = this.serv.getSubscriptions();
+            //XINT make sure this still works!
             var result = this.filterOutDeletedSubscriptions(subscriptions);
             subscriptions = result[0];
             deletedSubscriptions = result[1];
 
             for (var i = 0; i < subscriptions.length; i++){
                 var subscription = subscriptions[i];
-                this.currentCollections.push( { collection: subscription.calendar,
-                    transportInfo: subscription,
-                    conduit: cosmo.conduits.SubscriptionConduit,
-                    displayName: subscription.displayName,
-                    privileges: subscription.ticket.privileges } );
+                this.currentCollections.push(subscription);
             }
         }
 
         // Sort the collections
         var f = function (a, b) {
-            var aName = a.displayName.toLowerCase();
-            var bName = b.displayName.toLowerCase();
+            var aName = a.getDisplayName().toLowerCase();
+            var bName = b.getDisplayName().toLowerCase();
             var r = 0;
             if (aName == bName) {
-                r = (a.collection.uid > b.collection.uid) ? 1 : -1;
+                r = (a.collection.getUid() > b.collection.getUid()) ? 1 : -1;
             }
             else {
                 r = (aName > bName) ? 1 : -1;
@@ -595,7 +564,7 @@ cosmo.app.pim = new function () {
         // If we received a collectionUid, select that collection
         if (collectionUid){
             for (var i = 0; i < this.currentCollections.length; i++){
-                if (this.currentCollections[i].collection.uid == collectionUid){
+                if (this.currentCollections[i].collection.getUid() == collectionUid){
                     this.currentCollection = this.currentCollections[i];
                     break;
                 }
@@ -608,40 +577,28 @@ cosmo.app.pim = new function () {
     };
     this.handleCollectionUpdated = function(/*cosmo.topics.CollectionUpdatedMessage*/ message){
         var updatedCollection = message.collection;
-        var updateCollection = function(collection){
-            if (collection.collection.uid == updatedCollection.uid){
-                collection.collection = updatedCollection;
-            }
-            if (!collection.transportInfo){
-                collection.displayName = updatedCollection.name;
-            }
+        
+        for (var x = 0; x < this.currentCollections.length; x++){
+            var collection = this.currentCollections[x];
+            if (collection instanceof cosmo.model.Collection 
+                   && collection.getUid() == updatedCollection.getUid()){
+                this.currentCollections[x] = updatedCollection;
+            } 
         }
-
-        updateCollection(this.currentCollection);
-        dojo.lang.map(this.currentCollections, updateCollection);
     };
+
     this.handleSubscriptionUpdated = function(/*cosmo.topics.SubscriptionUpdatedMessage*/ message){
         var updatedSubscription = message.subscription;
-        var updateCollection = function(collection){
-            var transportInfo = collection.transportInfo;
-            if (transportInfo && transportInfo instanceof cosmo.model.Subscription){
-                if (transportInfo.calendar.uid = updatedSubscription.calendar.uid){
-                    collection.transportInfo = updatedSubscription;
-                    collection.displayName = updatedSubscription.displayName;
-                }
-            }
+        for (var x = 0; x < this.currentCollections.length; x++){
+            var subcription = this.currentCollections[x];
+            if (subcription instanceof cosmo.model.Subscription
+                   && subcription.getUid() == updatedSubscription.getUid()){
+                this.currentCollections[x] = updatedSubscription;
+            } 
         }
-        updateCollection(this.currentCollection);
-        dojo.lang.map(this.currentCollections, updateCollection);
     };
-    this.createWelcomeEvent = function (){
-        var vs = this.viewStart;
-        vs = new Date(vs.getFullYear(), vs.getMonth(), vs.getDate(), 9, 0);
-        var start = cosmo.datetime.Date.add(vs, dojo.date.dateParts.DAY, 3);
-        var end = cosmo.datetime.Date.add(start, dojo.date.dateParts.MINUTE, 60);
-        return new cosmo.model.CalEventData(null, "Welcome to Cosmo", "Welcome to Cosmo",
-           start, end, false);
-    };
+
+    //XINT 
     this.filterOutDeletedSubscriptions = function(subscriptions){
         var deletedSubscriptions = [];
         var filteredSubscriptions = dojo.lang.filter(subscriptions,

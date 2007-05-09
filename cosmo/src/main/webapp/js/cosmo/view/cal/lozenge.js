@@ -103,13 +103,17 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateDisplayMain = function () {
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
     var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
-    var d = ev.data;
-    var strtime = dojo.date.strftime(d.start, '%I:%M%p');
+    var note = ev.data;
+    var eventStamp = note.getEventStamp()
+    var startDate = eventStamp.getStartDate();
+    var endDate = eventStamp.getEndDate();
+    
+    var strtime = dojo.date.strftime(startDate, '%I:%M%p');
     // Trim leading zero if need be
     strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
     // Display timezone info for event if it has one
-    if (d.start.tzId) {
-        strtime += ' (' + d.start.getTimezoneAbbrName() + ')';
+    if (startDate.tzId) {
+        strtime += ' (' + startDate.getTimezoneAbbrName() + ')';
     }
     var timeDiv = document.getElementById(this.divId + 'Start' +
         '__' + ev.id);
@@ -118,7 +122,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
     if (timeDiv) {
         this.setText(timeDiv, strtime);
     }
-    this.setText(titleDiv, d.title);
+    this.setText(titleDiv, note.getBody());
 };
 /**
  * A bit of a misnomer -- just static text at the moment
@@ -149,14 +153,14 @@ cosmo.view.cal.lozenge.Lozenge.prototype.mainAreaCursorChange = function (isProc
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicLeft = function () {
     var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
     var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-        cosmo.view.cal.viewStart, ev.data.start);
+        cosmo.view.cal.viewStart, ev.getEventStamp().getStartDate());
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicWidth = function () {
     var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
     var diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-        ev.data.start, ev.data.end))+3;
+        ev.getEventStamp().getStartDate(), ev.getEventStamp().getEndDate()))+3;
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 }
 /**
@@ -338,13 +342,20 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.useLightColor = function (ev) {
     var ret = false;
+    var eventStamp = ev.data.getEventStamp();
+    var startDate = eventStamp.getStartDate();
+    var endDate = eventStamp.getEndDate();
+    var status = eventStamp.getStatus();
+    var allDay = eventStamp.getAllDay();
+    var anyTime= eventStamp.getAnyTime();
     switch(true) {
         // 'FYI' events
-        case (ev.data.status && ev.data.status == EventStatus.FYI):
+        case (status && status == EventStatus.FYI):
         // @-time events
-        case (!ev.data.allDay && (ev.data.start.getTime() == ev.data.end.getTime())):
+        
+        case (!allDay && (startDate.equals(endDate))):
         // Anytime events
-        case (ev.data.anyTime == true):
+        case (anyTime):
             ret = true;
             break;
         default:
@@ -353,6 +364,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.useLightColor = function (ev) {
     }
     return ret;
 };
+
 /**
  * Make the lozenge look selected -- change color and
  * move forward to z-index of 25
@@ -490,9 +502,13 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateFromEvent = function (ev) 
             left = 0;
         }
         else {
-            var formatStartTime = ev.data.start.strftimeLocalTimezone('%H:%M');
+            var eventStamp = ev.data.getEventStamp();
+            var startDate = eventStamp.getStartDate();
+            var endDate = eventStamp.getEndDate();
+            
+            var formatStartTime = startDate.strftimeLocalTimezone('%H:%M');
             startPos = cosmo.view.cal.canvas.calcPosFromTime(formatStartTime, 'start');
-            left = (ev.data.start.getLocalDay())*cosmo.view.cal.canvas.dayUnitWidth;
+            left = (startDate.getLocalDay()) * cosmo.view.cal.canvas.dayUnitWidth;
         }
         var formatEndTime = ev.data.end.strftimeLocalTimezone('%H:%M');
         endPos = cosmo.view.cal.canvas.calcPosFromTime(formatEndTime, 'end');
@@ -555,7 +571,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateEvent = function (ev, drag
     // If the event was originally less than the minimum *visible* lozenge
     // height, preserve the original times when editing
     var origLengthMinutes = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
-        ev.dataOrig.start, ev.dataOrig.end);
+        ev.dataOrig.getEventStamp().getStartDate(), ev.dataOrig.getEventStamp().getEndDate());
     var newLengthMinutes = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
         evStart, evEnd);
 
@@ -589,21 +605,24 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
     var lozengeDivSub = null;
     var d = null;
     var view = null;
-
+    var eventStamp = ev.data.getEventStamp();
+    var startDate = eventStamp.getStartDate();
+    var endDate = eventStamp.getEndDate();
+    
     if (ev.startsBeforeViewRange()) {
         startDay = 0;
         this.startsBeforeViewRange = true;
     }
     else {
-        startDay = ev.data.start.getLocalDay();
+        startDay = startDate.getLocalDay();
     }
     if (ev.endsAfterViewRange()) {
         endDay = 6;
         this.endsAfterViewRange = true;
     }
     else {
-        endDay = ev.data.end.getLocalDay();
-        if (ev.data.end.getHours() == 0) {
+        endDay = endDate.getLocalDay();
+        if (endDate.getHours() == 0) {
             endDay--;
         }
     }
@@ -850,7 +869,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setHeight = function (size, over
 /**
  * Position and resize the lozenge, and turn on its visibility
  */
-cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateElements = function () {
+cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateElements = function lozengeUpdateElements() {
     this.setLeft(this.left);
     this.setTop(this.top);
     this.setHeight(this.height);
@@ -962,8 +981,11 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.hideProcessing = function () {
  * the lozenge has to be updated to show the changes to the event
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateFromEvent = function (ev, temp) {
+    var eventStamp = ev.data.getEventStamp();
+    var startDate = eventStamp.getStartDate();
+    var endDate = eventStamp.getEndDate();
     var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-        ev.data.start, ev.data.end) + 1;
+        startDate, endDate) + 1;
     this.left = this.getPlatonicLeft();
     this.width = (diff*cosmo.view.cal.canvas.dayUnitWidth)-3;
     if (!temp) {
@@ -979,16 +1001,18 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateFromEvent = function (ev, t
  * the backup copy of the CalEventData in the event's dataOrig property
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateEvent = function (ev, dragMode) {
-    // Dragged-to date
+    var eventStamp = ev.data.getEventStamp();
+    var startDate = eventStamp.getStartDate();
+    var endDate = eventStamp.getEndDate();    // Dragged-to date
     var evDate = cosmo.view.cal.canvas.calcDateFromPos(this.left);
     // Difference in days
     var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-        ev.data.start, evDate);
+        startDate, evDate);
     // Increment start and end by number of days
     // User can't resize all-day events
-    ev.data.start = cosmo.datetime.Date.add(ev.data.start,
+    startDate = cosmo.datetime.Date.add(startDate,
         dojo.date.dateParts.DAY, diff);
-    ev.data.end = cosmo.datetime.Date.add(ev.data.end,
+    endDate = cosmo.datetime.Date.add(endDate,
         dojo.date.dateParts.DAY, diff);
     return true;
 }
@@ -1001,13 +1025,15 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateEvent = function (ev, dragM
  * FIXME: Check the view type to figure out the end of the view span
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.calcWidth = function (startDay, ev) {
-
+    var eventStamp = ev.data.getEventStamp();
+    var startDate = eventStamp.getStartDate();
+    var endDate = eventStamp.getEndDate();
     var diff = 0;
     var maxDiff = (7-startDay);
     var width = 0;
 
     diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-        ev.data.start, ev.data.end))+1;
+        startDate, endDate))+1;
 
     diff = (diff > maxDiff) ? maxDiff : diff;
     width = (diff*cosmo.view.cal.canvas.dayUnitWidth)-1;

@@ -40,7 +40,11 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         });
 
     },
-
+    
+    resetServiceAccessTime: function(){
+      //TODO  
+    },
+    
     getCollection: function(collectionUid, kwArgs){
 
         var d = this._transport.getCollection(collectionUid, kwArgs);

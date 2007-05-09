@@ -115,7 +115,7 @@ cosmo.util.validate = new function () {
      */
     this.eMail = function (s) {
         // Just do really basic e-mail addr validation
-        pat = /^.+@.+\..{2,3}$/;
+        pat = /^.+@.+\..{2,6}$/;
         err = '';
         val = typeof s == 'object' ? s.value : s;
         if (!pat.test(val)) {

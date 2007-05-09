@@ -96,12 +96,13 @@ cosmo.account.create = new function () {
 
         // Config settings for external client setup
         cfg['Server'] = homedirUrl.host;
-        cfg['Path'] = homedirUrl.path;
+        cfg['Path'] = cosmo.env.getBaseUrl();
         cfg['Username'] = username;
         cfg['Password'] = '(Hidden)';
         cfg['PortNumber'] = portNum;
         cfg['UseSSL'] = isSSL;
-        cfg['FullURL'] = user.homedirUrl;
+        cfg['FullURL'] = homedirUrl.scheme + "://" + homedirUrl.host + ":" + 
+            portNum + cosmo.env.getBaseUrl();
 
         return cfg;
     }

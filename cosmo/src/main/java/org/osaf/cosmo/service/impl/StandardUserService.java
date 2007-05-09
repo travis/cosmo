@@ -155,14 +155,11 @@ public class StandardUserService implements UserService {
         user.setDateCreated(new Date());
         user.setDateModified(user.getDateCreated());
 
-
         userDao.createUser(user);
 
         User newUser = userDao.getUser(user.getUsername());
         
-        contentDao.createRootItem(newUser);
-        
-        CollectionItem rootItem = contentDao.getRootItem(newUser);
+        HomeCollectionItem home = contentDao.createRootItem(newUser);
         
         CollectionItem collection = new CollectionItem();
         collection.setName(DEFAULT_COLLECTION_NAME);
@@ -171,7 +168,7 @@ public class StandardUserService implements UserService {
         CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
         collection.addStamp(ccs);
         
-        contentDao.createCollection(rootItem, collection);
+        contentDao.createCollection(home, collection);
 
         return newUser;
     }

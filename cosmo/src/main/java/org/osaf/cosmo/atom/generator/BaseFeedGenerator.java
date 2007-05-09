@@ -199,6 +199,8 @@ public abstract class BaseFeedGenerator
         entry.setUpdated(item.getClientModifiedDate());
         entry.setPublished(item.getClientCreationDate());
         entry.addLink(newSelfLink(item));
+        if (isDocument)
+            entry.addAuthor(newPerson(item.getOwner()));
 
         setEntryContent(entry, item);
 
@@ -278,7 +280,14 @@ public abstract class BaseFeedGenerator
         Person author = factory.getAbdera().getFactory().newAuthor();
 
         author.setName(user.getUsername());
-        author.setEmail(user.getEmail());
+        // author.setEmail(user.getEmail());
+
+        String uri = personIri(user);
+        try {
+            author.setUri(uri);
+        } catch (IRISyntaxException e) {
+            throw new GeneratorException("Attempted to set invalid person uri " + uri, e);
+        }
 
         return author;
     }
@@ -437,6 +446,16 @@ public abstract class BaseFeedGenerator
         if (withPathInfo && getProjection() != null)
             iri.append("/").append(getProjection());
         return iri.toString();
+    }
+
+    /**
+     * Returns the IRI of the given user. Requesting this IRI returns
+     * a service document describing the user.
+     *
+     * @param user the user
+     */
+    protected String personIri(User user) {
+        return serviceLocator.getAtomUrl(user, false);
     }
 
     /**

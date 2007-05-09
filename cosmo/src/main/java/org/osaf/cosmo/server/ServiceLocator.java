@@ -131,6 +131,7 @@ public class ServiceLocator implements ServerConstants {
      */
     public Map<String,String> getUserUrls(User user) {
         HashMap<String,String> urls = new HashMap<String,String>();
+        urls.put(SVC_ATOM, getAtomUrl(user));
         urls.put(SVC_CMP, getCmpUrl(user));
         urls.put(SVC_DAV, getDavUrl(user));
         urls.put(SVC_DAV_PRINCIPAL, getDavPrincipalUrl(user));
@@ -161,6 +162,24 @@ public class ServiceLocator implements ServerConstants {
     public String getAtomUrl(Item item,
                              boolean absolute) {
         return calculateItemUrl(item, factory.getAtomPrefix(), absolute);
+    }
+
+    /**
+     * Returns the Atom URL of the user.
+     */
+    public String getAtomUrl(User user) {
+        return calculateUserUrl(user, factory.getAtomPrefix());
+    }
+
+    /**
+     * Returns the Atom URL of the user.
+     *
+     * @param the user
+     * @param absolute whether or not the URL should be absolute 
+     */
+    public String getAtomUrl(User user,
+                             boolean absolute) {
+        return calculateUserUrl(user, factory.getAtomPrefix(), absolute);
     }
 
     /**
@@ -284,11 +303,18 @@ public class ServiceLocator implements ServerConstants {
 
     private String calculateUserUrl(User user,
                                     String servicePrefix) {
-        StringBuffer buf = new StringBuffer(appMountUrl);
+        return calculateUserUrl(user, servicePrefix, true);
+    }
 
-        buf.append(servicePrefix).
-            append("/").append(PATH_USER).
-            append("/").append(user.getUsername());
+    private String calculateUserUrl(User user,
+                                    String servicePrefix,
+                                    boolean absolute) {
+        StringBuffer buf = new StringBuffer();
+
+        if (absolute)
+            buf.append(appMountUrl).append(servicePrefix).append("/");
+
+        buf.append(PATH_USER).append("/").append(user.getUsername());
 
         return buf.toString();
     }

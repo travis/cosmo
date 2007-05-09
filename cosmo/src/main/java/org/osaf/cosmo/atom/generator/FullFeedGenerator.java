@@ -17,7 +17,6 @@ package org.osaf.cosmo.atom.generator;
 
 import javax.activation.MimeTypeParseException;
 
-
 import org.apache.abdera.model.Entry;
 
 import org.apache.commons.logging.Log;
@@ -56,20 +55,27 @@ public class FullFeedGenerator extends BaseFeedGenerator {
 
     /**
      * Extends the superclass method to add an edit link and links for
-     * the parent collection, the item modified by this item (if any),
-     * and any items modified by this item.
+     * the parent collection (only if the entry is enclosed in its own
+     * document), the item modified by this item (if any), and any
+     * items modified by this item.
      *
      * @param item the item on which the entry is based
+     * @param isDocument whether or not the entry represents an entire
+     * document or is attached to a feed document
      * @throws GeneratorException
      */
-    protected Entry createEntry(NoteItem item)
+    protected Entry createEntry(NoteItem item,
+                                boolean isDocument)
         throws GeneratorException {
-        Entry entry = super.createEntry(item);
+        Entry entry = super.createEntry(item, isDocument);
 
         entry.addLink(newEditLink(item));
 
-        for (CollectionItem parent : item.getParents())
-            entry.addLink(newParentLink(parent));
+        if (isDocument) {
+            for (CollectionItem parent : item.getParents())
+                entry.addLink(newParentLink(parent));
+        }
+
         if (item.getModifies() != null)
             entry.addLink(newModifiesLink(item.getModifies()));
         for (NoteItem modification : item.getModifications())

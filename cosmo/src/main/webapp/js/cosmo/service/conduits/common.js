@@ -44,16 +44,24 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     },
 
-    getCollections: function(kwArgs){
+    getCollections: function getCollections(kwArgs){
         var deferred = this._transport.getCollections(kwArgs);
 
         deferred.addCallback(this.translateGetCollections);
           
         return deferred;
     },
+    
+    getSubscriptions: function getSubscriptions(kwArgs){
+
+        var deferred = this._transport.getSubscriptions(kwArgs);
+      
+        return deferred;
+
+    },
 
     /*
-     * returns: dojo.Deferred with callback that returns XML Document object.
+     * returns: dojo.Deferred with callbac that returns XML Document object.
      */
     getCollection: function(collectionUid, kwArgs){
 
@@ -65,7 +73,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return deferred;
     },
 
-    getItems: function(collection, searchCriteria, kwArgs){
+    getItems: function getItems(collection, searchCriteria, kwArgs){
         kwArgs.ticketKey = collection.getTicket() || undefined;
         var deferred = this._transport.getItems(collection, searchCriteria, kwArgs);
 

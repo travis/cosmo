@@ -40,8 +40,8 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     },
 
     getCollection: function(collectionUid, kwArgs){
-        var d = new dojo.Deferred();
-        var r = this.getDefaultRequest(d, kwArgs);
+        var deferred = new dojo.Deferred();
+        var r = this.getDefaultRequest(deferred, kwArgs);
 
         var query = this._generateAuthQuery(kwArgs);
         
@@ -50,23 +50,33 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
           this.queryHashToString(query);
         
         
-        return d;    
+        return deferred;    
     },
 
     getCollections: function(kwArgs){
-        var d = new dojo.Deferred();
-        var r = this.getDefaultRequest(d, kwArgs);
+        var deferred = new dojo.Deferred();
+        var r = this.getDefaultRequest(deferred, kwArgs);
 
         r.url = cosmo.env.getBaseUrl() +
           "/atom/user/" + cosmo.util.auth.getUsername();
         
         dojo.io.bind(r);
-        return d;    
+        return deferred;    
+    },
+    
+    getSubscriptions: function (kwArgs){
+        var deferred = new dojo.Deferred();
+        
+        //TODO
+        deferred.callback([]);
+        
+        return deferred;
+        
     },
 
     getItems: function (collectionUid, searchCrit, kwArgs){
-        var d = new dojo.Deferred();
-        var r = this.getDefaultRequest(d, kwArgs);
+        var deferred = new dojo.Deferred();
+        var r = this.getDefaultRequest(deferred, kwArgs);
         
         var query = this._generateAuthQuery(kwArgs);
         dojo.lang.mixin(query, this._generateSearchQuery(searchCrit));
@@ -76,7 +86,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
           this.queryHashToString(query);
 
         dojo.io.bind(r);
-        return d;
+        return deferred;
 
     },
 

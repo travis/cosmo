@@ -522,7 +522,8 @@ cosmo.app.pim = new function () {
 
         // Otherwise, get all collections for this user
         else {
-            var userCollections = this.serv.getCollections();
+            var userCollections = this.serv.getCollections({sync: true}).results[0];
+
             for (var i = 0; i < userCollections.length; i++){
                 var collection = userCollections[i];
                 this.currentCollections.push (collection);
@@ -533,7 +534,7 @@ cosmo.app.pim = new function () {
                  //XINT
                  throw new Error("No collections!")
             }
-            var subscriptions = this.serv.getSubscriptions();
+            var subscriptions = this.serv.getSubscriptions().results[0];
             //XINT make sure this still works!
             var result = this.filterOutDeletedSubscriptions(subscriptions);
             subscriptions = result[0];

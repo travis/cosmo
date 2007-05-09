@@ -597,13 +597,6 @@ cosmo.view.cal = new function () {
             }
         }
 
-        // Resets local timer for timeout -- we know server-side
-        // session has been refreshed
-        // ********************
-        // BANDAID: need to move this into the actual Service call
-        // ********************
-        cosmo.app.pim.serv.resetServiceAccessTime();
-
         // Success for recurring events -- repaint canvas
         if (act == 'saveSuccess' &&
             (opts.saveType == 'recurrenceMaster' ||
@@ -837,13 +830,6 @@ cosmo.view.cal = new function () {
             act = 'removeSuccess';
         }
 
-        // Resets local timer for timeout -- we know server-side
-        // session has been refreshed
-        // ********************
-        // BANDAID: need to move this into the actual Service call
-        // ********************
-        cosmo.app.pim.serv.resetServiceAccessTime();
-
         // Broadcast success
         dojo.event.topic.publish('/calEvent', { 'action': act,
             'data': removeEv, 'opts': opts });
@@ -896,13 +882,6 @@ cosmo.view.cal = new function () {
         else {
             act = opts.saveAction + 'Success';
         }
-
-        // Resets local timer for timeout -- we know server-side
-        // session has been refreshed
-        // ********************
-        // BANDAID: need to move this into the actual Service call
-        // ********************
-        cosmo.app.pim.serv.resetServiceAccessTime();
 
         // If the event has been edited such that it is now out of
         // the viewable range, remove the event from display

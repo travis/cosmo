@@ -113,7 +113,6 @@ cosmo.app.pim = new function () {
         // Create and init the Cosmo service
         // ===============================
         this.serv = cosmo.service.conduits.getAtomPlusEimConduit();
-        this.serv.resetServiceAccessTime(); // Client-side keepalive
 
         // Base layout
         // ===============================

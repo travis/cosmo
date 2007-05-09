@@ -80,7 +80,8 @@ cosmo.ui.event.handlers.mouseDownHandler = function (e) {
     // =================
     // Check for client-side timeout on all mouse clicks
     // =================
-    cosmo.app.pim.checkTimeout();
+    //XINT 
+    //TODO: add timeout check
 }
 
 /**
@@ -140,9 +141,8 @@ cosmo.ui.event.handlers.keyUpHandler = function (e) {
     // Have to return false to keep event from continuing to bubble
     // otherwise it actually ends up refreshing the session before
     // we have a chance to time out
-    if (cosmo.app.pim.checkTimeout()) {
-        return false;
-    }
+    //XINT
+    //TODO: add timeout check
 
     e = !e ? window.event : e;
 

@@ -29,8 +29,37 @@ dojo.require("cosmo.service.translators.common");
 dojo.require("cosmo.datetime.serialize");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
+    
+    translateGetCollections: function atomPlusEimTranslateCollections(atomXml){
+        var workspaces = atomXml.getElementsByTagName("workspace");
+        var collections = [];
+        for (var i = 0; i < workspaces.length; i++){
+            var workspace = workspaces[i];
+            
+            var title = workspace.getElementsByTagName("atom:title")[0];
+            
+            var collectionElements = workspace.getElementsByTagName("collection");
+            
+            for (var j = 0; j < collectionElements.length; j++){
+                collections.push(this.collectionXmlToCollection(collectionElements[j]));
+            }
+        }
+        return collections;
+    },
+    
+    collectionXmlToCollection: function collectionXmlToCollection(collectionXml){
+        var collection = new cosmo.model.Collection(
+            {
+                //TODO: replace this with the correct uid grabbing code
+                uid: collectionXml.getAttribute("href").split("/")[1],
+                displayName: collectionXml.getElementsByTagName("title")[0].firstChild.nodeValue,
+                ticket: ""
+            }
+        );
+        return collection;
+    },
 
-    responseToObject: function atomPlusEimResponseToObject(atomXml){
+    translateGetItems: function atomPlusEimTranslateItems(atomXml){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
         }

@@ -35,8 +35,33 @@ dojo.require("cosmo.service.transport.Rest");
 dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     {
 
-    getCollection: function(collectionUid, kwArgs){
+    createCollection: function(name){
+        
+    },
 
+    getCollection: function(collectionUid, kwArgs){
+        var d = new dojo.Deferred();
+        var r = this.getDefaultRequest(d, kwArgs);
+
+        var query = this._generateAuthQuery(kwArgs);
+        
+        r.url = cosmo.env.getBaseUrl() +
+          "/atom/collection/" + collectionUid
+          this.queryHashToString(query);
+        
+        
+        return d;    
+    },
+
+    getCollections: function(kwArgs){
+        var d = new dojo.Deferred();
+        var r = this.getDefaultRequest(d, kwArgs);
+
+        r.url = cosmo.env.getBaseUrl() +
+          "/atom/user/" + cosmo.util.auth.getUsername();
+        
+        dojo.io.bind(r);
+        return d;    
     },
 
     getItems: function (collectionUid, searchCrit, kwArgs){
@@ -47,7 +72,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         dojo.lang.mixin(query, this._generateSearchQuery(searchCrit));
 
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/collection/" +  collectionUid + "/full" +
+          "/atom/collection/" +  collectionUid + "/full/eim-json" +
           this.queryHashToString(query);
 
         dojo.io.bind(r);
@@ -59,7 +84,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     },
 
-    deleteItem: function(kwArgs){
+    deleteItem: function(item, kwArgs){
     },
 
     removeItem: function(collection, item, kwArgs){
@@ -76,16 +101,16 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     _generateSearchQuery: function(/*Object*/searchCrit){
         var ret = {};
         if (!searchCrit) return ret;
-        if (searchCrit.startMin) {
-            var d = searchCrit.startMin;
+        if (searchCrit.start) {
+            var d = searchCrit.start;
             if (d instanceof cosmo.datetime.Date){
                 d = dojo.date.toRfc3339(d);
             }
             
             ret["start-min"] = d;
         }
-        if (searchCrit.startMax) {
-            var d = searchCrit.startMax;
+        if (searchCrit.end) {
+            var d = searchCrit.end;
             if (d instanceof cosmo.datetime.Date){
                 d = dojo.date.toRfc3339(d);
             }

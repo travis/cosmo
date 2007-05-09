@@ -35,33 +35,44 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     initializer: function (transport, translator){
         this._transport = transport;
         this._translator = translator;
-        this.translateResponse = dojo.lang.hitch(this, function (obj, xhr){
-            return this._translator.responseToObject(obj);
+        this.translateGetItems = dojo.lang.hitch(this, function (obj, xhr){
+            return this._translator.translateGetItems(obj);
+        });
+        this.translateGetCollections = dojo.lang.hitch(this, function (obj, xhr){
+            return this._translator.translateGetCollections(obj);
         });
 
     },
-    
-    resetServiceAccessTime: function(){
-      //TODO  
+
+    getCollections: function(kwArgs){
+        var deferred = this._transport.getCollections(kwArgs);
+
+        deferred.addCallback(this.translateGetCollections);
+          
+        return deferred;
     },
-    
+
+    /*
+     * returns: dojo.Deferred with callback that returns XML Document object.
+     */
     getCollection: function(collectionUid, kwArgs){
 
-        var d = this._transport.getCollection(collectionUid, kwArgs);
+        var deferred = this._transport.getCollection(collectionUid, kwArgs);
 
-        d.addCallback(this.translateResponse);
-
+        deferred.addCallback(this.translateGetCollection);
+        
         //TODO: do topic notifications
-        return d;
+        return deferred;
     },
 
-    getItems: function(collection, startTime, endTime, kwArgs){
-        var d = this._transport.getItems(collection, startTime, endTime, kwArgs);
+    getItems: function(collection, searchCriteria, kwArgs){
+        kwArgs.ticketKey = collection.getTicket() || undefined;
+        var deferred = this._transport.getItems(collection, searchCriteria, kwArgs);
 
-        d.addCallback(this.translateResponse);
+        deferred.addCallback(this.translateGetItems);
 
         // do topic notifications
-        return d;
+        return deferred;
     },
 
     saveItem: function(item, kwArgs){
@@ -69,7 +80,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         // add object translator to callback chain
 
         // do topic notifications
-        return d;
+        return deferred;
     },
 
     removeItem: function(collection, item, kwArgs){
@@ -77,99 +88,33 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         // add object translator to callback chain
 
         // do topic notifications
-        return d;
+        return deferred;
+    },
+    
+    getPreference: function getPreference(key){
+
+    },
+
+    setPreference: function setPreference(key, val){
+
+    },
+
+    removePreference: function removePreference(key){
+
+    },
+    
+    getPreferences: function getPreferences(){
+       return {};
+    },
+
+    setPreferences: function getPreference(prefs){
+
+    },
+
+    setMultiplePreferences: function setMultiplePreferences(prefs){
+
     }
-});
-
-dojo.declare('cosmo.service.conduits.AbstractTicketedConduit', cosmo.service.conduits.AbstractConduit,
-{
-    initializer: function(ticket){
-        this.ticket = ticket;
-    },
-    getTicketKey: function(){
-        return ticket.ticketKey;
-    },
-    getTicketedKwArgs: function(kwArgs){
-        var kwArgs = kwArgs || {};
-        kwArgs.ticketKey = this.getTicketKey();
-        return kwArgs;
-    }
-})
-
-dojo.declare('cosmo.service.conduits.AbstractCurrentUserConduit', cosmo.service.conduits.AbstractConduit,
-{
-    getCollections: function(kwArgs){
-        var d = this.doGetCollections(kwArgs);
-
-        d.addCallback(
-           dojo.lang.hitch(this,
-             function(result){
-               return this._translator.convertObject(
-                 result[0]);
-           }));
-
-        // do topic notifications
-        return d;
-    },
-
-    doGetCollections: function(/*Hash*/ kwArgs){
-         dojo.unimplemented();
-    },
-
-    getPreference: function(/*String*/ key, /*Hash*/ kwArgs){
-
-        this.doGetPreference(key, kwArgs);
-    },
-
-    doGetPreference: function(/*String*/ key, /*Hash*/ kwArgs){
-         dojo.unimplemented();
-    },
-
-    setPreference: function(/*String*/ key, /*String*/ value,
-                            /*Hash*/ kwArgs){
-       this.doSetPreference(key, value, kwArgs);
-    },
-
-    doSetPreference: function(/*String*/ key, /*String*/ value,
-                              /*Hash*/ kwArgs){
-        dojo.unimplemented();
-    },
-
-    removePreference: function(/*String*/ key, /*Hash*/ kwArgs){
-        this.doRemovePreference(key, kwArgs);
-    },
-
-    doRemovePreference: function(/*String*/ key,
-                              /*Hash*/ kwArgs){
-        dojo.unimplemented();
-    },
-
-    getPreferences: function(/*Hash*/ kwArgs){
-        this.doGetPreferences(kwArgs)
-    },
-
-    doGetPreferences: function(/*Hash*/ kwArgs){
-        dojo.unimplemented();
-    },
-
-    setPreferences: function(/*Hash<String, String>*/ preferences, /*Hash*/ kwArgs){
-        this.doSetPreferences(preferences, kwArgs);
-    },
-
-    doSetPreferences: function(/*Hash<String, String>*/ preferences,
-                              /*Hash*/ kwArgs){
-        dojo.unimplemented();
-    },
-
-    setMultiplePreferences: function(/*Hash<String, String>*/ preferences,
-                                      /*Hash*/ kwArgs){
-        this.doSetMultiplePreferences(preferences, kwArgs);
-    },
-
-    doSetMultiplePreferences: function(/*Hash<String, String>*/ preferences,
-                              /*Hash*/ kwArgs){
-        dojo.unimplemented();
-    }
+    
 });
 
 cosmo.service.conduits.getAtomPlusEimConduit = function getAtomPlusEimConduit(){

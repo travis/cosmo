@@ -309,11 +309,17 @@ cosmo.model.declare("cosmo.model.Modification", null,
     {
       initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
-      },
+      }
     });
 
-dojo.declare("cosmo.model.Collection", cosmo.model.Item, {
-});
+dojo.declare("cosmo.model.Collection", cosmo.model.Item, 
+    [["ticketKey", {"default": null}]
+     ],
+    {
+      initializer: function(kwArgs){
+            this.initializeProperties(kwArgs);
+      }
+    });
 
 dojo.declare("cosmo.model.StampMetaData", null,{
     __immutable:true,

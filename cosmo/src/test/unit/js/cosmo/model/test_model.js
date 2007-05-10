@@ -32,7 +32,7 @@ test_declareStamp : function(){
     jum.assertFalse(typeof(TestStamp) == "undefined");
     var s = new TestStamp();
     jum.assertEquals(s.getTestString(), "def");
-    jum.assertEquals([1,2,3], s.getTestArrayOfNumbers());
+    jum.assertEquals([1,2,3].toString(), s.getTestArrayOfNumbers().toString());
     var attr = s.stampMetaData.getAttribute("testArrayOfNumbers");
     assertEquals(attr.type[0], Array);
     assertEquals(attr.type[1], Number);

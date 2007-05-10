@@ -81,8 +81,8 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
          * @return Boolean, true or false
          */
         var compareStatus = function (curr, orig) {
-            if ((!curr && orig == EventStatus.CONFIRMED) ||
-                (curr == EventStatus.CONFIRMED && !orig)) {
+            if ((!curr && orig == cosmo.model.EventStatus.CONFIRMED) ||
+                (curr == cosmo.model.EventStatus.CONFIRMED && !orig)) {
                 return false;
             }
             else if (curr != orig) {

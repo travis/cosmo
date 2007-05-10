@@ -350,7 +350,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.useLightColor = function (ev) {
     var anyTime= eventStamp.getAnyTime();
     switch(true) {
         // 'FYI' events
-        case (status && status == EventStatus.FYI):
+        case (status && status == cosmo.model.EventStatus.FYI):
         // @-time events
         
         case (!allDay && (startDate.equals(endDate))):

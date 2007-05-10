@@ -500,9 +500,9 @@ cosmo.ui.cal_form.CalForm = function () {
         opt.text = 'Once';
         opt.value = '';
         recurOpt.push(opt);
-        for (var i in RecurrenceRuleFrequency) {
+        for (var i in cosmo.model.RecurrenceRule.FREQUENCIES) {
             opt = new Object();
-            str = RecurrenceRuleFrequency[i];
+            str = cosmo.model.RecurrenceRule.FREQUENCIES[i];
             opt.text = dojo.string.capitalize(str);
             opt.value = str;
             recurOpt.push(opt);
@@ -515,10 +515,10 @@ cosmo.ui.cal_form.CalForm = function () {
         var opt = null;
         var str = '';
 
-        for (var i in EventStatus) {
+        for (var i in cosmo.model.EventStatus) {
             opt = new Object();
-            str = EventStatus[i];
-            if(str == EventStatus.FYI) {
+            str = cosmo.model.EventStatus[i];
+            if(str == cosmo.model.EventStatus.FYI) {
                 opt.text = i;
             }
             else {

@@ -46,13 +46,13 @@ cosmo.model.declare("cosmo.model.RecurrenceRule", null,
         immutable: true
     });
 
-dojo.lang.mixin(cosmo.model.RecurrenceRule, {
+cosmo.model.RecurrenceRule.FREQUENCIES = {
     FREQUENCY_DAILY: "daily",
     FREQUENCY_WEEKLY: "weekly",
     FREQUENCY_BIWEEKLY: "biweekly",
     FREQUENCY_MONTHLY: "monthly",
     FREQUENCY_YEARLY: "yearly"
-});
+};
 
 cosmo.model.declare("cosmo.model.Duration", null, 
     [["year",   {"default":0} ],
@@ -86,3 +86,9 @@ cosmo.model.declare("cosmo.model.Duration", null,
     {
         immutable: true
     });
+    
+cosmo.model.EventStatus = {
+    CONFIRMED: "CONFIRMED",
+    TENTATIVE: "TENTATIVE",
+    FYI: "CANCELLED"
+};

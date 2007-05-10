@@ -110,7 +110,7 @@
          </tbody>
     </table>
     <div dojoAttachPoint="helpText" style="visibility: hidden; position:absolute; top:0px; left:0px">
-         <a href="${this.strings.helpLink}">${this.strings.help}</a>
+         <a href="${this.strings.helpLink}" onclick="window.open('${this.strings.helpLink}'); return false;">${this.strings.help}</a>
         <span dojoAttachPoint="chandlerPlug" style="display:none"><!--
             Don't use Dojo widget string substitution with anchor tags -
             it 'helpfully' escapes the quotes in the href prop

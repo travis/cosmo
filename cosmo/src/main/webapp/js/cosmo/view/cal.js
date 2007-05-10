@@ -981,7 +981,7 @@ cosmo.view.cal = new function () {
             var note = arr[i];
             var eventStamp = note.getEventStamp();
 
-            var id = self.generateTempId();
+            var id = note.getUid();
             var ev = new CalEvent(id, null);
             ev.data = note;
             h.setItem(id, ev);

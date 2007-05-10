@@ -133,7 +133,7 @@ cosmo.ui.cal_form.CalForm = function () {
 
     function toggleReadOnlyIcon() {
         var icon = $('readOnlyIcon');
-        if (cosmo.app.pim.currentCollection.privileges.write) {
+        if (cosmo.app.pim.currentCollection.isWriteable()) {
             icon.style.display = 'none';
         }
         else {
@@ -741,7 +741,7 @@ cosmo.ui.cal_form.CalForm = function () {
         form.eventlocation.value = eventStamp.getLocation();
         form.eventdescr.value = note.getBody() || "";
         form.status.value = eventStamp.getStatus() || "";
-        form.startdate.value = dojo.date.strftime(starDate, '%m/%d/%Y');
+        form.startdate.value = dojo.date.strftime(startDate, '%m/%d/%Y');
         form.enddate.value = dojo.date.strftime(endDate, '%m/%d/%Y');
         form.eventallday.checked = eventStamp.getAllDay();
 

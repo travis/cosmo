@@ -795,11 +795,11 @@ cosmo.view.cal.canvas = new function () {
      * for the event getting added to the canvas
      */
     function appendLozenge(key, val) {
+        var id = key;
+        var ev = val;
         var eventStamp = ev.data.getEventStamp();
         var allDay = eventStamp.getAllDay();
         var anyTime = eventStamp.getAnyTime();
-        var id = key;
-        var ev = val;
         // Create the lozenge and link it to the event
         ev.lozenge = (allDay || anyTime) ? new cosmo.view.cal.lozenge.NoTimeLozenge(id) :
             new cosmo.view.cal.lozenge.HasTimeLozenge(id);
@@ -1145,7 +1145,7 @@ cosmo.view.cal.canvas = new function () {
                 }
 
                 // No move/resize for read-only collections
-                if (cosmo.app.pim.currentCollection.privileges.write) {
+                if (cosmo.app.pim.currentCollection.isWriteable()) {
                     // Set up Draggable and save dragMode -- user may be dragging
                     if (id.indexOf('AllDay') > -1) {
                         dragItem = new cosmo.view.cal.draggable.NoTimeDraggable(s);
@@ -1192,7 +1192,7 @@ cosmo.view.cal.canvas = new function () {
         var elem = null;
 
         // Event creation only in write-mode
-        if (cosmo.app.pim.currentCollection.privileges.write) {
+        if (cosmo.app.pim.currentCollection.isWriteable()) {
             e = !e ? window.event : e;
             elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
             id = elem.id

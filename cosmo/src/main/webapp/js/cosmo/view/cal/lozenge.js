@@ -140,7 +140,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.showStatusAnim = function () {
 cosmo.view.cal.lozenge.Lozenge.prototype.mainAreaCursorChange = function (isProc) {
     var cursorChange = '';
     // Read-only collection -- clickable but not draggable/resizable
-    if (!cosmo.app.pim.currentCollection.privileges.write) {
+    if (!cosmo.app.pim.currentCollection.isWriteable()) {
         cursorChange = 'pointer';
     }
     // Writeable collection -- drag/resize cursors
@@ -153,14 +153,14 @@ cosmo.view.cal.lozenge.Lozenge.prototype.mainAreaCursorChange = function (isProc
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicLeft = function () {
     var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
     var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-        cosmo.view.cal.viewStart, ev.getEventStamp().getStartDate());
+        cosmo.view.cal.viewStart, ev.data.getEventStamp().getStartDate());
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicWidth = function () {
     var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
     var diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-        ev.getEventStamp().getStartDate(), ev.getEventStamp().getEndDate()))+3;
+        ev.data.getEventStamp().getStartDate(), ev.data.getEventStamp().getEndDate()))+3;
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 }
 /**
@@ -284,7 +284,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
             break;
     }
 
-    if (ev.data.status && ev.data.status.indexOf('TENTATIVE') > -1) {
+    if (ev.data.getEventStamp().getStatus() && ev.data.getEventStamp().getStatus().indexOf('TENTATIVE') > -1) {
         borderStyle = 'dashed';
     }
 
@@ -443,7 +443,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.resizeHandleCursorChange = funct
     var topChange = '';
     var bottomChange = '';
     // Read-only collection -- clickable but not draggable/resizable
-    if (!cosmo.app.pim.currentCollection.privileges.write) {
+    if (!cosmo.app.pim.currentCollection.isWriteable()) {
         topChange = 'pointer';
         bottomChange = 'pointer';
     }
@@ -497,20 +497,19 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateFromEvent = function (ev) 
     }
     // Events still on the canvas
     else {
+        var eventStamp = ev.data.getEventStamp();
+        var startDate = eventStamp.getStartDate();
+        var endDate = eventStamp.getEndDate();
         if (this.startsBeforeViewRange) {
             startPos = 0;
             left = 0;
         }
         else {
-            var eventStamp = ev.data.getEventStamp();
-            var startDate = eventStamp.getStartDate();
-            var endDate = eventStamp.getEndDate();
-            
             var formatStartTime = startDate.strftimeLocalTimezone('%H:%M');
             startPos = cosmo.view.cal.canvas.calcPosFromTime(formatStartTime, 'start');
             left = (startDate.getLocalDay()) * cosmo.view.cal.canvas.dayUnitWidth;
         }
-        var formatEndTime = ev.data.end.strftimeLocalTimezone('%H:%M');
+        var formatEndTime = endDate.strftimeLocalTimezone('%H:%M');
         endPos = cosmo.view.cal.canvas.calcPosFromTime(formatEndTime, 'end');
 
 
@@ -570,8 +569,10 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateEvent = function (ev, drag
 
     // If the event was originally less than the minimum *visible* lozenge
     // height, preserve the original times when editing
+    var startDate = ev.dataOrig.getEventStamp().getStartDate();
+    var endDate = ev.dataOrig.getEventStamp().getEndDate();
     var origLengthMinutes = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
-        ev.dataOrig.getEventStamp().getStartDate(), ev.dataOrig.getEventStamp().getEndDate());
+        startDate, endDate);
     var newLengthMinutes = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
         evStart, evEnd);
 
@@ -582,8 +583,9 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateEvent = function (ev, drag
     }
 
     // Update cosmo.datetime.Date with new UTC values
-    ev.data.start.updateFromUTC(evStart.getTime());
-    ev.data.end.updateFromUTC(evEnd.getTime());
+    startDate.updateFromUTC(evStart.getTime());
+    endDate.updateFromUTC(evEnd.getTime());
+    ev.dataOrig.getEventStamp().setEndDate(endDate);
     return true;
 }
 

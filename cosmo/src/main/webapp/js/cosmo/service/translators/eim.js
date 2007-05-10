@@ -94,8 +94,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             items[uuid] = this.entryToItem(mods[uuid], uuid, masterItem);
             //this.addModificationRecordSet(items, eval("(" + mods[i] + ")"));
         }
+        var itemArray = [];
+        for (var uid in items){
+            itemArray.push(items[uid]);
+        }
 
-        return items;
+        return itemArray;
     },
     
     entryToItem: function entryToItem(/*XMLElement*/entry, /*String*/uuid, 
@@ -377,7 +381,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          return {
             startDate: record.fields.dtstart? this.fromEimDate(record.fields.dtstart[1]): undefined,
             duration: record.fields.duration?
-                cosmo.datetime.parseIso8601Duration(record.fields.duration[1]) : undefined,
+                new cosmo.model.Duration(cosmo.datetime.parseIso8601Duration(record.fields.duration[1])) : undefined,
             anytime: dateParams.anyTime,
             location: record.fields.location? record.fields.location[1] : undefined,
             rrule: record.fields.rrule? this.parseRRule(record.fields.rrule[1]): undefined,
@@ -583,7 +587,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 unsupportedRule: rprops
             });
         } else {
-            var RecurrenceRule = cosmo.model.RecurrenceRule;
+            var RecurrenceRule = cosmo.model.RecurrenceRule.FREQUENCIES;
             var Recur = this.rruleConstants;
             var recurrenceRule = {}
             // Set frequency

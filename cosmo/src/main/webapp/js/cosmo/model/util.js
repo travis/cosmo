@@ -144,15 +144,15 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         }
     }, 
     
-    _genericGetter: function genericGetter(propertyName){
+    _genericGetter: function (propertyName){
         return this["_"+propertyName];
     },
     
-    _genericSetter: function genericSetter(propertyName, value){
+    _genericSetter: function (propertyName, value){
         this["_"+propertyName] = value;
     },
     
-    _getDefault: function getDefault(propertyName){
+    _getDefault: function (propertyName){
         var propDefault = this.__defaults[propertyName];
                     
         if (typeof(propDefault) == "function"){

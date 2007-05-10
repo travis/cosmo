@@ -44,7 +44,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     },
 
-    getCollections: function getCollections(kwArgs){
+    getCollections: function (kwArgs){
         var deferred = this._transport.getCollections(kwArgs);
 
         deferred.addCallback(this.translateGetCollections);
@@ -52,7 +52,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return deferred;
     },
     
-    getSubscriptions: function getSubscriptions(kwArgs){
+    getSubscriptions: function (kwArgs){
 
         var deferred = this._transport.getSubscriptions(kwArgs);
       
@@ -73,7 +73,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return deferred;
     },
 
-    getItems: function getItems(collection, searchCriteria, kwArgs){
+    getItems: function (collection, searchCriteria, kwArgs){
         if (!kwArgs) kwArgs = {};
         kwArgs.ticketKey = collection.getTicketKey() || undefined;
         var deferred = this._transport.getItems(collection.getUid(), searchCriteria, kwArgs);
@@ -100,33 +100,33 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return deferred;
     },
     
-    getPreference: function getPreference(key){
+    getPreference: function (key){
 
     },
 
-    setPreference: function setPreference(key, val){
+    setPreference: function (key, val){
 
     },
 
-    removePreference: function removePreference(key){
+    removePreference: function (key){
 
     },
     
-    getPreferences: function getPreferences(){
+    getPreferences: function (){
        return {};
     },
 
-    setPreferences: function getPreference(prefs){
+    setPreferences: function (prefs){
 
     },
 
-    setMultiplePreferences: function setMultiplePreferences(prefs){
+    setMultiplePreferences: function (prefs){
 
     }
     
 });
 
-cosmo.service.conduits.getAtomPlusEimConduit = function getAtomPlusEimConduit(){
+cosmo.service.conduits.getAtomPlusEimConduit = function (){
     dojo.require("cosmo.service.translators.eim");
     dojo.require("cosmo.service.transport.Atom");
 
@@ -134,6 +134,6 @@ cosmo.service.conduits.getAtomPlusEimConduit = function getAtomPlusEimConduit(){
         new cosmo.service.transport.Atom(),
         cosmo.service.translators.eim
     );
-}
+};
 
 

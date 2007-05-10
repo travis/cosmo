@@ -39,6 +39,7 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.view.cal.canvas");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.minical");
+dojo.require("cosmo.model.common");
 
 dojo.provide("cosmo.ui.cal_form");
 
@@ -500,9 +501,9 @@ cosmo.ui.cal_form.CalForm = function () {
         opt.text = 'Once';
         opt.value = '';
         recurOpt.push(opt);
-        for (var i in cosmo.model.RecurrenceRule.FREQUENCIES) {
+        for (var i in cosmo.model.RRULE_FREQUENCIES) {
             opt = new Object();
-            str = cosmo.model.RecurrenceRule.FREQUENCIES[i];
+            str = cosmo.model.RRULE_FREQUENCIES[i];
             opt.text = dojo.string.capitalize(str);
             opt.value = str;
             recurOpt.push(opt);

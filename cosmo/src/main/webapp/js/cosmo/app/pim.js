@@ -25,7 +25,6 @@ dojo.require('cosmo.convenience');
 // --
 
 // -- FIXME: Weirdness that should be fixed
-dojo.require("cosmo.service.json_service_impl");
 dojo.require("cosmo.legacy.cal_event");
 // --
 

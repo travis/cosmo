@@ -54,8 +54,6 @@
 
 <cosmo:dojoBoilerplate timezones="true"/>
 
-<script type="text/javascript" src="${staticBaseUrl}/js-${PRODUCT_VERSION}/lib/jsonrpc-java-js/jsonrpc.js"></script>
-
 <script type="text/javascript">
 // Dojo requires
 dojo.require('cosmo.app');
@@ -180,6 +178,7 @@ cosmo.ui.event.listeners.hookUpListeners();
             Loading the app ...
           </div>
         </div>
+
 </body>
 
 </html>

@@ -55,7 +55,7 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
         },
         
         //it doesn't make sense to initialze properties of an occurrence.
-        initializeProperties: function noop(){
+        initializeProperties: function (){
             return;
         },
         
@@ -63,7 +63,7 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
 
         __setProperty: cosmo.model._occurrenceSetProperty,
 
-        getMaster: function getMaster(){
+        getMaster: function (){
             return this._master;
         },
     
@@ -166,7 +166,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             return date.strftime(this.OCCURRENCE_FMT_STRING);
         },
       
-        isOccurrence: function isOccurrence(){
+        isOccurrence: function (){
             return false;
         },
       
@@ -226,7 +226,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
         this.recurrenceId = recurrenceId;
     },
     
-    isOccurrence: function isOccurrence(){
+    isOccurrence: function (){
         return true;
     },
     

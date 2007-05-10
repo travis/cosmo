@@ -30,7 +30,7 @@ dojo.require("cosmo.datetime.serialize");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
     
-    translateGetCollections: function atomPlusEimTranslateCollections(atomXml){
+    translateGetCollections: function (atomXml){
         var workspaces = atomXml.getElementsByTagName("workspace");
         var collections = [];
         for (var i = 0; i < workspaces.length; i++){
@@ -47,7 +47,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return collections;
     },
     
-    collectionXmlToCollection: function collectionXmlToCollection(collectionXml){
+    collectionXmlToCollection: function (collectionXml){
         var collection = new cosmo.model.Collection(
             {
                 //TODO: replace this with the correct uid grabbing code
@@ -60,7 +60,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return collection;
     },
 
-    translateGetItems: function atomPlusEimTranslateItems(atomXml){
+    translateGetItems: function (atomXml){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
         }
@@ -102,7 +102,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return itemArray;
     },
     
-    entryToItem: function entryToItem(/*XMLElement*/entry, /*String*/uuid, 
+    entryToItem: function (/*XMLElement*/entry, /*String*/uuid, 
         /*cosmo.model.Item*/ masterItem){
 
             var uuidParts = uuid.split("::");
@@ -143,7 +143,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return item;
     },
     
-    recordSetToObject: function recordSetToObject(/*Object*/ recordSet){
+    recordSetToObject: function (/*Object*/ recordSet){
         //TODO
         /* We can probably optimize this by grabbing the
          * appropriate properties from the appropriate records
@@ -187,7 +187,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     /*
      * 
      */
-    recordSetToModification: function recordSetToModification(recordSet, masterItem){
+    recordSetToModification: function (recordSet, masterItem){
         var uidParts = recordSet.uuid.split("::");
 
         var modifiedProperties = {};
@@ -233,7 +233,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return masterItem.getNoteOccurrence(recurrenceId);
     },
     
-    recurrenceIdToDate: function recurrenceIdToDate(/*String*/ rid){
+    recurrenceIdToDate: function (/*String*/ rid){
          return cosmo.datetime.fromIso8601(rid.split(":")[1]);
     },
 
@@ -374,7 +374,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
     },
 
-    getEventStampProperties: function getEventStampProperties(record){
+    getEventStampProperties: function (record){
 
         var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
 
@@ -391,28 +391,28 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          }
     },
 
-    getTaskStampProperties: function getTaskStampProperties(record){
+    getTaskStampProperties: function (record){
 
         return {};
     },
 
-    addItemRecord: function addItemRecord(record, object){
+    addItemRecord: function (record, object){
         if (record.fields.title) object.setDisplayName(record.fields.title[1]);
         if (record.fields.createdOn) object.setCreationDate(record.fields.createdOn[1]);
 
         if (record.fields.triage) this.addTriage(record.fields.triage[1], object);
     },
 
-    addNoteRecord: function addNoteRecord(record, object){
+    addNoteRecord: function (record, object){
         if (record.fields.body) object.setBody(record.fields.body[1]);
     },
 
-    fromEimDate: function fromEimDate(dateString){
+    fromEimDate: function (dateString){
         var date = dateString.split(":")[1];
         return cosmo.datetime.fromIso8601(date);
     },
 
-    addTriage: function addTriage(triageString, object){
+    addTriage: function (triageString, object){
         var triageArray = triageString.split(" ");
 
         object.setTriageStatus(triageArray[0]);
@@ -425,7 +425,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         object.setAutoTriage(triageArray[2] == true);
     },
 
-    dateParamsFromEimDate: function dateParams(dateString){
+    dateParamsFromEimDate: function (dateString){
         var returnVal = {};
         var params = dateString.split(":")[0].split(";");
         for (var i = 0; i < params.length; i++){
@@ -445,7 +445,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return !!(dateString.split("T")[1]);
     },
 
-    rruleToICal: function rruleToICal(rrule){
+    rruleToICal: function (rrule){
         if (rrule.isUnsupported()){
             return rrulePropsToICal(rrule.getUnsupportedRule());
         } 
@@ -455,7 +455,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
     },
 
-    rrlePropsToICal: function rrulePropsToICal(rProps){
+    rrlePropsToICal: function (rProps){
         var iCalProps = [];
         for (var key in rProps){
             iCalProps.push(key);
@@ -476,7 +476,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
     },
 
-    parseRRule: function parseRRule(rule){
+    parseRRule: function (rule){
         if (!rule) {
             return null;
         }
@@ -484,7 +484,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     //Snagged from dojo.cal.iCalendar
-    parseRRuleToHash: function parseRRuleToHash(rule){
+    parseRRuleToHash: function (rule){
         var rrule = {}
         var temp = rule.split(";");
         for (var y=0; y<temp.length; y++) {
@@ -513,7 +513,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
       YEARLY: "YEARLY"
     },
 
-    isRRuleUnsupported: function isRRuleUnsupported(recur){
+    isRRuleUnsupported: function (recur){
 
         with (this.rruleConstants){
 
@@ -579,7 +579,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
 
-    rPropsToRRule: function rPropsToRRule(rprops){
+    rPropsToRRule: function (rprops){
         if (this.isRRuleUnsupported(rprops)) {
             // TODO set something more readable?
             return new cosmo.model.RecurrenceRule({
@@ -587,7 +587,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 unsupportedRule: rprops
             });
         } else {
-            var RecurrenceRule = cosmo.model.RecurrenceRule.FREQUENCIES;
+            var RecurrenceRule = cosmo.model.RRULE_FREQUENCIES;
             var Recur = this.rruleConstants;
             var recurrenceRule = {}
             // Set frequency

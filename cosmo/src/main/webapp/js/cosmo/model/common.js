@@ -46,7 +46,7 @@ cosmo.model.declare("cosmo.model.RecurrenceRule", null,
         immutable: true
     });
 
-cosmo.model.RecurrenceRule.FREQUENCIES = {
+cosmo.model.RRULE_FREQUENCIES = {
     FREQUENCY_DAILY: "daily",
     FREQUENCY_WEEKLY: "weekly",
     FREQUENCY_BIWEEKLY: "biweekly",

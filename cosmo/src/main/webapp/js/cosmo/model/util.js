@@ -164,7 +164,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         return propDefault;
     },
     
-    _genericToString: function modelGenericToString(){
+    _genericToString: function (){
         var s = "{";
         for (var x = 0; x < this.__propertyNames.length; x++){
             var propName  = this.__propertyNames[x];
@@ -174,7 +174,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         return s;
     },
     
-    _genericEquals: function modelGenericEquals(that){
+    _genericEquals: function (that){
         if (that == null){
             return false;
         }
@@ -190,7 +190,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         return true;
     },
     
-    _genericClone: function modelGenericClone(){
+    _genericClone: function (){
         var clone = new this.constructor();
         for (var x = 0; x < this.__propertyNames.length; x++){
             var propName  = "_" + this.__propertyNames[x];
@@ -220,7 +220,7 @@ dojo.declare("cosmo.model.util.InheritingSubclassCreator", null, {
     
 }); 
 
-cosmo.model.util.equals = function cosmoEquals(a,b){
+cosmo.model.util.equals = function (a,b){
     var type = typeof (a);
     
     if (type == "undefined" && typeof b != "undefined"){
@@ -246,7 +246,7 @@ cosmo.model.util.equals = function cosmoEquals(a,b){
     return a == b;
 }   
 
-  cosmo.model._occurrenceGetProperty =  function occurrenceGetProperty(propertyName){
+  cosmo.model._occurrenceGetProperty =  function (propertyName){
         //get the master version
         var master = this.getMaster();
         var masterProperty = this._getMasterProperty(propertyName);
@@ -274,7 +274,7 @@ cosmo.model.util.equals = function cosmoEquals(a,b){
         return masterProperty;
 }
 
-cosmo.model._occurrenceSetProperty = function occurrenceSetProperty(propertyName, value){
+cosmo.model._occurrenceSetProperty = function (propertyName, value){
     if (this.__noOverride[propertyName]){
         throw new Error("You can not override property '" + propertyName +"'");
     }
@@ -308,7 +308,7 @@ cosmo.model._occurrenceSetProperty = function occurrenceSetProperty(propertyName
     }
 }
 
-cosmo.model.clone = function modelClone(thing){
+cosmo.model.clone = function (thing){
     var type = typeof thing;
 
     if  (type == "undefined" ||

@@ -48,7 +48,7 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
     var stampOccurrenceCtr = dojo.declare(ctrName+"Occurrence", newCtr, {
         __noOverride:{},
 
-        initializer: function stampOccurrenceInitializer(noteOccurrence){
+        initializer: function (noteOccurrence){
            this._master = noteOccurrence._master;
            this.recurrenceId = noteOccurrence.recurrenceId; 
            this.item = noteOccurrence;
@@ -67,14 +67,14 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
             return this._master;
         },
     
-        _getMasterProperty: function noteOccurrenceGetMasterProperty(propertyName){
+        _getMasterProperty: function (propertyName){
             if (this._masterPropertyGetters && this._masterPropertyGetters[propertyName]){
                 return this._masterPropertyGetters[propertyName].apply(this);
             }
             return this._master._stamps[stampName].__getProperty(propertyName);
         },
     
-        _getModifiedProperty: function stampOccurrenceGetModifiedProperty(propertyName){
+        _getModifiedProperty: function (propertyName){
             var modification = this._master.getModification(this.recurrenceId);
             var modifiedStamp = modification._modifiedStamps[stampName];
             if (modifiedStamp){
@@ -82,7 +82,7 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
             }
         },
     
-        _setModifiedProperty: function stampOccurrenceSetModifiedProperty(propertyName, value){
+        _setModifiedProperty: function (propertyName, value){
             var modification = this._master.getModification(this.recurrenceId);
             var modifiedStamp = modification._modifiedStamps[stampName];
             if (!modifiedStamp){
@@ -150,7 +150,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
            
         }, 
         
-        getModification: function getModification(/*cosmo.datetime.Date*/ recurrenceId){
+        getModification: function (/*cosmo.datetime.Date*/ recurrenceId){
             return this._modifications[this._formatRecurrenceId(recurrenceId)];
         },
         
@@ -158,11 +158,11 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             this._modifications[this._formatRecurrenceId(modification.getRecurrenceId())] = modification;
         },
         
-        removeModification: function removeModification(/*cosmo.model.Modification*/ recurrenceId){
+        removeModification: function (/*cosmo.model.Modification*/ recurrenceId){
             delete(this._modifications[this._formatRecurrenceId(recurrenceId)]);  
         },
         
-        _formatRecurrenceId: function formatRecurrenceId(/*cosmo.datetime.Date*/date){
+        _formatRecurrenceId: function (/*cosmo.datetime.Date*/date){
             return date.strftime(this.OCCURRENCE_FMT_STRING);
         },
       
@@ -170,27 +170,27 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             return false;
         },
       
-        getMaster: function getMaster(){
+        getMaster: function (){
             return this;
         },
 
-        removeStamp: function removeStamp(/*String*/ stampName){
+        removeStamp: function (/*String*/ stampName){
             delete this._stamps[stampName];
         },
         
-        getEventStamp: function getEventStamp(/*Boolean?*/ createIfDoesntExist){
+        getEventStamp: function (/*Boolean?*/ createIfDoesntExist){
             return this.getStamp("event", createIfDoesntExist);
         },
         
-        getTaskStamp: function getTaskStamp(/*Boolean*/ createIfDoesntExist){
+        getTaskStamp: function (/*Boolean*/ createIfDoesntExist){
             return this.getStamp("task", createIfDoesntExist);
         },
         
-        getNoteOccurrence: function getNoteOccurrence(/*cosmo.datetime.Date*/ recurrenceId){
+        getNoteOccurrence: function (/*cosmo.datetime.Date*/ recurrenceId){
             return new cosmo.model.NoteOccurrence(this, recurrenceId);
         },
         
-        clone: function NoteClone(){
+        clone: function (){
           //summary: creates a deep copy of all the properties of this Item. 
           //description: Copies all the properties of the Note, making copies
           //             of all mutable objects
@@ -208,7 +208,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
           return clone;
       },
       
-      getDelta: function getDelta(formValues){
+      getDelta: function (formValues){
           //summary: returns a Delta object, which encapsulates the desired changes 
           //         made to the note given the values in the form.
           //description: for every value in formValues, this function will compare it to the 
@@ -220,7 +220,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
 dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     __noOverride:{uid:1,version:1},
     
-    initializer: function noteOccurrenceInitializer(master, recurrenceId){
+    initializer: function (master, recurrenceId){
 //        dojo.debug("noteOccurrenceInitializer");
         this._master = master;
         this.recurrenceId = recurrenceId;
@@ -230,20 +230,20 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
         return true;
     },
     
-    getMaster: function getMaster(){
+    getMaster: function (){
         return this._master;
     },
     
-    _getMasterProperty: function noteOccurrenceGetMasterProperty(propertyName){
+    _getMasterProperty: function (propertyName){
         return this._master.__getProperty(propertyName);
     },
     
-    _getModifiedProperty: function noteOccurrenceGetModifiedProperty(propertyName){
+    _getModifiedProperty: function (propertyName){
         var modification = this._master.getModification(this.recurrenceId);
         return modification.getModifiedProperties()[propertyName];
     },
     
-    _setModifiedProperty: function noteOccurrenceSetModifiedProperty(propertyName, value){
+    _setModifiedProperty: function (propertyName, value){
         var modification = this._master.getModification(this.recurrenceId);
         modification._modifiedProperties[propertyName] = value;  
     },
@@ -253,7 +253,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     __setProperty: cosmo.model._occurrenceSetProperty,
     
     
-    initializeProperties: function noop(){
+    initializeProperties: function (){
         return;
     },
     
@@ -261,7 +261,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
         throw new Error("You can only call this method on the master item");
     },
 
-    getStamp: function occurrenceGetStamp(/*String*/ stampName, /*Boolean*/createIfDoesntExist){
+    getStamp: function (/*String*/ stampName, /*Boolean*/createIfDoesntExist){
            var ctr = cosmo.model._stampRegistry[stampName]["occurrenceConstructor"];
            //does the parent have the stamp?
            if (this.getMaster().getStamp(stampName)){
@@ -280,7 +280,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
            }
     }, 
     
-    removeStamp: function removeStamp(/*String*/ stampName){
+    removeStamp: function (/*String*/ stampName){
         throw new Error("remove stamp not implented yet!");
     },
 
@@ -296,7 +296,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
         this._throwOnlyMaster();
     },
 
-    getNoteOccurrence: function getNoteOccurrence(/*cosmo.datetime.Date*/ recurrenceId){
+    getNoteOccurrence: function (/*cosmo.datetime.Date*/ recurrenceId){
         this._throwOnlyMaster();
     }
     
@@ -317,10 +317,10 @@ cosmo.model.declare("cosmo.model.Collection", cosmo.model.Item,
      ["writeable", {"default": true}]
      ],
     {
-      initializer: function(kwArgs){
+      initializer: function (kwArgs){
             this.initializeProperties(kwArgs);
       },
-      isWriteable: function isWriteable(){
+      isWriteable: function (){
           return this.getWriteable();
       }
     });
@@ -343,7 +343,7 @@ dojo.declare("cosmo.model.StampMetaData", null,{
         }
     },
     
-    getAttribute: function getAttribute(name){
+    getAttribute: function (name){
         for (var x = 0; x < this.attributes.length; x++){
             var attr = this.attributes[x];
             if (attr.name == name){
@@ -379,7 +379,7 @@ dojo.declare("cosmo.model.StampAttribute", null, {
 dojo.declare("cosmo.model.BaseStamp", null, {
     stampMetaData: null,
     item: null,
-    initializer: function baseStampInitializer(kwArgs){
+    initializer: function (kwArgs){
         if (kwArgs){
             this.item = kwArgs.item;
         }
@@ -401,16 +401,16 @@ dojo.declare("cosmo.model.Delta", null, {
         this._propertyProps = {};
     },
     
-    addStampProperty: function deltaAddStampProperty(stampName, propertyName, value){
+    addStampProperty: function (stampName, propertyName, value){
         var stamp = this._getStamp(stampName);
         stamp[propertyName] = value;
     },
     
-    addProperty: function deltaAddProperty(propertyName, value){
+    addProperty: function (propertyName, value){
         this._propertyProps[propertyName] = value;
     },
     
-    deltafy: function deltafy(/*cosmo.model.Note*/ note){
+    deltafy: function (/*cosmo.model.Note*/ note){
         // summary: removes all properties which are the same as given note
         // description: removes all properties from the delta which are the same
         //              same as the properties in the given note and its stamps,
@@ -420,7 +420,7 @@ dojo.declare("cosmo.model.Delta", null, {
         
     },
     
-    _filterOutEqualProperties: function filterOutEquals(original, changes){
+    _filterOutEqualProperties: function (original, changes){
         for (var propName in changes){
             var changeValue = changes[propName];
             var origValue = this._getPropertyUsingGetter(original, propName);
@@ -430,10 +430,10 @@ dojo.declare("cosmo.model.Delta", null, {
         }
     },
     
-    _getPropertyUsingGetter: function getPropertyUsingGetter(object, propertyName){
+    _getPropertyUsingGetter: function (object, propertyName){
         
     },
-    _getStamp: function deltaGetStamp(stampName){
+    _getStamp: function (stampName){
         var stamp = this._stampProps[stampName];
         if (!stamp){
             stamp = {};

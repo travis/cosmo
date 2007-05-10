@@ -34,19 +34,19 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
             this.initializeProperties(kwArgs);
         },
     
-        getEndDate: function getEndDate(){
+        getEndDate: function (){
             var duration = this.getDuration();
             var endDate = this.getStartDate().clone();
             endDate.addDuration(duration);
             return endDate;
         },
 
-        setEndDate: function setEndDate(/*CosmoDate*/ endDate){
+        setEndDate: function (/*CosmoDate*/ endDate){
             var duration = new cosmo.model.Duration(this.getStartDate(), endDate);
             this.setDuration(duration);
         },
     
-        setStartDate: function setStartDate(/*cosmo.datetime.Date*/ newStartDate){
+        setStartDate: function (/*cosmo.datetime.Date*/ newStartDate){
            var oldDate = this.getStartDate();
            this.__setProperty("startDate", newStartDate);
            
@@ -75,13 +75,13 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
     //mixins for occurrence stamps
     {
         _masterPropertyGetters: {
-            startDate: function eventStampOcurrenceStartDateMasterPropertyGetter(){
+            startDate: function (){
                return this.recurrenceId;
             }
         },
         
         //we don't want to inherit from the one from the master....
-        setStartDate: function setStartDate(newStartDate){
+        setStartDate: function (newStartDate){
            this.__setProperty("startDate", newStartDate);
         }
     

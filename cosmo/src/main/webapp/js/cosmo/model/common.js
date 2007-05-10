@@ -33,7 +33,7 @@ cosmo.model.declare("cosmo.model.RecurrenceRule", null,
             this.initializeProperties(kwArgs);
         },
         
-        isSupported: function isSupported(){
+        isSupported: function (){
             return this.getIsSupported();  
         },
     

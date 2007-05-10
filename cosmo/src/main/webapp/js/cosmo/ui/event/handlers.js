@@ -35,6 +35,7 @@ dojo.provide('cosmo.ui.event.handlers');
 dojo.require('dojo.event.topic');
 dojo.require('cosmo.app');
 dojo.require('cosmo.app.pim');
+dojo.require('cosmo.ui.timeout');
 
 /**
  * Generic function to get the source elem of a UI event
@@ -81,7 +82,10 @@ cosmo.ui.event.handlers.mouseDownHandler = function (e) {
     // Check for client-side timeout on all mouse clicks
     // =================
     //XINT 
-    //TODO: add timeout check
+    if (cosmo.ui.timeout.timedOut()){
+        alert("Logout needs to happen!")
+    }
+    cosmo.ui.timeout.updateLastActionTime();
 }
 
 /**

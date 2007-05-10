@@ -355,9 +355,6 @@ cosmo.app.pim = new function () {
                 cosmo.app.showDialog(
                     cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
                         self.currentCollection.collection,
-                        self.currentCollection.displayName,
-                        self.currentCollection.conduit,
-                        self.currentCollection.transportInfo,
                         sel.options[sel.selectedIndex].value));
                 }
             };

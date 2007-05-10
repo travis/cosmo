@@ -18,7 +18,7 @@ dojo.provide("cosmotest.model.test_common")
 dojo.require("cosmo.model.common");
 
 cosmotest.model.test_common = {
-    test_duration: function testDuration(){
+    test_duration: function (){
         var duration = new cosmo.model.Duration({day:1, month:2});
         jum.assertEquals(1, duration.getDay());
         jum.assertEquals(2, duration.getMonth());

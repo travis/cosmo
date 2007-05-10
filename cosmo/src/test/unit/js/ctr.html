@@ -43,13 +43,12 @@ For use with the JsUnit from www.jsunit.net
   <!-- doing this in body onload seems to disable jsunit -->
   <script language="JavaScript" type="text/javascript">
     var bu_alert = dojo.hostenv.println;
-    print = dojo.hostenv.println;
+    var print = dojo.hostenv.println;
     cosmotest.testutils.init(
         ["cosmotest.model.test_model",
         "cosmotest.model.test_common",
         "cosmotest.model.test_eventStamp",
         "cosmotest.model.util.test_util",
-        "cosmotest.datetime.test_7581",
         "cosmotest.datetime.test_date",
         "cosmotest.datetime.test_timezone",
         "cosmotest.datetime.test_serialize",
@@ -79,7 +78,6 @@ For use with the JsUnit from www.jsunit.net
      col.appendChild(document.createTextNode(test_names[i]));
      row.appendChild(col);
    }
-   
    function checkBoxesFromLocation(){
           var testNames = location.search.slice(1).split("&");
        var tests = {};
@@ -117,7 +115,7 @@ For use with the JsUnit from www.jsunit.net
    
    function run_tests() {
        var tests = []
-       for (var i in test_menu.childNodes) {
+       for (var i = 0; i < test_menu.childNodes.length; i++) {
            var test_row = test_menu.childNodes[i];
            if (test_row.nodeType != Node.ELEMENT_NODE) continue;
 

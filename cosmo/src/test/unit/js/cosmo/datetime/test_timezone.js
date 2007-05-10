@@ -27,22 +27,22 @@ var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry(cosmo.env
 cosmo.datetime.timezone.setTimezoneRegistry(registry);
 
 cosmotest.datetime.test_timezone = {
-    getNyTz: function getNyTz(){
+    getNyTz: function (){
         var timezone = cosmo.datetime.timezone.getTimezone("America/New_York");
         return timezone;
     },
 
-    getUsRs: function getUsRs(){
+    getUsRs: function (){
         var rs = cosmo.datetime.timezone.getRuleSet("US");
         return rs;
     },
 
-    test_getTimezone: function test_getTimezone(){
+    test_getTimezone: function (){
         var timezone = cosmotest.datetime.test_timezone.getNyTz();
         jum.assertTrue(timezone != null);
     },
 
-    test_getDateField: function test_getDateField(){
+    test_getDateField: function (){
         var getDateField = cosmo.datetime.timezone._getDateField;
         var scoobyDate = new ScoobyDate(2006, 11, 10, 12, 33, 30);
         jum.assertEquals(2006, getDateField(scoobyDate, "year"));
@@ -85,7 +85,7 @@ cosmotest.datetime.test_timezone = {
         jum.assertEquals(0, getDateField(sparseHashDate, "seconds"));
     },
 
-    test_compareDates: function test_compareDates(){
+    test_compareDates: function (){
         var compareDates = cosmo.datetime.timezone._compareDates;
         var jsDate1 = new Date(2006, 11, 10, 12, 33, 30);
         var jsDate2 = new Date(2007, 11, 10, 12, 33, 30);
@@ -109,7 +109,7 @@ cosmotest.datetime.test_timezone = {
         jum.assertTrue(compareDates(sparseHashDate, jsDate2) < 0);
     },
 
-    test_getZoneItemForDate: function test_getZoneItemForDate(){
+    test_getZoneItemForDate: function (){
         var tz = cosmotest.datetime.test_timezone.getNyTz();
         var date = new Date(2006, 1, 1);
         var zoneItem = tz._getZoneItemForDate(date);
@@ -128,14 +128,14 @@ cosmotest.datetime.test_timezone = {
         jum.assertEquals(1942, zoneItem.untilDate.year);
         },
     
-        test_getRulesForYear:     function test_getRulesForYear(){
+        test_getRulesForYear:     function (){
         var rs = cosmotest.datetime.test_timezone.getUsRs();
         var rules = rs._getRulesForYear(1999);
         jum.assertEquals(2, rules.length);
         jum.assertEquals(1967, rules[0].startYear);
     },
 
-    test_DayGreateThanNForMonthAndYear: function test_DayGreateThanNForMonthAndYear(){
+    test_DayGreateThanNForMonthAndYear: function (){
         var func = cosmo.datetime.timezone._getDayGreaterThanNForMonthAndYear;
     
         //"get me the date of the first thursday that is greater than or equal to the 8th in November"
@@ -151,7 +151,7 @@ cosmotest.datetime.test_timezone = {
         jum.assertEquals(14, date);
     },
 
-    test_DayLessThanNForMonthAndYear: function test_DayLessThanNForMonthAndYear(){
+    test_DayLessThanNForMonthAndYear: function (){
         var func = cosmo.datetime.timezone._getDayLessThanNForMonthAndYear;
     
         //"get me the date of the last thursday that is less than or equal to the 8th in November"
@@ -167,7 +167,7 @@ cosmotest.datetime.test_timezone = {
         jum.assertEquals(7, date);
     },
 
-    test_getStartDateForYear: function test_getStartDateForYear(){
+    test_getStartDateForYear: function (){
       //to test: cosmo.datetime.timezone.Rule.prototype._getStartDateForYear = function(year)
       var rs = cosmotest.datetime.test_timezone.getUsRs();
       var sorter = function(a,b){return a.startMonth - b.startMonth};
@@ -199,7 +199,7 @@ cosmotest.datetime.test_timezone = {
       jum.assertEquals(11, startDate.date);
     },
 
-    test_getOffsetInMinutes: function test_getOffsetInMinutes(){
+    test_getOffsetInMinutes: function (){
     var timezone = cosmotest.datetime.test_timezone.getNyTz();
     var date;
     var offset;
@@ -221,7 +221,7 @@ cosmotest.datetime.test_timezone = {
     jum.assertEquals(-240, offset);
     },
 
-    getPrefixes: function getPrefixes(){
+    getPrefixes: function (){
     var files = ["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"];
     var prefixes = {};
     
@@ -252,7 +252,7 @@ cosmotest.datetime.test_timezone = {
     return prefixes;    
 },
 
-getPrefixToFileMap: function getPrefixToFileMap(){
+getPrefixToFileMap: function (){
 
     function getFileNameWithMostTzids(record){
         var winner = 0;
@@ -277,7 +277,7 @@ getPrefixToFileMap: function getPrefixToFileMap(){
     return map;
 },
 
-printPrefixes: function printPrefixes(){
+printPrefixes: function (){
     var prefixes = getPrefixes();
     for (var prefix in prefixes){
         print("Prefix: '" + prefix + "'");
@@ -288,7 +288,7 @@ printPrefixes: function printPrefixes(){
     }
 },
 
-getExceptionMap: function getExceptionMap(){
+getExceptionMap: function (){
    var prefixToFileMap = getPrefixToFileMap();
    var files = ["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"];
    var map = {};

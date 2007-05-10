@@ -90,7 +90,7 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
                 modification._modifiedStamps[stampName] = modifiedStamp;
             }
             modifiedStamp[propertyName] = value;
-        },
+        }
 });
 
     dojo.lang.mixin(stampOccurrenceCtr.prototype, occurrenceDeclarations || {});
@@ -221,7 +221,6 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     __noOverride:{uid:1,version:1},
     
     initializer: function (master, recurrenceId){
-//        dojo.debug("noteOccurrenceInitializer");
         this._master = master;
         this.recurrenceId = recurrenceId;
     },

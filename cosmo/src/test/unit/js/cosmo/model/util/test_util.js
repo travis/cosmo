@@ -18,7 +18,7 @@ dojo.provide("cosmotest.model.util.test_util");
 dojo.require("cosmo.model.util");
 
 cosmotest.model.util.test_util = {
-test_simplePropertyApplicator: function test_simplePropertyApplicator(){
+test_simplePropertyApplicator: function (){
     var app  = cosmo.model.util.simplePropertyApplicator;
     NewClass = null;
     dojo.declare("NewClass", null, {});

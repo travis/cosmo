@@ -26,14 +26,14 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
       ["location", String, {}],
       ["rrule", cosmo.model.RecurrenceRule, {}],
       ["exdates", [Array, cosmo.datetime.Date], {}],
-      ["status", String, {}],
+      ["status", String, {}]
     ],
     //mixins for master item stamps		 
     {
         initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
         },
-    
+
         getEndDate: function (){
             var duration = this.getDuration();
             var endDate = this.getStartDate().clone();

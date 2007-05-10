@@ -28,7 +28,7 @@ registry.init(["northamerica"]);
 cosmo.datetime.timezone.setTimezoneRegistry(registry);
 
 cosmotest.datetime.test_date = {
-test_dateConstructor: function test_dateConstructor() {
+test_dateConstructor: function () {
     var dt = null;
     var dtComp = new Date(2006, 9, 23);
     
@@ -157,7 +157,7 @@ test_dateConstructor: function test_dateConstructor() {
     jum.assertEquals(0, dt.getTimezoneOffset());
 },
 
-test_dateGetOffset: function test_dateGetOffset() {
+test_dateGetOffset: function () {
     var dt = null;
     
     dt = new D(2006, 9, 29, 1, 59, 'America/Los_Angeles');
@@ -167,7 +167,7 @@ test_dateGetOffset: function test_dateGetOffset() {
     jum.assertEquals(480, dt.getTimezoneOffset());
 },
 
-test_dateSetters: function test_dateSetters() {
+test_dateSetters: function () {
     var dt = null;
     
     dt = new D(2006, 9, 23, 22, 12, 55, 6);
@@ -226,7 +226,7 @@ test_dateSetters: function test_dateSetters() {
     }
 },
 
-test_dateUTCSetters: function test_dateUTCSetters() {
+test_dateUTCSetters: function () {
     var dt = null;
     
     // UTC date
@@ -253,7 +253,7 @@ test_dateUTCSetters: function test_dateUTCSetters() {
     }
 },
 
-   test_addDuration: function test_addDuration(){
+   test_addDuration: function (){
        var date = new cosmo.datetime.Date(2000,0,1,12,0,0);
        var duration = new cosmo.model.Duration({year:1});
        date.addDuration(duration);

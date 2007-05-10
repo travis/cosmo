@@ -147,6 +147,6 @@ test_stampInheritance : function(){
     jum.assertEquals(occurStamp.getLocation(), "Yo");
     
     
-},
+}
 
 });

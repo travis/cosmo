@@ -23,7 +23,7 @@ dojo.require("cosmo.datetime.serialize");
 
 cosmotest.service.translators.test_eim = {
   
-    test_parseRecordSet: function test_parseRecordSet(){
+    test_parseRecordSet: function (){
         var uid = "12345";
         var title = "o1";
         var triageStatus = "100";
@@ -41,9 +41,9 @@ cosmotest.service.translators.test_eim = {
               dtstart: dtstart
               
             }));
-        var objectList = cosmo.service.translators.eim.responseToObject(a);
+        var objectList = cosmo.service.translators.eim.translateGetItems(a);
         
-        var o1 = objectList[uid];
+        var o1 = objectList[0];
 
         jum.assertEquals("uid does not match", uid, o1.getUid());
         jum.assertEquals("display name does not match title", title, o1.getDisplayName());
@@ -58,12 +58,12 @@ cosmotest.service.translators.test_eim = {
               
     },
 
-    test_parseRRuleFreq: function parseRRuleFreq(){
+    test_parseRRuleFreq: function (){
         var rule = "FREQ=DAILY;UNTIL=20000131T090000Z;"
         var rrule = cosmo.service.translators.eim.parseRRule(rule);
-        
+       
         jum.assertEquals("wrong frequency", 
-                         cosmo.model.RecurrenceRule.FREQUENCY_DAILY, 
+                         cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY, 
                          rrule.getFrequency());
 
         var until = cosmo.datetime.fromIso8601("20000131T090000Z");
@@ -75,32 +75,32 @@ cosmotest.service.translators.test_eim = {
         rrule = cosmo.service.translators.eim.parseRRule(rule);
 
         jum.assertEquals("wrong frequency", 
-                         cosmo.model.RecurrenceRule.FREQUENCY_WEEKLY, 
+                         cosmo.model.RRULE_FREQUENCIES.FREQUENCY_WEEKLY, 
                          rrule.getFrequency());
 
         rule = "FREQ=WEEKLY;INTERVAL=2;UNTIL=20000131T090000Z;"
         rrule = cosmo.service.translators.eim.parseRRule(rule);
 
         jum.assertEquals("wrong frequency", 
-                         cosmo.model.RecurrenceRule.FREQUENCY_BIWEEKLY, 
+                         cosmo.model.RRULE_FREQUENCIES.FREQUENCY_BIWEEKLY, 
                          rrule.getFrequency());
 
         rule = "FREQ=MONTHLY;UNTIL=20000131T090000Z;"
         rrule = cosmo.service.translators.eim.parseRRule(rule);
 
         jum.assertEquals("wrong frequency", 
-                         cosmo.model.RecurrenceRule.FREQUENCY_MONTHLY, 
+                         cosmo.model.RRULE_FREQUENCIES.FREQUENCY_MONTHLY, 
                          rrule.getFrequency());
 
         rule = "FREQ=YEARLY;UNTIL=20000131T090000Z;"
         rrule = cosmo.service.translators.eim.parseRRule(rule);
 
         jum.assertEquals("wrong frequency", 
-                         cosmo.model.RecurrenceRule.FREQUENCY_YEARLY, 
+                         cosmo.model.RRULE_FREQUENCIES.FREQUENCY_YEARLY, 
                          rrule.getFrequency());
     },
     
-    test_parseRRuleUnsupported: function parseRRuleUnsupported(){
+    test_parseRRuleUnsupported: function (){
         var rule = "FREQ=DAILY;UNTIL=20000131T090000Z;BYMONTH=1"
         var rrule = cosmo.service.translators.eim.parseRRule(rule);
         
@@ -130,7 +130,7 @@ cosmotest.service.translators.test_eim = {
         
     },
   
-    generateAtom: function generateAtom(/*Object*/ content){
+    generateAtom: function (/*Object*/ content){
         
         var uuid = content.uuid;
         
@@ -155,7 +155,7 @@ cosmotest.service.translators.test_eim = {
 
     },
     
-    toXMLDocument: function _toXMLDocument(/*String*/ text){
+    toXMLDocument: function (/*String*/ text){
         if (window.ActiveXObject)
           {
           var doc=new ActiveXObject("Microsoft.XMLDOM");
@@ -171,7 +171,7 @@ cosmotest.service.translators.test_eim = {
           return doc;
     },
     
-    getEimRecordset: function getEimRecordset(/*Object*/ props){
+    getEimRecordset: function (/*Object*/ props){
         props = props || {};
         
         var recordSet = 

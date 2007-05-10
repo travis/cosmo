@@ -66,6 +66,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
      * changed property, and the value is an object with two items:
      * newValue (the updated value) and origValue (the original)
      */
+     //XINT
     this.hasChanged = function () {
         var d = this.data;
         var dO = this.dataOrig;
@@ -243,7 +244,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
     this.makeSnapshot = function () {
         // Make backup snapshot before saving
         // ================
-        this.dataOrig = CalEventData.clone(this.data);
+        this.dataOrig = this.data.clone();
         return true;
     };
     /**
@@ -254,7 +255,7 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
     this.restoreFromSnapshot = function () {
         // Restore from backup snapshot
         // ================
-        this.data = CalEventData.clone(this.dataOrig);
+        this.data = this.dataOrig.clone();
         return true;
     };
     /**
@@ -271,16 +272,16 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
 
     };
     this.startsBeforeViewRange = function () {
-        return (this.data.start.toUTC() < cosmo.view.cal.viewStart.getTime());
+        return (this.data.getEventStamp().getStartDate().toUTC() < cosmo.view.cal.viewStart.getTime());
     };
     this.endsBeforeViewRange = function () {
-        return (this.data.end.toUTC() < cosmo.view.cal.viewStart.getTime());
+        return (this.data.getEventStamp().getEndDate().toUTC() < cosmo.view.cal.viewStart.getTime());
     };
     this.startsAfterViewRange = function () {
-        return (this.data.start.toUTC() > cosmo.view.cal.viewEnd.getTime());
+        return (this.data.getEventStamp().getStartDate().toUTC() > cosmo.view.cal.viewEnd.getTime());
     };
     this.endsAfterViewRange = function () {
-        return (this.data.end.toUTC() > cosmo.view.cal.viewEnd.getTime());
+        return (this.data.getEventStamp().getEndDate().toUTC() > cosmo.view.cal.viewEnd.getTime());
     };
     //toString = genericToString;
 }

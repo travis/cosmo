@@ -120,11 +120,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                                 else {
                                     // Log the user into Cosmo and display the current collection
                                     self._showPrompt(msg);
-                                    location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.collection.uid;
+                                    location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
                                 }
                             };
-                            cosmo.app.pim.serv.saveSubscription(n, curr.collection.uid, passedKey,
-                                curr.displayName)
+                            cosmo.app.pim.serv.saveSubscription(n, curr.getUid(), passedKey,
+                                curr.getDisplayName())
                         },
                         attemptPrompt: strings.attemptPrompt,
                         successPrompt: strings.successPrompt };
@@ -142,10 +142,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                         var _pim = cosmo.app.pim;
                         cosmo.app.showDialog(
                             cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                            _pim.currentCollection.collection,
-                            _pim.currentCollection.displayName,
-                            _pim.currentCollection.conduit,
-                            _pim.currentCollection.transportInfo));
+                            _pim.currentCollection));
                     };
                 }
 
@@ -221,10 +218,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 var c = 0;
                 for (var i in col) {
                     // Grab the currently selected collection's index
-                    if (col[i].displayName == curr.displayName) {
+                    if (col[i].getDisplayName() == curr.getDisplayName()) {
                         c = i;
                     }
-                    o.push( { value: i, text: col[i].displayName } );
+                    o.push( { value: i, text: col[i].getDisplayName()} );
                 }
 
                 // The collection selector
@@ -284,19 +281,23 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
         handleCollectionUpdated: function(/*cosmo.topics.CollectionUpdatedMessage*/ message){
             var updatedCollection = message.collection;
             for (var x = 0; x < this.collections.length;x++){
-                if (this.collections[x].collection.uid == updatedCollection.uid){
-                    this.collections[x].collection = updatedCollection;
-                    if (!this.collections[x].transportInfo){
-                        this.collections[x].displayName = updatedCollection.name;
+                var collection = this.collections[x];
+                if (collection.getUid() = updatedCollection.getUid()){
+                    if (collection instanceof cosmo.model.Subscription){
+                        collection.setCollection(updatedCollection);
+                    } else {
+                        //we'll assume it's a "normal" collection
+                        this.collections[x] = updatedCollection;
                     }
-                    break;
-                }
+                }                
             }
 
-            if (this.currentCollection.uid == updatedCollection.uid){
+            if (this.currentCollection.getUid() == updatedCollection.getUid()){
                 this.currentCollection.collection = updatedCollection;
-                if (!currentCollection.transportInfo){
-                    this.currentCollection.displayName = updatedCollection.name;
+                if (currentCollection instanceof cosmo.model.Subscription){
+                    this.currentCollection.setCollection(updatedCollection);
+                } else {
+                    this.currentCollection = updatedCollection;
                 }
             }
             this._redraw();
@@ -306,21 +307,19 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var updatedSubscription = message.subscription;
             for (var x = 0; x < this.collections.length;x++){
                 var col = this.collections[x];
-                if (col.transportInfo &&
-                    col.transportInfo instanceof cosmo.model.Subscription &&
-                    col.transportInfo.calendar.uid == updatedSubscription.calendar.uid &&
-                    col.transportInfo.ticketKey == updatedSubscription.ticketKey){
-                    col.transportInfo = updatedSubscription;
-                    col.displayName = updatedSubscription.displayName;
-                    break;
+                if (col instanceof cosmo.model.Subscription
+                     && col.getTicketKey() == updatedSubscription.getTicketKey()
+                     && col.getUid() == updatedSubscription.getUid()){
+                     
+                     this.collections[x] = updatedSubscription;                      
+                     break;
                 }
             }
 
-            if (this.currentCollection.transportInfo
-                   && this.currentCollection.transportInfo.calendar.uid == updatedSubscription.calendar.uid
-                   && this.currentCollection.transportInfo.ticketKey == updatedSubscription.ticketKey ){
-                this.currentCollection.displayName = updatedSubscription.displayName;
-                this.currentCollection.transportInfo = updatedSubscription;
+            if (this.currentCollection instanceof cosmo.model.Subscription
+                     && this.currentCollection.getTicketKey() == updatedSubscription.getTicketKey()
+                     && this.currentCollection.getUid() == updatedSubscription.getUid()){
+                this.currentCollection = updatedSubscription;
             }
             this._redraw();
         } ,

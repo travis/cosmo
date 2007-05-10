@@ -39,10 +39,7 @@ dojo.widget.HtmlWidget, function(){
 //Prototype Properties
 {
         //User supplied properties:
-        calendar: /*CalendarMetadata*/ null,
-        conduit: /*cosmo.conduits.Conduit*/ null,
-        transportInfo: null,
-        displayName: null, //the collection display name
+        collection: /*cosmo.model.Collection ||cosmo.model.Subscription*/ null,
         displayedSelection: '', // The selection item to display if invoked from ticket view
 
         // Template stuff
@@ -97,7 +94,7 @@ dojo.widget.HtmlWidget, function(){
            var options = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
            cosmo.util.html.setSelectOptions(this.clientSelector, options);
 
-           if (this.conduit != null && this.conduit.saveDisplayName){
+           if (true /*XINT figure out when to not be able to save */){
                this.collectionNameInputSpan.style.display = "";
            } else {
                this.collectionNameText.style.display = "";
@@ -126,6 +123,7 @@ dojo.widget.HtmlWidget, function(){
            this._handleClientChanged();
         },
 
+        //XINT
         saveDisplayName: function(){
             this.conduit.saveDisplayName(this.calendar.uid, this._getDisplayName(), this.transportInfo);
             //TODO - This should not here. The publishing should happen at the service level,
@@ -207,7 +205,9 @@ dojo.widget.HtmlWidget, function(){
             }
             dojo.dom.replaceChildren(this.clientInstructions, d);
         },
-
+        
+        
+        //XINT
         _setClientCollectionAddress: function(client){
             var url =  this.calendar.protocolUrls[this.clientsToProtocols[client]];
             this.clientCollectionAddress.value = url;
@@ -225,18 +225,11 @@ dojo.widget.HtmlWidget, function(){
  );
 
  cosmo.ui.widget.CollectionDetailsDialog.getInitProperties =
-    function(/*CalendarMetadata*/ calendar,
-             /*string*/ displayName,
-             /*cosmo.conduits.Conduit*/ conduit,
-             transportInfo,
-             /* string */ displayedSelection) {
+    function(/*cosmo.model.Collection || cosmo.model.Subscription*/ collection,/* string */ displayedSelection) {
 
     var dummyNode = document.createElement('span');
     var contentWidget = dojo.widget.createWidget("cosmo:CollectionDetailsDialog",
-                    { calendar: calendar,
-                      displayName: displayName,
-                      conduit: conduit,
-                      transportInfo: transportInfo,
+                    { collection: collection,
                       displayedSelection: displayedSelection },
                  dummyNode, 'last');
 
@@ -298,5 +291,3 @@ cosmo.ui.widget.CollectionDetailsDialog.getClientOptions = function () {
     }
     return options;
 }
-
-

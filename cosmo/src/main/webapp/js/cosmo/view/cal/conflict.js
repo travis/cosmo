@@ -78,25 +78,26 @@ cosmo.view.cal.conflict = new function() {
          */
         function checkConflictAtPos(i) {
             var ev = evReg.getAtPos(i);
-            var evStart = ev.data.start.getTime();
-            var evEnd = ev.data.end.getTime();
+            var eventStamp = ev.data.getEventStamp();
+            var evStart = eventStamp.getStartDate().getTime();
+            var evEnd = eventStamp.getEndDate().getTime();
             var evCheck = null;
             var evCheckStart = 0;
 
             // Don't check conflicts for non-timed events
-            if (ev.data.allDay || ev.data.anyTime) {
+            if (eventStamp.getAllDay() || eventStamp.getAnyTime()) {
                 return;
             }
             for (var j = i+1; j < evReg.length; j++) {
                 evCheck = evReg.getAtPos(j);
-                evCheckStart = evCheck.data.start.getTime();
+                evCheckStart = evCheck.data.getEventStamp().getStartDate().getTime();
                 // Quit looking when you see an event that
                 // comes after this event's block finishes
                 if ((evCheckStart >= evEnd) && (evCheckStart != evStart)) {
                     return;
                 }
                 // Ignore all non-timed events
-                else if (evCheck.data.allDay || evCheck.data.anyTime) {
+                else if (evCheck.data.getEventStamp().getAllDay() || evCheck.data.getEventStamp().getAnyTime()) {
                     // Do nothing
                 }
                 // Record actual conflicts
@@ -224,21 +225,26 @@ cosmo.view.cal.conflict = new function() {
             var matrix = allDayMatrix;
             var isPlaced = false;
             var row = 0;
-
+            var eventStamp = ev.data.getEventStamp();
+            var allDay = eventStamp.getAllDay();
+            var anyTime = eventStamp.getAnyTime();
+            
             // Only look at untimed events
-            if (ev.data.allDay || ev.data.anyTime) {
+            if (allDay || anyTime) {
+                var startDate = eventStamp.getStartDate();
+                var endDate = eventStamp.getStartDate();
                 // Calc start column and column width
                 if (ev.startsBeforeViewRange()) {
                     startCol = 0;
                 }
                 else {
-                    startCol = ev.data.start.getLocalDay();
+                    startCol = startDate.getLocalDay();
                 }
                 if (ev.endsAfterViewRange()) {
                     endCol = 6;
                 }
                 else {
-                    endCol = ev.data.end.getLocalDay();
+                    endCol = endDate.getLocalDay();
                 }
                 evLength = endCol - startCol;
 

@@ -1153,8 +1153,6 @@ cosmo.view.cal = new function () {
         var collection = data.collection;
         var start = data.startDate;
         var end = data.endDate;
-        var s = start.getTime();
-        var e = end.getTime();
         var eventLoadList = null;
         var eventLoadHash = new Hash();
         var isErr = false;
@@ -1167,8 +1165,8 @@ cosmo.view.cal = new function () {
         // Load the array of events
         // ======================
         try {
-            var deferred = cosmo.app.pim.serv.getItems(collection, {start:s, end:e});
-            eventLoadList = deferred.result;
+            var deferred = cosmo.app.pim.serv.getItems(collection, {start:start, end:end}, {sync: true});
+            eventLoadList = deferred.results[0];
         }
         catch(e) {
             cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), getErrDetailMessage(e));

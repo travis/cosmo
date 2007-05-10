@@ -526,7 +526,7 @@ cosmo.app.pim = new function () {
 
             for (var i = 0; i < userCollections.length; i++){
                 var collection = userCollections[i];
-                this.currentCollections.push (collection);
+                this.currentCollections.push(collection);
             }
 
             // No collections for this user

@@ -74,8 +74,9 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     },
 
     getItems: function getItems(collection, searchCriteria, kwArgs){
-        kwArgs.ticketKey = collection.getTicket() || undefined;
-        var deferred = this._transport.getItems(collection, searchCriteria, kwArgs);
+        if (!kwArgs) kwArgs = {};
+        kwArgs.ticketKey = collection.getTicketKey() || undefined;
+        var deferred = this._transport.getItems(collection.getUid(), searchCriteria, kwArgs);
 
         deferred.addCallback(this.translateGetItems);
 

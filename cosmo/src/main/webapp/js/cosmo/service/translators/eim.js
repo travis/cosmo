@@ -53,7 +53,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 //TODO: replace this with the correct uid grabbing code
                 uid: collectionXml.getAttribute("href").split("/")[1],
                 displayName: collectionXml.getElementsByTagName("title")[0].firstChild.nodeValue,
-                ticket: ""
+                ticket: "",
+                writable: true
             }
         );
         return collection;

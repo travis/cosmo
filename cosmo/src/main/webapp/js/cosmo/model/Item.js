@@ -226,7 +226,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
         this.recurrenceId = recurrenceId;
     },
     
-   isOccurrence: function isOccurrence(){
+    isOccurrence: function isOccurrence(){
         return true;
     },
     
@@ -312,12 +312,16 @@ cosmo.model.declare("cosmo.model.Modification", null,
       }
     });
 
-dojo.declare("cosmo.model.Collection", cosmo.model.Item, 
-    [["ticketKey", {"default": null}]
+cosmo.model.declare("cosmo.model.Collection", cosmo.model.Item, 
+    [["ticketKey", {"default": null}],
+     ["writeable", {"default": true}]
      ],
     {
       initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
+      },
+      isWriteable: function isWriteable(){
+          return this.getWriteable();
       }
     });
 

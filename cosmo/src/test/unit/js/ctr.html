@@ -60,7 +60,10 @@ For use with the JsUnit from www.jsunit.net
 <!--<body onload="alert('hieatt_core.html onload, number scripts=' + document.getElementsByTagName('script').length); jum.init()">-->
 <!--<body onload="jum.init()">-->
 <body>
-  <table id="test-menu">
+  <table>
+  <tbody id="test-menu">
+  	
+  </tbody>
   </table>
 <script type="text/javascript" language="JavaScript">
    var test_names = jum.alltests_.group_names_;
@@ -73,10 +76,10 @@ For use with the JsUnit from www.jsunit.net
      box.setAttribute('value',test_names[i]);
      col.appendChild(box);
      row.appendChild(col);
-     test_menu.appendChild(row);
      col = document.createElement("td");
      col.appendChild(document.createTextNode(test_names[i]));
      row.appendChild(col);
+     test_menu.appendChild(row);
    }
    function checkBoxesFromLocation(){
           var testNames = location.search.slice(1).split("&");
@@ -115,10 +118,10 @@ For use with the JsUnit from www.jsunit.net
    
    function run_tests() {
        var tests = []
-       for (var i = 0; i < test_menu.childNodes.length; i++) {
-           var test_row = test_menu.childNodes[i];
-           if (test_row.nodeType != Node.ELEMENT_NODE) continue;
-
+       var rows = test_menu.getElementsByTagName ("tr");
+       for (var i = 0; i < rows.length; i++) {
+           var test_row = rows[i];
+           if (test_row.nodeType != 1/*Node.ELEMENT_NODE in most browsers*/) continue;
            if (test_row.childNodes[0].childNodes[0].checked) {
              jum.runGroup(test_row.childNodes[1].childNodes[0].data);
            }
@@ -148,7 +151,9 @@ For use with the JsUnit from www.jsunit.net
    Convenience!
    */
    document.onkeyup = function (e){
-       if (String.fromCharCode(e.keyCode) == 'R'){
+       e = !e ? window.event : e;
+   
+	   if (String.fromCharCode(e.keyCode) == 'R'){
             location = location.href.split("?")[0] + getCurrentQueryString();
         }
 

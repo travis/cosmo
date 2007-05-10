@@ -42,9 +42,7 @@ cosmotest.service.translators.test_eim = {
               
             }));
         var objectList = cosmo.service.translators.eim.translateGetItems(a);
-        
         var o1 = objectList[0];
-
         jum.assertEquals("uid does not match", uid, o1.getUid());
         jum.assertEquals("display name does not match title", title, o1.getDisplayName());
         jum.assertEquals("triage status does not match", triageStatus, o1.getTriageStatus());
@@ -124,16 +122,14 @@ cosmotest.service.translators.test_eim = {
         jum.assertTrue("unsupported rule not saved", !!rrule.getUnsupportedRule());
         jum.assertEquals("wkst wrong in unsupported rule", "SU", 
                          rrule.getUnsupportedRule().wkst);
-        jum.assertEquals("count wrong in unsupported rule", ["MO","WE", "FR"], 
-                         rrule.getUnsupportedRule().byday);
+        jum.assertEquals("count wrong in unsupported rule", ["MO","WE", "FR"].toString(), 
+                         rrule.getUnsupportedRule().byday.toString());
         
         
     },
   
     generateAtom: function (/*Object*/ content){
-        
         var uuid = content.uuid;
-        
         return cosmotest.service.translators.test_eim.toXMLDocument('<?xml version=\'1.0\' encoding=\'UTF-8\'?>' +
         '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:base="http://localhost:8080/cosmo/atom/">' +
         '<id>urn:uuid:56599b95-6676-4823-8c88-1eec17058f48</id>' +
@@ -147,7 +143,7 @@ cosmotest.service.translators.test_eim = {
         '<updated>2007-05-01T21:01:59.535Z</updated><published>2007-05-01T21:01:59.535Z</published>' +
         '<link rel="self" type="application/atom+xml" href="item/' + uuid + '/full/eim-json" />' +
         '<content type="application/eim+json">' + 
-        content.toSource().slice(1,-1) + 
+        dojo.json.serialize(content) + 
         '</content>' +
         '<link rel="edit" type="application/atom+xml" href="item/' + uuid + '"/>' +
         '<link rel="parent" type="application/atom+xml" href="collection/56599b95-6676-4823-8c88-1eec17058f48/full/eim-json" />' +
@@ -195,7 +191,7 @@ cosmotest.service.translators.test_eim = {
                               "icalUid":["text", props.icalUid || "dfad540e-eae5-4792-9d2d-d9642fcfc411"]}},
             "event":{"ns":"http://osafoundation.org/eim/event/0",
                      "key":{"uuid":["text", props.uuid || "0017e507-e087-487a-8eae-63afa7d865b5"]},
-                     "fields":{"dtstart":["text", props.dtstart || ";VALUE=DATE-TIME:00021231T000000"],
+                     "fields":{"dtstart":["text", props.dtstart || ";=DATE-TIME:00021231T000000"],
                                "duration":["text", props.duration || "PT0S"],
                                "location":["text", props.location || ""],
                                "rrule":["text", props.rrule || null],

@@ -104,7 +104,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     entryToItem: function (/*XMLElement*/entry, /*String*/uuid, 
         /*cosmo.model.Item*/ masterItem){
-
             var uuidParts = uuid.split("::");
             var uidParts = uuidParts[0].split(":");
             try {
@@ -114,7 +113,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                    ParseError("Could not find content element for entry " + (i+1));
             }
             var content = c.firstChild.nodeValue;
-
             var item;
             // If we have a second part to the uid, this entry is a
             // recurrence modification.
@@ -314,6 +312,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                          object.start.strftime("%Y%m%dT%H%M%S"))],
 
                 anytime: [type.INTEGER, stamp.getAnytime()],
+                
                 rrule: [type.TEXT, stamp.getRrule()? stamp.getRrule().toString() : null],
                 status: [type.TEXT, stamp.getStatus() || null],
                 location: [type.TEXT, stamp.getLocation() || null]

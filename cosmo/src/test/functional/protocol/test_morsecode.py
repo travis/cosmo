@@ -43,17 +43,29 @@ def test_update():
                                              'X-MorseCode-SyncToken':collections['example']['token']})
     assert client.response.status == 204
     
-def test_multiple_recordsets():
+def test_get_all_collections():
     
-    collection = collections['example']['xobj']
+    eimml = xmlobjects.fromstring(eimml_example)
+
+    collection_uuid = str(uuid.uuid1())
+    record_uuid = str(uuid.uuid1())
+
+    eimml['uuid'] = collection_uuid
+    for record in eimml.recordset.record:
+       record.uuid = record_uuid
+       if hasattr(record, 'icalUid'):
+           record.icalUid = collection_uuid
+
+    client.mc_publish_collection(eimml)
+    assert client.response.status == 201
+    collections[eimml['uuid']] = {'xobj':eimml, 'token':client.response.getheader('X-MorseCode-SyncToken')}
     
-    recordsets = []
-    for x in range(5):
-        recordsets.append(xmlobjects.fromstring(eimml_example).recordset)
+    path = client._cosmo_path+'mc/user/%s' % client._username
+    client.get(path, headers={'content-type':'application/eim+xml; charset=UTF-8'})
+    assert client.response.status == 200
     
-    for recordset in recordsets:
-        pass
-    
+    xobj = xmlobjects.fromstring(client.response.body)
+    assert len(xobj.collection) is 3 # cosmolib creates one calendar collection so we should have 3
 
     
     

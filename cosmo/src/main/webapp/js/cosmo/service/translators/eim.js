@@ -382,7 +382,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             startDate: record.fields.dtstart? this.fromEimDate(record.fields.dtstart[1]): undefined,
             duration: record.fields.duration?
                 new cosmo.model.Duration(cosmo.datetime.parseIso8601Duration(record.fields.duration[1])) : undefined,
-            anytime: dateParams.anyTime,
+            anyTime: dateParams.anyTime,
+            allDay: dateParams.allDay,
             location: record.fields.location? record.fields.location[1] : undefined,
             rrule: record.fields.rrule? this.parseRRule(record.fields.rrule[1]): undefined,
             exdates: null, //TODO
@@ -436,13 +437,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 returnVal.value = param[1].toLowerCase();
             }
         }
+        if (!this.isDateTime(dateString) && !returnVal.anyTime) returnVal.allDay = true;
         return returnVal;
     },
-
-    anyTimeFromEimDate: function(dateString){
-
-        return false;
-
+    
+    isDateTime: function (dateString){
+        return !!(dateString.split("T")[1]);
     },
 
     rruleToICal: function rruleToICal(rrule){

@@ -85,7 +85,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
         boolean rv = handler.preconditions(helper.getProvider(), req, res);
         assertFalse("Preconditions passed", rv);
-        assertEquals("Incorrect response status", 412, res.getStatus());
+        assertEquals("Incorrect response status", 304, res.getStatus());
         assertNotNull("Null ETag header", res.getHeader("ETag"));
     }
 
@@ -97,7 +97,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
         boolean rv = handler.preconditions(helper.getProvider(), req, res);
         assertFalse("Preconditions passed", rv);
-        assertEquals("Incorrect response status", 412, res.getStatus());
+        assertEquals("Incorrect response status", 304, res.getStatus());
         assertNotNull("Null ETag header", res.getHeader("ETag"));
     }
 

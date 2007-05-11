@@ -44,10 +44,10 @@ public class StandardRequestHandler extends DefaultRequestHandler {
 
         BaseItemTarget target = (BaseItemTarget) request.getTarget();
 
-        if (! ifMatch(request.getIfMatch(), target, response))
+        if (! ifMatch(request.getIfMatch(), target, request, response))
             return false;
 
-        if (! ifNoneMatch(request.getIfNoneMatch(), target, response))
+        if (! ifNoneMatch(request.getIfNoneMatch(), target, request, response))
             return false;
 
         return true;
@@ -55,6 +55,7 @@ public class StandardRequestHandler extends DefaultRequestHandler {
 
     private boolean ifMatch(String header,
                             BaseItemTarget target,
+                            RequestContext request,
                             HttpServletResponse response)
         throws IOException {
         try {
@@ -64,14 +65,17 @@ public class StandardRequestHandler extends DefaultRequestHandler {
             response.sendError(400, e.getMessage());
             return false;
         }
+
         response.sendError(412, "If-Match disallows conditional request");
         if (target.getEntityTag() != null)
             response.addHeader("ETag", target.getEntityTag().toString());
+
         return false;
     }
 
     private boolean ifNoneMatch(String header,
                                 BaseItemTarget target,
+                                RequestContext request,
                                 HttpServletResponse response)
         throws IOException {
         try {
@@ -81,9 +85,20 @@ public class StandardRequestHandler extends DefaultRequestHandler {
             response.sendError(400, e.getMessage());
             return false;
         }
-        response.sendError(412, "If-None-Match disallows conditional request");
+
+        if (deservesNotModified(request))
+            response.sendError(304, "Not Modified");
+        else
+            response.sendError(412, "If-None-Match disallows conditional request");
+
         if (target.getEntityTag() != null)
             response.addHeader("ETag", target.getEntityTag().toString());
+
         return false;
+    }
+
+    private boolean deservesNotModified(RequestContext request) {
+        return (request.getMethod().equals("GET") ||
+                request.getMethod().equals("HEAD"));
     }
 }

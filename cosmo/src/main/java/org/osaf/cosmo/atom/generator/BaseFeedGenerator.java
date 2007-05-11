@@ -35,6 +35,8 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
+import org.osaf.cosmo.eim.eimml.EimmlConstants;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
@@ -50,7 +52,8 @@ import org.osaf.cosmo.service.ContentService;
  * @see CollectionItem
  */
 public abstract class BaseFeedGenerator
-    implements FeedGenerator, AtomConstants {
+    implements FeedGenerator, AtomConstants, EimmlConstants,
+               ICalendarConstants {
     private static final Log log = LogFactory.getLog(BaseFeedGenerator.class);
 
     private StandardGeneratorFactory factory;
@@ -335,6 +338,44 @@ public abstract class BaseFeedGenerator
         throws GeneratorException {
         return newLink(Link.REL_ALTERNATE, MEDIA_TYPE_HTML,
                        serviceLocator.getPimUrl(item, true));
+    }
+
+    /**
+     * Creates a <code>Link</code> for the Morse Code IRI of the given
+     * collection.
+     *
+     * @param collection the collection to link
+     * @throws GeneratorException
+     */
+    protected Link newMorseCodeLink(CollectionItem collection)
+        throws GeneratorException {
+        return newLink(REL_MORSE_CODE, MEDIA_TYPE_EIMML,
+                       serviceLocator.getMorseCodeUrl(collection));
+    }
+
+    /**
+     * Creates a <code>Link</code> for the dav IRI of the given item.
+     *
+     * @param item the item to link
+     * @throws GeneratorException
+     */
+    protected Link newDavLink(Item item)
+        throws GeneratorException {
+        return newLink(REL_DAV, MEDIA_TYPE_XML,
+                       serviceLocator.getDavUrl(item));
+    }
+
+    /**
+     * Creates a <code>Link</code> for the Webal IRI of the given
+     * collection.
+     *
+     * @param collection the collection to link
+     * @throws GeneratorException
+     */
+    protected Link newWebcalLink(CollectionItem collection)
+        throws GeneratorException {
+        return newLink(REL_WEBCAL, ICALENDAR_MEDIA_TYPE,
+                       serviceLocator.getWebcalUrl(collection));
     }
 
     /**

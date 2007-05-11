@@ -63,6 +63,8 @@ public class StandardGeneratorFactory
      * <dd>{@link BasicFeedGenerator}</dd>
      * <dt>{@link AtomConstants#PROJECTION_FULL}</dt>
      * <dd>{@link FullFeedGenerator}</dd>
+     * <dt>{@link AtomConstants#PROJECTION_DETAILS}</dt>
+     * <dd>{@link DetailsFeedGenerator}</dd>
      * </dl>
      * <p>
      * If no projection is specified, the basic feed generator is
@@ -74,9 +76,9 @@ public class StandardGeneratorFactory
      * <dd>EIM over JSON</dd>
      * </dl>
      * <p>
-     * The basic feed generator ignores the format argument. For all
-     * other generators, if no format is provided, EIM over JSON is
-     * used.
+     * The basic and details feed generators ignore the format
+     * argument. For all other generators, if no format is provided,
+     * EIM over JSON is used.
      *
      * @param projection the projection name
      * @param format the format name
@@ -94,6 +96,8 @@ public class StandardGeneratorFactory
             return new BasicFeedGenerator(this, serviceLocator);
         if (projection.equals(PROJECTION_FULL))
             return new FullFeedGenerator(this, serviceLocator, format);
+        if (projection.equals(PROJECTION_DETAILS))
+            return new DetailsFeedGenerator(this, serviceLocator);
         throw new UnsupportedProjectionException(projection);
     }
 

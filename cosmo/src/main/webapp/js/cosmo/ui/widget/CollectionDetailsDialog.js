@@ -39,7 +39,7 @@ dojo.widget.HtmlWidget, function(){
 //Prototype Properties
 {
         //User supplied properties:
-        collection: /*cosmo.model.Collection ||cosmo.model.Subscription*/ null,
+        collection: /*cosmo.model.Collection || cosmo.model.Subscription*/ null,
         displayedSelection: '', // The selection item to display if invoked from ticket view
 
         // Template stuff
@@ -54,9 +54,9 @@ dojo.widget.HtmlWidget, function(){
         clientCollectionLink: null, //The anchor element with client collection address
         clientInstructionRows: null, //The instructions for the selected client
         protocolRows: null, //The rows for all the protocols
-        collectionNameText: null, //Label with the calendar name
-        collectionNameInputSpan: null, //span with textbox with the calendar name
-        collectionNameInput: null, //Textbox with the calendar name
+        collectionNameText: null, //Label with the collection name
+        collectionNameInputSpan: null, //span with textbox with the collection name
+        collectionNameInput: null, //Textbox with the collection name
         linkSpan: null, //where to put the link image
         chandlerPlug: null, //span with info about downloading chandler
 
@@ -88,8 +88,17 @@ dojo.widget.HtmlWidget, function(){
             FeedReader: "atom",
             Download: "webcal"
         },
-
+        
+        protocolUrls: null,
+        displayName: null,
+        
         // Lifecycle functions
+        postMixInProperties: function(){
+           this.protocolUrls = cosmo.app.pim.serv.
+               getProtocolUrls(this.collection.getUid(),{sync:true}).results[0];
+           this.displayName = this.collection.getDisplayName();
+        },
+        
         fillInTemplate: function () {
            var options = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
            cosmo.util.html.setSelectOptions(this.clientSelector, options);
@@ -205,11 +214,8 @@ dojo.widget.HtmlWidget, function(){
             }
             dojo.dom.replaceChildren(this.clientInstructions, d);
         },
-        
-        
-        //XINT
         _setClientCollectionAddress: function(client){
-            var url =  this.calendar.protocolUrls[this.clientsToProtocols[client]];
+            var url =  this.protocolUrls[this.clientsToProtocols[client]];
             this.clientCollectionAddress.value = url;
             this.clientCollectionLink.href = url;
         },
@@ -247,7 +253,8 @@ dojo.widget.HtmlWidget, function(){
     btnsRight.push(closeButton);
     dummyNode.removeChild(closeButton.domNode);
 
-    if (conduit && conduit.saveDisplayName){
+    //XINT figure out when save button should be shown/not shown
+    if (true){
         var saveButton = dojo.widget.createWidget(
                         "cosmo:Button",
                         { text: _("Main.CollectionDetails.Save"),

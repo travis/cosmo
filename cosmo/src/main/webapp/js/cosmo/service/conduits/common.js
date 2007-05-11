@@ -122,6 +122,20 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     setMultiplePreferences: function (prefs){
 
+    },
+    
+    //TODO - actually implement this once BCM give us what we need
+    getProtocolUrls:function(collectionUid, kwargs){
+        var fakeDeferred = {};
+        fakeDeferred.results = [{
+            mc: "http://mc",
+            atom: "http://atom",
+            webcal: "http://webcal",
+            dav: "http://dav",
+            pim: "http://pim"
+        },null];
+        
+        return fakeDeferred;
     }
     
 });

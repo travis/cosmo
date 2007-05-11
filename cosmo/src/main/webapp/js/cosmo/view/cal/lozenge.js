@@ -122,7 +122,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
     if (timeDiv) {
         this.setText(timeDiv, strtime);
     }
-    this.setText(titleDiv, note.getBody());
+    this.setText(titleDiv, note.getDisplayName());
 };
 /**
  * A bit of a misnomer -- just static text at the moment

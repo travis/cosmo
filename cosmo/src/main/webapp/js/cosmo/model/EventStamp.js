@@ -38,11 +38,18 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
             var duration = this.getDuration();
             var endDate = this.getStartDate().clone();
             endDate.addDuration(duration);
+            if (this.getAnyTime() || this.getAllDay()){
+                endDate.add(dojo.date.dateParts.DAY, -1);
+            }
             return endDate;
         },
 
         setEndDate: function (/*CosmoDate*/ endDate){
             var duration = new cosmo.model.Duration(this.getStartDate(), endDate);
+            endDate = endDate.clone();
+            if (this.getAnyTime() || this.getAllDay()){
+                endDate.add(dojo.date.dateParts.DAY, +1);
+            }
             this.setDuration(duration);
         },
     

@@ -216,10 +216,10 @@ public class RPCServiceImplTest extends BaseMockServletTestCase {
     public void testGetCalendars() throws Exception {
         rpcService.createCalendar(TEST_CALENDAR_NAME+"1");
         calendars = rpcService.getCalendars(request);
-        assertEquals(calendars.length, 2);
+        assertEquals(3, calendars.length);
         rpcService.removeCalendar(testCalendarUid);
         calendars = rpcService.getCalendars(request);
-        assertEquals(calendars.length, 1);
+        assertEquals(2, calendars.length);
     }
 
     public void testCreateCalendar() throws Exception {

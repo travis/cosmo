@@ -159,7 +159,6 @@ public class RPCServiceImpl implements RPCService, ICalendarConstants {
             Item child = i.next();
             if (child.getStamp(CalendarCollectionStamp.class) != null) {
                 Calendar calendar = createCalendarFromItem(request, child);
-
                 cals.add(calendar);
             }
         }

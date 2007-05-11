@@ -55,9 +55,11 @@ public class CaldavReportTest extends BaseDavTestCase
         report.init(home, makeReportInfo("freebusy1.xml", DEPTH_INFINITY));
 
         report.runQuery();
-        
+
         // Verify report is recursively called on all collections
-        Assert.assertEquals(report.calls.size(), 3);
+        // should be 4 collections: home collection, account default
+        // collection, and two test collections
+        Assert.assertEquals(4, report.calls.size());
         Assert.assertTrue(report.calls.contains(testHelper.getHomeCollection()
                 .getDisplayName()));
         Assert.assertTrue(report.calls.contains(coll1.getDisplayName()));

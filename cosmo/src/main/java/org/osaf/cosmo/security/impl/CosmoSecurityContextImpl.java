@@ -15,27 +15,22 @@
  */
 package org.osaf.cosmo.security.impl;
 
-import org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationToken;
-import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
-import org.osaf.cosmo.model.Ticket;
-import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.CosmoSecurityContext;
-import org.osaf.cosmo.security.CosmoSecurityManager;
-
-import java.util.Iterator;
-
 import org.acegisecurity.Authentication;
 import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationToken;
+import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
+import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.security.BaseSecurityContext;
+
 /**
- * The default implementation of {@link CosmoSecurityContext}. Wraps
+ * Standard implementation of {@link CosmoSecurityContext}. Wraps
  * an instance of Acegi Security's
  * {@link org.acegisecurity.Authentication}.
  *
@@ -44,109 +39,30 @@ import org.apache.commons.logging.LogFactory;
  * CosmoSecurityContext for users and tickets that don't use an
  * Authentication at all
  */
-public class CosmoSecurityContextImpl implements CosmoSecurityContext {
+public class CosmoSecurityContextImpl extends BaseSecurityContext {
     private static final Log log =
         LogFactory.getLog(CosmoSecurityContextImpl.class);
 
-    private boolean admin;
-    private boolean anonymous;
-    private Authentication authentication;
-    private Ticket ticket;
-    private User user;
-
-    /**
-     */
     public CosmoSecurityContextImpl(Authentication authentication) {
-        this.anonymous = false;
-        this.authentication = authentication;
-        this.admin = false;
-
-        processAuthentication();
+        super(authentication);
     }
 
-    /* ----- CosmoSecurityContext methods ----- */
-
-    /**
-     * Returns a name describing the principal for this security
-     * context (the name of the Cosmo user, the id of the ticket, or
-     * the string "anonymous".
-     */
-    public String getName() {
-        if (isAnonymous()) {
-            return "anonymous";
-        }
-        if (ticket != null) {
-            return ticket.getKey();
-        }
-        return user.getUsername();
-    }
-
-    /**
-     * Determines whether or not the context represents an anonymous
-     * Cosmo user.
-     */
-    public boolean isAnonymous() {
-        return anonymous;
-    }
-
-    /**
-     * Returns an instance of {@link User} describing the user
-     * represented by the security context, or <code>null</code> if
-     * the context does not represent a user.
-     */
-    public User getUser() {
-        return user;
-    }
-
-    /**
-     * Returns an instance of {@link Ticket} describing the ticket
-     * represented by the security context, or <code>null</code> if
-     * the context does not represent a ticket.
-     */
-    public Ticket getTicket() {
-        return ticket;
-    }
-
-    /**
-     * Determines whether or not the security context represents an
-     * administrator
-     */
-    public boolean isAdmin() {
-        return admin;
-    }
-
-    /* ----- our methods ----- */
-
-    /**
-     */
-    public String toString() {
-        return ToStringBuilder.
-            reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-    }
-
-    /**
-     */
-    protected Authentication getAuthentication() {
-        return authentication;
-    }
-
-    private void processAuthentication() {
+    protected void processPrincipal() {
         //anonymous principals do not have CosmoUserDetails and by
         //definition are not running as other principals
-        if (authentication instanceof AnonymousAuthenticationToken) {
-            anonymous = true;
-            return;
-        }
-
-        if (authentication instanceof TicketAuthenticationToken) {
-            ticket = (Ticket)
-                ((TicketAuthenticationToken) authentication).getPrincipal();
-            return;
-        }
-
-        if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            user = ((CosmoUserDetails) authentication.getPrincipal()).getUser();
-            admin = user.getAdmin().booleanValue();
+        if (getPrincipal() instanceof AnonymousAuthenticationToken) {
+            setAnonymous(true);
+        } else if (getPrincipal() instanceof UsernamePasswordAuthenticationToken) {
+            CosmoUserDetails details = (CosmoUserDetails)
+                ((Authentication) getPrincipal()).getPrincipal();
+            setUser(details.getUser());
+            setAdmin(details.getUser().getAdmin().booleanValue());
+        } else if (getPrincipal() instanceof TicketAuthenticationToken) {
+            Ticket ticket = (Ticket)
+                ((Authentication) getPrincipal()).getPrincipal();
+            setTicket(ticket);
+        } else {
+            throw new RuntimeException("Unknown principal type " + getPrincipal().getClass().getName());
         }
     }
 }

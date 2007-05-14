@@ -24,7 +24,6 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
-import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockContentItem;
@@ -319,9 +318,12 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         return collection;
     }
 
-    public void updateCollectionTimestamp(String collectionUid) {
-        CollectionItem col = findCollectionByUid(collectionUid);
-        col.setModifiedDate(new Date());
+    public CollectionItem updateCollectionTimestamp(CollectionItem collection) {
+        collection.setModifiedDate(new Date());
+        if (collection instanceof MockCollectionItem)
+            ((MockCollectionItem) collection).setMockVersion(collection
+                    .getVersion() + 1);
+        return collection;
     }
 
     public Set<ContentItem> loadChildren(CollectionItem collection, Date timestamp) {

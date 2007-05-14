@@ -17,7 +17,6 @@ package org.osaf.cosmo.eim.schema.event.alarm;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -31,11 +30,9 @@ import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
-import org.osaf.cosmo.model.AttributeTombstone;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.Tombstone;
 
 /**
  * Generates EIM records from event stamps.
@@ -74,14 +71,7 @@ public class DisplayAlarmGenerator extends BaseStampGenerator
             return super.generateRecords(timestamp);
         
         ArrayList<EimRecord> records = new ArrayList<EimRecord>();
-        NoteItem note = (NoteItem) getItem();
-        
-        // If there is no reminderTime, check for tombstone
-        if(note.getReminderTime()==null) {
-            checkForAttributeTombstone(records, timestamp);
-            return records;
-        }
-        
+       
         // Otherwise overide for non-event records, where we
         // pull the alarm from NoteItem.reminderTime
         addRecordsNonEvent(records);
@@ -151,48 +141,19 @@ public class DisplayAlarmGenerator extends BaseStampGenerator
         
         record.addField(new TextField(FIELD_DESCRIPTION, null));
         
-        // TODO: fix to generate isMissing if required
-        if(noteItem.getReminderTime()==null)
+        // TODO: fix to generate isMissing
+        if(noteItem.getReminderTime()==null) {
             record.addField(new TextField(FIELD_TRIGGER, null));
+        }
         else {
             DateTime dt = new DateTime(true);
             dt.setTime(noteItem.getReminderTime().getTime());
             record.addField(new TextField(FIELD_TRIGGER, EimValueConverter.formatTriggerFromDateTime(dt)));
         }
+        
         record.addField(new TextField(FIELD_DURATION, null));
-        record.addField(new IntegerField(FIELD_REPEAT, 1));
+        record.addField(new IntegerField(FIELD_REPEAT, null));
 
         record.addFields(generateUnknownFields());
-    }
-    
-    protected void checkForAttributeTombstone(ArrayList<EimRecord> records,
-            long timestamp) {
-        // check for AttributeTombstone
-        for (Iterator<Tombstone> it = getItem().getTombstones().iterator(); it
-                .hasNext();) {
-            Tombstone ts = it.next();
-            if (ts instanceof AttributeTombstone) {
-                // check for reminderTime attribute
-                if (NoteItem.ATTR_REMINDER_TIME
-                        .equals(((AttributeTombstone) ts).getQName())) {
-
-                    // Ignore tombstones for subscribes, because subscribes
-                    // don't need to know about past deletions
-                    if (timestamp == -1)
-                        return;
-
-                    // Ignore if Tombstone occured before last timestamp
-                    if (ts.getTimestamp().getTime() < timestamp)
-                        return;
-
-                    // the attribute has been removed since the given time
-                    EimRecord record = new EimRecord(getPrefix(),
-                            getNamespace());
-                    addKeyFields(record);
-                    record.setDeleted(true);
-                    records.add(record);
-                }
-            }
-        }
     }
 }

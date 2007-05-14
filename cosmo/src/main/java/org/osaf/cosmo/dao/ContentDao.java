@@ -163,9 +163,10 @@ public interface ContentDao extends ItemDao {
     
     /**
      * Update timestamp on collection.
-     * @param collectionUid collection to update
+     * @param collection collection to update
+     * @return updated collection
      */
-    public void updateCollectionTimestamp(String collectionUid);
+    public CollectionItem updateCollectionTimestamp(CollectionItem collection);
     
     /**
      * Load all children for collection that have been updated since a

@@ -167,11 +167,14 @@ public class StandardDavResourceFactory implements DavResourceFactory {
                     session);
             }
         }
-            
+          
+        // only handle master event NoteItems for now
         if (item instanceof NoteItem) {
             if(item.getStamp(EventStamp.class) != null)
                 return new DavEvent((NoteItem) item, locator, this,
                         session);
+            else 
+                return null;
         } 
             
         return new DavFile((ContentItem) item, locator, this, session);

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -98,26 +99,23 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
      */
     public CollectionItem updateCollection(CollectionItem collection, Set<ContentItem> children) {
         
-        int count = 0;
-        int batchSize = 20;
-        
         try {
             collection = updateCollection(collection);
             
             // Either create, update, or delete each item
             for (ContentItem item : children) {
                 
-                // periodically clear the session to improve performance
-                count++;
-                if(count%batchSize==0)
-                    getSession().clear();
-                
+                // clear the session each iteration to improve performance
+                getSession().clear();
+                getSession().load(collection, collection.getId());
+                 
                 // create item
                 if(item.getId()==-1) {
                     item = createContent(collection, item);
                 }
                 // delete item
                 else if(item.getIsActive()==false) {
+                    getSession().load(item, item.getId());
                     removeItemFromCollection(item, collection);
                 }
                 // update item
@@ -128,11 +126,11 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                     // same collection..", we need to merge the transient
                     // item state with the persistent state, and pass the
                     // peristent object into updateContent().
-                    if(!getSession().contains(item)) {
-                        item = (ContentItem) getSession().merge(item);
-                    }
-                    if(!item.getParents().contains(collection))
+                    item = (ContentItem) getSession().merge(item);
+                    
+                    if(!item.getParents().contains(collection)) {
                         addItemToCollection(item, collection);
+                    }
                     updateContent(item);
                 }
             }
@@ -282,9 +280,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
      */
     public CollectionItem findCollectionByUid(String uid) {
         try {
-            return (CollectionItem) getSession().getNamedQuery(
-                    "collectionItem.by.uid").setParameter("uid", uid)
-                    .uniqueResult();
+            Query hibQuery = getSession()
+                    .getNamedQuery("collectionItem.by.uid").setParameter("uid",uid);
+            hibQuery.setFlushMode(FlushMode.MANUAL);
+            return (CollectionItem) hibQuery.uniqueResult();
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
         }
@@ -331,18 +330,22 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
      */
     public ContentItem findContentByUid(String uid) {
         try {
-            return (ContentItem) getSession().getNamedQuery(
-                    "contentItem.by.uid").setParameter("uid", uid).uniqueResult();
+            Query hibQuery = getSession().getNamedQuery("contentItem.by.uid")
+                    .setParameter("uid", uid);
+            hibQuery.setFlushMode(FlushMode.MANUAL);
+            return (ContentItem) hibQuery.uniqueResult();
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
         }
     }
 
-    public void updateCollectionTimestamp(String collectionUid) {
+    public CollectionItem updateCollectionTimestamp(CollectionItem collection) {
         try {
-            CollectionItem collection = findCollectionByUid(collectionUid);
+            if(!getSession().contains(collection))
+                collection = (CollectionItem) getSession().merge(collection);
             collection.setModifiedDate(new Date());
             getSession().flush();
+            return collection;
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
         }
@@ -473,7 +476,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 query = getSession().getNamedQuery("contentItem.by.parent.timestamp")
                         .setParameter("parent", collection).setParameter(
                                 "timestamp", timestamp);
-
+            
+            query.setFlushMode(FlushMode.MANUAL);
             List results = query.list();
             for (Iterator it = results.iterator(); it.hasNext();) {
                 ContentItem content = (ContentItem) it.next();
@@ -516,6 +520,14 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             removeCollection((CollectionItem) item);
         else
             super.removeItem(item);
+    }
+    
+    @Override
+    public void removeItemFromCollection(Item item, CollectionItem collection) {
+        if(item instanceof NoteItem)
+            removeNoteItemFromCollection((NoteItem) item, collection);
+        else
+            super.removeItemFromCollection(item, collection);
     }
 
     @Override
@@ -577,5 +589,39 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         }
         
         getSession().delete(collection);
+    }
+    
+    
+    /**
+     * Remove NoteItem from a collection.  This includes removing any modificaions.
+     */
+    public void removeNoteItemFromCollection(NoteItem note, CollectionItem collection) {
+        try {
+            removeNoteItemFromCollectionInternal(note, collection);
+            getSession().flush();
+        } catch (HibernateException e) {
+            throw convertHibernateAccessException(e);
+        } 
+    }
+    
+    private void removeNoteItemFromCollectionInternal(NoteItem note, CollectionItem collection) {
+        getSession().update(collection);
+        getSession().update(note);
+        
+        // do nothing if item doesn't belong to collection
+        if(!note.getParents().contains(collection))
+            return;
+        
+        collection.addTombstone(new ItemTombstone(collection, note));
+        note.getParents().remove(collection);
+        
+        for(NoteItem mod: note.getModifications())
+            removeNoteItemFromCollectionInternal(mod, collection);
+        
+        // If the item belongs to no collection, then it should
+        // be purged.
+        if(note.getParents().size()==0)
+            getSession().delete(note);
+        
     }
 }

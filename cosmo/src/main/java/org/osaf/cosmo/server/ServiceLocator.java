@@ -134,6 +134,7 @@ public class ServiceLocator implements ServerConstants {
         urls.put(SVC_ATOM, getAtomUrl(user));
         urls.put(SVC_CMP, getCmpUrl(user));
         urls.put(SVC_DAV, getDavUrl(user));
+        urls.put(SVC_MORSE_CODE, getMorseCodeUrl(user));
         urls.put(SVC_DAV_PRINCIPAL, getDavPrincipalUrl(user));
         urls.put(SVC_DAV_CALENDAR_HOME, getDavCalendarHomeUrl(user));
         return urls;
@@ -229,6 +230,25 @@ public class ServiceLocator implements ServerConstants {
      */
     public String getMorseCodeUrl(CollectionItem collection) {
         return calculateItemUrl(collection, factory.getMorseCodePrefix());
+    }
+
+    /**
+     * Returns the Morse Code URL of the collection.
+     *
+     * @param the collection
+     * @param absolute whether or not the URL should be absolute 
+     */
+    public String getMorseCodeUrl(CollectionItem collection,
+                                  boolean absolute) {
+        return calculateItemUrl(collection, factory.getMorseCodePrefix(),
+                                absolute);
+    }
+
+    /**
+     * Returns the Morse Code URL of the user.
+     */
+    public String getMorseCodeUrl(User user) {
+        return calculateUserUrl(user, factory.getMorseCodePrefix());
     }
 
     /**

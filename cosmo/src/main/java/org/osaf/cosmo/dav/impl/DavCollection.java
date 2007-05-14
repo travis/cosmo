@@ -57,7 +57,6 @@ import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
-import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Extends <code>DavResourceBase</code> to adapt the Cosmo
@@ -402,10 +401,6 @@ public class DavCollection extends DavResourceBase
              i.hasNext();) {
             Item memberItem = (Item) i.next();
             
-            // ignore modifications
-            if(memberItem instanceof NoteItem && ((NoteItem) memberItem).getModifies()!=null)
-                continue;
-            
             String memberPath = getResourcePath() + "/" + memberItem.getName();
             try {
                 DavResourceLocator memberLocator =
@@ -416,7 +411,9 @@ public class DavCollection extends DavResourceBase
                 DavResource member =
                     ((StandardDavResourceFactory)getFactory()).
                     createResource(memberLocator, getSession(), memberItem);
-                members.add(member);
+                
+                if(member!=null)
+                    members.add(member);
             } catch (DavException e) {
                 // should never happen
                 log.error("error loading member resource for item " +

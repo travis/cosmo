@@ -1,0 +1,32 @@
+# -*- rnc -*-
+# RELAX NG Compact Syntax Grammar for the
+# Morse Code schema Version 0
+
+namespace mc = "http://osafoundation.org/mc/0"
+
+start = mcService
+
+# The root element of a Morse Code service document.
+
+mcService =
+   element mc:service {
+      mcCollection*
+   }
+
+# Describes a collection item.
+
+mcCollection =
+   element mc:collection {
+      attribute uuid { text },
+      attribute href { text },
+      element mc:name { text } &
+      mcTicket*
+   }
+
+# Describes a ticket.
+
+mcTicket =
+   element mc:ticket {
+      attribute type { "read-only" | "read-write" | "free-busy" },
+      text
+   }

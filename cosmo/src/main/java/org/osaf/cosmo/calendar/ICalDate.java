@@ -23,17 +23,13 @@ import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZone;
-import net.fortuna.ical4j.model.TimeZoneRegistry;
-import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.calendar.TimeZoneTranslator;
-import org.osaf.cosmo.calendar.UnknownTimeZoneException;
+import org.osaf.cosmo.eim.schema.EimConversionException;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 /**
@@ -43,9 +39,6 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
 public class ICalDate implements ICalendarConstants {
     private static final Log log = LogFactory.getLog(ICalDate.class);
 
-    private static final TimeZoneRegistry TIMEZONE_REGISTRY =
-        TimeZoneRegistryFactory.getInstance().createRegistry();
-    
     private static TimeZoneTranslator tzTranslator = TimeZoneTranslator.getInstance();
 
     private Value value;
@@ -55,7 +48,7 @@ public class ICalDate implements ICalendarConstants {
     private TimeZone tz;
     private Date date;
     private DateList dates;
-
+   
     /**
      * Constructs an <code>ICalDate</code> by parsing an EIM text
      * value containing a serialized iCalendar property value with
@@ -104,14 +97,16 @@ public class ICalDate implements ICalendarConstants {
         if (date instanceof DateTime) {
             value = Value.DATE_TIME;
             tz = ((DateTime) date).getTimeZone();
+            // We only support known tzids (Olson for the most part)
             if (tz != null) {
-                String origId = tz.getID();
                 tz = tzTranslator.translateToOlsonTz(tz);
-                if (tz == null)
-                    throw new UnknownTimeZoneException(origId); 
-                String id = tz.getVTimeZone().getProperties().
-                    getProperty(Property.TZID).getValue();
-                tzid = new TzId(id);
+                // If timezone can't be translated, then datetime will
+                // essentiallyi be floating.
+                if (tz != null) {
+                    String id = tz.getVTimeZone().getProperties().
+                        getProperty(Property.TZID).getValue();
+                    tzid = new TzId(id);
+                }
             }
         } else {
             value = Value.DATE;
@@ -222,6 +217,21 @@ public class ICalDate implements ICalendarConstants {
         tz = tzTranslator.translateToOlsonTz(str);
         if (tz == null)
             throw new UnknownTimeZoneException(str);
+        
+        // FIXME: ical4j does not like TZID=GMT or TZID=Etc/UTC because
+        // its converts the entire datetime into UTC.  See bug 8962. 
+        // So until ical4j supports these, reject these two timezones 
+        // and suggest an alternative to prevent an ical4j validation 
+        // error from being thrown.
+        if("Etc/UTC".equals(tz.getID()))
+            throw new UnknownTimeZoneException("Etc/UTC is currently not supported, use UTC instead");
+        if("GMT".equals(tz.getID()))
+            throw new UnknownTimeZoneException("GMT is currently not supported, use Greenwich or GMT0 instead");
+            
+        // If the timezone ids don't match, give an indication of the
+        // correct timezone
+        if(!tz.getID().equals(str))
+            throw new UnknownTimeZoneException(str + " perhaps you meant " + tz.getID());
     }
 
     private void parseAnyTime(String str) {
@@ -231,8 +241,11 @@ public class ICalDate implements ICalendarConstants {
     private void parseDates(String str)
         throws ParseException {
         String[] strs = str.split(",");
-        if (strs.length == 1)
+        if (strs.length == 1) {
             date = isDate() ? new Date(str) : new DateTime(str, tz);
+            if(isDate() && tz != null)
+                throw new ParseException("DATE cannot have timezone",0);
+        }
 
         dates = isDate() ?
             new DateList(Value.DATE) :

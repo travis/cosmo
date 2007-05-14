@@ -648,6 +648,26 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         queryItem = contentDao.findCollectionByUid(a.getUid());
         Assert.assertEquals("b", queryItem.getName());
     }
+    
+    public void testContentDaoUpdateCollectionTimestamp() throws Exception {
+        User user = getUser(userDao, "testuser2");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        CollectionItem a = new CollectionItem();
+        a.setName("a");
+        a.setOwner(user);
+
+        a = contentDao.createCollection(root, a);
+        Integer ver = a.getVersion();
+        Date timestamp = a.getModifiedDate();
+        
+        clearSession();
+        Thread.sleep(1);
+        
+        a = contentDao.updateCollectionTimestamp(a);
+        Assert.assertTrue(a.getVersion()==ver + 1);
+        Assert.assertTrue(timestamp.before(a.getModifiedDate()));
+    }
 
     public void testContentDaoDeleteCollection() throws Exception {
         User user = getUser(userDao, "testuser2");
@@ -1178,6 +1198,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertEquals(triageStatus.getCode(),
                             new Integer(TriageStatus.CODE_LATER));
         Assert.assertEquals(triageStatus.getRank(), rank);
+        
+        queryItem.setTriageStatus(null);
+        contentDao.updateContent(queryItem);
+        clearSession();
+        // should be null triagestatus
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        triageStatus = queryItem.getTriageStatus();
+        Assert.assertNull(triageStatus);
     }
     
     public void testContentDaoAttributeTombstones() throws Exception {

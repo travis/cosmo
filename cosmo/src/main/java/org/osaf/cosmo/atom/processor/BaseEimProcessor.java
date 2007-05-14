@@ -19,13 +19,12 @@ import java.io.Reader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.ItemTranslator;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -118,9 +117,9 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
         // if the item is a modification, relate it to the item it
         // modifies
         if (child.getUid().
-            indexOf(EventExceptionStamp.RECURRENCEID_DELIMITER) > 0) {
+            indexOf(ModificationUid.RECURRENCEID_DELIMITER) > 0) {
             String masterUid = child.getUid().
-                split(EventExceptionStamp.RECURRENCEID_DELIMITER)[0];
+                split(ModificationUid.RECURRENCEID_DELIMITER)[0];
             for (Item sibling : collection.getChildren()) {
                 if (sibling.getUid().equals(masterUid)) {
                     if (! (sibling instanceof NoteItem))

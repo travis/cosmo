@@ -227,7 +227,7 @@ public class CosmoToICalendarConverter {
         DtStart dtStart = null;
         DtEnd dtEnd = null;
 
-        if (event.isAllDay()) {
+        if (event.isAllDay() || event.isAnyTime()) {
             dateTime = false;
             dtStart = new DtStart();
             setDate(dtStart, event.getStart());
@@ -245,21 +245,16 @@ public class CosmoToICalendarConverter {
                 dtEnd.setDate(endDate);
                 dtEnd.getParameters().add(Value.DATE);
             }
-
-        } else if (event.isAnyTime()) {
-            dateTime = false;
-            Parameter anyTimeParam = null;
-            try {
-                anyTimeParam = ParameterFactoryImpl.getInstance()
-                        .createParameter(PARAM_X_OSAF_ANYTIME, VALUE_TRUE);
-            } catch (URISyntaxException urise) {
-                throw new RuntimeException(urise);
+            if (event.isAnyTime()) {
+                Parameter anyTimeParam = null;
+                try {
+                    anyTimeParam = ParameterFactoryImpl.getInstance()
+                            .createParameter(PARAM_X_OSAF_ANYTIME, VALUE_TRUE);
+                } catch (URISyntaxException urise) {
+                    throw new RuntimeException(urise);
+                }
+                dtStart.getParameters().add(anyTimeParam);
             }
-            dtStart = new DtStart();
-            setDate(dtStart, event.getStart());
-            dtStart.getParameters().add(anyTimeParam);
-            removeProperty(vevent, Property.DTEND);
-
         } else if (event.isPointInTime()) {
             dtStart = new DtStart();
             setDateTime(dtStart, event.getStart());

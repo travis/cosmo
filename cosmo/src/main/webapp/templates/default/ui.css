@@ -175,7 +175,7 @@ body.adminPage {
     padding-bottom:4px;
 }
 #loginDialogLoginPrompt {
-    height:46px;
+    padding-bottom: 1em;                          
 }
 
 #loginDialogLogo {

@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.security;
 
+import java.util.Set;
+
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
@@ -57,4 +60,10 @@ public interface CosmoSecurityContext {
      * administrative user.
      */
     public boolean isAdmin();
+
+    /**
+     * Returns the set of tickets granted on the given item that are
+     * visible to the current security context.
+     */
+    public Set<Ticket> findVisibleTickets(Item item);
 }

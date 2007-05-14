@@ -27,6 +27,7 @@ import net.fortuna.ical4j.model.Calendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.osaf.cosmo.calendar.util.CalendarFlattener;
 import org.osaf.cosmo.model.CalendarPropertyIndex;
@@ -54,9 +55,12 @@ public class DefaultCalendarIndexer implements CalendarIndexer {
         // remove previous indexes
         if (event.getId() != -1) {
             session.getNamedQuery("delete.calendarPropertyIndex").setParameter(
-                    "eventStamp", event).executeUpdate();
+                    "eventStamp", event).setFlushMode(FlushMode.MANUAL)
+                    .executeUpdate();
+
             session.getNamedQuery("delete.calendarTimeRangeIndex")
-                    .setParameter("eventStamp", event).executeUpdate();
+                    .setParameter("eventStamp", event).setFlushMode(
+                            FlushMode.MANUAL).executeUpdate();
         }
         
         for (Iterator it = propertyMap.entrySet().iterator(); it.hasNext();) {

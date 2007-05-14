@@ -59,28 +59,38 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         masterEvent.createCalendar();
         masterEvent.setLocation("here");
         masterEvent.setStatus("CONFIRMED");
-        masterEvent.setStartDate(EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070212T074500").getDate());
-        masterEvent.setEndDate(EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070212T084500").getDate());
+        masterEvent.setStartDate(EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070210T074500").getDate());
+        masterEvent.setEndDate(EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070214T084500").getDate());
         
         masterNote.addStamp(masterEvent);
         
         NoteItem modNote = new NoteItem();
         EventExceptionStamp modEvent = new EventExceptionStamp(modNote);
         modEvent.createCalendar();
+        modEvent.setRecurrenceId(EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070212T074500").getDate());
         modEvent.setLocation("blah");
         modEvent.setStatus("blah");
         modNote.setModifies(masterNote);
         modNote.addStamp(modEvent);
        
-        
         EimRecord record = makeTestMissingRecord();
 
         EventApplicator applicator =
             new EventApplicator(modNote);
         applicator.applyRecord(record);
 
+        Assert.assertEquals("20070212T074500", modEvent.getStartDate().toString());
+        Assert.assertNull(modEvent.getDuration());
+        Assert.assertNull(modEvent.getAnyTime());
         Assert.assertNull(modEvent.getLocation());
         Assert.assertNull(modEvent.getStatus());
+        
+        record = makeTestModificationRecord();
+
+        applicator.applyRecord(record);
+
+        Assert.assertEquals("20070213T074500", modEvent.getStartDate().toString());
+        Assert.assertFalse(modEvent.getAnyTime());
     }
     
     private EimRecord makeTestRecord() {
@@ -95,8 +105,21 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         return record;
     }
     
+    private EimRecord makeTestModificationRecord() {
+        EimRecord record = new EimRecord(PREFIX_EVENT, NS_EVENT);
+
+        record.addField(new TextField(FIELD_DTSTART, ";VALUE=DATE-TIME:20070213T074500"));
+        record.addField(new TextField(FIELD_DURATION, "PT1H"));
+        record.addField(new TextField(FIELD_LOCATION, "here"));
+        record.addField(new TextField(FIELD_STATUS, "CONFIRMED"));
+
+        return record;
+    }
+    
     private EimRecord makeTestMissingRecord() {
         EimRecord record = new EimRecord(PREFIX_EVENT, NS_EVENT);
+        addMissingTextField(FIELD_DTSTART, record);
+        addMissingTextField(FIELD_DURATION, record);
         addMissingTextField(FIELD_LOCATION, record);
         addMissingIntegerField(FIELD_STATUS, record);
         return record;

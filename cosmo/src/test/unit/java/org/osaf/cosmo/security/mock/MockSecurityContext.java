@@ -15,122 +15,43 @@
  */
 package org.osaf.cosmo.security.mock;
 
-import org.osaf.cosmo.model.Ticket;
-import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.CosmoSecurityContext;
-import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.security.BaseSecurityContext;
 
-import java.util.Iterator;
 import java.security.Principal;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.model.User;
 
 /**
  * A mock implementation of {@link CosmoSecurityContext} that provides
  * dummy instances for use with unit mocks.
  */
-public class MockSecurityContext implements CosmoSecurityContext {
+public class MockSecurityContext extends BaseSecurityContext {
     private static final Log log =
         LogFactory.getLog(MockSecurityContext.class);
-
-    private boolean anonymous;
-    private Principal principal;
-    private boolean admin;
-    private Ticket ticket;
-    private User user;
 
     /**
      */
     public MockSecurityContext(Principal principal) {
-        this.anonymous = false;
-        this.principal = principal;
-        this.admin = false;
-
-        processPrincipal();
+        super(principal);
     }
 
-    /* ----- CosmoSecurityContext methods ----- */
-
-    /**
-     * Returns a name describing the principal for this security
-     * context (the name of the Cosmo user, the id of the ticket, or
-     * some other precise identification.
-     */
-    public String getName() {
-        if (isAnonymous()) {
-            return "anonymous";
+    protected void processPrincipal() {
+        if (getPrincipal() instanceof MockAnonymousPrincipal) {
+            setAnonymous(true);
         }
-        if (ticket != null) {
-            return ticket.getKey();
+        else if (getPrincipal() instanceof MockUserPrincipal) {
+            User user = ((MockUserPrincipal) getPrincipal()).getUser();
+            setUser(user);
+            setAdmin(user.getAdmin().booleanValue());
         }
-        return user.getUsername();
-    }
-
-    /**
-     * Determines whether or not the context represents an anonymous
-     * Cosmo user.
-     */
-    public boolean isAnonymous() {
-        return anonymous;
-    }
-
-    /**
-     * Returns an instance of {@link User} describing the user
-     * represented by the security context, or <code>null</code> if
-     * the context does not represent a user.
-     */
-    public User getUser() {
-        return user;
-    }
-
-    /**
-     * Returns an instance of {@link Ticket} describing the ticket
-     * represented by the security context, or <code>null</code> if
-     * the context does not represent a ticket.
-     */
-    public Ticket getTicket() {
-        return ticket;
-    }
-
-    /**
-     * Determines whether or not the security context represents an
-     * administrative user.
-     */
-    public boolean isAdmin() {
-        return admin;
-    }
-
-    /* ----- our methods ----- */
-
-    /**
-     */
-    public String toString() {
-        return ToStringBuilder.
-            reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-    }
-
-    /**
-     */
-    protected Principal getPrincipal() {
-        return principal;
-    }
-
-    private void processPrincipal() {
-        if (principal instanceof MockAnonymousPrincipal) {
-            anonymous = true;
-        }
-        else if (principal instanceof MockUserPrincipal) {
-            user = ((MockUserPrincipal) principal).getUser();
-            admin = user.getAdmin().booleanValue();
-        }
-        else if (principal instanceof MockTicketPrincipal) {
-            ticket = ((MockTicketPrincipal) principal).getTicket();
+        else if (getPrincipal() instanceof MockTicketPrincipal) {
+            setTicket(((MockTicketPrincipal) getPrincipal()).getTicket());
         }
         else {
-            throw new RuntimeException("unknown principal type " + principal.getClass().getName());
+            throw new RuntimeException("unknown principal type " + getPrincipal().getClass().getName());
         }
     }
 }

@@ -251,7 +251,7 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
                     Property description = mod.getProperties().getProperty(Property.DESCRIPTION);
                     String eventSummary = null;
                     String eventDescription = null;
-                    String uid = parentUid + "::" + fromDateToString(recurrenceId.getDate());
+                    String uid = parentUid + ":" + fromDateToStringNoTimezone(recurrenceId.getDate());
                     
                     if(exceptionMap.containsKey(uid)) {
                         if(!hasDuplicateMods) {
@@ -437,41 +437,25 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
         return createBaseCalendar(event);
     }
     
-    public static String fromDateToString(Date date) {
-        Value value = null;
-        TimeZone tz = null;
-        Parameter tzid = null;
+    public static String fromDateToStringNoTimezone(Date date) {
+        if(date==null)
+            return null;
         
-        if (date instanceof DateTime) {
-            value = Value.DATE_TIME;
-            tz = ((DateTime) date).getTimeZone();
-            
-            // Make sure timezone is Olson.  If the translator can't
-            // translate the timezon to an Olson timezone, then
-            // the event will essentially be floating.
-            if (tz != null) {
-                String oldId = tz.getID();
-                tz = TimeZoneTranslator.getInstance().translateToOlsonTz(tz);
-                if(tz==null)
-                    log.warn("no Olson timezone found for " + oldId);
-            }
-            
-            if(tz != null) {
-                String id = tz.getVTimeZone().getProperties().
-                    getProperty(Property.TZID).getValue();
-                tzid = new TzId(id);
+        if(date instanceof DateTime) {
+            DateTime dt = (DateTime) date;
+            // If DateTime has a timezone, then convert to UTC before
+            // serializing as String.
+            if(dt.getTimeZone()!=null) {
+                // clone instance first to prevent changes to original instance
+                DateTime copy = new DateTime(dt);
+                copy.setUtc(true);
+                return copy.toString();
+            } else {
+                return dt.toString();
             }
         } else {
-            value = Value.DATE;
+            return date.toString();
         }
-       
-        StringBuffer buf = new StringBuffer(";");
-        buf.append(value.toString());
-        if (tzid != null)
-            buf.append(";").append("TZID=").append(tzid.getValue());
-       
-        buf.append(":").append(date.toString());
-        return buf.toString();
     }
 
 }

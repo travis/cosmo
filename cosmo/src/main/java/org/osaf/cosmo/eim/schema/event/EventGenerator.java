@@ -84,7 +84,7 @@ public class EventGenerator extends BaseStampGenerator
 
         String value = null;
 
-        if(isDtStartMissing(stamp) && isMissingAttribute("anyTime")) {
+        if(isDtStartMissing(stamp)) {
             record.addField(generateMissingField(new TextField(FIELD_DTSTART, null)));
         } else {
             value = EimValueConverter.fromICalDate(stamp.getStartDate(),
@@ -96,6 +96,9 @@ public class EventGenerator extends BaseStampGenerator
             record.addField(generateMissingField(new TextField(FIELD_DURATION, null)));
         } else {
             value = DurationFormat.getInstance().format(stamp.getDuration());
+            // Empty duration translates to None
+            if("".equals(value))
+                value = null;
             record.addField(new TextField(FIELD_DURATION, value));
         }
         
@@ -129,7 +132,8 @@ public class EventGenerator extends BaseStampGenerator
     
     /**
      * Determine if startDate is missing.  The startDate is missing
-     * if the startDate is equal to the reucurreceId.
+     * if the startDate is equal to the reucurreceId and the anyTime
+     * parameter is inherited.
      * @param stamp BaseEventStamp to test
      * @return
      */
@@ -140,7 +144,15 @@ public class EventGenerator extends BaseStampGenerator
         if(stamp.getStartDate()==null || stamp.getRecurrenceId()==null)
             return false;
         
-        return stamp.getStartDate().equals(stamp.getRecurrenceId());
+        // "missing" startDate is represented as startDate==recurrenceId
+        if(!stamp.getStartDate().equals(stamp.getRecurrenceId()))
+            return false;
+        
+        // "missing" anyTime is represented as null
+        if(stamp.isAnyTime()!=null)
+            return false;
+        
+        return true;
     }
     
     /**
@@ -154,9 +166,6 @@ public class EventGenerator extends BaseStampGenerator
         if(!isModification())
             return false;
         
-        if(stamp.getDuration()==null)
-            return true;
-        else
-            return isMissingAttribute("duration");
+        return (stamp.getDuration()==null);
     }
 }

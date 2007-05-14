@@ -55,8 +55,10 @@ public class UsernameRequestIntegrationFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
         try {
-            request.setAttribute(USERNAME_ATTRIBUTE_KEY, 
-                    securityManager.getSecurityContext().getName());
+            String principal = securityManager.getSecurityContext().getName();
+            if (securityManager.getSecurityContext().getTicket() != null)
+                principal = "ticket:" + principal;
+            request.setAttribute(USERNAME_ATTRIBUTE_KEY, principal);
         } catch (CosmoSecurityException e){
             request.setAttribute(USERNAME_ATTRIBUTE_KEY, "-");
         }

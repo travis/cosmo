@@ -196,7 +196,9 @@ public abstract class DavCalendarResource extends DavFile {
         outputContext.setETag(getETag());
         
         // track mismatches
-        if(calendarBytes.length != content.getContentLength().longValue())
+        long storedLength = content.getContentLength() == null ? 0 : content
+                .getContentLength().longValue();
+        if(calendarBytes.length != storedLength)
             log.warn("contentLength: " + content.getContentLength() + 
                     " does not match content: " + calendarBytes.length);
 

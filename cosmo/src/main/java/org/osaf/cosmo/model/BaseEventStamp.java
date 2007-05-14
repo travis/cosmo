@@ -38,6 +38,7 @@ import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.parameter.XParameter;
 import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.DateListProperty;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -69,6 +70,8 @@ public abstract class BaseEventStamp extends Stamp
 
     protected static final TimeZoneRegistry TIMEZONE_REGISTRY =
         TimeZoneRegistryFactory.getInstance().createRegistry();
+    
+    protected static final String VALUE_MISSING = "MISSING";
     
     public abstract VEvent getEvent();
     public abstract void setCalendar(Calendar calendar);
@@ -242,6 +245,21 @@ public abstract class BaseEventStamp extends Stamp
         prop.getParameters().add(value);
         setDirty(true);
     }
+    
+    @Transient
+    protected void setDateListPropertyValue(DateListProperty prop,
+                                        Date date) {
+        if (prop == null)
+            return;
+        Value value = (Value)
+            prop.getParameters().getParameter(Parameter.VALUE);
+        if (value != null)
+            prop.getParameters().remove(value);
+        
+        value = date instanceof DateTime ? Value.DATE_TIME : Value.DATE;
+        prop.getParameters().add(value);
+        setDirty(true);
+    }
 
     /**
      * Returns the duration of the event as calculated from the
@@ -401,10 +419,20 @@ public abstract class BaseEventStamp extends Stamp
      */
     @Transient
     public DateList getRecurrenceDates() {
-        DateList l = new DateList(Value.DATE_TIME);
+        
+        DateList l = null;
+        
         for (RDate rdate : (List<RDate>) getEvent().getProperties().
-                 getProperties(Property.RDATE))
+                 getProperties(Property.RDATE)) {
+            if(l==null) {
+                if(Value.DATE.equals(rdate.getParameter(Parameter.VALUE)))
+                    l = new DateList(Value.DATE);
+                else
+                    l = new DateList(Value.DATE_TIME);
+            }
             l.addAll(rdate.getDates());
+        }
+            
         return l;
     }
 
@@ -425,7 +453,10 @@ public abstract class BaseEventStamp extends Stamp
             pl.remove(rdate);
         if (dates.isEmpty())
             return;
-        pl.add(new RDate(dates));
+        
+        RDate rDate = new RDate(dates);
+        setDateListPropertyValue(rDate, (Date) dates.get(0));
+        pl.add(rDate);   
     }
 
     /**
@@ -434,10 +465,18 @@ public abstract class BaseEventStamp extends Stamp
      */
     @Transient
     public DateList getExceptionDates() {
-        DateList l = new DateList(Value.DATE_TIME);
+        DateList l = null;
         for (ExDate exdate : (List<ExDate>) getEvent().getProperties().
-                 getProperties(Property.EXDATE))
+                 getProperties(Property.EXDATE)) {
+            if(l==null) {
+                if(Value.DATE.equals(exdate.getParameter(Parameter.VALUE)))
+                    l = new DateList(Value.DATE);
+                else
+                    l = new DateList(Value.DATE_TIME);
+            }
             l.addAll(exdate.getDates());
+        }
+            
         return l;
     }
     
@@ -452,6 +491,11 @@ public abstract class BaseEventStamp extends Stamp
         if(event==null)
             return null;
         
+        return getDisplayAlarm(event);
+    }
+    
+    @Transient
+    protected VAlarm getDisplayAlarm(VEvent event) {
         for(Iterator it = event.getAlarms().iterator();it.hasNext();) {
             VAlarm alarm = (VAlarm) it.next();
             if (alarm.getProperties().getProperty(Property.ACTION).equals(
@@ -673,7 +717,10 @@ public abstract class BaseEventStamp extends Stamp
             pl.remove(exdate);
         if (dates.isEmpty())
             return;
-        pl.add(new ExDate(dates));
+        
+        ExDate exDate = new ExDate(dates);
+        setDateListPropertyValue(exDate, (Date) dates.get(0));
+        pl.add(exDate);
     }
 
     /**
@@ -708,7 +755,9 @@ public abstract class BaseEventStamp extends Stamp
             recurrenceId = new RecurrenceId();
             getEvent().getProperties().add(recurrenceId);
         }
+        
         recurrenceId.setDate(date);
+        setDatePropertyValue(recurrenceId, date);
     }
 
     /**
@@ -789,21 +838,17 @@ public abstract class BaseEventStamp extends Stamp
 
         // if it exists, update based on isAnyTime
         if (parameter != null) {
-            String value = parameter.getValue();
-            boolean currIsAnyTime = VALUE_TRUE.equals(value);
-            if (currIsAnyTime && !Boolean.TRUE.equals(isAnyTime))
-                dtStart.getParameters().remove(parameter);
-            else if (!currIsAnyTime && Boolean.TRUE.equals(isAnyTime)) {
-                dtStart.getParameters().remove(parameter);
+            dtStart.getParameters().remove(parameter);
+            if (Boolean.TRUE.equals(isAnyTime))   
                 dtStart.getParameters().add(getAnyTimeXParam());
-            }
         }
     }
     
     @Transient
-    private Parameter getAnyTimeXParam() {
+    protected Parameter getAnyTimeXParam() {
         return new XParameter(PARAM_X_OSAF_ANYTIME, VALUE_TRUE);
     }
+    
     
     /**
      * Initializes the Calendar with a default master event.
@@ -826,11 +871,21 @@ public abstract class BaseEventStamp extends Stamp
         
         // VEVENT UID is the NoteItem's icalUid
         // if it exists, or just the Item's uid
-        if(note!=null && note.getIcalUid() != null)
+        if(note.getIcalUid()!=null)
             uid.setValue(note.getIcalUid());
-        else
-            uid.setValue(getItem().getUid());
-            
+        else {
+            // A modifications UID will be the parent's icaluid
+            // or uid
+            if(note.getModifies()!=null) {
+                if(note.getModifies().getIcalUid()!=null)
+                    uid.setValue(note.getModifies().getIcalUid());
+                else
+                    uid.setValue(note.getModifies().getUid());
+            } else {
+                uid.setValue(note.getUid());
+            }
+        }
+     
         vevent.getProperties().add(uid);
        
         cal.getComponents().add(vevent);
@@ -842,6 +897,20 @@ public abstract class BaseEventStamp extends Stamp
             setSummary(note.getDisplayName());
             setDescription(note.getBody());
         }
+    }
+    
+    /**
+     * Determine if an event is recurring
+     * @return true if the underlying event is a recurring event
+     */
+    @Transient
+    public boolean isRecurring() {
+       if(getRecurrenceRules().size()>0)
+           return true;
+       
+       DateList rdates = getRecurrenceDates();
+       
+       return (rdates!=null && rdates.size()>0);
     }
     
     /**

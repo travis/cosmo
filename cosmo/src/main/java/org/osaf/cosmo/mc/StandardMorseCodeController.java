@@ -32,17 +32,23 @@ import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.EventExceptionStamp;
+import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemTombstone;
+import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
+import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.service.UserService;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.ConcurrencyFailureException;
+import org.springframework.dao.DataRetrievalFailureException;
 
 /**
  * The standard implementation for
@@ -55,7 +61,31 @@ public class StandardMorseCodeController implements MorseCodeController {
         LogFactory.getLog(StandardMorseCodeController.class);
 
     private ContentService contentService;
+    private UserService userService;
     private CosmoSecurityManager securityManager;
+
+    /**
+     * Returns information about every collection in the user's home
+     * collection.
+     *
+     * @param username the username of the user whose collections are
+     * to be described
+     * @param locator the service locator used to resolve collection URLs
+     *
+     * @throws DataRetrievalFailureException if the user is not found
+     * @throws MorseCodeException if an unknown error occurs
+     */
+    public CollectionService discoverCollections(String username,
+                                                 ServiceLocator locator) {
+        if (log.isDebugEnabled())
+            log.debug("discovering collections for " + username);
+
+        User user = userService.getUser(username);
+        HomeCollectionItem home = contentService.getRootItem(user);
+
+        return new CollectionService(home, locator,
+                                     securityManager.getSecurityContext());
+    }
 
     /**
      * Causes the identified collection and all contained items to be
@@ -159,9 +189,14 @@ public class StandardMorseCodeController implements MorseCodeController {
         for (Ticket.Type type : ticketTypes)
             collection.addTicket(new Ticket(type));
 
-        // throws UidinUseException
-        collection =
-            contentService.createCollection(parent, collection, children);
+        try {
+            // throws UidinUseException
+            collection =
+                contentService.createCollection(parent, collection, children);
+        } catch (CannotAcquireLockException e) {
+            log.debug("DEADLOCK(PUBLISH):");
+            throw new ServerBusyException("Database is busy", e);
+        }
 
         return new PubCollection(collection);
     }
@@ -239,6 +274,11 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new NotCollectionException(uid);
         CollectionItem collection = (CollectionItem) item;
 
+        // If collection hasn't changed, don't bother querying for children
+        // just return empty SubRecords
+        if (token.isValid(collection))
+            return new SubRecords(collection, new ArrayList<ContentItem>(0));
+        
         SubRecords subRecords = new SubRecords(collection, getModifiedItems(token, collection),
                 getRecentTombstones(token, collection), token);
        
@@ -324,6 +364,8 @@ public class StandardMorseCodeController implements MorseCodeController {
             // ConcurrencyFailureException
             collection = contentService.updateCollection(collection, children);
         } catch (ConcurrencyFailureException cfe) {
+            if(cfe instanceof CannotAcquireLockException)
+                log.debug("DEADLOCK(UPDATE)");
             // This means the data has been updated since the last sync token,
             // so a StaleCollectionException should be thrown
             throw new StaleCollectionException(uid);
@@ -345,6 +387,16 @@ public class StandardMorseCodeController implements MorseCodeController {
     }
 
     /** */
+    public UserService getUserService() {
+        return userService;
+    }
+
+    /** */
+    public void setUserService(UserService service) {
+        userService = service;
+    }
+
+    /** */
     public CosmoSecurityManager getSecurityManager() {
         return securityManager;
     }
@@ -358,6 +410,8 @@ public class StandardMorseCodeController implements MorseCodeController {
     public void init() {
         if (contentService == null)
             throw new IllegalStateException("contentService is required");
+        if (userService == null)
+            throw new IllegalStateException("userService is required");
         if (securityManager == null)
             throw new IllegalStateException("securityManager is required");
     }
@@ -378,10 +432,6 @@ public class StandardMorseCodeController implements MorseCodeController {
         // The set of items that need to be updated/created/deleted
         HashSet<Item> children = new HashSet<Item>();
         
-        // The list of modification records that need to be processed
-        // at theh end of the recordset
-        ArrayList<EimRecordSet> modRecords = new ArrayList<EimRecordSet>(); 
-
         try {
             while (i.hasNext()) {
                 EimRecordSet recordset = i.next();
@@ -390,38 +440,18 @@ public class StandardMorseCodeController implements MorseCodeController {
                         contentService.findItemByUid(recordset.getUuid());
                     if (item != null && ! (item instanceof ContentItem))
                         throw new ValidationException("Child item " + recordset.getUuid() + " is not a content item");
+                    
+                   
                     ContentItem child = (item != null) ?
                         (ContentItem) item :
                         createChildItem(collection, recordset);
-             
-                    // If child is null, it means that the item is a 
-                    // modification and the parent item has not been processed.
-                    // In this case, keep track of and retry at the end of the
-                    // recordset.
-                    if(child==null) {
-                        modRecords.add(recordset);
-                    }
-                    else {
-                        children.add(child);
-                        new ItemTranslator(child).applyRecords(recordset);
-                    }
+                        
+                    collection.getChildren().add(child);
+                    children.add(child);
+                    new ItemTranslator(child).applyRecords(recordset);
                 } catch (EimValidationException e) {
                     throw new ValidationException("could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
                 }
-            }
-            
-            // Re-try any records that represent item modifications where the
-            // parent item could not be found.  This ensures that all master
-            // items are processed before the modification items.
-            for(EimRecordSet recordset: modRecords) {
-                ContentItem child = createChildItem(collection, recordset);
-                if(child==null) {
-                    log.debug("could not find parent item for " + recordset.getUuid());
-                    throw new ValidationException("no parent found for " + recordset.getUuid());
-                } else {
-                    children.add(child);
-                    new ItemTranslator(child).applyRecords(recordset);
-                }   
             }
             
         } catch (EimException e) {
@@ -443,20 +473,27 @@ public class StandardMorseCodeController implements MorseCodeController {
         // If the item is a modification, we need to find the master item.
         // If the master item hasn't been created, then we need to return null,
         // and try again at the end of the recordset.
-        if(child.getUid().indexOf(EventExceptionStamp.RECURRENCEID_DELIMITER)>0)
-            if(handleModificationItem(child, collection)==false)
-                return null;
+        if(child.getUid().indexOf(ModificationUid.RECURRENCEID_DELIMITER)>0)
+            handleModificationItem(child, collection);
+                
                   
         // Add reference to parent collection so that applicator can
         // access parent (and children) if necessary
         child.getParents().add(collection);
-        collection.getChildren().add(child);
         return child;
     }
     
     private boolean handleModificationItem(NoteItem noteMod, CollectionItem collection) {
-        String parentUid = noteMod.getUid().split(
-                EventExceptionStamp.RECURRENCEID_DELIMITER)[0];
+        ModificationUid modUid = null;
+        
+        try {
+            modUid = new ModificationUid(noteMod.getUid());
+        } catch (ModelValidationException e) {
+            throw new ValidationException("invalid modification uid: "
+                    + noteMod.getUid());
+        }
+        
+        String parentUid = modUid.getParentUid();
         
         // Find parent note item by looking through collection's children.
         for (Item child : collection.getChildren()) {
@@ -466,7 +503,8 @@ public class StandardMorseCodeController implements MorseCodeController {
             }
         }
         
-        return false;
+        log.debug("could not find parent item for " + noteMod.getUid());
+        throw new ValidationException("no parent found for " + noteMod.getUid());
     }
     
     private List<ContentItem> getAllItems(CollectionItem collection) {

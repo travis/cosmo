@@ -53,6 +53,12 @@ public class CosmoConstants {
      */
     public static final String PRODUCT_VERSION;
     // XXX: add build timestamp for snapshots
+    
+    /**
+     * The Cosmo secham version.  This may or may not change when the
+     * PRODUCT_VERSION changes.
+     */
+    public static final String SCHEMA_VERSION = "100";
 
     /**
      * The servlet context attribute which contains the Cosmo server

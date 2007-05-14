@@ -144,6 +144,17 @@
         />
 
     <cache
+        name="org.osaf.cosmo.model.Item.parents"
+        maxElementsInMemory="10000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="600"
+        diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="120"
+        />
+
+    <cache
         name="org.osaf.cosmo.model.Stamp"
         maxElementsInMemory="20000"
         eternal="false"

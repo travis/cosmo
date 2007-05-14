@@ -92,19 +92,12 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
      */
     public void indexEvents(Collection<NoteItem> events) {
         
-        int count = 0;
-        int batchSize = 20;
-        
         for(NoteItem note: events) {
-            
-            // periodically clear the session to improve performance
-            count++;
-            if(count%batchSize==0)
-                getSession().clear();
-            
-            // because we clear the session, we may have to re-load item
-            if(!getSession().contains(note))
-                getSession().load(note, note.getId());
+            // clear the session each iteration to improve performance
+            getSession().clear();
+                
+            // because we clear the session, we have to re-load item
+            note = (NoteItem) getSession().load(NoteItem.class, note.getId());
             EventStamp event = EventStamp.getStamp(note);
             indexEvent(event);
         }

@@ -147,6 +147,13 @@ public class ICalendarToCosmoConverter {
             case ANYTIME:
                 event.setAnyTime(true);
                 event.setStart(createCosmoDate(dtStart, calendar));
+                if (!hasNoEnd){
+                    Calendar endCalendar = Calendar.getInstance();
+                    endCalendar.setTime(endDate);
+                    endCalendar.add(Calendar.DATE, -1);
+                    endDate = new net.fortuna.ical4j.model.Date(endCalendar.getTimeInMillis());
+                    event.setEnd(createCosmoDate(endDate, calendar, null));
+                }
                 break;
             case ATTIME:
                 event.setPointInTime(true);

@@ -35,15 +35,16 @@ import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.eim.schema.text.DurationFormat;
 import org.osaf.cosmo.mc.ValidationException;
 import org.osaf.cosmo.model.BaseEventStamp;
-import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
 
 /**
- * Applies display alarm EIM records to an EventStamp.
+ * Applies display alarm EIM records to an EventStamp/NoteItem.
+ * A deleted displayAlarm record is the same as sending a
+ * trigger value of 'None'.
  *
- * @see EventStamp
+ * @see BaseEventStamp
  */
 public class DisplayAlarmApplicator extends BaseStampApplicator
     implements DisplayAlarmConstants {
@@ -115,9 +116,14 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                 }
                 else {
                     String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
+                    // Trigger=None = no alarm
+                    if(value==null) {
+                        applyDeletion(record);
+                        return;
+                    }
+                    
                     Trigger newTrigger = EimValueConverter.toIcalTrigger(value);
-                    if(newTrigger==null)
-                        throw new ValidationException(FIELD_TRIGGER + " required");
+                    
                     eventStamp.setDisplayAlarmTrigger(newTrigger);
                     setReminderTime(note, getEventStamp(), newTrigger);
                 }
@@ -168,14 +174,23 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                 // ignore, don't support
             }
             else if(field.getName().equals(FIELD_TRIGGER)) {
+                
                 if(field.isMissing()) {
-                    handleMissingAttribute("reminderTime");
+                    // NOTE: We dont' really support missing trigger for non-events
+                    // So we should never get here.  For now treat "missing" as delete.
+                    log.debug("tried to apply missing Trigger on non-event");
+                    applyDeletionNonEvent(record);
                 }
                 else {
                     String value = EimFieldValidator.validateText(field, MAXLEN_TRIGGER);
+                    // Trigger=None means no alarm
+                    if(value==null) {
+                        applyDeletionNonEvent(record);
+                        return;
+                    }
+                    
                     Trigger trigger = EimValueConverter.toIcalTrigger(value);
-                    if(trigger==null)
-                        throw new ValidationException(FIELD_TRIGGER + " required");
+                        
                     setReminderTime(note, trigger);
                 }
             }

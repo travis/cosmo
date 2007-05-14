@@ -297,7 +297,6 @@ public class StandardContentServiceTest extends TestCase {
         
         Assert.assertEquals(1, masterCal.getComponents().getComponents(Component.VEVENT).size());
         Assert.assertNull(eventStamp.getMasterEvent().getRecurrenceId());
-        Assert.assertTrue(masterNote.getContentLength().equals( new Long(calendar.toString().getBytes("UTF-8").length)));
         
         Assert.assertEquals(masterNote.getModifications().size(), 4);
         for(NoteItem mod : masterNote.getModifications()) {

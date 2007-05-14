@@ -104,7 +104,9 @@ public class EventGeneratorTest extends BaseGeneratorTestCase
         eventStamp.createCalendar();
         eventStamp.setLocation(null);
         eventStamp.setStatus(null);
+        eventStamp.setRecurrenceId(EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070212T074500").getDate());
         eventStamp.setStartDate(EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070212T074500").getDate());
+        eventStamp.setAnyTime(null);
         eventStamp.setEndDate(EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070212T084500").getDate());
         
         noteItem.addStamp(eventStamp);
@@ -123,7 +125,8 @@ public class EventGeneratorTest extends BaseGeneratorTestCase
         assertEquals("unexpected number of fields", 8, fields.size());
 
         EimRecordField dtStartField = fields.get(0);
-        checkTextField(dtStartField, FIELD_DTSTART, ";VALUE=DATE-TIME:20070212T074500");
+        Assert.assertEquals(FIELD_DTSTART, dtStartField.getName());
+        Assert.assertTrue(dtStartField.isMissing());
 
         EimRecordField durationField = fields.get(1);
         checkTextField(durationField, FIELD_DURATION, "PT1H");
@@ -147,6 +150,24 @@ public class EventGeneratorTest extends BaseGeneratorTestCase
         EimRecordField statusField = fields.get(7);
         Assert.assertEquals(FIELD_STATUS, statusField.getName());
         Assert.assertTrue(statusField.isMissing());
+        
+        // now change anyTime to TRUE (not inherited)
+        eventStamp.setAnyTime(true);
+        records = generator.generateRecords(-1);
+        assertEquals("unexpected number of records generated", 1,
+                     records.size());
+
+        record = records.get(0);
+        checkNamespace(record, PREFIX_EVENT, NS_EVENT);
+        checkUuidKey(record.getKey(), "1");
+
+        fields = record.getFields();
+        assertEquals("unexpected number of fields", 8, fields.size());
+
+        // since anyTime was set, dtStart will not be "missing"
+        dtStartField = fields.get(0);
+        Assert.assertFalse(dtStartField.isMissing());
+        checkTextField(dtStartField, FIELD_DTSTART, ";VALUE=DATE-TIME;X-OSAF-ANYTIME=TRUE:20070212T074500");        
     }
 
 }

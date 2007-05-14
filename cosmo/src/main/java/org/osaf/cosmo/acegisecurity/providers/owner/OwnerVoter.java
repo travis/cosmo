@@ -120,8 +120,15 @@ public class OwnerVoter implements AccessDecisionVoter {
                         // find indirectly addressed item's parent
                         String parentPath =
                             PathUtil.getParentPath(cp.getPathInfo());
-                        item = contentService.
-                            findItemByPath(parentPath, cp.getUid());
+                        
+                        // If the parent path is "/", then the parent will be
+                        // the directly addressed collection
+                        if(parentPath.equals("/"))
+                            item = contentService.findItemByUid(cp.getUid());
+                        else
+                            item = contentService.
+                                findItemByPath(parentPath, cp.getUid());
+                        
                         if (item == null) {
                             // case 5
                             if (log.isDebugEnabled())

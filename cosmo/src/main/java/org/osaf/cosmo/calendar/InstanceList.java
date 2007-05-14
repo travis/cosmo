@@ -147,8 +147,22 @@ public class InstanceList extends HashMap {
             end = org.osaf.cosmo.calendar.util.Dates.getInstance(duration.getTime(start), start);
         } else {
             // Convert to UTC if needed
-            if(end instanceof DateTime)
+            if(end instanceof DateTime) {
                 end = convertToUTCIfNecessary((DateTime) end);
+                // Handle case where dtend is before dtstart, in which the duration
+                // will be 0, since it is a timed event
+                if(end.before(start)) {
+                    end = org.osaf.cosmo.calendar.util.Dates.getInstance(
+                            new Dur(0, 0, 0, 0).getTime(start), start);
+                }
+            } else {
+                // Handle case where dtend is before dtstart, in which the duration
+                // will be 1 day since its an all-day event
+                if(end.before(start)) {
+                    end = org.osaf.cosmo.calendar.util.Dates.getInstance(
+                            new Dur(1, 0, 0, 0).getTime(start), start);
+                }
+            }
             duration = new Dur(start, end);
         }
         
@@ -279,8 +293,22 @@ public class InstanceList extends HashMap {
             dtend = org.osaf.cosmo.calendar.util.Dates.getInstance(duration.getTime(dtstart), dtstart);
         } else {
             // Convert to UTC if needed
-            if(dtend instanceof DateTime)
+            if(dtend instanceof DateTime) {
                 dtend = convertToUTCIfNecessary((DateTime) dtend);
+                // Handle case where dtend is before dtstart, in which the duration
+                // will be 0, since it is a timed event
+                if(dtend.before(dtstart)) {
+                    dtend = org.osaf.cosmo.calendar.util.Dates.getInstance(
+                            new Dur(0, 0, 0, 0).getTime(dtstart), dtstart);
+                }
+            } else {
+                // Handle case where dtend is before dtstart, in which the duration
+                // will be 1 day since its an all-day event
+                if(dtend.before(dtstart)) {
+                    dtend = org.osaf.cosmo.calendar.util.Dates.getInstance(
+                            new Dur(1, 0, 0, 0).getTime(dtstart), dtstart);
+                }
+            }
         }
 
         // Now create the map entry

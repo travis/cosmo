@@ -901,7 +901,7 @@ public class RPCServiceImpl implements RPCService, ICalendarConstants {
                     + collection.getUid());
         ContentItem calItem = (ContentItem) contentService
                 .findItemByUid(eventUid);
-        contentService.removeContent(calItem);
+        contentService.removeItemFromCollection(calItem, collection);
     }
 
     private String doSaveEvent(CollectionItem collection, Event event)

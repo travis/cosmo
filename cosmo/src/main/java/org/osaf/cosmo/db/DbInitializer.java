@@ -141,11 +141,11 @@ public class DbInitializer {
                 .getServerProperty(ServerProperty.PROP_SCHEMA_VERSION);
 
         log.info("found schema version " + schemaVersion);
-        if (!CosmoConstants.PRODUCT_VERSION.equals(schemaVersion)) {
+        if (!CosmoConstants.SCHEMA_VERSION.equals(schemaVersion)) {
             log.error("Schema version does not match (" + schemaVersion + ":"
-                    + CosmoConstants.PRODUCT_VERSION);
+                    + CosmoConstants.SCHEMA_VERSION);
             throw new RuntimeException(
-                    "Schema version does not match server version");
+                    "Schema version found in database does not match schema version required by server");
         }
     }
     
@@ -191,7 +191,7 @@ public class DbInitializer {
     private void addServerProperties() {
         serverPropertyService.setServerProperty(
                 ServerProperty.PROP_SCHEMA_VERSION,
-                CosmoConstants.PRODUCT_VERSION);
+                CosmoConstants.SCHEMA_VERSION);
     }
 
     public void setRootLoginUrl(String rootLoginUrl) {

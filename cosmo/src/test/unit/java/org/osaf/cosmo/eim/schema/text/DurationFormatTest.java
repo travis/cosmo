@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.eim.schema.text;
 
+import java.text.ParseException;
+
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import net.fortuna.ical4j.model.Date;
@@ -48,6 +51,43 @@ public class DurationFormatTest extends TestCase {
 
         dur = makeDur("20070512T103000", "20070512T103030");
         assertEquals("PT30S", df.format(dur));
+    }
+    
+    public void testParse() throws Exception {
+        DurationFormat df = DurationFormat.getInstance();
+        
+        Assert.assertEquals(df.parse("P5W").toString(), "P5W");
+        Assert.assertEquals(df.parse("P5D").toString(), "P5D");
+        Assert.assertEquals(df.parse("PT5H").toString(), "PT5H");
+        Assert.assertEquals(df.parse("P5DT5H").toString(), "P5DT5H");
+        Assert.assertEquals(df.parse("PT5H5M").toString(), "PT5H5M");
+        Assert.assertEquals(df.parse("PT5M").toString(), "PT5M");
+        Assert.assertEquals(df.parse("PT5M5S").toString(), "PT5M5S");
+        Assert.assertEquals(df.parse("PT5S").toString(), "PT5S");
+        
+        try {
+            df.parse("P");
+            Assert.fail("able to parse invalid duration");
+        } catch (ParseException e) {
+        }
+        
+        try {
+            df.parse("P5H");
+            Assert.fail("able to parse invalid duration");
+        } catch (ParseException e) {
+        }
+        
+        try {
+            df.parse("P0M");
+            Assert.fail("able to parse invalid duration");
+        } catch (ParseException e) {
+        }
+        
+        try {
+            df.parse("PT5M5H");
+            Assert.fail("able to parse invalid duration");
+        } catch (ParseException e) {
+        }
     }
 
     private Dur makeDur(String start,

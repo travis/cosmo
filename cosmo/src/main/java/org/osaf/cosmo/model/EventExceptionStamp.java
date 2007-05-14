@@ -24,7 +24,10 @@ import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.XParameter;
+import net.fortuna.ical4j.model.property.DtStart;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -34,7 +37,7 @@ import org.osaf.cosmo.hibernate.validator.EventException;
 
 
 /**
- * Represents a calendar event.
+ * Represents an event exception.
  */
 @Entity
 @DiscriminatorValue("eventexception")
@@ -50,8 +53,6 @@ public class EventExceptionStamp extends BaseEventStamp implements
     private static final long serialVersionUID = 3992468809776886156L;
 
     private Calendar calendar = null;
- 
-    public static final String RECURRENCEID_DELIMITER = "::";
     
     /** default constructor */
     public EventExceptionStamp() {
@@ -110,6 +111,63 @@ public class EventExceptionStamp extends BaseEventStamp implements
         
         // add event exception
         calendar.getComponents().add(event);
+    }
+ 
+    /**
+     * Toggle the event exception anytime parameter.
+     * @param isAnyTime True if the event occurs anytime<br/>
+     *                  False if the event does not occur anytime</br>
+     *                  null if the event should inherit the anyTime
+     *                  attribute of the master event.
+     */
+    @Override
+    public void setAnyTime(Boolean isAnyTime) {
+        // Interpret null as "missing" anyTime, meaning inherited from master
+        if(isAnyTime==null) {
+            DtStart dtStart = getEvent().getStartDate();
+            if (dtStart == null)
+                throw new IllegalStateException("event has no start date");
+            Parameter parameter = dtStart.getParameters().getParameter(
+                    PARAM_X_OSAF_ANYTIME);
+            if(parameter!=null)
+                dtStart.getParameters().remove(parameter);
+            
+            // "missing" anyTime is represented as X-OSAF-ANYTIME=MISSING
+            dtStart.getParameters().add(getInheritedAnyTimeXParam());
+        } else {
+            super.setAnyTime(isAnyTime);
+        }
+    }
+    
+    /**
+     * Is the event exception marked as anytime.
+     * @return True if the event is an anytime event<br/>
+     *         False if it is not an anytime event<br/>
+     *         null if the anyTime attribute is "missing", ie inherited
+     *         from the master event.
+     */
+    @Override
+    @Transient
+    public Boolean isAnyTime() {
+        DtStart dtStart = getEvent().getStartDate();
+        if (dtStart == null)
+            return Boolean.FALSE;
+        Parameter parameter = dtStart.getParameters()
+            .getParameter(PARAM_X_OSAF_ANYTIME);
+        if (parameter == null) {
+            return Boolean.FALSE;
+        }
+     
+        // return null for "missing" anyTime
+        if(VALUE_MISSING.equals(parameter.getValue()))
+            return null;
+
+        return new Boolean(VALUE_TRUE.equals(parameter.getValue()));
+    }
+    
+    @Transient
+    private Parameter getInheritedAnyTimeXParam() {
+        return new XParameter(PARAM_X_OSAF_ANYTIME, VALUE_MISSING);
     }
 
     /**

@@ -7,4 +7,4 @@ alter table item drop foreign key FK317B137014CFFB
 drop index idx_itemisactive
 
 # update server version
-update server_properties SET propertyvalue='${pom.version}' WHERE propertyname='cosmo.schemaVersion'
+update server_properties SET propertyvalue='100' WHERE propertyname='cosmo.schemaVersion'

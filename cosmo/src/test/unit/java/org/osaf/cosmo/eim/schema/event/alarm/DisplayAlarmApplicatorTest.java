@@ -63,6 +63,14 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
         Assert.assertNotNull(noteItem.getReminderTime());
         // it should be the end date of the period of eventStart,trigger duration
         Assert.assertEquals(period.getEnd().getTime(), noteItem.getReminderTime().getTime());
+    
+        // test removing alarm from event
+        record = makeTestNoneRecord();
+
+        applicator.applyRecord(record);
+
+        Assert.assertNull(noteItem.getReminderTime());
+        Assert.assertNull(eventStamp.getDisplayAlarm());
     }
     
     public void testApplyFieldNonEvent() throws Exception {
@@ -75,6 +83,12 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
 
         Assert.assertNotNull(noteItem.getReminderTime());
         Assert.assertEquals(noteItem.getReminderTime(), new DateTime("20080101T075900Z"));
+    
+        record = makeTestNoneRecord();
+
+        applicator.applyRecord(record);
+
+        Assert.assertNull(noteItem.getReminderTime());
     }
     
     public void testApplyMissingField() throws Exception {
@@ -114,6 +128,17 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
         record.addField(new TextField(FIELD_TRIGGER, "PT15M"));
         record.addField(new TextField(FIELD_DURATION, "P1W"));
         record.addField(new IntegerField(FIELD_REPEAT, 1));
+
+        return record;
+    }
+    
+    private EimRecord makeTestNoneRecord() {
+        EimRecord record = new EimRecord(PREFIX_DISPLAY_ALARM, NS_DISPLAY_ALARM);
+
+        record.addField(new TextField(FIELD_DESCRIPTION, null));
+        record.addField(new TextField(FIELD_TRIGGER, null));
+        record.addField(new TextField(FIELD_DURATION, null));
+        record.addField(new IntegerField(FIELD_REPEAT, null));
 
         return record;
     }

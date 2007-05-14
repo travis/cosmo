@@ -18,12 +18,27 @@ package org.osaf.cosmo.mc;
 import java.util.Set;
 
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.server.ServiceLocator;
 
 /**
  * Interface for controllers that implement the operations specified
  * by Morse Code.
  */
 public interface MorseCodeController {
+
+    /**
+     * Returns information about every collection in the user's home
+     * collection. Ignores subcollections.
+     *
+     * @param username the username of the user whose collections are
+     * to be described
+     * @param locator the service locator used to resolve collection URLs
+     *
+     * @throws DataRetrievalFailureException if the user is not found
+     * @throws MorseCodeException if an unknown error occurs
+     */
+    public CollectionService discoverCollections(String username,
+                                                 ServiceLocator locator);
 
     /**
      * Causes the identified collection and all contained items to be

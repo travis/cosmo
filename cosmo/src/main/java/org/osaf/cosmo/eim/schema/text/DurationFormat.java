@@ -15,18 +15,16 @@
  */
 package org.osaf.cosmo.eim.schema.text;
 
-import net.fortuna.ical4j.model.Dur;
-
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.regex.Pattern;
 
+import net.fortuna.ical4j.model.Dur;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.eim.schema.EimValidationException;
 
 /**
  * Parses and formats EIM duration text values.
@@ -41,7 +39,7 @@ public class DurationFormat extends Format {
         LogFactory.getLog(DurationFormat.class);
 
     private static final Pattern PATTERN = Pattern.
-        compile("[+-]?P((\\d+W)|((\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+S)?)?))");
+        compile("^[+-]?P((\\d+W)|(\\d+D)|((\\d+D)?(T(\\d+H)?(\\d+M)?(\\d+S)?))){1}$");
 
     private ParseException parseException;
 

@@ -154,7 +154,7 @@
         <prop key="hibernate.cache.use_second_level_cache">true</prop>
         <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
         <prop key="hibernate.show_sql">false</prop>
-
+        <prop key="hibernate.jdbc.batch_size">25</prop>
         <!-- configure in cosmo.propeties -->
         <prop key="hibernate.dialect">${cosmo.hibernate.dialect}</prop>
       </props>
@@ -578,6 +578,9 @@
         init-method="init">
     <property name="contentService">
       <ref local="contentService"/>
+    </property>
+    <property name="userService">
+      <ref local="userService"/>
     </property>
     <property name="securityManager">
       <ref local="securityManager"/>

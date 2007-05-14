@@ -121,6 +121,14 @@ public interface ContentService extends Service {
      *            item to remove
      */
     public void removeItem(Item item);
+    
+    /**
+     * Remove an item from a collection.  The item will be deleted if
+     * it belongs to no more collections.
+     * @param item item to remove from collection
+     * @param collection item to remove item from
+     */
+    public void removeItemFromCollection(Item item, CollectionItem collection);
 
     /**
      * Remove an item.

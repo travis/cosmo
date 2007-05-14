@@ -18,6 +18,7 @@ package org.osaf.cosmo.eim.schema.event;
 import java.text.ParseException;
 
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Dur;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +35,7 @@ import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
 
@@ -71,10 +73,9 @@ public class EventApplicator extends BaseStampApplicator
         else {
             eventStamp = new EventExceptionStamp(getItem());
             eventStamp.createCalendar();
-            String recurrenceId = note.getUid().split(
-                    EventExceptionStamp.RECURRENCEID_DELIMITER)[1];
-            ICalDate icd = EimValueConverter.toICalDate(recurrenceId);
-            eventStamp.setRecurrenceId(icd.getDate());
+           
+            ModificationUid modUid = new ModificationUid(note.getUid());
+            eventStamp.setRecurrenceId(modUid.getRecurrenceId()); 
         }
         
         // need to copy reminderTime to alarm in event
@@ -89,6 +90,8 @@ public class EventApplicator extends BaseStampApplicator
         return eventStamp;
     }
 
+    
+    
     /**
      * Copies record field values to stamp properties and
      * attributes.
@@ -104,9 +107,14 @@ public class EventApplicator extends BaseStampApplicator
         if (field.getName().equals(FIELD_DTSTART)) {
             if(field.isMissing()) {
                 handleMissingDtStart();
-                handleMissingAttribute("anyTime");
             }
             else {
+                // Handle the case where there is an existing dtend (no duration)
+                // and only dtstart is present in the record.  Calculate old
+                // duration and reset it on event to avoid conflicts.
+                if(event.getEndDate() != null && !hasDurationField(field.getRecord()))    
+                    event.setDuration(new Dur(event.getStartDate(), event.getEndDate())); 
+                
                 String value =
                     EimFieldValidator.validateText(field, MAXLEN_DTSTART);
                 ICalDate icd = EimValueConverter.toICalDate(value);
@@ -164,11 +172,22 @@ public class EventApplicator extends BaseStampApplicator
         }
     }
     
+    private boolean hasDurationField(EimRecord record) {
+        for(EimRecordField field : record.getFields()) {
+            if(field.getName().equals(FIELD_DURATION))
+                return true;
+        }
+        return false;
+    }
+    
     private void handleMissingDtStart() throws EimSchemaException {
         checkIsModification();
         // A missing dtstart on a modification means that the start date
         // is equal to the recurrenceId
         BaseEventStamp event = (BaseEventStamp) getStamp();
         event.setStartDate(event.getRecurrenceId());
+        
+        // A missing anyTime is set using null
+        event.setAnyTime(null);
     }
 }

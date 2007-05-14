@@ -9,4 +9,4 @@ alter table item drop index idx_itemisactive;
 alter table item drop column isactive;
 
 # update server version
-update server_properties SET propertyvalue='${pom.version}' WHERE propertyname='cosmo.schemaVersion';
+update server_properties SET propertyvalue='100' WHERE propertyname='cosmo.schemaVersion';

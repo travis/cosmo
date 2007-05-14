@@ -1,0 +1,11 @@
+# -*- rnc -*-
+# RELAX NG Compact Syntax Grammar for
+# Cosmo extensions to the Atom schema
+
+namespace cosmo = "http://osafoundation.org/cosmo/Atom"
+
+cosmoTicket =
+   element cosmo:ticket {
+      attribute type { "read-only" | "read-write" | "free-busy" },
+      text
+   }

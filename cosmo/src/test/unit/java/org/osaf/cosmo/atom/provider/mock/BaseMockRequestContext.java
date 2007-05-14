@@ -43,7 +43,7 @@ public class BaseMockRequestContext extends HttpServletRequestContext {
         return new MockHttpServletRequest(ctx, method, uri);
     }
 
-    MockHttpServletRequest getMockRequest() {
+    public MockHttpServletRequest getMockRequest() {
         return (MockHttpServletRequest) getRequest();
     }
 }

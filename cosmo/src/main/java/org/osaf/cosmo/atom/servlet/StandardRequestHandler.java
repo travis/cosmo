@@ -18,20 +18,77 @@ package org.osaf.cosmo.atom.servlet;
 import java.io.IOException;
 import java.text.ParseException;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.Provider;
 import org.apache.abdera.protocol.server.provider.RequestContext;
+import org.apache.abdera.protocol.server.provider.ResponseContext;
+import org.apache.abdera.protocol.server.provider.TargetType;
 import org.apache.abdera.protocol.server.servlet.DefaultRequestHandler;
 import org.apache.abdera.protocol.server.servlet.RequestHandler;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.osaf.cosmo.atom.provider.BaseItemTarget;
+import org.osaf.cosmo.atom.provider.ExtendedProvider;
 import org.osaf.cosmo.http.IfMatch;
 import org.osaf.cosmo.http.IfNoneMatch;
 
+/**
+ * Extends {@link DefaultRequestHandler} to provide Cosmo-specific
+ * behaviors.
+ */
 public class StandardRequestHandler extends DefaultRequestHandler {
+    private static final Log log =
+        LogFactory.getLog(StandardRequestHandler.class);
+    private static final MimeType MIME_TYPE_FORM;
 
+    static {
+        try {
+            MIME_TYPE_FORM = new MimeType("application/x-www-form-urlencoded");
+        } catch (MimeTypeParseException e) {
+            throw new RuntimeException("Form mime type specified incorrectly", e);
+        }
+    }
+
+    /**
+     * <p>
+     * Extends the superclass method to implement the following APP
+     * extensions:
+     * </p>
+     * <ul>
+     * <li> When <code>POST</code>ing to a collection, if the content
+     * type of the request is
+     * <code>application/x-www-form-urlencoded</code>, the request is
+     * interpreted as a collection details update.
+     * </ul>
+     */
+    protected ResponseContext process(Provider provider,
+                                      RequestContext request) {
+        String method = request.getMethod();
+        TargetType type = request.getTarget().getType();
+
+        if (method.equals("POST")) {
+            if (type == TargetType.TYPE_COLLECTION) {
+                if (matchContentType(request, MIME_TYPE_FORM))
+                    return ((ExtendedProvider) provider).
+                        updateCollection(request);
+            }
+        }
+
+        return super.process(provider, request);
+    }
+
+    /**
+     * Extends the superclass method to implement conditional request
+     * methods by honoring the <code>If-Match</code> request header
+     * and friends.
+     */
     protected boolean preconditions(Provider provider, 
                                     RequestContext request, 
                                     HttpServletResponse response)
@@ -51,6 +108,16 @@ public class StandardRequestHandler extends DefaultRequestHandler {
             return false;
 
         return true;
+    }
+
+    private boolean matchContentType(RequestContext request,
+                                     MimeType mediaType) {
+        try {
+            MimeType contentType = request.getContentType();
+            return contentType != null && contentType.match(mediaType);
+        } catch (MimeTypeParseException e) {
+            throw new RuntimeException("Unable to parse request content type", e);
+        }
     }
 
     private boolean ifMatch(String header,

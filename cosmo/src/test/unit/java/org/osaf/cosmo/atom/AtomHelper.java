@@ -136,6 +136,14 @@ public class AtomHelper extends MockHelper {
         return new MockCollectionRequestContext(serviceContext, uid, method);
     }
 
+    public RequestContext createUpdateRequestContext(CollectionItem collection)
+        throws IOException {
+        MockCollectionRequestContext rc =
+            new MockCollectionRequestContext(serviceContext, collection,
+                                             "POST");
+        return rc;
+    }
+
     public RequestContext createEntryRequestContext(NoteItem item,
                                                     String method)
         throws IOException {
@@ -211,6 +219,21 @@ public class AtomHelper extends MockHelper {
         ((MockHttpServletRequest)
          ((BaseMockRequestContext)context).getRequest()).
             addHeader("If-None-Match", etag);
+    }
+
+    public void setContentType(RequestContext context,
+                               String contentType) {
+        ((BaseMockRequestContext)context).getMockRequest().
+            setContentType(contentType);
+        ((BaseMockRequestContext)context).getMockRequest().
+            addHeader("Content-Type", contentType);
+    }
+
+    public void addParameter(RequestContext context,
+                             String param,
+                             String value) {
+        ((BaseMockRequestContext)context).getMockRequest().
+            addParameter(param, value);
     }
 
     public void rememberProjection(String projection) {

@@ -26,6 +26,7 @@ import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Service;
+import org.apache.abdera.parser.ParseException;
 import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.AbstractProvider;
 import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
@@ -35,6 +36,7 @@ import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,7 +62,7 @@ import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
 
 public class StandardProvider extends AbstractProvider
-    implements AtomConstants {
+    implements AtomConstants, ExtendedProvider {
     private static final Log log = LogFactory.getLog(StandardProvider.class);
 
     private Abdera abdera;
@@ -100,6 +102,8 @@ public class StandardProvider extends AbstractProvider
             rc.setContentLocation(entry.getSelfLink().toString());
 
             return rc;
+        } catch (ParseException e) {
+            return badrequest(abdera, request, "Unable to parse entry: " + e.getMessage());
         } catch (UnsupportedMediaTypeException e) {
             return notsupported(abdera, request, "invalid content type " + e.getMediaType());
         } catch (ValidationException e) {
@@ -176,6 +180,8 @@ public class StandardProvider extends AbstractProvider
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
 
             return rc;
+        } catch (ParseException e) {
+            return badrequest(abdera, request, "Unable to parse entry: " + e.getMessage());
         } catch (UnsupportedMediaTypeException e) {
             return notsupported(abdera, request, "invalid content type " + e.getMediaType());
         } catch (ValidationException e) {
@@ -343,6 +349,41 @@ public class StandardProvider extends AbstractProvider
   
     public ResponseContext mediaPost(RequestContext request) {
         throw new UnsupportedOperationException();
+    }
+
+    // ExtendedProvider methods
+
+    public ResponseContext updateCollection(RequestContext request) {
+        CollectionTarget target = (CollectionTarget) request.getTarget();
+        CollectionItem collection = target.getCollection();
+        if (log.isDebugEnabled())
+            log.debug("updating details for collection " + collection.getUid());
+
+        try {
+            boolean dirty = false;
+            for (String param : request.getParameterNames()) {
+                if (param.equals("name")) {
+                    String name = request.getParameter("name");
+                    if (! StringUtils.isBlank(name)) {
+                        collection.setName(name);
+                        collection.setDisplayName(name);
+                        dirty = true;
+                    }
+                } else {
+                    log.warn("skipping unknown collection details parameter " +
+                             param);
+                }
+            }
+            if (dirty)
+                collection = contentService.updateCollection(collection);
+
+            AbstractResponseContext rc = createResponseContext(204);
+            rc.setEntityTag(new EntityTag(collection.getEntityTag()));
+
+            return rc;
+        } catch (CollectionLockedException e) {
+            return locked(abdera, request);
+        }
     }
 
     // AbstractProvider methods

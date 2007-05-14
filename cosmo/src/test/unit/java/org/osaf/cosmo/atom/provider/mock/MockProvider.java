@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.abdera.protocol.server.provider.EmptyResponseContext;
-import org.apache.abdera.protocol.server.provider.Provider;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 
@@ -27,14 +26,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.provider.CollectionTarget;
+import org.osaf.cosmo.atom.provider.ExtendedProvider;
 import org.osaf.cosmo.atom.provider.ItemTarget;
+import org.osaf.cosmo.model.CollectionItem;
 
-public class MockProvider implements Provider {
+public class MockProvider implements ExtendedProvider {
     private static final Log log = LogFactory.getLog(MockProvider.class);
 
     private Set<String> collections = new HashSet<String>();
     private Set<String> items = new HashSet<String>();
     private boolean failureMode;
+    private String updatedCollection;
+
+    // Provider methods
 
     public ResponseContext createEntry(RequestContext request) {
         if (failureMode)
@@ -50,7 +54,7 @@ public class MockProvider implements Provider {
     public ResponseContext deleteMedia(RequestContext request) {
         return null;
     }
-  
+
     public ResponseContext updateEntry(RequestContext request) {
         if (failureMode)
             throw new RuntimeException("failure mode engaged");
@@ -114,6 +118,25 @@ public class MockProvider implements Provider {
   
     public ResponseContext mediaPost(RequestContext request) {
         return null;
+    }
+
+    // ExtendedProvider methods
+
+    public ResponseContext updateCollection(RequestContext request) {
+        if (! (request.getTarget() instanceof CollectionTarget))
+            return new EmptyResponseContext(404);
+
+        CollectionTarget target = (CollectionTarget) request.getTarget();
+        updatedCollection = target.getCollection().getUid();
+
+        return new EmptyResponseContext(204);
+    }
+
+    // our methods
+
+    public boolean isUpdated(CollectionItem collection) {
+        return (updatedCollection != null &&
+                updatedCollection.equals(collection.getUid()));
     }
 
     public void addCollection(String uid) {

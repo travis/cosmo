@@ -21,11 +21,13 @@ import junit.framework.TestCase;
 
 import org.apache.abdera.protocol.server.provider.Provider;
 import org.apache.abdera.protocol.server.provider.RequestContext;
+import org.apache.abdera.protocol.server.provider.ResponseContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomHelper;
+import org.osaf.cosmo.atom.provider.mock.MockProvider;
 import org.osaf.cosmo.model.CollectionItem;
 
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -110,6 +112,17 @@ public class StandardRequestHandlerTest extends TestCase {
         boolean rv = handler.preconditions(helper.getProvider(), req, res);
         assertTrue("Preconditions failed", rv);
         assertEquals("Incorrect response status", 200, res.getStatus());
+    }
+
+    public void testProcessCollectionUpdate() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createUpdateRequestContext(collection);
+        helper.setContentType(req, "application/x-www-form-urlencoded");
+
+        ResponseContext res = handler.process(helper.getProvider(), req);
+        assertNotNull("Null response context", res);
+        assertTrue("Collection not updated",
+                   ((MockProvider)helper.getProvider()).isUpdated(collection));
     }
 
     protected void setUp() throws Exception {

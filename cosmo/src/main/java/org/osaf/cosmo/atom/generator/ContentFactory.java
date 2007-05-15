@@ -127,25 +127,25 @@ public class ContentFactory
     }
 
     private ContentBean createHtmlContent(Item item) {
-        EventStamp stamp = EventStamp.getStamp(item);
-        if (stamp == null)
-            return null;
-
         ContentBean content = new ContentBean();
-        content.setValue(new EventEntryFormatter(stamp).formatHtmlContent());
         content.setMediaType(MEDIA_TYPE_HTML);
+
+        EventStamp stamp = EventStamp.getStamp(item);
+        String value = stamp != null ?
+            new EventEntryFormatter(stamp).formatHtmlContent() : "";
+        content.setValue(value);
 
         return content;
     }
 
     private ContentBean createTextContent(Item item) {
-        EventStamp stamp = EventStamp.getStamp(item);
-        if (stamp == null)
-            return null;
-
         ContentBean content = new ContentBean();
-        content.setValue(new EventEntryFormatter(stamp).formatTextSummary());
         content.setMediaType(MEDIA_TYPE_TEXT);
+
+        EventStamp stamp = EventStamp.getStamp(item);
+        String value = stamp != null ?
+            new EventEntryFormatter(stamp).formatTextSummary() : "";
+        content.setValue(value);
 
         return content;
     }

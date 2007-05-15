@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
@@ -76,6 +77,10 @@ public class StandardTargetResolver implements TargetResolver {
         if (ip != null)
             return createItemTarget(context, ip);
 
+        SubscriptionPath sp = SubscriptionPath.parse(uri);
+        if (sp != null)
+            return createSubscriptionTarget(context, sp);
+
         UserPath up = UserPath.parse(uri);
         if (up != null)
             return createUserTarget(context, up);
@@ -126,6 +131,27 @@ public class StandardTargetResolver implements TargetResolver {
 
         return new ItemTarget(context, (NoteItem) item,
                               info.getProjection(), info.getFormat());
+    }
+
+    /**
+     * Creates a target representing one or all of a user's
+     * subscriptions.
+     */
+    protected Target createSubscriptionTarget(RequestContext context,
+                                              SubscriptionPath path) {
+        User user = userService.getUser(path.getUsername());
+        if (user == null)
+            return null;
+
+        if (path.getDisplayName() != null) {
+            CollectionSubscription sub =
+                user.getSubscription(path.getDisplayName());
+            if (sub == null)
+                return null;
+            return new SubscriptionTarget(context, user, sub);
+        }
+
+        return new SubscriptionTarget(context, user);
     }
 
     /**

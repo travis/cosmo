@@ -195,6 +195,7 @@ public class DavCalendarCollection extends DavCollection
         return CalendarCollectionStamp.getStamp(getItem());
     }
 
+
     /** */
     protected void populateItem(InputContext inputContext)
         throws DavException {
@@ -328,7 +329,7 @@ public class DavCalendarCollection extends DavCollection
     }
 
     /** */
-    protected void saveFile(DavFile member)
+    protected void saveContent(DavContent member)
         throws DavException {
         CollectionItem collection = (CollectionItem) getItem();
         CalendarCollectionStamp cc = getCalendarCollectionStamp();
@@ -337,27 +338,6 @@ public class DavCalendarCollection extends DavCollection
             throw new IllegalArgumentException("member not DavEvent");
         ContentItem content = (ContentItem) member.getItem();
         EventStamp event = EventStamp.getStamp(content);
-
-        // CALDAV:supported-calendar-data
-        String contentType = content.getContentType();
-        if (contentType == null)
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST,
-                                   "No media type specified for calendar data");
-        if (! contentType.equals(ICALENDAR_MEDIA_TYPE))
-            throw new DavException(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
-                                   "Content of type " + contentType + " not supported in calendar collection");
-
-        // CALDAV:valid-calendar-data
-        Calendar calendar = null;
-        try {
-            // forces the event's content to be parsed
-            calendar = event.getCalendar();
-            calendar.validate(true);
-        } catch (ModelConversionException e) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Unable to interpret content as calendar object: " + e.getMessage());
-        } catch (ValidationException e) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Invalid calendar object: " + e.getMessage());
-        }
 
         // CALDAV:valid-calendar-object-resource
         if (hasMultipleComponentTypes(event.getCalendar()))
@@ -411,7 +391,7 @@ public class DavCalendarCollection extends DavCollection
     }
 
     /** */
-    protected void removeFile(DavFile member)
+    protected void removeContent(DavContent member)
         throws DavException {
         if (! (member instanceof DavEvent))
             throw new IllegalArgumentException("member not DavEvent");

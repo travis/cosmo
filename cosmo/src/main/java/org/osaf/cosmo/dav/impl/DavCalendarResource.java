@@ -17,7 +17,6 @@ package org.osaf.cosmo.dav.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
@@ -35,16 +34,18 @@ import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
+import org.osaf.cosmo.dav.caldav.CaldavConstants;
+import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Abstract calendar resource.
  */
-public abstract class DavCalendarResource extends DavFile {
+public abstract class DavCalendarResource extends DavContent {
     
     private static final Log log =
         LogFactory.getLog(DavCalendarResource.class);
@@ -74,35 +75,53 @@ public abstract class DavCalendarResource extends DavFile {
     @Override
     protected void populateItem(InputContext inputContext) throws DavException {
         super.populateItem(inputContext);
-        NoteItem content = (NoteItem) getItem();
+        
         Calendar calendar = null;
         
+        // get mime type
+        String contentType = inputContext.getContentType();
+        if(contentType!=null)
+            contentType = IOUtil.getMimeType(contentType);
+        else
+            contentType = IOUtil.MIME_RESOLVER.getMimeType(getItem().getName());
+        
         // CALDAV:valid-calendar-data
-        try {
-            // forces the event's content to be parsed
-            calendar = CalendarUtils.parseCalendar(content.getContentInputStream());
-            calendar.validate(true);
-        } catch (IOException e) {
-            log.error("Cannot read resource content", e);
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "Cannot read resource content: " + e.getMessage());
-        }catch (ValidationException e) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Invalid calendar object: " + e.getMessage());
-        } catch (ParserException e) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Invalid calendar object: " + e.getMessage());
-        } 
+        if (contentType == null)
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST,
+                                   "No media type specified for calendar data");
+        if (! contentType.equals(CaldavConstants.CT_ICALENDAR))
+            throw new DavException(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
+                                   "Content of type " + contentType + " not supported in calendar collection");
         
-        setCalendar(calendar);
-        
-        try {
-            // set the contentLength on ContentItem
-            content.setContentLength((long) calendar.toString().getBytes("UTF-8").length);
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        if (inputContext.hasStream()) {  
+            try {
+                // make sure content length matches what was read
+                long contentLength = inputContext.getContentLength();
+                long bufferedLength = ((DavInputContext) inputContext)
+                        .getBufferedContentLength();
+
+                if (contentLength != IOUtil.UNDEFINED_LENGTH
+                        && contentLength != bufferedLength)
+                    throw new IOException("Read only " + bufferedLength
+                            + " of " + contentLength + " bytes");
+                calendar = CalendarUtils.parseCalendar(inputContext.getInputStream());
+                calendar.validate(true);
+                
+            } catch (IOException e) {
+                log.error("Cannot read resource content", e);
+                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "Cannot read resource content: " + e.getMessage());
+            } catch (DataSizeException e) {
+                throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource content: " + e.getMessage());
+            } 
+            // CALDAV:valid-calendar-data
+            catch (ValidationException e) {
+                throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Invalid calendar object: " + e.getMessage());
+            } catch (ParserException e) {
+                throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Invalid calendar object: " + e.getMessage());
+            } 
         }
         
-        // no need to store content twice (already stored as event stamp)
-        content.clearContent();
+        setCalendar(calendar);
     }
     
     // our methods
@@ -179,29 +198,14 @@ public abstract class DavCalendarResource extends DavFile {
         if (log.isDebugEnabled())
             log.debug("spooling file " + getResourcePath());
 
-        ContentItem content = (ContentItem) getItem();
-
-        String contentType =
-            IOUtil.buildContentType(content.getContentType(),
-                                    content.getContentEncoding());
-        outputContext.setContentType(contentType);
-
-        if (content.getContentLanguage() != null)
-            outputContext.setContentLanguage(content.getContentLanguage());
-        
+        outputContext.setContentType(CaldavConstants.CT_ICALENDAR);
+  
         // convert Calendar object to String, then to bytes (UTF-8)
         byte[] calendarBytes = getCalendar().toString().getBytes("UTF-8");
         outputContext.setContentLength(calendarBytes.length);
         outputContext.setModificationTime(getModificationTime());
         outputContext.setETag(getETag());
         
-        // track mismatches
-        long storedLength = content.getContentLength() == null ? 0 : content
-                .getContentLength().longValue();
-        if(calendarBytes.length != storedLength)
-            log.warn("contentLength: " + content.getContentLength() + 
-                    " does not match content: " + calendarBytes.length);
-
         if (! outputContext.hasStream())
             return;
 

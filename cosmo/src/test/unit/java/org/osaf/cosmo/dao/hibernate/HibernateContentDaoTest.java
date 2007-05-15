@@ -37,6 +37,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DecimalAttribute;
 import org.osaf.cosmo.model.DuplicateItemNameException;
+import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
@@ -434,14 +435,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        ContentItem item = generateTestContent();
+        FileItem item = generateTestContent();
 
         ContentItem newItem = contentDao.createContent(root, item);
         Date newItemModifyDate = newItem.getModifiedDate();
         
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        FileItem queryItem = (FileItem) contentDao.findContentByUid(newItem.getUid());
 
         helper.verifyItem(newItem, queryItem);
         Assert.assertEquals(0, queryItem.getVersion().intValue());
@@ -454,7 +455,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         // Make sure modified date changes
         Thread.sleep(1000);
-        queryItem = contentDao.updateContent(queryItem);
+        queryItem = (FileItem) contentDao.updateContent(queryItem);
 
         clearSession();
 
@@ -763,7 +764,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem queryC = contentDao.findContentByPath("/testuser2/a/b/c");
         Assert.assertNotNull(queryC);
         helper.verifyInputStream(
-                new FileInputStream(baseDir + "/testdata1.txt"), queryC
+                new FileInputStream(baseDir + "/testdata1.txt"), ((FileItem) queryC)
                         .getContent());
         Assert.assertEquals("c", queryC.getName());
 
@@ -969,7 +970,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertNotNull(dcopy);
         Assert.assertEquals(d.getName(), dcopy.getName());
         Assert.assertNotSame(d.getUid(), dcopy.getUid());
-        helper.verifyBytes(d.getContent(), dcopy.getContent());
+        helper.verifyBytes(((FileItem) d).getContent(), ((FileItem) dcopy).getContent());
 
         clearSession();
 
@@ -1291,13 +1292,13 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         return helper.getUser(userDao, contentDao, username);
     }
 
-    private ContentItem generateTestContent() throws Exception {
+    private FileItem generateTestContent() throws Exception {
         return generateTestContent("test", "testuser");
     }
 
-    private ContentItem generateTestContent(String name, String owner)
+    private FileItem generateTestContent(String name, String owner)
             throws Exception {
-        ContentItem content = new ContentItem();
+        FileItem content = new FileItem();
         content.setName(name);
         content.setDisplayName(name);
         content.setContent(helper.getBytes(baseDir + "/testdata1.txt"));

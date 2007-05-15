@@ -21,6 +21,7 @@ import org.apache.jackrabbit.webdav.xml.Namespace;
 
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.FileItem;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
@@ -42,6 +43,6 @@ public class MaxResourceSize extends AbstractDavProperty
      * size.
      */
     public Object getValue() {
-        return new Long(ContentItem.MAX_CONTENT_SIZE);
+        return new Long(FileItem.MAX_CONTENT_SIZE);
     }
 }

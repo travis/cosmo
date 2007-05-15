@@ -332,10 +332,6 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         NoteItem content = new NoteItem();
         content.setName(name);
         content.setDisplayName(name);
-        content.setContent(helper.getBytes(baseDir + "/testdata1.txt"));
-        content.setContentLanguage("en");
-        content.setContentEncoding("UTF8");
-        content.setContentType("text/text");
         content.setOwner(getUser(userDao, owner));
         content.addAttribute(new StringAttribute(new QName("customattribute"),
                 "customattributevalue"));

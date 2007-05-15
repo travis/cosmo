@@ -49,6 +49,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -248,7 +249,7 @@ public class TestHelper {
         String serial = new Integer(++cseq).toString();
         String name = "test content " + serial;
 
-        ContentItem content = new ContentItem();
+        FileItem content = new FileItem();
 
         content.setName(name);
         content.setOwner(user);
@@ -269,13 +270,10 @@ public class TestHelper {
 
         note.setName(name);
         note.setOwner(user);
-        note.setContentEncoding("UTF-8");
-        note.setContentLanguage("en_US");
-        note.setContentType("text/plain");
+        
         note.setIcalUid(serial);
         note.setBody("This is a note. I love notes.");
-        note.setContent(note.getBody().getBytes());
-
+        
         return note;
     }
 

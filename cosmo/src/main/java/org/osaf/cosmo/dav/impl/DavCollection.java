@@ -157,7 +157,7 @@ public class DavCollection extends DavResourceBase
         if (member instanceof DavCollection) {
             saveSubcollection((DavCollection)member);
         } else {
-            saveFile((DavFile)member);
+            saveContent((DavContent)member);
         }
 
         members.add(member);
@@ -211,7 +211,7 @@ public class DavCollection extends DavResourceBase
         if (member instanceof DavCollection) {
             removeSubcollection((DavCollection)member);
         } else {
-            removeFile((DavFile)member);
+            removeContent((DavContent)member);
         }
 
         members.remove(member);
@@ -318,9 +318,9 @@ public class DavCollection extends DavResourceBase
     }
 
     /**
-     * Saves the given file resource to storage.
+     * Saves the given content resource to storage.
      */
-    protected void saveFile(DavFile member)
+    protected void saveContent(DavContent member)
         throws DavException {
         CollectionItem collection = (CollectionItem) getItem();
         ContentItem content = (ContentItem) member.getItem();
@@ -366,9 +366,9 @@ public class DavCollection extends DavResourceBase
     }
 
     /**
-     * Removes the given file resource from storage.
+     * Removes the given content resource from storage.
      */
-    protected void removeFile(DavFile member)
+    protected void removeContent(DavContent member)
         throws DavException {
         CollectionItem collection = (CollectionItem) getItem();
         ContentItem content = (ContentItem) member.getItem();

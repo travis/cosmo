@@ -16,7 +16,6 @@
 package org.osaf.cosmo.ui.account;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,15 +30,13 @@ import net.fortuna.ical4j.model.ValidationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.Permission;
 import org.osaf.cosmo.server.CollectionPath;
@@ -48,7 +45,6 @@ import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.ui.bean.CalendarBean;
 import org.osaf.cosmo.ui.bean.EventBean;
 import org.osaf.cosmo.util.PathUtil;
-
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
@@ -233,8 +229,8 @@ public class AccountBrowsingController extends MultiActionController
             spoolEvent(EventStamp.getStamp(item), request,
                        response);
             return null;
-        } else if (item instanceof ContentItem) {
-            spoolItem((ContentItem) item, request, response);
+        } else if (item instanceof FileItem) {
+            spoolItem((FileItem) item, request, response);
             return null;
         } else if (item.getStamp(CalendarCollectionStamp.class) != null) {
             spoolCalendar(CalendarCollectionStamp.getStamp(item), request,
@@ -350,7 +346,7 @@ public class AccountBrowsingController extends MultiActionController
         params.add(param);
     }
 
-    private void spoolItem(ContentItem item,
+    private void spoolItem(FileItem item,
                            HttpServletRequest request,
                            HttpServletResponse response)
         throws IOException {

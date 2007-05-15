@@ -36,7 +36,6 @@ import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.DuplicateEventUidException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
@@ -110,16 +109,10 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         EventStamp evs = (EventStamp) queryEvent.getStamp(EventStamp.class);
         
         Assert.assertEquals("test.ics", queryEvent.getName());
-        Assert.assertEquals("text/calendar", queryEvent.getContentType());
-        Assert.assertEquals("UTF8", queryEvent.getContentEncoding());
-        Assert.assertEquals("en", queryEvent.getContentLanguage());
         Assert.assertEquals(getCalendar(event).toString(), evs.getCalendar().toString());
 
         // test update event
         queryEvent.setName("test2.ics");
-        queryEvent.setContentEncoding("UTF16");
-        queryEvent.setContentLanguage("es");
-        queryEvent.setContentType("text/ical");
         evs.setCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/cal2.ics")));
         
         queryEvent = contentDao.updateContent(queryEvent);
@@ -132,9 +125,6 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         evs = (EventStamp) queryEvent.getStamp(EventStamp.class);
         
         Assert.assertEquals("test2.ics", queryEvent.getName());
-        Assert.assertEquals("text/ical", queryEvent.getContentType());
-        Assert.assertEquals("UTF16", queryEvent.getContentEncoding());
-        Assert.assertEquals("es", queryEvent.getContentLanguage());
         Assert.assertEquals(evs.getCalendar().toString(), cal.toString());
         
 
@@ -366,15 +356,11 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         event.setName(name);
         event.setDisplayName(name);
         event.setOwner(getUser(userDao, owner));
-        event.setContentEncoding("UTF8");
-        event.setContentType("text/calendar");
-        event.setContentLanguage("en");
-        
+       
         EventStamp evs = new EventStamp();
         event.addStamp(evs);
         evs.setCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
-        event.setContentLength((long) evs.getCalendar().toString().getBytes().length);
-        
+       
         return event;
     }
     

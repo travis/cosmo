@@ -21,14 +21,13 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.eim.DecimalField;
 import org.osaf.cosmo.eim.EimRecord;
-import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseApplicatorTestCase;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Test Case for {@link ModifiedByApplicator}.
@@ -130,7 +129,7 @@ public class ModifiedByApplicatorTest extends BaseApplicatorTestCase
                                      String lastModifiedBy,
                                      Integer action,
                                      Date modifiedDate) {
-        ContentItem contentItem = new ContentItem();
+        ContentItem contentItem = new NoteItem();
         contentItem.setUid(uuid);
         contentItem.setLastModifiedBy(lastModifiedBy);
         contentItem.setLastModification(action);

@@ -78,6 +78,7 @@
             <value>org.osaf.cosmo.model.DictionaryAttribute</value>
             <value>org.osaf.cosmo.model.EventExceptionStamp</value>
             <value>org.osaf.cosmo.model.EventStamp</value>
+            <value>org.osaf.cosmo.model.FileItem</value>
             <value>org.osaf.cosmo.model.HomeCollectionItem</value>
             <value>org.osaf.cosmo.model.IntegerAttribute</value>
             <value>org.osaf.cosmo.model.Item</value>

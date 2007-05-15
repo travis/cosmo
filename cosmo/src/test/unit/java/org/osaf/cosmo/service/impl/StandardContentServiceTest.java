@@ -85,7 +85,7 @@ public class StandardContentServiceTest extends TestCase {
     public void testFindItemByPath() throws Exception {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
-        ContentItem dummyContent = new ContentItem();
+        ContentItem dummyContent = new NoteItem();
         dummyContent.setName("foo");
         dummyContent.setOwner(user);
         dummyContent = contentDao.createContent(rootCollection, dummyContent);
@@ -113,7 +113,7 @@ public class StandardContentServiceTest extends TestCase {
     public void testRemoveItem() throws Exception {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
-        ContentItem dummyContent = new ContentItem();
+        ContentItem dummyContent = new NoteItem();
         dummyContent.setName("foo");
         dummyContent.setOwner(user);
         dummyContent = contentDao.createContent(rootCollection, dummyContent);
@@ -132,7 +132,7 @@ public class StandardContentServiceTest extends TestCase {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
 
-        ContentItem content = new ContentItem();
+        ContentItem content = new NoteItem();
         content.setName("foo");
         content.setOwner(user);
         content = contentDao.createContent(rootCollection, content);
@@ -148,7 +148,7 @@ public class StandardContentServiceTest extends TestCase {
     public void testRemoveContent() throws Exception {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
-        ContentItem dummyContent = new ContentItem();
+        ContentItem dummyContent = new NoteItem();
         dummyContent.setName("foo");
         dummyContent.setOwner(user);
         dummyContent = contentDao.createContent(rootCollection, dummyContent);

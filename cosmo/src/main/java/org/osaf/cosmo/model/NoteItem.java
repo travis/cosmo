@@ -31,14 +31,12 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Where;
 
 /**
  * Extends {@link ContentItem} to represent a Note item.
  */
 @Entity
 @DiscriminatorValue("note")
-@Where(clause = "isactive=1")
 public class NoteItem extends ContentItem {
 
     public static final QName ATTR_NOTE_BODY = new QName(

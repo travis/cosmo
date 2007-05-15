@@ -29,8 +29,8 @@ import org.osaf.cosmo.dav.CosmoDavMethods;
 import org.osaf.cosmo.dav.ExtendedDavResource;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
@@ -177,7 +177,7 @@ public class StandardDavResourceFactory implements DavResourceFactory {
                 return null;
         } 
             
-        return new DavFile((ContentItem) item, locator, this, session);
+        return new DavFile((FileItem) item, locator, this, session);
     }
 
     /** */

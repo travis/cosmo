@@ -40,7 +40,7 @@
   - <span class="md">${Path}</span>
 </div>
 
-<c:if test="${Item.class.name == 'org.osaf.cosmo.model.ContentItem' || eventstamp!=null}">
+<c:if test="${Item.class.name == 'org.osaf.cosmo.model.FileItem' || eventstamp!=null}">
 <div style="margin-top:12px;">
 <c:choose>
 <c:when test="${eventstamp != null}">

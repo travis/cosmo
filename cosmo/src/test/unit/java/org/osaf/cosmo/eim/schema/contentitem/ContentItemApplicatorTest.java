@@ -17,7 +17,6 @@ package org.osaf.cosmo.eim.schema.contentitem;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.Date;
 
 import junit.framework.Assert;
 
@@ -42,7 +41,7 @@ public class ContentItemApplicatorTest extends BaseApplicatorTestCase
         LogFactory.getLog(ContentItemApplicatorTest.class);
 
     public void testApplyField() throws Exception {
-        ContentItem contentItem = new ContentItem();
+        ContentItem contentItem = new NoteItem();
 
         EimRecord record = makeTestRecord();
 

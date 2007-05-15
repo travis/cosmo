@@ -59,7 +59,7 @@ public class ContentItemGeneratorTest extends BaseGeneratorTestCase
         ts.setRank(triageStatusRank);
         ts.setAutoTriage(autoTriage);
 
-        ContentItem contentItem = new ContentItem();
+        ContentItem contentItem = new NoteItem();
         contentItem.setUid(uid);
         contentItem.setName(name);
         contentItem.setDisplayName(displayName);
@@ -109,7 +109,7 @@ public class ContentItemGeneratorTest extends BaseGeneratorTestCase
     public void testInactiveNotDeleted() throws Exception {
         // inactive items are not deleted via item records but via
         // recordset
-        ContentItem contentItem = new ContentItem();
+        ContentItem contentItem = new NoteItem();
         contentItem.setIsActive(false);
 
         ContentItemGenerator generator = new ContentItemGenerator(contentItem);

@@ -18,7 +18,7 @@ package org.osaf.cosmo.dav;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.mock.MockContentDao;
-import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -46,7 +46,7 @@ public class DavPutTest extends BaseDavServletTestCase {
                      MockHttpServletResponse.SC_CREATED,
                      response.getStatus());
         
-        ContentItem content = (ContentItem)
+        FileItem content = (FileItem)
             testHelper.getContentService().
             findItemByPath(toCanonicalPath("testContent"));
      

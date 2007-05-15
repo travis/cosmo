@@ -114,10 +114,6 @@ public class HibernateContentDaoModificationsTest extends AbstractHibernateDaoTe
         NoteItem content = new NoteItem();
         content.setName(name);
         content.setDisplayName(name);
-        content.setContent(helper.getBytes(baseDir + "/testdata1.txt"));
-        content.setContentLanguage("en");
-        content.setContentEncoding("UTF8");
-        content.setContentType("text/text");
         content.setOwner(getUser(userDao, owner));
         content.setIcalUid("icaluid");
         content.setBody("this is a body");

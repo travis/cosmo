@@ -21,13 +21,11 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.util.DateUtil;
 
 /**
  * Aggregates information about a user's usage of storage space.
@@ -84,8 +82,8 @@ public class SpaceUsageReport {
 
         /** */
         public Long getSize() {
-            if (item instanceof ContentItem)
-                return ((ContentItem)item).getContentLength();
+            if (item instanceof FileItem)
+                return ((FileItem)item).getContentLength();
             return new Long(0);
         }
 

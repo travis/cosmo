@@ -125,6 +125,17 @@ public class StandardRequestHandlerTest extends TestCase {
                    ((MockProvider)helper.getProvider()).isUpdated(collection));
     }
 
+    public void testProcessCollectionUpdateWrongContentType() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createUpdateRequestContext(collection);
+        helper.setContentType(req, "multipart/form-data");
+
+        ResponseContext res = handler.process(helper.getProvider(), req);
+        assertNotNull("Null response context", res);
+        assertFalse("Collection incorrectly updated",
+                   ((MockProvider)helper.getProvider()).isUpdated(collection));
+    }
+
     protected void setUp() throws Exception {
         helper = new AtomHelper();
         helper.setUp();

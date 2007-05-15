@@ -59,7 +59,8 @@ public class BasicFeedGenerator extends BaseFeedGenerator {
 
         ContentBean summary = getFactory().getContentFactory().
             createContent(FORMAT_TEXT, item);
-        entry.setSummary(summary.getValue());
+        if (summary != null)
+            entry.setSummary(summary.getValue());
     }
 
     /**

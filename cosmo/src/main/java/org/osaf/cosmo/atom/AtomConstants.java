@@ -31,6 +31,9 @@ public interface AtomConstants {
     public static final String MEDIA_TYPE_XML = "text/xml";
     /** */
     public static final String MEDIA_TYPE_TEXT = "text/plain";
+    /** */
+    public static final String MEDIA_TYPE_URLENCODED =
+        "application/x-www-form-urlencoded";
 
     // link relation constants
 

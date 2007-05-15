@@ -34,6 +34,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.provider.BaseItemTarget;
 import org.osaf.cosmo.atom.provider.ExtendedProvider;
 import org.osaf.cosmo.http.IfMatch;
@@ -43,14 +44,15 @@ import org.osaf.cosmo.http.IfNoneMatch;
  * Extends {@link DefaultRequestHandler} to provide Cosmo-specific
  * behaviors.
  */
-public class StandardRequestHandler extends DefaultRequestHandler {
+public class StandardRequestHandler extends DefaultRequestHandler
+    implements AtomConstants {
     private static final Log log =
         LogFactory.getLog(StandardRequestHandler.class);
     private static final MimeType MIME_TYPE_FORM;
 
     static {
         try {
-            MIME_TYPE_FORM = new MimeType("application/x-www-form-urlencoded");
+            MIME_TYPE_FORM = new MimeType(MEDIA_TYPE_URLENCODED);
         } catch (MimeTypeParseException e) {
             throw new RuntimeException("Form mime type specified incorrectly", e);
         }

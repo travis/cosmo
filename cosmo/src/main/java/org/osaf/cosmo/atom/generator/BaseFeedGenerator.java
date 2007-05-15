@@ -391,12 +391,25 @@ public abstract class BaseFeedGenerator
 
     /**
      * Creates a <code>Link</code> for the edit IRI of the given
+     * collection.
+     *
+     * @param item the item to link
+     * @throws GeneratorException
+     */
+    protected Link newEditLink(CollectionItem collection)
+        throws GeneratorException {
+        return newLink(Link.REL_EDIT, MEDIA_TYPE_URLENCODED,
+                       selfIri(collection, false));
+    }
+
+    /**
+     * Creates a <code>Link</code> for the edit IRI of the given
      * item.
      *
      * @param item the item to link
      * @throws GeneratorException
      */
-    protected Link newEditLink(Item item)
+    protected Link newEditLink(NoteItem item)
         throws GeneratorException {
         return newLink(Link.REL_EDIT, MEDIA_TYPE_ATOM, selfIri(item, false));
     }

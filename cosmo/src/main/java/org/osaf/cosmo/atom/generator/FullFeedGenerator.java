@@ -18,6 +18,7 @@ package org.osaf.cosmo.atom.generator;
 import javax.activation.MimeTypeParseException;
 
 import org.apache.abdera.model.Entry;
+import org.apache.abdera.model.Feed;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,6 +52,21 @@ public class FullFeedGenerator extends BaseFeedGenerator {
         } else {
             this.format = FORMAT_EIM_JSON;
         }
+    }
+
+    /**
+     * Extends the superclass method to add an edit link.
+     *
+     * @param collection the collection on which the feed is based
+     * @throws GeneratorException
+     */
+    protected Feed createFeed(CollectionItem collection)
+        throws GeneratorException {
+        Feed feed = super.createFeed(collection);
+
+        feed.addLink(newEditLink(collection));
+
+        return feed;
     }
 
     /**

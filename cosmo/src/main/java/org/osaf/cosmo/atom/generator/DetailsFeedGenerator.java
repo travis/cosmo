@@ -62,6 +62,7 @@ public class DetailsFeedGenerator extends BaseFeedGenerator {
         throws GeneratorException {
         Feed feed = super.createFeed(collection);
 
+        feed.addLink(newEditLink(collection));
         feed.addLink(newMorseCodeLink(collection));
         feed.addLink(newDavLink(collection));
         feed.addLink(newWebcalLink(collection));

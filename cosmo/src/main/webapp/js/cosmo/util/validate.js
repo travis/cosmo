@@ -89,8 +89,8 @@ cosmo.util.validate = new function () {
      * @return String, error message (empty if no err).
      */
     this.minLength = function (s, len) {
-        err = '';
-        val = typeof s == 'object' ? s.value : s;
+        var err = '';
+        var val = typeof s == 'object' ? s.value : s;
         // Only bother checking length if a value is present
         // Requiring a value should be done with 'required' method
         if (val && (val.length < len)) {
@@ -103,8 +103,8 @@ cosmo.util.validate = new function () {
      * @return String, error message (empty if no err).
      */
     this.required = function (s) {
-        err = '';
-        val = (s != null && typeof s == 'object') ? s.value : s;
+        var err = '';
+        var val = (s != null && typeof s == 'object') ? s.value : s;
         if (!val) {
             err = _('Signup.Error.RequiredField');
         }
@@ -115,10 +115,8 @@ cosmo.util.validate = new function () {
      * @return String, error message (empty if no err).
      */
     this.eMail = function (s) {
-        // Just do really basic e-mail addr validation
-        pat = /^.+@.+\..{2,6}$/;
-        err = '';
-        val = typeof s == 'object' ? s.value : s;
+        var err = '';
+        var val = typeof s == 'object' ? s.value : s;
         if (!dojo.validate.isEmailAddress(val, {allowLocal:true})) {
             err = _('Signup.Error.ValidEMail');
         }
@@ -129,9 +127,9 @@ cosmo.util.validate = new function () {
      * @return String, error message (empty if no err).
      */
     this.confirmPass = function (s, sCompare) {
-        err = '';
-        val = typeof s == 'object' ? s.value : s;
-        val2 = typeof sCompare == 'object' ? sCompare.value : s;
+        var err = '';
+        var val = typeof s == 'object' ? s.value : s;
+        var val2 = typeof sCompare == 'object' ? sCompare.value : s;
         if (val != val2) {
             err = _('Signup.Error.MatchPassword');
         }

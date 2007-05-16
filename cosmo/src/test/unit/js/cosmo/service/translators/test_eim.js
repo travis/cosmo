@@ -127,9 +127,48 @@ cosmotest.service.translators.test_eim = {
         
         
     },
+    
+    test_itemToRecordSet: function(){
+        var note = new cosmo.model.Note({
+            uid: "12345",
+            displayName: "test calendar",
+            triageStatus: 200,
+            autoTriage: true,
+            rank: -12345.67
+        });
+        var recordSet = cosmo.service.translators.eim.noteToRecordSet(note);
+        jum.assertEquals("12345", recordSet.uuid);
+        jum.assertEquals("test calendar", recordSet.records.item.fields.title[1]);
+        jum.assertEquals("200 -12345.67 1", recordSet.records.item.fields.triage[1]);
+        
+        note.getStamp("event", true, {
+            startDate: new cosmo.datetime.Date(2007, 5, 7, 12, 30, 45),
+            duration: new cosmo.model.Duration({
+                hour: 2,
+                minute: 30,
+                second: 45,
+            }),
+            anyTime: true,
+            allDay: false,
+            location: "home",
+            status: "Confirmed",
+            rrule: new cosmo.model.RecurrenceRule({
+                frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY,
+                endDate: new cosmo.datetime.Date(2007, 5, 14)
+            })
+        });
+        
+        var recordSet = cosmo.service.translators.eim.noteToRecordSet(note);
+        jum.assertEquals("home", recordSet.records.event.fields.location[1]);
+        jum.assertEquals("Confirmed", recordSet.records.event.fields.status[1]);
+        jum.assertEquals("PT2H30M45S", recordSet.records.event.fields.duration[1]);
+        jum.assertEquals(";VALUE=DATE;X-OSAF-ANYTIME=TRUE:20070607", 
+                        recordSet.records.event.fields.dtstart[1]);
+        
+    },
   
     generateAtom: function (/*Object*/ content){
-        var uuid = content.uuid;
+       var uuid = content.uuid;
         return cosmotest.service.translators.test_eim.toXMLDocument('<?xml version=\'1.0\' encoding=\'UTF-8\'?>' +
         '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:base="http://localhost:8080/cosmo/atom/">' +
         '<id>urn:uuid:56599b95-6676-4823-8c88-1eec17058f48</id>' +

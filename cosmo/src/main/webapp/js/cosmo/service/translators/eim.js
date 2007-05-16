@@ -235,9 +235,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          return cosmo.datetime.fromIso8601(rid.split(":")[1]);
     },
 
-    objectToAtomEntry: function(object){
+    objectToAtomEntry: function (object){
 
-         var jsonObject = this.objectToRecordSet(object);
+         var jsonObject = this.noteToRecordSet(object);
 
          return '<entry xmlns="http://www.w3.org/2005/Atom">' +
          '<title>' + object.data.title + '</title>' +
@@ -248,39 +248,47 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '</entry>'
     },
 
-    objectToRecordSet: function(obj){
+    noteToRecordSet: function (note){
+        var records = {
+            item: this.noteToItemRecord(note),
+            note: this.noteToNoteRecord(note),
+            modby: this.noteToModbyRecord(note)
+        };
 
-        var object = obj.data;
-        with (cosmo.service.eim.constants){
-            return {
-                uuid: object.id,
-                records: {
-                    item: this.objectToItemRecord(object),
-                    note: this.objectToNoteRecord(object),
-                    event: this.objectToEventRecord(object),
-                    modby: this.objectToModbyRecord(object)
-                }
-            }
+        if (note.getEventStamp()) records.event = this.noteToEventRecord(note);
+        
+        return {
+            uuid: note.getUid(),
+            records: records
         }
+
     },
 
     noteToItemRecord: function(note){
-
+        var title = note.getDisplayName();
+        var triageRank = note.getRank();
+        var triageStatus = note.getTriageStatus();
+        var autoTriage = note.getAutoTriage();
+        var fields = {};
         with (cosmo.service.eim.constants){
+        
+            if (title) fields.title = [type.TEXT, title];
+            if (triageRank || triageRank || autoTriage)
+                fields.triage =  [type.TEXT, [triageStatus, triageRank, autoTriage? 1 : 0].join(" ")];
+            
             return {
                 prefix: prefix.ITEM,
                 ns: ns.ITEM,
                 keys: {
                     uuid: [type.TEXT, note.getUid()]
                 },
-                fields: {
-                    title: [type.TEXT, note.getDisplayName() || ""]
-                }
+                fields: fields
             }
         }
     },
 
     noteToNoteRecord: function(note){
+        var body = note.getBody();
 
         with (cosmo.service.eim.constants){
             return {
@@ -290,8 +298,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                     uuid: [type.TEXT, note.getUid()]
                 },
                 fields: {
-
-                    body: [type.CLOB, note.getBody() || ""]
+                    body: body? [type.CLOB, body] : undefined
                 }
             }
         }
@@ -300,32 +307,23 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     noteToEventRecord: function(note){
 
         var stamp = note.getEventStamp();
+        var allDay = stamp.getAllDay();
+        var anyTime = stamp.getAnyTime();
+        var start = stamp.getStartDate();
+        var rrule = stamp.getRrule();
+        var stat = stamp.getStatus();
+        var loc = stamp.getLocation();
+        var duration = stamp.getDuration();
 
         with (cosmo.service.eim.constants){
-            var fields = {
-               dtstart: [type.TEXT, ";VALUE=" +
-                        (object.allDay || object.anyTime? "DATE" : "DATE-TIME") +
-                        (object.anyTime? ";X-OSAF-ANYTIME=TRUE" : "") +
-                        ":" +
-                        (object.allDay || stamp.getAnytime()?
-                         object.start.strftime("%Y%m%d"):
-                         object.start.strftime("%Y%m%dT%H%M%S"))],
-
-                anytime: [type.INTEGER, stamp.getAnytime()],
-                
-                rrule: [type.TEXT, stamp.getRrule()? stamp.getRrule().toString() : null],
-                status: [type.TEXT, stamp.getStatus() || null],
-                location: [type.TEXT, stamp.getLocation() || null]
-
-            };
-            if (!(object.allDay || object.anyTime)){
-                fields.duration =
-                    [type.TEXT,
-                     cosmo.datetime.getIso8601Duration(
-                         object.start, object.end)
-                    ]
-            }
-
+            var fields = {};
+            if (start) fields.dtstart = 
+                [type.TEXT, this.dateToEimDtstart(start, allDay, anyTime)];
+            if (anyTime) fields.anytime = [type.INTEGER, anyTime];
+            if (rrule) fields.rrule = [type.TEXT, rrule.toString()];
+            if (stat) fields.status = [type.TEXT, stat];
+            if (loc) fields.location = [type.TEXT, loc];
+            if (duration) fields.duration = [type.TEXT, duration.toIso8601()];
 
             return {
                 prefix: prefix.EVENT,
@@ -334,13 +332,24 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                     uuid: [type.TEXT, note.getUid()]
                 },
                 fields: fields
-
             }
         }
 
     },
+    
+    dateToEimDtstart: function (start, allDay, anyTime){
+        return [";VALUE=",
+                ((allDay || anyTime)? "DATE" : "DATE-TIME"),
+                (anyTime? ";X-OSAF-ANYTIME=TRUE" : ""),
+                ":",
+                ((allDay || anyTime)?
+                    start.strftime("%Y%m%d"):
+                    start.strftime("%Y%m%dT%H%M%S"))
+                ].join("");
+        
+    },
 
-    noteToTaskRecord: function(note){
+    noteToTaskRecord: function (note){
 
         var stamp = note.getTaskStamp();
 

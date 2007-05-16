@@ -96,7 +96,10 @@ dojo.declare("cosmo.service.transport.Rest", null,
     					err.id = obj.id;
     					deferredRequestHandler.errback(err, xhr);
     				} else {
-    				    obj = xhr.responseXML? xhr.responseXML : obj;
+    				    obj = xhr.responseXML || obj;
+    				    if (dojo.render.html.ie) {
+    				        obj = dojo.dom.createDocumentFromText(xhr.responseText);
+    				    }
     					deferredRequestHandler.callback(obj, xhr);
     				}
     			}

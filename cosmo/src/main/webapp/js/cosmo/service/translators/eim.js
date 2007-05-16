@@ -36,8 +36,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         for (var i = 0; i < workspaces.length; i++){
             var workspace = workspaces[i];
             
-            var title = workspace.getElementsByTagName("atom:title")[0];
-            
+            var title = cosmo.util.html.getElementsByTagName(workspace, "atom", "title")[0];
             var collectionElements = workspace.getElementsByTagName("collection");
             
             for (var j = 0; j < collectionElements.length; j++){
@@ -52,7 +51,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             {
                 //TODO: replace this with the correct uid grabbing code
                 uid: collectionXml.getAttribute("href").split("/")[1],
-                displayName: collectionXml.getElementsByTagName("title")[0].firstChild.nodeValue,
+                displayName: cosmo.util.html.getElementsByTagName(collectionXml, "atom", "title")
+                    [0].firstChild.nodeValue,
                 ticket: "",
                 writable: true
             }

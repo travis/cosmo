@@ -376,7 +376,7 @@ cosmo.view.cal.canvas = new function () {
                 currDayImg = '';
             }
             // Set background image or set to flat white for day name
-            $('dayListDiv' + currDateDay).style.backgroundImage = currDayImg;
+            $('dayListDiv' + currDateDay).style.backgroundImage = 'url(' + currDayImg + ')';
             // Set gray or white background for all-day area
             $('allDayListDiv' + currDateDay).className = 'allDayListDayDiv' + currDayClass;
             // Reset the CSS class on all the rows in the 'today' col

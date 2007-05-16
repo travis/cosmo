@@ -224,5 +224,28 @@ cosmo.util.html.handleTextInputFocus = function (e) {
     else {
         t.select();
     }
-}
+};
+
+/*
+ * Wrapper to hide browser differences in potentially namespaced elements.
+ * 
+ * Does not really support namespaces in a meaningful way due to the lack of 
+ * Element.lookupNamespaceURI method on Safari.
+ */
+cosmo.util.html.getElementsByTagName = function(parent, namespace, tagName, kwArgs){
+    if (!tagName) {
+        tagName = namespace;
+        namespace = null;
+    }
+    
+    if (dojo.render.html.ie){
+        tagName = namespace? namespace + ":" + tagName : tagName; 
+        return parent.getElementsByTagName(tagName);
+    }
+    else {
+        namespace = "*";
+        return parent.getElementsByTagNameNS(namespace, tagName);
+    }
+    
+};
 

@@ -52,7 +52,8 @@ For use with the JsUnit from www.jsunit.net
         "cosmotest.datetime.test_date",
         "cosmotest.datetime.test_timezone",
         "cosmotest.datetime.test_serialize",
-        "cosmotest.service.translators.test_eim"
+        "cosmotest.service.translators.test_eim",
+        "cosmotest.util.test_html"
         ]
      );
   </script>
@@ -82,7 +83,7 @@ For use with the JsUnit from www.jsunit.net
      test_menu.appendChild(row);
    }
    function checkBoxesFromLocation(){
-          var testNames = location.search.slice(1).split("&");
+       var testNames = location.search.slice(1).split("&");
        var tests = {};
        
        for (var i = 0; i < testNames.length; i++){

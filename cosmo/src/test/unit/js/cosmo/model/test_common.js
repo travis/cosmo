@@ -22,28 +22,33 @@ cosmotest.model.test_common = {
         var duration = new cosmo.model.Duration({day:1, month:2});
         jum.assertEquals(1, duration.getDay());
         jum.assertEquals(2, duration.getMonth());
-        
+        jum.assertEquals("P2M1D", duration.toIso8601());
+
         duration = new cosmo.model.Duration("PT4H5M6S");
         jum.assertEquals(4, duration.getHour());
         jum.assertEquals(5, duration.getMinute());
         jum.assertEquals(6, duration.getSecond());
+        jum.assertEquals("PT4H5M6S", duration.toIso8601());
         
         var date1 = new cosmo.datetime.Date(2000,0,1);
         var date2 = new cosmo.datetime.Date(2000,0,2);
         duration = new cosmo.model.Duration(date1, date2);
         jum.assertEquals(1, duration.getDay());
+        jum.assertEquals("P1D", duration.toIso8601());
 
         date1 = new cosmo.datetime.Date(2000,0,1,12);
         date2 = new cosmo.datetime.Date(2000,0,2,14);
         duration = new cosmo.model.Duration(date1, date2);
         jum.assertEquals(1, duration.getDay());
         jum.assertEquals(2, duration.getHour());
+        jum.assertEquals("P1DT2H", duration.toIso8601());
 
         date1 = new cosmo.datetime.Date(2000,0,1,12);
         date2 = new cosmo.datetime.Date(2000,0,2,11);
         duration = new cosmo.model.Duration(date1, date2);
         jum.assertEquals(0, duration.getDay());
         jum.assertEquals(23, duration.getHour());
+        jum.assertEquals("PT23H", duration.toIso8601());
     }
 }
 

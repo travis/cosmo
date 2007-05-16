@@ -98,7 +98,12 @@ dojo.declare("cosmo.service.transport.Rest", null,
     				} else {
     				    obj = xhr.responseXML || obj;
     				    if (dojo.render.html.ie) {
-    				        obj = dojo.dom.createDocumentFromText(xhr.responseText);
+    				        obj = new ActiveXObject("Microsoft.XMLDOM");
+                            obj.async = false;     
+                            if (!obj.loadXML(xhr.responseText)){
+    		                   alert(obj.parseError.reason)
+                     		}
+                            
     				    }
     					deferredRequestHandler.callback(obj, xhr);
     				}

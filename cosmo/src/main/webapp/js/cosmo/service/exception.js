@@ -23,3 +23,7 @@ function(){}, {});
 dojo.declare("cosmo.service.exception.ConcurrencyException", cosmo.service.exception.ServiceException,
     // summary: Thrown when another client is trying to update the item on the server
 function(){}, {});
+
+dojo.declare("cosmo.service.exception.CantSaveException", cosmo.service.exception.ServiceException,
+    // summary: Thrown when we encounter problems with saving an entity.
+function(){}, {});

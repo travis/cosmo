@@ -30,6 +30,20 @@ dojo.require("cosmo.datetime.serialize");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
     
+    initializer: function (){
+        with (this.rruleConstants) {
+        with (cosmo.model.RRULE_FREQUENCIES){
+            this.rruleFrequenciesToRruleConstants =
+            {
+                FREQUENCY_DAILY: DAILY,
+                FREQUENCY_WEEKLY: WEEKLY,
+                FREQUENCY_BIWEEKLY: WEEKLY + ";INTERVAL=2",
+                FREQUENCY_MONTHLY: MONTHLY,
+                FREQUENCY_YEARLY: YEARLY
+            }     
+        }}
+    },
+          
     translateGetCollections: function (atomXml){
         var workspaces = atomXml.getElementsByTagName("workspace");
         var collections = [];
@@ -324,7 +338,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (stat) fields.status = [type.TEXT, stat];
             if (loc) fields.location = [type.TEXT, loc];
             if (duration) fields.duration = [type.TEXT, duration.toIso8601()];
-
+            if (rrule) fields.rrule = [type.TEXT, this.rruleToICal(rrule)];
+            
             return {
                 prefix: prefix.EVENT,
                 ns: ns.EVENT,
@@ -454,12 +469,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     rruleToICal: function (rrule){
-        if (rrule.isUnsupported()){
-            return rrulePropsToICal(rrule.getUnsupportedRule());
+        if (rrule.isSupported()){
+            return [
+                ";FREQ=",
+                this.rruleFrequenciesToRruleConstants[rrule.getFrequency()],
+                ";UNTIL",
+                dojo.date.strftime(rrule.getEndDate().getUTCDateProxy(), "%Y%m%dT%H%M%SZ")
+            ].join("");
         } 
         else {
-            //TODO
-            dojo.unimplemented("rrule to ical not implemented for supported rules");
+            return rrulePropsToICal(rrule.getUnsupportedRule());
         }
     },
 
@@ -520,7 +539,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
       WEEKLY:  "WEEKLY",
       YEARLY: "YEARLY"
     },
-
+    
     isRRuleUnsupported: function (recur){
 
         with (this.rruleConstants){

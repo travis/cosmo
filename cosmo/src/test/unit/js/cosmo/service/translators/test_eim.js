@@ -164,6 +164,7 @@ cosmotest.service.translators.test_eim = {
         jum.assertEquals("PT2H30M45S", recordSet.records.event.fields.duration[1]);
         jum.assertEquals(";VALUE=DATE;X-OSAF-ANYTIME=TRUE:20070607", 
                         recordSet.records.event.fields.dtstart[1]);
+        jum.assertEquals(";FREQ=DAILY;UNTIL=20070614T000000Z");
         
     },
   

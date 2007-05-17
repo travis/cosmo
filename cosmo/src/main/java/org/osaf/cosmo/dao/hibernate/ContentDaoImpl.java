@@ -16,6 +16,7 @@
 package org.osaf.cosmo.dao.hibernate;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +35,8 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.Stamp;
+import org.osaf.cosmo.model.StampHandler;
 import org.osaf.cosmo.model.User;
 
 /**
@@ -43,6 +46,7 @@ import org.osaf.cosmo.model.User;
 public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
 
     private static final Log log = LogFactory.getLog(ContentDaoImpl.class);
+    private HashMap<String, StampHandler> stampHandlers = new HashMap<String, StampHandler>();
 
     /*
      * (non-Javadoc)
@@ -183,6 +187,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             if(parent.removeTombstone(content)==true)
                 getSession().update(parent);
             
+            applyStampHandlerCreate(content);
+            
             getSession().save(content);
             getSession().flush();
             return content;
@@ -210,6 +216,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             checkForDuplicateUid(content);
             
             setBaseItemProps(content);
+            
+            applyStampHandlerCreate(content);
             
             getSession().save(content);
             getSession().flush();
@@ -261,6 +269,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 if(parent.removeTombstone(content)==true)
                     getSession().update(parent);
             }
+            
+            applyStampHandlerCreate(content);
             
             getSession().save(content);
             getSession().flush();
@@ -410,6 +420,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             content.setModifiedDate(new Date());
             
+            applyStampHandlerUpdate(content);
+            
             getSession().flush();
             
             return content;
@@ -552,6 +564,16 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             super.removeItem(item);
     }
     
+       
+    public HashMap<String, StampHandler> getStampHandlers() {
+        return stampHandlers;
+    }
+
+    public void setStampHandlers(HashMap<String, StampHandler> stampHandlers) {
+        this.stampHandlers = stampHandlers;
+    }
+
+
     /**
      * Initializes the DAO, sanity checking required properties and defaulting
      * optional properties.
@@ -624,4 +646,33 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             getSession().delete(note);
         
     }
+    
+    private void applyStampHandlerCreate(Item item) {
+        
+        if(stampHandlers.size()==0)
+            return;
+        
+        for(Stamp stamp : item.getStamps()) {
+            StampHandler sh = stampHandlers.get(stamp.getClass().getName());
+            if(sh != null) {
+                sh.onCreateItem(stamp);
+                continue;
+            }
+        }
+    }
+    
+    private void applyStampHandlerUpdate(Item item) {
+        
+        if(stampHandlers.size()==0)
+            return;
+        
+        for(Stamp stamp : item.getStamps()) {
+            StampHandler sh = stampHandlers.get(stamp.getClass().getName());
+            if(sh != null) {
+                sh.onUpdateItem(stamp);
+                continue;
+            }
+        }
+    }
+    
 }

@@ -369,9 +369,6 @@ public class StandardContentService implements ContentService {
             // Create the new collection
             collection = contentDao.createCollection(parent, collection);
             
-            // Keep track of event items (NoteItem with EventStamp) that need
-            // to be indexed
-            HashMap<String, NoteItem> events = new HashMap<String, NoteItem>();
             Set<ContentItem> childrenToUpdate = new LinkedHashSet<ContentItem>();
             
             // Keep track of NoteItem modifications that need to be processed
@@ -390,14 +387,7 @@ public class StandardContentService implements ContentService {
                     if(note.getModifies()!=null)
                         modifications.add(note);
                     else
-                        childrenToUpdate.add(note);
-                    
-                    // keep track of events so we can index
-                    if(note.getModifies()!=null && (EventStamp.getStamp(note.getModifies())!=null))
-                        events.put(note.getModifies().getUid(), note.getModifies());
-                    else if(EventStamp.getStamp(note)!=null)
-                        events.put(note.getUid(), note);
-                      
+                        childrenToUpdate.add(note); 
                 }
             }
             
@@ -407,9 +397,6 @@ public class StandardContentService implements ContentService {
             
             // update all children and collection
             collection = contentDao.updateCollection(collection, childrenToUpdate);
-            
-            // index all calendar events
-            calendarDao.indexEvents(events.values());
             
             // update timestamps on all collections involved
             for(CollectionItem lockedCollection : locks) {
@@ -479,9 +466,6 @@ public class StandardContentService implements ContentService {
         Set<CollectionItem> locks = acquireLocks(collection, updates);
         
         try {
-            // Keep track of event items (NoteItem with EventStamp) that need
-            // to be indexed
-            HashMap<String, NoteItem> events = new HashMap<String, NoteItem>();
             Set<ContentItem> childrenToUpdate = new LinkedHashSet<ContentItem>();
             
             // Keep track of NoteItem modifications that need to be processed
@@ -501,19 +485,6 @@ public class StandardContentService implements ContentService {
                         modifications.add(note);
                     else
                         childrenToUpdate.add(note);
-                    
-                    // keep track of events so we can index
-                    if(note.getModifies()!=null && note.getModifies().getIsActive()==true) {
-                        EventStamp masterEvent = EventStamp.getStamp(note.getModifies());
-                        EventExceptionStamp exEvent = EventExceptionStamp.getStamp(note);
-                        // only index event if the eventstamp is dirty
-                        if(masterEvent!=null && exEvent !=null && exEvent.isDirty())
-                            events.put(note.getModifies().getUid(), note.getModifies());
-                    } else if(note.getIsActive()==true && EventStamp.getStamp(note)!=null) {
-                        // only index event if the eventstamp is dirty
-                        if(EventStamp.getStamp(note).isDirty())
-                            events.put(note.getUid(), note);
-                    }
                 }
             }
             
@@ -526,8 +497,6 @@ public class StandardContentService implements ContentService {
             }
             
             collection = contentDao.updateCollection(collection, childrenToUpdate);
-            
-            calendarDao.indexEvents(events.values());
             
             // update collections involved
             for(CollectionItem lockedCollection : locks) {
@@ -962,14 +931,11 @@ public class StandardContentService implements ContentService {
 
         // Master calendar includes everything in the original calendar minus
         // any exception events (VEVENT with RECURRENCEID)
-        eventStamp.setMasterCalendar(masterCalendar);
+        eventStamp.setEventCalendar(masterCalendar);
         eventStamp.compactTimezones();
         
         // synchronize exceptions with master NoteItem modifications
         syncExceptions(exceptions, masterNote);
-                
-        // index entire calendar
-        calendarDao.indexEvent(eventStamp);
         
         // update master note
         contentDao.updateContent(masterNote);

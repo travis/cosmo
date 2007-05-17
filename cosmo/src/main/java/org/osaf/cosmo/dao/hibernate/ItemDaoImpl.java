@@ -32,6 +32,7 @@ import org.hibernate.UnresolvableObjectException;
 import org.hibernate.validator.InvalidStateException;
 import org.hibernate.validator.InvalidValue;
 import org.osaf.cosmo.dao.ItemDao;
+import org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
@@ -42,6 +43,7 @@ import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.filter.ItemFilter;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -55,6 +57,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     private IdentifierGenerator idGenerator = null;
     private IdentifierGenerator ticketKeyGenerator = null;
     private ItemPathTranslator itemPathTranslator = null;
+    private ItemFilterProcessor itemFilterProcessor = null;
 
     /*
      * (non-Javadoc)
@@ -449,6 +452,19 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
          }
     }
     
+    /**
+     * Find a set of items using an ItemFilter.
+     * @param filter criteria to filter items by
+     * @return set of items matching ItemFilter
+     */
+    public Set<Item> findItems(ItemFilter filter) {
+        try {
+            return itemFilterProcessor.processFilter(getSession(), filter);
+        } catch (HibernateException e) {
+            throw convertHibernateAccessException(e);
+        }
+    }
+
 
     /**
      * Set the unique ID generator for new items
@@ -489,6 +505,16 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     public void setItemPathTranslator(ItemPathTranslator itemPathTranslator) {
         this.itemPathTranslator = itemPathTranslator;
     }
+    
+    
+    public ItemFilterProcessor getItemFilterProcessor() {
+        return itemFilterProcessor;
+    }
+
+    public void setItemFilterProcessor(ItemFilterProcessor itemFilterProcessor) {
+        this.itemFilterProcessor = itemFilterProcessor;
+    }
+
 
     /*
      * (non-Javadoc)
@@ -517,6 +543,11 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         if (itemPathTranslator == null) {
             throw new IllegalStateException("itemPathTranslator is required");
         }
+        
+        if (itemFilterProcessor == null) {
+            throw new IllegalStateException("itemFilterProcessor is required");
+        }
+
     }
 
     protected Item copyItem(Item item, CollectionItem parent, boolean deepCopy) {

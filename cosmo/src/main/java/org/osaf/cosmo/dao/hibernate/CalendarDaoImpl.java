@@ -15,8 +15,10 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
-import java.util.Collection;
 import java.util.Set;
+
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Period;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,10 +26,13 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dao.CalendarDao;
+import org.osaf.cosmo.dao.hibernate.query.CalendarFilterConverter;
+import org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.filter.EventStampFilter;
+import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -37,8 +42,7 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
 
     private static final Log log = LogFactory.getLog(CalendarDaoImpl.class);
 
-    private CalendarFilterTranslator calendarFilterTranslator = null;
-    private CalendarIndexer calendarIndexer = null;
+    private ItemFilterProcessor itemFilterProcessor = null;
   
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.CalendarDao#findEvents(org.osaf.cosmo.model.CollectionItem, org.osaf.cosmo.calendar.query.CalendarFilter)
@@ -47,12 +51,36 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
                                              CalendarFilter filter) {
 
         try {
-            return calendarFilterTranslator.
-                getCalendarItems(getSession(), collection, filter);
+            ItemFilter itemFilter = new CalendarFilterConverter().translateToItemFilter(collection, filter);
+            Set results = itemFilterProcessor.processFilter(getSession(), itemFilter);
+            return (Set<ContentItem>) results;
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
         }
     }
+    
+    
+
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.dao.CalendarDao#findEvents(org.osaf.cosmo.model.CollectionItem, net.fortuna.ical4j.model.DateTime, net.fortuna.ical4j.model.DateTime)
+     */
+    public Set<ContentItem> findEvents(CollectionItem collection, DateTime rangeStart, DateTime rangeEnd) {
+        NoteItemFilter itemFilter = new NoteItemFilter();
+        itemFilter.setParent(collection);
+        EventStampFilter eventFilter = new EventStampFilter();
+        Period period = new Period(rangeStart, rangeEnd);
+        eventFilter.setPeriod(period);
+        itemFilter.getStampFilters().add(eventFilter);
+        
+        try {
+            Set results = itemFilterProcessor.processFilter(getSession(), itemFilter);
+            return (Set<ContentItem>) results;
+        } catch (HibernateException e) {
+            throw convertHibernateAccessException(e);
+        }
+    }
+
+
 
     /*
      * (non-Javadoc)
@@ -73,67 +101,25 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
         }
     }
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.dao.CalendarDao#indexEvent(org.osaf.cosmo.model.EventStamp)
-     */
-    public void indexEvent(EventStamp eventStamp) {
-        try {
-            getSession().update(eventStamp);
-            getCalendarIndexer().indexCalendarEvent(getSession(), eventStamp);
-            getSession().flush();
-        } catch (HibernateException e) {
-            throw convertHibernateAccessException(e);
-        } 
-    }
     
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.dao.CalendarDao#indexEvents(java.util.Collection)
-     */
-    public void indexEvents(Collection<NoteItem> events) {
-        
-        for(NoteItem note: events) {
-            // clear the session each iteration to improve performance
-            getSession().clear();
-                
-            // because we clear the session, we have to re-load item
-            note = (NoteItem) getSession().load(NoteItem.class, note.getId());
-            EventStamp event = EventStamp.getStamp(note);
-            indexEvent(event);
-        }
-        
+    public ItemFilterProcessor getItemFilterProcessor() {
+        return itemFilterProcessor;
     }
 
-    public CalendarFilterTranslator getCalendarFilterTranslator() {
-        return calendarFilterTranslator;
+    public void setItemFilterProcessor(ItemFilterProcessor itemFilterProcessor) {
+        this.itemFilterProcessor = itemFilterProcessor;
     }
 
-    public void setCalendarFilterTranslator(
-            CalendarFilterTranslator calendarFilterTranslator) {
-        this.calendarFilterTranslator = calendarFilterTranslator;
-    }
 
-    public CalendarIndexer getCalendarIndexer() {
-        return calendarIndexer;
-    }
-
-    public void setCalendarIndexer(CalendarIndexer calendarIndexer) {
-        this.calendarIndexer = calendarIndexer;
-    }
-    
     /**
      * Initializes the DAO, sanity checking required properties and defaulting
      * optional properties.
      */
     public void init() {
         
-        if (calendarFilterTranslator == null) {
-            throw new IllegalStateException(
-                    "calendarFilterTranslatorClass is required");
+        if (itemFilterProcessor == null) {
+            throw new IllegalStateException("itemFilterProcessor is required");
         }
-        
-        if (calendarIndexer == null)
-            throw new IllegalStateException("calendarIndexer is required");
 
     }
     

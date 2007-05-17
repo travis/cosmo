@@ -178,5 +178,4 @@ public interface ContentDao extends ItemDao {
      *         timestamp, or all children if timestamp is null
      */
     public Set<ContentItem> loadChildren(CollectionItem collection, Date timestamp);
-
 }

@@ -22,6 +22,7 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.filter.ItemFilter;
 
 /**
  * Interface for DAO that provides base functionality for items stored in the
@@ -206,4 +207,11 @@ public interface ItemDao extends Dao {
      * @param item
      */
     public void initializeItem(Item item);
+    
+    /**
+     * Find a set of items using an ItemFilter.
+     * @param filter criteria to filter items by
+     * @return set of items matching ItemFilter
+     */
+    public Set<Item> findItems(ItemFilter filter);
 }

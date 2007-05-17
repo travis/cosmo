@@ -18,6 +18,7 @@ package org.osaf.cosmo.dao.hibernate;
 import junit.framework.Assert;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Date;
 
 import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.dao.UserDao;
@@ -92,6 +93,46 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Assert.assertEquals(ms.getCc(), message.getCc());
         Assert.assertEquals(ms.getTo(), message.getTo());
         Assert.assertEquals(ms.getFrom(), message.getFrom());
+    }
+    
+    public void testStampHandlers() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        NoteItem item = generateTestContent();
+        
+        item.setIcalUid("icaluid");
+        item.setBody("this is a body");
+        
+        EventStamp event = new EventStamp();
+        event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        
+        item.addStamp(event);
+        
+        Assert.assertNull(event.getTimeRangeIndex());
+        
+        ContentItem newItem = contentDao.createContent(root, item);
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        
+        event = (EventStamp) queryItem.getStamp(EventStamp.class);
+        Assert.assertEquals("20050817T115000", event.getTimeRangeIndex().getDateStart());
+        Assert.assertEquals("20050817T131500",event.getTimeRangeIndex().getDateEnd());
+        Assert.assertTrue(event.getTimeRangeIndex().getIsFloating().booleanValue());
+        
+        event.setStartDate(new Date("20070101"));
+        event.setEndDate(null);
+        
+        contentDao.updateContent(queryItem);
+        clearSession();
+        
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        
+        event = (EventStamp) queryItem.getStamp(EventStamp.class);
+        Assert.assertEquals("20070101", event.getTimeRangeIndex().getDateStart());
+        Assert.assertEquals("20070101",event.getTimeRangeIndex().getDateEnd());
+        Assert.assertFalse(event.getTimeRangeIndex().getIsFloating().booleanValue());
     }
     
     public void testStampsUpdate() throws Exception {
@@ -276,7 +317,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         item.setBody("this is a body");
         
         EventExceptionStamp eventex = new EventExceptionStamp();
-        eventex.setExceptionCalendar(helper.getCalendar(baseDir + "/exception.ics"));
+        eventex.setEventCalendar(helper.getCalendar(baseDir + "/exception.ics"));
         
         item.addStamp(eventex);
         
@@ -293,7 +334,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Assert.assertTrue(stamp instanceof EventExceptionStamp);
         Assert.assertEquals("eventexception", stamp.getType());
         EventExceptionStamp ees = (EventExceptionStamp) stamp;
-        Assert.assertEquals(ees.getExceptionCalendar().toString(), eventex.getExceptionCalendar()
+        Assert.assertEquals(ees.getEventCalendar().toString(), eventex.getEventCalendar()
                 .toString());
     }
     
@@ -307,7 +348,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         item.setBody("this is a body");
         
         EventExceptionStamp eventex = new EventExceptionStamp();
-        eventex.setExceptionCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        eventex.setEventCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
         
         item.addStamp(eventex);
         

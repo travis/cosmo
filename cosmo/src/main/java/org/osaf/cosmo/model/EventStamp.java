@@ -16,16 +16,14 @@
 package org.osaf.cosmo.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.Transient;
@@ -44,10 +42,6 @@ import net.fortuna.ical4j.model.property.DtStart;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
 import org.osaf.cosmo.hibernate.validator.Event;
@@ -63,19 +57,14 @@ import org.osaf.cosmo.hibernate.validator.Event;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EventStamp extends BaseEventStamp implements
         java.io.Serializable {
-
     
     /**
      * 
      */
     private static final long serialVersionUID = 3992468809776886156L;
 
-    private Calendar calendar = null;
-    private Collection<CalendarTimeRangeIndex> timeRangeIndexes = 
-        new ArrayList<CalendarTimeRangeIndex>(0);
-
-    private Collection<CalendarPropertyIndex> propertyIndexes = 
-        new ArrayList<CalendarPropertyIndex>(0);
+    private Calendar eventCalendar = null;
+    private EventTimeRangeIndex timeRangeIndex = null;
     
     /** default constructor */
     public EventStamp() {
@@ -90,6 +79,27 @@ public class EventStamp extends BaseEventStamp implements
         return "event";
     }
     
+    @Column(table="event_stamp", name = "icaldata", length=102400000, nullable = false)
+    @Type(type="calendar_clob")
+    @NotNull
+    @Event
+    public Calendar getEventCalendar() {
+        return eventCalendar;
+    }
+    
+    public void setEventCalendar(Calendar calendar) {
+        this.eventCalendar = calendar;
+    }
+    
+    @Embedded
+    public EventTimeRangeIndex getTimeRangeIndex() {
+        return timeRangeIndex;
+    }
+
+    public void setTimeRangeIndex(EventTimeRangeIndex timeRangeIndex) {
+        this.timeRangeIndex = timeRangeIndex;
+    }
+
     @Override
     @Transient
     public VEvent getEvent() {
@@ -101,7 +111,7 @@ public class EventStamp extends BaseEventStamp implements
         Calendar masterCal = null;
         
         try {
-            masterCal = new Calendar(calendar);
+            masterCal = new Calendar(getEventCalendar());
         } catch (Exception e) {
             throw new RuntimeException("Cannot copy calendar", e);
         }
@@ -197,55 +207,10 @@ public class EventStamp extends BaseEventStamp implements
     }
 
     public void setCalendar(Calendar calendar) {
-        setMasterCalendar(calendar);
+        setEventCalendar(calendar);
     }
     
-    @Column(table="event_stamp", name = "icaldata", length=102400000, nullable = false)
-    @Type(type="calendar_clob")
-    @NotNull
-    @Event
-    public Calendar getMasterCalendar() {
-        return calendar;
-    }
     
-    public void setMasterCalendar(Calendar calendar) {
-        this.calendar = calendar;
-    }
-    
-    @OneToMany(mappedBy = "eventStamp", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.SAVE_UPDATE, CascadeType.DELETE_ORPHAN })
-    @OnDelete(action=OnDeleteAction.CASCADE)
-    public Collection<CalendarTimeRangeIndex> getTimeRangeIndexes() {
-        return timeRangeIndexes;
-    }
-
-    private void setTimeRangeIndexes(Collection<CalendarTimeRangeIndex> indexes) {
-        this.timeRangeIndexes = indexes;
-    }
-    
-    @OneToMany(mappedBy = "eventStamp", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.SAVE_UPDATE, CascadeType.DELETE_ORPHAN })
-    @OnDelete(action=OnDeleteAction.CASCADE)
-    public Collection<CalendarPropertyIndex> getPropertyIndexes() {
-        return propertyIndexes;
-    }
-
-    private void setPropertyIndexes(Collection<CalendarPropertyIndex> propertyIndexes) {
-        this.propertyIndexes = propertyIndexes;
-    }
-    
-    public void addTimeRangeIndex(CalendarTimeRangeIndex index) {
-        index.setItem(getItem());
-        index.setEventStamp(this);
-        timeRangeIndexes.add(index);
-    }
-    
-    public void addPropertyIndex(CalendarPropertyIndex index) {
-        index.setItem(getItem());
-        index.setEventStamp(this);
-        propertyIndexes.add(index);
-    }
-
     /**
      * Returns the master event extracted from the underlying
      * icalendar object. Changes to the master event will be persisted
@@ -253,10 +218,16 @@ public class EventStamp extends BaseEventStamp implements
      */
     @Transient
     public VEvent getMasterEvent() {
-        if(getMasterCalendar()==null)
+        if(getEventCalendar()==null)
             return null;
-        return (VEvent) getMasterCalendar().getComponents().getComponents(
-                Component.VEVENT).get(0);
+        
+        ComponentList events = getEventCalendar().getComponents().getComponents(
+                Component.VEVENT);
+        
+        if(events.size()==0)
+            return null;
+        
+        return (VEvent) events.get(0);
     }
 
     /**
@@ -276,17 +247,9 @@ public class EventStamp extends BaseEventStamp implements
         
         // Need to copy Calendar, and indexes
         try {
-            stamp.calendar = new Calendar(calendar);
+            stamp.setEventCalendar(new Calendar(getEventCalendar()));
         } catch (Exception e) {
             throw new RuntimeException("Cannot copy calendar", e);
-        }
-        
-        for(CalendarTimeRangeIndex index : timeRangeIndexes) {
-            stamp.addTimeRangeIndex(index.copy());
-        }
-        
-        for(CalendarPropertyIndex index : propertyIndexes) {
-            stamp.addPropertyIndex(index.copy());
         }
         
         return stamp;
@@ -298,7 +261,7 @@ public class EventStamp extends BaseEventStamp implements
      * found in the timezone registry.
      */
     public void compactTimezones() {
-        Calendar master = getMasterCalendar();
+        Calendar master = getEventCalendar();
         if(master==null)
             return;
         

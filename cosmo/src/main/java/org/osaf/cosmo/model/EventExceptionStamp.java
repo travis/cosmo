@@ -17,6 +17,7 @@ package org.osaf.cosmo.model;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
@@ -35,7 +36,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
 import org.osaf.cosmo.hibernate.validator.EventException;
 
-
 /**
  * Represents an event exception.
  */
@@ -51,9 +51,11 @@ public class EventExceptionStamp extends BaseEventStamp implements
      * 
      */
     private static final long serialVersionUID = 3992468809776886156L;
-
-    private Calendar calendar = null;
     
+    private Calendar eventCalendar = null;
+    private EventTimeRangeIndex timeRangeIndex = null;
+    
+ 
     /** default constructor */
     public EventExceptionStamp() {
     }
@@ -67,6 +69,27 @@ public class EventExceptionStamp extends BaseEventStamp implements
         return "eventexception";
     }
     
+    @Column(table="event_stamp", name = "icaldata", length=102400000, nullable = false)
+    @Type(type="calendar_clob")
+    @NotNull
+    @EventException
+    public Calendar getEventCalendar() {
+        return eventCalendar;
+    }
+    
+    public void setEventCalendar(Calendar calendar) {
+        this.eventCalendar = calendar;
+    }
+    
+    @Embedded
+    public EventTimeRangeIndex getTimeRangeIndex() {
+        return timeRangeIndex;
+    }
+
+    public void setTimeRangeIndex(EventTimeRangeIndex timeRangeIndex) {
+        this.timeRangeIndex = timeRangeIndex;
+    }
+    
     @Override
     @Transient
     public VEvent getEvent() {
@@ -75,19 +98,7 @@ public class EventExceptionStamp extends BaseEventStamp implements
      
     @Override
     public void setCalendar(Calendar calendar) {
-        setExceptionCalendar(calendar);
-    }
-
-    @Column(table="event_stamp", name = "icaldata", length=102400000, nullable = false)
-    @Type(type="calendar_clob")
-    @NotNull
-    @EventException
-    public Calendar getExceptionCalendar() {
-        return calendar;
-    }
-    
-    public void setExceptionCalendar(Calendar calendar) {
-        this.calendar = calendar;
+        setEventCalendar(calendar);
     }
     
     /**
@@ -97,20 +108,20 @@ public class EventExceptionStamp extends BaseEventStamp implements
      */
     @Transient
     public VEvent getExceptionEvent() {
-        return (VEvent) getExceptionCalendar().getComponents().getComponents(
+        return (VEvent) getEventCalendar().getComponents().getComponents(
                 Component.VEVENT).get(0);
     }
     
     public void setExceptionEvent(VEvent event) {
-        if(calendar==null)
+        if(getEventCalendar()==null)
             createCalendar();
         
         // remove all events
-        calendar.getComponents().removeAll(
-                calendar.getComponents().getComponents(Component.VEVENT));
+        getEventCalendar().getComponents().removeAll(
+                getEventCalendar().getComponents().getComponents(Component.VEVENT));
         
         // add event exception
-        calendar.getComponents().add(event);
+        getEventCalendar().getComponents().add(event);
     }
  
     /**
@@ -187,7 +198,7 @@ public class EventExceptionStamp extends BaseEventStamp implements
         
         // Need to copy Calendar
         try {
-            stamp.setExceptionCalendar(new Calendar(calendar));
+            stamp.setEventCalendar(new Calendar(getEventCalendar()));
         } catch (Exception e) {
             throw new RuntimeException("Cannot copy calendar", e);
         }

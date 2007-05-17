@@ -68,8 +68,8 @@ public class EventStampTest extends TestCase {
         Assert.assertEquals(2, cal.getComponents(Component.VTIMEZONE).size());
         
         // add timezones to master event calendar
-        eventStamp.getMasterCalendar().getComponents().add(registry.getTimeZone("America/Chicago").getVTimeZone());
-        eventStamp.getMasterCalendar().getComponents().add(registry.getTimeZone("America/Los_Angeles").getVTimeZone());
+        eventStamp.getEventCalendar().getComponents().add(registry.getTimeZone("America/Chicago").getVTimeZone());
+        eventStamp.getEventCalendar().getComponents().add(registry.getTimeZone("America/Los_Angeles").getVTimeZone());
         
         cal = eventStamp.getCalendar();
         Assert.assertEquals(2, cal.getComponents(Component.VTIMEZONE).size());

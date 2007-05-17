@@ -368,7 +368,7 @@ public class DavCalendarCollection extends DavCollection
                 log.debug("updating event " + member.getResourcePath());
 
             try {
-                content = getContentService().updateEvent((NoteItem) content, event.getMasterCalendar());
+                content = getContentService().updateEvent((NoteItem) content, event.getEventCalendar());
             } catch (DuplicateEventUidException e) {
                 throw new DavException(DavServletResponse.SC_CONFLICT, "Uid already in use");
             } catch (CollectionLockedException e) {
@@ -379,7 +379,7 @@ public class DavCalendarCollection extends DavCollection
                 log.debug("creating event " + member.getResourcePath());
 
             try {
-                content = getContentService().createEvent(collection, (NoteItem) content, event.getMasterCalendar());
+                content = getContentService().createEvent(collection, (NoteItem) content, event.getEventCalendar());
             } catch (DuplicateEventUidException e) {
                 throw new DavException(DavServletResponse.SC_CONFLICT, "Uid already in use");
             } catch (CollectionLockedException e) {

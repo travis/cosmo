@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
@@ -65,18 +67,29 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
 /**
  * Represents a calendar event.
  */
+@Entity
+@DiscriminatorValue("baseevent")
 public abstract class BaseEventStamp extends Stamp
     implements java.io.Serializable, ICalendarConstants {
 
     protected static final TimeZoneRegistry TIMEZONE_REGISTRY =
         TimeZoneRegistryFactory.getInstance().createRegistry();
     
+    public static final String TIME_INFINITY = "Z-TIME-INFINITY";
+    
     protected static final String VALUE_MISSING = "MISSING";
     
+    @Transient
     public abstract VEvent getEvent();
+    
     public abstract void setCalendar(Calendar calendar);
     
+    public abstract void setTimeRangeIndex(EventTimeRangeIndex index);
     
+    @Transient
+    public abstract EventTimeRangeIndex getTimeRangeIndex();
+    
+      
     /**
      * Return BaseEventStamp from Item
      * @param item
@@ -85,6 +98,7 @@ public abstract class BaseEventStamp extends Stamp
     public static BaseEventStamp getStamp(Item item) {
         return (BaseEventStamp) item.getStamp(BaseEventStamp.class);
     }
+    
     
     /**
      * Returns a copy of the the iCalendar UID property value of the
@@ -172,7 +186,11 @@ public abstract class BaseEventStamp extends Stamp
      */
     @Transient
     public Date getStartDate() {
-        DtStart dtStart = getEvent().getStartDate();
+        VEvent event = getEvent();
+        if(event==null)
+            return null;
+        
+        DtStart dtStart = event.getStartDate();
         if (dtStart == null)
             return null;
         return dtStart.getDate();
@@ -203,9 +221,29 @@ public abstract class BaseEventStamp extends Stamp
      */
     @Transient
     public Date getEndDate() {
-        DtEnd dtEnd = getEvent().getEndDate();
-        if (dtEnd == null)
+        VEvent event = getEvent();
+        if(event==null)
             return null;
+        DtEnd dtEnd = event.getEndDate(false);
+        // if no DTEND, then calculate endDate from DURATION
+        if (dtEnd == null) {
+            Date startDate = getStartDate();
+            Dur duration = getDuration();
+            
+            // if no DURATION, then there is no end time
+            if(duration==null)
+                return null;
+            
+            Date endDate = null;
+            if(startDate instanceof DateTime)
+                endDate = new DateTime(startDate);
+            else
+                endDate = new Date(startDate);
+            
+            endDate.setTime(duration.getTime(startDate).getTime());
+            return endDate;
+        }
+            
         return dtEnd.getDate();
     }
 
@@ -217,8 +255,12 @@ public abstract class BaseEventStamp extends Stamp
     @Transient
     public void setEndDate(Date date) {
         DtEnd dtEnd = getEvent().getEndDate();
-        if (dtEnd != null)
+        if (dtEnd != null && date != null)
             dtEnd.setDate(date);
+        else  if(dtEnd !=null && date == null) {
+            // remove DtEnd if there is no end date
+            getEvent().getProperties().remove(dtEnd);
+        }
         else {
             // remove the duration if there was one
             Duration duration = (Duration) getEvent().getProperties().
@@ -357,9 +399,12 @@ public abstract class BaseEventStamp extends Stamp
     @Transient
     public List<Recur> getRecurrenceRules() {
         ArrayList<Recur> l = new ArrayList<Recur>();
-        for (RRule rrule : (List<RRule>) getEvent().getProperties().
-                 getProperties(Property.RRULE))
-            l.add(rrule.getRecur());
+        VEvent event = getEvent();
+        if(event!=null) {
+            for (RRule rrule : (List<RRule>) getEvent().getProperties().
+                     getProperties(Property.RRULE))
+                l.add(rrule.getRecur());
+        }
         return l;
     }
 
@@ -422,7 +467,11 @@ public abstract class BaseEventStamp extends Stamp
         
         DateList l = null;
         
-        for (RDate rdate : (List<RDate>) getEvent().getProperties().
+        VEvent event = getEvent();
+        if(event==null)
+            return null;
+        
+        for (RDate rdate : (List<RDate>) event.getProperties().
                  getProperties(Property.RDATE)) {
             if(l==null) {
                 if(Value.DATE.equals(rdate.getParameter(Parameter.VALUE)))
@@ -921,5 +970,4 @@ public abstract class BaseEventStamp extends Stamp
         alarm.getProperties().add(Action.DISPLAY);
         getEvent().getAlarms().add(alarm);
     }
-    
 }

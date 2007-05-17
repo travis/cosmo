@@ -30,6 +30,7 @@ import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.util.PathUtil;
 
 /**
@@ -370,6 +371,11 @@ public class MockItemDao implements ItemDao {
         // do nothing
     }
     
+    public Set<Item> findItems(ItemFilter filter) {
+        // do nothing for now
+        return null;
+    }
+
     // Dao methods
     /**
      * Initializes the DAO, sanity checking required properties

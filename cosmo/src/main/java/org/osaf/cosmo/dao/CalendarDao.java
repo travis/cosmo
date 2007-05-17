@@ -15,14 +15,13 @@
  */
 package org.osaf.cosmo.dao;
 
-import java.util.Collection;
 import java.util.Set;
+
+import net.fortuna.ical4j.model.DateTime;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Interface for DAO that provides query apis for finding 
@@ -59,16 +58,16 @@ public interface CalendarDao {
                                              CalendarFilter filter);
     
     /**
-     * Index calendar event
-     * @param eventStamp event stamp to index
+     * Find calendar events by time range.
+     *
+     * @param collection
+     *            collection to search
+     * @param rangeStart time range start
+     * @param rangeEnd time range end
+     * @return set ContentItem objects that contain EventStamps that occur
+     *         int the given timeRange.
      */
-    public void indexEvent(EventStamp eventStamp);
-    
-    /**
-     * Index calendar events
-     * @param events events to index.  An event is a NoteItem stamped
-     *               with EventStamp.
-     */
-    public void indexEvents(Collection<NoteItem> events);
+    public Set<ContentItem> findEvents(CollectionItem collection,
+                                             DateTime rangeStart, DateTime rangeEnd);
 
 }

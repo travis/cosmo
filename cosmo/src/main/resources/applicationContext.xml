@@ -99,12 +99,11 @@
         <list>
             <value>org.osaf.cosmo.model.Attribute</value>
             <value>org.osaf.cosmo.model.AttributeTombstone</value>
+            <value>org.osaf.cosmo.model.BaseEventStamp</value>
             <value>org.osaf.cosmo.model.BinaryAttribute</value>
             <value>org.osaf.cosmo.model.BooleanAttribute</value>
             <value>org.osaf.cosmo.model.CalendarAttribute</value>
             <value>org.osaf.cosmo.model.CalendarCollectionStamp</value>			
-            <value>org.osaf.cosmo.model.CalendarPropertyIndex</value>
-            <value>org.osaf.cosmo.model.CalendarTimeRangeIndex</value>
             <value>org.osaf.cosmo.model.CollectionItem</value>
             <value>org.osaf.cosmo.model.CollectionSubscription</value>
             <value>org.osaf.cosmo.model.ContentData</value>
@@ -251,6 +250,12 @@
     </property>
   </bean>
 
+  <bean id="eventStampHandler"
+        class="org.osaf.cosmo.model.EventStampHandler" />
+
+  <bean id="standardItemFilterProcessor"
+        class="org.osaf.cosmo.dao.hibernate.query.StandardItemFilterProcessor" />
+
   <bean id="contentDao"
         class="org.osaf.cosmo.dao.hibernate.ContentDaoImpl"
         init-method="init"
@@ -267,6 +272,19 @@
     <property name="ticketKeyGenerator">
       <ref local="ticketKeyGenerator" />
     </property>
+    <property name="itemFilterProcessor">
+      <ref local="standardItemFilterProcessor" />
+    </property>
+    <property name="stampHandlers">
+      <map>
+        <entry key="org.osaf.cosmo.model.EventStamp">
+          <ref local="eventStampHandler"/>
+        </entry>
+        <entry key="org.osaf.cosmo.model.EventExceptionStamp">
+          <ref local="eventStampHandler"/>
+        </entry>
+      </map>
+    </property>
   </bean>
 
   <bean id="userDao"
@@ -281,27 +299,14 @@
     </property>
   </bean>
 
-  <bean id="calendarIndexer"
-        class="org.osaf.cosmo.dao.hibernate.DefaultCalendarIndexer" />
-
-  <bean id="calendarFilterTranslator"
-        class="org.osaf.cosmo.dao.hibernate.SQLCalendarFilterTranslator">
-    <property name="booleanTrueValue">
-        <value>${cosmo.hibernate.sql.booleanStringValue}</value>
-    </property>
-  </bean>
-
   <bean id="calendarDao"
         class="org.osaf.cosmo.dao.hibernate.CalendarDaoImpl"
         init-method="init">
     <property name="sessionFactory">
       <ref bean="sessionFactory" />
     </property>
-    <property name="calendarFilterTranslator">
-      <ref bean="calendarFilterTranslator" />
-    </property>
-    <property name="calendarIndexer">
-      <ref bean="calendarIndexer" />
+    <property name="itemFilterProcessor">
+      <ref local="standardItemFilterProcessor" />
     </property>
   </bean>
 

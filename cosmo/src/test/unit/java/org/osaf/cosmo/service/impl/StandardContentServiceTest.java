@@ -292,7 +292,7 @@ public class StandardContentServiceTest extends TestCase {
         
         service.updateEvent(masterNote, calendar);
         
-        Calendar masterCal = eventStamp.getMasterCalendar();
+        Calendar masterCal = eventStamp.getEventCalendar();
         VEvent masterEvent = eventStamp.getMasterEvent();
         
         Assert.assertEquals(1, masterCal.getComponents().getComponents(Component.VEVENT).size());

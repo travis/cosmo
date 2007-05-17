@@ -179,7 +179,7 @@ public class OwnerVoter implements AccessDecisionVoter {
             return checkOwnership(details.getUser(), item);
         }
 
-        UserPath up = UserPath.parse(path);
+        UserPath up = UserPath.parse(path, true);
         if (up != null) {
             User user = userService.getUser(up.getUsername());
             if (user == null) {

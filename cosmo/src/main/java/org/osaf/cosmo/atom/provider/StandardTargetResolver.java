@@ -77,13 +77,13 @@ public class StandardTargetResolver implements TargetResolver {
         if (ip != null)
             return createItemTarget(context, ip);
 
-        SubscriptionPath sp = SubscriptionPath.parse(uri);
-        if (sp != null)
-            return createSubscriptionTarget(context, sp);
-
         UserPath up = UserPath.parse(uri);
-        if (up != null)
+        if (up != null) {
+            SubscriptionPathInfo spi = SubscriptionPathInfo.parse(up);
+            if (spi != null)
+                return createSubscriptionTarget(context, spi);
             return createUserTarget(context, up);
+        }
 
         return null;
     }
@@ -138,14 +138,14 @@ public class StandardTargetResolver implements TargetResolver {
      * subscriptions.
      */
     protected Target createSubscriptionTarget(RequestContext context,
-                                              SubscriptionPath path) {
-        User user = userService.getUser(path.getUsername());
+                                              SubscriptionPathInfo pathInfo) {
+        User user = userService.getUser(pathInfo.getUserPath().getUsername());
         if (user == null)
             return null;
 
-        if (path.getDisplayName() != null) {
+        if (pathInfo.getDisplayName() != null) {
             CollectionSubscription sub =
-                user.getSubscription(path.getDisplayName());
+                user.getSubscription(pathInfo.getDisplayName());
             if (sub == null)
                 return null;
             return new SubscriptionTarget(context, user, sub);

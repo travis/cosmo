@@ -21,6 +21,7 @@ import javax.activation.MimeTypeParseException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.abdera.Abdera;
+import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
@@ -463,10 +464,24 @@ public class StandardProvider extends AbstractProvider
 
     protected ContentProcessor createContentProcessor(Entry entry)
         throws UnsupportedMediaTypeException {
-        String mediaType = entry.getContentType() != null ?
-            entry.getContentType().toString() :
-            entry.getContentMimeType().toString();
-        return createContentProcessor(mediaType);
+        String mediaType = null;
+
+        // if the entry is text, HTML, XHTML or XML, we can use the
+        // content type itself to find a processor.
+        if (entry.getContentType() != null &&
+            ! entry.getContentType().equals(Content.Type.MEDIA))
+            mediaType = entry.getContentType().toString();
+ 
+        // if it's media, then we we want to use the content's mime
+        // type directly.
+        if (mediaType == null &&
+            entry.getContentMimeType() != null)
+            mediaType = entry.getContentMimeType().toString();
+
+        if (mediaType != null)
+            return createContentProcessor(mediaType);
+
+        throw new UnsupportedMediaTypeException("indeterminate media type");
     }
 
     protected ContentProcessor createContentProcessor(String mediaType)

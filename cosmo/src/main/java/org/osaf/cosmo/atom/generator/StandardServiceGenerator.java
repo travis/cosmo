@@ -17,17 +17,22 @@ package org.osaf.cosmo.atom.generator;
 
 import org.apache.abdera.i18n.iri.IRISyntaxException;
 import org.apache.abdera.model.Collection;
+import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Service;
 import org.apache.abdera.model.Workspace;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
+import org.osaf.cosmo.service.ContentService;
 
 /**
  * Standard implementation of {@link ServiceGenerator}.
@@ -36,39 +41,61 @@ import org.osaf.cosmo.server.ServiceLocator;
  * @see CollectionItem
  * @see User
  */
-public class StandardServiceGenerator implements ServiceGenerator {
+public class StandardServiceGenerator
+    implements ServiceGenerator, AtomConstants{
     private static final Log log =
         LogFactory.getLog(StandardServiceGenerator.class);
 
     private StandardGeneratorFactory factory;
     private ServiceLocator serviceLocator;
+    private ContentService contentService;
 
     public StandardServiceGenerator(StandardGeneratorFactory factory,
-                                    ServiceLocator serviceLocator) {
+                                    ServiceLocator serviceLocator,
+                                    ContentService contentService) {
         this.factory = factory;
         this.serviceLocator = serviceLocator;
+        this.contentService = contentService;
     }
 
     /**
-     * Generates a Service with a single workspace containing a
-     * collection for each of the collections in a home collection
-     * (not including any subcollections).
+     * <p>
+     * Generates a service containing the following workspaces
+     * describing the collections accessible for a user:
+     * </p>
+     * <dl>
+     * <dt>{@link #WORKSPACE_HOME}</dt>
+     * <dd>Contains an Atom collection for each of the collections in
+     * a user's home collection (not including any
+     * sub-collections).</dd>
+     * <dt>{@link @WORKSPACE_LOCAL}</dt>
+     * <dd>Contains an Atom collection for each of the local
+     * collections (those on the same server) that the user to which
+     * the user is subscribed.
+     * </dl>
      *
-     * @param collection the collection on which the feed is based
+     * @param the user
+     * @param home the user's home collection
      * @throws GeneratorException
      */
-    public Service generateService(HomeCollectionItem home)
+    public Service generateService(User user)
         throws GeneratorException {
-        Service service = createService(home.getOwner());
+        Service service = createService(user);
 
-        Workspace workspace = createHomeWorkspace(home);
-        service.addWorkspace(workspace);
+        Workspace hw = createHomeWorkspace();
+        service.addWorkspace(hw);
 
+        HomeCollectionItem home = contentService.getRootItem(user);
         for (Item child : home.getChildren()) {
             if (child instanceof CollectionItem)
-                workspace.
-                    addCollection(createCollection((CollectionItem)child));
+                hw.addCollection(createCollection((CollectionItem)child));
         }
+
+        Workspace lw = createLocalWorkspace();
+        service.addWorkspace(lw);
+
+        for (CollectionSubscription sub : user.getCollectionSubscriptions())
+            lw.addCollection(createCollection(sub));
 
         return service;
     }
@@ -101,10 +128,23 @@ public class StandardServiceGenerator implements ServiceGenerator {
      * the workspace
      * @throws GeneratorException
      */
-    protected Workspace createHomeWorkspace(HomeCollectionItem home)
+    protected Workspace createHomeWorkspace()
         throws GeneratorException {
         Workspace workspace = factory.getAbdera().getFactory().newWorkspace();
         workspace.setTitle(WORKSPACE_HOME);
+        return workspace;
+    }
+
+    /**
+     * Creates a <code>Workspace</code> representing the service
+     * user's subscribed collections.
+     *
+     * @throws GeneratorException
+     */
+    protected Workspace createLocalWorkspace()
+        throws GeneratorException {
+        Workspace workspace = factory.getAbdera().getFactory().newWorkspace();
+        workspace.setTitle(WORKSPACE_LOCAL);
         return workspace;
     }
 
@@ -117,7 +157,8 @@ public class StandardServiceGenerator implements ServiceGenerator {
      */
     protected Collection createCollection(CollectionItem item)
         throws GeneratorException {
-        Collection collection = factory.getAbdera().getFactory().newCollection();
+        Collection collection =
+            factory.getAbdera().getFactory().newCollection();
         String href = serviceLocator.getAtomUrl(item, false);
 
         try {
@@ -131,11 +172,65 @@ public class StandardServiceGenerator implements ServiceGenerator {
         return collection;
     }
 
+    /**
+     * Creates a <code>Collection</code> based on a collection
+     * subscription.
+     *
+     * @param sub the collection subscription described by the atom
+     * collection
+     * @throws GeneratorException
+     */
+    protected Collection createCollection(CollectionSubscription sub)
+        throws GeneratorException {
+        Collection collection =
+            factory.getAbdera().getFactory().newCollection();
+
+        CollectionItem ci = (CollectionItem)
+            contentService.findItemByUid(sub.getCollectionUid());
+        Ticket ticket = ci != null ?
+            contentService.getTicket(ci, sub.getTicketKey()) :
+            null;
+
+        String href =
+            serviceLocator.getAtomCollectionUrl(sub.getCollectionUid(), false);
+
+        try {
+            collection.setAccept("entry");
+            collection.setHref(href);
+            collection.setTitle(sub.getDisplayName());
+            if (ci == null)
+                collection.setAttributeValue(QN_EXISTS, "false");
+            addTicket(collection, sub.getTicketKey(), ticket);
+        } catch (IRISyntaxException e) {
+            throw new GeneratorException("Attempted to set invalid collection href " + href, e);
+        }
+
+        return collection;
+    }
+
+    private void addTicket(Collection collection,
+                           String ticketKey,
+                           Ticket ticket)
+        throws GeneratorException {
+        Element extension = getFactory().getAbdera().getFactory().
+            newExtensionElement(QN_TICKET);
+        if (ticket != null)
+            extension.setAttributeValue(QN_TYPE, ticket.getType().toString());
+        else
+            extension.setAttributeValue(QN_EXISTS, "false");
+        extension.setText(ticketKey);
+        collection.addExtension(extension);
+    }
+
     public StandardGeneratorFactory getFactory() {
         return factory;
     }
 
     public ServiceLocator getServiceLocator() {
         return serviceLocator;
+    }
+
+    public ContentService getContentService() {
+        return contentService;
     }
 }

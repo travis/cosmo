@@ -99,8 +99,7 @@ public class AtomHelper extends MockHelper {
 
     public RequestContext createServiceRequestContext()
         throws IOException {
-        return new MockServiceRequestContext(serviceContext, getUser(),
-                                             getHomeCollection());
+        return new MockServiceRequestContext(serviceContext, getUser());
     }
 
     public RequestContext createFeedRequestContext(CollectionItem collection,

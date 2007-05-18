@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.provider.UserTarget;
-import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.User;
 
 /**
@@ -32,10 +31,9 @@ public class MockServiceRequestContext extends BaseMockRequestContext {
         LogFactory.getLog(MockServiceRequestContext.class);
 
     public MockServiceRequestContext(ServiceContext context,
-                                     User user,
-                                     HomeCollectionItem home) {
+                                     User user) {
         super(context, "GET", toRequestUri(user));
-        this.target = new UserTarget(this, user, home);
+        this.target = new UserTarget(this, user);
     }
 
     private static String toRequestUri(User user) {

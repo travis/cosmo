@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.generator.ServiceGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
-import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -49,7 +49,7 @@ public class MockServiceGenerator implements ServiceGenerator {
 
     // ServiceGenerator methods
 
-    public Service generateService(HomeCollectionItem home)
+    public Service generateService(User user)
         throws GeneratorException {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");

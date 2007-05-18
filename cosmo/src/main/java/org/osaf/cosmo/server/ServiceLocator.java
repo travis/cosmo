@@ -166,6 +166,38 @@ public class ServiceLocator implements ServerConstants {
     }
 
     /**
+     * Returns the Atom URL of the identified collection.
+     */
+    public String getAtomCollectionUrl(String uid) {
+        return calculateItemUrl(uid, PATH_COLLECTION, factory.getAtomPrefix());
+    }
+
+    /**
+     * Returns the Atom URL of the identified collection.
+     */
+    public String getAtomItemUrl(String uid) {
+        return calculateItemUrl(uid, PATH_ITEM, factory.getAtomPrefix());
+    }
+
+    /**
+     * Returns the Atom URL of the identified collection.
+     */
+    public String getAtomCollectionUrl(String uid,
+                                       boolean absolute) {
+        return calculateItemUrl(uid, PATH_COLLECTION, factory.getAtomPrefix(),
+                                absolute);
+    }
+
+    /**
+     * Returns the Atom URL of the identified collection.
+     */
+    public String getAtomItemUrl(String uid,
+                                 boolean absolute) {
+        return calculateItemUrl(uid, PATH_ITEM, factory.getAtomPrefix(),
+                                absolute);
+    }
+
+    /**
      * Returns the Atom URL of the user.
      */
     public String getAtomUrl(User user) {
@@ -229,7 +261,8 @@ public class ServiceLocator implements ServerConstants {
      * Returns the Morse Code URL of the collection.
      */
     public String getMorseCodeUrl(CollectionItem collection) {
-        return calculateItemUrl(collection, factory.getMorseCodePrefix());
+        return calculateItemUrl(collection.getUid(), PATH_COLLECTION,
+                                factory.getMorseCodePrefix());
     }
 
     /**
@@ -240,8 +273,8 @@ public class ServiceLocator implements ServerConstants {
      */
     public String getMorseCodeUrl(CollectionItem collection,
                                   boolean absolute) {
-        return calculateItemUrl(collection, factory.getMorseCodePrefix(),
-                                absolute);
+        return calculateItemUrl(collection.getUid(), PATH_COLLECTION,
+                                factory.getMorseCodePrefix(), absolute);
     }
 
     /**
@@ -287,7 +320,8 @@ public class ServiceLocator implements ServerConstants {
      * Returns the webcal URL of the collection.
      */
     public String getWebcalUrl(CollectionItem collection) {
-        return calculateItemUrl(collection, factory.getWebcalPrefix());
+        return calculateItemUrl(collection.getUid(), PATH_COLLECTION,
+                                factory.getWebcalPrefix());
     }
 
     private String calculateBaseUrl(String servicePrefix) {
@@ -306,14 +340,28 @@ public class ServiceLocator implements ServerConstants {
     private String calculateItemUrl(Item item,
                                     String servicePrefix,
                                     boolean absolute) {
+        String pathPrefix = item instanceof CollectionItem ?
+            PATH_COLLECTION : PATH_ITEM;
+        return calculateItemUrl(item.getUid(), pathPrefix, servicePrefix,
+                                absolute);
+    }
+
+    private String calculateItemUrl(String uid,
+                                    String pathPrefix,
+                                    String servicePrefix) {
+        return calculateItemUrl(uid, pathPrefix, servicePrefix, true);
+    }
+
+    private String calculateItemUrl(String uid,
+                                    String pathPrefix,
+                                    String servicePrefix,
+                                    boolean absolute) {
         StringBuffer buf = new StringBuffer();
 
         if (absolute)
             buf.append(appMountUrl).append(servicePrefix).append("/");
 
-        String itemPrefix = item instanceof CollectionItem ?
-            PATH_COLLECTION : PATH_ITEM;
-        buf.append(itemPrefix).append("/").append(item.getUid());
+        buf.append(pathPrefix).append("/").append(uid);
 
         if (ticketKey != null)
             buf.append("?").append(PARAM_TICKET).append("=").append(ticketKey);

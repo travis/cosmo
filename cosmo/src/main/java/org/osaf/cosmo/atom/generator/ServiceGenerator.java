@@ -17,11 +17,11 @@ package org.osaf.cosmo.atom.generator;
 
 import org.apache.abdera.model.Service;
 
-import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.User;
 
 /**
  * Constructs an Atom introspection document describing the
- * collections owned by a user.
+ * collections owned by and subscribed to by a user.
  *
  * @see Service
  * @see CollectionItem
@@ -30,15 +30,27 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 public interface ServiceGenerator {
 
     public static final String WORKSPACE_HOME = "home";
+    public static final String WORKSPACE_LOCAL = "local";
 
     /**
-     * Generates a Service with a single workspace containing a
-     * collection for each of the collections in a home collection
-     * (not including any subcollections).
+     * <p>
+     * Generates a service containing the following workspaces
+     * describing the collections accessible for a user:
+     * </p>
+     * <dl>
+     * <dt>{@link #WORKSPACE_HOME}</dt>
+     * <dd>Contains an Atom collection for each of the collections in
+     * the user's home collection (not including any
+     * sub-collections).</dd>
+     * <dt>{@link @WORKSPACE_LOCAL}</dt>
+     * <dd>Contains an Atom collection for each of the local
+     * collections (those on the same server) to which the user is
+     * subscribed.
+     * </dl>
      *
-     * @param collection the collection on which the feed is based
+     * @param the user
      * @throws GeneratorException
      */
-    public Service generateService(HomeCollectionItem home)
+    public Service generateService(User user)
         throws GeneratorException;
 }

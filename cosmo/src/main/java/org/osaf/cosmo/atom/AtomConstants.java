@@ -87,4 +87,7 @@ public interface AtomConstants {
     /** */
     public static final QName QN_TYPE =
         new QName(NS_COSMO, "type", PRE_COSMO);
+    /** */
+    public static final QName QN_EXISTS =
+        new QName(NS_COSMO, "exists", PRE_COSMO);
 }

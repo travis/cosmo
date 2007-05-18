@@ -267,7 +267,7 @@ public class StandardProvider extends AbstractProvider
             ServiceLocator locator = createServiceLocator(request);
             ServiceGenerator generator = createServiceGenerator(locator);
             Service service =
-                generator.generateService(target.getHomeCollection());
+                generator.generateService(target.getUser());
 
             return createResponseContext(service.getDocument());
         } catch (GeneratorException e) {

@@ -56,7 +56,7 @@ public class JsonProcessor extends BaseEimProcessor {
         } catch (JsonValidationException e) {
             throw new ValidationException("Invalid json packet", e);
         } catch (JsonStreamException e) {
-            throw new ProcessorException("Unable to read parse recordset", e);
+            throw new ProcessorException("Unable to parse recordset", e);
         } finally {
             try {
                 reader.close();

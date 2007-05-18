@@ -26,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
-import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
@@ -162,9 +161,7 @@ public class StandardTargetResolver implements TargetResolver {
         User user = userService.getUser(path.getUsername());
         if (user == null)
             return null;
-        HomeCollectionItem home = contentService.getRootItem(user);
-
-        return new UserTarget(context, user, home);
+        return new UserTarget(context, user);
     }
 
     public ContentService getContentService() {

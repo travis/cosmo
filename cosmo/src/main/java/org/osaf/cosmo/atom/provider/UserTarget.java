@@ -20,27 +20,19 @@ import org.apache.abdera.protocol.server.provider.AbstractTarget;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 
-import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.User;
 
 public class UserTarget extends AbstractTarget {
 
     private User user;
-    private HomeCollectionItem home;
 
     public UserTarget(RequestContext request,
-                      User user,
-                      HomeCollectionItem home) {
+                      User user) {
         super(TargetType.TYPE_SERVICE, request);
         this.user = user;
-        this.home = home;
     }
 
     public User getUser() {
         return user;
-    }
-
-    public HomeCollectionItem getHomeCollection() {
-        return home;
     }
 }

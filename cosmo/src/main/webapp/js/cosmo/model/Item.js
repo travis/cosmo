@@ -16,6 +16,7 @@
 dojo.provide("cosmo.model.Item");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.model.util");
+dojo.require("cosmo.model.Delta");
 
 cosmo.model.NEW_DATESTAMP = function(){return (new Date()).getTime()};
 cosmo.model.NEW_OBJECT = function(){return {}};
@@ -393,51 +394,3 @@ cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",
             this.initializeProperties(kwArgs);
         }
     });
-    
-dojo.declare("cosmo.model.Delta", null, {
-    initializer: function(){
-        this._stampProps = {}
-        this._propertyProps = {};
-    },
-    
-    addStampProperty: function (stampName, propertyName, value){
-        var stamp = this._getStamp(stampName);
-        stamp[propertyName] = value;
-    },
-    
-    addProperty: function (propertyName, value){
-        this._propertyProps[propertyName] = value;
-    },
-    
-    deltafy: function (/*cosmo.model.Note*/ note){
-        // summary: removes all properties which are the same as given note
-        // description: removes all properties from the delta which are the same
-        //              same as the properties in the given note and its stamps,
-        //              leaving you with just the delta, hence "deltafy"
-        this._filterOutEqualProperties(note, this._propertyProps);
-        //XXX
-        
-    },
-    
-    _filterOutEqualProperties: function (original, changes){
-        for (var propName in changes){
-            var changeValue = changes[propName];
-            var origValue = this._getPropertyUsingGetter(original, propName);
-            if (cosmo.model.equals(changeValue, origValue)){
-                delete changes[propName];
-            } 
-        }
-    },
-    
-    _getPropertyUsingGetter: function (object, propertyName){
-        
-    },
-    _getStamp: function (stampName){
-        var stamp = this._stampProps[stampName];
-        if (!stamp){
-            stamp = {};
-            this._stampProps[stampName] = stamp;
-        }
-        return stamp;        
-    }
-});

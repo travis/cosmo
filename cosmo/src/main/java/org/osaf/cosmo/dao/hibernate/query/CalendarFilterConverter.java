@@ -19,7 +19,9 @@ import java.util.Iterator;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
+import org.osaf.cosmo.calendar.query.ParamFilter;
 import org.osaf.cosmo.calendar.query.PropertyFilter;
+import org.osaf.cosmo.calendar.query.TextMatchFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
@@ -29,6 +31,12 @@ import org.osaf.cosmo.model.filter.NoteItemFilter;
  * Translates <code>CalendarFilter</code> into <code>ItemFilter</code>
  */
 public class CalendarFilterConverter {
+    
+    private static final String COMP_VCALENDAR = "VCALENDAR";
+    private static final String COMP_VEVENT = "VEVENT";
+    private static final String PROP_UID = "UID";
+    private static final String PROP_DESCRIPTION = "DESCRIPTION";
+    private static final String PROP_SUMMARY = "SUMMARY";
     
     public CalendarFilterConverter() {}
     
@@ -46,7 +54,7 @@ public class CalendarFilterConverter {
         NoteItemFilter itemFilter = new NoteItemFilter();
         itemFilter.setParent(calendar);
         ComponentFilter rootFilter = calendarFilter.getFilter();
-        if(!"VCALENDAR".equalsIgnoreCase(rootFilter.getName()))
+        if(!COMP_VCALENDAR.equalsIgnoreCase(rootFilter.getName()))
             throw new IllegalArgumentException("unsupported component filter: " + rootFilter.getName());
         
         for(Iterator it = rootFilter.getComponentFilters().iterator(); it.hasNext();) {
@@ -59,9 +67,13 @@ public class CalendarFilterConverter {
         
     private void handleCompFilter(ComponentFilter compFilter, NoteItemFilter itemFilter) {
         
-        if(!"VEVENT".equalsIgnoreCase(compFilter.getName()))
+        if(COMP_VEVENT.equalsIgnoreCase(compFilter.getName()))
+            handleEventCompFilter(compFilter, itemFilter);
+        else
             throw new IllegalArgumentException("unsupported component filter: " + compFilter.getName());
-        
+    }
+    
+    private void handleEventCompFilter(ComponentFilter compFilter, NoteItemFilter itemFilter) {
         // TODO: handle case of multiple VEVENT filters
         EventStampFilter eventFilter = new EventStampFilter();
         itemFilter.getStampFilters().add(eventFilter);
@@ -79,8 +91,68 @@ public class CalendarFilterConverter {
         
         for(Iterator it = compFilter.getPropFilters().iterator(); it.hasNext();) {
             PropertyFilter propFilter = (PropertyFilter) it.next();
-            throw new IllegalArgumentException("unsupported prop filter: " + propFilter.getName());
+            handleEventPropFilter(propFilter, itemFilter);
         }
+    }
+    
+    private void handleEventPropFilter(PropertyFilter propFilter, NoteItemFilter itemFilter) {
+       
+        if(PROP_UID.equalsIgnoreCase(propFilter.getName()))
+            handleUidPropFilter(propFilter, itemFilter);
+        else if(PROP_SUMMARY.equalsIgnoreCase(propFilter.getName()))
+            handleSummaryPropFilter(propFilter, itemFilter);
+        else if(PROP_DESCRIPTION.equalsIgnoreCase(propFilter.getName()))
+            handleDescriptionPropFilter(propFilter, itemFilter);
+        else
+            throw new IllegalArgumentException("unsupported prop filter: " + propFilter.getName());
+    }
+    
+    private void handleUidPropFilter(PropertyFilter propFilter, NoteItemFilter itemFilter) {
+        
+        for(Iterator it = propFilter.getParamFilters().iterator(); it.hasNext();) {
+            ParamFilter paramFilter = (ParamFilter) it.next();
+            throw new IllegalArgumentException("unsupported param filter: " + paramFilter.getName());
+        }
+        
+        TextMatchFilter textMatch = propFilter.getTextMatchFilter();
+        if(textMatch==null)
+            return;
+        
+        if(textMatch.isNegateCondition())
+            throw new IllegalArgumentException("unsupported negate condition for prop-filter");
+        itemFilter.setIcalUid(textMatch.getValue());
+    }
+    
+    private void handleDescriptionPropFilter(PropertyFilter propFilter, NoteItemFilter itemFilter) {
+        
+        for(Iterator it = propFilter.getParamFilters().iterator(); it.hasNext();) {
+            ParamFilter paramFilter = (ParamFilter) it.next();
+            throw new IllegalArgumentException("unsupported param filter: " + paramFilter.getName());
+        }
+        
+        TextMatchFilter textMatch = propFilter.getTextMatchFilter();
+        if(textMatch==null)
+            return;
+        
+        if(textMatch.isNegateCondition())
+            throw new IllegalArgumentException("unsupported negate condition for prop-filter");
+        itemFilter.setBody(textMatch.getValue());
+    }
+    
+    private void handleSummaryPropFilter(PropertyFilter propFilter, NoteItemFilter itemFilter) {
+        
+        for(Iterator it = propFilter.getParamFilters().iterator(); it.hasNext();) {
+            ParamFilter paramFilter = (ParamFilter) it.next();
+            throw new IllegalArgumentException("unsupported param filter: " + paramFilter.getName());
+        }
+        
+        TextMatchFilter textMatch = propFilter.getTextMatchFilter();
+        if(textMatch==null)
+            return;
+        
+        if(textMatch.isNegateCondition())
+            throw new IllegalArgumentException("unsupported negate condition for prop-filter");
+        itemFilter.setDisplayName(textMatch.getValue());
     }
         
 }

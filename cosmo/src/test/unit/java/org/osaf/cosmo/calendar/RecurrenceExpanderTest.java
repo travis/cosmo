@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 
@@ -101,10 +102,10 @@ public class RecurrenceExpanderTest extends TestCase {
         RecurrenceExpander expander = new RecurrenceExpander();
         EventStamp es = new EventStamp(new NoteItem());
         es.createCalendar();
-        DateTime start = new DateTime("20070101T100000");
-        start.setTimeZone(TIMEZONE_REGISTRY.getTimeZone("America/Chicago"));
-        DateTime end = new DateTime("20070101T120000");
-        end.setTimeZone(TIMEZONE_REGISTRY.getTimeZone("America/Chicago"));
+        TimeZone ctz = TIMEZONE_REGISTRY.getTimeZone("America/Chicago");
+        DateTime start = new DateTime("20070101T100000", ctz);
+        DateTime end = new DateTime("20070101T120000", ctz);
+      
         es.setStartDate(start);
         es.setEndDate(end);
         

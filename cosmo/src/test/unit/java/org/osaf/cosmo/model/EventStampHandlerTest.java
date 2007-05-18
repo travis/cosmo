@@ -20,6 +20,7 @@ import java.util.List;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 
@@ -48,12 +49,11 @@ public class EventStampHandlerTest extends TestCase {
         Assert.assertEquals("20070212T094500", eventStamp.getTimeRangeIndex().getDateEnd());
         Assert.assertTrue(eventStamp.getTimeRangeIndex().getIsFloating().booleanValue());
         
-        DateTime start = (DateTime) eventStamp.getStartDate();
-        start.setTimeZone(registry.getTimeZone("America/Chicago"));
+        TimeZone ctz = registry.getTimeZone("America/Chicago");
+        DateTime start = new DateTime("20070212T074500", ctz);
         eventStamp.setStartDate(start);
         
-        DateTime end = (DateTime) eventStamp.getEndDate();
-        end.setTimeZone(registry.getTimeZone("America/Chicago"));
+        DateTime end = new DateTime("20070212T094500", ctz);
         eventStamp.setEndDate(end);
         
         String recur1 = "FREQ=DAILY;";

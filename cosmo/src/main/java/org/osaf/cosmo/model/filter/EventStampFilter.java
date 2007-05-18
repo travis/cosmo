@@ -81,6 +81,7 @@ public class EventStampFilter extends StampFilter {
      */
     public void setTimezone(TimeZone timezone) {
         this.timezone = timezone;
+        updateFloatingTimes();
     }
 
     @Override

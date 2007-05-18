@@ -218,12 +218,6 @@
             <version>2.0.1</version>
         </dependency>
         <dependency>
-            <groupId>jsonrpc-java</groupId>
-            <artifactId>jsonrpc-java</artifactId>
-            <version>1.0</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
             <version>1.1.2</version>
@@ -503,12 +497,6 @@
                                      <version>2006o-1</version>
                                      <type>jar</type>
                                    </artifactItem>
-                                   <artifactItem>
-                                      <groupId>org.osaf.cosmo</groupId>
-                                      <artifactId>jsonrpc-java-js</artifactId>
-                                      <version>1.0</version>
-                                      <type>jar</type>
-                                    </artifactItem>
                                 </artifactItems>
                               <outputDirectory>${project.build.directory}/${project.build.finalName}/js/lib</outputDirectory>
                            </configuration>
@@ -549,12 +537,6 @@
                                      <version>2006o-1</version>
                                      <type>jar</type>
                                    </artifactItem>
-                                   <artifactItem>
-                                      <groupId>org.osaf.cosmo</groupId>
-                                      <artifactId>jsonrpc-java-js</artifactId>
-                                      <version>1.0</version>
-                                      <type>jar</type>
-                                    </artifactItem>
                                 </artifactItems>
                               <outputDirectory>${basedir}/src/main/webapp/js/lib</outputDirectory>
                            </configuration>

@@ -93,7 +93,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
     				    obj = xhr.responseXML || obj;
     				    if (dojo.render.html.ie) {
     				        var response = xhr.responseText;
-    				        response = response.replace(/xmlns:xml.*=".*"/,"")
+    				        response = response.replace(/xmlns:xml.*=".*"/, "");
     				        obj = new ActiveXObject("Microsoft.XMLDOM");
                             if (!obj.loadXML(response)){
     		                   alert(obj.parseError.reason)

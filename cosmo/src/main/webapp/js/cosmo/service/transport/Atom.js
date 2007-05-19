@@ -42,13 +42,11 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     getCollection: function(collectionUid, kwArgs){
         var deferred = new dojo.Deferred();
         var r = this.getDefaultRequest(deferred, kwArgs);
-
+        
         var query = this._generateAuthQuery(kwArgs);
         
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/collection/" + collectionUid
-          this.queryHashToString(query);
-        
+          "/atom/collection/" + collectionUid + "/details";
         
         return deferred;    
     },
@@ -56,7 +54,6 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     getCollections: function(kwArgs){
         var deferred = new dojo.Deferred();
         var r = this.getDefaultRequest(deferred, kwArgs);
-
         r.url = cosmo.env.getBaseUrl() +
           "/atom/user/" + cosmo.util.auth.getUsername();
         
@@ -90,8 +87,45 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     },
 
-    saveItem: function (item, kwArgs){
+    saveItem: function (item, postContent, kwArgs){
+        var deferred = new dojo.Deferred();
+        var r = this.getDefaultRequest(deferred, kwArgs);
+        
+        var query = this._generateAuthQuery(kwArgs);
 
+        if (!item.editLink){
+            throw new CantSaveException("No edit link on item with UID " + item.getUid());
+        }
+        r.contentType = "application/atom+xml";
+        dojo.debug(item.editLink);
+        r.url = cosmo.env.getBaseUrl() + "/atom/" + 
+                item.editLink; + this.queryHashToString(query);
+        r.postContent = postContent;
+        r.method = "POST";
+        r.headers['X-Http-Method-Override'] = "PUT";
+
+        dojo.io.bind(r);
+        return deferred;
+        
+    },
+    
+    createItem: function(item, postContent, collectionUid, kwArgs){
+        var deferred = new dojo.Deferred();
+        var r = this.getDefaultRequest(deferred, kwArgs);
+        
+        var query = this._generateAuthQuery(kwArgs);
+        
+        r.url = cosmo.env.getBaseUrl() +
+          "/atom/collection/" +  collectionUid + 
+          this.queryHashToString(query);
+        
+        r.contentType = "application/atom+xml";
+        r.postContent = postContent;
+        r.method = "POST";
+
+        dojo.io.bind(r);
+        return deferred;
+        
     },
 
     deleteItem: function(item, kwArgs){

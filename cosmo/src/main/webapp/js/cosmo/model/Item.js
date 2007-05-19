@@ -179,12 +179,12 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             delete this._stamps[stampName];
         },
         
-        getEventStamp: function (/*Boolean?*/ createIfDoesntExist){
-            return this.getStamp("event", createIfDoesntExist);
+        getEventStamp: function (/*Boolean?*/ createIfDoesntExist, /*Object?*/initialProps){
+            return this.getStamp("event", createIfDoesntExist, initialProps);
         },
         
-        getTaskStamp: function (/*Boolean*/ createIfDoesntExist){
-            return this.getStamp("task", createIfDoesntExist);
+        getTaskStamp: function (/*Boolean*/ createIfDoesntExist, /*Object?*/initialProps){
+            return this.getStamp("task", createIfDoesntExist, initialProps);
         },
         
         getNoteOccurrence: function (/*cosmo.datetime.Date*/ recurrenceId){

@@ -16,18 +16,18 @@ For use with the JsUnit from www.jsunit.net
   <script src="jsunit/app/jsUnitCore.js" language="JavaScript" type="text/javascript"></script>
 
   <!-- scripts under test -->
-  <script src="../../../main/webapp/js/lib/dojo/dojo.js" language="JavaScript" type="text/javascript"></script>
-  <script src="../../../main/webapp/js/cosmo/util/debug.js" language="JavaScript" type="text/javascript"></script>
+  <script src="../../../js/lib/dojo/dojo.js" language="JavaScript" type="text/javascript"></script>
+  <script src="../../../js/cosmo/util/debug.js" language="JavaScript" type="text/javascript"></script>
 
   <!-- dojo setup stuff -->
   <script language="JavaScript" type="text/javascript">
 
       dojo.require("dojo.widget.*");
       dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);      
-      dojo.registerModulePath("cosmotest", "../../../../../test/unit/js/cosmo")
+      dojo.registerModulePath("cosmotest", "../../../test/unit/js/cosmo")
       dojo.require("cosmo.env");
       dojo.require("cosmotest.testutils");
-      cosmo.env.setBaseUrl("../../../main/webapp/");
+      cosmo.env.setBaseUrl("/cosmo");
 
   </script>
 
@@ -43,16 +43,8 @@ For use with the JsUnit from www.jsunit.net
   <!-- doing this in body onload seems to disable jsunit -->
   <script language="JavaScript" type="text/javascript">
     cosmotest.testutils.init(
-        ["cosmotest.model.test_model",
-        "cosmotest.model.test_common",
-        "cosmotest.model.test_eventStamp",
-        "cosmotest.model.test_performance",
-        "cosmotest.model.util.test_util",
-        "cosmotest.datetime.test_date",
-        "cosmotest.datetime.test_timezone",
-        "cosmotest.datetime.test_serialize",
-        "cosmotest.service.translators.test_eim",
-        "cosmotest.util.test_html"
+        [
+        "cosmotest.service.conduits.test_conduits"
         ]
      );
   </script>

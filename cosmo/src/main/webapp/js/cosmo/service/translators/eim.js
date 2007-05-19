@@ -27,6 +27,8 @@ dojo.require("cosmo.service.eim");
 dojo.require("cosmo.model.*");
 dojo.require("cosmo.service.translators.common");
 dojo.require("cosmo.datetime.serialize");
+dojo.require("cosmo.util.html");
+dojo.require("cosmo.util.uuid");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
     
@@ -43,6 +45,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             }     
         }}
     },
+    
+    uuidGenerator: new cosmo.util.uuid.RandomGenerator(),
+    
+    translateGetCollection: function (atomXml){
+        return atomXml;
+    },
           
     translateGetCollections: function (atomXml){
         var workspaces = atomXml.getElementsByTagName("workspace");
@@ -54,6 +62,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var collectionElements = workspace.getElementsByTagName("collection");
             
             for (var j = 0; j < collectionElements.length; j++){
+         
                 collections.push(this.collectionXmlToCollection(collectionElements[j]));
             }
         }
@@ -79,6 +88,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
         }
         var entries = atomXml.getElementsByTagName("entry");
+
         var items = {};
         var mods = {};
         for (var i = 0; i < entries.length; i++){
@@ -137,14 +147,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 item = this.recordSetToObject(eval("(" + content + ")"))
             }
             
-            var links;
-            // Safari doesn't find paging links with non NS call
-            if (dojo.render.html.safari){
-               links = entry.getElementsByTagNameNS('*', "link");
-            } else {
-               links = entry.getElementsByTagName("link");
-            }
-    
+            var links = cosmo.util.html.getElementsByTagName(entry, "link");
             for (var j = 0; j < links.length; j++){
                 var link = links[j];
                 if (link.getAttribute('rel') == 'edit'){
@@ -249,13 +252,15 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          return cosmo.datetime.fromIso8601(rid.split(":")[1]);
     },
 
-    objectToAtomEntry: function (object){
-
+    itemToAtomEntry: function (object){
+         // If the item doesn't have a uid, give it one.
+         if (!object.getUid()){
+             object.setUid(this.uuidGenerator.generate());
+         }
          var jsonObject = this.noteToRecordSet(object);
-
          return '<entry xmlns="http://www.w3.org/2005/Atom">' +
-         '<title>' + object.data.title + '</title>' +
-         '<id>urn:uuid:' + object.data.id + '</id>' +
+         '<title>' + object.getDisplayName() + '</title>' +
+         '<id>urn:uuid:' + object.getUid() + '</id>' +
          '<updated>' + dojo.date.toRfc3339(new Date()) + '</updated>' +
          '<author><name>' + cosmo.util.auth.getUsername() + '</name></author>' +
          '<content type="application/eim+json">' + dojo.json.serialize(jsonObject) + '</content>' +
@@ -303,17 +308,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     noteToNoteRecord: function(note){
         var body = note.getBody();
-
         with (cosmo.service.eim.constants){
+            var fields = {};
+            if (body) fields.body = body;
             return {
                 prefix: prefix.NOTE,
                 ns: ns.NOTE,
                 keys: {
                     uuid: [type.TEXT, note.getUid()]
                 },
-                fields: {
-                    body: body? [type.CLOB, body] : undefined
-                }
+                fields: fields
             }
         }
     },

@@ -24,7 +24,8 @@
  * on appropriate topic channels.
  *
  */
-dojo.provide("cosmo.service.conduits.common")
+dojo.provide("cosmo.service.conduits.common");
+dojo.require("dojo.uuid.RandomGenerator");
 
 dojo.declare("cosmo.service.conduits.Conduit", null, {
 
@@ -41,23 +42,22 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         this.translateGetCollections = dojo.lang.hitch(this, function (obj, xhr){
             return this._translator.translateGetCollections(obj);
         });
-
+        this.translateGetCollection = dojo.lang.hitch(this, function (obj, xhr){
+            return this._translator.translateGetCollection(obj);
+        });
     },
 
     getCollections: function (kwArgs){
         var deferred = this._transport.getCollections(kwArgs);
 
         deferred.addCallback(this.translateGetCollections);
-          
         return deferred;
     },
     
     getSubscriptions: function (kwArgs){
 
         var deferred = this._transport.getSubscriptions(kwArgs);
-      
         return deferred;
-
     },
 
     /*
@@ -86,10 +86,15 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     saveItem: function(item, kwArgs){
 
-        // add object translator to callback chain
-
         // do topic notifications
-        return deferred;
+        return this._transport.saveItem(item, this._translator.itemToAtomEntry(item), kwArgs);
+
+    },
+    
+    createItem: function(item, parentCollection, kwArgs){
+        return this._transport.createItem(item, this._translator.itemToAtomEntry(item), 
+                                          parentCollection.getUid(), kwArgs);
+        
     },
 
     removeItem: function(collection, item, kwArgs){

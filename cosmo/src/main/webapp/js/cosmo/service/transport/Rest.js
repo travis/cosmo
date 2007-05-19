@@ -14,14 +14,6 @@
 
  /**
  * summary:
- *      This module provides wrappers around dojo.io.bind to simplify using
- *      the Cosmo Management Protocol (CMP) from javascript.
- * description:
- *      For more information about CMP, please see:
- *      http://wiki.osafoundation.org/Projects/CosmoManagementProtocol
- *
- *      Most methods take handlerDicts identical to those required
- *      by dojo.io.bind.
  */
 
 dojo.provide("cosmo.service.transport.Rest");
@@ -45,7 +37,9 @@ dojo.declare("cosmo.service.transport.Rest", null,
          */
         getDefaultRequest: function (/*dojo.Deferred*/deferred,
                                      /*boolean?*/ sync){
-
+            
+            deferred.addErrback(function(e) { cosmo.app.showErr("Service error", e); return e;});
+          
             var request = cosmo.util.auth.getAuthorizedRequest();
 
             request.load = this.resultCallback(deferred);
@@ -98,7 +92,12 @@ dojo.declare("cosmo.service.transport.Rest", null,
     				} else {
     				    obj = xhr.responseXML || obj;
     				    if (dojo.render.html.ie) {
-    				        obj = dojo.dom.createDocumentFromText(xhr.responseText);
+    				        var response = xhr.responseText;
+    				        response = response.replace(/xmlns:xml.*=".*"/,"")
+    				        obj = new ActiveXObject("Microsoft.XMLDOM");
+                            if (!obj.loadXML(response)){
+    		                   alert(obj.parseError.reason)
+                            }
     				    }
     					deferredRequestHandler.callback(obj, xhr);
     				}

@@ -95,15 +95,20 @@ public class UserServiceResource
                                           locator.getCmpUrl(user));
         service.appendChild(cmpLink);
 
-        Element davLink = makeLinkElement(doc, SVC_DAV,
-                                          CmpConstants.MEDIA_TYPE_XML,
-                                          locator.getDavUrl(user));
-        service.appendChild(davLink);
-
         Element mcLink = makeLinkElement(doc, SVC_MORSE_CODE,
                                          CmpConstants.MEDIA_TYPE_XML,
                                          locator.getMorseCodeUrl(user));
         service.appendChild(mcLink);
+
+        Element atomLink = makeLinkElement(doc, SVC_ATOM,
+                                           MEDIA_TYPE_ATOMSVC,
+                                           locator.getAtomUrl(user));
+        service.appendChild(atomLink);
+
+        Element davLink = makeLinkElement(doc, SVC_DAV,
+                                          CmpConstants.MEDIA_TYPE_XML,
+                                          locator.getDavUrl(user));
+        service.appendChild(davLink);
 
         Element davPrincipalLink =
             makeLinkElement(doc, SVC_DAV_PRINCIPAL,

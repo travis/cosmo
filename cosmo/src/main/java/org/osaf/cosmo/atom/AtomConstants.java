@@ -24,6 +24,8 @@ public interface AtomConstants {
     // media type constants
 
     /** */
+    public static final String MEDIA_TYPE_ATOMSVC = "application/atomsvc+xml";
+    /** */
     public static final String MEDIA_TYPE_ATOM = "application/atom+xml";
     /** */
     public static final String MEDIA_TYPE_HTML = "text/html";

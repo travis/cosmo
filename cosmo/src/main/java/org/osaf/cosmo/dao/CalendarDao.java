@@ -64,10 +64,13 @@ public interface CalendarDao {
      *            collection to search
      * @param rangeStart time range start
      * @param rangeEnd time range end
+     * @param expandRecurringEvents if true, recurring events will be expanded
+     *        and each occurrence will be returned as a NoteItemOccurrence.
      * @return set ContentItem objects that contain EventStamps that occur
      *         int the given timeRange.
      */
     public Set<ContentItem> findEvents(CollectionItem collection,
-                                             DateTime rangeStart, DateTime rangeEnd);
+                                             DateTime rangeStart, DateTime rangeEnd,
+                                             boolean expandRecurringEvents);
 
 }

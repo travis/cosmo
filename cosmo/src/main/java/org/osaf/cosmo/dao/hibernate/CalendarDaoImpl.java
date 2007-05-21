@@ -51,6 +51,7 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
                                              CalendarFilter filter) {
 
         try {
+            // translate CalendarFilter to ItemFilter and execute filter
             ItemFilter itemFilter = new CalendarFilterConverter().translateToItemFilter(collection, filter);
             Set results = itemFilterProcessor.processFilter(getSession(), itemFilter);
             return (Set<ContentItem>) results;
@@ -59,17 +60,21 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
         }
     }
     
-    
-
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.dao.CalendarDao#findEvents(org.osaf.cosmo.model.CollectionItem, net.fortuna.ical4j.model.DateTime, net.fortuna.ical4j.model.DateTime)
+     * @see org.osaf.cosmo.dao.CalendarDao#findEvents(org.osaf.cosmo.model.CollectionItem, net.fortuna.ical4j.model.DateTime, net.fortuna.ical4j.model.DateTime, boolean)
      */
-    public Set<ContentItem> findEvents(CollectionItem collection, DateTime rangeStart, DateTime rangeEnd) {
+    public Set<ContentItem> findEvents(CollectionItem collection, DateTime rangeStart, DateTime rangeEnd, boolean expandRecurringEvents) {
+        
+        // Create a NoteItemFilter that filters by parent
         NoteItemFilter itemFilter = new NoteItemFilter();
         itemFilter.setParent(collection);
+        
+        // and EventStamp by timeRange
         EventStampFilter eventFilter = new EventStampFilter();
         Period period = new Period(rangeStart, rangeEnd);
         eventFilter.setPeriod(period);
+        eventFilter.setExpandRecurringEvents(expandRecurringEvents);
         itemFilter.getStampFilters().add(eventFilter);
         
         try {

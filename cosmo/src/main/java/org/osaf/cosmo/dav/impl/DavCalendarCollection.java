@@ -167,6 +167,9 @@ public class DavCalendarCollection extends DavCollection
             DavEvent member = (DavEvent)
                 ((StandardDavResourceFactory)getFactory()).
                 createResource(memberLocator, getSession(), memberItem);
+            
+            if(member!=null)
+                members.add(member);
             members.add(member);
         }
 

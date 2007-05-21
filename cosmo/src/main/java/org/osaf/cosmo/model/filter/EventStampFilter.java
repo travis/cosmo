@@ -30,6 +30,7 @@ public class EventStampFilter extends StampFilter {
     private Period period = null;
     private DateTime dstart, dend, fstart, fend;
     private TimeZone timezone = null;
+    private boolean expandRecurringEvents = false;
     
     public Period getPeriod() {
         return period;
@@ -65,6 +66,23 @@ public class EventStampFilter extends StampFilter {
         return fend.toString();
     }
     
+    public boolean isExpandRecurringEvents() {
+        return expandRecurringEvents;
+    }
+
+    /**
+     * If a time-range query is specified, the filter can be configured
+     * to expand recurring events within the time range.  This results
+     * in a <code>NoteOccurrence</code> item returned for each occurrence
+     * of a matching recurring event during the specified time range.
+     * @param expandRecurringEvents if true and a time-range is specified,
+     *        return a NoteOccurrence for each occurence of a recurring event
+     *        during the time-range.
+     */
+    public void setExpandRecurringEvents(boolean expandRecurringEvents) {
+        this.expandRecurringEvents = expandRecurringEvents;
+    }
+
     public EventStampFilter() {
     }
 

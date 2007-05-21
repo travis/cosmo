@@ -27,6 +27,11 @@ public interface EimSchemaConstants {
     /** */
     public static final String PREFIX_ITEM = "item";
     /** */
+    public static final String NS_OCCURRENCE_ITEM =
+        "http://osafoundation.org/eim/occurrence/0";
+    /** */
+    public static final String PREFIX_OCCURRENCE_ITEM = "occurrence";
+    /** */
     public static final String NS_MODIFIEDBY =
         "http://osafoundation.org/eim/modifiedBy/0";
     /** */

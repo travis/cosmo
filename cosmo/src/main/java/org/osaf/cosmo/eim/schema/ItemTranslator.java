@@ -36,6 +36,7 @@ import org.osaf.cosmo.eim.schema.message.MessageApplicator;
 import org.osaf.cosmo.eim.schema.message.MessageGenerator;
 import org.osaf.cosmo.eim.schema.note.NoteApplicator;
 import org.osaf.cosmo.eim.schema.note.NoteGenerator;
+import org.osaf.cosmo.eim.schema.occurenceitem.OccurrenceItemGenerator;
 import org.osaf.cosmo.eim.schema.task.TaskApplicator;
 import org.osaf.cosmo.eim.schema.task.TaskGenerator;
 import org.osaf.cosmo.eim.schema.unknown.UnknownApplicator;
@@ -43,6 +44,7 @@ import org.osaf.cosmo.eim.schema.unknown.UnknownGenerator;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.NoteOccurrence;
 
 /**
  * Handles the translation of EIM recordsets to/from an
@@ -69,6 +71,7 @@ public class ItemTranslator implements EimSchemaConstants {
     private TaskGenerator taskGenerator;
     private MessageApplicator messageApplicator;
     private MessageGenerator messageGenerator;
+    private OccurrenceItemGenerator occurrenceGenerator;
     private UnknownApplicator unknownApplicator;
     private UnknownGenerator unknownGenerator;
 
@@ -76,6 +79,13 @@ public class ItemTranslator implements EimSchemaConstants {
     public ItemTranslator(Item item) {
         this.item = item;
 
+        // If item is an occurrence, then we only need an 
+        // occurrence generator
+        if(item instanceof NoteOccurrence) {
+            occurrenceGenerator = new OccurrenceItemGenerator(item);
+            return;
+        }
+        
         contentItemApplicator = new ContentItemApplicator(item);
         contentItemGenerator = new ContentItemGenerator(item);
 
@@ -131,8 +141,8 @@ public class ItemTranslator implements EimSchemaConstants {
             else if (record.getNamespace().equals(NS_MODIFIEDBY)) {
                 modifiedByApplicator.applyRecord(record);
                 continue;
-            }
-
+            } 
+            
             if (item instanceof NoteItem) {
                 if (record.getNamespace().equals(NS_NOTE)) {
                     noteApplicator.applyRecord(record);
@@ -190,6 +200,13 @@ public class ItemTranslator implements EimSchemaConstants {
         EimRecordSet recordset = new EimRecordSet();
         recordset.setUuid(item.getUid());
 
+        // If item is an occurrence, then we only need an 
+        // occurrence generator
+        if(item instanceof NoteOccurrence) {
+            recordset.addRecords(occurrenceGenerator.generateRecords());
+            return recordset;
+        }
+        
         if (! BooleanUtils.isTrue(item.getIsActive())) {
             recordset.setDeleted(true);
             return recordset;

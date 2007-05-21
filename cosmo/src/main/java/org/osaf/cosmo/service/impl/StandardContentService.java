@@ -52,6 +52,7 @@ import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.lock.LockManager;
 
@@ -677,7 +678,35 @@ public class StandardContentService implements ContentService {
         }
         return calendarDao.findEvents(calendar, filter);
     }
-
+    
+    
+    /**
+     * Find calendar events by time range.
+     *
+     * @param collection
+     *            collection to search
+     * @param rangeStart time range start
+     * @param rangeEnd time range end
+     * @param expandRecurringEvents if true, recurring events will be expanded
+     *        and each occurrence will be returned as a NoteItemOccurrence.
+     * @return set ContentItem objects that contain EventStamps that occur
+     *         int the given timeRange.
+     */
+    public Set<ContentItem> findEvents(CollectionItem collection, DateTime rangeStart, DateTime rangeEnd, boolean expandRecurringEvents) {
+        return calendarDao.findEvents(collection, rangeStart, rangeEnd, expandRecurringEvents);
+    }
+    
+    /**
+     * Find items by filter.
+     *
+     * @param filter
+     *            filter to use in search
+     * @return set items matching specified
+     *         filter.
+     */
+    public Set<Item> findItems(ItemFilter filter) {
+        return contentDao.findItems(filter);
+    }
 
     /**
      * Creates a ticket on an item.

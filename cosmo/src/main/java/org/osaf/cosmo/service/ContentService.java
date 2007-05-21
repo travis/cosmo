@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.DateTime;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
@@ -29,6 +30,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.filter.ItemFilter;
 
 /**
  * Interface for services that manage access to user content.
@@ -250,6 +252,16 @@ public interface ContentService extends Service {
 
     
     /**
+     * Find items by filter.
+     *
+     * @param filter
+     *            filter to use in search
+     * @return set items matching specified
+     *         filter.
+     */
+    public Set<Item> findItems(ItemFilter filter);
+    
+    /**
      * Find calendar events by filter.
      *
      * @param calendar
@@ -262,6 +274,22 @@ public interface ContentService extends Service {
     public Set<ContentItem> findEvents(CollectionItem calendar,
                                              CalendarFilter filter);
 
+    /**
+     * Find calendar events by time range.
+     *
+     * @param collection
+     *            collection to search
+     * @param rangeStart time range start
+     * @param rangeEnd time range end
+     * @param expandRecurringEvents if true, recurring events will be expanded
+     *        and each occurrence will be returned as a NoteItemOccurrence.
+     * @return set ContentItem objects that contain EventStamps that occur
+     *         int the given timeRange.
+     */
+    public Set<ContentItem> findEvents(CollectionItem collection,
+                                             DateTime rangeStart, DateTime rangeEnd,
+                                             boolean expandRecurringEvents);
+    
     
     /**
      * Creates a ticket on an item.

@@ -77,7 +77,7 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
         return null;
     }
 
-    public Set<ContentItem> findEvents(CollectionItem collection, DateTime rangeStart, DateTime rangeEnd) {
+    public Set<ContentItem> findEvents(CollectionItem collection, DateTime rangeStart, DateTime rangeEnd, boolean expandRecurringEvents) {
         return null;
     }
     

@@ -15,8 +15,11 @@
  */
 package org.osaf.cosmo.dao.hibernate.query;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -25,11 +28,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.osaf.cosmo.calendar.Instance;
 import org.osaf.cosmo.calendar.InstanceList;
 import org.osaf.cosmo.calendar.RecurrenceExpander;
-import org.osaf.cosmo.model.BaseEventStamp;
+import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.filter.AttributeFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
@@ -47,6 +53,8 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     private static final Log log = LogFactory.getLog(StandardItemFilterProcessor.class);
     
     public StandardItemFilterProcessor() {}
+    
+    
     
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor#processFilter(org.hibernate.Session, org.osaf.cosmo.model.filter.ItemFilter)
@@ -193,17 +201,16 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     
     /**
      * Because a timeRange query requires two passes: one to get the list
-     * of possible events that occur in the range, and one to ensure that
-     * any recurring event returned in the list actually occurs in the
-     * time range.  This is required because we only index a start and end
+     * of possible events that occur in the range, and one 
+     * to expand recurring events if necessary.
+     * This is required because we only index a start and end
      * for the entire recurrence series, and expansion is required to determine
-     * if the event actually occurs.
+     * if the event actually occurs, and to return individual occurences.
      */
     private HashSet<Item> processResults(List<Item> results, ItemFilter itemFilter) {
         boolean hasTimeRangeFilter = false;
         HashSet<Item> processedResults = new HashSet<Item>();
         EventStampFilter eventFilter = (EventStampFilter) itemFilter.getStampFilter(EventStampFilter.class);
-        RecurrenceExpander expander = new RecurrenceExpander();
         
         if(eventFilter!=null)
             hasTimeRangeFilter = (eventFilter.getPeriod()!=null);
@@ -218,27 +225,63 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             
             NoteItem note = (NoteItem) item;
             
-            // If note is a modification, then add the master note
-            if(note.getModifies()!=null)
+            // If note is a modification then add both the modification and the 
+            // master.
+            if(note.getModifies()!=null) {
+                processedResults.add(note);
                 processedResults.add(note.getModifies());
+            } 
             // If filter doesn't have a timeRange, then we are done
             else if(!hasTimeRangeFilter)
                 processedResults.add(note);
             else {
-                BaseEventStamp eventStamp = BaseEventStamp.getStamp(note);
-                // If event is not recurring, then we are done
-                if(!eventStamp.isRecurring())
-                    processedResults.add(note);
-                else {
-                    // otherwise, determine if event occurs in range
-                    InstanceList instances = expander.getOcurrences(eventStamp.getEvent(), eventFilter.getPeriod().getStart(), eventFilter.getPeriod().getEnd());
-                    if(instances.size()>0)
-                        processedResults.add(note);
-                }
+                processedResults.addAll(processMasterNote(note, eventFilter));
             }
         }
         
         return processedResults;
+    }
+    
+    private Collection<ContentItem> processMasterNote(NoteItem note,
+            EventStampFilter filter) {
+        EventStamp eventStamp = EventStamp.getStamp(note);
+        ArrayList<ContentItem> results = new ArrayList<ContentItem>();
+
+        // If the event is not recurring, then return the
+        // master note.
+        if (!eventStamp.isRecurring()) {
+            results.add(note);
+            return results;
+        }
+
+        // Otherwise, expand the recurring item to determine if it actually
+        // occurs
+        RecurrenceExpander expander = new RecurrenceExpander();
+        InstanceList instances = expander.getOcurrences(eventStamp
+                .getCalendar(), filter.getPeriod().getStart(), filter
+                .getPeriod().getEnd());
+
+        // If recurring event occurs in range, add master
+        if (instances.size() > 0)
+            results.add(note);
+        
+        // If were aren't expanding, then return
+        if(filter.isExpandRecurringEvents() == false)
+            return results;
+        
+        // Otherwise, add an occurence item for each occurrence
+        for (Iterator<Entry<String, Instance>> it = instances.entrySet()
+                .iterator(); it.hasNext();) {
+            Entry<String, Instance> entry = it.next();
+
+            // Ignore overrides as they are separate items that should have
+            // already been added
+            if (entry.getValue().isOverridden() == false) {
+                results.add(new NoteOccurrence(entry.getValue().getRid(), note));
+            }
+        }
+
+        return results;
     }
 
 }

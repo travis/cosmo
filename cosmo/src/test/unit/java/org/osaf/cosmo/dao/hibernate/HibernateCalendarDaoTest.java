@@ -340,7 +340,9 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         event = generateEvent("test2.ics", "eventwithtimezone2.ics", "testuser");
         newEvent = (NoteItem) contentDao.createContent(calendar, event);
         event = generateEvent("test3.ics", "eventwithtimezone3.ics", "testuser");
+        event.setUid("test3uid");
         newEvent = (NoteItem) contentDao.createContent(calendar, event);
+        
 
         // modification to infinite daily recurring eventwithtimezone3.ics
         event = generateEventException("mod.ics", "eventmodwithtimezone.ics", "testuser");
@@ -349,8 +351,8 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         
         clearSession();
 
-        // Should match all
-        Set<ContentItem> queryEvents = calendarDao.findEvents(calendar, new DateTime("20070501T010000Z"), new DateTime("20070601T010000Z"));
+        // Should match all except modification
+        Set<ContentItem> queryEvents = calendarDao.findEvents(calendar, new DateTime("20070501T010000Z"), new DateTime("20070601T010000Z"), false);
         Assert.assertEquals(3, queryEvents.size());
         
         verifyItemNameInSet(queryEvents, "test1.ics");
@@ -358,24 +360,50 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         verifyItemNameInSet(queryEvents, "test3.ics");
         
         // Should match two
-        queryEvents = calendarDao.findEvents(calendar, new DateTime("20070515T010000Z"), new DateTime("20070518T010000Z"));
+        queryEvents = calendarDao.findEvents(calendar, new DateTime("20070515T010000Z"), new DateTime("20070518T010000Z"), false);
         Assert.assertEquals(2, queryEvents.size());
         verifyItemNameInSet(queryEvents, "test1.ics");
         verifyItemNameInSet(queryEvents, "test3.ics");
         
-        // Should match one
-        queryEvents = calendarDao.findEvents(calendar, new DateTime("20200517T010000Z"), new DateTime("20200518T010000Z"));
+        // Should match one (the infinite recurring event)
+        queryEvents = calendarDao.findEvents(calendar, new DateTime("20200517T010000Z"), new DateTime("20200518T010000Z"), false);
         Assert.assertEquals(1, queryEvents.size());
         verifyItemNameInSet(queryEvents, "test3.ics");
         
-        // Should match one
-        queryEvents = calendarDao.findEvents(calendar, new DateTime("20060501T010000Z"), new DateTime("20060601T010000Z"));
-        Assert.assertEquals(1, queryEvents.size());
+        // Should match the modification, so the results should include the 
+        // modification and the master
+        queryEvents = calendarDao.findEvents(calendar, new DateTime("20060501T010000Z"), new DateTime("20060601T010000Z"), false);
+        Assert.assertEquals(2, queryEvents.size());
         verifyItemNameInSet(queryEvents, "test3.ics");
+        verifyItemNameInSet(queryEvents, "mod.ics");
         
         // Should match none
-        queryEvents = calendarDao.findEvents(calendar, new DateTime("20060401T010000Z"), new DateTime("20060501T010000Z"));
+        queryEvents = calendarDao.findEvents(calendar, new DateTime("20060401T010000Z"), new DateTime("20060501T010000Z"), false);
         Assert.assertEquals(0, queryEvents.size());
+        
+        // Test expand
+        // Should match the modification, so the results should include the modification
+        // and the master (but no occurences because the only occurrence is the mod)
+        queryEvents = calendarDao.findEvents(calendar, new DateTime("20060501T010000Z"), new DateTime("20060601T010000Z"), true);
+        Assert.assertEquals(2, queryEvents.size());
+        verifyItemNameInSet(queryEvents, "test3.ics");
+        verifyItemNameInSet(queryEvents, "mod.ics");
+        
+        // Should match 10 occurences in the future, so the results should include
+        // the master plus 10 occurence items
+        queryEvents = calendarDao.findEvents(calendar, new DateTime("20200517T010000Z"), new DateTime("20200527T010000Z"), true);
+        Assert.assertEquals(11, queryEvents.size());
+        verifyItemNameInSet(queryEvents, "test3.ics");
+        verifyUidInSet(queryEvents, "test3uid:20200517T081500Z");
+        verifyUidInSet(queryEvents, "test3uid:20200518T081500Z");
+        verifyUidInSet(queryEvents, "test3uid:20200519T081500Z");
+        verifyUidInSet(queryEvents, "test3uid:20200520T081500Z");
+        verifyUidInSet(queryEvents, "test3uid:20200521T081500Z");
+        verifyUidInSet(queryEvents, "test3uid:20200522T081500Z");
+        verifyUidInSet(queryEvents, "test3uid:20200523T081500Z");
+        verifyUidInSet(queryEvents, "test3uid:20200524T081500Z");
+        verifyUidInSet(queryEvents, "test3uid:20200525T081500Z");
+        verifyUidInSet(queryEvents, "test3uid:20200526T081500Z");
     }
 
     private User getUser(UserDao userDao, String username) {
@@ -438,11 +466,20 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
     
     private void verifyItemNameInSet(Set<ContentItem> items, String name) {
         for(ContentItem item: items) {
-            if(item.getName().equals(name))
+            if(name.equals(item.getName()))
                 return;
         }
         
         Assert.fail("item " + name + " not in set");
+    }
+    
+    private void verifyUidInSet(Set<ContentItem> items, String uid) {
+        for(ContentItem item: items) {
+            if(uid.equals(item.getUid()))
+                return;
+        }
+        
+        Assert.fail("uid " + uid + " not in set");
     }
 
 }

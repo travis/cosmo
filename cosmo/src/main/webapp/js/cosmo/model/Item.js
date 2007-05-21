@@ -208,14 +208,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
           }
           return clone;
       },
-      
-      getDelta: function (formValues){
-          //summary: returns a Delta object, which encapsulates the desired changes 
-          //         made to the note given the values in the form.
-          //description: for every value in formValues, this function will compare it to the 
-          //             the equivalent property in this object, be it a Note or NoteOccurrence
-      }
-        
+              
     });
     
 dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {

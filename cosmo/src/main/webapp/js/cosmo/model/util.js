@@ -19,6 +19,13 @@ cosmo.model.util._upperFirstChar = function(str){
     return str.charAt(0).toUpperCase() + str.substr(1,str.length -1 );
 }
 
+cosmo.model.util.getGetterAndSetterName = function(propertyName){
+        var upProp = cosmo.model.util._upperFirstChar(propertyName);
+        var setterName = "set" + upProp;
+        var getterName = "get" + upProp;
+        return [getterName, setterName];
+}
+
 cosmo.model.util.BasePropertyApplicator = function(){}   
 cosmo.model.util.BasePropertyApplicator.prototype = {
     
@@ -31,9 +38,9 @@ cosmo.model.util.BasePropertyApplicator.prototype = {
     
     addProperty: function(ctr, propertyName, kwArgs){
         kwArgs = kwArgs || {};
-        var upProp = cosmo.model.util._upperFirstChar(propertyName);
-        var setterName = "set" + upProp;
-        var getterName = "get" + upProp;
+        var getterAndSetter = cosmo.model.util.getGetterAndSetterName(propertyName);
+        var setterName = getterAndSetter[1];
+        var getterName = getterAndSetter[0];
         
         if (!ctr.prototype[setterName]){
             ctr.prototype[setterName] = this.getSetter(ctr, propertyName, kwArgs);
@@ -105,6 +112,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         ctr.prototype.toString = this._genericToString;
         ctr.prototype.equals = this._genericEquals;
         ctr.prototype.clone = this._genericClone;
+        ctr.prototype.isChanged = this._genericIsChanged;
         
         if (kwArgs["enhanceInitializer"]){
             var oldInitter = ctr.prototype.initializer;
@@ -197,7 +205,14 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
             clone[propName] = cosmo.model.clone(this[propName]);
         }
         return clone;
+    },
+          
+    _genericIsChanged: function(propertyName, changedProperty){
+          var getterName = cosmo.model.util.getGetterAndSetterName(propertyName)[0];
+          var origProperty = this[getterName]();
+          return !cosmo.model.util.equals(origProperty, changedProperty);
     }
+    
 });
 
 //instantiate the singleton 

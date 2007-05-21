@@ -24,7 +24,7 @@ test_declareStamp : function(){
     cosmo.model.declareStamp("TestStamp", "test",
         [["testString", String, {"default" : "def"}],
          ["testArrayOfNumbers", [Array, Number], {"default" : function(){return [1,2,3]}}]],
-        {
+         {
             initializer: function(kwArgs){
                 this.initializeProperties(kwArgs);
             }});

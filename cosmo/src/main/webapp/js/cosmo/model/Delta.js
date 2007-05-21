@@ -17,9 +17,10 @@
 dojo.provide("cosmo.model.Delta");
 
 dojo.declare("cosmo.model.Delta", null, {
-    initializer: function(){
+    initializer: function(/*cosmo.model.Note | cosmo.model.NoteOccurrence */ note){
         this._stampProps = {}
         this._propertyProps = {};
+        this._note = note;
     },
     
     addStampProperty: function (stampName, propertyName, value){
@@ -31,29 +32,37 @@ dojo.declare("cosmo.model.Delta", null, {
         this._propertyProps[propertyName] = value;
     },
     
-    deltafy: function (/*cosmo.model.Note*/ note){
-        // summary: removes all properties which are the same as given note
+    getProperty: function(propertyName){
+       return this._propertyProps[propertyName];
+    },
+    
+    getStampProperty: function(stampName, propertyName){
+        var stamp = this._getStamp(stampName);
+        return stamp[propertyName]; 
+    },
+    
+    deltafy: function (){
+        // summary: removes all properties which are the same as its note
         // description: removes all properties from the delta which are the same
-        //              same as the properties in the given note and its stamps,
+        //              same as the properties in its note and its stamps,
         //              leaving you with just the delta, hence "deltafy"
-        this._filterOutEqualProperties(note, this._propertyProps);
-        //XXX
-        
+        this._filterOutEqualProperties(this._note, this._propertyProps);
+        for (var stampName in this._stampProps){
+            var stamp = this._note.getStamp(stampName);
+            var stampChanges = this._stampProps[stamp];
+            this._filterOutEqualProperties(stamp, stampChanges);
+        }        
     },
     
     _filterOutEqualProperties: function (original, changes){
         for (var propName in changes){
             var changeValue = changes[propName];
-            var origValue = this._getPropertyUsingGetter(original, propName);
-            if (cosmo.model.equals(changeValue, origValue)){
+            if (!original.isChanged(propName, changeValue)){
                 delete changes[propName];
             } 
         }
     },
     
-    _getPropertyUsingGetter: function (object, propertyName){
-        
-    },
     _getStamp: function (stampName){
         var stamp = this._stampProps[stampName];
         if (!stamp){

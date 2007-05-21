@@ -43,7 +43,8 @@ For use with the JsUnit from www.jsunit.net
   <!-- doing this in body onload seems to disable jsunit -->
   <script language="JavaScript" type="text/javascript">
     cosmotest.testutils.init(
-        ["cosmotest.model.test_model",
+        ["cosmotest.model.test_delta",
+        "cosmotest.model.test_model",
         "cosmotest.model.test_common",
         "cosmotest.model.test_eventStamp",
         "cosmotest.model.test_performance",
@@ -62,12 +63,12 @@ For use with the JsUnit from www.jsunit.net
 <body>
   <table>
   <tbody id="test-menu">
-  	
+      
   </tbody>
   </table>
+
 <script type="text/javascript" src="setupTester.js" language="JavaScript"/>
- 
-   <button id="run_tests" onclick="run_tests()">Run Tests</button>
+  <button id="run_tests" onclick="run_tests()">Run Tests</button>
   <br />
   <br />
   <div id="output">

@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.model.filter;
 
+import java.util.Date;
+
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.TimeZone;
@@ -48,6 +50,17 @@ public class EventStampFilter extends StampFilter {
         
         // set timezone on floating times
         updateFloatingTimes();
+    }
+    
+    /**
+     * Matches events that occur in a given time-range.
+     * @param start range start
+     * @param end range end
+     */
+    public void setTimeRange(Date start, Date end) {
+        DateTime startDt = utc(start);
+        DateTime endDt = utc(end);
+        setPeriod(new Period(startDt, endDt));
     }
 
     public String getUTCStart() {
@@ -122,6 +135,12 @@ public class EventStampFilter extends StampFilter {
             // if the timezone is null then default system timezone is used
             fend.setTimeZone((timezone != null) ? timezone : null);
         }
+    }
+    
+    private static DateTime utc(java.util.Date date) {
+        DateTime dt = new DateTime(date);
+        dt.setUtc(true);
+        return dt;
     }
  
 }

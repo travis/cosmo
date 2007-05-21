@@ -15,12 +15,11 @@
  */
 package org.osaf.cosmo.atom.generator;
 
-import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Entry;
-
-import org.osaf.cosmo.calendar.query.CalendarFilter;
+import org.apache.abdera.model.Feed;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.filter.ItemFilter;
 
 /**
  * An interface for classes that generate Atom feeds and entries
@@ -39,7 +38,7 @@ public interface FeedGenerator {
      *
      * @param filter the query filter
      */
-    public void setFilter(CalendarFilter filter);
+    public void setFilter(ItemFilter filter);
 
     /**
      * Generates an Atom feed containing entries for items in a

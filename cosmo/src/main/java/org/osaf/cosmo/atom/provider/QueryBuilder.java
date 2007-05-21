@@ -19,21 +19,19 @@ import java.text.ParseException;
 import java.util.Date;
 
 import org.apache.abdera.protocol.server.provider.RequestContext;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.calendar.query.CalendarFilter;
-import org.osaf.cosmo.calendar.query.ComponentFilter;
-import org.osaf.cosmo.calendar.query.TimeRangeFilter;
+import org.osaf.cosmo.model.filter.EventStampFilter;
+import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.util.DateUtil;
 
 /**
  * A utility class for constructing query information based on a
  * request context.
  *
- * @see CalendarFilter
+ * @see ItemFilter
  * @see RequestContext
  */
 public class QueryBuilder {
@@ -41,11 +39,11 @@ public class QueryBuilder {
 
     /**
      * <p>
-     * Constructs a calendar filter based on the information provided
+     * Constructs an item filter based on the information provided
      * in the request context.
      * </p>
      * <p>
-     * The returned filter specifies all <code>VEVENT</code>s that
+     * The returned filter specifies all events that
      * begin with the time range specified by the
      * <code>start-min</code> and <code>start-max</code> request
      * parameters. These parameter values are both required and must
@@ -55,7 +53,7 @@ public class QueryBuilder {
      * @throws InvalidQueryException if the required parameters are
      * not found or cannot be parsed
      */
-    public static CalendarFilter buildFilter(RequestContext request)
+    public static ItemFilter buildFilter(RequestContext request)
         throws InvalidQueryException {
         String isostart = request.getParameter("start-min");
         if (StringUtils.isBlank(isostart))
@@ -71,18 +69,15 @@ public class QueryBuilder {
 
         Date start = parseDateParameter(isostart);
         Date end = parseDateParameter(isoend);
-        TimeRangeFilter tr = new TimeRangeFilter(start, end);
+        
+        NoteItemFilter itemFilter = new NoteItemFilter();
+        EventStampFilter eventFilter = new EventStampFilter();
+        eventFilter.setTimeRange(start, end);
+        //eventFilter.setExpandRecurringEvents(true);
 
-        ComponentFilter vev = new ComponentFilter("VEVENT");
-        vev.setTimeRangeFilter(tr);
-
-        ComponentFilter vcal = new ComponentFilter("VCALENDAR");
-        vcal.getComponentFilters().add(vev);
-
-        CalendarFilter cal = new CalendarFilter();
-        cal.setFilter(vcal);
-
-        return cal;
+        itemFilter.getStampFilters().add(eventFilter);
+        
+        return itemFilter;
     }
   
     private static Date parseDateParameter(String value)

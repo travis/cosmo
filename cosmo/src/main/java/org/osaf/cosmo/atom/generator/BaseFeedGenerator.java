@@ -22,28 +22,23 @@ import java.util.TreeSet;
 import javax.activation.MimeTypeParseException;
 
 import org.apache.abdera.i18n.iri.IRISyntaxException;
-import org.apache.abdera.factory.Factory;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Generator;
-import org.apache.abdera.model.Person;
 import org.apache.abdera.model.Link;
-
+import org.apache.abdera.model.Person;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.atom.AtomConstants;
-import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
-import org.osaf.cosmo.service.ContentService;
 
 /**
  * A base class for feed generators.
@@ -58,7 +53,7 @@ public abstract class BaseFeedGenerator
 
     private StandardGeneratorFactory factory;
     private ServiceLocator serviceLocator;
-    private CalendarFilter filter;
+    private ItemFilter filter;
 
     // FeedGenerator methods
 
@@ -75,7 +70,7 @@ public abstract class BaseFeedGenerator
      *
      * @param filter the query filter
      */
-    public void setFilter(CalendarFilter filter) {
+    public void setFilter(ItemFilter filter) {
         this.filter = filter;
     }
 
@@ -135,8 +130,9 @@ public abstract class BaseFeedGenerator
         // XXX query
 
         if (filter != null) {
-            for (ContentItem item : factory.getContentService().
-                     findEvents(collection, filter))
+            filter.setParent(collection);
+            for (Item item : factory.getContentService().
+                     findItems(filter))
                 contents.add((NoteItem)item);
         } else {
             for (Item child : collection.getChildren()) {
@@ -529,7 +525,7 @@ public abstract class BaseFeedGenerator
         return serviceLocator;
     }
 
-    public CalendarFilter getFilter() {
+    public ItemFilter getFilter() {
         return filter;
     }
 

@@ -17,15 +17,13 @@ package org.osaf.cosmo.atom.generator.mock;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.generator.FeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
-import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -43,7 +41,7 @@ public class MockFeedGenerator implements FeedGenerator {
     private String projection;
     private String format;
     private ServiceLocator locator;
-    private CalendarFilter filter;
+    private ItemFilter filter;
 
     /** */
     public MockFeedGenerator(MockGeneratorFactory factory,
@@ -58,7 +56,7 @@ public class MockFeedGenerator implements FeedGenerator {
 
     // FeedGenerator methods
 
-    public void setFilter(CalendarFilter filter) {
+    public void setFilter(ItemFilter filter) {
         this.filter = filter;
     }
 

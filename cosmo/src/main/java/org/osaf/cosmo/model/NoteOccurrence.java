@@ -25,7 +25,7 @@ import net.fortuna.ical4j.model.Date;
  * a combination of the master NoteItem's uid and the occurrence
  * date.
  */
-public class NoteOccurrence extends ContentItem {
+public class NoteOccurrence extends NoteItem {
 
     Date occurrenceDate = null;
     NoteItem masterNote = null;

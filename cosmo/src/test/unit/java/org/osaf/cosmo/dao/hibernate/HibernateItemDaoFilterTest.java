@@ -89,7 +89,6 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
                     + i + ".ics", "testuser");
             event.setUid("calendar2_" + i);
             contentDao.createContent(calendar2, event);
-            System.out.println("blah");
         }
     }
 

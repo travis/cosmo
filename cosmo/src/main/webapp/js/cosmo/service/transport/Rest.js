@@ -38,8 +38,10 @@ dojo.declare("cosmo.service.transport.Rest", null,
         getDefaultRequest: function (/*dojo.Deferred*/deferred,
                                      /*boolean?*/ sync){
             
-            deferred.addErrback(function(e) { cosmo.app.showErr("Service error", e); return e;});
-          
+            // Add error for transport layer problems
+            deferred.addErrback(function(e) { dojo.debug("Transport Error: "); 
+                                              dojo.debug(e)
+                                              return e;});
             var request = cosmo.util.auth.getAuthorizedRequest();
 
             request.load = this.resultCallback(deferred);
@@ -61,7 +63,6 @@ dojo.declare("cosmo.service.transport.Rest", null,
     		// summary
     		// create callback that calls the Deferreds errback method
     		return function(type, e, xhr){
-
                 // Workaround to not choke on 204s
     		    if ((dojo.render.safari &&
                     !xhr.status) || (dojo.render.ie &&
@@ -96,7 +97,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
     				        response = response.replace(/xmlns:xml.*=".*"/, "");
     				        obj = new ActiveXObject("Microsoft.XMLDOM");
                             if (!obj.loadXML(response)){
-    		                   alert(obj.parseError.reason)
+    		                   dojo.debug(obj.parseError.reason)
                             }
     				    }
     					deferredRequestHandler.callback(obj, xhr);

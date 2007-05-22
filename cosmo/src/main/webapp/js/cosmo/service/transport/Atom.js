@@ -97,9 +97,8 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
             throw new CantSaveException("No edit link on item with UID " + item.getUid());
         }
         r.contentType = "application/atom+xml";
-        dojo.debug(item.editLink);
         r.url = cosmo.env.getBaseUrl() + "/atom/" + 
-                item.editLink; + this.queryHashToString(query);
+                item.editLink + this.queryHashToString(query);
         r.postContent = postContent;
         r.method = "POST";
         r.headers['X-Http-Method-Override'] = "PUT";
@@ -107,6 +106,19 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         dojo.io.bind(r);
         return deferred;
         
+    },
+    
+    getItem: function(uid, kwArgs){
+        var deferred = new dojo.Deferred();
+        var r = this.getDefaultRequest(deferred, kwArgs);
+        
+        var query = this._generateAuthQuery(kwArgs);
+        
+        r.url = cosmo.env.getBaseUrl() + "/atom/item/" + 
+                uid + "/full/eim-json" + this.queryHashToString(query);
+        r.method = "GET";
+        dojo.io.bind(r);
+        return deferred;
     },
     
     createItem: function(item, postContent, collectionUid, kwArgs){

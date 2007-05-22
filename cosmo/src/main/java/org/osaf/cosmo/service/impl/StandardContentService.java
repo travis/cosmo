@@ -39,6 +39,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.ContentDao;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
@@ -340,6 +341,15 @@ public class StandardContentService implements ContentService {
             log.debug("creating collection " + collection.getName() +
                       " in " + parent.getName());
         }
+        
+        // add CalendarCollectionStamp if parent is the home collection
+        if(parent instanceof HomeCollectionItem) {
+            if(collection.getStamp(CalendarCollectionStamp.class)==null) {
+                CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
+                collection.addStamp(ccs);
+            }
+        }
+        
         return contentDao.createCollection(parent, collection);
     }
 
@@ -365,6 +375,14 @@ public class StandardContentService implements ContentService {
         // if it is the parent of one of the children.  If all children are new
         // items, then no locks are obtained.
         Set<CollectionItem> locks = acquireLocks(collection, children);
+        
+        // add CalendarCollectionStamp if parent is the home collection
+        if(parent instanceof HomeCollectionItem) {
+            if(collection.getStamp(CalendarCollectionStamp.class)==null) {
+                CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
+                collection.addStamp(ccs);
+            }
+        }
         
         try {
             // Create the new collection

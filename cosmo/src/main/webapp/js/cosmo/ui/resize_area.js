@@ -60,9 +60,13 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
             div, this.getAbsTop(div), this.getHeight(div));
     };
     this.setDragLimit = function() {
+        /*
         this.dragLimit = this.adjacentArea[0].origPos +
             this.adjacentArea[0].origSize - TOP_MENU_HEIGHT -
             ALL_DAY_RESIZE_HANDLE_HEIGHT;
+        */
+        // FIXME
+        this.dragLimit = 9999999;
     };
     this.compareNumbers = function(a, b) { return a - b };
     this.doDrag = function () {
@@ -84,7 +88,7 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
                 div = this.adjacentArea[i].div;
                 div.style.top = (pos+8) + 'px';
                 div.style.height = (((this.adjacentArea[i].origPos-yPos) +
-                    this.adjacentArea[i].origSize) - 8) + 'px';
+                    this.adjacentArea[i].origSize) - 8 + TOP_MENU_HEIGHT) + 'px';
             }
         }
     };

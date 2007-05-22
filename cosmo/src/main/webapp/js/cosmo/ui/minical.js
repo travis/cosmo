@@ -20,7 +20,7 @@
  * the main view apropriately. It will show up to three months of time
  * and allow for the following navigation mechanisms: next month,
  * previous month, current day.
- * @authors Matthew Eernisse (mde@osafoudation.org), 
+ * @authors Matthew Eernisse (mde@osafoudation.org),
  *     Jeremy Epstein (eggfree@eggfree.net)
  * @license Apache License 2.0
  */
@@ -32,7 +32,7 @@ dojo.require("dojo.date.format");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.datetime");
 
-cosmo.ui.minical.MiniCal = new function() {
+cosmo.ui.minical.MiniCal = new function () {
 
     var self = this;
     var viewStart = null;
@@ -59,6 +59,7 @@ cosmo.ui.minical.MiniCal = new function() {
         self.displayContext.style.visibility = 'visible';
     };
 
+    this.parent = null;
     this.controller = null;
     this.id = '';
     this.displayContext = null;
@@ -86,9 +87,10 @@ cosmo.ui.minical.MiniCal = new function() {
     this.tileCanvas = null;
     // Height of the widget
     this.height = 0;
+    this.hasBeenRendered = false;
 
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
-    this.handlePub = function(cmd) {
+    this.handlePub = function (cmd) {
         var act = cmd.action;
         var qual = cmd.qualifier || null;
         var opts = cmd.opts || {};
@@ -117,15 +119,17 @@ cosmo.ui.minical.MiniCal = new function() {
      * Hide until rendering is completed because Firefox
      * gives a brief glimpse as styles are being applied
      */
-    this.init = function(controller, displayContext) {
+    this.init = function (controller, displayContext, parent) {
         self.controller = controller;
         self.displayContext = displayContext || null;
         self.id = 'miniCal';
         self.currDate = cosmo.app.pim.currDate;
+
+        this.parent = parent;
         hide();
-        if (self.render()) {
-            show();
-        }
+        //if (self.render()) {
+        //    show();
+        //}
         return true;
     };
 
@@ -138,8 +142,7 @@ cosmo.ui.minical.MiniCal = new function() {
      * is no need to pass arguments
      * @return Boolean true
      */
-    this.render = function() {
-
+    this.render = function () {
         /**
          * Inner function that uses DOM methods to create the
          * three-col table for the month-to-month navigation
@@ -165,7 +168,7 @@ cosmo.ui.minical.MiniCal = new function() {
             npCell.id = 'miniCalNavPanelLeft';
             npCell.style.textAlign = 'left';
             npCell.style.cursor = 'pointer';
-            npCell.onclick = function() { self.goMonth(-1); };
+            npCell.onclick = function () { self.goMonth(-1); };
             npCell.appendChild(document.createTextNode('<'));
             npRow.appendChild(npCell);
             // Center
@@ -181,7 +184,7 @@ cosmo.ui.minical.MiniCal = new function() {
             npCell.id = 'miniCalNavPanelRight';
             npCell.style.textAlign = 'right';
             npCell.style.cursor = 'pointer';
-            npCell.onclick = function() { self.goMonth(1); };
+            npCell.onclick = function () { self.goMonth(1); };
             npCell.appendChild(document.createTextNode('>'));
             npRow.appendChild(npCell);
 
@@ -206,9 +209,13 @@ cosmo.ui.minical.MiniCal = new function() {
          */
         function setContainerSize() {
             var h = document.getElementById('miniCalNavPanel').offsetHeight;
-            var c = cosmo.app.pim._collectionSelectContainer.offsetHeight + 40;
+            var aboveElem = cosmo.app.pim._collectionSelectContainer;
+            var c = 40;
+            if (aboveElem) {
+                c += aboveElem.offsetHeight;
+            }
             for (var i = 0; i < self.months.length; i++) {
-                if (h + self.months[i].offsetHeight < (self.controller.height - c)) {
+                if (h + self.months[i].offsetHeight < (self.parent.height - c)) {
                     h += self.months[i].offsetHeight;
                 }
             }
@@ -223,14 +230,14 @@ cosmo.ui.minical.MiniCal = new function() {
          */
         function setContainerPos() {
             self.displayContext.style.top =
-                (self.controller.height - self.height) + 'px';
+                (self.parent.height - self.height) + 'px';
         }
 
         // Begin rendering
         // ==========================
         // Bail if there's no context to render in
-        if (this.displayContext == null) {
-            return false;
+        if (self.displayContext == null) {
+            throw 'No place to render this component.';
         }
 
         // Sync the start date of the displayed period
@@ -254,21 +261,24 @@ cosmo.ui.minical.MiniCal = new function() {
             self.renderMonths();
         }
 
-        // Init render only
-        // Later on this will get more interesting if we add the
-        // same behavior Chandler has for resizing and snapping into place
+        // Set size/pos
         setContainerSize();
         setContainerPos();
 
         // Init and week-to-week nav from main cal
         self.renderSelection();
 
+        if (!self.hasBeenRendered) {
+            show();
+            self.hasBeenRendered = true;
+        }
+
         return true;
     };
     /**
      * Render three blank month tiles and attach to tileCanvas
      */
-    this.renderMonths = function() {
+    this.renderMonths = function () {
 
         /**
          * Generates calendar layout -- creates a blank month "tile"
@@ -480,7 +490,7 @@ cosmo.ui.minical.MiniCal = new function() {
      * If the selected time range is outside the displayed
      * months, the function simply bails out
      */
-    this.renderSelection = function() {
+    this.renderSelection = function () {
 
         // Sync internal start date with query start for main cal
         self.syncViewStart();
@@ -566,7 +576,7 @@ cosmo.ui.minical.MiniCal = new function() {
      * The selection gets re-rendered so it stays in place
      * as you move month-to-month
      */
-    this.goMonth = function(dir) {
+    this.goMonth = function (dir) {
         var incr = dir;
         var compMonthDate =  new Date(viewStart.getFullYear(),
             viewStart.getMonth(), 1);
@@ -583,16 +593,16 @@ cosmo.ui.minical.MiniCal = new function() {
      * FIXME -- this is one of the places we should look at using
      * topics and pub/sub
      */
-    this.goToday = function() {
+    this.goToday = function () {
         dojo.event.topic.publish('/calEvent', {
-            action: 'loadCollection', data: { goTo: self.currDate }
+            action: 'loadCollection', opts: { goTo: self.currDate }, data: {}
         });
     }
     /**
      * Handle clicks on normal dates within minical
      * Navigate to appropriate dates and re-render selection
      */
-    this.clickHandler = function(event) {
+    this.clickHandler = function (event) {
         var target = (typeof event.target != "undefined") ?
             event.target : event.srcElement;
         var elem = getElementOfAttribute("day", target);
@@ -606,8 +616,8 @@ cosmo.ui.minical.MiniCal = new function() {
 
         dojo.event.topic.publish('/calEvent', {
             action: 'loadCollection',
-            data: { goTo: dt },
-            opts: { source: 'minical' }
+            opts: { goTo: dt, source: 'mincal' },
+            data: {}
         });
     };
     /**
@@ -615,14 +625,14 @@ cosmo.ui.minical.MiniCal = new function() {
      * start date for the range of displayed events in
      * the main cal
      */
-    this.syncViewStart = function() {
+    this.syncViewStart = function () {
         viewStart = cosmo.view.cal.viewStart;
         viewEnd = cosmo.view.cal.viewEnd;
     }
     /**
      * Prevent memleak
      */
-    this.cleanup = function() {
+    this.cleanup = function () {
         /* need to do dom cleanup*/
          dojo.event.kwDisconnect({
                 srcObj:     self.tileCanvas,

@@ -34,6 +34,7 @@ dojo.provide("cosmo.view.cal.draggable");
 
 dojo.require("dojo.event.topic");
 dojo.require("cosmo.app.pim");
+dojo.require("cosmo.app.pim.layout");
 /**
  * @object An event lozenge being dragged or resized
  */
@@ -90,7 +91,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         this.min = this.bottom-(HOUR_UNIT_HEIGHT/2)+2;
         this.clickOffsetX = xPos - this.origDivLeft;
         this.clickOffsetY = yPos - div.offsetTop;
-        this.rLimit = (cosmo.app.pim.midColWidth - cosmo.view.cal.canvas.dayUnitWidth -
+        this.rLimit = (cosmo.app.pim.baseLayout.mainApp.centerColumn.width - cosmo.view.cal.canvas.dayUnitWidth -
             SCROLLBAR_SPACER_WIDTH - 2);
         this.scrollOffset = cosmo.view.cal.canvas.getTimedCanvasScrollTop();
         if (lozenge.composite()) {

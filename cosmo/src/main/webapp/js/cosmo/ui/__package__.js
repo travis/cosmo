@@ -23,7 +23,8 @@ dojo.kwCompoundRequire({
 		"cosmo.ui.contentcontainer",
 		"cosmo.ui.login",
 		"cosmo.ui.minical",
-		"cosmo.ui.resize_area"
+		"cosmo.ui.resize_area",
+		"cosmo.ui.menu"
 		]
 });
 

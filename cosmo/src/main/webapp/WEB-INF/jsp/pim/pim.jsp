@@ -43,6 +43,7 @@
 <title><fmt:message key="App.Welcome"/></title>
 
 <link rel="stylesheet" href="${staticBaseUrl}/templates/default/global.css"/>
+<link rel="stylesheet" href="${staticBaseUrl}/templates/default/ui.css"/>
 
 <c:if test="${not empty relationLinks}">
 <link rel="self" type="text/html" href="${relationLinks['pim']}"/>
@@ -57,8 +58,7 @@
 <script type="text/javascript">
 // Dojo requires
 dojo.require('cosmo.app');
-dojo.require('cosmo.app.pim');
-dojo.require('cosmo.ui.global_css');
+dojo.require('cosmo.app.pim.layout');
 dojo.require('cosmo.convenience');
 dojo.require('cosmo.topics');
 dojo.require('cosmo.account.preferences');
@@ -76,6 +76,12 @@ cosmo.app.initParams.ticketKey = '${ticketKey}';
 <c:if test="${not ticketedView}">
 cosmo.app.initParams.authAccess = true;
 </c:if>
+<authz:authorize ifAnyGranted="ROLE_USER">
+cosmo.app.initParams.roleUser = true;
+</authz:authorize>
+<authz:authorize ifAllGranted="ROLE_ROOT">
+cosmo.app.initParams.roleRoot = true;
+</authz:authorize>
 
 dojo.require("cosmo.ui.event.listeners");
 cosmo.ui.event.listeners.hookUpListeners();
@@ -85,100 +91,12 @@ cosmo.ui.event.listeners.hookUpListeners();
 </head>
 
 <body id="body">
-        <div id="menuBarDiv">
-          <div id="smallLogoDiv"></div>
-            <%-- Begin main nav menu --%>
-            <div id="menuNavItems">
-            <c:choose>
-              <c:when test="${not ticketedView}">
-              	<%-- Start non-ticketed links --%>
-                <authz:authorize ifAnyGranted="ROLE_USER">
-                <fmt:message key="Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
-                  <span class="menuBarDivider">|</span>
-                </authz:authorize>
-                <authz:authorize ifAllGranted="ROLE_ROOT">
-                  <c:url var="consoleUrl" value="/admin/users"/>
-                  <a href="${consoleUrl}"><fmt:message key="Main.Console"/></a>
-                  <span class="menuBarDivider">|</span>
-                </authz:authorize>
-                <a href="javascript:cosmo.account.settings.showDialog();">
-                  Settings
-                </a>
-                <span class="menuBarDivider">|</span>
-                <span id="accountBrowserLink" style="display: none;">
-                <a href="${staticBaseUrl}/browse/${user.username}" 
-                  onclick="window.open('${staticBaseUrl}/browse/${user.username}'); 
-                  return false;">
-                  Account Browser
-                </a>
-                <span class="menuBarDivider">|</span>
-                </span>
-                <%-- End non-ticketed links --%>
-              </c:when>
-              <c:otherwise>
-              	<%-- 
-                    Ticketed version of links
-                    Add divs for subscribeSelector, signupGraphic via JavaScript DOM
-                    so we can get accurate offsetWidth as code executes
-                --%>
-              </c:otherwise>
-            </c:choose>
-              
-            <c:url var="helpUrl" 
-                value="http://wiki.osafoundation.org/Projects/CosmoHelpRel0dot6"/>
-            <a href="${helpUrl}" 
-                onclick="window.open('${helpUrl}'); 
-                return false;"><fmt:message key="Main.Help"/></a>
-                
-            <c:if test="${not ticketedView}">
-               <authz:authorize ifAnyGranted="ROLE_USER">
-                 <span class="menuBarDivider">|</span>
-                  <a href="${staticBaseUrl}/logout">
-                    <fmt:message key="Main.LogOut"/>
-                  </a>
-               </authz:authorize>
-            </c:if>&nbsp;&nbsp;
-          </div>
-          <%-- End main nav menu --%>
-        </div>
-        <div id="calDiv">
-                <div id="leftSidebarDiv">
-                    <div id="calSelectNav"></div>
-                    <div id="jumpToDateDiv"></div>
-                    <div id="miniCalDiv"></div>
-                </div>
-                <div id="calTopNavDiv">
-                    <table cellpadding="0" cellspacing="0">
-                        <tr>
-                            <td>&nbsp;&nbsp;&nbsp;</td>
-                            <td id="viewNavButtons"></td>
-                            <td>&nbsp;&nbsp;&nbsp;</td>
-                            <td id="monthHeaderDiv" class="labelTextXL"></td>
-                        </tr>
-                    </table>
-                </div>
-                <div id="dayListDiv"></div>
-                <div id="allDayResizeMainDiv" onSelectStart="return false;">
-                    <div id="allDayHourSpacerDiv"></div>
-                    <div id="allDayContentDiv"></div>
-                </div>
-                <div id="allDayResizeHandleDiv"></div>
-                <div id="timedScrollingMainDiv" onSelectStart="return false;">
-                    <div id="timedHourListDiv"></div>
-                    <div id="timedContentDiv"></div>
-                </div>
-                <div id="rightSidebarDiv">
-                    <form method="post" id="calForm" action="">
-                    <div id="eventInfoDiv"></div>
-            </form>
-        </div>
-        </div>
-        <div id="maskDiv">
-          <div id="appLoadingMessage">
-            Loading the app ...
-          </div>
-        </div>
-
+    <div id="baseLayout" style="position: absolute;"></div>
+    <div id="maskDiv">
+      <div id="appLoadingMessage">
+        Loading the app ...
+      </div>
+    </div>
 </body>
 
 </html>

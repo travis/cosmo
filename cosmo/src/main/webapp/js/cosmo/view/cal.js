@@ -23,6 +23,7 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
+dojo.require('cosmo.view.cal.dialog');
 
 cosmo.view.cal = new function () {
 
@@ -1006,17 +1007,10 @@ cosmo.view.cal = new function () {
         var opts = cmd.opts;
         switch (act) {
             case 'loadCollection':
-                var f = function () { self.triggerLoadEvents(data, opts); };
+                var f = function () { self.triggerLoadEvents(opts); };
                 //self.uiMask.show();
                 // Give processing message a brief instant to show
                 setTimeout(f, 100);
-                break;
-            case 'eventsLoadSuccess':
-                //self.uiMask.hide();
-                break;
-            case 'eventsLoad':
-                // Load and display events
-                self.loadEvents(data, opts);
                 break;
             case 'saveConfirm':
                 var confirmEv = cmd.data;
@@ -1058,7 +1052,7 @@ cosmo.view.cal = new function () {
                 case 13:
                     // Go-to date
                     if (elem.id.toLowerCase() == 'jumpto') {
-                        cosmo.app.pim.calForm.goJumpToDate();
+                        //cosmo.app.pim.calForm.goJumpToDate();
                     }
                     // Save an event from the Enter key -- requires:
                     //  * a selected event, not in 'processing' state
@@ -1092,16 +1086,17 @@ cosmo.view.cal = new function () {
         }
     };
     
-    this.triggerLoadEvents = function (data, opts) {
-        var collection = data.collection;
-        var goTo = data.goTo;
-        var data = {};
-
+    this.triggerLoadEvents = function (o) {
+        var opts = o;
+        var collection = opts.collection;
+        var goTo = opts.goTo;
+        
         // Changing collection
         // --------
         if (collection) {
             // Update pointer to currently selected collection
             self.currentCollection = collection;
+            cosmo.app.pim.currentCollection = collection;
         }
         // Changing dates
         // --------
@@ -1118,26 +1113,25 @@ cosmo.view.cal = new function () {
                 queryDate = goTo;
             }
             // Update cosmo.view.cal.viewStart and cosmo.view.cal.viewEnd with new dates
-            cosmo.view.cal.setQuerySpan(queryDate);
+            self.setQuerySpan(queryDate);
         }
 
         // Data obj to pass to topic publishing
-        data = {
+        opts = {
             collection: cosmo.app.pim.currentCollection,
-            startDate: cosmo.view.cal.viewStart,
-            endDate: cosmo.view.cal.viewEnd,
+            viewStart: cosmo.view.cal.viewStart,
+            viewEnd: cosmo.view.cal.viewEnd,
             currDate: cosmo.app.pim.currDate
         }
 
         // If we're looking at different dates, have to re-render
         // the base canvas with the new date range
-        if (goTo) {
-            dojo.event.topic.publish('/calEvent', {
-                action: 'eventsLoadPrepare', data: data, opts: opts });
-        }
+        //if (goTo) {
+        //    dojo.event.topic.publish('/calEvent', {
+        //        action: 'eventsLoadPrepare', data: {}, opts: opts });
+        //}
         // Load and display events
-        dojo.event.topic.publish('/calEvent', {
-            action: 'eventsLoad', data: data, opts: opts });
+        self.loadEvents(opts);
     };
     /**
      * Loading events in the initial app setup, and week-to-week
@@ -1148,10 +1142,11 @@ cosmo.view.cal = new function () {
      * period
      * @return Boolean, true
      */
-    this.loadEvents = function (data, opts) {
-        var collection = data.collection;
-        var start = data.startDate;
-        var end = data.endDate;
+    this.loadEvents = function (o) {
+        var opts = o;
+        var collection = opts.collection;
+        var start = opts.viewStart;
+        var end = opts.viewEnd;
         var eventLoadList = null;
         var eventLoadHash = new Hash();
         var isErr = false;
@@ -1159,16 +1154,19 @@ cosmo.view.cal = new function () {
         var evData = null;
         var id = '';
         var ev = null;
-
-        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadStart', opts: opts });
+        
+        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadStart', 
+            opts: opts });
         // Load the array of events
         // ======================
         try {
-            var deferred = cosmo.app.pim.serv.getItems(collection, {start:start, end:end}, {sync: true});
+            var deferred = cosmo.app.pim.serv.getItems(collection, 
+                { start: start, end: end }, { sync: true });
             eventLoadList = deferred.results[0];
         }
         catch(e) {
-            cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), getErrDetailMessage(e));
+            cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), 
+                getErrDetailMessage(e));
             return false;
         }
 

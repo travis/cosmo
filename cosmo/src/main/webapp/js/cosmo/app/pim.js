@@ -28,27 +28,16 @@ dojo.require('cosmo.convenience');
 dojo.require("cosmo.legacy.cal_event");
 // --
 
-// -- Widget includes, may not always find proper namespaced refs
-// -- ie, cosmo:CollectionSelector
-dojo.require("cosmo.ui.widget.CollectionSelector");
-// --
-
 dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.ui.cal_form");
-dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require('cosmo.view.cal');
-dojo.require('cosmo.view.cal.lozenge');
-dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.account.create');
 dojo.require('cosmo.service.conduits.common');
-// Props for confirmation dialogs
-dojo.require('cosmo.view.cal.dialog');
-
 
 // Global variables for X and Y position for mouse
 xPos = 0;
@@ -59,12 +48,16 @@ yPos = 0;
  */
 cosmo.app.pim = new function () {
 
+
     var self = this;
     // Private variable for the list of any deleted subscriptions
     var deletedSubscriptions = [];
 
     // The Cosmo service -- used to talk to the backend
     this.serv = null;
+    // The base layout for the PIM -- cosmo.ui.ContentBox obj
+    this.baseLayout = null;
+
     // For calculating UI element positions
     this.top = 0;
     this.left = 0;
@@ -78,8 +71,6 @@ cosmo.app.pim = new function () {
     // All-day resizable area, scrolling area for normal events, detail form
     // Calculated based on client window size
     this.midColWidth = 0;
-    // The form on the page -- a CalForm obj
-    this.calForm = null;
     // Current date for highlighting in the interface
     this.currDate = null;
     // The path to the currently selected collection
@@ -88,6 +79,8 @@ cosmo.app.pim = new function () {
     this.currentCollections = [];
     // Anonymous ticket view, no client-side timeout
     this.authAccess = true;
+    // Ticket passed, if any
+    this.ticketKey = null;
     // Create the 'Welcome to Cosmo' event?
     this.createWelcomeItem = false;
 
@@ -102,87 +95,72 @@ cosmo.app.pim = new function () {
      */
     this.init = function (p) {
 
+        // Load some dependencies
+        dojo.require("cosmo.app.pim.layout");
+
         var params = p || {};
         var collectionUid = params.collectionUid;
-        var ticketKey = params.ticketKey;
 
+        this.ticketKey = params.ticketKey;
         this.authAccess = params.authAccess;
         this.currDate = new Date();
 
-        // Create and init the Cosmo service
+        // Do some setup
         // ===============================
+        // Create and init the Cosmo service
         this.serv = cosmo.service.conduits.getAtomPlusEimConduit();
+        // Localized date strings
+        this.loadLocaleDateInfo();
+        // Tell the calendar view what week we're on
+        cosmo.view.cal.setQuerySpan(this.currDate)
+        // Load collections for this user
+        this.loadCollections(this.ticketKey, collectionUid);
 
         // Base layout
         // ===============================
-        // Only in logged-in view
-        if (params.authAccess) {
-            cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage,
-                [cosmo.account.preferences.getPreferences()]);
+        // FIXME: IE6 -- Need to hide selectors until the whole UI is rendered
+        // FIXME: Safari -- Need to valign-middle the whole-screen mask
+        if (this.baseLayout = cosmo.app.pim.layout.initBaseLayout({
+            domNode: $('baseLayout') })) {
+            $('maskDiv').style.display = 'none';
         }
-        
-        // Place all the UI DOM elements based on window size
-        this.placeUI();
-        this.setImagesForSkin();
 
-        // Populate base layout with UI elements
-        // ===============================
-        // Load and display date info, render cal canvas
-        if (this.loadLocaleDateInfo() && cosmo.view.cal.setQuerySpan(this.currDate)) {
-            cosmo.view.cal.canvas.render(cosmo.view.cal.viewStart,
-                cosmo.view.cal.viewEnd, this.currDate);
-        }
-        // Calendar event detail form
-        this.calForm = new CalForm();
-        this.calForm.init();
-        // Initialize the color set for the cal lozenges
-        cosmo.view.cal.canvas.calcColors();
+        // FIXME: Use script to build this conditionally
+        // not hide after the fact
+        // Only in logged-in view
+        //if (params.authAccess) {
+        //    cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage,
+        //        [cosmo.account.preferences.getPreferences()]);
+        //}
 
         // Load data
         // ===============================
-        // Load collections for this user
-        this.loadCollections(ticketKey, collectionUid);
-        // Load and display events
-
-        // Load / render
-        // ===============================
-        // FIXME: This stuff should eventually participate in
-        // the normal topic-based prepare-load-render lifecycle
-        // --------------
+        // Load items and publish success to UI components
         cosmo.view.cal.loadEvents({ collection: self.currentCollection,
-            startDate: cosmo.view.cal.viewStart, endDate: cosmo.view.cal.viewEnd });
+            viewStart: cosmo.view.cal.viewStart, viewEnd: cosmo.view.cal.viewEnd });
 
-        // Render UI elements
-        // ===============================
-        // Display selector or single cal name
-        this._collectionSelectContainer = $('calSelectNav');
-        this._collectionSelector = dojo.widget.createWidget(
-            'cosmo:CollectionSelector', {
-                'collections': this.currentCollections,
-                'currentCollection': this.currentCollection,
-                'ticketKey': ticketKey
-            }, this._collectionSelectContainer, 'last');
+        return;
 
-        // Minical and jump-to date
-        var mcDiv = $('miniCalDiv');
-        var jpDiv = $('jumpToDateDiv');
+        // Go-to date
+        var d = _createElem('div');
+        d.id = 'jumpToDateDiv';
+        var cB = new cosmo.ui.ContentBox({ domNode: d, id: d.id });
+        this.baseLayout.mainApp.leftSidebar.addChild(cB);
+
+
         // Place jump-to date based on mini-cal pos
-        if (cosmo.ui.minical.MiniCal.init(cosmo.app.pim, mcDiv)) {
-           this.calForm.addJumpToDate(jpDiv);
-        }
+        //if (cosmo.ui.minical.MiniCal.init(cosmo.app.pim, mcDiv)) {
+           //this.calForm.addJumpToDate(jpDiv);
+        //}
         // Top menubar setup and positioning
         if (this.setUpMenubar()) {
             this.positionMenubarElements.apply(this);
         }
         // Add event listeners for form-element behaviors
-        this.calForm.setEventListeners();
+        //this.calForm.setEventListeners();
 
         // Final stuff / cleanup
         // ===============================
-        // Scroll to 8am for normal event
-        // Have to do this dead last because appending to the div
-        // seems to reset the scrollTop in Safari
-        $('timedScrollingMainDiv').scrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
 
         // Hide the UI mask
         this.uiMask.hide();
@@ -191,7 +169,8 @@ cosmo.app.pim = new function () {
         // is a private var populated in the loadCollections method
         if (deletedSubscriptions && deletedSubscriptions.length > 0){
             for (var x = 0; x < deletedSubscriptions.length; x++){
-                cosmo.app.showErr(_("Main.Error.SubscribedCollectionDeleted",deletedSubscriptions[x].displayName));
+                cosmo.app.showErr(_("Main.Error.SubscribedCollectionDeleted",
+                    deletedSubscriptions[x].displayName));
             }
         }
 
@@ -244,16 +223,6 @@ cosmo.app.pim = new function () {
 
         // Position UI elements
         // =========================
-        // **** Save these coords for middle-col mask ****
-        $('appLoadingMessage').style.width = PROCESSING_ANIM_WIDTH + 'px';
-        $('appLoadingMessage').style.top = parseInt((winheight-PROCESSING_ANIM_HEIGHT)/2) + 'px';
-        $('appLoadingMessage').style.left = parseInt((winwidth-PROCESSING_ANIM_WIDTH)/2) + 'px';
-        //this.uiMask.setPosition(this.top, LEFT_SIDEBAR_WIDTH);
-        //this.uiMask.setSize(this.midColWidth-2, this.height);
-        // Position the processing animation
-        //uiProcessing.setPosition(parseInt((winheight-PROCESSING_ANIM_HEIGHT)/2),
-        //    parseInt((this.midColWidth-PROCESSING_ANIM_WIDTH)/2));
-
         // Menubar
         menuBar.setPosition(0, 0);
         menuBar.setSize(this.width, TOP_MENU_HEIGHT-1);
@@ -573,13 +542,13 @@ cosmo.app.pim = new function () {
     };
     this.handleCollectionUpdated = function(/*cosmo.topics.CollectionUpdatedMessage*/ message){
         var updatedCollection = message.collection;
-        
+
         for (var x = 0; x < this.currentCollections.length; x++){
             var collection = this.currentCollections[x];
-            if (collection instanceof cosmo.model.Collection 
+            if (collection instanceof cosmo.model.Collection
                    && collection.getUid() == updatedCollection.getUid()){
                 this.currentCollections[x] = updatedCollection;
-            } 
+            }
         }
     };
 
@@ -590,11 +559,11 @@ cosmo.app.pim = new function () {
             if (subcription instanceof cosmo.model.Subscription
                    && subcription.getUid() == updatedSubscription.getUid()){
                 this.currentCollections[x] = updatedSubscription;
-            } 
+            }
         }
     };
 
-    //XINT 
+    //XINT
     this.filterOutDeletedSubscriptions = function(subscriptions){
         var deletedSubscriptions = [];
         var filteredSubscriptions = dojo.lang.filter(subscriptions,
@@ -620,7 +589,6 @@ cosmo.app.pim = new function () {
         if (this.allDayArea) {
             this.allDayArea.cleanup();
         }
-        this.calForm = null;
         this.allDayArea = null;
     };
 }

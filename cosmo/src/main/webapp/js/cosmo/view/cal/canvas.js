@@ -30,6 +30,7 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.model");
 dojo.require("cosmo.ui.resize_area");
+dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.view.cal");
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require("cosmo.view.cal.conflict");
@@ -40,7 +41,7 @@ cosmo.view.cal.canvas = new function () {
     // Need some closure for scope
     var self = this;
     // Rendering the first time
-    var initRender = false;
+    var hasBeenRendered = false;
     // Resizeable area for all-day events -- a ResizeArea obj
     var allDayArea = null;
     // Blue, green, red, orange, gold, plum, turquoise, fuschia, indigo
@@ -345,12 +346,12 @@ cosmo.view.cal.canvas = new function () {
         function setUpNavButtons() {
             var back = function back() {
                 dojo.event.topic.publish('/calEvent', {
-                    action: 'loadCollection', data: { goTo: 'back' }
+                    action: 'loadCollection', opts: { goTo: 'back' }, data: {}
                 });
             }
             var next = function next() {
                 dojo.event.topic.publish('/calEvent', {
-                    action: 'loadCollection', data: { goTo: 'next' }
+                    action: 'loadCollection', opts: { goTo: 'next' }, data: {}
                 });
             }
             var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
@@ -368,15 +369,17 @@ cosmo.view.cal.canvas = new function () {
                 cosmo.view.cal.viewEnd.getTime() > currDateTime) {
                 currDayClass = ' currentDayDay';
                 currDayImg = 'url(' + cosmo.env.getImagesUrl() +
-                    'day_col_header_background.gif); background-repeat:' +
-                    ' repeat-x; background-position:0px 0px;'
+                    'day_col_header_background.gif)';
             }
             else {
                 currDayClass = '';
                 currDayImg = '';
             }
             // Set background image or set to flat white for day name
-            $('dayListDiv' + currDateDay).style.backgroundImage = 'url(' + currDayImg + ')';
+            var d = $('dayListDiv' + currDateDay);
+            d.style.backgroundImage = currDayImg;
+            d.style.backgroundRepeat = 'repeat-x';
+            d.style.backgroundPosition = '0px 0px';
             // Set gray or white background for all-day area
             $('allDayListDiv' + currDateDay).className = 'allDayListDayDiv' + currDayClass;
             // Reset the CSS class on all the rows in the 'today' col
@@ -390,12 +393,6 @@ cosmo.view.cal.canvas = new function () {
         // -----------
         // Do it!
         // -----------
-        // Remove events for re-draw -- don't do on first render
-        // must happen before any rendering occurs
-        if (initRender) {
-            removeAllEvents();
-        }
-
         // Init and call all the rendering functions
         init();
         showMonthHeader();
@@ -404,28 +401,34 @@ cosmo.view.cal.canvas = new function () {
 
         // On the first time rendering happens -- must happen
         // after base render
-        if (!initRender) {
+        if (!hasBeenRendered) {
             // Make the all-day event area resizeable
-            allDayArea = new cosmo.ui.resize_area.ResizeArea(
-                'allDayResizeMainDiv', 'allDayResizeHandleDiv');
-            allDayArea.init('down');
-            allDayArea.addAdjacent('timedScrollingMainDiv');
-            allDayArea.setDragLimit();
-        // Create event listeners
+            // Create event listeners
             dojo.event.connect(hoursNode, 'onmousedown', mouseDownHandler);
             dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
             dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
             dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
+            setUpNavButtons();
             // Get a reference to the main scrolling area for timed events;
             timedScrollingMainDiv = $('timedScrollingMainDiv');
-            // Render the base canvas and week-to-week nav buttons
-            showHours();
-            setUpNavButtons();
+            // Set the scrollbar to 'working hours' -- do this
+            // last because Safari will reset if you update content
+            // in the DOM element
+            timedScrollingMainDiv.scrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
         }
-        // Just updating the CSS to highlight the current day
-        // is faster than re-rendering the entire base cal canvas
+        allDayArea = new cosmo.ui.resize_area.ResizeArea(
+            'allDayResizeMainDiv', 'allDayResizeHandleDiv');
+        allDayArea.init('down');
+        allDayArea.addAdjacent('timedScrollingMainDiv');
+        allDayArea.setDragLimit();
+        showHours();
         setCurrentDayStatus();
-        initRender = true;
+        
+        // Render event lozenges
+        self.calcColors();
+        loadSuccess();
+        
+        hasBeenRendered = true;
     };
     /**
      * Get the scroll offset for the timed canvas
@@ -463,7 +466,9 @@ cosmo.view.cal.canvas = new function () {
             return 'rgb(' + rgb.join() + ')';
         }
         var lozengeColors = {};
-        var sel = cosmo.app.pim.calForm.form.calSelectElem;
+        // Use the collection selector's selected index, if
+        // it's on the page, to pick a color -- otherwise just use blue
+        var sel = $('calSelectElem');
         var index = sel ? sel.selectedIndex : 0;
         var hue = hues[index];
 
@@ -561,16 +566,13 @@ cosmo.view.cal.canvas = new function () {
         var opts = cmd.opts;
         var data = cmd.data;
         switch (act) {
-            case 'eventsLoadPrepare':
-                self.render(data.startDate, data.endDate, data.currDate);
-                break;
-            case 'eventsLoadStart':
-                self.calcColors();
-                wipe();
-                break;
             case 'eventsLoadSuccess':
-                var ev = cmd.data;
-                loadSuccess(ev);
+                self.eventRegistry = data;
+                self.selectedEvent = null;
+                var _c = cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas;
+                // Update viewStart, viewEnd from passed opts
+                for (var n in opts) { _c[n] = opts[n]; }
+                _c.render();
                 break;
             case 'eventsAddSuccess':
                 addSuccess(cmd.data);
@@ -719,13 +721,7 @@ cosmo.view.cal.canvas = new function () {
      * don't remove the lozenges along with the CalEvent objs
      */
     function removeAllEvents(rem) {
-        // Default behavior is to remove the lozenge
-        var removeLozenge = rem != false ? true : false;
-        var ev = null;
-        // Pull the last event off the eventRegistry list and remove it
-        if (removeLozenge) {
-            self.eventRegistry.each(removeEventFromDisplay);
-        }
+        self.eventRegistry.each(removeEventFromDisplay);
         self.eventRegistry = new Hash();
         return true;
     }
@@ -878,8 +874,10 @@ cosmo.view.cal.canvas = new function () {
      * @param ev Hash, the eventRegistry of loaded events
      */
     function loadSuccess(ev) {
-        removeAllEvents();
-        self.eventRegistry = ev;
+        if (ev) {
+            removeAllEvents();
+            self.eventRegistry = ev;
+        }
         self.eventRegistry.each(appendLozenge);
         // Update the view
         updateEventsDisplay();
@@ -1435,6 +1433,113 @@ cosmo.view.cal.canvas = new function () {
         return ret;
     };
 }
+
+cosmo.view.cal.canvas.Canvas = function (p) {
+    var params = p || {}
+    var d = null;
+    d = _createElem('div');
+    d.id = 'calendarCanvas';
+    this.domNode = d;
+    this.viewStart = null;
+    this.viewEnd = null;
+    this.currDate = null;
+    for (var n in params) { this[n] = params[n]; }
+    this.renderSelf = function () {
+        this.width = this.parent.width;
+        this.height = this.parent.height;
+        this.setPosition();
+        this.setSize();
+        if (!this.hasBeenRendered) {
+            //FIXME: Either Dojo widgetize or convert to DOM 
+            // Right now we just want to wire the original
+            // code to the newer recursive composition scheme
+            str = '';    
+            str += '<div id="calTopNavDiv">';
+            str += '<table cellpadding="0" cellspacing="0">';
+            str += '<tr>';
+            str += '<td>&nbsp;&nbsp;&nbsp;</td>';
+            str += '<td id="viewNavButtons"></td>';
+            str += '<td>&nbsp;&nbsp;&nbsp;</td>';
+            str += '<td id="monthHeaderDiv" class="labelTextXL"></td>';
+            str += '</tr>';
+            str += '</table>';
+            str += '</div>';
+            str += '<div id="dayListDiv"></div>';
+            str += '<div id="allDayResizeMainDiv" onSelectStart="return false;">';
+            str += '<div id="allDayHourSpacerDiv"></div>';
+            str += '<div id="allDayContentDiv"></div>';
+            str += '</div>';
+            str += '<div id="allDayResizeHandleDiv"></div>';
+            str += '<div id="timedScrollingMainDiv" onSelectStart="return false;">';
+            str += '<div id="timedHourListDiv"></div>';
+            str += '<div id="timedContentDiv"></div>';
+            str += '</div>';
+            this.domNode.innerHTML = str;
+            this.parent.domNode.appendChild(this.domNode);
+            var _c = cosmo.ui.ContentBox;
+            var subList = [ 'calTopNavDiv', 'dayListDiv', 
+                'timedScrollingMainDiv', 'timedContentDiv', 'timedHourListDiv', 
+                'eventInfoDiv', 'allDayResizeMainDiv', 'allDayResizeHandleDiv',
+                'allDayContentDiv', 'allDayHourSpacerDiv' ];
+            var vOffset = 0;
+            var calcHeight = 0;
+            for (var i = 0; i < subList.length; i++) {
+                var key = subList[i];
+                this[key] = new _c({ id: key, domNode: $(key) });
+            }
+            
+            this.hasBeenRendered = true;
+        }
+        // Center column
+        // Top nav
+        vOffset = 0;
+        // 1px for border per retarded CSS spec
+        var topNav = this.calTopNavDiv;
+        topNav.setSize(this.width - 2, CAL_TOP_NAV_HEIGHT-1);
+        topNav.setPosition(0, vOffset);
+        // Day listing
+        vOffset += CAL_TOP_NAV_HEIGHT;
+        var dayList = this.dayListDiv;
+        dayList.setSize(this.width - 2, DAY_LIST_DIV_HEIGHT);
+        dayList.setPosition(0, vOffset);
+        // No-time event area
+        vOffset += DAY_LIST_DIV_HEIGHT;
+        var allDayMain = this.allDayResizeMainDiv;
+        allDayMain.setSize((this.width - 2), ALL_DAY_RESIZE_AREA_HEIGHT);
+        allDayMain.setPosition(0, vOffset);
+        // Resize handle
+        vOffset += ALL_DAY_RESIZE_AREA_HEIGHT;
+        var allDayResize = this.allDayResizeHandleDiv;
+        allDayResize.setSize(this.width - 1, ALL_DAY_RESIZE_HANDLE_HEIGHT);
+        allDayResize.setPosition(0, vOffset);
+        var allDayContent = this.allDayContentDiv;
+        allDayContent.setSize((this.width - SCROLLBAR_SPACER_WIDTH - HOUR_LISTING_WIDTH), '100%');
+        allDayContent.setPosition((HOUR_LISTING_WIDTH + 1), 0);
+        var allDaySpacer = this.allDayHourSpacerDiv
+        allDaySpacer.setSize((HOUR_LISTING_WIDTH - 1), '100%');
+        allDaySpacer.setPosition(0, 0);
+
+        // Scrollable view area
+        vOffset += ALL_DAY_RESIZE_HANDLE_HEIGHT;
+        calcHeight = this.height - vOffset;
+        var timedMain = this.timedScrollingMainDiv;
+        timedMain.setSize(this.width - 2, calcHeight); // Variable height area
+        timedMain.setPosition(0, vOffset);
+        var timedContent = this.timedContentDiv;
+        timedContent.setSize((this.width - HOUR_LISTING_WIDTH), VIEW_DIV_HEIGHT);
+        timedContent.setPosition((HOUR_LISTING_WIDTH + 1), 0);
+        var timedHourList = this.timedHourListDiv; 
+        timedHourList.setSize(HOUR_LISTING_WIDTH - 1, VIEW_DIV_HEIGHT);
+        timedHourList.setPosition(0, 0);
+        
+        // Set cal day column width
+        cosmo.view.cal.canvas.dayUnitWidth = parseInt(
+            (this.width - HOUR_LISTING_WIDTH - SCROLLBAR_SPACER_WIDTH)/7 );
+        cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
+    };
+}
+cosmo.view.cal.canvas.Canvas.prototype =
+    new cosmo.ui.ContentBox();
 
 // Cleanup
 dojo.event.browser.addListener(window, "onunload", cosmo.view.cal.canvas.cleanup, false);

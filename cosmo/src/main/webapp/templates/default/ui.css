@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     http: //www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,66 +14,24 @@
  * limitations under the License.
  */
 
-// Base font for all text
-$fontFamily = "Lucida Grande", "Verdana", "Arial", sans-serif
-// Base color for all text
-$fontColor = #000000
-// Base font sizes
-$fontSizeS = 9px
-$fontSizeM = 11px
-$fontSizeL = 12px
-$fontSizeXL = 14px
-// Color for base areas of UI
-$mainUIColor = #ffffff
-// Selected event block color
-$selectedBlockColor = #0064cb
-// Unselected event block color
-$unselectedBlockColor = #3398ff
-// Processing event block color
-$processingBlockColor = #9fd1fc
-// Block outline color
-$blockBorderColor = #ffffff
-// Text color for selected blocks
-$selectedTextColor = #ffffff
-// Text color for unselected block
-$unselectedTextColor = #ffffff
-// Text color for processing text
-$processingTextColor = #ffffff
-// Color for stripe on left side with timeline
-$sideStripeColor = #ffffff
-// Main border line color
-$uiDetailBorderColor = #999999
-// Color for 3D highlight of borders
-$uiDetailBorderHighlightColor = #999999
-// Medium color for text labels
-$labelTextMedColor = #333333
-// Color of text and nav arrows on week-to-week nav
-$navBarTextColor = #333333
-// Color for link and button text
-$linkTextColor = #333399
-// Color for disabled link and button text
-$linkTextDisabledColor = #999999
-// Color for week-to-week nav bar
-$calTopNavColor = #ffffff
-
 /* Main styles, element types
  * ==================================== */
 /* All elements -- don't set the default font size here
  * because it will affect vertical size of block elements */
 * {
-    font-family:$fontFamily;
-    padding:0px;
-    margin:0px;
-    color:$fontColor;
+    font-family: "Lucida Grande", "Verdana", "Arial", sans-serif;
+    padding: 0px;
+    margin: 0px;
+    color: #000000;
 }
 img {
     border: 0px;
     }
 
 hr {
-    height:1px;
-    border:0px;
-    background:#cccccc;
+    height: 1px;
+    border: 0px;
+    background: #cccccc;
 }
 
 a:visited {
@@ -81,7 +39,7 @@ a:visited {
 }
 
 a span, a{
-    color: $linkTextColor;
+    color: #333399;
     text-decoration: none;
 }
 
@@ -93,40 +51,40 @@ a:hover {
  * height of 100% ensures that IE can get an accurate measure
  * of the window height */
 body {
-    padding:0px;
-    margin:0px;
-    border:0px;
-    height:100%;
-    font-size:$fontSizeL;
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+    height: 100%;
+    font-size: 12px;
 }
 
 /* Stupid default behavior is to act like
  * a block-level element */
 form {
-    display:inline;
+    display: inline;
 }
 /* Set p, td, div each separately since IE can't handle comma-
  * separated lists in with addRule for CSS */
 p {
-    font-size:$fontSizeM;
+    font-size: 11px;
 }
 td {
-    font-size:$fontSizeM;
+    font-size: 11px;
 }
 div {
-    font-size:$fontSizeM;
+    font-size: 11px;
 }
 /* Default link color --
  * generally color for text of active buttons should match */
 a {
-    color:$linkTextColor;
+    color: #333399;
 }
 .jsLink {
     cursor: pointer;
 }
 /* Invisible elements */
 .invisible {
-    display:none;
+    display: none;
 }
 
 
@@ -141,14 +99,14 @@ a {
 
 
 body.adminPage {
-    font-size: $fontSizeL;
+    font-size: 12px;
     background: #ffffff;
-    color:#222222;
-    padding-left:1%;
-    padding-right:1%;
-    padding-top:1%;
+    color: #222222;
+    padding-left: 1%;
+    padding-right: 1%;
+    padding-top: 1%;
     height: 99%;
-	width: 98%;
+    width: 98%;
 
 }
 
@@ -159,32 +117,32 @@ body.adminPage {
  * --------------------- */
 /* Login prompt -- default state */
 .promptText {
-    color:$labelTextMedColor;
+    color: #333333;
 }
 /* Login prompt -- error state */
 .promptTextError {
-    color:#aa3333;
+    color: #aa3333;
 }
 #loginDialog{
-    margin:auto;
-    width:280px;
-    text-align:left;
-    padding-top:16px;
+    margin: auto;
+    width: 280px;
+    text-align: left;
+    padding-top: 16px;
 }
 #loginDialogInputsBox td {
-    padding-bottom:4px;
+    padding-bottom: 4px;
 }
 #loginDialogLoginPrompt {
     padding-bottom: 1em;                          
 }
 
 #loginDialogLogo {
-    text-align:center;
-    padding-bottom:4px;
+    text-align: center;
+    padding-bottom: 4px;
 }
 #loginDialogFormContainer {
-    padding:12px;
-    border:1px solid $uiDetailBorderColor;
+    padding: 12px;
+    border: 1px solid #999999;
 }
 
 #loginDialogInputsBox{
@@ -198,7 +156,7 @@ body.adminPage {
 }
 #loginDialogUsernameInputContainer{
     display: table-cell;
-    padding-bottom:4px;
+    padding-bottom: 4px;
 }
 #loginDialogPasswordWidget{
     display: table-row;
@@ -213,8 +171,8 @@ body.adminPage {
     display: table-cell;
 }
 #loginDialogSubmitButton{
-    margin-top:16px;
-    float:right;
+    margin-top: 16px;
+    float: right;
 }
 
 /* Account Activation
@@ -223,10 +181,10 @@ body.adminPage {
 #accountActivator{
     margin-left: auto;
     margin-right: auto;
-    margin-top:2em;
+    margin-top: 2em;
 
-    text-align:left;
-    padding:24px;
+    text-align: left;
+    padding: 24px;
 }
 
 #accountActivateButton{
@@ -244,17 +202,17 @@ body.adminPage {
 
 .smTableColHead {
     font-size: 11px;
-    color:#666666;
-    font-weight:bold;
-    text-align:center;
-    background:#eeeeee;
-    border:1px solid #cccccc;
-    white-space:nowrap;
+    color: #666666;
+    font-weight: bold;
+    text-align: center;
+    background: #eeeeee;
+    border: 1px solid #cccccc;
+    white-space: nowrap;
 }
 
 .smTableData {
     font-size: 11px;
-    border:1px solid #cccccc;
+    border: 1px solid #cccccc;
 }
 
 /* Buttons
@@ -334,117 +292,117 @@ body.adminPage {
  * --------------------- */
 /* Main areas of the UI surface */
 .baseWidget {
-    background:$mainUIColor;
-    border:1px solid $uiDetailBorderColor;
+    background: #ffffff;
+    border: 1px solid #999999;
 }
 /* Embossed divider line */
 .embossedLine {
-    height:1px;
-    font-size:0px;
-    background:$uiDetailBorderColor;
-    border-bottom:1px solid #ffffff;
-    margin-left:auto;
-    margin-right:auto;
+    height: 1px;
+    font-size: 0px;
+    background: #999999;
+    border-bottom: 1px solid #ffffff;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* Form elements and labels
  * --------------------- */
 /* Label appearing above form inputs */
 .labelTextVert {
-    color:$labelTextMedColor;
-    font-weight:bold;
-    margin-bottom:2px;
+    color: #333333;
+    font-weight: bold;
+    margin-bottom: 2px;
 }
 /* Label appearing to left of form inputs */
 .labelTextHoriz {
-    color:$labelTextMedColor;
-    font-weight:bold;
+    color: #333333;
+    font-weight: bold;
 }
 /* Add right align and padding */
 .labelTextCell {
-    text-align:right;
-    vertical-align:top;
-    padding-top:4px;
-    padding-right:4px;
-    white-space:nowrap;
+    text-align: right;
+    vertical-align: top;
+    padding-top: 4px;
+    padding-right: 4px;
+    white-space: nowrap;
 }
 .labelTextXL {
-    font-size:$fontSizeXL;
-    font-weight:bold;
-    color:#333333;
-    color:$navBarTextColor;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333333;
+    color: #333333;
 }
 /* For block elements containing form inputs */
 .formElem {
-    margin-bottom:8px;
+    margin-bottom: 8px;
 }
 /* Text inputs */
 .inputText {
-    font-family:$fontFamily;
-    font-size:$fontSizeM;
-    font-weight:normal;
-    color:#000000;
-    border:1px
+    font-family: "Lucida Grande", "Verdana", "Arial", sans-serif;
+    font-size: 11px;
+    font-weight: normal;
+    color: #000000;
+    border: 1px
     solid #aaaaaa;
-    padding:2px;
+    padding: 2px;
 }
 /* Disabled text inputs */
 .inputTextDim {
-    font-family:$fontFamily;
-    font-size:$fontSizeM;
-    font-weight:normal;
-    color:#999999;
-    border:1px solid #aaaaaa;
-    padding:2px;
+    font-family: "Lucida Grande", "Verdana", "Arial", sans-serif;
+    font-size: 11px;
+    font-weight: normal;
+    color: #999999;
+    border: 1px solid #aaaaaa;
+    padding: 2px;
 }
 /* Select box */
 .selectElem {
-    font-family:$fontFamily;
-    font-size:$fontSizeM;
-    font-weight:normal;
-    color:#000000;
-    border:1px solid #aaaaaa;
+    font-family: "Lucida Grande", "Verdana", "Arial", sans-serif;
+    font-size: 11px;
+    font-weight: normal;
+    color: #000000;
+    border: 1px solid #aaaaaa;
 }
 /* Form-input-specific errors */
 .inputError {
-    font-size:$fontSizeS;
-    color:#aa3333;
+    font-size: 9px;
+    color: #aa3333;
 }
 /* A simple bordered box */
 .borderBox {
-    border:1px solid #cccccc;
-    padding:8px;
+    border: 1px solid #cccccc;
+    padding: 8px;
 }
 
 /* General layout -- floats and clear
  * --------------------- */
 .floatLeft {
-    float:left;
+    float: left;
 }
 .floatRight {
-    float:right;
+    float: right;
 }
 .clearAll {
-    clear:both;
-    font-size:0px;
+    clear: both;
+    font-size: 0px;
 }
 .clearBoth {
-    clear:both;
-    font-size:0px;
+    clear: both;
+    font-size: 0px;
 }
 
 /* Tables, data display */
 table.dataDisplay {
-    border-collapse:collapse;
-    border-spacing:0;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 table.dataDisplay td {
-    padding:4px;
-    border:1px solid #dfdfdf;
+    padding: 4px;
+    border: 1px solid #dfdfdf;
 }
 td.dataDisplayLabel {
-    background-color:#eeeeee;
-    color:#666666;
+    background-color: #eeeeee;
+    color: #666666;
 }
 
 
@@ -452,25 +410,25 @@ td.dataDisplayLabel {
  * ==================================== */
 /* Error dialog box text */
 .errText {
-    font-weight:bold;
-    margin-bottom:4px;
+    font-weight: bold;
+    margin-bottom: 4px;
 }
 
 /* Event canvases -- all-day and timed events
  * --------------------- */
 /* Contain day/date at column top -- e.g., 'Sun 11' */
 .dayListDayDiv {
-    position:absolute;
-    border-right:1px solid #cccccc;
-    border-bottom:1px solid #cccccc;
-    text-align:center;
-    -moz-user-select:none;
+    position: absolute;
+    border-right: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
+    text-align: center;
+    -moz-user-select: none;
 }
 /* Day columns for resizable all-day event area */
 .allDayListDayDiv {
-    height:100%;
-    position:absolute;
-    border-right:1px solid #dfdfdf;
+    height: 100%;
+    position: absolute;
+    border-right: 1px solid #dfdfdf;
 }
 /* The div containing lozenges for timed cal events */
 #timedContentDiv {
@@ -478,99 +436,99 @@ td.dataDisplayLabel {
 }
 /* Day columns for timed event canvas */
 .dayDiv {
-    position:absolute;
-    border-right:1px solid #dfdfdf;
+    position: absolute;
+    border-right: 1px solid #dfdfdf;
 }
 /* Top half-hour of a one-hour block on the timed canvas */
 .hourDivTop {
-    width:100%;
-    border-bottom:1px dotted #cccccc;
-    vertical-align:top;
+    width: 100%;
+    border-bottom: 1px dotted #cccccc;
+    vertical-align: top;
 }
 /* Bottom half-hour of a one-hour block on the timed canvas */
 .hourDivBottom {
-    width:100%;
-    border-bottom:1px solid #dddddd;
-    vertical-align:top;
+    width: 100%;
+    border-bottom: 1px solid #dddddd;
+    vertical-align: top;
 }
 /* Left-hand timeline containing times of day -- e.g., '11 AM' */
 .hourDivSubLeft {
-    color:#999999;
-    font-size:9px;
-    padding-top:2px;
-    padding-right:3px;
-    letter-spacing:-1px;
-    text-align:right;
-    font-weight:bold;
+    color: #999999;
+    font-size: 9px;
+    padding-top: 2px;
+    padding-right: 3px;
+    letter-spacing: -1px;
+    text-align: right;
+    font-weight: bold;
 }
 /* AM/PM in lighter color after time of day */
 .hourDivSubLeft span {
-    color:#cccccc;
+    color: #cccccc;
 }
 /* Adds colored background to current day column */
 .currentDayDay {
-    background:#e9e9e9;
+    background: #e9e9e9;
 }
 .workingHours {
-   background:#99ccff;
+   background: #99ccff;
 }
 .nonWorkingHours {
-    background:#dddddd;
+    background: #dddddd;
 }
 
 /* Event blocks
  * --------------------- */
 /* All blocks */
 .eventLozenge {
-    position:absolute;
-    width:1px;
-    left:0px;
-    opacity:1.0;
-    z-index:5;
-    visibility:hidden;
+    position: absolute;
+    width: 1px;
+    left: 0px;
+    opacity: 1.0;
+    z-index: 5;
+    visibility: hidden;
     background-repeat: repeat-y;
-    background-position:0px 0px;
-    border-style:solid;
-    border-width:1px;
+    background-position: 0px 0px;
+    border-style: solid;
+    border-width: 1px;
 }
 /* Resize handle at the top of timed event blocks */
 .eventResizeTop {
-    background:transparent;
-    padding:0px;
-    margin:0px;
-    font-size:1px;
-    cursor:n-resize;
+    background: transparent;
+    padding: 0px;
+    margin: 0px;
+    font-size: 1px;
+    cursor: n-resize;
 }
 /* Resize handle at the bottom of timed event blocks */
 .eventResizeBottom {
-    background:transparent;
-    padding:0px;
-    margin:0px;
-    font-size:1px;
-    cursor:s-resize;
+    background: transparent;
+    padding: 0px;
+    margin: 0px;
+    font-size: 1px;
+    cursor: s-resize;
 }
 /* Central content area bewteen resize handles --
  * this area contains two divs, one each of the
  * following two classes */
 .eventContent {
-    background:transparent;
-    color:inherit;
-    cursor:move;
-    overflow:hidden;
+    background: transparent;
+    color: inherit;
+    cursor: move;
+    overflow: hidden;
 }
 /* Contains the event time on the event block */
 .eventTime {
-    color:inherit;
-    font-size:9px;
-    font-weight:bold;
-    letter-spacing:1px;
-    overflow:hidden;
+    color: inherit;
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    overflow: hidden;
 }
 /* Contains the event title on the event block */
 .eventTitle {
-    color:inherit;
-    font-size:10px;
-    overflow:hidden;
+    color: inherit;
+    font-size: 10px;
+    overflow: hidden;
 }
 
 
@@ -579,191 +537,200 @@ td.dataDisplayLabel {
 /* Top menubar
  * --------------------- */
 /* Menubar main */
-#menuBarDiv {
-    position:absolute;
-    background:#ffffff;
-    border-bottom:1px solid #dddddd;
-    visibility: hidden;
+#menuBar {
+    position: absolute;
+    background: #ffffff;
+    border-bottom: 1px solid #dddddd;
+    visibility: visible;
 }
 #menuNavItems {
     position: absolute;
     width: 100%;
-    color:#333333;
-    font-size:$fontSizeS;
-    font-weight:bold;
-    text-align:right;
+    color: #333333;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: right;
+}
+/* Give menu links an underline whether or not
+ * they have an href prop or not */
+#menuNavItems a.menuBarLink {
+    text-decoration: underline;
+    cursor: pointer;
 }
 /* The pipe character between links */
 #menuNavItems span.menuBarDivider {
-    font-weight:normal;
-    color:$uiDetailBorderColor;
+    font-weight: normal;
+    color: #999999;
 }
 /* Cosmo logo up on menubar */
 #smallLogoDiv {
-    position:absolute;
-    top:8px;
-    left:8px;
-    width:129px;
-    height:28px;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 129px;
+    height: 28px;
     background-repeat: no-repeat;
 }
 
 /* Main content area under menubar -- contains both
  * sidebars and the central column for main content
  * --------------------- */
-#calDiv {
-    position:absolute;
-    border-top:0px solid #dfdfdf;
+#mainApp {
+    position: absolute;
 }
 
 /* Left sidebar
  * --------------------- */
 /* Left sidebar main */
 #leftSidebarDiv {
-    position:absolute;
-    background:$mainUIColor;
+    position: absolute;
+    background: #ffffff;
 }
 /* Collection select box */
 #calSelectNav {
-    padding-left:12px;
-    position:absolute;
-    top:8px;
+    padding-left: 12px;
+    position: absolute;
+    top: 8px;
 }
 /* Text for single collections */
 #collectionLabelPrompt {
-    color:#aaaaaa;
-    padding-bottom:2px;
+    color: #aaaaaa;
+    padding-bottom: 2px;
 }
 /* Jump-to date box */
 #jumpToDateDiv {
-    padding:0px;
-    position:absolute;
+    padding: 0px;
+    position: absolute;
 }
 /* Right sidebar
  * --------------------- */
 /* Right sidebar main */
 #rightSidebarDiv {
-    position:absolute;
-    background:#ffffff;
+    position: absolute;
+    background: #ffffff;
 }
 /* Center column for main content
  * --------------------- */
 /* Mask to cover center content area while loading or rendering view */
 #maskDiv {
-    position:absolute;
+    position: absolute;
     top: 0px;
     left: 0px;
     width: 100%;
     height: 100%;
     background: #fff; 
-    z-index:10000;
-    border-top:0px;
-    border-bottom:0px;
+    z-index: 10000;
+    border-top: 0px;
+    border-bottom: 0px;
+    display: block;
 }
 /* Small box that contains 'Processing ...' message inside mask */
 #appLoadingMessage {
-    position:absolute;
-    color:$linkTextColor;
-    width:120px;
-    height:40px;
-    border:1px solid $linkTextColor;
-    line-height:38px;
-    text-align:center;
+    position: relative;
+    width: 120px;
+    height: 40px;
+    margin: auto;
+    top: 50%;
+    margin-top: -20px;
+    color: #333399;
+    border: 1px solid #333399;
+    line-height: 38px;
+    text-align: center;
 }
 /* Nav button set for week-to-week nav */
 #calTopNavDiv {
-    border-left:1px solid $uiDetailBorderColor;
-    border-right:1px solid $uiDetailBorderColor;
-    position:absolute;
-    border-bottom:1px solid #dfdfdf;
-    background:$calTopNavColor;
-    line-height:34px;
-    vertical-align:middle;
+    border-left: 1px solid #999999;
+    border-right: 1px solid #999999;
+    position: absolute;
+    border-bottom: 1px solid #dfdfdf;
+    background: #ffffff;
+    line-height: 34px;
+    vertical-align: middle;
 }
 /* List of day/dates -- e.g., 'Sun 11 | Mon 12 | Tue 12' */
 #dayListDiv {
-    border-left:1px solid $uiDetailBorderColor;
-    border-right:1px solid $uiDetailBorderColor;
-    position:absolute;
+    border-left: 1px solid #999999;
+    border-right: 1px solid #999999;
+    position: absolute;
 }
 /* Shoves the day list over the width of the timeline sidebar */
 #dayListSpacer {
-    background:$sideStripeColor;
+    background: #ffffff;
 }
 /* Main container for resizable all-day event area */
 #allDayResizeMainDiv {
-    border-left:1px solid $uiDetailBorderColor;
-    border-right:1px solid $uiDetailBorderColor;
-    position:absolute;
-    background:#ffffff;
-    z-index:100;
+    border-left: 1px solid #999999;
+    border-right: 1px solid #999999;
+    position: absolute;
+    background: #ffffff;
+    z-index: 100;
 }
 /* Handle to grab and drag to resize all-day event area */
 #allDayResizeHandleDiv {
-    border-top:1px solid $uiDetailBorderHighlightColor;
-    border-bottom:1px solid $uiDetailBorderColor;
-    border-right:1px solid $uiDetailBorderColor;
-    position:absolute;
-    background:$mainUIColor;
-    line-height:12px;
-    font-size:1px; cursor:s-resize;
-    z-index:100;
-    text-align:center;
-    vertical-align:middle;
+    border-top: 1px solid #999999;
+    border-bottom: 1px solid #999999;
+    border-right: 1px solid #999999;
+    position: absolute;
+    background: #ffffff;
+    line-height: 12px;
+    font-size: 1px; cursor: s-resize;
+    z-index: 100;
+    text-align: center;
+    vertical-align: middle;
 }
 /* Shoves hour cols for all-day events over the width of
  * the timeline sidebar */
 #allDayHourSpacerDiv {
-    position:absolute;
-    background:$sideStripeColor;
-    border-right:1px solid #dfdfdf;
+    position: absolute;
+    background: #ffffff;
+    border-right: 1px solid #dfdfdf;
 }
 /* Contains the cols for the all-day events */
 #allDayContentDiv {
-    position:absolute;
-    overflow:hidden;
-    -moz-user-select:none
+    position: absolute;
+    overflow: hidden;
+    -moz-user-select: none
 }
 /* Scrolling area containing the timeline and timed events */
 #timedScrollingMainDiv {
-    border-left:1px solid $uiDetailBorderColor;
-    border-right:1px solid $uiDetailBorderColor;
-    position:absolute;
-    overflow:auto; overflow-y:auto; overflow-x:hidden;
-    -moz-user-select:none;
+    border-left: 1px solid #999999;
+    border-right: 1px solid #999999;
+    position: absolute;
+    overflow: auto; overflow-y: auto; overflow-x: hidden;
+    -moz-user-select: none;
 }
 /* Timeline containing hours with AM/PM alongside timed events */
 #timedHourListDiv {
-    position:absolute;
-    border-right:1px solid #dfdfdf;
-    background:$sideStripeColor;
-    -moz-user-select:none;
+    position: absolute;
+    border-right: 1px solid #dfdfdf;
+    background: #ffffff;
+    -moz-user-select: none;
 }
 /* Canvas for timed events */
 #timedContentDiv {
-    position:absolute;
-    -moz-user-select:none
+    position: absolute;
+    -moz-user-select: none
 }
 /* Contains event detail form */
 #eventInfoDiv {
-    position:absolute;
+    position: absolute;
 }
 #eventInfoDivContent {
-    padding-left:12px;
-    padding-right:8px;
-    padding-top:6px;
+    padding-left: 12px;
+    padding-right: 8px;
+    padding-top: 6px;
 }
 
 /* Fake popup for modal dialog box
  * --------------------- */
 /* Main box for fake popup */
 #modalDialog {
-    position:absolute;
-    /* background:$mainUIColor;
-    background:$mainUIColor;
-    border:1px solid $uiDetailBorderColor; */
-    z-index:2000;
-    display:none;
+    position: absolute;
+    /* background: #ffffff;
+    background: #ffffff;
+    border: 1px solid #999999; */
+    z-index: 2000;
+    display: none;
 }
 /* Fake popup center content area -- inside padding */
 #modalDialogContent {
@@ -773,25 +740,25 @@ td.dataDisplayLabel {
 }
 /* Only set if the dialog title exists */
 .dialogTitle {
-    background:#eeeeee;
-    text-align:left;
-    height:24px;
-    line-height:26px;
-    vertical-align:middle;
-    border-bottom:1px solid #dfdfdf;
-    padding-left:6px;
-    font-size:13px;
-    font-weight:bold;
-    color:#444444;
+    background: #eeeeee;
+    text-align: left;
+    height: 24px;
+    line-height: 26px;
+    vertical-align: middle;
+    border-bottom: 1px solid #dfdfdf;
+    padding-left: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #444444;
 }
 /* Only set if the dialog prompt exists */
 .dialogPrompt {
-    text-align:left;
+    text-align: left;
     padding: 4px 0 0 8px;
-    height:32px;
-    line-height:16px;
-    vertical-align:middle;
-    font-size:11px;
+    height: 32px;
+    line-height: 16px;
+    vertical-align: middle;
+    font-size: 11px;
 }
 .dialogButtonPanel {
     padding: 0 8px;
@@ -849,7 +816,7 @@ td.dataDisplayLabel {
   */
   opacity: 0.8; 
   background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
-  background-repeat: repeat-y; background-position:-16px 0px; 
+  background-repeat: repeat-y; background-position: -16px 0px; 
   font-size: 1px; 
 }
 .dropShadowBottomLeft {
@@ -874,119 +841,119 @@ td.dataDisplayLabel {
   width: 16px; 
   background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
   background-position: -32px 0px; 
-  font-size:1px;
+  font-size: 1px;
 }
 
 
 /* Tab container 
  * --------------------- */
 .tabPanel {
-    height:20px;
-    position:relative;
-    margin-top:12px;
+    height: 20px;
+    position: relative;
+    margin-top: 12px;
 }
 .tabContent {
-    position:relative;
-    margin-top:24px;
+    position: relative;
+    margin-top: 24px;
 }
 .tabSelected {
-    color:$linkTextColor; 
-    border-left:1px solid #aaaaaa; 
-    border-top:1px solid #aaaaaa;
-    border-right:1px solid #aaaaaa; 
-    height:19px;
-    line-height:20px;
-    vertical-align:middle;
-    text-align:center;
-    padding:0px 6px 0px 6px;
-    white-space:nowrap;
-    cursor:pointer;
+    color: #333399; 
+    border-left: 1px solid #aaaaaa; 
+    border-top: 1px solid #aaaaaa;
+    border-right: 1px solid #aaaaaa; 
+    height: 19px;
+    line-height: 20px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 0px 6px 0px 6px;
+    white-space: nowrap;
+    cursor: pointer;
 }
 .tabUnselected {
-    color:$linkTextColor; 
-    border-left:1px solid #aaaaaa;
-    border-top:1px solid #aaaaaa;
-    border-right:1px solid #aaaaaa;
-    border-bottom:1px solid $uiDetailBorderColor;
-    background:#eeeeee;
-    height:18px;
-    line-height:20px;
-    vertical-align:middle;
-    text-align:center;
-    padding:0px 6px 0px 6px;
-    white-space:nowrap;
-    cursor:pointer;
+    color: #333399; 
+    border-left: 1px solid #aaaaaa;
+    border-top: 1px solid #aaaaaa;
+    border-right: 1px solid #aaaaaa;
+    border-bottom: 1px solid #999999;
+    background: #eeeeee;
+    height: 18px;
+    line-height: 20px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 0px 6px 0px 6px;
+    white-space: nowrap;
+    cursor: pointer;
 }
 .tabSpacer {
-    height:19px;
-    line-height:20px;
-    width:1%;
-    border-bottom:1px solid $uiDetailBorderColor;
+    height: 19px;
+    line-height: 20px;
+    width: 1%;
+    border-bottom: 1px solid #999999;
 }
 
 /* Minical styles
  * --------------------- */
 #miniCalDiv {
-    border:0px;
-    left:15px;
-    width:140px;
-    border:1px solid #cccccc;
-    position:relative;
-    visibility:hidden;
+    border: 0px;
+    left: 15px;
+    width: 140px;
+    border: 1px solid #cccccc;
+    position: relative;
+    visibility: hidden;
 }
 #miniCalNavPanel td {
-    font-size:0.9em;
-    font-weight:bold;
-    border-bottom:1px solid #cccccc;
-    line-height:1.4em;
-    padding-left:4px;
-    padding-right:4px;
+    font-size: 0.9em;
+    font-weight: bold;
+    border-bottom: 1px solid #cccccc;
+    line-height: 1.4em;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 #miniCalNavPanelCenter {
-    border-right:1px solid #cccccc;
-    border-left:1px solid #cccccc;
+    border-right: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
 }
 .miniMonthTile td {
-    border-bottom:1px solid rgb(226,226,226);
-    height:18px;
-    padding:0px;
-    padding-left:2px;
-    padding-right:2px;
+    border-bottom: 1px solid rgb(226,226,226);
+    height: 18px;
+    padding: 0px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 .miniMonthName {
-    color:#000000;
-    text-align:center;
-    font-size:0.9em;
-    font-weight:bold;
+    color: #000000;
+    text-align: center;
+    font-size: 0.9em;
+    font-weight: bold;
 }
 .miniDayName {
-    color:rgb(100,100,100);
-    text-align:center;
-    font-size:0.9em;
+    color: rgb(100,100,100);
+    text-align: center;
+    font-size: 0.9em;
 }
 .miniBase {
-    font-size:0px;
+    font-size: 0px;
 }
 .miniWeekday {
-    color:#666666;
-    cursor:pointer;
-    text-align:right;
-    font-size:0.9em;
+    color: #666666;
+    cursor: pointer;
+    text-align: right;
+    font-size: 0.9em;
 }
 .miniToday {
-    color:#000000;
-    cursor:pointer;
-    text-align:right;
-    font-size:0.9em;
-    font-weight:bold;
+    color: #000000;
+    cursor: pointer;
+    text-align: right;
+    font-size: 0.9em;
+    font-weight: bold;
 }
 .miniDimmed {
-    color:#bbbbbb;
-    text-align:right;
-    font-size:0.9em;
+    color: #bbbbbb;
+    text-align: right;
+    font-size: 0.9em;
 }
 .miniSelected {
-    background:#deeeff;
+    background: #deeeff;
 }
 
 
@@ -994,14 +961,14 @@ td.dataDisplayLabel {
  * modal dialog box -- effectively disables all user input
  * --------------------- */
 #fullMaskDiv {
-    position:absolute;
-    left:0px;
-    top:0px;
-    width:100%;
-    height:100%;
-    background:transparent;
-    z-index:1000;
-    display:none;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 1000;
+    display: none;
 }
 
 
@@ -1013,68 +980,68 @@ td.dataDisplayLabel {
 
 .lg {
     font-size: 16px;
-    color:#333333;
+    color: #333333;
 }
 
 .hd {
     font-size: 14px;
-    color:#333333;
-    font-weight:bold;
+    color: #333333;
+    font-weight: bold;
 }
 
 .md {
     font-size: 12px;
-    color:#333333;
+    color: #333333;
 }
 
 .mdData {
     font-size: 12px;
-    color:#333333;
+    color: #333333;
 }
 
 .mdLabel {
     font-size: 12px;
-    color:#666666;
-    font-weight:bold;
-    white-space:nowrap;
+    color: #666666;
+    font-weight: bold;
+    white-space: nowrap;
 }
 
 .sm {
     font-size: 11px;
-    color:#333333;
+    color: #333333;
 }
 
 .smData {
     font-size: 11px;
-    color:#333333;
+    color: #333333;
 }
 
 .smLabel {
     font-size: 11px;
-    color:#666666;
-    font-weight:bold;
+    color: #666666;
+    font-weight: bold;
 }
 
 .smTableColHead {
     font-size: 11px;
-    color:#666666;
-    font-weight:bold;
-    text-align:center;
-    background:#eeeeee;
-    border:1px solid #cccccc;
-    white-space:nowrap;
+    color: #666666;
+    font-weight: bold;
+    text-align: center;
+    background: #eeeeee;
+    border: 1px solid #cccccc;
+    white-space: nowrap;
 }
 
 .smTableData {
     font-size: 11px;
-    border:1px solid #cccccc;
+    border: 1px solid #cccccc;
 }
 
 
 .footer {
-    font-size:
+    font-size: 
     10px; font-style: italic;
-    color:#333333;
+    color: #333333;
 }
 
 .inlinecodeblock {
@@ -1101,32 +1068,67 @@ td.dataDisplayLabel {
 
 .confirm { color: #33aa33 }
 
-.disabled { color:#aaaaaa; }
+.disabled { color: #aaaaaa; }
 
 .textInput {
-    color:#000000;
-    border:1px solid #aaaaaa;
-    padding:2px;
+    color: #000000;
+    border: 1px solid #aaaaaa;
+    padding: 2px;
 }
 
 .buttonInput {
-    cursor:pointer;
-    padding:1px;
+    cursor: pointer;
+    padding: 1px;
 }
 
 .widgetBorder {
-    border:1px solid #cccccc;
+    border: 1px solid #cccccc;
 }
 
 .widgetContent {
-    background:#efefef;
+    background: #efefef;
 }
 
 /* CollectionDetails */
 .collectionDetailsNotice {
-    color:#808080;
+    color: #808080;
 }
 
 .collectionDetailsHelpMeCell {
     padding-left: 10px;
+}
+
+/* collection handles and viewports*/
+.l-rHandle,.t-bHandle {
+    position: absolute;
+    cursor: e-resize;
+    cursor: col-resize;
+    background-color: rgb(216,216,216);
+    display: block;
+}
+.t-bHandle {
+    cursor: n-resize;
+    cursor: col-resize;
+}
+.leftSideHandle {
+    background-color: rgb(230,230,230);
+    border-top: hidden;
+    border-bottom: hidden;
+    border-left: 1px solid rgb(216,216,216);
+    border-right: 1px solid rgb(216,216,216);
+    width: 2px;
+    z-index: 30;
+    height: 100%;
+    left: 100%;
+    margin-left: -3px;
+    position: absolute;
+    
+}
+.viewport {
+    position: absolute;
+    clip: auto;
+    height: 20px;
+    width: 20px;
+    left: -30px;
+    top: -30px;            
 }

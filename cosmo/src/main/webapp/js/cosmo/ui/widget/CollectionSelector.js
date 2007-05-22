@@ -52,7 +52,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var c = this.collections[t.selectedIndex];
             this.currentCollection = c;
             dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', data: { collection: c }
+                action: 'loadCollection', opts: { collection: c }, data: {}
             });
         },
 

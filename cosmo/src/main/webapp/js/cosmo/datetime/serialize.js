@@ -49,12 +49,12 @@ function parseIso8601Duration(/*String*/duration){
    var r = "^P(?:(?:([0-9\.]*)Y)?(?:([0-9\.]*)M)?(?:([0-9\.]*)D)?(?:T(?:([0-9\.]*)H)?(?:([0-9\.]*)M)?(?:([0-9\.]*)S)?)?)(?:([0-9/.]*)W)?$"
    var dateArray = duration.match(r).slice(1);
    var dateHash = {
-     year: parseFloat(dateArray[0]),
-     month: parseFloat(dateArray[1]),
-     day: parseFloat(dateArray[2]),
-     hour: parseFloat(dateArray[3]),
-     minute: parseFloat(dateArray[4]),
-     second: parseFloat(dateArray[5])
+     year: parseFloat(dateArray[0]) || 0,
+     month: parseFloat(dateArray[1]) || 0,
+     day: parseFloat(dateArray[2]) || 0,
+     hour: parseFloat(dateArray[3]) || 0,
+     minute: parseFloat(dateArray[4]) || 0,
+     second: parseFloat(dateArray[5]) || 0
    }
    return dateHash
 }

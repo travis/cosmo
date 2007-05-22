@@ -42,20 +42,30 @@ cosmotest.service.conduits.test_conduits = {
             
             // Test createItem
             var newItemDisplayName = "Testing display name";
+            var newItemBody = "Testing message body";
+            var newItemTriageStatus = 100;
+            var newItemTriageRank = -12345.67;
+            var newItemAutoTriage = 1;            
             var newItem = new cosmo.model.Note(
             {
-                displayName: newItemDisplayName
+                displayName: newItemDisplayName,
+                triageStatus: newItemTriageStatus,
+                rank: newItemTriageRank,
+                autoTriage: newItemAutoTriage,
+                body: newItemBody
             }
-            );
+           );
 
             conduit.createItem(newItem, c0, {sync: true});
             
             var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
             
-            
             jum.assertEquals("new item display name", newItemDisplayName, item0.getDisplayName());
-            
-            
+            jum.assertEquals("triage status", newItemTriageStatus, item0.getTriageStatus());
+            jum.assertEquals("triage rank", newItemTriageRank, item0.getRank());
+            jum.assertEquals("auto triage", newItemAutoTriage, item0.getAutoTriage());
+            jum.assertEquals("body", newItemBody, item0.getBody());
+
             // Test saveItem
             var item0DisplayName = "New Display Name";
             item0.setDisplayName(item0DisplayName);
@@ -78,12 +88,13 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertEquals("items length", 2, items.length);
             
             
-            // Test deleteItem
+            // Test deleteItem 
+            /*
             conduit.deleteItem(item0.getUid, {sync: true});
             
             items = conduit.getItems(c0, {sync: true}).results[0];
             jum.assertTrue("deleteItem: items", !!items);
-            jum.assertEquals("deleteItem: items length", 1, items.length);
+            jum.assertEquals("deleteItem: items length", 1, items.length);*/
             
             
         }
@@ -93,7 +104,7 @@ cosmotest.service.conduits.test_conduits = {
     },
     
     test_Event: function(){
-        try{
+        try {
             var user = cosmotest.service.conduits.test_conduits.createTestAccount();
             
             var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
@@ -109,18 +120,45 @@ cosmotest.service.conduits.test_conduits = {
             
             var startDate = new cosmo.datetime.Date();
             startDate.setMilliseconds(0);
+
+            var duration = new cosmo.model.Duration({hour: 1});
+            var loc = "Wherever";
+            var stat = "CONFIRMED";
             newItem.getEventStamp(true, {
                 startDate: startDate,
-                duration: new cosmo.model.Duration({hour: 1})
+                duration: duration,
+                location: loc,
+                status: stat
             });
 
             conduit.createItem(newItem, c0, {sync: true});
             
             var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
             jum.assertTrue("start date", startDate.equals(item0.getEventStamp().getStartDate()));
+            jum.assertTrue("duration", duration.equals(item0.getEventStamp().getDuration()));
+            jum.assertEquals("location", loc, item0.getEventStamp().getLocation());
+            jum.assertEquals("status", stat, item0.getEventStamp().getStatus());
+            
+            item0.getEventStamp().setAnyTime(true);
+            conduit.saveItem(item0, c0, {sync: true});
+            
+            startDate.setHours(0);
+            startDate.setMinutes(0);
+            startDate.setSeconds(0);
+            var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
+
+            jum.assertTrue("post-anytime start date", startDate.equals(item0.getEventStamp().getStartDate()));
+            jum.assertTrue("anytime", item0.getEventStamp().getAnyTime());
+            
+            item0.getEventStamp().setAllDay(true);
+            item0.getEventStamp().setAnyTime(false);
+            conduit.saveItem(item0, c0, {sync: true});
+            var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
+            jum.assertTrue("post-allday start date", startDate.equals(item0.getEventStamp().getStartDate()));
+            jum.assertTrue("allday", item0.getEventStamp().getAllDay());
             
             
-        } finally{
+        } finally {
             cosmotest.service.conduits.test_conduits.cleanup(user);            
         }
     },

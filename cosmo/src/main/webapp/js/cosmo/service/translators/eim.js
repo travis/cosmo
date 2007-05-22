@@ -302,7 +302,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var body = note.getBody();
         with (cosmo.service.eim.constants){
             var fields = {};
-            if (body) fields.body = body;
+            if (body) fields.body = [type.CLOB, body];
             return {
                 prefix: prefix.NOTE,
                 ns: ns.NOTE,
@@ -329,7 +329,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var fields = {};
             if (start) fields.dtstart = 
                 [type.TEXT, this.dateToEimDtstart(start, allDay, anyTime)];
-            if (anyTime) fields.anytime = [type.INTEGER, anyTime];
             if (rrule) fields.rrule = [type.TEXT, rrule.toString()];
             if (stat) fields.status = [type.TEXT, stat];
             if (loc) fields.location = [type.TEXT, loc];
@@ -400,7 +399,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          return {
             startDate: record.fields.dtstart? this.fromEimDate(record.fields.dtstart[1]): undefined,
             duration: record.fields.duration?
-                new cosmo.model.Duration(cosmo.datetime.parseIso8601Duration(record.fields.duration[1])) : undefined,
+                new cosmo.model.Duration(record.fields.duration[1]) : undefined,
             anyTime: dateParams.anyTime,
             allDay: dateParams.allDay,
             location: record.fields.location? record.fields.location[1] : undefined,
@@ -456,14 +455,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 returnVal.value = param[1].toLowerCase();
             }
         }
-        if (!this.isDateTime(dateString) && !returnVal.anyTime) returnVal.allDay = true;
+        
+        if ((returnVal.value == "date") && !returnVal.anyTime) returnVal.allDay = true;
         return returnVal;
     },
     
-    isDateTime: function (dateString){
-        return !!(dateString.split("T")[1]);
-    },
-
     rruleToICal: function (rrule){
         if (rrule.isSupported()){
             return [

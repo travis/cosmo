@@ -207,7 +207,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
               clone._modifications = cosmo.model.clone(this._modifications);
           }
           return clone;
-      },
+      }
               
     });
     

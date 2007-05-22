@@ -542,9 +542,10 @@ public abstract class BaseFeedGenerator
 
         public int compare(NoteItem o1,
                            NoteItem o2) {
-            if (o1.getModifiedDate().getTime() ==
-                o2.getModifiedDate().getTime())
+            // use item equality for equals
+            if(o1.equals(o2))
                 return 0;
+            // otherwise use modifedDate for ordering
             if (o1.getModifiedDate().after(o2.getModifiedDate()))
                 return reverse ? -1 : 1;
             return reverse ? 1 : -1;

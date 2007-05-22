@@ -31,22 +31,34 @@ public class NoteOccurrence extends NoteItem {
     NoteItem masterNote = null;
     
     public NoteOccurrence(Date occurrenceDate, NoteItem masterNote) {
+        // uid is the same as a modification's uid
         setUid(new ModificationUid(masterNote, occurrenceDate).toString());
+        
+        // set base fields from master
         setModifiedDate(masterNote.getModifiedDate());
+        setCreationDate(masterNote.getCreationDate());
+        setDisplayName(masterNote.getDisplayName());
         this.occurrenceDate = occurrenceDate;
         this.masterNote = masterNote;
     }
    
+    /**
+     * A NoteOccurrence is an occurrence of a recurring NoteItem.
+     * @return the master NoteItem
+     */
     public NoteItem getMasterNote() {
         return masterNote;
     }
     
+    /**
+     * @return date of the occurrence
+     */
     public Date getOccurrenceDate() {
         return occurrenceDate;
     }
 
     @Override
     public Item copy() {
-        throw new RuntimeException("cannot copy NoteOccurrence");
+        return new NoteOccurrence(occurrenceDate, masterNote);
     }
 }

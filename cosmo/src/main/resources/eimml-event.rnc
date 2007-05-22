@@ -12,7 +12,6 @@ eimEventRecord =
          eventUuid
        & eventDtStart?
        & eventDuration?
-       & eventAnytime?
        & eventLocation?
        & eventRRule?
        & eventExRule?
@@ -65,11 +64,6 @@ eventExDate =
 eventStatus =
    element event:status {
       eimTextFieldContent
-   }
-   
-eventAnytime =
-   element event:anytime {
-      eimIntegerFieldContent
    }
 
 anyEventField =
